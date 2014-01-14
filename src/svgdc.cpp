@@ -109,7 +109,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
     }
     
-    s += Vrv::StringFormat ( "<svg width=\"%dpx\" height=\"%dpx\"", (int)((double)m_width * m_userScaleX), (int)((double)m_height * m_userScaleY));
+    s += StringFormat ( "<svg width=\"%dpx\" height=\"%dpx\"", (int)((double)m_width * m_userScaleX), (int)((double)m_height * m_userScaleY));
     s += " version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
     
     m_outdata << s;
@@ -122,7 +122,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
         {
             m_outdata << "\t\t";
-            CopyFileToStream( Vrv::GetResourcesPath() + "/svg/" + (*it) + ".xml", m_outdata );
+            CopyFileToStream( Resources::GetPath() + "/svg/" + (*it) + ".xml", m_outdata );
         }
         m_outdata << "\t</defs>\n";
     }
@@ -143,7 +143,7 @@ void SvgDeviceContext::WriteLine( std::string string )
 
 void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std::string gId )
 {
-    WriteLine(Vrv::StringFormat("<g class=\"%s\" id=\"%s\" style=\"%s %s %s %s\">", gClass.c_str(), gId.c_str(), m_penColour.c_str(), m_penStyle.c_str(),
+    WriteLine(StringFormat("<g class=\"%s\" id=\"%s\" style=\"%s %s %s %s\">", gClass.c_str(), gId.c_str(), m_penColour.c_str(), m_penStyle.c_str(),
         m_brushColour.c_str(), m_brushStyle.c_str() ) );
     m_graphics++;
     m_indents++;
@@ -160,7 +160,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *rc )
 
 void SvgDeviceContext::StartPage( )
 {
-    WriteLine(Vrv::StringFormat("<g class=\"page\" transform=\"translate(%d, %d)  scale(%f, %f)\">", 
+    WriteLine(StringFormat("<g class=\"page\" transform=\"translate(%d, %d)  scale(%f, %f)\">", 
         (int)((double)m_originX * m_userScaleX), (int)((double)m_originY * m_userScaleY), m_userScaleX, m_userScaleY ) );
     m_graphics++;
     m_indents++;
@@ -209,7 +209,7 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
 void SvgDeviceContext::SetPen( int colour, int width, int style )
 {
     m_penColour = "stroke:#" + GetColour(colour)  + semicolon;
-    m_penWidth = "stroke-width:" + Vrv::StringFormat("%d", width) + semicolon;
+    m_penWidth = "stroke-width:" + StringFormat("%d", width) + semicolon;
     switch ( style )
     {
         case AxSOLID :
@@ -296,7 +296,7 @@ MusPoint SvgDeviceContext::GetLogicalOrigin( )
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
-    WriteLine( Vrv::StringFormat("<path d=\"M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d\" style=\"fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0\" />", 
+    WriteLine( StringFormat("<path d=\"M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d\" style=\"fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0\" />", 
                                 x, y, // M command
                                 bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
                                 bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
@@ -314,7 +314,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     int rh = height / 2;
     int rw = width  / 2;
 
-    WriteLine(Vrv::StringFormat("<ellipse cx=\"%d\" cy=\"%d\" rx=\"%d\" ry=\"%d\" />", x+rw,y+rh, rw, rh ));
+    WriteLine(StringFormat("<ellipse cx=\"%d\" cy=\"%d\" rx=\"%d\" ry=\"%d\" />", x+rw,y+rh, rw, rh ));
 }
 
         
@@ -369,7 +369,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye), int(xc), int(yc)  );
 
-    WriteLine( Vrv::StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />",
+    WriteLine( StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />",
         int(xs), int(ys), abs(int(rx)), abs(int(ry)),
         fArc, fSweep, int(xe), int(ye) ) );
 }
@@ -377,7 +377,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
               
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    WriteLine( Vrv::StringFormat("<path d=\"M%d %d L%d %d\" style=\"%s\" />", x1,y1,x2,y2, m_penWidth.c_str()) );
+    WriteLine( StringFormat("<path d=\"M%d %d L%d %d\" style=\"%s\" />", x1,y1,x2,y2, m_penWidth.c_str()) );
 }
  
                
@@ -395,7 +395,7 @@ void SvgDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yo
 
     for (int i = 0; i < n;  i++)
     {
-        s += Vrv::StringFormat("%d,%d ", points [i].x+xoffset, points[i].y+yoffset );
+        s += StringFormat("%d,%d ", points [i].x+xoffset, points[i].y+yoffset );
         //CalcBoundingBox ( points [i].x+xoffset, points[i].y+yoffset);
     }
     s += "\" /> " ;
@@ -424,7 +424,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }   
 
-    WriteLine ( Vrv::StringFormat(" <rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" rx=\"%.2g\" />", x, y, width, height, radius ) );
+    WriteLine ( StringFormat(" <rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" rx=\"%.2g\" />", x, y, width, height, radius ) );
 
 }
 
@@ -456,7 +456,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
         WriteLine("/*- MusSVGFileDC::DrawRotatedText - Backgound not implemented */") ;
     }
     /*
-    s = Vrv::StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" ", x, y, 1, 1) ;
+    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" ", x, y, 1, 1) ;
 
     // For some reason, some browsers (e.g., Chrome) do not like spaces or dots in font names...
     sTmp.Replace(" ", "");
@@ -588,7 +588,7 @@ void SvgDeviceContext::DrawMusicText(const std::string& text, int x, int y)
         }
         
         // Write the char in the SVG
-        WriteLine ( Vrv::StringFormat("<use xlink:href=\"#%s\" transform=\"translate(%d, %d) scale(%f, %f)\"/>",
+        WriteLine ( StringFormat("<use xlink:href=\"#%s\" transform=\"translate(%d, %d) scale(%f, %f)\"/>",
                                      glyph.c_str(), x, y, ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)),
                                      ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) );
         

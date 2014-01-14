@@ -165,8 +165,8 @@ void System::SetValues( int type )
     for (i = 0; i < GetStaffCount(); i++) 
 	{
         switch ( type ) {
-            case PAGE_VALUES_VOICES: values += Vrv::StringFormat("%d;", (m_children[i])->voix ); break;
-            case PAGE_VALUES_INDENT: values += Vrv::StringFormat("%d;", (m_children[i])->indent ); break;
+            case PAGE_VALUES_VOICES: values += StringFormat("%d;", (m_children[i])->voix ); break;
+            case PAGE_VALUES_INDENT: values += StringFormat("%d;", (m_children[i])->indent ); break;
         }
 	}
     values = wxGetTextFromUser( "Enter values for the pages", "", values );
@@ -182,7 +182,7 @@ void System::SetValues( int type )
         }	
 	}
     */
-    Vrv::LogDebug("TODO");
+    LogDebug("TODO");
     return;
 }
 
@@ -301,7 +301,7 @@ int System::JustifyX( ArrayPtrVoid params )
     
     if ((*ratio) < 0.8 ) {
         // Arbitrary value for avoiding over-compressed justification
-        Vrv::LogWarning("Justification stop because of a ratio smaller the 0.8");
+        LogWarning("Justification stop because of a ratio smaller the 0.8");
         return FUNCTOR_SIBLINGS;
     }
     

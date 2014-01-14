@@ -74,7 +74,7 @@ void display_usage() {
     
     cerr << "-r, --recources=PATH" << endl;
     cerr << "\t\tSpecify path for SVG resoucces" << endl;
-    cerr << "\t\t(default in " <<  Vrv::GetResourcesPath() << ")" << endl;
+    cerr << "\t\t(default in " <<  vrv::Resources::GetPath() << ")" << endl;
     
     cerr << "-s, --scale=FACTOR" << endl;
     cerr << "\t\tscale percent (100 default, max 1000)" << endl;
@@ -175,7 +175,7 @@ int main(int argc, char** argv)
                 break;
                 
             case 'r':
-                Vrv::SetResourcesPath(optarg);
+                vrv::Resources::SetPath(optarg);
                 break;
                 
             case 'o':

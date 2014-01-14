@@ -100,7 +100,7 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
     else if (this->IsSymbol() )
         element = new Symbol( *(Symbol*)this );
     else {
-        Vrv::LogDebug( "Missing %s", this->MusClassName().c_str() );
+        LogDebug( "Missing %s", this->MusClassName().c_str() );
         assert( false ); // Copy of this type unimplemented
         return NULL;
     }
@@ -350,7 +350,7 @@ int LayerElement::Align( ArrayPtrVoid params )
     // increase the time position
     (*time) += duration;
 
-    //Vrv::LogDebug("Time %f", (*time) );
+    //LogDebug("Time %f", (*time) );
     
     return FUNCTOR_CONTINUE;
 }

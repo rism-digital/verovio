@@ -18,174 +18,93 @@
 
 //----------------------------------------------------------------------------
 
-// AX_APP is define is the Aruspix wxWidget application only
-#ifdef AX_APP
-#include "wx/wxprec.h"
-#include "app/axapp.h"
-#endif
+#define STRING_FORMAT_MAX_LEN 2048
 
 namespace vrv {
+        
+// Initialize static members
+std::string Resources::m_path = "/usr/local/share/verovio";
+std::string Resources::m_musicFontDesc = "0;13;70;90;90;0;Leipzig 4.7;33";
+std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
+int Resources::m_fontPosCorrection = 0;
+  
 
-// Initialize static respource path
-std::string Vrv::m_respath = "/usr/local/share/aruspix";
-
-//----------------------------------------------------------------------------
-// Vrv
-//----------------------------------------------------------------------------
-
-
-bool Vrv::AreEqual(double dFirstVal, double dSecondVal)
+bool AreEqual(double dFirstVal, double dSecondVal)
 {
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }
-
-std::string Vrv::GetAxVersion() {
-#ifndef AX_APP
-    return std::string("command line"); // we need to add versioning
-#else
-    return AxApp::s_version.mb_str();
-#endif
-}
-
-std::string Vrv::GetResourcesPath() {
-#ifndef AX_APP
-    //hardcode galore
-    return m_respath;
-#else
-    return wxGetApp().m_resourcesPath.mb_str();
-#endif
-}
-
-std::string Vrv::GetMusicFontDescStr() {
-#ifndef AX_APP
-    return std::string("0;13;70;90;90;0;Leipzig 4.7;33");
-#else
-    return wxGetApp().m_musicFontDesc.mb_str();
-#endif
-}
-
-std::string Vrv::GetLyricFontDescStr() {
-#ifndef AX_APP
-    return std::string("0;12;70;93;90;0;Garamond;0");
-#else
-    return wxGetApp().m_lyricFontDesc.mb_str();
-#endif
-}
-
-
-int Vrv::GetFontPosCorrection(){
-#ifndef AX_APP
-    return 0;
-#else
-    return wxGetApp().m_fontPosCorrection;
-#endif
-}
-
-std::string Vrv::GetFileVersion(int vmaj, int vmin, int vrev) {
-    return Vrv::StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev );
-}
-
-std::string Vrv::StringFormat(const char *fmt, ...)
+    
+void LogDebug(const char *fmt, ...)
 {
-    std::string str( 2048, 0 );
+#ifdef EMSCRIPTEN
+    return;
+#else
+#if defined(DEBUG)
     va_list args;
     va_start ( args, fmt );
-    vsnprintf ( &str[0], 2048, fmt, args );
+    printf("[Debug] ");
+    vprintf( fmt, args );
+    printf("\n");
+    va_end ( args );
+#endif
+#endif
+}
+
+void LogError(const char *fmt, ...)
+{
+#ifdef EMSCRIPTEN
+    return;
+#else
+    va_list args;
+    va_start ( args, fmt );
+    printf("[Error] ");
+    vprintf( fmt, args );
+    printf("\n");
+    va_end ( args );
+#endif
+}
+
+void LogMessage(const char *fmt, ...)
+{
+#ifdef EMSCRIPTEN
+    return;
+#else
+    va_list args;
+    va_start ( args, fmt );
+    printf("[Message] ");
+    vprintf( fmt, args );
+    printf("\n");
+    va_end ( args );
+#endif
+}
+
+void LogWarning(const char *fmt, ...)
+{
+#ifdef EMSCRIPTEN
+    return;
+#else
+    va_list args;
+    va_start ( args, fmt );
+    printf("[Warning] ");
+    vprintf( fmt, args );
+    printf("\n");
+    va_end ( args );
+#endif
+}
+    
+    
+std::string StringFormat(const char *fmt, ...)
+{
+    std::string str( STRING_FORMAT_MAX_LEN, 0 );
+    va_list args;
+    va_start ( args, fmt );
+    vsnprintf ( &str[0], STRING_FORMAT_MAX_LEN, fmt, args );
     va_end ( args );
     str.resize( strlen( str.data() ) );
     return str;
 }
 
-std::string Vrv::GetFilename( std::string fullpath )
-{
-    // remove extension
-    std::string name = fullpath;
-    size_t lastdot = name.find_last_of(".");
-    if (lastdot != std::string::npos) {
-        name = name.substr(0, lastdot);
-    }
-    size_t lastslash = name.find_last_of("/");
-    if (lastslash != std::string::npos) {
-        name = name.substr(lastslash + 1, std::string::npos);
-    }
-    return name;
-}
-
-void Vrv::LogDebug(const char *fmt, ...)
-{
-#ifdef EMSCRIPTEN
-    return;
-#else
-    va_list args;
-    va_start ( args, fmt );
-#ifndef AX_APP
-    #if defined(DEBUG)
-    printf("[Debug] ");
-    vprintf( fmt, args );
-    printf("\n");
-    #endif
-#else
-    wxVLogDebug( fmt, args );
-#endif
-    va_end ( args );
-#endif
-}
-
-void Vrv::LogError(const char *fmt, ...)
-{
-#ifdef EMSCRIPTEN
-    return;
-#else
-    va_list args;
-    va_start ( args, fmt );
-#ifndef AX_APP
-    printf("[Error] ");
-    vprintf( fmt, args );
-    printf("\n");
-#else
-    wxVLogError( fmt, args );
-#endif
-    va_end ( args );
-#endif
-}
-
-void Vrv::LogMessage(const char *fmt, ...)
-{
-#ifdef EMSCRIPTEN
-    return;
-#else
-    va_list args;
-    va_start ( args, fmt );
-#ifndef AX_APP
-    printf("[Message] ");
-    vprintf( fmt, args );
-    printf("\n");
-#else
-    wxVLogMessage( fmt, args );
-#endif
-    va_end ( args );
-#endif
-}
-
-void Vrv::LogWarning(const char *fmt, ...)
-{
-#ifdef EMSCRIPTEN
-    return;
-#else
-    va_list args;
-    va_start ( args, fmt );
-#ifndef AX_APP
-    printf("[Warning] ");
-    vprintf( fmt, args );
-    printf("\n");
-#else
-    wxVLogWarning( fmt, args );
-#endif
-    va_end ( args );
-#endif
-}
-
-std::string Vrv::UTF16to8(const wchar_t * in)
+std::string UTF16to8(const wchar_t * in)
 {
     std::string out;
     unsigned int codepoint = 0;
@@ -226,7 +145,7 @@ std::string Vrv::UTF16to8(const wchar_t * in)
     return out;
 }
 
-std::wstring Vrv::UTF8to16(const char * in)
+std::wstring UTF8to16(const char * in)
 {
     std::wstring out;
     if (in == NULL)
@@ -260,6 +179,42 @@ std::wstring Vrv::UTF8to16(const char * in)
     }
     return out;
 }
+    
+    
+std::string GetFileVersion(int vmaj, int vmin, int vrev) {
+    return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev );
+}
+    
+    
+std::string GetFilename( std::string fullpath )
+{
+    // remove extension
+    std::string name = fullpath;
+    size_t lastdot = name.find_last_of(".");
+    if (lastdot != std::string::npos) {
+        name = name.substr(0, lastdot);
+    }
+    size_t lastslash = name.find_last_of("/");
+    if (lastslash != std::string::npos) {
+        name = name.substr(lastslash + 1, std::string::npos);
+    }
+    return name;
+}
+
+//----------------------------------------------------------------------------
+// Resources
+//----------------------------------------------------------------------------
+
+
+std::string Resources::GetVersion() {
+#ifndef AX_APP
+    return std::string("command line"); // we need to add versioning
+#else
+    return AxApp::s_version.mb_str();
+#endif
+}
+
+
 
 //----------------------------------------------------------------------------
 // MusEnv

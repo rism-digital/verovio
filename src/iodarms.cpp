@@ -107,7 +107,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
     } else if (data[pos] == 'O') {
         if (data[pos + 1] == '/') {
             pos++;
-            Vrv::LogMessage("O/ not supported");
+            LogMessage("O/ not supported");
         }
         meter->m_sign = MENSUR_SIGN_O;
         pos++;
@@ -130,7 +130,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             meter->m_numBase = 1;
         } else {
             pos++;
-            if (data[pos] == '-') Vrv::LogMessage("Time sig numbers should be divided with ':'.");
+            if (data[pos] == '-') LogMessage("Time sig numbers should be divided with ':'.");
             // same as above, get one or two nums
             n1 = data[++pos] - ASCII_NUMBER_OFFSET; // old school conversion to int
             if (isdigit(data[pos + 1])) {
@@ -140,7 +140,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             
             meter->m_numBase = n1;
         }
-        Vrv::LogMessage("Meter is: %i %i", meter->m_num, meter->m_numBase);
+        LogMessage("Meter is: %i %i", meter->m_num, meter->m_numBase);
     }
     
     m_layer->AddElement(meter);
@@ -158,7 +158,7 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
         case 'I': // Voice nr.
             //the next digit should be a number, but we do not care what
             if (!isdigit(data[++pos])) {
-                Vrv::LogMessage("Expected number after I");
+                LogMessage("Expected number after I");
             }
             break;
             
@@ -172,7 +172,7 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
             if (data[pos] == '-' || data[pos] == '#') {
                 UnrollKeysig(quantity, data[pos]);
             } else {
-                Vrv::LogMessage("Invalid char for K: %c", data[pos]);
+                LogMessage("Invalid char for K: %c", data[pos]);
             }
             break;
             
@@ -193,7 +193,7 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
              NR	rest in place of notehead
              */
             if (!isdigit(data[++pos])) {
-                Vrv::LogMessage("Expected number after N");
+                LogMessage("Expected number after N");
             } else { // we honor only notehead 7, diamond
                 if (data[pos] == 0x07 + ASCII_NUMBER_OFFSET)
                     m_antique_notation = true;
@@ -220,14 +220,14 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             case 3: mclef->m_clefId = UT2; break;
             case 5: mclef->m_clefId = UT3; break;
             case 7: mclef->m_clefId = UT4; break;
-            default: Vrv::LogMessage("Invalid C clef on line %i", position); break;
+            default: LogMessage("Invalid C clef on line %i", position); break;
         }
         m_clef_offset = 21 - position; // 21 is the position in the array, position is of the clef
     } else if (data[pos] == 'G') {
         switch (position) {
             case 1: mclef->m_clefId = SOL1; break;
             case 3: mclef->m_clefId = SOL2; break;
-            default: Vrv::LogMessage("Invalid G clef on line %i", position); break;
+            default: LogMessage("Invalid G clef on line %i", position); break;
         }
         m_clef_offset = 25 - position;
     } else if (data[pos] == 'F') {
@@ -235,12 +235,12 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             case 3: mclef->m_clefId = FA3; break;
             case 5: mclef->m_clefId = FA4; break;
             case 7: mclef->m_clefId = FA5; break;
-            default: Vrv::LogMessage("Invalid F clef on line %i", position); break;
+            default: LogMessage("Invalid F clef on line %i", position); break;
         }
         m_clef_offset = 15 - position;
     } else {
         // what the...
-        Vrv::LogMessage("Invalid clef specification: %c", data[pos]);
+        LogMessage("Invalid clef specification: %c", data[pos]);
         return 0; // fail
     }
     
@@ -309,7 +309,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         case 'Z': duration = DUR_256; break;
             
         default:
-            Vrv::LogMessage("Unkown note duration: %c", data[pos]);
+            LogMessage("Unkown note duration: %c", data[pos]);
             return 0;
             break;
     }
@@ -390,7 +390,7 @@ bool DarmsInput::ImportFile() {
     infile.getline(data, sizeof(data), '\n');
     len = strlen(data);
     infile.close();
-    Vrv::LogMessage("len: %i, %s", len, data);
+    LogMessage("len: %i, %s", len, data);
     
     m_doc->Reset( Raw );
     System *system = new System();
@@ -408,7 +408,7 @@ bool DarmsInput::ImportFile() {
         char c = data[pos];
         
         if (c == '!') {
-            Vrv::LogMessage("Global spec. at %i", pos);
+            LogMessage("Global spec. at %i", pos);
             res = do_globalSpec(pos, data);
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
@@ -427,7 +427,7 @@ bool DarmsInput::ImportFile() {
             if (res) pos = res;
         } else {
             //if (!isspace(c))
-                //Vrv::LogMessage("Other %c", c);
+                //LogMessage("Other %c", c);
         }
  
         pos++;

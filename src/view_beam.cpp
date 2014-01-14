@@ -187,7 +187,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	do
 	{
         
-        //Vrv::LogDebug("-> %s", chk->MusClassName().c_str() );
+        //LogDebug("-> %s", chk->MusClassName().c_str() );
         
         if ( chk->IsNote() ) {
             k = ((Note*)chk)->m_colored ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
@@ -258,7 +258,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	}
 */
     
-    //Vrv::LogDebug("ct %d", ct );
+    //LogDebug("ct %d", ct );
 
 	_ct = ct - 1;		/* compte d'entree moins 1 */
 

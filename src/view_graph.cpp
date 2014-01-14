@@ -184,7 +184,7 @@ void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c,
         dc->SetPen( m_currentColour, 1, AxSOLID );
         dc->SetBrush( m_currentColour, AxSOLID );
 
-		//Vrv::LogDebug("Drawing text here, x: %d, y: %d, y (zoomed): %d, y + fontcorr: %d"
+		//LogDebug("Drawing text here, x: %d, y: %d, y (zoomed): %d, y + fontcorr: %d"
 		//	   , ToRendererX(x), y, ToRendererY(y), ToRendererY(y + fontCorr));
         // DrawMusicText is the same with AxWxDc but different with SvgDeviceContext
 		dc->DrawMusicText( m_str, ToRendererX(x), ToRendererY(y + fontCorr) );
@@ -211,7 +211,7 @@ void View::putstring ( DeviceContext *dc, int x, int y, std::string s, int centr
     
 	if ( centrer )
 	{
-        Vrv::LogDebug("Centering string not implemented with DeviceContext");
+        LogDebug("Centering string not implemented with DeviceContext");
 		
         int w, h;
 		dc->GetTextExtent( s, &w, &h );

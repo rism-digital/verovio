@@ -163,7 +163,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     StaffDef *lastDef = dynamic_cast<StaffDef*>(staffDefs->back());
     
     if (!firstDef || !lastDef ) {
-        Vrv::LogDebug("Could not get staffDef while drawing staffGrp - Vrv::DrawStaffGrp");
+        LogDebug("Could not get staffDef while drawing staffGrp - Vrv::DrawStaffGrp");
         return;
     }
     
@@ -172,7 +172,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     Staff *last = measure->GetStaffWithNo( lastDef->GetStaffNo() );
     
     if (!first || !last ) {
-        Vrv::LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetStaffNo(), lastDef->GetStaffNo() );
+        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetStaffNo(), lastDef->GetStaffNo() );
         return;
     }
     
@@ -345,7 +345,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             else if ( childStaffDef ) {
                 Staff *staff = measure->GetStaffWithNo( childStaffDef->GetStaffNo() );
                 if (!staff ) {
-                    Vrv::LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
+                    LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
                     continue;
                 }
                 int y_top = staff->m_yDrawing;
@@ -370,7 +370,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         StaffDef *lastDef = dynamic_cast<StaffDef*>(staffDefs->back());
         
         if (!firstDef || !lastDef ) {
-            Vrv::LogDebug("Could not get staffDef while drawing staffGrp - Vrv::DrawStaffGrp");
+            LogDebug("Could not get staffDef while drawing staffGrp - Vrv::DrawStaffGrp");
             return;
         }
         
@@ -379,7 +379,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         Staff *last = measure->GetStaffWithNo( lastDef->GetStaffNo() );
         
         if (!first || !last ) {
-            Vrv::LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetStaffNo(), lastDef->GetStaffNo() );
+            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetStaffNo(), lastDef->GetStaffNo() );
             return;
         }
         
@@ -398,7 +398,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 if ( childStaffDef ) {
                     Staff *staff = measure->GetStaffWithNo( childStaffDef->GetStaffNo() );
                     if (!staff ) {
-                        Vrv::LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
+                        LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
                         continue;
                     }
                     DrawBarlineDots( dc, x, staff, barline );

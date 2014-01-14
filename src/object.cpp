@@ -200,7 +200,7 @@ bool Object::operator==( Object& other )
     // This should never happen.
     // The comparison is performed in the CmpFile::Align method.
     // We expect to compare only Note, Rest, etc object for which we have an overwritten method
-    Vrv::LogError( "Missing comparison operator for '%s'", this->MusClassName().c_str() );
+    LogError( "Missing comparison operator for '%s'", this->MusClassName().c_str() );
     return false;
 }
 
@@ -239,7 +239,7 @@ void Object::FillList( ListOfObjects *list )
     for (iter = list->begin(); iter != list->end(); ++iter)
     {
         Object *current = *iter;
-        Vrv::LogDebug("%s", current->MusClassName().c_str() );
+        LogDebug("%s", current->MusClassName().c_str() );
     }
     */
 }
@@ -434,7 +434,7 @@ void DocObject::Refresh()
 
 void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2) 
 {
-    //Vrv::LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2 ,m_contentBB_y2);
+    //LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2 ,m_contentBB_y2);
     
     int min_x = std::min( x1, x2 );
     int max_x = std::max( x1, x2 );
@@ -447,12 +447,12 @@ void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
     
     m_updatedBB = true;
-    //Vrv::LogDebug("CB Is:  %i %i %i %i", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+    //LogDebug("CB Is:  %i %i %i %i", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 }
 
 void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 ) 
 {
-    //Vrv::LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2 ,m_selfBB_y2);
+    //LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2 ,m_selfBB_y2);
     
     int min_x = std::min( x1, x2 );
     int max_x = std::max( x1, x2 );
@@ -466,7 +466,7 @@ void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 )
     
     m_updatedBB = true;
     
-    //Vrv::LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2 ,m_selfBB_y2);
+    //LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2 ,m_selfBB_y2);
     
 }
 
@@ -639,10 +639,10 @@ int Object::FindByUuid( ArrayPtrVoid params )
     
     if ( *uuid == this->GetUuid()) {
         (*element) = this;
-        //Vrv::LogDebug("Found it!");
+        //LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    //Vrv::LogDebug("Still looking for uuid...");
+    //LogDebug("Still looking for uuid...");
     return FUNCTOR_CONTINUE;
 }
 
@@ -789,7 +789,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    //Vrv::LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->MusClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->MusClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
@@ -863,7 +863,7 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
         current->GetAlignment()->SetYShift( overlap );
     }
     
-    //Vrv::LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->MusClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->MusClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_y1;

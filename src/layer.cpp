@@ -201,7 +201,7 @@ void Layer::Insert( LayerElement *layerElement, LayerElement *before )
 void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )
 {
     if (!currentStaffDef || !currentScoreDef) {
-        Vrv::LogDebug("scoreDef and/or staffDef not found");
+        LogDebug("scoreDef and/or staffDef not found");
         return;
     }
     

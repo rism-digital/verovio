@@ -80,7 +80,7 @@ bool XMLOutput::ExportFile( )
 
 bool XMLOutput::WriteDoc( Doc *doc )
 {
-    Vrv::LogDebug("Doc");
+    LogDebug("Doc");
     
     // Write the partwise declaration
     // the MusicXML "score-partwise" does not map to our MusScore
@@ -118,7 +118,7 @@ bool XMLOutput::WriteMeasure( Measure *measure )
     
     m_measure_count++;
     num << m_measure_count;
-    Vrv::LogDebug("Measure %i", m_measure_count);
+    LogDebug("Measure %i", m_measure_count);
     
     // go on and create this measure
     m_xml_measure = new TiXmlElement("measure");
@@ -138,7 +138,7 @@ bool XMLOutput::WriteMeasure( Measure *measure )
 bool XMLOutput::WriteStaff( Staff *staff )
 //bool XMLOutput::WriteMeiStaff( Staff *meiStaff, Staff *staff )
 {
-    Vrv::LogDebug("Staff");
+    LogDebug("Staff");
     
     m_xml_part = new TiXmlElement("part");
     m_xml_part->SetAttribute("id", "P1");
@@ -162,13 +162,13 @@ bool XMLOutput::WriteStaff( Staff *staff )
 bool XMLOutput::WriteLayer( Layer *layer )
 //bool XMLOutput::WriteMeiLayer( Layer *meiLayer, Layer *layer )
 {
-    Vrv::LogDebug("Layer");
+    LogDebug("Layer");
     return true;
 }
 
 bool XMLOutput::WriteLayerElement( LayerElement *element )
 {
-    Vrv::LogDebug("Layer Elem");
+    LogDebug("Layer Elem");
         
     if (dynamic_cast<Clef*>(element)) {
         WriteClef(element);
@@ -187,7 +187,7 @@ bool XMLOutput::WriteLayerElement( LayerElement *element )
         SetTie(m_xml_last_note, false);
     }
     
- //   Vrv::LogDebug("---- %s", element->MusClassName().c_str());
+ //   LogDebug("---- %s", element->MusClassName().c_str());
     
     return true;
  }
@@ -197,37 +197,37 @@ bool XMLOutput::WriteLayerElement( LayerElement *element )
 
 bool XMLOutput::WriteLayout( Doc *layout )
 {
-    Vrv::LogDebug("Layout");
+    LogDebug("Layout");
     return true;
 }
 
 bool XMLOutput::WritePage( Page *page )
 {
-    Vrv::LogDebug("Page");
+    LogDebug("Page");
     return true;
 }
 
 bool XMLOutput::WriteSystem( System *system )
 {
-    Vrv::LogDebug("System");
+    LogDebug("System");
     return true;
 }
 
 bool XMLOutput::WriteLaidOutStaff( Staff *laidOutStaff )
 {
-    Vrv::LogDebug("Laid staff");
+    LogDebug("Laid staff");
     return true;
 }
 
 bool XMLOutput::WriteLaidOutLayer( Layer *laidOutLayer )
-{    Vrv::LogDebug("Laid layer");
+{    LogDebug("Laid layer");
     return true;
 
 }
 
 bool XMLOutput::WriteLaidOutLayerElement( LayerElement *laidOutLayerElement )
 {
-    Vrv::LogDebug("Laid Layer Elem");
+    LogDebug("Laid Layer Elem");
     return true;
 }
 
@@ -441,7 +441,7 @@ void XMLOutput::CreateRestsForMultiMeasure() {
         m_xml_measure->SetAttribute("number", mstring.str().c_str());
         
     }
-    Vrv::LogDebug("Measures incremented to %i.", m_measure_count);
+    LogDebug("Measures incremented to %i.", m_measure_count);
     m_multimeasure_rests = 0;
     //m_measure_count--;
     // we do not want to increment this two times
@@ -594,7 +594,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
             // attach the beam to the note
             note->LinkEndChild(xbeam);
         } else {
-            Vrv::LogDebug("Beam with no notes");
+            LogDebug("Beam with no notes");
         }
     }
     

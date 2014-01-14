@@ -299,8 +299,8 @@ void Page::SetValues( int type )
     for (i = 0; i < nbrePortees; i++) 
 	{
         switch ( type ) {
-            case PAGE_VALUES_VOICES: values += Vrv::StringFormat("%d;", (&m_staves[i])->voix ); break;
-            case PAGE_VALUES_INDENT: values += Vrv::StringFormat("%d;", (&m_staves[i])->indent ); break;
+            case PAGE_VALUES_VOICES: values += StringFormat("%d;", (&m_staves[i])->voix ); break;
+            case PAGE_VALUES_INDENT: values += StringFormat("%d;", (&m_staves[i])->indent ); break;
         }
 	}
     values = wxGetTextFromUser( "Enter values for the pages", "", values );
@@ -316,7 +316,7 @@ void Page::SetValues( int type )
         }	
 	}
 */
-    Vrv::LogDebug("TODO");
+    LogDebug("TODO");
     return;
 }
 

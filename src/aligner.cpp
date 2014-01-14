@@ -57,7 +57,7 @@ StaffAlignment* SystemAligner::GetStaffAlignment( int idx )
     }
     // check that we are searching for the next one (not gap)
     assert( idx == GetStaffAlignmentCount() );
-    //Vrv::LogDebug("Creating staff alignment");
+    //LogDebug("Creating staff alignment");
     
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
@@ -143,7 +143,7 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, MusAlignmentType typ
     {
         alignment = (Alignment*)m_children[i];
         double alignment_time = alignment->GetTime();
-        if ( Vrv::AreEqual( alignment_time, time ) && (alignment->GetType() == type) ) {
+        if ( vrv::AreEqual( alignment_time, time ) && (alignment->GetType() == type) ) {
             return alignment;
         }
         // nothing found, do not go any further but keep the index

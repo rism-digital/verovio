@@ -117,7 +117,7 @@ void Note::SetValue( int value, int flag )
 void Note::SetTieAttrInitial()
 {
     if ( m_tieAttrInitial ) {
-        Vrv::LogWarning("Initial tie attribute already set for note '%s", this->GetUuid().c_str() );
+        LogWarning("Initial tie attribute already set for note '%s", this->GetUuid().c_str() );
         return;
     }
     m_tieAttrInitial = new Tie();
@@ -127,11 +127,11 @@ void Note::SetTieAttrInitial()
 void Note::SetTieAttrTerminal( Note *previousNote )
 {
     if ( m_tieAttrTerminal ) {
-        Vrv::LogWarning("Terminal tie attribute already set for note '%s", this->GetUuid().c_str() );
+        LogWarning("Terminal tie attribute already set for note '%s", this->GetUuid().c_str() );
         return;
     }
     if ( !previousNote || !previousNote->GetTieAttrInitial() ) {
-        Vrv::LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
+        LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
         return;
     }
     m_tieAttrTerminal = previousNote->GetTieAttrInitial();

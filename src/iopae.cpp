@@ -154,7 +154,7 @@ void PaeInput::convertPlainAndEasyToKern(std::istream &infile, std::ostream &out
     while (!infile.eof()) {
         infile.getline(data_line, 10000);
         if (infile.eof()) {
-            Vrv::LogDebug("Truncated file or ending tag missing");
+            LogDebug("Truncated file or ending tag missing");
             //exit(1);
         }
         getAtRecordKeyValue(data_key, data_value, data_line);
@@ -546,7 +546,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
                 // we should not find the parens before the ';' !
                 // FIXME find a graceful way to exit signaling this to user
                 if (incipit[t] == ')') {
-                    Vrv::LogDebug("You have a ) before the ; in a tuplet!");
+                    LogDebug("You have a ) before the ; in a tuplet!");
                     return i - index;
                 }
                 
@@ -559,7 +559,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
                 
                 // If we have extraneous chars, exit here
                 if (!isdigit(incipit[t + t2])) {
-                    Vrv::LogDebug("You have a non-number in a tuplet number");
+                    LogDebug("You have a non-number in a tuplet number");
                     return i - index;
                 }
                 
@@ -816,7 +816,7 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
         }
     } else {
         // what the...
-        Vrv::LogDebug("Clef is ??");
+        LogDebug("Clef is ??");
     }
     
     //measure->clef = mclef;

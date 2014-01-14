@@ -184,7 +184,7 @@ void Doc::SetRendPage( Page *page )
     
     m_rendFontHeight = CalcLeipzigFontSize();
     m_rendFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_rendFontHeight / LEIPZIG_UNITS_PER_EM);
-	m_rendFontHeightAscent[0][0] +=  Vrv::GetFontPosCorrection();
+	m_rendFontHeightAscent[0][0] +=  Resources::GetFontPosCorrection();
 	m_rendFontHeightAscent[0][1] = (m_rendFontHeightAscent[0][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];
     m_rendFontHeightAscent[1][0] = (m_rendFontHeightAscent[0][0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
 	m_rendFontHeightAscent[1][1] = (m_rendFontHeightAscent[1][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];
@@ -243,10 +243,10 @@ int Doc::CalcLeipzigFontSize( )
 
 void Doc::UpdateFontValues() 
 {	
-	if ( !m_rendLeipzigFont.FromString( Vrv::GetMusicFontDescStr() ) )
-        Vrv::LogWarning( "Impossible to load font 'Leipzig'" );
+	if ( !m_rendLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
+        LogWarning( "Impossible to load font 'Leipzig'" );
 	
-	//Vrv::LogMessage( "Size %d, Family %d, Style %d, Weight %d, Underline %d, Face %s, Desc %s",
+	//LogMessage( "Size %d, Family %d, Style %d, Weight %d, Underline %d, Face %s, Desc %s",
 	//	m_rendLeipzigFont.GetPointSize(),
 	//	m_rendLeipzigFont.GetFamily(),
 	//	m_rendLeipzigFont.GetStyle(),
@@ -261,8 +261,8 @@ void Doc::UpdateFontValues()
     m_rendFonts[1][1] = m_rendLeipzigFont;
 	
 	// Lyrics
-	if ( !m_rendLyricFont.FromString( Vrv::GetLyricFontDescStr() ) )
-		Vrv::LogWarning( "Impossible to load font for the lyrics" );
+	if ( !m_rendLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
+		LogWarning( "Impossible to load font for the lyrics" );
     
 	m_rendLyricFonts[0] = m_rendLyricFont;
     m_rendLyricFonts[1] = m_rendLyricFont;

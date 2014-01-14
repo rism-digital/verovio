@@ -230,7 +230,7 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     int fSweep ;
     if ( fabs(theta2 - theta1) > M_PI) fSweep = 1; else fSweep = 0 ;
 
-    //WriteLine( Vrv::StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />",
+    //WriteLine( StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />",
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye) ) );
     

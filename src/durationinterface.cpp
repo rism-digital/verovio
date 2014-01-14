@@ -59,7 +59,7 @@ double DurationInterface::GetAlignementDuration( int num, int numbase )
     if ( m_dots > 0 ) {
         duration = 2 * duration - (duration / pow(2, m_dots));
     }
-    //Vrv::LogDebug("Duration %d; Dot %d; Alignement %f", m_dur, m_dots, duration );
+    //LogDebug("Duration %d; Dot %d; Alignement %f", m_dur, m_dots, duration );
     return duration;
 }
 

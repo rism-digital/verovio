@@ -41,7 +41,7 @@ void Beam::FilterList()
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( currentElement && !currentElement->HasDurationInterface() )
         {
-            //Vrv::LogDebug("KILLED!!! %s", currentElement->MusClassName().c_str() );
+            //LogDebug("KILLED!!! %s", currentElement->MusClassName().c_str() );
             iter = m_list.erase( iter );
         } else {
             iter++;

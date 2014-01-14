@@ -69,19 +69,19 @@ bool InterfaceController::LoadFile( std::string filename )
         input = new MeiInput( &m_doc, filename.c_str() );
     }
     else {
-        Vrv::LogError( "Unknown format" );
+        LogError( "Unknown format" );
         return false;
     }
     
     // something went wrong
     if ( !input ) {
-        Vrv::LogError( "Unknown error" );
+        LogError( "Unknown error" );
         return false;
     }
 
     // load the file
     if ( !input->ImportFile()) {
-        Vrv::LogError( "Error importing file '%s'", filename.c_str() );
+        LogError( "Error importing file '%s'", filename.c_str() );
         delete input;
         return false;
     }
@@ -100,19 +100,19 @@ bool InterfaceController::LoadString( std::string data )
         input = new MeiInput( &m_doc, "" );
     }
     else {
-        Vrv::LogError( "Unknown format" );
+        LogError( "Unknown format" );
         return false;
     }
     
     // something went wrong
     if ( !input ) {
-        Vrv::LogError( "Unknown error" );
+        LogError( "Unknown error" );
         return false;
     }
     
     // load the file
     if ( !input->ImportString( data )) {
-        Vrv::LogError( "Error importing data" );
+        LogError( "Error importing data" );
         delete input;
         return false;
     }
@@ -136,7 +136,7 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
         
     // Read JSON options
     if (!json.parse(json_options)) {
-        Vrv::LogError( "Can not parse JSON string." );
+        LogError( "Can not parse JSON string." );
         return false;
     }
     
@@ -179,29 +179,29 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
     else if (in_format == "darms")
         SetFormat(darms_file);
     else { // fail if format in invalid
-        Vrv::LogError( "InputFormat is invalid: %s\n", in_format.c_str() );
+        LogError( "InputFormat is invalid: %s\n", in_format.c_str() );
         return false;
     }
     
     // Check boundaries for scale and border
     
     if (border < 0 || border > 1000)
-        Vrv::LogError( "Border out of bounds, use 10 (default)." );
+        LogError( "Border out of bounds, use 10 (default)." );
     else
         SetBorder(border);
         
     if (scale < 0 || scale > 1000)
-        Vrv::LogError( "Scale out of bounds, use 10 (default)." );
+        LogError( "Scale out of bounds, use 10 (default)." );
     else
         SetScale(scale);
     
     if (width < 0 || width > 5000)
-        Vrv::LogError( "Page width out of bounds" );
+        LogError( "Page width out of bounds" );
     else
         SetPageWidth(width);
     
     if (height < 0 || height > 5000)
-        Vrv::LogError( "Page Height out of bounds." );
+        LogError( "Page Height out of bounds." );
     else
         SetPageHeight(height);
     
