@@ -131,7 +131,7 @@ public:
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */
-    MusEnv m_env;
+    DefaultEnv m_env;
     
     /** 
      * The source id. Exact use to be clarified.

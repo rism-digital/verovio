@@ -13,70 +13,93 @@
 
 namespace vrv {
 
+/**
+ * The following functions are helpers for formating, conversion, or loggin
+ * Most of them differ if they are used in Aruspix or in the command line tool
+ */
+        
+    
+void LogDebug(  const char *fmt, ... );
+void LogError(  const char *fmt, ... );
+void LogMessage(  const char *fmt, ... );
+void LogWarning(  const char *fmt, ... );
+
+/**
+ * Utility for comparing doubles
+ */
+bool AreEqual(double dFirstVal, double dSecondVal);
+
+/**
+ * Utility for converting UTF16 (std::wstring) to UTF-8
+ */
+std::string UTF16to8(const wchar_t * in);
+
+/**
+ * Utility for converting UTF-8 to UTF16 (std::wstring)
+ */
+std::wstring UTF8to16(const char * in);
+    
+/**
+ * Format a string using vsnprintf.
+ * The maximum length is giving by STRING_FORMAT_MAX_LEN
+ */
+std::string StringFormat( const char *fmt, ... );
+    
+/**
+ * Return a formatted version (####.####.####) of the file version
+ */
+std::string GetFileVersion(int vmaj, int vmin, int vrev);
+ 
+/**
+ * Return a the filename (without extension) extracted from the fullpath
+ */
+std::string GetFilename( std::string fullpath );
+
 //----------------------------------------------------------------------------
-// Vrv
+// Resources
 //----------------------------------------------------------------------------
 
 /**
- * This class provides static helpers 
- * Most of them differ if they are used in Aruspix or in the command line tool
+ * This class provides static resource values.
+ * The default values can be changed by setters.
  */
 
-class Vrv
+class Resources
 {
 public:
     // Some statis utiliry functions
-    static std::string GetAxVersion();
-    static std::string GetResourcesPath();
-    static void SetResourcesPath(std::string p) {m_respath = p;}
-    static std::string GetMusicFontDescStr();
-    static std::string GetNeumeFontDescStr();
-    static std::string GetLyricFontDescStr();
-    static int GetFontPosCorrection();
-    static std::string GetFileVersion(int vmaj, int vmin, int vrev);
-    static std::string StringFormat( const char *fmt, ... );
-    static std::string GetFilename( std::string fullpath );
-    
-    static void LogDebug(  const char *fmt, ... );
-    static void LogError(  const char *fmt, ... );
-    static void LogMessage(  const char *fmt, ... );
-    static void LogWarning(  const char *fmt, ... );
-    
-    /**
-     * Utility for comparing doubles
-     */
-    static bool AreEqual(double dFirstVal, double dSecondVal);
-    
-    /**
-     * Utility for converting UTF16 (std::wstring) to UTF-8
-     */
-    static std::string UTF16to8(const wchar_t * in);
-
-    /**
-     * Utility for converting UTF-8 to UTF16 (std::wstring)
-     */
-    static std::wstring UTF8to16(const char * in);
-    
+    static std::string GetVersion();
+    static std::string GetPath() { return m_path; };
+    static void SetPath(std::string path) {m_path = path;};
+    static std::string GetMusicFontDescStr() { return m_musicFontDesc; };
+    static void GetMusicFontDescStr(std::string lyricFontDesc) {m_musicFontDesc = lyricFontDesc;};
+    static std::string GetLyricFontDescStr() { return m_lyricFontDesc; };
+    static void GetLyricFontDescStr(std::string lyricFontDesc) {m_lyricFontDesc = lyricFontDesc;};
+    static int GetFontPosCorrection() { return m_fontPosCorrection; };
+    static void GetFontPosCorrection(int fontPosCorrection) {m_fontPosCorrection = fontPosCorrection;};
     
 private:
-    static std::string m_respath;
+    static std::string m_path;
+    static std::string m_musicFontDesc;
+    static std::string m_lyricFontDesc;
+    static int m_fontPosCorrection;
 };
 
 
 //----------------------------------------------------------------------------
-// MusEnv
+// DefaultEnv
 //----------------------------------------------------------------------------
 
 /** 
  * This class contains the document default environment variables.
  * Some of them are not available as is in MEI - to be solved
  */
-class MusEnv 
+class DefaultEnv 
 {
 public:
     // constructors and destructors
-    MusEnv();
-    virtual ~MusEnv();
+    DefaultEnv();
+    virtual ~DefaultEnv();
     
     
 public:

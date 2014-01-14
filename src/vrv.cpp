@@ -217,10 +217,10 @@ std::string Resources::GetVersion() {
 
 
 //----------------------------------------------------------------------------
-// MusEnv
+// DefaultEnv
 //----------------------------------------------------------------------------
 
-MusEnv::MusEnv()
+DefaultEnv::DefaultEnv()
 {
     
     m_interlDefin = 18;
@@ -252,7 +252,7 @@ MusEnv::MusEnv()
     //m_notationMode = MUS_CMN_MODE;
 }
 
-MusEnv::~MusEnv()
+DefaultEnv::~DefaultEnv()
 {
 }
 
