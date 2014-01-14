@@ -76,7 +76,7 @@ python $EMCC --closure 0 -O2 \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="['_convertMusic']" \
-    -o build/aruspix.js
+    -o build/verovio.js
 
 if [ $? -eq 0 ]; then echo "Done."; fi
 

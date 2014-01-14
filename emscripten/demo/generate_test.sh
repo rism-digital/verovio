@@ -11,7 +11,7 @@ HEAD=` cat <<HERE
 
     <title>Dynamic demo</title>
 
-<script src="../build/aruspix.js" type="text/javascript"></script>	
+<script src="../build/verovio.js" type="text/javascript"></script>	
 
 <script type="text/javascript">
 
