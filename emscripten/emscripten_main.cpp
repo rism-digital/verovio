@@ -14,9 +14,10 @@
 #include <string>
 
 #include "vrv.h"
-#include "controller.h"
+#include "interfacecontroller.h"
 
 using namespace std;
+using namespace vrv;
 
 bool initialized = false;
 

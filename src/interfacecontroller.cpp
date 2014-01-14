@@ -27,7 +27,6 @@
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"
-using namespace jsonxx;
 #endif
 
 namespace vrv {
@@ -133,7 +132,7 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
     int width = m_pageWidth;
     int height = m_pageHeight;
     
-    Object json;
+    jsonxx::Object json;
         
     // Read JSON options
     if (!json.parse(json_options)) {
@@ -141,36 +140,36 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
         return false;
     }
     
-    if (json.has<String>("inputFormat"))
-        in_format = json.get<String>("inputFormat");
+    if (json.has<jsonxx::String>("inputFormat"))
+        in_format = json.get<jsonxx::String>("inputFormat");
     
-    if (json.has<Number>("scale"))
-        scale = json.get<Number>("scale");
+    if (json.has<jsonxx::Number>("scale"))
+        scale = json.get<jsonxx::Number>("scale");
     
-    if (json.has<Number>("border"))
-        border = json.get<Number>("border");
+    if (json.has<jsonxx::Number>("border"))
+        border = json.get<jsonxx::Number>("border");
 
-    if (json.has<Number>("pageWidth"))
-        width = json.get<Number>("pageWidth");
+    if (json.has<jsonxx::Number>("pageWidth"))
+        width = json.get<jsonxx::Number>("pageWidth");
     
-    if (json.has<Number>("pageHeight"))
-        height = json.get<Number>("pageHeight");
+    if (json.has<jsonxx::Number>("pageHeight"))
+        height = json.get<jsonxx::Number>("pageHeight");
     
     // Parse the various flags
-    if (json.has<Boolean>("noLayout"))
-        SetNoLayout(json.get<Boolean>("noLayout"));
+    if (json.has<jsonxx::Boolean>("noLayout"))
+        SetNoLayout(json.get<jsonxx::Boolean>("noLayout"));
     
-    if (json.has<Boolean>("ignoreLayout"))
-        SetIgnoreLayout(json.get<Boolean>("ignoreLayout"));
+    if (json.has<jsonxx::Boolean>("ignoreLayout"))
+        SetIgnoreLayout(json.get<jsonxx::Boolean>("ignoreLayout"));
 
-    if (json.has<Boolean>("adjustPageHeight"))
-        SetAdjustPageHeight(json.get<Boolean>("adjustPageHeight"));
+    if (json.has<jsonxx::Boolean>("adjustPageHeight"))
+        SetAdjustPageHeight(json.get<jsonxx::Boolean>("adjustPageHeight"));
 
-    if (json.has<Boolean>("noJustification"))
-        SetNoJustification(json.get<Boolean>("noJustification"));
+    if (json.has<jsonxx::Boolean>("noJustification"))
+        SetNoJustification(json.get<jsonxx::Boolean>("noJustification"));
 
-    if (json.has<Boolean>("showBoundingBoxes"))
-        SetShowBoundingBoxes(json.get<Boolean>("showBoundingBoxes"));
+    if (json.has<jsonxx::Boolean>("showBoundingBoxes"))
+        SetShowBoundingBoxes(json.get<jsonxx::Boolean>("showBoundingBoxes"));
     
     // set file type
     if (in_format == "pae") 
