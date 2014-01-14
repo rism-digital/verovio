@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="http://www.aruspix.net/mei-page-based-2013-08-29.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title />
+            </titleStmt>
+            <pubStmt>
+                <date>Fri Sep  6 11:44:10 2013</date>
+            </pubStmt>
+        </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Encoded with Aruspix version 2.3.0</p>
+            </projectDesc>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score type="raw">
+                    <!--Coordinates in MEI axis direction-->
+                    <page xml:id="m-3b09b17e-adca-4817-8bc1-54d9763844e6" page.width="2104" page.height="2970" page.leftmar="0" page.rightmar="0">
+                        <system xml:id="m-1bce7927-30bf-4c66-b957-a558d76b6012" system.leftmar="0" system.rightmar="0" uly="0">
+                            <staff xml:id="m-56c938d6-82b8-4f5a-8a38-35495882f359" uly="2969" n="-1">
+                                <layer xml:id="m-5fcf0be0-a217-4da7-b0bb-10f59a5df42e" n="1">
+                                    <note pname="g" oct="4" dur="minima" xml:id="m-2f3c143f-4c54-40a1-96da-0612a127c1c1" ulx="15" />
+                                    <beam xml:id="m-2a001fc5-26d2-4123-9ce4-0a3b0e48c62d" ulx="0">
+                                        <note dots="2" pname="a" oct="4" dur="fusa" xml:id="m-6257829f-3aa1-475f-9113-ce966b0f6d5c" ulx="58" />
+                                        <rest ploc="a" oloc="4" dur="fusa"/>
+                                        <space/>
+                                        <note accid="s" pname="g" oct="4" dur="fusa" xml:id="m-2f3c143f-4c54-40a1-96da-0612a127c1c1" ulx="101" />
+                                        <custos oct="3" pname="a"/>
+                                        <rest ploc="a" oloc="4" dur="fusa"/>
+                                    </beam>
+                                    <note pname="g" oct="4" dur="minima" xml:id="m-2f3c143f-4c54-40a1-96da-0612a127c1c1" ulx="144" />
+                                </layer>
+                            </staff>
+                        </system>
+                    </page>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

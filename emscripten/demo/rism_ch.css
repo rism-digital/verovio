@@ -1,0 +1,110 @@
+
+/* links */
+
+a { 
+	color: #822C0F;
+	background: inherit;
+}
+
+a:hover {
+	color: #177bbd;
+	background: inherit;
+}
+
+
+h1 a {
+	color: #822C0F;
+	background: inherit;
+	text-decoration: none;
+}
+
+h1 a:hover {
+	color: #581f0c;
+	background: inherit;
+	text-decoration: none;
+}
+
+/* top menu */
+
+#hmenu a:hover {
+	background: #822C0F url(/images/hmenuarrowhover.gif) no-repeat top center;
+	color: #FFFFFF;
+	border-bottom: 4px solid #581f0c;
+}
+
+/* left menu colors */
+
+#leftmenu span {
+	background-color: #8E3413;
+	color: #FFFFFF;
+}
+
+#leftmenu a {
+	background-color: #8E3413;
+	color: #FFFFFF;
+}
+
+#leftmenu a:hover {
+	background-color: #581f0c;
+	color: #FFFFFF;
+}
+
+#leftmenu a.browse {
+	background: #8E3413 url(/images/vmenuarrow.gif) no-repeat 6px center;
+	color: #FFFFFF;
+}
+
+#leftmenu a.browse:hover {
+	background: #581f0c url(/images/vmenuarrowhover.gif) no-repeat 6px center;
+	color: #FFFFFF;
+}
+
+div#i18n_none { 
+	background: #8E3413
+}
+
+div#i18n {
+	background: #8E3413 url(/images/lang.png) 2px 1px no-repeat
+}
+
+/* other */
+
+.quick_help a, .tf_help a {
+	background-color:#ffeaea !important;
+	color:#581f0c !important;
+}
+
+/* cluetips, in cluetips.css */
+
+.cluetip-default {
+  /*background-color: #ffeaea;*/
+
+}
+.cluetip-default #cluetip-outer {
+  /*background-color: #ffeaea;*/
+}
+.cluetip-default h3#cluetip-title {
+  background-color: #581f0c;
+  color: #fff;
+}
+.cluetip-default #cluetip-title a {
+  /*color: #ffeaea;*/
+}  
+.cluetip-default #cluetip-inner {
+  padding: 10px;
+}
+.cluetip-default div#cluetip-close { 
+  color: #900;
+}
+
+/* unicode table */
+
+
+table.unicode {border-collapse:collapse;margin:1em 0;}
+table.unicode td {text-align:center;padding:.5em;border:2px solid #fff; width: 45px;}
+table.unicode td {background:#ddd;}
+
+table.unicode td:hover {background:#581f0c; color:#fff;}
+
+
+

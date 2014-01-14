@@ -1,0 +1,12 @@
+<defs>
+  <style type="text/css">
+    <![CDATA[
+
+		@font-face {
+		  font-family: "Leipzig46";
+		  src: url(./Leipzig-4.6.ttf) format("truetype");
+		}
+
+    ]]>
+ </style>
+</defs>

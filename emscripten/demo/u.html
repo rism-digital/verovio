@@ -1,0 +1,1083 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <title>Dynamic demo</title>
+
+<script src="../build/aruspix.js" type="text/javascript"></script>	
+
+<script type="text/javascript">
+
+convertMusic = Module.cwrap('convertMusic', 'string', ['string', 'string'])
+
+function render_music( music, format )
+{	
+	var svg = convertMusic(music, JSON.stringify({inputFormat: format, scale: 50, pageHeight: 250, pageWidth: 2000}));
+	return svg;
+
+};
+
+</script>
+</head>
+<BODY>
+<h3>1_clefs</h3>
+01_G2-clef.pae<p>
+<div id="01_G2-clef.pae"></div>
+</p>
+<xmp id="01_G2-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:none
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('01_G2-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('01_G2-clef.pae').innerHTML = svg;
+</script>
+02_C1-clef.pae<p>
+<div id="02_C1-clef.pae"></div>
+</p>
+<xmp id="02_C1-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:C-1
+@keysig:none
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('02_C1-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('02_C1-clef.pae').innerHTML = svg;
+</script>
+03_C2-clef.pae<p>
+<div id="03_C2-clef.pae"></div>
+</p>
+<xmp id="03_C2-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:C-2
+@keysig:none
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('03_C2-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('03_C2-clef.pae').innerHTML = svg;
+</script>
+04_C3-clef.pae<p>
+<div id="04_C3-clef.pae"></div>
+</p>
+<xmp id="04_C3-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:C-3
+@keysig:none
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('04_C3-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('04_C3-clef.pae').innerHTML = svg;
+</script>
+05_C4-clef.pae<p>
+<div id="05_C4-clef.pae"></div>
+</p>
+<xmp id="05_C4-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:C-4
+@keysig:none
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('05_C4-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('05_C4-clef.pae').innerHTML = svg;
+</script>
+06_C5-clef.pae<p>
+<div id="06_C5-clef.pae"></div>
+</p>
+<xmp id="06_C5-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:C-5
+@keysig:none
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('06_C5-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('06_C5-clef.pae').innerHTML = svg;
+</script>
+07_F3-clef.pae<p>
+<div id="07_F3-clef.pae"></div>
+</p>
+<xmp id="07_F3-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:F-3
+@keysig:none
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('07_F3-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('07_F3-clef.pae').innerHTML = svg;
+</script>
+08_F4-clef.pae<p>
+<div id="08_F4-clef.pae"></div>
+</p>
+<xmp id="08_F4-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:F-4
+@keysig:none
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('08_F4-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('08_F4-clef.pae').innerHTML = svg;
+</script>
+09_g2-clef.pae<p>
+<div id="09_g2-clef.pae"></div>
+</p>
+<xmp id="09_g2-clef.pae-data" style="display:none;">
+@start:clefs
+@clef:g-2
+@keysig:none
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('09_g2-clef.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('09_g2-clef.pae').innerHTML = svg;
+</script>
+<h3>2_keys</h3>
+01_key-sharp-G-1.pae<p>
+<div id="01_key-sharp-G-1.pae"></div>
+</p>
+<xmp id="01_key-sharp-G-1.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('01_key-sharp-G-1.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('01_key-sharp-G-1.pae').innerHTML = svg;
+</script>
+02_key-sharp-G-2.pae<p>
+<div id="02_key-sharp-G-2.pae"></div>
+</p>
+<xmp id="02_key-sharp-G-2.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xFC
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('02_key-sharp-G-2.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('02_key-sharp-G-2.pae').innerHTML = svg;
+</script>
+03_key-sharp-G-3.pae<p>
+<div id="03_key-sharp-G-3.pae"></div>
+</p>
+<xmp id="03_key-sharp-G-3.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xFCG
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('03_key-sharp-G-3.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('03_key-sharp-G-3.pae').innerHTML = svg;
+</script>
+04_key-sharp-G-4.pae<p>
+<div id="04_key-sharp-G-4.pae"></div>
+</p>
+<xmp id="04_key-sharp-G-4.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xFCGD
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('04_key-sharp-G-4.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('04_key-sharp-G-4.pae').innerHTML = svg;
+</script>
+05_key-sharp-G-5.pae<p>
+<div id="05_key-sharp-G-5.pae"></div>
+</p>
+<xmp id="05_key-sharp-G-5.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xFCGDA
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('05_key-sharp-G-5.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('05_key-sharp-G-5.pae').innerHTML = svg;
+</script>
+06_key-sharp-G-6.pae<p>
+<div id="06_key-sharp-G-6.pae"></div>
+</p>
+<xmp id="06_key-sharp-G-6.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xFCGDAE
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('06_key-sharp-G-6.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('06_key-sharp-G-6.pae').innerHTML = svg;
+</script>
+07_key-sharp-G-7.pae<p>
+<div id="07_key-sharp-G-7.pae"></div>
+</p>
+<xmp id="07_key-sharp-G-7.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('07_key-sharp-G-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('07_key-sharp-G-7.pae').innerHTML = svg;
+</script>
+08_key-flat-G-1.pae<p>
+<div id="08_key-flat-G-1.pae"></div>
+</p>
+<xmp id="08_key-flat-G-1.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('08_key-flat-G-1.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('08_key-flat-G-1.pae').innerHTML = svg;
+</script>
+09_key-flat-G-2.pae<p>
+<div id="09_key-flat-G-2.pae"></div>
+</p>
+<xmp id="09_key-flat-G-2.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bBE
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('09_key-flat-G-2.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('09_key-flat-G-2.pae').innerHTML = svg;
+</script>
+10_key-flat-G-3.pae<p>
+<div id="10_key-flat-G-3.pae"></div>
+</p>
+<xmp id="10_key-flat-G-3.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bBEA
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('10_key-flat-G-3.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('10_key-flat-G-3.pae').innerHTML = svg;
+</script>
+11_key-flat-G-4.pae<p>
+<div id="11_key-flat-G-4.pae"></div>
+</p>
+<xmp id="11_key-flat-G-4.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bBEAD
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('11_key-flat-G-4.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('11_key-flat-G-4.pae').innerHTML = svg;
+</script>
+12_key-flat-G-5.pae<p>
+<div id="12_key-flat-G-5.pae"></div>
+</p>
+<xmp id="12_key-flat-G-5.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bBEADG
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('12_key-flat-G-5.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('12_key-flat-G-5.pae').innerHTML = svg;
+</script>
+13_key-flat-G-6.pae<p>
+<div id="13_key-flat-G-6.pae"></div>
+</p>
+<xmp id="13_key-flat-G-6.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bBEADGC
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('13_key-flat-G-6.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('13_key-flat-G-6.pae').innerHTML = svg;
+</script>
+14_key-flat-G-7.pae<p>
+<div id="14_key-flat-G-7.pae"></div>
+</p>
+<xmp id="14_key-flat-G-7.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('14_key-flat-G-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('14_key-flat-G-7.pae').innerHTML = svg;
+</script>
+15_key-sharp-C1-7.pae<p>
+<div id="15_key-sharp-C1-7.pae"></div>
+</p>
+<xmp id="15_key-sharp-C1-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-1
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('15_key-sharp-C1-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('15_key-sharp-C1-7.pae').innerHTML = svg;
+</script>
+16_key-flat-C1-7.pae<p>
+<div id="16_key-flat-C1-7.pae"></div>
+</p>
+<xmp id="16_key-flat-C1-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-1
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('16_key-flat-C1-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('16_key-flat-C1-7.pae').innerHTML = svg;
+</script>
+17_key-sharp-C2-7.pae<p>
+<div id="17_key-sharp-C2-7.pae"></div>
+</p>
+<xmp id="17_key-sharp-C2-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-2
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('17_key-sharp-C2-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('17_key-sharp-C2-7.pae').innerHTML = svg;
+</script>
+18_key-flat-C2-7.pae<p>
+<div id="18_key-flat-C2-7.pae"></div>
+</p>
+<xmp id="18_key-flat-C2-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-2
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('18_key-flat-C2-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('18_key-flat-C2-7.pae').innerHTML = svg;
+</script>
+19_key-sharp-C3-7.pae<p>
+<div id="19_key-sharp-C3-7.pae"></div>
+</p>
+<xmp id="19_key-sharp-C3-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-3
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('19_key-sharp-C3-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('19_key-sharp-C3-7.pae').innerHTML = svg;
+</script>
+20_key-flat-C3-7.pae<p>
+<div id="20_key-flat-C3-7.pae"></div>
+</p>
+<xmp id="20_key-flat-C3-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-3
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('20_key-flat-C3-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('20_key-flat-C3-7.pae').innerHTML = svg;
+</script>
+21_key-sharp-C4-7.pae<p>
+<div id="21_key-sharp-C4-7.pae"></div>
+</p>
+<xmp id="21_key-sharp-C4-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-4
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('21_key-sharp-C4-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('21_key-sharp-C4-7.pae').innerHTML = svg;
+</script>
+22_key-flat-C4-7.pae<p>
+<div id="22_key-flat-C4-7.pae"></div>
+</p>
+<xmp id="22_key-flat-C4-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-4
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('22_key-flat-C4-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('22_key-flat-C4-7.pae').innerHTML = svg;
+</script>
+23_key-sharp-C5-7.pae<p>
+<div id="23_key-sharp-C5-7.pae"></div>
+</p>
+<xmp id="23_key-sharp-C5-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-5
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('23_key-sharp-C5-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('23_key-sharp-C5-7.pae').innerHTML = svg;
+</script>
+24_key-flat-C5-7.pae<p>
+<div id="24_key-flat-C5-7.pae"></div>
+</p>
+<xmp id="24_key-flat-C5-7.pae-data" style="display:none;">
+@start:clefs
+@clef:C-5
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('24_key-flat-C5-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('24_key-flat-C5-7.pae').innerHTML = svg;
+</script>
+25_key-sharp-F3-7.pae<p>
+<div id="25_key-sharp-F3-7.pae"></div>
+</p>
+<xmp id="25_key-sharp-F3-7.pae-data" style="display:none;">
+@start:clefs
+@clef:F-3
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('25_key-sharp-F3-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('25_key-sharp-F3-7.pae').innerHTML = svg;
+</script>
+26_key-flat-F3-7.pae<p>
+<div id="26_key-flat-F3-7.pae"></div>
+</p>
+<xmp id="26_key-flat-F3-7.pae-data" style="display:none;">
+@start:clefs
+@clef:F-3
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('26_key-flat-F3-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('26_key-flat-F3-7.pae').innerHTML = svg;
+</script>
+27_key-sharp-F4-7.pae<p>
+<div id="27_key-sharp-F4-7.pae"></div>
+</p>
+<xmp id="27_key-sharp-F4-7.pae-data" style="display:none;">
+@start:clefs
+@clef:F-4
+@keysig:xFCGDAEB
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('27_key-sharp-F4-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('27_key-sharp-F4-7.pae').innerHTML = svg;
+</script>
+28_key-flat-F4-7.pae<p>
+<div id="28_key-flat-F4-7.pae"></div>
+</p>
+<xmp id="28_key-flat-F4-7.pae-data" style="display:none;">
+@start:clefs
+@clef:F-4
+@keysig:bBEADGCF
+@key: 
+@timesig:
+@data:,4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('28_key-flat-F4-7.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('28_key-flat-F4-7.pae').innerHTML = svg;
+</script>
+<h3>3_octave</h3>
+01_oct-h1.pae<p>
+<div id="01_oct-h1.pae"></div>
+</p>
+<xmp id="01_oct-h1.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:
+@key: 
+@timesig:
+@data:'4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('01_oct-h1.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('01_oct-h1.pae').innerHTML = svg;
+</script>
+02_oct-h2.pae<p>
+<div id="02_oct-h2.pae"></div>
+</p>
+<xmp id="02_oct-h2.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:
+@key: 
+@timesig:
+@data:''4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('02_oct-h2.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('02_oct-h2.pae').innerHTML = svg;
+</script>
+03_oct-h3.pae<p>
+<div id="03_oct-h3.pae"></div>
+</p>
+<xmp id="03_oct-h3.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:
+@key: 
+@timesig:
+@data:'''4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('03_oct-h3.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('03_oct-h3.pae').innerHTML = svg;
+</script>
+04_oct-h4.pae<p>
+<div id="04_oct-h4.pae"></div>
+</p>
+<xmp id="04_oct-h4.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:
+@key: 
+@timesig:
+@data:''''4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('04_oct-h4.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('04_oct-h4.pae').innerHTML = svg;
+</script>
+05_oct-l1.pae<p>
+<div id="05_oct-l1.pae"></div>
+</p>
+<xmp id="05_oct-l1.pae-data" style="display:none;">
+@start:clefs
+@clef:F-4
+@keysig:
+@key: 
+@timesig:
+@data:,4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('05_oct-l1.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('05_oct-l1.pae').innerHTML = svg;
+</script>
+06_oct-l2.pae<p>
+<div id="06_oct-l2.pae"></div>
+</p>
+<xmp id="06_oct-l2.pae-data" style="display:none;">
+@start:clefs
+@clef:F-4
+@keysig:
+@key: 
+@timesig:
+@data:,,4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('06_oct-l2.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('06_oct-l2.pae').innerHTML = svg;
+</script>
+07_oct-l3.pae<p>
+<div id="07_oct-l3.pae"></div>
+</p>
+<xmp id="07_oct-l3.pae-data" style="display:none;">
+@start:clefs
+@clef:F-4
+@keysig:
+@key: 
+@timesig:
+@data:,,,4C4D4E4F4G4A4B
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('07_oct-l3.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('07_oct-l3.pae').innerHTML = svg;
+</script>
+<h3>4_duration</h3>
+01_dur-longa.pae<p>
+<div id="01_dur-longa.pae"></div>
+</p>
+<xmp id="01_dur-longa.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'0G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('01_dur-longa.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('01_dur-longa.pae').innerHTML = svg;
+</script>
+02_dur-breve.pae<p>
+<div id="02_dur-breve.pae"></div>
+</p>
+<xmp id="02_dur-breve.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'9G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('02_dur-breve.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('02_dur-breve.pae').innerHTML = svg;
+</script>
+03_dur-semibreve.pae<p>
+<div id="03_dur-semibreve.pae"></div>
+</p>
+<xmp id="03_dur-semibreve.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'1G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('03_dur-semibreve.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('03_dur-semibreve.pae').innerHTML = svg;
+</script>
+04_dur-minima.pae<p>
+<div id="04_dur-minima.pae"></div>
+</p>
+<xmp id="04_dur-minima.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'2G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('04_dur-minima.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('04_dur-minima.pae').innerHTML = svg;
+</script>
+05_dur-4th.pae<p>
+<div id="05_dur-4th.pae"></div>
+</p>
+<xmp id="05_dur-4th.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('05_dur-4th.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('05_dur-4th.pae').innerHTML = svg;
+</script>
+06_dur-8th.pae<p>
+<div id="06_dur-8th.pae"></div>
+</p>
+<xmp id="06_dur-8th.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'8G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('06_dur-8th.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('06_dur-8th.pae').innerHTML = svg;
+</script>
+07_dur-16th.pae<p>
+<div id="07_dur-16th.pae"></div>
+</p>
+<xmp id="07_dur-16th.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'6G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('07_dur-16th.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('07_dur-16th.pae').innerHTML = svg;
+</script>
+08_dur-32th.pae<p>
+<div id="08_dur-32th.pae"></div>
+</p>
+<xmp id="08_dur-32th.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'3G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('08_dur-32th.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('08_dur-32th.pae').innerHTML = svg;
+</script>
+09_dur-64th.pae<p>
+<div id="09_dur-64th.pae"></div>
+</p>
+<xmp id="09_dur-64th.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'5G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('09_dur-64th.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('09_dur-64th.pae').innerHTML = svg;
+</script>
+10_dur-128th.pae<p>
+<div id="10_dur-128th.pae"></div>
+</p>
+<xmp id="10_dur-128th.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'7G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('10_dur-128th.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('10_dur-128th.pae').innerHTML = svg;
+</script>
+11_dur-4dot.pae<p>
+<div id="11_dur-4dot.pae"></div>
+</p>
+<xmp id="11_dur-4dot.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4.G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('11_dur-4dot.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('11_dur-4dot.pae').innerHTML = svg;
+</script>
+12_dur-8dotdot.pae<p>
+<div id="12_dur-8dotdot.pae"></div>
+</p>
+<xmp id="12_dur-8dotdot.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'8..G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('12_dur-8dotdot.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('12_dur-8dotdot.pae').innerHTML = svg;
+</script>
+13_dur-7neumatic.pae<p>
+<div id="13_dur-7neumatic.pae"></div>
+</p>
+<xmp id="13_dur-7neumatic.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'7.G
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('13_dur-7neumatic.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('13_dur-7neumatic.pae').innerHTML = svg;
+</script>
+<h3>5_accidentals</h3>
+01_accid-sharp.pae<p>
+<div id="01_accid-sharp.pae"></div>
+</p>
+<xmp id="01_accid-sharp.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4xG
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('01_accid-sharp.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('01_accid-sharp.pae').innerHTML = svg;
+</script>
+02_accid-sharpsharp.pae<p>
+<div id="02_accid-sharpsharp.pae"></div>
+</p>
+<xmp id="02_accid-sharpsharp.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4xxG
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('02_accid-sharpsharp.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('02_accid-sharpsharp.pae').innerHTML = svg;
+</script>
+03_accid-flat.pae<p>
+<div id="03_accid-flat.pae"></div>
+</p>
+<xmp id="03_accid-flat.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4bG
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('03_accid-flat.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('03_accid-flat.pae').innerHTML = svg;
+</script>
+04_accid-flatflat.pae<p>
+<div id="04_accid-flatflat.pae"></div>
+</p>
+<xmp id="04_accid-flatflat.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4bbG
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('04_accid-flatflat.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('04_accid-flatflat.pae').innerHTML = svg;
+</script>
+05_accid-natural.pae<p>
+<div id="05_accid-natural.pae"></div>
+</p>
+<xmp id="05_accid-natural.pae-data" style="display:none;">
+@start:clefs
+@clef:G-2
+@keysig:xF
+@key: 
+@timesig:
+@data:'4nG
+@end:clefs
+</xmp>
+<script>
+var v = document.getElementById('05_accid-natural.pae-data').textContent;
+var svg = render_music(v, 'pae');
+document.getElementById('05_accid-natural.pae').innerHTML = svg;
+</script>
+</BODY>

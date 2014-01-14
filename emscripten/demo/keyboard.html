@@ -1,0 +1,503 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <title>Dynamic demo</title>
+
+
+
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/themes/base/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" />
+
+<link href="rism.css" media="screen" rel="stylesheet" type="text/css" />
+<link href="cw.css" media="screen" rel="stylesheet" type="text/css" />
+
+<style media="screen" type="text/css">
+a.kb
+{
+	margin: 0px;
+	height: 15px; 
+	width: auto;
+}
+
+a.kb-rest, a.kb-dot, a.kb-barline
+{
+	margin-left: 10px; 
+}
+
+span.ui-icon-custom-00 { background-image: url(icons/00.png) !important; }
+span.ui-icon-custom-01 { background-image: url(icons/01.png) !important; }
+span.ui-icon-custom-02 { background-image: url(icons/02.png) !important; }
+span.ui-icon-custom-04 { background-image: url(icons/04.png) !important; }
+span.ui-icon-custom-08 { background-image: url(icons/08.png) !important; }
+span.ui-icon-custom-16 { background-image: url(icons/16.png) !important; }
+span.ui-icon-custom-32 { background-image: url(icons/32.png) !important; }
+span.ui-icon-custom-64 { background-image: url(icons/64.png) !important; }
+span.ui-icon-custom-rest { background-image: url(icons/rest.png) !important; }
+span.ui-icon-custom-dot { background-image: url(icons/dot.png) !important; }
+span.ui-icon-custom-barline { background-image: url(icons/barline.png) !important; }
+
+span.ui-icon-custom-00,
+span.ui-icon-custom-01,
+span.ui-icon-custom-02,
+span.ui-icon-custom-04,
+span.ui-icon-custom-08,
+span.ui-icon-custom-16,
+span.ui-icon-custom-32,
+span.ui-icon-custom-64,
+span.ui-icon-custom-rest,
+span.ui-icon-custom-dot,
+span.ui-icon-custom-barline
+{
+	height: 18px;
+}
+</style>
+
+<script src="../build/aruspix.js" type="text/javascript"></script>	
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.min.js"></script>
+
+<script type="text/javascript">
+
+// Export the conversion function
+//convertMusic = Module.cwrap('convertMusic', 'string', ['integer', 'integer', 'string'])
+convertMusic = Module.cwrap('convertMusic', 'string', ['string', 'string'])
+
+function render_music( music, format )
+{	
+	// The trailing newline is needed so we can read the file lines
+	// correctly if the file does not end with a newline
+	var svg = convertMusic(music + "\n", JSON.stringify({inputFormat: format, scale: 50, pageHeight: 250, pageWidth: 2000}));
+	document.getElementById('render_01').innerHTML = svg;
+	
+
+};
+
+function pe_incipit(destination_column, clef, keysig, timesig, incipit, target)
+{
+	jquery_clef = clef.replace(/(\[|\])/g, '\\$1');
+	jquery_keysig = keysig.replace(/(\[|\])/g, '\\$1');
+	jquery_timesig = timesig.replace(/(\[|\])/g, '\\$1');
+	jquery_incipit = incipit.replace(/(\[|\])/g, '\\$1');
+
+	pae_clef = $('#' + jquery_clef).val();
+	pae_keysig =  $('#' + jquery_keysig).val();
+	pae_timesig = $('#' + jquery_timesig).val();
+	pae_incipit = $('#' + jquery_incipit).val();
+
+
+	pae = "@start:pae-file\n";
+	pae = pae + "@clef:" + pae_clef + "\n";
+	pae = pae + "@keysig:" + pae_keysig + "\n";
+	pae = pae + "@key:\n";
+	pae = pae + "@timesig:" + pae_timesig + "\n";
+	pae = pae + "@data: " + pae_incipit + "\n";
+	pae = pae + "@end:pae-file\n"
+	render_music(pae, 'pae');
+	
+}
+  
+</script>
+</head>
+<body>
+	
+<table cellpadding="2" cellspacing="2" width="768">
+	<tr width="25%">
+		<!--
+		<td>
+			<select id="incipit_method" name="incipit_method" class="adv_entry">
+				<option value="1">n-grams</option>
+				<option value="2">themefinder</option>
+			</select>	
+		</td>
+		-->
+		<td width="5%" align="right">
+			none
+		</td>
+		
+		<td width="60%">
+			<input type="input" id="incipit_01" name="incipit_01" class="adv_entry" >
+		</td>
+		
+		<td width="10%" align="right">
+			<a onclick="clear_incipit()" class="folders_button abutton abutton-icon-solo ui-state-default ui-corner-all" style="margin: 6px; height: 10px; width: 8px;"><span class="ui-icon ui-icon-cancel"></span></a>		
+		</td>
+		
+	</tr>
+</table>
+	
+<table cellpadding="2" cellspacing="2" width="768">
+	<tr>
+		<tr id="rhythm_toolbar" style="display: visible;">
+			<td style="text-align: center; padding-top: 30px;" colspan="4" width="100%">
+				
+				<span style="float: left; width: 45px;">&nbsp;</span>
+				<a id="kb_focus" href=""></a>
+
+				<a id="kb-00" onclick="javascript:onduration(9)" class="abutton abutton-icon-left ui-corner-left kb">
+					<span class="ui-icon ui-icon-custom-00"></span>9
+				</a>
+				<a id="kb-01" onclick="javascript:onduration(1)" class="abutton abutton-icon-left kb">
+					<span class="ui-icon ui-icon-custom-01"></span>1
+				</a>
+				<a id="kb-02" onclick="javascript:onduration(2)" class="abutton abutton-icon-left kb">
+					<span class="ui-icon ui-icon-custom-02"></span>2
+				</a>
+				<a id="kb-04" onclick="javascript:onduration(4)" class="abutton abutton-icon-left kb">
+					<span class="ui-icon ui-icon-custom-04"></span>4
+				</a>
+				<a id="kb-08" onclick="javascript:onduration(8)" class="abutton abutton-icon-left kb">
+					<span class="ui-icon ui-icon-custom-08"></span>8
+				</a>	
+				<a id="kb-16" onclick="javascript:onduration(6)" class="abutton abutton-icon-left kb">
+					<span class="ui-icon ui-icon-custom-16"></span>6
+				</a>
+				<a id="kb-32" onclick="javascript:onduration(3)" class="abutton abutton-icon-left kb">
+					<span class="ui-icon ui-icon-custom-32"></span>3
+				</a>
+				<a id="kb-64" onclick="javascript:onduration(5)" class="abutton abutton-icon-left ui-corner-right kb">
+					<span class="ui-icon ui-icon-custom-64"></span>5
+				</a>
+
+				<a id="kb-64" onclick="javascript:onrest()" class="abutton abutton-icon-left ui-corner-all kb kb-rest">
+					<span class="ui-icon ui-icon-custom-rest"></span><u>r</u>est
+				</a>
+
+				<a id="kb-dot" onclick="javascript:ondot()" class="abutton abutton-icon-left ui-corner-all kb kb-dot">
+					<span class="ui-icon ui-icon-custom-dot"></span><u>d</u>ot
+				</a>
+				
+				<a id="kb-barline" onclick="javascript:onbarline()" class="abutton abutton-icon-left ui-corner-all kb kb-barline">
+					<span class="ui-icon ui-icon-custom-barline"></span><u>b</u>arline
+				</a>
+				
+				<a id="kb-undo" onclick="javascript:onundo()" class="abutton abutton-icon-left ui-corner-all kb kb-dot">
+					<span class="ui-icon ui-icon-arrowreturnthick-1-w"></span><u>u</u>ndo
+				</a>
+				
+				<a onclick="reset_themefinder()" style="font-size: 1.0em;" id="reset_themefinder" class="abutton ui-state-default ui-corner-all kb kb-dot">
+					RESET
+				</a>
+				
+			</td>	
+		</tr>
+		<td style="text-align: center; padding-top: 10px;" colspan="4" width="100%">
+	      	<map id="piano_map" name="piano_map">
+				<area shape="rect" coords="17,3,32,52" href="javascript:onpitch('C', 1, 1, 61)">
+				<area shape="rect" coords="42,3,57,52" href="javascript:onpitch('D', 1, 1, 63)">
+				<area shape="rect" coords="92,3,107,52" href="javascript:onpitch('F', 1, 1, 66)">
+				<area shape="rect" coords="117,3,132,52" href="javascript:onpitch('G', 1, 1, 68)">
+				<area shape="rect" coords="142,3,157,52" href="javascript:onpitch('A', 1, 1, 70)">
+				
+				<area shape="rect" coords="17,53,32,102" href="javascript:onpitch('D', 1, -1, 61)">
+				<area shape="rect" coords="42,53,57,102" href="javascript:onpitch('E', 1, -1, 63)">
+				<area shape="rect" coords="92,53,107,102" href="javascript:onpitch('G', 1, -1, 66)">
+				<area shape="rect" coords="117,53,132,102" href="javascript:onpitch('A', 1, -1, 68)">
+				<area shape="rect" coords="142,53,157,102" href="javascript:onpitch('B', 1, -1, 70)">
+			
+				<area shape="rect" coords="1,3,25,152" href="javascript:onpitch('C', 1, 0, 60)">
+				<area shape="rect" coords="26,3,50,152" href="javascript:onpitch('D', 1, 0, 62)">
+				<area shape="rect" coords="51,3,75,152" href="javascript:onpitch('E', 1, 0, 64)">
+				<area shape="rect" coords="76,3,100,152" href="javascript:onpitch('F', 1, 0, 65)">
+				<area shape="rect" coords="101,3,125,152" href="javascript:onpitch('G', 1, 0, 67)">
+				<area shape="rect" coords="126,3,150,152" href="javascript:onpitch('A', 1, 0, 69)">
+				<area shape="rect" coords="151,3,175,152" href="javascript:onpitch('B', 1, 0, 71)">
+				
+				<area shape="rect" coords="192,3,207,52" href="javascript:onpitch('C', 2, 1, 73)">
+				<area shape="rect" coords="217,3,232,52" href="javascript:onpitch('D', 2, 1, 75)">
+				<area shape="rect" coords="267,3,282,52" href="javascript:onpitch('F', 2, 1, 78)">
+				<area shape="rect" coords="292,3,307,52" href="javascript:onpitch('G', 2, 1, 80)">
+				<area shape="rect" coords="317,3,332,52" href="javascript:onpitch('A', 2, 1, 82)">
+				
+				<area shape="rect" coords="192,53,207,102" href="javascript:onpitch('D', 2, -1, 73)">
+				<area shape="rect" coords="217,53,232,102" href="javascript:onpitch('E', 2, -1, 75)">
+				<area shape="rect" coords="267,53,282,102" href="javascript:onpitch('G', 2, -1, 78)">
+				<area shape="rect" coords="292,53,307,102" href="javascript:onpitch('A', 2, -1, 80)">
+				<area shape="rect" coords="317,53,332,102" href="javascript:onpitch('B', 2, -1, 82)">
+				
+				<area shape="rect" coords="176,3,200,152" href="javascript:onpitch('C', 2, 0, 72)">
+				<area shape="rect" coords="201,3,225,152" href="javascript:onpitch('D', 2, 0, 74)">
+				<area shape="rect" coords="226,3,250,152" href="javascript:onpitch('E', 2, 0, 76)">
+				<area shape="rect" coords="251,3,275,152" href="javascript:onpitch('F', 2, 0, 77)">
+				<area shape="rect" coords="276,3,300,152" href="javascript:onpitch('G', 2, 0, 79)">
+				<area shape="rect" coords="301,3,325,152" href="javascript:onpitch('A', 2, 0, 81)">
+				<area shape="rect" coords="326,3,350,152" href="javascript:onpitch('B', 2, 0, 83)">
+				
+				
+				<area shape="rect" coords="367,3,382,52" href="javascript:onpitch('C', 3, 1, 85)">
+				<area shape="rect" coords="392,3,407,52" href="javascript:onpitch('D', 3, 1, 87)">
+				<area shape="rect" coords="442,3,457,52" href="javascript:onpitch('F', 3, 1, 90)">
+				<area shape="rect" coords="467,3,482,52" href="javascript:onpitch('G', 3, 1, 92)">
+				<area shape="rect" coords="492,3,507,52" href="javascript:onpitch('A', 3, 1, 94)">
+
+				<area shape="rect" coords="367,53,382,102" href="javascript:onpitch('D', 3, -1, 85)">				
+				<area shape="rect" coords="392,53,407,102" href="javascript:onpitch('E', 3, -1, 87)">
+				<area shape="rect" coords="442,53,457,102" href="javascript:onpitch('G', 3, -1, 90)">
+				<area shape="rect" coords="467,53,482,102" href="javascript:onpitch('A', 3, -1, 92)">
+				<area shape="rect" coords="492,53,507,102" href="javascript:onpitch('B', 3, -1, 94)">
+				
+				<area shape="rect" coords="351,3,375,152" href="javascript:onpitch('C', 3, 0, 84)">
+				<area shape="rect" coords="376,3,400,152" href="javascript:onpitch('D', 3, 0, 86)">
+				<area shape="rect" coords="401,3,425,152" href="javascript:onpitch('E', 3, 0, 88)">
+				<area shape="rect" coords="426,3,450,152" href="javascript:onpitch('F', 3, 0, 89)">
+				<area shape="rect" coords="451,3,475,152" href="javascript:onpitch('G', 3, 0, 91)">
+				<area shape="rect" coords="476,3,500,152" href="javascript:onpitch('A', 3, 0, 93)">
+				<area shape="rect" coords="501,3,525,152" href="javascript:onpitch('B', 3, 0, 95)">
+			</map>
+			<img id="piano_img" src="piano.png" usemap="#piano_map"/>
+		</td>
+	</tr>
+	
+	<tr>
+		<td style="text-align: center; padding-top: 10px;" colspan="4" width="100%">
+			<input type="hidden" id="clef_01" name="clef_01" value="G-2">
+			<input type="hidden" id="key_01" name="key_01" value="">
+			<input type="hidden" id="timesig_01" name="timesig_01" value="4/4">
+			<div style="text-align: center;  display:inline;" id="render_01">&nbsp; </div>
+		</td>	
+	</tr>
+</table>
+
+<script type="text/javascript">
+
+	var soundPosition = 0;
+
+	/*
+	soundManager.url = '/swf/';
+	//soundManager.flashVersion = 9; // optional: shiny features (default = 8)
+	
+	soundManager.onready(function() {
+	  if (soundManager.supported()) {
+	    // SM2 is ready to go!
+		soundManager.createSound({
+		  id: 'scale',
+		  url: '/sound/scale_2-4.5.mp3',
+		  autoLoad: true,
+		  autoPlay: false,
+		  onload: function() {
+		    //alert('The sound '+this.sID+' loaded!');
+		  },
+		  whileplaying: function() {
+			//console.log(this.position);
+			if (this.position >= (soundPosition + 750)) {
+				soundManager.stopAll();
+			}
+		  }
+		});
+	  } else {
+	    // unsupported/error case
+	  }
+	});*/
+	
+	// global variables for the music notation
+	var current_oct = -1;
+	var current_duration = 4;
+	var current_dot = 0;
+	var undos = new Array();
+	
+	// cancel MSIE because cannot handle SVG without plugin - to be tested?
+	if ($.browser.msie) {
+		$('#piano').hide(); 
+	} 
+	
+	// reset the incipit
+	function clear_incipit() {
+		$('#incipit_01').val('');
+		current_oct = -1;
+		reset_undos();
+		update_incipit();		
+	}
+	
+	// function called from the SVG keyboard
+	function onpitch(pitch, oct, alteration, midi)
+    {
+		//soundManager.stopAll();
+		//soundPosition = (midi - 60) * 800 + 5;
+		//soundManager.setPosition('scale', (midi - 60) * 80 )
+		//soundManager.play('scale', {position: soundPosition} );
+		//alert( (midi - 64) * 80 );
+	
+		pitch_str = '';
+		if (oct != current_oct) {
+		  switch (oct) {
+			 case 3:
+			 pitch_str += '\'';
+			 case 2:
+			 pitch_str += '\'';
+			 case 1:
+			 pitch_str += '\'';
+		  }
+		}
+		current_oct = oct;
+		switch (alteration) {
+		    /*
+			 case 0:
+			 pitch_str += 'n';
+			 break;
+			*/
+			 case 1:
+			 pitch_str += 'x';
+			 break;
+			 case -1:
+			 pitch_str += 'b';
+			 break;
+		}
+
+			pitch_str += current_duration;
+			if (current_dot == 1) {
+				pitch_str += '.';
+			}	
+
+		pitch_str += pitch;
+		undos.push( $('#incipit_01').val() );
+		$('#incipit_01').val($('#incipit_01').val() + pitch_str );
+		update_incipit();
+		activate_buttons();
+
+	}
+	
+	function reset_undos( ) 
+	{
+		undos = []
+	}
+	
+	function set_timesig( )
+	{
+		num = $('#timesig_num_01').val();
+		den = $('#timesig_den_01').val();
+		num = parseInt( num );
+		den = parseInt( den );
+		timesig = "";
+		if ( num && den ) {
+			timesig = num + '/' + den;
+		} 
+		$('#timesig_01').val( timesig );
+	}
+	
+	function activate_buttons( ) {
+		// this is a hack: we set the focus on the kb-focus link (arbitrarily) so we can process
+		// keystroke events for changing the duration with the keyboard
+		$('#kb_focus').focus();
+	}
+	
+	function onduration( value )
+    {
+		current_duration = value;
+		update_buttons();
+    }
+
+	function ondot(  )
+    {
+		if (current_dot == 0) {	current_dot = 1; }
+		else { current_dot = 0; }
+		update_buttons();
+    }
+
+	function onrest( )
+    {
+		rest_str = current_duration;
+		rest_str += '-';
+		undos.push( $('#incipit_01').val() );
+		$('#incipit_01').val($('#incipit_01').val() + rest_str );
+		update_incipit();
+		activate_buttons();
+    }
+
+	function onbarline( )
+    {
+		undos.push( $('#incipit_01').val() );
+		$('#incipit_01').val($('#incipit_01').val() + '/' );
+		update_incipit();
+		activate_buttons();
+    }
+
+	function onundo( )
+	{
+		undo_str = undos.pop()
+		$('#incipit_01').val( undo_str );
+		update_incipit();
+		activate_buttons();
+		
+	}
+	
+	// update the incipit and handle the timer - do not update if already updating	
+	function update_incipit()
+	{
+		//$('#incipit_01').val('4'+ $('#incipit_01').val());
+		
+		set_timesig( );
+		if ($('#incipit_01').val() == '') {
+			// reset the octave if nothing in the incipit
+			current_oct = -1
+			$('#btn_clear_incipit').hide();			
+		} else {
+			$('#btn_clear_incipit').show();	
+		}
+	
+		update_display();
+	}
+		
+	// actually updating
+	function update_display()
+    {
+		pe_incipit('', 
+						"clef_01",
+						"key_01",
+						"timesig_01",
+						"incipit_01",
+						"render_01");
+    }
+
+	function update_buttons()
+	{
+		$(".kb").removeClass("ui-state-active");
+		$(".kb").addClass("ui-state-default");
+		if (current_duration == 9) { $('#kb-00').addClass("ui-state-active"); }
+		else if (current_duration == 1) { $('#kb-01').addClass("ui-state-active"); }
+		else if (current_duration == 2) { $('#kb-02').addClass("ui-state-active"); }
+		else if (current_duration == 4) { $('#kb-04').addClass("ui-state-active"); }
+		else if (current_duration == 8) { $('#kb-08').addClass("ui-state-active"); }
+		else if (current_duration == 6) { $('#kb-16').addClass("ui-state-active"); }
+		else if (current_duration == 3) { $('#kb-32').addClass("ui-state-active"); }
+		else if (current_duration == 5) { $('#kb-64').addClass("ui-state-active"); }
+		// dot
+		if (current_dot == 1) { $('#kb-dot').addClass("ui-state-active"); }
+	}
+	
+	// keyup event for updating when the text input is modified
+	$('#incipit_01').keyup(function(event){
+		update_incipit();
+	});
+	
+	// keydown events for shortcuts to the buttons - only when #kb_focus (empty) has focus (hacky)
+	$('#kb_focus').keypress(function(event) {
+		if (event.charCode == 57) { onduration(9); } // 9
+		else if (event.charCode == 49) { onduration(1); } // 1
+		else if (event.charCode == 50) { onduration(2); } // 2
+		else if (event.charCode == 52) { onduration(4); } // 4
+		else if (event.charCode == 56) { onduration(8); } // 8
+		else if (event.charCode == 54) { onduration(6); } // 6
+		else if (event.charCode == 51) { onduration(3); } // 3
+		else if (event.charCode == 53) { onduration(5); } // 5
+		// rest		
+		else if ((event.charCode == 82) || (event.charCode == 114) || (event.charCode == 45)) { onrest(); }
+		// dot
+		else if ((event.charCode == 68) || (event.charCode == 100) || (event.charCode == 46)) { ondot(); }
+		// barline
+		else if ((event.charCode == 66) || (event.charCode == 98) || (event.charCode == 47)) { onbarline(); }
+		// undo		
+		else if ((event.charCode == 85) || (event.charCode == 117)) { onundo(); }
+	});
+
+	if ($('#incipit_01').val() != "") {
+		update_incipit();
+	}
+
+	update_buttons();
+	activate_buttons();
+
+</script>
+
+</body>
+</html>
