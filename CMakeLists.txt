@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(Aruspix)
+project(Verovio)
 
 add_definitions(-g)
 
@@ -8,60 +8,58 @@ include_directories(/usr/local/include)
 
 link_libraries()
 
-include_directories(src/mus src/ src/tinyxml)
+include_directories(include/verovio include/ tinyxml)
 
-add_executable (aruspix 
-	src/mus/main.cpp 
-	src/mus/mus.cpp
-	src/mus/musaligner.cpp
-	src/mus/musapp.cpp
-	src/mus/musbarline.cpp 
-	src/mus/musbboxdc.cpp 
-	src/mus/musbeam.cpp
-	src/mus/musclef.cpp 
-	src/mus/muscontroller.cpp
-	src/mus/musdc.cpp 
-	src/mus/musdoc.cpp 	
-	src/mus/musdurationinterface.cpp 
-	src/mus/musio.cpp 
-	src/mus/musiodarms.cpp
-	src/mus/musiomei.cpp 
-	src/mus/musiomusxml.cpp
-	src/mus/musiopae.cpp 
-	src/mus/muskeysig.cpp
-	src/mus/muslayer.cpp
-	src/mus/muslayerelement.cpp 
-	src/mus/musleipzigbbox.cpp
-	src/mus/musmensur.cpp 
-	src/mus/musmeasure.cpp
-	src/mus/musmultirest.cpp
-	src/mus/musnote.cpp 
-	src/mus/musobject.cpp 
-	src/mus/muspage.cpp 
-	src/mus/muspitchinterface.cpp 
-	src/mus/muspositioninterface.cpp 
-	src/mus/musrc.cpp 
-	src/mus/musrc_beam.cpp  
-	src/mus/musrc_bezier.cpp 
-	src/mus/musrc_element.cpp 
-	src/mus/musrc_graph.cpp 
-	src/mus/musrc_page.cpp
-	src/mus/musrc_tuplet.cpp
-	src/mus/musrest.cpp 
-	src/mus/musscoredef.cpp
-	src/mus/musslur.cpp
-	src/mus/musstaff.cpp 
-	src/mus/mussvgdc.cpp 
-	src/mus/mussymbol.cpp 
-	src/mus/mussystem.cpp 
-	src/mus/mustie.cpp
-	src/mus/mustuplet.cpp
-	src/tinyxml/tinystr.cpp
-	src/tinyxml/tinyxml.cpp
-	src/tinyxml/tinyxmlerror.cpp
-	src/tinyxml/tinyxmlparser.cpp
-
+add_executable (verovio 
+	main.cpp 
+	src/aligner.cpp
+	src/app.cpp
+	src/barline.cpp 
+	src/bboxdc.cpp 
+	src/beam.cpp
+	src/clef.cpp 
+	src/devicecontext.cpp 
+	src/doc.cpp 	
+	src/durationinterface.cpp 
+	src/io.cpp 
+	src/iodarms.cpp
+	src/iomei.cpp 
+	src/iopae.cpp 
+	src/interfacecontroller.cpp
+	src/keysig.cpp
+	src/layer.cpp
+	src/layerelement.cpp 
+	src/leipzigbbox.cpp
+	src/mensur.cpp 
+	src/measure.cpp
+	src/multirest.cpp
+	src/note.cpp 
+	src/object.cpp 
+	src/page.cpp 
+	src/pitchinterface.cpp 
+	src/positioninterface.cpp 
+	src/view.cpp 
+	src/view_beam.cpp  
+	src/view_bezier.cpp 
+	src/view_element.cpp 
+	src/view_graph.cpp 
+	src/view_page.cpp
+	src/view_tuplet.cpp
+	src/rest.cpp 
+	src/scoredef.cpp
+	src/slur.cpp
+	src/staff.cpp 
+	src/svgdc.cpp 
+	src/symbol.cpp 
+	src/system.cpp 
+	src/tie.cpp
+	src/tuplet.cpp
+	src/vrv.cpp
+	tinyxml/tinystr.cpp
+	tinyxml/tinyxml.cpp
+	tinyxml/tinyxmlerror.cpp
+	tinyxml/tinyxmlparser.cpp
 	)
 
-install (TARGETS aruspix DESTINATION bin)
-INSTALL(DIRECTORY data/svg/ DESTINATION share/aruspix/svg FILES_MATCHING PATTERN "*.xml")
+install (TARGETS verovio DESTINATION commandline)
+INSTALL(DIRECTORY data/svg/ DESTINATION share/verovio/svg FILES_MATCHING PATTERN "*.xml")
