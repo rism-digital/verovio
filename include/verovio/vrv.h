@@ -9,6 +9,8 @@
 #ifndef __MUS_H__
 #define __MUS_H__
 
+#include <cstring>
+#include <stdio.h>
 #include <string>
 
 namespace vrv {
