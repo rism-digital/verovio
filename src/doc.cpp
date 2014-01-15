@@ -184,7 +184,6 @@ void Doc::SetRendPage( Page *page )
     
     m_rendFontHeight = CalcLeipzigFontSize();
     m_rendFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_rendFontHeight / LEIPZIG_UNITS_PER_EM);
-	m_rendFontHeightAscent[0][0] +=  Resources::GetFontPosCorrection();
 	m_rendFontHeightAscent[0][1] = (m_rendFontHeightAscent[0][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];
     m_rendFontHeightAscent[1][0] = (m_rendFontHeightAscent[0][0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
 	m_rendFontHeightAscent[1][1] = (m_rendFontHeightAscent[1][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];

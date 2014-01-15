@@ -75,21 +75,27 @@ std::string GetVersion();
 class Resources
 {
 public:
-    // Some statis utiliry functions
-    static std::string GetPath() { return m_path; };
-    static void SetPath(std::string path) {m_path = path;};
-    static std::string GetMusicFontDescStr() { return m_musicFontDesc; };
-    static void GetMusicFontDescStr(std::string lyricFontDesc) {m_musicFontDesc = lyricFontDesc;};
-    static std::string GetLyricFontDescStr() { return m_lyricFontDesc; };
-    static void GetLyricFontDescStr(std::string lyricFontDesc) {m_lyricFontDesc = lyricFontDesc;};
-    static int GetFontPosCorrection() { return m_fontPosCorrection; };
-    static void GetFontPosCorrection(int fontPosCorrection) {m_fontPosCorrection = fontPosCorrection;};
+
+    /**
+     * @name Setters and getters for static environment variables
+     */
+    ///@{
+    static std::string GetPath( ) { return m_path; };
+    static void SetPath( std::string path ) { m_path = path; };
+    static std::string GetMusicFontDescStr( ) { return m_musicFontDesc; };
+    static void SetMusicFontDescStr( std::string lyricFontDesc ) { m_musicFontDesc = lyricFontDesc; };
+    static std::string GetLyricFontDescStr( ) { return m_lyricFontDesc; };
+    static void SetLyricFontDescStr( std::string lyricFontDesc ) { m_lyricFontDesc = lyricFontDesc; };
+    ///@}
+    
     
 private:
+    /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static std::string m_path;
+    /** The FontInfo string for the music font */
     static std::string m_musicFontDesc;
+    /** The FontInfo string for the default lyric font */
     static std::string m_lyricFontDesc;
-    static int m_fontPosCorrection;
 };
 
 
