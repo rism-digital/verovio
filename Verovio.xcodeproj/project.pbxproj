@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D70F42B18871CDC009FEB9E /* pugiconfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D70F42818871CDC009FEB9E /* pugiconfig.hpp */; };
+		4D70F42C18871CDC009FEB9E /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D70F42918871CDC009FEB9E /* pugixml.cpp */; };
+		4D70F42D18871CDC009FEB9E /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D70F42918871CDC009FEB9E /* pugixml.cpp */; };
+		4D70F42E18871CDC009FEB9E /* pugixml.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D70F42A18871CDC009FEB9E /* pugixml.hpp */; };
 		4D7D8A3B1886E35B00D78B62 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D8A3A1886E35B00D78B62 /* main.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
@@ -158,6 +162,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4D70F42818871CDC009FEB9E /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = pugixml/pugiconfig.hpp; sourceTree = "<group>"; };
+		4D70F42918871CDC009FEB9E /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = pugixml/pugixml.cpp; sourceTree = "<group>"; };
+		4D70F42A18871CDC009FEB9E /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = pugixml/pugixml.hpp; sourceTree = "<group>"; };
 		4D7D8A3A1886E35B00D78B62 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../tools/main.cpp; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; };
@@ -270,6 +277,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4D70F42F18871CE6009FEB9E /* pugixml */ = {
+			isa = PBXGroup;
+			children = (
+				4D70F42818871CDC009FEB9E /* pugiconfig.hpp */,
+				4D70F42918871CDC009FEB9E /* pugixml.cpp */,
+				4D70F42A18871CDC009FEB9E /* pugixml.hpp */,
+			);
+			name = pugixml;
+			sourceTree = "<group>";
+		};
 		4D7D8A3C1886E36200D78B62 /* tools */ = {
 			isa = PBXGroup;
 			children = (
@@ -282,6 +299,7 @@
 		8F086E9E188534680037FD8E = {
 			isa = PBXGroup;
 			children = (
+				4D70F42F18871CE6009FEB9E /* pugixml */,
 				8F086F3E18853BEA0037FD8E /* tinyxml */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
@@ -487,6 +505,8 @@
 				8F59295818854BF800FE51AD /* view.h in Headers */,
 				8F59295918854BF800FE51AD /* vrv.h in Headers */,
 				8F59295A18854BF800FE51AD /* vrvdef.h in Headers */,
+				4D70F42B18871CDC009FEB9E /* pugiconfig.hpp in Headers */,
+				4D70F42E18871CDC009FEB9E /* pugixml.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -607,6 +627,7 @@
 				8F086F4718853BEA0037FD8E /* tinyxmlerror.cpp in Sources */,
 				8F086F4818853BEA0037FD8E /* tinyxmlparser.cpp in Sources */,
 				4D7D8A3B1886E35B00D78B62 /* main.cpp in Sources */,
+				4D70F42C18871CDC009FEB9E /* pugixml.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -662,6 +683,7 @@
 				8F3DD31A18854AF50051330C /* tinyxml.cpp in Sources */,
 				8F3DD31C18854AF50051330C /* tinyxmlerror.cpp in Sources */,
 				8F3DD31D18854AF50051330C /* tinyxmlparser.cpp in Sources */,
+				4D70F42D18871CDC009FEB9E /* pugixml.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

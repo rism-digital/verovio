@@ -10,12 +10,7 @@
 
 #include "doc.h"
 
-// TINYXML
-#if defined (__WXMSW__)
-    #include "tinyxml.h"
-#else
-    #include "tinyxml.h"
-#endif
+#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -79,62 +74,62 @@ private:
      * Write a Barline. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiBarline( TiXmlElement *meiBarline, Barline *barline );
+    void WriteMeiBarline( pugi::xml_node meiBarline, Barline *barline );
     
     /**
      * Write a Beam. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiBeam( TiXmlElement *meiBeam, Beam *beam );
+    void WriteMeiBeam( pugi::xml_node meiBeam, Beam *beam );
     
     /**
      * Write a Clef.  
      * Callded from WriteLayerElement.
      */
-    void WriteMeiClef( TiXmlElement *meiClef, Clef *clef );
+    void WriteMeiClef( pugi::xml_node meiClef, Clef *clef );
     
     /**
      * Write a Mensur. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiMensur( TiXmlElement *meiMensur, Mensur *mensur );
+    void WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur );
     
     /**
      * Write a MultiRest. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiMultiRest( TiXmlElement *meiMultiRest, MultiRest *multiRest );
+    void WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multiRest );
     
     /**
      * Write a Note. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiNote( TiXmlElement *meiNote, Note *note );
+    void WriteMeiNote( pugi::xml_node meiNote, Note *note );
     
     /**
      * Write a Rest. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiRest( TiXmlElement *meiRest, Rest *rest );
+    void WriteMeiRest( pugi::xml_node meiRest, Rest *rest );
     
     /**
      * Write a Tuplet. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiTuplet( TiXmlElement *meiTuplet, Tuplet *tuplet );
+    void WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet );
     
     /**
      * Write a Symbol. 
      * The appropriate MeiElement is created by the method and returned.
      * Callded from WriteLayerElement.
      */
-    TiXmlElement *WriteMeiSymbol( Symbol *symbol ); 
+    pugi::xml_node WriteMeiSymbol( Symbol *symbol, pugi::xml_node currentParent );
     
     /**
      * Write a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
-    void WriteSameAsAttr( TiXmlElement *meiElement, Object *element );
+    void WriteSameAsAttr( pugi::xml_node meiElement, Object *element );
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -159,27 +154,27 @@ public:
 
 private:
     std::string m_filename;
-    TiXmlElement *m_mei;
+    pugi::xml_node m_mei;
     /** @name Members for pointers to the current element */
     ///@{
-    TiXmlElement *m_pages;
-    TiXmlElement *m_page;
-    TiXmlElement *m_scoreDef;
-    TiXmlElement *m_system;
-    TiXmlElement *m_staffGrp;
-    TiXmlElement *m_staffDef;
-    TiXmlElement *m_measure;
-    TiXmlElement *m_staff;
+    pugi::xml_node m_pages;
+    pugi::xml_node m_page;
+    pugi::xml_node m_scoreDef;
+    pugi::xml_node m_system;
+    pugi::xml_node m_staffGrp;
+    pugi::xml_node m_staffDef;
+    pugi::xml_node m_measure;
+    pugi::xml_node m_staff;
     /** The pointer for the layer within a staff */
-    TiXmlElement *m_layer;
+    pugi::xml_node m_layer;
     /** The pointer for the rdg within an app (LayerRdg) */
-    TiXmlElement *m_rdgLayer;
+    pugi::xml_node m_rdgLayer;
     /** The pointer for a beam */
-    TiXmlElement *m_beam;
+    pugi::xml_node m_beam;
     /** The pointer for a tuplet */
-    TiXmlElement *m_tuplet;
+    pugi::xml_node m_tuplet;
     // app
-    TiXmlElement *m_app;
+    pugi::xml_node m_app;
     ///@}
 };
 
@@ -204,38 +199,38 @@ public:
     virtual bool ImportString(std::string mei);
     
 private:
-    bool ReadMei( TiXmlElement *root );
-    bool ReadMeiHeader( TiXmlElement *meihead );
+    bool ReadMei( pugi::xml_node root );
+    bool ReadMeiHeader( pugi::xml_node meihead );
     /** Reads the content of a <layer> or of a <rdg> for <app> within <layer> */
-    bool ReadMeiPage( TiXmlElement *page );
-    bool ReadMeiSystem( TiXmlElement *system );
-    bool ReadMeiScoreDef( TiXmlElement *scoreDef );
-    bool ReadMeiStaffGrp( TiXmlElement *system );
-    bool ReadMeiStaffDef( TiXmlElement *system );
-    bool ReadMeiMeasure( TiXmlElement *measure );
-    bool ReadMeiStaff( TiXmlElement *staff );
-    bool ReadMeiLayer( TiXmlElement *layer );
-    bool ReadMeiLayerElement( TiXmlElement *XmlElement );
-    LayerElement *ReadMeiBarline( TiXmlElement *barline );
-    LayerElement *ReadMeiBeam( TiXmlElement *beam );
-    LayerElement *ReadMeiClef( TiXmlElement *clef );
-    LayerElement *ReadMeiMensur( TiXmlElement *mensur );
-    LayerElement *ReadMeiMultiRest( TiXmlElement *multiRest );
-    LayerElement *ReadMeiNote( TiXmlElement *note );
-    LayerElement *ReadMeiRest( TiXmlElement *rest );
-    LayerElement *ReadMeiTuplet( TiXmlElement *tuplet );
-    LayerElement *ReadMeiAccid( TiXmlElement *accid );
-    LayerElement *ReadMeiCustos( TiXmlElement *custos );
-    LayerElement *ReadMeiDot( TiXmlElement *dot );
+    bool ReadMeiPage( pugi::xml_node page );
+    bool ReadMeiSystem( pugi::xml_node system );
+    bool ReadMeiScoreDef( pugi::xml_node scoreDef );
+    bool ReadMeiStaffGrp( pugi::xml_node system );
+    bool ReadMeiStaffDef( pugi::xml_node system );
+    bool ReadMeiMeasure( pugi::xml_node measure );
+    bool ReadMeiStaff( pugi::xml_node staff );
+    bool ReadMeiLayer( pugi::xml_node layer );
+    bool ReadMeiLayerElement( pugi::xml_node XmlElement );
+    LayerElement *ReadMeiBarline( pugi::xml_node barline );
+    LayerElement *ReadMeiBeam( pugi::xml_node beam );
+    LayerElement *ReadMeiClef( pugi::xml_node clef );
+    LayerElement *ReadMeiMensur( pugi::xml_node mensur );
+    LayerElement *ReadMeiMultiRest( pugi::xml_node multiRest );
+    LayerElement *ReadMeiNote( pugi::xml_node note );
+    LayerElement *ReadMeiRest( pugi::xml_node rest );
+    LayerElement *ReadMeiTuplet( pugi::xml_node tuplet );
+    LayerElement *ReadMeiAccid( pugi::xml_node accid );
+    LayerElement *ReadMeiCustos( pugi::xml_node custos );
+    LayerElement *ReadMeiDot( pugi::xml_node dot );
     /** Reads <app> elements. For now, only <app> within <layer> are taken into account */
-    LayerElement *ReadMeiApp( TiXmlElement *app );
-    bool ReadMeiRdg( TiXmlElement *rdg );
+    LayerElement *ReadMeiApp( pugi::xml_node app );
+    bool ReadMeiRdg( pugi::xml_node rdg );
     
     /**
      * Read a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
-    void ReadSameAsAttr( TiXmlElement *element, Object *object );
+    void ReadSameAsAttr( pugi::xml_node element, Object *object );
     
     /**
      * Add the LayerElement to the appropriate parent (e.g., Layer, LayerRdg)
@@ -245,7 +240,7 @@ private:
     /**
      * Read unsupported element and try to convert them
      */
-    bool ReadUnsupported( TiXmlElement *element );
+    bool ReadUnsupported( pugi::xml_node element );
     
     /**
      * Look through the list of notes with open tie stored in MeiInput::m_openTies.
@@ -256,7 +251,7 @@ private:
     bool FindOpenTie( Note *terminalNote );
     
 	//
-    void SetMeiUuid( TiXmlElement *element, Object *object );
+    void SetMeiUuid( pugi::xml_node element, Object *object );
     bool StrToBool(std::string value);
 	int StrToDur(std::string dur);
 	int StrToOct(std::string oct);

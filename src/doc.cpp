@@ -96,7 +96,7 @@ void Doc::Layout( )
 	{
 		page = (Page*)this->m_children[i];
         page->Layout( );
-        break;
+        //break;
      }
 }
 
