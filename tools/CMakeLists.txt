@@ -4,7 +4,7 @@ project(Verovio)
 
 add_definitions(-g)
 
-include_directories(/usr/local/include ../include/verovio ../tinyxml)
+include_directories(/usr/local/include ../include/vrv ../tinyxml)
 
 add_executable (verovio 
 	main.cpp 

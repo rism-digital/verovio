@@ -1,7 +1,7 @@
 #/bin/bash
 
 VEROVIO_ROOT=../
-VEROVIO_INCLUDE=../include/verovio
+VEROVIO_INCLUDE=../include/vrv
 EMCC=`which emcc`
 
 if [ ! -d build ]; then mkdir build; fi
