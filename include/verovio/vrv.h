@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_H__
-#define __MUS_H__
+#ifndef __VRV_H__
+#define __VRV_H__
 
 #include <cstring>
 #include <stdio.h>
@@ -48,7 +48,8 @@ std::wstring UTF8to16(const char * in);
 std::string StringFormat( const char *fmt, ... );
     
 /**
- * Return a formatted version (####.####.####) of the file version
+ * Return a formatted version (####.####.####) of the file version.
+ * This can be used for comparing if the file version is < or >
  */
 std::string GetFileVersion(int vmaj, int vmin, int vrev);
  
@@ -56,6 +57,11 @@ std::string GetFileVersion(int vmaj, int vmin, int vrev);
  * Return a the filename (without extension) extracted from the fullpath
  */
 std::string GetFilename( std::string fullpath );
+
+/**
+ * Return the version number (X.X.X)
+ */
+std::string GetVersion();
 
 //----------------------------------------------------------------------------
 // Resources
@@ -70,7 +76,6 @@ class Resources
 {
 public:
     // Some statis utiliry functions
-    static std::string GetVersion();
     static std::string GetPath() { return m_path; };
     static void SetPath(std::string path) {m_path = path;};
     static std::string GetMusicFontDescStr() { return m_musicFontDesc; };

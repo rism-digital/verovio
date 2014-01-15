@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musiodarms.h
+// Name:        iodarms.h
 // Author:      Rodolfo Zitellini
 // Created:     02/07/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_IODARMS_H__
-#define __MUS_IODARMS_H__
+#ifndef __VRV_IODARMS_H__
+#define __VRV_IODARMS_H__
 
 #include <string>
 #include <vector>
@@ -68,4 +68,4 @@ private:
 
 } // namespace vrv
 
-#endif // __MUS_IODARMS_H__
+#endif // __VRV_IODARMS_H__

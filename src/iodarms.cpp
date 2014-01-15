@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musiodarms.cpp
+// Name:        iodarms.cpp
 // Author:      Rodolfo Zitellini
 // Created:     02/07/2012
 // Copyright (c) Authors and others. All rights reserved.

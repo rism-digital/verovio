@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mussystem.cpp
+// Name:        system.cpp
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
@@ -60,10 +60,10 @@ void System::Clear( )
 	ClearChildren();
 	m_systemLeftMar = 50;
 	m_systemRightMar = 50;
-	m_xAbs = AX_UNSET;
+	m_xAbs = VRV_UNSET;
     m_xRel = 0;
 	m_xDrawing = 0;
-	m_yAbs = AX_UNSET;
+	m_yAbs = VRV_UNSET;
     m_yRel = 0;
 	m_yDrawing = 0;
     m_totalDrawingWidth = 0;

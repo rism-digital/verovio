@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mussvgdc.h 
+// Name:        svgdc.h 
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.   
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_SVG_DC_H__
-#define __MUS_SVG_DC_H__
+#ifndef __VRV_SVG_DC_H__
+#define __VRV_SVG_DC_H__
 
 #include "devicecontext.h"
 
@@ -159,4 +159,4 @@ private:
 
 } // namespace vrv
 
-#endif // __MUS_SVG_DC_H__
+#endif // __VRV_SVG_DC_H__

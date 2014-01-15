@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musscoredef.cpp
+// Name:        scoredef.cpp
 // Author:      Laurent Pugin
 // Created:     2013/11/08
 // Copyright (c) Authors and others. All rights reserved.

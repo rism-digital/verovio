@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musbeam.cpp
+// Name:        beam.cpp
 // Author:      Rodolfo Zitellini
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.
@@ -41,7 +41,7 @@ void Beam::FilterList()
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( currentElement && !currentElement->HasDurationInterface() )
         {
-            //LogDebug("KILLED!!! %s", currentElement->MusClassName().c_str() );
+            //LogDebug("KILLED!!! %s", currentElement->GetClassName().c_str() );
             iter = m_list.erase( iter );
         } else {
             iter++;

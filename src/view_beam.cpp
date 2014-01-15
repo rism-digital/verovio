@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrc_beam.cpp
+// Name:        view_beam.cpp
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Author and others. All rights reserved.
@@ -187,7 +187,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	do
 	{
         
-        //LogDebug("-> %s", chk->MusClassName().c_str() );
+        //LogDebug("-> %s", chk->GetClassName().c_str() );
         
         if ( chk->IsNote() ) {
             k = ((Note*)chk)->m_colored ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;

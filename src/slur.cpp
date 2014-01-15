@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musslur.cpp
+// Name:        slur.cpp
 // Author:      Rodolfo Zitellini
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.

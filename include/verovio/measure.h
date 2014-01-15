@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musmeasure.h
+// Name:        measure.h
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_MEASURE_H__
-#define __MUS_MEASURE_H__
+#ifndef __VRV_MEASURE_H__
+#define __VRV_MEASURE_H__
 
 #include "object.h"
 
@@ -36,7 +36,7 @@ public:
     Measure( bool measuredMusic = true, int logMeasureNb = -1 );
     virtual ~Measure();
     
-    virtual std::string MusClassName( ) { return "Measure"; };
+    virtual std::string GetClassName( ) { return "Measure"; };
     
     /**
      * Return true if measured music (otherwise we have fakes measures)
@@ -79,7 +79,6 @@ public:
     virtual int Save( ArrayPtrVoid params );
     
 	void CopyAttributes( Measure *measure ); // copy all attributes but none of the elements
-	//void ClearElements( DeviceContext *dc , MusElement *start = NULL );
     
 	Staff *GetFirst( );
 	Staff *GetLast( );

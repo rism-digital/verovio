@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musnote.cpp
+// Name:        note.cpp
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.

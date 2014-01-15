@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muscontroller.h
+// Name:        controller.h
 // Author:      Laurent Pugin
 // Created:     17/10/2013
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_CONTROLLER_H__
-#define __MUS_CONTROLLER_H__
+#ifndef __VRV_CONTROLLER_H__
+#define __VRV_CONTROLLER_H__
 
 #include "doc.h"
 #include "view.h"

@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muspositioninterface.h
+// Name:        positioninterface.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_POSITION_INTERFACE_H__
-#define __MUS_POSITION_INTERFACE_H__
+#ifndef __VRV_POSITION_INTERFACE_H__
+#define __VRV_POSITION_INTERFACE_H__
 
 namespace vrv {
 

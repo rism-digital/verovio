@@ -1,13 +1,13 @@
  /////////////////////////////////////////////////////////////////////////////
-// Name:        musobject.h
+// Name:        object.h
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_OBJECT_H__
-#define __MUS_OBJECT_H__
+#ifndef __VRV_OBJECT_H__
+#define __VRV_OBJECT_H__
 
 #include <list>
 #include <string>
@@ -91,7 +91,7 @@ public:
      */
     void SetParent( Object *parent );
     
-    virtual std::string MusClassName( ) { return "[MISSING]"; };
+    virtual std::string GetClassName( ) { return "[MISSING]"; };
 
     /**
      * Return the index position of the object in its parent (-1 if not found)

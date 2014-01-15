@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musaligner.h
+// Name:        aligner.h
 // Author:      Laurent Pugin
 // Created:     2013
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_ALIGNER_H__
-#define __MUS_ALIGNER_H__
+#ifndef __VRV_ALIGNER_H__
+#define __VRV_ALIGNER_H__
 
 #include "object.h"
 
@@ -21,7 +21,7 @@ class MeasureAligner;
  * Alignment types for aligning types together.
  * For example, we align notes and rests (default) together, clef separately, etc.
  */
-enum MusAlignmentType {
+enum AlignmentType {
     ALIGNMENT_DEFAULT = 0,
     ALIGNMENT_CLEF,
     ALIGNMENT_MENSUR,
@@ -136,7 +136,7 @@ class Alignment: public Object
 public:
     // constructors and destructors
     Alignment( );
-    Alignment( double time, MusAlignmentType type = ALIGNMENT_DEFAULT );
+    Alignment( double time, AlignmentType type = ALIGNMENT_DEFAULT );
     virtual ~Alignment();
     
     void SetXRel( int x_rel );
@@ -160,8 +160,8 @@ public:
      * @name Set and get the type of the alignment
      */
     ///@{
-    void SetType( MusAlignmentType type ) { m_type = type; };
-    MusAlignmentType GetType() { return m_type; };
+    void SetType( AlignmentType type ) { m_type = type; };
+    AlignmentType GetType() { return m_type; };
     ///@}
     
     /**
@@ -191,13 +191,13 @@ private:
      * Stores the position relative to the measure.
      * This is instanciated the Object::SetAligmentXPos functor.
      * It takes into account a non-linear according to the time interval with
-     * the previous MusAlignement
+     * the previous Alignement
      */
     int m_xRel;
     /**
      * Stores temporally the maximum amount we need to shift the element pointing to it for 
      * avoiding collisions. This is set in Object::SetBoundingBoxXShift and then
-     * integrated for all aligment in MusAligment::IntegrateBoundingBoxXShift.
+     * integrated for all aligment in Aligment::IntegrateBoundingBoxXShift.
      */
     int m_xShift;
     /**
@@ -212,13 +212,13 @@ private:
      */
     double m_time;
     /**
-     * Defines the type of alignment (see the MusAlignmentType enum).
+     * Defines the type of alignment (see the AlignmentType enum).
      * We have different types because we want events occuring at the same
      * time to be alignnemt separately. Example: the clef needs to be aligned
      * togeter, but key signature together and then the notes, even if all
      * of them occur at time 0.
      */
-    MusAlignmentType m_type;
+    AlignmentType m_type;
 };
 
 //----------------------------------------------------------------------------
@@ -243,7 +243,7 @@ public:
      */
     void Reset();
     
-    Alignment* GetAlignmentAtTime( double time, MusAlignmentType type );
+    Alignment* GetAlignmentAtTime( double time, AlignmentType type );
     
     /**
      * Keep the maximum time of the measure.
@@ -283,7 +283,7 @@ public:
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
-     * For each MusMeasureAlignment, we need to reset the previous time position.
+     * For each MeasureAlignment, we need to reset the previous time position.
      */
     virtual int SetAligmentXPos( ArrayPtrVoid params );
     

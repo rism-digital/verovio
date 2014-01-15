@@ -1,13 +1,13 @@
-//
-//  musmultirest.h
-//  aruspix
-//
-//  Created by Rodolfo Zitellini on 02/12/13.
-//  Copyright (c) 2013 com.aruspix.www. All rights reserved.
-//
+/////////////////////////////////////////////////////////////////////////////
+// Name:        multirest.h
+// Author:      Rodolfo Zitellini
+// Created:     2013
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MUS_MULTIREST_H__
-#define __MUS_MULTIREST_H__
+
+#ifndef __VRV_MULTIREST_H__
+#define __VRV_MULTIREST_H__
 
 #include "vrvdef.h"
 #include "layerelement.h"
@@ -19,7 +19,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /** 
- * This class models the MEI <musmultirest> element. 
+ * This class models the MEI <multiRest> element. 
  */
 class MultiRest: public LayerElement
 {
@@ -35,7 +35,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string MusClassName( ) { return "MultiRest"; };
+    virtual std::string GetClassName( ) { return "MultiRest"; };
     
     /**
      * Get the multi measure rest number

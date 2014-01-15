@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musapp.cpp
+// Name:        app.cpp
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.

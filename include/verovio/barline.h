@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musbarline.h
+// Name:        barline.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_BARLINE_H__
-#define __MUS_BARLINE_H__
+#ifndef __VRV_BARLINE_H__
+#define __VRV_BARLINE_H__
 
 #include "vrvdef.h"
 #include "layerelement.h"
@@ -34,7 +34,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string MusClassName( ) { return "Barline"; };
+    virtual std::string GetClassName( ) { return "Barline"; };
     
     /**
      * Use to set the alignment for the Measure Barline members.

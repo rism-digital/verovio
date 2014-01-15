@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_DC_H__
-#define __MUS_DC_H__
+#ifndef __VRV_DC_H__
+#define __VRV_DC_H__
 
 #include <string>
 
@@ -54,7 +54,7 @@ class View;
  * This class is an abstract device context.
  * It enables different types of concrete classes to be implemented.
  * For example:
- *  MusWxDC - a wrapper to wxDCs;
+ *  MusWxDC - a wrapper to wxDCs with wxWidgets;
  *  SvgDeviceContext - a non-gui file DC;
  *  MusCairoDC - a wrapper to a Cairo surface;
  * The class uses int-based colour encoding (instead of wxColour in wxDC).

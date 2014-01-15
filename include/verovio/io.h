@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musio.h
+// Name:        io.h
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MUS_IO_H__
-#define __MUS_IO_H__
+#ifndef __VRV_IO_H__
+#define __VRV_IO_H__
 
 #include <fstream>
 #include <iostream>

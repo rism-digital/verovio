@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musiomusxml.h
+// Name:        iomusxml.h
 // Author:      Rodolfo Zitellini
 // Created:     10/08/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_IOMUSXML_H__
-#define __MUS_IOMUSXML_H__
+#ifndef __VRV_IOMUSXML_H__
+#define __VRV_IOMUSXML_H__
 
 #include "doc.h"
 #include "layer.h"
@@ -92,4 +92,4 @@ private:
 
 } // namespace vrv {
 
-#endif // __MUS_IOMUSXML_H__
+#endif // __VRV_IOMUSXML_H__

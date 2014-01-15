@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mussystem.h
+// Name:        system.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_SYSTEM_H__
-#define __MUS_SYSTEM_H__
+#ifndef __VRV_SYSTEM_H__
+#define __VRV_SYSTEM_H__
 
 #include "aligner.h"
 #include "barline.h"
@@ -37,7 +37,7 @@ public:
 	System( const System& system ); // copy contructor
     virtual ~System();
         
-    virtual std::string MusClassName( ) { return "System"; };
+    virtual std::string GetClassName( ) { return "System"; };
     
     void Clear();
 	
@@ -79,7 +79,7 @@ public:
     
     /**
      * Set the position of the StaffAlignment.
-     * Redirect the functor to the MusSytemAligner
+     * Redirect the functor to the SytemAligner
      */
     virtual int SetAligmentYPos( ArrayPtrVoid params );
     

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musdoc.cpp
+// Name:        doc.cpp
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.

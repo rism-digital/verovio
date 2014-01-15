@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musleipzigbbox.h
+// Name:        leipzigbbox.h
 // Author:      Rodolfo Zitellini
 // Created:     30/07/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_LEIPZIGBBOX_H__
-#define __MUS_LEIPZIGBBOX_H__
+#ifndef __VRV_LEIPZIGBBOX_H__
+#define __VRV_LEIPZIGBBOX_H__
 
 #include "object.h"
 

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrc.cpp
+// Name:        view.cpp
 // Author:      Laurent Pugin
 // Created:     2010
 // Copyright (c) Authors and others. All rights reserved.
@@ -40,11 +40,11 @@ View::View( )
 
 	m_lyricMode = false;
 	m_inputLyric = false;
-    m_editorMode = MUS_EDITOR_EDIT;
-	//m_editorMode = MUS_EDITOR_INSERT;
+    m_editorMode = EDITOR_EDIT;
+	//m_editorMode = EDITOR_INSERT;
 	
-	m_notation_mode = MUS_MENSURAL_MODE;
-    //m_notation_mode = MUS_CMN_MODE;
+	m_notation_mode = MENSURAL_MODE;
+    //m_notation_mode = CMN_MODE;
 	
 	m_str.reserve(1000);
 }
@@ -186,7 +186,7 @@ bool View::IsNoteSelected()
 	if (!m_currentElement) 
 		return false;
 	else
-		return m_currentElement->IsNote() || m_currentElement->IsNeume();
+		return m_currentElement->IsNote();
 }
 
 } // namespace vrv

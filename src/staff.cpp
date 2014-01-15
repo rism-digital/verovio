@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musstaff.cpp
+// Name:        staff.cpp
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
@@ -88,7 +88,7 @@ void Staff::Clear()
 	portNbLine = 5;
 	accol = 0;
 	accessoire = 0;
-	m_yAbs = AX_UNSET;
+	m_yAbs = VRV_UNSET;
 	m_yDrawing = 0;
     m_staffAlignment = NULL;
 }

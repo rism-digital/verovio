@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrc_bezier.cpp
+// Name:        view_bezier.cpp
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.

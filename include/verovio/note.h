@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musnote.h
+// Name:        note.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MUS_NOTE_H__
-#define __MUS_NOTE_H__
+#ifndef __VRV_NOTE_H__
+#define __VRV_NOTE_H__
 
 #include "beam.h"
 #include "durationinterface.h"
@@ -53,7 +53,7 @@ public:
     Note();
     virtual ~Note();
     
-    virtual std::string MusClassName( ) { return "Note"; };
+    virtual std::string GetClassName( ) { return "Note"; };
     
      /** 
       * Set the duration.

@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musapp.h
+// Name:        app.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_APP_H__
-#define __MUS_APP_H__
+#ifndef __VRV_APP_H__
+#define __VRV_APP_H__
 
 #include "layerelement.h"
 

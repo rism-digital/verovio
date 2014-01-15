@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mussvgdc.cpp
+// Name:        svgdc.cpp
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
@@ -453,7 +453,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
     
     //if (m_backgroundMode == AxSOLID)
     {
-        WriteLine("/*- MusSVGFileDC::DrawRotatedText - Backgound not implemented */") ;
+        WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
     }
     /*
     s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" ", x, y, 1, 1) ;

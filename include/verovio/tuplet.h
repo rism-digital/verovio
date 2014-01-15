@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mustuplet.h
+// Name:        tuplet.h
 // Author:      Rodolfo Zitellini
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_TUPLET_H__
-#define __MUS_TUPLET_H__
+#ifndef __VRV_TUPLET_H__
+#define __VRV_TUPLET_H__
 
 #include "layer.h"
 #include "note.h"
@@ -26,7 +26,7 @@ public:
     Tuplet();
     virtual ~Tuplet();
     
-    virtual std::string MusClassName( ) { return "Tuplet"; };
+    virtual std::string GetClassName( ) { return "Tuplet"; };
 
 	int GetNoteCount() const { return (int)m_children.size(); };
     

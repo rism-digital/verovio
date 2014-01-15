@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muspage.h
+// Name:        page.h
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_PAGE_H__
-#define __MUS_PAGE_H__
+#ifndef __VRV_PAGE_H__
+#define __VRV_PAGE_H__
 
 #include "object.h"
 #include "scoredef.h"
@@ -39,7 +39,7 @@ public:
     Page();
     virtual ~Page();
     
-    virtual std::string MusClassName( ) { return "Page"; };
+    virtual std::string GetClassName( ) { return "Page"; };
     
     void Clear();
 	

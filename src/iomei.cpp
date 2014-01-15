@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musiomei.cpp
+// Name:        iomei.cpp
 // Author:      Laurent Pugin
 // Created:     2008
 // Copyright (c) Laurent Pugin. All rights reserved.
@@ -136,7 +136,7 @@ bool MeiOutput::WriteDoc( Doc *doc )
     TiXmlElement *p1 = new TiXmlElement("p");
     projectDesc->LinkEndChild(p1);
     
-    p1->LinkEndChild( new TiXmlText( StringFormat( "Encoded with Aruspix version %s",  Resources::GetVersion().c_str() ).c_str() ) );
+    p1->LinkEndChild( new TiXmlText( StringFormat( "Encoded with Aruspix version %s",  GetVersion().c_str() ).c_str() ) );
     
     // date
     time_t now = time(0);
@@ -291,7 +291,7 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
     assert( m_layer );
     
     // Here we look at what is the parent.
-    // For example, if we are in a beam, we must attach it to the beam xml element (m_beam)
+    // For example, if we are in a beam, we vrvT attach it to the beam xml element (m_beam)
     // By default, we attach it to m_layer
     TiXmlElement *currentParent = m_layer;
     if ( dynamic_cast<LayerRdg*>(element->m_parent) ) {
@@ -351,14 +351,14 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
     if ( xmlElement ) {
         this->WriteSameAsAttr( xmlElement, element );
         xmlElement->SetAttribute( "xml:id",  UuidToMeiStr( element ).c_str() );
-        if ( element->m_xAbs != AX_UNSET) {
+        if ( element->m_xAbs != VRV_UNSET) {
             xmlElement->SetAttribute( "ulx", StringFormat( "%d", element->m_xAbs ).c_str() );
         }
         currentParent->LinkEndChild( xmlElement );
         return true;
     }
     else {
-        LogWarning( "Element class %s could not be saved", element->MusClassName().c_str() );
+        LogWarning( "Element class %s could not be saved", element->GetClassName().c_str() );
         return false;
     }    
 }
@@ -1152,69 +1152,69 @@ bool MeiInput::ReadMeiLayer( TiXmlElement *layer )
 
 bool MeiInput::ReadMeiLayerElement( TiXmlElement *xmlElement )
 {
-    LayerElement *musElement = NULL;
+    LayerElement *vrvElement = NULL;
     if ( std::string( xmlElement->Value() )  == "barLine" ) {
-        musElement = ReadMeiBarline( xmlElement );
+        vrvElement = ReadMeiBarline( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "beam" ) {
-        musElement = ReadMeiBeam( xmlElement );
+        vrvElement = ReadMeiBeam( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "clef" ) {
-        musElement = ReadMeiClef( xmlElement );
+        vrvElement = ReadMeiClef( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "mensur" ) {
-        musElement = ReadMeiMensur( xmlElement );
+        vrvElement = ReadMeiMensur( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "note" ) {
-        musElement = ReadMeiNote( xmlElement );
+        vrvElement = ReadMeiNote( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "rest" ) {
-        musElement = ReadMeiRest( xmlElement );
+        vrvElement = ReadMeiRest( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "multiRest" ) {
-        musElement = ReadMeiMultiRest( xmlElement );
+        vrvElement = ReadMeiMultiRest( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "tuplet" ) {
-        musElement = ReadMeiTuplet( xmlElement );
+        vrvElement = ReadMeiTuplet( xmlElement );
     }
     // symbols
     else if ( std::string( xmlElement->Value() ) == "accid" ) {
-        musElement = ReadMeiAccid( xmlElement );
+        vrvElement = ReadMeiAccid( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "custos" ) {
-        musElement = ReadMeiCustos( xmlElement );
+        vrvElement = ReadMeiCustos( xmlElement );
     }
     else if ( std::string( xmlElement->Value() ) == "dot" ) {
-        musElement = ReadMeiDot( xmlElement );
+        vrvElement = ReadMeiDot( xmlElement );
     }
     // app
     else if ( std::string( xmlElement->Value() ) == "app" ) {
-        musElement = ReadMeiApp( xmlElement );
+        vrvElement = ReadMeiApp( xmlElement );
     }
     // unkown            
     else {
         LogDebug("Element %s ignored", xmlElement->Value() );
     }
     
-    if ( !musElement ) {
+    if ( !vrvElement ) {
         return false;
     }
     
     if ( xmlElement->Attribute( "ulx" ) ) {
-        musElement->m_xAbs = atoi ( xmlElement->Attribute( "ulx" ) );
+        vrvElement->m_xAbs = atoi ( xmlElement->Attribute( "ulx" ) );
     }
-    ReadSameAsAttr( xmlElement, musElement );
-    SetMeiUuid( xmlElement, musElement );
+    ReadSameAsAttr( xmlElement, vrvElement );
+    SetMeiUuid( xmlElement, vrvElement );
     
-    AddLayerElement( musElement );
+    AddLayerElement( vrvElement );
     return true;
 }
 
 LayerElement *MeiInput::ReadMeiBarline( TiXmlElement *barline )
 {
-    Barline *musBarline = new Barline();
+    Barline *vrvBarline = new Barline();
     
-    return musBarline;    
+    return vrvBarline;    
 }
 
 LayerElement *MeiInput::ReadMeiBeam( TiXmlElement *beam )
@@ -1244,140 +1244,140 @@ LayerElement *MeiInput::ReadMeiBeam( TiXmlElement *beam )
     } 
     else {
         // set the member to NULL but keep a pointer to be returned        
-        Beam *musBeam = m_beam;
+        Beam *vrvBeam = m_beam;
         m_beam = NULL;
-        return musBeam;
+        return vrvBeam;
     }
 }
 
 LayerElement *MeiInput::ReadMeiClef( TiXmlElement *clef )
 { 
-    Clef *musClef = new Clef(); 
+    Clef *vrvClef = new Clef(); 
     if ( clef->Attribute( "shape" ) && clef->Attribute( "line" ) ) {
-        musClef->m_clefId = StrToClef( clef->Attribute( "shape" ) , clef->Attribute( "line" ) );
+        vrvClef->m_clefId = StrToClef( clef->Attribute( "shape" ) , clef->Attribute( "line" ) );
     }
     
-    return musClef;
+    return vrvClef;
 }
 
 
 LayerElement *MeiInput::ReadMeiMensur( TiXmlElement *mensur )
 {
-    Mensur *musMensur = new Mensur();
+    Mensur *vrvMensur = new Mensur();
     
     if ( mensur->Attribute( "sign" ) ) {
-        musMensur->m_sign = StrToMensurSign( mensur->Attribute( "sign" ) );
+        vrvMensur->m_sign = StrToMensurSign( mensur->Attribute( "sign" ) );
     }
     if ( mensur->Attribute( "dot" ) ) {
-        musMensur->m_dot = ( strcmp( mensur->Attribute( "dot" ), "true" ) == 0 );
+        vrvMensur->m_dot = ( strcmp( mensur->Attribute( "dot" ), "true" ) == 0 );
     }
     if ( mensur->Attribute( "slash" ) ) {
-        musMensur->m_slash =  1; //atoi( mensur->Attribute( "Slash" ) );
+        vrvMensur->m_slash =  1; //atoi( mensur->Attribute( "Slash" ) );
     }
     if ( mensur->Attribute( "orient" ) ) {
-        musMensur->m_reversed = ( strcmp ( mensur->Attribute( "orient" ), "reversed" ) == 0 );
+        vrvMensur->m_reversed = ( strcmp ( mensur->Attribute( "orient" ), "reversed" ) == 0 );
     }
     if ( mensur->Attribute( "num" ) ) {
-        musMensur->m_num = atoi ( mensur->Attribute( "num" ) );
+        vrvMensur->m_num = atoi ( mensur->Attribute( "num" ) );
     }
     if ( mensur->Attribute( "numbase" ) ) {
-        musMensur->m_numBase = atoi ( mensur->Attribute( "numbase" ) );
+        vrvMensur->m_numBase = atoi ( mensur->Attribute( "numbase" ) );
     }
     // missing m_meterSymb
     
-    return musMensur;
+    return vrvMensur;
 }
 
 LayerElement *MeiInput::ReadMeiMultiRest( TiXmlElement *multiRest )
 {
-	MultiRest *musMultiRest = new MultiRest();
+	MultiRest *vrvMultiRest = new MultiRest();
     
 	// pitch
     if ( multiRest->Attribute( "num" ) ) {
-        musMultiRest->SetNumber( atoi ( multiRest->Attribute( "num" ) ) );
+        vrvMultiRest->SetNumber( atoi ( multiRest->Attribute( "num" ) ) );
     }
 	
-	return musMultiRest;
+	return vrvMultiRest;
 }
 
 LayerElement *MeiInput::ReadMeiNote( TiXmlElement *note )
 {
-	Note *musNote = new Note();
+	Note *vrvNote = new Note();
     
 	// pitch
 	if ( note->Attribute( "pname" ) ) {
-		musNote->m_pname = StrToPitch( note->Attribute( "pname" ) );
+		vrvNote->m_pname = StrToPitch( note->Attribute( "pname" ) );
 	}
 	// oct
 	if ( note->Attribute( "oct" ) ) {
-		musNote->m_oct = StrToOct( note->Attribute( "oct" ) );
+		vrvNote->m_oct = StrToOct( note->Attribute( "oct" ) );
 	}
 	// duration
 	if ( note->Attribute( "dur" ) ) {
-		musNote->m_dur = StrToDur( note->Attribute( "dur" ) );
+		vrvNote->m_dur = StrToDur( note->Attribute( "dur" ) );
 	}
     // dots
     if ( note->Attribute( "dots" ) ) {
-		musNote->m_dots = atoi( note->Attribute( "dots" ) );
+		vrvNote->m_dots = atoi( note->Attribute( "dots" ) );
 	}
     // accid
     if ( note->Attribute( "accid" ) ) {
-		musNote->m_accid = StrToAccid( note->Attribute( "accid" ) );
+		vrvNote->m_accid = StrToAccid( note->Attribute( "accid" ) );
 	}
     // ligature
     if ( note->Attribute( "lig" ) ) {
-        musNote->m_lig = true; // this has to be double checked
+        vrvNote->m_lig = true; // this has to be double checked
         if ( strcmp( note->Attribute( "lig" ), "obliqua" ) == 0 ) {
-            musNote->m_ligObliqua = true;
+            vrvNote->m_ligObliqua = true;
         }
     }
     // stem direction
     if ( note->Attribute( "stem.dir" ) ) {
         // we use it to indicate opposite direction
-        musNote->m_stemDir = 1;
+        vrvNote->m_stemDir = 1;
     }
     // coloration
     if ( note->Attribute( "colored" ) ) {
-        musNote->m_colored = ( strcmp ( note->Attribute( "colored" ), "true" ) == 0 );
+        vrvNote->m_colored = ( strcmp ( note->Attribute( "colored" ), "true" ) == 0 );
     }
     // coloration
     if ( note->Attribute( "tie" ) ) {
         if ( (strcmp ( note->Attribute( "tie" ), "i" ) == 0) || (strcmp ( note->Attribute( "tie" ), "m" ) == 0) ) {
-            musNote->SetTieAttrInitial();
-            m_openTies.push_back( musNote );
+            vrvNote->SetTieAttrInitial();
+            m_openTies.push_back( vrvNote );
         }
         if ( (strcmp ( note->Attribute( "tie" ), "t" ) == 0) || (strcmp ( note->Attribute( "tie" ), "m" ) == 0) ) {
-            if (!FindOpenTie( musNote ) ) {
+            if (!FindOpenTie( vrvNote ) ) {
                 LogWarning("Initial tie could not be found" );
             }
         }
     }
 	
-	return musNote;
+	return vrvNote;
 }
 
 
 LayerElement *MeiInput::ReadMeiRest( TiXmlElement *rest )
 {
-    Rest *musRest = new Rest();
+    Rest *vrvRest = new Rest();
     
 	// duration
 	if ( rest->Attribute( "dur" ) ) {
-		musRest->m_dur = StrToDur( rest->Attribute( "dur" ) );
+		vrvRest->m_dur = StrToDur( rest->Attribute( "dur" ) );
 	}
     if ( rest->Attribute( "dots" ) ) {
-		musRest->m_dots = atoi( rest->Attribute( "dots" ) );
+		vrvRest->m_dots = atoi( rest->Attribute( "dots" ) );
 	}
     // position
 	if ( rest->Attribute( "ploc" ) ) {
-		musRest->m_pname = StrToPitch( rest->Attribute( "ploc" ) );
+		vrvRest->m_pname = StrToPitch( rest->Attribute( "ploc" ) );
 	}
 	// oct
 	if ( rest->Attribute( "oloc" ) ) {
-		musRest->m_oct = StrToOct( rest->Attribute( "oloc" ) );
+		vrvRest->m_oct = StrToOct( rest->Attribute( "oloc" ) );
 	}
 	
-    return musRest;
+    return vrvRest;
 }
 
 
@@ -1415,64 +1415,64 @@ LayerElement *MeiInput::ReadMeiTuplet( TiXmlElement *tuplet )
     }
     else {
         // set the member to NULL but keep a pointer to be returned
-        Tuplet *musTuplet = m_tuplet;
+        Tuplet *vrvTuplet = m_tuplet;
         m_tuplet = NULL;
-        return musTuplet;
+        return vrvTuplet;
     }
 }
 
 
 LayerElement *MeiInput::ReadMeiAccid( TiXmlElement *accid )
 {
-    Symbol *musAccid = new Symbol( SYMBOL_ACCID );
+    Symbol *vrvAccid = new Symbol( SYMBOL_ACCID );
     
     if ( accid->Attribute( "accid" ) ) {
-        musAccid->m_accid = StrToAccid( accid->Attribute( "accid" ) );
+        vrvAccid->m_accid = StrToAccid( accid->Attribute( "accid" ) );
     }
     // position
 	if ( accid->Attribute( "ploc" ) ) {
-		musAccid->m_pname = StrToPitch( accid->Attribute( "ploc" ) );
+		vrvAccid->m_pname = StrToPitch( accid->Attribute( "ploc" ) );
 	}
 	// oct
 	if ( accid->Attribute( "oloc" ) ) {
-		musAccid->m_oct = StrToOct( accid->Attribute( "oloc" ) );
+		vrvAccid->m_oct = StrToOct( accid->Attribute( "oloc" ) );
 	}
 	
-	return musAccid;
+	return vrvAccid;
 }
 
 LayerElement *MeiInput::ReadMeiCustos( TiXmlElement *custos )
 {
-    Symbol *musCustos = new Symbol( SYMBOL_CUSTOS );
+    Symbol *vrvCustos = new Symbol( SYMBOL_CUSTOS );
     
 	// position (pitch)
 	if ( custos->Attribute( "pname" ) ) {
-		musCustos->m_pname = StrToPitch( custos->Attribute( "pname" ) );
+		vrvCustos->m_pname = StrToPitch( custos->Attribute( "pname" ) );
 	}
 	// oct
 	if ( custos->Attribute( "oct" ) ) {
-		musCustos->m_oct = StrToOct( custos->Attribute( "oct" ) );
+		vrvCustos->m_oct = StrToOct( custos->Attribute( "oct" ) );
 	}
 	
-	return musCustos;    
+	return vrvCustos;    
 }
 
 LayerElement *MeiInput::ReadMeiDot( TiXmlElement *dot )
 {
-    Symbol *musDot = new Symbol( SYMBOL_DOT );
+    Symbol *vrvDot = new Symbol( SYMBOL_DOT );
     
-    musDot->m_dot = 0;
+    vrvDot->m_dot = 0;
     // missing m_dots
     // position
 	if ( dot->Attribute( "ploc" ) ) {
-		musDot->m_pname = StrToPitch( dot->Attribute( "ploc" ) );
+		vrvDot->m_pname = StrToPitch( dot->Attribute( "ploc" ) );
 	}
 	// oct
 	if ( dot->Attribute( "oloc" ) ) {
-		musDot->m_oct = StrToOct( dot->Attribute( "oloc" ) );
+		vrvDot->m_oct = StrToOct( dot->Attribute( "oloc" ) );
 	}
 	
-	return musDot;
+	return vrvDot;
 }
 
 LayerElement *MeiInput::ReadMeiApp( TiXmlElement *app )

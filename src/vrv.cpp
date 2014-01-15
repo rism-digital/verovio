@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mus.cpp
+// Name:        vrv.cpp
 // Author:      Laurent Pugin
 // Created:     2013
 // Copyright (c) Authors and others. All rights reserved.
@@ -200,21 +200,10 @@ std::string GetFilename( std::string fullpath )
     }
     return name;
 }
-
-//----------------------------------------------------------------------------
-// Resources
-//----------------------------------------------------------------------------
-
-
-std::string Resources::GetVersion() {
-#ifndef AX_APP
-    return std::string("command line"); // we need to add versioning
-#else
-    return AxApp::s_version.mb_str();
-#endif
+    
+std::string GetVersion() {
+    return StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION );
 }
-
-
 
 //----------------------------------------------------------------------------
 // DefaultEnv
@@ -233,7 +222,7 @@ DefaultEnv::DefaultEnv()
     m_beamMaxSlope = 30;
     m_beamMinSlope = 10;
     
-    // originally in MusParameters2
+    // originally in WG Parameters2
     m_smallStaffNum = 16;
     m_smallStaffDen = 20;
     m_graceNum = 3;
@@ -248,8 +237,8 @@ DefaultEnv::DefaultEnv()
     m_pageTopMar = 0;
     
     // additional parameters
-    m_notationMode = MUS_MENSURAL_MODE;
-    //m_notationMode = MUS_CMN_MODE;
+    m_notationMode = MENSURAL_MODE;
+    //m_notationMode = CMN_MODE;
 }
 
 DefaultEnv::~DefaultEnv()

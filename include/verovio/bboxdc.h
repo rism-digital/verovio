@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musbboxdc.h 
+// Name:        bboxdc.h 
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.   
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_BBOX_DC_H__
-#define __MUS_BBOX_DC_H__
+#ifndef __VRV_BBOX_DC_H__
+#define __VRV_BBOX_DC_H__
 
 #include "devicecontext.h"
 #include "object.h"
@@ -131,4 +131,4 @@ private:
 
 } // namespace vrv
 
-#endif // __MUS_BBOX_DC_H__
+#endif // __VRV_BBOX_DC_H__

@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrc_page.cpp
+// Name:        view_page.cpp
 // Author:      Laurent Pugin and Chris Niven
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
@@ -88,7 +88,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     dc->StartGraphic( system, "system", system->GetUuid() );
     
     
-    if ( system->m_yAbs == AX_UNSET ) {
+    if ( system->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
         system->m_yDrawing = system->m_yRel;
         system->m_xDrawing = system->m_xRel;
@@ -517,7 +517,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_xRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_xAbs
-    if ( measure->m_xAbs == AX_UNSET ) {
+    if ( measure->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
         measure->m_xDrawing = measure->m_xRel + system->m_xDrawing;
     }
@@ -664,7 +664,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_yRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs
-    if ( staff->m_yAbs == AX_UNSET ) {
+    if ( staff->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
         staff->m_yDrawing = staff->GetYRel() + system->m_yDrawing;
     }

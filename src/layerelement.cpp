@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muslayerelement.cpp
+// Name:        layerelement.cpp
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
@@ -100,7 +100,7 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
     else if (this->IsSymbol() )
         element = new Symbol( *(Symbol*)this );
     else {
-        LogDebug( "Missing %s", this->MusClassName().c_str() );
+        LogDebug( "Missing %s", this->GetClassName().c_str() );
         assert( false ); // Copy of this type unimplemented
         return NULL;
     }
@@ -172,7 +172,7 @@ void LayerElement::Init()
     m_staffShift = 0;
     m_visible = true;
     
-    m_xAbs = AX_UNSET;
+    m_xAbs = VRV_UNSET;
     m_xDrawing = 0;
     m_yRel = 0;
     m_in_layer_app = false;
@@ -227,16 +227,6 @@ bool LayerElement::IsMultiRest()
 bool LayerElement::IsMensur() 
 {  
     return (dynamic_cast<Mensur*>(this));
-}
-
-bool LayerElement::IsNeume() 
-{  
-    return false; //return (typeid(*m_layerElement) == typeid(MusNeume)); 
-}
-
-bool LayerElement::IsNeumeSymbol() 
-{  
-    return false; //return (typeid(*m_layerElement) == typeid(MusNeume)); 
 }
 
 bool LayerElement::IsNote() 
@@ -323,7 +313,7 @@ int LayerElement::Align( ArrayPtrVoid params )
     MeasureAligner **measureAligner = (MeasureAligner**)params[0];
     double *time = (double*)params[1];
     
-    MusAlignmentType type = ALIGNMENT_DEFAULT;
+    AlignmentType type = ALIGNMENT_DEFAULT;
     if ( this->IsBarline() ) {
         type = ALIGNMENT_BARLINE;
     }

@@ -299,8 +299,6 @@
 				8F086F3918853A190037FD8E /* view */,
 				8F086EB6188539540037FD8E /* aligner.cpp */,
 				8F59290D18854BF800FE51AD /* aligner.h */,
-				8F59293218854BF800FE51AD /* vrv.h */,
-				8F59293318854BF800FE51AD /* vrvdef.h */,
 				8F086EBD188539540037FD8E /* doc.cpp */,
 				8F59291418854BF800FE51AD /* doc.h */,
 				8F086EBF188539540037FD8E /* interfacecontroller.cpp */,
@@ -308,6 +306,8 @@
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				8F086EE1188539540037FD8E /* vrv.cpp */,
+				8F59293218854BF800FE51AD /* vrv.h */,
+				8F59293318854BF800FE51AD /* vrvdef.h */,
 			);
 			name = source;
 			sourceTree = "<group>";

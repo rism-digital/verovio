@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musscoredef.h
+// Name:        scoredef.h
 // Author:      Laurent Pugin
 // Created:     2013/11/08
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_SCOREDEF_H__
-#define __MUS_SCOREDEF_H__
+#ifndef __VRV_SCOREDEF_H__
+#define __VRV_SCOREDEF_H__
 
 #include "object.h"
 
@@ -93,7 +93,7 @@ public:
     ScoreDef();
     virtual ~ScoreDef();
         
-    virtual std::string MusClassName( ) { return "ScoreDef"; };
+    virtual std::string GetClassName( ) { return "ScoreDef"; };
     
     void Clear();
     
@@ -154,7 +154,7 @@ public:
     virtual ~StaffGrp();
     virtual Object* Clone() { return new StaffGrp(*this); };
     
-    virtual std::string MusClassName( ) { return "StaffGrp"; };
+    virtual std::string GetClassName( ) { return "StaffGrp"; };
 	
 	void AddStaffDef( StaffDef *staffDef );
     
@@ -212,7 +212,7 @@ public:
     virtual ~StaffDef();
     virtual Object* Clone() { return new StaffDef(*this); };
     
-    virtual std::string MusClassName( ) { return "StaffDef"; };
+    virtual std::string GetClassName( ) { return "StaffDef"; };
     
     /**
      * @name Set and get  the staff number which is 1-based.

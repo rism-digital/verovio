@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muscontroller.cpp
+// Name:        controller.cpp
 // Author:      Laurent Pugin
 // Created:     17/10/2013
 // Copyright (c) Authors and others. All rights reserved.

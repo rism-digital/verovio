@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mustie.h
+// Name:        tie.h
 // Author:      Rodolfo Zitellini
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_TIE_H__
-#define __MUS_TIE_H__
+#ifndef __VRV_TIE_H__
+#define __VRV_TIE_H__
 
 #include "layer.h"
 #include "note.h"
@@ -28,7 +28,7 @@ public:
     Tie();
     virtual ~Tie();
     
-    virtual std::string MusClassName( ) { return "Tie"; };
+    virtual std::string GetClassName( ) { return "Tie"; };
     
     /**
      * @name Set and get the first and second note of the tie

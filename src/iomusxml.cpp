@@ -187,7 +187,7 @@ bool XMLOutput::WriteLayerElement( LayerElement *element )
         SetTie(m_xml_last_note, false);
     }
     
- //   LogDebug("---- %s", element->MusClassName().c_str());
+ //   LogDebug("---- %s", element->GetClassName().c_str());
     
     return true;
  }

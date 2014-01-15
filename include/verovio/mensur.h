@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musmensur.h
+// Name:        mensur.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_MENSUR_H__
-#define __MUS_MENSUR_H__
+#ifndef __VRV_MENSUR_H__
+#define __VRV_MENSUR_H__
 
 #include "vrvdef.h"
 #include "layerelement.h"
@@ -34,7 +34,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string MusClassName( ) { return "Mensur"; };
+    virtual std::string GetClassName( ) { return "Mensur"; };
     
     /**
      * Set the value for the mensur.

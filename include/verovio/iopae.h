@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_IOPAE_H__
-#define __MUS_IOPAE_H__
+#ifndef __VRV_IOPAE_H__
+#define __VRV_IOPAE_H__
 
 #include <string>
 #include <vector>

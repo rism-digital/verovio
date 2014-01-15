@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musiomei.h
+// Name:        iomei.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __MUS_IOMEI_H__
-#define __MUS_IOMEI_H__
+#ifndef __VRV_IOMEI_H__
+#define __VRV_IOMEI_H__
 
 #include "doc.h"
 

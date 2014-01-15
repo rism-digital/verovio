@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musio.cpp
+// Name:        io.cpp
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Laurent Pugin. All rights reserved.

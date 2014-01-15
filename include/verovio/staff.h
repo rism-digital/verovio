@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musstaff.h
+// Name:        staff.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_STAFF_H__
-#define __MUS_STAFF_H__
+#ifndef __VRV_STAFF_H__
+#define __VRV_STAFF_H__
 
 #include "object.h"
 
@@ -40,7 +40,7 @@ public:
 	Staff( const Staff& staff ); // copy contructor
     virtual ~Staff();
 
-    virtual std::string MusClassName( ) { return "Staff"; };	
+    virtual std::string GetClassName( ) { return "Staff"; };	
     
     void Clear();
     
@@ -76,7 +76,6 @@ public:
     virtual bool GetPosOnPage( ArrayPtrVoid params );
     
 	void CopyAttributes( Staff *staff ); // copy all attributes but none of the elements
-	//void ClearElements( DeviceContext *dc , MusElement *start = NULL );
 
 	Layer *GetFirst( );
 	Layer *GetLast( );

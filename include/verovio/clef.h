@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musclef.h
+// Name:        clef.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_CLEF_H__
-#define __MUS_CLEF_H__
+#ifndef __VRV_CLEF_H__
+#define __VRV_CLEF_H__
 
 #include "vrvdef.h"
 #include "layerelement.h"
@@ -34,7 +34,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string MusClassName( ) { return "Clef"; };
+    virtual std::string GetClassName( ) { return "Clef"; };
     
     /**
      * Return the offset of the clef

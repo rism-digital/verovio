@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrest.h
+// Name:        rest.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_REST_H__
-#define __MUS_REST_H__
+#ifndef __VRV_REST_H__
+#define __VRV_REST_H__
 
 #include "durationinterface.h"
 #include "layerelement.h"
@@ -35,7 +35,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string MusClassName( ) { return "Rest"; };
+    virtual std::string GetClassName( ) { return "Rest"; };
     
 private:
     

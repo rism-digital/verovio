@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muslayerelement.h
+// Name:        layerelement.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_LAYER_ELEMENT_H__
-#define __MUS_LAYER_ELEMENT_H__
+#ifndef __VRV_LAYER_ELEMENT_H__
+#define __VRV_LAYER_ELEMENT_H__
 
 #include "devicecontext.h" // for MusPoint
 #include "vrvdef.h"
@@ -95,8 +95,6 @@ public:
     bool IsKeySig();
     bool IsMensur();
     bool IsMultiRest();
-    bool IsNeume();
-    bool IsNeumeSymbol();
     bool IsNote();
     bool HasPitchInterface();
     bool HasPositionInterface();

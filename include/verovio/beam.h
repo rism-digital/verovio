@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musbeam.h
+// Name:        beam.h
 // Author:      Rodolfo Zitellini
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 //
 
-#ifndef __MUS_BEAM_H__
-#define __MUS_BEAM_H__
+#ifndef __VRV_BEAM_H__
+#define __VRV_BEAM_H__
 
 #include "layerelement.h"
 #include "note.h"
@@ -25,7 +25,7 @@ public:
     Beam();
     virtual ~Beam();
     
-    virtual std::string MusClassName( ) { return "Beam"; };
+    virtual std::string GetClassName( ) { return "Beam"; };
     
     int GetNoteCount() const { return (int)m_children.size(); };
     

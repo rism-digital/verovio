@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musdurationinterface.h
+// Name:        durationinterface.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_DURATION_INTERFACE_H__
-#define __MUS_DURATION_INTERFACE_H__
+#ifndef __VRV_DURATION_INTERFACE_H__
+#define __VRV_DURATION_INTERFACE_H__
 
 namespace vrv {
 

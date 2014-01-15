@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mussymbol.h
+// Name:        symbol.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_SYMBOL_H__
-#define __MUS_SYMBOL_H__
+#ifndef __VRV_SYMBOL_H__
+#define __VRV_SYMBOL_H__
 
 #include "vrvdef.h"
 #include "layerelement.h"
@@ -39,7 +39,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string MusClassName( ) { return "Symbol"; };
+    virtual std::string GetClassName( ) { return "Symbol"; };
     
     /**
      * Set the value for the symbol.

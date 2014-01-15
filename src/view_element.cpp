@@ -62,7 +62,7 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     // Here we set the appropriate x value to be used for drawing
     // With Raw documents, we use m_xRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_xAbs
-    if ( element->m_xAbs == AX_UNSET ) {
+    if ( element->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
         //element->m_xDrawing = element->m_xRel + measure->m_xDrawing;
         //element->m_xDrawing = element->m_xRel + measure->GetXRel();

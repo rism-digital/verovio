@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musdc.cpp
+// Name:        devicecontext.cpp
 // Author:      Laurent Pugin
 // Created:     2010
 // Copyright (c) Authors and others. All rights reserved.

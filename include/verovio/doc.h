@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musdoc.h
+// Name:        doc.h
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_DOC_H__
-#define __MUS_DOC_H__
+#ifndef __VRV_DOC_H__
+#define __VRV_DOC_H__
 
 #include "vrv.h"
 #include "devicecontext.h"
@@ -115,7 +115,7 @@ private:
     /**
      * Calculates the Leipzig font size according to the m_interlDefin reference value.
      * The size is calculated using  LEIPZIG_UNITS_PER_EM and LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT.
-     * See musdef.h for more information about these values.
+     * See vrvdef.h for more information about these values.
      */
     int CalcLeipzigFontSize( );
     

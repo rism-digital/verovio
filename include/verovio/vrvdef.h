@@ -1,25 +1,29 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musdef.h
+// Name:        vrvdef.h
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_DEF_H__
-#define __MUS_DEF_H__
-
-//----------------------------------------------------------------------------
-// ARUSPIX 2
-//----------------------------------------------------------------------------
+#ifndef __VRV_DEF_H__
+#define __VRV_DEF_H__
 
 #include <algorithm>
 
 namespace vrv {
-
+    
+//----------------------------------------------------------------------------
+// Global defines
+//----------------------------------------------------------------------------
+    
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 9
+#define VERSION_REVISION 0
+    
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
-#define AX_UNSET -0x7FFFFFFF
+#define VRV_UNSET -0x7FFFFFFF
 
 /**
  * Codes returned by MusFunctors.
@@ -27,23 +31,22 @@ namespace vrv {
  * FUNCTOR_SIBLINGS will no go any deeper in the tree.
  * FUNCTOR_STOP wil stop the tree processing.
  */
-enum MusFunctorCode {
+enum FunctorCode {
     FUNCTOR_CONTINUE = 0,
     FUNCTOR_SIBLINGS,
     FUNCTOR_STOP
 };
 
 // Is this score for Mensural, neumes, or CMN
-enum MusNotationMode {
-    MUS_MENSURAL_MODE = 0,
-    MUS_NEUMATIC_MODE,
-    MUS_CMN_MODE
+enum NotationMode {
+    MENSURAL_MODE = 0,
+    CMN_MODE
 };
 
 // Is the app in insert mode or edit (drag) mode
-enum MusEditorMode {
-	MUS_EDITOR_EDIT,
-	MUS_EDITOR_INSERT
+enum EditorMode {
+	EDITOR_EDIT,
+	EDITOR_INSERT
 };
 
 // SPACING
@@ -192,70 +195,6 @@ enum SymbolType {
     SYMBOL_PB = 5
 };
 
-
-//----------------------------------------------------------------------------
-// Neumes - Festa Dies font
-//----------------------------------------------------------------------------
-
-// NEUMES
-#define nQUILISMA '@'		// quilisma
-#define nWHITEPUNCT 'B'		// nota excavata (white punctum)
-#define nDIAMOND_SMALL 'C'	// Punctum inclinatum parvum 
-#define nDIAMOND 'D'		// diamond punctum
-#define nCEPHALICUS 'K'		// cephalicus (downward punctum)
-#define nPUNCT_UP 'L'		// punctum (upwards)
-#define nPES 'M'			// podatus bottom (normal)
-#define nAPOSTROPHA 'X'		// apostropha
-#define nPODATUS_EP 'Y'		// podatus bottom (epiphonus)
-#define nNATURAL 'b'		// natural sign
-#define nB_FLAT 'c'			// b flat
-#define nPUNCTUM 'd'		// square punctum
-#define nLIQUES_UP 'e'		// liquescent (upward)
-#define nLIQUES_DOWN 'f'	// liquescent (downward)
-#define nPORRECT_1 'j'		// one step down porrectus
-#define nPORRECT_2 'k'		// two steps down porrectus
-#define nPORRECT_3 'l'		// three steps down porrectus
-#define nPORRECT_4 'm'		// four steps down porrectus
-#define nNEXT_PITCH 't'		// end-of-line next pitch marker (custos)
-#define nC_CLEF 'y'         // C clef
-#define nF_CLEF 'z'			// F clef
-#define nCOMMA ';'			// comma division
-#define nDIV_MINOR ')'		// half barline
-#define nDIV_FINAL '('		// double barline
-#define nDIV_SMALL '0'		// small barline
-#define nDIV_MAJOR '&'		// full barline
-#define nDOT 'g'			// dot
-//
-#define nVIRGA 5	// convenience - for use with SetValue(int) 
-
-// festa dies stems
-enum NeumeStem {
-	nSTEM_T_LEFT = '5',
-	nSTEM_B_LEFT = '3',
-	nSTEM_T_RIGHT = '+',
-	nSTEM_B_RIGHT = '#'
-};
-
-// MEI-related defs
-#define INEUME 0 // 'broken' neume (climacus or scandicus)
-#define UNEUME 1 // 'unbroken' neume (clivis, pes, etc)
-
-// forms
-#define QUIL 1 // "quilismatic"
-#define RHOM 2 // "rhombic"
-#define LIQ1 3 // "liquescent1"
-
-// for neume_line
-#define LEFT_STEM 0
-#define RIGHT_STEM 1
-
-// x spacings
-#define PUNCT_PADDING 25 // space between punctums in open editing mode
-#define PUNCT_WIDTH 10 // 'guesstimation' of punctum width -- this number is fairly arbitrary
-#define CLIVIS_X_SAME 15	// spacing between punctums of the same pitch in a clivis
-#define CLIVIS_X_DIFF 9	// distance is tighter between altering pitches in clivis
-
-
 //----------------------------------------------------------------------------
 // Music - Leipzig font
 //----------------------------------------------------------------------------
@@ -325,4 +264,4 @@ enum NeumeStem {
 
 } // namespace vrv
 
-#endif // __MUS_DEF_H__
+#endif // __VRV_DEF_H__

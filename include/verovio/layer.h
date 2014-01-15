@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muslayer.h
+// Name:        layer.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_LAYER_H__
-#define __MUS_LAYER_H__
+#ifndef __VRV_LAYER_H__
+#define __VRV_LAYER_H__
 
 #include <typeinfo>
 
@@ -37,7 +37,7 @@ public:
     Layer( int n );
     virtual ~Layer();
     
-    virtual std::string MusClassName( ) { return "Layer"; };
+    virtual std::string GetClassName( ) { return "Layer"; };
     
     void Clear();
 	

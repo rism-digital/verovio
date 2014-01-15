@@ -1,5 +1,5 @@
 //
-//  musmultirest.cpp
+//  multirest.cpp
 //  aruspix
 //
 //  Created by Rodolfo Zitellini on 02/12/13.

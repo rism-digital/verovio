@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musmeasure.h
+// Name:        measure.h
 // Author:      Laurent Pugin
 // Created:     2012
 // Copyright (c) Authors and others. All rights reserved.
@@ -47,7 +47,7 @@ void Measure::Clear()
     m_parent = NULL;
     m_logMeasureNb = -1;
     m_measuredMusic = true;
-    m_xAbs = AX_UNSET;
+    m_xAbs = VRV_UNSET;
     m_xRel = 0;
     m_xDrawing = 0;
     // by default, we have a single barline on the right (none on the left)
@@ -190,7 +190,7 @@ int Measure::Align( ArrayPtrVoid params )
 int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift (unused)
-    // param 1: the functor to be redirected to MusAligner
+    // param 1: the functor to be redirected to Aligner
     MusFunctor *integrateBoundingBoxShift = (MusFunctor*)params[1];
     
     m_measureAligner.Process( integrateBoundingBoxShift, params);
@@ -202,7 +202,7 @@ int Measure::SetAligmentXPos( ArrayPtrVoid params )
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
-    // param 2: the functor to be redirected to MusAligner
+    // param 2: the functor to be redirected to Aligner
     MusFunctor *setAligmnentPosX = (MusFunctor*)params[2];
     
     m_measureAligner.Process( setAligmnentPosX, params);

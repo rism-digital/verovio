@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musobject.cpp
+// Name:        object.cpp
 // Author:      Laurent Pugin
 // Created:     2005
 // Copyright (c) Authors and others. All rights reserved.
@@ -200,7 +200,7 @@ bool Object::operator==( Object& other )
     // This should never happen.
     // The comparison is performed in the CmpFile::Align method.
     // We expect to compare only Note, Rest, etc object for which we have an overwritten method
-    LogError( "Missing comparison operator for '%s'", this->MusClassName().c_str() );
+    LogError( "Missing comparison operator for '%s'", this->GetClassName().c_str() );
     return false;
 }
 
@@ -239,7 +239,7 @@ void Object::FillList( ListOfObjects *list )
     for (iter = list->begin(); iter != list->end(); ++iter)
     {
         Object *current = *iter;
-        LogDebug("%s", current->MusClassName().c_str() );
+        LogDebug("%s", current->GetClassName().c_str() );
     }
     */
 }
@@ -789,7 +789,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->MusClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
@@ -863,7 +863,7 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
         current->GetAlignment()->SetYShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->MusClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_y1;

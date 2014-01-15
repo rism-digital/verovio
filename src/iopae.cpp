@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musiopae.cpp
+// Name:        iopae.cpp
 // Author:      Rodolfo Zitellini // this is the important stuff!
 // Created:     2012
 // Copyright (c) Laurent Pugin. All rights reserved.

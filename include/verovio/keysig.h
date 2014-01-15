@@ -1,14 +1,14 @@
 
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muskeysig.h
+// Name:        keysig.h
 // Author:      Rodolfo Zitellini
 // Created:     10/07/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_KEYSIG_H__
-#define __MUS_KEYSIG_H__
+#ifndef __VRV_KEYSIG_H__
+#define __VRV_KEYSIG_H__
 
 #include "vrvdef.h"
 #include "layerelement.h"
@@ -17,7 +17,7 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// MusKeysig
+// KeySignature
 //----------------------------------------------------------------------------
 
 class KeySignature: public LayerElement, public PositionInterface
@@ -28,7 +28,7 @@ public:
     KeySignature(int num_alter, char alter);
     virtual ~KeySignature();
     
-    virtual std::string MusClassName( ) { return "KeySignature"; };
+    virtual std::string GetClassName( ) { return "KeySignature"; };
     
     /**
      * Return the default horizontal spacing after a keysig.

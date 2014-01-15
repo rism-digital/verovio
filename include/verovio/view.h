@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_RENDERER_H__
-#define __MUS_RENDERER_H__
+#ifndef __VRV_RENDERER_H__
+#define __VRV_RENDERER_H__
 
 #include <typeinfo>
 
@@ -86,7 +86,7 @@ public:
      */
 	void SetPage( Page *page );
 
-	/* musrc_graph.cpp */
+	/* view_graph.cpp */
 	void v_bline ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void v_bline2 ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void h_bline ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
@@ -102,7 +102,8 @@ public:
 	void rect_plein2( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	int hGrosseligne ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
 	int DoDrawDot ( DeviceContext *dc, int x, int y );
-	/* musrc_bezier.cpp */
+	
+    /* view_bezier.cpp */
 	static int CC(int ,int );
 	static long BBlend(int ,int ,long );
 	static int InitBezier(int );
@@ -110,7 +111,7 @@ public:
 	static void calcBez ( MusPoint *ptcoord, int _nbint );
 	static void pntswap (MusPoint *x1, MusPoint *x2);
     
-    /* musrc_page.cpp */
+    /* view_page.cpp */
 	void DrawPage( DeviceContext *dc, Page *page, bool background = true );
     void DrawSystem( DeviceContext *dc, System *system );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barline = NULL );
@@ -132,7 +133,7 @@ public:
 	void DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height = -1);
     int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
     
-    /* musrc_element.cpp */
+    /* view_element.cpp */
     /** @name Methods for drawing LayerElement containing other elements */
     ///@{
     void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
@@ -172,7 +173,8 @@ public:
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    /* musrc_beam.cpp */
+    
+    /* view_beam.cpp */
     void DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff );
     
 private:
@@ -208,7 +210,7 @@ public:
 	int m_notation_mode; // neumes or mensural notation mode
 	bool m_lyricMode;
 	bool m_inputLyric;
-	MusEditorMode m_editorMode; // Edit or insert
+	EditorMode m_editorMode; // Edit or insert
     
 private:
 

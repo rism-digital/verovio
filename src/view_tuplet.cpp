@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrc_tuplet.cpp
+// Name:        view_tuplet.cpp
 // Author:      Rodolfo Zitellini
 // Created:     21/08/2012
 // Copyright (c) Authors and others. All rights reserved.

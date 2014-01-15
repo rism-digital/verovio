@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        muspitchinterface.h
+// Name:        pitchinterface.h
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __MUS_PITCH_INTERFACE_H__
-#define __MUS_PITCH_INTERFACE_H__
+#ifndef __VRV_PITCH_INTERFACE_H__
+#define __VRV_PITCH_INTERFACE_H__
 
 namespace vrv {
 

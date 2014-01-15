@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musaligner.cpp
+// Name:        aligner.cpp
 // Author:      Laurent Pugin
 // Created:     2013
 // Copyright (c) Authors and others. All rights reserved.
@@ -133,7 +133,7 @@ void MeasureAligner::AddAlignment( Alignment *alignment, int idx )
     }
 }
 
-Alignment* MeasureAligner::GetAlignmentAtTime( double time, MusAlignmentType type )
+Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
 {
     int i;
     int idx = -1; // the index if we reach the end.
@@ -171,7 +171,7 @@ void MeasureAligner::SetMaxTime( double time )
 }
 
 //----------------------------------------------------------------------------
-// MusAlignement
+// Alignement
 //----------------------------------------------------------------------------
 
 Alignment::Alignment( ):
@@ -184,7 +184,7 @@ Alignment::Alignment( ):
     m_type = ALIGNMENT_DEFAULT;
 }
 
-Alignment::Alignment( double time, MusAlignmentType type ):
+Alignment::Alignment( double time, AlignmentType type ):
     Object()
 {
     m_xRel = 0;
