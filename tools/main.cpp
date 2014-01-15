@@ -53,7 +53,7 @@ std::string removeExtension( std::string const& filename )
 
 
 void display_usage() {
-    cerr << "Aruspix command line usage:" << endl;
+    cerr << "Verovio command line usage:" << endl;
     cerr << "aruspix [-f pae | mei | darms] [-s scale] [-t mei | svg] [-r resources] [-o outfile] infile" << endl << endl;
 
     cerr << "-p, --page-height=PAGE_HEIGHT" << endl;

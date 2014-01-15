@@ -17,7 +17,7 @@ namespace vrv {
 
 /**
  * The following functions are helpers for formating, conversion, or loggin
- * Most of them differ if they are used in Aruspix or in the command line tool
+ * Most of them differ if they are used in the command line tool or in emscripten
  */
         
     

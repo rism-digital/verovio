@@ -136,7 +136,7 @@ bool MeiOutput::WriteDoc( Doc *doc )
     TiXmlElement *p1 = new TiXmlElement("p");
     projectDesc->LinkEndChild(p1);
     
-    p1->LinkEndChild( new TiXmlText( StringFormat( "Encoded with Aruspix version %s",  GetVersion().c_str() ).c_str() ) );
+    p1->LinkEndChild( new TiXmlText( StringFormat( "Encoded with Verovio version %s",  GetVersion().c_str() ).c_str() ) );
     
     // date
     time_t now = time(0);
