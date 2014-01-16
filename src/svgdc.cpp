@@ -150,7 +150,7 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
 }
   
       
-void SvgDeviceContext::EndGraphic(DocObject *object, View *rc ) 
+void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
     m_graphics--;
     m_indents--;

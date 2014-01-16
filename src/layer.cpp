@@ -159,9 +159,6 @@ LayerElement *Layer::Insert( LayerElement *element, int x )
         return NULL;
     }
     
-    // This is temporary and is OK because we have only one single layout for now.
-    // Inserting elements should be done from the logical tree and then update the layout
-    
     LayerElement *insertElement = element->GetChildCopy();
 
     // First we find the element after which we are inserting the element

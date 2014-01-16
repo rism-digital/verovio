@@ -647,7 +647,7 @@ int Object::FindByUuid( ArrayPtrVoid params )
 }
 
 
-int Object::SetPageScoreDef( ArrayPtrVoid params )
+int Object::SetCurrentScoreDef( ArrayPtrVoid params )
 {
 
     // param 0: the current scoreDef

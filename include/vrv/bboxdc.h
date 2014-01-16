@@ -31,7 +31,7 @@ class BBoxDeviceContext: public DeviceContext
 {
 public:
 
-    BBoxDeviceContext ( View *rc, int width, int height );
+    BBoxDeviceContext ( View *view, int width, int height );
     virtual ~BBoxDeviceContext();
     
     // Setters
@@ -97,7 +97,7 @@ public:
     // 
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId );
     
-    virtual void EndGraphic(DocObject *object, View *rc );
+    virtual void EndGraphic(DocObject *object, View *view );
     
     virtual void StartPage();
     
@@ -119,7 +119,7 @@ private:
     /**
      * The rendering context we are calling from - used to flip back the Y coordinates
      */
-    View *m_rc;
+    View *m_view;
    
     //
     int m_penWidth;

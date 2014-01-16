@@ -147,7 +147,7 @@ public:
     
 private:
     Doc m_doc;
-    View m_rc;
+    View m_view;
     int m_border;
     int m_scale;
     ConvertFileFormat m_format;

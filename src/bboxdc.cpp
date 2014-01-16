@@ -31,12 +31,12 @@ static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; }
 //----------------------------------------------------------------------------
 
 
-BBoxDeviceContext::BBoxDeviceContext ( View *rc, int width, int height):
+BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     DeviceContext()
 {	
     m_correctMusicAscent = false; // do not correct the ascent in the Leipzig font    
     
-    m_rc = rc;
+    m_view = view;
     m_width = width;
     m_height = height;
     
@@ -61,7 +61,7 @@ void BBoxDeviceContext::StartGraphic( DocObject *object, std::string gClass, std
     m_objects.push_back( object );
 }
       
-void BBoxDeviceContext::EndGraphic(DocObject *object, View *rc ) 
+void BBoxDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
     // detach the object
     assert( m_objects.back() == object );
@@ -413,11 +413,11 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     
     
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View object)
-    ((DocObject*)m_objects.back())->UpdateSelfBB( m_rc->ToLogicalX(x1), m_rc->ToLogicalY(y1), m_rc->ToLogicalX(x2), m_rc->ToLogicalY(y2) );
+    ((DocObject*)m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     
     int i;
     for (i = 0; i < (int)m_objects.size(); i++) {
-        ((DocObject*)m_objects[i])->UpdateContentBB( m_rc->ToLogicalX(x1), m_rc->ToLogicalY(y1), m_rc->ToLogicalX(x2), m_rc->ToLogicalY(y2) );
+        ((DocObject*)m_objects[i])->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     }
 }
 

@@ -46,7 +46,7 @@ void View::DrawPage( DeviceContext *dc, Page *page, bool background )
 	System *system = NULL;
     
     // Set the current score def to the page one
-    // The page one has previously been set by Object::SetPageScoreDef
+    // The page one has previously been set by Object::SetCurrentScoreDef
     m_drawingScoreDef = page->m_drawingScoreDef;
 
     if ( background )

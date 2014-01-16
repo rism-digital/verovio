@@ -132,7 +132,7 @@ public:
     
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId ) = 0;
     
-    virtual void EndGraphic( DocObject *object, View *rc  ) = 0;
+    virtual void EndGraphic( DocObject *object, View *view  ) = 0;
     
     virtual void StartPage( ) = 0;
     

@@ -104,7 +104,7 @@ public:
     // 
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId );
     
-    virtual void EndGraphic( DocObject *object, View *rc  );
+    virtual void EndGraphic( DocObject *object, View *view  );
     
     virtual void StartPage();
     

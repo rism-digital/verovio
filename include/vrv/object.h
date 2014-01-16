@@ -179,7 +179,10 @@ public:
      */
     virtual void Process( MusFunctor *functor, ArrayPtrVoid params, MusFunctor *endFunctor = NULL );
     
-    // functor methods
+    //----------//
+    // Functors //
+    //----------//
+    
     /**
      * Add each LayerElements and its children to a list
      */
@@ -249,7 +252,7 @@ public:
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
      */
-    virtual int SetPageScoreDef( ArrayPtrVoid params );
+    virtual int SetCurrentScoreDef( ArrayPtrVoid params );
 
     /**
      * Set the initial scoreDef of each page.

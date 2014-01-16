@@ -199,10 +199,10 @@ void Page::AlignHorizontally( )
     this->Process( &setAlignmentX, params );
     
     // Render it for filling the bounding boxing
-    View rc;
-    BBoxDeviceContext bb_dc( &rc, 0, 0 );
-    rc.SetDoc(doc);
-    rc.DrawPage(  &bb_dc, this, false );
+    View view;
+    BBoxDeviceContext bb_dc( &view, 0, 0 );
+    view.SetDoc(doc);
+    view.DrawPage(  &bb_dc, this, false );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping

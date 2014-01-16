@@ -136,7 +136,7 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized with by the Object::SetPageScoreDef functor.
+     * The value is initialized with by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
 

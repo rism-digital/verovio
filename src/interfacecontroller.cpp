@@ -86,7 +86,7 @@ bool InterfaceController::LoadFile( std::string filename )
         return false;
     }
     
-    m_rc.SetDoc( &m_doc );
+    m_view.SetDoc( &m_doc );
     delete input;
     return true;
 }
@@ -117,7 +117,7 @@ bool InterfaceController::LoadString( std::string data )
         return false;
     }
     
-    m_rc.SetDoc( &m_doc );
+    m_view.SetDoc( &m_doc );
     delete input;
     return true;
 }
@@ -219,7 +219,7 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     m_doc.Layout();
     
     // Get the current system for the SVG clipping size
-    Page *page = dynamic_cast<Page*>(m_doc.m_children[0]);
+    Page *page = dynamic_cast<Page*>(m_doc.m_children[pageNo]);
     //System *system = dynamic_cast<System*>(page->m_children[0]);
     
     // Create the SVG object, h & w come from the system
@@ -235,7 +235,7 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
     
     // render the page
-    m_rc.DrawPage( &svg, page , false);
+    m_view.DrawPage( &svg, page , false);
     
     std::string out_str = svg.GetStringSVG( xml_tag );
     return out_str;

@@ -498,7 +498,7 @@ std::string MeiOutput::OctToStr(int oct)
 	// For some reason, #include <sstream> does not work with xcode 3.2
 	//std::ostringstream oss;
 	//oss << oct;
-	//return oss.str();
+	//return oss.str();    
 }
 
 
@@ -640,7 +640,7 @@ std::string MeiOutput::DocTypeToStr(DocType type)
         case Rendering : value = "rendering"; break;
 		case Transcription : value = "transcription"; break;		
         default: 
-            LogWarning("Unknown layout type '%d'", type);
+            LogWarning("Unknown document type '%d'", type);
             value = "";
             break;
 	}

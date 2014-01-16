@@ -77,6 +77,12 @@ public:
      */
     virtual int Save( FileOutputStream *output );
 
+    /**
+     * Set the initial scoreDef of each page
+     * This is necessary for integrating changes that occur within a page.
+     * It uses the MusObject::SetPageScoreDef functor method for parsing the file
+     */
+     void SetCurrentScoreDef( );
     
     /**
      * Performs the layout of the entire document

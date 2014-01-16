@@ -126,7 +126,7 @@ public:
     int m_yAbs;
     /**
      * The Y relative position of the system.
-     * It is used internally when calculating the layout andd it is not stored in the file.
+     * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_yRel;
 	/**

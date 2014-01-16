@@ -78,8 +78,8 @@ void Doc::Refresh()
 {
     RefreshViews();
 }
-
-void Doc::Layout( )
+    
+void Doc::SetCurrentScoreDef( )
 {
     ScoreDef currentScoreDef;
     currentScoreDef = m_scoreDef;
@@ -87,8 +87,13 @@ void Doc::Layout( )
     ArrayPtrVoid params;
     params.push_back( &currentScoreDef );
     params.push_back( &staffDef );
-    MusFunctor setPageScoreDef( &Object::SetPageScoreDef );
-    this->Process( &setPageScoreDef, params );
+    MusFunctor SetCurrentScoreDef( &Object::SetCurrentScoreDef );
+    this->Process( &SetCurrentScoreDef, params );
+}
+
+void Doc::Layout( )
+{
+    this->SetCurrentScoreDef();
     
     int i;
 	Page *page = NULL;
