@@ -71,16 +71,35 @@ public:
     void Layout( );
     
     /**
-     * Do the horizontal layout of the page
+     * Align the content of the page (measures and their content) horizontally
      */
-    void HorizontalLayout( );
+    void AlignHorizontally( );
+    
+    /**
+     * Justifiy the content of the page (measures and their content) horizontally
+     */
+    void JustifyHorizontally( );
 
     /**
-     * Do the vertical layout of the page
+     * Align the content of the page (system/staves) vertically.
+     * This should be called only one Page::AlignHorizontally has been called before.
+     * (Otherwise, the bounding boxes used for performing the alignment would be missing).
      */
-    void VerticalLayout( );
+    void AlignVertically( );
+    
+    /**
+     * Justifiy the content of the page (system/staves) vertically
+     */
+    void JustifyVertically( );
 
-    // functors
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Save the content of the page using the FileOutputStream passed as parameter
+     * param 0: a pointer to the FileOutputStream.
+     */
     virtual int Save( ArrayPtrVoid params );
     
     

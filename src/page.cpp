@@ -153,6 +153,14 @@ System *Page::GetAtPos( int y )
 
 void Page::Layout( )
 {
+    this->AlignHorizontally();
+    this->AlignVertically();
+    this->JustifyHorizontally();
+    
+}
+    
+void Page::AlignHorizontally( )
+{
     if (!dynamic_cast<Doc*>(m_parent)) {
         assert( false );
         return;
@@ -224,9 +232,22 @@ void Page::Layout( )
     MusFunctor alignMeasures( &Object::AlignMeasures );
     MusFunctor alignMeasuresEnd( &Object::AlignMeasuresEnd );
     this->Process( &alignMeasures, params, &alignMeasuresEnd );
+}
+    
+void Page::AlignVertically( )
+{
+    if (!dynamic_cast<Doc*>(m_parent)) {
+        assert( false );
+        return;
+    }
+    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    
+    doc->SetRendPage( this );
+    
+    ArrayPtrVoid params;
     
     // Adjust the Y shift of the StaffAlignment looking at the bounding boxes
-    // Look at each Staff and changes the m_yShift if the bounding box is overlapping 
+    // Look at each Staff and changes the m_yShift if the bounding box is overlapping
     params.clear();
     int previous_height = 0;
     params.push_back( &previous_height );
@@ -250,7 +271,7 @@ void Page::Layout( )
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
     params.clear();
-    shift = 0;
+    int shift = 0;
     params.push_back( &shift );
     MusFunctor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
@@ -265,6 +286,19 @@ void Page::Layout( )
     params.push_back( &systemMargin );
     MusFunctor alignSystems( &Object::AlignSystems );
     this->Process( &alignSystems, params );
+}
+    
+void Page::JustifyHorizontally( )
+{
+    if (!dynamic_cast<Doc*>(m_parent)) {
+        assert( false );
+        return;
+    }
+    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    
+    doc->SetRendPage( this );
+    
+    ArrayPtrVoid params;
     
     // Justify X position
     params.clear();
@@ -275,20 +309,7 @@ void Page::Layout( )
     MusFunctor justifyX( &Object::JustifyX );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &justifyX );
-    //this->Process( &justifyX, params );
-       
-    // Trim the page to the needed position
-    // LP I am not sure about this. m_pageHeight / Width should not be modified
-    /*
-    this->m_pageWidth = 0; // first resest the page to 0
-    this->m_pageHeight = doc->m_pageHeight;
-    params.clear();
-    
-    MusFunctor trimSystem(&Object::TrimSystem);
-    this->Process( &trimSystem, params );
-    */
-    
-    //rc.DrawPage(  &bb_dc, this , false );
+    this->Process( &justifyX, params );    
 }
 
 void Page::SetValues( int type )
