@@ -66,9 +66,11 @@ public:
     int GetStaffPosOnPage( Staff *staff );
     
     /**
-     * Do the layout of the page
+     * Do the layout of the page, whichi means aligning is content horizontally
+     * and vertically, and justify horizontally and vertically if wanted.
+     * This will be done only if m_layoutDone is false or force is true.
      */
-    void Layout( );
+    void Layout( bool force = false );
     
     /**
      * Align the content of the page (measures and their content) horizontally
@@ -141,6 +143,14 @@ public:
     ScoreDef m_drawingScoreDef;
 
 private:
+    
+    /**
+     * A flag for indicating whether the layout has been done or not
+     * If yes, Layout will not layout the page (again) unless
+     * the force parameter is set.
+     */
+    bool m_layoutDone;
+    
     
 };
 

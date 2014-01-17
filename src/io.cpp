@@ -49,18 +49,26 @@ FileInputStream::FileInputStream( Doc *doc, std::string filename  ) :
     std::ifstream( filename.c_str() )
 {
 	assert(doc); // Document cannot be NULL"
-	m_doc = doc;
-    m_hasLayoutInformation = false;
+    m_doc = doc;
+    Init();
+    
 }
+
 
 FileInputStream::FileInputStream( Doc *doc ) :
     std::ifstream(  )
 {
 	assert(doc); // Document cannot be NULL"
 	m_doc = doc;
-    m_hasLayoutInformation = false;
+    Init();
 }
 
+void FileInputStream::Init( )
+{
+    m_hasLayoutInformation = false;
+    m_ignoreLayoutInformation = false;
+}
+    
 FileInputStream::~FileInputStream()
 {
     if ( this->is_open()) {

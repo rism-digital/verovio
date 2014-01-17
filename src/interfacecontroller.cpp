@@ -93,6 +93,11 @@ bool InterfaceController::LoadString( std::string data )
         return false;
     }
     
+    // ignore layout?
+    if ( m_ignoreLayout || m_noLayout ) {
+        input->IgnoreLayoutInformation();
+    }
+    
     // load the file
     if ( !input->ImportString( data )) {
         LogError( "Error importing data" );
@@ -206,8 +211,7 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     pageNo--;
     
     // Get the current system for the SVG clipping size
-    Page *page = dynamic_cast<Page*>(m_doc.m_children[pageNo]);
-    //System *system = dynamic_cast<System*>(page->m_children[0]);
+    m_view.SetPage( pageNo );
     
     // Create the SVG object, h & w come from the system
     // we add border*2 so it is centered into the image
@@ -222,7 +226,7 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
     
     // render the page
-    m_view.DrawPage( &svg, page , false);
+    m_view.DrawCurrentPage( &svg, false);
     
     std::string out_str = svg.GetStringSVG( xml_tag );
     return out_str;

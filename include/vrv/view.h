@@ -79,12 +79,12 @@ public:
 	static void SwapY( int *y1, int *y2 ) { int tmp = *y1; *y1 = *y2; *y2 = tmp; }
     
     /**
-     * Set the current page to *page.
-     * This method is dangerous because it can potentially be a page that do not belong to the layout.
-     * It should be check (currently not done)
-     * A safer option would be to pass the page number.
+     * Set the current page to pageIdx.
+     * If doLayout is true, the layout of the page will be calculated.
+     * This is the default behavior, however, in some cases, we do not
+     * want it. For example, when drawing the pages for getting the bounding boxes
      */
-	void SetPage( Page *page );
+    void SetPage( int pageIdx, bool doLayout = true );
 
 	/* view_graph.cpp */
 	void v_bline ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
@@ -112,7 +112,7 @@ public:
 	static void pntswap (MusPoint *x1, MusPoint *x2);
     
     /* view_page.cpp */
-	void DrawPage( DeviceContext *dc, Page *page, bool background = true );
+	void DrawCurrentPage( DeviceContext *dc, bool background = true );
     void DrawSystem( DeviceContext *dc, System *system );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barline = NULL );
 	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
@@ -188,10 +188,8 @@ private:
 public:
     /** Document */
     Doc *m_doc;
-    /** Page affichee */
-    Page *m_page;
-    /** No Page affichee */
-    int m_npage;
+    /** Index of the current page */
+    int m_pageIdx;
 
 	std::string m_str;
     
@@ -207,6 +205,7 @@ public:
     Measure *m_currentMeasure;
 	Staff *m_currentStaff;
     System *m_currentSystem;
+    Page *m_currentPage;
     
 	int m_notation_mode; // neumes or mensural notation mode
 	bool m_lyricMode;

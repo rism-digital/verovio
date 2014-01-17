@@ -19,6 +19,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -53,6 +54,7 @@ void Doc::Reset( DocType type )
     m_pageTopMar = 0;
     
     m_rendPage = NULL;
+    m_currentScoreDefDone = false;
     
     m_scoreDef.Clear();
 }
@@ -79,8 +81,12 @@ void Doc::Refresh()
     RefreshViews();
 }
     
-void Doc::SetCurrentScoreDef( )
+void Doc::SetCurrentScoreDef( bool force )
 {
+    if ( m_currentScoreDefDone && ! force ) {
+        return;
+    }
+    
     ScoreDef currentScoreDef;
     currentScoreDef = m_scoreDef;
     StaffDef *staffDef = NULL;
@@ -89,37 +95,42 @@ void Doc::SetCurrentScoreDef( )
     params.push_back( &staffDef );
     MusFunctor SetCurrentScoreDef( &Object::SetCurrentScoreDef );
     this->Process( &SetCurrentScoreDef, params );
+    
+    m_currentScoreDefDone = true;
 }
 
 void Doc::Layout( )
 {
-    this->SetCurrentScoreDef();
+
+}
     
-    int i;
-	Page *page = NULL;
-    for (i = 0; i < this->GetChildCount(); i++)
-	{
-		page = (Page*)this->m_children[i];
-        page->Layout( );
-        //break;
-     }
+bool Doc::HasPage( int pageIdx )
+{
+    return ( (pageIdx >= 0 ) && (pageIdx < GetChildCount() ) );
 }
 
-void Doc::SetRendPage( Page *page )
+Page *Doc::SetRendPage( int pageIdx )
 {
-    if ( !page || (page == m_rendPage) ) {
-        return;
+    // out of range 
+    if ( !HasPage( pageIdx ) ) {
+        return NULL;
     }
-    m_rendPage = page;
+    // nothing to do
+    if ( m_rendPage && m_rendPage->GetIdx() == pageIdx ) {
+        return m_rendPage;
+    }
+    m_rendPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
+    
+    assert( m_rendPage );
     
     // we use the page members only if set (!= -1) 
-    if ( page->m_pageHeight != -1 )
+    if ( m_rendPage->m_pageHeight != -1 )
     {
-        m_rendPageHeight = page->m_pageHeight;
-        m_rendPageWidth = page->m_pageWidth;
-        m_rendPageLeftMar = page->m_pageLeftMar;
-        m_rendPageRightMar = page->m_pageRightMar;
-        m_rendPageTopMar = page->m_pageTopMar;
+        m_rendPageHeight = m_rendPage->m_pageHeight;
+        m_rendPageWidth = m_rendPage->m_pageWidth;
+        m_rendPageLeftMar = m_rendPage->m_pageLeftMar;
+        m_rendPageRightMar = m_rendPage->m_pageRightMar;
+        m_rendPageTopMar = m_rendPage->m_pageTopMar;
 	}
 	else if ( this->m_pageHeight != -1 )
 	{
@@ -236,7 +247,7 @@ void Doc::SetRendPage( Page *page )
     m_rendAccidWidth[1][0] = (m_rendAccidWidth[0][0] * m_rendSmallStaffRatio[0]) /m_rendSmallStaffRatio[1];
     m_rendAccidWidth[1][1] = (m_rendAccidWidth[1][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
     
-	return;
+	return m_rendPage;
 }
 
 int Doc::CalcLeipzigFontSize( )

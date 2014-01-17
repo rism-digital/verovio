@@ -90,14 +90,30 @@ public:
     // constructors and destructors
     FileInputStream( Doc *doc, std::string filename );
     FileInputStream( Doc *doc );
-    FileInputStream() {};
     virtual ~FileInputStream();
+    
+    
     
     // read
     virtual bool ImportFile( ) { return true; }
     virtual bool ImportString( std::string data ) { return true; }
     
+    /**
+     * Setter for the layoutInformation ignore flag
+     */
+    void IgnoreLayoutInformation() { m_ignoreLayoutInformation = true; };
+    
+    /**
+     * Getter for layoutInformation flag the is set to true during import
+     * if layout information is found (and not to be ignored).
+     */
     bool HasLayoutInformation() { return m_hasLayoutInformation; };
+    
+private:
+    /**
+     * Init values (called by the constructors
+     */
+    void Init();
     
 public:
     
@@ -110,6 +126,13 @@ protected:
      * file contains <pb> and <sb>. This will stay wrong with PAE import
      */
     bool m_hasLayoutInformation;
+    
+    /**
+     * If set to true, the layout information found during the import
+     * will be ignored. The file will be loaded in one single page with
+     * one single system.
+     */
+    bool m_ignoreLayoutInformation;
     
     
 };

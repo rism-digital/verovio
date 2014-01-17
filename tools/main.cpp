@@ -155,6 +155,7 @@ int main(int argc, char** argv)
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"border",              required_argument,  0, 'b'},
         {"format",              required_argument,  0, 'f'},
+        {"ignore-layout",       no_argument,        &ignore_layout, 1},
         {"no-layout",           no_argument,        &no_layout, 1},
         {"no-mei-hdr",          no_argument,        &no_mei_hdr, 1},
         {"no-justification",    no_argument,        &no_justification, 1},

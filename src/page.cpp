@@ -42,6 +42,7 @@ void Page::Clear( )
 {
 	ClearChildren( );
     m_drawingScoreDef.Clear();
+    m_layoutDone = false;
 	defin = 18;
     // by default we have no values and use the document ones
     m_pageHeight = -1;
@@ -151,12 +152,17 @@ System *Page::GetAtPos( int y )
 	return system;
 }
 
-void Page::Layout( )
+void Page::Layout( bool force )
 {
+    if ( m_layoutDone && ! force ) {
+        return;
+    }
+    
     this->AlignHorizontally();
     this->AlignVertically();
     this->JustifyHorizontally();
     
+    m_layoutDone = true;
 }
     
 void Page::AlignHorizontally( )
@@ -167,7 +173,9 @@ void Page::AlignHorizontally( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
-    doc->SetRendPage( this );
+    // Doc::SetRendPage should have been called before
+    // Make sure we have the correct page
+    assert( this == doc->GetRendPage() );
     
     ArrayPtrVoid params;
     
@@ -202,7 +210,9 @@ void Page::AlignHorizontally( )
     View view;
     BBoxDeviceContext bb_dc( &view, 0, 0 );
     view.SetDoc(doc);
-    view.DrawPage(  &bb_dc, this, false );
+    // Do not do the layout in this view - otherwise we will loop...
+    view.SetPage( this->GetIdx(), false );
+    view.DrawCurrentPage(  &bb_dc, false );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
@@ -242,7 +252,9 @@ void Page::AlignVertically( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
-    doc->SetRendPage( this );
+    // Doc::SetRendPage should have been called before
+    // Make sure we have the correct page
+    assert( this == doc->GetRendPage() );
     
     ArrayPtrVoid params;
     
@@ -296,7 +308,9 @@ void Page::JustifyHorizontally( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
-    doc->SetRendPage( this );
+    // Doc::SetRendPage should have been called before
+    // Make sure we have the correct page
+    assert( this == doc->GetRendPage() );
     
     ArrayPtrVoid params;
     

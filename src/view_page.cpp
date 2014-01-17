@@ -37,17 +37,19 @@ namespace vrv {
 // View - Page
 //----------------------------------------------------------------------------
 
-void View::DrawPage( DeviceContext *dc, Page *page, bool background ) 
+void View::DrawCurrentPage( DeviceContext *dc, bool background )
 {
 	assert( dc ); // DC cannot be NULL
-    assert( page );
+    assert( m_doc );
+    
+    m_currentPage = m_doc->SetRendPage( m_pageIdx );
     
     int i;
 	System *system = NULL;
     
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
-    m_drawingScoreDef = page->m_drawingScoreDef;
+    m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
     if ( background )
         dc->DrawRectangle( 0, 0, m_doc->m_rendPageWidth, m_doc->m_rendPageHeight );
@@ -59,9 +61,9 @@ void View::DrawPage( DeviceContext *dc, Page *page, bool background )
 
     dc->StartPage();
 
-    for (i = 0; i < page->GetSystemCount(); i++) 
+    for (i = 0; i < m_currentPage->GetSystemCount(); i++) 
 	{
-		system = (System*)page->m_children[i];
+		system = (System*)m_currentPage->m_children[i];
         DrawSystem( dc, system );
         
         // TODO here: also update x_abs and m_yDrawing positions for system. How to calculate them?
@@ -76,7 +78,6 @@ void View::DrawPage( DeviceContext *dc, Page *page, bool background )
 
 
 // drawing
-
 
 void View::DrawSystem( DeviceContext *dc, System *system ) 
 {

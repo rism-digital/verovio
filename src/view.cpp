@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "layerelement.h"
 #include "note.h"
+#include "page.h"
 
 namespace vrv {
 
@@ -28,8 +29,7 @@ namespace vrv {
 View::View( )
 {
 	m_doc = NULL;
-    m_page = NULL;
-	m_npage = 0;
+	m_pageIdx = 0;
 
 	m_currentColour = AxBLACK;
 	m_currentElement = NULL;
@@ -59,38 +59,43 @@ void View::SetDoc( Doc *doc )
 	if ( doc == NULL ) // unset file
 	{
 		m_doc = NULL;
-		m_page = NULL;
-        m_currentElement = NULL;
-        m_currentLayer = NULL;
-        m_currentMeasure = NULL;
-        m_currentStaff = NULL;
-        m_currentSystem = NULL;
         DoReset();
-		return;
 	}
     else {
         m_doc = doc;
-        //m_notation_mode = m_layout->m_env.m_notationMode;
-        m_npage = 0;
-        // for now we just get the first page
-        SetPage( (Page*)m_doc->m_children[m_npage] );
-        //CheckPoint( UNDO_ALL, MUS_UNDO_FILE ); // ax2
     }
+    m_currentElement = NULL;
+    m_currentLayer = NULL;
+    m_currentMeasure = NULL;
+    m_currentStaff = NULL;
+    m_currentSystem = NULL;
+    m_currentPage = NULL;
+    m_pageIdx = 0;
 }
 
 
-void View::SetPage( Page *page )
+void View::SetPage( int pageIdx, bool doLayout )
 {
-	assert( page ); // Page cannot be NULL
+
+	assert( m_doc ); // Page cannot be NULL
+    assert( m_doc->HasPage( pageIdx ) );
     
-    m_doc->SetRendPage( page );
+    m_pageIdx = pageIdx;
+    m_currentPage = m_doc->SetRendPage( pageIdx );
+    
+    if (doLayout) {
+        m_doc->SetCurrentScoreDef();
+        // if we once deal with multiple views, it would be better
+        // to redo the layout only when necessary?
+        m_currentPage->Layout( );
+    }
 
-	m_page = page;
-
-	m_currentElement = NULL;
+    m_currentElement = NULL;
     m_currentLayer = NULL;
     m_currentMeasure = NULL;
-	m_currentStaff = NULL;
+    m_currentStaff = NULL;
+    m_currentSystem = NULL;
+    
     
     /*
 	// selectionne le premier element
@@ -119,9 +124,9 @@ void View::SetPage( Page *page )
 bool View::HasNext( bool forward ) 
 { 
 	if ( forward )
-		return ( m_doc && ((int)m_doc->GetChildCount() - 1 > m_npage) );
+		return ( m_doc && ( m_doc->HasPage( m_pageIdx + 1 ) ) );
 	else
-		return ( m_doc && (m_npage > 0) );
+		return ( m_doc && ( m_doc->HasPage( m_pageIdx - 1 ) ) );
     return false;
 		
 }
@@ -132,11 +137,11 @@ void View::Next( bool forward )
         return;
 
 	if ( forward && this->HasNext( true ) )
-		m_npage++;
+		m_pageIdx++;
 	else if ( !forward && this->HasNext( false ) )
-		m_npage--;
+		m_pageIdx--;
 
-	SetPage( (Page*)m_doc->m_children[m_npage] );
+	SetPage( m_pageIdx );
 }
 
 void View::LoadPage( int nopage )

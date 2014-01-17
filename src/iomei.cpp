@@ -1583,7 +1583,8 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         ReadMeiStaff( element );
     }
     */
-    else if ( (std::string( element.name() ) == "pb") && (m_system->GetMeasureCount() > 0 ) ) {
+    else if ( (std::string( element.name() ) == "pb")
+             && (m_system->GetMeasureCount() > 0 )  && !m_ignoreLayoutInformation) {
         LogDebug( "pb" );
         this->m_hasLayoutInformation = true;
         m_page = new Page( );
@@ -1592,7 +1593,8 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         m_doc->AddPage( m_page );
         
     }
-    else if ( (std::string( element.name() ) == "sb") && (m_page->GetSystemCount() > 0 ) ) {
+    else if ( (std::string( element.name() ) == "sb")
+             && (m_page->GetSystemCount() > 0 )  && !m_ignoreLayoutInformation) {
         LogDebug( "sb" );
         this->m_hasLayoutInformation = true;
         m_system = new System( );

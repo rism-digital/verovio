@@ -61,6 +61,11 @@ public:
     DocType GetType() { return m_type; };
     
     /**
+     * Check if the document has a page with the specified value
+     */
+    bool HasPage( int pageIdx );
+    
+    /**
      * @name Setters for the page dimensions and margins
      */
     ///@{
@@ -80,9 +85,10 @@ public:
     /**
      * Set the initial scoreDef of each page
      * This is necessary for integrating changes that occur within a page.
-     * It uses the MusObject::SetPageScoreDef functor method for parsing the file
+     * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
+     * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-     void SetCurrentScoreDef( );
+     void SetCurrentScoreDef( bool force = false );
     
     /**
      * Performs the layout of the entire document
@@ -100,7 +106,14 @@ public:
      * If a page is given, the size of the page is taken.
      * calculFormatPapier() in Wolfgang
      */
-	void SetRendPage( Page *page );
+	Page *SetRendPage( int pageIdx );
+    
+    /**
+     * Getter to the rendPage. Normally, getting the page should 
+     * be done with Doc::SetRendPage. This is only a method for 
+     * asserting that currently have the right page.
+     */
+    Page *GetRendPage( ) { return m_rendPage; };
 
     /**
      * Initializes fonts from the resources (music and lyrics)
@@ -231,6 +244,13 @@ private:
      * and that no layout algorithm should be applied.
      */
     DocType m_type;
+    
+    /**
+     * A flag for indicating whether the currentScoreDef has been set or not
+     * If yes, SetCurrentScoreDef will not parse the document (again) unless
+     * the force parameter is set.
+     */
+    bool m_currentScoreDefDone;
     
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

@@ -279,7 +279,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		rayon += rayon/3;
 	}
 
-	/*NEW: diminuer le rayon d'une quantitÇ paramÇtrable*/
 	x1 = xn-rayon;	// position d'appel du caractäre et de la queue gauche
     xl = xn;
 
