@@ -57,7 +57,7 @@ public:
     /**
      * Render the page in SVG and save it to the file.
      */
-    bool RenderToSvgFile( std::string filename, int pageNo =  1 );
+    bool RenderToSvgFile( std::string filename, int pageNo =  0 );
     
     /**
      * @name Set and get the border
