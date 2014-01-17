@@ -202,6 +202,9 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
 
 std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
 {
+    // Page number is one-based - correction to 0-based first
+    pageNo--;
+    
     // Get the current system for the SVG clipping size
     Page *page = dynamic_cast<Page*>(m_doc.m_children[pageNo]);
     //System *system = dynamic_cast<System*>(page->m_children[0]);

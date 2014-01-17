@@ -304,10 +304,10 @@
 		8F086E9E188534680037FD8E = {
 			isa = PBXGroup;
 			children = (
-				4D22C42118891D7300D0831F /* pugixml */,
 				8F086F3E18853BEA0037FD8E /* tinyxml */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
+				4D22C42118891D7300D0831F /* pugixml */,
 				8F086EAA188534680037FD8E /* Products */,
 			);
 			sourceTree = "<group>";

@@ -51,13 +51,15 @@ public:
     
     /**
      * Render the page in SVG and returns it as a string
+     * Page number is 1-based
      */
     std::string RenderToSvg( int pageNo =  1, bool xml_tag = false );
 
     /**
      * Render the page in SVG and save it to the file.
+     * Page number is 1-based.
      */
-    bool RenderToSvgFile( std::string filename, int pageNo =  0 );
+    bool RenderToSvgFile( std::string filename, int pageNo =  1 );
     
     /**
      * @name Set and get the border

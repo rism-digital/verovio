@@ -53,51 +53,66 @@ std::string removeExtension( std::string const& filename )
 
 
 void display_usage() {
-    cerr << "Verovio command line usage:" << endl;
-    cerr << "aruspix [-f pae | mei | darms] [-s scale] [-t mei | svg] [-r resources] [-o outfile] infile" << endl << endl;
+    
+    cerr << "Verovio " << GetVersion() << endl << "Usage:" << endl << endl;
+    cerr << " aruspix [-f format] [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
+    
+    // These need to be kept in alphabetical order:
+    // -short options first
+    // -then long options only
+    // -then debugging options
 
-    cerr << "-p, --page-height=PAGE_HEIGHT" << endl;
+    // Options
+    cerr << "Options" << endl;
+    
+    cerr << " -b, --border=BORDER" << endl;
+    cerr << "\t\tAdd border (default is 10, max 1000)" << endl;
+    
+    cerr << " -f, --format=INPUT_FORMAT" << endl;
+    cerr << "\t\tSelect input format: darms, mei, pae (default is pae)" << endl;
+    
+    cerr << " -p, --page-height=PAGE_HEIGHT" << endl;
     cerr << "\t\tSpecify the page height (default is 2970)" << endl;
-
-    cerr << "-w, --page-width=PAGE_WIDTH" << endl;
-    cerr << "\t\tSpecify the page width (default is 2100)" << endl;
     
-    cerr << "-b, --border=BORDER" << endl;
-    cerr << "\t\tAdd border (10 px default, max 1000)" << endl;
-
-    cerr << "-f, --format=INPUT_FORMAT" << endl;
-    cerr << "\t\tSelect input format: darms, mei, pae" << endl;
-    cerr << "\t\t(optional, default is pae)" << endl;
-    
-    cerr << "-o, --output=FILE_NAME" << endl;
+    cerr << " -o, --outfile=FILE_NAME" << endl;
     cerr << "\t\tOutput file name" << endl;
     
-    cerr << "-r, --recources=PATH" << endl;
-    cerr << "\t\tSpecify path for SVG resoucces" << endl;
-    cerr << "\t\t(default in " <<  vrv::Resources::GetPath() << ")" << endl;
+    cerr << " -r, --recources=PATH" << endl;
+    cerr << "\t\tPath to SVG resoucces (default is " <<  vrv::Resources::GetPath() << ")" << endl;
     
-    cerr << "-s, --scale=FACTOR" << endl;
-    cerr << "\t\tscale percent (100 default, max 1000)" << endl;
+    cerr << " -s, --scale=FACTOR" << endl;
+    cerr << "\t\tscale percent (default is 100, max 1000)" << endl;
     
-    cerr << "-t, --type=OUTPUT_TYPE" << endl;
-    cerr << "\t\tSelect output format: mei, svg" << endl;
-    cerr << "\t\t(optional, default is svg)" << endl;
+    cerr << " -t, --type=OUTPUT_TYPE" << endl;
+    cerr << "\t\tSelect output format: mei, svg (default is svg)" << endl;
 
-    cerr << "--no-layout" << endl;
-    cerr << "\t\tIgnore all encoded layout information (if any)" << endl;
-    cerr << "\t\tand output one single page with one single system" << endl;
+    cerr << " -w, --page-width=PAGE_WIDTH" << endl;
+    cerr << "\t\tSpecify the page width (default is 2100)" << endl;
     
-    cerr << "--ignore-layout" << endl;
+    // long options only
+    cerr << endl << "Additional options" << endl;
+    
+    cerr << " --adjust-page-height" << endl;
+    cerr << "\t\tCrop the page height to the height of the content" << endl;
+    
+    cerr << " --ignore-layout" << endl;
     cerr << "\t\tIgnore all encoded layout information (if any)" << endl;
     cerr << "\t\tand fully recalculate the layout" << endl;
     
-    cerr << "--adjust-page-height" << endl;
-    cerr << "\t\tCrop the page height to the height of the content" << endl;
+    cerr << " --no-layout" << endl;
+    cerr << "\t\tIgnore all encoded layout information (if any)" << endl;
+    cerr << "\t\tand output one single page with one single system" << endl;
     
-    cerr << "--no-justification" << endl;
+    cerr << " --page=PAGE" << endl;
+    cerr << "\t\tSelect the page to engrave (default is 1)" << endl;
+
+    // Debugging options
+    cerr << endl << "Debugging options" << endl;
+    
+    cerr << " --no-justification" << endl;
     cerr << "\t\tDo not justify the system (for debugging purposes)" << endl;
     
-    cerr << "--show-bounding-boxes" << endl;
+    cerr << " --show-bounding-boxes" << endl;
     cerr << "\t\tShow symbol bounding boxes (for debugging purposes)" << endl;
 }
 
@@ -105,26 +120,27 @@ void display_usage() {
 int main(int argc, char** argv)
 {
     
-    string m_infile;
-    string m_svgdir;
-    string m_outfile;
-    string m_outformat = "svg";
+    string infile;
+    string svgdir;
+    string outfile;
+    string outformat = "svg";
     
     // Init random number generator for uuids
     std::srand(std::time(0));
     
-    ConvertFileFormat m_type;
-    int m_no_mei_hdr = 0;
-    int m_adjust_page_height = 0;
-    int m_no_layout = 0;
-    int m_ignore_layout = 0;
-    int m_no_justification = 0;
-    int m_show_bounding_boxes = 0;
+    ConvertFileFormat type;
+    int no_mei_hdr = 0;
+    int adjust_page_height = 0;
+    int no_layout = 0;
+    int ignore_layout = 0;
+    int no_justification = 0;
+    int show_bounding_boxes = 0;
+    int page = 1;
       
     InterfaceController controller;
     
     // read pae by default
-    m_type = pae_file;
+    type = pae_file;
     
     if (argc < 2) {
         cerr << "Expecting one input file." << endl << endl;
@@ -136,36 +152,43 @@ int main(int argc, char** argv)
     static struct option long_options[] =
     {
         
-        {"adjust-page-height",  no_argument,        &m_adjust_page_height, 1},
+        {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"border",              required_argument,  0, 'b'},
         {"format",              required_argument,  0, 'f'},
-        {"no-layout",           no_argument,        &m_no_layout, 1},
-        {"no-mei-hdr",          no_argument,        &m_no_mei_hdr, 1},
-        {"no-justification",    no_argument,        &m_no_justification, 1},
-        {"output",              required_argument,  0, 'o'},
+        {"no-layout",           no_argument,        &no_layout, 1},
+        {"no-mei-hdr",          no_argument,        &no_mei_hdr, 1},
+        {"no-justification",    no_argument,        &no_justification, 1},
+        {"outfile",             required_argument,  0, 'o'},
+        {"page",                required_argument,  0, 0},
         {"page-height",         required_argument,  0, 'p'},
-        {"page-width",          required_argument,  0, 'w'},        
+        {"page-width",          required_argument,  0, 'w'},
         {"resources",           required_argument,  0, 'r'},
         {"scale",               required_argument,  0, 's'},
-        {"show-bounding-boxes", no_argument,        &m_show_bounding_boxes, 1},
+        {"show-bounding-boxes", no_argument,        &show_bounding_boxes, 1},
         {"type",                required_argument,  0, 't'},
         {0, 0, 0, 0}
     };
     
-    while ((c = getopt_long(argc, argv, "b:f:o:p:r:s:t:w:", long_options, NULL)) != -1)
+    int option_index = 0;
+    while ((c = getopt_long(argc, argv, "b:f:ho:p:r:s:t:w:", long_options, &option_index)) != -1)
     {                
         switch (c)
         {
-            case '0': break;
+            case 0:
+                if (long_options[option_index].flag != 0)
+                    break;
+                if (strcmp(long_options[option_index].name,"page") == 0)
+                    page = atoi(optarg);
+                break;
 
             case 'f': {
                 string informat = string(optarg);
                 if (informat == "pae")
-                    m_type = pae_file;
+                    type = pae_file;
                 else if(informat == "darms")
-                    m_type = darms_file;
+                    type = darms_file;
                 else if(informat == "mei")
-                    m_type = mei_file;
+                    type = mei_file;
                 else {
                     cerr << "Input format can only be: pae mei darms" << endl;
                     display_usage();
@@ -174,16 +197,16 @@ int main(int argc, char** argv)
             }
                 break;
                 
-            case 'r':
-                vrv::Resources::SetPath(optarg);
-                break;
-                
             case 'o':
-                m_outfile = string(optarg);
+                outfile = string(optarg);
                 break;
             
             case 'p':
                 controller.SetPageHeight(atoi(optarg));
+                break;
+                
+            case 'r':
+                vrv::Resources::SetPath(optarg);
                 break;
  
             case 'w':
@@ -191,7 +214,7 @@ int main(int argc, char** argv)
                 break;
                 
             case 't':
-                m_outformat = string(optarg);
+                outformat = string(optarg);
                 break;
                 
             case 's':
@@ -218,14 +241,14 @@ int main(int argc, char** argv)
     }
     
     // Set the various flags
-    controller.SetAdjustPageHeight(m_adjust_page_height);
-    controller.SetNoLayout(m_no_layout);
-    controller.SetIgnoreLayout(m_ignore_layout);
-    controller.SetNoJustification(m_no_justification);
-    controller.SetShowBoundingBoxes(m_show_bounding_boxes);
+    controller.SetAdjustPageHeight(adjust_page_height);
+    controller.SetNoLayout(no_layout);
+    controller.SetIgnoreLayout(ignore_layout);
+    controller.SetNoJustification(no_justification);
+    controller.SetShowBoundingBoxes(show_bounding_boxes);
     
     if (optind <= argc - 1) {
-        m_infile = string(argv[optind]);
+        infile = string(argv[optind]);
     }
     else {
         cerr << "Incorrect number of options: expecting one input file." << endl << endl;
@@ -233,12 +256,12 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    if (m_outformat != "svg" && m_outformat != "mei") {
+    if (outformat != "svg" && outformat != "mei") {
         cerr << "Output format can only be: mei svg" << endl;
         exit(1);
     }
     
-    if (m_outformat == "mei" && m_type == mei_file) {
+    if (outformat == "mei" && type == mei_file) {
         cerr << "Cannot convert from mei to mei (do not specify -f mei and -t mei)." << endl;
         exit(1);
     }
@@ -248,22 +271,22 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    if (m_outfile.empty()) {
-        m_outfile = removeExtension(basename(m_infile)) + "." + m_outformat;
+    if (outfile.empty()) {
+        outfile = removeExtension(basename(infile)) + "." + outformat;
     }
     
-    cerr << "Reading " << m_infile << "..." << endl;
+    cerr << "Reading " << infile << "..." << endl;
 
-    controller.SetFormat(m_type);
+    controller.SetFormat(type);
     
-    if ( !controller.LoadFile( m_infile ) ) {
+    if ( !controller.LoadFile( infile ) ) {
         exit(1);
     }
     
     // Create SVG or mei
-    if (m_outformat == "svg") {
-        if ( !controller.RenderToSvgFile( m_outfile ) ) {
-            cerr << "Unable to write SVG to " << m_outfile << "." << endl;
+    if (outformat == "svg") {
+        if ( !controller.RenderToSvgFile( outfile, page ) ) {
+            cerr << "Unable to write SVG to " << outfile << "." << endl;
             exit(1);
         }
         // Write it to file
@@ -271,15 +294,15 @@ int main(int argc, char** argv)
     } else {
         // To be implemented in InterfaceController
         /*
-        XMLOutput meioutput(doc, m_outfile.c_str());
+        XMLOutput meioutput(doc, outfile.c_str());
         if (!meioutput.ExportFile()) {
-            cerr << "Unable to write MEI to " << m_outfile << "." << endl;
+            cerr << "Unable to write MEI to " << outfile << "." << endl;
             exit(1);
         }
         */
         
     }
-    cerr << "Output written to " << m_outfile << endl;
+    cerr << "Output written to " << outfile << endl;
     
     return 0;
 }
