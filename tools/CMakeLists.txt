@@ -4,7 +4,7 @@ project(Verovio)
 
 add_definitions(-g)
 
-include_directories(/usr/local/include ../include/vrv ../tinyxml ../pugixml)
+include_directories(/usr/local/include ../include/vrv ../tinyxml)
 
 add_executable (verovio 
 	main.cpp 
@@ -56,7 +56,7 @@ add_executable (verovio
 	../tinyxml/tinyxml.cpp
 	../tinyxml/tinyxmlerror.cpp
 	../tinyxml/tinyxmlparser.cpp
-	../pugixml/pugixml.cpp
+	../src/pugixml.cpp
 	)
 
 install (TARGETS verovio DESTINATION /usr/local/bin)

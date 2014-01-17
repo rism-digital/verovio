@@ -480,9 +480,9 @@ void View::DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff 
 {
 	assert( dc ); // DC cannot be NULL
 
+    /* ax3
 	int b, bb;
 
-    /* ax3
 	Staff *next = system->GetNext( NULL );
 	if ( next )
 	{	

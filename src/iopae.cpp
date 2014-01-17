@@ -653,7 +653,8 @@ int PaeInput::getGraceNote(const char* incipit, NoteObject *note, int index ) {
 //
 
 int PaeInput::getPitch( char c_note ) {
-    int pitch;
+    
+    int pitch = PITCH_C;
     
     switch (c_note) {
         case 'A':

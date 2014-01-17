@@ -21,7 +21,6 @@ python $EMCC --closure 0 -O2 \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_ROOT/tinyxml \
-	-I$VEROVIO_ROOT/pugixml \
 	-DUSE_EMSCRIPTEN \
 	-s TOTAL_MEMORY=256*1024*1024 \
 	-s TOTAL_STACK=16*1024*1024 \
@@ -75,7 +74,7 @@ python $EMCC --closure 0 -O2 \
 	$VEROVIO_ROOT/tinyxml/tinyxml.cpp \
 	$VEROVIO_ROOT/tinyxml/tinyxmlerror.cpp \
 	$VEROVIO_ROOT/tinyxml/tinyxmlparser.cpp \
-	$VEROVIO_ROOT/pugixml/pugixml.cpp \
+	$VEROVIO_ROOT/src/pugixml.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="['_convertMusic']" \
