@@ -280,8 +280,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
 
 	/*NEW: diminuer le rayon d'une quantitÇ paramÇtrable*/
-	if (note->m_dur > DUR_1)
-		rayon -= ((rayon * m_doc->m_env.m_stemCorrection) / 20);
 	x1 = xn-rayon;	// position d'appel du caractäre et de la queue gauche
     xl = xn;
 

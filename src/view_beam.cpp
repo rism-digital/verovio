@@ -165,8 +165,8 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     } 
     else
     {	
-        dx[0] =  m_doc->m_rendNoteRadius[staff->staffSize][0] - ((m_doc->m_rendNoteRadius[staff->staffSize][0] * m_doc->m_env.m_stemCorrection) / 20);
-        dx[1] =  m_doc->m_rendNoteRadius[staff->staffSize][1] - ((m_doc->m_rendNoteRadius[staff->staffSize][1] * m_doc->m_env.m_stemCorrection) / 20);
+        dx[0] =  m_doc->m_rendNoteRadius[staff->staffSize][0];
+        dx[1] =  m_doc->m_rendNoteRadius[staff->staffSize][1];
         dx[0] -= (m_doc->m_env.m_stemWidth)/2;
         dx[1] -= (m_doc->m_env.m_stemWidth)/2;
     }

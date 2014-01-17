@@ -5,3 +5,5 @@ It can be used as a standalone command-line tool for converting a files, as the 
 The main project page is http://www.verovio.org
 
 Verovio is available under the GPL license, see LICENSE.txt.
+
+![Example page](/images/page.png)

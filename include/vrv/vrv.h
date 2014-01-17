@@ -126,10 +126,6 @@ public:
     unsigned char m_stemWidth;
     /** The barline width */
     unsigned char m_barlineWidth;
-    /** The beam width */
-    unsigned char m_beamWidth;
-    /** The beam white width */
-    unsigned char m_beamWhiteWidth;
     /** The maximum beam slope */
     unsigned char m_beamMaxSlope;
     /** The minimum beam slope */
@@ -142,8 +138,6 @@ public:
     unsigned char m_graceNum;
     /** The grace size ratio denominator */
     unsigned char m_graceDen;
-    /** The stem position correction */
-    signed char m_stemCorrection;
     /** The header and footer type */
     unsigned int m_headerType;
     /** The notation mode (cmn or mensural) */

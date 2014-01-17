@@ -182,8 +182,8 @@ void Doc::SetRendPage( Page *page )
     m_rendStep3 = m_rendStep1 * 6;
     
     // values for beams
-    m_rendBeamWidth[0] = this->m_env.m_beamWidth;
-    m_rendBeamWhiteWidth[0] = this->m_env.m_beamWhiteWidth;
+    m_rendBeamWidth[0] = this->m_env.m_interlDefin / 2;
+    m_rendBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
     m_rendBeamWidth[1] = (m_rendBeamWidth[0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
     m_rendBeamWhiteWidth[1] = (m_rendBeamWhiteWidth[0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
     

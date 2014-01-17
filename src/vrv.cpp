@@ -210,22 +210,19 @@ std::string GetVersion() {
 DefaultEnv::DefaultEnv()
 {
     
-    m_interlDefin = 18;
+    m_interlDefin = 16;
     m_landscape = false;
     m_staffLineWidth = 2;
     m_stemWidth = 2;
     m_barlineWidth = 2;
-    m_beamWidth = 8;
-    m_beamWhiteWidth = 6;
     m_beamMaxSlope = 30;
     m_beamMinSlope = 10;
     
     // originally in WG Parameters2
-    m_smallStaffNum = 16;
-    m_smallStaffDen = 20;
+    m_smallStaffNum = 3;
+    m_smallStaffDen = 4;
     m_graceNum = 3;
     m_graceDen = 4;
-	m_stemCorrection = 0;
     m_headerType = 0;
     
     m_pageHeight = 2970;
