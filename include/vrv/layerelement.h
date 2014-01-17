@@ -95,12 +95,15 @@ public:
     bool IsKeySig();
     bool IsMensur();
     bool IsMultiRest();
+    bool IsMRest();
     bool IsNote();
     bool HasPitchInterface();
     bool HasPositionInterface();
     bool IsRest();
     bool IsSymbol( SymbolType type );
     bool IsSymbol( );
+    bool IsTie();
+    bool IsTuplet();
     
     virtual double GetAlignementDuration();
     

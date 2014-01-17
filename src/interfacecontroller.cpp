@@ -60,35 +60,16 @@ InterfaceController::~InterfaceController()
 
 bool InterfaceController::LoadFile( std::string filename )
 {
-    FileInputStream *input = NULL;
-    if (m_format == pae_file) {
-        input = new PaeInput( &m_doc, filename.c_str() );
-    } else if (m_format == darms_file) {
-        input = new DarmsInput( &m_doc, filename.c_str() );
-    } else if (m_format == mei_file) {
-        input = new MeiInput( &m_doc, filename.c_str() );
-    }
-    else {
-        LogError( "Unknown format" );
-        return false;
-    }
+    std::ifstream in( filename.c_str() );
+    in.seekg(0, std::ios::end);
+    std::streamsize fileSize = (std::streamsize)in.tellg();
+    in.seekg(0, std::ios::beg);
     
-    // something went wrong
-    if ( !input ) {
-        LogError( "Unknown error" );
-        return false;
-    }
-
-    // load the file
-    if ( !input->ImportFile()) {
-        LogError( "Error importing file '%s'", filename.c_str() );
-        delete input;
-        return false;
-    }
+    // read the file into the string:
+    std::string content( fileSize, 0 );
+    in.read(&content[0], fileSize);
     
-    m_view.SetDoc( &m_doc );
-    delete input;
-    return true;
+    return LoadString( content );
 }
 
 bool InterfaceController::LoadString( std::string data )
@@ -96,6 +77,8 @@ bool InterfaceController::LoadString( std::string data )
     FileInputStream *input = NULL;
     if (m_format == pae_file) {
         input = new PaeInput( &m_doc, "" );
+    } else if (m_format == darms_file) {
+        input = new DarmsInput( &m_doc, "" );
     } else if (m_format == mei_file) {
         input = new MeiInput( &m_doc, "" );
     }
@@ -117,8 +100,11 @@ bool InterfaceController::LoadString( std::string data )
         return false;
     }
     
-    m_view.SetDoc( &m_doc );
     delete input;
+    
+    m_view.SetDoc( &m_doc );
+    m_doc.Layout();
+    
     return true;
 }
 
@@ -216,8 +202,6 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
 
 std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
 {
-    m_doc.Layout();
-    
     // Get the current system for the SVG clipping size
     Page *page = dynamic_cast<Page*>(m_doc.m_children[pageNo]);
     //System *system = dynamic_cast<System*>(page->m_children[0]);

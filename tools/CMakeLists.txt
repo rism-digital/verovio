@@ -28,6 +28,7 @@ add_executable (verovio
 	../src/leipzigbbox.cpp
 	../src/mensur.cpp 
 	../src/measure.cpp
+	../src/mrest.cpp
 	../src/multirest.cpp
 	../src/note.cpp 
 	../src/object.cpp 

@@ -19,6 +19,7 @@ class Beam;
 class Clef;
 class Layer;
 class Mensur;
+class MRest;
 class MultiRest;
 class Note;
 class Rest;
@@ -93,6 +94,12 @@ private:
      * Callded from WriteLayerElement.
      */
     void WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur );
+
+    /**
+     * Write a MRest (represented by MultiRest class).
+     * Callded from WriteLayerElement.
+     */
+    void WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest );
     
     /**
      * Write a MultiRest. 
@@ -215,6 +222,7 @@ private:
     LayerElement *ReadMeiBeam( pugi::xml_node beam );
     LayerElement *ReadMeiClef( pugi::xml_node clef );
     LayerElement *ReadMeiMensur( pugi::xml_node mensur );
+    LayerElement *ReadMeiMRest( pugi::xml_node mRest );
     LayerElement *ReadMeiMultiRest( pugi::xml_node multiRest );
     LayerElement *ReadMeiNote( pugi::xml_node note );
     LayerElement *ReadMeiRest( pugi::xml_node rest );

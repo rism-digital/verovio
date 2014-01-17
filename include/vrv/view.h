@@ -153,7 +153,8 @@ public:
     void DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff ); 
     void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawSymbol( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent = NULL );

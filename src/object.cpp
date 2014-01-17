@@ -27,6 +27,7 @@
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "multirest.h"
 #include "page.h"
 #include "view.h"
 #include "scoredef.h"
@@ -758,15 +759,19 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( dynamic_cast<Beam*>(current) ) {
+    if ( current->IsBeam() ) {
         return FUNCTOR_CONTINUE;
     }
     
-    if ( dynamic_cast<Tie*>(current) ) {
+    if ( current->IsTie() ) {
         return FUNCTOR_CONTINUE;
     }
     
-    if ( dynamic_cast<Tuplet*>(current) ) {
+    if ( current->IsTuplet() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( current->IsMultiRest() || current->IsMRest() ) {
         return FUNCTOR_CONTINUE;
     }
     

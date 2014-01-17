@@ -26,10 +26,12 @@
 #include "keysig.h"
 #include "io.h"
 #include "mensur.h"
+#include "mRest.h"
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
 #include "symbol.h"
+#include "tie.h"
 #include "tuplet.h"
 
 namespace vrv {
@@ -219,6 +221,12 @@ bool LayerElement::IsKeySig()
     return (dynamic_cast<KeySignature*>(this));
 }
 
+    
+bool LayerElement::IsMRest()
+{
+    return (dynamic_cast<MRest*>(this));
+}
+    
 bool LayerElement::IsMultiRest() 
 {  
     return (dynamic_cast<MultiRest*>(this));
@@ -247,6 +255,16 @@ bool LayerElement::HasPositionInterface()
 bool LayerElement::IsRest() 
 {  
     return (dynamic_cast<Rest*>(this));
+}
+    
+bool LayerElement::IsTie()
+{
+    return (dynamic_cast<Tie*>(this));
+}
+
+bool LayerElement::IsTuplet()
+{
+    return (dynamic_cast<Tuplet*>(this));
 }
 
 
@@ -326,7 +344,7 @@ int LayerElement::Align( ArrayPtrVoid params )
     else if ( this->IsMensur() ) {
         type = ALIGNMENT_MENSUR;
     }
-    else if ( this->IsMultiRest() ) {
+    else if ( this->IsMultiRest() || this->IsMRest() ) {
         type = ALIGNMENT_MULTIREST;
     }
     

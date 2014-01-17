@@ -48,6 +48,7 @@ python $EMCC --closure 0 -O2 \
 	$VEROVIO_ROOT/src/layerelement.cpp \
 	$VEROVIO_ROOT/src/leipzigbbox.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
+	$VEROVIO_ROOT/src/mrest.cpp \
 	$VEROVIO_ROOT/src/multirest.cpp \
 	$VEROVIO_ROOT/src/note.cpp \
 	$VEROVIO_ROOT/src/object.cpp \

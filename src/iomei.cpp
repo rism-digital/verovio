@@ -27,6 +27,7 @@
 #include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
+#include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
@@ -294,6 +295,10 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
         xmlElement = currentParent.append_child("mensur");
         WriteMeiMensur( xmlElement, dynamic_cast<Mensur*>(element) );
     }
+    else if (dynamic_cast<MRest*>(element)) {
+        xmlElement = currentParent.append_child("mRest");
+        WriteMeiMRest( xmlElement, dynamic_cast<MRest*>(element) );
+    }
     else if (dynamic_cast<MultiRest*>(element)) {
         xmlElement = currentParent.append_child("multiRest");
         WriteMeiMultiRest( xmlElement, dynamic_cast<MultiRest*>(element) );
@@ -374,6 +379,11 @@ void MeiOutput::WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur )
     // missing m_meterSymb
     
     return;
+}
+    
+void MeiOutput::WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest )
+{
+     return;
 }
 
 void MeiOutput::WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multiRest )
@@ -1137,6 +1147,9 @@ bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
     else if ( std::string( xmlElement.name() ) == "rest" ) {
         vrvElement = ReadMeiRest( xmlElement );
     }
+    else if ( std::string( xmlElement.name() ) == "mRest" ) {
+        vrvElement = ReadMeiMRest( xmlElement );
+    }
     else if ( std::string( xmlElement.name() ) == "multiRest" ) {
         vrvElement = ReadMeiMultiRest( xmlElement );
     }
@@ -1253,10 +1266,17 @@ LayerElement *MeiInput::ReadMeiMensur( pugi::xml_node mensur )
     
     return vrvMensur;
 }
+    
+LayerElement *MeiInput::ReadMeiMRest( pugi::xml_node mRest )
+{
+    MRest *vrvMRest = new MRest();
+    
+    return vrvMRest;
+}
 
 LayerElement *MeiInput::ReadMeiMultiRest( pugi::xml_node multiRest )
 {
-	MultiRest *vrvMultiRest = new MultiRest();
+	MultiRest *vrvMultiRest = new MultiRest( 1 );
     
 	// pitch
     if ( multiRest.attribute( "num" ) ) {

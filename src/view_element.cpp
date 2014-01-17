@@ -27,6 +27,7 @@
 #include "leipzigbbox.h"
 #include "measure.h"
 #include "mensur.h"
+#include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
@@ -89,8 +90,11 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     else if (dynamic_cast<Mensur*>(element)) {
         DrawMensur(dc, element, layer, staff);
     }
+    else if (dynamic_cast<MRest*>(element)) {
+        DrawMRest(dc, element, layer, staff, measure);
+    }
     else if (dynamic_cast<MultiRest*>(element)) {
-        DrawMultiRest(dc, element, layer, staff);
+        DrawMultiRest(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Note*>(element)) {
         DrawDurationElement(dc, element, layer, staff);
@@ -699,11 +703,35 @@ void View::DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigne
 	}
 	return;
 }
+    
+void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    assert(dynamic_cast<MRest*>(element)); // Element must be a MultiRest"
+    
+    MRest *mrest = dynamic_cast<MRest*>(element);
+    
+    dc->StartGraphic( element, "mrest", element->GetUuid() );
+    
+    int a = element->m_xDrawing + mrest->m_hOffset + measure->GetXRelRight() / 2;
+    int b = element->m_yRel;
+    
+    // move it down according to the number of line in the staff
+    b -= staff->portNbLine / 2 * m_doc->m_rendInterl[staff->staffSize];
+    
+    DrawWholeRest ( dc, a, b, DUR_1, 0, false, staff);
+    
+    dc->EndGraphic(element, this);
+    
+    return;
+    
+}
 
 /** This function draws multi-measure rests
  **/
 #define NUMBER_REDUCTION 5
-void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
+void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {	
     int x, x2, y, y2, length;
 
@@ -712,6 +740,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert(dynamic_cast<MultiRest*>(element)); // Element must be a Symbol"
     
     MultiRest *multirest = dynamic_cast<MultiRest*>(element);
+    
     dc->StartGraphic( element, "multirest", element->GetUuid() );
     
     int a = element->m_xDrawing + multirest->m_hOffset;

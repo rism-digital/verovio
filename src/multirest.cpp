@@ -1,10 +1,9 @@
-//
-//  multirest.cpp
-//  aruspix
-//
-//  Created by Rodolfo Zitellini on 02/12/13.
-//  Copyright (c) 2013 com.aruspix.www. All rights reserved.
-//
+/////////////////////////////////////////////////////////////////////////////
+// Name:        multirest.cpp
+// Author:      Rodolfo Zitellini
+// Created:     2013
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
 
 
 #include "multirest.h"

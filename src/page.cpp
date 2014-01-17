@@ -309,7 +309,7 @@ void Page::JustifyHorizontally( )
     MusFunctor justifyX( &Object::JustifyX );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &justifyX );
-    this->Process( &justifyX, params );    
+    this->Process( &justifyX, params );
 }
 
 void Page::SetValues( int type )
