@@ -105,10 +105,18 @@ bool InterfaceController::LoadString( std::string data )
         return false;
     }
     
+    // do the layout? this depends on the options and of the
+    // file. PAE and DARMS of no layout information. MEI files
+    // can have, but this might have been ignored because of the
+    // --ignore-layout option. We won't do it if --no-layout option
+    // was set, though.
+    if (!input->HasLayoutInformation() && !m_noLayout) {
+        m_doc.Layout();
+    }
+    
     delete input;
     
     m_view.SetDoc( &m_doc );
-    m_doc.Layout();
     
     return true;
 }
@@ -214,9 +222,8 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     m_view.SetPage( pageNo );
     
     // Create the SVG object, h & w come from the system
-    // we add border*2 so it is centered into the image
-    //SvgDeviceContext svg(system->m_contentBB_x2 - system->m_contentBB_x1 + m_border * 2, (system->m_contentBB_y2 - system->m_contentBB_y1) + m_border * 2);
-    SvgDeviceContext svg( m_pageWidth + m_border * 2, m_pageHeight + m_border * 2 );
+    // We will need to set the size of the page after having drawn it depending on the options
+    SvgDeviceContext svg( m_pageWidth + m_border, m_pageHeight + m_border );
     
     // set scale and border from user options
     svg.SetUserScale((double)m_scale / 100, (double)m_scale / 100);
@@ -227,6 +234,9 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     
     // render the page
     m_view.DrawCurrentPage( &svg, false);
+    
+    // TODO: adjust the size of the page depending on the options
+    // --no-layout or --adjust-page-height
     
     std::string out_str = svg.GetStringSVG( xml_tag );
     return out_str;

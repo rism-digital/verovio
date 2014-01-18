@@ -51,6 +51,12 @@ public:
 	Measure *GetAtPos( int x );
     
     /**
+     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Called by SetCurrentScoreDef functor.
+     */
+    virtual void ResetDrawingValues( );
+    
+    /**
      * Return the default horizontal spacing of system.
      */
     int GetVerticalSpacing();

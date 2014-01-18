@@ -47,6 +47,12 @@ public:
      */
     virtual int GetHorizontalSpacing( );
     
+    /**
+     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Called by SetCurrentScoreDef functor.
+     */
+    virtual void ResetDrawingValues( );
+    
     /** Adjust the pname and the octave for values outside the range */
     static void AdjustPname( int *pname, int *oct );
     

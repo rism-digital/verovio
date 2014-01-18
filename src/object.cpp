@@ -123,7 +123,11 @@ void Object::ClearChildren()
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter)
     {
-        delete *iter;
+        // we need to check if the this is the parent
+        // ownership might have been given up with Relinquish
+        if ((*iter)->m_parent == this) {
+            delete *iter;
+        }
     }
     m_children.clear();
 }
@@ -156,6 +160,16 @@ Object *Object::DetachChild( int idx )
     return child;
 }
 
+    
+Object *Object::Relinquish( int idx )
+{
+    if ( idx >= (int)m_children.size() ) {
+        return NULL;
+    }
+    Object *child = m_children[idx];
+    child->m_parent = NULL;
+    return child;
+}
 
 Object* Object::GetChild( int idx )
 {
@@ -655,6 +669,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     ScoreDef *currentScoreDef = (ScoreDef*)params[0];
     StaffDef **currentStaffDef = (StaffDef**)params[1];
     
+    // reset all the drawing values
+    this->ResetDrawingValues();
 
     // starting a new page
     Page *current_page = dynamic_cast<Page*>(this);

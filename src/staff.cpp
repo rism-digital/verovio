@@ -188,10 +188,14 @@ Layer *Staff::GetLayerWithIdx( int LayerIdx )
 	return (Layer*)m_children[LayerIdx];
 }
 
-
 int Staff::GetVerticalSpacing()
 {
     return 160; // arbitrary generic value
+}
+    
+void Staff::ResetDrawingValues()
+{
+    m_yDrawing = 0;
 }
 
 bool Staff::GetPosOnPage( ArrayPtrVoid params )

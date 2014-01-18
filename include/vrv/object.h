@@ -92,6 +92,12 @@ public:
     void SetParent( Object *parent );
     
     virtual std::string GetClassName( ) { return "[MISSING]"; };
+    
+    /**
+     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Called by SetCurrentScoreDef functor.
+     */
+    virtual void ResetDrawingValues( ) { };
 
     /**
      * Return the index position of the object in its parent (-1 if not found)
@@ -113,6 +119,17 @@ public:
      * The parent pointer is set to NULL.
      */
     Object *DetachChild( int idx );
+    
+    /**
+     * Give up ownership of the child at the idx position (NULL if not found)
+     * This is a method to used only in very particular case where the child
+     * object cannot be detached straight away. It is typically the case 
+     * when this has to be done within an iterator. The parent of the object
+     * will be set to NULL but the object will not be removed. If the parent
+     * is not destroyed after that, you should expect problems...
+     * In other words: do not use unless you are absolutely sure what you are doing
+     */
+    Object *Relinquish( int idx );
     
     /**
      * Remove and delete the child at the idx position.
@@ -301,6 +318,17 @@ public:
      * Align the system by adjusting the m_yRel position looking at the SystemAligner.
      */
     virtual int AlignSystems( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Fill a page by adding systems with the appropriate length
+     * 
+     */
+    virtual int CastOffSystems( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     *
+     */
+    virtual int CastOffPages( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
 
 public:
     ArrayOfObjects m_children;

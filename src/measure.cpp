@@ -17,7 +17,9 @@
 #include "vrv.h"
 #include "vrvdef.h"
 #include "io.h"
+#include "page.h"
 #include "staff.h"
+#include "system.h"
 
 namespace vrv {
 
@@ -139,6 +141,20 @@ Staff *Measure::GetStaffWithNo( int staffNo )
     }
 	return NULL;
 }
+ 
+
+void Measure::ResetDrawingValues()
+{
+    m_xRel = 0;
+    m_xDrawing = 0;
+    if ( m_measureAligner.GetLeftAlignment() ) {
+        m_measureAligner.GetLeftAlignment()->SetXRel( 0 );
+    }
+    if ( m_measureAligner.GetRightAlignment() ) {
+        m_measureAligner.GetRightAlignment()->SetXRel( 0 );
+    }
+}
+
 
 int Measure::GetXRel()
 {
@@ -244,6 +260,31 @@ int Measure::AlignMeasures( ArrayPtrVoid params )
         // shift the next measure of the total with
         (*shift) += GetRightBarline()->GetAlignment()->GetMaxWidth();
     }
+    
+    return FUNCTOR_SIBLINGS;
+}
+    
+int Measure::CastOffSystems( ArrayPtrVoid params )
+{
+    // param 0: a pointer to the system we are taking the content from
+    // param 1: a pointer the page we are adding system to
+    // param 2: a pointer to the current system
+    // param 3: the cummulated shift (m_xRel of the first measure of the current system)
+    System *contentSystem = (System*)params[0];
+    Page *page = (Page*)params[1];
+    System *currentSystem = (System*)params[2];
+    int *shift = (int*)params[3];
+    
+    this->m_xRel = (*shift);
+    
+    // Special case where we use the Relinquish method.
+    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
+    // from the content System because this screws up the iterator. Relinquish gives up
+    // the ownership of the Measure - the contentSystem will be deleted afterwards.
+    Measure *measure = dynamic_cast<Measure*>( contentSystem->Relinquish( this->GetIdx()) );
+    currentSystem->AddMeasure( measure );
+    
+    (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
     
     return FUNCTOR_SIBLINGS;
 }

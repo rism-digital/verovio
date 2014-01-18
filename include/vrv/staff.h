@@ -67,6 +67,12 @@ public:
      */
     int GetVerticalSpacing();
     
+    /**
+     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Called by SetCurrentScoreDef functor.
+     */
+    virtual void ResetDrawingValues( );
+    
     StaffAlignment *GetAlignment() { return m_staffAlignment; };
     
     int GetYRel();

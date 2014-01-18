@@ -133,6 +133,13 @@ int LayerElement::GetHorizontalSpacing()
 {
     return 10; // arbitrary generic value
 }
+    
+    
+void LayerElement::ResetDrawingValues()
+{
+    m_xDrawing = 0;
+    m_yRel = 0;
+}
 
 void LayerElement::SetPitchOrPosition(int pname, int oct) 
 {

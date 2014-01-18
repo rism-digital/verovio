@@ -93,6 +93,12 @@ public:
     int GetXRelRight( );
     
     /**
+     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Called by SetCurrentScoreDef functor.
+     */
+    virtual void ResetDrawingValues( );
+    
+    /**
      * Align the content of a system.
      */
     virtual int Align( ArrayPtrVoid params );
@@ -120,6 +126,12 @@ public:
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int JustifyX( ArrayPtrVoid params );
+    
+    /**
+     * Fill a page by adding systems with the appropriate length
+     *
+     */
+    virtual int CastOffSystems( ArrayPtrVoid params );
         
 public:
     /** The logical staff */

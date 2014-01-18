@@ -93,6 +93,14 @@ int System::GetVerticalSpacing()
     return 0; // arbitrary generic value
 }
 
+void System::ResetDrawingValues()
+{
+    m_xRel = 0;
+	m_xDrawing = 0;
+    m_yRel = 0;
+	m_yDrawing = 0;
+}
+
 Measure *System::GetFirst( )
 {
 	if ( m_children.empty() )
