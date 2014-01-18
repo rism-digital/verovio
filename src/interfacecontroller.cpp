@@ -37,27 +37,82 @@ namespace vrv {
 
 InterfaceController::InterfaceController()
 {
-    m_border = 10;
-    m_scale = 100;
+    m_border = DEFAULT_BORDER;
+    m_scale = DEFAULT_SCALE;
     m_format = pae_file;
     
     // default page size
-    m_pageHeight = 2970;
-    m_pageWidth = 2100;
+    m_pageHeight = DEFAULT_PAGEHEIGHT;
+    m_pageWidth = DEFAULT_PAGEWIDTH;
     
     m_noLayout = false;
     m_ignoreLayout = false;
     m_adjustPageHeight = false;
     m_noJustification = false;
     m_showBoundingBoxes = false;
-    
 }
 
 
 InterfaceController::~InterfaceController()
 {
 }
+    
+bool InterfaceController::SetBorder( int border )
+{
+    if (border < MIN_BORDER|| border > MAX_BORDER) {
+        LogError( "Border out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_BORDER, MIN_BORDER, MAX_BORDER );
+        return false;
+    }
+    m_border = border;
+}
+    
+bool InterfaceController::SetScale( int scale )
+{
+    if (scale < MIN_SCALE || scale > MAX_SCALE) {
+        LogError( "Scale out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE, MAX_SCALE );
+        return false;
+    }
+    m_scale = scale;
+    return true;
+}
+    
+bool InterfaceController::SetPageHeight( int h )
+{
+    if (h < MIN_PAGEHEIGHT || h > MAX_PAGEHEIGHT) {
+        LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGEHEIGHT, MIN_PAGEHEIGHT, MAX_PAGEHEIGHT );
+        return false;
+    }
+    m_pageHeight = h;
+    return true;
+}
+    
+bool InterfaceController::SetPageWidth( int w )
+{
+    if (w < MIN_PAGEWIDTH || w > MAX_PAGEWIDTH) {
+        LogError( "Page width out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGEWIDTH, MIN_PAGEWIDTH, MAX_PAGEWIDTH );
+        return false;
+    }
+    m_pageWidth = w;
+};
+    
 
+bool InterfaceController::SetFormat( std::string informat )
+{
+    if (informat == "pae")
+        m_format = pae_file;
+    else if(informat == "darms")
+        m_format = darms_file;
+    else if(informat == "mei")
+        m_format = mei_file;
+    else {
+        LogError("Input format can only be: pae mei or darms");
+        return false;
+    }
+    return true;
+};
+    
+
+    
 bool InterfaceController::LoadFile( std::string filename )
 {
     std::ifstream in( filename.c_str() );

@@ -21,6 +21,22 @@ typedef enum _file_formats {
     pae_file,
     darms_file
 } ConvertFileFormat;
+    
+#define DEFAULT_SCALE 100
+#define MIN_SCALE 10
+#define MAX_SCALE 1000
+    
+#define DEFAULT_BORDER 10
+#define MIN_BORDER 10
+#define MAX_BORDER 100
+
+#define DEFAULT_PAGEHEIGHT 2970
+#define MIN_PAGEHEIGHT 100
+#define MAX_PAGEHEIGHT 10000
+    
+#define DEFAULT_PAGEWIDTH 2100
+#define MIN_PAGEWIDTH 100
+#define MAX_PAGEWIDTH 10000
 
 //----------------------------------------------------------------------------
 // InterfaceController
@@ -65,7 +81,7 @@ public:
      * @name Set and get the border
      */
     ///@{
-    void SetBorder( int border ) { m_border = border; };
+    bool SetBorder( int border );
     int GetBorder() { return m_border; };
     ///@}
     
@@ -73,7 +89,7 @@ public:
      * @name Set and get the scale
      */
     ///@{
-    void SetScale( int scale ) { m_scale = scale; };
+    bool SetScale( int scale );
     int GetScale() { return m_scale; };
     ///@}
     
@@ -81,7 +97,7 @@ public:
      * @name Set and get the page height (in pixels)
      */
     ///@{
-    void SetPageHeight( int h ) { m_pageHeight = h; };
+    bool SetPageHeight( int h );
     int GetPageHeight() { return m_pageHeight; };
     ///@}
     
@@ -89,7 +105,7 @@ public:
      * @name Set and get the page width (in pixels)
      */
     ///@{
-    void SetPageWidth( int w ) { m_pageWidth = w; };
+    bool SetPageWidth( int w );
     int GetPageWidth() { return m_pageWidth; };
     ///@}
     
@@ -137,8 +153,10 @@ public:
     
     /**
      * @name Get the input file format (defined as ConvertFileFormat)
+     * The SetFormat with ConvertFileFormat does not perform any validation
      */
     ///@{
+    bool SetFormat( std::string informat );
     void SetFormat( ConvertFileFormat format ) { m_format = format; };
     int GetFormat() { return m_format; };
     ///@}
