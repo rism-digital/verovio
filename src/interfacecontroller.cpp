@@ -64,6 +64,7 @@ bool InterfaceController::SetBorder( int border )
         return false;
     }
     m_border = border;
+    return true;
 }
     
 bool InterfaceController::SetScale( int scale )
@@ -93,6 +94,7 @@ bool InterfaceController::SetPageWidth( int w )
         return false;
     }
     m_pageWidth = w;
+    return true;
 };
     
 
@@ -178,13 +180,6 @@ bool InterfaceController::LoadString( std::string data )
 
 bool InterfaceController::ParseOptions( std::string json_options ) {
 #ifdef USE_EMSCRIPTEN
-    std::string in_format = "pae";
-    
-    int scale = m_scale;
-    int border = m_border;
-    
-    int width = m_pageWidth;
-    int height = m_pageHeight;
     
     jsonxx::Object json;
         
@@ -195,19 +190,19 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
     }
     
     if (json.has<jsonxx::String>("inputFormat"))
-        in_format = json.get<jsonxx::String>("inputFormat");
+        SetFormat( json.get<jsonxx::String>("inputFormat") );
     
     if (json.has<jsonxx::Number>("scale"))
-        scale = json.get<jsonxx::Number>("scale");
+        SetScale( json.get<jsonxx::Number>("scale") );
     
     if (json.has<jsonxx::Number>("border"))
-        border = json.get<jsonxx::Number>("border");
+        SetBorder( json.get<jsonxx::Number>("border") );
 
     if (json.has<jsonxx::Number>("pageWidth"))
-        width = json.get<jsonxx::Number>("pageWidth");
+        SetPageWidth( json.get<jsonxx::Number>("pageWidth") );
     
     if (json.has<jsonxx::Number>("pageHeight"))
-        height = json.get<jsonxx::Number>("pageHeight");
+        SetPageHeight( json.get<jsonxx::Number>("pageHeight") );
     
     // Parse the various flags
     if (json.has<jsonxx::Boolean>("noLayout"))
@@ -224,41 +219,7 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
 
     if (json.has<jsonxx::Boolean>("showBoundingBoxes"))
         SetShowBoundingBoxes(json.get<jsonxx::Boolean>("showBoundingBoxes"));
-    
-    // set file type
-    if (in_format == "pae") 
-        SetFormat(pae_file);
-    else if (in_format == "mei")
-        SetFormat(mei_file);
-    else if (in_format == "darms")
-        SetFormat(darms_file);
-    else { // fail if format in invalid
-        LogError( "InputFormat is invalid: %s\n", in_format.c_str() );
-        return false;
-    }
-    
-    // Check boundaries for scale and border
-    
-    if (border < 0 || border > 1000)
-        LogError( "Border out of bounds, use 10 (default)." );
-    else
-        SetBorder(border);
         
-    if (scale < 0 || scale > 1000)
-        LogError( "Scale out of bounds, use 10 (default)." );
-    else
-        SetScale(scale);
-    
-    if (width < 0 || width > 5000)
-        LogError( "Page width out of bounds" );
-    else
-        SetPageWidth(width);
-    
-    if (height < 0 || height > 5000)
-        LogError( "Page Height out of bounds." );
-    else
-        SetPageHeight(height);
-    
     return true;
     
 #else
