@@ -101,6 +101,8 @@ void Doc::SetCurrentScoreDef( bool force )
 
 void Doc::Layout( )
 {
+    this->SetCurrentScoreDef();
+    
     Page *contentPage = this->SetRendPage( 0 );
     assert( contentPage );
     contentPage->AlignHorizontally();
@@ -111,18 +113,21 @@ void Doc::Layout( )
     System *currentSystem = new System();
     contentPage->AddSystem( currentSystem );
     int shift = 0;
+    int systemFullWidth = this->m_rendPageWidth - this->m_rendPageLeftMar - this->m_rendPageRightMar
+        - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     ArrayPtrVoid params;
     params.push_back( contentSystem );
     params.push_back( contentPage );
-    params.push_back( currentSystem );
+    params.push_back( &currentSystem );
     params.push_back( &shift );
+    params.push_back( &systemFullWidth );
     MusFunctor castOffSystems( &Object::CastOffSystems );
     contentSystem->Process( &castOffSystems, params );
     delete contentSystem;
     
     //LogMessage("Prout");
-    //this->SetCurrentScoreDef( true );
-    //contentPage->Layout( true );
+    this->SetCurrentScoreDef( true );
+    contentPage->Layout( true );
 }
     
 bool Doc::HasPage( int pageIdx )

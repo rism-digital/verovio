@@ -162,6 +162,9 @@ bool InterfaceController::LoadString( std::string data )
         return false;
     }
     
+    m_doc.SetPageHeight( this->GetPageHeight() );
+    m_doc.SetPageWidth( this->GetPageWidth() );
+    
     // do the layout? this depends on the options and of the
     // file. PAE and DARMS of no layout information. MEI files
     // can have, but this might have been ignored because of the

@@ -160,7 +160,7 @@ void Page::Layout( bool force )
     
     this->AlignHorizontally();
     this->AlignVertically();
-    this->JustifyHorizontally();
+    //this->JustifyHorizontally();
     
     m_layoutDone = true;
 }

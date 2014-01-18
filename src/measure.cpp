@@ -270,21 +270,25 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     // param 1: a pointer the page we are adding system to
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_xRel of the first measure of the current system)
+    // param 4: the system width
     System *contentSystem = (System*)params[0];
     Page *page = (Page*)params[1];
-    System *currentSystem = (System*)params[2];
+    System **currentSystem = (System**)params[2];
     int *shift = (int*)params[3];
+    int *systemWidth = (int*)params[4];
     
-    this->m_xRel = (*shift);
+    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_xRel + this->GetXRelRight() - (*shift) > (*systemWidth) ) ) {
+        (*currentSystem) = new System();
+        page->AddSystem( *currentSystem );
+        (*shift) = this->m_xRel;;
+    }
     
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     Measure *measure = dynamic_cast<Measure*>( contentSystem->Relinquish( this->GetIdx()) );
-    currentSystem->AddMeasure( measure );
-    
-    (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
+    (*currentSystem)->AddMeasure( measure );
     
     return FUNCTOR_SIBLINGS;
 }
