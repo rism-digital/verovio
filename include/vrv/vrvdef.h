@@ -48,6 +48,37 @@ enum EditorMode {
 	EDITOR_EDIT,
 	EDITOR_INSERT
 };
+    
+// Default values
+#define DEFAULT_UNIT 9
+#define MIN_UNIT 5
+#define MAX_UNIT 15
+    
+#define DEFAULT_PAGE_RIGHT_MAR 50
+#define MIN_PAGE_RIGHT_MAR 0
+#define MAX_PAGE_RIGHT_MAR 500
+    
+#define DEFAULT_PAGE_LEFT_MAR 50
+#define MIN_PAGE_LEFT_MAR 0
+#define MAX_PAGE_LEFT_MAR 500
+    
+#define DEFAULT_PAGE_TOP_MAR 50
+#define MIN_PAGE_TOP_MAR 0
+#define MAX_PAGE_TOP_MAR 500
+    
+#define DEFAULT_SCALE 100
+#define MIN_SCALE 10
+#define MAX_SCALE 1000
+    
+#define DEFAULT_PAGE_HEIGHT 2970
+#define MIN_PAGEHEIGHT 100
+#define MAX_PAGEHEIGHT 10000
+    
+#define DEFAULT_PAGEWIDTH 2100
+#define MIN_PAGEWIDTH 100
+#define MAX_PAGEWIDTH 10000
+    
+
 
 // SPACING
 #define MIN_TIE_HEIGHT 12

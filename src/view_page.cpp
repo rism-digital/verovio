@@ -57,7 +57,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     dc->DrawBackgroundImage( );
     
     MusPoint origin = dc->GetLogicalOrigin();
-    dc->SetLogicalOrigin( origin.x - m_doc->m_rendPageLeftMar, origin.y );
+    dc->SetLogicalOrigin( origin.x - m_doc->m_rendPageLeftMar, origin.y - m_doc->m_rendPageTopMar );
 
     dc->StartPage();
 

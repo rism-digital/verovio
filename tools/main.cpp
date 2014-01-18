@@ -65,11 +65,11 @@ void display_usage() {
     // Options
     cerr << "Options" << endl;
     
-    cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_BORDER << ")" << endl;
+    cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
     
     cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae (default is pae)" << endl;
     
-    cerr << " -p, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGEHEIGHT << ")" << endl;
+    cerr << " -p, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
     
     cerr << " -o, --outfile=FILE_NAME    Output file name" << endl;
     

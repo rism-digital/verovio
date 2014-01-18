@@ -210,7 +210,7 @@ std::string GetVersion() {
 DefaultEnv::DefaultEnv()
 {
     
-    m_interlDefin = 18;
+    m_interlDefin = 18; //DEFAULT_UNIT * 2;
     m_landscape = false;
     m_staffLineWidth = 2;
     m_stemWidth = 2;
@@ -225,11 +225,11 @@ DefaultEnv::DefaultEnv()
     m_graceDen = 4;
     m_headerType = 0;
     
-    m_pageHeight = 2970;
-    m_pageWidth = 2100;
-    m_pageRightMar = 0;
-    m_pageLeftMar = 0;
-    m_pageTopMar = 0;
+    m_pageHeight = DEFAULT_PAGE_HEIGHT;
+    m_pageWidth = DEFAULT_PAGEWIDTH;
+    m_pageRightMar = DEFAULT_PAGE_RIGHT_MAR;
+    m_pageLeftMar = DEFAULT_PAGE_LEFT_MAR;
+    m_pageTopMar = DEFAULT_PAGE_TOP_MAR;
     
     // additional parameters
     m_notationMode = MENSURAL_MODE;

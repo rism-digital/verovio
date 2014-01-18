@@ -21,22 +21,7 @@ typedef enum _file_formats {
     pae_file,
     darms_file
 } ConvertFileFormat;
-    
-#define DEFAULT_SCALE 100
-#define MIN_SCALE 10
-#define MAX_SCALE 1000
-    
-#define DEFAULT_BORDER 10
-#define MIN_BORDER 10
-#define MAX_BORDER 100
 
-#define DEFAULT_PAGEHEIGHT 2970
-#define MIN_PAGEHEIGHT 100
-#define MAX_PAGEHEIGHT 10000
-    
-#define DEFAULT_PAGEWIDTH 2100
-#define MIN_PAGEWIDTH 100
-#define MAX_PAGEWIDTH 10000
 
 //----------------------------------------------------------------------------
 // InterfaceController
@@ -168,12 +153,13 @@ public:
 private:
     Doc m_doc;
     View m_view;
-    int m_border;
     int m_scale;
     ConvertFileFormat m_format;
     
     int m_pageHeight;
     int m_pageWidth;
+    int m_border; // to be replace by pageRightMar, pageLeftMar, pageTopMar
+    int m_unit;
     
     bool m_noLayout;
     bool m_ignoreLayout;

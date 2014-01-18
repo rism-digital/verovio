@@ -37,13 +37,14 @@ namespace vrv {
 
 InterfaceController::InterfaceController()
 {
-    m_border = DEFAULT_BORDER;
+
     m_scale = DEFAULT_SCALE;
     m_format = pae_file;
     
     // default page size
-    m_pageHeight = DEFAULT_PAGEHEIGHT;
+    m_pageHeight = DEFAULT_PAGE_HEIGHT;
     m_pageWidth = DEFAULT_PAGEWIDTH;
+    m_border = DEFAULT_PAGE_LEFT_MAR;
     
     m_noLayout = false;
     m_ignoreLayout = false;
@@ -59,8 +60,9 @@ InterfaceController::~InterfaceController()
     
 bool InterfaceController::SetBorder( int border )
 {
-    if (border < MIN_BORDER|| border > MAX_BORDER) {
-        LogError( "Border out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_BORDER, MIN_BORDER, MAX_BORDER );
+    // We use left margin values because for now we cannot specify different values for each margin
+    if (border < MIN_PAGE_LEFT_MAR || border > MAX_PAGE_LEFT_MAR) {
+        LogError( "Border out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR, MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR );
         return false;
     }
     m_border = border;
@@ -80,7 +82,7 @@ bool InterfaceController::SetScale( int scale )
 bool InterfaceController::SetPageHeight( int h )
 {
     if (h < MIN_PAGEHEIGHT || h > MAX_PAGEHEIGHT) {
-        LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGEHEIGHT, MIN_PAGEHEIGHT, MAX_PAGEHEIGHT );
+        LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGEHEIGHT, MAX_PAGEHEIGHT );
         return false;
     }
     m_pageHeight = h;
@@ -164,6 +166,9 @@ bool InterfaceController::LoadString( std::string data )
     
     m_doc.SetPageHeight( this->GetPageHeight() );
     m_doc.SetPageWidth( this->GetPageWidth() );
+    m_doc.SetPageRightMar( this->GetBorder() );
+    m_doc.SetPageLeftMar( this->GetBorder() );
+    m_doc.SetPageTopMar( this->GetBorder() );
     
     // do the layout? this depends on the options and of the
     // file. PAE and DARMS of no layout information. MEI files
@@ -242,11 +247,10 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg( m_pageWidth + m_border, m_pageHeight + m_border );
+    SvgDeviceContext svg( m_pageWidth, m_pageHeight );
     
     // set scale and border from user options
     svg.SetUserScale((double)m_scale / 100, (double)m_scale / 100);
-    svg.SetLogicalOrigin(m_border, m_border);
     
     // debug BB?
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
