@@ -2,7 +2,7 @@ Verovio is a fast, portable and lightweight library for engraving Music Encoding
 
 It can be used as a standalone command-line tool for converting a files, as the music rendering library for applications, or it can be compiled to Javascript using the Emscripten LLVM-to-JavaScript compiler.
 
-The main project page is http://www.verovio.org [coming soon!]
+The main project page will be available at http://www.verovio.org [coming soon!]
 
 Verovio is available under the GPL license, see LICENSE.txt.
 
