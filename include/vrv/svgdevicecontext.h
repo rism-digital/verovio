@@ -1,16 +1,21 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        bboxdc.h 
+// Name:        svgdevicecontext.h 
 // Author:      Laurent Pugin
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.   
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_BBOX_DC_H__
-#define __VRV_BBOX_DC_H__
+#ifndef __VRV_SVG_DC_H__
+#define __VRV_SVG_DC_H__
 
 #include "devicecontext.h"
-#include "object.h"
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace vrv {
 
@@ -19,20 +24,16 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /** 
- * This class calculates the bouding box of the object that are drawn.
- * It can be used when doing the layout of the object in order to manage object spacing.
- * The drawing primitives do not draw anything but update the bounding box values of the 
- * layout objects currently drawn. The layout objects store their own bounding box and a
- * bounding box of their content. The own bouding box is updated only for the object being
- * drawn (the top one on the stack). The content bounding box is updated for all objects
- * the stack
+ * This class implements a drawing context for generating SVG files.
+ * The Leipzig font is embedded by incorporating ./data/svg/xxx.xml glyphs within
+ * the SVG file.
  */
-class BBoxDeviceContext: public DeviceContext
+class SvgDeviceContext: public DeviceContext
 {
 public:
 
-    BBoxDeviceContext ( View *view, int width, int height );
-    virtual ~BBoxDeviceContext();
+    SvgDeviceContext ( int width, int height );
+    virtual ~SvgDeviceContext();
     
     // Setters
     
@@ -40,7 +41,7 @@ public:
     
     virtual void SetBackground( int colour, int style = AxSOLID );
     
-    virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) {};
+    virtual void SetBackgroundImage( void *image, double opacity = 1.0 );
     
     virtual void SetBackgroundMode( int mode );
     
@@ -66,8 +67,14 @@ public:
     
     virtual MusPoint GetLogicalOrigin( );
 
+    /**
+     * Get the the SVG into a string
+     * Add the xml tag if necessary.
+     */
+    std::string GetStringSVG( bool xml_tag = false );
+    
     // Drawing methods
-        
+    
     virtual void DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6]);
     
     virtual void DrawCircle(int x, int y, int radius);
@@ -92,43 +99,64 @@ public:
     
     virtual void DrawSpline(int n, MusPoint points[]);
     
-    virtual void DrawBackgroundImage( int x = 0, int y = 0 ) {};
+    virtual void DrawBackgroundImage( int x = 0, int y = 0 );
     
     // 
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId );
     
-    virtual void EndGraphic(DocObject *object, View *view );
+    virtual void EndGraphic( DocObject *object, View *view  );
     
     virtual void StartPage();
     
     virtual void EndPage();
     
-    
 private:
+    
+    /**
+     * Copy the content of a file to the output stream.
+     * This is used for copying <defs> items.
+     */
+    bool CopyFileToStream(const std::string& filename, std::ostream& dest);
+    
+    // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of the page
+    // some viewer seem to support to have the <defs> at the end, but some do not (pdf2svg, for example)
+    // for this reason, the full svg is finally written a string from the destructor or when Flush() is called
+    std::stringstream m_outdata;
+    
+    // the std::stringstream we are writing the svg (without <defs>)
+    std::stringstream m_svg;
+    
+    bool m_committed; // did we flushed the file?
+    int m_graphics;
+    int m_indents;
     int m_width, m_height;
     int m_originX, m_originY;
     double m_userScaleX, m_userScaleY;
-    
-    /**
-     * The array containing the object for which the bounding box needs to be updated
-     */ 
-    ArrayOfObjects m_objects;
-    
     FontMetricsInfo m_font;
+      
+    // holds the list of glyphs from the leipzig font used so far
+    // they will be added at the end of the file as <defs>
+    std::vector<std::string> m_leipzig_glyphs;
     
     /**
-     * The rendering context we are calling from - used to flip back the Y coordinates
+     * Flush the data to the internal buffer.
+     * Adds the xml tag if necessary and the <defs> from m_leipzig_glyphs
      */
-    View *m_view;
-   
+    void Commit( bool xml_tag );
+    
+    void WriteLine( std::string );
+    
     //
-    int m_penWidth;
+    std::string m_brushColour;
+    std::string m_brushStyle;
+    std::string m_penColour;
+    std::string m_penWidth;
+    std::string m_penStyle;
     
-    void UpdateBB(int x1, int y1, int x2, int y2);
-    
-    void FindPointsForBounds(MusPoint P0, MusPoint P1, MusPoint P2, MusPoint P3, int *ret);
+    std::string GetColour( int colour );
+        
 };
 
 } // namespace vrv
 
-#endif // __VRV_BBOX_DC_H__
+#endif // __VRV_SVG_DC_H__

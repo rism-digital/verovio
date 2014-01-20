@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "aligner.h"
-#include "bboxdc.h"
+#include "bboxdevicecontext.h"
 #include "vrvdef.h"
 #include "doc.h"
 #include "view.h"

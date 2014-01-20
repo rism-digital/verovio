@@ -14,7 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "bboxdc.h"
 #include "doc.h"
 #include "iodarms.h"
 #include "iomei.h"
@@ -22,8 +21,7 @@
 #include "iopae.h"
 #include "page.h"
 #include "view.h"
-#include "svgdc.h"
-#include "system.h"
+#include "svgdevicecontext.h"
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"
