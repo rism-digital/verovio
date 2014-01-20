@@ -11,7 +11,7 @@ add_executable (verovio
 	../src/aligner.cpp
 	../src/app.cpp
 	../src/barline.cpp 
-	../src/bboxdc.cpp 
+	../src/bboxdevicecontext.cpp 
 	../src/beam.cpp
 	../src/clef.cpp 
 	../src/devicecontext.cpp 
@@ -46,7 +46,7 @@ add_executable (verovio
 	../src/scoredef.cpp
 	../src/slur.cpp
 	../src/staff.cpp 
-	../src/svgdc.cpp 
+	../src/svgdevicecontext.cpp 
 	../src/symbol.cpp 
 	../src/system.cpp 
 	../src/tie.cpp

@@ -30,7 +30,7 @@ python $EMCC --closure 0 -O2 \
 	$VEROVIO_ROOT/src/app.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
-	$VEROVIO_ROOT/src/bboxdc.cpp \
+	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/interfacecontroller.cpp \
@@ -65,7 +65,7 @@ python $EMCC --closure 0 -O2 \
 	$VEROVIO_ROOT/src/scoredef.cpp \
 	$VEROVIO_ROOT/src/slur.cpp \
 	$VEROVIO_ROOT/src/staff.cpp \
-	$VEROVIO_ROOT/src/svgdc.cpp \
+	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/symbol.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
@@ -81,23 +81,3 @@ python $EMCC --closure 0 -O2 \
     -o build/verovio.js
 
 if [ $? -eq 0 ]; then echo "Done."; fi
-
-# Unused
-
-#	lib/regex/regcomp.c \
-#	lib/regex/regexec.c \
-#	lib/regex/regfree.c \
-#	lib/regex/regerror.c \
-
-#/Users/xhero/Downloads/e2fsprogs-1.42.8/lib/uuid/result.bc \
-#--embed-file data/svg/ \
-#	llvm_regexp/regcomp.c \
-#	llvm_regexp/regexec.c \
-#	llvm_regexp/regfree.c \
-#	llvm_regexp/regerror.c \
-#	llvm_regexp/regstrlcpy.c \
-
-#	apple_regex/regcomp.c \
-#	apple_regex/regexec.c \
-#	apple_regex/regfree.c \
-#	apple_regex/regerror.c \
