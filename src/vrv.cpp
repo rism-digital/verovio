@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <stdarg.h>
+#include <sys/time.h>
 
 //----------------------------------------------------------------------------
 
@@ -26,10 +27,28 @@ namespace vrv {
 std::string Resources::m_path = "/usr/local/share/verovio";
 std::string Resources::m_musicFontDesc = "0;13;70;90;90;0;Leipzig 4.9;33";
 std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
+ 
+// Global for LogElapsedTimeXXX functions (debugging purposes)
+struct timeval start;
 
 bool AreEqual(double dFirstVal, double dSecondVal)
 {
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
+}
+
+void LogElapsedTimeStart( )
+{
+    gettimeofday(&start, NULL);
+}
+    
+void LogElapsedTimeEnd( const char *msg )
+{
+    double elapsedTime;
+    struct timeval end;
+    gettimeofday(&end, NULL);
+    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;  // sec to ms
+    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+    LogMessage("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000 );
 }
     
 void LogDebug(const char *fmt, ...)

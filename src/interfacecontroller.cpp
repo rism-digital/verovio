@@ -174,7 +174,9 @@ bool InterfaceController::LoadString( std::string data )
     // --ignore-layout option. We won't do it if --no-layout option
     // was set, though.
     if (!input->HasLayoutInformation() && !m_noLayout) {
+        //LogElapsedTimeStart();
         m_doc.Layout();
+        //LogElapsedTimeEnd("layout");
     }
     
     delete input;

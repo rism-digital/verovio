@@ -62,6 +62,21 @@ std::string GetFilename( std::string fullpath );
  * Return the version number (X.X.X)
  */
 std::string GetVersion();
+ 
+/**
+ * Functions for logging in milliseconds the elapsed time of an
+ * operation (for debugging purposes).
+ * LogElapsedTimeStart needs to be called before the operation
+ * 
+ * Ex:
+ * 
+ * LogElapsedTimeStart( );
+ * ... Do something
+ * LogElapsedTimeEnd( "name of the operation" );
+ */
+extern struct timeval start;
+void LogElapsedTimeStart( );
+void LogElapsedTimeEnd (const char *msg = "unspecified operation" );
 
 //----------------------------------------------------------------------------
 // Resources
