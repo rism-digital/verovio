@@ -126,13 +126,13 @@ LayerElement *Layer::GetAtPos( int x )
 		return NULL;
 
     
-	int dif = x - element->m_xDrawing;
+	int dif = x - element->m_drawX;
     LayerElement *next = NULL;
-	while ( (next = this->GetNext( element )) && (int)element->m_xDrawing < x ){
+	while ( (next = this->GetNext( element )) && (int)element->m_drawX < x ){
 		element = next;
-		if ( (int)element->m_xDrawing > x && dif < (int)element->m_xDrawing - x )
+		if ( (int)element->m_drawX > x && dif < (int)element->m_drawX - x )
 			return this->GetPrevious( element );
-		dif = x - element->m_xDrawing;
+		dif = x - element->m_drawX;
 	}
 	
 	return element;
@@ -166,7 +166,7 @@ LayerElement *Layer::Insert( LayerElement *element, int x )
     // We are also updating the section and measure ( TODO, not necessary for now )
     int idx = 0;
 	LayerElement *next = this->GetFirst();
-	while ( next && (next->m_xDrawing < x) )
+	while ( next && (next->m_drawX < x) )
 	{
         idx++;
         // update section and measure if necessary (no section breaks and measure breaks for now)

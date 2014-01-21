@@ -34,7 +34,7 @@ class Tuplet;
 //----------------------------------------------------------------------------
 
 /** 
- * This class is a rendering context and corresponds to the view of a MVC design pattern.
+ * This class is a drawing context and corresponds to the view of a MVC design pattern.
  */
 class View
 {
@@ -67,11 +67,11 @@ public:
 	    
     void SetDoc( Doc *doc );
     
-    /** x value in the Renderer */
+    /** x value in the View */
 	int ToRendererX( int i );
 	/** x value in the Logical world */
 	int ToLogicalX( int i );
-	/** y value in the Renderer */
+	/** y value in the View */
 	int ToRendererY( int i );
 	/** y value in the Logical world  */
 	int ToLogicalY( int i );
@@ -218,7 +218,7 @@ private:
     static int s_drawingLigX[2], s_drawingLigY[2];	// pour garder coord. des ligatures    
     static bool s_drawingLigObliqua;	// marque le 1e passage pour une oblique
 
-    ScoreDef m_drawingScoreDef;
+    ScoreDef m_drawScoreDef;
     
 
 };

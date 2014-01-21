@@ -101,19 +101,19 @@ public:
     void RefreshViews( ) {};
 	
 	/**
-     * Set the paper size for the (when drawing it)
+     * Set drawing values (page size, etc) when drawing a page.
      * By default, the page size of the document is taken.
      * If a page is given, the size of the page is taken.
      * calculFormatPapier() in Wolfgang
      */
-	Page *SetRendPage( int pageIdx );
+	Page *SetDrawingPage( int pageIdx );
     
     /**
-     * Getter to the rendPage. Normally, getting the page should 
-     * be done with Doc::SetRendPage. This is only a method for 
+     * Getter to the drawPage. Normally, getting the page should 
+     * be done with Doc::SetDrawingPage. This is only a method for 
      * asserting that currently have the right page.
      */
-    Page *GetRendPage( ) { return m_rendPage; };
+    Page *GetDrawingPage( ) { return m_drawPage; };
 
     /**
      * Initializes fonts from the resources (music and lyrics)
@@ -165,77 +165,77 @@ public:
     
     /*
      * The following values are set in the Doc::SetRenderedPage.
-     * They are all current values to be used when rendering a page in a View and 
+     * They are all current values to be used when drawing a page in a View and
      * reset for every page. However, most of them are based on the m_staffDefin values
      * and will remain the same. This can be optimized.
      * The pages dimensions and margins are based on the page ones, the document ones or 
      * the default in the following order and if available.
      */
   
-    /** The page currently being rendered */
-    Page *m_rendPage;
+    /** The page currently being drawn */
+    Page *m_drawPage;
     /** Editor step (10 by default) */
-    int m_rendStep1;
-    /** Editor medium step (3 * m_rendStep1) */
-    int m_rendStep2;
-    /** Editor large step (6 * m_rendStep1) */
-    int m_rendStep3;
+    int m_drawStep1;
+    /** Editor medium step (3 * m_drawStep1) */
+    int m_drawStep2;
+    /** Editor large step (6 * m_drawStep1) */
+    int m_drawStep3;
     /** Half a the space between to staff lines for normal and small staff (10 and 8 by default) */
-    int m_rendHalfInterl[2];
+    int m_drawHalfInterl[2];
     /** Space between to staff lines for normal and small staff (20 and 16 by default) */
-    int m_rendInterl[2];
+    int m_drawInterl[2];
     /** Height of a five line staff for normal and small staff (80 and 64 by default) */
-    int m_rendStaffSize[2];
+    int m_drawStaffSize[2];
     /** Height of an octave for normal and small staff (70 and 56 by default) */
-    int m_rendOctaveSize[2];
+    int m_drawOctaveSize[2];
     /** Font height (100 par defaut) */
-    int m_rendFontHeight;
+    int m_drawFontHeight;
     /** Font height with ascent for normal and small staff and normal and grace size */
-	int m_rendFontHeightAscent[2][2];
+	int m_drawFontHeightAscent[2][2];
     /** Normal and small staff ration (16 / 20 by default) */
-    int m_rendSmallStaffRatio[2];
+    int m_drawSmallStaffRatio[2];
     /** Normal and grace size (3 / 4 by default) */
-    int m_rendGraceRatio[2];
+    int m_drawGraceRatio[2];
     /** Height of a beam for normal and small staff (10 and 6 by default) */
-    int m_rendBeamWidth[2];
+    int m_drawBeamWidth[2];
     /** Height of a beam spacing (white) for normal and small staff (10 and 6 by default) */
-    int m_rendBeamWhiteWidth[2];
+    int m_drawBeamWhiteWidth[2];
     /** Current font height with ascent for normal and small staff and normal and grace size */
-    int m_rendFontSize[2][2];
+    int m_drawFontSize[2][2];
     /** Note radius for normal and small staff and normal and grace size */
-    int m_rendNoteRadius[2][2];
+    int m_drawNoteRadius[2][2];
     /** Ledger line length for normal and small staff and normal and grace size */
-    int m_rendLedgerLine[2][3];
+    int m_drawLedgerLine[2][3];
     /** Brevis width for normal and small staff */
-    int m_rendBrevisWidth[2];
+    int m_drawBrevisWidth[2];
     /** Accident width for normal and small staff and normal and grace size */
-    int m_rendAccidWidth[2][2];
+    int m_drawAccidWidth[2][2];
     /** A vertical unit corresponding to the 1/4 of an interline */
-    float m_rendVerticalUnit1[2];
+    float m_drawVerticalUnit1[2];
     /** A vertical unit corresponding to the 1/8 of an interline */
-    float m_rendVerticalUnit2[2];
+    float m_drawVerticalUnit2[2];
     /** Current Leipzig font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_rendFonts[2][2];				
+    FontMetricsInfo m_drawFonts[2][2];				
     /** Leipzig font */
-    FontMetricsInfo m_rendLeipzigFont;
+    FontMetricsInfo m_drawLeipzigFont;
     /** Current lyric font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_rendLyricFonts[2];
+    FontMetricsInfo m_drawLyricFonts[2];
     /** Lyric font by default */
-    FontMetricsInfo m_rendLyricFont;
+    FontMetricsInfo m_drawLyricFont;
     /** The current page height */
-    int m_rendPageHeight;
+    int m_drawPageHeight;
     /** The current page height */
-    int m_rendPageWidth;
+    int m_drawPageWidth;
     /** The current page witdth */
-    int m_rendPageLeftMar;
+    int m_drawPageLeftMar;
     /** The current page left margin */
-    int m_rendPageRightMar;
+    int m_drawPageRightMar;
     /** The current page right margin */
-    int m_rendPageTopMar;
+    int m_drawPageTopMar;
     /** the current beam minimal slope */
-	float m_rendBeamMinSlope;
+	float m_drawBeamMinSlope;
     /** the current beam maximal slope */
-    float m_rendBeamMaxSlope;
+    float m_drawBeamMaxSlope;
     
 private:
     /**

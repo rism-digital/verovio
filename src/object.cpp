@@ -676,7 +676,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     Page *current_page = dynamic_cast<Page*>(this);
     if ( current_page  ) {
         currentScoreDef->SetRedraw( true, true, false );
-        current_page->m_drawingScoreDef = *currentScoreDef;
+        current_page->m_drawScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
     
@@ -750,7 +750,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         // reset it as the minimum position to the step (if doc found)
         (*min_pos) = 0;
         Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
-        if (doc) (*min_pos) = doc->m_rendStep1;
+        if (doc) (*min_pos) = doc->m_drawStep1;
         // set scoreDef attr
         if (current_layer->GetClefAttr()) {
             current_layer->GetClefAttr()->SetBoundingBoxXShift( params );
@@ -810,7 +810,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
@@ -884,7 +884,7 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
         current->GetAlignment()->SetYShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  x_rel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_y1;

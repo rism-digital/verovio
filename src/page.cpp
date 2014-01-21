@@ -41,7 +41,7 @@ Page::~Page()
 void Page::Clear( )
 {
 	ClearChildren( );
-    m_drawingScoreDef.Clear();
+    m_drawScoreDef.Clear();
     m_layoutDone = false;
 	defin = 18;
     // by default we have no values and use the document ones
@@ -173,9 +173,9 @@ void Page::AlignHorizontally( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
-    // Doc::SetRendPage should have been called before
+    // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
-    assert( this == doc->GetRendPage() );
+    assert( this == doc->GetDrawingPage() );
     
     ArrayPtrVoid params;
     
@@ -252,9 +252,9 @@ void Page::AlignVertically( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
-    // Doc::SetRendPage should have been called before
+    // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
-    assert( this == doc->GetRendPage() );
+    assert( this == doc->GetDrawingPage() );
     
     ArrayPtrVoid params;
     
@@ -270,8 +270,8 @@ void Page::AlignVertically( )
     // Adjusts the Y shift for making sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
-    int staffMargin = doc->m_rendStaffSize[0]; // the minimal space we want to have between each staff
-    int* interlineSizes = doc->m_rendInterl; // the interline sizes to be used for calculating the (previous) staff height
+    int staffMargin = doc->m_drawStaffSize[0]; // the minimal space we want to have between each staff
+    int* interlineSizes = doc->m_drawInterl; // the interline sizes to be used for calculating the (previous) staff height
     params.push_back( &previousStaffHeight );
     params.push_back( &staffMargin );
     params.push_back( &interlineSizes );
@@ -292,8 +292,8 @@ void Page::AlignVertically( )
     
     // Adjust system Y position
     params.clear();
-    shift = doc->m_rendPageHeight - doc->m_rendPageTopMar;
-    int systemMargin = doc->m_rendStaffSize[0];
+    shift = doc->m_drawPageHeight - doc->m_drawPageTopMar;
+    int systemMargin = doc->m_drawStaffSize[0];
     params.push_back( &shift );
     params.push_back( &systemMargin );
     MusFunctor alignSystems( &Object::AlignSystems );
@@ -309,16 +309,16 @@ void Page::JustifyHorizontally( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
-    // Doc::SetRendPage should have been called before
+    // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
-    assert( this == doc->GetRendPage() );
+    assert( this == doc->GetDrawingPage() );
     
     ArrayPtrVoid params;
     
     // Justify X position
     params.clear();
     double ratio = 0.0;
-    int systemFullWidth = doc->m_rendPageWidth - doc->m_rendPageLeftMar - doc->m_rendPageRightMar;
+    int systemFullWidth = doc->m_drawPageWidth - doc->m_drawPageLeftMar - doc->m_drawPageRightMar;
     params.push_back( &ratio );
     params.push_back( &systemFullWidth );
     MusFunctor justifyX( &Object::JustifyX );

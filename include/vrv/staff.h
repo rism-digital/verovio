@@ -68,7 +68,7 @@ public:
     int GetVerticalSpacing();
     
     /**
-     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Reset the drawing values (m_drawX, m_drawXRel, etc.)
      * Called by SetCurrentScoreDef functor.
      */
     virtual void ResetDrawingValues( );
@@ -139,12 +139,12 @@ public:
      * The Y relative position of the staff.
      * It is used internally when calculating the layout andd it is not stored in the file.
      */
-    //int m_yRel;
+    //int m_drawYRel;
 	/** 
      * The Y drawing position of the staff.
      * It is re-computed everytime the staff is drawn and it is not stored in the file.
      */
-    int m_yDrawing;
+    int m_drawY;
     
     /** indicates this staff is in anchent notation
      it has to be carried on to the LayedOutStaf */

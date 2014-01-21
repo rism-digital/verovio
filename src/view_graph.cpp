@@ -152,7 +152,7 @@ void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c,
 	int staffSize = staff->staffSize;
 	int fontCorr = 0;
     if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_rendFontHeightAscent[staffSize][dimin];
+        fontCorr = m_doc->m_drawFontHeightAscent[staffSize][dimin];
     }
 
 	assert( dc ); // DC cannot be NULL
@@ -165,13 +165,13 @@ void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c,
 		{	
 			c+= 14;	// les cles d===e tablature
             if (dc->CorrectMusicAscent()) {
-                fontCorr = m_doc->m_rendFontHeightAscent[ staffSize][0];
+                fontCorr = m_doc->m_drawFontHeightAscent[ staffSize][0];
             }
 		}
 	}
 	if (!staff->notAnc || !is_in (c, 241, 243))	// tout sauf clefs de tablature
 	{
-        dc->SetFont( &m_doc->m_rendFonts[ staffSize ][ dimin ] );
+        dc->SetFont( &m_doc->m_drawFonts[ staffSize ][ dimin ] );
 	}
 
 	if ( dc)
@@ -202,10 +202,10 @@ void View::putstring ( DeviceContext *dc, int x, int y, std::string s, int centr
 
     int fontCorr = 0;
     
-    dc->SetFont( &m_doc->m_rendFonts[ staffSize ][0] );
+    dc->SetFont( &m_doc->m_drawFonts[ staffSize ][0] );
     x = ToRendererX(x);
     if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_rendFontHeightAscent[staffSize][0];
+        fontCorr = m_doc->m_drawFontHeightAscent[staffSize][0];
     }
     
     
@@ -226,7 +226,7 @@ void View::putlyric ( DeviceContext *dc, int x, int y, std::string s, int staffS
 { 
 	assert( dc ); // DC cannot be NULL
 
-    dc->SetFont( &m_doc->m_rendLyricFonts[ staffSize ] );
+    dc->SetFont( &m_doc->m_drawLyricFonts[ staffSize ] );
 	x = ToRendererX(x);
 
 	dc->SetTextForeground( m_currentColour );
@@ -238,9 +238,9 @@ void View::putlyric ( DeviceContext *dc, int x, int y, std::string s, int staffS
 
 void View::DrawTieBezier(DeviceContext *dc, int x, int y, int x1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT, std::min( 1 * m_doc->m_rendInterl[0], abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT, std::min( 1 * m_doc->m_drawInterl[0], abs( x1 - x ) / 4 ) );
     
-    int thickness = std::max( m_doc->m_rendInterl[0] / 3, MIN_TIE_THICKNESS );
+    int thickness = std::max( m_doc->m_drawInterl[0] / 3, MIN_TIE_THICKNESS );
     
     int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point

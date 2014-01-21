@@ -115,13 +115,13 @@ public:
     void AddToDrawingList( LayerElement *element );
 
     /**
-     * Return the darwing list.
-     * This is used when actually darwing the list (see View::DrawLayerList)
+     * Return the drawing list.
+     * This is used when actually drawing the list (see View::DrawLayerList)
      */
     ListOfObjects *GetDrawingList( );
 
     /**
-     * Reset the darwing list.
+     * Reset the drawing list.
      * Clears the list - called when the layer starts to be drawn
      */
     void ResetDrawingList( );

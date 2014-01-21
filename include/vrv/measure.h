@@ -93,7 +93,7 @@ public:
     int GetXRelRight( );
     
     /**
-     * Reset the drawing values (m_xDrawing, m_xRel, etc.)
+     * Reset the drawing values (m_drawX, m_drawXRel, etc.)
      * Called by SetCurrentScoreDef functor.
      */
     virtual void ResetDrawingValues( );
@@ -116,7 +116,7 @@ public:
     virtual int SetAligmentXPos( ArrayPtrVoid params );
     
     /**
-     * Align the measures by adjusting the m_xRel position looking at the MeasureAligner.
+     * Align the measures by adjusting the m_drawXRel position looking at the MeasureAligner.
      * This method also moves the end position of the measure according to the barline width.
      */
     virtual int AlignMeasures( ArrayPtrVoid params );
@@ -145,12 +145,12 @@ public:
      * The X relative position of the measure.
      * It is used internally when calculating the layout and it is not stored in the file.
      */
-    int m_xRel;
+    int m_drawXRel;
 	/**
      * The X drawing position of the measure.
      * It is re-computed everytime the measure is drawn and it is not stored in the file.
      */
-    int m_xDrawing;
+    int m_drawX;
     
 private:
     bool m_measuredMusic;

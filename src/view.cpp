@@ -81,7 +81,7 @@ void View::SetPage( int pageIdx, bool doLayout )
     assert( m_doc->HasPage( pageIdx ) );
     
     m_pageIdx = pageIdx;
-    m_currentPage = m_doc->SetRendPage( pageIdx );
+    m_currentPage = m_doc->SetDrawingPage( pageIdx );
     
     if (doLayout) {
         m_doc->SetCurrentScoreDef();
@@ -164,14 +164,14 @@ int View::ToRendererX( int i ) { return i; }; // the same
 /** x value in the Logical world */
 int View::ToLogicalX( int i )  { return i; };
 
-/** y value in the Renderer */
+/** y value in the View */
 int View::ToRendererY( int i )  
 { 
     if (!m_doc) {
         return 0;
     }
     
-    return m_doc->m_rendPageHeight - i; // flipped
+    return m_doc->m_drawPageHeight - i; // flipped
 }
 
 /** y value in the Logical world  */
@@ -182,7 +182,7 @@ int View::ToLogicalY( int i )
             return 0;
         }
         
-        return m_doc->m_rendPageHeight - i; // flipped
+        return m_doc->m_drawPageHeight - i; // flipped
     }
 }
 

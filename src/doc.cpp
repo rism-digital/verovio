@@ -53,7 +53,7 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
-    m_rendPage = NULL;
+    m_drawPage = NULL;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Clear();
@@ -103,7 +103,7 @@ void Doc::Layout( )
 {
     this->SetCurrentScoreDef();
     
-    Page *contentPage = this->SetRendPage( 0 );
+    Page *contentPage = this->SetDrawingPage( 0 );
     assert( contentPage );
     contentPage->AlignHorizontally();
     
@@ -113,7 +113,7 @@ void Doc::Layout( )
     System *currentSystem = new System();
     contentPage->AddSystem( currentSystem );
     int shift = 0;
-    int systemFullWidth = this->m_rendPageWidth - this->m_rendPageLeftMar - this->m_rendPageRightMar
+    int systemFullWidth = this->m_drawPageWidth - this->m_drawPageLeftMar - this->m_drawPageRightMar
         - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     ArrayPtrVoid params;
     params.push_back( contentSystem );
@@ -135,145 +135,145 @@ bool Doc::HasPage( int pageIdx )
     return ( (pageIdx >= 0 ) && (pageIdx < GetChildCount() ) );
 }
 
-Page *Doc::SetRendPage( int pageIdx )
+Page *Doc::SetDrawingPage( int pageIdx )
 {
     // out of range 
     if ( !HasPage( pageIdx ) ) {
         return NULL;
     }
     // nothing to do
-    if ( m_rendPage && m_rendPage->GetIdx() == pageIdx ) {
-        return m_rendPage;
+    if ( m_drawPage && m_drawPage->GetIdx() == pageIdx ) {
+        return m_drawPage;
     }
-    m_rendPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
+    m_drawPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
     
-    assert( m_rendPage );
+    assert( m_drawPage );
     
     // we use the page members only if set (!= -1) 
-    if ( m_rendPage->m_pageHeight != -1 )
+    if ( m_drawPage->m_pageHeight != -1 )
     {
-        m_rendPageHeight = m_rendPage->m_pageHeight;
-        m_rendPageWidth = m_rendPage->m_pageWidth;
-        m_rendPageLeftMar = m_rendPage->m_pageLeftMar;
-        m_rendPageRightMar = m_rendPage->m_pageRightMar;
-        m_rendPageTopMar = m_rendPage->m_pageTopMar;
+        m_drawPageHeight = m_drawPage->m_pageHeight;
+        m_drawPageWidth = m_drawPage->m_pageWidth;
+        m_drawPageLeftMar = m_drawPage->m_pageLeftMar;
+        m_drawPageRightMar = m_drawPage->m_pageRightMar;
+        m_drawPageTopMar = m_drawPage->m_pageTopMar;
 	}
 	else if ( this->m_pageHeight != -1 )
 	{
-        m_rendPageHeight = this->m_pageHeight;
-        m_rendPageWidth = this->m_pageWidth;
-        m_rendPageLeftMar = this->m_pageLeftMar;
-        m_rendPageRightMar = this->m_pageRightMar;
-        m_rendPageTopMar = this->m_pageTopMar;
+        m_drawPageHeight = this->m_pageHeight;
+        m_drawPageWidth = this->m_pageWidth;
+        m_drawPageLeftMar = this->m_pageLeftMar;
+        m_drawPageRightMar = this->m_pageRightMar;
+        m_drawPageTopMar = this->m_pageTopMar;
     }
     else
     {
-        m_rendPageHeight = m_env.m_pageHeight;
-        m_rendPageWidth = m_env.m_pageWidth;
-        m_rendPageLeftMar = m_env.m_pageLeftMar;
-        m_rendPageRightMar = m_env.m_pageRightMar;
-        m_rendPageTopMar = m_env.m_pageTopMar;
+        m_drawPageHeight = m_env.m_pageHeight;
+        m_drawPageWidth = m_env.m_pageWidth;
+        m_drawPageLeftMar = m_env.m_pageLeftMar;
+        m_drawPageRightMar = m_env.m_pageRightMar;
+        m_drawPageTopMar = m_env.m_pageTopMar;
     }
     
     if (this->m_env.m_landscape)
     {	
-        int pageHeight = m_rendPageWidth;
-        m_rendPageWidth = m_rendPageHeight;
-        m_rendPageHeight = pageHeight;
-        int pageRightMar = m_rendPageLeftMar;
-        m_rendPageLeftMar = m_rendPageRightMar;
-        m_rendPageRightMar = pageRightMar;
+        int pageHeight = m_drawPageWidth;
+        m_drawPageWidth = m_drawPageHeight;
+        m_drawPageHeight = pageHeight;
+        int pageRightMar = m_drawPageLeftMar;
+        m_drawPageLeftMar = m_drawPageRightMar;
+        m_drawPageRightMar = pageRightMar;
     }
     
     // From here we could check if values have changed
     // Since  m_env.m_interlDefin stays the same, it useless to do it
     // every time for now.
     
-	m_rendBeamMaxSlope = this->m_env.m_beamMaxSlope;
-	m_rendBeamMinSlope = this->m_env.m_beamMinSlope;
-	m_rendBeamMaxSlope /= 100;
-	m_rendBeamMinSlope /= 100;
+	m_drawBeamMaxSlope = this->m_env.m_beamMaxSlope;
+	m_drawBeamMinSlope = this->m_env.m_beamMinSlope;
+	m_drawBeamMaxSlope /= 100;
+	m_drawBeamMinSlope /= 100;
     
-    m_rendSmallStaffRatio[0] = this->m_env.m_smallStaffNum;
-    m_rendSmallStaffRatio[1] = this->m_env.m_smallStaffDen;
-    m_rendGraceRatio[0] = this->m_env.m_graceNum;
-    m_rendGraceRatio[1] = this->m_env.m_graceDen;
+    m_drawSmallStaffRatio[0] = this->m_env.m_smallStaffNum;
+    m_drawSmallStaffRatio[1] = this->m_env.m_smallStaffDen;
+    m_drawGraceRatio[0] = this->m_env.m_graceNum;
+    m_drawGraceRatio[1] = this->m_env.m_graceDen;
     
     // half of the space between two lines
-    m_rendHalfInterl[0] = m_env.m_interlDefin/2;
+    m_drawHalfInterl[0] = m_env.m_interlDefin/2;
     // same for small staves
-    m_rendHalfInterl[1] = (m_rendHalfInterl[0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
+    m_drawHalfInterl[1] = (m_drawHalfInterl[0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
     // space between two lines
-    m_rendInterl[0] = m_rendHalfInterl[0] * 2;
+    m_drawInterl[0] = m_drawHalfInterl[0] * 2;
     // same for small staves
-    m_rendInterl[1] = m_rendHalfInterl[1] * 2;
+    m_drawInterl[1] = m_drawHalfInterl[1] * 2;
     // staff (with five lines)
-    m_rendStaffSize[0] = m_rendInterl[0] * 4;
-    m_rendStaffSize[1] = m_rendInterl[1] * 4;
+    m_drawStaffSize[0] = m_drawInterl[0] * 4;
+    m_drawStaffSize[1] = m_drawInterl[1] * 4;
     //
-    m_rendOctaveSize[0] = m_rendHalfInterl[0] * 7;
-    m_rendOctaveSize[1] = m_rendHalfInterl[1] * 7;
+    m_drawOctaveSize[0] = m_drawHalfInterl[0] * 7;
+    m_drawOctaveSize[1] = m_drawHalfInterl[1] * 7;
     
-    m_rendStep1 = m_rendHalfInterl[0];
-    m_rendStep2 = m_rendStep1 * 3;
-    m_rendStep3 = m_rendStep1 * 6;
+    m_drawStep1 = m_drawHalfInterl[0];
+    m_drawStep2 = m_drawStep1 * 3;
+    m_drawStep3 = m_drawStep1 * 6;
     
     // values for beams
-    m_rendBeamWidth[0] = this->m_env.m_interlDefin / 2;
-    m_rendBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
-    m_rendBeamWidth[1] = (m_rendBeamWidth[0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
-    m_rendBeamWhiteWidth[1] = (m_rendBeamWhiteWidth[0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
+    m_drawBeamWidth[0] = this->m_env.m_interlDefin / 2;
+    m_drawBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
+    m_drawBeamWidth[1] = (m_drawBeamWidth[0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
+    m_drawBeamWhiteWidth[1] = (m_drawBeamWhiteWidth[0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
     
-    m_rendFontHeight = CalcLeipzigFontSize();
-    m_rendFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_rendFontHeight / LEIPZIG_UNITS_PER_EM);
-	m_rendFontHeightAscent[0][1] = (m_rendFontHeightAscent[0][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];
-    m_rendFontHeightAscent[1][0] = (m_rendFontHeightAscent[0][0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
-	m_rendFontHeightAscent[1][1] = (m_rendFontHeightAscent[1][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];
+    m_drawFontHeight = CalcLeipzigFontSize();
+    m_drawFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
+	m_drawFontHeightAscent[0][1] = (m_drawFontHeightAscent[0][0] * m_drawGraceRatio[0]) / m_drawGraceRatio[1];
+    m_drawFontHeightAscent[1][0] = (m_drawFontHeightAscent[0][0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
+	m_drawFontHeightAscent[1][1] = (m_drawFontHeightAscent[1][0] * m_drawGraceRatio[0]) / m_drawGraceRatio[1];
     
-    m_rendFontSize[0][0] = m_rendFontHeight;
-    m_rendFontSize[0][1] = (m_rendFontSize[0][0] * m_rendGraceRatio[0]) / m_rendGraceRatio[1];
-    m_rendFontSize[1][0] = (m_rendFontSize[0][0] * m_rendSmallStaffRatio[0]) / m_rendSmallStaffRatio[1];
-    m_rendFontSize[1][1]= (m_rendFontSize[1][0] * m_rendGraceRatio[0])/ m_rendGraceRatio[1];
+    m_drawFontSize[0][0] = m_drawFontHeight;
+    m_drawFontSize[0][1] = (m_drawFontSize[0][0] * m_drawGraceRatio[0]) / m_drawGraceRatio[1];
+    m_drawFontSize[1][0] = (m_drawFontSize[0][0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
+    m_drawFontSize[1][1]= (m_drawFontSize[1][0] * m_drawGraceRatio[0])/ m_drawGraceRatio[1];
     
-	m_rendFonts[0][0].SetPointSize( m_rendFontSize[0][0] ); //160
-    m_rendFonts[0][1].SetPointSize( m_rendFontSize[0][1] ); //120
-    m_rendFonts[1][0].SetPointSize( m_rendFontSize[1][0] ); //128
-    m_rendFonts[1][1].SetPointSize( m_rendFontSize[1][1] ); //100
+	m_drawFonts[0][0].SetPointSize( m_drawFontSize[0][0] ); //160
+    m_drawFonts[0][1].SetPointSize( m_drawFontSize[0][1] ); //120
+    m_drawFonts[1][0].SetPointSize( m_drawFontSize[1][0] ); //128
+    m_drawFonts[1][1].SetPointSize( m_drawFontSize[1][1] ); //100
     
-	m_rendLyricFonts[0].SetPointSize( m_rendLyricFont.GetPointSize() );
-    m_rendLyricFonts[1].SetPointSize( m_rendLyricFont.GetPointSize() );
+	m_drawLyricFonts[0].SetPointSize( m_drawLyricFont.GetPointSize() );
+    m_drawLyricFonts[1].SetPointSize( m_drawLyricFont.GetPointSize() );
     
-    m_rendVerticalUnit1[0] = (float)m_rendInterl[0]/4;
-    m_rendVerticalUnit2[0] = (float)m_rendInterl[0]/8;
-    m_rendVerticalUnit1[1] = (float)m_rendInterl[1]/4;
-    m_rendVerticalUnit2[1] = (float)m_rendInterl[1]/8;
+    m_drawVerticalUnit1[0] = (float)m_drawInterl[0]/4;
+    m_drawVerticalUnit2[0] = (float)m_drawInterl[0]/8;
+    m_drawVerticalUnit1[1] = (float)m_drawInterl[1]/4;
+    m_drawVerticalUnit2[1] = (float)m_drawInterl[1]/8;
     
     float glyph_size;
-    glyph_size = (LEIPZIG_HALF_NOTE_HEAD_WIDTH * (float)m_rendFontHeight / LEIPZIG_UNITS_PER_EM);
-    m_rendNoteRadius[0][0] = ceil(glyph_size / 2);
-    m_rendNoteRadius[0][1] = (m_rendNoteRadius[0][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
-    m_rendNoteRadius[1][0] = (m_rendNoteRadius[0][0] * m_rendSmallStaffRatio[0])/m_rendSmallStaffRatio[1];
-    m_rendNoteRadius[1][1] = (m_rendNoteRadius[1][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
+    glyph_size = (LEIPZIG_HALF_NOTE_HEAD_WIDTH * (float)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
+    m_drawNoteRadius[0][0] = ceil(glyph_size / 2);
+    m_drawNoteRadius[0][1] = (m_drawNoteRadius[0][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
+    m_drawNoteRadius[1][0] = (m_drawNoteRadius[0][0] * m_drawSmallStaffRatio[0])/m_drawSmallStaffRatio[1];
+    m_drawNoteRadius[1][1] = (m_drawNoteRadius[1][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
     
-    m_rendLedgerLine[0][0] = (int)(glyph_size * .72);
-    m_rendLedgerLine[0][1] = (m_rendLedgerLine[0][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
-    m_rendLedgerLine[1][0] = (m_rendLedgerLine[0][0] * m_rendSmallStaffRatio[0])/m_rendSmallStaffRatio[1];
-    m_rendLedgerLine[1][1] = (m_rendLedgerLine[1][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
+    m_drawLedgerLine[0][0] = (int)(glyph_size * .72);
+    m_drawLedgerLine[0][1] = (m_drawLedgerLine[0][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
+    m_drawLedgerLine[1][0] = (m_drawLedgerLine[0][0] * m_drawSmallStaffRatio[0])/m_drawSmallStaffRatio[1];
+    m_drawLedgerLine[1][1] = (m_drawLedgerLine[1][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
     
-    glyph_size = round(LEIPZIG_WHOLE_NOTE_HEAD_WIDTH * (double)m_rendFontHeight / LEIPZIG_UNITS_PER_EM);
-    m_rendLedgerLine[0][2] = (int)(glyph_size * .66);
-    m_rendLedgerLine[1][2] = (m_rendLedgerLine[0][2] * m_rendSmallStaffRatio[0]) /m_rendSmallStaffRatio[1];
+    glyph_size = round(LEIPZIG_WHOLE_NOTE_HEAD_WIDTH * (double)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
+    m_drawLedgerLine[0][2] = (int)(glyph_size * .66);
+    m_drawLedgerLine[1][2] = (m_drawLedgerLine[0][2] * m_drawSmallStaffRatio[0]) /m_drawSmallStaffRatio[1];
     
-    m_rendBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
-    m_rendBrevisWidth[1] = (m_rendBrevisWidth[0] * m_rendSmallStaffRatio[0]) /m_rendSmallStaffRatio[1];
+    m_drawBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
+    m_drawBrevisWidth[1] = (m_drawBrevisWidth[0] * m_drawSmallStaffRatio[0]) /m_drawSmallStaffRatio[1];
     
-    glyph_size = round(LEIPZIG_SHARP_WIDTH * (double)m_rendFontHeight / LEIPZIG_UNITS_PER_EM);
-    m_rendAccidWidth[0][0] = glyph_size;
-    m_rendAccidWidth[0][1] = (m_rendAccidWidth[0][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
-    m_rendAccidWidth[1][0] = (m_rendAccidWidth[0][0] * m_rendSmallStaffRatio[0]) /m_rendSmallStaffRatio[1];
-    m_rendAccidWidth[1][1] = (m_rendAccidWidth[1][0] * m_rendGraceRatio[0])/m_rendGraceRatio[1];
+    glyph_size = round(LEIPZIG_SHARP_WIDTH * (double)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
+    m_drawAccidWidth[0][0] = glyph_size;
+    m_drawAccidWidth[0][1] = (m_drawAccidWidth[0][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
+    m_drawAccidWidth[1][0] = (m_drawAccidWidth[0][0] * m_drawSmallStaffRatio[0]) /m_drawSmallStaffRatio[1];
+    m_drawAccidWidth[1][1] = (m_drawAccidWidth[1][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
     
-	return m_rendPage;
+	return m_drawPage;
 }
 
 int Doc::CalcLeipzigFontSize( )
@@ -284,29 +284,29 @@ int Doc::CalcLeipzigFontSize( )
 
 void Doc::UpdateFontValues() 
 {	
-	if ( !m_rendLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
+	if ( !m_drawLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
         LogWarning( "Impossible to load font 'Leipzig'" );
 	
 	//LogMessage( "Size %d, Family %d, Style %d, Weight %d, Underline %d, Face %s, Desc %s",
-	//	m_rendLeipzigFont.GetPointSize(),
-	//	m_rendLeipzigFont.GetFamily(),
-	//	m_rendLeipzigFont.GetStyle(),
-	//	m_rendLeipzigFont.GetWeight(),
-	//	m_rendLeipzigFont.GetUnderlined(),
-	//	m_rendLeipzigFont.GetFaceName().c_str(),
-	//	m_rendLeipzigFont.GetNativeFontInfoDesc().c_str());
+	//	m_drawLeipzigFont.GetPointSize(),
+	//	m_drawLeipzigFont.GetFamily(),
+	//	m_drawLeipzigFont.GetStyle(),
+	//	m_drawLeipzigFont.GetWeight(),
+	//	m_drawLeipzigFont.GetUnderlined(),
+	//	m_drawLeipzigFont.GetFaceName().c_str(),
+	//	m_drawLeipzigFont.GetNativeFontInfoDesc().c_str());
     
-	m_rendFonts[0][0] = m_rendLeipzigFont;
-    m_rendFonts[0][1] = m_rendLeipzigFont;
-    m_rendFonts[1][0] = m_rendLeipzigFont;
-    m_rendFonts[1][1] = m_rendLeipzigFont;
+	m_drawFonts[0][0] = m_drawLeipzigFont;
+    m_drawFonts[0][1] = m_drawLeipzigFont;
+    m_drawFonts[1][0] = m_drawLeipzigFont;
+    m_drawFonts[1][1] = m_drawLeipzigFont;
 	
 	// Lyrics
-	if ( !m_rendLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
+	if ( !m_drawLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
 		LogWarning( "Impossible to load font for the lyrics" );
     
-	m_rendLyricFonts[0] = m_rendLyricFont;
-    m_rendLyricFonts[1] = m_rendLyricFont;
+	m_drawLyricFonts[0] = m_drawLyricFont;
+    m_drawLyricFonts[1] = m_drawLyricFont;
 }
 
 

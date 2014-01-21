@@ -38,11 +38,11 @@ System::System( const System& system )
 	m_systemLeftMar = system.m_systemLeftMar;
 	m_systemRightMar = system.m_systemRightMar;
 	m_xAbs = system.m_xAbs;
-	m_xRel = system.m_xRel;
-	m_xDrawing = system.m_xDrawing;
+	m_drawXRel = system.m_drawXRel;
+	m_drawX = system.m_drawX;
 	m_yAbs = system.m_yAbs;
-	m_yRel = system.m_yRel;
-	m_yDrawing = system.m_yDrawing;
+	m_drawYRel = system.m_drawYRel;
+	m_drawY = system.m_drawY;
     
 	for (i = 0; i < this->GetMeasureCount(); i++)
 	{
@@ -61,12 +61,12 @@ void System::Clear( )
 	m_systemLeftMar = 50;
 	m_systemRightMar = 50;
 	m_xAbs = VRV_UNSET;
-    m_xRel = 0;
-	m_xDrawing = 0;
+    m_drawXRel = 0;
+	m_drawX = 0;
 	m_yAbs = VRV_UNSET;
-    m_yRel = 0;
-	m_yDrawing = 0;
-    m_totalDrawingWidth = 0;
+    m_drawYRel = 0;
+	m_drawY = 0;
+    m_drawTotalWidth = 0;
 }
 
 
@@ -95,10 +95,10 @@ int System::GetVerticalSpacing()
 
 void System::ResetDrawingValues()
 {
-    m_xRel = 0;
-	m_xDrawing = 0;
-    m_yRel = 0;
-	m_yDrawing = 0;
+    m_drawXRel = 0;
+	m_drawX = 0;
+    m_drawYRel = 0;
+	m_drawY = 0;
 }
 
 Measure *System::GetFirst( )
@@ -155,7 +155,7 @@ Measure *System::GetAtPos( int x )
     Measure *next = NULL;
 	while ( (next = this->GetNext(measure) ) )
 	{
-		if ( (int)measure->m_xDrawing < x )
+		if ( (int)measure->m_drawX < x )
 		{
 			return measure;
 		}
@@ -207,7 +207,7 @@ int System::Align( ArrayPtrVoid params )
     SystemAligner **systemAligner = (SystemAligner**)params[2];
     
     // When calculating the alignment, the position has to be 0
-    m_xRel = 0;
+    m_drawXRel = 0;
     m_systemAligner.Reset();
     (*systemAligner) = &m_systemAligner;
     
@@ -239,7 +239,7 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
     int *shift = (int*)params[0];
     MusFunctor *integrateBoundingBoxYShift = (MusFunctor*)params[1];
     
-    m_xRel = this->m_systemLeftMar;
+    m_drawXRel = this->m_systemLeftMar;
     (*shift) = 0;
     m_systemAligner.Process( integrateBoundingBoxYShift, params);
     
@@ -261,7 +261,7 @@ int System::AlignMeasuresEnd( ArrayPtrVoid params )
     // param 0: the cumulated shift
     int *shift = (int*)params[0];
     
-    m_totalDrawingWidth = (*shift);
+    m_drawTotalWidth = (*shift);
     
     return FUNCTOR_CONTINUE;
 }
@@ -273,7 +273,7 @@ int System::AlignSystems( ArrayPtrVoid params )
     int *shift = (int*)params[0];
     int *systemMargin = (int*)params[1];
     
-    this->m_yRel = (*shift);
+    this->m_drawYRel = (*shift);
     
     assert( m_systemAligner.GetBottomAlignment() );
     
@@ -291,7 +291,7 @@ int System::JustifyX( ArrayPtrVoid params )
     double *ratio = (double*)params[0];
     int *systemFullWidth = (int*)params[1];
     
-    (*ratio) = (double)((*systemFullWidth) - this->m_systemLeftMar - this->m_systemRightMar) / (double)m_totalDrawingWidth;
+    (*ratio) = (double)((*systemFullWidth) - this->m_systemLeftMar - this->m_systemRightMar) / (double)m_drawTotalWidth;
     
     if ((*ratio) < 0.8 ) {
         // Arbitrary value for avoiding over-compressed justification

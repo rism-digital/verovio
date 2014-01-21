@@ -42,22 +42,22 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 	assert( dc ); // DC cannot be NULL
     assert( m_doc );
     
-    m_currentPage = m_doc->SetRendPage( m_pageIdx );
+    m_currentPage = m_doc->SetDrawingPage( m_pageIdx );
     
     int i;
 	System *system = NULL;
     
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
-    m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
+    m_drawScoreDef = m_currentPage->m_drawScoreDef;
 
     if ( background )
-        dc->DrawRectangle( 0, 0, m_doc->m_rendPageWidth, m_doc->m_rendPageHeight );
+        dc->DrawRectangle( 0, 0, m_doc->m_drawPageWidth, m_doc->m_drawPageHeight );
     
     dc->DrawBackgroundImage( );
     
     MusPoint origin = dc->GetLogicalOrigin();
-    dc->SetLogicalOrigin( origin.x - m_doc->m_rendPageLeftMar, origin.y - m_doc->m_rendPageTopMar );
+    dc->SetLogicalOrigin( origin.x - m_doc->m_drawPageLeftMar, origin.y - m_doc->m_drawPageTopMar );
 
     dc->StartPage();
 
@@ -66,7 +66,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 		system = (System*)m_currentPage->m_children[i];
         DrawSystem( dc, system );
         
-        // TODO here: also update x_abs and m_yDrawing positions for system. How to calculate them?
+        // TODO here: also update x_abs and m_drawY positions for system. How to calculate them?
     }
     
     dc->EndPage();
@@ -91,14 +91,14 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     if ( system->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        system->m_yDrawing = system->m_yRel;
-        system->m_xDrawing = system->m_xRel;
+        system->m_drawY = system->m_drawYRel;
+        system->m_drawX = system->m_drawXRel;
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        system->m_yDrawing = system->m_yAbs;
-        system->m_xDrawing = system->m_xAbs;
+        system->m_drawY = system->m_yAbs;
+        system->m_drawX = system->m_xAbs;
     }
     
     
@@ -108,7 +108,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         DrawMeasure( dc , measure, system );
 	}
 
-    // We draw the groups after the staves because we use the m_y_darwing member of the staves
+    // We draw the groups after the staves because we use the m_drawY member of the staves
     // that needs to be intialized.
     // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
     // and @symbol values, otherwise results will be unexpected...
@@ -116,7 +116,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     measure  = dynamic_cast<Measure*>(system->GetFirstChild( &typeid(Measure) ) );
     if ( measure ) {
         // NULL for the Barline parameters indicates that we are drawing the scoreDef
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, system->m_xDrawing, NULL );
+        DrawScoreDef( dc, &m_drawScoreDef, measure, system->m_drawX, NULL );
     }
     
     dc->EndGraphic(system, this );
@@ -177,9 +177,9 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         return;
     }
     
-    int y_top = first->m_yDrawing;
+    int y_top = first->m_drawY;
     // for the bottom position we need to take into account the number of lines and the staff size
-    int y_bottom = last->m_yDrawing - (last->portNbLine - 1) * m_doc->m_rendInterl[last->staffSize];
+    int y_bottom = last->m_drawY - (last->portNbLine - 1) * m_doc->m_drawInterl[last->staffSize];
     
     // actually draw the line, the brace or the bracket
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
@@ -190,7 +190,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     }
     else if ( staffGrp->GetSymbol() == STAFFGRP_BRACKET ) {
         DrawBracket( dc, x, y_top, y_bottom, last->staffSize );
-        x -= 2 * m_doc->m_rendBeamWidth[0] - m_doc->m_rendBeamWhiteWidth[0];
+        x -= 2 * m_doc->m_drawBeamWidth[0] - m_doc->m_drawBeamWhiteWidth[0];
     }
     
     // recursively draw the children
@@ -212,28 +212,28 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
     dc->SetPen( m_currentColour , 2, AxSOLID );
     dc->SetBrush( m_currentColour , AxTRANSPARENT );
     
-    ecart = m_doc->m_rendBeamWidth[0] + m_doc->m_rendBeamWhiteWidth[0];
+    ecart = m_doc->m_drawBeamWidth[0] + m_doc->m_drawBeamWhiteWidth[0];
     centre = x - ecart;
     
     xg = centre - ecart*2;
     xd = centre + ecart*2;
     
-    yg = y1 + m_doc->m_rendInterl[ staffSize ] * 2;
+    yg = y1 + m_doc->m_drawInterl[ staffSize ] * 2;
     yd = y1;
     SwapY( &yg, &yd );
     dc->DrawEllipticArc( ToRendererX(xg), ToRendererY(yg), ToRendererX(xd-xg), ToRendererX(yg-yd), 90, 40 );
     
     yg = y2;
-    yd = y2 - m_doc->m_rendInterl[ staffSize ] * 2;
+    yd = y2 - m_doc->m_drawInterl[ staffSize ] * 2;
     SwapY( &yg, &yd );
     dc->DrawEllipticArc( ToRendererX(xg), ToRendererY(yg), ToRendererX(xd-xg), ToRendererX(yg-yd), 320, 270 );
     
     dc->ResetPen();
     dc->ResetBrush();
     
-    xg = x - (m_doc->m_rendBeamWhiteWidth[0] + 1);
+    xg = x - (m_doc->m_drawBeamWhiteWidth[0] + 1);
     // determine le blanc entre barres grosse et mince
-    v_bline2( dc, y1, y2, xg, m_doc->m_rendBeamWidth[0]);
+    v_bline2( dc, y1, y2, xg, m_doc->m_drawBeamWidth[0]);
 
 	return;
 }
@@ -252,22 +252,22 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->SetPen( m_currentColour , 1, AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
     
-	x -= m_doc->m_rendBeamWhiteWidth[ staffSize ];  // distance entre barre et debut accolade
+	x -= m_doc->m_drawBeamWhiteWidth[ staffSize ];  // distance entre barre et debut accolade
     
 	nbrInt = BEZIER_NB_POINTS;
     
 	ymed = (y1 + y2) / 2;
-	fact = m_doc->m_rendBeamWidth[ staffSize ]-1 + m_doc->m_env.m_barlineWidth;
+	fact = m_doc->m_drawBeamWidth[ staffSize ]-1 + m_doc->m_env.m_barlineWidth;
 	xdec = ToRendererX(fact);
     
 	point_[0].x = ToRendererX(x);
 	point_[0].y = ToRendererY(y1);
-	point_[1].x = ToRendererX(x - m_doc->m_rendStep2);
-	point_[1].y = point_[0].y - ToRendererX( m_doc->m_rendInterl[ staffSize ]*3);
-	point_[3].x = ToRendererX(x - m_doc->m_rendStep1*2);
+	point_[1].x = ToRendererX(x - m_doc->m_drawStep2);
+	point_[1].y = point_[0].y - ToRendererX( m_doc->m_drawInterl[ staffSize ]*3);
+	point_[3].x = ToRendererX(x - m_doc->m_drawStep1*2);
 	point_[3].y = ToRendererY(ymed);
-	point_[2].x = ToRendererX(x + m_doc->m_rendStep1);
-	point_[2].y = point_[3].y + ToRendererX( m_doc->m_rendInterl[ staffSize ]);
+	point_[2].x = ToRendererX(x + m_doc->m_drawStep1);
+	point_[2].y = point_[3].y + ToRendererX( m_doc->m_drawInterl[ staffSize ]);
     
     new_coords[0][0] = point_[1].x;
     new_coords[0][1] = point_[1].y;
@@ -281,7 +281,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 	
 	point_[1].x += xdec;
 	point_[2].x += xdec;
-	point_[1].y = point_[0].y + ToRendererX( m_doc->m_rendInterl[ staffSize ]*2);
+	point_[1].y = point_[0].y + ToRendererX( m_doc->m_drawInterl[ staffSize ]*2);
     
     new_coords[1][0] = point_[1].x;
     new_coords[1][1] = point_[1].y;
@@ -293,9 +293,9 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->DrawComplexBezierPath(ToRendererX(x), ToRendererY(y1), new_coords[0], new_coords[1]);
     
 	// on produit l'image reflet vers le bas: 0 est identique 
-	point_[1].y = point_[0].y - ToRendererX( m_doc->m_rendInterl[ staffSize ]*2);
+	point_[1].y = point_[0].y - ToRendererX( m_doc->m_drawInterl[ staffSize ]*2);
 	point_[3].y = ToRendererY(y2);
-	point_[2].y = point_[3].y + ToRendererX( m_doc->m_rendInterl[ staffSize ]*3);
+	point_[2].y = point_[3].y + ToRendererX( m_doc->m_drawInterl[ staffSize ]*3);
     
     new_coords[0][0] = point_[1].x;
     new_coords[0][1] = point_[1].y;
@@ -309,7 +309,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 	
 	point_[1].x -= xdec;
 	point_[2].x -= xdec;
-	point_[2].y = point_[3].y - ToRendererX( m_doc->m_rendInterl[ staffSize ]);
+	point_[2].y = point_[3].y - ToRendererX( m_doc->m_drawInterl[ staffSize ]);
     
     new_coords[1][0] = point_[1].x;
     new_coords[1][1] = point_[1].y;
@@ -349,9 +349,9 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                     LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
                     continue;
                 }
-                int y_top = staff->m_yDrawing;
+                int y_top = staff->m_drawY;
                 // for the bottom position we need to take into account the number of lines and the staff size
-                int y_bottom = staff->m_yDrawing - (staff->portNbLine - 1) * m_doc->m_rendInterl[staff->staffSize];
+                int y_bottom = staff->m_drawY - (staff->portNbLine - 1) * m_doc->m_drawInterl[staff->staffSize];
                 DrawBarline( dc, x, y_top, y_bottom, barline );
                 if ( barline->HasRepetitionDots() ) {
                     DrawBarlineDots( dc, x, staff, barline );
@@ -384,9 +384,9 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             return;
         }
         
-        int y_top = first->m_yDrawing;
+        int y_top = first->m_drawY;
         // for the bottom position we need to take into account the number of lines and the staff size
-        int y_bottom = last->m_yDrawing - (last->portNbLine - 1) * m_doc->m_rendInterl[last->staffSize];
+        int y_bottom = last->m_drawY - (last->portNbLine - 1) * m_doc->m_drawInterl[last->staffSize];
         
         DrawBarline( dc, x, y_top, y_bottom, barline );
         
@@ -413,8 +413,8 @@ void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barli
 {
     assert( dc );
 
-	int x1 = x - m_doc->m_rendBeamWidth[0] - m_doc->m_env.m_barlineWidth;
-	int x2 = x + m_doc->m_rendBeamWidth[0] + m_doc->m_env.m_barlineWidth;
+	int x1 = x - m_doc->m_drawBeamWidth[0] - m_doc->m_env.m_barlineWidth;
+	int x2 = x + m_doc->m_drawBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
 	if (barline->m_barlineType == BARLINE_SINGLE)
     {
@@ -423,18 +423,18 @@ void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barli
     else if (barline->m_barlineType == BARLINE_RPTBOTH)
     {
         v_bline( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
-        v_bline( dc , y_top, y_bottom, x, m_doc->m_rendBeamWidth[0]);
+        v_bline( dc , y_top, y_bottom, x, m_doc->m_drawBeamWidth[0]);
         v_bline( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
     }
     else if (barline->m_barlineType  == BARLINE_RPTSTART)
     {
-        v_bline( dc , y_top, y_bottom, x, m_doc->m_rendBeamWidth[0]);
+        v_bline( dc , y_top, y_bottom, x, m_doc->m_drawBeamWidth[0]);
         v_bline( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
     }
     else if (barline->m_barlineType == BARLINE_RPTEND)
 	{
         v_bline( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
-        v_bline( dc , y_top, y_bottom, x, m_doc->m_rendBeamWidth[0]);
+        v_bline( dc , y_top, y_bottom, x, m_doc->m_drawBeamWidth[0]);
 	}
 	else if (barline->m_barlineType  == BARLINE_DBL)
 	{
@@ -446,7 +446,7 @@ void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barli
 	else if (barline->m_barlineType  == BARLINE_END)
     {
         v_bline( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
-        v_bline( dc , y_top, y_bottom, x, m_doc->m_rendBeamWidth[0]);
+        v_bline( dc , y_top, y_bottom, x, m_doc->m_drawBeamWidth[0]);
     }
 }
 
@@ -455,11 +455,11 @@ void View::DrawBarlineDots ( DeviceContext *dc, int x, Staff *staff, Barline *ba
 {
 	assert( dc ); // DC cannot be NULL
     
-	int x1 = x - 2 * m_doc->m_rendBeamWidth[0] - m_doc->m_env.m_barlineWidth;
-	int x2 = x + 2 * m_doc->m_rendBeamWidth[0] + m_doc->m_env.m_barlineWidth;
+	int x1 = x - 2 * m_doc->m_drawBeamWidth[0] - m_doc->m_env.m_barlineWidth;
+	int x2 = x + 2 * m_doc->m_drawBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
-    int y_bottom = staff->m_yDrawing - staff->portNbLine  * m_doc->m_rendHalfInterl[staff->staffSize];
-    int y_top = y_bottom + m_doc->m_rendInterl[staff->staffSize];
+    int y_bottom = staff->m_drawY - staff->portNbLine  * m_doc->m_drawHalfInterl[staff->staffSize];
+    int y_top = y_bottom + m_doc->m_drawInterl[staff->staffSize];
  
     if ((barline->m_barlineType  == BARLINE_RPTSTART) || (barline->m_barlineType == BARLINE_RPTBOTH))
     {
@@ -487,8 +487,8 @@ void View::DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff 
 	Staff *next = system->GetNext( NULL );
 	if ( next )
 	{	
-		b = pportee->m_yDrawing - m_doc->m_rendStaffSize[ pportee->staffSize ]*2;
-		bb = next->m_yDrawing - m_doc->m_rendStaffSize[ next->staffSize];
+		b = pportee->m_drawY - m_doc->m_drawStaffSize[ pportee->staffSize ]*2;
+		bb = next->m_drawY - m_doc->m_drawStaffSize[ next->staffSize];
 
 		if (m_doc->m_env.m_barlineWidth > 2)	// barres plus epaisses qu'un 1/2 mm
 			v_bline2 ( dc, b, bb, x,  m_doc->m_env.m_barlineWidth);
@@ -516,16 +516,16 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     }
     
     // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_xRel that is calculated by the layout algorithm
+    // With Raw documents, we use m_drawXRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_xAbs
     if ( measure->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        measure->m_xDrawing = measure->m_xRel + system->m_xDrawing;
+        measure->m_drawX = measure->m_drawXRel + system->m_drawX;
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        measure->m_xDrawing = measure->m_xAbs;
+        measure->m_drawX = measure->m_xAbs;
     }
     
 	Staff *staff = NULL;
@@ -538,10 +538,10 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     }
 
     if ( measure->GetLeftBarlineType() != BARLINE_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_xDrawing, measure->GetLeftBarline() );
+        DrawScoreDef( dc, &m_drawScoreDef, measure, measure->m_drawX, measure->GetLeftBarline() );
     }
     if ( measure->GetRightBarlineType() != BARLINE_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_xDrawing + measure->GetXRelRight(), measure->GetRightBarline() );
+        DrawScoreDef( dc, &m_drawScoreDef, measure, measure->m_drawX + measure->GetXRelRight(), measure->GetRightBarline() );
     }
     
     if ( measure->IsMeasuredMusic()) {
@@ -563,13 +563,13 @@ int View::CalculateNeumePosY ( Staff *staff, char note, int dec_clef, int oct)
 	char *pnote, i;
 	pnote = &notes[0] - 1;
 	
-	y_int = ((dec_clef + oct*7) - 17 ) * m_doc->m_rendHalfInterl[staff->staffSize];
+	y_int = ((dec_clef + oct*7) - 17 ) * m_doc->m_drawHalfInterl[staff->staffSize];
 	if (staff->portNbLine > 4)
-		y_int -= ((staff->portNbLine - 4) * 2) * m_doc->m_rendHalfInterl[staff->staffSize];
+		y_int -= ((staff->portNbLine - 4) * 2) * m_doc->m_drawHalfInterl[staff->staffSize];
 	
 	for (i=0; i<(signed)sizeof(notes); i++)
 		if (*(pnote+i) == note)
-			return(y_int += (i*m_doc->m_rendHalfInterl[staff->staffSize]));
+			return(y_int += (i*m_doc->m_drawHalfInterl[staff->staffSize]));
 	return 0;
 }
 
@@ -582,16 +582,16 @@ int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
 	char *ptouche, i;
 	ptouche=&touches[0];
 
-	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_rendHalfInterl[staff->staffSize];
+	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_drawHalfInterl[staff->staffSize];
 	if (staff->portNbLine > 5)
-		y_int -= ((staff->portNbLine - 5) * 2) * m_doc->m_rendHalfInterl[staff->staffSize];
+		y_int -= ((staff->portNbLine - 5) * 2) * m_doc->m_drawHalfInterl[staff->staffSize];
 
-	/* exprime distance separant m_yDrawing de
+	/* exprime distance separant m_drawY de
 	position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
-	ensuite, donc elle doit etre NEGATIVE si plus bas que m_yDrawing */
+	ensuite, donc elle doit etre NEGATIVE si plus bas que m_drawY */
 	for (i=0; i<(signed)sizeof(touches); i++)
 		if (*(ptouche+i) == pname)
-			return(y_int += ((i+1)*m_doc->m_rendHalfInterl[staff->staffSize]));
+			return(y_int += ((i+1)*m_doc->m_drawHalfInterl[staff->staffSize]));
 	return 0;
 }
 
@@ -599,7 +599,7 @@ int View::CalculateRestPosY ( Staff *staff, char duration)
 {
     assert(staff); // Pointer to staff cannot be NULL"
 
-	int staff_space = m_doc->m_rendHalfInterl[staff->staffSize];
+	int staff_space = m_doc->m_drawHalfInterl[staff->staffSize];
     int base = -17 * staff_space; // -17 is a magic number copied from above
     int offset;
     
@@ -631,10 +631,10 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
 
 	int j, x1, x2, yy;
 
-	yy = staff->m_yDrawing;
+	yy = staff->m_drawY;
 
 	x1 = system->m_systemLeftMar;
-    x2 = m_doc->m_rendPageWidth - m_doc->m_rendPageLeftMar - m_doc->m_rendPageRightMar - system->m_systemRightMar;
+    x2 = m_doc->m_drawPageWidth - m_doc->m_drawPageLeftMar - m_doc->m_drawPageRightMar - system->m_systemRightMar;
 
 	dc->SetPen( m_currentColour, ToRendererX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
@@ -645,7 +645,7 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
 	for(j = 0;j < staff->portNbLine; j++)
 	{
 		dc->DrawLine( x1 , ToRendererY ( yy ) , x2 , ToRendererY ( yy ) );
-		yy -= m_doc->m_rendInterl[staff->staffSize];
+		yy -= m_doc->m_drawInterl[staff->staffSize];
 	}
     
     dc->ResetPen( );
@@ -663,16 +663,16 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     dc->StartGraphic( staff, "staff", staff->GetUuid());
     
     // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_yRel that is calculated by the layout algorithm
+    // With Raw documents, we use m_drawYRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs
     if ( staff->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        staff->m_yDrawing = staff->GetYRel() + system->m_yDrawing;
+        staff->m_drawY = staff->GetYRel() + system->m_drawY;
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        staff->m_yDrawing = staff->m_yAbs;
+        staff->m_drawY = staff->m_yAbs;
     }
     
     DrawStaffLines( dc, staff, measure, system );
@@ -710,11 +710,11 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 
     int staffSize = ((Staff*)layer->m_parent)->staffSize;
 	// calculer position du do central en fonction clef
-	y_n += (int) m_doc->m_rendVerticalUnit2[staffSize];
-	yb = ((Staff*)layer->m_parent)->m_yDrawing -  m_doc->m_rendStaffSize[((Staff*)layer->m_parent)->staffSize]*2; // UT1 default
+	y_n += (int) m_doc->m_drawVerticalUnit2[staffSize];
+	yb = ((Staff*)layer->m_parent)->m_drawY -  m_doc->m_drawStaffSize[((Staff*)layer->m_parent)->staffSize]*2; // UT1 default
 	
 
-	plafond = yb + 8 *  m_doc->m_rendOctaveSize[staffSize];
+	plafond = yb + 8 *  m_doc->m_drawOctaveSize[staffSize];
 	if (y_n > plafond)
 		y_n = plafond;
 
@@ -726,16 +726,16 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	Clef *clef = layer->GetClef (pelement);
     if (clef) {
         clefId = clef->m_clefId;
-        yb += (clef->GetClefOffset()) * m_doc->m_rendHalfInterl[staffSize];	// UT1 reel
+        yb += (clef->GetClefOffset()) * m_doc->m_drawHalfInterl[staffSize];	// UT1 reel
     }
-	yb -= 4 *  m_doc->m_rendOctaveSize[staffSize];	// UT, note la plus grave
+	yb -= 4 *  m_doc->m_drawOctaveSize[staffSize];	// UT, note la plus grave
 
 	y_dec = y_n - yb;	// decalage par rapport a UT le plus grave
 
 	if (y_dec< 0)
 		y_dec = 0;
 
-	degres = y_dec /  m_doc->m_rendHalfInterl[staffSize];	// ecart en degres (PITCH_C..PITCH_B) par rapport a UT1
+	degres = y_dec /  m_doc->m_drawHalfInterl[staffSize];	// ecart en degres (PITCH_C..PITCH_B) par rapport a UT1
 	octaves = degres / 7;
 	position = degres % 7;
 

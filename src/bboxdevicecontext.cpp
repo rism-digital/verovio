@@ -352,7 +352,7 @@ void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
         LeipzigBBox::GetCharBounds(c, &g_x, &g_y, &g_w, &g_h);
     
         int x_off = x + (g_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) - 2;
-        // because we are in the rendering context, y position are already flipped
+        // because we are in the drawing context, y position are already flipped
         int y_off = y - (g_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) + 2;
         // the +/- 2 is to compesate a couple pixels down the figure (rounding error?)
          
@@ -368,7 +368,7 @@ void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
     
     /*
     int x_off = x + (bbox->m_bBox[glyph].m_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
-    // because we are in the rendering context, y position are already flipped
+    // because we are in the drawing context, y position are already flipped
     int y_off = y - (bbox->m_bBox[glyph].m_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
     
     UpdateBB(x_off, y_off, 

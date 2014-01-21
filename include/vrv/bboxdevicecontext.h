@@ -117,7 +117,7 @@ private:
     FontMetricsInfo m_font;
     
     /**
-     * The rendering context we are calling from - used to flip back the Y coordinates
+     * The view are calling from - used to flip back the Y coordinates
      */
     View *m_view;
    
