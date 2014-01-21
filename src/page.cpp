@@ -297,7 +297,8 @@ void Page::AlignVertically( )
     params.push_back( &shift );
     params.push_back( &systemMargin );
     MusFunctor alignSystems( &Object::AlignSystems );
-    this->Process( &alignSystems, params );
+    MusFunctor alignSystemsEnd( &Object::AlignSystemsEnd );
+    this->Process( &alignSystems, params, &alignSystemsEnd );
 }
     
 void Page::JustifyHorizontally( )

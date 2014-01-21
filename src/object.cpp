@@ -892,8 +892,13 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     // do not go further down the tree in this case
     return FUNCTOR_SIBLINGS;
 }
+    
+int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
+{
+    return FUNCTOR_CONTINUE;
+}
 
-} // namespace vrv 
+} // namespace vrv
 
 
 

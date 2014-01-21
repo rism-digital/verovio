@@ -219,16 +219,46 @@ public:
     
     /**
      * Save the content of and object by calling the appropriate FileOutputStream method
+     * Overriden in all classes.
      * param 0: a pointer to the FileOutputStream.
      */
     virtual int Save( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * @name Functors for aligning the content horizontally
+     */
+    ///@{
     
     /**
-     * Adjust the size of a system according to its content
-     * See System::TrimSystem for actual implementation.
+     * Align the content of a system.
+     * For each LayerElement, instanciate its Alignment.
+     * It creates it if no other note or event occurs at its position.
      */
-    virtual int TrimSystem( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-
+    virtual int Align( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Align the measures by adjusting the m_xRel position looking at the MeasureAligner.
+     */
+    virtual int AlignMeasures( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Store the width of the system in the MeasureAligner for justification
+     * This method is called at the end of a system.
+     */
+    virtual int AlignMeasuresEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Correct the X alignment once the the content of a system has been aligned and laid out
+     * See Measure::IntegrateBoundingBoxXShift for actual implementation
+     */
+    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };    
+    
+    /**
+     * Set the position of the Alignment.
+     * Looks at the time different with the previous Alignment.
+     */
+    virtual int SetAligmentXPos( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
     /**
      * Lay out the X positions of the staff content looking that the bounding boxes.
      * The m_xShift is updated appropriately
@@ -241,29 +271,60 @@ public:
      */
     virtual int SetBoundingBoxXShiftEnd( ArrayPtrVoid params );
     
+    ///@}
+    
+    /**
+     * @name Functors for aligning the content vertically.
+     */
+    ///@{
+    
+    /**
+     * Align the system by adjusting the m_yRel position looking at the SystemAligner.
+     */
+    virtual int AlignSystems( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Store the height of the system in the SystemAligner for justification
+     * This method is called at the end of a system.
+     */
+    virtual int AlignSystemsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Correct the Y alignment once the the content of a system has been aligned and laid out
+     * See System::IntegrateBoundingBoxYShift for actual implementation
+     */
+    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Set the position of the StaffAlignment.
+     */
+    virtual int SetAligmentYPos( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
     /**
      * Lay out the Y positions of the staff looking that the bounding box of each staff.
      * The m_yShift is updated appropriately
      */
     virtual int SetBoundingBoxYShift( ArrayPtrVoid params );
     
-    /**
-     * Align the content of a system.
-     * For each LayerElement, instanciate its Alignment.
-     * It creates it if no other note or event occurs at its position.
-     */
-    virtual int Align( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Set the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
+     * Lay out the Y positions of the staff looking that the bounding boxes of each staff
+     * This is the MusFunctor called at the end of the system or a measure.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-
+    virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid params );
+    
+    ///@}
+    
     /**
-     * Set the position of the StaffAlignment.
+     * @name Functors setting the current scoreDef.
      */
-    virtual int SetAligmentYPos( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    ///@{
+    
+    /**
+     * Replace all the staffDefs in a scoreDef.
+     * param 0: a pointer to the scoreDef we are going to replace the staffDefs
+     */
+    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Set the initial scoreDef of each page.
@@ -280,34 +341,12 @@ public:
      */
     virtual int SetStaffDefDraw( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
-    /**
-     * Replace all the staffDefs in a scoreDef.
-     * param 0: a pointer to the scoreDef we are going to replace the staffDefs
-     */
-    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    ///@}
     
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
+     * @name Functors for justification
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
-    /**
-     * Correct the Y alignment once the the content of a system has been aligned and laid out
-     * See System::IntegrateBoundingBoxYShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
-    /**
-     * Align the measures by adjusting the m_xRel position looking at the MeasureAligner.
-     */
-    virtual int AlignMeasures( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
-    /**
-     * Store the width of the system in the MeasureAligner for justification
-     * This method is called at the end of a system
-     */
-    virtual int AlignMeasuresEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    ///@{
     
     /**
      * Justify the X positions
@@ -315,9 +354,16 @@ public:
     virtual int JustifyX( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Align the system by adjusting the m_yRel position looking at the SystemAligner.
+     * Justify the Y positions
      */
-    virtual int AlignSystems( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int JustifyY( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    ///@}
+    
+    /**
+     * @name Functors for calculating the layout of a document.
+     */
+    ///@{
     
     /**
      * Fill a page by adding systems with the appropriate length
@@ -329,6 +375,8 @@ public:
      *
      */
     virtual int CastOffPages( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    ///@}
 
 public:
     ArrayOfObjects m_children;

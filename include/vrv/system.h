@@ -70,13 +70,11 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); };
     
-    // functors
+    //----------//
+    // Functors //
+    //----------//
+    
     virtual int Save( ArrayPtrVoid params );
-
-    /**
-     * Adjust the size of a system according to its content (to be verified)
-     */
-    virtual int TrimSystem( ArrayPtrVoid params );
     
     /**
      * Align the content of a system.
