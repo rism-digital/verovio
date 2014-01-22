@@ -130,9 +130,6 @@ enum EditorMode {
 #define ON 1
 #define OFF 0
 
-// BEZIER
-#define BEZIER_NB_POINTS 20
-
 // TODO // ax2
 
 // RESTS

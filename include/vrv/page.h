@@ -140,7 +140,7 @@ public:
      * all the clef or key changes that might occur within the text.
      * The value is initialized with by the Object::SetCurrentScoreDef functor.
      */
-    ScoreDef m_drawScoreDef;
+    ScoreDef m_drawingScoreDef;
 
 private:
     

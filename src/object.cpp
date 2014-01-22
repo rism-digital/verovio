@@ -676,7 +676,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     Page *current_page = dynamic_cast<Page*>(this);
     if ( current_page  ) {
         currentScoreDef->SetRedraw( true, true, false );
-        current_page->m_drawScoreDef = *currentScoreDef;
+        current_page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
     
@@ -750,7 +750,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         // reset it as the minimum position to the step (if doc found)
         (*min_pos) = 0;
         Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
-        if (doc) (*min_pos) = doc->m_drawStep1;
+        if (doc) (*min_pos) = doc->m_drawingStep1;
         // set scoreDef attr
         if (current_layer->GetClefAttr()) {
             current_layer->GetClefAttr()->SetBoundingBoxXShift( params );

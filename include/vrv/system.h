@@ -51,7 +51,7 @@ public:
 	Measure *GetAtPos( int x );
     
     /**
-     * Reset the drawing values (m_drawX, m_drawXRel, etc.)
+     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
      * Called by SetCurrentScoreDef functor.
      */
     virtual void ResetDrawingValues( );
@@ -94,12 +94,12 @@ public:
     virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid params );
     
     /**
-     * Align the system by adjusting the m_drawYRel position looking at the SystemAligner.
+     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
     virtual int AlignSystems( ArrayPtrVoid params );
     
     /**
-     * Align the measures by adjusting the m_drawXRel position looking at the MeasureAligner.
+     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * In System object resets the shift to 0;
      */
     virtual int AlignMeasures( ArrayPtrVoid params );
@@ -132,12 +132,12 @@ public:
      * The Y relative position of the system.
      * It is used internally when calculating the layout and it is not stored in the file.
      */
-    int m_drawYRel;
+    int m_drawingYRel;
 	/**
      * The Y drawing position of the system.
      * It is re-computed everytime the system is drawn and it is not stored in the file.
      */
-    int m_drawY;
+    int m_drawingY;
 	/** 
      * The x absolute position of the  system for facsimile layouts.
      * This is the top left corner of the system.
@@ -147,17 +147,17 @@ public:
      * The X relative position of the system.
      * It is used internally when calculating the layout andd it is not stored in the file.
      */
-    int m_drawXRel;
+    int m_drawingXRel;
 	/**
      * The X drawing position of the system.
      * It is re-computed everytime the system is drawn and it is not stored in the file.
      */
-    int m_drawX;
+    int m_drawingX;
     /**
      * The total width of the system.
      * It is computed during the layout processed and used for calculating the justification ratio.
      */
-    int m_drawTotalWidth;
+    int m_drawingTotalWidth;
 
 private:
     

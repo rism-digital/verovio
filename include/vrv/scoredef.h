@@ -229,12 +229,12 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    int DrawClef() const { return m_drawClef; };
-    void SetDrawClef( bool drawClef ) { m_drawClef = drawClef; };
-    int DrawKeySig() const { return m_drawKeySig; };
-    void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
-    int DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawClef = drawMensur; };
+    int DrawClef() const { return m_drawingClef; };
+    void SetDrawClef( bool drawClef ) { m_drawingClef = drawClef; };
+    int DrawKeySig() const { return m_drawingKeySig; };
+    void SetDrawKeySig( bool drawKeySig ) { m_drawingKeySig = drawKeySig; };
+    int DrawMensur() const { return m_drawingMensur; };
+    void SetDrawMensur( bool drawMensur ) { m_drawingClef = drawMensur; };
     ///@}
 
     // functors
@@ -268,9 +268,9 @@ private:
      *  @name Flags for indicating where the clef, keysig and mensur needs to be drawn or not
      */
     ///@{
-    bool m_drawClef;
-    bool m_drawKeySig;
-    bool m_drawMensur;
+    bool m_drawingClef;
+    bool m_drawingKeySig;
+    bool m_drawingMensur;
     ///@}
     
 };

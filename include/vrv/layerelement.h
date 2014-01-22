@@ -48,7 +48,7 @@ public:
     virtual int GetHorizontalSpacing( );
     
     /**
-     * Reset the drawing values (m_drawX, m_drawXRel, etc.)
+     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
      * Called by SetCurrentScoreDef functor.
      */
     virtual void ResetDrawingValues( );
@@ -138,11 +138,11 @@ public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
 	/** Relative position X. This is used internally when calculating the layout */
-    //int m_drawXRel;
+    //int m_drawingXRel;
 	/** Drawing position X. This is used internally when drawing */
-    int m_drawX;
+    int m_drawingX;
 	/** Relative position Y. This is used internally when drawing */
-	int m_drawYRel;
+	int m_drawingYRel;
     /** for elements in LayerApp. They will be drawn from the LayerElement of the app (and not from the layer) */
     bool m_in_layer_app;
     /** Indicates if cue size */
@@ -158,7 +158,7 @@ public:
     MusPoint m_stem_start; // beginning point, the one near the note
     MusPoint m_stem_end; // end point (!), near beam or stem
     /** stem direction as drawn, true = up, false = down */
-    bool m_drawn_stem_dir;
+    bool m_drawingN_stem_dir;
     
 protected:
     Alignment *m_alignment;

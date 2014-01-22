@@ -52,7 +52,7 @@ Staff::Staff( const Staff& staff )
 	accol = staff.accol;
 	accessoire = staff.accessoire;
 	m_yAbs = staff.m_yAbs;
-	m_drawY = staff.m_drawY;
+	m_drawingY = staff.m_drawingY;
     m_staffAlignment = NULL;
 
     int i;
@@ -89,7 +89,7 @@ void Staff::Clear()
 	accol = 0;
 	accessoire = 0;
 	m_yAbs = VRV_UNSET;
-	m_drawY = 0;
+	m_drawingY = 0;
     m_staffAlignment = NULL;
 }
 
@@ -135,7 +135,7 @@ void Staff::CopyAttributes( Staff *nstaff )
 	nstaff->accol = accol;
 	nstaff->accessoire = accessoire;
 	nstaff->m_yAbs = m_yAbs;
-	nstaff->m_drawY = m_drawY;
+	nstaff->m_drawingY = m_drawingY;
 }
 
 Layer *Staff::GetFirst( )
@@ -195,7 +195,7 @@ int Staff::GetVerticalSpacing()
     
 void Staff::ResetDrawingValues()
 {
-    m_drawY = 0;
+    m_drawingY = 0;
 }
 
 bool Staff::GetPosOnPage( ArrayPtrVoid params )
@@ -276,9 +276,9 @@ int Staff::LayOutSystemAndStaffYPos( ArrayPtrVoid params )
         if ( system ) {
             // the staff position is the same as the one of the system
             (*current_y_staff_shift) = 0;
-            this->m_drawYRel = 0;
+            this->m_drawingYRel = 0;
             // move the system down to fit the content
-            system->m_drawYRel = (*current_y_system_shift)  + negative_offset;
+            system->m_drawingYRel = (*current_y_system_shift)  + negative_offset;
             // spacing for the next system
             (*current_y_system_shift) -= system->GetVerticalSpacing();
         }
@@ -286,7 +286,7 @@ int Staff::LayOutSystemAndStaffYPos( ArrayPtrVoid params )
     else
     {
         // just more the staff down
-        this->m_drawYRel = (*current_y_staff_shift)  + negative_offset;
+        this->m_drawingYRel = (*current_y_staff_shift)  + negative_offset;
     }
     
     int shift = (this->m_contentBB_y2 - this->m_contentBB_y1) + this->GetVerticalSpacing();

@@ -147,7 +147,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
-        if (firstNote->m_drawn_stem_dir)
+        if (firstNote->m_drawingN_stem_dir)
             y = lastNote->m_stem_end.y + (firstNote->m_stem_end.y - lastNote->m_stem_end.y) / 2 + TUPLET_OFFSET;
         else 
             y = lastNote->m_stem_end.y + (firstNote->m_stem_end.y - lastNote->m_stem_end.y) / 2 - TUPLET_OFFSET;
@@ -155,7 +155,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         // Copy the generated coordinates
         center->x = x;
         center->y = y;
-        direction =  firstNote->m_drawn_stem_dir; // stem direction is same for all notes
+        direction =  firstNote->m_drawingN_stem_dir; // stem direction is same for all notes
     } else {
             
         //ArrayOfObjects all_notes;
@@ -181,7 +181,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         
         // In this case use the center of the notehead to calculate the exact center
         // as it looks better
-        x = firstNote->m_drawX + (lastNote->m_drawX - firstNote->m_drawX) / 2;
+        x = firstNote->m_drawingX + (lastNote->m_drawingX - firstNote->m_drawingX) / 2;
         
         // Return the start and end position for the brackes
         // starting from the first edge and last of the BBoxes
@@ -194,7 +194,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         while (iter != tuplet->m_list.end()) {
             LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
             
-            if (currentNote->m_drawn_stem_dir == true)
+            if (currentNote->m_drawingN_stem_dir == true)
                 ups++;
             else
                 downs++;
@@ -259,7 +259,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             while (iter != tuplet->m_list.end()) {
                 LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
                 
-                if (currentNote->m_drawn_stem_dir == direction) {
+                if (currentNote->m_drawingN_stem_dir == direction) {
                                         
                     if (direction) {
                         if (y == 0 || currentNote->m_stem_end.y + TUPLET_OFFSET >= y)
@@ -312,7 +312,7 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     int txt_x = center.x - (txt_lenght / 2) - 4;
     //DrawLeipzigFont ( dc, txt_x,  center.y, notes + 0x82, staff, false);
     
-    putstring(dc, txt_x, center.y, notes, 0);
+    DrawLeipzigString(dc, txt_x, center.y, notes, 0);
     
     //dc->SetPen(AxBLACK);
     dc->SetPen(AxBLACK, 2, AxSOLID);
@@ -334,17 +334,17 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
         double y2 = (double)start.y + m * (xa - (double)start.x);
         
         // first line
-        dc->DrawLine(start.x, ToRendererY(start.y), (int)x, ToRendererY((int)y1));
+        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
         // second line after gap
-        dc->DrawLine((int)xa, ToRendererY((int)y2), end.x, ToRendererY(end.y));
+        dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
         
         // vertical bracket lines
         if (direction) {
-            dc->DrawLine(start.x, ToRendererY(start.y), start.x, ToRendererY(start.y - 10));
-            dc->DrawLine(end.x, ToRendererY(end.y), end.x, ToRendererY(end.y - 10));
+            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - 10));
+            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - 10));
         } else {
-            dc->DrawLine(start.x, ToRendererY(start.y), start.x, ToRendererY(start.y + 10));
-            dc->DrawLine(end.x, ToRendererY(end.y), end.x, ToRendererY(end.y + 10));
+            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + 10));
+            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + 10));
         }
                 
     }

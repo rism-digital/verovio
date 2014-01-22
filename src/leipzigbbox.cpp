@@ -15,10 +15,6 @@
 namespace vrv {
 
 bool LeipzigBBox::m_initialized =  false;
-/*
-LeipzigBBox::BoundingBox* LeipzigBBox::m_bBox = LeipzigBBox::InitializeStatic();
-*/
-
 
 LeipzigBBox::BoundingBox LeipzigBBox::m_bBox[LEIPZIG_GLYPHS];
 
@@ -403,9 +399,6 @@ void LeipzigBBox::GetCharBounds(const unsigned char c, int *x, int *y, int *w, i
     *h = m_bBox[glyph].m_height;
     *x = m_bBox[glyph].m_x;
     *y = m_bBox[glyph].m_y;
-     
-    
-    //bBox = 0;
 }
 
 } // namespace vrv

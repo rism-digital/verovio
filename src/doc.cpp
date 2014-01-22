@@ -53,7 +53,7 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
-    m_drawPage = NULL;
+    m_drawingPage = NULL;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Clear();
@@ -113,7 +113,7 @@ void Doc::Layout( )
     System *currentSystem = new System();
     contentPage->AddSystem( currentSystem );
     int shift = 0;
-    int systemFullWidth = this->m_drawPageWidth - this->m_drawPageLeftMar - this->m_drawPageRightMar
+    int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
         - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     ArrayPtrVoid params;
     params.push_back( contentSystem );
@@ -142,138 +142,138 @@ Page *Doc::SetDrawingPage( int pageIdx )
         return NULL;
     }
     // nothing to do
-    if ( m_drawPage && m_drawPage->GetIdx() == pageIdx ) {
-        return m_drawPage;
+    if ( m_drawingPage && m_drawingPage->GetIdx() == pageIdx ) {
+        return m_drawingPage;
     }
-    m_drawPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
+    m_drawingPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
     
-    assert( m_drawPage );
+    assert( m_drawingPage );
     
     // we use the page members only if set (!= -1) 
-    if ( m_drawPage->m_pageHeight != -1 )
+    if ( m_drawingPage->m_pageHeight != -1 )
     {
-        m_drawPageHeight = m_drawPage->m_pageHeight;
-        m_drawPageWidth = m_drawPage->m_pageWidth;
-        m_drawPageLeftMar = m_drawPage->m_pageLeftMar;
-        m_drawPageRightMar = m_drawPage->m_pageRightMar;
-        m_drawPageTopMar = m_drawPage->m_pageTopMar;
+        m_drawingPageHeight = m_drawingPage->m_pageHeight;
+        m_drawingPageWidth = m_drawingPage->m_pageWidth;
+        m_drawingPageLeftMar = m_drawingPage->m_pageLeftMar;
+        m_drawingPageRightMar = m_drawingPage->m_pageRightMar;
+        m_drawingPageTopMar = m_drawingPage->m_pageTopMar;
 	}
 	else if ( this->m_pageHeight != -1 )
 	{
-        m_drawPageHeight = this->m_pageHeight;
-        m_drawPageWidth = this->m_pageWidth;
-        m_drawPageLeftMar = this->m_pageLeftMar;
-        m_drawPageRightMar = this->m_pageRightMar;
-        m_drawPageTopMar = this->m_pageTopMar;
+        m_drawingPageHeight = this->m_pageHeight;
+        m_drawingPageWidth = this->m_pageWidth;
+        m_drawingPageLeftMar = this->m_pageLeftMar;
+        m_drawingPageRightMar = this->m_pageRightMar;
+        m_drawingPageTopMar = this->m_pageTopMar;
     }
     else
     {
-        m_drawPageHeight = m_env.m_pageHeight;
-        m_drawPageWidth = m_env.m_pageWidth;
-        m_drawPageLeftMar = m_env.m_pageLeftMar;
-        m_drawPageRightMar = m_env.m_pageRightMar;
-        m_drawPageTopMar = m_env.m_pageTopMar;
+        m_drawingPageHeight = m_env.m_pageHeight;
+        m_drawingPageWidth = m_env.m_pageWidth;
+        m_drawingPageLeftMar = m_env.m_pageLeftMar;
+        m_drawingPageRightMar = m_env.m_pageRightMar;
+        m_drawingPageTopMar = m_env.m_pageTopMar;
     }
     
     if (this->m_env.m_landscape)
     {	
-        int pageHeight = m_drawPageWidth;
-        m_drawPageWidth = m_drawPageHeight;
-        m_drawPageHeight = pageHeight;
-        int pageRightMar = m_drawPageLeftMar;
-        m_drawPageLeftMar = m_drawPageRightMar;
-        m_drawPageRightMar = pageRightMar;
+        int pageHeight = m_drawingPageWidth;
+        m_drawingPageWidth = m_drawingPageHeight;
+        m_drawingPageHeight = pageHeight;
+        int pageRightMar = m_drawingPageLeftMar;
+        m_drawingPageLeftMar = m_drawingPageRightMar;
+        m_drawingPageRightMar = pageRightMar;
     }
     
     // From here we could check if values have changed
     // Since  m_env.m_interlDefin stays the same, it useless to do it
     // every time for now.
     
-	m_drawBeamMaxSlope = this->m_env.m_beamMaxSlope;
-	m_drawBeamMinSlope = this->m_env.m_beamMinSlope;
-	m_drawBeamMaxSlope /= 100;
-	m_drawBeamMinSlope /= 100;
+	m_drawingBeamMaxSlope = this->m_env.m_beamMaxSlope;
+	m_drawingBeamMinSlope = this->m_env.m_beamMinSlope;
+	m_drawingBeamMaxSlope /= 100;
+	m_drawingBeamMinSlope /= 100;
     
-    m_drawSmallStaffRatio[0] = this->m_env.m_smallStaffNum;
-    m_drawSmallStaffRatio[1] = this->m_env.m_smallStaffDen;
-    m_drawGraceRatio[0] = this->m_env.m_graceNum;
-    m_drawGraceRatio[1] = this->m_env.m_graceDen;
+    m_drawingSmallStaffRatio[0] = this->m_env.m_smallStaffNum;
+    m_drawingSmallStaffRatio[1] = this->m_env.m_smallStaffDen;
+    m_drawingGraceRatio[0] = this->m_env.m_graceNum;
+    m_drawingGraceRatio[1] = this->m_env.m_graceDen;
     
     // half of the space between two lines
-    m_drawHalfInterl[0] = m_env.m_interlDefin/2;
+    m_drawingHalfInterl[0] = m_env.m_interlDefin/2;
     // same for small staves
-    m_drawHalfInterl[1] = (m_drawHalfInterl[0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
+    m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
-    m_drawInterl[0] = m_drawHalfInterl[0] * 2;
+    m_drawingInterl[0] = m_drawingHalfInterl[0] * 2;
     // same for small staves
-    m_drawInterl[1] = m_drawHalfInterl[1] * 2;
+    m_drawingInterl[1] = m_drawingHalfInterl[1] * 2;
     // staff (with five lines)
-    m_drawStaffSize[0] = m_drawInterl[0] * 4;
-    m_drawStaffSize[1] = m_drawInterl[1] * 4;
+    m_drawingStaffSize[0] = m_drawingInterl[0] * 4;
+    m_drawingStaffSize[1] = m_drawingInterl[1] * 4;
     //
-    m_drawOctaveSize[0] = m_drawHalfInterl[0] * 7;
-    m_drawOctaveSize[1] = m_drawHalfInterl[1] * 7;
+    m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
+    m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
     
-    m_drawStep1 = m_drawHalfInterl[0];
-    m_drawStep2 = m_drawStep1 * 3;
-    m_drawStep3 = m_drawStep1 * 6;
+    m_drawingStep1 = m_drawingHalfInterl[0];
+    m_drawingStep2 = m_drawingStep1 * 3;
+    m_drawingStep3 = m_drawingStep1 * 6;
     
     // values for beams
-    m_drawBeamWidth[0] = this->m_env.m_interlDefin / 2;
-    m_drawBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
-    m_drawBeamWidth[1] = (m_drawBeamWidth[0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
-    m_drawBeamWhiteWidth[1] = (m_drawBeamWhiteWidth[0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
+    m_drawingBeamWidth[0] = this->m_env.m_interlDefin / 2;
+    m_drawingBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
+    m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
-    m_drawFontHeight = CalcLeipzigFontSize();
-    m_drawFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
-	m_drawFontHeightAscent[0][1] = (m_drawFontHeightAscent[0][0] * m_drawGraceRatio[0]) / m_drawGraceRatio[1];
-    m_drawFontHeightAscent[1][0] = (m_drawFontHeightAscent[0][0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
-	m_drawFontHeightAscent[1][1] = (m_drawFontHeightAscent[1][0] * m_drawGraceRatio[0]) / m_drawGraceRatio[1];
+    m_drawingFontHeight = CalcLeipzigFontSize();
+    m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
+    m_drawingFontHeightAscent[1][0] = (m_drawingFontHeightAscent[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
     
-    m_drawFontSize[0][0] = m_drawFontHeight;
-    m_drawFontSize[0][1] = (m_drawFontSize[0][0] * m_drawGraceRatio[0]) / m_drawGraceRatio[1];
-    m_drawFontSize[1][0] = (m_drawFontSize[0][0] * m_drawSmallStaffRatio[0]) / m_drawSmallStaffRatio[1];
-    m_drawFontSize[1][1]= (m_drawFontSize[1][0] * m_drawGraceRatio[0])/ m_drawGraceRatio[1];
+    m_drawingFontSize[0][0] = m_drawingFontHeight;
+    m_drawingFontSize[0][1] = (m_drawingFontSize[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
+    m_drawingFontSize[1][0] = (m_drawingFontSize[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingFontSize[1][1]= (m_drawingFontSize[1][0] * m_drawingGraceRatio[0])/ m_drawingGraceRatio[1];
     
-	m_drawFonts[0][0].SetPointSize( m_drawFontSize[0][0] ); //160
-    m_drawFonts[0][1].SetPointSize( m_drawFontSize[0][1] ); //120
-    m_drawFonts[1][0].SetPointSize( m_drawFontSize[1][0] ); //128
-    m_drawFonts[1][1].SetPointSize( m_drawFontSize[1][1] ); //100
+	m_drawingFonts[0][0].SetPointSize( m_drawingFontSize[0][0] ); //160
+    m_drawingFonts[0][1].SetPointSize( m_drawingFontSize[0][1] ); //120
+    m_drawingFonts[1][0].SetPointSize( m_drawingFontSize[1][0] ); //128
+    m_drawingFonts[1][1].SetPointSize( m_drawingFontSize[1][1] ); //100
     
-	m_drawLyricFonts[0].SetPointSize( m_drawLyricFont.GetPointSize() );
-    m_drawLyricFonts[1].SetPointSize( m_drawLyricFont.GetPointSize() );
+	m_drawingLyricFonts[0].SetPointSize( m_drawingLyricFont.GetPointSize() );
+    m_drawingLyricFonts[1].SetPointSize( m_drawingLyricFont.GetPointSize() );
     
-    m_drawVerticalUnit1[0] = (float)m_drawInterl[0]/4;
-    m_drawVerticalUnit2[0] = (float)m_drawInterl[0]/8;
-    m_drawVerticalUnit1[1] = (float)m_drawInterl[1]/4;
-    m_drawVerticalUnit2[1] = (float)m_drawInterl[1]/8;
+    m_drawingVerticalUnit1[0] = (float)m_drawingInterl[0]/4;
+    m_drawingVerticalUnit2[0] = (float)m_drawingInterl[0]/8;
+    m_drawingVerticalUnit1[1] = (float)m_drawingInterl[1]/4;
+    m_drawingVerticalUnit2[1] = (float)m_drawingInterl[1]/8;
     
     float glyph_size;
-    glyph_size = (LEIPZIG_HALF_NOTE_HEAD_WIDTH * (float)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
-    m_drawNoteRadius[0][0] = ceil(glyph_size / 2);
-    m_drawNoteRadius[0][1] = (m_drawNoteRadius[0][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
-    m_drawNoteRadius[1][0] = (m_drawNoteRadius[0][0] * m_drawSmallStaffRatio[0])/m_drawSmallStaffRatio[1];
-    m_drawNoteRadius[1][1] = (m_drawNoteRadius[1][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
+    glyph_size = (LEIPZIG_HALF_NOTE_HEAD_WIDTH * (float)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    m_drawingNoteRadius[0][0] = ceil(glyph_size / 2);
+    m_drawingNoteRadius[0][1] = (m_drawingNoteRadius[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    m_drawingNoteRadius[1][0] = (m_drawingNoteRadius[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
+    m_drawingNoteRadius[1][1] = (m_drawingNoteRadius[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     
-    m_drawLedgerLine[0][0] = (int)(glyph_size * .72);
-    m_drawLedgerLine[0][1] = (m_drawLedgerLine[0][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
-    m_drawLedgerLine[1][0] = (m_drawLedgerLine[0][0] * m_drawSmallStaffRatio[0])/m_drawSmallStaffRatio[1];
-    m_drawLedgerLine[1][1] = (m_drawLedgerLine[1][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
+    m_drawingLedgerLine[0][0] = (int)(glyph_size * .72);
+    m_drawingLedgerLine[0][1] = (m_drawingLedgerLine[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    m_drawingLedgerLine[1][0] = (m_drawingLedgerLine[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
+    m_drawingLedgerLine[1][1] = (m_drawingLedgerLine[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     
-    glyph_size = round(LEIPZIG_WHOLE_NOTE_HEAD_WIDTH * (double)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
-    m_drawLedgerLine[0][2] = (int)(glyph_size * .66);
-    m_drawLedgerLine[1][2] = (m_drawLedgerLine[0][2] * m_drawSmallStaffRatio[0]) /m_drawSmallStaffRatio[1];
+    glyph_size = round(LEIPZIG_WHOLE_NOTE_HEAD_WIDTH * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    m_drawingLedgerLine[0][2] = (int)(glyph_size * .66);
+    m_drawingLedgerLine[1][2] = (m_drawingLedgerLine[0][2] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     
-    m_drawBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
-    m_drawBrevisWidth[1] = (m_drawBrevisWidth[0] * m_drawSmallStaffRatio[0]) /m_drawSmallStaffRatio[1];
+    m_drawingBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
+    m_drawingBrevisWidth[1] = (m_drawingBrevisWidth[0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     
-    glyph_size = round(LEIPZIG_SHARP_WIDTH * (double)m_drawFontHeight / LEIPZIG_UNITS_PER_EM);
-    m_drawAccidWidth[0][0] = glyph_size;
-    m_drawAccidWidth[0][1] = (m_drawAccidWidth[0][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
-    m_drawAccidWidth[1][0] = (m_drawAccidWidth[0][0] * m_drawSmallStaffRatio[0]) /m_drawSmallStaffRatio[1];
-    m_drawAccidWidth[1][1] = (m_drawAccidWidth[1][0] * m_drawGraceRatio[0])/m_drawGraceRatio[1];
+    glyph_size = round(LEIPZIG_SHARP_WIDTH * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    m_drawingAccidWidth[0][0] = glyph_size;
+    m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
+    m_drawingAccidWidth[1][1] = (m_drawingAccidWidth[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     
-	return m_drawPage;
+	return m_drawingPage;
 }
 
 int Doc::CalcLeipzigFontSize( )
@@ -284,29 +284,29 @@ int Doc::CalcLeipzigFontSize( )
 
 void Doc::UpdateFontValues() 
 {	
-	if ( !m_drawLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
+	if ( !m_drawingLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
         LogWarning( "Impossible to load font 'Leipzig'" );
 	
 	//LogMessage( "Size %d, Family %d, Style %d, Weight %d, Underline %d, Face %s, Desc %s",
-	//	m_drawLeipzigFont.GetPointSize(),
-	//	m_drawLeipzigFont.GetFamily(),
-	//	m_drawLeipzigFont.GetStyle(),
-	//	m_drawLeipzigFont.GetWeight(),
-	//	m_drawLeipzigFont.GetUnderlined(),
-	//	m_drawLeipzigFont.GetFaceName().c_str(),
-	//	m_drawLeipzigFont.GetNativeFontInfoDesc().c_str());
+	//	m_drawingLeipzigFont.GetPointSize(),
+	//	m_drawingLeipzigFont.GetFamily(),
+	//	m_drawingLeipzigFont.GetStyle(),
+	//	m_drawingLeipzigFont.GetWeight(),
+	//	m_drawingLeipzigFont.GetUnderlined(),
+	//	m_drawingLeipzigFont.GetFaceName().c_str(),
+	//	m_drawingLeipzigFont.GetNativeFontInfoDesc().c_str());
     
-	m_drawFonts[0][0] = m_drawLeipzigFont;
-    m_drawFonts[0][1] = m_drawLeipzigFont;
-    m_drawFonts[1][0] = m_drawLeipzigFont;
-    m_drawFonts[1][1] = m_drawLeipzigFont;
+	m_drawingFonts[0][0] = m_drawingLeipzigFont;
+    m_drawingFonts[0][1] = m_drawingLeipzigFont;
+    m_drawingFonts[1][0] = m_drawingLeipzigFont;
+    m_drawingFonts[1][1] = m_drawingLeipzigFont;
 	
 	// Lyrics
-	if ( !m_drawLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
+	if ( !m_drawingLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
 		LogWarning( "Impossible to load font for the lyrics" );
     
-	m_drawLyricFonts[0] = m_drawLyricFont;
-    m_drawLyricFonts[1] = m_drawLyricFont;
+	m_drawingLyricFonts[0] = m_drawingLyricFont;
+    m_drawingLyricFonts[1] = m_drawingLyricFont;
 }
 
 

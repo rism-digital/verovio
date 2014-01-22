@@ -1,0 +1,24 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <title>Dynamic demo</title>
+
+<script src="../build/verovio.js" type="text/javascript"></script>	
+
+<script type="text/javascript">
+
+convertMusic = Module.cwrap('convertMusic', 'string', ['string', 'string'])
+
+function render_music( music, format )
+{	
+	var svg = convertMusic(music, JSON.stringify({inputFormat: format, scale: 50, pageHeight: 250, pageWidth: 2000}));
+	return svg;
+
+};
+
+</script>
+</head>
+<BODY>
+</BODY>

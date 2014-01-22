@@ -50,8 +50,8 @@ void Measure::Clear()
     m_logMeasureNb = -1;
     m_measuredMusic = true;
     m_xAbs = VRV_UNSET;
-    m_drawXRel = 0;
-    m_drawX = 0;
+    m_drawingXRel = 0;
+    m_drawingX = 0;
     // by default, we have a single barline on the right (none on the left)
     m_rightBarline.m_barlineType = BARLINE_SINGLE;
     m_leftBarline.m_barlineType = BARLINE_NONE;
@@ -145,8 +145,8 @@ Staff *Measure::GetStaffWithNo( int staffNo )
 
 void Measure::ResetDrawingValues()
 {
-    m_drawXRel = 0;
-    m_drawX = 0;
+    m_drawingXRel = 0;
+    m_drawingX = 0;
     if ( m_measureAligner.GetLeftAlignment() ) {
         m_measureAligner.GetLeftAlignment()->SetXRel( 0 );
     }
@@ -236,7 +236,7 @@ int Measure::JustifyX( ArrayPtrVoid params )
     double *ratio = (double*)params[0];
     MusFunctor *justifyX = (MusFunctor*)params[2];
     
-    this->m_drawXRel = ceil((*ratio) * (double)this->m_drawXRel);
+    this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
     
     m_measureAligner.Process( justifyX, params );
     
@@ -249,7 +249,7 @@ int Measure::AlignMeasures( ArrayPtrVoid params )
     // param 0: the cumulated shift
     int *shift = (int*)params[0];
     
-    this->m_drawXRel = (*shift);
+    this->m_drawingXRel = (*shift);
     
     assert( m_measureAligner.GetRightAlignment() );
     
@@ -269,7 +269,7 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to
     // param 2: a pointer to the current system
-    // param 3: the cummulated shift (m_drawXRel of the first measure of the current system)
+    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
     // param 4: the system width
     System *contentSystem = (System*)params[0];
     Page *page = (Page*)params[1];
@@ -277,10 +277,10 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     int *shift = (int*)params[3];
     int *systemWidth = (int*)params[4];
     
-    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawXRel + this->GetXRelRight() - (*shift) > (*systemWidth) ) ) {
+    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetXRelRight() - (*shift) > (*systemWidth) ) ) {
         (*currentSystem) = new System();
         page->AddSystem( *currentSystem );
-        (*shift) = this->m_drawXRel;;
+        (*shift) = this->m_drawingXRel;;
     }
     
     // Special case where we use the Relinquish method.

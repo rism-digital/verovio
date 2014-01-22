@@ -38,15 +38,9 @@ View::View( )
 	m_currentStaff = NULL;
     m_currentSystem = NULL;
 
-	m_lyricMode = false;
-	m_inputLyric = false;
     m_editorMode = EDITOR_EDIT;
-	//m_editorMode = EDITOR_INSERT;
 	
-	m_notation_mode = MENSURAL_MODE;
-    //m_notation_mode = CMN_MODE;
-	
-	m_str.reserve(1000);
+	m_notationMode = MENSURAL_MODE;
 }
 
 
@@ -144,34 +138,19 @@ void View::Next( bool forward )
 	SetPage( m_pageIdx );
 }
 
-void View::LoadPage( int nopage )
-{
-    /*
-	if ( !m_doc )
-		return;
-
-	if ((nopage < 0) || (nopage > m_fh->nbpage - 1))
-		return;
-
-	m_npage = nopage;
-	SetPage( &m_doc->m_pages[m_npage] );
-    */
-    LogDebug( "View::LoadPage missing in ax2" );
-}
-
-int View::ToRendererX( int i ) { return i; }; // the same
+int View::ToDeviceContextX( int i ) { return i; }; // the same
 
 /** x value in the Logical world */
 int View::ToLogicalX( int i )  { return i; };
 
 /** y value in the View */
-int View::ToRendererY( int i )  
+int View::ToDeviceContextY( int i )  
 { 
     if (!m_doc) {
         return 0;
     }
     
-    return m_doc->m_drawPageHeight - i; // flipped
+    return m_doc->m_drawingPageHeight - i; // flipped
 }
 
 /** y value in the Logical world  */
@@ -182,16 +161,16 @@ int View::ToLogicalY( int i )
             return 0;
         }
         
-        return m_doc->m_drawPageHeight - i; // flipped
+        return m_doc->m_drawingPageHeight - i; // flipped
     }
 }
-
-bool View::IsNoteSelected() 
-{ 
-	if (!m_currentElement) 
-		return false;
-	else
-		return m_currentElement->IsNote();
+    
+void View::SwapPoints (MusPoint *x1, MusPoint *x2)
+{
+    MusPoint a;
+    a = *x1;
+    *x1 = *x2;
+    *x2 = a;
 }
 
 } // namespace vrv

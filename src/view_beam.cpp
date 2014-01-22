@@ -153,7 +153,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	/***if (e_t->_shport) { provshp = e_t->_shport; shportee (0);}***/
 		/* retablir a la fin si provshp existe */
 
-	low = chk->m_drawYRel + staff->m_drawY;	/* initialiser */
+	low = chk->m_drawingYRel + staff->m_drawingY;	/* initialiser */
     k = ((Note*)chk)->m_colored ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
     
 	valref = k;		/* m_dur test conservee */
@@ -165,12 +165,12 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     } 
     else
     {	
-        dx[0] =  m_doc->m_drawNoteRadius[staff->staffSize][0];
-        dx[1] =  m_doc->m_drawNoteRadius[staff->staffSize][1];
+        dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0];
+        dx[1] =  m_doc->m_drawingNoteRadius[staff->staffSize][1];
         dx[0] -= (m_doc->m_env.m_stemWidth)/2;
         dx[1] -= (m_doc->m_env.m_stemWidth)/2;
     }
-	_yy[0] = staff->m_drawY;	
+	_yy[0] = staff->m_drawingY;	
 
     /***
 	if (calcBeam)	// eviter side-effect de circuit...
@@ -215,7 +215,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 				fb.mrq_port = chk->_shport;
             }***/
 
-			(crd+ct)->a = chk->m_drawX + chk->m_hOffset - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
+			(crd+ct)->a = chk->m_drawingX + chk->m_hOffset - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
 			if (chk->IsNote() && ((Note*)chk)->m_breakSec && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
@@ -247,7 +247,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	}	while (1);
 
     // SECURITE : EVITER DE BARRER UN ACCORD ISOLE...
-/*	if (chk->IsNote() && (((Note*)chk)->m_chord & CHORD_TERMINAL)  && (chk->m_drawX == layer->beamListPremier->m_drawX))
+/*	if (chk->IsNote() && (((Note*)chk)->m_chord & CHORD_TERMINAL)  && (chk->m_drawingX == layer->beamListPremier->m_drawingX))
 	{	chk = layer->beamListPremier;
 		do {	
                 ((Note*)chk)->m_beam[0] = 0;
@@ -268,36 +268,36 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	if (fb.mrq_port)
 	// le y le plus haut est dans _yy[0] 
 	{	if (fb.mrq_port==1)
-		{	_yy[0] = (this != phead) ? staff->ptr_pp->m_drawY : staff->m_drawY; 
-			_yy[1] = staff->m_drawY;
+		{	_yy[0] = (this != phead) ? staff->ptr_pp->m_drawingY : staff->m_drawingY; 
+			_yy[1] = staff->m_drawingY;
 		}
 		else
-		{	_yy[1] = (this != ptail) ? staff->ptr_fp->m_drawY : staff->m_drawY; 
-			_yy[0] = staff->m_drawY;
+		{	_yy[1] = (this != ptail) ? staff->ptr_fp->m_drawingY : staff->m_drawingY; 
+			_yy[0] = staff->m_drawingY;
 		}
 	}
     ***/
 	for (i = 0; i < ct; i++)
 	{	switch (fb.mrq_port)
 		{	case 0: crd[i].prov = OFF;
-					(crd+i)->b = crd[i].chk->m_drawYRel+staff->m_drawY;
+					(crd+i)->b = crd[i].chk->m_drawingYRel+staff->m_drawingY;
 					break;
 			case 1: if (crd[i].chk->m_staffShift)
 					{	crd[i].prov = ON;
-						(crd+i)->b = crd[i].chk->m_drawYRel + _yy[0];
+						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[0];
 					}
 					else
 					{	crd[i].prov = OFF;
-						(crd+i)->b = crd[i].chk->m_drawYRel + _yy[1];
+						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[1];
 					}
 					break;
 			case 2: if (crd[i].chk->m_staffShift)
 					{	crd[i].prov = OFF;
-						(crd+i)->b = crd[i].chk->m_drawYRel + _yy[1];
+						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[1];
 					}
 					else
 					{	crd[i].prov = ON;
-						(crd+i)->b = crd[i].chk->m_drawYRel + _yy[0];
+						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[0];
 					}
 		}
 		high= std::max((double)(crd+i)->b,high);		/* enregistrement des extremes */
@@ -324,7 +324,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	/* direction queues: auto = moyenne */
 	/* bch.inpt: le flot de donnees a ete envoye par input et non rd_objet */
 	{	
-        milieu = _yy[0] - (m_doc->m_drawInterl[staff->staffSize] * 2);
+        milieu = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
 		y_moy /= ct;
 		if ( y_moy <  milieu )
 			fb.dir = ON;
@@ -344,12 +344,12 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 
     if (crd[_ct].chk->m_cueSize == false)
     {
-        deltanbbar = m_doc->m_drawBeamWidth[staff->staffSize];
-        deltablanc = m_doc->m_drawBeamWhiteWidth[staff->staffSize];
+        deltanbbar = m_doc->m_drawingBeamWidth[staff->staffSize];
+        deltablanc = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
     }
     else
-    {	deltanbbar = std::max(2, (m_doc->m_drawBeamWidth[staff->staffSize]/2));
-        deltablanc = std::max(2, (m_doc->m_drawBeamWhiteWidth[staff->staffSize]-1));
+    {	deltanbbar = std::max(2, (m_doc->m_drawingBeamWidth[staff->staffSize]/2));
+        deltablanc = std::max(2, (m_doc->m_drawingBeamWhiteWidth[staff->staffSize]-1));
     }
 	deltabar = deltanbbar + deltablanc;
 
@@ -378,7 +378,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     /***
 	if (fb.mrq_port && extern_q_auto)
 	// deux portees concernees (partage), en mode automatique 
-	{	ecart = e_t->m_doc->m_drawInterl[staff->staffSize]*6;
+	{	ecart = e_t->m_doc->m_drawingInterl[staff->staffSize]*6;
 		for (i=0; i<ct; i++)
 		{	if ((crd+i)->prov)
 			{	(crd+i)->a -= dx[crd[i].chk->dimin];
@@ -403,10 +403,10 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         ecart = ((shortest-DUR_8)*(deltabar));
 
 		if (crd[_ct].chk->m_cueSize)
-			ecart += m_doc->m_drawHalfInterl[staff->staffSize]*5;
+			ecart += m_doc->m_drawingHalfInterl[staff->staffSize]*5;
 		else
         //   Le 24 Septembre 1993: obtenir des DUR_8 reliees a la hauteur des separees 
-			ecart += (shortest > DUR_8) ? m_doc->m_drawInterl[staff->staffSize]*hauteurBarreMoyenne : m_doc->m_drawInterl[staff->staffSize]*(hauteurBarreMoyenne+0.5);
+			ecart += (shortest > DUR_8) ? m_doc->m_drawingInterl[staff->staffSize]*hauteurBarreMoyenne : m_doc->m_drawingInterl[staff->staffSize]*(hauteurBarreMoyenne+0.5);
 
 		if (!fb.dir && !staff->notAnc)
 		{	dx[0] = - dx[0];
@@ -414,7 +414,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 		}
         /***
         if (crd[_ct].chk->existDebord) {
-        ecart = m_doc->m_drawInterl[0]*2;
+        ecart = m_doc->m_drawingInterl[0]*2;
             if (!fb.mrq_port) extern_q_auto= 0;
         }
         ***/
@@ -448,8 +448,8 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	else
 		dB = 0.0;
 	/* Correction esthetique : */
-	if (fabs(dB) < m_doc->m_drawBeamMinSlope ) dB = 0.0;
-	if (fabs(dB) > m_doc->m_drawBeamMaxSlope ) dB = (dB>0) ? m_doc->m_drawBeamMaxSlope : - m_doc->m_drawBeamMaxSlope;
+	if (fabs(dB) < m_doc->m_drawingBeamMinSlope ) dB = 0.0;
+	if (fabs(dB) > m_doc->m_drawingBeamMaxSlope ) dB = (dB>0) ? m_doc->m_drawingBeamMaxSlope : - m_doc->m_drawingBeamMaxSlope;
 	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
 
 if (fPente)
@@ -519,56 +519,56 @@ if (fPente)
 		if (fb.fl_cond)	/* esth: eviter que queues depassent barres */
 		{	if (crd[i].prov)	/* venant du haut, m_stemDir en bas */
 			{	/***fy1 = *(_ybeam+i)+v_pnt;***/	/* on raccourcit m_stemDir */
-				fy2 = crd[i].b-m_doc->m_drawVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b-m_doc->m_drawingVerticalUnit2[staff->staffSize];
 			}
 			else
 			{	/***fy1 = *(_ybeam+i)-e_t->v_pnt;***/	/* on allonge m_stemDir */
-				fy2 = crd[i].b+m_doc->m_drawVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b+m_doc->m_drawingVerticalUnit2[staff->staffSize];
 			}
 		}
 		else	// on tient compte de l'‚paisseur qui fait des "bosses"
 		{	if (fb.dir)	// m_stemDir en haut
 			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b+m_doc->m_drawVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b+m_doc->m_drawingVerticalUnit2[staff->staffSize];
                 crd[i].chk->m_stem_start.x = crd[i].chk->m_stem_end.x = crd[i].a;
                 crd[i].chk->m_stem_start.y = fy2;
                 crd[i].chk->m_stem_end.y = fy1;
-                crd[i].chk->m_drawn_stem_dir = true;
+                crd[i].chk->m_drawingN_stem_dir = true;
 			}
 			else
 			{	fy1 = *(_ybeam+i) + m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b-m_doc->m_drawVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b-m_doc->m_drawingVerticalUnit2[staff->staffSize];
                 crd[i].chk->m_stem_start.x = crd[i].chk->m_stem_end.x = crd[i].a;
                 crd[i].chk->m_stem_start.y = fy2;
                 crd[i].chk->m_stem_end.y = fy1;
-                crd[i].chk->m_drawn_stem_dir = false;
+                crd[i].chk->m_drawingN_stem_dir = false;
 			}
 		}
 		if ((crd+i)->chk->IsNote() && ((Note*)(crd+i)->chk)->m_headshape != SANSQUEUE)
 		{	
-            v_bline (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
+            DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
             
 // ICI, bon endroit pour enfiler les STACCATOS - ne sont traités ici que ceux qui sont opposés à la tête (les autres, in wgnote.cpp)
 			if (((Note*)(crd+i)->chk)->m_artic
 				 && (!((Note*)(crd+i)->chk)->m_chord || (((Note*)(crd+i)->chk)->m_chord & CHORD_TERMINAL)))
 			// les cas non traités par note()
 /*			{	if (fb.dir || (fb.mrq_port && m_stemLen && !crd[i].prov))
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawInterl[staff->staffSize]-staff->m_drawY, 0,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				else
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawInterl[staff->staffSize]-staff->m_drawY, -1,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
 			}
 */
 			{	
                 /***if (fb.mrq_port && extern_q_auto)
 				{	if (crd[i].prov)
-						putStacc (dc,crd[i].a+dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawInterl[staff->staffSize]-staff->m_drawY, -1,crd[i].chk->typStac);
+						putStacc (dc,crd[i].a+dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
 					else
-						putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawInterl[staff->staffSize]-staff->m_drawY, 0,crd[i].chk->typStac);
+						putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				}
 				else if (fb.dir)
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawInterl[staff->staffSize]-staff->m_drawY, 0,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				else
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawInterl[staff->staffSize]-staff->m_drawY, -1,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
                 ***/
 			}
 
@@ -611,7 +611,8 @@ if (fPente)
 
 	for (j=0; j<h ; j++)
 	{
-		decalage = hGrosseligne (dc,fx1,fy1,fx2,fy2, deltanbbar*delt_y /***, workColor2***/);
+		decalage = deltanbbar*delt_y;
+        DrawObliqueLine (dc,fx1,fy1,fx2,fy2, decalage /***, workColor2***/);
 		fy1 += decalage; fy2 += decalage;
 
 /* ici, redescendre  de l'epaisseur de la barre s'il y a accele */
@@ -725,18 +726,20 @@ if (fPente)
                     {
                         if (apax == t && k==0 && mx_i[k] != crd[_ct].a)	/* au debut du paquet */
                         {	fy1 = my_i[k] + barre_y;
-                            mx_f[k] = mx_i[k] + m_doc->m_drawLedgerLine[staff->staffSize][0];
+                            mx_f[k] = mx_i[k] + m_doc->m_drawingLedgerLine[staff->staffSize][0];
                             fy2 = dA + sy_up + barre_y + dB * mx_f[k];
 
-                            decalage= hGrosseligne (dc,mx_i[k],fy1,mx_f[k],fy2,deltanbbar*delt_y /***, workColor2***/ );
+                            decalage= deltanbbar*delt_y;
+                            DrawObliqueLine (dc,mx_i[k],fy1,mx_f[k],fy2, decalage /***, workColor2***/ );
                             fy1 += decalage; fy2 += decalage;
 
                         }
                         else		/* corps ou fin de paquet */
                         {	fy2 = my_i[k] + barre_y;
-                            mx_i[k] -= m_doc->m_drawLedgerLine[staff->staffSize][0];
+                            mx_i[k] -= m_doc->m_drawingLedgerLine[staff->staffSize][0];
                             fy1 = dA + sy_up + barre_y + dB * mx_i[k];
-                            decalage= hGrosseligne (dc,mx_i[k],fy1,mx_f[k],fy2,deltanbbar*delt_y /***,workColor2***/);
+                            decalage = deltanbbar*delt_y;
+                            DrawObliqueLine (dc,mx_i[k],fy1,mx_f[k],fy2, decalage  /***,workColor2***/);
                             fy1 += decalage; fy2 += decalage;
 
                         }
@@ -744,7 +747,8 @@ if (fPente)
                     else if (mx_i[k])		/* s'il y a un marqueur */
                     {	fy1 = my_i[k] + barre_y;
                         fy2 = my_f[k] + barre_y;
-                        decalage= hGrosseligne (dc,mx_i[k],fy1,mx_f[k],fy2,deltanbbar*delt_y /***,workColor2***/);
+                        decalage = deltanbbar*delt_y;
+                        DrawObliqueLine (dc,mx_i[k],fy1,mx_f[k],fy2, decalage /***,workColor2***/);
                         fy1 += decalage; fy2 += decalage;
 
                     }				

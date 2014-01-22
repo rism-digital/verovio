@@ -137,8 +137,8 @@ int LayerElement::GetHorizontalSpacing()
     
 void LayerElement::ResetDrawingValues()
 {
-    m_drawX = 0;
-    m_drawYRel = 0;
+    m_drawingX = 0;
+    m_drawingYRel = 0;
 }
 
 void LayerElement::SetPitchOrPosition(int pname, int oct) 
@@ -182,8 +182,8 @@ void LayerElement::Init()
     m_visible = true;
     
     m_xAbs = VRV_UNSET;
-    m_drawX = 0;
-    m_drawYRel = 0;
+    m_drawingX = 0;
+    m_drawingYRel = 0;
     m_in_layer_app = false;
     
     m_alignment = NULL;

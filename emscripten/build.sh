@@ -56,7 +56,6 @@ python $EMCC --closure 0 -O2 \
 	$VEROVIO_ROOT/src/positioninterface.cpp \
 	$VEROVIO_ROOT/src/view.cpp \
 	$VEROVIO_ROOT/src/view_beam.cpp \
-	$VEROVIO_ROOT/src/view_bezier.cpp \
 	$VEROVIO_ROOT/src/view_element.cpp \
 	$VEROVIO_ROOT/src/view_graph.cpp \
 	$VEROVIO_ROOT/src/view_page.cpp \

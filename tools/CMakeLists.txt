@@ -21,6 +21,7 @@ add_executable (verovio
 	../src/iodarms.cpp
 	../src/iomei.cpp 
 	../src/iopae.cpp 
+	../src/iomusxml.cpp
 	../src/interfacecontroller.cpp
 	../src/keysig.cpp
 	../src/layer.cpp
@@ -37,7 +38,6 @@ add_executable (verovio
 	../src/positioninterface.cpp 
 	../src/view.cpp 
 	../src/view_beam.cpp  
-	../src/view_bezier.cpp 
 	../src/view_element.cpp 
 	../src/view_graph.cpp 
 	../src/view_page.cpp

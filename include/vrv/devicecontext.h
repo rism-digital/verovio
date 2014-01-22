@@ -65,7 +65,7 @@ class DeviceContext
 {
 public:
 
-    DeviceContext () { m_correctMusicAscent = true; m_drawBoundingBoxes = false;};
+    DeviceContext () { m_correctMusicAscent = true; m_drawingBoundingBoxes = false;};
     virtual ~DeviceContext() {};
     
     // Setters
@@ -144,13 +144,13 @@ public:
 
     
     // debug bounding boxes?
-    virtual void SetDrawBoundingBoxes(bool b) {m_drawBoundingBoxes = b;};
-    virtual bool GetDrawBoundingBoxes() {return m_drawBoundingBoxes;};
+    virtual void SetDrawBoundingBoxes(bool b) {m_drawingBoundingBoxes = b;};
+    virtual bool GetDrawBoundingBoxes() {return m_drawingBoundingBoxes;};
     
 protected:
     
     bool m_correctMusicAscent; // specify if the ascent has to be correct when view the Leipzig font (true wxDC, false SVG)
-    bool m_drawBoundingBoxes;
+    bool m_drawingBoundingBoxes;
 };
 
 // ---------------------------------------------------------------------------

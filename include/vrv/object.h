@@ -94,7 +94,7 @@ public:
     virtual std::string GetClassName( ) { return "[MISSING]"; };
     
     /**
-     * Reset the drawing values (m_drawX, m_drawXRel, etc.)
+     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
      * Called by SetCurrentScoreDef functor.
      */
     virtual void ResetDrawingValues( ) { };
@@ -237,7 +237,7 @@ public:
     virtual int Align( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Align the measures by adjusting the m_drawXRel position looking at the MeasureAligner.
+     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      */
     virtual int AlignMeasures( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
@@ -279,7 +279,7 @@ public:
     ///@{
     
     /**
-     * Align the system by adjusting the m_drawYRel position looking at the SystemAligner.
+     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
     virtual int AlignSystems( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     

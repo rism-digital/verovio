@@ -52,7 +52,6 @@
 		8F086F04188539540037FD8E /* tie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED8188539540037FD8E /* tie.cpp */; };
 		8F086F05188539540037FD8E /* tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED9188539540037FD8E /* tuplet.cpp */; };
 		8F086F06188539540037FD8E /* view_beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDA188539540037FD8E /* view_beam.cpp */; };
-		8F086F07188539540037FD8E /* view_bezier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDB188539540037FD8E /* view_bezier.cpp */; };
 		8F086F08188539540037FD8E /* view_element.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDC188539540037FD8E /* view_element.cpp */; };
 		8F086F09188539540037FD8E /* view_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDD188539540037FD8E /* view_graph.cpp */; };
 		8F086F0A188539540037FD8E /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDE188539540037FD8E /* view_page.cpp */; };
@@ -101,7 +100,6 @@
 		8F3DD35C18854B390051330C /* leipzigbbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC8188539540037FD8E /* leipzigbbox.cpp */; };
 		8F3DD35E18854B390051330C /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE0188539540037FD8E /* view.cpp */; };
 		8F3DD36018854B390051330C /* view_beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDA188539540037FD8E /* view_beam.cpp */; };
-		8F3DD36118854B390051330C /* view_bezier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDB188539540037FD8E /* view_bezier.cpp */; };
 		8F3DD36218854B390051330C /* view_element.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDC188539540037FD8E /* view_element.cpp */; };
 		8F3DD36318854B390051330C /* view_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDD188539540037FD8E /* view_graph.cpp */; };
 		8F3DD36418854B390051330C /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDE188539540037FD8E /* view_page.cpp */; };
@@ -209,7 +207,6 @@
 		8F086ED8188539540037FD8E /* tie.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tie.cpp; path = src/tie.cpp; sourceTree = "<group>"; };
 		8F086ED9188539540037FD8E /* tuplet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tuplet.cpp; path = src/tuplet.cpp; sourceTree = "<group>"; };
 		8F086EDA188539540037FD8E /* view_beam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_beam.cpp; path = src/view_beam.cpp; sourceTree = "<group>"; };
-		8F086EDB188539540037FD8E /* view_bezier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_bezier.cpp; path = src/view_bezier.cpp; sourceTree = "<group>"; };
 		8F086EDC188539540037FD8E /* view_element.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_element.cpp; path = src/view_element.cpp; sourceTree = "<group>"; };
 		8F086EDD188539540037FD8E /* view_graph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_graph.cpp; path = src/view_graph.cpp; sourceTree = "<group>"; };
 		8F086EDE188539540037FD8E /* view_page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_page.cpp; path = src/view_page.cpp; sourceTree = "<group>"; };
@@ -400,7 +397,6 @@
 				8F086EE0188539540037FD8E /* view.cpp */,
 				8F59293118854BF800FE51AD /* view.h */,
 				8F086EDA188539540037FD8E /* view_beam.cpp */,
-				8F086EDB188539540037FD8E /* view_bezier.cpp */,
 				8F086EDC188539540037FD8E /* view_element.cpp */,
 				8F086EDD188539540037FD8E /* view_graph.cpp */,
 				8F086EDE188539540037FD8E /* view_page.cpp */,
@@ -623,7 +619,6 @@
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
-				8F086F07188539540037FD8E /* view_bezier.cpp in Sources */,
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
 				8F086F09188539540037FD8E /* view_graph.cpp in Sources */,
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
@@ -652,7 +647,6 @@
 				8F3DD35C18854B390051330C /* leipzigbbox.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
-				8F3DD36118854B390051330C /* view_bezier.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,

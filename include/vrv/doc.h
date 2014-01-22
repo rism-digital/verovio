@@ -113,7 +113,7 @@ public:
      * be done with Doc::SetDrawingPage. This is only a method for 
      * asserting that currently have the right page.
      */
-    Page *GetDrawingPage( ) { return m_drawPage; };
+    Page *GetDrawingPage( ) { return m_drawingPage; };
 
     /**
      * Initializes fonts from the resources (music and lyrics)
@@ -173,69 +173,69 @@ public:
      */
   
     /** The page currently being drawn */
-    Page *m_drawPage;
+    Page *m_drawingPage;
     /** Editor step (10 by default) */
-    int m_drawStep1;
-    /** Editor medium step (3 * m_drawStep1) */
-    int m_drawStep2;
-    /** Editor large step (6 * m_drawStep1) */
-    int m_drawStep3;
+    int m_drawingStep1;
+    /** Editor medium step (3 * m_drawingStep1) */
+    int m_drawingStep2;
+    /** Editor large step (6 * m_drawingStep1) */
+    int m_drawingStep3;
     /** Half a the space between to staff lines for normal and small staff (10 and 8 by default) */
-    int m_drawHalfInterl[2];
+    int m_drawingHalfInterl[2];
     /** Space between to staff lines for normal and small staff (20 and 16 by default) */
-    int m_drawInterl[2];
+    int m_drawingInterl[2];
     /** Height of a five line staff for normal and small staff (80 and 64 by default) */
-    int m_drawStaffSize[2];
+    int m_drawingStaffSize[2];
     /** Height of an octave for normal and small staff (70 and 56 by default) */
-    int m_drawOctaveSize[2];
+    int m_drawingOctaveSize[2];
     /** Font height (100 par defaut) */
-    int m_drawFontHeight;
+    int m_drawingFontHeight;
     /** Font height with ascent for normal and small staff and normal and grace size */
-	int m_drawFontHeightAscent[2][2];
+	int m_drawingFontHeightAscent[2][2];
     /** Normal and small staff ration (16 / 20 by default) */
-    int m_drawSmallStaffRatio[2];
+    int m_drawingSmallStaffRatio[2];
     /** Normal and grace size (3 / 4 by default) */
-    int m_drawGraceRatio[2];
+    int m_drawingGraceRatio[2];
     /** Height of a beam for normal and small staff (10 and 6 by default) */
-    int m_drawBeamWidth[2];
+    int m_drawingBeamWidth[2];
     /** Height of a beam spacing (white) for normal and small staff (10 and 6 by default) */
-    int m_drawBeamWhiteWidth[2];
+    int m_drawingBeamWhiteWidth[2];
     /** Current font height with ascent for normal and small staff and normal and grace size */
-    int m_drawFontSize[2][2];
+    int m_drawingFontSize[2][2];
     /** Note radius for normal and small staff and normal and grace size */
-    int m_drawNoteRadius[2][2];
+    int m_drawingNoteRadius[2][2];
     /** Ledger line length for normal and small staff and normal and grace size */
-    int m_drawLedgerLine[2][3];
+    int m_drawingLedgerLine[2][3];
     /** Brevis width for normal and small staff */
-    int m_drawBrevisWidth[2];
+    int m_drawingBrevisWidth[2];
     /** Accident width for normal and small staff and normal and grace size */
-    int m_drawAccidWidth[2][2];
+    int m_drawingAccidWidth[2][2];
     /** A vertical unit corresponding to the 1/4 of an interline */
-    float m_drawVerticalUnit1[2];
+    float m_drawingVerticalUnit1[2];
     /** A vertical unit corresponding to the 1/8 of an interline */
-    float m_drawVerticalUnit2[2];
+    float m_drawingVerticalUnit2[2];
     /** Current Leipzig font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_drawFonts[2][2];				
+    FontMetricsInfo m_drawingFonts[2][2];				
     /** Leipzig font */
-    FontMetricsInfo m_drawLeipzigFont;
+    FontMetricsInfo m_drawingLeipzigFont;
     /** Current lyric font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_drawLyricFonts[2];
+    FontMetricsInfo m_drawingLyricFonts[2];
     /** Lyric font by default */
-    FontMetricsInfo m_drawLyricFont;
+    FontMetricsInfo m_drawingLyricFont;
     /** The current page height */
-    int m_drawPageHeight;
+    int m_drawingPageHeight;
     /** The current page height */
-    int m_drawPageWidth;
+    int m_drawingPageWidth;
     /** The current page witdth */
-    int m_drawPageLeftMar;
+    int m_drawingPageLeftMar;
     /** The current page left margin */
-    int m_drawPageRightMar;
+    int m_drawingPageRightMar;
     /** The current page right margin */
-    int m_drawPageTopMar;
+    int m_drawingPageTopMar;
     /** the current beam minimal slope */
-	float m_drawBeamMinSlope;
+	float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
-    float m_drawBeamMaxSlope;
+    float m_drawingBeamMaxSlope;
     
 private:
     /**

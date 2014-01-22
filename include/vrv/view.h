@@ -12,8 +12,8 @@
 #include <typeinfo>
 
 #include "devicecontext.h"
-#include "vrvdef.h"
 #include "scoredef.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -39,11 +39,17 @@ class Tuplet;
 class View
 {
 public:
-    // constructors and destructors
+    /** Constructors and destructors */
+    ///@{
     View();
 	virtual ~View();
+    ///@}
 
-	// edition
+    /**
+     * @name Virtual methods that are triggered when necessary but the do nothing in 
+     * the View class. The can be overriden when necessary in the child classses.
+     */
+    ///@{
     virtual void OnBeginEdition() {}
     virtual void OnEndEdition() {}
     virtual void OnBeginEditionClef() {}
@@ -53,66 +59,67 @@ public:
     virtual void DoLyricCursor( int x, int y, DeviceContext *dc, std::string lyric ) {}
     virtual void DoReset() {}
     virtual void OnPageChange() {};
+    ///@}
 
-	// navigation
+    /**
+     * @name Navigation methods for changing the page in the view.
+     * Navigating will check that the page exists in the document and also set it
+     * by calling SetPage (with doLayout = true);
+     */
 	void Next( bool forward );
 	bool HasNext( bool forward );
-	void LoadPage( int nopage );
+    ///@}
 	
-	// simply returns the value of the last note-type element (mensural or neume)
+	/**
+     * Simply returns the value of the last note-type element (mensural or neume)
+     */
 	bool GetNotationMode();
-	
-	// convenience method that should be changed after refactoring
-	bool IsNoteSelected();
-	    
+
+    /**
+     * Set the document the view is pointing to (mandatory).
+     * Several view can point to the same document.
+     */
     void SetDoc( Doc *doc );
     
-    /** x value in the View */
-	int ToRendererX( int i );
-	/** x value in the Logical world */
+    /** 
+     * @name Methods for converting coordinates from the logical world to the device
+     * context world.
+     * X coordinates are identical in both worlds. Y coordinates are from bottom to top
+     * in the logical world and from top to bottom in the device context world.
+     */
+    ///@{
+	int ToDeviceContextX( int i );
 	int ToLogicalX( int i );
-	/** y value in the View */
-	int ToRendererY( int i );
-	/** y value in the Logical world  */
+	int ToDeviceContextY( int i );
 	int ToLogicalY( int i );
-	
-	static void SwapY( int *y1, int *y2 ) { int tmp = *y1; *y1 = *y2; *y2 = tmp; }
+    ///@}
     
     /**
      * Set the current page to pageIdx.
      * If doLayout is true, the layout of the page will be calculated.
      * This is the default behavior, however, in some cases, we do not
-     * want it. For example, when drawing the pages for getting the bounding boxes
+     * want it. For example, when drawing the pages for getting the bounding boxes.
      */
     void SetPage( int pageIdx, bool doLayout = true );
-
-	/* view_graph.cpp */
-	void v_bline ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
-	void v_bline2 ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
-	void h_bline ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
-	void festa_string ( DeviceContext *dc, int x, int y, const std::string str, 
-					   Staff *staff, int dimin ); 
-	void DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, 
-				  Staff *staff, bool dimin );
-    void DrawTieBezier(DeviceContext *dc, int x, int y, int x1, bool direction);
-	//void putfontfast ( DeviceContext *dc, int x, int y, unsigned char c );
-	void putstring ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize = 0);
-	void putlyric ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0, bool cursor = false);
-	void box( DeviceContext *dc, int x1, int y1, int x2, int y2);
-	void rect_plein2( DeviceContext *dc, int x1, int y1, int x2, int y2);
-	int hGrosseligne ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
-	int DoDrawDot ( DeviceContext *dc, int x, int y );
-	
-    /* view_bezier.cpp */
-	static int CC(int ,int );
-	static long BBlend(int ,int ,long );
-	static int InitBezier(int );
-	static void Bezier(long *,long *,long ,int );
-	static void calcBez ( MusPoint *ptcoord, int _nbint );
-	static void pntswap (MusPoint *x1, MusPoint *x2);
     
-    /* view_page.cpp */
+    /**  
+     * Method that actually draw the current page.
+     * This is the only drawing method that is public and that can be called for drawing.
+     * The method also takes care of setting the drawing page of the document by calling 
+     * Doc::SetDrawingPage. It means that we have different views, each view can have a different
+     * current page and it will still work properly.
+     * Defined in view_page.cpp
+     */
 	void DrawCurrentPage( DeviceContext *dc, bool background = true );
+    
+    
+protected:
+    /** 
+     * @name Methods for drawing System, ScoreDef, StaffDef, Staff, and Layer.
+     * Additional methods for drawing braces, barlines, slurs, etc.
+     * Defined in view_page.cpp
+     */
+    ///@{
     void DrawSystem( DeviceContext *dc, System *system );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barline = NULL );
 	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
@@ -125,16 +132,26 @@ public:
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
 	void DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
-    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
-	int CalculateNeumePosY ( Staff *staff, char note, int dec_clef, int oct);
-    int CalculateRestPosY ( Staff *staff, char duration);
     void DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff,  Measure *measure );
     void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const std::type_info *elementType );
 	void DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height = -1);
-    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
+    ///@}
     
-    /* view_element.cpp */
-    /** @name Methods for drawing LayerElement containing other elements */
+    /**
+     * @name Methods for calculating drawing positions
+     * Defined in view_element.cpp
+     */
+    ///@{
+    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
+    int CalculateRestPosY ( Staff *staff, char duration);
+    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
+    ///@}
+    
+    /** 
+     * @name Methods for drawing LayerElement containing other elements.
+     * This is the case of Beam, Tuplet, Chords, etc.
+     * Defined in view_element.cpp
+     */
     ///@{
     void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
     void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff);
@@ -142,6 +159,11 @@ public:
     void DrawLayerApp( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
     ///@}
     
+    /**
+     * @name Methods for drawing LayerElement child classes.
+     * Defined in view_element.cpp
+     */
+    ///@{
     void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
     void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
@@ -171,55 +193,104 @@ public:
     void DrawWholeRest ( DeviceContext *dc, int a, int b, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawQuarterRest ( DeviceContext *dc, int a, int b, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawDots ( DeviceContext *dc, int x1, int y1, int offy, unsigned char dots, Staff *staff );
-    void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
+    ///@}
     
-    /* view_beam.cpp */
+    /**
+     * @name Method for drawing Beam.
+     * Wolfgang legacy code to be redesigned.
+     * Defined in view_beam.cpp
+     */
+    ///@{
     void DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff );
+    ///@}
+
+    /**
+     * @name Low level drawing methods
+     * Defined in view_graph.cpp
+     */
+    ///@{
+	void DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
+	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
+	void DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, Staff *staff, bool dimin );
+    void DrawTieBezier(DeviceContext *dc, int x, int y, int x1, bool direction);
+	void DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize = 0);
+	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0, bool cursor = false);
+	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
+	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
+	void DoDrawDot ( DeviceContext *dc, int x, int y );
+    ///@}
     
-private:
-    
-    //Used for calculating tuplets
+private:    
+    /**
+     * @name Internal methods used for calculating tuplets
+     */
+    ///@{
     bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center);
     std::string IntToObliqueFigures(unsigned int number);
     bool OneBeamInTuplet(Tuplet* tuplet);
+    ///@}
+    
+    /**
+     * Swap the to points passed as reference.
+     * This is useful for example when calculating bezier positions.
+     */
+    static void SwapPoints (MusPoint *x1, MusPoint *x2);
+    
+    /**
+     * Swap values passed as reference.
+     * This is useful for example when switching to the device context world.
+     */
+	static void SwapY( int *y1, int *y2 ) { int tmp = *y1; *y1 = *y2; *y2 = tmp; }
     
 public:
     /** Document */
     Doc *m_doc;
     /** Index of the current page */
     int m_pageIdx;
-
-	std::string m_str;
     
-	// static
-	static MusPoint point_[4];
-	static MusPoint bcoord[2*(BEZIER_NB_POINTS+1)];
-
-    int m_currentColour;
-    
-    // element currently selected
+    /**
+     * @name The objects currently selected.
+     * To be used in child classes, but defined here because it can be
+     * useful for changing the color, for example
+     */
+    ///@{
 	LayerElement *m_currentElement;
     Layer *m_currentLayer;
     Measure *m_currentMeasure;
 	Staff *m_currentStaff;
     System *m_currentSystem;
     Page *m_currentPage;
+    ///@}
     
-	int m_notation_mode; // neumes or mensural notation mode
-	bool m_lyricMode;
-	bool m_inputLyric;
-	EditorMode m_editorMode; // Edit or insert
+    /** The notation mode (CMN, Mensural) */
+	int m_notationMode;
+    /** The editor mode, which can be Edit or Insert */
+	EditorMode m_editorMode;
+    
+protected:
+    /** 
+     * The colour currently being used when drawing.
+     * It can change when drawing the m_currentElement, for example
+     */
+    int m_currentColour;
+    
+    /**
+     * The current drawing score def.
+     * The is set when starting to draw a page in DrawCurrentPage and then
+     * modified appropriately when going through the page.
+     */
+    ScoreDef m_drawingScoreDef;
     
 private:
 
-    // static for ligatures
-    static int s_drawingLigX[2], s_drawingLigY[2];	// pour garder coord. des ligatures    
-    static bool s_drawingLigObliqua;	// marque le 1e passage pour une oblique
-
-    ScoreDef m_drawScoreDef;
-    
+    /** @name Internal values for storing temporary values for ligatures */
+    ///@{
+    static int s_drawingLigX[2], s_drawingLigY[2];   
+    static bool s_drawingLigObliqua;
+    ///@}
 
 };
 
