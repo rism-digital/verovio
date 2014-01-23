@@ -127,7 +127,7 @@ protected:
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, Barline *barline );
     void DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barline *barline );
-	void DrawBarlineDots ( DeviceContext *dc, int x, Staff *staff, Barline *barline );
+	void DrawBarlineDots ( DeviceContext *dc, int x, StaffDef *staffDef, Staff *staff, Barline *barline );
 	void DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff *pportee);
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );

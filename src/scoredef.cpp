@@ -274,6 +274,7 @@ StaffDef::StaffDef() :
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
+    m_lines = 5;
 }
 
 StaffDef::~StaffDef()

@@ -179,11 +179,15 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     
     int y_top = first->m_drawingY;
     // for the bottom position we need to take into account the number of lines and the staff size
-    int y_bottom = last->m_drawingY - (last->portNbLine - 1) * m_doc->m_drawingInterl[last->staffSize];
+    int y_bottom = last->m_drawingY - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
+    
+    // ajdust the top and bottom according to staffline width
+    y_top += m_doc->m_env.m_staffLineWidth / 2;
+    y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth );
     }
     else if ( staffGrp->GetSymbol() == STAFFGRP_BRACE ) {
         DrawBrace ( dc, x, y_top, y_bottom, last->staffSize );
@@ -226,7 +230,7 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
     yg = y2;
     yd = y2 - m_doc->m_drawingInterl[ staffSize ] * 2;
     SwapY( &yg, &yd );
-    dc->DrawEllipticArc( ToDeviceContextX(xg), ToDeviceContextY(yg), ToDeviceContextX(xd-xg), ToDeviceContextX(yg-yd), 320, 270 );
+    dc->DrawEllipticArc( ToDeviceContextX(xg), ToDeviceContextY(yg), ToDeviceContextX(xd-xg), ToDeviceContextX(yg-yd), 320, 271 );
     
     dc->ResetPen();
     dc->ResetBrush();
@@ -350,10 +354,10 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 }
                 int y_top = staff->m_drawingY;
                 // for the bottom position we need to take into account the number of lines and the staff size
-                int y_bottom = staff->m_drawingY - (staff->portNbLine - 1) * m_doc->m_drawingInterl[staff->staffSize];
+                int y_bottom = staff->m_drawingY - (childStaffDef->GetLines() - 1) * m_doc->m_drawingInterl[staff->staffSize];
                 DrawBarline( dc, x, y_top, y_bottom, barline );
                 if ( barline->HasRepetitionDots() ) {
-                    DrawBarlineDots( dc, x, staff, barline );
+                    DrawBarlineDots( dc, x, childStaffDef, staff, barline );
                 }
             }
         }
@@ -385,7 +389,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         
         int y_top = first->m_drawingY;
         // for the bottom position we need to take into account the number of lines and the staff size
-        int y_bottom = last->m_drawingY - (last->portNbLine - 1) * m_doc->m_drawingInterl[last->staffSize];
+        int y_bottom = last->m_drawingY - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
         
         DrawBarline( dc, x, y_top, y_bottom, barline );
         
@@ -401,7 +405,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                         LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
                         continue;
                     }
-                    DrawBarlineDots( dc, x, staff, barline );
+                    DrawBarlineDots( dc, x, childStaffDef, staff, barline );
                 }
             }
         }
@@ -411,6 +415,10 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
 void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barline *barline )
 {
     assert( dc );
+    
+    // adjust the top and bottom
+    y_top += m_doc->m_env.m_staffLineWidth / 2;
+    y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
 
 	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
@@ -450,14 +458,14 @@ void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barli
 }
 
  
-void View::DrawBarlineDots ( DeviceContext *dc, int x, Staff *staff, Barline *barline )
+void View::DrawBarlineDots ( DeviceContext *dc, int x, StaffDef *staffDef, Staff *staff, Barline *barline )
 {
 	assert( dc ); // DC cannot be NULL
     
 	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
-    int y_bottom = staff->m_drawingY - staff->portNbLine  * m_doc->m_drawingHalfInterl[staff->staffSize];
+    int y_bottom = staff->m_drawingY - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
     int y_top = y_bottom + m_doc->m_drawingInterl[staff->staffSize];
  
     if ((barline->m_barlineType  == BARLINE_RPTSTART) || (barline->m_barlineType == BARLINE_RPTBOTH))
@@ -564,8 +572,8 @@ int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
 	ptouche=&touches[0];
 
 	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_drawingHalfInterl[staff->staffSize];
-	if (staff->portNbLine > 5)
-		y_int -= ((staff->portNbLine - 5) * 2) * m_doc->m_drawingHalfInterl[staff->staffSize];
+	if (staff->m_drawingLines > 5)
+		y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->m_drawingHalfInterl[staff->staffSize];
 
 	/* exprime distance separant m_drawingY de
 	position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
@@ -603,39 +611,6 @@ int View::CalculateRestPosY ( Staff *staff, char duration)
     return base + staff_space * offset;
 }
 
-void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system )
-{
-	assert( dc ); // DC cannot be NULL
-        
-    if (staff->invisible)
-        return;
-
-	int j, x1, x2, yy;
-
-	yy = staff->m_drawingY;
-
-	x1 = system->m_systemLeftMar;
-    x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
-
-	dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
-    dc->SetBrush( m_currentColour , AxSOLID );
-
-	x1 = ToDeviceContextX (x1);
-	x2 = ToDeviceContextX (x2);
-
-	for(j = 0;j < staff->portNbLine; j++)
-	{
-		dc->DrawLine( x1 , ToDeviceContextY ( yy ) , x2 , ToDeviceContextY ( yy ) );
-		yy -= m_doc->m_drawingInterl[staff->staffSize];
-	}
-    
-    dc->ResetPen( );
-    dc->ResetBrush( );
-    
-	return;
-}
-
-
 
 void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system )
 {
@@ -655,6 +630,9 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
         assert( m_doc->GetType() == Transcription );
         staff->m_drawingY = staff->m_yAbs;
     }
+    if ( StaffDef *staffDef = m_drawingScoreDef.GetStaffDef( staff->GetStaffNo() ) ) {
+        staff->m_drawingLines = staffDef->GetLines( ) ;
+    }
     
     DrawStaffLines( dc, staff, measure, system );
         
@@ -668,6 +646,42 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 	}
     
     dc->EndGraphic( staff, this );
+}
+    
+    
+void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system )
+{
+    assert( dc ); // DC cannot be NULL
+    
+    if (staff->invisible)
+        return;
+    
+    int j, x1, x2, yy;
+    
+    yy = staff->m_drawingY;
+    
+    //x1 = system->m_systemLeftMar;
+    //x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
+    
+    x1 = measure->m_drawingX;
+    x2 = x1 + measure->GetXRelRight();
+    
+    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
+    dc->SetBrush( m_currentColour , AxSOLID );
+    
+    x1 = ToDeviceContextX (x1);
+    x2 = ToDeviceContextX (x2);
+    
+    for(j = 0;j < staff->m_drawingLines; j++)
+    {
+        dc->DrawLine( x1 , ToDeviceContextY ( yy ) , x2 , ToDeviceContextY ( yy ) );
+        yy -= m_doc->m_drawingInterl[staff->staffSize];
+    }
+    
+    dc->ResetPen( );
+    dc->ResetBrush( );
+    
+    return;
 }
 
 

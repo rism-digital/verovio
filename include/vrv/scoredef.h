@@ -224,6 +224,14 @@ public:
     ///@}
     
     /**
+     * @name Set and get  the staff lines.
+     */
+    ///@{
+    int GetLines() const { return m_lines; };
+    void SetLines( int lines ) { m_lines = lines; };
+    ///@}
+    
+    /**
      * @name Set and get the layer drawing flags for clef, keysig and mensur.
      * This will be true when starting a new system or when a scoreDef or staffDef changes occurs
      * This will be true only for the first layer in the staff.
@@ -263,6 +271,8 @@ public:
 private:
     /** The staff number */
     int m_n;
+    /** The staff number of lines */
+    int m_lines;
     
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not

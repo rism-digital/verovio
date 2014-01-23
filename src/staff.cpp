@@ -38,19 +38,11 @@ Staff::Staff( int n ):
 Staff::Staff( const Staff& staff )
 {
     m_parent = NULL;
-	totGrp = staff.totGrp;
-	//noLigne = staff.noLigne;
-	armTyp = staff.armTyp;
-	armNbr = staff.armNbr;
 	notAnc = staff.notAnc;
 	grise = staff.grise;
 	invisible = staff.invisible;
-	vertBarre = staff.vertBarre;
-	brace = staff.brace;
 	staffSize = staff.staffSize;
-	portNbLine = staff.portNbLine;
-	accol = staff.accol;
-	accessoire = staff.accessoire;
+	m_drawingLines = staff.m_drawingLines;
 	m_yAbs = staff.m_yAbs;
 	m_drawingY = staff.m_drawingY;
     m_staffAlignment = NULL;
@@ -74,20 +66,11 @@ void Staff::Clear()
 {
 	ClearChildren();
     m_parent = NULL;
-	noGrp = 0;
-	totGrp = 0;
-	//noLigne = 0; // ax2
-	armTyp = 0;
-	armNbr = 0;
 	notAnc = false; // LP we want modern notation :))
 	grise = false;
 	invisible = false;
-	vertBarre = 0;
-	brace = 0;
 	staffSize = 0; 
-	portNbLine = 5;
-	accol = 0;
-	accessoire = 0;
+	m_drawingLines = 1;
 	m_yAbs = VRV_UNSET;
 	m_drawingY = 0;
     m_staffAlignment = NULL;
@@ -120,20 +103,11 @@ void Staff::CopyAttributes( Staff *nstaff )
 		return;
 
 	nstaff->Clear();
-	nstaff->noGrp = noGrp;
-	nstaff->totGrp = totGrp;
-	//nstaff->noLigne = noLigne;
-	nstaff->armTyp = armTyp;
-	nstaff->armNbr = armNbr;
 	nstaff->notAnc = notAnc;
 	nstaff->grise = grise;
 	nstaff->invisible = invisible;
-	nstaff->vertBarre = vertBarre;
-	nstaff->brace = brace;
 	nstaff->staffSize = staffSize;
-	nstaff->portNbLine = portNbLine;
-	nstaff->accol = accol;
-	nstaff->accessoire = accessoire;
+	nstaff->m_drawingLines = m_drawingLines;
 	nstaff->m_yAbs = m_yAbs;
 	nstaff->m_drawingY = m_drawingY;
 }

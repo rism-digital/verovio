@@ -617,8 +617,8 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	if (formval == DUR_1)
 	{	
-        if (staff->portNbLine == 1) {
-		// silences sur portee a une seule ligne
+        if (staff->m_drawingLines == 1) {
+		 //silences sur portee a une seule ligne
 			b += m_doc->m_drawingInterl[staff->staffSize];
 		}
         else
@@ -715,7 +715,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int b = element->m_drawingYRel;
     
     // move it down according to the number of line in the staff
-    b -= staff->portNbLine / 2 * m_doc->m_drawingInterl[staff->staffSize];
+    b -= staff->m_drawingLines / 2 * m_doc->m_drawingInterl[staff->staffSize];
     
     DrawWholeRest ( dc, a, b, DUR_1, 0, false, staff);
     
@@ -1085,9 +1085,6 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	int b = staff->m_drawingY;
 	int a = element->m_drawingX;
     int sym = LEIPZIG_CLEF_G;	//sSOL, position d'ordre des cles sol fa ut in fonts
-
-	if (staff->portNbLine > 5)
-		b -= ((staff->portNbLine - 5) * 2) *m_doc->m_drawingHalfInterl[ staff->staffSize ]; // LP: I am not sure it works with any number of lines
 
     /*  poser sym=no de position sSOL dans la fonte
      *	au depart; ne faire operation sur b qu'une fois pour cas semblables,
