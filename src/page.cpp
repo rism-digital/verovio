@@ -43,7 +43,6 @@ void Page::Clear( )
 	ClearChildren( );
     m_drawingScoreDef.Clear();
     m_layoutDone = false;
-	defin = 18;
     // by default we have no values and use the document ones
     m_pageHeight = -1;
     m_pageWidth = -1;
@@ -57,7 +56,7 @@ void Page::Clear( )
 int Page::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];       
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
     if (!output->WritePage( this )) {
         return FUNCTOR_STOP;
     }
@@ -93,7 +92,7 @@ System *Page::GetFirst( )
 {
 	if ( m_children.empty() )
 		return NULL;
-	return (System*)m_children[0];
+	return dynamic_cast<System*>(m_children[0]);
 }
 
 System *Page::GetLast( )
@@ -101,7 +100,7 @@ System *Page::GetLast( )
 	if ( m_children.empty() )
 		return NULL;
 	int i = GetSystemCount() - 1;
-	return (System*)m_children[i];
+	return dynamic_cast<System*>(m_children[i]);
 }
 
 System *Page::GetNext( System *system )
@@ -114,7 +113,7 @@ System *Page::GetNext( System *system )
 	if ((i == -1 ) || ( i >= GetSystemCount() - 1 ))
 		return NULL;
 	
-	return (System*)m_children[i + 1];
+	return dynamic_cast<System*>(m_children[i + 1]);
 }
 
 System *Page::GetPrevious( System *system  )
@@ -127,14 +126,14 @@ System *Page::GetPrevious( System *system  )
 	if ((i == -1 ) || ( i <= 0 ))
         return NULL;
 	
-    return (System*)m_children[i - 1];
+    return dynamic_cast<System*>(m_children[i - 1]);
 }
 
 
 System *Page::GetAtPos( int y )
 {
 
-	y -= ( SYSTEM_OFFSET / 2 );
+	//y -= ( SYSTEM_OFFSET / 2 ); // SYSTEM_OFFSET used to be 190
     System *system = this->GetFirst();
 	if ( !system )
 		return NULL;
@@ -325,35 +324,6 @@ void Page::JustifyHorizontally( )
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &justifyX );
     this->Process( &justifyX, params );
-}
-
-void Page::SetValues( int type )
-{
-/* 
-    int i;
-    std::string values;
-    for (i = 0; i < nbrePortees; i++) 
-	{
-        switch ( type ) {
-            case PAGE_VALUES_VOICES: values += StringFormat("%d;", (&m_staves[i])->voix ); break;
-            case PAGE_VALUES_INDENT: values += StringFormat("%d;", (&m_staves[i])->indent ); break;
-        }
-	}
-    values = wxGetTextFromUser( "Enter values for the pages", "", values );
-    if (values.Length() == 0 ) {
-        return;
-    }
-    wxArrayString values_arr = wxStringTokenize(values, ";");
-    for (i = 0; (i < nbrePortees) && (i < (int)values_arr.GetCount()) ; i++) 
-	{
-        switch ( type ) {
-            case PAGE_VALUES_VOICES: (&m_staves[i])->voix = atoi( values_arr[i].c_str() ); break;
-            case PAGE_VALUES_INDENT: (&m_staves[i])->indent = atoi( values_arr[i].c_str() ); break;
-        }	
-	}
-*/
-    LogDebug("TODO");
-    return;
 }
 
 } // namespace vrv

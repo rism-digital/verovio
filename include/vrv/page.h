@@ -18,11 +18,7 @@ class DeviceContext;
 class Staff;
 class System;
 
-enum {
-    PAGE_VALUES_VOICES = 0,
-    PAGE_VALUES_INDENT
-};
-
+    
 //----------------------------------------------------------------------------
 // Page
 //----------------------------------------------------------------------------
@@ -50,8 +46,6 @@ public:
 	System *GetNext( System *system );
 	System *GetPrevious( System *system );
 	System *GetAtPos( int y );
-
-    void SetValues( int type );
 	
 	int GetSystemCount() const { return (int)m_children.size(); };
     
@@ -104,7 +98,6 @@ public:
      */
     virtual int Save( ArrayPtrVoid params );
     
-    
 private:
     
 public:
@@ -124,16 +117,6 @@ public:
      */
     std::string m_surface;
     
-    
-    /** definition en mm des portees de la page */
-    unsigned char defin; // m_pageScale
-    /** longueur en mm de l'indentation des portees de la page */
-    //int indent; // ax2
-    /** longueur en mm de l'indentation droite des portees de la page */
-    //int indentDroite; // ax2
-    /** longueur en mm des lignes de la pages */
-    //int lrg_lign; // ax2
-    
     /**
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
@@ -143,14 +126,12 @@ public:
     ScoreDef m_drawingScoreDef;
 
 private:
-    
     /**
      * A flag for indicating whether the layout has been done or not
      * If yes, Layout will not layout the page (again) unless
      * the force parameter is set.
      */
     bool m_layoutDone;
-    
     
 };
 

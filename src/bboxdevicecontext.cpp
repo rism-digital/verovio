@@ -381,7 +381,7 @@ void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
 
 void BBoxDeviceContext::DrawSpline(int n, MusPoint points[])
 {
-    //m_dc->DrawSpline( n, (wxPoint*)points );
+
 }
 
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2) 
@@ -413,11 +413,11 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     
     
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View object)
-    ((DocObject*)m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
+    (m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     
     int i;
     for (i = 0; i < (int)m_objects.size(); i++) {
-        ((DocObject*)m_objects[i])->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
+        (m_objects[i])->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     }
 }
 

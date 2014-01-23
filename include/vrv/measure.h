@@ -52,7 +52,7 @@ public:
     /**
      * Return the index position of the measure in its system parent
      */
-    int GetMeasureNo() const { return Object::GetIdx(); };
+    int GetMeasureIdx() const { return Object::GetIdx(); };
     
     /**
      * @name Set and get the left and right barline types

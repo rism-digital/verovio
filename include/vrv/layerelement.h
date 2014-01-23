@@ -91,7 +91,7 @@ public:
 	virtual void SetLigature( ) {};
     
     
-    int GetElementNo() const;
+    int GetElementIdx() const;
 
     
     bool IsBarline();

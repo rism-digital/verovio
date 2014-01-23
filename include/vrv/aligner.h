@@ -219,6 +219,7 @@ private:
      * of them occur at time 0.
      */
     AlignmentType m_type;
+    
 };
 
 //----------------------------------------------------------------------------
@@ -292,7 +293,6 @@ public:
      * Special case of functor redirected from Measure.
      */
     //virtual int JustifyX( ArrayPtrVoid params );
-
     
 private:
     void AddAlignment( Alignment *alignment, int idx = -1 );

@@ -62,7 +62,7 @@ void Doc::Reset( DocType type )
 int Doc::Save( ArrayPtrVoid params )
 {  
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];       
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
     if (!output->WriteDoc( this )) {
         return FUNCTOR_STOP;
     }

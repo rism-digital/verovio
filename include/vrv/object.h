@@ -339,7 +339,7 @@ public:
      * param 1: bool keysig flag.
      * param 2: bool the mensur flag.
      */
-    virtual int SetStaffDefDraw( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     ///@}
     
@@ -454,8 +454,8 @@ public:
 //----------------------------------------------------------------------------
 
 /** 
- * This class is an interface for elements maintaining a list of children
- * LayerElement for processing.
+ * This class is an pseudo interface for elements maintaining a list of
+ * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
  * It is not an abstract class but should not be instanciate directly.
  */

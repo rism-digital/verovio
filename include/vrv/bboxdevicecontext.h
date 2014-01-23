@@ -112,7 +112,7 @@ private:
     /**
      * The array containing the object for which the bounding box needs to be updated
      */ 
-    ArrayOfObjects m_objects;
+    std::vector<DocObject*> m_objects;
     
     FontMetricsInfo m_font;
     

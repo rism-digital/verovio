@@ -54,7 +54,7 @@ void Layer::Clear()
 int Layer::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];       
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
     if (!output->WriteLayer( this )) {
         return FUNCTOR_STOP;
     }
@@ -88,7 +88,7 @@ LayerElement *Layer::GetFirst( )
 {
 	if ( m_children.empty() )
 		return NULL;
-	return (LayerElement*)m_children[0];
+	return dynamic_cast<LayerElement*>(m_children[0]);
 }
 
 LayerElement *Layer::GetLast( )
@@ -96,7 +96,7 @@ LayerElement *Layer::GetLast( )
 	if ( m_children.empty() )
 		return NULL;
 	int i = (int)m_children.size() - 1;
-	return (LayerElement*)m_children[i];
+	return dynamic_cast<LayerElement*>(m_children[i]);
 }
 
 LayerElement *Layer::GetNext( LayerElement *element )
@@ -106,7 +106,7 @@ LayerElement *Layer::GetNext( LayerElement *element )
     if ( !element || m_list.empty() )
         return NULL;
     
-    return (LayerElement*)GetListNext( element );
+    return dynamic_cast<LayerElement*>( GetListNext( element ) );
 }
 
 LayerElement *Layer::GetPrevious( LayerElement *element )
@@ -116,7 +116,7 @@ LayerElement *Layer::GetPrevious( LayerElement *element )
     if ( !element || m_list.empty() )
         return NULL;
     
-    return (LayerElement*)GetListPrevious( element );
+    return dynamic_cast<LayerElement*>( GetListPrevious( element ) );
 }
 
 LayerElement *Layer::GetAtPos( int x )
@@ -294,7 +294,7 @@ LayerElement *Layer::GetFirst( LayerElement *element, unsigned int direction, co
                 break;
             }
 			i--;
-            element = (LayerElement*)GetListPrevious(element);
+            element = static_cast<LayerElement*>( GetListPrevious(element) );
 		}
 		else
 		{	if (i >= (int)GetList(this)->size() - 1 ) {
@@ -302,7 +302,7 @@ LayerElement *Layer::GetFirst( LayerElement *element, unsigned int direction, co
                 break;
             }
 			i++;
-			element = (LayerElement*)GetListNext(element);
+			element = static_cast<LayerElement*>( GetListNext(element) );
 		}
 	}	
 
@@ -363,12 +363,14 @@ void Layer::RemoveClefAndCustos()
     int elementCount =  this->GetElementCount();
     for (i = 0; i < elementCount; i++)
     {
-        if ( ((LayerElement*)m_children[i])->IsClef() ) {
-            Clef *clef = dynamic_cast<Clef*>(m_children[i]);
+        LayerElement *element = dynamic_cast<LayerElement*>( m_children[i] );
+        if ( element && element->IsClef() ) {
+            Clef *clef = dynamic_cast<Clef*>( m_children[i] );
             // we remove the clef because it is the same as the previous one
             if ( currentClef && ((*currentClef) == (*clef)) ) {
                 // check if it is a F clef with a Longa before
-                if ( (i > 0) && ((LayerElement*)m_children[i - 1])->IsNote() )
+                LayerElement *previous = dynamic_cast<LayerElement*>(m_children[i - 1]);
+                if ( (i > 0) && previous && previous->IsNote() )
                 {
                     Note *note = dynamic_cast<Note*>(m_children[i - 1]);
                     if ( note && (note->m_dur == DUR_LG) )
@@ -408,8 +410,8 @@ void Layer::RemoveClefAndCustos()
                 currentClef = clef;
             }
         }
-        else if ( ((LayerElement*)m_children[i])->IsSymbol( SYMBOL_CUSTOS ) ) {
-            Symbol *symbol = dynamic_cast<Symbol*>(m_children[i]);
+        else if ( element && element->IsSymbol( SYMBOL_CUSTOS ) ) {
+            Symbol *symbol = dynamic_cast<Symbol*>( m_children[i] );
             this->Delete( symbol );
             elementCount--;
             i--;
@@ -417,218 +419,7 @@ void Layer::RemoveClefAndCustos()
     }
 }
 
-
     
-/*
-// Gets the y coordinate of the previous lyric. If lyric is NULL, it will return the y coordinate of the first lyric 
-// in the stave. If there are no lyrics in the Stave -1 is returned.
-int Layer::GetLyricPos( Symbol1 *lyric )
-{
-	Symbol1 *tmp;
-	if ( !lyric ){
-		if ( !( tmp = GetFirstLyric() ) )
-			return -1;
-		return tmp->dec_y;
-	}
-	
-	if ( !( tmp = GetPreviousLyric( lyric ) ) )
-		return -1;
-	return tmp->dec_y;
-}
-
-Symbol1 *Layer::GetPreviousLyric( Symbol1 *lyric )
-{
-	if ( !lyric || m_children.IsEmpty() || !lyric->m_note_ptr || lyric->m_note_ptr->no < 0 )
-		return NULL;
-	
-	// If there are other lyrics attached to the note that lyric is attached to...
-	if ( (int)lyric->m_note_ptr->m_lyrics.GetCount() > 1 ){
-		bool check = false; // Keeps track if we have past the pointer to this element in m_lyrics
-		for ( int i = (int)lyric->m_note_ptr->m_lyrics.GetCount() - 1; i >= 0; i-- ){
-			Symbol1 *previousLyric = &lyric->m_note_ptr->m_lyrics[i];
-			if ( check ) return previousLyric;
-			if ( previousLyric == lyric ) check = true;
-		}
-	}
-	// Check previous note in staff for lyric
-	int no = lyric->m_note_ptr->no - 1;
-	while ( no >= 0 ){
-		if ( m_children[ no ].IsNote() ){
-			for ( int i = (int) ((Note1*)m_children[ no ])->m_lyrics.GetCount() - 1; i >= 0 ; i-- ){
-				Symbol1 *previousLyric = ((Note1*)m_children[ no ])->m_lyrics[i];
-				if ( previousLyric ) return previousLyric;
-			}
-		}
-		no--;
-	}
-	return NULL;
-}
-
-Symbol1 *Layer::GetNextLyric( Symbol1 *lyric )
-{	
-	if ( !lyric || m_children.IsEmpty() || !lyric->m_note_ptr || lyric->m_note_ptr->no > (int)m_children.GetCount() - 1 )
-		return NULL;
-	
-	// If there are other lyrics attached to the note that lyric is attached to...
-	if ( (int)lyric->m_note_ptr->m_lyrics.GetCount() > 1 ){
-		bool check = false; // Keeps track if we have past the pointer to this element in m_lyrics
-		for ( int i = 0; i < (int)lyric->m_note_ptr->m_lyrics.GetCount(); i++ ){
-			Symbol1 *nextLyric = &lyric->m_note_ptr->m_lyrics[i];
-			if ( check ) 
-				return nextLyric;
-			if ( nextLyric == lyric ) 
-				check = true;
-		}
-	}
-	// Check next note in staff for lyric
-	int no = lyric->m_note_ptr->no + 1;
-	while ( no < (int)m_children.GetCount() ){
-		if ( m_children[ no ].IsNote() ){
-			for ( int i = 0; i < (int) ((Note1*)m_children[ no ])->m_lyrics.GetCount(); i++ ){
-				Symbol1 *nextLyric = ((Note1*)m_children[ no ])->m_lyrics[i];
-				if ( nextLyric )
-					return nextLyric;
-			}
-		}
-		no++;
-	}
-	return NULL;
-}
-
-Symbol1 *Layer::GetFirstLyric( )
-{
-	if ( m_children.IsEmpty() )
-		return NULL;
-	int no = 0;
-	while ( no < (int)m_children.GetCount() ){
-		if ( m_children[ no ].IsNote() ){
-			for ( int i = 0; i < (int) ((Note1*)m_children[ no ])->m_lyrics.GetCount(); i++ ){
-				Symbol1 *lyric = ((Note1*)m_children[ no ])->m_lyrics[i];
-				if ( lyric )
-					return lyric;
-			}
-		}
-		no++;
-	}
-	return NULL;	
-}
-
-Symbol1 *Layer::GetLastLyric( )
-{
-	if ( m_children.IsEmpty() )
-		return NULL;
-	int no = (int)m_children.GetCount() - 1;
-	while ( no >= 0 ){
-		if ( m_children[ no ].IsNote() ) {
-			for ( int i = (int) ((Note1*)m_children[ no ])->m_lyrics.GetCount() - 1; i >= 0 ; i-- ){
-				Symbol1 *lyric = ((Note1*)m_children[ no ])->m_lyrics[i];
-				if ( lyric )
-					return lyric;
-			}
-		}
-		no--;
-	}
-	return NULL;
-}
-
-Symbol1 *Layer::GetLyricAtPos( int x )
-{
-	Symbol1 *lyric = this->GetFirstLyric();
-	if ( !lyric )
-		return NULL;
-	
-	//int xx = 0;
-	int dif = x - lyric->m_xAbs;
-	while ( this->GetNextLyric( lyric ) && (int)lyric->m_xAbs < x ){
-		lyric = this->GetNextLyric( lyric );
-		if ( (int)lyric->m_xAbs > x && dif < (int)lyric->m_xAbs - x )
-			return this->GetPreviousLyric( lyric );
-		dif = x - lyric->m_xAbs;
-	}
-		
-	return lyric;
-}
-
-void Layer::DeleteLyric( Symbol1 *symbol )
-{
-	if ( !symbol ) return;
-	
-	Note1 *note = symbol->m_note_ptr;
-	for ( int i = 0; i < (int)note->m_lyrics.GetCount(); i++ ){
-		Symbol1 *lyric = &note->m_lyrics[i];
-		if ( symbol == lyric )
-			note->m_lyrics.Detach(i);
-	}
-	
-	this->Delete( symbol );
-}
-
-Note1 *Layer::GetNextNote( Symbol1 * lyric )
-{
-	if ( !lyric || m_children.IsEmpty() || !lyric->m_note_ptr || lyric->m_note_ptr->no >= (int)m_children.GetCount() - 1 )
-		return NULL;
-	
-	int no = lyric->m_note_ptr->no + 1;
-	for ( int i = no; i < (int)m_children.GetCount(); i++ ){
-		LayerElement *element = m_children[i];
-		if ( element->IsNote() && ((Note1*)element)->sil == _NOT )
-			return (Note1*)element; 
-	}
-	return NULL;
-}
-
-Note1 *Layer::GetPreviousNote( Symbol1 * lyric )
-{
-	if ( !lyric || m_children.IsEmpty() || !lyric->m_note_ptr || lyric->m_note_ptr->no <= 0 )
-		return NULL;
-	
-	int no = lyric->m_note_ptr->no - 1;
-	for ( int i = no; i >= 0; i-- ){
-		LayerElement *element = m_children[i];
-		if ( element->IsNote() && ((Note1*)element)->sil == _NOT )
-			return (Note1*)element; 
-	}
-	return NULL;
-}
-
-//Switches the note association of lyric from oldNote to newNote and modifies the two notes accordingly
-//bool beginning: indicates if we want to add the lyric to beginning or end of the lyric array in newNote 
-//		true = beginning of array
-//		false = end of array
-void Layer::SwitchLyricNoteAssociation( Symbol1 *lyric, Note1 *oldNote, Note1* newNote, bool beginning )
-{
-	if ( !lyric || !oldNote || !newNote )
-		return;
-	
-	lyric->m_note_ptr = newNote;
-	if ( beginning )
-		newNote->m_lyrics.Insert( lyric, 0 );
-	else
-		newNote->m_lyrics.Insert( lyric, newNote->m_lyrics.GetCount() );
-	
-	for ( int i = 0; i < (int)oldNote->m_lyrics.GetCount(); i++ ){
-		Symbol1 *element = &oldNote->m_lyrics[i];
-		if ( element == lyric ){
-			oldNote->m_lyrics.Detach(i);
-			break;
-		}			
-	}
-}
-
-void Layer::AdjustLyricLineHeight( int delta ) 
-{
-	for ( int i = 0; i < (int)m_children.GetCount(); i++ ){
-		LayerElement *element = m_children[i];
-		if ( element->IsNote() ){
-			for ( int j = 0; j < (int)((Note1*)element)->m_lyrics.GetCount(); j++ ){
-				Symbol1 *lyric = &((Note1*)element)->m_lyrics[j];
-				lyric->dec_y += delta;
-			}
-		}
-	}
-}
-*/
-
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
@@ -641,17 +432,17 @@ int Layer::CopyToLayer( ArrayPtrVoid params )
     
     
     // param 0: the Layer we need to copy to
-	Layer *destinationLayer = (Layer*)params[0]; 
+	Layer *destinationLayer = static_cast<Layer*>(params[0]);
     // param 1: the uuid of the start element (if any)
-    std::string *start = (std::string*)params[1];
+    std::string *start = static_cast<std::string*>(params[1]);
     // param 2: the uuid of the end element (if any)
-    std::string *end = (std::string*)params[2];
+    std::string *end = static_cast<std::string*>(params[2]);
     // param 3: we have a start element and have started
-    bool *has_started = (bool*)params[3];
+    bool *has_started = static_cast<bool*>(params[3]);
     // param 4: we have an end element and have ended
-    bool *has_ended = (bool*)params[4];
+    bool *has_ended = static_cast<bool*>(params[4]);
     // param 5: we want a new uuid for the copied elements
-    bool *new_uuid = (bool*)params[5];
+    bool *new_uuid = static_cast<bool*>(params[5]);
     
     if ( (*has_ended) ) {
         return FUNCTOR_STOP;
@@ -671,7 +462,9 @@ int Layer::CopyToLayer( ArrayPtrVoid params )
         }
         
         // copy and add it
-        LayerElement *copy = ((LayerElement*)m_children[i])->GetChildCopy( (*new_uuid) );
+        LayerElement *element = dynamic_cast<LayerElement*>(m_children[i]);
+        assert( element );
+        LayerElement *copy = element->GetChildCopy( (*new_uuid) );
         destinationLayer->AddElement( copy );
         
         // check if we have a end uuid and if we have reached it. 
@@ -693,7 +486,7 @@ int Layer::Align( ArrayPtrVoid params )
     // param 1: the time
     // param 2: the systemAligner (unused)
     // param 3: the staffNb (unused)
-    double *time = (double*)params[1];
+    double *time = static_cast<double*>(params[1]);
 
     // we are starting a new layer, reset the time;
     (*time) = 0.0;

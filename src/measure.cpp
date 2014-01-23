@@ -60,7 +60,7 @@ void Measure::Clear()
 int Measure::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);  
     if (!output->WriteMeasure( this )) {
         return FUNCTOR_STOP;
     }
@@ -82,7 +82,7 @@ Staff *Measure::GetFirst( )
 {
 	if ( m_children.empty() )
 		return NULL;
-	return (Staff*)m_children[0];
+	return dynamic_cast<Staff*>(m_children[0]);
 }
 
 Staff *Measure::GetLast( )
@@ -90,7 +90,7 @@ Staff *Measure::GetLast( )
 	if ( m_children.empty() )
 		return NULL;
 	int i = GetStaffCount() - 1;
-	return (Staff*)m_children[i];
+	return dynamic_cast<Staff*>(m_children[i]);
 }
 
 Staff *Measure::GetNext( Staff *staff )
@@ -103,7 +103,7 @@ Staff *Measure::GetNext( Staff *staff )
 	if ((i == -1 ) || ( i >= GetStaffCount() - 1 ))
 		return NULL;
     
-	return (Staff*)m_children[i + 1];
+	return dynamic_cast<Staff*>(m_children[i + 1]);
 }
 
 Staff *Measure::GetPrevious( Staff *staff )
@@ -116,7 +116,7 @@ Staff *Measure::GetPrevious( Staff *staff )
 	if ((i == -1 ) || ( i <= 0 ))
         return NULL;
 	
-    return (Staff*)m_children[i - 1];
+    return dynamic_cast<Staff*>(m_children[i - 1]);
 }
 
 
@@ -125,7 +125,7 @@ Staff *Measure::GetStaffWithIdx( int staffIdx )
     if ( staffIdx > (int)m_children.size() - 1 )
         return NULL;
 	
-	return (Staff*)m_children[staffIdx];
+	return dynamic_cast<Staff*>(m_children[staffIdx]);
 }
 
 
@@ -182,8 +182,8 @@ int Measure::Align( ArrayPtrVoid params )
     // param 1: the time (unused)
     // param 2: the systemAligner (unused)
     // param 3: the staffNb
-    MeasureAligner **measureAligner = (MeasureAligner**)params[0];
-    int *staffNb = (int*)params[3];
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
+    int *staffNb = static_cast<int*>(params[3]);
     
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -207,7 +207,7 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift (unused)
     // param 1: the functor to be redirected to Aligner
-    MusFunctor *integrateBoundingBoxShift = (MusFunctor*)params[1];
+    MusFunctor *integrateBoundingBoxShift = static_cast<MusFunctor*>(params[1]);
     
     m_measureAligner.Process( integrateBoundingBoxShift, params);
     
@@ -219,7 +219,7 @@ int Measure::SetAligmentXPos( ArrayPtrVoid params )
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
     // param 2: the functor to be redirected to Aligner
-    MusFunctor *setAligmnentPosX = (MusFunctor*)params[2];
+    MusFunctor *setAligmnentPosX = static_cast<MusFunctor*>(params[2]);
     
     m_measureAligner.Process( setAligmnentPosX, params);
     
@@ -233,8 +233,8 @@ int Measure::JustifyX( ArrayPtrVoid params )
     // param 0: the justification ratio
     // param 1: the system full width (without system margins) (unused)
     // param 2: the functor to be redirected to the MeasureAligner
-    double *ratio = (double*)params[0];
-    MusFunctor *justifyX = (MusFunctor*)params[2];
+    double *ratio = static_cast<double*>(params[0]);
+    MusFunctor *justifyX = static_cast<MusFunctor*>(params[2]);
     
     this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
     
@@ -247,7 +247,7 @@ int Measure::JustifyX( ArrayPtrVoid params )
 int Measure::AlignMeasures( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
-    int *shift = (int*)params[0];
+    int *shift = static_cast<int*>(params[0]);
     
     this->m_drawingXRel = (*shift);
     
@@ -271,11 +271,11 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
     // param 4: the system width
-    System *contentSystem = (System*)params[0];
-    Page *page = (Page*)params[1];
-    System **currentSystem = (System**)params[2];
-    int *shift = (int*)params[3];
-    int *systemWidth = (int*)params[4];
+    System *contentSystem = static_cast<System*>(params[0]);
+    Page *page = static_cast<Page*>(params[1]);
+    System **currentSystem = static_cast<System**>(params[2]);
+    int *shift = static_cast<int*>(params[3]);
+    int *systemWidth = static_cast<int*>(params[4]);
     
     if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetXRelRight() - (*shift) > (*systemWidth) ) ) {
         (*currentSystem) = new System();

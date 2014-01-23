@@ -120,7 +120,7 @@ public:
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
      */
-    void SetRedraw( bool clef, bool keysig, bool mensur );
+    void SetRedrawFlags( bool clef, bool keysig, bool mensur );
     
 protected:
     /**
@@ -229,12 +229,12 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    int DrawClef() const { return m_drawingClef; };
-    void SetDrawClef( bool drawClef ) { m_drawingClef = drawClef; };
-    int DrawKeySig() const { return m_drawingKeySig; };
-    void SetDrawKeySig( bool drawKeySig ) { m_drawingKeySig = drawKeySig; };
-    int DrawMensur() const { return m_drawingMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawingClef = drawMensur; };
+    bool DrawClef() const { return m_drawClef; };
+    void SetDrawClef( bool drawClef ) { m_drawClef = drawClef; };
+    bool DrawKeySig() const { return m_drawKeySig; };
+    void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
+    bool DrawMensur() const { return m_drawMensur; };
+    void SetDrawMensur( bool drawMensur ) { m_drawClef = drawMensur; };
     ///@}
 
     // functors
@@ -248,13 +248,13 @@ public:
     virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid params );
     
     /**
-     * Set the initial scoreDef of each page.
-     * This is necessary for integrating changes that occur within a page.
+     * Set flags for the staff set for indicating whether clefs, keysig, etc. needs to be redrawn.
+     * This is typically occurs when a new system or a new scoreDef is encountered.
      * param 0: bool clef flag.
      * param 1: bool keysig flag.
      * param 2: bool the mensur flag.
      */
-    virtual int SetStaffDefDraw( ArrayPtrVoid params );
+    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params );
     
 private:
     
@@ -265,12 +265,12 @@ private:
     int m_n;
     
     /**
-     *  @name Flags for indicating where the clef, keysig and mensur needs to be drawn or not
+     *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
      */
     ///@{
-    bool m_drawingClef;
-    bool m_drawingKeySig;
-    bool m_drawingMensur;
+    bool m_drawClef;
+    bool m_drawKeySig;
+    bool m_drawMensur;
     ///@}
     
 };

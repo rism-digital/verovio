@@ -121,7 +121,7 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
 
 
 
-int LayerElement::GetElementNo() const
+int LayerElement::GetElementIdx() const
 {
     assert( m_parent ); // Layer cannot be NULL
     
@@ -278,7 +278,7 @@ bool LayerElement::IsTuplet()
 int LayerElement::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];         
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);           
     if (!output->WriteLayerElement( this )) {
         return FUNCTOR_STOP;
     }
@@ -335,8 +335,8 @@ int LayerElement::Align( ArrayPtrVoid params )
     // param 1: the time
     // param 2: the systemAligner (unused)
     // param 3: the staffNb (unused)
-    MeasureAligner **measureAligner = (MeasureAligner**)params[0];
-    double *time = (double*)params[1];
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
+    double *time = static_cast<double*>(params[1]);
     
     AlignmentType type = ALIGNMENT_DEFAULT;
     if ( this->IsBarline() ) {

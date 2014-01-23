@@ -606,7 +606,7 @@ void SvgDeviceContext::DrawMusicText(const std::string& text, int x, int y)
 
 void SvgDeviceContext::DrawSpline(int n, MusPoint points[])
 {
-    //m_dc->DrawSpline( n, (wxPoint*)points );
+
 }
 
 void SvgDeviceContext::DrawBackgroundImage( int x, int y )

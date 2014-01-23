@@ -53,7 +53,7 @@ StaffAlignment* SystemAligner::GetStaffAlignment( int idx )
     
     if (idx < GetStaffAlignmentCount()) {
         this->m_children.push_back( m_bottomAlignment );
-        return (StaffAlignment*)m_children[idx];
+        return dynamic_cast<StaffAlignment*>(m_children[idx]);
     }
     // check that we are searching for the next one (not gap)
     assert( idx == GetStaffAlignmentCount() );
@@ -141,7 +141,9 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
     // First try to see if we already have something at the time position
     for (i = 0; i < GetAlignmentCount(); i++)
     {
-        alignment = (Alignment*)m_children[i];
+        alignment = dynamic_cast<Alignment*>(m_children[i]);
+        assert( alignment );
+        
         double alignment_time = alignment->GetTime();
         if ( vrv::AreEqual( alignment_time, time ) && (alignment->GetType() == type) ) {
             return alignment;
@@ -230,9 +232,9 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid params )
     // param 1: the staff margin
     // param 2: the staff interline sizes (int[2])
     // param 2: the functor to be redirected to SystemAligner (unused)
-    int *previousStaffHeight = (int*)params[0];
-    int *staffMargin = (int*)params[1];
-    int **interlineSizes = (int**)params[2];
+    int *previousStaffHeight = static_cast<int*>(params[0]);
+    int *staffMargin = static_cast<int*>(params[1]);
+    int **interlineSizes = static_cast<int**>(params[2]);
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
     
@@ -250,7 +252,7 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
     // param 1: the functor to be redirected to the SystemAligner (unused)
-    int *shift = (int*)params[0];
+    int *shift = static_cast<int*>(params[0]);
     
     // integrates the m_xShift into the m_xRel
     m_yRel += m_yShift + (*shift);
@@ -266,7 +268,7 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
     // param 0: the cumulated shift
     // param 1: the cumulated width
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    int *shift = (int*)params[0];
+    int *shift = static_cast<int*>(params[0]);
     
     // We start a new MeasureAligner
     // Reset the cumulated shift to 0;
@@ -279,7 +281,7 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
     // param 1: the functor to be redirected to the MeasureAligner (unused)
-    int *shift = (int*)params[0];
+    int *shift = static_cast<int*>(params[0]);
     
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
@@ -297,8 +299,8 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid params )
     // param 0: the previous time position
     // param 1: the previous x rel position
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    double *previousTime = (double*)params[0];
-    int *previousXRel = (int*)params[1];
+    double *previousTime = static_cast<double*>(params[0]);
+    int *previousXRel = static_cast<int*>(params[1]);
     
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
@@ -313,8 +315,8 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid params )
     // param 0: the previous time position
     // param 1: the previous x rel position
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    double *previousTime = (double*)params[0];
-    int *previousXRel = (int*)params[1];
+    double *previousTime = static_cast<double*>(params[0]);
+    int *previousXRel = static_cast<int*>(params[1]);
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
@@ -335,7 +337,7 @@ int Alignment::JustifyX( ArrayPtrVoid params )
     // param 0: the justification ratio
     // param 1: the system full width (without system margins) (unused)
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio = (double*)params[0];
+    double *ratio =static_cast<double*>(params[0]);
     
     this->m_xRel = ceil((*ratio) * (double)this->m_xRel);
 

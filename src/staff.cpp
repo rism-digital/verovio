@@ -58,7 +58,7 @@ Staff::Staff( const Staff& staff )
     int i;
 	for (i = 0; i < staff.GetLayerCount(); i++)
 	{
-        Layer *nlayer = new Layer( *(Layer*)staff.m_children[i] );
+        Layer *nlayer = new Layer( *dynamic_cast<Layer*>( staff.m_children[i] ) );
         this->AddLayer( nlayer );
 	}
     
@@ -96,7 +96,7 @@ void Staff::Clear()
 int Staff::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];         
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);           
     if (!output->WriteStaff( this )) {
         return FUNCTOR_STOP;
     }
@@ -142,7 +142,7 @@ Layer *Staff::GetFirst( )
 {
 	if ( m_children.empty() )
 		return NULL;
-	return (Layer*)m_children[0];
+	return dynamic_cast<Layer*>(m_children[0]);
 }
 
 Layer *Staff::GetLast( )
@@ -150,7 +150,7 @@ Layer *Staff::GetLast( )
 	if ( m_children.empty() )
 		return NULL;
 	int i = GetLayerCount() - 1;
-	return (Layer*)m_children[i];
+	return dynamic_cast<Layer*>(m_children[i]);
 }
 
 Layer *Staff::GetNext( Layer *layer )
@@ -163,7 +163,7 @@ Layer *Staff::GetNext( Layer *layer )
 	if ((i == -1 ) || ( i >= GetLayerCount() - 1 ))
 		return NULL;
 
-	return (Layer*)m_children[i + 1];
+	return dynamic_cast<Layer*>(m_children[i + 1]);
 }
 
 Layer *Staff::GetPrevious( Layer *layer )
@@ -176,7 +176,7 @@ Layer *Staff::GetPrevious( Layer *layer )
 	if ((i == -1 ) || ( i <= 0 ))
         return NULL;
 	
-    return (Layer*)m_children[i - 1];
+    return dynamic_cast<Layer*>(m_children[i - 1]);
 }
 
 
@@ -185,7 +185,7 @@ Layer *Staff::GetLayerWithIdx( int LayerIdx )
     if ( LayerIdx > (int)m_children.size() - 1 )
         return NULL;
 	
-	return (Layer*)m_children[LayerIdx];
+	return dynamic_cast<Layer*>(m_children[LayerIdx]);
 }
 
 int Staff::GetVerticalSpacing()
@@ -203,9 +203,9 @@ bool Staff::GetPosOnPage( ArrayPtrVoid params )
     // param 0: the Staff we are looking for
     // param 1: the position on the page (int)
     // param 2; the success flag (bool)
-    Staff *staff = (Staff*)params[0];
-	int *position = (int*)params[1];
-    bool *success = (bool*)params[2];
+    Staff *staff = static_cast<Staff*>(params[0]);
+	int *position = static_cast<int*>(params[1]);
+    bool *success = static_cast<bool*>(params[2]);
     
     if ( (*success) ) {
         return true;
@@ -239,8 +239,8 @@ int Staff::Align( ArrayPtrVoid params )
     // param 1: the time (unused)
     // param 2: the systemAligner
     // param 3: the staffNb
-    SystemAligner **systemAligner = (SystemAligner**)params[2];
-	int *staffNb = (int*)params[3];
+    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[2]);
+	int *staffNb = static_cast<int*>(params[3]);
     
     // this gets (or creates) the measureAligner for the measure
     StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment( *staffNb );
@@ -257,42 +257,3 @@ int Staff::Align( ArrayPtrVoid params )
 }
 
 } // namespace vrv
-    
-/*
-int Staff::LayOutSystemAndStaffYPos( ArrayPtrVoid params )
-{
-    // param 0: the current y system shift
-    // param 1: the current y staff shift
-	int *current_y_system_shift = (int*)params[0];
-	int *current_y_staff_shift = (int*)params[1];
-    
-    // This is the value that need to be added to fit everything
-    int negative_offset = this->m_staffAlignment->GetXRel() - this->m_contentBB_y2;
-    
-    // reset the x position if we are starting a new system
-    if ( this->m_parent->GetChildIndex( this ) == 0 ) {
-        System *system = dynamic_cast<System*>( this->m_parent );
-        // The parent is a System, we need to reset the y staff shift
-        if ( system ) {
-            // the staff position is the same as the one of the system
-            (*current_y_staff_shift) = 0;
-            this->m_drawingYRel = 0;
-            // move the system down to fit the content
-            system->m_drawingYRel = (*current_y_system_shift)  + negative_offset;
-            // spacing for the next system
-            (*current_y_system_shift) -= system->GetVerticalSpacing();
-        }
-    }
-    else
-    {
-        // just more the staff down
-        this->m_drawingYRel = (*current_y_staff_shift)  + negative_offset;
-    }
-    
-    int shift = (this->m_contentBB_y2 - this->m_contentBB_y1) + this->GetVerticalSpacing();
-    (*current_y_staff_shift) -= shift;
-    (*current_y_system_shift) -= shift;
-    // do not go further down the tree in this case
-    return FUNCTOR_SIBLINGS;
-}
-*/

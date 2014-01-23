@@ -1060,7 +1060,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     
     if (barline->m_partialBarline)
     {
-        DrawPartialBarline ( dc, (System*)staff->m_parent, x, staff);
+        DrawPartialBarline ( dc, dynamic_cast<System*>( staff->m_parent ), x, staff);
     }
     else
     {
@@ -1682,10 +1682,13 @@ void View::DrawLayerApp( DeviceContext *dc, LayerElement *element, Layer *layer,
     int i;
     for (i = 0; i < app->GetRdgCount(); i++ )
     {
-        Layer *rdg = (Layer*)app->m_children[i];
+        Layer *rdg = dynamic_cast<Layer*>( app->m_children[i] );
+        assert( rdg );
         int j;
         for (j = 0; j < rdg->GetElementCount(); j++ ) {
-            LayerElement *lelem = (LayerElement*)rdg->m_children[j];
+            
+            LayerElement *lelem = dynamic_cast<LayerElement*>( rdg->m_children[j] );
+            assert( lelem );
             if (i == 0) {
                 m_currentColour = AxGREEN;
             }

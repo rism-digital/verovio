@@ -197,13 +197,13 @@ StaffDef *ScoreDef::GetStaffDef( int n )
 }
 
 
-void ScoreDef::SetRedraw( bool clef, bool keysig, bool mensur )
+void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur )
 {
     ArrayPtrVoid params;
 	params.push_back( &clef );
     params.push_back( &keysig );
 	params.push_back( &mensur );
-    MusFunctor setStaffDefDraw( &Object::SetStaffDefDraw );
+    MusFunctor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
     this->Process( &setStaffDefDraw, params );
 }
 
@@ -239,7 +239,7 @@ void StaffGrp::AddStaffGrp( StaffGrp *staffGrp )
 int StaffGrp::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);  
     if (!output->WriteStaffGrp( this )) {
         return FUNCTOR_STOP;
     }
@@ -271,6 +271,9 @@ void StaffGrp::FilterList()
 StaffDef::StaffDef() :
     Object(), ScoreOrStaffDefAttrInterface()
 {
+    m_drawClef = false;
+    m_drawKeySig = false;
+    m_drawMensur = false;
 }
 
 StaffDef::~StaffDef()
@@ -280,7 +283,7 @@ StaffDef::~StaffDef()
 int StaffDef::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);  
     if (!output->WriteStaffDef( this )) {
         return FUNCTOR_STOP;
     }
@@ -295,21 +298,21 @@ int StaffDef::Save( ArrayPtrVoid params )
 int StaffDef::ReplaceStaffDefsInScoreDef( ArrayPtrVoid params )
 {
     // param 0: the scoreDef
-    ScoreDef *scoreDef = (ScoreDef*)params[0];
+    ScoreDef *scoreDef = static_cast<ScoreDef*>(params[0]);
     
     scoreDef->Replace( this );
     
     return FUNCTOR_CONTINUE;
 }
 
-int StaffDef::SetStaffDefDraw( ArrayPtrVoid params )
+int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid params )
 {
     // param 0: bool clef flag
     // param 1: bool keysig flag
     // param 2: bool the mensur flag
-    bool *clef = (bool*)params[0];
-    bool *keysig = (bool*)params[1];
-    bool *mensur = (bool*)params[2];
+    bool *clef = static_cast<bool*>(params[0]);
+    bool *keysig = static_cast<bool*>(params[1]);
+    bool *mensur = static_cast<bool*>(params[2]);
     
     if ( (*clef) ) {
         this->SetDrawClef( true );

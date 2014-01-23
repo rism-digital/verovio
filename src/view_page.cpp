@@ -63,7 +63,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 
     for (i = 0; i < m_currentPage->GetSystemCount(); i++) 
 	{
-		system = (System*)m_currentPage->m_children[i];
+		system = dynamic_cast<System*>(m_currentPage->m_children[i]);
         DrawSystem( dc, system );
         
         // TODO here: also update x_abs and m_drawingY positions for system. How to calculate them?
@@ -104,7 +104,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     for (i = 0; i < (int)system->GetMeasureCount(); i++)
 	{
-		measure = (Measure*)system->m_children[i];
+		measure = dynamic_cast<Measure*>(system->m_children[i]);
         DrawMeasure( dc , measure, system );
 	}
 
@@ -479,6 +479,10 @@ void View::DrawBarlineDots ( DeviceContext *dc, int x, Staff *staff, Barline *ba
 void View::DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff *pportee)
 {
 	assert( dc ); // DC cannot be NULL
+    
+    if ( !system ) {
+        return;
+    }
 
     /* ax3
 	int b, bb;
@@ -528,8 +532,8 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 	int j;
     
 	for(j = 0; j < measure->GetStaffCount(); j++)
-	{
-		staff = (Staff*)measure->m_children[j];
+	{       
+		staff = static_cast<Staff*>(measure->m_children[j]);
 		DrawStaff( dc, staff, measure, system );
     }
 
@@ -659,7 +663,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
 	for(j = 0; j < staff->GetLayerCount(); j++)
 	{
-		layer = (Layer*)staff->m_children[j];
+		layer = dynamic_cast<Layer*>(staff->m_children[j]);
 		DrawLayer( dc, layer, staff, measure );
 	}
     
@@ -679,16 +683,18 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(layer->m_parent); // Pointer to staff cannot be NULL"
+    assert(dynamic_cast<Staff*>(layer->m_parent)); // Pointer to parent has to be a staff
 	
     static int touches[] = {PITCH_C,PITCH_D,PITCH_E,PITCH_F,PITCH_G,PITCH_A,PITCH_B};
 	int y_dec, yb, plafond;
 	int degres, octaves, position, code;
 	char clefId=0;
 
-    int staffSize = ((Staff*)layer->m_parent)->staffSize;
+    Staff *parentStaff = dynamic_cast<Staff*>(layer->m_parent);
+    int staffSize = parentStaff->staffSize;
 	// calculer position du do central en fonction clef
 	y_n += (int) m_doc->m_drawingVerticalUnit2[staffSize];
-	yb = ((Staff*)layer->m_parent)->m_drawingY -  m_doc->m_drawingStaffSize[((Staff*)layer->m_parent)->staffSize]*2; // UT1 default
+	yb = parentStaff->m_drawingY -  m_doc->m_drawingStaffSize[staffSize]*2; // UT1 default
 	
 
 	plafond = yb + 8 *  m_doc->m_drawingOctaveSize[staffSize];
@@ -856,9 +862,9 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     
 	for(j = 0; j < layer->GetElementCount(); j++)
 	{
-		element = (LayerElement*)layer->m_children[j];
+		element = dynamic_cast<LayerElement*>(layer->m_children[j]);
         
-        if ( !element->m_in_layer_app ) {
+        if ( element && !element->m_in_layer_app ) {
             DrawElement( dc, element, layer, measure, staff );
         }
 	}

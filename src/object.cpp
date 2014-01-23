@@ -54,7 +54,7 @@ Object::Object(std::string classid)
 
 Object *Object::Clone( )
 {
-    // This should new happen because the method should be overwritten
+    // This should never happen because the method should be overwritten
     assert( false );
 }
 
@@ -633,7 +633,7 @@ void MusFunctor::Call( Object *ptr, ArrayPtrVoid params )
 int Object::AddLayerElementToList( ArrayPtrVoid params )
 {
     // param 0: the ListOfObjects
-    ListOfObjects **list = (ListOfObjects**)params[0];
+    ListOfObjects **list = static_cast<ListOfObjects**>(params[0]);
     //if ( dynamic_cast<LayerElement*>(this ) ) {
         (*list)->push_back( this );
     //}
@@ -644,8 +644,8 @@ int Object::FindByUuid( ArrayPtrVoid params )
 {
     // param 0: the uuid we are looking for
     // param 1: the pointer to pointer to the Object
-    std::string *uuid = (std::string*)params[0];  
-    Object **element = (Object**)params[1];  
+    std::string *uuid = static_cast<std::string*>(params[0]);
+    Object **element = static_cast<Object**>(params[1]);
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -666,8 +666,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
 {
 
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = (ScoreDef*)params[0];
-    StaffDef **currentStaffDef = (StaffDef**)params[1];
+    ScoreDef *currentScoreDef = static_cast<ScoreDef*>(params[0]);
+    StaffDef **currentStaffDef = static_cast<StaffDef**>(params[1]);
     
     // reset all the drawing values
     this->ResetDrawingValues();
@@ -675,7 +675,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new page
     Page *current_page = dynamic_cast<Page*>(this);
     if ( current_page  ) {
-        currentScoreDef->SetRedraw( true, true, false );
+        currentScoreDef->SetRedrawFlags( true, true, false );
         current_page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
@@ -684,7 +684,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new system
     System *current_system = dynamic_cast<System*>(this);
     if ( current_system  ) {
-        currentScoreDef->SetRedraw( true, true, false );
+        currentScoreDef->SetRedrawFlags( true, true, false );
         return FUNCTOR_CONTINUE;
     }
 
@@ -724,8 +724,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
-    int *min_pos = (int*)params[0];
-    int *measure_width = (int*)params[1];
+    int *min_pos = static_cast<int*>(params[0]);
+    int *measure_width = static_cast<int*>(params[1]);
 
     // starting a new measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -823,8 +823,8 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
-    int *min_pos = (int*)params[0];
-    int *measure_width = (int*)params[1];
+    int *min_pos = static_cast<int*>(params[0]);
+    int *measure_width = static_cast<int*>(params[1]);
     
     // ending a measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -853,7 +853,7 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
 int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
 {
     // param 0: the height of the previous staff
-    int *min_pos = (int*)params[0];
+    int *min_pos = static_cast<int*>(params[0]);
     
     // starting a new measure
     Measure *current_measure = dynamic_cast<Measure*>(this);

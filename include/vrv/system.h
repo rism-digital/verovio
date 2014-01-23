@@ -15,8 +15,6 @@
 
 namespace vrv {
 
-#define SYSTEM_OFFSET 190
-
 class DeviceContext;
 class Measure;
 
@@ -47,7 +45,6 @@ public:
 	Measure *GetLast( );
 	Measure *GetNext( Measure *measure );
 	Measure *GetPrevious( Measure *measure );
-    //Measure *GetMeasure( int MeasureNo );
 	Measure *GetAtPos( int x );
     
     /**
@@ -61,7 +58,6 @@ public:
      */
     int GetVerticalSpacing();
 
-    void SetValues( int type );
 	
 	int GetMeasureCount() const { return (int)m_children.size(); };
     

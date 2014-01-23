@@ -46,7 +46,7 @@ System::System( const System& system )
     
 	for (i = 0; i < this->GetMeasureCount(); i++)
 	{
-        Measure *nmeasure = new Measure( *(Measure*)system.m_children[i] );
+        Measure *nmeasure = new Measure( *dynamic_cast<Measure*>( system.m_children[i] ) );
         this->AddMeasure( nmeasure );
 	}
 }
@@ -73,7 +73,7 @@ void System::Clear( )
 int System::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = (FileOutputStream*)params[0];       
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
     if (!output->WriteSystem( this )) {
         return FUNCTOR_STOP;
     }
@@ -105,7 +105,7 @@ Measure *System::GetFirst( )
 {
 	if ( m_children.empty() )
 		return NULL;
-	return (Measure*)m_children[0];
+	return dynamic_cast<Measure*>(m_children[0]);
 }
 
 Measure *System::GetLast( )
@@ -113,7 +113,7 @@ Measure *System::GetLast( )
 	if ( m_children.empty() )
 		return NULL;
 	int i = (int)m_children.size() - 1;
-	return (Measure*)m_children[i];
+	return dynamic_cast<Measure*>(m_children[i]);
 }
 
 Measure *System::GetNext( Measure *measure )
@@ -126,7 +126,7 @@ Measure *System::GetNext( Measure *measure )
 	if ((i == -1 ) || ( i >= GetMeasureCount() - 1 ))
 		return NULL;
 	
-	return (Measure*)m_children[i + 1];
+	return dynamic_cast<Measure*>(m_children[i + 1]);
 	
 }
 
@@ -140,7 +140,7 @@ Measure *System::GetPrevious( Measure *measure  )
 	if ((i == -1 ) || ( i <= 0 ))
         return NULL;
 	
-    return (Measure*)m_children[i - 1];
+    return dynamic_cast<Measure*>(m_children[i - 1]);
 }
 
 
@@ -165,34 +165,6 @@ Measure *System::GetAtPos( int x )
 	return measure;
 }
 
-void System::SetValues( int type )
-{
-    /*
-    int i;
-    std::string values;
-    for (i = 0; i < GetStaffCount(); i++) 
-	{
-        switch ( type ) {
-            case PAGE_VALUES_VOICES: values += StringFormat("%d;", (m_children[i])->voix ); break;
-            case PAGE_VALUES_INDENT: values += StringFormat("%d;", (m_children[i])->indent ); break;
-        }
-	}
-    values = wxGetTextFromUser( "Enter values for the pages", "", values );
-    if (values.Length() == 0 ) {
-        return;
-    }
-    wxArrayString values_arr = wxStringTokenize(values, ";");
-    for (i = 0; (i < GetStaffCount()) && (i < (int)values_arr.GetCount()) ; i++) 
-	{
-        switch ( type ) {
-            case PAGE_VALUES_VOICES: (m_children[i])->voix = atoi( values_arr[i].c_str() ); break;
-            case PAGE_VALUES_INDENT: (m_children[i])->indent = atoi( values_arr[i].c_str() ); break;
-        }	
-	}
-    */
-    LogDebug("TODO");
-    return;
-}
 
 //----------------------------------------------------------------------------
 // System functor methods
@@ -204,7 +176,7 @@ int System::Align( ArrayPtrVoid params )
     // param 1: the time (unused)
     // param 2: the systemAligner
     // param 3: the staffNb (unused)
-    SystemAligner **systemAligner = (SystemAligner**)params[2];
+    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[2]);
     
     // When calculating the alignment, the position has to be 0
     m_drawingXRel = 0;
@@ -221,8 +193,8 @@ int System::SetAligmentYPos( ArrayPtrVoid params )
     // param 1: the staff margin (unused)
     // param 2: the staff interline sizes (int[2]) (unused)
     // param 2: the functor to be redirected to SystemAligner
-    int *previousStaffHeight = (int*)params[0];
-    MusFunctor *setAligmnentPosY = (MusFunctor*)params[3];
+    int *previousStaffHeight = static_cast<int*>(params[0]);
+    MusFunctor *setAligmnentPosY = static_cast<MusFunctor*>(params[3]);
     
     (*previousStaffHeight) = 0;
     
@@ -236,8 +208,8 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
     // param 1: the functor to be redirected to SystemAligner
-    int *shift = (int*)params[0];
-    MusFunctor *integrateBoundingBoxYShift = (MusFunctor*)params[1];
+    int *shift = static_cast<int*>(params[0]);
+    MusFunctor *integrateBoundingBoxYShift = static_cast<MusFunctor*>(params[1]);
     
     m_drawingXRel = this->m_systemLeftMar;
     (*shift) = 0;
@@ -249,7 +221,7 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
 int System::AlignMeasures( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
-    int *shift = (int*)params[0];
+    int *shift = static_cast<int*>(params[0]);
     
     (*shift) = 0;
     
@@ -259,7 +231,7 @@ int System::AlignMeasures( ArrayPtrVoid params )
 int System::AlignMeasuresEnd( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
-    int *shift = (int*)params[0];
+    int *shift = static_cast<int*>(params[0]);
     
     m_drawingTotalWidth = (*shift);
     
@@ -270,8 +242,8 @@ int System::AlignSystems( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
     // param 1: the system margin
-    int *shift = (int*)params[0];
-    int *systemMargin = (int*)params[1];
+    int *shift = static_cast<int*>(params[0]);
+    int *systemMargin = static_cast<int*>(params[1]);
     
     this->m_drawingYRel = (*shift);
     
@@ -288,8 +260,8 @@ int System::JustifyX( ArrayPtrVoid params )
     // param 0: the justification ratio (unused)
     // param 1: the system full width (without system margins)
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio = (double*)params[0];
-    int *systemFullWidth = (int*)params[1];
+    double *ratio = static_cast<double*>(params[0]);
+    int *systemFullWidth = static_cast<int*>(params[1]);
     
     (*ratio) = (double)((*systemFullWidth) - this->m_systemLeftMar - this->m_systemRightMar) / (double)m_drawingTotalWidth;
     
