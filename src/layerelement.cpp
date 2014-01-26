@@ -135,7 +135,7 @@ int LayerElement::GetHorizontalSpacing()
 }
     
     
-void LayerElement::ResetDrawingValues()
+void LayerElement::ResetHorizontalAlignment()
 {
     m_drawingX = 0;
     m_drawingYRel = 0;
@@ -329,14 +329,15 @@ int LayerElement::GetXRel()
     return 0;
 }
 
-int LayerElement::Align( ArrayPtrVoid params )
+int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner
     // param 1: the time
-    // param 2: the systemAligner (unused)
-    // param 3: the staffNb (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
     double *time = static_cast<double*>(params[1]);
+    
+    // we need to call it because we are overriding Object::AlignHorizontally
+    this->ResetHorizontalAlignment();
     
     AlignmentType type = ALIGNMENT_DEFAULT;
     if ( this->IsBarline() ) {

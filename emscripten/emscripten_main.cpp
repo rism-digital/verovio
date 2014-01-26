@@ -47,5 +47,7 @@ extern "C" {
         // in the future we will be able to render to mei too
         out_str = controller.RenderToSvg();
         return out_str.c_str();
+        // return self allocated pointer?
+        // see https://github.com/DDMAL/aruspix/commit/cb2b957ebcc8edf9787bc6f6271217115a6959e3
     }
 }

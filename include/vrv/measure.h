@@ -90,18 +90,31 @@ public:
     
     int GetXRel( );
     
-    int GetXRelRight( );
+    /** 
+     * Return the X rel position of the right barline (without its width)
+     */
+    int GetRightBarlineX( );
     
     /**
-     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
-     * Called by SetCurrentScoreDef functor.
+     * Return the width of the measure, including the barline width
      */
-    virtual void ResetDrawingValues( );
+    int GetWidth( );
     
     /**
-     * Align the content of a system.
+     * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
+     * Called by AlignHorizontally
      */
-    virtual int Align( ArrayPtrVoid params );
+    virtual void ResetHorizontalAlignment( );
+    
+    /**
+     * AlignHorizontally the content of a measure.
+     */
+    virtual int AlignHorizontally( ArrayPtrVoid params );
+
+    /**
+     * AlignVertically the content of a measure.
+     */
+    virtual int AlignVertically( ArrayPtrVoid params );
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.

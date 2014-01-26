@@ -81,7 +81,7 @@ void View::SetPage( int pageIdx, bool doLayout )
         m_doc->SetCurrentScoreDef();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
-        m_currentPage->Layout( );
+        m_currentPage->LayOut( );
     }
 
     m_currentElement = NULL;

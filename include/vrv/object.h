@@ -94,10 +94,13 @@ public:
     virtual std::string GetClassName( ) { return "[MISSING]"; };
     
     /**
-     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
-     * Called by SetCurrentScoreDef functor.
+     * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
+     * Called by AlignHorizontally and AlignVertically
      */
-    virtual void ResetDrawingValues( ) { };
+    ///@{
+    virtual void ResetHorizontalAlignment( ) {};
+    virtual void ResetVerticalAlignment( ) {};
+    ///@}
 
     /**
      * Return the index position of the object in its parent (-1 if not found)
@@ -230,11 +233,12 @@ public:
     ///@{
     
     /**
-     * Align the content of a system.
+     * Align horizontally the content of a page.
      * For each LayerElement, instanciate its Alignment.
      * It creates it if no other note or event occurs at its position.
+     * Any functor overriding this one needs to call ResetHorizontalAlignment
      */
-    virtual int Align( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int AlignHorizontally( ArrayPtrVoid params );
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
@@ -277,6 +281,13 @@ public:
      * @name Functors for aligning the content vertically.
      */
     ///@{
+    
+    /**
+     * Align vertically the content of a page.
+     * For each Staff, instanciate its StaffAlignment.
+     * Any functor overriding this one needs to call ResetVerticalAlignment
+     */
+    virtual int AlignVertically( ArrayPtrVoid params );
     
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.

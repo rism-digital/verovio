@@ -711,7 +711,10 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     dc->StartGraphic( element, "mrest", element->GetUuid() );
     
-    int a = element->m_drawingX + mrest->m_hOffset + measure->GetXRelRight() / 2;
+    //LogMessage("Measure %d - X %d - RightX %d;", measure->GetIdx(), element->m_drawingX, measure->GetRightBarlineX() );
+    
+    int mpos = element->m_drawingX + mrest->m_hOffset;
+    int a = mpos + (measure->m_drawingX + measure->GetRightBarlineX() - mpos)  / 2;
     int b = element->m_drawingYRel;
     
     // move it down according to the number of line in the staff

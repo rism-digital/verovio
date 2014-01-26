@@ -151,20 +151,20 @@ System *Page::GetAtPos( int y )
 	return system;
 }
 
-void Page::Layout( bool force )
+void Page::LayOut( bool force )
 {
     if ( m_layoutDone && ! force ) {
         return;
     }
     
-    this->AlignHorizontally();
-    this->AlignVertically();
+    this->LayOutHorizontally();
+    this->LayOutVertically();
     //this->JustifyHorizontally();
     
     m_layoutDone = true;
 }
     
-void Page::AlignHorizontally( )
+void Page::LayOutHorizontally( )
 {
     if (!dynamic_cast<Doc*>(m_parent)) {
         assert( false );
@@ -178,20 +178,15 @@ void Page::AlignHorizontally( )
     
     ArrayPtrVoid params;
     
-    // Align the content of the page using measure and system aligners
+    // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
-    // - each Staff object will then have its StaffAlignment pointer initialized
     MeasureAligner *measureAlignerPtr = NULL;
     double time = 0.0;
-    SystemAligner *systemAlignerPtr = NULL;
-    int staffNb = 0;
     params.push_back( &measureAlignerPtr );
     params.push_back( &time );
-    params.push_back( &systemAlignerPtr );
-    params.push_back( &staffNb );
-    MusFunctor align( &Object::Align );
-    this->Process( &align, params );
+    MusFunctor alignHorizontally( &Object::AlignHorizontally );
+    this->Process( &alignHorizontally, params );
     
     // Set the X position of each Alignment
     // Does a duration-based non linear spacing looking at the duration space between two Alignment objects
@@ -243,7 +238,7 @@ void Page::AlignHorizontally( )
     this->Process( &alignMeasures, params, &alignMeasuresEnd );
 }
     
-void Page::AlignVertically( )
+void Page::LayOutVertically( )
 {
     if (!dynamic_cast<Doc*>(m_parent)) {
         assert( false );
@@ -257,19 +252,40 @@ void Page::AlignVertically( )
     
     ArrayPtrVoid params;
     
+    // Align the content of the page using system aligners
+    // After this:
+    // - each Staff object will then have its StaffAlignment pointer initialized
+    SystemAligner *systemAlignerPtr = NULL;
+    int staffNb = 0;
+    params.push_back( &systemAlignerPtr );
+    params.push_back( &staffNb );
+    MusFunctor alignVertically( &Object::AlignVertically );
+    this->Process( &alignVertically, params );
+    
+    // Render it for filling the bounding boxing
+    View view;
+    BBoxDeviceContext bb_dc( &view, 0, 0 );
+    view.SetDoc(doc);
+    // Do not do the layout in this view - otherwise we will loop...
+    view.SetPage( this->GetIdx(), false );
+    view.DrawCurrentPage(  &bb_dc, false );
+    
     // Adjust the Y shift of the StaffAlignment looking at the bounding boxes
     // Look at each Staff and changes the m_yShift if the bounding box is overlapping
     params.clear();
     int previous_height = 0;
+    int system_height = 0;
     params.push_back( &previous_height );
+    params.push_back( &system_height );
     MusFunctor setBoundingBoxYShift( &Object::SetBoundingBoxYShift );
-    this->Process( &setBoundingBoxYShift, params );
+    MusFunctor setBoundingBoxYShiftEnd( &Object::SetBoundingBoxYShiftEnd );
+    this->Process( &setBoundingBoxYShift, params, &setBoundingBoxYShiftEnd );
     
     // Set the Y position of each StaffAlignment
     // Adjusts the Y shift for making sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
-    int staffMargin = doc->m_drawingStaffSize[0]; // the minimal space we want to have between each staff
+    int staffMargin = 1.0 * doc->m_drawingStaffSize[0]; // the minimal space we want to have between each staff
     int* interlineSizes = doc->m_drawingInterl; // the interline sizes to be used for calculating the (previous) staff height
     params.push_back( &previousStaffHeight );
     params.push_back( &staffMargin );
@@ -292,7 +308,7 @@ void Page::AlignVertically( )
     // Adjust system Y position
     params.clear();
     shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
-    int systemMargin = doc->m_drawingStaffSize[0];
+    int systemMargin = 0;// doc->m_drawingStaffSize[0];
     params.push_back( &shift );
     params.push_back( &systemMargin );
     MusFunctor alignSystems( &Object::AlignSystems );

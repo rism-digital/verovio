@@ -480,22 +480,23 @@ int Layer::CopyToLayer( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::Align( ArrayPtrVoid params )
+int Layer::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time
-    // param 2: the systemAligner (unused)
-    // param 3: the staffNb (unused)
     double *time = static_cast<double*>(params[1]);
+    
+    // we need to call it because we are overriding Object::AlignHorizontally
+    this->ResetHorizontalAlignment();
 
     // we are starting a new layer, reset the time;
     (*time) = 0.0;
     
     if ( m_clef ) {
-        m_clef->Align( params );
+        m_clef->AlignHorizontally( params );
     }
     if ( m_keySig ) {
-        m_keySig->Align( params );
+        m_keySig->AlignHorizontally( params );
     }
 
     return FUNCTOR_CONTINUE;

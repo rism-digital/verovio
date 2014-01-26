@@ -152,6 +152,28 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
       
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
+    /*
+    if (view) // GetDrawBoundingBoxes())
+    {
+        SetPen( AxRED, 1, AxDOT_DASH );
+        SetBrush( AxWHITE, AxTRANSPARENT );
+        StartGraphic( object, "bounding-box", "0");
+        if ( object->HasSelfBB() ) {
+            this->DrawRectangle( view->ToDeviceContextX( object->m_selfBB_x1 ), view->ToDeviceContextY( object->m_selfBB_y1 ),
+                                view->ToDeviceContextX( object->m_selfBB_x2 ) - view->ToDeviceContextX( object->m_selfBB_x1 ),
+                                view->ToDeviceContextY( object->m_selfBB_y2 ) - view->ToDeviceContextY( object->m_selfBB_y1 ));
+        }
+        
+        if ( object->HasContentBB() ) {
+            //this->DrawRectangle( view->ToDeviceContextX( object->m_contentBB_x1 ), view->ToDeviceContextY( object->m_contentBB_y1 ),
+            //                    view->ToDeviceContextX( object->m_contentBB_x2 ) - view->ToDeviceContextX( object->m_contentBB_x1 ),
+                            //view->ToDeviceContextY( object->m_contentBB_y2 ) - view->ToDeviceContextY( object->m_contentBB_y1 ));
+        }
+        EndGraphic( object, NULL );
+   
+    }
+    */
+    
     m_graphics--;
     m_indents--;
     WriteLine("</g>");

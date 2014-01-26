@@ -144,29 +144,10 @@ public:
      */
     void SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
     
-
-    //Lyric related methods
-    /*
-	int GetLyricPos( Symbol *lyric );
-	Symbol *GetPreviousLyric( Symbol *lyric );
-	Symbol *GetNextLyric( Symbol *lyric );
-	Symbol *GetFirstLyric( );
-	Symbol *GetLastLyric( );
-	Symbol *GetLyricAtPos( int x );
-	void DeleteLyric( Symbol *symbol );
-	Note *GetNextNote( Symbol * lyric );
-	Note *GetPreviousNote( Symbol * lyric );
-	void SwitchLyricNoteAssociation( Symbol *lyric, Note *oldNote, Note* newNote, bool beginning );
-	void AdjustLyricLineHeight( int delta );
-    */
-    
     /**
-     * Align the content of a system.
+     * Align horizontally the content of a layer.
      */
-    
-    ///@{
-
-    virtual int Align( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid params );
     
 private:
     

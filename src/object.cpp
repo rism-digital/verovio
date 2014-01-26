@@ -668,9 +668,6 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // param 0: the current scoreDef
     ScoreDef *currentScoreDef = static_cast<ScoreDef*>(params[0]);
     StaffDef **currentStaffDef = static_cast<StaffDef**>(params[1]);
-    
-    // reset all the drawing values
-    this->ResetDrawingValues();
 
     // starting a new page
     Page *current_page = dynamic_cast<Page*>(this);
@@ -679,7 +676,6 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
         current_page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
-    
    
     // starting a new system
     System *current_system = dynamic_cast<System*>(this);
@@ -718,7 +714,30 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
-
+    
+int Object::AlignHorizontally( ArrayPtrVoid params )
+{
+    // param 0: the measureAligner (unused)
+    // param 1: the time (unused)
+        
+    // reset all the drawing values - this also need to be called
+    // from any functor overriding this one!
+    this->ResetHorizontalAlignment();
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Object::AlignVertically( ArrayPtrVoid params )
+{
+    // param 0: the systemAligner (unused)
+    // param 1: the staffNb (unused
+    
+    // reset all the drawing values - this also need to be called
+    // from any functor overriding this one!
+    this->ResetVerticalAlignment();
+    
+    return FUNCTOR_CONTINUE;
+}
 
 int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
 {
@@ -742,11 +761,6 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // starting an new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
-        // mininimum position is the with for the last (previous) layer
-        // we keep it if it is higher than what we had so far
-        // this will be used for shifting the right barline.
-        // This can probably also be done in a EndFunctor for the measure
-        (*measure_width) = std::max( (*measure_width), (*min_pos) );
         // reset it as the minimum position to the step (if doc found)
         (*min_pos) = 0;
         Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
@@ -787,7 +801,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsMultiRest() || current->IsMRest() ) {
+    if ( current->IsMRest() ) {
+        // We need to reconsider this: if the multi-rest is on the top staff, the aligner will be before any other note
+        // aligner. This means that it will not be shifted. We need to shift it but not take into account its own width.
+        //current->GetAlignment()->SetXShift( current->GetAlignment()->GetXRel() );
         return FUNCTOR_CONTINUE;
     }
     
@@ -852,15 +869,28 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
 
 int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
 {
-    // param 0: the height of the previous staff
+    // param 0: the position of the previous staff
+    // param 1: the maximum height in the current system
     int *min_pos = static_cast<int*>(params[0]);
+    int *system_height = static_cast<int*>(params[1]);
+    
+    // starting a new system
+    System *current_system = dynamic_cast<System*>(this);
+    if ( current_system  ) {
+        // we reset the system height
+        (*system_height) = 0;
+        (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
+    }
     
     // starting a new measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
     if ( current_measure  ) {
         (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
     }
     
+    // starting a new staff
     Staff *current = dynamic_cast<Staff*>(this);
     if ( !current  ) {
         return FUNCTOR_CONTINUE;
@@ -895,6 +925,22 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     
 int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
 {
+    // param 0: the position of the previous staff
+    // param 1: the maximum height in the current system
+    int *min_pos = static_cast<int*>(params[0]);
+    int *system_height = static_cast<int*>(params[1]);
+    
+    // ending a measure
+    Measure *current_measure = dynamic_cast<Measure*>(this);
+    if ( current_measure  ) {
+        // mininimum position is the height for the last (previous) staff
+        // we keep it if it is higher than what we had so far
+        (*system_height) = std::min( (*system_height), (*min_pos) );
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // ending a system: see System::SetBoundingBoxYShiftEnd
+
     return FUNCTOR_CONTINUE;
 }
 

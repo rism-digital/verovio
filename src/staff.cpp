@@ -70,7 +70,7 @@ void Staff::Clear()
 	grise = false;
 	invisible = false;
 	staffSize = 0; 
-	m_drawingLines = 1;
+	m_drawingLines = 5;
 	m_yAbs = VRV_UNSET;
 	m_drawingY = 0;
     m_staffAlignment = NULL;
@@ -167,7 +167,7 @@ int Staff::GetVerticalSpacing()
     return 160; // arbitrary generic value
 }
     
-void Staff::ResetDrawingValues()
+void Staff::ResetVerticalAlignment()
 {
     m_drawingY = 0;
 }
@@ -207,14 +207,15 @@ int Staff::GetYRel()
 //----------------------------------------------------------------------------
 
 
-int Staff::Align( ArrayPtrVoid params )
+int Staff::AlignVertically( ArrayPtrVoid params )
 {
-    // param 0: the measureAligner (unused)
-    // param 1: the time (unused)
-    // param 2: the systemAligner
-    // param 3: the staffNb
-    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[2]);
-	int *staffNb = static_cast<int*>(params[3]);
+    // param 0: the systemAligner
+    // param 1: the staffNb
+    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[0]);
+	int *staffNb = static_cast<int*>(params[1]);
+    
+    // we need to call it because we are overriding Object::AlignVertically
+    this->ResetVerticalAlignment();
     
     // this gets (or creates) the measureAligner for the measure
     StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment( *staffNb );

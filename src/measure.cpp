@@ -11,6 +11,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -141,9 +142,8 @@ Staff *Measure::GetStaffWithNo( int staffNo )
     }
 	return NULL;
 }
- 
 
-void Measure::ResetDrawingValues()
+void Measure::ResetHorizontalAlignment()
 {
     m_drawingXRel = 0;
     m_drawingX = 0;
@@ -164,7 +164,7 @@ int Measure::GetXRel()
     return 0;
 }
 
-int Measure::GetXRelRight()
+int Measure::GetRightBarlineX()
 {
     if ( m_measureAligner.GetRightAlignment() ) {
         return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -172,18 +172,26 @@ int Measure::GetXRelRight()
     return 0;
 }
 
+int Measure::GetWidth()
+{
+    if ( m_measureAligner.GetRightAlignment() ) {
+        return GetRightBarlineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
+    }
+    return 0;
+}
+    
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::Align( ArrayPtrVoid params )
+int Measure::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner
     // param 1: the time (unused)
-    // param 2: the systemAligner (unused)
-    // param 3: the staffNb
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
-    int *staffNb = static_cast<int*>(params[3]);
+    
+    // we need to call it because we are overriding Object::AlignHorizontally
+    this->ResetHorizontalAlignment();
     
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -195,21 +203,34 @@ int Measure::Align( ArrayPtrVoid params )
         m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
     
-    // we also need to reset the staffNb
-    (*staffNb) = 0;
-    
     assert( *measureAligner );
         
     return FUNCTOR_CONTINUE;
 }
 
+    
+int Measure::AlignVertically( ArrayPtrVoid params )
+{
+    // param 0: the systemAligner (unused)
+    // param 1: the staffNb
+    int *staffNb = static_cast<int*>(params[1]);
+    
+    // we need to call it because we are overriding Object::AlignVertically
+    this->ResetVerticalAlignment();
+    
+    // we also need to reset the staffNb
+    (*staffNb) = 0;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
 int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift (unused)
     // param 1: the functor to be redirected to Aligner
     MusFunctor *integrateBoundingBoxShift = static_cast<MusFunctor*>(params[1]);
     
-    m_measureAligner.Process( integrateBoundingBoxShift, params);
+    m_measureAligner.Process( integrateBoundingBoxShift, params );
     
     return FUNCTOR_SIBLINGS;
 }
@@ -225,8 +246,6 @@ int Measure::SetAligmentXPos( ArrayPtrVoid params )
     
     return FUNCTOR_SIBLINGS;
 }
-
-#include <math.h>
 
 int Measure::JustifyX( ArrayPtrVoid params )
 {
@@ -277,7 +296,7 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     int *shift = static_cast<int*>(params[3]);
     int *systemWidth = static_cast<int*>(params[4]);
     
-    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetXRelRight() - (*shift) > (*systemWidth) ) ) {
+    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetWidth() - (*shift) > (*systemWidth) ) ) {
         (*currentSystem) = new System();
         page->AddSystem( *currentSystem );
         (*shift) = this->m_drawingXRel;;

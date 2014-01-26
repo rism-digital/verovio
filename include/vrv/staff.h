@@ -68,10 +68,10 @@ public:
     int GetVerticalSpacing();
     
     /**
-     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
-     * Called by SetCurrentScoreDef functor.
+     * Reset the alignment values (m_drawingY, m_drawingYRel, etc.)
+     * Called by  AlignVertically
      */
-    virtual void ResetDrawingValues( );
+    virtual void ResetVerticalAlignment( );
     
     StaffAlignment *GetAlignment() { return m_staffAlignment; };
     
@@ -90,9 +90,9 @@ public:
     Layer *GetLayerWithIdx( int LayerIdx );
     
     /**
-     * Align the content of a system.
+     * Align the content of a staff vertically.
      */
-    virtual int Align( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid params );
     
 public:
 	/**

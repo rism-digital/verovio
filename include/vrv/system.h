@@ -47,11 +47,16 @@ public:
 	Measure *GetPrevious( Measure *measure );
 	Measure *GetAtPos( int x );
     
+    
+    
     /**
-     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
-     * Called by SetCurrentScoreDef functor.
+     * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
+     * Called by AlignHorizontally and AlignVertically
      */
-    virtual void ResetDrawingValues( );
+    ///@{
+    virtual void ResetHorizontalAlignment( );
+    virtual void ResetVerticalAlignment( );
+    ///@}
     
     /**
      * Return the default horizontal spacing of system.
@@ -73,9 +78,9 @@ public:
     virtual int Save( ArrayPtrVoid params );
     
     /**
-     * Align the content of a system.
+     * Align the content of a system vertically.
      */
-    virtual int Align( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid params );
     
     /**
      * Set the position of the StaffAlignment.
@@ -110,6 +115,17 @@ public:
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int JustifyX( ArrayPtrVoid params );
+    
+    /**
+     * Lay out the Y positions of the staff looking that the bounding boxes of each staff
+     * This is the MusFunctor called at the end of the system or a measure.
+     */
+    virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid params );
+    
+    /**
+     *
+     */
+    virtual int CastOffPages( ArrayPtrVoid params );
     
 private:
     SystemAligner m_systemAligner;

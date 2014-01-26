@@ -56,7 +56,7 @@ public:
     
     /**
      * Get bottom StaffAlignment for the system.
-     * For each SystemAligner, we keep and StaffAlignment for the bottom position.
+     * For each SystemAligner, we keep a StaffAlignment for the bottom position.
      */
     StaffAlignment *GetBottomAlignment( ) { return m_bottomAlignment; };
     
@@ -208,7 +208,7 @@ private:
     int m_maxWidth;
     /**
      * Stores the time at which the alignment occur.
-     * It is set by  Object::Align.
+     * It is set by Object::AlignHorizontally.
      */
     double m_time;
     /**

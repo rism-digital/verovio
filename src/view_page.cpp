@@ -549,7 +549,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
         DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_drawingX, measure->GetLeftBarline() );
     }
     if ( measure->GetRightBarlineType() != BARLINE_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_drawingX + measure->GetXRelRight(), measure->GetRightBarline() );
+        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_drawingX + measure->GetRightBarlineX(), measure->GetRightBarline() );
     }
     
     if ( measure->IsMeasuredMusic()) {
@@ -664,7 +664,7 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     //x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
     
     x1 = measure->m_drawingX;
-    x2 = x1 + measure->GetXRelRight();
+    x2 = x1 + measure->GetWidth(); // - m_doc->m_env.m_barlineWidth / 2;
     
     dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );

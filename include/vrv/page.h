@@ -64,12 +64,12 @@ public:
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
      */
-    void Layout( bool force = false );
+    void LayOut( bool force = false );
     
     /**
-     * Align the content of the page (measures and their content) horizontally
+     * Lay out the content of the page (measures and their content) horizontally
      */
-    void AlignHorizontally( );
+    void LayOutHorizontally( );
     
     /**
      * Justifiy the content of the page (measures and their content) horizontally
@@ -77,11 +77,9 @@ public:
     void JustifyHorizontally( );
 
     /**
-     * Align the content of the page (system/staves) vertically.
-     * This should be called only one Page::AlignHorizontally has been called before.
-     * (Otherwise, the bounding boxes used for performing the alignment would be missing).
+     * Lay out the content of the page (system/staves) vertically.
      */
-    void AlignVertically( );
+    void LayOutVertically(  );
     
     /**
      * Justifiy the content of the page (system/staves) vertically

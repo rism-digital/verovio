@@ -48,10 +48,10 @@ public:
     virtual int GetHorizontalSpacing( );
     
     /**
-     * Reset the drawing values (m_drawingX, m_drawingXRel, etc.)
-     * Called by SetCurrentScoreDef functor.
+     * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
+     * Called by AlignHorizontally
      */
-    virtual void ResetDrawingValues( );
+    virtual void ResetHorizontalAlignment( );
     
     /** Adjust the pname and the octave for values outside the range */
     static void AdjustPname( int *pname, int *oct );
@@ -127,9 +127,9 @@ public:
     virtual int Save( ArrayPtrVoid params );
     
     /**
-     * Align the content of a system.
+     * Align horizontally the LayerElement.
      */
-    virtual int Align( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid params );
     
 private:
     void Init();

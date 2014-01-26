@@ -38,7 +38,7 @@ void View::DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int n
 	assert( dc ); // DC cannot be NULL
 
     dc->SetPen( m_currentColour, std::max( 1, ToDeviceContextX(nbr) ), AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
+    dc->SetBrush( m_currentColour, AxSOLID );
 
 	dc->DrawLine( ToDeviceContextX(x1) , ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1) );
 

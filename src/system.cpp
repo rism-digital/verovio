@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "vrv.h"
+#include "doc.h"
 #include "io.h"
 #include "measure.h"
 #include "page.h"
@@ -93,14 +94,19 @@ int System::GetVerticalSpacing()
     return 0; // arbitrary generic value
 }
 
-void System::ResetDrawingValues()
+void System::ResetHorizontalAlignment()
 {
     m_drawingXRel = 0;
 	m_drawingX = 0;
-    m_drawingYRel = 0;
-	m_drawingY = 0;
 }
 
+    
+void System::ResetVerticalAlignment()
+{
+    m_drawingYRel = 0;
+    m_drawingY = 0;
+}
+    
 Measure *System::GetFirst( )
 {
 	if ( m_children.empty() )
@@ -170,13 +176,14 @@ Measure *System::GetAtPos( int x )
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::Align( ArrayPtrVoid params )
+int System::AlignVertically( ArrayPtrVoid params )
 {
-    // param 0: the measureAligner (unused)
-    // param 1: the time (unused)
-    // param 2: the systemAligner
-    // param 3: the staffNb (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[2]);
+    // param 0: the systemAligner
+    // param 1: the staffNb (unused)
+    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[0]);
+    
+    // we need to call it because we are overriding Object::AlignVertically
+    this->ResetVerticalAlignment();
     
     // When calculating the alignment, the position has to be 0
     m_drawingXRel = 0;
@@ -272,6 +279,46 @@ int System::JustifyX( ArrayPtrVoid params )
     }
     
     return FUNCTOR_CONTINUE;
+}
+    
+int System::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
+{
+    // param 0: the height of the previous staff
+    int *system_height = static_cast<int*>(params[1]);
+    
+    m_systemAligner.GetBottomAlignment()->SetYShift( (*system_height) );
+
+    return FUNCTOR_CONTINUE;
+}
+
+    
+int System::CastOffPages( ArrayPtrVoid params )
+{
+    // param 0: a pointer to the page we are taking the content from
+    // param 1: a pointer the document we are adding pages to
+    // param 2: a pointer to the current page
+    // param 3: the cummulated shift (m_drawingYRel of the first system of the current page)
+    // param 4: the page height
+    Page *contentPage = static_cast<Page*>(params[0]);
+    Doc *doc = static_cast<Doc*>(params[1]);
+    Page **currentPage = static_cast<Page**>(params[2]);
+    int *shift = static_cast<int*>(params[3]);
+    int *pageHeight = static_cast<int*>(params[4]);
+    
+    if ( ( (*currentPage)->GetChildCount() > 0 ) && ( this->m_drawingYRel + this->m_systemAligner.GetBottomAlignment()->GetYRel() - (*shift) < 0 )) { //(*pageHeight) ) ) {
+        (*currentPage) = new Page();
+        doc->AddPage( *currentPage );
+        (*shift) = this->m_drawingYRel - (*pageHeight);
+    }
+    
+    // Special case where we use the Relinquish method.
+    // We want to move the system to the currentPage. However, we cannot use DetachChild
+    // from the contentPage because this screws up the iterator. Relinquish gives up
+    // the ownership of the system - the contentPage itself will be deleted afterwards.
+    System *system = dynamic_cast<System*>( contentPage->Relinquish( this->GetIdx()) );
+    (*currentPage)->AddSystem( system );
+    
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

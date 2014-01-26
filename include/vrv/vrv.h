@@ -12,6 +12,7 @@
 #include <cstring>
 #include <stdio.h>
 #include <string>
+#include <sys/time.h>
 
 namespace vrv {
 

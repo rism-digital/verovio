@@ -105,7 +105,7 @@ void Doc::Layout( )
     
     Page *contentPage = this->SetDrawingPage( 0 );
     assert( contentPage );
-    contentPage->AlignHorizontally();
+    contentPage->LayOutHorizontally();
     
     System *contentSystem = dynamic_cast<System*>(contentPage->DetachChild( 0 ));
     assert( contentSystem );
@@ -125,9 +125,36 @@ void Doc::Layout( )
     contentSystem->Process( &castOffSystems, params );
     delete contentSystem;
     
-    //LogMessage("Prout");
+    LogDebug("Layout: %d systems", contentPage->GetSystemCount());
+    
+    // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDef( true );
-    contentPage->Layout( true );
+    contentPage->LayOutVertically( );
+    
+    // Detach the contentPage
+    this->DetachChild( 0 );
+    assert( contentPage && !contentPage->m_parent );
+    
+    Page *currentPage = new Page();
+    this->AddPage( currentPage );
+    shift = 0;
+    int pageFullHeight = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
+    params.clear();
+    params.push_back( contentPage );
+    params.push_back( this );
+    params.push_back( &currentPage );
+    params.push_back( &shift );
+    params.push_back( &pageFullHeight );
+    MusFunctor castOffPages( &Object::CastOffPages );
+    contentPage->Process( &castOffPages, params );
+    delete contentPage;
+    
+    LogDebug("Layout: %d pages", this->GetChildCount());
+
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage( );
+    this->SetCurrentScoreDef( true );
 }
     
 bool Doc::HasPage( int pageIdx )
