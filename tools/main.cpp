@@ -69,7 +69,7 @@ void display_usage() {
     
     cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae (default is pae)" << endl;
     
-    cerr << " -p, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
+    cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
     
     cerr << " -o, --outfile=FILE_NAME    Output file name" << endl;
     
@@ -85,6 +85,8 @@ void display_usage() {
     cerr << endl << "Additional options" << endl;
     
     cerr << " --adjust-page-height       Crop the page height to the height of the content" << endl;
+    
+    cerr << " --help                     Display this message" << endl;
     
     cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and fully recalculate the layout" << endl;
@@ -122,6 +124,7 @@ int main(int argc, char** argv)
     int no_justification = 0;
     int show_bounding_boxes = 0;
     int page = 1;
+    int show_help = 0;
       
     InterfaceController controller;
     
@@ -141,13 +144,14 @@ int main(int argc, char** argv)
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"border",              required_argument,  0, 'b'},
         {"format",              required_argument,  0, 'f'},
+        {"help",                no_argument,        &show_help, 1},
         {"ignore-layout",       no_argument,        &ignore_layout, 1},
         {"no-layout",           no_argument,        &no_layout, 1},
         {"no-mei-hdr",          no_argument,        &no_mei_hdr, 1},
         {"no-justification",    no_argument,        &no_justification, 1},
         {"outfile",             required_argument,  0, 'o'},
         {"page",                required_argument,  0, 0},
-        {"page-height",         required_argument,  0, 'p'},
+        {"page-height",         required_argument,  0, 'h'},
         {"page-width",          required_argument,  0, 'w'},
         {"resources",           required_argument,  0, 'r'},
         {"scale",               required_argument,  0, 's'},
@@ -157,7 +161,7 @@ int main(int argc, char** argv)
     };
     
     int option_index = 0;
-    while ((c = getopt_long(argc, argv, "b:f:ho:p:r:s:t:w:", long_options, &option_index)) != -1)
+    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:", long_options, &option_index)) != -1)
     {                
         switch (c)
         {
@@ -173,7 +177,6 @@ int main(int argc, char** argv)
                     exit(1);
                 }
                 break;
-                
             
             case 'f':
                 if ( !controller.SetFormat ( string(optarg) ) ) {
@@ -182,18 +185,13 @@ int main(int argc, char** argv)
                 break;
                 
             case 'h':
-                display_usage();
-                exit(0);
+                if ( !controller.SetPageHeight( atoi(optarg) ) ) {
+                    exit(1);
+                };
                 break;
                 
             case 'o':
                 outfile = string(optarg);
-                break;
-            
-            case 'p':
-                if ( !controller.SetPageHeight( atoi(optarg) ) ) {
-                     exit(1);
-                };
                 break;
                 
             case 'r':
@@ -224,6 +222,11 @@ int main(int argc, char** argv)
             default:
                 break;
         }
+    }
+    
+    if (show_help) {
+        display_usage();
+        exit(0);
     }
     
     // Set the various flags
