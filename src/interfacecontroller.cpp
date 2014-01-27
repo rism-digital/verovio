@@ -245,9 +245,20 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     // Get the current system for the SVG clipping size
     m_view.SetPage( pageNo );
     
+    // Adjusting page width and height according to the options
+    int width = m_pageWidth;
+    if ( m_noLayout ) {
+        width = m_doc.GetAdjustedDrawingPageWidth();
+    }
+    
+    int height = m_pageHeight;
+    if ( m_adjustPageHeight || m_noLayout ) {
+        height = m_doc.GetAdjustedDrawingPageHeight();
+    }
+    
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg( m_pageWidth, m_pageHeight );
+    SvgDeviceContext svg( width, height );
     
     // set scale and border from user options
     svg.SetUserScale((double)m_scale / 100, (double)m_scale / 100);
@@ -256,10 +267,7 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
     
     // render the page
-    m_view.DrawCurrentPage( &svg, false);
-    
-    // TODO: adjust the size of the page depending on the options
-    // --no-layout or --adjust-page-height
+    m_view.DrawCurrentPage( &svg, false );
     
     std::string out_str = svg.GetStringSVG( xml_tag );
     return out_str;

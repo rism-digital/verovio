@@ -341,5 +341,46 @@ void Page::JustifyHorizontally( )
     params.push_back( &justifyX );
     this->Process( &justifyX, params );
 }
+    
+int Page::GetContentHeight( )
+{
+    if (!dynamic_cast<Doc*>(m_parent)) {
+        assert( false );
+        return 0;
+    }
+    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert( this == doc->GetDrawingPage() );
+    
+    System *last = dynamic_cast<System*>(m_children.back());
+    if (!last ) {
+        return 0;
+    }
+    return  doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->m_drawingYRel + last->GetHeight();
+    
+}
 
+int Page::GetContentWidth( )
+{
+    if (!dynamic_cast<Doc*>(m_parent)) {
+        assert( false );
+        return 0;
+    }
+    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert( this == doc->GetDrawingPage() );
+    
+    System *first = dynamic_cast<System*>(m_children.front());
+    if (!first ) {
+        return 0;
+    }
+    // we include the left margin and the right margin
+    return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+}
+
+    
 } // namespace vrv

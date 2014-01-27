@@ -85,6 +85,21 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically( );
+    
+    /**
+     * Return the height of the content by looking at the last system of the page.
+     * This is used for adjusting the page height when this is the expected behaviour,
+     * typically with the --adjust-page-height option in the commandline tool
+     */
+    int GetContentHeight( );
+
+    /**
+     * Return the width of the content by looking at the first system of the page.
+     * This is used for adjusting the page with when this is the expected behaviour,
+     * typically with the --no_layout option in the commandline tool
+     * 
+     */
+    int GetContentWidth( );
 
     //----------//
     // Functors //

@@ -18,7 +18,7 @@ function render_music( music, format )
 	// The trailing newline is needed so we can read the file lines
 	// correctly if the file does not end with a newline
 	//var svg = convertMusic(format, 0, music + "\n");
-	var svg = convertMusic(music, JSON.stringify({inputFormat: format, scale: 50, pageHeight: 250, pageWidth: 2000}));
+	var svg = convertMusic(music, JSON.stringify({inputFormat: format, scale: 50, pageWidth: 2100, border: 0, adjustPageHeight: true}));
 	document.getElementById('test').innerHTML = svg;
 
 };

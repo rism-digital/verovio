@@ -47,8 +47,6 @@ public:
 	Measure *GetPrevious( Measure *measure );
 	Measure *GetAtPos( int x );
     
-    
-    
     /**
      * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
      * Called by AlignHorizontally and AlignVertically
@@ -57,6 +55,11 @@ public:
     virtual void ResetHorizontalAlignment( );
     virtual void ResetVerticalAlignment( );
     ///@}
+    
+    /**
+     * Return the height of the system
+     */
+    int GetHeight( );
     
     /**
      * Return the default horizontal spacing of system.

@@ -122,7 +122,19 @@ public:
      * asserting that currently have the right page.
      */
     Page *GetDrawingPage( ) { return m_drawingPage; };
+    
+    /**
+     * Return the width adjusted to the content of the current drawing page.
+     * This includes the appropriate left and right margins.
+     */
+    int GetAdjustedDrawingPageWidth( );
 
+    /**
+     * Return the height adjusted to the content of the current drawing page.
+     * This includes the appropriate top and bottom margin (using top as bottom).
+     */
+    int GetAdjustedDrawingPageHeight( );
+    
     /**
      * Initializes fonts from the resources (music and lyrics)
      * The method is called when the doc is reset.

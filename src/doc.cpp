@@ -335,7 +335,21 @@ void Doc::UpdateFontValues()
 	m_drawingLyricFonts[0] = m_drawingLyricFont;
     m_drawingLyricFonts[1] = m_drawingLyricFont;
 }
+    
+int Doc::GetAdjustedDrawingPageHeight()
+{
+    assert( m_drawingPage );
+    int contentHeight = m_drawingPage->GetContentHeight();
+    return (contentHeight + m_drawingPageTopMar * 2);
+}
 
+    
+int Doc::GetAdjustedDrawingPageWidth()
+{
+    assert( m_drawingPage );
+    int contentWidth = m_drawingPage->GetContentWidth();
+    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar);
+}
 
 int Doc::Save( FileOutputStream *output )
 {

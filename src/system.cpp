@@ -170,6 +170,15 @@ Measure *System::GetAtPos( int x )
 
 	return measure;
 }
+    
+    
+int System::GetHeight()
+{
+    if ( m_systemAligner.GetBottomAlignment() ) {
+        return -m_systemAligner.GetBottomAlignment()->GetYRel();
+    }
+    return 0;
+}
 
 
 //----------------------------------------------------------------------------
@@ -305,7 +314,7 @@ int System::CastOffPages( ArrayPtrVoid params )
     int *shift = static_cast<int*>(params[3]);
     int *pageHeight = static_cast<int*>(params[4]);
     
-    if ( ( (*currentPage)->GetChildCount() > 0 ) && ( this->m_drawingYRel + this->m_systemAligner.GetBottomAlignment()->GetYRel() - (*shift) < 0 )) { //(*pageHeight) ) ) {
+    if ( ( (*currentPage)->GetChildCount() > 0 ) && ( this->m_drawingYRel - this->GetHeight() - (*shift) < 0 )) { //(*pageHeight) ) ) {
         (*currentPage) = new Page();
         doc->AddPage( *currentPage );
         (*shift) = this->m_drawingYRel - (*pageHeight);
