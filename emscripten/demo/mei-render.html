@@ -28,7 +28,7 @@
 
 	var vrvToolkit = new verovio.toolkit();
 	var page = 1;
-	var zoom = 100;
+	var zoom = 40;
 
 	function upload_file(input, format) {
 	
@@ -44,7 +44,7 @@
 				
 				document.getElementById("total_text").innerHTML = vrvToolkit.getPageCount();
 				
-				zoom = 100;
+				//zoom = 40;
 				page = 1;
 				set_zoom(zoom);
 				// set_zoom calls goto page
@@ -91,7 +91,7 @@
   	}
   
   	function zoom_out() {
-  		if (zoom <= 1) {
+  		if (zoom <= 10) {
   			return;
   		}
 		
@@ -100,13 +100,43 @@
   	}
 	
   	function zoom_in() {
-  		if (zoom > 400) {
+  		if (zoom > 150) {
   			return;
   		}
 		
 		zoom = zoom + 10;
 		set_zoom(zoom);
   	}
+  
+	function do_page_enter(e) {
+		key = e.keyCode || e.which;
+		if (key == 13) {
+			
+			text = document.getElementById('jump_text').value;
+			
+			if (text <= vrvToolkit.getPageCount() && text > 0) {
+				page = Number(text);
+				goto_page(page);
+			} else {
+				 document.getElementById('jump_text').value = page;
+			}
+			
+		}
+	}
+	
+	function do_zoom_enter(e) {
+		key = e.keyCode || e.which;
+		if (key == 13) {
+			
+			text = document.getElementById('zoom_text').value;
+			
+			if (text < 150 && text > 10) {
+				zoom = Number(text);
+				set_zoom(zoom);
+			}
+			
+		}
+	}
   
 </script>
 	
@@ -125,7 +155,7 @@
 	  
       <div class="row row-offcanvas row-offcanvas-right">
 
-          <div class="col-xs-12 col-sm-9">
+          <div class="col-xs-9">
               <p class="pull-right visible-xs">
                   <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
               </p>
@@ -153,7 +183,7 @@
 			
 		</div>
 		
-		<div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="col-xs-3 sidebar-offcanvas" id="sidebar" role="navigation">
 		  <div class="panel panel-default">
 			<div class="panel-heading">Navigation</div>
 		    <div class="panel-body">
@@ -165,7 +195,7 @@
 					      	<span class="input-group-btn">
 					        	<button onclick="prev_page()" class="btn btn-default" type="button"><<</button>
 					      	</span>
-					      	<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:40px">
+					      	<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:40px" onkeypress="do_page_enter(event)">
 						  	<span class="input-group-addon" id="total_text">/ 0</span>
 					      	<span class="input-group-btn">
 					        	<button onclick="next_page()" class="btn btn-default" type="button">>></button>
@@ -183,7 +213,7 @@
 					      	<span class="input-group-btn">
 					        	<button onclick="zoom_out()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-out"></span></button>
 					      	</span>
-					      	<input type="text" class="form-control" placeholder="100%" id="zoom_text" style="width:60px">
+					      	<input type="text" class="form-control" placeholder="100%" id="zoom_text" style="width:60px" onkeypress="do_zoom_enter(event)">
 					      	<span class="input-group-btn">
 					        	<button onclick="zoom_in()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-in"></span></button>
 					      	</span>
