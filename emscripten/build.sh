@@ -76,7 +76,19 @@ python $EMCC --closure 0 -O2 \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
-	-s EXPORTED_FUNCTIONS="['_convertMusic']" \
+	-s EXPORTED_FUNCTIONS="['_convertMusic',\
+		'_vrvInterfaceController_constructor',\
+		'_vrvInterfaceController_destructor',\
+		'_vrvInterfaceController_getLog',\
+		'_vrvInterfaceController_getPageCount',\
+		'_vrv_InterfaceController_loadData',\
+		'_vrvInterfaceController_renderData',\
+		'_vrvInterfaceController_renderPage',\
+		'_vrvInterfaceController_setOptions']" \
     -o build/verovio.js
 
-if [ $? -eq 0 ]; then echo "Done."; fi
+if [ $? -eq 0 ]; then 
+	echo "Done."
+	cat build/verovio.js verovio-proxy.js > build/verovio-class.js
+	echo "JavaScript class in build/verovio-class.js"
+fi

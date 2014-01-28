@@ -50,4 +50,69 @@ extern "C" {
         // return self allocated pointer?
         // see https://github.com/DDMAL/aruspix/commit/cb2b957ebcc8edf9787bc6f6271217115a6959e3
     }
+	
+	/****************************************************************
+	* Methods exported to use the InterfaceController class from js
+	****************************************************************/
+	void *vrvInterfaceController_constructor() {
+		
+		// Init the random number generator
+		// for mei ids
+        if (!initialized) {
+            std::srand(std::time(0));
+            initialized = true;
+        }
+		
+		// set the resource path in the js blob
+		Resources::SetPath("/data");
+		
+		return new InterfaceController();
+	}
+	
+	void vrvInterfaceController_destructor(InterfaceController *ic) {
+		delete ic;
+	}
+	
+	const char *vrvInterfaceController_getLog(InterfaceController *ic) {
+		return NULL;
+	}
+	
+	
+	int vrvInterfaceController_getPageCount(InterfaceController *ic) {
+		return 0;
+	}
+
+	bool vrv_InterfaceController_loadData(InterfaceController *ic, const char *data) {
+        string notation(data);
+        return ic->LoadString( notation );
+	}
+
+	const char* vrvInterfaceController_renderData(InterfaceController *ic, const char *data, const char *c_options) {
+        string notation(data);
+		string options(c_options);
+		string out_str;
+		
+        if (!ic->ParseOptions( options )) {
+            vrv::LogError( "Could not load JSON options." );
+            return NULL;
+        }
+		
+        ic->LoadString( notation );
+		
+        out_str = ic->RenderToSvg();
+        return out_str.c_str();
+	}
+
+	const char *vrvInterfaceController_renderPage(InterfaceController *ic, int page_no, const char *c_options) {
+		return NULL;
+	}
+	
+	void vrvInterfaceController_setOptions(InterfaceController *ic, const char *c_options) {
+		string options(c_options);
+		
+        if (!ic->ParseOptions( options )) {
+            vrv::LogError( "Could not load JSON options." );
+        }
+	}
+
 }
