@@ -62,6 +62,16 @@ public:
      */
     bool RenderToSvgFile( std::string filename, int pageNo =  1 );
     
+	/**
+	* @name Set and get a std::string into a char * buffer.
+	* This is used for returning a string buffer to emscripten.
+	* The buffer is freed when reset or in MusController destructor.
+	*/
+	///@{
+	void SetCString( std::string data );
+	char *GetCString( );
+	///@}
+	
     /**
      * @name Set and get the border
      */
@@ -175,6 +185,8 @@ private:
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;
+	
+	char *m_cString;
 };
 
 } // namespace vrv

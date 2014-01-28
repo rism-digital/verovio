@@ -49,11 +49,16 @@ InterfaceController::InterfaceController()
     m_adjustPageHeight = false;
     m_noJustification = false;
     m_showBoundingBoxes = false;
+	
+	m_cString = NULL;
 }
 
 
 InterfaceController::~InterfaceController()
 {
+    if (m_cString) {
+        free( m_cString );
+    }
 }
     
 bool InterfaceController::SetBorder( int border )
@@ -293,6 +298,32 @@ bool InterfaceController::RenderToSvgFile( std::string filename, int pageNo )
 
 int InterfaceController::GetPageCount() {
 	return m_doc.GetPageCount();
+}
+
+void InterfaceController::SetCString( std::string data )
+{
+    if (m_cString) {
+        free(m_cString);
+        m_cString = NULL;
+    }
+    
+    m_cString = (char *)malloc(strlen(data.c_str()) + 1);
+    
+    // something went wrong
+    if (!m_cString) {
+        return;
+    }
+    strcpy(m_cString, data.c_str());
+}
+
+char *InterfaceController::GetCString( )
+{
+    if (m_cString) {
+        return m_cString;
+    }
+    else {
+        return "[unspecified]";
+    }
 }
 
 } //namespace vrv

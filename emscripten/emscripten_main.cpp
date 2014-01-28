@@ -88,10 +88,8 @@ extern "C" {
 
 
 	const char *vrvInterfaceController_renderPage(InterfaceController *ic, int page_no, const char *c_options) {
-		//string out_str;
-		
-        return ic->RenderToSvg(page_no, false).c_str();
-        //return out_str.c_str();
+		ic->SetCString(ic->RenderToSvg(page_no, false));
+		return ic->GetCString();
 	}
 	
 	void vrvInterfaceController_setOptions(InterfaceController *ic, const char *options) {		
@@ -105,20 +103,6 @@ extern "C" {
 		vrv_InterfaceController_loadData(ic, data);
 		
 		return vrvInterfaceController_renderPage(ic, 1, options);
-		
-		/*
-		string out_str;
-		
-        if (!ic->ParseOptions( options )) {
-            vrv::LogError( "Could not load JSON options." );
-            return NULL;
-        }
-		
-        ic->LoadString( data );
-		
-        out_str = ic->RenderToSvg(1, false);
-        return out_str.c_str();
-		*/
 	}
 
 
