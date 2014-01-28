@@ -79,17 +79,34 @@ extern "C" {
 	
 	
 	int vrvInterfaceController_getPageCount(InterfaceController *ic) {
-		return 0;
+		return ic->GetPageCount();
 	}
 
 	bool vrv_InterfaceController_loadData(InterfaceController *ic, const char *data) {
-        string notation(data);
-        return ic->LoadString( notation );
+        return ic->LoadString( data );
 	}
 
-	const char* vrvInterfaceController_renderData(InterfaceController *ic, const char *data, const char *c_options) {
-        string notation(data);
-		string options(c_options);
+
+	const char *vrvInterfaceController_renderPage(InterfaceController *ic, int page_no, const char *c_options) {
+		//string out_str;
+		
+        return ic->RenderToSvg(page_no, false).c_str();
+        //return out_str.c_str();
+	}
+	
+	void vrvInterfaceController_setOptions(InterfaceController *ic, const char *options) {		
+        if (!ic->ParseOptions( options )) {
+            vrv::LogError( "Could not load JSON options." );
+        }
+	}
+
+	const char* vrvInterfaceController_renderData(InterfaceController *ic, const char *data, const char *options) {
+		vrvInterfaceController_setOptions(ic, options);
+		vrv_InterfaceController_loadData(ic, data);
+		
+		return vrvInterfaceController_renderPage(ic, 1, options);
+		
+		/*
 		string out_str;
 		
         if (!ic->ParseOptions( options )) {
@@ -97,22 +114,12 @@ extern "C" {
             return NULL;
         }
 		
-        ic->LoadString( notation );
+        ic->LoadString( data );
 		
-        out_str = ic->RenderToSvg();
+        out_str = ic->RenderToSvg(1, false);
         return out_str.c_str();
+		*/
 	}
 
-	const char *vrvInterfaceController_renderPage(InterfaceController *ic, int page_no, const char *c_options) {
-		return NULL;
-	}
-	
-	void vrvInterfaceController_setOptions(InterfaceController *ic, const char *c_options) {
-		string options(c_options);
-		
-        if (!ic->ParseOptions( options )) {
-            vrv::LogError( "Could not load JSON options." );
-        }
-	}
 
 }

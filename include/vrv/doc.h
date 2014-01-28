@@ -65,6 +65,11 @@ public:
      */
     bool HasPage( int pageIdx );
     
+	/**
+	* Get the total page count
+	*/
+	int GetPageCount( );
+	
     /**
      * @name Setters for the page dimensions and margins
      */

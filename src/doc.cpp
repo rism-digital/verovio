@@ -162,6 +162,11 @@ bool Doc::HasPage( int pageIdx )
     return ( (pageIdx >= 0 ) && (pageIdx < GetChildCount() ) );
 }
 
+int Doc::GetPageCount( )
+{
+    return GetChildCount() ;
+}
+
 Page *Doc::SetDrawingPage( int pageIdx )
 {
     // out of range 

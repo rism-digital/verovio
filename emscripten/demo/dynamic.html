@@ -5,20 +5,19 @@
 
     <title>Dynamic demo</title>
 
-<script src="../build/verovio.js" type="text/javascript"></script>	
+<script src="../build/verovio-class.js" type="text/javascript"></script>	
 
 <script type="text/javascript">
 
-// Export the conversion function
-//convertMusic = Module.cwrap('convertMusic', 'string', ['integer', 'integer', 'string'])
-convertMusic = Module.cwrap('convertMusic', 'string', ['string', 'string'])
+vrvToolkit = new verovio.toolkit();
 
 function render_music( music, format )
 {	
 	// The trailing newline is needed so we can read the file lines
 	// correctly if the file does not end with a newline
 	//var svg = convertMusic(format, 0, music + "\n");
-	var svg = convertMusic(music, JSON.stringify({inputFormat: format, scale: 50, pageWidth: 2100, border: 0, adjustPageHeight: true}));
+	
+	var svg = vrvToolkit.renderData(music, JSON.stringify({inputFormat: format, scale: 50, pageWidth: 2100, border: 0, adjustPageHeight: true}));
 	document.getElementById('test').innerHTML = svg;
 
 };
@@ -33,7 +32,14 @@ function upload_file(input, format) {
 	reader.onload = (function(theFile) {
 		return function(e) {
 		// Render thumbnail.
-		 render_music(e.target.result, format);
+		 //render_music(e.target.result, format);
+		 //return;
+		 vrvToolkit.setOptions(JSON.stringify({inputFormat: format, scale: 50, pageWidth: 2100, border: 0}));
+		 vrvToolkit.loadData(e.target.result);
+		 document.getElementById("total").innerHTML = "1/" + vrvToolkit.getPageCount();
+		 svg = vrvToolkit.renderPage(1, "");
+		 //svg = vrvToolkit.renderData(e.target.result, JSON.stringify({inputFormat: format, scale: 50, pageWidth: 2100, border: 0, adjustPageHeight: true}));
+		 document.getElementById('test').innerHTML = svg;
 	};
 	})(file);
 
@@ -41,11 +47,40 @@ function upload_file(input, format) {
 	reader.readAsText(file);
 
   };
+
+  var page = 1;
+  
+function next_page() {
+	if (page >= vrvToolkit.getPageCount()) {
+		return;
+	}
+	
+	page = page + 1;
+
+	document.getElementById("total").innerHTML = page + "/" + vrvToolkit.getPageCount();
+	svg = vrvToolkit.renderPage(page, "");
+	document.getElementById('test').innerHTML = svg;
+} ;
+
+function prev_page() {
+	if (page <= 1) {
+		return;
+	}
+	
+	page = page - 1;
+	document.getElementById("total").innerHTML = page + "/" + vrvToolkit.getPageCount();
+	svg = vrvToolkit.renderPage(page, "");
+	document.getElementById('test').innerHTML = svg;
+} ;
   
 </script>
 </head>
 <body>
 <h3>Read PAE/MEI from Javascript Demo</h3>
+<button onclick="prev_page()"><<</button>
+<label id="total">0</label>
+  <button onclick="next_page()">>></button>
+  
 	<div id="test">	(output will be here)</div>
 
 	<hr>
@@ -76,4 +111,5 @@ function upload_file(input, format) {
     <input type="file" id="mei_files" name="files[]" />
     <input type="submit" value="Render">
   </form>
+
 </body>

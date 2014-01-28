@@ -145,6 +145,14 @@ public:
     void SetFormat( ConvertFileFormat format ) { m_format = format; };
     int GetFormat() { return m_format; };
     ///@}
+	
+   /**
+    * @name Get the pages for a loaded file
+    * The SetFormat with ConvertFileFormat does not perform any validation
+    */
+   ///@{
+   int GetPageCount( );
+   ///@}
     
 private:
     

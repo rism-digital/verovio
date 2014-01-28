@@ -74,7 +74,7 @@ verovio.toolkit.prototype.getPageCount = function () {
 };
 
 verovio.toolkit.prototype.loadData = function (data) {
-  	return verovio.vrvInterfaceController.getPageCount(this.ptr, data);
+  	return verovio.vrvInterfaceController.loadData(this.ptr, data);
 };
 
 verovio.toolkit.prototype.renderData = function (data, options) {
@@ -86,6 +86,6 @@ verovio.toolkit.prototype.renderPage = function (page_no, options) {
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {
-  	return verovio.vrvInterfaceController.setOptions(this.ptr, options);
+	verovio.vrvInterfaceController.setOptions(this.ptr, options);
 };
 /***************************************************************************************************************************/

@@ -180,7 +180,6 @@ bool InterfaceController::LoadString( std::string data )
     }
     
     delete input;
-    
     m_view.SetDoc( &m_doc );
     
     return true;
@@ -290,5 +289,10 @@ bool InterfaceController::RenderToSvgFile( std::string filename, int pageNo )
     outfile.close();
     return true;
 }
-    
+
+
+int InterfaceController::GetPageCount() {
+	return m_doc.GetPageCount();
+}
+
 } //namespace vrv
