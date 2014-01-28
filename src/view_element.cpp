@@ -349,7 +349,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
 			
 			// ENZ
-			if ( note->m_stemDir != 0 ) {
+			if ( note->m_stemDir == 0 ) {
 				up = (up == ON) ? OFF : ON;
             }
 			

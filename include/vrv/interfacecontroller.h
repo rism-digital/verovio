@@ -69,7 +69,7 @@ public:
 	*/
 	///@{
 	void SetCString( std::string data );
-	char *GetCString( );
+	const char *GetCString( );
 	///@}
 	
     /**

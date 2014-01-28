@@ -159,7 +159,7 @@ void Page::LayOut( bool force )
     
     this->LayOutHorizontally();
     this->LayOutVertically();
-    //this->JustifyHorizontally();
+    this->JustifyHorizontally();
     
     m_layoutDone = true;
 }
@@ -285,7 +285,7 @@ void Page::LayOutVertically( )
     // Adjusts the Y shift for making sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
-    int staffMargin = 1.0 * doc->m_drawingStaffSize[0]; // the minimal space we want to have between each staff
+    int staffMargin = 1.5 * doc->m_drawingStaffSize[0]; // the minimal space we want to have between each staff
     int* interlineSizes = doc->m_drawingInterl; // the interline sizes to be used for calculating the (previous) staff height
     params.push_back( &previousStaffHeight );
     params.push_back( &staffMargin );

@@ -316,7 +316,7 @@ void InterfaceController::SetCString( std::string data )
     strcpy(m_cString, data.c_str());
 }
 
-char *InterfaceController::GetCString( )
+const char *InterfaceController::GetCString( )
 {
     if (m_cString) {
         return m_cString;

@@ -1320,7 +1320,7 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
     // stem direction
     if ( note.attribute( "stem.dir" ) ) {
         // we use it to indicate opposite direction
-        vrvNote->m_stemDir = 1;
+        //vrvNote->m_stemDir = 1;
     }
     // coloration
     if ( note.attribute( "colored" ) ) {
