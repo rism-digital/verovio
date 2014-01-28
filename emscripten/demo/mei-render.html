@@ -42,7 +42,7 @@
 				vrvToolkit.setOptions(JSON.stringify({inputFormat: format, scale: 100, pageWidth: 2100, border: 0}));
 				vrvToolkit.loadData(e.target.result);
 				
-				document.getElementById("#total_text").innerHTML = vrvToolkit.getPageCount();
+				document.getElementById("total_text").innerHTML = vrvToolkit.getPageCount();
 				
 				zoom = 100;
 				page = 1;
