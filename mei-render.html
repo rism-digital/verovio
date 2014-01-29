@@ -1,0 +1,70 @@
+---
+layout: verovio
+title: MEI Rendering
+---
+<div class="row row-offcanvas row-offcanvas-right">
+	<div class="col-xs-9">
+		<p class="pull-right visible-xs">
+			<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+		</p>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Select MEI File
+			</div>
+			<div class="panel-body">
+				<form onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
+					<div class="form-group">
+						<input type="file" id="mei_files" name="files[]" />
+					</div><button type="submit" class="btn btn-default">Render</button>
+				</form>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div id="svg_output" style="overflow:auto; height:800px"></div>
+		</div>
+	</div>
+	<div class="col-xs-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Navigation
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-lg-6">
+						<p>
+							Go to Page:
+						</p>
+						<div class="input-group input-group-sm">
+							<span class="input-group-btn"><button onclick="prev_page()" class="btn btn-default" type="button"><span class="input-group-btn">&lt;&lt;</span></button></span> <input type="text" class="form-control" placeholder="0" id="jump_text" style="width:40px" onkeypress="do_page_enter(event)" /><span class="input-group-addon" id="total_text">/ 0</span> <span class="input-group-btn"><button onclick="next_page()" class="btn btn-default" type="button"><span class="input-group-btn">&gt;&gt;</span></button></span>
+						</div><!-- /input-group -->
+					</div><!-- /.col-lg-6 -->
+				</div><!-- /.row -->
+				<hr />
+				<div class="row">
+					<div class="col-lg-6">
+						<p>
+							Zoom:
+						</p>
+						<div class="input-group input-group-sm">
+							<input type="text" class="form-control" placeholder="100%" id="zoom_text" style="width:60px" onkeypress="do_zoom_enter(event)" />
+						</div><!-- /input-group -->
+					</div><!-- /.col-lg-6 -->
+				</div><!-- /.row -->
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Examples
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-lg-6">
+						<p>
+							<a href="link">Hummel Concerto</a>
+						</p>
+					</div><!-- /.col-lg-6 -->
+				</div><!-- /.row -->
+			</div>
+		</div>
+	</div>
+</div>
