@@ -15,13 +15,13 @@ active: mei-rendering
 			<div class="panel-body">
 				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
 					<div class="form-group">
-						<input type="file" id="mei_files" name="files[]" style="display:none" />
+						<input type="file" id="mei_files" style="display:none" />
 						<div class="input-append">
 							<button class="btn btn-default" onclick="$('input[id=mei_files]').click();">Browse and render</button>
 							<script type="text/javascript">
-							$('input[id=mei_files]').change(function() {
-								$('#upload_form').submit();
-							});
+								$('input[id=mei_files]').change(function() {
+									$('#upload_form').submit();
+								});
 							</script>
 						</div>
 					</div>
