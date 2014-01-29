@@ -1,6 +1,7 @@
 ---
 layout: verovio
 title: MEI Rendering
+active: mei-rendering
 ---
 <div class="row row-offcanvas row-offcanvas-right">
 	<div class="col-xs-9">
@@ -12,15 +13,24 @@ title: MEI Rendering
 				Select MEI File
 			</div>
 			<div class="panel-body">
-				<form onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
+				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
 					<div class="form-group">
-						<input type="file" id="mei_files" name="files[]" />
-					</div><button type="submit" class="btn btn-default">Render</button>
+						<input type="file" id="mei_files" name="files[]" style="display:none" />
+						<div class="input-append">
+							<button class="btn btn-default" onclick="$('input[id=mei_files]').click();">Browse and render</button>
+							<script type="text/javascript">
+							$('input[id=mei_files]').change(function() {
+								$('#upload_form').submit();
+							});
+							</script>
+						</div>
+					</div>
+					
 				</form>
 			</div>
 		</div>
 		<div class="panel panel-default">
-			<div id="svg_output" style="overflow:auto; height:800px"></div>
+			<div id="svg_output" style="overflow:auto; height:1194px"></div>
 		</div>
 	</div>
 	<div class="col-xs-3 sidebar-offcanvas" id="sidebar" role="navigation">
@@ -60,7 +70,7 @@ title: MEI Rendering
 				<div class="row">
 					<div class="col-lg-6">
 						<p>
-							<a href="link">Hummel Concerto</a>
+							<a href="link">Hummel Concertoo</a>
 						</p>
 					</div><!-- /.col-lg-6 -->
 				</div><!-- /.row -->

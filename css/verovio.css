@@ -1,0 +1,45 @@
+body {
+	margin-top: 75px;
+}
+
+.nav {
+	margin-top: 10px;
+}
+
+.navbar {
+	background: #fff;
+}
+
+.navbar-header {
+	height: 60px;
+}
+
+.navbar-brand {
+	padding: 5px 5px;
+}
+
+.navbar hr {
+	margin: 0px;
+	color: #464646;
+	background-color: #464646;
+	height: 2px;
+}
+
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 999px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    background: red;
+    cursor: inherit;
+    display: block;
+}
