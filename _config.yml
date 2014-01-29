@@ -1,4 +1,4 @@
 name: Your New Jekyll Site
 markdown: redcarpet
 pygments: true
-baseurl: /verovio
+baseurl: "http://lpugin.github.io/verovio"
