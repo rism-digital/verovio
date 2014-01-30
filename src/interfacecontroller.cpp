@@ -217,20 +217,23 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
         SetPageHeight( json.get<jsonxx::Number>("pageHeight") );
     
     // Parse the various flags
-    if (json.has<jsonxx::Boolean>("noLayout"))
-        SetNoLayout(json.get<jsonxx::Boolean>("noLayout"));
+    // Note: it seems that there is a bug with jsonxx and emscripten
+    // Boolean value false do not parse properly. We have to use Number instead
     
-    if (json.has<jsonxx::Boolean>("ignoreLayout"))
-        SetIgnoreLayout(json.get<jsonxx::Boolean>("ignoreLayout"));
+    if (json.has<jsonxx::Number>("noLayout"))
+        SetNoLayout(json.get<jsonxx::Number>("noLayout"));
+    
+    if (json.has<jsonxx::Number>("ignoreLayout"))
+        SetIgnoreLayout(json.get<jsonxx::Number>("ignoreLayout"));
 
-    if (json.has<jsonxx::Boolean>("adjustPageHeight"))
-        SetAdjustPageHeight(json.get<jsonxx::Boolean>("adjustPageHeight"));
+    if (json.has<jsonxx::Number>("adjustPageHeight"))
+        SetAdjustPageHeight(json.get<jsonxx::Number>("adjustPageHeight"));
 
-    if (json.has<jsonxx::Boolean>("noJustification"))
-        SetNoJustification(json.get<jsonxx::Boolean>("noJustification"));
+    if (json.has<jsonxx::Number>("noJustification"))
+        SetNoJustification(json.get<jsonxx::Number>("noJustification"));
 
-    if (json.has<jsonxx::Boolean>("showBoundingBoxes"))
-        SetShowBoundingBoxes(json.get<jsonxx::Boolean>("showBoundingBoxes"));
+    if (json.has<jsonxx::Number>("showBoundingBoxes"))
+        SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));
         
     return true;
     

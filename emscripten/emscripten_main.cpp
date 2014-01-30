@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
+#include <assert.h>
 
 #include <sstream>
 #include <string>
