@@ -4,6 +4,7 @@ body {
 
 .nav {
 	margin-top: 10px;
+	height: 50px;
 }
 
 .navbar {
@@ -25,21 +26,41 @@ body {
 	height: 2px;
 }
 
-.btn-file {
-    position: relative;
-    overflow: hidden;
+span.keyboard-00 { background-image: url(icons/00.png) !important; }
+span.keyboard-01 { background-image: url(icons/01.png) !important; }
+span.keyboard-02 { background-image: url(icons/02.png) !important; }
+span.keyboard-04 { background-image: url(icons/04.png) !important; }
+span.keyboard-08 { background-image: url(icons/08.png) !important; }
+span.keyboard-16 { background-image: url(icons/16.png) !important; }
+span.keyboard-32 { background-image: url(icons/32.png) !important; }
+span.keyboard-64 { background-image: url(icons/64.png) !important; }
+span.keyboard-rest { background-image: url(icons/rest.png) !important; }
+span.keyboard-dot { background-image: url(icons/dot.png) !important; }
+span.keyboard-barline { background-image: url(icons/barline.png) !important; }
+
+span.keyboard-00,
+span.keyboard-01,
+span.keyboard-02,
+span.keyboard-04,
+span.keyboard-08,
+span.keyboard-16,
+span.keyboard-32,
+span.keyboard-64,
+span.keyboard-rest,
+span.keyboard-dot,
+span.keyboard-barline
+{
+	top: 3px; 
+	height: 18px;
+	margin: 0px !important;
+	left: -4px;
+	width: 14px !important;
 }
-.btn-file input[type=file] {
-    position: absolute;
-    top: 0;
-    right: 0;
-    min-width: 100%;
-    min-height: 100%;
-    font-size: 999px;
-    text-align: right;
-    filter: alpha(opacity=0);
-    opacity: 0;
-    background: red;
-    cursor: inherit;
-    display: block;
+
+table.keyboard {
+	width: 100%;
+}
+td.keyboard {
+	text-align: center;
+	padding: 10px;
 }

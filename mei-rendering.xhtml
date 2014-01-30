@@ -16,8 +16,8 @@ downloads:
       description: "String quartet, 7 pages - 640Kb"
       link: "Brahms_StringQuartet_Op51_No1.mei"
 ---
-
 <script type="text/javascript">
+//<![CDATA[
 	var vrvToolkit = new verovio.toolkit();
 	var page = 1;
 	var zoom = 40;
@@ -38,10 +38,16 @@ downloads:
 	};
 	
 	function load_data(data, format) {
-		vrvToolkit.setOptions(JSON.stringify({
-			inputFormat: format,
-			border: 0
-		}));
+		ignoreLayout = 0;
+		if ( document.getElementById('ignoreLayout').checked ) {
+			ignoreLayout = 1;
+		}
+		options = JSON.stringify({
+					inputFormat: format,
+					border: 0,
+					ignoreLayout: ignoreLayout
+				});
+		vrvToolkit.setOptions( options );
 		vrvToolkit.loadData(data);
 
 		document.getElementById("total_text").innerHTML = vrvToolkit.getPageCount();
@@ -130,78 +136,84 @@ downloads:
 
 		}
 	}
-	
-	// Load the default file or the file passed in the URL
-	var file = location.search.substring(1);
-	if (file.length != 0) {
-		alert( file );
-		$.get( file , function( data ) {
-			load_data( data, 'mei');
-		});
-	}
-	
+
+//]]>
 </script>
 
-<div class="row row-offcanvas row-offcanvas-right">
-	<div class="col-xs-9">
-		<p class="pull-right visible-xs">
-			<button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
-		</p>
-		<div class="panel panel-default">
+<div class="row">
+	<div class="col-md-9">
+		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
 				Select MEI File
 			</div>
 			<div class="panel-body">
 				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
 					<div class="row">
-					  <div class="col-lg-6">
-						 <input type="file" id="mei_files" name="file" class"form-control" placeholder=".col-lg-6"/>
+					  <div class="col-md-9">
+						 <input type="file" id="mei_files" name="file" style="margin: 4px 0px 8px 0px;" placeholder=".col-md-9"/>
 					  </div>
-					  <div class="col-lg-2 pull-right">
-						<button type="submit" class="btn btn-default form-control" placeholder=".col-lg-2">Render</button>
+					  <div class="col-md-3">
+						<button type="submit" class="btn btn-default form-control" placeholder=".col-md-3">Render</button>
 					  </div>
 					</div>			
 				</form>
 			</div>
 		</div>
-		<div class="panel panel-default">
-			<div id="svg_output" style="overflow:auto; height:1194px"></div>
+		<div id="svg_panel" class="panel panel-default">
+			<div id="svg_output" style="overflow:auto;">
+			</div>
 		</div>
 	</div>
-	<div class="col-xs-3 sidebar-offcanvas" id="sidebar" role="navigation">
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				Navigation
 			</div>
 			<div class="panel-body">
 				<div class="row">
-					<div class="col-lg-6">
+					<div class="col-md-6">
 						<p>
 							Go to Page:
 						</p>
-						<div class="input-group input-group-sm">
-							<span class="input-group-btn"><button onclick="prev_page()" class="btn btn-default" type="button"><span class="input-group-btn">&lt;&lt;</span></button></span> <input type="text" class="form-control" placeholder="0" id="jump_text" style="width:40px" onkeypress="do_page_enter(event)" /><span class="input-group-addon" id="total_text">/ 0</span> <span class="input-group-btn"><button onclick="next_page()" class="btn btn-default" type="button"><span class="input-group-btn">&gt;&gt;</span></button></span>
+						<div class="col-xs-2 input-group input-group-sm">
+							<span class="input-group-btn">
+								<button onclick="prev_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-backward" /></button>
+							</span> 
+							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:40px" onkeypress="do_page_enter(event)" />
+							<span class="input-group-addon" id="total_text">/ 0</span>
+							<span class="input-group-btn">
+								<button onclick="next_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-forward" /></button>
+							</span>
 						</div><!-- /input-group -->
 					</div><!-- /.col-lg-6 -->
 				</div><!-- /.row -->
 				<hr />
 				<div class="row">
-					<div class="col-lg-6">
+					<div class="col-md-6">
 						<p>
 							Zoom:
 						</p>
-						<div class="input-group input-group-sm">
+						<div class="col-xs-2 input-group input-group-sm">
 					      	<span class="input-group-btn">
 					        	<button onclick="zoom_out()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-out"></span></button>
 					      	</span>
-							
-							<input type="text" class="form-control" placeholder="100%" id="zoom_text" style="width:60px" onkeypress="do_zoom_enter(event)" />
+							<input type="text" class="form-control" style="width:60px" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)" />
 					      	<span class="input-group-btn">
 					        	<button onclick="zoom_in()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-in"></span></button>
 					      	</span>
 							
 						</div><!-- /input-group -->
-					</div><!-- /.col-lg-6 -->
+					</div><!-- /.col-md-6 -->
+				</div><!-- /.row -->
+				<hr />
+				<div class="row">
+					<div class="col-md-12">
+					    <div class="checkbox">
+					      <label>
+					        <input id="ignoreLayout" type="checkbox" /> Ignore layout
+					      </label>
+					    </div>
+					</div><!-- /.col-md-6 -->
 				</div><!-- /.row -->
 			</div>
 		</div>
@@ -211,16 +223,35 @@ downloads:
 			</div>
 			<div class="panel-body">
 				<div class="row">
-					<div class="col-lg-12">
+					<div class="col-md-12">
 						{% for d in page.downloads %}
 						<p>
 							<a href="{{ site.baseurl }}/examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
 						    {{ d.description }}
 						 </p>
 						{% endfor %}
-					</div><!-- /.col-lg-6 -->
+					</div><!-- /.col-md-6 -->
 				</div><!-- /.row -->
 			</div>
 		</div>
 	</div>
 </div>
+<script type="text/javascript">
+//<![CDATA[
+	$( document ).ready(function() {
+		// Adjust the size of the svg_output and the zoom according to the div (screen) size
+	    width = $('#svg_panel').width();
+		$('#svg_output').height( width / 2100 * 2970 );
+		zoom = Math.floor( 100 * width / 2100 );
+		
+	
+		// Load the default file or the file passed in the URL
+		var file = location.search.substring(1);
+		if (file.length != 0) {
+			$.get( file , function( data ) {
+				load_data( data, 'mei');
+			});
+		}
+	});
+//]]>
+</script>
