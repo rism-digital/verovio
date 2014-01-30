@@ -1,0 +1,8 @@
+<Files *.xml>
+ForceType application/octet-stream
+Header set Content-Disposition attachment
+</Files>
+<Files *.mei>
+ForceType application/octet-stream
+Header set Content-Disposition attachment
+</Files>

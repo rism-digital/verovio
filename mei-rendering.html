@@ -2,6 +2,19 @@
 layout: verovio
 title: MEI Rendering
 active: mei-rendering
+downloads:
+    - name: "Hummel Concerto"
+      description: "Orchestra score, 120 pages - 7Mb"
+      link: "Hummel_Concerto_for_trumpet-P1.mei"
+    - name: "Krebs Trio in Eb"
+      description: "Organ score, 6 pages - 380Kb"
+      link: "Krebs_Trio_Eb_2.mei"
+    - name: "Beethoven Op 18/1"
+      description: "String quartet, 18 pages - 1.1Mb"
+      link: "Beethoven_op.18_1.mei"
+    - name: "Brahms Op 51/1"
+      description: "String quartet, 7 pages - 640Kb"
+      link: "Brahms_StringQuartet_Op51_No1.mei"
 ---
 <div class="row row-offcanvas row-offcanvas-right">
 	<div class="col-xs-9">
@@ -14,18 +27,14 @@ active: mei-rendering
 			</div>
 			<div class="panel-body">
 				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
-					<div class="form-group">
-						<input type="file" id="mei_files" style="display:none" />
-						<div class="input-append">
-							<button class="btn btn-default" onclick="$('input[id=mei_files]').click();">Browse and render</button>
-							<script type="text/javascript">
-								$('input[id=mei_files]').change(function() {
-									$('#upload_form').submit();
-								});
-							</script>
-						</div>
-					</div>
-					
+					<div class="row">
+					  <div class="col-lg-6">
+						 <input type="file" id="mei_files" name="file" class"form-control" placeholder=".col-lg-6"/>
+					  </div>
+					  <div class="col-lg-2 pull-right">
+						<button type="submit" class="btn btn-default form-control" placeholder=".col-lg-2">Render</button>
+					  </div>
+					</div>			
 				</form>
 			</div>
 		</div>
@@ -68,10 +77,13 @@ active: mei-rendering
 			</div>
 			<div class="panel-body">
 				<div class="row">
-					<div class="col-lg-6">
+					<div class="col-lg-12">
+						{% for d in page.downloads %}
 						<p>
-							<a href="link">Hummel Concertoo</a>
-						</p>
+							<a href="{{ site.baseurl }}/examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+						    {{ d.description }}
+						 </p>
+						{% endfor %}
 					</div><!-- /.col-lg-6 -->
 				</div><!-- /.row -->
 			</div>
