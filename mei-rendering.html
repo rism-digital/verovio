@@ -16,6 +16,132 @@ downloads:
       description: "String quartet, 7 pages - 640Kb"
       link: "Brahms_StringQuartet_Op51_No1.mei"
 ---
+
+<script type="text/javascript">
+	var vrvToolkit = new verovio.toolkit();
+	var page = 1;
+	var zoom = 40;
+
+	function upload_file(input, format) {
+		var file = document.getElementById(input).files[0];
+		var reader = new FileReader();
+
+		// Closure to capture the file information.
+		reader.onload = (function(theFile) {
+			return function(e) {
+				load_data(e.target.result, format);
+			};
+		})(file);
+
+		// Read in the image file as a data URL.
+		reader.readAsText(file);
+	};
+	
+	function load_data(data, format) {
+		vrvToolkit.setOptions(JSON.stringify({
+			inputFormat: format,
+			border: 0
+		}));
+		vrvToolkit.loadData(data);
+
+		document.getElementById("total_text").innerHTML = vrvToolkit.getPageCount();
+		page = 1;
+		set_zoom(zoom);
+	}
+
+	function goto_page(page_nr) {
+		document.getElementById('jump_text').value = page_nr;
+
+		svg = vrvToolkit.renderPage(page_nr, "");
+		document.getElementById('svg_output').innerHTML = svg;
+	};
+
+	function next_page() {
+		if (page >= vrvToolkit.getPageCount()) {
+			return;
+		}
+
+		page = page + 1;
+		goto_page(page);
+	};
+
+	function prev_page() {
+		if (page <= 1) {
+			return;
+		}
+
+		page = page - 1;
+		goto_page(page);
+	};
+
+	function set_zoom(zoom_nr) {
+		vrvToolkit.setOptions(JSON.stringify({
+			scale: zoom_nr
+		}));
+		goto_page(page);
+
+		document.getElementById('zoom_text').value = zoom_nr + "%";
+	}
+
+	function zoom_out() {
+		if (zoom <= 10) {
+			return;
+		}
+
+		zoom = zoom - 10;
+		set_zoom(zoom);
+	}
+
+	function zoom_in() {
+		if (zoom >= 150) {
+			return;
+		}
+
+		zoom = zoom + 10;
+		set_zoom(zoom);
+	}
+
+	function do_page_enter(e) {
+		key = e.keyCode || e.which;
+		if (key == 13) {
+
+			text = document.getElementById('jump_text').value;
+
+			if (text <= vrvToolkit.getPageCount() && text > 0) {
+				page = Number(text);
+				goto_page(page);
+			} else {
+				document.getElementById('jump_text').value = page;
+			}
+
+		}
+	}
+
+	function do_zoom_enter(e) {
+		key = e.keyCode || e.which;
+		if (key == 13) {
+
+			text = document.getElementById('zoom_text').value;
+
+			if (text < 150 && text > 10) {
+				zoom = Number(text);
+				set_zoom(zoom);
+			}
+
+		}
+	}
+	
+	// Load the default file or the file passed in the URL
+	var file = location.search.substring(1);
+	if (file.length != 0) {
+		alert( file );
+		$.get( file , function( data ) {
+			load_data( data, 'mei');
+		});
+	}
+	
+</script>
+
 <div class="row row-offcanvas row-offcanvas-right">
 	<div class="col-xs-9">
 		<p class="pull-right visible-xs">
@@ -65,7 +191,15 @@ downloads:
 							Zoom:
 						</p>
 						<div class="input-group input-group-sm">
+					      	<span class="input-group-btn">
+					        	<button onclick="zoom_out()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-out"></span></button>
+					      	</span>
+							
 							<input type="text" class="form-control" placeholder="100%" id="zoom_text" style="width:60px" onkeypress="do_zoom_enter(event)" />
+					      	<span class="input-group-btn">
+					        	<button onclick="zoom_in()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-in"></span></button>
+					      	</span>
+							
 						</div><!-- /input-group -->
 					</div><!-- /.col-lg-6 -->
 				</div><!-- /.row -->
@@ -73,7 +207,7 @@ downloads:
 		</div>
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				Examples
+				Example files to download
 			</div>
 			<div class="panel-body">
 				<div class="row">
