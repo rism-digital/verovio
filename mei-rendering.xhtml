@@ -3,9 +3,12 @@ layout: verovio
 title: MEI Rendering
 active: mei-rendering
 downloads:
+    - name: "Guami Canzona 24"
+      description: "8 voices and b.c., 10 pages - 235Kb"
+      link: "Guami_Canzona_24.mei"
     - name: "Hummel Concerto"
-      description: "Orchestra score, 120 pages - 7Mb"
-      link: "Hummel_Concerto_for_trumpet-P1.mei"
+      description: "Orchestra score, 121 pages - 7Mb"
+      link: "Hummel_Concerto_for_trumpet.mei"
     - name: "Krebs Trio in Eb"
       description: "Organ score, 6 pages - 380Kb"
       link: "Krebs_Trio_Eb_2.mei"
@@ -77,6 +80,16 @@ downloads:
 		}
 
 		page = page - 1;
+		goto_page(page);
+	};
+
+	function first_page() {
+		page = 1;
+		goto_page(page);
+	};
+	
+	function last_page() {
+		page = vrvToolkit.getPageCount();
 		goto_page(page);
 	};
 
@@ -177,12 +190,14 @@ downloads:
 						</p>
 						<div class="col-xs-2 input-group input-group-sm">
 							<span class="input-group-btn">
+								<button onclick="first_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-fast-backward" /></button>
 								<button onclick="prev_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-backward" /></button>
 							</span> 
-							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:40px" onkeypress="do_page_enter(event)" />
+							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:60px" onkeypress="do_page_enter(event)" />
 							<span class="input-group-addon" id="total_text">/ 0</span>
 							<span class="input-group-btn">
 								<button onclick="next_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-forward" /></button>
+								<button onclick="last_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-fast-forward" /></button>
 							</span>
 						</div><!-- /input-group -->
 					</div><!-- /.col-lg-6 -->
@@ -217,7 +232,7 @@ downloads:
 				</div><!-- /.row -->
 			</div>
 		</div>
-		<div class="panel panel-default">
+		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
 				Example files to download
 			</div>

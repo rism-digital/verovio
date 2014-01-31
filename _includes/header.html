@@ -1,26 +1,36 @@
-<nav class="navbar navbar-fixed-top" role="navigation">
-    <div class="container">
-        <div class="navbar-header hidden-xs">          
-            <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.html"><img src="{{ site.baseurl }}/images/verovio-50.png" /></a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-		<ul class="nav nav-pills pull-right">
-			<li {% if page.active == "home" %}class="active"{% endif %}>
-				<a href="{{ site.baseurl }}/index.html">Home</a>
-			</li>
-			<li {% if page.active == "mei-rendering" %}class="active"{% endif %}>
-				<a href="{{ site.baseurl }}/mei-rendering.xhtml">MEI Rendering</a>
-			</li>
-			<li {% if page.active == "pae-editor" %}class="active"{% endif %}>
-				<a href="{{ site.baseurl }}/pae-editor.xhtml">PAE Editor</a>
-			</li>
-			<li {% if page.active == "about" %}class="active"{% endif %}>
-				<a href="{{ site.baseurl }}/about.html">About</a>
-			</li>
-		</ul>
-        <!-- /.navbar-collapse -->
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+  <div class="container">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.html"><img src="{{ site.baseurl }}/images/verovio-50.png" /></a>
     </div>
-	<hr/>
-    <!-- /.container -->
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+		<li {% if page.active == "home" %}class="active"{% endif %}>
+			<a href="{{ site.baseurl }}/index.html">Home</a>
+		</li>
+		<li {% if page.active == "mei-rendering" %}class="active"{% endif %}>
+			<a href="{{ site.baseurl }}/mei-rendering.xhtml">MEI Rendering</a>
+		</li>
+		<li class="dropdown {% if page.active == "pae-editor" %}active{% endif %}">
+			<a href="#" class="dropdown-toggle" data-toggle="dropdown">Plain and Easy <b class="caret"></b></a>
+            <ul class="dropdown-menu">
+              <li><a href="{{ site.baseurl }}/pae-editor.xhtml">PAE Editor</a></li>
+            </ul>
+		</li>
+		<li {% if page.active == "about" %}class="active"{% endif %}>
+			<a href="{{ site.baseurl }}/about.html">About</a>
+		</li>
+      </ul>
+    </div><!-- /.navbar-collapse -->
+  </div><!-- /.container-fluid -->
+  <hr/>
 </nav>
