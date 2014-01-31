@@ -191,7 +191,7 @@
                     <persName>Laurent Pugin</persName>
                 </respStmt>
                 <changeDesc>
-                    <p>Completing staffGrps</p>
+                    <p>Completing staffGrps and rearranging layout (pb and sb)</p>
                 </changeDesc>
                 <date isodate="2014-01-31"/>
             </change>
@@ -881,7 +881,7 @@
                             <trill startid="#d1e5354" staff="1" place="above"/>
                             <trill staff="2" startid="#d1e5548" place="above"/>
                         </measure>
-                        <pb/>
+                        <pb n="2"/>
                         <scoreDef system.topmar="70.00"/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -1651,7 +1651,7 @@
                             </staff>
                             <tie tstamp="4.5" staff="2" curvedir="below" startid="#d1e12698" endid="#d1e13019"/>
                         </measure>
-                        <pb/>
+                        <pb n="3"/>
                         <scoreDef/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -2335,7 +2335,6 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <sb/>
                         <scoreDef/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -2365,6 +2364,7 @@
                                 </layer>
                             </staff>
                         </measure>
+                        <pb n="4"/>
                         <measure n="39" xml:id="d1e18640" width="112.44">
                             <staff n="1">
                                 <layer n="1">
@@ -2566,10 +2566,10 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <sb/>
                         <scoreDef/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
+                        <sb/>
                         <measure n="46" xml:id="d1e19967" width="243.30">
                             <staff n="1">
                                 <layer n="1">
@@ -2931,7 +2931,7 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <pb/>
+                        <sb/>
                         <scoreDef system.topmar="70.00"/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -3109,7 +3109,7 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <sb/>
+                        <pb n="5"/>
                         <scoreDef/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -3752,7 +3752,7 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <pb/>
+                        <sb/>
                         <scoreDef system.topmar="70.00"/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -4032,7 +4032,7 @@
                             <tie tstamp="1" staff="2" curvedir="below" startid="#d1e28957" endid="#d1e28976"/>
                             <tie tstamp="3" staff="2" curvedir="below" startid="#d1e28976" endid="#d1e29138"/>
                         </measure>
-                        <sb/>
+                        <pb n="6"/>
                         <scoreDef/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -4711,7 +4711,7 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <pb/>
+                        <sb/>
                         <scoreDef system.topmar="70.00"/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
@@ -4907,7 +4907,7 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <sb/>
+                        <pb n="7"/>
                         <scoreDef/>
                         <staffDef n="2"/>
                         <staffDef n="3"/>
