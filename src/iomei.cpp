@@ -218,12 +218,23 @@ bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
     
     return true;
 }
-
-bool MeiOutput::WriteStaff( Staff *staff )
+      
+bool MeiOutput::WriteMeasure( Measure *measure )
 {
     assert( !m_system.empty() );
     
-    m_staff = m_system.append_child("staff");
+    m_measure = m_system.append_child("measure");
+    m_measure.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
+    m_measure.append_attribute( "n" ) = StringFormat( "%d", measure->m_logMeasureNb ).c_str();
+    
+    return true;
+}
+
+bool MeiOutput::WriteStaff( Staff *staff )
+{
+    assert( !m_measure.empty() );
+    
+    m_staff = m_measure.append_child("staff");
     m_staff.append_attribute( "xml:id" ) =  UuidToMeiStr( staff ).c_str();
     // y position
     if ( staff->notAnc ) {
@@ -235,16 +246,6 @@ bool MeiOutput::WriteStaff( Staff *staff )
     return true;
 }
 
-bool MeiOutput::WriteMeasure( Measure *measure )
-{
-    assert( !m_staff.empty() );
-    
-    m_measure = m_staff.append_child("measure");
-    m_measure.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
-    m_measure.append_attribute( "n" ) = StringFormat( "%d", measure->m_logMeasureNb ).c_str();
-
-    return true;
-}
 
 bool MeiOutput::WriteLayer( Layer *layer )
 {
@@ -1625,20 +1626,18 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
     std::vector<Note*>::iterator iter;
     for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
     {
-        // we need to get the parent layer for comparing their number
+        // we need to get the parent layer and the parent staff for comparing their number
         Layer *parentLayer = dynamic_cast<Layer*>( (*iter)->GetFirstParent( &typeid(Layer) ) );
-        if (!parentLayer) {
-            continue;
-        }
-        Staff *parentStaff = dynamic_cast<Staff*>( parentLayer->GetFirstParent( &typeid(Staff) ) );
-        // We assume the if the note has no parent staff it is because we are in the same layer and that
-        // the layer has not been added to its parent staff yet.
+        Staff *parentStaff = dynamic_cast<Staff*>( (*iter)->GetFirstParent( &typeid(Staff) ) );
+        // We assume that if the note has no parent layer or no parent staff it,
+        // is because we are in the same staff or layer (e.g., beam) and they have not been added
+        //to their parent (staff or layer) yet.
         // If we have one, compare the number
         if ( (parentStaff) && (m_staff->GetStaffNo() != parentStaff->GetStaffNo()) ) {
             continue;
         }
         // same layer?
-        if ( m_layer->GetLayerNo() != parentLayer->GetLayerNo() ) {
+        if ( (parentLayer) && (m_layer->GetLayerNo() != parentLayer->GetLayerNo()) ) {
             continue;
         }
         // we only compare oct and pname because alteration is not relevant for ties
