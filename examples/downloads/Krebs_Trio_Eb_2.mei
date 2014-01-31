@@ -186,6 +186,15 @@
                 </changeDesc>
                 <date isodate="2013-01-28"/>
             </change>
+            <change n="6">
+                <respStmt>
+                    <persName>Laurent Pugin</persName>
+                </respStmt>
+                <changeDesc>
+                    <p>Completing staffGrps</p>
+                </changeDesc>
+                <date isodate="2014-01-31"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -193,9 +202,11 @@
             <mdiv>
                 <score>
                     <scoreDef meter.count="4" meter.unit="4" key.sig="3f" key.mode="major">
-                        <staffGrp>
-                            <staffDef n="1" xml:id="P1" label="upper" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
-                            <staffDef n="2" xml:id="P2" label="lower" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
+                        <staffGrp symbol="line">
+                            <staffGrp symbol="brace" barthru="true">
+                                <staffDef n="1" xml:id="P1" label="upper" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
+                                <staffDef n="2" xml:id="P2" label="lower" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
+                            </staffGrp>
                             <staffDef n="3" xml:id="P3" label="pedal" lines="5" clef.line="4" clef.shape="F" key.sig="3f" key.mode="major"/>
                         </staffGrp>
                     </scoreDef>
