@@ -16,6 +16,9 @@
 
 #include <getopt.h>
 
+// Used to check if a dir exists
+#include <sys/stat.h>
+
 #include "vrv.h"
 #include "interfacecontroller.h"
 
@@ -51,6 +54,14 @@ std::string removeExtension( std::string const& filename )
     : std::string( filename.begin(), pivot.base() - 1 );
 }
 
+bool dir_exists (string dir) {
+    struct stat st;
+    if ((stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR)) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 void display_usage() {
     
@@ -242,6 +253,13 @@ int main(int argc, char** argv)
     else {
         cerr << "Incorrect number of arguments: expecting one input file." << endl << endl;
         display_usage();
+        exit(1);
+    }
+    
+    // Make sure the user uses a valid Resource path
+    // Save many headaches for empty SVGs
+    if(!dir_exists(vrv::Resources::GetPath())) {
+        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found, please use -r option." << endl;
         exit(1);
     }
     
