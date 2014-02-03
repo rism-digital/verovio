@@ -129,10 +129,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile, std::ostream &out) {
     MeasureObject current_measure;
     NoteObject current_note;
     
-    //Array<int> current_key; // not the measure one, which will be altered by temporary alterations
-    //current_key.setSize(7);
-    //current_key.setAll(0);
-    
     std::vector<MeasureObject> staff;
     
     // read values
@@ -972,8 +968,14 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
         // and have no dots
         note->duration = DUR_8;
     } else {
-        note->duration = measure->durations[measure->durations_offset];
-        note->dots = measure->dots[measure->durations_offset];
+        if (measure->durations.size() == 0) {
+            note->duration = DUR_4;
+            note->dots = 0;
+            LogWarning("Got a note before a duration was specified");
+        } else {
+            note->duration = measure->durations[measure->durations_offset];
+            note->dots = measure->dots[measure->durations_offset];
+        }
     }
     note->pitch = getPitch( incipit[i] );
     
@@ -981,21 +983,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     // it will be added instead of the note
     if (note->pitch == 255)
         note->rest = true;
-    
-    // beaming
-    // detect if it is a fermata or a tuplet
-    if (note->beam > 0) {
-        regcomp(&re, "^[^}/]*[ABCDEFG-].*", REG_EXTENDED);
-        int is_not_last_note = regexec(&re, incipit + i + 1, 0, NULL, 0);
-        regfree(&re);
-        //std::cout << "regexp " << is_not_last_note << std::endl;
-        if ( is_not_last_note != 0 ) {
-            //note->beam = -1; // close the beam
-
-            //note->beam = BEAM_TERMINAL;
-             // ax2.3
-        }
-    } 
     
     // trills
     regcomp(&re, "^[^ABCDEFG]*t", REG_EXTENDED);
