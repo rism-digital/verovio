@@ -14,6 +14,10 @@ body {
 	height: 2px;
 }
 
+hr.panel {
+	margin: 10px 0px;
+}
+
 span.keyboard-00 { background-image: url(icons/00.png) !important; }
 span.keyboard-01 { background-image: url(icons/01.png) !important; }
 span.keyboard-02 { background-image: url(icons/02.png) !important; }

@@ -19,6 +19,7 @@ downloads:
       description: "String quartet, 7 pages - 640Kb"
       link: "Brahms_StringQuartet_Op51_No1.mei"
 ---
+
 <script type="text/javascript">
 //<![CDATA[
 	var vrvToolkit = new verovio.toolkit();
@@ -97,6 +98,7 @@ downloads:
 		vrvToolkit.setOptions(JSON.stringify({
 			scale: zoom_nr
 		}));
+		$('#svg_output').height( zoom_nr * 30 ); // slighly more for making sure we have no scroll bar
 		goto_page(page);
 
 		document.getElementById('zoom_text').value = zoom_nr + "%";
@@ -154,21 +156,66 @@ downloads:
 </script>
 
 <div class="row">
-	<div class="col-md-9">
+	<div class="col-sm-8 col-md-9">
 		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
-				Select MEI File
+				<!-- /.row -->
+				<div class="row">
+					<div class="col-md-11">
+						Select MEI File
+					</div>
+				</div>
 			</div>
+			
 			<div class="panel-body">
 				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
 					<div class="row">
-					  <div class="col-md-9">
-						 <input type="file" id="mei_files" name="file" style="margin: 4px 0px 8px 0px;" placeholder=".col-md-9"/>
-					  </div>
-					  <div class="col-md-3">
-						<button type="submit" class="btn btn-default form-control" placeholder=".col-md-3">Render</button>
-					  </div>
-					</div>			
+						<div class="col-md-10">
+							<input type="file" id="mei_files" name="file" style="margin: 4px 0px 8px 0px;"/>
+						</div>
+						<div class="col-md-1">
+							<button type="submit" class="btn btn-default btn-sm">Render</button>
+						</div>
+						<div class="col-md-1 pull-right">
+							<!-- help button -->
+							<button onclick="first_page()" class="btn btn-default btn-sm" type="button">
+								<span class="glyphicon glyphicon-question-sign"/>
+							</button>
+						</div>
+					</div>
+					<!-- /.row -->
+					<hr class="panel"/>
+					<div class="row">
+						<div class="col-md-3">
+							<div class="checkbox">
+								<label class="checkbox">
+									<input id="ignoreLayout" type="checkbox"/> Ignore encoded layout
+						      	</label>
+							</div>
+						</div>
+						<!-- /.col-xs -->
+						<div class="col-md-3">
+							<div class="checkbox">
+								<label class="checkbox">
+									<input id="adjustPageHeight" type="checkbox"/> Adjust height to content
+						      	</label>
+							</div>
+						</div>
+						<!-- /.col-xs -->
+						<div class="col-md-6">
+						    <div class="col-md-4 form-group">
+						      <input type="text" class="form-control" id="pageHeight" placeholder="Height"/>
+						    </div>
+						    <div class="col-md-4 form-group">
+						      <input type="text" class="form-control" id="pageWidth" placeholder="Width"/>
+						    </div>
+						    <div class="col-md-4 form-group">
+						      <input type="text" class="form-control" id="border" placeholder="Margin"/>
+						    </div>
+						</div>
+						<!-- /.col-xs -->
+					</div>
+					<!-- /.row -->
 				</form>
 			</div>
 		</div>
@@ -177,59 +224,65 @@ downloads:
 			</div>
 		</div>
 	</div>
-	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+	<div class="col-sm-4 col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				Navigation
 			</div>
 			<div class="panel-body">
 				<div class="row">
-					<div class="col-md-6">
+					<div class="col-md-12">
 						<p>
-							Go to Page:
+							Go to page [1-<span id="total_text">1</span>]:
 						</p>
-						<div class="col-xs-2 input-group input-group-sm">
+						<div class="col-xs-1 input-group input-group-sm">
 							<span class="input-group-btn">
-								<button onclick="first_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-fast-backward" /></button>
-								<button onclick="prev_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-backward" /></button>
-							</span> 
-							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:60px" onkeypress="do_page_enter(event)" />
-							<span class="input-group-addon" id="total_text">/ 0</span>
-							<span class="input-group-btn">
-								<button onclick="next_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-forward" /></button>
-								<button onclick="last_page()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-fast-forward" /></button>
+								<button onclick="first_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-fast-backward"/>
+								</button>
+								<button onclick="prev_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-backward"/>
+								</button>
 							</span>
-						</div><!-- /input-group -->
-					</div><!-- /.col-lg-6 -->
-				</div><!-- /.row -->
-				<hr />
+							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:45px" onkeypress="do_page_enter(event)"/>
+							<span class="input-group-btn">
+								<button onclick="next_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-forward"/>
+								</button>
+								<button onclick="last_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-fast-forward"/>
+								</button>
+							</span>
+						</div>
+						<!-- /input-group -->
+					</div>
+					<!-- /.col-lg-6 -->
+				</div>
+				<!-- /.row -->
+				<hr/>
 				<div class="row">
 					<div class="col-md-6">
 						<p>
 							Zoom:
 						</p>
 						<div class="col-xs-2 input-group input-group-sm">
-					      	<span class="input-group-btn">
-					        	<button onclick="zoom_out()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-out"></span></button>
-					      	</span>
-							<input type="text" class="form-control" style="width:60px" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)" />
-					      	<span class="input-group-btn">
-					        	<button onclick="zoom_in()" class="btn btn-default" type="button"><span class="glyphicon glyphicon-zoom-in"></span></button>
-					      	</span>
-							
-						</div><!-- /input-group -->
-					</div><!-- /.col-md-6 -->
-				</div><!-- /.row -->
-				<hr />
-				<div class="row">
-					<div class="col-md-12">
-					    <div class="checkbox">
-					      <label>
-					        <input id="ignoreLayout" type="checkbox" /> Ignore layout
-					      </label>
-					    </div>
-					</div><!-- /.col-md-6 -->
-				</div><!-- /.row -->
+							<span class="input-group-btn">
+								<button onclick="zoom_out()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-zoom-out"/>
+								</button>
+							</span>
+							<input type="text" class="form-control" style="width:60px" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
+							<span class="input-group-btn">
+								<button onclick="zoom_in()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-zoom-in"/>
+								</button>
+							</span>
+						</div>
+						<!-- /input-group -->
+					</div>
+					<!-- /.col-md-6 -->
+				</div>
+				<!-- /.row -->
 			</div>
 		</div>
 		<div class="panel panel-default hidden-xs hidden-sm">
@@ -240,24 +293,29 @@ downloads:
 				<div class="row">
 					<div class="col-md-12">
 						{% for d in page.downloads %}
-						<p>
-							<a href="{{ site.baseurl }}/examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+						<p><a href="{{ site.baseurl }}/examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
 						    {{ d.description }}
 						 </p>
 						{% endfor %}
-					</div><!-- /.col-md-6 -->
-				</div><!-- /.row -->
+					</div>
+					<!-- /.col-md-6 -->
+				</div>
+				<!-- /.row -->
 			</div>
 		</div>
 	</div>
 </div>
+
 <script type="text/javascript">
 //<![CDATA[
 	$( document ).ready(function() {
+		
+		//$('.tooltipp').tooltip();
+		
 		// Adjust the size of the svg_output and the zoom according to the div (screen) size
 	    width = $('#svg_panel').width();
-		$('#svg_output').height( width / 2100 * 2970 );
 		zoom = Math.floor( 100 * width / 2100 );
+		$('#svg_output').height( zoom * 30 ); // slighly more for making sure we have no scroll bar
 		
 	
 		// Load the default file or the file passed in the URL
