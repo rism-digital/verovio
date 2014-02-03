@@ -15,7 +15,7 @@ echo "Compliling"
 # we use ASM_JS=0 because otherwise it does not work with FireFox
 # memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
 
-python $EMCC --closure 0 -O2 \
+python $EMCC --closure 1 -O2 \
 	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=160000 \
 	-I./lib/jsonxx \
@@ -89,6 +89,7 @@ python $EMCC --closure 0 -O2 \
 
 if [ $? -eq 0 ]; then 
 	echo "Done."
-	cat build/verovio.js verovio-proxy.js > build/verovio-class.js
-	echo "JavaScript class in build/verovio-class.js"
+	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
+	cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js > build/verovio-toolkit.js
+	echo "JavaScript class in build/verovio-toolkit.js"
 fi
