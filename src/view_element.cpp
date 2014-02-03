@@ -247,7 +247,28 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     Note *note = dynamic_cast<Note*>(element);
     
-    bool inBeam = (note->GetFirstParent( &typeid( Beam ) ) != NULL );
+    bool inBeam = false;
+    
+    // Get the immadiate parent of the note
+    // to see if beamed or not
+    Object *note_parent = note->GetFirstParent(&typeid(Beam));
+    
+    // This note is beamed and cue sized
+    if (note_parent != NULL) {
+        if (note->m_cueSize == true) {
+            // Get the Parent of the parent
+            // we want to see if we are in a group of
+            // beamed cue notes
+            Beam *b = dynamic_cast<Beam*>(note_parent);
+            if (b->GetListIndex(note) > -1) {
+                inBeam = true;
+            }
+                        
+        } else {
+            // the note is just in a beam
+            inBeam = true;
+        }
+    }
     
 	int staffSize = staff->staffSize;
 

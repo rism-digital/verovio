@@ -33,6 +33,7 @@ void Beam::AddElement(LayerElement *element) {
 
 void Beam::FilterList()
 {
+    bool firstNoteGrace = false;
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ListOfObjects::iterator iter = m_list.begin();
@@ -41,10 +42,20 @@ void Beam::FilterList()
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( currentElement && !currentElement->HasDurationInterface() )
         {
-            //LogDebug("KILLED!!! %s", currentElement->GetClassName().c_str() );
             iter = m_list.erase( iter );
         } else {
-            iter++;
+            // Drop notes that are signaled as grace notes
+            Note *n = dynamic_cast<Note*>(currentElement);
+            
+            if (m_list.begin() == iter) {
+              if (n->m_cueSize)
+                  firstNoteGrace = true;
+            }
+            
+            if ( !firstNoteGrace && n->m_cueSize == true)
+                iter = m_list.erase( iter );
+            else
+                iter++;
         }
     }
     

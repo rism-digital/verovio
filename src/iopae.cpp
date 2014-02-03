@@ -123,7 +123,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile, std::ostream &out) {
     char c_timesig[1024] = {0};
     char c_alttimesig[1024] = {0};
     char incipit[10001] = {0};
-    bool in_beam = false;
+    int in_beam = 0;
     
     std::string s_key;
     MeasureObject current_measure;
@@ -210,14 +210,14 @@ void PaeInput::parsePlainAndEasy(std::istream &infile, std::ostream &out) {
 		else if (incipit[i] == '{') {
 			//current_note.beam = 1;
             current_note.beam = BEAM_INITIAL;
-            in_beam = true;
+            in_beam++;
         }
         
         // beaming ends
-		else if (incipit[i] == '}' && in_beam) {
+		else if (incipit[i] == '}' && in_beam > 0) {
             current_measure.notes[current_measure.notes.size() - 1].beam = BEAM_TERMINAL;
             current_note.beam = 0;
-            in_beam = false;
+            in_beam--;
 		}
 		
         // slurs are read when adding the note
@@ -1068,7 +1068,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
 }
 
 
-
 //////////////////////////////
 //
 // printMeasure --
@@ -1171,28 +1170,28 @@ void PaeInput::parseNote(NoteObject note) {
     }
     
     
-    if (note.beam == BEAM_INITIAL)
+    if (note.appoggiatura > 0) {
+        element->m_cueSize = true;
+        
+        if (note.beam == BEAM_INITIAL)
+            PushContainer(new Beam());
+
+    } else if (note.appoggiatura == 0 && note.beam == BEAM_INITIAL) {
         PushContainer(new Beam());
+    }
     
     // we have a tuplet, the tuplet_note is > 0
     // which means we are counting a tuplet
     if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) // first elem in tuplet
         PushContainer(new Tuplet());
     
-    if (note.appoggiatura > 0) {
-        element->m_cueSize = true;
-        
-        if (note.appoggiatura_multiple && note.appoggiatura > 1)
-            PushContainer(new Beam());
-
-    }
     
     // Add the note to the current container
     AddLayerElement(element);
     
     
     // this is the last note in appoggiatura beam, set the beam to null
-    if (note.appoggiatura_multiple && note.appoggiatura == 2) // last one in a beam is 2
+    if (note.appoggiatura == 2 && note.beam == BEAM_TERMINAL) // last one in a beam is 2
         PopContainer();
 
     // the last note counts always '1'
@@ -1201,7 +1200,7 @@ void PaeInput::parseNote(NoteObject note) {
     if (note.tuplet_note == 1)
         PopContainer();
     
-    if (note.beam == BEAM_TERMINAL)
+    if (note.appoggiatura == 0 && note.beam == BEAM_TERMINAL)
         PopContainer();
 }
 
