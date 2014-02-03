@@ -17,10 +17,15 @@ namespace vrv {
 Tuplet::Tuplet():
 LayerElement("tuplet-"), ObjectListInterface()
 {
-    m_num = 1;
-    m_numbase = 1;
+    Tuplet(1, 1);
 }
 
+Tuplet::Tuplet(int num, int numbase):
+LayerElement("tuplet-"), ObjectListInterface()
+{
+    m_num = num;
+    m_numbase = numbase;
+}
 
 Tuplet::~Tuplet()
 {

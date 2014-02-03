@@ -567,7 +567,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
             tuplet_val = 3;
         }
         
-        // this is the first note, the notal number of notes = tuplet_val
+        // this is the first note, the total number of notes = tuplet_val
         note->tuplet_notes = tuplet_val;
         // but also the note counter
         note->tuplet_note =  tuplet_val;
@@ -1147,8 +1147,9 @@ void PaeInput::parseNote(NoteObject note) {
     
     // we have a tuplet, the tuplet_note is > 0
     // which means we are counting a tuplet
-    if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) // first elem in tuplet
-        pushContainer(new Tuplet());
+    if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) { // first elem in tuplet
+        pushContainer(new Tuplet(note.tuplet_notes, note.tuplet_notes));
+    }
     
     
     // Add the note to the current container

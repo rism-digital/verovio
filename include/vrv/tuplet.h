@@ -24,6 +24,7 @@ class Tuplet: public LayerElement, public ObjectListInterface
 public:
     // constructors and destructors
     Tuplet();
+    Tuplet(int num, int numbase);
     virtual ~Tuplet();
     
     virtual std::string GetClassName( ) { return "Tuplet"; };
@@ -36,6 +37,12 @@ public:
      */
     void AddElement(LayerElement *element);
     
+    int GetNum() { return m_num; };
+    void SetNum(int n) {m_num = n; };
+    
+    int GetNumBase() { return m_numbase; };
+    void SetNumBase(int n) {m_numbase = n; };
+    
 protected:
     /**
      * Filter the list for a specific class.
@@ -46,11 +53,11 @@ protected:
 private:
     
 public:
-    int m_num;
-    int m_numbase;
+
     
 private:
-
+    int m_num;
+    int m_numbase;
 };
 
 } // namespace vrv    

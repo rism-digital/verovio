@@ -300,7 +300,7 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     
     int txt_lenght, txt_height;
     
-    std::string notes = IntToObliqueFigures((unsigned int)tuplet->m_num);
+    std::string notes = IntToObliqueFigures((unsigned int)tuplet->GetNum());
     
     dc->GetTextExtent(notes, &txt_lenght, &txt_height);
     

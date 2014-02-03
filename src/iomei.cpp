@@ -1383,10 +1383,10 @@ LayerElement *MeiInput::ReadMeiTuplet( pugi::xml_node tuplet )
     
     // Read in the numerator and denominator properties
     if ( tuplet.attribute( "num" ) ) {
-		m_tuplet->m_num = atoi( tuplet.attribute( "num" ).value() );
+		m_tuplet->SetNum(atoi( tuplet.attribute( "num" ).value() ));
 	}
     if ( tuplet.attribute( "numbase" ) ) {
-		m_tuplet->m_numbase = atoi( tuplet.attribute( "numbase" ).value() );
+		m_tuplet->SetNumBase(atoi( tuplet.attribute( "numbase" ).value() ));
 	}
     
     pugi::xml_node current;
@@ -1638,10 +1638,10 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     
     // Read in the numerator and denominator properties
     if ( tupletSpan.attribute( "num" ) ) {
-		tuplet->m_num = atoi( tupletSpan.attribute( "num" ).value() );
+		tuplet->SetNum(atoi( tupletSpan.attribute( "num" ).value() ));
 	}
     if ( tupletSpan.attribute( "numbase" ) ) {
-		tuplet->m_numbase = atoi( tupletSpan.attribute( "numbase" ).value() );
+		tuplet->SetNumBase(atoi( tupletSpan.attribute( "numbase" ).value() ));
 	}
     
 	// position (pitch)

@@ -310,8 +310,8 @@ double LayerElement::GetAlignementDuration()
         int num = 1;
         int numbase = 1;
         if ( tuplet ) {
-            num = tuplet->m_num;
-            numbase = tuplet->m_numbase;
+            num = tuplet->GetNum();
+            numbase = tuplet->GetNumBase();
         }
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
         return duration->GetAlignementDuration( num, numbase );
