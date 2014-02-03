@@ -269,13 +269,12 @@ void PaeInput::parsePlainAndEasy(std::istream &infile, std::ostream &out) {
         else if ((incipit[i] == 'i') && staff.size() > 0) {
             MeasureObject last_measure = staff[staff.size() - 1];
             current_measure.notes = last_measure.notes;
-            // time was copied explicitally, but now not anymore
-            //current_measure.time = last_measure.time;
+            current_measure.wholerest = last_measure.wholerest;
             
             // if old measure does not end with a tie
             // force the first note of the newly copied measure to be without tie
             // this is to prevent copying tie closes which are invalid
-            if (last_measure.notes[last_measure.notes.capacity() - 1].tie == 0)
+            if (last_measure.notes.size() > 0 && last_measure.notes[last_measure.notes.capacity() - 1].tie == 0)
                 current_measure.notes[0].tie = 0;
         }
         
