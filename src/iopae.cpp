@@ -629,7 +629,6 @@ int PaeInput::getGraceNote(const char* incipit, NoteObject *note, int index ) {
     else if (incipit[i] == 'q') {
         note->appoggiatura = 1;
         if ((i+1 < length) && (incipit[i+1] == 'q')) {
-            note->appoggiatura_multiple = true;
             i++;
             int r = i;
             while ((r < length) && (incipit[r] != 'r')) {
@@ -1051,7 +1050,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     if (app > 0) {
         //std::cout << note->appoggiatura << std::endl; 
         note->appoggiatura = --app;
-        note->appoggiatura_multiple = false;
     }
     // durations
     if (measure->durations.size() > 0) {
@@ -1169,14 +1167,11 @@ void PaeInput::parseNote(NoteObject note) {
         dynamic_cast<Note *>(element)->m_acciaccatura = true;
     }
     
-    
     if (note.appoggiatura > 0) {
         element->m_cueSize = true;
-        
-        if (note.beam == BEAM_INITIAL)
-            PushContainer(new Beam());
+    }
 
-    } else if (note.appoggiatura == 0 && note.beam == BEAM_INITIAL) {
+    if (note.beam == BEAM_INITIAL) {
         PushContainer(new Beam());
     }
     
@@ -1189,18 +1184,13 @@ void PaeInput::parseNote(NoteObject note) {
     // Add the note to the current container
     AddLayerElement(element);
     
-    
-    // this is the last note in appoggiatura beam, set the beam to null
-    if (note.appoggiatura == 2 && note.beam == BEAM_TERMINAL) // last one in a beam is 2
-        PopContainer();
-
     // the last note counts always '1'
     // insert the tuplet elem
     // and reset the tuplet counter
     if (note.tuplet_note == 1)
         PopContainer();
     
-    if (note.appoggiatura == 0 && note.beam == BEAM_TERMINAL)
+    if (note.beam == BEAM_TERMINAL)
         PopContainer();
 }
 

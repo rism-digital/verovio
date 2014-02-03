@@ -35,7 +35,6 @@ public:
         tie = old.tie;
         acciaccatura = old.acciaccatura;
         appoggiatura = old.appoggiatura;
-        appoggiatura_multiple = old.appoggiatura_multiple;
         fermata = old.fermata;
         trill = old.trill;
         
@@ -57,7 +56,7 @@ public:
     NoteObject(void) { clear(); };
     void   clear(void) {
         appoggiatura = 0;
-        acciaccatura = appoggiatura_multiple = fermata = trill = false;
+        acciaccatura = fermata = trill = false;
         tie = 0;
         
         octave = 4;
@@ -82,7 +81,6 @@ public:
         tie = d.tie;
         acciaccatura = d.acciaccatura;
         appoggiatura = d.appoggiatura;
-        appoggiatura_multiple = d.appoggiatura_multiple;
         fermata = d.fermata;
         trill = d.trill;
         
@@ -114,7 +112,6 @@ public:
     int    tie;
     bool   acciaccatura;
     int    appoggiatura;
-    bool   appoggiatura_multiple;
     bool   fermata;
     bool   trill;
     
