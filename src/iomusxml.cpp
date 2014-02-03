@@ -292,11 +292,11 @@ void XMLOutput::WriteKey(LayerElement *element) {
     
     // Convert the number of alterations to string
     std::stringstream n_alter;
-    if (key->m_alteration == ACCID_FLAT)
+    if (key->GetAlteration() == ACCID_FLAT)
         // flats are negative numbers
-        n_alter << -key->m_num_alter;
+        n_alter << -key->GetAlterationNumber();
     else
-        n_alter << key->m_num_alter;
+        n_alter << key->GetAlterationNumber();
     
     //create <fifths> node with the number of alterations
     TiXmlElement *xfifths = new TiXmlElement("fifths");

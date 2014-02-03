@@ -130,7 +130,7 @@ bool InterfaceController::LoadFile( std::string filename )
     // read the file into the string:
     std::string content( fileSize, 0 );
     in.read(&content[0], fileSize);
-    
+
     return LoadString( content );
 }
 

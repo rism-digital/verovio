@@ -173,8 +173,8 @@ bool MeiOutput::WriteScoreDef( ScoreDef *scoreDef )
         // we should add 8va attr
     }
     if (scoreDef->GetKeySigAttr()) {
-        m_scoreDef.append_attribute( "key.sig" ) = KeySigToStr( scoreDef->GetKeySigAttr()->m_num_alter,
-                                                         scoreDef->GetKeySigAttr()->m_alteration ).c_str();
+        m_scoreDef.append_attribute( "key.sig" ) = KeySigToStr( scoreDef->GetKeySigAttr()->GetAlterationNumber(),
+                                                         scoreDef->GetKeySigAttr()->GetAlteration() ).c_str();
     }
     
     // this needs to be fixed
@@ -212,8 +212,8 @@ bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
         // we should add 8va attr
     }
     if (staffDef->GetKeySigAttr()) {
-        m_staffDef.append_attribute( "key.sig" ) = KeySigToStr( staffDef->GetKeySigAttr()->m_num_alter,
-                                                         staffDef->GetKeySigAttr()->m_alteration ).c_str();
+        m_staffDef.append_attribute( "key.sig" ) = KeySigToStr( staffDef->GetKeySigAttr()->GetAlterationNumber(),
+                                                         staffDef->GetKeySigAttr()->GetAlteration() ).c_str();
     }
     
     return true;

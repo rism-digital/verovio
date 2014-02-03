@@ -43,22 +43,6 @@
 
 #include <regex.h>
 
-/* Leave them here form now
-#include "../../llvm_regexp/regex_impl.h"
-#include "../../llvm_regexp/regutils.h"
-#include "../../llvm_regexp/regex2.h"
-
-#include "../../llvm_regexp/regcclass.h"
-#include "../../llvm_regexp/regcname.h"
-
-#define regex_t llvm_regex_t
-#define regmatch_t llvm_regmatch_t
-#define regcomp llvm_regcomp
-#define regerror llvm_regerror
-#define regexec llvm_regexec
-#define regfree llvm_regfree
-*/
-
 namespace vrv {
 
 #define BEAM_INITIAL    0x01
@@ -111,7 +95,7 @@ bool PaeInput::ImportFile()
     std::ifstream infile;
     infile.open(m_filename.c_str());
     
-    convertPlainAndEasyToKern(infile, std::cout);
+    parsePlainAndEasy(infile, std::cout);
     
     return true;
 }
@@ -121,17 +105,17 @@ bool PaeInput::ImportString(std::string pae)
     
     std::istringstream in_stream(pae);
     
-    convertPlainAndEasyToKern(in_stream, std::cout);
+    parsePlainAndEasy(in_stream, std::cout);
     
     return true;
 }
 
 //////////////////////////////
 //
-// convertPlainAndEasyToKern --
+// parsePlainAndEasy --
 //
 
-void PaeInput::convertPlainAndEasyToKern(std::istream &infile, std::ostream &out) {
+void PaeInput::parsePlainAndEasy(std::istream &infile, std::ostream &out) {
     // buffers
     char c_clef[1024] = {0};
     char c_key[1024] = {0};
@@ -185,10 +169,14 @@ void PaeInput::convertPlainAndEasyToKern(std::istream &infile, std::ostream &out
     }
 
     if (strlen(c_keysig)) {
-        getKeyInfo( c_keysig, &current_measure);
+        KeySignature *k = new KeySignature();
+        getKeyInfo( c_keysig, k);
+        current_measure.key = k;
     }
     if (strlen(c_timesig)) {
-        getTimeInfo( c_timesig, &current_measure);
+        Mensur *meter = new Mensur;
+        getTimeInfo( c_timesig, meter);
+        current_measure.time = meter;
     }   
     
     // read the incipit string
@@ -303,24 +291,33 @@ void PaeInput::convertPlainAndEasyToKern(std::istream &infile, std::ostream &out
 		else if ((incipit[i] == '%') && (i+1 < length)) {
             Clef *c = new Clef;
             i += getClefInfo(incipit, c, i + 1);
-            current_note.clef = c;
+            // If there are no notes yet in the measure
+            // attach this clef change to the measure
+            if (current_measure.notes.size() == 0)
+                current_measure.clef = c;
+            else
+                current_note.clef = c;
         }
         
 		//time signature change
 		else if ((incipit[i] == '@') && (i+1 < length)) {
-            i += getTimeInfo( incipit, &current_measure, i + 1);
+            Mensur *meter = new Mensur;
+            i += getTimeInfo( incipit, meter, i + 1);
+            if (current_measure.notes.size() == 0)
+                current_measure.time = meter;
+            else
+                current_note.time = meter;
         } 
         
   		//key signature change
 		else if ((incipit[i] == '$') && (i+1 < length)) {
-            i += getKeyInfo( incipit, &current_measure, i + 1);
-		} 
-        
-        //
-        //if (in_beam && (current_note.beam & BEAM_INITIAL) == 0 && (current_note.beam & BEAM_TERMINAL) == 0) {
-        //    current_note.beam |= BEAM_MEDIAL;
-        //}
-        // // ax2.3 LP
+            KeySignature *k = new KeySignature;
+            i += getKeyInfo( incipit, k, i + 1);
+            if (current_measure.notes.size() == 0)
+                current_measure.key = k;
+            else
+                current_note.key = k;
+		}
             
         i++;
     }
@@ -691,11 +688,10 @@ int PaeInput::getPitch( char c_note ) {
 // getTimeInfo -- read the key signature.
 //
 
-int PaeInput::getTimeInfo( const char* incipit, MeasureObject *measure, int index) {
+int PaeInput::getTimeInfo( const char* incipit, Mensur *meter, int index) {
     
     int i = index;
     int length = strlen(incipit);
-    Mensur *meter = new Mensur;
     
     if (!isdigit(incipit[i]) && (incipit[i] != 'c') && (incipit[i] != 'o'))
         return 0;
@@ -764,8 +760,6 @@ int PaeInput::getTimeInfo( const char* incipit, MeasureObject *measure, int inde
         std::cout << "Warning: unknown time signature: " << timesig_str << std::endl;
         
     }
-
-    measure->time = meter;
     
     return i - index;
 }
@@ -798,19 +792,19 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
     }
 
     
-    if (clef == 'C') {
+    if (clef == 'C' || clef == 'c') {
         switch (line) {
             case '1': mclef->m_clefId = UT1; break;
             case '2': mclef->m_clefId = UT2; break;
             case '3': mclef->m_clefId = UT3; break;
             case '4': mclef->m_clefId = UT4; break;
         }
-    } else if (clef == 'G') {
+    } else if (clef == 'G' || clef == 'g') {
         switch (line) {
             case '1': mclef->m_clefId = SOL1; break;
             case '2': mclef->m_clefId = SOL2; break;
         }
-    } else if (clef == 'F') {
+    } else if (clef == 'F' || clef == 'f') {
         switch (line) {
             case '3': mclef->m_clefId = FA3; break;
             case '4': mclef->m_clefId = FA4; break;
@@ -818,7 +812,7 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
         }
     } else {
         // what the...
-        LogDebug("Clef is ??");
+        LogDebug("Clef %c is Undefined", clef);
     }
     
     //measure->clef = mclef;
@@ -928,37 +922,33 @@ int PaeInput::getAbbreviation(const char* incipit, MeasureObject *measure, int i
 // getKeyInfo -- read the key signature.
 //
 
-int PaeInput::getKeyInfo(const char *incipit, MeasureObject *measure, int index ) {
-            
+int PaeInput::getKeyInfo(const char *incipit, KeySignature *key, int index ) {
+    int alt_nr = 0;
+
     // at the key information line, extract data
     int length = strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': measure->key_alteration = ACCID_FLAT; break;
-            case 'x': measure->key_alteration = ACCID_SHARP; break;
-            //case '[': paren =  1; break;
-            //case ']': paren =  1; break;
-            case 'F': measure->key.push_back(PITCH_F); break;
-            case 'C': measure->key.push_back(PITCH_C); break;
-            case 'G': measure->key.push_back(PITCH_G); break;
-            case 'D': measure->key.push_back(PITCH_D); break;
-            case 'A': measure->key.push_back(PITCH_A); break;
-            case 'E': measure->key.push_back(PITCH_E); break;
-            case 'B': measure->key.push_back(PITCH_B); break;
+            case 'b': key->SetAlteration(ACCID_FLAT); break;
+            case 'x': key->SetAlteration(ACCID_SHARP); break;
+            case 'F':
+            case 'C':
+            case 'G':
+            case 'D':
+            case 'A':
+            case 'E':
+            case 'B': alt_nr++; break;
             default:
                 end_of_keysig = true;
-                //if (debugQ) {
-                //  std::cout << "Warning: unknown character: " << keysig_str[i] << " in key signature " << keysig_str
-                //       << std::endl;
-                //exit(1);
-                //}
                 break;
         }
         if (!end_of_keysig)
             i++;
     }
+    
+    key->SetAlterationNumber(alt_nr);
     
     return i - index;
 }
@@ -1090,9 +1080,8 @@ void PaeInput::printMeasure(std::ostream& out, MeasureObject *measure ) {
         m_layer->AddElement(measure->clef);
     }
     
-    if ( measure->key.size() > 0 ) {
-        KeySignature *key = new KeySignature(measure->key.size(), measure->key_alteration);
-        m_layer->AddElement(key);
+    if ( measure->key != NULL) {
+        m_layer->AddElement(measure->key);
     }
     
     if ( measure->time != NULL ) {
@@ -1160,7 +1149,19 @@ void PaeInput::parseNote(NoteObject note) {
         element = mnote;
     }
     
+    // Does this note have a clef change? push it before everyting else
+    if (note.clef)
+        AddLayerElement(note.clef);
 
+    // Same thing for time changes
+    // You can find this sometimes
+    if (note.time)
+        AddLayerElement(note.time);
+    
+    // Handle key change. Evil if done in a beam
+    if (note.time)
+        AddLayerElement(note.key);
+    
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist

@@ -38,16 +38,25 @@ public:
     unsigned char GetAlterationAt(int pos);
     int GetOctave(unsigned char pitch, char clef);
     
+    /* Alteration number getter/setter */
+    int GetAlterationNumber() { return m_num_alter; };
+    void SetAlterationNumber(int n) { m_num_alter = n; };
+    
+    /* Alteration number getter/setter */
+    unsigned char GetAlteration() { return m_alteration; };
+    void SetAlteration(int n) { m_alteration = n; };
+    
 private:
     
 public:
-    int m_num_alter;
-    unsigned char m_alteration;
     
 private:
     static unsigned char flats[];
     static unsigned char sharps[];
     static int octave_map[2][9][7];
+    
+    int m_num_alter;
+    unsigned char m_alteration;
     
 };
 

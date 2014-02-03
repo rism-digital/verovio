@@ -24,6 +24,7 @@ class Mensur;
 class Staff;
 class Tie;
 class Tuplet;
+class KeySignature;
 
 
 class NoteObject {
@@ -47,6 +48,8 @@ public:
         rest = old.rest;
         
         clef = old.clef;
+        time = old.time;
+        key = old.key;
 
         tuplet_notes = old.tuplet_notes;
         tuplet_note = old.tuplet_note;
@@ -69,6 +72,8 @@ public:
         tuplet_note = 0;
         
         clef = NULL;
+        time = NULL;
+        key = NULL;
     };
     
     NoteObject& operator=(const NoteObject& d){ // for STL vector
@@ -90,6 +95,8 @@ public:
         rest = d.rest;
         
         clef = d.clef;
+        time = d.time;
+        key = d.key;
         
         tuplet_notes = d.tuplet_notes;
         tuplet_note = d.tuplet_note;
@@ -120,6 +127,9 @@ public:
     bool rest;
     
     Clef *clef;
+    Mensur *time;
+    KeySignature *key;
+    
 };
 
 
@@ -132,7 +142,6 @@ public:
         notes = d.notes;
         
         key = d.key;
-        key_alteration = d.key_alteration;
         
         durations = d.durations;
         dots = d.dots; 
@@ -149,7 +158,6 @@ public:
         notes = d.notes;
         
         key = d.key;
-        key_alteration = d.key_alteration;
         
         durations = d.durations;
         dots = d.dots; 
@@ -170,7 +178,7 @@ public:
     void   reset(void) {
         clef = NULL;
         time = NULL;
-        key.clear();
+        key = NULL;
         notes.clear();
         barline = "";
         wholerest = 0; 
@@ -178,10 +186,9 @@ public:
     };
     Clef *clef;
     Mensur *time;
+    KeySignature *key;
+    
     std::vector<NoteObject> notes;
-
-    std::vector<int> key;
-    char key_alteration;
     
     std::vector<int> durations;
     std::vector<int> dots; // use the same offset as durations, they are used in parallel
@@ -220,11 +227,11 @@ public:
 private:
     // function declarations:
     
-     void      convertPlainAndEasyToKern( std::istream &infile, std::ostream &outfile);
+     void      parsePlainAndEasy( std::istream &infile, std::ostream &outfile);
      
      // parsing functions
-     int       getKeyInfo          (const char* incipit, MeasureObject *measure, int index = 0);
-     int       getTimeInfo         (const char* incipit, MeasureObject *measure, int index = 0);
+     int       getKeyInfo          (const char* incipit, KeySignature *key, int index = 0);
+     int       getTimeInfo         (const char* incipit, Mensur *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
      int       getBarline          (const char* incipit, std::string *output, int index = 0 );
      int       getAccidental       (const char* incipit, unsigned char *accident, int index = 0);

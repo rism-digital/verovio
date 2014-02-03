@@ -1481,14 +1481,14 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     dc->StartGraphic( element, "keysig", element->GetUuid() );
     
-    for (int i = 0; i < ks->m_num_alter; i++) {
+    for (int i = 0; i < ks->GetAlterationNumber(); i++) {
         
         element->m_drawingYRel = CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->m_clefId));
         
         x = element->m_drawingX + (m_doc->m_drawingAccidWidth[staff->staffSize][0] + 5) * i;
         y = element->m_drawingYRel + staff->m_drawingY;
         
-        if (ks->m_alteration == ACCID_FLAT)
+        if (ks->GetAlteration() == ACCID_FLAT)
             symb = LEIPZIG_ACCID_FLAT;
         else
             symb = LEIPZIG_ACCID_SHARP;
