@@ -230,6 +230,7 @@ private:
     LayerElement *ReadMeiAccid( pugi::xml_node accid );
     LayerElement *ReadMeiCustos( pugi::xml_node custos );
     LayerElement *ReadMeiDot( pugi::xml_node dot );
+    bool ReadTupletSpanAsTuplet( pugi::xml_node tupletSpan );
     /** Reads <app> elements. For now, only <app> within <layer> are taken into account */
     LayerElement *ReadMeiApp( pugi::xml_node app );
     bool ReadMeiRdg( pugi::xml_node rdg );
@@ -272,7 +273,9 @@ private:
     int StrToKeySigNum(std::string accid);
     BarlineType StrToBarlineType(std::string type);
     StaffGrpSymbol StrToStaffGrpSymbol(std::string sign);
-    
+    /** Extract the uuid for references to uuids with ..#uuid values */
+    std::string ExtractUuidFragment(std::string refUuid);
+     
 public:
     
 private:

@@ -1056,16 +1056,19 @@ bool MeiInput::ReadMeiMeasure( pugi::xml_node measure )
     }
     
     pugi::xml_node current;
-    for( current = measure.child( "staff" ); current; current = current.next_sibling( "staff" ) ) {
-        m_staff = new Staff( );
-        SetMeiUuid( current , m_staff );
-        if ( ReadMeiStaff( current )) {
-            m_measure->AddStaff( m_staff );
+    for( current = measure.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "staff" ) {
+            m_staff = new Staff( );
+            SetMeiUuid( current , m_staff );
+            if ( ReadMeiStaff( current )) {
+                m_measure->AddStaff( m_staff );
+            }
+            else {
+                delete m_staff;
+            }
+            m_staff = NULL;
         }
-        else {
-            delete m_staff;
-        }
-        m_staff = NULL;
+        else ReadUnsupported( current );
     }
     // success only if at least one staff was added to the measure
     return (m_measure->GetStaffCount() > 0);
@@ -1564,6 +1567,11 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         }
         m_measure = NULL;
     }
+    else if ( std::string( element.name() ) == "tupletSpan" ) {
+        if (!ReadTupletSpanAsTuplet( element )) {
+            LogWarning( "TupletSpan element could not be read as tuplet and was ignored" );
+        }
+    }
     /*
     else if ( std::string( element.name() ) == "staff" ) {
         LogDebug( "staff" );
@@ -1616,6 +1624,70 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         LogWarning( "Element %s ignored", element.name() );
     }
     return true;
+}
+    
+bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
+{
+    assert( m_measure );
+    
+    Tuplet *tuplet = new Tuplet();
+    SetMeiUuid(tupletSpan, tuplet);
+    
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+    
+    // Read in the numerator and denominator properties
+    if ( tupletSpan.attribute( "num" ) ) {
+		tuplet->m_num = atoi( tupletSpan.attribute( "num" ).value() );
+	}
+    if ( tupletSpan.attribute( "numbase" ) ) {
+		tuplet->m_numbase = atoi( tupletSpan.attribute( "numbase" ).value() );
+	}
+    
+	// position (pitch)
+	if ( tupletSpan.attribute( "startid" ) ) {
+        std::string refId = ExtractUuidFragment( tupletSpan.attribute( "startid" ).value() );
+        start = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+
+        if (!start) {
+            LogWarning( "Element with @startid %s not found when trying to read tupletSpan", refId.c_str() );
+        }    
+        
+	}
+	if ( tupletSpan.attribute( "endid" ) ) {
+        std::string refId = ExtractUuidFragment( tupletSpan.attribute( "endid" ).value() );
+        end = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+        
+        if (!end) {
+            LogWarning( "Element with @endid %s not found when trying to read tupletSpan", refId.c_str() );
+        }
+	}
+    if (!start || !end) {
+        delete tuplet;
+        return false;
+    }
+    
+    LayerElement *startChild =  dynamic_cast<LayerElement*>( start->GetLastParentNot( &typeid(Layer) ) );
+    LayerElement *endChild =  dynamic_cast<LayerElement*>( end->GetLastParentNot( &typeid(Layer) ) );
+    
+    if ( !startChild || !endChild || (startChild->m_parent != endChild->m_parent) ) {
+        LogWarning( "TupletSpan element %s could start and end element are not in the same layer", tuplet->GetUuid().c_str() );
+        delete tuplet;
+        return false;
+    }
+    
+    Layer *parentLayer = dynamic_cast<Layer*>( startChild->m_parent );
+    
+    int startIdx = startChild->GetIdx();
+    int endIdx = endChild->GetIdx();
+    LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
+    int i;
+    for (i = endIdx; i >= startIdx; i--) {
+        tuplet->AddElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
+    }
+    parentLayer->InsertChild( tuplet, startIdx );
+    return true;
+
 }
 
 bool MeiInput::FindOpenTie( Note *terminalNote )
@@ -1825,5 +1897,14 @@ StaffGrpSymbol MeiInput::StrToStaffGrpSymbol(std::string symbol)
 	return STAFFGRP_LINE;
 }
     
+std::string MeiInput::ExtractUuidFragment(std::string refUuid)
+{
+    unsigned pos = refUuid.find_last_of("#");
+    if ( (pos != std::string::npos) && (pos < refUuid.length() - 1) ) {
+        refUuid = refUuid.substr( pos + 1 );
+    }
+    return refUuid;
+}
+
 } // namespace vrv
 

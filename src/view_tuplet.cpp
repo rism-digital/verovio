@@ -95,7 +95,8 @@ bool View::OneBeamInTuplet(Tuplet* tuplet) {
     // Get here if tuplet
     // has no beams or notes
     // should not happen!
-    assert(currentBeam);
+    // LP removed assert: it happen when have a beam and a rest in the tuplet. What to do?
+    // assert(currentBeam);
         
     return true;
 }
@@ -299,7 +300,7 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     
     int txt_lenght, txt_height;
     
-    std::string notes = IntToObliqueFigures((unsigned int)tuplet->GetNoteCount());
+    std::string notes = IntToObliqueFigures((unsigned int)tuplet->m_num);
     
     dc->GetTextExtent(notes, &txt_lenght, &txt_height);
     

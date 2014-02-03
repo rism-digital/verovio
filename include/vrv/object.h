@@ -124,6 +124,12 @@ public:
     Object *DetachChild( int idx );
     
     /**
+     * Look for a child with the specified uuid (returns NULL if not found)
+     * This method is a wrapper to a Object::FindByUuid functor.
+     */
+    Object *FindChildByUuid( std::string uuid );
+    
+    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to used only in very particular case where the child
      * object cannot be detached straight away. It is typically the case 
@@ -144,6 +150,12 @@ public:
      * The maxSteps parameter limit the search to a certain number of level if not -1.
      */
     Object *GetFirstParent( const std::type_info *elementType, int maxSteps = -1 );
+
+    /**
+     * Return the last parent that is NOT of the specified type.
+     * The maxSteps parameter limit the search to a certain number of level if not -1.
+     */
+    Object *GetLastParentNot( const std::type_info *elementType, int maxSteps = -1 );
     
     /**
      * Return the first of the specified type.

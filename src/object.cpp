@@ -143,6 +143,7 @@ void Object::InsertChild( Object *element, int idx )
 {
     if ( idx >= (int)m_children.size() ) {
         m_children.push_back( element );
+        return;
     }
     ArrayOfObjects::iterator iter = m_children.begin();
     m_children.insert( iter+(idx), element );
@@ -169,6 +170,17 @@ Object *Object::Relinquish( int idx )
     Object *child = m_children[idx];
     child->m_parent = NULL;
     return child;
+}
+    
+Object *Object::FindChildByUuid( std::string uuid )
+{
+    MusFunctor findByUuid( &Object::FindByUuid );
+    Object *element = NULL;
+    ArrayPtrVoid params;
+    params.push_back( &uuid );
+    params.push_back( &element );
+    this->Process( &findByUuid, params );
+    return element;
 }
 
 Object* Object::GetChild( int idx )
@@ -287,6 +299,21 @@ Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps 
     }
 }
 
+    
+Object *Object::GetLastParentNot( const std::type_info *elementType, int maxSteps )
+{
+    if ( (maxSteps == 0) || !m_parent ) {
+        return NULL;
+    }
+    
+    if ( typeid(*m_parent) == *elementType ) {
+        return this;
+    }
+    else {
+        return ( m_parent->GetLastParentNot( elementType, maxSteps - 1 ) );
+    }
+}
+    
 
 Object *Object::GetFirstChild( const std::type_info *elementType )
 {
@@ -652,7 +679,7 @@ int Object::FindByUuid( ArrayPtrVoid params )
         return FUNCTOR_STOP;
     }
     
-    if ( *uuid == this->GetUuid()) {
+    if ( (*uuid) == this->GetUuid() ) {
         (*element) = this;
         //LogDebug("Found it!");
         return FUNCTOR_STOP;
