@@ -5,9 +5,13 @@ active: pae-editor
 ---
 <div class="row">
 	<div class="col-md-9">
-		<div class="panel">
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				Plain and Easy keyboard editor
+			</div>
 			
-			<div class="col-sm-12">
+			<div class="panel-body">
+				<div style="overflow-x: scroll; overflow-y: hidden;">
 				<table class="keyboard">
 					<tr>
 						<td class="keyboard">
@@ -136,6 +140,7 @@ active: pae-editor
 						</td>
 					</tr>
 				</table>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -393,7 +398,7 @@ active: pae-editor
 	{	
 		// The trailing newline is needed so we can read the file lines
 		// correctly if the file does not end with a newline
-		var svg = vrvToolkit.renderData(music + "\n", JSON.stringify({scale: 50, adjustPageHeight: 1, pageWidth: 1500, border: 0}));
+		var svg = vrvToolkit.renderData(music + "\n", JSON.stringify({scale: 50, adjustPageHeight: 1, pageWidth: 1048, border: 0}));
 		document.getElementById('render_01').innerHTML = svg;
 	
 
