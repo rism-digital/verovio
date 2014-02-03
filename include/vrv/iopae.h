@@ -248,7 +248,7 @@ private:
      void      addLayerElement     (LayerElement *element);
      void      parseNote           (NoteObject note);
      void      popContainer        ();
-     void      printMeasure        (std::ostream& out, MeasureObject *measure);
+     void      convertMeasure        (MeasureObject *measure);
      void      pushContainer       (LayerElement *container);
 
 

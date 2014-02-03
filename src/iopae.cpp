@@ -153,8 +153,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
             strcpy( c_alttimesig, data_value );
         } else if (strcmp(data_key,"data")==0) { 
             strcpy( incipit, data_value );
-        } else if (strncmp(data_line,"!!", 2) == 0) { 
-            out << data_line << "\n";
         }
     }
     
@@ -344,7 +342,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         system->AddMeasure( m_measure );
         
         MeasureObject obj = *it;
-        printMeasure( out, &obj );
+        convertMeasure( &obj );
         measure_count++;
     }
 
@@ -1040,10 +1038,10 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
 
 //////////////////////////////
 //
-// printMeasure --
+// convertMeasure --
 //
 
-void PaeInput::printMeasure(std::ostream& out, MeasureObject *measure ) {
+void PaeInput::convertMeasure(MeasureObject *measure ) {
     
     if ( measure->clef != NULL ) {
         m_layer->AddElement(measure->clef);
