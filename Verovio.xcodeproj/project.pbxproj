@@ -182,9 +182,9 @@
 		8F086EBF188539540037FD8E /* interfacecontroller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = interfacecontroller.cpp; path = src/interfacecontroller.cpp; sourceTree = "<group>"; };
 		8F086EC0188539540037FD8E /* io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = io.cpp; path = src/io.cpp; sourceTree = "<group>"; };
 		8F086EC1188539540037FD8E /* iodarms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iodarms.cpp; path = src/iodarms.cpp; sourceTree = "<group>"; };
-		8F086EC2188539540037FD8E /* iomei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iomei.cpp; path = src/iomei.cpp; sourceTree = "<group>"; };
+		8F086EC2188539540037FD8E /* iomei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = iomei.cpp; path = src/iomei.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EC3188539540037FD8E /* iomusxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iomusxml.cpp; path = src/iomusxml.cpp; sourceTree = "<group>"; };
-		8F086EC4188539540037FD8E /* iopae.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iopae.cpp; path = src/iopae.cpp; sourceTree = "<group>"; };
+		8F086EC4188539540037FD8E /* iopae.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = iopae.cpp; path = src/iopae.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EC5188539540037FD8E /* keysig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = keysig.cpp; path = src/keysig.cpp; sourceTree = "<group>"; };
 		8F086EC6188539540037FD8E /* layer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layer.cpp; path = src/layer.cpp; sourceTree = "<group>"; };
 		8F086EC7188539540037FD8E /* layerelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerelement.cpp; path = src/layerelement.cpp; sourceTree = "<group>"; };
@@ -232,9 +232,9 @@
 		8F59291618854BF800FE51AD /* interfacecontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interfacecontroller.h; path = include/vrv/interfacecontroller.h; sourceTree = "<group>"; };
 		8F59291718854BF800FE51AD /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = io.h; path = include/vrv/io.h; sourceTree = "<group>"; };
 		8F59291818854BF800FE51AD /* iodarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iodarms.h; path = include/vrv/iodarms.h; sourceTree = "<group>"; };
-		8F59291918854BF800FE51AD /* iomei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iomei.h; path = include/vrv/iomei.h; sourceTree = "<group>"; };
+		8F59291918854BF800FE51AD /* iomei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = iomei.h; path = include/vrv/iomei.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59291A18854BF800FE51AD /* iomusxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iomusxml.h; path = include/vrv/iomusxml.h; sourceTree = "<group>"; };
-		8F59291B18854BF800FE51AD /* iopae.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iopae.h; path = include/vrv/iopae.h; sourceTree = "<group>"; };
+		8F59291B18854BF800FE51AD /* iopae.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = iopae.h; path = include/vrv/iopae.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59291C18854BF800FE51AD /* keysig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = keysig.h; path = include/vrv/keysig.h; sourceTree = "<group>"; };
 		8F59291D18854BF800FE51AD /* layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layer.h; path = include/vrv/layer.h; sourceTree = "<group>"; };
 		8F59291E18854BF800FE51AD /* layerelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerelement.h; path = include/vrv/layerelement.h; sourceTree = "<group>"; };

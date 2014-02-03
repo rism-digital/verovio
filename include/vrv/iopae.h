@@ -224,7 +224,7 @@ public:
 private:
     // function declarations:
     
-     void      parsePlainAndEasy( std::istream &infile, std::ostream &outfile);
+     void      parsePlainAndEasy( std::istream &infile );
      
      // parsing functions
      int       getKeyInfo          (const char* incipit, KeySignature *key, int index = 0);
@@ -245,11 +245,11 @@ private:
      int       getPitch            (char c_note );
      
      // output functions
-     void      AddLayerElement     (LayerElement *element);
+     void      addLayerElement     (LayerElement *element);
      void      parseNote           (NoteObject note);
-     void      PopContainer        ();
+     void      popContainer        ();
      void      printMeasure        (std::ostream& out, MeasureObject *measure);
-     void      PushContainer       (LayerElement *container);
+     void      pushContainer       (LayerElement *container);
 
 
      // input functions

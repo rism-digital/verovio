@@ -95,7 +95,7 @@ bool PaeInput::ImportFile()
     std::ifstream infile;
     infile.open(m_filename.c_str());
     
-    parsePlainAndEasy(infile, std::cout);
+    parsePlainAndEasy(infile);
     
     return true;
 }
@@ -105,7 +105,7 @@ bool PaeInput::ImportString(std::string pae)
     
     std::istringstream in_stream(pae);
     
-    parsePlainAndEasy(in_stream, std::cout);
+    parsePlainAndEasy(in_stream);
     
     return true;
 }
@@ -115,7 +115,7 @@ bool PaeInput::ImportString(std::string pae)
 // parsePlainAndEasy --
 //
 
-void PaeInput::parsePlainAndEasy(std::istream &infile, std::ostream &out) {
+void PaeInput::parsePlainAndEasy(std::istream &infile) {
     // buffers
     char c_clef[1024] = {0};
     char c_key[1024] = {0};
@@ -429,7 +429,7 @@ int PaeInput::getDuration(const char* incipit, int *duration, int *dot, int inde
         // neumatic notation
         *duration = 1.0;
         *dot = 0;
-        std::cout << "Warning: found a note in neumatic notation (7.), using quarter note instead" << std::endl;				
+        LogWarning("Found a note in neumatic notation (7.), using quarter note instead");				
     }
     
     return i - index;
@@ -576,7 +576,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
         
     } else {
         if ( note->tuplet_notes > 0 ) {
-            std::cout << "Warning: fermata within a tuplet. Won't be handled correctly" << std::endl;
+            LogWarning("Fermata within a tuplet. Won't be handled correctly");
         }
         note->fermata = true;
     }
@@ -721,38 +721,26 @@ int PaeInput::getTimeInfo( const char* incipit, Mensur *meter, int index) {
         strcpy(buf_str, timesig_str);
         int beats = atoi(strtok(buf_str, "/"));
         int note_value = atoi(strtok(NULL, "/")); 
-        //timeinfo[0] = (double)beats; timeinfo[1] = 4.0/(double)note_value;
-        //sout << "*M" << beats << "/" << note_value;
         meter->m_num = beats;
         meter->m_numBase = note_value;
     } else if ( is_one_number == 0) {
         int beats = atoi(timesig_str);
         meter->m_num = beats;
         meter->m_numBase = 1;
-        //timeinfo[0] = (double)beats; timeinfo[1] = 4.0/1.0;
-        //sout << "*M" << beats << "/1\n*met(" << beats << ")";
-        //std::cout << output << std::endl;
     } else if (strcmp(timesig_str, "c") == 0) {
         // C
-        ////imeinfo[0] = 4.0; timeinfo[1] = 4.0/4.0;
         meter->m_meterSymb = METER_SYMB_COMMON;
     } else if (strcmp(timesig_str, "c/") == 0) {
         // C|
-        //timeinfo[0] = 2.0; timeinfo[1] = 4.0/2.0;
         meter->m_meterSymb = METER_SYMB_CUT;
     } else if (strcmp(timesig_str, "c3") == 0) {
         // C3
-        //timeinfo[0] = 3.0; timeinfo[1] = 4.0/1.0;
         meter->m_meterSymb = METER_SYMB_3;
     } else if (strcmp(timesig_str, "c3/2") == 0) {
         // C3/2
-        //timeinfo[0] = 3.0; timeinfo[1] = 4.0/2.0;
         meter->m_meterSymb = METER_SYMB_3_CUT; // ??
     } else {
-        //timeinfo[0] = 4.0; timeinfo[1] = 4.0/4.0;
-        //sout << "*M4/4\n!! unknown time signature";
-        std::cout << "Warning: unknown time signature: " << timesig_str << std::endl;
-        
+        LogWarning("Unknown time signature: %s", timesig_str);
     }
     
     return i - index;
@@ -996,7 +984,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     regcomp(&re, "^[^ABCDEFG]*\\+", REG_EXTENDED);
     int has_tie = regexec(&re, incipit + i + 1, 0, NULL, 0);
     regfree(&re);
-    //std::cout << "regexp " << has_tie << std::endl;
     if ( has_tie == 0) {
         if (note->tie == 0)
             note->tie = 1; // reset 1 for the first note, >1 for next ones is incremented under
@@ -1034,7 +1021,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     // grace notes
     note->acciaccatura = false;
     if (app > 0) {
-        //std::cout << note->appoggiatura << std::endl; 
         note->appoggiatura = --app;
     }
     // durations
@@ -1134,16 +1120,16 @@ void PaeInput::parseNote(NoteObject note) {
     
     // Does this note have a clef change? push it before everyting else
     if (note.clef)
-        AddLayerElement(note.clef);
+        addLayerElement(note.clef);
 
     // Same thing for time changes
     // You can find this sometimes
     if (note.time)
-        AddLayerElement(note.time);
+        addLayerElement(note.time);
     
     // Handle key change. Evil if done in a beam
     if (note.time)
-        AddLayerElement(note.key);
+        addLayerElement(note.key);
     
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
@@ -1158,39 +1144,39 @@ void PaeInput::parseNote(NoteObject note) {
     }
 
     if (note.beam == BEAM_INITIAL) {
-        PushContainer(new Beam());
+        pushContainer(new Beam());
     }
     
     // we have a tuplet, the tuplet_note is > 0
     // which means we are counting a tuplet
     if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) // first elem in tuplet
-        PushContainer(new Tuplet());
+        pushContainer(new Tuplet());
     
     
     // Add the note to the current container
-    AddLayerElement(element);
+    addLayerElement(element);
     
     // the last note counts always '1'
     // insert the tuplet elem
     // and reset the tuplet counter
     if (note.tuplet_note == 1)
-        PopContainer();
+        popContainer();
     
     if (note.beam == BEAM_TERMINAL)
-        PopContainer();
+        popContainer();
 }
 
-void PaeInput::PushContainer(LayerElement *container) {
-    AddLayerElement(container);
+void PaeInput::pushContainer(LayerElement *container) {
+    addLayerElement(container);
     m_nested_objects.push_back(container);
 }
 
-void PaeInput::PopContainer() {
+void PaeInput::popContainer() {
     assert(m_nested_objects.size() > 0);
     m_nested_objects.pop_back();
 }
 
-void PaeInput::AddLayerElement(LayerElement *element) {
+void PaeInput::addLayerElement(LayerElement *element) {
     
     if (m_nested_objects.size() > 0) {
         LayerElement *bottom = m_nested_objects.back();
