@@ -279,12 +279,23 @@ int System::JustifyX( ArrayPtrVoid params )
     double *ratio = static_cast<double*>(params[0]);
     int *systemFullWidth = static_cast<int*>(params[1]);
     
+    assert( m_parent );
+    assert( m_parent->m_parent );
+    
     (*ratio) = (double)((*systemFullWidth) - this->m_systemLeftMar - this->m_systemRightMar) / (double)m_drawingTotalWidth;
     
     if ((*ratio) < 0.8 ) {
         // Arbitrary value for avoiding over-compressed justification
         LogWarning("Justification stop because of a ratio smaller the 0.8");
         return FUNCTOR_SIBLINGS;
+    }
+    
+    // Check if we are on the last page and on the last system - do no justify it if ratio > 1.0
+    if ( (m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
+        && (this->GetIdx() == m_parent->GetChildCount() - 1) ) {
+        if ( (*ratio) > 1.0 ) {
+            return FUNCTOR_STOP;
+        }
     }
     
     return FUNCTOR_CONTINUE;
