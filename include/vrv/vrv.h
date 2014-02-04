@@ -27,6 +27,14 @@ void LogError(  const char *fmt, ... );
 void LogMessage(  const char *fmt, ... );
 void LogWarning(  const char *fmt, ... );
 
+#ifdef EMSCRIPTEN
+    extern std::string _log_buffer;
+    
+    void ResetLogBuffer();
+    std::string GetLogBuffer();
+
+#endif
+
 /**
  * Utility for comparing doubles
  */
@@ -47,6 +55,8 @@ std::wstring UTF8to16(const char * in);
  * The maximum length is giving by STRING_FORMAT_MAX_LEN
  */
 std::string StringFormat( const char *fmt, ... );
+// This is the implementation callable with variable arguments
+std::string StringFormatVariable( const char * format, va_list arg );
     
 /**
  * Return a formatted version (####.####.####) of the file version.

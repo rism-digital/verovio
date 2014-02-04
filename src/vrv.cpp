@@ -30,6 +30,10 @@ std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
 // Global for LogElapsedTimeXXX functions (debugging purposes)
 struct timeval start;
 
+#ifdef EMSCRIPTEN
+    std::string _log_string_buffer = "";
+#endif
+    
 bool AreEqual(double dFirstVal, double dSecondVal)
 {
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
@@ -53,7 +57,10 @@ void LogElapsedTimeEnd( const char *msg )
 void LogDebug(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
-    return;
+    va_list args;
+    va_start ( args, fmt );
+    _log_string_buffer += "[Debug] " + StringFormatVariable(fmt, args) + "\n";
+    va_end ( args );
 #else
 #if defined(DEBUG)
     va_list args;
@@ -69,7 +76,10 @@ void LogDebug(const char *fmt, ...)
 void LogError(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
-    return;
+    va_list args;
+    va_start ( args, fmt );
+    _log_string_buffer += "[Error] " + StringFormatVariable(fmt, args) + "\n";
+    va_end ( args );
 #else
     va_list args;
     va_start ( args, fmt );
@@ -83,7 +93,10 @@ void LogError(const char *fmt, ...)
 void LogMessage(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
-    return;
+    va_list args;
+    va_start ( args, fmt );
+    _log_string_buffer += "[Message] " + StringFormatVariable(fmt, args) + "\n";
+    va_end ( args );
 #else
     va_list args;
     va_start ( args, fmt );
@@ -97,7 +110,10 @@ void LogMessage(const char *fmt, ...)
 void LogWarning(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
-    return;
+    va_list args;
+    va_start ( args, fmt );
+    _log_string_buffer += "[Warning] " + StringFormatVariable(fmt, args) + "\n";
+    va_end ( args );
 #else
     va_list args;
     va_start ( args, fmt );
@@ -114,12 +130,30 @@ std::string StringFormat(const char *fmt, ...)
     std::string str( STRING_FORMAT_MAX_LEN, 0 );
     va_list args;
     va_start ( args, fmt );
-    vsnprintf ( &str[0], STRING_FORMAT_MAX_LEN, fmt, args );
+    vsnprintf ( &str[0], STRING_FORMAT_MAX_LEN,fmt, args );
     va_end ( args );
     str.resize( strlen( str.data() ) );
     return str;
 }
 
+std::string StringFormatVariable(const char * format, va_list arg)
+{
+    std::string str( STRING_FORMAT_MAX_LEN, 0 );
+    vsnprintf ( &str[0], STRING_FORMAT_MAX_LEN, format, arg );
+    str.resize( strlen( str.data() ) );
+    return str;
+}
+    
+#ifdef EMSCRIPTEN
+void ResetLogBuffer() {
+    _log_string_buffer.clear();
+}
+    
+std::string GetLogBuffer() {
+    return _log_string_buffer;
+}
+#endif
+    
 std::string UTF16to8(const wchar_t * in)
 {
     std::string out;
