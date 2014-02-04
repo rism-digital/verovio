@@ -47,15 +47,27 @@ void Beam::FilterList()
             // Drop notes that are signaled as grace notes
             Note *n = dynamic_cast<Note*>(currentElement);
             
-            if (m_list.begin() == iter) {
-              if (n->m_cueSize)
-                  firstNoteGrace = true;
-            }
-            
-            if ( !firstNoteGrace && n->m_cueSize == true)
-                iter = m_list.erase( iter );
-            else
+            if (n) {
+                // if we are at the beginning of the beam
+                // and the note is cueSize
+                // assume all the beam is of grace notes
+                if (m_list.begin() == iter) {
+                  if (n->m_cueSize)
+                      firstNoteGrace = true;
+                }
+                
+                // if the first note in beam was NOT a grace
+                // we have grace notes embedded in a beam
+                // drop them
+                if ( !firstNoteGrace && n->m_cueSize == true)
+                    iter = m_list.erase( iter );
+                else
+                    iter++;
+                
+            } else {
+                // if it is a Rest, do not drop
                 iter++;
+            }
         }
     }
     
