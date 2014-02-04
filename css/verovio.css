@@ -18,6 +18,25 @@ hr.panel {
 	margin: 10px 0px;
 }
 
+// Does not work with Firefox and not very well with Safari
+@media print 
+{
+    body {
+		margin: 0px;
+		padding: 0px;
+		width:940px;
+	}
+	.panel {
+		padding: 0px;
+		margin: 0px;
+	}
+	.panel-default {
+		border: 0px;
+		padding: 0px;
+		margin: 0 30px;
+	}
+}
+
 span.keyboard-00 { background-image: url(icons/00.png) !important; }
 span.keyboard-01 { background-image: url(icons/01.png) !important; }
 span.keyboard-02 { background-image: url(icons/02.png) !important; }
