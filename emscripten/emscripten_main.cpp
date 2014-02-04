@@ -13,6 +13,7 @@
 
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "vrv.h"
 #include "interfacecontroller.h"
@@ -78,13 +79,19 @@ extern "C" {
 	}
 	
 	const char *vrvInterfaceController_getLog(InterfaceController *ic) {
+		std::vector<std::string> v = vrv::GetLogBuffer();
+		std::string str;
+		
+		for( size_t i = 0; i != v.size(); ++i)
+		        str = str + v[i];
+		
 		if (_persistent_log_string == NULL) {
-			_persistent_log_string = (char*)malloc(strlen(vrv::GetLogBuffer().c_str() + 1));
+			_persistent_log_string = (char*)malloc(strlen(str.c_str() + 1));
 		} else {
-			_persistent_log_string = (char*)realloc(_persistent_log_string, strlen(vrv::GetLogBuffer().c_str() + 1));
+			_persistent_log_string = (char*)realloc(_persistent_log_string, strlen(str.c_str() + 1));
 		}
 		
-		strcpy(_persistent_log_string, vrv::GetLogBuffer().c_str());
+		strcpy(_persistent_log_string, str.c_str());
 		
 		return _persistent_log_string;
 	}

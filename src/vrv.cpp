@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <stdarg.h>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
 struct timeval start;
 
 #ifdef EMSCRIPTEN
-    std::string _log_string_buffer = "";
+    std::vector<std::string> _log_buffer;
 #endif
     
 bool AreEqual(double dFirstVal, double dSecondVal)
@@ -57,9 +58,11 @@ void LogElapsedTimeEnd( const char *msg )
 void LogDebug(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
+    std::string s;
     va_list args;
     va_start ( args, fmt );
-    _log_string_buffer += "[Debug] " + StringFormatVariable(fmt, args) + "\n";
+    s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
+    AppendLogBuffer(true, s);
     va_end ( args );
 #else
 #if defined(DEBUG)
@@ -76,9 +79,11 @@ void LogDebug(const char *fmt, ...)
 void LogError(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
+    std::string s;
     va_list args;
     va_start ( args, fmt );
-    _log_string_buffer += "[Error] " + StringFormatVariable(fmt, args) + "\n";
+    s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
+    AppendLogBuffer(true, s);
     va_end ( args );
 #else
     va_list args;
@@ -93,9 +98,11 @@ void LogError(const char *fmt, ...)
 void LogMessage(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
+    std::string s;
     va_list args;
     va_start ( args, fmt );
-    _log_string_buffer += "[Message] " + StringFormatVariable(fmt, args) + "\n";
+    s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
+    AppendLogBuffer(true, s);
     va_end ( args );
 #else
     va_list args;
@@ -110,9 +117,11 @@ void LogMessage(const char *fmt, ...)
 void LogWarning(const char *fmt, ...)
 {
 #ifdef EMSCRIPTEN
+    std::string s;
     va_list args;
     va_start ( args, fmt );
-    _log_string_buffer += "[Warning] " + StringFormatVariable(fmt, args) + "\n";
+    s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
+    AppendLogBuffer(true, s);
     va_end ( args );
 #else
     va_list args;
@@ -146,12 +155,37 @@ std::string StringFormatVariable(const char * format, va_list arg)
     
 #ifdef EMSCRIPTEN
 void ResetLogBuffer() {
-    _log_string_buffer.clear();
+    _log_buffer.clear();
 }
     
-std::string GetLogBuffer() {
-    return _log_string_buffer;
+std::vector<std::string> GetLogBuffer() {
+    return _log_buffer;
 }
+    
+bool LogBufferContains(std::string s) {
+    std::vector<std::string>::iterator iter = _log_buffer.begin();
+    
+    while ( iter != _log_buffer.end()) {
+        std::string s2 = *iter;
+        if (s2 == s)
+            return true;
+        ++iter;
+    }
+    
+    return false;
+}
+
+void AppendLogBuffer(bool checkDuplicate, std::string message) {
+    
+    if (checkDuplicate) {
+        if (!LogBufferContains(message))
+            _log_buffer.push_back(message);
+    } else
+        _log_buffer.push_back(message);
+    
+}
+    
+
 #endif
     
 std::string UTF16to8(const wchar_t * in)

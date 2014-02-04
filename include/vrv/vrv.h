@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
+#include <vector>
 
 namespace vrv {
 
@@ -28,10 +29,12 @@ void LogMessage(  const char *fmt, ... );
 void LogWarning(  const char *fmt, ... );
 
 #ifdef EMSCRIPTEN
-    extern std::string _log_buffer;
+    extern std::vector<std::string> _log_buffer;
     
     void ResetLogBuffer();
-    std::string GetLogBuffer();
+    std::vector<std::string> GetLogBuffer();
+    bool LogBufferContains(std::string s);
+    void AppendLogBuffer(bool checkDuplicate, std::string message);
 
 #endif
 
