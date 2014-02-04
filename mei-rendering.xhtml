@@ -48,7 +48,7 @@ downloads:
 		}
 		options = JSON.stringify({
 					inputFormat: format,
-					border: 0,
+					border: 50,
 					ignoreLayout: ignoreLayout
 				});
 		vrvToolkit.setOptions( options );
@@ -173,7 +173,7 @@ downloads:
 						</div>
 						<div class="col-md-1 pull-right">
 							<!-- help button -->
-							<button onclick="first_page()" class="btn btn-default btn-sm" type="button">
+							<button id="options-help" class="btn btn-default btn-sm" type="button">
 								<span class="glyphicon glyphicon-question-sign"/>
 							</button>
 						</div>
@@ -220,6 +220,35 @@ downloads:
 		</div>
 	</div>
 	<div class="col-sm-4 col-md-3 sidebar-offcanvas hidden-print" id="sidebar" role="navigation">
+		
+		<div id="help_panel" class="panel panel-default" style="display: none">
+			<div class="panel-heading">
+				Help
+			</div>
+			<div class="panel-body">
+				<h5>Ignore encoded layout</h5>
+				<p>
+					Make Verovio ignore the encoded layout information (if any) and have it fully recalculated
+				</p>
+				<h5>Adjust height to content</h5>
+				<p>
+					Crop the page height to the height of the content
+				</p>
+				<h5>Height</h5>
+				<p>
+					Specify the page height (default is 2970)
+				</p>
+				<h5>Width</h5>
+				<p>
+					Specify the page width (default is 2100)
+				</p>
+				<h5>Margin</h5>
+				<p>
+					Add a margin (default is 50)
+				</p>
+			</div>
+		</div>
+		
 		<div class="panel panel-default">
 			<div class="panel-heading">
 				Navigation
@@ -305,7 +334,12 @@ downloads:
 //<![CDATA[
 	$( document ).ready(function() {
 		
-		//$('.tooltipp').tooltip();
+		$( "#options-help" ).mouseenter(function() {
+		  $( "#help_panel" ).slideDown();
+		});
+		$( "#options-help" ).mouseleave(function() {
+		  $( "#help_panel" ).slideUp();
+		});
 		
 		// Adjust the size of the svg_output and the zoom according to the div (screen) size
 	    width = $('#svg_panel').width();
