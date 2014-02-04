@@ -21,6 +21,7 @@ class Clef;
 class Layer;
 class Measure;
 class Mensur;
+class Note;
 class Staff;
 class Tie;
 class Tuplet;
@@ -263,7 +264,7 @@ private:
 	Staff *m_staff;
     Measure *m_measure;
 	Layer *m_layer;
-    Tie *m_current_tie;
+    Note *m_last_tied_note;
 
     std::vector<LayerElement *> m_nested_objects;   
     

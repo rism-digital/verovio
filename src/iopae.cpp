@@ -80,7 +80,7 @@ FileInputStream( doc )
 	m_staff = NULL;
     m_measure = NULL;
 	m_layer = NULL;
-    m_current_tie = NULL;
+    m_last_tied_note = NULL;
 }
 
 PaeInput::~PaeInput()
@@ -943,7 +943,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySignature *key, int index ) {
 int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *measure, int index ) {
     
     regex_t re;
-    int oct, tie;
+    int oct;
     int i = index;
     bool acc;
     int app;
@@ -987,11 +987,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
             note->tie = 1; // reset 1 for the first note, >1 for next ones is incremented under
     }
     
-    tie = note->tie;
-    // last note in tie
-    if (has_tie != 0 && tie > 0)
-        tie = 0;
-    
     oct = note->octave;
     measure->notes.push_back( *note );
     
@@ -1011,10 +1006,6 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     // al the other values just need to be in the first note
     if (tuplet_num > 0)
         note->tuplet_note = --tuplet_num;
-    
-    // If prevous note has tie, increment tie count
-    if (tie > 0)
-        note->tie = ++tie;
     
     // grace notes
     note->acciaccatura = false;
@@ -1112,6 +1103,16 @@ void PaeInput::parseNote(NoteObject note) {
         
         if (note.trill == true)
             mnote->m_embellishment = EMB_TRILL;
+        
+        if (m_last_tied_note != NULL) {
+            mnote->SetTieAttrTerminal(m_last_tied_note);
+            m_last_tied_note = NULL;
+        }
+        
+        if (note.tie) {
+            mnote->SetTieAttrInitial();
+            m_last_tied_note = mnote;
+        }
         
         element = mnote;
     }
