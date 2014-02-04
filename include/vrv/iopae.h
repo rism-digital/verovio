@@ -266,10 +266,7 @@ private:
 	Layer *m_layer;
     Note *m_last_tied_note;
 
-    std::vector<LayerElement *> m_nested_objects;   
-    
-    //unsigned char m_rest_position;
-    //unsigned int m_rest_octave;
+    std::vector<LayerElement *> m_nested_objects;
 };
 
 } // namespace vrv

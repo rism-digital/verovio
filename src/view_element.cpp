@@ -1426,13 +1426,32 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
     int symc;
     switch (accid->m_accid)
     {	case ACCID_NATURAL :  symc = LEIPZIG_ACCID_NATURAL; break;
-        //case ACCID_DOUBLE_SHARP : symc = LEIPZIG_ACCID_DOUBLE_SHARP; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
-        // so far, double sharp (and flat) have been used for key signature. This is poor design and should be fixed
-        case ACCID_DOUBLE_SHARP : symc = LEIPZIG_ACCID_SHARP; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );    
+        
+        /* The ACCID_DOUBLE_SHARP definition is used in two ways:
+         * 1) Antique notation (notAnc == true): it displays the two
+         *    stacked sharps used in key signatures;
+         * 2) Modern notation: is display a double flat
+         *    this poses no particular rendering problems;
+         * Case 1) on the other hand requires that the sharp
+         * is printed two times, the second time shifting it up
+         * (hence no break in the case statement)
+         * Same thing applies to LEIPZIG_ACCID_FLAT, but in this
+         * case it is used ONLY ad stacked flats (no double flat
+         * glyph).
+         */
+        case ACCID_DOUBLE_SHARP :
+            if (staff->notAnc) {
+                    symc = LEIPZIG_ACCID_SHARP;
+                    DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );    
                     y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
+            } else {
+                symc = LEIPZIG_ACCID_DOUBLE_SHARP;
+                break;
+            }
         case ACCID_SHARP : symc = LEIPZIG_ACCID_SHARP; break;
-        case ACCID_DOUBLE_FLAT :  symc = LEIPZIG_ACCID_FLAT; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
-                    y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
+        case ACCID_DOUBLE_FLAT :  
+            symc = LEIPZIG_ACCID_FLAT; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
+            y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
         case ACCID_FLAT :  symc = LEIPZIG_ACCID_FLAT; break;
         case ACCID_QUARTER_SHARP : symc = LEIPZIG_ACCID_QUARTER_SHARP; break;
         case ACCID_QUARTER_FLAT :  symc= LEIPZIG_ACCID_QUARTER_FLAT; break;
@@ -1440,7 +1459,7 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
     DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
 
     
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 
 }
 
