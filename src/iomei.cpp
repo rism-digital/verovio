@@ -405,6 +405,9 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
     if ( note->m_accid ) {
         meiNote.append_attribute( "accid" ) = AccidToStr( note->m_accid ).c_str();
     }
+    if ( note->m_cueSize ) {
+        meiNote.append_attribute( "grace" ) = "unknown";
+    }
     if ( note->m_lig ) {
         if ( note->m_ligObliqua ) {
             meiNote.append_attribute( "lig" ) = "obliqua";
@@ -1313,6 +1316,10 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
     // accid
     if ( note.attribute( "accid" ) ) {
 		vrvNote->m_accid = StrToAccid( note.attribute( "accid" ).value() );
+	}
+    // grace
+    if ( note.attribute( "grace" ) ) {
+		vrvNote->m_cueSize = true; //
 	}
     // ligature
     if ( note.attribute( "lig" ) ) {

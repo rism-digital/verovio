@@ -249,6 +249,12 @@ bool LayerElement::IsNote()
     return (dynamic_cast<Note*>(this));
 }
 
+bool LayerElement::IsGraceNote()
+{
+    Note *note = dynamic_cast<Note*>(this);
+    return (note && note->m_cueSize);
+}
+    
 bool LayerElement::HasPitchInterface() 
 {  
     return (dynamic_cast<PitchInterface*>(this));
@@ -305,6 +311,10 @@ void LayerElement::AdjustPname( int *pname, int *oct )
 
 double LayerElement::GetAlignementDuration()
 {
+    if ( this->IsGraceNote() ) {
+        return 0.0;
+    }
+    
     if ( HasDurationInterface() ) {
         Tuplet *tuplet = dynamic_cast<Tuplet*>( this->GetFirstParent( &typeid(Tuplet), MAX_TUPLET_DEPTH ) );
         int num = 1;
@@ -354,6 +364,9 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     }
     else if ( this->IsMultiRest() || this->IsMRest() ) {
         type = ALIGNMENT_MULTIREST;
+    }
+    else if ( this->IsGraceNote() ) {
+        type = ALIGNMENT_GRACENOTE;
     }
     
     // get the duration of the event

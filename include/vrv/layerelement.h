@@ -110,6 +110,7 @@ public:
     bool IsSymbol( );
     bool IsTie();
     bool IsTuplet();
+    bool IsGraceNote();
     
     virtual double GetAlignementDuration();
     
