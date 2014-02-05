@@ -18,6 +18,14 @@ hr.panel {
 	margin: 10px 0px;
 }
 
+.btn-heading {
+	padding: 0px 4px;
+}
+
+.popover {
+    z-index: 1031; /* We want them on top of the nav-bar */
+}
+
 // Does not work with Firefox and not very well with Safari
 @media print 
 {

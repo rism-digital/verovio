@@ -25,8 +25,10 @@ downloads:
 	var vrvToolkit = new verovio.toolkit();
 	var page = 1;
 	var zoom = 40;
+	var swipe_pages = false;
 
 	function upload_file(input, format) {
+		
 		var file = document.getElementById(input).files[0];
 		var reader = new FileReader();
 
@@ -64,6 +66,14 @@ downloads:
 
 		svg = vrvToolkit.renderPage(page_nr, "");
 		document.getElementById('svg_output').innerHTML = svg;
+		
+		// adjust the height of the panel
+		if ( $('#svg_panel svg') ) {
+			$('#svg_output').height( $('#svg_panel svg').height() + 10 ); // slighly more for making sure we have no scroll bar	
+		}
+		// enable the swipe (or not)
+		enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
+		
 	};
 
 	function next_page() {
@@ -98,14 +108,14 @@ downloads:
 		vrvToolkit.setOptions(JSON.stringify({
 			scale: zoom_nr
 		}));
-		$('#svg_output').height( zoom_nr * 30 ); // slighly more for making sure we have no scroll bar
+		
 		goto_page(page);
 
 		document.getElementById('zoom_text').value = zoom_nr + "%";
 	}
 
 	function zoom_out() {
-		if (zoom <= 10) {
+		if (zoom < 20) {
 			return;
 		}
 
@@ -114,7 +124,7 @@ downloads:
 	}
 
 	function zoom_in() {
-		if (zoom >= 150) {
+		if (zoom > 140) {
 			return;
 		}
 
@@ -141,14 +151,38 @@ downloads:
 	function do_zoom_enter(e) {
 		key = e.keyCode || e.which;
 		if (key == 13) {
-
 			text = document.getElementById('zoom_text').value;
+			set_zoom( Number(text) );
+		}
+	}
+    
+	function swipe_prev(event, direction, distance, duration, fingerCount) {
+     	prev_page();
+    }
 
-			if (text < 150 && text > 10) {
-				zoom = Number(text);
-				set_zoom(zoom);
-			}
+    function swipe_next(event, direction, distance, duration, fingerCount) {
+		 next_page();
+    }
 
+    function swipe_zoom_in(event, target) {
+		 zoom_in();
+    }
+	
+    function swipe_zoom_out(event, target) {
+		 zoom_out();
+    }
+	
+	function enable_swipe( pages ) {
+		if ( pages && !swipe_pages ) {
+			$("#svg_output").swipe( "destroy" );
+			$("#svg_output").swipe( { swipeLeft: swipe_next, swipeRight: swipe_prev, tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+			swipe_pages = true;
+		}
+		// zoom only
+		else if ( !pages && swipe_pages ) {
+			$("#svg_output").swipe( "destroy" );
+			$("#svg_output").swipe( { tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+			swipe_pages = false;		
 		}
 	}
 
@@ -159,7 +193,16 @@ downloads:
 	<div class="col-sm-8 col-md-9">
 		<div class="panel panel-default hidden-xs hidden-sm hidden-print">
 			<div class="panel-heading">
-				MEI file and optional parameters
+				<div class="row">
+					<div class="col-xs-10">
+						MEI file and optional parameters
+					</div>
+					<div class="col-xs-2">
+						<button id="options-help" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
 			</div>
 			
 			<div class="panel-body">
@@ -168,14 +211,8 @@ downloads:
 						<div class="col-md-10">
 							<input type="file" id="mei_files" name="file" style="margin: 4px 0px 8px 0px;"/>
 						</div>
-						<div class="col-md-1">
-							<button type="submit" class="btn btn-default btn-sm">Render</button>
-						</div>
-						<div class="col-md-1 pull-right">
-							<!-- help button -->
-							<button id="options-help" class="btn btn-default btn-sm" type="button">
-								<span class="glyphicon glyphicon-question-sign"/>
-							</button>
+						<div class="col-md-2">
+							<button type="submit" class="btn btn-default btn-sm pull-right">Render</button>
 						</div>
 					</div>
 					<!-- /.row -->
@@ -211,47 +248,54 @@ downloads:
 						<!-- /.col-xs -->
 					</div>
 					<!-- /.row -->
+					
+					<div id="help_panel" style="display: none">
+						<hr class="panel"/>
+						<h5>Ignore encoded layout</h5>
+						<p>
+							Make Verovio ignore the encoded layout information (if any) and have it fully recalculated
+						</p>
+						<h5>Adjust height to content</h5>
+						<p>
+							Crop the page height to the height of the content
+						</p>
+						<h5>Height</h5>
+						<p>
+							Specify the page height (default is 2970)
+						</p>
+						<h5>Width</h5>
+						<p>
+							Specify the page width (default is 2100)
+						</p>
+						<h5>Margin</h5>
+						<p>
+							Add a margin (default is 50)
+						</p>
+					</div>
+					
 				</form>
 			</div>
 		</div>
+		
 		<div id="svg_panel" class="panel panel-default">
 			<div id="svg_output" style="overflow:auto;">
 			</div>
 		</div>
 	</div>
 	<div class="col-sm-4 col-md-3 sidebar-offcanvas hidden-print" id="sidebar" role="navigation">
-		
-		<div id="help_panel" class="panel panel-default" style="display: none">
-			<div class="panel-heading">
-				Help
-			</div>
-			<div class="panel-body">
-				<h5>Ignore encoded layout</h5>
-				<p>
-					Make Verovio ignore the encoded layout information (if any) and have it fully recalculated
-				</p>
-				<h5>Adjust height to content</h5>
-				<p>
-					Crop the page height to the height of the content
-				</p>
-				<h5>Height</h5>
-				<p>
-					Specify the page height (default is 2970)
-				</p>
-				<h5>Width</h5>
-				<p>
-					Specify the page width (default is 2100)
-				</p>
-				<h5>Margin</h5>
-				<p>
-					Add a margin (default is 50)
-				</p>
-			</div>
-		</div>
-		
+			
 		<div class="panel panel-default">
 			<div class="panel-heading">
-				Navigation
+				<div class="row">
+					<div class="col-xs-10">
+						Navigation
+					</div>
+					<div class="col-xs-2">
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out.">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
 			</div>
 			<div class="panel-body">
 				<div class="row">
@@ -311,7 +355,16 @@ downloads:
 		</div>
 		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
-				Example files to download
+				<div class="row">
+					<div class="col-xs-10">
+						Example files to download
+					</div>
+					<div class="col-xs-2">
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="These files can be downloaded locally on your machine and then selected for rendering in your browser">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
 			</div>
 			<div class="panel-body">
 				<div class="row">
@@ -334,18 +387,24 @@ downloads:
 //<![CDATA[
 	$( document ).ready(function() {
 		
-		$( "#options-help" ).mouseenter(function() {
-		  $( "#help_panel" ).slideDown();
+		// Toggle for the options help
+		$( "#options-help" ).click(function() {
+			if ( $( "#help_panel" ).css("display") == "none")
+			    $( "#help_panel" ).slideDown();
+			else
+			    $( "#help_panel" ).slideUp();
 		});
-		$( "#options-help" ).mouseleave(function() {
-		  $( "#help_panel" ).slideUp();
-		});
+		
+		// Set the popover for the btn
+		$( ".popover-btn" ).popover( );
 		
 		// Adjust the size of the svg_output and the zoom according to the div (screen) size
 	    width = $('#svg_panel').width();
 		zoom = Math.floor( 100 * width / 2100 );
-		$('#svg_output').height( zoom * 30 ); // slighly more for making sure we have no scroll bar
+		$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
 		
+		// Init the swip
+		enable_swipe( true );
 	
 		// Load the default file or the file passed in the URL
 		var file = location.search.substring(1);
