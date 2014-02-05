@@ -26,7 +26,7 @@
 #include "keysig.h"
 #include "io.h"
 #include "mensur.h"
-#include "mRest.h"
+#include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
