@@ -145,8 +145,19 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
         assert( alignment );
         
         double alignment_time = alignment->GetTime();
-        if ( vrv::AreEqual( alignment_time, time ) && (alignment->GetType() == type) ) {
-            return alignment;
+        if ( vrv::AreEqual( alignment_time, time ) ) {
+            // we found a default alignment, but we are inserting a grace note (another layer)
+            // we need the grace note to be inserted before so we stop here
+            // this does not work when we have grace notes simultanously at different voices because
+            // they will all have their own alignment. We need something more sophisticated that takes
+            // care of the staff/layer number (or using the layer uuid?)
+            if ( (alignment->GetType() == ALIGNMENT_DEFAULT) && (type == ALIGNMENT_GRACENOTE) ) {
+                idx = i;
+                break;
+            }
+            else if ( (alignment->GetType() == type) && (type != ALIGNMENT_GRACENOTE) ) {
+                return alignment;
+            }
         }
         // nothing found, do not go any further but keep the index
         if (alignment->GetTime() > time) {

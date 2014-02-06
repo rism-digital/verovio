@@ -20,6 +20,8 @@ class MeasureAligner;
 /**
  * Alignment types for aligning types together.
  * For example, we align notes and rests (default) together, clef separately, etc.
+ * The container is a generic alignment for tuplet, chords, beams, etc.; we needs
+ * this to avoid notes aligning to it
  */
 enum AlignmentType {
     ALIGNMENT_DEFAULT = 0,
@@ -27,6 +29,7 @@ enum AlignmentType {
     ALIGNMENT_MENSUR,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_GRACENOTE,
+    ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_MULTIREST,
     ALIGNMENT_MEASURE_START,

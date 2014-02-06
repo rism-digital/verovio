@@ -368,6 +368,9 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     else if ( this->IsGraceNote() ) {
         type = ALIGNMENT_GRACENOTE;
     }
+    else if ( this->IsBeam() || this->IsTuplet() ) {
+        type = ALIGNMENT_CONTAINER;
+    }
     
     // get the duration of the event
     double duration = this->GetAlignementDuration();
@@ -376,10 +379,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     
     m_alignment = (*measureAligner)->GetAlignmentAtTime( *time, type );
     
+    //LogDebug("Time %f - %s", (*time), this->GetClassName().c_str() );
+    
     // increase the time position
     (*time) += duration;
-
-    //LogDebug("Time %f", (*time) );
     
     return FUNCTOR_CONTINUE;
 }
