@@ -897,6 +897,21 @@ bool MeiInput::ReadMeiSystem( pugi::xml_node system )
     }
     
     pugi::xml_node current;
+    
+    
+    // load the first scoreDef (if any) - temporary since we want to load all scoreDef elements
+    if ( !m_hasScoreDef && ( current = system.first_child() ) && ( std::string( current.name() ) == "scoreDef") ) {
+        LogDebug( "scoreDef" );
+        m_scoreDef = &m_doc->m_scoreDef;
+        SetMeiUuid( current, m_scoreDef );
+        if (ReadMeiScoreDef( current )) {
+            m_hasScoreDef = true;
+        }
+        else {
+            m_hasScoreDef = false;
+        }
+    }
+    
     // unmeasured music
     if ( system.child( "staff" ) ) {
         // this is the trick for un-measured music: we add one measure ( false )
