@@ -828,7 +828,7 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         std::vector<Note*>::iterator iter;
         for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
         {
-            LogWarning("Terminal tie for note '%s' could not be matched", (*iter)->GetUuid().c_str() );
+            LogWarning("Terminal @tie for <note> '%s' could not be matched", (*iter)->GetUuid().c_str() );
         }
     }
     
@@ -1043,7 +1043,7 @@ bool MeiInput::ReadMeiStaffDef( pugi::xml_node staffDef )
         m_staffDef->SetStaffNo( atoi ( staffDef.attribute( "n" ).value() ) );
     }
     else {
-        LogWarning("No @n on staffDef");
+        LogWarning("No @n on <staffDef>");
     }
     if ( staffDef.attribute( "key.sig" ) ) {
         KeySignature keysig(
@@ -1101,7 +1101,7 @@ bool MeiInput::ReadMeiStaff( pugi::xml_node staff )
         m_staff->SetStaffNo( atoi ( staff.attribute( "n" ).value() ) );
     }
     else {
-        LogWarning("No @n on staff");
+        LogWarning("No @n on <staff>");
     }
     if ( staff.attribute( "uly" ) ) {
         m_staff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
@@ -1137,7 +1137,7 @@ bool MeiInput::ReadMeiLayer( pugi::xml_node layer )
         m_layer->SetLayerNo( atoi ( layer.attribute( "n" ).value() ) );
     }
     else {
-        LogWarning("No @n on layer");
+        LogWarning("No @n on <layer>");
     }
     
     pugi::xml_node current;
@@ -1234,7 +1234,7 @@ LayerElement *MeiInput::ReadMeiBeam( pugi::xml_node beam )
     }
     
     if ( m_beam->GetNoteCount() == 1 ) {
-        LogWarning("Beam element with only one note");
+        LogWarning("<beam> with only one note");
     }
     // switch back to the previous one
     m_currentLayer = previousLayer;
@@ -1360,7 +1360,7 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
         }
         if ( (strcmp ( note.attribute( "tie" ).value(), "t" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
             if (!FindOpenTie( vrvNote ) ) {
-                LogWarning("Initial tie could not be found" );
+                LogWarning("Initial @tie not found" );
             }
         }
     }
@@ -1417,7 +1417,7 @@ LayerElement *MeiInput::ReadMeiTuplet( pugi::xml_node tuplet )
     }
     
     if ( m_tuplet->GetNoteCount() == 1 ) {
-        LogWarning("Tuplet element with only one note");
+        LogWarning("<tuplet> with only one note");
     }
     // switch back to the previous one
     m_currentLayer = previousLayer;
@@ -1591,7 +1591,7 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
     }
     else if ( std::string( element.name() ) == "tupletSpan" ) {
         if (!ReadTupletSpanAsTuplet( element )) {
-            LogWarning( "TupletSpan element could not be read as tuplet and was ignored" );
+            LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
         }
     }
     /*
@@ -1643,7 +1643,7 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         }
     }
     else {
-        LogWarning( "Element %s ignored", element.name() );
+        LogWarning( "Elements <%s> ignored", element.name() );
     }
     return true;
 }
@@ -1672,7 +1672,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
         start = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
 
         if (!start) {
-            LogWarning( "Element with @startid %s not found when trying to read tupletSpan", refId.c_str() );
+            LogWarning( "Element with @startid '%s' not found when trying to read the <tupletSpan>", refId.c_str() );
         }    
         
 	}
@@ -1681,7 +1681,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
         end = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
         
         if (!end) {
-            LogWarning( "Element with @endid %s not found when trying to read tupletSpan", refId.c_str() );
+            LogWarning( "Element with @endid '%s' not found when trying to read the <tupletSpan>", refId.c_str() );
         }
 	}
     if (!start || !end) {
@@ -1693,7 +1693,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     LayerElement *endChild =  dynamic_cast<LayerElement*>( end->GetLastParentNot( &typeid(Layer) ) );
     
     if ( !startChild || !endChild || (startChild->m_parent != endChild->m_parent) ) {
-        LogWarning( "TupletSpan element %s could start and end element are not in the same layer", tuplet->GetUuid().c_str() );
+        LogWarning( "Start and end elements for <tupletSpan> '%s' not in the same layer", tuplet->GetUuid().c_str() );
         delete tuplet;
         return false;
     }
@@ -1781,7 +1781,7 @@ int MeiInput::StrToDur(std::string dur)
     else if (dur == "64") value = DUR_64;
     else if (dur == "128") value = DUR_128;
 	else {
-		//LogWarning("Unknown duration '%s'", dur.c_str());
+		LogWarning("Unknown @dur value '%s'", dur.c_str());
         value = DUR_4;
 	}
     return value;
@@ -1803,7 +1803,7 @@ int MeiInput::StrToPitch(std::string pitch)
     else if (pitch == "a") value = PITCH_A;
     else if (pitch == "b") value = PITCH_B;
     else {
-		LogWarning("Unknow pname '%s'", pitch.c_str());
+		LogWarning("Unknow @pname value '%s'", pitch.c_str());
         value = PITCH_C;
     }
     return value;
@@ -1844,7 +1844,7 @@ ClefId MeiInput::StrToClef( std::string shape, std::string line )
     else if ( clef == "C5" ) clefId = UT5; 
     else 
     {
-        LogWarning("Unknown clef shape '%s' line '%s'", shape.c_str(), line.c_str() );
+        LogWarning("Unsupported clef with @shape '%s' and @line '%s'", shape.c_str(), line.c_str() );
     }
     return clefId;
 }
@@ -1854,7 +1854,7 @@ MensurSign MeiInput::StrToMensurSign(std::string sign)
     if (sign == "C") return MENSUR_SIGN_C;
     else if (sign == "O") return MENSUR_SIGN_O;
     else {
-        LogWarning("Unknown mensur sign '%s'", sign.c_str() );
+        LogWarning("Unsupported mensur sign '%s'", sign.c_str() );
 	}
     // default
 	return MENSUR_SIGN_C;

@@ -51,8 +51,8 @@ enum EditorMode {
     
 // Default values
 #define DEFAULT_UNIT 9
-#define MIN_UNIT 5
-#define MAX_UNIT 15
+#define MIN_UNIT 7
+#define MAX_UNIT 11
     
 #define DEFAULT_PAGE_RIGHT_MAR 50
 #define MIN_PAGE_RIGHT_MAR 0

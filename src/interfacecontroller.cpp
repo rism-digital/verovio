@@ -241,7 +241,28 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
     // The non js version of the app should not use this function.
     return false;
 #endif
+}
     
+
+std::string InterfaceController::GetLogString() {
+#ifdef USE_EMSCRIPTEN
+    std::string str;
+    std::vector<std::string>::iterator iter;
+    for (iter = logBuffer.begin(); iter != logBuffer.end(); iter++) {
+        str += (*iter);
+    }
+    return str;
+#else
+    // The non js version of the app should not use this function.
+    return "";
+#endif
+}
+  
+
+void  InterfaceController::ResetLogBuffer() {
+#ifdef USE_EMSCRIPTEN 
+    vrv::logBuffer.clear();
+#endif
 }
 
 std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )

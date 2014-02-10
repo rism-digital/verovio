@@ -182,8 +182,12 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
 
 void SvgDeviceContext::StartPage( )
 {
-    WriteLine(StringFormat("<g class=\"page\" transform=\"translate(%d, %d)  scale(%f, %f)\">", 
-        (int)((double)m_originX * m_userScaleX), (int)((double)m_originY * m_userScaleY), m_userScaleX, m_userScaleY ) );
+    // a graphic for scaling
+    WriteLine(StringFormat("<g class=\"page-scale\" transform=\"scale(%f, %f)\">", m_userScaleX, m_userScaleY ) );
+    m_graphics++;
+    m_indents++;
+    // a graphic for the origin
+    WriteLine(StringFormat("<g class=\"page-margin\" transform=\"translate(%d, %d)\">", (int)((double)m_originX), (int)((double)m_originY) ) );
     m_graphics++;
     m_indents++;
 }
@@ -191,6 +195,11 @@ void SvgDeviceContext::StartPage( )
        
 void SvgDeviceContext::EndPage() 
 {
+    // end page-margin
+    m_graphics--;
+    m_indents--;
+    WriteLine("</g>");
+    // end page-scale
     m_graphics--;
     m_indents--;
     WriteLine("</g>");

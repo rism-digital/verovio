@@ -31,8 +31,9 @@ std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
 // Global for LogElapsedTimeXXX functions (debugging purposes)
 struct timeval start;
 
+    
 #ifdef EMSCRIPTEN
-    std::vector<std::string> _log_buffer;
+std::vector<std::string> logBuffer;
 #endif
     
 bool AreEqual(double dFirstVal, double dSecondVal)
@@ -57,6 +58,7 @@ void LogElapsedTimeEnd( const char *msg )
     
 void LogDebug(const char *fmt, ...)
 {
+#if defined(DEBUG)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
@@ -65,7 +67,6 @@ void LogDebug(const char *fmt, ...)
     AppendLogBuffer(true, s);
     va_end ( args );
 #else
-#if defined(DEBUG)
     va_list args;
     va_start ( args, fmt );
     printf("[Debug] ");
@@ -154,38 +155,26 @@ std::string StringFormatVariable(const char * format, va_list arg)
 }
     
 #ifdef EMSCRIPTEN
-void ResetLogBuffer() {
-    _log_buffer.clear();
-}
-    
-std::vector<std::string> GetLogBuffer() {
-    return _log_buffer;
-}
-    
-bool LogBufferContains(std::string s) {
-    std::vector<std::string>::iterator iter = _log_buffer.begin();
-    
-    while ( iter != _log_buffer.end()) {
-        std::string s2 = *iter;
-        if (s2 == s)
+bool LogBufferContains(std::string s)
+{
+    std::vector<std::string>::iterator iter = logBuffer.begin();
+    while (iter != logBuffer.end()) {
+        if ((*iter) == s)
             return true;
         ++iter;
     }
-    
     return false;
 }
 
-void AppendLogBuffer(bool checkDuplicate, std::string message) {
-    
+void AppendLogBuffer(bool checkDuplicate, std::string message)
+{    
     if (checkDuplicate) {
         if (!LogBufferContains(message))
-            _log_buffer.push_back(message);
-    } else
-        _log_buffer.push_back(message);
-    
+            logBuffer.push_back(message);
+    } else {
+        logBuffer.push_back(message);
+    }
 }
-    
-
 #endif
     
 std::string UTF16to8(const wchar_t * in)

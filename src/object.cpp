@@ -727,11 +727,10 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    assert( *currentStaffDef );
-    
     // starting a new clef
     Clef *current_clef = dynamic_cast<Clef*>(this);
     if ( current_clef  ) {
+        assert( *currentStaffDef );
         (*currentStaffDef)->ReplaceClef( current_clef );
         return FUNCTOR_CONTINUE;
     }
@@ -739,6 +738,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new keysig
     KeySignature *current_keysig = dynamic_cast<KeySignature*>(this);
     if ( current_keysig  ) {
+        assert( *currentStaffDef );
         (*currentStaffDef)->ReplaceKeySig( current_keysig );
         return FUNCTOR_CONTINUE;
     }

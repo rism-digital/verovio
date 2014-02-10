@@ -22,8 +22,6 @@ using namespace std;
 using namespace vrv;
 
 bool initialized = false;
-char *_persistent_log_string = NULL;
-
 
 extern "C" {
 
@@ -47,40 +45,25 @@ extern "C" {
 	
 	void vrvInterfaceController_destructor(InterfaceController *ic) {
 		delete ic;
-		free(_persistent_log_string);
 	}
 	
 	const char *vrvInterfaceController_getLog(InterfaceController *ic) {
-		std::vector<std::string> v = vrv::GetLogBuffer();
-		std::string str;
-		
-		for( size_t i = 0; i != v.size(); ++i)
-		        str = str + v[i];
-		
-		if (_persistent_log_string == NULL) {
-			_persistent_log_string = (char*)malloc(strlen(str.c_str() + 1));
-		} else {
-			_persistent_log_string = (char*)realloc(_persistent_log_string, strlen(str.c_str() + 1));
-		}
-		
-		strcpy(_persistent_log_string, str.c_str());
-		
-		return _persistent_log_string;
-	}
-	
+        ic->SetCString(ic->GetLogString());
+        return ic->GetCString();
+    }
 	
 	int vrvInterfaceController_getPageCount(InterfaceController *ic) {
 		return ic->GetPageCount();
 	}
 
 	bool vrv_InterfaceController_loadData(InterfaceController *ic, const char *data) {
-		ResetLogBuffer();
+		ic->ResetLogBuffer();
         return ic->LoadString( data );
 	}
 
 
 	const char *vrvInterfaceController_renderPage(InterfaceController *ic, int page_no, const char *c_options) {
-		ResetLogBuffer();
+		ic->ResetLogBuffer();
 		ic->SetCString(ic->RenderToSvg(page_no, false));
 		return ic->GetCString();
 	}
@@ -92,7 +75,7 @@ extern "C" {
 	}
 
 	const char* vrvInterfaceController_renderData(InterfaceController *ic, const char *data, const char *options) {
-		ResetLogBuffer();
+		ic->ResetLogBuffer();
 		vrvInterfaceController_setOptions(ic, options);
 		vrv_InterfaceController_loadData(ic, data);
 		

@@ -51,6 +51,19 @@ public:
     bool ParseOptions( std::string json_options );
     
     /**
+     * Concatenates the vrv::logBuffer into a string an returns it.
+     * This is used only for Emscripten based compilation.
+     * The vrv::logBuffer is filled by the vrv::LogXXX functions.
+     */
+    std::string GetLogString( );
+    
+    /**
+     * Resets the vrv::logBuffer.
+     * This is used only for Emscripten based compilation.
+     */
+    void ResetLogBuffer();
+    
+    /**
      * Render the page in SVG and returns it as a string
      * Page number is 1-based
      */

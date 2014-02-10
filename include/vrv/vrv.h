@@ -18,24 +18,22 @@
 namespace vrv {
 
 /**
- * The following functions are helpers for formating, conversion, or loggin
+ * The following functions are helpers for formating, conversion, or loging
  * Most of them differ if they are used in the command line tool or in emscripten
  */
         
-    
 void LogDebug(  const char *fmt, ... );
 void LogError(  const char *fmt, ... );
 void LogMessage(  const char *fmt, ... );
 void LogWarning(  const char *fmt, ... );
 
+/**
+ * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
+ */
 #ifdef EMSCRIPTEN
-    extern std::vector<std::string> _log_buffer;
-    
-    void ResetLogBuffer();
-    std::vector<std::string> GetLogBuffer();
-    bool LogBufferContains(std::string s);
-    void AppendLogBuffer(bool checkDuplicate, std::string message);
-
+extern std::vector<std::string> logBuffer;
+bool LogBufferContains(std::string s);
+void AppendLogBuffer(bool checkDuplicate, std::string message);
 #endif
 
 /**
