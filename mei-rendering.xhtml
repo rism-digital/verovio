@@ -25,6 +25,8 @@ downloads:
 	var vrvToolkit = new verovio.toolkit();
 	var page = 1;
 	var zoom = 40;
+	var pageHeight = 2970;
+	var pageWidth = 2100;
 	var swipe_pages = false;
 
 	function upload_file(input, format) {
@@ -51,6 +53,7 @@ downloads:
 		options = JSON.stringify({
 					inputFormat: format,
 					border: 50,
+					scale: 10,
 					ignoreLayout: ignoreLayout
 				});
 		vrvToolkit.setOptions( options );
@@ -58,22 +61,16 @@ downloads:
 
 		document.getElementById("total_text").innerHTML = vrvToolkit.getPageCount();
 		page = 1;
-		set_zoom(zoom);
+		load_page();
 	}
 
-	function goto_page(page_nr) {
-		document.getElementById('jump_text').value = page_nr;
+	function load_page() {
+		document.getElementById('jump_text').value = page;
 
-		svg = vrvToolkit.renderPage(page_nr, "");
+		svg = vrvToolkit.renderPage(page, "");
 		document.getElementById('svg_output').innerHTML = svg;
 		
-		// adjust the height of the panel
-		if ( $('#svg_panel svg') ) {
-			$('#svg_output').height( $('#svg_panel svg').height() + 10 ); // slighly more for making sure we have no scroll bar	
-		}
-		// enable the swipe (or not)
-		enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
-		
+		apply_zoom();		
 	};
 
 	function next_page() {
@@ -82,7 +79,7 @@ downloads:
 		}
 
 		page = page + 1;
-		goto_page(page);
+		load_page();
 	};
 
 	function prev_page() {
@@ -91,27 +88,29 @@ downloads:
 		}
 
 		page = page - 1;
-		goto_page(page);
+		load_page();
 	};
 
 	function first_page() {
 		page = 1;
-		goto_page(page);
+		load_page();
 	};
 	
 	function last_page() {
 		page = vrvToolkit.getPageCount();
-		goto_page(page);
+		load_page();
 	};
 
-	function set_zoom(zoom_nr) {
+	function apply_zoom() {
+		/*
 		vrvToolkit.setOptions(JSON.stringify({
-			scale: zoom_nr
+			scale: zoom
 		}));
+		load_page();
+		*/
 		
-		goto_page(page);
-
-		document.getElementById('zoom_text').value = zoom_nr + "%";
+		$('#svg_panel svg g.page-scale').attr("transform", "scale(" + zoom / 100 + ", "+ zoom / 100 +")") ;
+		adjust_page_height();
 	}
 
 	function zoom_out() {
@@ -119,17 +118,17 @@ downloads:
 			return;
 		}
 
-		zoom = zoom - 10;
-		set_zoom(zoom);
+		zoom = zoom / 2;
+		apply_zoom();
 	}
 
 	function zoom_in() {
-		if (zoom > 140) {
+		if (zoom > 80) {
 			return;
 		}
 
-		zoom = zoom + 10;
-		set_zoom(zoom);
+		zoom = zoom * 2;
+		apply_zoom();
 	}
 
 	function do_page_enter(e) {
@@ -140,7 +139,7 @@ downloads:
 
 			if (text <= vrvToolkit.getPageCount() && text > 0) {
 				page = Number(text);
-				goto_page(page);
+				load_page();
 			} else {
 				document.getElementById('jump_text').value = page;
 			}
@@ -152,8 +151,24 @@ downloads:
 		key = e.keyCode || e.which;
 		if (key == 13) {
 			text = document.getElementById('zoom_text').value;
-			set_zoom( Number(text) );
+			zoom = Number(text);
+			apply_zoom( );
 		}
+	}
+	
+	function adjust_page_height() {
+		// adjust the height of the panel
+		if ( $('#svg_panel svg') ) {
+			$('#svg_output').height( (pageHeight * zoom / 100) + 10 ); // slighly more for making sure we have no scroll bar	
+			$('#svg_panel svg').height(pageHeight * zoom / 100 );
+			$('#svg_panel svg').width(pageWidth * zoom / 100 );	
+		}
+		
+		// also update the zoom control
+		document.getElementById('zoom_text').value = zoom + "%";
+		
+		// enable the swipe (or not)
+		enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
 	}
     
 	function swipe_prev(event, direction, distance, duration, fingerCount) {
@@ -198,6 +213,9 @@ downloads:
 						MEI file and optional parameters
 					</div>
 					<div class="col-xs-2">
+						<button id="toggle-options" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-chevron-down"/>
+						</button>
 						<button id="options-help" class="btn btn-default btn-xs btn-heading pull-right" type="button">
 							<span class="glyphicon glyphicon-question-sign"/>
 						</button>
@@ -205,7 +223,7 @@ downloads:
 				</div>
 			</div>
 			
-			<div class="panel-body">
+			<div id="options_body_panel" class="panel-body">
 				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
 					<div class="row">
 						<div class="col-md-10">
@@ -389,10 +407,13 @@ downloads:
 		
 		// Toggle for the options help
 		$( "#options-help" ).click(function() {
-			if ( $( "#help_panel" ).css("display") == "none")
-			    $( "#help_panel" ).slideDown();
-			else
-			    $( "#help_panel" ).slideUp();
+			$( "#help_panel" ).slideToggle();	
+		});
+		
+		$('#toggle-options').click(function(){
+			$( "#options_body_panel" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-chevron-left glyphicon-chevron-down");
 		});
 		
 		// Set the popover for the btn
