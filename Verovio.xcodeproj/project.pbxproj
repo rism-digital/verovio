@@ -168,6 +168,7 @@
 		4D22C41F18891D6D00D0831F /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = src/pugixml.cpp; sourceTree = "<group>"; };
 		4D22C42218891FB900D0831F /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/vrv/pugiconfig.hpp; sourceTree = "<group>"; };
 		4D22C42318891FB900D0831F /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/vrv/pugixml.hpp; sourceTree = "<group>"; };
+		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
 		4D7D8A3A1886E35B00D78B62 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../tools/main.cpp; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; };
@@ -293,6 +294,7 @@
 			isa = PBXGroup;
 			children = (
 				4D7D8A3A1886E35B00D78B62 /* main.cpp */,
+				4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */,
 			);
 			name = tools;
 			path = tinyxml;
