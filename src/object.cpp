@@ -696,6 +696,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     ScoreDef *currentScoreDef = static_cast<ScoreDef*>(params[0]);
     StaffDef **currentStaffDef = static_cast<StaffDef**>(params[1]);
 
+    assert( currentScoreDef );
+    
     // starting a new page
     Page *current_page = dynamic_cast<Page*>(this);
     if ( current_page  ) {
@@ -725,17 +727,19 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
+    assert( *currentStaffDef );
+    
     // starting a new clef
     Clef *current_clef = dynamic_cast<Clef*>(this);
     if ( current_clef  ) {
-        currentScoreDef->ReplaceClef( current_clef );
+        (*currentStaffDef)->ReplaceClef( current_clef );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new keysig
     KeySignature *current_keysig = dynamic_cast<KeySignature*>(this);
     if ( current_keysig  ) {
-        currentScoreDef->ReplaceKeySig( current_keysig );
+        (*currentStaffDef)->ReplaceKeySig( current_keysig );
         return FUNCTOR_CONTINUE;
     }
     
