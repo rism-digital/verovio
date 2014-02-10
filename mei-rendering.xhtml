@@ -29,15 +29,15 @@ downloads:
 	var pageWidth = 2100;
 	var swipe_pages = false;
 
-	function upload_file(input, format) {
+	function upload_file(option_form, format) {
 		
-		var file = document.getElementById(input).files[0];
+		var file = $("#mei_files", option_form).prop('files')[0];
 		var reader = new FileReader();
 
 		// Closure to capture the file information.
 		reader.onload = (function(theFile) {
 			return function(e) {
-				load_data(e.target.result, format);
+				load_data(e.target.result, option_form);
 			};
 		})(file);
 
@@ -45,30 +45,35 @@ downloads:
 		reader.readAsText(file);
 	};
 	
-	function load_data(data, format) {
-		ignoreLayout = 0;
-		if ( document.getElementById('ignoreLayout').checked ) {
-			ignoreLayout = 1;
-		}
+	function load_data(data, option_form) {
+		ignoreLayout = $("#ignoreLayout", option_form).is(':checked') ? 1 : 0;
+		pageHeight = $("#pageHeight", option_form).val().length ? Number( $("#pageHeight", option_form).val() ) : 2970;
+		pageWidth = $("#pageWidth", option_form).val().length ? Number( $("#pageWidth", option_form).val() ) : 2100;
+		border = $("#border", option_form).val().length ? Number( $("#border", option_form).val() ) : 50;
 		options = JSON.stringify({
-					inputFormat: format,
-					border: 50,
+					inputFormat: 'mei',
+					pageHeight: pageHeight,
+					pageWidth: pageWidth,
+					border: border,
 					scale: 10,
 					ignoreLayout: ignoreLayout
 				});
 		vrvToolkit.setOptions( options );
 		vrvToolkit.loadData(data);
+		
+		str = vrvToolkit.getLog();
+		$("#log_p").html( str.replace(/\n/g, "<br />") );
 
-		document.getElementById("total_text").innerHTML = vrvToolkit.getPageCount();
+		$("#total_text").html(vrvToolkit.getPageCount());
 		page = 1;
 		load_page();
 	}
 
 	function load_page() {
-		document.getElementById('jump_text').value = page;
+		$("#jump_text").val(page);
 
 		svg = vrvToolkit.renderPage(page, "");
-		document.getElementById('svg_output').innerHTML = svg;
+		$("#svg_output").html(svg);
 		
 		apply_zoom();		
 	};
@@ -135,13 +140,13 @@ downloads:
 		key = e.keyCode || e.which;
 		if (key == 13) {
 
-			text = document.getElementById('jump_text').value;
+			text = $("#jump_text").val();
 
 			if (text <= vrvToolkit.getPageCount() && text > 0) {
 				page = Number(text);
 				load_page();
 			} else {
-				document.getElementById('jump_text').value = page;
+				$("#jump_text").val(page);
 			}
 
 		}
@@ -150,9 +155,12 @@ downloads:
 	function do_zoom_enter(e) {
 		key = e.keyCode || e.which;
 		if (key == 13) {
-			text = document.getElementById('zoom_text').value;
-			zoom = Number(text);
-			apply_zoom( );
+			text = $("#zoom_text").val();
+			zoom_val = Number(text.replace("%", ""));
+			if (zoom_val < 10) zoom_val = 10;
+			else if (zoom_val > 160) zoom_val = 160;	
+			zoom = zoom_val;
+			apply_zoom();
 		}
 	}
 	
@@ -165,27 +173,27 @@ downloads:
 		}
 		
 		// also update the zoom control
-		document.getElementById('zoom_text').value = zoom + "%";
+		$("#zoom_text").val(zoom + "%");
 		
 		// enable the swipe (or not)
 		enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
 	}
-    
+	 
 	function swipe_prev(event, direction, distance, duration, fingerCount) {
-     	prev_page();
-    }
+	  	prev_page();
+	 }
 
-    function swipe_next(event, direction, distance, duration, fingerCount) {
+	 function swipe_next(event, direction, distance, duration, fingerCount) {
 		 next_page();
-    }
+	 }
 
-    function swipe_zoom_in(event, target) {
+	 function swipe_zoom_in(event, target) {
 		 zoom_in();
-    }
+	 }
 	
-    function swipe_zoom_out(event, target) {
+	 function swipe_zoom_out(event, target) {
 		 zoom_out();
-    }
+	 }
 	
 	function enable_swipe( pages ) {
 		if ( pages && !swipe_pages ) {
@@ -213,18 +221,18 @@ downloads:
 						MEI file and optional parameters
 					</div>
 					<div class="col-xs-2">
-						<button id="toggle-options" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+						<button id="toggle_options" class="btn btn-default btn-xs btn-heading pull-right" type="button">
 							<span class="glyphicon glyphicon-chevron-down"/>
 						</button>
-						<button id="options-help" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+						<button id="options_help" class="btn btn-default btn-xs btn-heading pull-right" type="button">
 							<span class="glyphicon glyphicon-question-sign"/>
 						</button>
 					</div>
 				</div>
 			</div>
 			
-			<div id="options_body_panel" class="panel-body">
-				<form id="upload_form" onsubmit="upload_file('mei_files', 'mei'); return false" class="form-inline" role="form">
+			<div id="options_panel_body" class="panel-body">
+				<form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
 					<div class="row">
 						<div class="col-md-10">
 							<input type="file" id="mei_files" name="file" style="margin: 4px 0px 8px 0px;"/>
@@ -240,7 +248,7 @@ downloads:
 							<div class="checkbox">
 								<label class="checkbox">
 									<input id="ignoreLayout" type="checkbox"/> Ignore encoded layout
-						      	</label>
+									</label>
 							</div>
 						</div>
 						<!-- /.col-xs -->
@@ -248,20 +256,20 @@ downloads:
 							<div class="checkbox">
 								<label class="checkbox">
 									<input id="adjustPageHeight" type="checkbox"/> Adjust height to content
-						      	</label>
+									</label>
 							</div>
 						</div>
 						<!-- /.col-xs -->
 						<div class="col-md-6">
-						    <div class="col-md-4 form-group">
-						      <input type="text" class="form-control" id="pageHeight" placeholder="Height"/>
-						    </div>
-						    <div class="col-md-4 form-group">
-						      <input type="text" class="form-control" id="pageWidth" placeholder="Width"/>
-						    </div>
-						    <div class="col-md-4 form-group">
-						      <input type="text" class="form-control" id="border" placeholder="Margin"/>
-						    </div>
+							 <div class="col-md-4 form-group">
+								<input type="text" class="form-control" id="pageHeight" placeholder="Height"/>
+							 </div>
+							 <div class="col-md-4 form-group">
+								<input type="text" class="form-control" id="pageWidth" placeholder="Width"/>
+							 </div>
+							 <div class="col-md-4 form-group">
+								<input type="text" class="form-control" id="border" placeholder="Margin"/>
+							 </div>
 						</div>
 						<!-- /.col-xs -->
 					</div>
@@ -290,6 +298,12 @@ downloads:
 							Add a margin (default is 50)
 						</p>
 					</div>
+
+					<!--><div id="log_panel" style="display: none">
+						<hr class="panel"/>
+						<p id="log_p"></p>
+					</div>
+					-->
 					
 				</form>
 			</div>
@@ -371,6 +385,7 @@ downloads:
 				<!-- /.row -->
 			</div>
 		</div>
+		
 		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
 				<div class="row">
@@ -378,7 +393,7 @@ downloads:
 						Example files to download
 					</div>
 					<div class="col-xs-2">
-						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="These files can be downloaded locally on your machine and then selected for rendering in your browser">
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="These files can be downloaded locally on your machine and then selected for rendering in your browser.">
 							<span class="glyphicon glyphicon-question-sign"/>
 						</button>
 					</div>
@@ -389,7 +404,7 @@ downloads:
 					<div class="col-md-12">
 						{% for d in page.downloads %}
 						<p><a href="{{ site.baseurl }}/examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
-						    {{ d.description }}
+							 {{ d.description }}
 						 </p>
 						{% endfor %}
 					</div>
@@ -398,6 +413,31 @@ downloads:
 				<!-- /.row -->
 			</div>
 		</div>
+		
+		<div class="panel panel-default hidden-xs hidden-sm">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-xs-8">
+						Log
+					</div>
+					<div class="col-xs-4">
+						<button id="toggle_log" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-chevron-left"/>
+						</button>
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="Shows the log information generated when loading the file.">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="log_panel_body" class="panel-body" style="display: none">
+				<div style="max-height: 400px; overflow-x: auto">
+					<p id="log_p"></p>
+				</div>
+			</div>
+		</div>
+		
+		
 	</div>
 </div>
 
@@ -406,12 +446,18 @@ downloads:
 	$( document ).ready(function() {
 		
 		// Toggle for the options help
-		$( "#options-help" ).click(function() {
+		$( "#options_help" ).click(function() {
 			$( "#help_panel" ).slideToggle();	
 		});
 		
-		$('#toggle-options').click(function(){
-			$( "#options_body_panel" ).toggle();
+		$( "#toggle_log" ).click(function() {
+			$( "#log_panel_body" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+		});
+		
+		$('#toggle_options').click(function(){
+			$( "#options_panel_body" ).toggle();
 		  	// toggle icon
 		  	$("span", this).toggleClass("glyphicon-chevron-left glyphicon-chevron-down");
 		});
@@ -420,7 +466,7 @@ downloads:
 		$( ".popover-btn" ).popover( );
 		
 		// Adjust the size of the svg_output and the zoom according to the div (screen) size
-	    width = $('#svg_panel').width();
+		 width = $('#svg_panel').width();
 		zoom = Math.floor( 100 * width / 2100 );
 		$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
 		
@@ -431,7 +477,7 @@ downloads:
 		var file = location.search.substring(1);
 		if (file.length != 0) {
 			$.get( file , function( data ) {
-				load_data( data, 'mei');
+				load_data( data, $('#upload_form') );
 			});
 		}
 	});
