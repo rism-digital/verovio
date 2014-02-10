@@ -59,8 +59,8 @@ System::~System()
 void System::Clear( )
 {
 	ClearChildren();
-	m_systemLeftMar = 50;
-	m_systemRightMar = 50;
+	m_systemLeftMar = 0;
+	m_systemRightMar = 0;
 	m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
 	m_drawingX = 0;
