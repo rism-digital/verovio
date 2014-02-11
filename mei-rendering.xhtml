@@ -28,6 +28,7 @@ downloads:
 	var pageHeight = 2970;
 	var pageWidth = 2100;
 	var swipe_pages = false;
+	var log = false;
 
 	function upload_file(option_form, format) {
 		
@@ -61,8 +62,10 @@ downloads:
 		vrvToolkit.setOptions( options );
 		vrvToolkit.loadData(data);
 		
-		str = vrvToolkit.getLog();
-		$("#log_p").html( str.replace(/\n/g, "<br />") );
+		if (log) {
+			str = vrvToolkit.getLog();
+			$("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
+		}
 
 		$("#total_text").html(vrvToolkit.getPageCount());
 		page = 1;
@@ -218,7 +221,7 @@ downloads:
 			<div class="panel-heading">
 				<div class="row">
 					<div class="col-xs-10">
-						MEI file and optional parameters
+						MEI file to render and optional parameters
 					</div>
 					<div class="col-xs-2">
 						<button id="toggle_options" class="btn btn-default btn-xs btn-heading pull-right" type="button">
@@ -277,26 +280,20 @@ downloads:
 					
 					<div id="help_panel" style="display: none">
 						<hr class="panel"/>
-						<h5>Ignore encoded layout</h5>
-						<p>
-							Make Verovio ignore the encoded layout information (if any) and have it fully recalculated
-						</p>
-						<h5>Adjust height to content</h5>
-						<p>
-							Crop the page height to the height of the content
-						</p>
-						<h5>Height</h5>
-						<p>
-							Specify the page height (default is 2970)
-						</p>
-						<h5>Width</h5>
-						<p>
-							Specify the page width (default is 2100)
-						</p>
-						<h5>Margin</h5>
-						<p>
-							Add a margin (default is 50)
-						</p>
+						<p><strong>Ignore encoded layout</strong></p>
+						<p>Make Verovio ignore the encoded layout information (if any) and have it fully recalculated</p>
+						
+						<p><strong>Adjust height to content</strong></p>
+						<p>Crop the page height to the height of the content</p>
+						
+						<p><strong>Height</strong></p>
+						<p>Specify the page height (default is 2970)</p>
+							
+						<p><strong>Width</strong></p>
+						<p>Specify the page width (default is 2100)</p>
+							
+						<p><strong>Margin</strong></p>
+						<p>Add a margin (default is 50)</p>
 					</div>
 
 					<!--><div id="log_panel" style="display: none">
@@ -417,10 +414,10 @@ downloads:
 		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
 				<div class="row">
-					<div class="col-xs-8">
+					<div class="col-xs-7">
 						Log
 					</div>
-					<div class="col-xs-4">
+					<div class="col-xs-5">
 						<button id="toggle_log" class="btn btn-default btn-xs btn-heading pull-right" type="button">
 							<span class="glyphicon glyphicon-chevron-left"/>
 						</button>
@@ -432,7 +429,7 @@ downloads:
 			</div>
 			<div id="log_panel_body" class="panel-body" style="display: none">
 				<div style="max-height: 400px; overflow-x: auto">
-					<p id="log_p"></p>
+					<p id="log_p">[Render the file for seeing the log]</p>
 				</div>
 			</div>
 		</div>
@@ -447,10 +444,14 @@ downloads:
 		
 		// Toggle for the options help
 		$( "#options_help" ).click(function() {
+			if ( !$("#options_panel_body").is(":visible") ) {
+				$( "#toggle_options" ).click();
+			}
 			$( "#help_panel" ).slideToggle();	
 		});
 		
 		$( "#toggle_log" ).click(function() {
+			log = !log;
 			$( "#log_panel_body" ).toggle();
 		  	// toggle icon
 		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
@@ -466,7 +467,7 @@ downloads:
 		$( ".popover-btn" ).popover( );
 		
 		// Adjust the size of the svg_output and the zoom according to the div (screen) size
-		 width = $('#svg_panel').width();
+		width = $('#svg_panel').width();
 		zoom = Math.floor( 100 * width / 2100 );
 		$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
 		
@@ -476,6 +477,7 @@ downloads:
 		// Load the default file or the file passed in the URL
 		var file = location.search.substring(1);
 		if (file.length != 0) {
+			$( "#toggle_options" ).click();
 			$.get( file , function( data ) {
 				load_data( data, $('#upload_form') );
 			});
