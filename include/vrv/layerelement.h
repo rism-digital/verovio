@@ -156,10 +156,10 @@ public:
     bool m_visible;
 
     /** If this is a note, store here the stem coordinates (useful for ex. tuplets) */
-    MusPoint m_stem_start; // beginning point, the one near the note
-    MusPoint m_stem_end; // end point (!), near beam or stem
+    MusPoint m_drawingStemStart; // beginning point, the one near the note
+    MusPoint m_drawingStemEnd; // end point (!), near beam or stem
     /** stem direction as drawn, true = up, false = down */
-    bool m_drawingN_stem_dir;
+    bool m_drawingStemDir;
     
 protected:
     Alignment *m_alignment;

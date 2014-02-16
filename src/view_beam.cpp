@@ -530,18 +530,18 @@ if (fPente)
 		{	if (fb.dir)	// m_stemDir en haut
 			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
 				fy2 = crd[i].b+m_doc->m_drawingVerticalUnit2[staff->staffSize];
-                crd[i].chk->m_stem_start.x = crd[i].chk->m_stem_end.x = crd[i].a;
-                crd[i].chk->m_stem_start.y = fy2;
-                crd[i].chk->m_stem_end.y = fy1;
-                crd[i].chk->m_drawingN_stem_dir = true;
+                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
+                crd[i].chk->m_drawingStemStart.y = fy2;
+                crd[i].chk->m_drawingStemEnd.y = fy1;
+                crd[i].chk->m_drawingStemDir = true;
 			}
 			else
 			{	fy1 = *(_ybeam+i) + m_doc->m_env.m_stemWidth;
 				fy2 = crd[i].b-m_doc->m_drawingVerticalUnit2[staff->staffSize];
-                crd[i].chk->m_stem_start.x = crd[i].chk->m_stem_end.x = crd[i].a;
-                crd[i].chk->m_stem_start.y = fy2;
-                crd[i].chk->m_stem_end.y = fy1;
-                crd[i].chk->m_drawingN_stem_dir = false;
+                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
+                crd[i].chk->m_drawingStemStart.y = fy2;
+                crd[i].chk->m_drawingStemEnd.y = fy1;
+                crd[i].chk->m_drawingStemDir = false;
 			}
 		}
 		if ((crd+i)->chk->IsNote() && ((Note*)(crd+i)->chk)->m_headshape != SANSQUEUE)

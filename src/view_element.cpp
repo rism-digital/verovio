@@ -421,10 +421,10 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				else
 					DrawVerticalLine ( dc,y2,(int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );//queue en descendant
                 
-                element->m_stem_start.x = element->m_stem_end.x = x2 - (m_doc->m_env.m_stemWidth / 2);
-                element->m_stem_end.y = y2;
-                element->m_stem_start.y = (int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]);
-                element->m_drawingN_stem_dir = true;
+                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+                element->m_drawingStemEnd.y = y2;
+                element->m_drawingStemStart.y = (int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]);
+                element->m_drawingStemDir = true;
                 
 				if (formval > DUR_4)
 				{
@@ -447,10 +447,10 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				else
 					DrawVerticalLine ( dc,y2,(int)(ynn- m_doc->m_drawingVerticalUnit2[staffSize]),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );	// queue en montant
 
-                element->m_stem_start.x = element->m_stem_end.x = x2 - (m_doc->m_env.m_stemWidth / 2);
-                element->m_stem_start.y = (int)(ynn- m_doc->m_drawingVerticalUnit2[staffSize]);
-                element->m_stem_end.y = y2;
-                element->m_drawingN_stem_dir = false;
+                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+                element->m_drawingStemStart.y = (int)(ynn- m_doc->m_drawingVerticalUnit2[staffSize]);
+                element->m_drawingStemEnd.y = y2;
+                element->m_drawingStemDir = false;
                 
 				// ENZ
 				// decalage du crochet vers la gauche
@@ -1631,10 +1631,10 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     dc->SetPen(AxBLACK, 2, AxSOLID);
     dc->SetBrush( AxBLACK, AxSOLID );
     
-    if (element->m_drawingN_stem_dir)
-        dc->DrawLine(element->m_stem_start.x - 10, ToDeviceContextY(element->m_stem_start.y + 10), element->m_stem_start.x + 20, ToDeviceContextY(element->m_stem_start.y + 40));
+    if (element->m_drawingStemDir)
+        dc->DrawLine(element->m_drawingStemStart.x - 10, ToDeviceContextY(element->m_drawingStemStart.y + 10), element->m_drawingStemStart.x + 20, ToDeviceContextY(element->m_drawingStemStart.y + 40));
     else
-        dc->DrawLine(element->m_stem_start.x - 10, ToDeviceContextY(element->m_stem_start.y - 10), element->m_stem_start.x + 20, ToDeviceContextY(element->m_stem_start.y - 40));
+        dc->DrawLine(element->m_drawingStemStart.x - 10, ToDeviceContextY(element->m_drawingStemStart.y - 10), element->m_drawingStemStart.x + 20, ToDeviceContextY(element->m_drawingStemStart.y - 40));
     
     dc->ResetPen();
     dc->ResetBrush();
@@ -1657,7 +1657,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         Note *note = dynamic_cast<Note*>(element);
         
         // stem down or semibreve/longa, fermata up!
-        if (!element->m_drawingN_stem_dir && (note->m_dur != DUR_1 || note->m_dur != DUR_BR)) {
+        if (!element->m_drawingStemDir && (note->m_dur != DUR_1 || note->m_dur != DUR_BR)) {
             
             // only for up-fermatas, if there is a trill on the same note
             // add a 35 pixel space so they do not collide

@@ -144,19 +144,19 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         // yes they are in a beam
         // get the x position centered from the STEM so it looks better
         // NOTE start and end are left to 0, this is the signal that no bracket has to be drawn
-        x = firstNote->m_stem_start.x + (lastNote->m_stem_start.x - firstNote->m_stem_start.x) / 2;
+        x = firstNote->m_drawingStemStart.x + (lastNote->m_drawingStemStart.x - firstNote->m_drawingStemStart.x) / 2;
         
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
-        if (firstNote->m_drawingN_stem_dir)
-            y = lastNote->m_stem_end.y + (firstNote->m_stem_end.y - lastNote->m_stem_end.y) / 2 + TUPLET_OFFSET;
+        if (firstNote->m_drawingStemDir)
+            y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 + TUPLET_OFFSET;
         else 
-            y = lastNote->m_stem_end.y + (firstNote->m_stem_end.y - lastNote->m_stem_end.y) / 2 - TUPLET_OFFSET;
+            y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 - TUPLET_OFFSET;
         
         // Copy the generated coordinates
         center->x = x;
         center->y = y;
-        direction =  firstNote->m_drawingN_stem_dir; // stem direction is same for all notes
+        direction =  firstNote->m_drawingStemDir; // stem direction is same for all notes
     } else {
             
         //ArrayOfObjects all_notes;
@@ -195,7 +195,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         while (iter != tuplet->m_list.end()) {
             LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
             
-            if (currentNote->m_drawingN_stem_dir == true)
+            if (currentNote->m_drawingStemDir == true)
                 ups++;
             else
                 downs++;
@@ -211,13 +211,13 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             // Calculate the average between the first and last stem
             // set center, start and end too.
             if (direction) { // up
-                y = lastNote->m_stem_end.y + (firstNote->m_stem_end.y - lastNote->m_stem_end.y) / 2 + TUPLET_OFFSET;
-                start->y = firstNote->m_stem_end.y + TUPLET_OFFSET;
-                end->y = lastNote->m_stem_end.y + TUPLET_OFFSET;
+                y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 + TUPLET_OFFSET;
+                start->y = firstNote->m_drawingStemEnd.y + TUPLET_OFFSET;
+                end->y = lastNote->m_drawingStemEnd.y + TUPLET_OFFSET;
             } else {
-                y = lastNote->m_stem_end.y + (firstNote->m_stem_end.y - lastNote->m_stem_end.y) / 2 - TUPLET_OFFSET;
-                start->y = firstNote->m_stem_end.y - TUPLET_OFFSET;
-                end->y = lastNote->m_stem_end.y - TUPLET_OFFSET;
+                y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 - TUPLET_OFFSET;
+                start->y = firstNote->m_drawingStemEnd.y - TUPLET_OFFSET;
+                end->y = lastNote->m_drawingStemEnd.y - TUPLET_OFFSET;
             }
             
             // Now we cycle again in all the intermediate notes (i.e. we start from the second note
@@ -231,15 +231,15 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
                 if (direction) {
                     // The note is more than the avg, adjust to y the difference
                     // from this note to the avg
-                    if (currentNote->m_stem_end.y + TUPLET_OFFSET > y) {
-                        int offset = y - (currentNote->m_stem_end.y + TUPLET_OFFSET);
+                    if (currentNote->m_drawingStemEnd.y + TUPLET_OFFSET > y) {
+                        int offset = y - (currentNote->m_drawingStemEnd.y + TUPLET_OFFSET);
                         y -= offset;
                         end->y -= offset;
                         start->y -= offset;
                     }
                 } else {
-                    if (currentNote->m_stem_end.y - TUPLET_OFFSET < y) {
-                        int offset = y - (currentNote->m_stem_end.y - TUPLET_OFFSET);
+                    if (currentNote->m_drawingStemEnd.y - TUPLET_OFFSET < y) {
+                        int offset = y - (currentNote->m_drawingStemEnd.y - TUPLET_OFFSET);
                         y -= offset;
                         end->y -= offset;
                         start->y -= offset;
@@ -260,14 +260,14 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             while (iter != tuplet->m_list.end()) {
                 LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
                 
-                if (currentNote->m_drawingN_stem_dir == direction) {
+                if (currentNote->m_drawingStemDir == direction) {
                                         
                     if (direction) {
-                        if (y == 0 || currentNote->m_stem_end.y + TUPLET_OFFSET >= y)
-                            y = currentNote->m_stem_end.y + TUPLET_OFFSET;
+                        if (y == 0 || currentNote->m_drawingStemEnd.y + TUPLET_OFFSET >= y)
+                            y = currentNote->m_drawingStemEnd.y + TUPLET_OFFSET;
                     } else {
-                        if (y == 0 || currentNote->m_stem_end.y - TUPLET_OFFSET <= y)
-                            y = currentNote->m_stem_end.y - TUPLET_OFFSET;
+                        if (y == 0 || currentNote->m_drawingStemEnd.y - TUPLET_OFFSET <= y)
+                            y = currentNote->m_drawingStemEnd.y - TUPLET_OFFSET;
                     }
                         
                 } else {
