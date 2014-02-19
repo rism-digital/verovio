@@ -52,14 +52,27 @@ LayerElement::LayerElement():
     Init();
 }
 
-
 LayerElement::LayerElement(std::string classid):
 	DocObject(classid)
 {
     Init();
 }
 
-
+void LayerElement::Init()
+{
+    m_cueSize = false;
+    m_hOffset = 0;
+    m_staffShift = 0;
+    m_visible = true;
+    
+    m_xAbs = VRV_UNSET;
+    m_drawingX = 0;
+    m_drawingYRel = 0;
+    m_in_layer_app = false;
+    
+    m_alignment = NULL;
+}
+    
 LayerElement::~LayerElement()
 {
     
@@ -173,22 +186,6 @@ void LayerElement::SetValue( int value, int flag )
         duration->SetDuration( value );
     }
 }
-
-void LayerElement::Init()
-{
-    m_cueSize = false;
-    m_hOffset = 0;
-    m_staffShift = 0;
-    m_visible = true;
-    
-    m_xAbs = VRV_UNSET;
-    m_drawingX = 0;
-    m_drawingYRel = 0;
-    m_in_layer_app = false;
-    
-    m_alignment = NULL;
-}
-
 
 bool LayerElement::IsBarline() 
 {  

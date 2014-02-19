@@ -149,14 +149,12 @@ Measure *System::GetPrevious( Measure *measure  )
     return dynamic_cast<Measure*>(m_children[i - 1]);
 }
 
-
 Measure *System::GetAtPos( int x )
 {
 	//y += ( STAFF_OFFSET / 2 );
 	Measure *measure = this->GetFirst();
 	if ( !measure )
 		return NULL;
-	
     
     Measure *next = NULL;
 	while ( (next = this->GetNext(measure) ) )
@@ -171,7 +169,6 @@ Measure *System::GetAtPos( int x )
 	return measure;
 }
     
-    
 int System::GetHeight()
 {
     if ( m_systemAligner.GetBottomAlignment() ) {
@@ -179,7 +176,6 @@ int System::GetHeight()
     }
     return 0;
 }
-
 
 //----------------------------------------------------------------------------
 // System functor methods

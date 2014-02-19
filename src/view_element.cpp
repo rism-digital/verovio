@@ -617,6 +617,11 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int formval = rest->m_dur;
 	int a = element->m_drawingX + rest->m_hOffset;
     int b = element->m_drawingYRel;
+    
+    // Temporary fix for rest within tuplet because drawing tuplet requires m_drawingStemXXX to be set
+    element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->m_drawingX - (m_doc->m_env.m_stemWidth / 2);
+    element->m_drawingStemEnd.y = b + staff->m_drawingY;
+    element->m_drawingStemStart.y = b + staff->m_drawingY; //(int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]);
 
 	//unsigned char dot = this->point;
 	/*if (inv_val && (!this->oblique && formval > DUR_1 || this->oblique && formval > DUR_2))

@@ -62,7 +62,7 @@ std::string View::IntToObliqueFigures(unsigned int number) {
  */
 bool View::OneBeamInTuplet(Tuplet* tuplet) {
     
-    Beam *currentBeam, *firstBeam = NULL;
+    Beam *currentBeam = NULL;
     ArrayOfObjects elems;
     
     // Are we contained in a beam?
@@ -71,32 +71,14 @@ bool View::OneBeamInTuplet(Tuplet* tuplet) {
 
     
     // No we contain a beam? Go on and search for it in the children
-    for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
-        if (dynamic_cast<Note*>(tuplet->m_children[i]))
-            return false;
-        
+    for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {        
         currentBeam = dynamic_cast<Beam*>(tuplet->m_children[i]);
         
-        if (!currentBeam)
-            continue;
-        
-        // The first time we find a beam, set the previous one
-        if (firstBeam == NULL)
-            firstBeam = currentBeam;
-        
-        // First beam has to be the same always
-        // if it is a different one, it means the tuplet
-        // is broken into two beams
-        if (firstBeam != currentBeam)
+        // first child is not a beam, or it is a beam but we have more than one child
+        if (!currentBeam || tuplet->GetChildCount() > 1) {
             return false;
-        
+        }
     }
-    
-    // Get here if tuplet
-    // has no beams or notes
-    // should not happen!
-    // LP removed assert: it happen when have a beam and a rest in the tuplet. What to do?
-    // assert(currentBeam);
         
     return true;
 }
