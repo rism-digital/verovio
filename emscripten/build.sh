@@ -116,7 +116,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
-	-s EXPORTED_FUNCTIONS="['\
+	-s EXPORTED_FUNCTIONS="[\
 		'_vrvInterfaceController_constructor',\
 		'_vrvInterfaceController_destructor',\
 		'_vrvInterfaceController_getLog',\
