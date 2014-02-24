@@ -60,4 +60,4 @@ add_executable (verovio
 	)
 
 install (TARGETS verovio DESTINATION /usr/local/bin)
-INSTALL(DIRECTORY data/svg/ DESTINATION share/verovio/svg FILES_MATCHING PATTERN "*.xml")
+INSTALL(DIRECTORY ../data/svg/ DESTINATION share/verovio/svg FILES_MATCHING PATTERN "*.xml")
