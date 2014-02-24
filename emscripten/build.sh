@@ -1,5 +1,11 @@
 #/bin/bash
 
+function print_help {
+	 echo "Usage:
+-l		Light version without ASM and no increased memory allocation
+-v N		Version number (e.g., 1.0.0); no number by default" >&2 ; 
+ } 
+
 VEROVIO_ROOT=../
 VEROVIO_INCLUDE=../include/vrv
 EMCC=`which emcc`
@@ -7,23 +13,57 @@ EMCC=`which emcc`
 if [ ! -d build ]; then mkdir build; fi
 
 if [ ! -d data ]; then mkdir data; fi
+	
+# default is with ASM an large file support
+# memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
+# we can disable this for a light version 	
+ASM="\
+	-s ASM_JS=1 \
+	-s OUTLINING_LIMIT=160000 \
+	-s TOTAL_MEMORY=256*1024*1024 \
+	-s TOTAL_STACK=16*1024*1024"
+ASM_NAME=""
+
+# default is master (no version)
+VERSION=""
+VERSION_NAME=""
+	
+while getopts "lv:h" opt; do
+  	case $opt in
+		l)
+ 	   		echo "light version (-l)"
+	  	  	ASM="-s ASM_JS=0"
+			ASM_NAME="-light"
+			;;
+		v)
+ 	   		echo "version (-v) $OPTARG"
+			VERSION="$OPTARG"
+			VERSION_NAME="-$VERSION"
+			;;
+		h)
+ 	   		print_help
+			exit 2
+			;;
+		\?)
+			print_help
+			exit 2
+			;;
+	esac
+done
+
+FILENAME="verovio-toolkit$ASM_NAME$VERSION_NAME.js"
 
 echo "Sync svg resources"
 cp -r ../data/svg data/
 
 echo "Compliling"
-# we use ASM_JS=0 because otherwise it does not work with FireFox
-# memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
 
 python $EMCC --closure 1 -O2 \
-	-s ASM_JS=1 \
-	-s OUTLINING_LIMIT=160000 \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_ROOT/tinyxml \
 	-DUSE_EMSCRIPTEN \
-	-s TOTAL_MEMORY=256*1024*1024 \
-	-s TOTAL_STACK=16*1024*1024 \
+	$ASM \
 	./emscripten_main.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
@@ -76,7 +116,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
-	-s EXPORTED_FUNCTIONS="['_convertMusic',\
+	-s EXPORTED_FUNCTIONS="['\
 		'_vrvInterfaceController_constructor',\
 		'_vrvInterfaceController_destructor',\
 		'_vrvInterfaceController_getLog',\
@@ -90,6 +130,6 @@ python $EMCC --closure 1 -O2 \
 if [ $? -eq 0 ]; then 
 	echo "Done."
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
-	cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js > build/verovio-toolkit.js
-	echo "JavaScript class in build/verovio-toolkit.js"
+	cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js > "build/$FILENAME"
+	echo "build/$FILENAME written"
 fi
