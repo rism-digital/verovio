@@ -779,11 +779,13 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
             case '3': mclef->m_clefId = UT3; break;
             case '4': mclef->m_clefId = UT4; break;
         }
-    } else if (clef == 'G' || clef == 'g') {
+    } else if (clef == 'G') {
         switch (line) {
             case '1': mclef->m_clefId = SOL1; break;
             case '2': mclef->m_clefId = SOL2; break;
         }
+    } else if (clef == 'g') {
+        mclef->m_clefId = SOLva;
     } else if (clef == 'F' || clef == 'f') {
         switch (line) {
             case '3': mclef->m_clefId = FA3; break;
