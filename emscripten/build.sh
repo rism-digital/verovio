@@ -131,5 +131,13 @@ if [ $? -eq 0 ]; then
 	echo "Done."
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
 	cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js > "build/$FILENAME"
+	# all good
 	echo "build/$FILENAME written"
+	# create also a zip file if version name is given
+	if [ -n "$VERSION_NAME" ]; then
+		cd "build"
+		zip "$FILENAME.zip" "$FILENAME"
+		cd ..
+		echo "build/$FILENAME.zip written"
+	fi
 fi
