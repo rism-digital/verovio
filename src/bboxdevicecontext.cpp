@@ -42,8 +42,6 @@ BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     
     m_userScaleX = 1.0;
     m_userScaleY = 1.0;
-    m_originX = 0;
-    m_originY = 0;
     
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
@@ -121,9 +119,6 @@ void BBoxDeviceContext::ResetPen( )
 
 void BBoxDeviceContext::SetLogicalOrigin( int x, int y ) 
 {
-    //// no idea how to handle this with the BB
-    m_originX = -x;
-    m_originY = -y;
 } 
 
 void BBoxDeviceContext::SetUserScale( double xScale, double yScale ) 
@@ -156,7 +151,7 @@ void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h
 
 MusPoint BBoxDeviceContext::GetLogicalOrigin( ) 
 {
-    return MusPoint( m_originX, m_originY );
+    return MusPoint( 0, 0 );
 }
 
 // claculated better
@@ -355,9 +350,9 @@ void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
         
         LeipzigBBox::GetCharBounds(c, &g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + (g_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) - 2;
+        int x_off = x + (g_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
         // because we are in the drawing context, y position are already flipped
-        int y_off = y - (g_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) + 2;
+        int y_off = y - (g_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
         // the +/- 2 is to compesate a couple pixels down the figure (rounding error?)
          
         UpdateBB(x_off, y_off, 

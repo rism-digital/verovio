@@ -105,11 +105,6 @@ public:
      * This is the top left corner of the staff (the X position is the position of the system).
      */
     int m_yAbs;
-	/** 
-     * The Y drawing position of the staff.
-     * It is re-computed everytime the staff is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
     
     /** indicates this staff is in anchent notation (unused?) */
     bool m_mensuralNotation;

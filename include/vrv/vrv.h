@@ -169,16 +169,21 @@ public:
     unsigned int m_headerType;
     /** The notation mode (cmn or mensural) */
     int m_notationMode;
-    /** The current page height */
+    /** The page height */
     int m_pageHeight;
-    /** The current page height */
+    /** The page width */
     int m_pageWidth;
-    /** The current page witdth */
-    int m_pageLeftMar;
-    /** The current page left margin */
-    int m_pageRightMar;
-    /** The current page right margin */
-    int m_pageTopMar;
+    /** The page left margin */
+    short m_pageLeftMar;
+    /** The page right margin */
+    short m_pageRightMar;
+    /** The page top margin */
+    short m_pageTopMar;
+    /** The staff minimal spacing */
+    short m_spacingStaff;
+    /** The system minimal spacing */
+    short m_spacingSystem;
+    
 };
 
 } // namespace vrv

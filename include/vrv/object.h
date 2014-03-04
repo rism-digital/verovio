@@ -452,23 +452,41 @@ public:
     bool HasContentBB();
     bool HasSelfBB();
     void ResetBB();
-
-    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
-    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2; 
+    
+    /**
+     * @name Get and set the X and Y drawing position
+     */
+    ///@{
+    int GetDrawingX() { return m_drawingX; };
+    int GetDrawingY() { return m_drawingY; };
+    void SetDrawingX( int drawingX ) { m_drawingX = drawingX; };
+    void SetDrawingY( int drawingY ) { m_drawingY = drawingY; };
+    ///@}
     
     /**
      * Is true if the bounding box (self or content) has been updated at least once.
      * We need this to avoid not updating bounding boxes to screw up the layout with their intial values.
      */
     bool HasUpdatedBB( ) { return m_updatedBB; };
-    
+
 private:
     bool m_updatedBB;
     
 protected:
+    /**
+     * The Y drawing position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingY;
+    /**
+     * The X drawing position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingX;
     
 public:
-    
+    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
+    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
 };
 
 

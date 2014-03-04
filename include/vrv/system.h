@@ -55,7 +55,7 @@ public:
     virtual void ResetHorizontalAlignment( );
     virtual void ResetVerticalAlignment( );
     ///@}
-    
+
     /**
      * Return the height of the system
      */
@@ -148,11 +148,6 @@ public:
      * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_drawingYRel;
-	/**
-     * The Y drawing position of the system.
-     * It is re-computed everytime the system is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
 	/** 
      * The x absolute position of the  system for facsimile layouts.
      * This is the top left corner of the system.
@@ -163,11 +158,6 @@ public:
      * It is used internally when calculating the layout andd it is not stored in the file.
      */
     int m_drawingXRel;
-	/**
-     * The X drawing position of the system.
-     * It is re-computed everytime the system is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
     /**
      * The total width of the system.
      * It is computed during the layout processed and used for calculating the justification ratio.

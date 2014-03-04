@@ -76,9 +76,19 @@ public:
     ///@{
     void SetPageHeight( int pageHeight ) { m_pageHeight = pageHeight; };
     void SetPageWidth( int pageWidth ) { m_pageWidth = pageWidth; };
-    void SetPageLeftMar( int pageLeftMar ) { m_pageLeftMar = pageLeftMar; };
-    void SetPageRightMar( int pageRightMar ) { m_pageRightMar = pageRightMar; };
-    void SetPageTopMar( int pageTopMar ) { m_pageTopMar = pageTopMar; };
+    void SetPageLeftMar( short pageLeftMar ) { m_pageLeftMar = pageLeftMar; };
+    void SetPageRightMar( short pageRightMar ) { m_pageRightMar = pageRightMar; };
+    void SetPageTopMar( short pageTopMar ) { m_pageTopMar = pageTopMar; };
+    void SetSpacingStaff( short spacingStaff ) { m_spacingStaff = spacingStaff; };
+    void SetSpacingSystem( short spacingSystem ) { m_spacingSystem = spacingSystem; };
+    ///@}
+
+    /**
+     * @name Getters for the page dimensions and margins
+     */
+    ///@{
+    short GetSpacingStaff( ) { return m_spacingStaff; };
+    short GetSpacingSystem( ) { return m_spacingSystem; };
     ///@}
     
     /**
@@ -287,6 +297,11 @@ private:
     short m_pageRightMar;
     /** Page top margin (MEI scoredef@page.topmar) - currently not saved */
     short m_pageTopMar;
+    /** Staff minimal spacing (MEI scoredef@spacing.staff) - currently not saved */
+    short m_spacingStaff;
+    /** System minimal spacing (MEI scoredef@spacing.system) - currently not saved */
+    short m_spacingSystem;
+    
 	
 };
 

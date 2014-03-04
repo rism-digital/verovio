@@ -90,7 +90,7 @@ void display_usage() {
     
     cerr << " -t, --type=OUTPUT_TYPE     Select output format: mei, svg (default is svg)" << endl;
 
-    cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGEWIDTH << ")" << endl;
+    cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGE_WIDTH << ")" << endl;
     
     // long options only
     cerr << endl << "Additional options" << endl;
@@ -167,6 +167,8 @@ int main(int argc, char** argv)
         {"resources",           required_argument,  0, 'r'},
         {"scale",               required_argument,  0, 's'},
         {"show-bounding-boxes", no_argument,        &show_bounding_boxes, 1},
+        {"spacing-staff",       required_argument,  0, 0},
+        {"spacing-system",      required_argument,  0, 0},
         {"type",                required_argument,  0, 't'},
         {0, 0, 0, 0}
     };
@@ -181,6 +183,16 @@ int main(int argc, char** argv)
                     break;
                 if (strcmp(long_options[option_index].name,"page") == 0)
                     page = atoi(optarg);
+                else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {
+                    if ( !controller.SetSpacingStaff( atoi(optarg) ) ) {
+                        exit(1);
+                    }
+                }
+                else if (strcmp(long_options[option_index].name,"spacing-system") == 0) {
+                    if ( !controller.SetSpacingSystem( atoi(optarg) ) ) {
+                        exit(1);
+                    }
+                }
                 break;
                 
             case 'b':

@@ -628,10 +628,6 @@ void SvgDeviceContext::DrawMusicText(const std::string& text, int x, int y)
         // Sum it to x so we move it to the start of the next char
         x += (w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
     }
-    
-
-    
-
 }
 
 

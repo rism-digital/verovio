@@ -159,7 +159,7 @@ Measure *System::GetAtPos( int x )
     Measure *next = NULL;
 	while ( (next = this->GetNext(measure) ) )
 	{
-		if ( (int)measure->m_drawingX < x )
+		if ( (int)measure->GetDrawingX() < x )
 		{
 			return measure;
 		}

@@ -41,8 +41,10 @@ InterfaceController::InterfaceController()
     
     // default page size
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
-    m_pageWidth = DEFAULT_PAGEWIDTH;
+    m_pageWidth = DEFAULT_PAGE_WIDTH;
     m_border = DEFAULT_PAGE_LEFT_MAR;
+    m_spacingStaff = DEFAULT_SPACING_STAFF;
+    m_spacingSystem = DEFAULT_SPACING_SYSTEM;
     
     m_noLayout = false;
     m_ignoreLayout = false;
@@ -84,8 +86,8 @@ bool InterfaceController::SetScale( int scale )
     
 bool InterfaceController::SetPageHeight( int h )
 {
-    if (h < MIN_PAGEHEIGHT || h > MAX_PAGEHEIGHT) {
-        LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGEHEIGHT, MAX_PAGEHEIGHT );
+    if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
+        LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT );
         return false;
     }
     m_pageHeight = h;
@@ -94,13 +96,34 @@ bool InterfaceController::SetPageHeight( int h )
     
 bool InterfaceController::SetPageWidth( int w )
 {
-    if (w < MIN_PAGEWIDTH || w > MAX_PAGEWIDTH) {
-        LogError( "Page width out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGEWIDTH, MIN_PAGEWIDTH, MAX_PAGEWIDTH );
+    if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
+        LogError( "Page width out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_WIDTH, MIN_PAGE_WIDTH, MAX_PAGE_WIDTH );
         return false;
     }
     m_pageWidth = w;
     return true;
 };
+    
+bool InterfaceController::SetSpacingStaff( int spacingStaff )
+{
+    if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
+        LogError( "Spacing staff out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_STAFF, MIN_SPACING_STAFF, MAX_SPACING_STAFF );
+        return false;
+    }
+    m_spacingStaff = spacingStaff;
+    return true;
+}
+    
+    
+bool InterfaceController::SetSpacingSystem( int spacingSystem )
+{
+    if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
+        LogError( "Spacing system out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM );
+        return false;
+    }
+    m_spacingSystem = spacingSystem;
+    return true;
+}
     
 
 bool InterfaceController::SetFormat( std::string informat )
@@ -159,7 +182,7 @@ bool InterfaceController::LoadString( std::string data )
     if ( m_ignoreLayout || m_noLayout ) {
         input->IgnoreLayoutInformation();
     }
-    
+
     // load the file
     if ( !input->ImportString( data )) {
         LogError( "Error importing data" );
@@ -172,6 +195,8 @@ bool InterfaceController::LoadString( std::string data )
     m_doc.SetPageRightMar( this->GetBorder() );
     m_doc.SetPageLeftMar( this->GetBorder() );
     m_doc.SetPageTopMar( this->GetBorder() );
+    m_doc.SetSpacingStaff( this->GetSpacingStaff() );
+    m_doc.SetSpacingSystem( this->GetSpacingSystem() );
     
     // do the layout? this depends on the options and of the
     // file. PAE and DARMS of no layout information. MEI files
@@ -215,6 +240,12 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
     
     if (json.has<jsonxx::Number>("pageHeight"))
         SetPageHeight( json.get<jsonxx::Number>("pageHeight") );
+    
+    if (json.has<jsonxx::Number>("spacingStaff"))
+        SetSpacingStaff( json.get<jsonxx::Number>("spacingStaff") );
+    
+    if (json.has<jsonxx::Number>("spacingSystem"))
+        SetSpacingSystem( json.get<jsonxx::Number>("spacingSystem") );
     
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten

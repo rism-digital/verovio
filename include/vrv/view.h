@@ -125,9 +125,9 @@ protected:
 	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
 	void DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
-    void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, Barline *barline );
-    void DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barline *barline );
-	void DrawBarlineDots ( DeviceContext *dc, int x, StaffDef *staffDef, Staff *staff, Barline *barline );
+    void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barline );
+    void DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barline );
+	void DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barline );
 	void DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff *pportee);
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
@@ -188,11 +188,11 @@ protected:
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );  
     void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
-    void DrawLongRest ( DeviceContext *dc, int a, int b, Staff *staff);
-    void DrawBreveRest ( DeviceContext *dc, int a, int b, Staff *staff);
-    void DrawWholeRest ( DeviceContext *dc, int a, int b, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void DrawQuarterRest ( DeviceContext *dc, int a, int b, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void DrawDots ( DeviceContext *dc, int x1, int y1, int offy, unsigned char dots, Staff *staff );
+    void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
@@ -220,7 +220,7 @@ protected:
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0, bool cursor = false);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
-	void DoDrawDot ( DeviceContext *dc, int x, int y );
+	void DrawDot ( DeviceContext *dc, int x, int y );
     ///@}
     
 private:    

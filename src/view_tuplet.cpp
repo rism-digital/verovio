@@ -164,12 +164,12 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         
         // In this case use the center of the notehead to calculate the exact center
         // as it looks better
-        x = firstNote->m_drawingX + (lastNote->m_drawingX - firstNote->m_drawingX) / 2;
+        x = firstNote->GetDrawingX() + (lastNote->GetDrawingX() - firstNote->GetDrawingX() + lastNote->m_selfBB_x2) / 2;
         
         // Return the start and end position for the brackes
         // starting from the first edge and last of the BBoxes
-        start->x = firstNote->m_selfBB_x1;
-        end->x = lastNote->m_selfBB_x2;
+        start->x = firstNote->m_selfBB_x1 + firstNote->GetDrawingX();
+        end->x = lastNote->m_selfBB_x2 + lastNote->GetDrawingX();
         
         // THe first step is to calculate all the stem directions
         // cycle into the elements and count the up and down dirs

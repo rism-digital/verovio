@@ -91,14 +91,14 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     if ( system->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        system->m_drawingY = system->m_drawingYRel;
-        system->m_drawingX = system->m_drawingXRel;
+        system->SetDrawingX( system->m_drawingXRel );
+        system->SetDrawingY( system->m_drawingYRel );
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        system->m_drawingY = system->m_yAbs;
-        system->m_drawingX = system->m_xAbs;
+        system->SetDrawingX( system->m_xAbs );
+        system->SetDrawingY( system->m_yAbs );
     }
     
     
@@ -116,7 +116,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     measure  = dynamic_cast<Measure*>(system->GetFirstChild( &typeid(Measure) ) );
     if ( measure ) {
         // NULL for the Barline parameters indicates that we are drawing the scoreDef
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, system->m_drawingX, NULL );
+        DrawScoreDef( dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL );
     }
     
     dc->EndGraphic(system, this );
@@ -140,8 +140,9 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
         DrawStaffGrp( dc, measure, staffGrp, x );
     }
     else{
+        barline->SetDrawingX( x );
         dc->StartGraphic( barline, "barline", barline->GetUuid() );
-        DrawBarlines( dc, measure, staffGrp, x, barline );
+        DrawBarlines( dc, measure, staffGrp, barline );
         dc->EndGraphic( barline, this );
     }
     
@@ -177,9 +178,9 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         return;
     }
     
-    int y_top = first->m_drawingY;
+    int y_top = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
-    int y_bottom = last->m_drawingY - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
+    int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
     
     // ajdust the top and bottom according to staffline width
     y_top += m_doc->m_env.m_staffLineWidth / 2;
@@ -330,7 +331,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 }
 
 
-void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, Barline *barline )
+void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barline )
 {
     assert( measure );
     assert( staffGrp );
@@ -344,7 +345,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             childStaffGrp = dynamic_cast<StaffGrp*>(staffGrp->GetChild( i ));
             childStaffDef = dynamic_cast<StaffDef*>(staffGrp->GetChild( i ));
             if ( childStaffGrp ) {
-                DrawBarlines( dc, measure, childStaffGrp, x, barline );
+                DrawBarlines( dc, measure, childStaffGrp, barline );
             }
             else if ( childStaffDef ) {
                 Staff *staff = measure->GetStaffWithNo( childStaffDef->GetStaffNo() );
@@ -352,12 +353,12 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                     LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
                     continue;
                 }
-                int y_top = staff->m_drawingY;
+                int y_top = staff->GetDrawingY();
                 // for the bottom position we need to take into account the number of lines and the staff size
-                int y_bottom = staff->m_drawingY - (childStaffDef->GetLines() - 1) * m_doc->m_drawingInterl[staff->staffSize];
-                DrawBarline( dc, x, y_top, y_bottom, barline );
+                int y_bottom = staff->GetDrawingY() - (childStaffDef->GetLines() - 1) * m_doc->m_drawingInterl[staff->staffSize];
+                DrawBarline( dc, y_top, y_bottom, barline );
                 if ( barline->HasRepetitionDots() ) {
-                    DrawBarlineDots( dc, x, childStaffDef, staff, barline );
+                    DrawBarlineDots( dc, childStaffDef, staff, barline );
                 }
             }
         }
@@ -387,11 +388,11 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             return;
         }
         
-        int y_top = first->m_drawingY;
+        int y_top = first->GetDrawingY();
         // for the bottom position we need to take into account the number of lines and the staff size
-        int y_bottom = last->m_drawingY - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
+        int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
         
-        DrawBarline( dc, x, y_top, y_bottom, barline );
+        DrawBarline( dc, y_top, y_bottom, barline );
         
         // Now we have a barthru barline, but we have dots so we still need to go through each staff
         if ( barline->HasRepetitionDots() ) {
@@ -405,14 +406,14 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                         LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetStaffNo() );
                         continue;
                     }
-                    DrawBarlineDots( dc, x, childStaffDef, staff, barline );
+                    DrawBarlineDots( dc, childStaffDef, staff, barline );
                 }
             }
         }
     }
 }
 
-void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barline *barline )
+void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barline )
 {
     assert( dc );
     
@@ -420,6 +421,7 @@ void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barli
     y_top += m_doc->m_env.m_staffLineWidth / 2;
     y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
 
+    int x = barline->GetDrawingX();
 	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
@@ -458,26 +460,27 @@ void View::DrawBarline( DeviceContext *dc, int x, int y_top, int y_bottom, Barli
 }
 
  
-void View::DrawBarlineDots ( DeviceContext *dc, int x, StaffDef *staffDef, Staff *staff, Barline *barline )
+void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barline )
 {
 	assert( dc ); // DC cannot be NULL
     
+    int x = barline->GetDrawingX();
 	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
-    int y_bottom = staff->m_drawingY - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
+    int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
     int y_top = y_bottom + m_doc->m_drawingInterl[staff->staffSize];
  
     if ((barline->m_barlineType  == BARLINE_RPTSTART) || (barline->m_barlineType == BARLINE_RPTBOTH))
     {
-        DoDrawDot(dc, x2, y_bottom );
-        DoDrawDot(dc, x2, y_top );
+        DrawDot(dc, x2, y_bottom );
+        DrawDot(dc, x2, y_top );
 
     }
     if ((barline->m_barlineType == BARLINE_RPTEND) || (barline->m_barlineType == BARLINE_RPTBOTH))
 	{
-        DoDrawDot(dc, x1, y_bottom );
-        DoDrawDot(dc, x1, y_top );
+        DrawDot(dc, x1, y_bottom );
+        DrawDot(dc, x1, y_top );
 	}
     
 	return;
@@ -528,12 +531,12 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     // With Transcription documents, we use the m_xAbs
     if ( measure->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        measure->m_drawingX = measure->m_drawingXRel + system->m_drawingX;
+        measure->SetDrawingX( measure->m_drawingXRel + system->GetDrawingX() );
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        measure->m_drawingX = measure->m_xAbs;
+        measure->SetDrawingX( measure->m_xAbs );
     }
     
 	Staff *staff = NULL;
@@ -546,10 +549,10 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     }
 
     if ( measure->GetLeftBarlineType() != BARLINE_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_drawingX, measure->GetLeftBarline() );
+        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarline() );
     }
     if ( measure->GetRightBarlineType() != BARLINE_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->m_drawingX + measure->GetRightBarlineX(), measure->GetRightBarline() );
+        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarlineX(), measure->GetRightBarline() );
     }
     
     if ( measure->IsMeasuredMusic()) {
@@ -623,12 +626,12 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     // With Transcription documents, we use the m_yAbs
     if ( staff->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        staff->m_drawingY = staff->GetYRel() + system->m_drawingY;
+        staff->SetDrawingY( staff->GetYRel() + system->GetDrawingY() );
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        staff->m_drawingY = staff->m_yAbs;
+        staff->SetDrawingY( staff->m_yAbs );
     }
     if ( StaffDef *staffDef = m_drawingScoreDef.GetStaffDef( staff->GetStaffNo() ) ) {
         staff->m_drawingLines = staffDef->GetLines( ) ;
@@ -658,12 +661,12 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     
     int j, x1, x2, yy;
     
-    yy = staff->m_drawingY;
+    yy = staff->GetDrawingY();
     
     //x1 = system->m_systemLeftMar;
     //x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
     
-    x1 = measure->m_drawingX;
+    x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth(); // - m_doc->m_env.m_barlineWidth / 2;
     
     dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
@@ -708,7 +711,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
     int staffSize = parentStaff->staffSize;
 	// calculer position du do central en fonction clef
 	y_n += (int) m_doc->m_drawingVerticalUnit2[staffSize];
-	yb = parentStaff->m_drawingY -  m_doc->m_drawingStaffSize[staffSize]*2; // UT1 default
+	yb = parentStaff->GetDrawingY() -  m_doc->m_drawingStaffSize[staffSize]*2; // UT1 default
 	
 
 	plafond = yb + 8 *  m_doc->m_drawingOctaveSize[staffSize];

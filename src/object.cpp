@@ -483,6 +483,11 @@ void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2)
     int min_y = std::min( y1, y2 );
     int max_y = std::max( y1, y2 );
     
+    min_x -= m_drawingX;
+    max_x -= m_drawingX;
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
+    
     if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
     if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
     if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
@@ -500,6 +505,11 @@ void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 )
     int max_x = std::max( x1, x2 );
     int min_y = std::min( y1, y2 );
     int max_y = std::max( y1, y2 );
+    
+    min_x -= m_drawingX;
+    max_x -= m_drawingX;
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
     
     if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
     if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
@@ -522,6 +532,8 @@ void DocObject::ResetBB()
     m_selfBB_y1 = 0xFFFF; 
     m_selfBB_x2 = -0xFFFF;
     m_selfBB_y2 = -0xFFFF;
+    //m_drawingX = 0;
+    //m_drawingY = 0;
     
     m_updatedBB = false;
 }
@@ -842,10 +854,12 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
+    //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
+    int negative_offset = - current->m_contentBB_x1;
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
+        LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
         negative_offset = 0;
     }
     
@@ -858,11 +872,13 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
+    LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 - current->GetAlignment()->GetXRel() + current->GetHorizontalSpacing() );
+    //(*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
+    //current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 - current->GetAlignment()->GetXRel() + current->GetHorizontalSpacing() );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + current->GetHorizontalSpacing();
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + current->GetHorizontalSpacing() );
     
     return FUNCTOR_CONTINUE;
 }
@@ -931,7 +947,7 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     assert( current->GetAlignment() );
     
     // This is the value that need to be removed to fit everything
-    int negative_offset = current->GetAlignment()->GetYRel() - current->m_contentBB_y2;
+    int negative_offset = - current->m_contentBB_y2;
     
     // this will probably never happen
     if ( negative_offset > 0 ) {

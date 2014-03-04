@@ -84,7 +84,7 @@ public:
 	void SetCString( std::string data );
 	const char *GetCString( );
 	///@}
-	
+
     /**
      * @name Set and get the border
      */
@@ -115,6 +115,16 @@ public:
     ///@{
     bool SetPageWidth( int w );
     int GetPageWidth() { return m_pageWidth; };
+    ///@}
+    
+    /**
+     * @name Set and get the spacing staff and system
+     */
+    ///@{
+    bool SetSpacingStaff( int spacingStaff );
+    bool SetSpacingSystem( int spacingSystem );
+    int GetSpacingStaff() { return m_spacingStaff; };
+    int GetSpacingSystem() { return m_spacingSystem; };
     ///@}
     
     /**
@@ -191,6 +201,8 @@ private:
     int m_pageWidth;
     int m_border; // to be replace by pageRightMar, pageLeftMar, pageTopMar
     int m_unit;
+    int m_spacingStaff;
+    int m_spacingSystem;
     
     bool m_noLayout;
     bool m_ignoreLayout;

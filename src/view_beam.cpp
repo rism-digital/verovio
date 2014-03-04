@@ -153,7 +153,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	/***if (e_t->_shport) { provshp = e_t->_shport; shportee (0);}***/
 		/* retablir a la fin si provshp existe */
 
-	low = chk->m_drawingYRel + staff->m_drawingY;	/* initialiser */
+	low = chk->GetDrawingY();	/* initialiser */
     k = ((Note*)chk)->m_colored ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
     
 	valref = k;		/* m_dur test conservee */
@@ -170,7 +170,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         dx[0] -= (m_doc->m_env.m_stemWidth)/2;
         dx[1] -= (m_doc->m_env.m_stemWidth)/2;
     }
-	_yy[0] = staff->m_drawingY;	
+	_yy[0] = staff->GetDrawingY();
 
     /***
 	if (calcBeam)	// eviter side-effect de circuit...
@@ -215,7 +215,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 				fb.mrq_port = chk->_shport;
             }***/
 
-			(crd+ct)->a = chk->m_drawingX + chk->m_hOffset - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
+			(crd+ct)->a = chk->GetDrawingX() + chk->m_hOffset - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
 			if (chk->IsNote() && ((Note*)chk)->m_breakSec && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
@@ -280,8 +280,9 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	for (i = 0; i < ct; i++)
 	{	switch (fb.mrq_port)
 		{	case 0: crd[i].prov = OFF;
-					(crd+i)->b = crd[i].chk->m_drawingYRel+staff->m_drawingY;
+					(crd+i)->b = crd[i].chk->GetDrawingY();
 					break;
+            /**
 			case 1: if (crd[i].chk->m_staffShift)
 					{	crd[i].prov = ON;
 						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[0];
@@ -299,6 +300,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 					{	crd[i].prov = ON;
 						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[0];
 					}
+             **/
 		}
 		high= std::max((double)(crd+i)->b,high);		/* enregistrement des extremes */
 		low = std::min((double)(crd+i)->b,low);

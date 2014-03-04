@@ -138,12 +138,6 @@ private:
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-	/** Relative position X. This is used internally when calculating the layout */
-    //int m_drawingXRel;
-	/** Drawing position X. This is used internally when drawing */
-    int m_drawingX;
-	/** Relative position Y. This is used internally when drawing */
-	int m_drawingYRel;
     /** for elements in LayerApp. They will be drawn from the LayerElement of the app (and not from the layer) */
     bool m_in_layer_app;
     /** Indicates if cue size */

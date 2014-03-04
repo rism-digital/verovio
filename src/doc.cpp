@@ -53,6 +53,9 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
+    m_spacingStaff = m_env.m_spacingStaff;
+    m_spacingSystem = m_env.m_spacingSystem;
+    
     m_drawingPage = NULL;
     m_currentScoreDefDone = false;
     

@@ -106,7 +106,6 @@ public:
     
 private:
     int m_width, m_height;
-    int m_originX, m_originY;
     double m_userScaleX, m_userScaleY;
     
     /**

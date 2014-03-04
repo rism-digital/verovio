@@ -89,7 +89,7 @@ void View::DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, 
 }
 
 
-void View::DoDrawDot ( DeviceContext *dc, int x, int y )
+void View::DrawDot ( DeviceContext *dc, int x, int y )
 {
 	int r = std::max( ToDeviceContextX(3), 2 );
 	

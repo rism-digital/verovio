@@ -301,10 +301,12 @@ DefaultEnv::DefaultEnv()
     m_headerType = 0;
     
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
-    m_pageWidth = DEFAULT_PAGEWIDTH;
+    m_pageWidth = DEFAULT_PAGE_WIDTH;
     m_pageRightMar = DEFAULT_PAGE_RIGHT_MAR;
     m_pageLeftMar = DEFAULT_PAGE_LEFT_MAR;
     m_pageTopMar = DEFAULT_PAGE_TOP_MAR;
+    m_spacingStaff = DEFAULT_SPACING_STAFF;
+    m_spacingSystem = DEFAULT_SPACING_SYSTEM;
     
     // additional parameters
     m_notationMode = MENSURAL_MODE;

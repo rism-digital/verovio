@@ -67,7 +67,7 @@ void LayerElement::Init()
     
     m_xAbs = VRV_UNSET;
     m_drawingX = 0;
-    m_drawingYRel = 0;
+    m_drawingY = 0;
     m_in_layer_app = false;
     
     m_alignment = NULL;
@@ -151,10 +151,10 @@ int LayerElement::GetHorizontalSpacing()
 void LayerElement::ResetHorizontalAlignment()
 {
     m_drawingX = 0;
-    m_drawingYRel = 0;
 }
 
-void LayerElement::SetPitchOrPosition(int pname, int oct) 
+
+void LayerElement::SetPitchOrPosition(int pname, int oct)
 {
     if ( this->HasPitchInterface() ){
         PitchInterface *pitch = dynamic_cast<PitchInterface*>(this);

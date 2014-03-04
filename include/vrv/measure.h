@@ -159,11 +159,6 @@ public:
      * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_drawingXRel;
-	/**
-     * The X drawing position of the measure.
-     * It is re-computed everytime the measure is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
     
 private:
     bool m_measuredMusic;

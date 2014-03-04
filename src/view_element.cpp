@@ -65,14 +65,14 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     // With Transcription documents, we use the m_xAbs
     if ( element->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        //element->m_drawingX = element->m_drawingXRel + measure->m_drawingX;
-        //element->m_drawingX = element->m_drawingXRel + measure->GetXRel();
-        element->m_drawingX = element->GetXRel() + measure->m_drawingX;
+        element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
+        element->SetDrawingY( staff->GetDrawingY() );
     }
     else
     {
         assert( m_doc->GetType() == Transcription );
-        element->m_drawingX = element->m_xAbs;
+        element->SetDrawingX( element->m_xAbs );
+        element->SetDrawingY( staff->GetDrawingY() );
     }
     
     if (dynamic_cast<Barline*>(element)) {
@@ -133,55 +133,25 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         Note *note = dynamic_cast<Note*>(element);
         int oct = note->m_oct - 4;
         
-        //if ( !m_lyricMode && BelongsToTheNote( m_currentElement ) ) // the current element is a lyric that belongs to the note we are drawing
-        //    m_currentColour = AxCYAN;
-            
+        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->m_pname, layer->GetClefOffset( element ), oct ) );
         dc->StartGraphic( element, "note", element->GetUuid() );
-        element->m_drawingYRel = CalculatePitchPosY( staff, note->m_pname, layer->GetClefOffset( element ), oct );
-        
-        if (!note->m_chord) // && (!pelement->ElemInvisible || illumine))
-        {	
-            DrawNote(dc, element, layer, staff);
-        //else 
-        //{
-            //	note->accord(dc, staff);
-        }
+        DrawNote(dc, element, layer, staff);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
         Rest *rest = dynamic_cast<Rest*>(element);
         int oct = rest->m_oct - 4;
-
-        dc->StartGraphic( element, "rest", element->GetUuid() );
-        //if (!transp_sil)
-		//	pnote->code = getSilencePitch (pelement);
         
         // Automatically calculate rest position, if so requested
         if (rest->m_pname == REST_AUTO)
-            element->m_drawingYRel = CalculateRestPosY( staff, rest->m_dur);
+            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->m_dur) );
         else
-            element->m_drawingYRel = CalculatePitchPosY( staff, rest->m_pname, layer->GetClefOffset( element ), oct);
+            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->m_pname, layer->GetClefOffset( element ), oct) );
 		
+        dc->StartGraphic( element, "rest", element->GetUuid() );
         DrawRest( dc, element, layer, staff );
         dc->EndGraphic(element, this );
 	}
-    
-	/* 
-	for ( int i = 0; i < (int)m_lyrics.GetCount(); i++ ){
-		Symbol1 *lyric = &m_lyrics[i];
-		
-		if ( lyric != NULL )
-		{
-            if ( lyric == m_currentElement )
-                m_currentColour = AxRED;
-            else if ( (this == m_currentElement) || BelongsToTheNote( m_currentElement ) )
-                m_currentColour = AxCYAN;
-
-			DrawLyricString(dc, lyric->m_drawingX + staff->m_drawingX, staff->m_drawingY + lyric->dec_y , 
-						  lyric->m_debord_str, staff->staffSize, ( lyric == m_currentElement && m_inputLyric ) );
-		}		
-	}
-    */ // ax2 lyrics
 	
 	return;
 }
@@ -191,8 +161,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
     
-    Beam *beam = dynamic_cast
-    <Beam*>(element);
+    Beam *beam = dynamic_cast<Beam*>(element);
 
     dc->StartGraphic( element, "beam", element->GetUuid() );
     
@@ -273,15 +242,15 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int staffSize = staff->staffSize;
 
 	//	int horphyspoint=h_pnt;
-	int b = element->m_drawingYRel;
+	//int b = element->m_drawingY;
 	int up=0, i, valdec, fontNo, ledge, queueCentre;
 	int x1, x2, y2, espac7, decval, vertical;
 	int formval = 0;	// pour permettre dessiner colorations avec dÇcalage de val
 	int rayon, milieu = 0;
 
-	int xn = element->m_drawingX, xl = element->m_drawingX;
-	int bby = staff->m_drawingY;  // bby= y sommet portee
-	int ynn = element->m_drawingYRel + staff->m_drawingY;
+	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
+	int bby = staff->GetDrawingY();  // bby= y sommet portee
+	int ynn = element->GetDrawingY();
 	static int ynn_chrd;
 
 	xn += note->m_hOffset;
@@ -494,7 +463,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         accid.m_oct = note->m_oct;
         accid.m_pname = note->m_pname;
 		accid.m_accid = note->m_accid;
-        accid.m_drawingX = x1;
+        accid.SetDrawingX( x1 );
+        accid.SetDrawingY( staff->GetDrawingY() );
         DrawSymbol( dc, &accid, layer, staff, element ); // ax2
 	}
 	if (note->m_chord)
@@ -521,7 +491,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	if (note->m_dots) // && (!this->pointInvisible)) // ax2 - no support of invisible dots yet
 	{
-		DrawDots( dc,x2,b, 0, note->m_dots, staff );
+		DrawDots( dc, x2, ynn, note->m_dots, staff );
 	}
 /*
 	if (this->stacc && (!this->rel || !this->queue_lig))
@@ -615,61 +585,27 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     Rest *rest = dynamic_cast<Rest*>(element);
 
 	int formval = rest->m_dur;
-	int a = element->m_drawingX + rest->m_hOffset;
-    int b = element->m_drawingYRel;
+	int x = element->GetDrawingX() + rest->m_hOffset;
+    int y = element->GetDrawingY();
     
     // Temporary fix for rest within tuplet because drawing tuplet requires m_drawingStemXXX to be set
-    element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->m_drawingX - (m_doc->m_env.m_stemWidth / 2);
-    element->m_drawingStemEnd.y = b + staff->m_drawingY;
-    element->m_drawingStemStart.y = b + staff->m_drawingY; //(int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]);
+    element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->GetDrawingX() - (m_doc->m_env.m_stemWidth / 2);
+    element->m_drawingStemEnd.y = element->GetDrawingY();
+    element->m_drawingStemStart.y = element->GetDrawingY();
 
-	//unsigned char dot = this->point;
-	/*if (inv_val && (!this->oblique && formval > DUR_1 || this->oblique && formval > DUR_2))
-		formval += 1;*/ // ax2 - no support of inv_val for rest - need to use @dur.ges
-
-	if (rest->m_dur == VALSilSpec) // WG multi-rest? 
+    if (formval > DUR_2)
     {
-		formval = DUR_1;
-    }
-	else if (formval > DUR_2)
-    {
-		a -= m_doc->m_drawingNoteRadius[staff->staffSize][rest->m_cueSize];
+		x -= m_doc->m_drawingNoteRadius[staff->staffSize][rest->m_cueSize];
     }
 
-	if (formval == DUR_BR || formval == DUR_2) 
-    {
-		b -= 0; //m_doc->m_drawingInterl[staff->staffSize]; // LP position des silences
+    switch (formval)
+    {	
+        case DUR_LG: DrawLongRest ( dc, x, y, staff); break;
+        case DUR_BR: DrawBreveRest( dc, x, y, staff); break;
+        case DUR_1:
+        case DUR_2: DrawWholeRest ( dc, x, y, formval, rest->m_dots, rest->m_cueSize, staff); break;
+        default: DrawQuarterRest( dc, x, y, formval, rest->m_dots, rest->m_cueSize, staff);
     }
-
-	if (formval == DUR_1)
-	{	
-        if (staff->m_drawingLines == 1) {
-		 //silences sur portee a une seule ligne
-			b += m_doc->m_drawingInterl[staff->staffSize];
-		}
-        else
-        {
-			//b += m_doc->m_drawingInterl[staff->staffSize]*2; 
-			b -= 0; //m_doc->m_drawingInterl[staff->staffSize]*2;// LP positions des silences
-        }
-	}
-
-	if (rest->m_dur == VALSilSpec && rest->m_multimeasure_dur > 1) // LP: not sure what is actually does...
-    {
-        LogError("Tried to set multi meausure in rest\n");
-    }
-	else
-	{	
-        switch (formval)
-		{	
-            case DUR_LG: DrawLongRest ( dc, a, b, staff); break;
-			case DUR_BR: DrawBreveRest( dc, a, b, staff); break;
-			case DUR_1:
-			case DUR_2: DrawWholeRest ( dc, a, b, formval, rest->m_dots, rest->m_cueSize, staff); break;
-			//case CUSTOS: s_nr ( dc, a, b - m_doc->m_drawingHalfInterl[staff->staffSize] + 1, '#' - LEIPZIG_REST_QUARTER + DUR_4 , staff); break; // Now in Symbol
-			default: DrawQuarterRest( dc, a, b, formval, rest->m_dots, rest->m_cueSize, staff);
-		}
-	}
     
     if(rest->m_fermata)
         DrawFermata(dc, element, staff);
@@ -739,14 +675,14 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     //LogMessage("Measure %d - X %d - RightX %d;", measure->GetIdx(), element->m_drawingX, measure->GetRightBarlineX() );
     
-    int mpos = element->m_drawingX + mrest->m_hOffset;
-    int a = mpos + (measure->m_drawingX + measure->GetRightBarlineX() - mpos)  / 2;
-    int b = element->m_drawingYRel;
+    int x = element->GetDrawingX() + mrest->m_hOffset;
+    int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
+    int y = element->GetDrawingY();
     
     // move it down according to the number of line in the staff
-    b -= staff->m_drawingLines / 2 * m_doc->m_drawingInterl[staff->staffSize];
+    y -= staff->m_drawingLines / 2 * m_doc->m_drawingInterl[staff->staffSize];
     
-    DrawWholeRest ( dc, a, b, DUR_1, 0, false, staff);
+    DrawWholeRest ( dc, xCentered, y, DUR_1, 0, false, staff);
     
     dc->EndGraphic(element, this);
     
@@ -758,7 +694,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
  **/
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {	
-    int x, x2, y, y2, length;
+    int x1, x2, y1, y2, length;
 
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -768,7 +704,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     dc->StartGraphic( element, "multirest", element->GetUuid() );
     
-    int a = element->m_drawingX + multirest->m_hOffset;
+    int x = element->GetDrawingX() + multirest->m_hOffset;
     
     // We do not support more than three chars
     if (multirest->GetNumber() > 999)
@@ -779,22 +715,22 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     // Position centered in third line
     // it would be m_drawingInterl * 6.5, or m_drawingInterl / 2 * 13
-	y = staff->m_drawingY - (m_doc->m_drawingInterl[staff->staffSize] / 2) * 5;
-    y2 = y + m_doc->m_drawingInterl[staff->staffSize];
+	y1 = staff->GetDrawingY() - (m_doc->m_drawingInterl[staff->staffSize] / 2) * 5;
+    y2 = y1 + m_doc->m_drawingInterl[staff->staffSize];
 	
     // a is the central point, claculate x and x2
-    x = a - length;
-    x2 = a + length;
+    x1 = x - length;
+    x2 = x + length;
     
     // Draw the base rect
     // make it 8 pixels smaller than the interline space
     // these are the two 4 substracted and added
-	DrawFullRectangle(dc, x, y2 - 4, x2, y + 4);
+	DrawFullRectangle(dc, x1, y2 - 4, x2, y1 + 4);
     
     //Draw the to lines at beginning and end
     // make it 8 pixesl longers, and 4 pixels width
-    DrawVerticalLine(dc, y - 4, y2 + 4, x, 4);
-    DrawVerticalLine(dc, y - 4, y2 + 4, x2, 4);
+    DrawVerticalLine(dc, y1 - 4, y2 + 4, x1, 4);
+    DrawVerticalLine(dc, y1 - 4, y2 + 4, x2, 4);
     
     // Draw the text above
     int w, h;
@@ -805,9 +741,9 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     text << multirest->GetNumber();
     
     dc->GetTextExtent( text.str(), &w, &h);
-    start_offset = (x2 - x - w) / 2; // calculate offset to center text
+    start_offset = (x2 - x1 - w) / 2; // calculate offset to center text
     
-    DrawLeipzigString(dc, x + start_offset, staff->m_drawingY + 5, text.str(), false);
+    DrawLeipzigString(dc, x1 + start_offset, staff->GetDrawingY() + 5, text.str(), false);
     
     dc->EndGraphic(element, this);
     
@@ -815,42 +751,54 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
 }
 
-void View::DrawLongRest ( DeviceContext *dc, int a, int b, Staff *staff)
-
-{	int x, x2, y = b + staff->m_drawingY, y2;
-
-	x = a; //- m_doc->m_drawingStep1/3; 
-	x2 = a+ (m_doc->m_drawingStep1 *2 / 3); // LP
-	if (b % m_doc->m_drawingInterl[staff->staffSize])
-		y -= m_doc->m_drawingHalfInterl[staff->staffSize];
-	y2 = y + m_doc->m_drawingInterl[staff->staffSize]*2;
-	DrawFullRectangle( dc,x,y2,x2,y);
+void View::DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff)
+{
+    int x1, x2, y1, y2;
+    
+    y1 = y;
+	x1 = x;
+	x2 = x + (m_doc->m_drawingStep1 * 2 / 3);
+    
+    // look if on line or between line
+	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
+		y1 -= m_doc->m_drawingHalfInterl[staff->staffSize];
+    
+	y2 = y1 + m_doc->m_drawingInterl[staff->staffSize]*2;
+	DrawFullRectangle( dc, x1, y2, x2, y1);
 	return;
 }
 
 
-void View::DrawBreveRest ( DeviceContext *dc, int a, int b, Staff *staff)
+void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
+{	
+    int x1, x2, y1, y2;
+    y1 = y;
+	x1 = x;
+	x2 = x + (m_doc->m_drawingStep1 * 2 / 3);
+    
+    // look if one line or between line
+	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
+		y1 -= m_doc->m_drawingHalfInterl[staff->staffSize];
+    
+	y2 = y1 + m_doc->m_drawingInterl[staff->staffSize]*2;
+	DrawFullRectangle( dc, x1, y2, x2, y1);
+	
+    // lines
+    x1 = x - m_doc->m_drawingStep1;
+    x2 = x + m_doc->m_drawingStep1;
 
-{	int x, x2, y = b + staff->m_drawingY, y2;
-
-	x = a; //- m_doc->m_drawingStep1/3; 
-	x2 = a+ (m_doc->m_drawingStep1 *2 / 3); // LP
-
-	if (b % m_doc->m_drawingInterl[staff->staffSize])
-		y -= m_doc->m_drawingHalfInterl[staff->staffSize];
-	y2 = y + m_doc->m_drawingInterl[staff->staffSize];
-	DrawFullRectangle ( dc,x,y2,x2,y);
-	x = a - m_doc->m_drawingStep1; x2 = a + m_doc->m_drawingStep1;
-
-	DrawHorizontalLine ( dc, x,x2,y2,1);
-	DrawHorizontalLine ( dc, x,x2,y, 1);
+	DrawHorizontalLine ( dc, x1, x2, y2, 1);
+	DrawHorizontalLine ( dc, x1, x2, y1, 1);
 	return;
 }
 
-void View::DrawWholeRest ( DeviceContext *dc, int a, int b, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
-
-{	int x, x2, y = b + staff->m_drawingY, y2, vertic = m_doc->m_drawingHalfInterl[staff->staffSize];
-	int off;
+void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
+{
+    int x1, x2, y1, y2, vertic;
+    y1 = y;
+    vertic = m_doc->m_drawingHalfInterl[staff->staffSize];
+	
+    int off;
 	float foff;
 
 	if (staff->notAnc)
@@ -862,64 +810,61 @@ void View::DrawWholeRest ( DeviceContext *dc, int a, int b, int valeur, unsigned
 		foff *= (int)( (float)m_doc->m_drawingGraceRatio[0] / (float)m_doc->m_drawingGraceRatio[1] );
 	off = (int)foff;
 
-	x = a - off;
-	x2 = a + off;
+	x1 = x - off;
+	x2 = x + off;
 
 	if (valeur == DUR_1)
 		vertic = -vertic;
 
-	if (b % m_doc->m_drawingInterl[staff->staffSize])
+    // look if one line or between line
+	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
 	{
 		if (valeur == DUR_2)
-			y -= vertic;
+			y1 -= vertic;
 		else
-			y += vertic;
+			y1 += vertic;
 	}
 
-	y2 = y + vertic;
-	DrawFullRectangle ( dc, x,y,x2,y2);
+	y2 = y1 + vertic;
+	DrawFullRectangle ( dc, x1, y1, x2, y2);
 
 	off /= 2;
-	x -= off;
+	x1 -= off;
 	x2 += off;
 
-	if (y > (int)staff->m_drawingY  || y < (int)staff->m_drawingY - m_doc->m_drawingStaffSize[staff->staffSize])
-		DrawHorizontalLine ( dc, x, x2, y, m_doc->m_env.m_staffLineWidth);
+    // legder line
+	if (y > (int)staff->GetDrawingY()  || y < staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize])
+		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_env.m_staffLineWidth);
 
 	if (dots)
-		DrawDots ( dc,(x2 + m_doc->m_drawingStep1), y2, -(int)staff->m_drawingY, dots, staff);
+		DrawDots ( dc, (x2 + m_doc->m_drawingStep1), y2, dots, staff);
 }
 
 
-void View::DrawQuarterRest ( DeviceContext *dc, int a, int b, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
+void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
 {
-	int _intrl = m_doc->m_drawingInterl[staff->staffSize];
-
-	DrawLeipzigFont( dc, a, (b + staff->m_drawingY), LEIPZIG_REST_QUARTER + (valeur-DUR_4), staff, smaller );
-
-	//DrawLeipzigFont( dc, a, (b + staff->m_drawingY - m_doc->m_drawingHalfInterl[staff->staffSize]), '#', staff, note->m_cueSize);
+	DrawLeipzigFont( dc, x, y, LEIPZIG_REST_QUARTER + (valeur-DUR_4), staff, smaller );
 
 	if (dots)
-	{	if (valeur >= DUR_16)
-			_intrl = 0;
-		DrawDots ( dc, (a+ m_doc->m_drawingStep2), b, _intrl, dots, staff);
+	{	if (valeur < DUR_16)
+			y += m_doc->m_drawingInterl[staff->staffSize];
+		DrawDots ( dc, (x + m_doc->m_drawingStep2), y, dots, staff);
 	}
 	return;
 }
 
 
-void View::DrawDots ( DeviceContext *dc, int x1, int y1, int offy, unsigned char dots, Staff *staff )
+void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff )
 
 {
-	y1 += offy + staff->m_drawingY;
-    if ((y1 % (int)m_doc->m_drawingInterl[staff->staffSize]) == 0) {
-        y1 += m_doc->m_drawingHalfInterl[staff->staffSize];
+    if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize] == 0 ) {
+        y += m_doc->m_drawingHalfInterl[staff->staffSize];
     }
     
 	int i;
 	for (i = 0; i < dots; i++) {
-		DoDrawDot ( dc, x1, y1 );
-		x1 += std::max (6, 2 * m_doc->m_drawingStep1);
+		DrawDot ( dc, x, y );
+		x += std::max (6, 2 * m_doc->m_drawingStep1);
 	}
 	return;
 }
@@ -944,7 +889,7 @@ void View::CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *s
     } 
 	if (previousNote->m_lig && previousNote->m_dur <= DUR_1)
 	{	
-        element->m_drawingX = previous->m_drawingX + m_doc->m_drawingBrevisWidth[staff->staffSize] * 2;
+        element->SetDrawingX( previous->GetDrawingX() + m_doc->m_drawingBrevisWidth[staff->staffSize] * 2 );
 	}
     return;
 }
@@ -962,14 +907,14 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	int milieu, up, epaisseur;
 
 	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
-	xn = element->m_drawingX;
+	xn = element->GetDrawingX();
 	
 	if ((note->m_lig==LIG_MEDIAL) || (note->m_lig==LIG_TERMINAL))
     {
 		CalculateLigaturePosX ( element, layer, staff );
     }
 	else {
-		xn = element->m_drawingX + note->m_hOffset;
+		xn = element->GetDrawingX() + note->m_hOffset;
     }
 
 
@@ -1056,7 +1001,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	}
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
 	{	
-		milieu = staff->m_drawingY - m_doc->m_drawingInterl[staff->staffSize]*6;
+		milieu = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize]*6;
 		//***up = this->q_auto ? ((y < milieu)? ON :OFF):this->queue;
 		// ENZ
 		up = (y < milieu) ? ON : OFF;
@@ -1083,7 +1028,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(dynamic_cast<Barline*>(element)); // Element must be a Barline"
     
     Barline *barline = dynamic_cast<Barline*>(element);
-    int x = element->m_drawingX + barline->m_hOffset;
+    int x = element->GetDrawingX() + barline->m_hOffset;
 
     dc->StartGraphic( element, "barline", element->GetUuid() );
     
@@ -1111,8 +1056,8 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic( element, "clef", element->GetUuid() );
 	
-	int b = staff->m_drawingY;
-	int a = element->m_drawingX;
+	int b = staff->GetDrawingY();
+	int a = element->GetDrawingX();
     int sym = LEIPZIG_CLEF_G;	//sSOL, position d'ordre des cles sol fa ut in fonts
 
     /*  poser sym=no de position sSOL dans la fonte
@@ -1181,7 +1126,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 
 	if (mensur->m_meterSymb)
 	{	
-		yp = staff->m_drawingY - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
+		yp = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
 		
 		unsigned char fontChar = LEIPZIG_METER_SYMB_COMMON;
 		switch (mensur->m_meterSymb)
@@ -1209,7 +1154,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 		}
 		if ( dc )
 		{	
-			DrawLeipzigFont( dc, element->m_drawingX, yp, fontChar, staff, staff->staffSize);
+			DrawLeipzigFont( dc, element->GetDrawingX(), yp, fontChar, staff, staff->staffSize);
 		}
 	}
 	else
@@ -1217,26 +1162,26 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 		if (mensur->m_sign==MENSUR_SIGN_O)
 		{	
             mNum = 2; mDen = 2;
-			DrawMensurCircle ( dc, element->m_drawingX, staff->m_drawingY, staff);
+			DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
 		}
 		else if (mensur->m_sign==MENSUR_SIGN_C && !mensur->m_reversed)
 		{	
             mNum = 2; mDen = 2;
-			DrawMensurHalfCircle ( dc, element->m_drawingX, staff->m_drawingY, staff);
+			DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
 		}
 		else if (mensur->m_sign==MENSUR_SIGN_C && mensur->m_reversed)
 		{	
             mNum = 4; mDen = 2;
-			DrawMensurReversedHalfCircle ( dc, element->m_drawingX, staff->m_drawingY, staff);
+			DrawMensurReversedHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
 		}
 		if (mensur->m_slash) // we handle only one single slash
 		{	
-            DrawMensurSlash ( dc, element->m_drawingX, staff->m_drawingY, staff);
+            DrawMensurSlash ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
 			mDen = 1;
 		}
 		if (mensur->m_dot) // we handle only one single dot
 		{	
-            DrawMensurDot (dc, element->m_drawingX, staff->m_drawingY, staff);
+            DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
 			mNum = 9; mDen = 4;
 		}
 	}
@@ -1244,12 +1189,12 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 
 	if (mensur->m_num)
 	{	
-        x = element->m_drawingX;
+        x = element->GetDrawingX();
 		if (mensur->m_sign || mensur->m_meterSymb) 
         {
 			x += m_doc->m_drawingStep1*5; // step forward because we have a sign or a meter symbol
         }
-		DrawMensurFigures ( dc, x, staff->m_drawingY, mensur->m_num, mensur->m_numBase, staff);
+		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->m_num, mensur->m_numBase, staff);
 		//mDen = max ( this->durDen, (unsigned short)1); // ax2
 		//mNum = max ( this->durNum, (unsigned short)1); // ax2
 	}
@@ -1401,7 +1346,7 @@ void View::DrawSymbol( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     Symbol *symbol = dynamic_cast<Symbol*>(element);
     int oct = symbol->m_oct - 4;
-    element->m_drawingYRel = CalculatePitchPosY( staff, symbol->m_pname, layer->GetClefOffset( list_elem ), oct);
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, symbol->m_pname, layer->GetClefOffset( list_elem ), oct) );
     
     if (symbol->m_type==SYMBOL_ACCID) {
         DrawSymbolAccid(dc, element, layer, staff);
@@ -1425,8 +1370,8 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
     Symbol *accid = dynamic_cast<Symbol*>(element);
     dc->StartGraphic( element, "accid", element->GetUuid() );
     
-    int x = element->m_drawingX + accid->m_hOffset;
-    int y = element->m_drawingYRel + staff->m_drawingY;
+    int x = element->GetDrawingX() + accid->m_hOffset;
+    int y = element->GetDrawingY();
     
     int symc;
     switch (accid->m_accid)
@@ -1478,8 +1423,8 @@ void View::DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *la
     Symbol *custos = dynamic_cast<Symbol*>(element);
     dc->StartGraphic( element, "custos", element->GetUuid() );
 
-    int x = element->m_drawingX + custos->m_hOffset;
-    int y = element->m_drawingYRel + staff->m_drawingY;
+    int x = element->GetDrawingX() + custos->m_hOffset;
+    int y = element->GetDrawingY();
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
     DrawLeipzigFont( dc, x, y, 35, staff, custos->m_cueSize );
@@ -1497,13 +1442,13 @@ void View::DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer
     Symbol *dot = dynamic_cast<Symbol*>(element);
     dc->StartGraphic( element, "dot", element->GetUuid() );
     
-    int x = element->m_drawingX + dot->m_hOffset;
-    int y = element->m_drawingYRel;
+    int x = element->GetDrawingX() + dot->m_hOffset;
+    int y = element->GetDrawingY();
 
     switch (dot->m_dot)
     {	
-        case 1 : DoDrawDot( dc, x, y ); x += std::max (6, m_doc->m_drawingStep1);
-        case 0 : DoDrawDot ( dc, x, y );
+        case 1 : DrawDot( dc, x, y ); x += std::max (6, m_doc->m_drawingStep1);
+        case 0 : DrawDot ( dc, x, y );
     }
     
     dc->EndGraphic(element, this );
@@ -1528,10 +1473,8 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     for (int i = 0; i < ks->GetAlterationNumber(); i++) {
         
-        element->m_drawingYRel = CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->m_clefId));
-        
-        x = element->m_drawingX + (m_doc->m_drawingAccidWidth[staff->staffSize][0] + 5) * i;
-        y = element->m_drawingYRel + staff->m_drawingY;
+        x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] + 5) * i;
+        y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->m_clefId));;
         
         if (ks->GetAlteration() == ACCID_FLAT)
             symb = LEIPZIG_ACCID_FLAT;
@@ -1580,9 +1523,9 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (!nextAlignement) {
             return;
         }
-        int y = note1->m_drawingYRel + staff->m_drawingY;
-        int x2 = measure->m_drawingX + nextAlignement->GetXRel();
-        DrawTieBezier(dc, note1->m_drawingX, y - 14, x2, true);
+        int y = note1->GetDrawingY();
+        int x2 = measure->GetDrawingX() + nextAlignement->GetXRel();
+        DrawTieBezier(dc, note1->GetDrawingX(), y - 14, x2, true);
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( parentSystem1 && currentSystem && ( parentSystem1 != currentSystem) ) {
@@ -1594,11 +1537,11 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (!previousAlignement) {
             return;
         }
-        int y = note2->m_drawingYRel + staff->m_drawingY;
+        int y = note2->GetDrawingY();
         //int x1 = measure->m_drawingX + previousAlignement->GetXRel() + previousAlignement->GetMaxWidth();
         // is it actually better for x1 just to have a fixed value
-        int x1 = note2->m_drawingX - m_doc->m_drawingStep2;
-        DrawTieBezier(dc, x1, y - 14, note2->m_drawingX, true);
+        int x1 = note2->GetDrawingX() - m_doc->m_drawingStep2;
+        DrawTieBezier(dc, x1, y - 14, note2->GetDrawingX(), true);
     }
     // Finally the normal case, but double check we have two notes
     else if ( note1 && note2 ) {
@@ -1606,8 +1549,8 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         // Copied from DrawNote
         // We could use the stamDir information
         // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
-        int ynn = note1->m_drawingYRel + staff->m_drawingY;
-        int bby = staff->m_drawingY;
+        int ynn = note1->GetDrawingY();
+        int bby = staff->GetDrawingY();
         int milieu = bby - m_doc->m_drawingInterl[staff->staffSize] * 2;
         
         up = (ynn < milieu) ? true : false;
@@ -1617,9 +1560,9 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         // FIXME, take in account elements that can be netween notes, eg keys time etc
         // 20 height nice with 70, not nice with 50
         if (up)
-            DrawTieBezier(dc, note1->m_drawingX, note1->m_drawingYRel + staff->m_drawingY - 14, note2->m_drawingX, true);
+            DrawTieBezier(dc, note1->GetDrawingX(), note1->GetDrawingY() - 14, note2->GetDrawingX(), true);
         else
-            DrawTieBezier(dc, note1->m_drawingX, note1->m_drawingYRel + staff->m_drawingY + 14, note2->m_drawingX, false);
+            DrawTieBezier(dc, note1->GetDrawingX(), note1->GetDrawingY() + 14, note2->GetDrawingX(), false);
 
         dc->EndGraphic(element, this );
     }
@@ -1655,7 +1598,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int emb_offset = 0; // if there is and embellishment, offset the note up
     
     // We position the fermata in the same horizontal pos. of th eobject
-    x = element->m_drawingX;
+    x = element->GetDrawingX();
     
     // First case, notes
     if (dynamic_cast<Note*>(element)) {
@@ -1670,34 +1613,34 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
                 emb_offset = 35;
             
             // check that the notehead is in the staff.
-            if ((element->m_drawingYRel + staff->m_drawingY) < staff->m_yAbs)
+            if ((element->GetDrawingY()) < staff->GetDrawingY())
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
-                y = staff->m_yAbs + 20 + emb_offset;
+                y = staff->GetDrawingY() + 20 + emb_offset;
             else
                 // out of the staff, place the trill 20 px above the notehead
-                y = (element->m_drawingYRel + staff->m_drawingY) + 20 + emb_offset;
+                y = (element->GetDrawingY()) + 20 + emb_offset;
             
             // draw the up-fermata
-            DrawLeipzigFont ( dc, element->m_drawingX, y, LEIPZIG_FERMATA_UP, staff, false );
+            DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
         } else { // stem up fermata down
             
             // This works as above, only we check that the note head is not
             // UNDER the staff
-            if ((element->m_drawingYRel + staff->m_drawingY) > (staff->m_drawingY - m_doc->m_drawingStaffSize[staff->staffSize]))
+            if ((element->GetDrawingY()) > (staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize]))
                 // notehead in staff, set at 20 px under
-                y = staff->m_drawingY - m_doc->m_drawingStaffSize[staff->staffSize] - 20;
+                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize] - 20;
             else
                 // notehead under staff, set 20 px under notehead
-                y = (element->m_drawingYRel + staff->m_drawingY) - 20;
+                y = (element->GetDrawingY()) - 20;
             
-            DrawLeipzigFont ( dc, element->m_drawingX, y, LEIPZIG_FERMATA_DOWN, staff, false );
+            DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
     } else if (dynamic_cast<Rest*>(element)) {
         // this is a rest
         // rests for the moment are always in the staff
         // so just place the fermata above the staff + 20 px
-        y = staff->m_yAbs + 20;
-        DrawLeipzigFont ( dc, element->m_drawingX, y, LEIPZIG_FERMATA_UP, staff, false );
+        y = staff->GetDrawingY() + 20;
+        DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
     }
 }
 
@@ -1706,14 +1649,14 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
 // if there are many symbols to draw we could make a generalized function
 void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;    
-    x = element->m_drawingX;
+    x = element->GetDrawingX();
 
-    if ((element->m_drawingYRel + staff->m_drawingY) < staff->m_yAbs)
-        y = staff->m_yAbs + 30;
+    if ((element->GetDrawingY()) < staff->GetDrawingY())
+        y = staff->GetDrawingY() + 30;
     else
-        y = (element->m_drawingYRel + staff->m_drawingY) + 30;
+        y = (element->GetDrawingY()) + 30;
     
-    DrawLeipzigFont ( dc, element->m_drawingX, y, LEIPZIG_EMB_TRILL, staff, false );
+    DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_EMB_TRILL, staff, false );
 }
 
 
