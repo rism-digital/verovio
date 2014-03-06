@@ -1,0 +1,129 @@
+---
+layout: verovio
+verovio-light: true
+title: Command-line
+active: how
+how-active: how-js
+---
+
+<div class="row">
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			{% include how-sidebar.html %}
+		</div>
+	</div>
+	
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p>
+					Vevorio can be compiled to Javascript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The the SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{% site.baseurl %}}/mei-viewer.xhtml">MEI Viewer</a> illustrates it.
+				</p>
+				<p>
+					The Javascript version of Verovio is available as a toolkit that makes it very easy to integrate.
+				</p>
+				{% highlight html %}<script src="http://rism-ch.github.io/verovio/javascript/verovio-toolkit.js"></script>{% endhighlight %}
+				<p>
+					Once included, it can be used to render music notation on the fly:
+				</p>
+{% highlight html %}
+<!-- The div where we are going to insert the SVG -->
+<div id="output"/>
+<script type="text/javascript">
+  /* The Plain and Easy code to be rendered */
+  data = "@clef:G-2\n\
+    @keysig:xFCGD\n\
+    @timesig:3/8\n\
+    @data:'6B/{8B+(6B''E'B})({AFD})/{6.E3G},8B-/({6'EGF})({FAG})({GEB})/";
+  /* Create the Vevorio toolkit instance */
+  var vrvToolkit = new verovio.toolkit();
+  /* Render the data and inserted as content of the #output div */
+  document.getElementById("output").innerHTML = vrvToolkit.renderData( data, "" );
+</script>
+{% endhighlight %}
+
+				<p>
+					With jQuery, it is easy to load an MEI file and to render it in the same way:
+				</p>
+{% highlight html %}
+<div id="output"/>
+<script type="text/javascript">
+  var vrvToolkit = new verovio.toolkit();
+  /* Load the file using a HTTP GET */
+  $.get( "/examples/downloads/Guami_Canzona_24.mei", function( data ) {
+    var svg = vrvToolkit.renderData( data + "\n", JSON.stringify({ inputFormat: 'mei' }) );
+    $("#output").html(svg);
+  });
+</script>
+{% endhighlight %}
+
+
+				<h4>Options</h4>
+				<p>
+					All the options of the <a href="{{% site.baseurl %}}/command-line.xhtml">command-line</a> version are supported, with the only difference that their name is in <code>camelCase</code> instead of <code>dash-case</code>. The option are passed to the Verovio toolkit in JSON.
+				</p>
+{% highlight javascript %}
+options = JSON.stringify({
+	inputFormat: 'mei',
+	pageHeight: 2100,
+	pageWidth: 4200,
+	ignoreLayout: 1,
+	border: 100,
+	scale: 50
+});
+{% endhighlight %}
+
+				<h4>Methods</h4>
+				<p>
+					In addition to the constructor and destructor, the Verovio Javascript toolkit provides a certain number of methods for manipulating the data.
+				</p>
+				<div class="panel panel-default">
+					<div class="panel-heading panel-option"><code>void setOptions( string data )</code></div>
+				  	<div class="panel-body panel-option">
+				    	Sets the options as JSON string for the toolkit instance.
+				  	</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading panel-option"><code>void loadData( string data )</code></div>
+				  	<div class="panel-body panel-option">
+				    	Loads the data passed as a parameter. This methods load the data and perfroms the layout if necessary. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted.
+				  	</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading panel-option"><code>int getPageCount()</code></div>
+				  	<div class="panel-body panel-option">
+				    	Returns the number of pages. This can be called once the data has been loaded with <code>loadData</code>. Page numbering is 1-based.
+				  	</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading panel-option"><code>string renderPage( int pageNumber, string options )</code></div>
+				  	<div class="panel-body panel-option">
+				    	Renders a page for the data loaded in the toolkit and returns it in SVG. The page numbering is 1-based. Options for rendering can be passed as JSON string. The options affecting the layout (e.g., <code>pageHeight</code>, or <code>ignoreLayout</code>) cannot be modified when rendering a page and reloading the data it necessary for this.
+				  	</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading panel-option"><code>string renderData( string data, string options )</code></div>
+				  	<div class="panel-body panel-option">
+				    	Loads and the data with the options passed as JSON string and renders the first page. This methods is a shortcut for <code>loadData</code> and then <code>renderPage</code> and is appropriate for rendering small data snippets. The does stay in memory once loaded.
+				  	</div>
+				</div>
+				<div class="panel panel-default">
+					<div class="panel-heading panel-option"><code>string getLog()</code></div>
+				  	<div class="panel-body panel-option">
+				    	Returns the log message of the last performed operation, for example after having loaded a file.
+				  	</div>
+				</div>
+				
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	$( document ).ready(function() {
+
+	});
+//]]>
+</script>

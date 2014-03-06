@@ -1,7 +1,7 @@
 ---
 layout: verovio
-title: MEI Rendering
-active: mei-rendering
+title: Verovio MEI Viewer
+active: mei-viewer
 downloads:
     - name: "Guami Canzona 24"
       description: "8 voices and b.c., 10 pages - 235Kb"
@@ -251,7 +251,7 @@ downloads:
 							<div class="checkbox">
 								<label class="checkbox">
 									<input id="ignoreLayout" type="checkbox"/> Ignore encoded layout
-									</label>
+								</label>
 							</div>
 						</div>
 						<!-- /.col-xs -->
@@ -341,7 +341,7 @@ downloads:
 									<span class="glyphicon glyphicon-backward"/>
 								</button>
 							</span>
-							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width:45px" onkeypress="do_page_enter(event)"/>
+							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width: 45px !important;" onkeypress="do_page_enter(event)"/>
 							<span class="input-group-btn">
 								<button onclick="next_page()" class="btn btn-default" type="button">
 									<span class="glyphicon glyphicon-forward"/>
@@ -368,7 +368,7 @@ downloads:
 									<span class="glyphicon glyphicon-zoom-out"/>
 								</button>
 							</span>
-							<input type="text" class="form-control" style="width:60px" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
+							<input type="text" class="form-control" style="width:60px !important;" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
 							<span class="input-group-btn">
 								<button onclick="zoom_in()" class="btn btn-default" type="button">
 									<span class="glyphicon glyphicon-zoom-in"/>
@@ -386,17 +386,20 @@ downloads:
 		<div class="panel panel-default hidden-xs hidden-sm">
 			<div class="panel-heading">
 				<div class="row">
-					<div class="col-xs-10">
-						Example files to download
+					<div class="col-xs-7">
+						Examples
 					</div>
-					<div class="col-xs-2">
-						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="These files can be downloaded locally on your machine and then selected for rendering in your browser.">
+					<div class="col-xs-5">
+						<button id="toggle_downloads" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-chevron-down"/>
+						</button>
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="These files are examples that can be downloaded locally on your machine and then selected for rendering in your browser.">
 							<span class="glyphicon glyphicon-question-sign"/>
 						</button>
 					</div>
 				</div>
 			</div>
-			<div class="panel-body">
+			<div id="downloads_panel_body" class="panel-body">
 				<div class="row">
 					<div class="col-md-12">
 						{% for d in page.downloads %}
@@ -453,6 +456,12 @@ downloads:
 		$( "#toggle_log" ).click(function() {
 			log = !log;
 			$( "#log_panel_body" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+		});
+		
+		$( "#toggle_downloads" ).click(function() {
+			$( "#downloads_panel_body" ).toggle();
 		  	// toggle icon
 		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
 		});

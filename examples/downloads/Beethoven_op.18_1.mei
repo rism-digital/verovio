@@ -174,6 +174,15 @@
                 </changeDesc>
                 <date isodate="2013-01-25"/>
             </change>
+            <change n="4">
+                <respStmt>
+                    <persName>Laurent Pugin</persName>
+                </respStmt>
+                <changeDesc>
+                    <p>Added clef #added-clef-2 and #added-clef-2 for cello; completed staffGrp</p>
+                </changeDesc>
+                <date isodate="2013-01-25"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -181,11 +190,13 @@
             <mdiv>
                 <score>
                     <scoreDef meter.count="3" meter.unit="4" key.sig="1f" key.mode="major">
-                        <staffGrp symbol="bracket">
-                            <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f" label="Violino I" lines="5"/>
-                            <staffDef n="2" xml:id="s2" clef.line="2" clef.shape="G" key.sig="1f" label="Violino II" lines="5"/>
-                            <staffDef n="3" xml:id="s3" clef.line="3" clef.shape="C" key.sig="1f" label="Viola" lines="5"/>
-                            <staffDef n="4" xml:id="s4" clef.line="4" clef.shape="F" key.sig="1f" label="Violoncello" lines="5"/>
+                        <staffGrp symbol="line">                       
+                            <staffGrp symbol="bracket">
+                                <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f" label="Violino I" lines="5"/>
+                                <staffDef n="2" xml:id="s2" clef.line="2" clef.shape="G" key.sig="1f" label="Violino II" lines="5"/>
+                                <staffDef n="3" xml:id="s3" clef.line="3" clef.shape="C" key.sig="1f" label="Viola" lines="5"/>
+                                <staffDef n="4" xml:id="s4" clef.line="4" clef.shape="F" key.sig="1f" label="Violoncello" lines="5"/>
+                            </staffGrp>
                         </staffGrp>
                     </scoreDef>
                     <section>
@@ -3746,6 +3757,7 @@
                             </staff>
                             <staff n="4">
                                 <layer n="1">
+                                    <clef shape="G" line="2" xml:id="added-clef-1"/>
                                     <note xml:id="d690095e18358" pname="g" oct="5" dur="4" dots="1" stem.dir="down"/>
                                     <beam>
                                         <note xml:id="d690095e18382" pname="a" oct="5" dur="16" stem.dir="down"/>
@@ -12135,6 +12147,7 @@
                             </staff>
                             <staff n="4">
                                 <layer n="1">
+                                    <clef shape="G" line="2" xml:id="added-clef-2"/>
                                     <note xml:id="d690095e64033" pname="c" oct="5" dur="4" dots="1" stem.dir="down"/>
                                     <beam>
                                         <note xml:id="d690095e64057" pname="d" oct="5" dur="16" stem.dir="down"/>

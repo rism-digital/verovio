@@ -1,0 +1,198 @@
+---
+layout: verovio
+verovio-light: false
+title: PAE Examples
+active: plain-and-easy
+pae-active: pae-examples
+---
+
+<script type="text/javascript">
+//<![CDATA[
+
+	var zoom = 40;
+	var pageHeight = 2970;
+	var pageWidth = 1400;
+	var spacingStaff = 0;
+	var border = 20;
+	var adjustPageHeight = 1;
+	var vrvToolkit = new verovio.toolkit();
+
+	function load_data(data, output_div) {
+		options = JSON.stringify({
+					inputFormat: 'pae',
+					pageHeight: pageHeight,
+					pageWidth: pageWidth,
+					adjustPageHeight: adjustPageHeight,
+					spacingStaff: spacingStaff,
+					border: border,
+					scale: zoom
+				});
+		
+		var svg = vrvToolkit.renderData( data + "\n", options );
+		output_div.html(svg);
+	}
+
+	var incipits = [
+	
+"@clef:G-2\n\
+@keysig:xFCGD\n\
+@timesig:3/8\n\
+@data:'6B/{8B+(6B''E'B})({AFD})/{6.E3G},8B-/({6'EGF})({FAG})({GEB})/4F6-",
+
+"@clef:G-2\n\
+@keysig:xF\n\
+@timesig:3/8\n\
+@data:=25//$xFCG @c 2-4.-'8E/{6AGFE}{8A''C}'B''4D{6C'B}/{''DC'BA}{''8EA}",
+
+"@clef:F-4\n\
+@keysig:bB\n\
+@timesig:c\n\
+@data:,6{FA'CF} %G-2{''6CEA'''C} %F-4{,6FB'DF} %G-2{''6DFA'''D}/\n",
+
+"@clef:C-4\n\
+@keysig:xFC\n\
+@timesig:c/\n\
+@data:,{8.A6A}/'4.Dt8D4.Ct8D/{8.E6C},8(A)'E4DtE/{8.Ft3GE}8(D)-2-/\n",
+
+"@clef:G-2\n\
+@keysig:xFCG\n\
+@timesig:3/8\n\
+@data:''8-{CD}+/{DC'B}/{xAB''F+}/{FED}/{CGB+}/{BAG+}/{GFE}/\n",
+
+"@clef:G-2\n\
+@keysig:bBE\n\
+@timesig:2/4\n\
+@data:''{8.F6D'8B}6-''F/{8.F6E8C}6-E/{8DC}{'8B''gCg'BgAgB''6FE}/2D\n",
+
+"@clef:F-4\n\
+@keysig:xF\n\
+@timesig:c\n\
+@data:qq,3{DnF'D}r/2Fqq,3{DnF'D}r2Aqq3,{DF'D}r/b1B,qq3{EG'C}r/1A//",
+
+"@clef:C-1\n\
+@keysig:xFCGD\n\
+@timesig:c\n\
+@data:'2-4.-8D/{EG}6.3{BA}{GF}{ED}{EF}{GA}{GF}/4E",
+
+"@clef:G-2\n\
+@keysig:none\n\
+@timesig:3/4\n\
+@data:'6!{GGCC}!f{GCGC}/i/i/"
+
+	];
+
+
+//]]>
+</script>
+
+<div class="row">
+	
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			{% include pae-sidebar.html %}
+		</div>
+	</div>
+	
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p>
+					The Plain and Easy (PAE) code is a simple music code for transcribing short monophonic incipits. It is mostly used by the Répertoire International des Sources Musicales (RISM) for inventorying the music incipits of the manuscripts. More information about the syntax is available on the <a href="http://www.iaml.info/en/activities/projects/plain_and_easy_code" target="_blank">IAML</a> website.
+				</p>
+				
+				<p>
+					The examples below show some features of the PAE code. They are all rendered dynamically in the web-browser with the <a href="{{ site.baseurl }}/javascript.xhtml">Javascript</a> version of Verovio.
+				</p>
+				
+				<h4>Beams and tuplets</h4>
+				<div id="svg_pae0" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae0"></code></pre></div>
+				</p>
+				
+				<h4>Measure rests and key and time signature changes</h4>
+				<div id="svg_pae1" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae1"></code></pre></div>
+				</p>
+				
+				<h4>Clef changes</h4>
+				<div id="svg_pae2" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae2"></code></pre></div>
+				</p>
+				
+				<h4>Trills and fermata</h4>
+				<div id="svg_pae3" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae3"></code></pre></div>
+				</p>
+				
+				<h4>Ties</h4>
+				<div id="svg_pae4" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae4"></code></pre></div>
+				</p>
+				
+				<h4>Grace notes (accaciature)</h4>
+				<div id="svg_pae5" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae5"></code></pre></div>
+				</p>
+				
+				<h4>Grace notes (appogiature)</h4>
+				<div id="svg_pae6" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae6"></code></pre></div>
+				</p>
+				
+				<h4>Rhythmic patterns</h4>
+				<div id="svg_pae7" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae7"></code></pre></div>
+				</p>
+				
+				<h4>Abbreviated writing</h4>
+				<div id="svg_pae8" style="overflow:auto;"/>
+				<p>
+					<div class="highlight"><pre><code id="code_pae8"></code></pre></div>
+				</p>
+				
+				
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+	$( document ).ready(function() {
+		
+		// adjust the zoom for small screens
+		width = $('#svg_pae1').width();
+		if ( width < zoom * pageWidth / 100 ) {
+			zoom = width * 100 / pageWidth;
+		}
+		
+		/*
+		var mei;
+		$.get( "{{ site.baseurl }}/examples/features/tuplets-4.mei" , function( data ) {
+			mei = data;
+			var incipits = [mei, mei, mei, mei, mei, mei, mei, mei, mei];
+			for (i = 0; i < incipits.length; i++) {
+				load_data( incipits[i], $('#svg_pae' + i) );
+				//$('#code_pae' + i).html( incipits[i] );
+			}
+		});
+		*/
+		
+		for (i = 0; i < incipits.length; i++) {
+			load_data( incipits[i], $('#svg_pae' + i) );
+			$('#code_pae' + i).html( incipits[i] );
+		}
+	
+	});
+//]]>
+</script>

@@ -17,17 +17,26 @@
 				<li {% if page.active == "home" %}class="active"{% endif %}>
 					<a href="{{ site.baseurl }}/index.html">Home</a>
 				</li>
-				<li {% if page.active == "mei-rendering" %}class="active"{% endif %}>
-					<a href="{{ site.baseurl }}/mei-rendering.xhtml">MEI Rendering</a>
+				<li {% if page.active == "about" %}class="active"{% endif %}>
+					<a href="{{ site.baseurl }}/command-line.xhtml">How it works</a>
 				</li>
+				<li {% if page.active == "mei-viewer" %}class="active"{% endif %}>
+					<a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a>
+				</li>
+				<li {% if page.active == "plain-and-easy" %}class="active"{% endif %}>
+					<a href="{{ site.baseurl }}/pae-examples.xhtml">Plain and Easy</a>
+				</li>
+				<!--
 				<li class="dropdown {% if page.active == "pae-editor" %}active{% endif %}">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">Plain and Easy <b class="caret"></b></a>
+					<a href="/" class="dropdown-toggle" data-toggle="dropdown">Plain and Easy <b class="caret"></b></a>
 		        	<ul class="dropdown-menu">
-		          		<li><a href="{{ site.baseurl }}/pae-editor.xhtml">PAE Editor</a></li>
+		          		<li><a href="{{ site.baseurl }}/pae-examples.xhtml">Examples</a></li>
+		          		<li><a href="{{ site.baseurl }}/pae-editor.xhtml">Editor</a></li>
 		        	</ul>
 				</li>
+				-->
 				<li {% if page.active == "about" %}class="active"{% endif %}>
-					<a href="{{ site.baseurl }}/about.html">About</a>
+					<a href="{{ site.baseurl }}/download.html">Download</a>
 				</li>
 		  	</ul>
 		</div>

@@ -1,0 +1,79 @@
+---
+layout: verovio
+verovio-light: true
+title: Features
+active: how
+how-active: how-features
+features:
+    - id: "tuplet"
+      name: "Tuplet"
+    - id: "scoredef"
+      name: "ScoreDef"
+---
+
+<div class="row">
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			{% include how-sidebar.html %}
+		</div>
+		<div class="panel panel-default">
+			<div class="list-group sublist-group">
+				{% for f in page.features %}
+				<a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-body" id="feature">
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+	var zoom = 40;
+	var pageHeight = 2970;
+	var pageWidth = 2100;
+	var adjustPageHeight = 1;
+	var border = 20;
+	var spacingStaff = 2;
+	var vrvToolkit = new verovio.toolkit();
+
+	function load_data(data, output_div) {
+		options = JSON.stringify({
+					inputFormat: 'mei',
+					pageHeight: pageHeight,
+					pageWidth: pageWidth,
+					adjustPageHeight: adjustPageHeight,
+					border: border,
+					spacingStaff: spacingStaff,
+					scale: zoom
+				});
+		
+		var svg = vrvToolkit.renderData( data + "\n", options );
+		output_div.html(svg);
+	}
+	
+	function getParameterByName(name) {
+	    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+	    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+	}
+
+	$( document ).ready(function() {
+		var id = getParameterByName("id");
+		if (!id) {
+			id = "{{ page.features[0].id }}";
+		}
+		var file = "features/" + id + ".html";	
+		// load the file	
+		$( "#feature" ).load( file );
+		// activate the link menu
+		$( "#link-" + id ).addClass( "active" );
+	});
+//]]>
+</script>

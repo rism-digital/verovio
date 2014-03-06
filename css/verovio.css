@@ -14,6 +14,11 @@ body {
 	height: 2px;
 }
 
+/* This is a fix for bootstrap 3.1 to override width: auto; */
+.form-control {
+    width: 100% !important;
+}
+
 hr.panel {
 	margin: 10px 0px;
 }
@@ -23,8 +28,20 @@ hr.panel {
 	margin-left: 4px;
 }
 
+p a {
+	text-decoration: underline;
+}
+
 .popover {
     z-index: 1031; /* We want them on top of the nav-bar */
+}
+
+.sublist-group a {
+	padding: 4px 15px;
+}
+
+.panel-option {
+	padding: 4px 8px;
 }
 
 // Does not work with Firefox and not very well with Safari

@@ -1,0 +1,110 @@
+---
+layout: verovio
+verovio-light: true
+title: Command-line
+active: how
+how-active: how-cmd
+options:
+  - ["-b, --border=BORDER", "Add border (default is 50)"]
+  - ["-f, --format=INPUT_FORMAT", "Select input format: darms, mei, pae (default is pae)"]
+  - ["-h, --page-height=HEIGHT", "Specify the page height (default is 2970)"]
+  - ["-o, --outfile=FILE_NAME", "Output file name"]
+  - ["-r, --recources=PATH", "Path to SVG resources (default is /usr/local/share/verovio)"]
+  - ["-s, --scale=FACTOR", "Scale percent (default is 100)"]
+  - ["-t, --type=OUTPUT_TYPE", "Select output format: mei, svg (default is svg)"]
+  - ["-w, --page-width=WIDTH", "Specify the page width (default is 2100)"]
+additional-options:
+  - ["--adjust-page-height", "Crop the page height to the height of the content"]
+  - ["--help", "Display the usage message"]
+  - ["--ignore-layout", "Ignore all encoded layout information (if any) and fully recalculate the layout"]
+  - ["--no-layout", "Ignore all encoded layout information (if any) and output one single page with one single system"]
+  - ["--page=PAGE", "Select the page to engrave (default is 1)"]
+---
+
+<div class="row">
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			{% include how-sidebar.html %}
+		</div>
+	</div>
+	
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p>
+					Verovio can be build as a light and fast standalone command-line tool for converting files (in DARMS, PAE or MEI) into SVG. It is written in pure standard C++ with no dependencies on third-party frameworks and libraries. This ensures maximum portability of the codebase. Verovio implements its own rendering engine, which can render SVG with all the musical symbols embedded in it and without dependency on external fonts. Since the rendering engine is defined as an abstract class, it is possible easily to implement a rendering output different from SVG if needed (e.g., PDF, or HTML Canvas).
+				</p>
+				<p>
+					Building and installing instructions are available on the <a href="{{ site.baseurl}}/download.xhtml">download</a> page.
+				</p>
+				
+				<h4>Basic usage</h4>
+				<p>
+					For typesetting an MEI file with the default options, you need to do:
+				</p>
+				{% highlight bash %}$ verovio -f mei -o output.svg Hummel_Concerto_for_trumpet.mei{% endhighlight %}
+				<p>
+					Width the <a href="{{ site.baseurl }}/examples/downloads/Hummel_Concerto_for_trumpet.mei">Hummel concerto for trumpet</a> example, this is what you should obtain:
+				</p>
+				<div id="hummel-p1">
+					{% include svg/hummel-p1.svg %}
+				</div>
+				
+				<h4>Typesetting options</h4>
+				{% for option in page.options %}
+				<div class="panel panel-default">
+				  <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
+				  <div class="panel-body panel-option">
+				    {{ option[1] }}
+				  </div>
+				</div>
+				{% endfor %}
+
+				<h4>Additional typesetting options</h4>
+				{% for option in page.additional-options %}
+				<div class="panel panel-default">
+				  <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
+				  <div class="panel-body panel-option">
+				    {{ option[1] }}
+				  </div>
+				</div>
+				{% endfor %}
+				
+				<h4>Usage with options</h4>
+				<p>
+					The following example shows how to ignore the layout information contained in the MEI file and to let it recalculated by Vevorio, here with a specific page width and page height. The second page of the <a href="{{ site.baseurl }}/examples/downloads/Guami_Canzona_24.mei">Guami canzona</a> example can be typeset with the following command:
+				</p>
+				{% highlight bash %}$ verovio -f mei --ignore-layout -h 2100 -w 4200 -b 100 --page=2 -o output.svg Guami_Canzona_24.mei{% endhighlight %}
+				<div id="guami-p2">
+					{% include svg/guami-p2.svg %}
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	function adjust_svg_size( div, pageWidth, pageHeight, zoom ) {
+		// adjust the size according to the width of the div
+		width = $( div ).width();
+		if ( width < zoom * pageWidth / 100 ) {
+			zoom = width * 100 / pageWidth;
+		}
+		$( div + ' svg g.page-scale').attr("transform", "scale(" + zoom / 100 + ", "+ zoom / 100 +")") ;
+		$( div + ' svg').height(pageHeight * zoom / 100 );
+		$( div + ' svg').width(pageWidth * zoom / 100 );		
+		
+		if ( $( div + ' svg') ) {
+			$( div + ' svg').height(pageHeight * zoom / 100 );
+			$( div + ' svg').width(pageWidth * zoom / 100 );	
+		}
+	}
+
+	$( document ).ready(function() {
+		adjust_svg_size( "#hummel-p1", 2100, 2970, 20 );
+		adjust_svg_size( "#guami-p2", 4200, 2100, 20 );
+	});
+//]]>
+</script>
