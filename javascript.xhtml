@@ -17,7 +17,7 @@ how-active: how-js
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<p>
-					Vevorio can be compiled to Javascript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The the SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{% site.baseurl %}}/mei-viewer.xhtml">MEI Viewer</a> illustrates it.
+					Vevorio can be compiled to Javascript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The the SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a> illustrates it.
 				</p>
 				<p>
 					The Javascript version of Verovio is available as a toolkit that makes it very easy to integrate.
@@ -60,7 +60,7 @@ how-active: how-js
 
 				<h4>Options</h4>
 				<p>
-					All the options of the <a href="{{% site.baseurl %}}/command-line.xhtml">command-line</a> version are supported, with the only difference that their name is in <code>camelCase</code> instead of <code>dash-case</code>. The option are passed to the Verovio toolkit in JSON.
+					All the options of the <a href="{{ site.baseurl }}/command-line.xhtml">command-line</a> version are supported, with the only difference that their name is in <code>camelCase</code> instead of <code>dash-case</code>. The option are passed to the Verovio toolkit in JSON.
 				</p>
 {% highlight javascript %}
 options = JSON.stringify({
