@@ -38,7 +38,7 @@ additional-options:
 					Building and installing instructions are available on the <a href="{{ site.baseurl}}/download.xhtml">download</a> page.
 				</p>
 				
-				<h4>Basic usage</h4>
+				<h3>Basic usage</h3>
 				<p>
 					For typesetting an MEI file with the default options, you need to do:
 				</p>
@@ -50,7 +50,7 @@ additional-options:
 					{% include svg/hummel-p1.svg %}
 				</div>
 				
-				<h4>Typesetting options</h4>
+				<h3>Typesetting options</h3>
 				{% for option in page.options %}
 				<div class="panel panel-default">
 				  <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
@@ -60,7 +60,7 @@ additional-options:
 				</div>
 				{% endfor %}
 
-				<h4>Additional typesetting options</h4>
+				<h3>Additional typesetting options</h3>
 				{% for option in page.additional-options %}
 				<div class="panel panel-default">
 				  <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
@@ -70,7 +70,7 @@ additional-options:
 				</div>
 				{% endfor %}
 				
-				<h4>Usage with options</h4>
+				<h3>Usage with options</h3>
 				<p>
 					The following example shows how to ignore the layout information contained in the MEI file and to let it recalculated by Vevorio, here with a specific page width and page height. The second page of the <a href="{{ site.baseurl }}/examples/downloads/Guami_Canzona_24.mei">Guami canzona</a> example can be typeset with the following command:
 				</p>

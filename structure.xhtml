@@ -15,7 +15,100 @@ how-active: how-structure
 	
 	<div class="col-md-9">
 		<div class="panel panel-default">
-			<div class="panel-body" id="feature">
+			<div class="panel-body">
+				
+				<h3>Page-based data structure</h3>
+				<p>
+					 The purpose of Verovio is to provide a self-contained typesetting engine that is directly capable of rendering MEI to its graphical representation in high quality. Its main goal is also to develop a library with an internal structure identical to MEI as far as possible. However, for practical reasons, the Verovio library uses a page-based customization of MEI internally.  Since the modifications introduced by the customization are very limited, the Verovio library can also be used to render un-customized MEI files. With the page-based customization, the content of the music is encoded in <code>&lt;page&gt;</code> elements that are themselves contained in a <code>&lt;pages&gt;</code> element within <code>&lt;mdiv&gt;</code>. 
+				</p>	 
+				<p>
+					 A <code>&lt;page&gt;</code> element contain <code>&lt;system&gt;</code> elements. From then on, the encoding is identical to standard MEI. That is, a <code>&lt;system&gt;</code> element will contain <code>&lt;measure&gt;</code> elements or <code>&lt;staff&gt;</code> elements that are both un-customized, depending on whether or not the music is measured or un-measured respectively. 
+				</p>
+							 
+{% highlight xml %}
+<body>
+  <mdiv>
+    <pages>
+      <page page.width="2108" page.height="2970" page.leftmar="20" page.rightmar="20">
+        <system system.leftmar="50" system.rightmar="50">
+          <scoreDef>
+            <staffGrp symbol="line">
+              <staffDef n="1" clef.line="2" clef.shape="G" /> 
+            </staffGrp>
+          </scoreDef>
+          <measure n="1">
+            <staff n="1">
+              <layer n="1">
+                <!-- ... -->
+              </layer>
+            </staff>
+          </measure>
+        </system>
+      </page>
+    </pages>
+  </mdiv>
+</body>
+{% endhighlight %}
+					
+				<h3>Layout and positionning</h3>
+				<p>
+					 The idea of a page-based customization is also to make it possible to encode the positioning of elements directly in the content tree. This can be useful in some uses of MEI where the encoding represents one single source with one image per page. This is typically the case with optical music recognition applications. Verovio supports both positioned elements and automatic layout. The latter will be executed when un-customized MEI files are rendered.
+				</p>
+				<p>
+					The page-based organization is modeled by a MEI customization that defines the structure describe above. The ODD file of the customization and the corresponding RNG schema are available from the <a href="https://code.google.com/p/mei-incubator/source/browse/#svn%2Fpage-based" target="_blank">MEI Incubator</a>. This is still work-in-progress.
+				</p>
+				
+				<h3>SVG structure</h3>
+				<p>
+						One advantage of SVG rendering over other formats (e.g., images or PDF) is that SVG is rendered natively in most modern web-browsers. Because it is in XML, it also has the advantage that it is well suitable to interaction since every graphic is an XML element that is easy addressable. With Verovio, we also have the advantage that the SVG is organized in such a way that the MEI structure is preserved as much as possible. For example, a <code>&lt;note&gt;</code> element with an <code>xml:id</code> attribute in the MEI file will have a corresponding <code>&lt;g&gt;</code> element in the SVG with and <code>class</code> attribute <code>"note"</code> and an <code>id</code> attribute corresponding to the <code>xml:id</code>. This makes interaction with the SVG very easy. The hierarchy of the element is also preserved as shown below.
+				</p>
+				
+{% highlight xml %}
+<tuplet xml:id="t1" num="3" numbase="2">
+  <beam xml:id="b1">
+    <note xml:id="n1" pname="d" oct="5" dur="8" />
+    <note xml:id="n2" pname="e" oct="5" dur="16" dots="1"/>
+    <note xml:id="n3" pname="d" oct="5" dur="32" />
+    <note xml:id="n4" pname="c" oct="5" dur="8" accid="s"/>
+  </beam>
+</tuplet>
+<beam xml:id="b2">
+  <tuplet xml:id="t2" num="3" numbase="2">
+    <note xml:id="n5" pname="d" oct="5" dur="8" />
+    <note xml:id="n6" pname="e" oct="5" dur="16" dots="1"/>
+    <note xml:id="n7" pname="f" oct="5" dur="32" accid="s"/>
+    <note xml:id="n8" pname="e" oct="5" dur="8"/>
+  </tuplet>
+</beam>
+
+{% endhighlight %}
+
+				<div class="row">
+					<div class="col-sm-6 text-center">
+						<img src="{{ site.baseurl }}/images/tuplet-beam.png" width="300"/>
+					</div>
+					<div class="col-sm-6">
+{% highlight xml %}
+<g class="tuplet" id="t1" >
+  <g class="beam" id="b1" >
+    <g class="note" id="n1" >...</g>
+    <g class="note" id="n2" >...</g>
+    <g class="note" id="n3" >...</g>
+    <g class="note" id="n4" >...</g>
+  </g>
+</g>
+<g class="beam" id="b2" >
+  <g class="tuplet" id="t2" >
+    <g class="note" id="n5" >...</g>
+    <g class="note" id="n6" >...</g>
+    <g class="note" id="n7" >...</g>
+    <g class="note" id="n8" >...</g>
+  </g>
+</g>
+{% endhighlight %}
+					</div>
+				</div>
+				
 			</div>
 		</div>
 	</div>
