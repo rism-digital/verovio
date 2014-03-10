@@ -1,7 +1,7 @@
 ---
 layout: verovio
 verovio-light: true
-title: Command-line
+title: Verovio JS Toolkit
 active: how
 how-active: how-js
 ---
@@ -19,10 +19,14 @@ how-active: how-js
 				<p>
 					Vevorio can be compiled to Javascript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The the SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a> illustrates it.
 				</p>
+				
+				<h4>Basic usage</h4>
+				
 				<p>
 					The Javascript version of Verovio is available as a toolkit that makes it very easy to integrate.
 				</p>
 				{% highlight html %}<script src="http://rism-ch.github.io/verovio/javascript/verovio-toolkit.js"></script>{% endhighlight %}
+				
 				<p>
 					Once included, it can be used to render music notation on the fly:
 				</p>
@@ -43,6 +47,14 @@ how-active: how-js
 {% endhighlight %}
 
 				<p>
+					<a href="{{ site.baseurl }}/hello-pae-world.html" target="_blank">
+						<button type="button" class="btn btn-default btn-sm">
+						  <span class="glyphicon glyphicon-eye-open"></span>  See it in action
+						</button>
+					</a>
+				</p>
+
+				<p>
 					With jQuery, it is easy to load an MEI file and to render it in the same way:
 				</p>
 {% highlight html %}
@@ -57,6 +69,13 @@ how-active: how-js
 </script>
 {% endhighlight %}
 
+				<p>
+					<a href="{{ site.baseurl }}/hello-mei-world.html" target="_blank">
+						<button type="button" class="btn btn-default btn-sm">
+						  <span class="glyphicon glyphicon-eye-open"></span>  See it in action
+						</button>
+					</a>
+				</p>
 
 				<h4>Options</h4>
 				<p>
@@ -86,7 +105,7 @@ options = JSON.stringify({
 				<div class="panel panel-default">
 					<div class="panel-heading panel-option"><code>void loadData( string data )</code></div>
 				  	<div class="panel-body panel-option">
-				    	Loads the data passed as a parameter. This methods load the data and perfroms the layout if necessary. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted.
+				    	Loads the data passed as a parameter. The data is a string of the music encoding (e.g., the MEI encoding). The method also perfroms the layout if necessary or if requested. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted.
 				  	</div>
 				</div>
 				<div class="panel panel-default">
@@ -110,7 +129,7 @@ options = JSON.stringify({
 				<div class="panel panel-default">
 					<div class="panel-heading panel-option"><code>string getLog()</code></div>
 				  	<div class="panel-body panel-option">
-				    	Returns the log message of the last performed operation, for example after having loaded a file.
+				    	Returns the log message of the last performed operation, for example after having called <code>loadData</code>.
 				  	</div>
 				</div>
 				
