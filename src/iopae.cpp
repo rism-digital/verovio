@@ -286,30 +286,53 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
             i += getClefInfo(incipit, c, i + 1);
             // If there are no notes yet in the measure
             // attach this clef change to the measure
-            if (current_measure.notes.size() == 0)
+            if (current_measure.notes.size() == 0) {
+                // If a clef was already assigned, remove it
+                if (current_measure.clef)
+                    delete current_measure.clef;
+                
                 current_measure.clef = c;
-            else
+            } else {
+                // as above
+                if (current_note.clef)
+                    delete current_note.clef;
+                
                 current_note.clef = c;
+            }
         }
         
 		//time signature change
 		else if ((incipit[i] == '@') && (i+1 < length)) {
             Mensur *meter = new Mensur;
             i += getTimeInfo( incipit, meter, i + 1);
-            if (current_measure.notes.size() == 0)
+            if (current_measure.notes.size() == 0) {
+                if (current_measure.time) 
+                    delete current_measure.time;
+                
                 current_measure.time = meter;
-            else
+            } else {
+                if (current_note.time)
+                    delete current_note.time;
+                
                 current_note.time = meter;
+            }
         } 
         
   		//key signature change
 		else if ((incipit[i] == '$') && (i+1 < length)) {
             KeySignature *k = new KeySignature;
             i += getKeyInfo( incipit, k, i + 1);
-            if (current_measure.notes.size() == 0)
+            if (current_measure.notes.size() == 0) {
+                if (current_measure.key)
+                    delete current_measure.key;
+                
                 current_measure.key = k;
-            else
+            } else {
+                if (current_note.key)
+                    delete current_note.key;
+                
                 current_note.key = k;
+            }
 		}
             
         i++;
@@ -538,6 +561,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
                 // FIXME find a graceful way to exit signaling this to user
                 if (incipit[t] == ')') {
                     LogDebug("You have a ) before the ; in a tuplet!");
+                    free(buf);
                     return i - index;
                 }
                 
@@ -551,6 +575,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
                 // If we have extraneous chars, exit here
                 if (!isdigit(incipit[t + t2])) {
                     LogDebug("You have a non-number in a tuplet number");
+                    free(buf);
                     return i - index;
                 }
                 
