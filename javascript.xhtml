@@ -62,7 +62,7 @@ how-active: how-js
 <script type="text/javascript">
   var vrvToolkit = new verovio.toolkit();
   /* Load the file using a HTTP GET */
-  $.get( "/examples/downloads/Guami_Canzona_24.mei", function( data ) {
+  $.get( "examples/downloads/Guami_Canzona_24.mei", function( data ) {
     var svg = vrvToolkit.renderData( data + "\n", JSON.stringify({ inputFormat: 'mei' }) );
     $("#output").html(svg);
   });
@@ -137,13 +137,16 @@ options = JSON.stringify({
 				<p>
 					The Verovio Javascript tookit has been tested with recent versions of the most widely used web-browsers. It works on desktop computers but also tablets and mobile devices.
 				</p>
-				<div class="row">
-					<div class="col-xs-12 text-center">
+				<div class="row text-center">
+					<div class="col-sm-12">
 						<img src="{{ site.baseurl }}/images/browsers/chrome.png" width="48"/>
 						<img src="{{ site.baseurl }}/images/browsers/firefox.png" width="48"/>
-						<img src="{{ site.baseurl }}/images/browsers/ie.png" width="48"/>
 						<img src="{{ site.baseurl }}/images/browsers/opera.png" width="48"/>
 						<img src="{{ site.baseurl }}/images/browsers/safari.png" width="48"/>
+						<img src="{{ site.baseurl }}/images/browsers/ie.png" width="48"/>
+						<img src="{{ site.baseurl }}/images/browsers/maxthon.png" width="48"/>
+						<img src="{{ site.baseurl }}/images/browsers/android.png" width="48"/>
+						<img src="{{ site.baseurl }}/images/browsers/dolphin.png" width="48"/>	
 					</div>
 				</div>
 				
