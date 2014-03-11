@@ -44,6 +44,11 @@ p a {
 	padding: 4px 8px;
 }
 
+.panel-supported-mei {
+	padding: 8px 8px;
+}
+
+
 // Does not work with Firefox and not very well with Safari
 @media print 
 {
