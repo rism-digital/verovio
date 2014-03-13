@@ -48,6 +48,11 @@ p a {
 	padding: 8px 8px;
 }
 
+code.panel-header {
+	background-color: #464646;
+	color: #f9f2f4;
+}
+
 
 // Does not work with Firefox and not very well with Safari
 @media print 

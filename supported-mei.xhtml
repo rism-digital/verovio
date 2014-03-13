@@ -4,6 +4,122 @@ verovio-light: true
 title: Verovio Supported MEI
 active: how
 how-active: how-mei
+
+classes:
+  - id: "accid"
+    attributes:
+    - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'."]
+    - ["oloc", ""]
+    - ["ploc", ""] 
+  - id: "beam"
+  - id: "barLine"
+  - id: "clef"
+    attributes:
+      - ["line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'."]
+      - ["shape", "Supported values are 'C', 'F' and 'G'."]
+  - id: "custos"
+    attributes:
+    - ["oct", ""]
+    - ["pname", ""] 
+  - id: "dot"
+    attributes:
+    - ["oloc", ""]
+    - ["ploc", ""] 
+  - id: "layer"
+    attributes:
+      - ["n", "The order of the <code>&lt;layer&gt;</code> elements must correspond to the values (1-based)."]
+  - id: "measure"
+    attributes:
+      - ["n", ""]
+  - id: "mensur"
+    attributes: 
+      - ["dot", ""]
+      - ["orient", "Only reversed is supported."]	  
+      - ["num", ""]
+      - ["numbase", ""]
+      - ["slash", "Only 1 slash is supported."]
+  - id: "mRest"
+  - id: "multiRest"
+    attributes:
+      - ["num", ""]
+  - id: "note"
+    attributes:
+      - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'."]
+      - ["colored", ""]
+      - ["dots", ""]
+      - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128."]
+      - ["grace", "Currently all values will be treated undifferently"]
+      - ["lig", ""]
+      - ["oct", ""]
+      - ["pname", ""]
+      - ["tie", ""]	  
+  - id: "rest"
+    attributes:
+      - ["dots", ""]
+      - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128."]
+      - ["oloc", ""]
+      - ["ploc", ""] 
+  - id: "scoreDef"
+    attributes:
+      - ["clef.dis", "Only value '8' is supported and it assumes shape 'G' and line 2."]
+      - ["clef.line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'."]
+      - ["clef.shape", "Supported values are 'C', 'F' and 'G'."]
+      - ["key.sig", "Mixed key signatures are not supported."]
+  - id: "staff"
+    attributes:
+      - ["n", "The order of the <code>&lt;staff&gt;</code> elements must correspond to the values (1-based)."]
+      - ["uly", "This is used for positionned page-based encoding."]
+  - id: "staffDef"
+    attributes:
+      - ["n", "The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based)."]
+      - ["clef.line", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>."]
+      - ["clef.shape", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>."]
+      - ["clef.gis", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>."]
+      - ["key.sig", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>."]
+  - id: "staffGrp"
+    attributes:
+      - ["symbol", "Supported values are 'brace', 'bracket' and 'line'. Default value is 'none' (no symbol)."]
+      - ["barthru", "Default value is 'false'."]
+  - id: "tuplet"
+    attributes:   
+      - ["num", ""]
+      - ["numbase", ""]
+ 
+page-based-classes:
+  - id: "page"
+    no-doc: true
+    comment: "Several attributes of <code>&lt;page&gt;</code> are stored in the <code>&lt;scoreDef&gt;</code> element in uncustomized MEI."
+    attributes:
+      - ["page.height", ""]
+      - ["page.leftmar", ""]
+      - ["page.rightmar", ""]
+      - ["page.topmar", ""]
+      - ["page.width", ""]
+      - ["surface", ""]
+  - id: "secb"
+    no-doc: true
+    comment: "Currently, <code>&lt;secb&gt;</code> elements are not handled."
+  - id: "system"
+    no-doc: true
+    comment: "Several attributes of <code>&lt;system&gt;</code> are stored in the <code>&lt;scoreDef&gt;</code> element in uncustomized MEI."
+    attributes:
+      - ["system.leftmar", ""]
+      - ["system.rightmar", ""]
+      - ["uly", "This is used for positionned page-based encoding."]
+
+loaded-classes:
+  - id: "pb"
+    comment: "During import, <code>&lt;pb&gt;</code> elements are converted to <code>&lt;page&gt;</code> elements unless the <code>--ignore-layout</code> or the <code>--no-layout</code> option was selected."
+  - id: "sb"
+    comment: "During import, <code>&lt;sb&gt;</code> elements are converted to <code>&lt;system&gt;</code> elements unless the <code>--ignore-layout</code> or the <code>--no-layout</code> option was selected."
+  - id: "score"
+  - id: "section"
+    comment: "During import, <code>&lt;section&gt;</code> elements are converted to <code>&lt;secb&gt;</code> elements."
+  - id: "tupletSpan"
+    comment: "During import and whenever possible, <code>&lt;tupletSpan&gt;</code> elements are converted to <code>&lt;tuplet&gt;</code> elements."
+
+
+mei-doc-root: http://music-encoding.org/documentation/guidelines2013/ 
 ---
 
 <div class="row">
@@ -15,7 +131,41 @@ how-active: how-mei
 	
 	<div class="col-md-9">
 		<div class="panel panel-default">
-			<div class="panel-body" id="feature">
+			<div class="panel-body">
+					
+				<p>
+					This page documents the elements and attributes that are currently supported by Vevorio. It is also important to note that the hierarchy of elements supported by Verovio is limited and that it will also determine wherether an MEI document can be rendered or not.
+				</p>
+									
+				<h3>MEI elements</h3>
+				<p>
+					Vevorio supports a subset of MEI elements and attributes that are documented here. Additional elements and attributes will be added in the future.
+				</p>				
+				
+					{% for class in page.classes %}
+						{% include mei-class.html %}
+					{% endfor %}
+
+				<h3>Page-based customization elements</h3>
+				<p>
+					A few elements supported by Verovio are defined in the page-based customization describe on the <a href="{{ site.baseurl}}/structure.xhtml">structure</a> page.
+				</p>					
+					{% for class in page.page-based-classes %}
+						{% include mei-class.html %}
+					{% endfor %}
+					
+				<h3>Load-only MEI elements</h3>
+				<p>
+					Verovio can load both page-based customized and uncustomized MEI documents. When loading uncustomized MEI documents, some MEI elements are loaded by Verovio and converted to a page-based representation. Typically, <code>&lt;pb&gt;</code> milestone elements are converted to <code>&lt;page&gt;</code> container elements. Oppositely, <code>&lt;section&gt;</code> container elements are converted to <code>&lt;secb&gt;</code> milestone elements.
+				</p>
+				<p>
+					There are also some MEI elements that Verovio can load but only if they can be converted to an alternate MEI representation. For example, Verovio can load <code>&lt;tupletSpan&gt;</code> elements but only when then can be appropriately converted to <code>&lt;tuplet&gt;</code> elements. Verovio tries to perfom the convertions when loading the document. This has nothing to do with the page-based customization.
+				</p>					
+					{% for class in page.loaded-classes %}
+						{% include mei-class.html %}
+					{% endfor %}
+				
+				
 			</div>
 		</div>
 	</div>
