@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-model href="./mei-page-based.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title />
+            </titleStmt>
+            <pubStmt>
+                <date>4 December 2013</date>
+            </pubStmt>
+        </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Tuplets example</p>
+            </projectDesc>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" key.sig="0">
+                        <staffGrp symbol="line">
+                            <staffGrp xml:id="P1" symbol="brace" label="Part_1">
+                                <staffDef n="1" lines="5" clef.line="2" clef.shape="G" key.sig="0"/>
+                                <staffDef n="2" lines="5" clef.line="4" clef.shape="F" key.sig="0"/>
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <!-- tuplet element -->
+                                    <beam>
+                                        <note xml:id="d1e41.1" pname="d" oct="5" dur="8"/>
+                                        <note xml:id="d1e66.1" pname="e" oct="5" dur="16"/>
+                                        <note xml:id="d1e90.1" pname="d" oct="5" dur="16"/>
+                                        <note xml:id="d1e114.1" pname="e" oct="5" dur="8" accid="s">
+                                        </note>
+                                    </beam>   
+                                    <beam>
+                                        <note xml:id="d1e41.2" pname="d" oct="5" dur="8"/>
+                                        <note xml:id="d1e66.2" pname="e" oct="5" dur="16" dots="1"/>
+                                        <note xml:id="d1e90.2" pname="d" oct="5" dur="32"/>
+                                        <note xml:id="d1e114.2" pname="e" oct="5" dur="8" accid="s">
+                                        </note>
+                                    </beam>
+                                   <beam>
+                                        <note xml:id="d1e41.3" pname="d" oct="5" dur="16"/>
+                                        <note xml:id="d1e42.3" pname="c" oct="5" dur="16" accid="s"/>
+                                        <note xml:id="d1e66.3" pname="d" oct="5" dur="16"/>
+                                        <note xml:id="d1e90.3" pname="c" oct="5" dur="16" accid="s"/>
+                                        <note xml:id="d1e114.3" pname="d" oct="5" dur="8"/>
+                                    </beam>
+                                    <note xml:id="d1e427.1" dur="4" pname="g" oct="4"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="d1e480.1" dur="8" pname="g" oct="3"/>
+                                        <note xml:id="d1e534.1" dur="8" pname="g" oct="3"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d1e480.2" dur="8" pname="g" oct="3"/>
+                                        <note xml:id="d1e534.2" dur="8" pname="g" oct="3"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d1e480.3" dur="8" pname="g" oct="3"/>
+                                        <note xml:id="d1e534.3" dur="8" pname="g" oct="3"/>
+                                    </beam>
+                                    <note xml:id="d1e427.2" dur="4" pname="a" oct="3"/>
+                                </layer>
+                            </staff>
+                        <tupletSpan startid="d1e41.1" endid="d1e114.1" num="3" numbase="2"/>
+                        <tupletSpan startid="d1e41.2" endid="d1e114.2" num="3" numbase="2"/>
+                        <tupletSpan startid="d1e41.3" endid="d1e114.3" num="3" numbase="2"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

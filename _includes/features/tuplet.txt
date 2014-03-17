@@ -1,0 +1,73 @@
+<measure n="1" xml:id="m1">
+  <staff n="1" xml:id="s1">
+    <layer n="1" xml:id="l1">
+      <beam xml:id="b1">
+        <tuplet xml:id="t1" num="7" numbase="6">
+          <note xml:id="n1" pname="f" oct="6" dur="16"/>
+          <note xml:id="n2" pname="e" oct="6" dur="16" accid="s"/>
+          <note xml:id="n3" pname="d" oct="6" dur="16"/>
+          <note xml:id="n4" pname="c" oct="6" dur="16"/>
+          <note xml:id="n5" pname="b" oct="5" dur="16"/>
+          <note xml:id="n6" pname="d" oct="6" dur="16"/>
+          <note xml:id="n7" pname="a" oct="5" dur="16"/>
+        </tuplet>
+      </beam>
+      <beam xml:id="b2">
+        <tuplet xml:id="t2" num="14" numbase="12">
+          <note xml:id="n8" pname="g" oct="5" dur="32" accid="x"/>
+          <note xml:id="n9" pname="f" oct="5" dur="32"/>
+          <note xml:id="n10" pname="e" oct="5" dur="32" accid="s"/>
+          <note xml:id="n11" pname="d" oct="5" dur="32"/>
+          <note xml:id="n12" pname="c" oct="5" dur="32" accid="x"/>
+          <note xml:id="n13" pname="e" oct="5" dur="32"/>
+          <note xml:id="n14" pname="d" oct="5" dur="32"/>
+          <note xml:id="n15" pname="c" oct="5" dur="32" accid="s"/>
+          <note xml:id="n16" pname="b" oct="4" dur="32"/>
+          <note xml:id="n17" pname="a" oct="4" dur="32"/>
+          <note xml:id="n18" pname="g" oct="4" dur="32" accid="x"/>
+          <note xml:id="n19" pname="f" oct="4" dur="32"/>
+          <note xml:id="n20" pname="e" oct="4" dur="32" accid="s"/>
+          <note xml:id="n21" pname="d" oct="4" dur="32"/>
+        </tuplet>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="2" xml:id="s2">
+    <layer n="1" xml:id="l2">
+      <beam>
+        <note xml:id="n22" dur="8" pname="a" oct="2"/>
+        <note xml:id="n23" dur="8" pname="f" oct="3"/>
+        <note xml:id="n24" dur="8" pname="f" oct="4"/>
+        <note xml:id="n25" dur="8" pname="g" oct="3" accid="s"/>
+        <note xml:id="n26" dur="8" pname="b" oct="3"/>
+        <note xml:id="n27" dur="8" pname="f" oct="3"/>
+      </beam>
+    </layer>
+  </staff>
+</measure>
+<measure n="2" xml:id="m2">
+  <staff n="1" xml:id="s3">
+    <layer n="1" xml:id="l3">
+      <note xml:id="n28" pname="c" oct="4" dur="8" accid="x"/>
+      <note xml:id="n29" pname="a" oct="4" dur="4" dots="1"/>
+      <beam>
+        <note xml:id="n30" pname="b" oct="4" dur="8"/>
+        <note xml:id="n31" pname="b" oct="4" dur="8" accid="s"/>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="2" xml:id="s4">
+    <layer n="1" xml:id="l4">
+      <beam>
+        <tuplet xml:id="t3" num="5" numbase="3">
+          <note xml:id="n32" dur="8" pname="a" oct="2"/>
+          <note xml:id="n33" dur="8" pname="e" oct="3" accid="s"/>
+          <note xml:id="n34" dur="8" pname="a" oct="3"/>
+          <note xml:id="n35" dur="8" pname="c" oct="4" accid="x"/>
+          <note xml:id="n36" dur="8" pname="e" oct="3"/>
+        </tuplet>
+      </beam>
+      <note xml:id="n37" pname="e" oct="4" dur="4" dots="1" accid="s"/>
+    </layer>
+  </staff>
+</measure>

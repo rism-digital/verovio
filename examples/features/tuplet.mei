@@ -30,7 +30,7 @@
                     </scoreDef>
                     <section>
                         <pb/>
-                        <measure n="1" xml:id="m1">
+                        <measure n="1" xml:id="m1" label="feature-example" >
                             <staff n="1" xml:id="s1">
                                 <layer n="1" xml:id="l1">
                                     <beam xml:id="b1">
@@ -77,7 +77,7 @@
                                 </layer>
                             </staff>
                         </measure>
-                        <measure n="2" xml:id="m2">
+                        <measure n="2" xml:id="m2" label="feature-example">
                             <staff n="1" xml:id="s3">
                                 <layer n="1" xml:id="l3">
                                     <note xml:id="n28" pname="c" oct="4" dur="8" accid="x"/>

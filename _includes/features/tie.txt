@@ -1,0 +1,26 @@
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <beam>
+        <note dur="8" oct="4" pname="e" xml:id="ed4n0v1b1s1"/>
+        <note dur="8" oct="4" pname="d" xml:id="dd4n128v1b1s1"/>
+        <note dur="8" oct="4" pname="e" xml:id="ed4n256v1b1s1"/>
+        <note dur="8" oct="4" pname="d" xml:id="dd4n384v1b1s1" tie="i"/>
+      </beam>
+      <beam>
+        <note dur="8" oct="4" pname="d" xml:id="dd4n512v1b1s1" tie="t"/>
+        <note dur="8" oct="4" pname="c" xml:id="cd4n640v1b1s1"/>
+        <note dur="8" oct="4" pname="d" xml:id="dd4n768v1b1s1"/>
+        <note dur="8" oct="4" pname="c" xml:id="cd4n896v1b1s1" tie="i"/>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="2">
+    <layer n="1">
+      <note dur="4" oct="3" pname="c" xml:id="cd3n0v1b1s2"/>
+      <note dur="4" oct="3" pname="c" xml:id="cd3n256v1b1s2"/>
+      <note dur="4" oct="2" pname="b" xml:id="bd2n512v1b1s2"/>
+      <note dur="4" oct="2" pname="b" xml:id="bd2n768v1b1s2"/>
+    </layer>
+  </staff>
+</measure>

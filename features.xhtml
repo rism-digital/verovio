@@ -5,10 +5,18 @@ title: Verovio Features
 active: how
 how-active: how-features
 features:
-    - id: "tuplet"
-      name: "Tuplet"
     - id: "scoredef"
-      name: "ScoreDef"
+      name: "Score and barlines"
+    - id: "clefs"
+      name: "Clef changes"
+    - id: "ties"
+      name: "Ties"
+    - id: "tuplets"
+      name: "Tuplets"  
+    - id: "mensural"
+      name: "Mensural notation"
+    - id: "grace"
+      name: "Grace notes"
 ---
 
 <div class="row">
@@ -73,15 +81,23 @@ features:
 	}
 
 	$( document ).ready(function() {
+		
 		var id = getParameterByName("id");
 		if (!id) {
 			id = "{{ page.features[0].id }}";
 		}
 		var file = "features/" + id + ".html";	
 		// load the file	
-		$( "#feature" ).load( file );
+		$( "#feature" ).load( file, function() {		  
+	  		$(".toggle_code").click(function(){
+	  			$( "#" + $(this).attr("id") + "-xml" ).toggle();
+	  		  	$("span", this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+	  		});
+		  
+		});
 		// activate the link menu
 		$( "#link-" + id ).addClass( "active" );
+				
 	});
 //]]>
 </script>
