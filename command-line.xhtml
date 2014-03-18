@@ -1,7 +1,7 @@
 ---
 layout: verovio
 verovio-light: true
-title: Verovio – Command-line
+title: Verovio Command-line
 active: how
 how-active: how-cmd
 options:
@@ -46,7 +46,7 @@ additional-options:
 				<p>
 					Width the <a href="{{ site.baseurl }}/examples/downloads/Hummel_Concerto_for_trumpet.mei">Hummel concerto for trumpet</a> example, this is what you should obtain:
 				</p>
-				<div id="hummel-p1">
+				<div id="hummel-p1" style="display: none;">
 					{% include svg/hummel-p1.svg %}
 				</div>
 				
@@ -75,7 +75,7 @@ additional-options:
 					The following example shows how to ignore the layout information contained in the MEI file and to let it recalculated by Vevorio, here with a specific page width and page height. The second page of the <a href="{{ site.baseurl }}/examples/downloads/Guami_Canzona_24.mei">Guami canzona</a> example can be typeset with the following command:
 				</p>
 				{% highlight bash %}$ verovio -f mei --ignore-layout -h 2100 -w 4200 -b 100 --page=2 -o output.svg Guami_Canzona_24.mei{% endhighlight %}
-				<div id="guami-p2">
+				<div id="guami-p2" style="display: none;">
 					{% include svg/guami-p2.svg %}
 				</div>
 				
@@ -88,6 +88,7 @@ additional-options:
 //<![CDATA[
 	function adjust_svg_size( div, pageWidth, pageHeight, zoom ) {
 		// adjust the size according to the width of the div
+		$( div ).show();
 		width = $( div ).width();
 		if ( width < zoom * pageWidth / 100 ) {
 			zoom = width * 100 / pageWidth;
