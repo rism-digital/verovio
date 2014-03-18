@@ -1,13 +1,12 @@
 ---
 ---
-
 <h3>Tuplet</h3>
+
+
 <p>
-	The Plain and Easy (PAE) code is a simple music code for transcribing short monophonic incipits. It is mostly used by the Répertoire International des Sources Musicales (RISM) for inventorying the music incipits of the manuscripts. More information about the syntax is available on the <a href="http://www.iaml.info/en/activities/projects/plain_and_easy_code" target="_blank">IAML</a> website.
+	Verovio supports tuplets, with no particular constraint on the content (e.g, notes, beams, etc.).
 </p>
-
 <div id="svg_output" style="overflow:auto;"/>
-
 <script type="text/javascript">
 //<![CDATA[
 	zoom = 40;
@@ -33,8 +32,10 @@
 </div>
 
 
+<p>
+	Verovio also supports tuplet spans, an alternate MEI approach for encoding tuplets. The limitation of Verovio <code>&lt;tupletSpan&gt;</code> element support is that they are supported as load-only elements. It means that they are converted to <code>&lt;tuplet&gt;</code> elements when the document is loaded, and this is possible only if all the elements contained by the tuplet have the same parent.
+</p>
 <div id="svg_output-2" style="overflow:auto;"/>
-
 <script type="text/javascript">
 //<![CDATA[
 	 pageWidth = 1450;

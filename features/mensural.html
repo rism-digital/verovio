@@ -1,0 +1,27 @@
+---
+---
+<h3>Menusral notation</h3>
+
+
+<p>
+	Coming soon.
+</p>
+
+<div id="svg_output" style="overflow:auto;"/>
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	pageWidth = 800;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+
+	$.get( "{{ site.baseurl }}/examples/features/tie.mei" , function( data ) {
+		//load_data( data, $('#svg_output') );
+	});
+//]]>
+</script>
+
