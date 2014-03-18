@@ -32,6 +32,7 @@ downloads:
 
 	function upload_file(option_form, format) {
 		
+		$('#submit-btn').popover('hide');
 		var file = $("#mei_files", option_form).prop('files')[0];
 		var reader = new FileReader();
 
@@ -238,10 +239,10 @@ downloads:
 				<form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
 					<div class="row">
 						<div class="col-md-10">
-							<input type="file" id="mei_files" name="file" style="margin: 4px 0px 8px 0px;"/>
+							<input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
 						</div>
 						<div class="col-md-2">
-							<button type="submit" class="btn btn-default btn-sm pull-right">Render</button>
+							<button type="submit" id="submit-btn" class="btn btn-default btn-sm pull-right popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to load the MEI file!" data-trigger="manual">Render</button>
 						</div>
 					</div>
 					<!-- /.row -->
