@@ -106,9 +106,6 @@ public:
      */
     int m_yAbs;
     
-    /** indicates this staff is in anchent notation (unused?) */
-    bool m_mensuralNotation;
-    
 	/** portee en notation ancienne (wolfgang legacy) */
 	char notAnc;
 	/** portee grise (wolfgang legacy) */

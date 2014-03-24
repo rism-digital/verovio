@@ -280,6 +280,11 @@ int main(int argc, char** argv)
         exit(1);
     }
     
+    // Hardvode svg ext for now
+    if (outfile.empty()) {
+        outfile = removeExtension(infile) + ".svg";
+    }
+    
     cerr << "Reading " << infile << "..." << endl;
     
     if ( !controller.LoadFile( infile ) ) {
