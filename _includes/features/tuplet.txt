@@ -44,6 +44,7 @@
       </beam>
     </layer>
   </staff>
+  <slur startid="n1" endid="n21"/>
 </measure>
 <measure n="2" xml:id="m2">
   <staff n="1" xml:id="s3">
@@ -70,4 +71,5 @@
       <note xml:id="n37" pname="e" oct="4" dur="4" dots="1" accid="s"/>
     </layer>
   </staff>
+  <slur startid="n28" endid="n29"/>
 </measure>

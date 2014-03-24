@@ -1,0 +1,33 @@
+<measure n="4" right="end">
+  <staff n="1">
+    <layer n="1">
+      <note dur="8" grace="acc" oct="4" pname="a" xml:id="p1cad4n0g9900v1b4s1"/>
+      <note dur="4" oct="5" pname="c" xml:id="p1ccd5n0v1b4s1"/>
+      <beam>
+        <note dur="8" grace="acc" oct="5" pname="g" xml:id="p1cgd5n256g10500v1b4s1"/>
+        <note dur="8" grace="acc" oct="5" pname="c" xml:id="p1ccd5n256g10500v1b4s1"/>
+        <note dur="8" grace="acc" oct="5" pname="d" xml:id="p1cdd5n256g10500v1b4s1"/>
+      </beam>
+      <note dur="4" oct="5" pname="c" xml:id="p1ccd5n256v1b4s1"/>
+      <beam>
+        <note dur="8" grace="acc" oct="6" pname="d" xml:id="p1cdd6n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="6" pname="c" xml:id="p1ccd6n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="5" pname="b" xml:id="p1cbd5n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="5" pname="a" xml:id="p1cad5n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="5" pname="g" xml:id="p1cgd5n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="5" pname="f" xml:id="p1cfd5n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="5" pname="e" xml:id="p1ced5n1536g16800v1b5s1"/>
+        <note dur="8" grace="acc" oct="5" pname="d" xml:id="p1cdd5n1536g16800v1b5s1"/>
+        <note dur="16" grace="acc" oct="5" pname="c" xml:id="p1ccd5n1536g16800v1b5s1"/>
+        <note dur="16" grace="acc" oct="4" pname="b" xml:id="p1cbd4n1536g16800v1b5s1"/>
+        <note dur="16" grace="acc" oct="4" pname="a" accid="f" xml:id="p1cad4n1536g16800v1b5s1"/>
+        <note dur="16" grace="acc" oct="5" pname="c" xml:id="p1ccd5n1536g16800v1b5s2"/>
+        <note dur="32" grace="acc" oct="4" pname="b" xml:id="p1cbd4n1536g16800v1b5s2"/>
+        <note dur="32" grace="acc" oct="4" pname="f" xml:id="p1cfd4n1536g16800v1b5s2"/>
+        <note dur="64" grace="acc" oct="4" pname="g" xml:id="p1cgd4n1536g16800v1b5s1"/>
+        <note dur="64" grace="acc" oct="4" pname="c" xml:id="p1ccd4n1536g16800v1b5s1"/>
+      </beam>
+      <note dur="2" oct="4" pname="d" xml:id="p1cdd4n1536v1b5s1"/>
+    </layer>
+  </staff>
+</measure>

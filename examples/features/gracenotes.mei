@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
+<meiHead>
+	<fileDesc>
+		<titleStmt>
+			<title>Grace notes example</title>
+			<respStmt>
+				<persName/>
+			</respStmt>
+		</titleStmt>
+		<pubStmt></pubStmt>
+	</fileDesc>
+</meiHead>
+<music>
+	<body>
+		<mdiv>
+			<score>
+				<scoreDef>
+					<staffGrp>
+						<staffDef n="1" clef.line="2" clef.shape="G" key.mode="major" key.sig="2s" lines="5" xml:id="sd1"/>
+					</staffGrp>
+				</scoreDef>
+				<section>
+					<pb n="1"/>
+					<measure n="1">
+						<staff n="1">
+							<layer n="1">
+								<note dur="8" grace="acc" oct="4" pname="b" xml:id="p1cbd4n0g3900v1b2s1"/>
+								<note dur="2" oct="4" pname="d" xml:id="p1cdd4n0v1b2s1"/>
+								<note dur="8" grace="acc" oct="4" pname="a" xml:id="p1cad4n256g4500v1b2s1"/>
+								<note dur="4" oct="4" pname="d" xml:id="p1cdd4n256v1b2s1"/>
+								<note dur="8" grace="acc" oct="4" pname="g" xml:id="p1cgd4n512g5100v1b2s1"/>
+								<note dur="4" oct="4" pname="d" xml:id="p1cdd4n512v1b2s1"/>
+								
+							</layer>
+						</staff>
+					</measure>
+					<measure n="2">
+						<staff n="1">
+							<layer n="1">
+							    <note dur="8" grace="acc" oct="4" pname="f" xml:id="p1cfd4n768g5700v1b2s1"/>
+								<note dur="4" oct="4" pname="d" xml:id="p1cdd4n768v1b2s1"/>
+								<note dur="8" grace="acc" oct="4" pname="e" xml:id="p1ced4n1024g6300v1b2s1"/>
+								<note dur="4" oct="4" pname="d" xml:id="p1cdd4n1024v1b2s1"/>
+								<note dur="8" grace="acc" oct="4" pname="e" xml:id="p1ced4n0g6900v1b3s1"/>
+								<note dur="2" oct="5" pname="c" xml:id="p1ccd5n0v1b3s1"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="3">
+						<staff n="1">
+							<layer n="1">
+							    <note dur="8" grace="acc" oct="4" pname="f" xml:id="p1cfd4n256g7500v1b3s1"/>
+								<note dur="4" oct="5" pname="c" xml:id="p1ccd5n256v1b3s1"/>
+								<note dur="8" grace="acc" oct="4" pname="g" xml:id="p1cgd4n512g8100v1b3s1"/>
+								<note dur="4" oct="5" pname="c" xml:id="p1ccd5n512v1b3s1"/>
+								<note dur="8" grace="acc" oct="4" pname="a" xml:id="p1cad4n768g8700v1b3s1"/>
+								<note dur="4" oct="5" pname="c" xml:id="p1ccd5n768v1b3s1"/>
+								<note dur="8" grace="acc" oct="4" pname="b" xml:id="p1cbd4n1024g9300v1b3s1"/>
+								<note dur="4" oct="5" pname="c" xml:id="p1ccd5n1024v1b3s1"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="4" right="end" label="feature-example">
+						<staff n="1">
+							<layer n="1">
+								<note dur="8" grace="acc" oct="4" pname="a" xml:id="p1cad4n0g9900v1b4s1"/>
+								<note dur="4" oct="5" pname="c" xml:id="p1ccd5n0v1b4s1"/>
+							    <beam>
+    								<note dur="8" grace="acc" oct="5" pname="g" xml:id="p1cgd5n256g10500v1b4s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="c" xml:id="p1ccd5n256g10500v1b4s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="d" xml:id="p1cdd5n256g10500v1b4s1"/>
+							    </beam>
+								<note dur="4" oct="5" pname="c" xml:id="p1ccd5n256v1b4s1"/>
+							    <beam>
+    								<note dur="8" grace="acc" oct="6" pname="d" xml:id="p1cdd6n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="6" pname="c" xml:id="p1ccd6n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="b" xml:id="p1cbd5n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="a" xml:id="p1cad5n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="g" xml:id="p1cgd5n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="f" xml:id="p1cfd5n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="e" xml:id="p1ced5n1536g16800v1b5s1"/>
+    								<note dur="8" grace="acc" oct="5" pname="d" xml:id="p1cdd5n1536g16800v1b5s1"/>
+    								<note dur="16" grace="acc" oct="5" pname="c" xml:id="p1ccd5n1536g16800v1b5s1"/>
+    								<note dur="16" grace="acc" oct="4" pname="b" xml:id="p1cbd4n1536g16800v1b5s1"/>
+    								<note dur="16" grace="acc" oct="4" pname="a" accid="f" xml:id="p1cad4n1536g16800v1b5s1"/>
+    								<note dur="16" grace="acc" oct="5" pname="c" xml:id="p1ccd5n1536g16800v1b5s2"/>
+    								<note dur="32" grace="acc" oct="4" pname="b" xml:id="p1cbd4n1536g16800v1b5s2"/>
+    								<note dur="32" grace="acc" oct="4" pname="f" xml:id="p1cfd4n1536g16800v1b5s2"/>
+    								<note dur="64" grace="acc" oct="4" pname="g" xml:id="p1cgd4n1536g16800v1b5s1"/>
+    								<note dur="64" grace="acc" oct="4" pname="c" xml:id="p1ccd4n1536g16800v1b5s1"/>
+							    </beam>
+								<note dur="2" oct="4" pname="d" xml:id="p1cdd4n1536v1b5s1"/>
+							</layer>
+						</staff>
+					</measure>
+				</section>
+			</score>
+		</mdiv>
+	</body>
+</music>
+</mei>
