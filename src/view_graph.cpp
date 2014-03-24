@@ -195,9 +195,9 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int
         DoLyricCursor( x, y, dc, s );	
 }
 
-void View::DrawTieBezier(DeviceContext *dc, int x, int y, int x1, bool direction)
+void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT, std::min( 1 * m_doc->m_drawingInterl[0], abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT, std::min( 2 * m_doc->m_drawingInterl[0] / 2, abs( x1 - x ) / 4 ) );
     
     int thickness = std::max( m_doc->m_drawingInterl[0] / 3, MIN_TIE_THICKNESS );
     
@@ -211,12 +211,12 @@ void View::DrawTieBezier(DeviceContext *dc, int x, int y, int x1, bool direction
     
     if (direction) {
         // tie goes up
-        top_y = y - height;
+        top_y = std::min(y, y1) - height;
         // the second bezier in internal
         top_y_fill = top_y + thickness;
     } else {
         //tie goes down
-        top_y = y + height;
+        top_y = std::max(y, y1) + height;
         // second bezier is internal as above
         top_y_fill = top_y - thickness;
     }
@@ -224,7 +224,7 @@ void View::DrawTieBezier(DeviceContext *dc, int x, int y, int x1, bool direction
     // Points for first bez, they go from xy to x1y1
     bez1[0] = ToDeviceContextX(x + one); bez1[1] = ToDeviceContextY(top_y);
     bez1[2] = ToDeviceContextX(x + two); bez1[3] = ToDeviceContextY(top_y);
-    bez1[4] = ToDeviceContextX(x1); bez1[5] = ToDeviceContextY(y);
+    bez1[4] = ToDeviceContextX(x1); bez1[5] = ToDeviceContextY(y1);
     
     // second bez. goes back
     bez2[0] = ToDeviceContextX(x + two); bez2[1] = ToDeviceContextY(top_y_fill);

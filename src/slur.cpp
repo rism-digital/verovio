@@ -8,6 +8,10 @@
 
 #include "slur.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -17,22 +21,31 @@ namespace vrv {
 Slur::Slur():
 LayerElement("slur-")
 {
+    m_first = NULL;
+    m_second = NULL;
 }
 
 
 Slur::~Slur()
 {
+    if (m_first && m_first->GetSlurAttrTerminal() == this) {
+        m_first->ResetSlurAttrInitial();
+    }
+    if (m_second && m_second->GetSlurAttrTerminal() == this) {
+        m_second->ResetSlurAttrTerminal();
+    }
 }
 
-void Slur::AddNote(LayerElement *element) {
-    
-    if (!element->HasDurationInterface()) {
-        return;
-    }
+void Slur::SetFirstNote( Note *note )
+{
+    assert( !m_first );
+    m_first = note;
+}
 
-    m_children.push_back(element);
-    Modify();
-    
+void Slur::SetSecondNote( Note *note )
+{
+    assert( !m_second );
+    m_second = note;
 }
 
 } // namespace vrv

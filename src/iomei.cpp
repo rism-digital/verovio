@@ -1605,6 +1605,11 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
             LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
         }
     }
+    else if ( std::string( element.name() ) == "slur" ) {
+        if (!ReadSlurAsSlurAttr( element )) {
+            LogWarning( "<slur> not readable as @slur and ignored" );
+        }
+    }
     /*
     else if ( std::string( element.name() ) == "staff" ) {
         LogDebug( "staff" );
@@ -1659,6 +1664,44 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
     return true;
 }
     
+bool MeiInput::ReadSlurAsSlurAttr(pugi::xml_node slur)
+{
+    assert( m_measure );
+    
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+    
+	// position (pitch)
+	if ( slur.attribute( "startid" ) ) {
+        std::string refId = ExtractUuidFragment( slur.attribute( "startid" ).value() );
+        start = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+
+        if (!start || !start->IsNote()) {
+            LogWarning( "Note with @startid '%s' not found when trying to read the <slur>", refId.c_str() );
+        }    
+        
+	}
+	if ( slur.attribute( "endid" ) ) {
+        std::string refId = ExtractUuidFragment( slur.attribute( "endid" ).value() );
+        end = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+        
+        if (!end || !end->IsNote()) {
+            LogWarning( "Note with @endid '%s' not found when trying to read the <slur>", refId.c_str() );
+        }
+	}
+    Note *startNote = dynamic_cast<Note*>(start);
+    Note *endNote = dynamic_cast<Note*>(end);
+    
+    if (!start || !end || !startNote || !endNote) {
+        return false;
+    }
+    
+    startNote->SetSlurAttrInitial();
+    endNote->SetSlurAttrTerminal( startNote );
+    return true;
+
+}
+    
 bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
 {
     assert( m_measure );
@@ -1671,30 +1714,30 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     
     // Read in the numerator and denominator properties
     if ( tupletSpan.attribute( "num" ) ) {
-		tuplet->SetNum(atoi( tupletSpan.attribute( "num" ).value() ));
-	}
+        tuplet->SetNum(atoi( tupletSpan.attribute( "num" ).value() ));
+    }
     if ( tupletSpan.attribute( "numbase" ) ) {
-		tuplet->SetNumBase(atoi( tupletSpan.attribute( "numbase" ).value() ));
-	}
+        tuplet->SetNumBase(atoi( tupletSpan.attribute( "numbase" ).value() ));
+    }
     
-	// position (pitch)
-	if ( tupletSpan.attribute( "startid" ) ) {
+    // position (pitch)
+    if ( tupletSpan.attribute( "startid" ) ) {
         std::string refId = ExtractUuidFragment( tupletSpan.attribute( "startid" ).value() );
         start = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
-
+        
         if (!start) {
             LogWarning( "Element with @startid '%s' not found when trying to read the <tupletSpan>", refId.c_str() );
-        }    
+        }
         
-	}
-	if ( tupletSpan.attribute( "endid" ) ) {
+    }
+    if ( tupletSpan.attribute( "endid" ) ) {
         std::string refId = ExtractUuidFragment( tupletSpan.attribute( "endid" ).value() );
         end = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
         
         if (!end) {
             LogWarning( "Element with @endid '%s' not found when trying to read the <tupletSpan>", refId.c_str() );
         }
-	}
+    }
     if (!start || !end) {
         delete tuplet;
         return false;
@@ -1720,7 +1763,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     }
     parentLayer->InsertChild( tuplet, startIdx );
     return true;
-
+    
 }
 
 bool MeiInput::FindOpenTie( Note *terminalNote )

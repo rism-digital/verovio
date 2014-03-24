@@ -28,6 +28,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "slur.h"
 #include "tie.h"
 #include "tuplet.h"
 
@@ -745,7 +746,6 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	return (code);
 }
 
-
 MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint center)
 {
     int distCenterX = (point.x - center.x);
@@ -766,95 +766,6 @@ MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint c
 	new_p.y += new_distCenterY;
 
     return new_p;
-}
-
-/**
-  x1 y1 = point de depart
-  x2 y2 = point d'arrivee
-  up = liaison vers le haut
-  heigth = hauteur de la liaison ( ‡ plat )
-  **/
-void View::DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height )
-{
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(layer->m_parent); // Pointer to staff cannot be NULL"
-
-    dc->SetPen( m_currentColour, 1, AxSOLID );
-    dc->SetBrush( m_currentColour, AxSOLID );
-
-
-    int distX = x1 - x2;
-    int distY = y1 - y2;
-    // pythagore, distance entre les points de depart et d'arrivee
-    int dist = (int)sqrt( pow( (double)distX, 2 ) + pow( (double)distY, 2 ) );
-
-	// angle
-    float alpha2 = float( distY ) / float( distX );
-    alpha2 = atan( alpha2 );
-	MusPoint orig(0,0);
-
-	int step = dist / 10; // espace entre les points
-	int nbpoints = dist / step;
-	dist += 2*step; // ajout d'un pas de chaque cote, supprime ‡ l'affichage
-	if ( nbpoints <= 2)
-		nbpoints = 3;
-	else if ( !(nbpoints % 2) ) // nombre impair de points
-		nbpoints++;
-
-	int i,j, k;
-	double a, b;
-	a = dist / 2; // largeur de l'ellipse
-	int nbp2 = nbpoints/2;
-	MusPoint *points = new MusPoint[2*nbpoints]; // buffer double - aller retour
-
-	// aller
-	b = 100; // hauteur de l'ellipse
-	points[nbp2].x = (int)a; // point central
-	points[nbp2].y = (int)b;
-	for(i = 0, j = nbpoints - 1, k = 1; i < nbp2; i++, j--, k++) // calcul de l'ellipse
-	{
-		points[i].x = k*step;
-		points[i+nbp2+1].y = (int)sqrt( (1 - pow((double)points[i].x,2) / pow(a,2)) * pow(b,2) );
-		points[j].x = dist - points[i].x;
-		points[j-nbp2-1].y = points[i+nbp2+1].y;		
-	}
-	int dec_y = points[0].y; // decalage y ‡ cause des 2 pas ajoutes
-	for(i = 0; i < nbpoints; i++)
-	{
-		points[i] = CalcPositionAfterRotation( points[i], alpha2, orig ); // rotation		
-		points[i].x = ToDeviceContextX( points[i].x + x1 - 1*step ); // transposition
-		points[i].y = ToDeviceContextY( points[i].y + y1 - dec_y );
-	}
-	dc->DrawSpline( nbpoints, points );
-
-	// retour idem
-	b = 90;	
-	points[nbp2+nbpoints].x = (int)a;
-	points[nbp2+nbpoints].y = (int)b;
-	for(i = nbpoints, j = 2*nbpoints - 1, k = 1; i < nbp2+nbpoints; i++, j--, k++)
-	{	
-		points[j].x = k*step;
-		points[i+nbp2+1].y = (int)sqrt( (1 - pow((double)points[j].x,2) / pow(a,2)) * pow(b,2) );
-		points[i].x = dist - points[j].x;
-		points[j-nbp2-1].y = points[i+nbp2+1].y;	
-	}
-	dec_y = points[nbpoints].y;
-
-	for(i = nbpoints; i < 2*nbpoints; i++)
-	{
-		points[i] = CalcPositionAfterRotation( points[i], alpha2, orig );
-		points[i].x = ToDeviceContextX( points[i].x + x1 - 1*step );
-		points[i].y = ToDeviceContextY( points[i].y + y1 - dec_y );
-	}
-	dc->DrawSpline( nbpoints, points+nbpoints );
-
-	// remplissage ?
-
-    dc->ResetPen( );
-    dc->ResetBrush( );
-
-	delete[] points;
-
 }
 
 void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure)
@@ -892,6 +803,8 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     DrawLayerList(dc, layer, staff, measure, &typeid(Tuplet) );
     // then ties
     DrawLayerList(dc, layer, staff, measure, &typeid(Tie) );
+    // then slurs
+    DrawLayerList(dc, layer, staff, measure, &typeid(Slur) );
     
 }
 
@@ -919,8 +832,10 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
             DrawTuplet( dc, tuplet, layer, staff );
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
-            Tie *tie = dynamic_cast<Tie*>(element);
-            DrawTie( dc, tie, layer, staff, measure );
+            DrawTie( dc, element, layer, staff, measure );
+        }
+        else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
+            DrawTie( dc, element, layer, staff, measure );
         }
     }
 }

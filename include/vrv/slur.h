@@ -28,19 +28,24 @@ public:
     
     virtual std::string GetClassName( ) { return "Slur"; };
     
-	int GetNoteCount() const { return (int)m_children.size(); };
-    
     /**
-     * Add an element (a note or a rest) to a beam.
-     * Only Note or Rest elements will be actually added to the beam.
+     * @name Set and get the first and second note of the tie
+     * The setter asserts that no note was previously set.
      */
-    void AddNote(LayerElement *element);
+    ///@{
+    void SetFirstNote( Note *note );
+    void SetSecondNote( Note *note );
+    Note *GetFirstNote() { return m_first; };
+    Note *GetSecondNote() { return m_second; };
+    ///@}
     
 private:
     
 public:
     
 private:
+    Note *m_first;
+    Note *m_second;
     
 };
 

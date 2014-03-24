@@ -34,6 +34,7 @@
 #include "symbol.h"
 #include "staff.h"
 #include "system.h"
+#include "slur.h"
 #include "tie.h"
 #include "tuplet.h"
 
@@ -107,7 +108,10 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (dynamic_cast<Tie*>(element)) {
         DrawTie(dc, element, layer, staff, measure);
-    } 
+    }
+    else if (dynamic_cast<Slur*>(element)) {
+        DrawTie(dc, element, layer, staff, measure);
+    }
     else if (dynamic_cast<Tuplet*>(element)) {
         DrawTupletElement(dc, element, layer, measure, staff);
     }
@@ -446,10 +450,10 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	if (note->m_slur[0])
 	{	
-        if (note->m_slur[0]==SLUR_TERMINAL)
-		{	/***liaison = OFF;	// pour tests de beam...
-			liais_note(hdc, this);***/
-		}
+        /***if (note->m_slur[0]==SLUR_TERMINAL)
+		{	liaison = OFF;	// pour tests de beam...
+			liais_note(hdc, this);
+		}***/
 		/***if (this->dliai && !attente)	premierLie = this;***/
 	}
     
@@ -562,6 +566,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     if ( note->GetTieAttrTerminal() ) {
         layer->AddToDrawingList( note->GetTieAttrTerminal() );
+    }
+    
+    // same for slurs
+    if ( note->GetSlurAttrInitial() ) {
+        Note *noteTerminal = note->GetSlurAttrInitial()->GetSecondNote();
+        if ( noteTerminal ) {
+            System *parentSystem1 = dynamic_cast<System*>( note->GetFirstParent( &typeid(System) ) );
+            System *parentSystem2 = dynamic_cast<System*>( noteTerminal->GetFirstParent( &typeid(System) ) );
+            if ( (parentSystem1 != parentSystem2) && parentSystem1 ) {
+                layer->AddToDrawingList( note->GetSlurAttrInitial() );
+            }
+        }
+    }
+    if ( note->GetSlurAttrTerminal() ) {
+        layer->AddToDrawingList( note->GetSlurAttrTerminal() );
     }
 
 	
@@ -1492,13 +1511,23 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Tie*>(element)); // The element must be a tie
+    assert(dynamic_cast<Tie*>(element) || dynamic_cast<Slur*>(element)); // The element must be a tie
     
     bool up = false;
+    LayerElement *note1 = NULL;
+    LayerElement *note2 = NULL;
+    
     
     Tie *tie = dynamic_cast<Tie*>(element);
-    LayerElement *note1 = tie->GetFirstNote();
-    LayerElement *note2 = tie->GetSecondNote();
+    Slur *slur = dynamic_cast<Slur*>(element);
+    if ( tie ) {
+        note1 = tie->GetFirstNote();
+        note2 = tie->GetSecondNote();
+    } else if ( slur ) {
+        note1 = slur->GetFirstNote();
+        note2 = slur->GetSecondNote();
+    }
+
     System *currentSystem = dynamic_cast<System*>( staff->GetFirstParent( &typeid(System) ) );
     System *parentSystem1 = NULL;
     System *parentSystem2 = NULL;
@@ -1525,7 +1554,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         int y = note1->GetDrawingY();
         int x2 = measure->GetDrawingX() + nextAlignement->GetXRel();
-        DrawTieBezier(dc, note1->GetDrawingX(), y - 14, x2, true);
+        DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y - 14, x2, y - 14, true);
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( parentSystem1 && currentSystem && ( parentSystem1 != currentSystem) ) {
@@ -1541,7 +1570,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         //int x1 = measure->m_drawingX + previousAlignement->GetXRel() + previousAlignement->GetMaxWidth();
         // is it actually better for x1 just to have a fixed value
         int x1 = note2->GetDrawingX() - m_doc->m_drawingStep2;
-        DrawTieBezier(dc, x1, y - 14, note2->GetDrawingX(), true);
+        DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);
     }
     // Finally the normal case, but double check we have two notes
     else if ( note1 && note2 ) {
@@ -1549,20 +1578,21 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         // Copied from DrawNote
         // We could use the stamDir information
         // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
-        int ynn = note1->GetDrawingY();
+        int y1 = note1->GetDrawingY();
+        int y2 = note2->GetDrawingY();
         int bby = staff->GetDrawingY();
         int milieu = bby - m_doc->m_drawingInterl[staff->staffSize] * 2;
         
-        up = (ynn < milieu) ? true : false;
+        up = (y1 < milieu) ? true : false;
         
         dc->StartGraphic( element, "tie", element->GetUuid() );
         
         // FIXME, take in account elements that can be netween notes, eg keys time etc
         // 20 height nice with 70, not nice with 50
         if (up)
-            DrawTieBezier(dc, note1->GetDrawingX(), note1->GetDrawingY() - 14, note2->GetDrawingX(), true);
+            DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y1 - 14, note2->GetDrawingX(), y2 - 14, true);
         else
-            DrawTieBezier(dc, note1->GetDrawingX(), note1->GetDrawingY() + 14, note2->GetDrawingX(), false);
+            DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y1 + 14, note2->GetDrawingX(), y2 + 14, false);
 
         dc->EndGraphic(element, this );
     }

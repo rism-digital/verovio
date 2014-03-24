@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "vrv.h"
+#include "slur.h"
 #include "tie.h"
 
 namespace vrv {
@@ -40,13 +41,17 @@ Note::Note():
     // tie pointers
     m_tieAttrInitial = NULL;
     m_tieAttrTerminal = NULL;
+    // slur pointers
+    m_slurAttrInitial = NULL;
+    m_slurAttrTerminal = NULL;
 }
 
 
 Note::~Note()
 {
-    // This deletes the Tie object if necessary
+    // This deletes the Tie and Slur objects if necessary
     ResetTieAttrInitial();
+    ResetSlurAttrInitial();
 }
 
 bool Note::operator==( Object& other )
@@ -146,6 +151,39 @@ void Note::ResetTieAttrInitial( )
 {
     if ( m_tieAttrInitial ) {
         // Deleting the Tie object will also reset the m_tieAttrTerminal of the second note
+        delete m_tieAttrInitial;
+        m_tieAttrInitial = NULL;
+    }
+}
+    
+void Note::SetSlurAttrInitial()
+{
+    if ( m_slurAttrInitial ) {
+        LogWarning("Initial slur attribute already set for note '%s", this->GetUuid().c_str() );
+        return;
+    }
+    m_slurAttrInitial = new Slur();
+    m_slurAttrInitial->SetFirstNote( this );
+}
+
+void Note::SetSlurAttrTerminal( Note *previousNote )
+{
+    if ( m_slurAttrTerminal ) {
+        LogWarning("Terminal slur attribute already set for note '%s", this->GetUuid().c_str() );
+        return;
+    }
+    if ( !previousNote || !previousNote->GetSlurAttrInitial() ) {
+        LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
+        return;
+    }
+    m_slurAttrTerminal = previousNote->GetSlurAttrInitial();
+    m_slurAttrTerminal->SetSecondNote( this );
+}
+
+void Note::ResetSlurAttrInitial( )
+{
+    if ( m_slurAttrInitial ) {
+        // Deleting the Slur object will also reset the m_slurAttrTerminal of the second note
         delete m_tieAttrInitial;
         m_tieAttrInitial = NULL;
     }

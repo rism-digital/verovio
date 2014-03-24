@@ -231,6 +231,7 @@ private:
     LayerElement *ReadMeiCustos( pugi::xml_node custos );
     LayerElement *ReadMeiDot( pugi::xml_node dot );
     bool ReadTupletSpanAsTuplet( pugi::xml_node tupletSpan );
+    bool ReadSlurAsSlurAttr( pugi::xml_node slur );
     /** Reads <app> elements. For now, only <app> within <layer> are taken into account */
     LayerElement *ReadMeiApp( pugi::xml_node app );
     bool ReadMeiRdg( pugi::xml_node rdg );

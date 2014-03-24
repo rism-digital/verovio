@@ -13,10 +13,6 @@
 #include "layerelement.h"
 #include "pitchinterface.h"
 
-#define SLUR_INITIAL  (1<<1)
-#define SLUR_MEDIAL  (1<<2) 
-#define SLUR_TERMINAL  (1<<3) 
-
 #define LIG_INITIAL  (1<<1)
 #define LIG_MEDIAL  (1<<2) 
 #define LIG_TERMINAL  (1<<3) 
@@ -29,6 +25,7 @@
 
 namespace vrv {
 
+class Slur;
 class Tie;
 
 //----------------------------------------------------------------------------
@@ -89,14 +86,29 @@ public:
     virtual int GetHorizontalSpacing( );
     
     /**
-     *
+     * @name Setters and getters for tie attributes
      */
+    ///@{
     void SetTieAttrInitial( );
     void SetTieAttrTerminal( Note *previousNote );
     Tie *GetTieAttrInitial( ) { return m_tieAttrInitial; };
     Tie *GetTieAttrTerminal( ) { return m_tieAttrTerminal; };
     void ResetTieAttrInitial();
     void ResetTieAttrTerminal() { m_tieAttrTerminal = NULL; };
+    ///@}
+    
+    /**
+     * @name Setters and getters for slur attributes.
+     * Only one attribute is currently supported.
+     */
+    ///@{
+    void SetSlurAttrInitial( );
+    void SetSlurAttrTerminal( Note *previousNote );
+    Slur *GetSlurAttrInitial( ) { return m_slurAttrInitial; };
+    Slur *GetSlurAttrTerminal( ) { return m_slurAttrTerminal; };
+    void ResetSlurAttrInitial();
+    void ResetSlurAttrTerminal() { m_slurAttrTerminal = NULL; };
+    ///@}
     
 private:
     
@@ -111,6 +123,19 @@ protected:
     ///@{
     Tie *m_tieAttrInitial;
     Tie *m_tieAttrTerminal;
+    ///@}
+    
+    /**
+     * @name Slur attributes are represented by pointers to Slur objects.
+     * There is one pointer for the initial attribute and one pointer for the end attribute.
+     * The Slur objects points back to the notes as it is the case with a MEI slur element.
+     * With attributes, the note with the initial attribute own the Slur object and take care of deleting it.
+     * Currenly only one single slub attribute (@slur="i1") is supported.
+     */
+     /* Note: we would need to change this to a Slur vector to support 1-6 slur attributes */
+    ///@{
+    Slur *m_slurAttrInitial;
+    Slur *m_slurAttrTerminal;
     ///@}
     
 public:
