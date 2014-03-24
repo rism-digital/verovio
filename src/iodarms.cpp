@@ -108,7 +108,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
     } else if (data[pos] == 'O') {
         if (data[pos + 1] == '/') {
             pos++;
-            LogMessage("O/ not supported");
+            LogWarning("DarmsInput: O/ not supported");
         }
         meter->m_sign = MENSUR_SIGN_O;
         pos++;
@@ -131,7 +131,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             meter->m_numBase = 1;
         } else {
             pos++;
-            if (data[pos] == '-') LogMessage("Time sig numbers should be divided with ':'.");
+            if (data[pos] == '-') LogWarning("DarmsInput: Time sig numbers should be divided with ':'.");
             // same as above, get one or two nums
             n1 = data[++pos] - ASCII_NUMBER_OFFSET; // old school conversion to int
             if (isdigit(data[pos + 1])) {
@@ -141,7 +141,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             
             meter->m_numBase = n1;
         }
-        LogMessage("Meter is: %i %i", meter->m_num, meter->m_numBase);
+        LogDebug("DarmsInput: Meter is: %i %i", meter->m_num, meter->m_numBase);
     }
     
     m_layer->AddElement(meter);
@@ -159,7 +159,7 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
         case 'I': // Voice nr.
             //the next digit should be a number, but we do not care what
             if (!isdigit(data[++pos])) {
-                LogMessage("Expected number after I");
+                LogWarning("DarmsInput: Expected number after I");
             }
             break;
             
@@ -173,7 +173,7 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
             if (data[pos] == '-' || data[pos] == '#') {
                 UnrollKeysig(quantity, data[pos]);
             } else {
-                LogMessage("Invalid char for K: %c", data[pos]);
+                LogWarning("DarmsInput: Invalid char for K: %c", data[pos]);
             }
             break;
             
@@ -194,7 +194,7 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
              NR	rest in place of notehead
              */
             if (!isdigit(data[++pos])) {
-                LogMessage("Expected number after N");
+                LogWarning("DarmsInput: Expected number after N");
             } else { // we honor only notehead 7, diamond
                 if (data[pos] == 0x07 + ASCII_NUMBER_OFFSET)
                     m_antique_notation = true;
@@ -221,14 +221,14 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             case 3: mclef->m_clefId = UT2; break;
             case 5: mclef->m_clefId = UT3; break;
             case 7: mclef->m_clefId = UT4; break;
-            default: LogMessage("Invalid C clef on line %i", position); break;
+            default: LogWarning("DarmsInput: Invalid C clef on line %i", position); break;
         }
         m_clef_offset = 21 - position; // 21 is the position in the array, position is of the clef
     } else if (data[pos] == 'G') {
         switch (position) {
             case 1: mclef->m_clefId = SOL1; break;
             case 3: mclef->m_clefId = SOL2; break;
-            default: LogMessage("Invalid G clef on line %i", position); break;
+            default: LogWarning("DarmsInput: Invalid G clef on line %i", position); break;
         }
         m_clef_offset = 25 - position;
     } else if (data[pos] == 'F') {
@@ -236,12 +236,12 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             case 3: mclef->m_clefId = FA3; break;
             case 5: mclef->m_clefId = FA4; break;
             case 7: mclef->m_clefId = FA5; break;
-            default: LogMessage("Invalid F clef on line %i", position); break;
+            default: LogWarning("DarmsInput: Invalid F clef on line %i", position); break;
         }
         m_clef_offset = 15 - position;
     } else {
         // what the...
-        LogMessage("Invalid clef specification: %c", data[pos]);
+        LogWarning("DarmsInput: Invalid clef specification: %c", data[pos]);
         return 0; // fail
     }
     
@@ -310,7 +310,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         case 'Z': duration = DUR_256; break;
             
         default:
-            LogMessage("Unkown note duration: %c", data[pos]);
+            LogWarning("DarmsInput: Unkown note duration: %c", data[pos]);
             return 0;
             break;
     }
@@ -377,8 +377,8 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
 
 bool DarmsInput::ImportFile() {
     char data[10000];
-    int len, res;
-    int pos = 0;
+    int len;
+    
     std::ifstream infile;
     
     infile.open(m_filename.c_str());
@@ -391,25 +391,34 @@ bool DarmsInput::ImportFile() {
     infile.getline(data, sizeof(data), '\n');
     len = strlen(data);
     infile.close();
-    LogMessage("len: %i, %s", len, data);
+    
+    return ImportString(data);
+}
+    
+bool DarmsInput::ImportString(std::string data_str) {
+    int len, res;
+    int pos = 0;
+    const char *data = data_str.c_str();
+    len = data_str.length();
     
     m_doc->Reset( Raw );
     System *system = new System();
     Page *page = new Page();
     m_staff = new Staff( 1 );
-    m_measure = new Measure( false, 1 );
+    m_measure = new Measure( true, 1 );
     m_layer = new Layer( 1 );
     
     m_current_tie = NULL;
     m_staff->AddLayer(m_layer);
     m_measure->AddStaff( m_staff );
+    system->AddMeasure( m_measure );
     
     // do this the C style, char by char
     while (pos < len) {
         char c = data[pos];
         
         if (c == '!') {
-            LogMessage("Global spec. at %i", pos);
+            LogDebug("DarmsInput: Global spec. at %i", pos);
             res = do_globalSpec(pos, data);
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
@@ -441,7 +450,6 @@ bool DarmsInput::ImportFile() {
     staffGrp->AddStaffDef( staffDef );
     m_doc->m_scoreDef.AddStaffGrp( staffGrp );
     
-    system->AddMeasure( m_measure );
     page->AddSystem( system );
     m_doc->AddPage( page );
     

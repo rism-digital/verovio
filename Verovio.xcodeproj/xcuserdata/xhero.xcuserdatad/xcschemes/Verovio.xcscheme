@@ -58,11 +58,27 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-o /Users/xhero/vrv_output.svg "
+            argument = "--adjust-page-height"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "/Users/xhero/vrv_input.pae"
+            argument = "-s 40"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-f darms"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-r /usr/local/share/verovio"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-o /Users/xhero/darms_out.svg"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "/Users/xhero/Documents/Aruspix.localized/001.darms"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
