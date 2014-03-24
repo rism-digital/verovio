@@ -970,6 +970,10 @@ bool MeiInput::ReadMeiScoreDef( pugi::xml_node scoreDef )
     if ( scoreDef.attribute( "clef.line" ) && scoreDef.attribute( "clef.shape" ).value() ) {
         Clef clef;
         clef.m_clefId = StrToClef( scoreDef.attribute( "clef.shape" ).value() , scoreDef.attribute( "clef.line" ).value() );
+        // this is obviously a short cut - assuming @clef.dis being SOLva
+        if ( scoreDef.attribute( "clef.dis" ) ) {
+            clef.m_clefId = SOLva;
+        }
         m_scoreDef->ReplaceClef( &clef );
         // add other attributes for SOLva
     }
@@ -1894,7 +1898,7 @@ int MeiInput::StrToKeySigNum(std::string accid)
 
 BarlineType MeiInput::StrToBarlineType(std::string type)
 {
-    if (type == "sigle") return BARLINE_SINGLE;
+    if (type == "single") return BARLINE_SINGLE;
     else if (type == "end") return BARLINE_END;
     else if (type == "dbl") return BARLINE_DBL;
     else if (type == "rptend") return BARLINE_RPTEND;
