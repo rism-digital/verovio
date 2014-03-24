@@ -203,9 +203,9 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 			{	
                 ((Note*)chk)->m_stemLen = extern_q_auto;
 				if (!extern_q_auto)	((Note*)chk)->m_stemDir = extern_queue;
-				if ( !fb._liaison && (((Note*)chk)->m_slur[0] & SLUR_TERMINAL)) {
+				/***if ( !fb._liaison && (((Note*)chk)->m_slur[0] & SLUR_TERMINAL)) {
 					fb._liaison = ON;
-                }
+                }***/
                 /***if (chk->grp==END) {	
                     fb._grp = ON; 
                     group.fin = chk;

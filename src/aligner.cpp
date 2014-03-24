@@ -253,7 +253,7 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid params )
         m_yShift = -min_shift;
     }
     
-    // for now always for interlines, eventually should be taken from the staffDef, so should the staff size
+    // for now always four interlines, eventually should be taken from the staffDef, so should the staff size
     (*previousStaffHeight) = 4 * (*interlineSizes)[0];
     
     return FUNCTOR_CONTINUE;

@@ -153,7 +153,7 @@ System *Page::GetAtPos( int y )
 
 void Page::LayOut( bool force )
 {
-    if ( m_layoutDone && ! force ) {
+    if ( m_layoutDone && !force ) {
         return;
     }
     
