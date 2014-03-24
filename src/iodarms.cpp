@@ -424,7 +424,7 @@ bool DarmsInput::ImportString(std::string data_str) {
             res = do_globalSpec(pos, data);
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
-            m_staff->m_mensuralNotation = m_antique_notation;
+            m_staff->notAnc = m_antique_notation;
         } else if (isdigit(c) || c == '-' ) { // check for '-' too as note positions can be negative
             //is number followed by '!' ? it is a clef
             if (data[pos + 1] == '!') {

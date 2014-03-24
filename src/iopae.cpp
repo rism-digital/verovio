@@ -1199,8 +1199,11 @@ void PaeInput::pushContainer(LayerElement *container) {
 }
 
 void PaeInput::popContainer() {
-    assert(m_nested_objects.size() > 0);
-    m_nested_objects.pop_back();
+    //assert(m_nested_objects.size() > 0);
+    if (m_nested_objects.size() == 0)
+        LogError("PaeInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, beams) are not supported.");
+    else
+        m_nested_objects.pop_back();
 }
 
 void PaeInput::addLayerElement(LayerElement *element) {
