@@ -37,6 +37,7 @@ DurationInterface::DurationInterface()
     m_breakSec = 0;
     m_dots = 0;
     m_dur = 0;
+    m_durGes = VRV_UNSET;
     m_num = 1;
     m_numBase = 1;
     memset(m_tuplet, 0, DURATION_MAX_TUPLETS * sizeof(unsigned char));
@@ -53,10 +54,16 @@ void DurationInterface::SetDuration( int value )
     this->m_dur = value;
 }
 
+void DurationInterface::SetDurationGes( int value )
+{
+    this->m_durGes = value;
+}
 
 double DurationInterface::GetAlignementDuration( int num, int numbase )
 {
-    double duration = DUR_MAX / pow (2.0, (double)(m_dur - 2.0)) * numbase / num;
+    int note_dur = m_durGes != VRV_UNSET ? m_durGes : m_dur;
+    
+    double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
     if ( m_dots > 0 ) {
         duration = 2 * duration - (duration / pow(2, m_dots));
     }

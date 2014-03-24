@@ -329,6 +329,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     if (rest) {
         Rest *rest =  new Rest;
         rest->m_dur = duration;
+        rest->m_durGes = DUR_8;
         rest->m_pname = REST_AUTO;
         rest->m_dots = dot;
         m_layer->AddElement(rest);
@@ -339,6 +340,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         
         Note *note = new Note;
         note->m_dur = duration;
+        note->m_durGes = DUR_8;
         note->m_accid = accidental;
         note->m_oct = PitchMap[position + m_clef_offset].oct;
         note->m_pname = PitchMap[position + m_clef_offset].pitch;

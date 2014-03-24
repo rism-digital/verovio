@@ -399,6 +399,9 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
     meiNote.append_attribute( "pname" ) = PitchToStr( note->m_pname ).c_str();
     meiNote.append_attribute( "oct" ) = OctToStr( note->m_oct ).c_str();
     meiNote.append_attribute( "dur" ) = DurToStr( note->m_dur ).c_str();
+    if (note->m_durGes != VRV_UNSET) {
+        meiNote.append_attribute( "dur.ges" ) = DurToStr( note->m_durGes ).c_str();
+    }
     if ( note->m_dots ) {
         meiNote.append_attribute( "dots" ) = StringFormat("%d", note->m_dots).c_str();
     }
@@ -1323,6 +1326,10 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 	// duration
 	if ( note.attribute( "dur" ) ) {
 		vrvNote->m_dur = StrToDur( note.attribute( "dur" ).value() );
+	}
+    // duration gestural
+	if ( note.attribute( "dur.ges" ) ) {
+		vrvNote->m_durGes = StrToDur( note.attribute( "dur.ges" ).value() );
 	}
     // dots
     if ( note.attribute( "dots" ) ) {

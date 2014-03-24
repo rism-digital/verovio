@@ -35,6 +35,8 @@ public:
     virtual ~DurationInterface();
     
     virtual void SetDuration( int value );
+    /* Set the logic (gestural) duration */
+    virtual void SetDurationGes( int value );
     
     
     virtual double GetAlignementDuration( int num, int numbase );
@@ -72,6 +74,8 @@ public:
     unsigned char m_dots;
     /** Indicates the duration */
     int m_dur;
+    /** Indicates the logical (gestural) duration */
+    int m_durGes;
     /** Indicates the numerator of the duration ratio */
     int m_num;
     /** Indicates the denominator of the duration ratio */
