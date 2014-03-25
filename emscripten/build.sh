@@ -109,10 +109,6 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/system.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
-	$VEROVIO_ROOT/tinyxml/tinystr.cpp \
-	$VEROVIO_ROOT/tinyxml/tinyxml.cpp \
-	$VEROVIO_ROOT/tinyxml/tinyxmlerror.cpp \
-	$VEROVIO_ROOT/tinyxml/tinyxmlparser.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \

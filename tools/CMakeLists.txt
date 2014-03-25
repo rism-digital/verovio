@@ -52,10 +52,6 @@ add_executable (verovio
 	../src/tie.cpp
 	../src/tuplet.cpp
 	../src/vrv.cpp
-	../tinyxml/tinystr.cpp
-	../tinyxml/tinyxml.cpp
-	../tinyxml/tinyxmlerror.cpp
-	../tinyxml/tinyxmlparser.cpp
 	../src/pugixml.cpp
 	)
 

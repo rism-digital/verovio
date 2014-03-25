@@ -40,11 +40,12 @@ FileOutputStream( doc )
 {
     m_filename = filename;
     m_measure_count = 0;
-    m_xml_attributes = NULL;
+/*    m_xml_attributes = NULL;
     m_xml_current_clef = NULL;
     m_xml_measure_style = NULL;
     m_xml_last_note = NULL;
-    
+*/   
+
     m_current_time = NULL;
     m_current_beam = NULL;
     m_in_beam = false;
@@ -59,21 +60,18 @@ XMLOutput::~XMLOutput()
 
 bool XMLOutput::ExportFile( )
 {
-
-    m_xml_doc = new TiXmlDocument;
-    TiXmlDeclaration * decl = new TiXmlDeclaration( "1.0", "UTF-8", "no" );
-    m_xml_doc->LinkEndChild( decl );
-
+    /*
     // do this or finale will barf, versione 3.0 for now
     TiXmlUnknown *unk = new TiXmlUnknown;
     //unk->SetValue("!DOCTYPE score-partwise PUBLIC \"-//Recordare//DTD MusicXML 3.0 Partwise//EN\" \"http://www.musicxml.org/dtds/partwise.dtd\"");
     unk->SetValue("!DOCTYPE score-timewise PUBLIC \"-//Recordare//DTD MusicXML 2.0 Timewise//EN\" \"http://www.musicxml.org/dtds/timewise.dtd\"");
     m_xml_doc->LinkEndChild(unk);
+    */
     
     // this starts the call of all the functors
     m_doc->Save( this );
         
-    m_xml_doc->SaveFile( m_filename.c_str() );
+    m_xml_doc.save_file( m_filename.c_str() );
     
 	return true;    
 }
@@ -85,22 +83,23 @@ bool XMLOutput::WriteDoc( Doc *doc )
     // Write the partwise declaration
     // the MusicXML "score-partwise" does not map to our MusScore
     
-    m_xml_score = new TiXmlElement("score-timewise");
+    m_xml_score = m_xml_doc.append_child("score-timewise");
     
     // hardcode a voice for noew
-    TiXmlElement *plist =  new TiXmlElement("part-list");
-    TiXmlElement *spart = new TiXmlElement("score-part");
-    spart->SetAttribute("id", "P1");
-    TiXmlElement *pname = new TiXmlElement("part-name");
-    TiXmlText *pname_text = new TiXmlText("Example Music");
-    pname->LinkEndChild(pname_text);
+    pugi::xml_node plist =  m_xml_score.append_child("part-list");
+    pugi::xml_node spart = plist.append_child("score-part");
+    spart.append_attribute("id") = "P1";
     
+    pugi::xml_node pname = spart.append_child("part-name");
+    pname.append_child(pugi::node_pcdata).set_value("Example Music");
+    
+    /*
     spart->LinkEndChild(pname);
     plist->LinkEndChild(spart);
     
     m_xml_score->LinkEndChild(plist);
     m_xml_doc->LinkEndChild(m_xml_score);
-    
+    */
     
     return true;
 }
@@ -140,20 +139,20 @@ bool XMLOutput::WriteStaff( Staff *staff )
 {
     LogDebug("Staff");
     
-    m_xml_part = new TiXmlElement("part");
-    m_xml_part->SetAttribute("id", "P1");
-    
-    m_xml_measure->LinkEndChild(m_xml_part);
-    
+    m_xml_part = m_xml_measure.append_child("part");
+    m_xml_part.append_attribute("id") = "P1";
+        
     // in first measure set the divisions value in <attributes>
     if (m_measure_count == 1) {
-        m_xml_attributes = new TiXmlElement("attributes");
-        TiXmlElement *divisions = new TiXmlElement("divisions");
-        TiXmlText *divval = new TiXmlText("4"); // no more than sixteenths for now
-        
+        m_xml_attributes = m_xml_part.append_child("attributes");
+        pugi::xml_node divisions = m_xml_attributes.append_child("divisions");
+        //TiXmlText *divval = new TiXmlText("4"); // no more than sixteenths for now
+        divisions.append_child(pugi::node_pcdata).set_value("4");
+        /*
         divisions->LinkEndChild(divval);
         m_xml_attributes->LinkEndChild(divisions);
         m_xml_part->LinkEndChild(m_xml_attributes);
+        */
     }
     
     return true;
@@ -257,24 +256,26 @@ void XMLOutput::WriteClef(LayerElement *element) {
     }
     
     //Create the <clef> element
-    TiXmlElement *xclef = new TiXmlElement("clef");
+    pugi::xml_node xclef = m_xml_attributes.append_child("clef");
     
     // Create the <sign> element and link to it it's text
-    TiXmlElement *xsign = new TiXmlElement("sign");
-    TiXmlText *xsignt = new TiXmlText(sign.c_str());
-    xsign->LinkEndChild(xsignt);
+    pugi::xml_node xsign = xclef.append_child("sign");
+    xsign.append_child(pugi::node_pcdata).set_value(sign.c_str());
+    //TiXmlText *xsignt = new TiXmlText(sign.c_str());
+    //xsign->LinkEndChild(xsignt);
     // Insert it into the <clef>
-    xclef->LinkEndChild(xsign);
+    //xclef->LinkEndChild(xsign);
     
     // Create the <line> element and link to it it's text
-    TiXmlElement *xline = new TiXmlElement("line");
-    TiXmlText *xlinet = new TiXmlText(line.c_str());
-    xline->LinkEndChild(xlinet);
+    pugi::xml_node xline = xclef.append_child("line");
+    xline.append_child(pugi::node_pcdata).set_value(line.c_str());
+    //TiXmlText *xlinet = new TiXmlText(line.c_str());
+    //xline->LinkEndChild(xlinet);
     // Insert it into the <clef>
-    xclef->LinkEndChild(xline); 
+    //xclef->LinkEndChild(xline); 
     
     // place clef into <attribute>
-    m_xml_attributes->LinkEndChild(xclef);
+    //m_xml_attributes->LinkEndChild(xclef);
     m_xml_current_clef = xclef;
     
 }
@@ -288,7 +289,7 @@ void XMLOutput::WriteKey(LayerElement *element) {
     CreateAttributes();
     
     // create tompost <key> elem
-    TiXmlElement *xkey = new TiXmlElement("key");
+    pugi::xml_node xkey = m_xml_attributes.append_child("key");
     
     // Convert the number of alterations to string
     std::stringstream n_alter;
@@ -299,31 +300,34 @@ void XMLOutput::WriteKey(LayerElement *element) {
         n_alter << key->GetAlterationNumber();
     
     //create <fifths> node with the number of alterations
-    TiXmlElement *xfifths = new TiXmlElement("fifths");
-    TiXmlText *xftxt = new TiXmlText(n_alter.str().c_str());
-    xfifths->LinkEndChild(xftxt);
+    pugi::xml_node xfifths = xkey.append_child("fifths");
+    xfifths.append_child(pugi::node_pcdata).set_value(n_alter.str().c_str());
+    //TiXmlText *xftxt = new TiXmlText(n_alter.str().c_str());
+    //xfifths->LinkEndChild(xftxt);
     // add it to the key elem
-    xkey->LinkEndChild(xfifths);
+    //xkey->LinkEndChild(xfifths);
     
     //I dont know what musicxml does with the <mode> tag
     //bmaybe it is just to annoy programmers using tinyxml
     //finale sets this always to major
-    TiXmlElement *mode = new TiXmlElement("mode");
-    TiXmlText *major = new TiXmlText("major");
-    mode->LinkEndChild(major);
+    pugi::xml_node mode = xkey.append_child("mode");
+    mode.append_child(pugi::node_pcdata).set_value("major");
+    //TiXmlText *major = new TiXmlText("major");
+    //mode->LinkEndChild(major);
     // add it to the key elem
-    xkey->LinkEndChild(mode);
+    //xkey->LinkEndChild(mode);
     
     // Obviously the order in which <key> <clef> and <time>
     // are fixed. If in music notation practice we have CLEF then KEY
     // why should MusicXML follow? the genious architect decided to
     // force the order of <attributes> REVERSED, <key> BEFORE <clef>
     // wow.
+    /*
     if (!m_xml_current_clef) // no clef
         m_xml_attributes->LinkEndChild(xkey);
     else // insert before the clef
         m_xml_attributes->InsertBeforeChild(m_xml_current_clef, *xkey);
-    
+    */
 }
 
 void XMLOutput::WriteTime(LayerElement *element) {
@@ -332,18 +336,18 @@ void XMLOutput::WriteTime(LayerElement *element) {
     
     CreateAttributes();
     
-    TiXmlElement *xtime = new TiXmlElement("time");
+    pugi::xml_node xtime = m_xml_attributes.append_child("time");
     
     // add symbol attribute if necessay
     if (timesig->m_meterSymb == METER_SYMB_COMMON) {
-        xtime->SetAttribute("symbol", "common");
+        xtime.append_attribute("symbol") = "common";
         // if the number of beats was not specified, approximate it
         if (timesig->m_num == 0){
             timesig->m_num = 4;
             timesig->m_numBase = 4;
         }
     } else if (timesig->m_meterSymb == METER_SYMB_CUT) {
-        xtime->SetAttribute("symbol", "cut");
+        xtime.append_attribute("symbol") = "cut";
         if (timesig->m_num == 0){
             timesig->m_num = 2;
             timesig->m_numBase = 2;
@@ -351,20 +355,23 @@ void XMLOutput::WriteTime(LayerElement *element) {
     }
     
     // Create beat and beat type attribsb
-    TiXmlElement *xbeats = new TiXmlElement("beats");
-    TiXmlElement *xbtype = new TiXmlElement("beat-type");
+    pugi::xml_node xbeats = xtime.append_child("beats");
+    pugi::xml_node xbtype = xtime.append_child("beat-type");
     
     // convert number to text for beats
     number << timesig->m_num;
-    TiXmlText *beat_text = new TiXmlText(number.str().c_str());
-    xbeats->LinkEndChild(beat_text);
+    xbeats.append_child(pugi::node_pcdata).set_value(number.str().c_str());
+    //TiXmlText *beat_text = new TiXmlText(number.str().c_str());
+    //xbeats->LinkEndChild(beat_text);
     
     // ditto as above
     number.clear();
     number << timesig->m_numBase;
-    TiXmlText *base_text = new TiXmlText(number.str().c_str());
-    xbtype->LinkEndChild(base_text);
+    xbtype.append_child(pugi::node_pcdata).set_value(number.str().c_str());
+    //TiXmlText *base_text = new TiXmlText(number.str().c_str());
+    //xbtype->LinkEndChild(base_text);
     
+    /*
     // push it to xtime
     xtime->LinkEndChild(xbeats);
     xtime->LinkEndChild(xbtype);
@@ -373,6 +380,7 @@ void XMLOutput::WriteTime(LayerElement *element) {
         m_xml_attributes->LinkEndChild(xtime);
     else // insert before the clef
         m_xml_attributes->InsertBeforeChild(m_xml_current_clef, *xtime);
+    */
     
     // save the current timesig in case we need to create mm rests
     m_current_time = timesig;
@@ -381,23 +389,22 @@ void XMLOutput::WriteTime(LayerElement *element) {
 void XMLOutput::WriteMultiMeasureRest(Rest *r) {
     std::stringstream num;
     num << r->m_multimeasure_dur;
-    
-    TiXmlElement *xmrest = new TiXmlElement("multiple-rest");
-    TiXmlText *mdur = new TiXmlText(num.str().c_str());
-    xmrest->LinkEndChild(mdur);
-    
+
     
     // chech that <attributes> exists
     CreateAttributes();
     
-    if (!m_xml_measure_style) {
-        m_xml_measure_style = new TiXmlElement("measure-style");
+    if (m_xml_measure_style.empty()) {
+        m_xml_measure_style = m_xml_attributes.append_child("measure-style");
         // link it into the current attributes
-        m_xml_attributes->LinkEndChild(m_xml_measure_style);
+        //m_xml_attributes->LinkEndChild(m_xml_measure_style);
     }
     
     // put the multiple measure thing into the measure style
-    m_xml_measure_style->LinkEndChild(xmrest);
+    pugi::xml_node xmrest = m_xml_measure_style.append_child("multiple-rest");
+    xmrest.append_child(pugi::node_pcdata).set_value(num.str().c_str());
+    //TiXmlText *mdur = new TiXmlText(num.str().c_str());
+    //xmrest->LinkEndChild(mdur);
     
     // save the quantity of measures to create
     m_multimeasure_rests = r->m_multimeasure_dur;
@@ -413,32 +420,37 @@ void XMLOutput::CreateRestsForMultiMeasure() {
         m_measure_count++;
         
         // create a fresh new rest
-        TiXmlElement *note = new TiXmlElement("note");
-        TiXmlElement *rest = new TiXmlElement("rest");
+        pugi::xml_node note = m_xml_part.append_child("note");
+        pugi::xml_node rest = note.append_child("rest");
         
-        note->LinkEndChild(rest);
+        //note->LinkEndChild(rest);
         
-        TiXmlElement *duration = new TiXmlElement("duration");
-        TiXmlText *dur_name = new TiXmlText("4");
-        duration->LinkEndChild(dur_name);
+        pugi::xml_node duration = note.append_child("duration");
+        duration.append_child(pugi::node_pcdata).set_value("4");
         
-        note->LinkEndChild(duration);
+        //TiXmlText *dur_name = new TiXmlText("4");
+        //duration->LinkEndChild(dur_name);
+        
+        //note->LinkEndChild(duration);
         
         // add it to the current part
-        m_xml_part->LinkEndChild(note);
+        //m_xml_part->LinkEndChild(note);
+        
         // first time is already linked
+        /*
         if (i > 0)
             m_xml_measure->LinkEndChild(m_xml_part);
         // and to the measure
         m_xml_score->LinkEndChild(m_xml_measure);
-        
+        */
+         
         // create a new part
-        m_xml_part = new TiXmlElement("part");
-        m_xml_part->SetAttribute("id", "P1");
+        m_xml_part = m_xml_measure.append_child("part");
+        m_xml_part.append_attribute("id") = "P1";
         
-        m_xml_measure = new TiXmlElement("measure");
+        m_xml_measure = m_xml_score.append_child("measure");
         mstring << m_measure_count;
-        m_xml_measure->SetAttribute("number", mstring.str().c_str());
+        m_xml_measure.append_attribute("number") =  mstring.str().c_str();
         
     }
     LogDebug("Measures incremented to %i.", m_measure_count);
@@ -459,10 +471,10 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     DurationInterface *di = dynamic_cast<DurationInterface*>(element);
     
     // toplevel note element
-    TiXmlElement *note = new TiXmlElement("note");
+    pugi::xml_node note = m_xml_part.append_child("note");
     
     // duration is common in notes and rests
-    TiXmlElement *duration = new TiXmlElement("duration");
+    pugi::xml_node duration = note.append_child("duration");
     
     switch (di->m_dur) {
         case DUR_LG: dur = "64"; t = "long"; break;
@@ -484,40 +496,44 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     if (dynamic_cast<Note*>(element)) {
         Note *n = dynamic_cast<Note*>(element);
         // make pitch
-        TiXmlElement *pitch = new TiXmlElement("pitch");
-        TiXmlElement *step = new TiXmlElement("step");
-        TiXmlElement *octave = new TiXmlElement("octave");
+        pugi::xml_node pitch = note.append_child("pitch");
+        pugi::xml_node step = pitch.append_child("step");
+        pugi::xml_node octave = pitch.append_child("octave");
         
         number << steps[n->m_pname - 1];
-        TiXmlText *step_name = new TiXmlText(number.str().c_str());
-        step->LinkEndChild(step_name);
+        step.append_child(pugi::node_pcdata).set_value(number.str().c_str());
+        //TiXmlText *step_name = new TiXmlText(number.str().c_str());
+        //step->LinkEndChild(step_name);
         
         number.clear();
         number << (int)n->m_oct;
-        TiXmlText *octave_name = new TiXmlText(number.str().c_str());
-        octave->LinkEndChild(octave_name);
+        octave.append_child(pugi::node_pcdata).set_value(number.str().c_str());
+        //TiXmlText *octave_name = new TiXmlText(number.str().c_str());
+        //octave->LinkEndChild(octave_name);
         
         // do we have an alteration?
         if (n->m_accid != 0) {
             number.clear();
             number << 1;
-            TiXmlElement *xalter = new TiXmlElement("alter");
-            TiXmlText *altnr = new TiXmlText(number.str().c_str());
-            xalter->LinkEndChild(altnr);
-            pitch->LinkEndChild(xalter);
+            pugi::xml_node xalter = pitch.append_child("alter");
+            xalter.append_child(pugi::node_pcdata).set_value(number.str().c_str());
+            //TiXmlText *altnr = new TiXmlText(number.str().c_str());
+            
+            //xalter->LinkEndChild(altnr);
+            //pitch->LinkEndChild(xalter);
         }
         
-        pitch->LinkEndChild(step);
-        pitch->LinkEndChild(octave);
-        note->LinkEndChild(pitch);
+        //pitch->LinkEndChild(step);
+        //pitch->LinkEndChild(octave);
+        //note->LinkEndChild(pitch);
         
         
     } else if (dynamic_cast<Rest*>(element)) {
         Rest *r = dynamic_cast<Rest*>(element);
         // rests just link a <rest /> item
-        TiXmlElement *rest = new TiXmlElement("rest");
+        pugi::xml_node rest = note.append_child("rest");
         
-        note->LinkEndChild(rest);
+        //note->LinkEndChild(rest);
         
         // handle multi measure rest
         // break from the generation of this element
@@ -528,10 +544,11 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     }
     
     // put the duration
-    TiXmlText *dur_name = new TiXmlText(dur.c_str());
-    duration->LinkEndChild(dur_name);
+    //TiXmlText *dur_name = new TiXmlText(dur.c_str());
+    //duration->LinkEndChild(dur_name);
+    duration.append_child(pugi::node_pcdata).set_value(dur.c_str());
     //link it to <note>
-    note->LinkEndChild(duration);
+    //note->LinkEndChild(duration);
     
     // was the prevous note the last one in a tie?
     // always close it, ties do not <continue>
@@ -540,18 +557,19 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     // ties go between <duration> and <beam>
     
     if (t != "") {
-        TiXmlElement *xtype = new TiXmlElement("type");
-        TiXmlText *xtext = new TiXmlText(t.c_str());
-        xtype->LinkEndChild(xtext);
-        note->LinkEndChild(xtype);
+        pugi::xml_node xtype = note.append_child("type");
+        xtype.append_child(pugi::node_pcdata).set_value(t.c_str());
+        //TiXmlText *xtext = new TiXmlText(t.c_str());
+        //xtype->LinkEndChild(xtext);
+        //note->LinkEndChild(xtype);
     }
     
     // add eventual dots to note/rest
     // they go after <tie> and before <beam>
     for (unsigned int i = 1; i == di->m_dots; i++) {
         // a <dot /> for every dot
-        TiXmlElement *dot = new TiXmlElement("dot");
-        note->LinkEndChild(dot);
+        note.append_child("dot");
+        //note->LinkEndChild(dot);
     }
     
     // Do beaming
@@ -581,18 +599,18 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
             }
             
             // write the xml for the beam
-            TiXmlElement *xbeam = new TiXmlElement("beam");
+            pugi::xml_node xbeam = note.append_child("beam");
             // set the number of beams attribute (!!! couldn't they do this automatically???)
             // seems to work even if left as 1
             // num_of_beams is set above when parsing durations
-            xbeam->SetAttribute("number", num_of_beams.c_str());
+            xbeam.append_attribute("number")  = num_of_beams.c_str();
             
             // write the arribute and attach it to beam
-            TiXmlText *xtype = new TiXmlText(btype.c_str());
-            xbeam->LinkEndChild(xtype);
+            pugi::xml_node xtype = xbeam.append_child(btype.c_str());
+            //xbeam->LinkEndChild(xtype);
             
             // attach the beam to the note
-            note->LinkEndChild(xbeam);
+            //note->LinkEndChild(xbeam);
         } else {
             LogDebug("Beam with no notes");
         }
@@ -600,14 +618,14 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     
     // measure in partwise
     // link to part
-    m_xml_part->LinkEndChild(note);
+    //m_xml_part->LinkEndChild(note);
     
     // save to current note pointer
     m_xml_last_note = note;
 }
 
-void XMLOutput::SetTie(TiXmlElement *xml_note, bool last) {
-    TiXmlElement *xtie = new TiXmlElement("tie");
+void XMLOutput::SetTie(pugi::xml_node xml_note, bool last) {
+    pugi::xml_node xtie =  xml_note.append_child("tie");
     std::string tie_type;
     
     if (!last) {
@@ -621,8 +639,9 @@ void XMLOutput::SetTie(TiXmlElement *xml_note, bool last) {
     }
     
     // add text to tie
-    xtie->SetAttribute("type", tie_type.c_str());
+    xtie.append_attribute("type") = tie_type.c_str();
     
+    /*
     // add to note
     // it has to be immediately after <duration>
     // so search for it
@@ -633,14 +652,15 @@ void XMLOutput::SetTie(TiXmlElement *xml_note, bool last) {
     else
         // else just at the end
         xml_note->LinkEndChild(xtie);
+    */
 }
                
 void XMLOutput::CreateAttributes() {
     // Make new attributes as necessary
-    if (m_xml_attributes == NULL) {
-        m_xml_attributes = new TiXmlElement("attributes");
+    if (m_xml_attributes.empty()) {
+        m_xml_attributes = m_xml_part.append_child("attributes");
         // put it into the current part
-        m_xml_part->LinkEndChild(m_xml_attributes);
+        //m_xml_part->LinkEndChild(m_xml_attributes);
     }
 }
 

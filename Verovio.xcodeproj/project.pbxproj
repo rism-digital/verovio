@@ -58,14 +58,6 @@
 		8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDF188539540037FD8E /* view_tuplet.cpp */; };
 		8F086F0C188539540037FD8E /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE0188539540037FD8E /* view.cpp */; };
 		8F086F0D188539540037FD8E /* vrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE1188539540037FD8E /* vrv.cpp */; };
-		8F086F4518853BEA0037FD8E /* tinystr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F3F18853BEA0037FD8E /* tinystr.cpp */; };
-		8F086F4618853BEA0037FD8E /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F4118853BEA0037FD8E /* tinyxml.cpp */; };
-		8F086F4718853BEA0037FD8E /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F4318853BEA0037FD8E /* tinyxmlerror.cpp */; };
-		8F086F4818853BEA0037FD8E /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F4418853BEA0037FD8E /* tinyxmlparser.cpp */; };
-		8F3DD31818854AF50051330C /* tinystr.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F3F18853BEA0037FD8E /* tinystr.cpp */; };
-		8F3DD31A18854AF50051330C /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F4118853BEA0037FD8E /* tinyxml.cpp */; };
-		8F3DD31C18854AF50051330C /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F4318853BEA0037FD8E /* tinyxmlerror.cpp */; };
-		8F3DD31D18854AF50051330C /* tinyxmlparser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086F4418853BEA0037FD8E /* tinyxmlparser.cpp */; };
 		8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
 		8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
 		8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
@@ -214,12 +206,6 @@
 		8F086EDF188539540037FD8E /* view_tuplet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_tuplet.cpp; path = src/view_tuplet.cpp; sourceTree = "<group>"; };
 		8F086EE0188539540037FD8E /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view.cpp; path = src/view.cpp; sourceTree = "<group>"; };
 		8F086EE1188539540037FD8E /* vrv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vrv.cpp; path = src/vrv.cpp; sourceTree = "<group>"; };
-		8F086F3F18853BEA0037FD8E /* tinystr.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinystr.cpp; sourceTree = "<group>"; };
-		8F086F4018853BEA0037FD8E /* tinystr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinystr.h; sourceTree = "<group>"; };
-		8F086F4118853BEA0037FD8E /* tinyxml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxml.cpp; sourceTree = "<group>"; };
-		8F086F4218853BEA0037FD8E /* tinyxml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tinyxml.h; sourceTree = "<group>"; };
-		8F086F4318853BEA0037FD8E /* tinyxmlerror.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlerror.cpp; sourceTree = "<group>"; };
-		8F086F4418853BEA0037FD8E /* tinyxmlparser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tinyxmlparser.cpp; sourceTree = "<group>"; };
 		8F086F4D18853CA90037FD8E /* liblibverovio.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibverovio.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F59290D18854BF800FE51AD /* aligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aligner.h; path = include/vrv/aligner.h; sourceTree = "<group>"; };
 		8F59290E18854BF800FE51AD /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = include/vrv/app.h; sourceTree = "<group>"; };
@@ -303,7 +289,6 @@
 		8F086E9E188534680037FD8E = {
 			isa = PBXGroup;
 			children = (
-				8F086F3E18853BEA0037FD8E /* tinyxml */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
 				4D22C42118891D7300D0831F /* pugixml */,
@@ -449,19 +434,6 @@
 				8F59293018854BF800FE51AD /* tuplet.h */,
 			);
 			name = elements;
-			sourceTree = "<group>";
-		};
-		8F086F3E18853BEA0037FD8E /* tinyxml */ = {
-			isa = PBXGroup;
-			children = (
-				8F086F3F18853BEA0037FD8E /* tinystr.cpp */,
-				8F086F4018853BEA0037FD8E /* tinystr.h */,
-				8F086F4118853BEA0037FD8E /* tinyxml.cpp */,
-				8F086F4218853BEA0037FD8E /* tinyxml.h */,
-				8F086F4318853BEA0037FD8E /* tinyxmlerror.cpp */,
-				8F086F4418853BEA0037FD8E /* tinyxmlparser.cpp */,
-			);
-			path = tinyxml;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -627,10 +599,6 @@
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
-				8F086F4518853BEA0037FD8E /* tinystr.cpp in Sources */,
-				8F086F4618853BEA0037FD8E /* tinyxml.cpp in Sources */,
-				8F086F4718853BEA0037FD8E /* tinyxmlerror.cpp in Sources */,
-				8F086F4818853BEA0037FD8E /* tinyxmlparser.cpp in Sources */,
 				4D7D8A3B1886E35B00D78B62 /* main.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C42018891D6D00D0831F /* pugixml.cpp in Sources */,
@@ -684,10 +652,6 @@
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
-				8F3DD31818854AF50051330C /* tinystr.cpp in Sources */,
-				8F3DD31A18854AF50051330C /* tinyxml.cpp in Sources */,
-				8F3DD31C18854AF50051330C /* tinyxmlerror.cpp in Sources */,
-				8F3DD31D18854AF50051330C /* tinyxmlparser.cpp in Sources */,
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C4271889214C00D0831F /* pugixml.cpp in Sources */,
 			);

@@ -13,22 +13,21 @@
 #include "layer.h"
 #include "tie.h"
 
-// TINYXML
-#if defined (__WXMSW__)
-    #include "tinyxml.h"
-#else
-    #include "tinyxml.h"
-#endif
+#include "pugixml.hpp"
 
 namespace vrv {
 
 class Barline;
 class Beam;
 class Clef;
+class Layer;
 class Mensur;
+class MRest;
+class MultiRest;
 class Note;
 class Rest;
 class Symbol;
+class Tuplet;
 
 
 //----------------------------------------------------------------------------
@@ -66,20 +65,20 @@ public:
     void WriteNoteOrRest(LayerElement *element);
     void WriteMultiMeasureRest(Rest *r);
     void CreateAttributes();
-    void SetTie(TiXmlElement *xml_note, bool last);
+    void SetTie(pugi::xml_node xml_note, bool last);
     void CreateRestsForMultiMeasure();
     
 private:
     std::string m_filename;
     
-    TiXmlElement *m_xml_score;
-    TiXmlElement *m_xml_part;
-    TiXmlElement *m_xml_measure;
-    TiXmlElement *m_xml_attributes;
-    TiXmlElement *m_xml_measure_style;
-    TiXmlElement *m_xml_last_note;
-    TiXmlDocument *m_xml_doc;
-    TiXmlElement *m_xml_current_clef;
+    pugi::xml_node m_xml_score;
+    pugi::xml_node m_xml_part;
+    pugi::xml_node m_xml_measure;
+    pugi::xml_node m_xml_attributes;
+    pugi::xml_node m_xml_measure_style;
+    pugi::xml_node m_xml_last_note;
+    pugi::xml_document m_xml_doc;
+    pugi::xml_node m_xml_current_clef;
     
     Mensur *m_current_time;
     Beam *m_current_beam;
