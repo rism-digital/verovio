@@ -852,42 +852,53 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
 
 
 
-//////////////////////////////
-//
-// getBarline -- read the barline.
-//
+/**********************************
+ *
+ * getBarline -- read the barline.
+ * Translation from PAE to verovio representaion:
+ *
+ BARLINE_SINGLE     /
+ BARLINE_END        does not exist
+ BARLINE_RPTBOTH    ://:
+ BARLINE_RPTSTART   ://
+ BARLINE_RPTEND     //:
+ BARLINE_DBL        //
+ */
 
-int PaeInput::getBarline( const char *incipit, std::string *output, int index ) {
-    
+int PaeInput::getBarline( const char *incipit, BarlineType *output, int index ) {
     regex_t re;
+    
     regcomp(&re, "^://:", REG_EXTENDED);
-    int is_rep_db_rep = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptboth = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
+    
     regcomp(&re, "^://", REG_EXTENDED);
-    int is_rep_db = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
+    
     regcomp(&re, "^//:", REG_EXTENDED);
-    int is_db_rep = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
+    
     regcomp(&re, "^//", REG_EXTENDED);
-    int is_db = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_dbl = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
     
     int i = 0; // number of characters
-    if (is_rep_db_rep == 0) {
-        *output = "=:||:";
+    if (is_barline_rptboth == 0) {
+        *output = BARLINE_RPTBOTH;
         i = 3;
-    } else if (is_rep_db == 0) {
-        *output = "=:|!";
+    } else if (is_barline_rptstart == 0) {
+        *output = BARLINE_RPTSTART;
         i = 2;
-    } else if (is_db_rep == 0) {
-        *output = "=!|:";
+    } else if (is_barline_rptend == 0) {
+        *output = BARLINE_RPTEND;
         i = 2;
-    } else if (is_db == 0) {
-        *output = "=||";
+    } else if (is_barline_dbl == 0) {
+        *output = BARLINE_DBL;
         i = 1;
     } else {
-        *output = "=";
+        *output = BARLINE_SINGLE;
         i = 0;
     }
     return i;
@@ -1087,17 +1098,9 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
     
     // Set barline
     // FIXME use flags for proper barline identification
-    if ( measure->barline.length() ) {
-        Barline *bline = m_measure->GetRightBarline();
-        if (measure->barline == "=")
-            bline->m_barlineType = BARLINE_SINGLE;
-        else 
-            bline->m_barlineType = BARLINE_DBL;
-        
-        //m_layer->AddElement(bline);
-    }
-    
-    //m_staff->AddLayer(m_layer);
+    Barline *bline = m_measure->GetRightBarline();
+    bline->m_barlineType = measure->barline;
+
 }
 
 void PaeInput::parseNote(NoteObject note) {

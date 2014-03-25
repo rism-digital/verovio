@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "io.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -26,6 +27,7 @@ class Staff;
 class Tie;
 class Tuplet;
 class KeySignature;
+class Barline;
 
 
 class NoteObject {
@@ -178,7 +180,7 @@ public:
         time = NULL;
         key = NULL;
         notes.clear();
-        barline = "";
+        barline = BARLINE_SINGLE;
         wholerest = 0; 
         abbreviation_offset = -1;
     };
@@ -191,7 +193,7 @@ public:
     std::vector<int> durations;
     std::vector<int> dots; // use the same offset as durations, they are used in parallel
     unsigned int durations_offset;
-    std::string barline;
+    BarlineType    barline;
     int    abbreviation_offset;  
     int    wholerest;   // number of whole rests to process
 };
@@ -231,7 +233,7 @@ private:
      int       getKeyInfo          (const char* incipit, KeySignature *key, int index = 0);
      int       getTimeInfo         (const char* incipit, Mensur *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
-     int       getBarline          (const char* incipit, std::string *output, int index = 0 );
+     int       getBarline          (const char *incipit, BarlineType *output, int index );
      int       getAccidental       (const char* incipit, unsigned char *accident, int index = 0);
      int       getOctave           (const char* incipit, unsigned char *octave, int index = 0 );
      int       getDurations        (const char* incipit, MeasureObject *measure, int index = 0);
