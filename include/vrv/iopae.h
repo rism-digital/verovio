@@ -180,7 +180,7 @@ public:
         time = NULL;
         key = NULL;
         notes.clear();
-        barline = BARLINE_SINGLE;
+        barline = BARLINE_NONE;
         wholerest = 0; 
         abbreviation_offset = -1;
     };
