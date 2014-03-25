@@ -1634,9 +1634,10 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
     if (dynamic_cast<Note*>(element)) {
         Note *note = dynamic_cast<Note*>(element);
         
+        /*
         // stem down or semibreve/longa, fermata up!
         if (!element->m_drawingStemDir && (note->m_dur != DUR_1 || note->m_dur != DUR_BR)) {
-            
+        */
             // only for up-fermatas, if there is a trill on the same note
             // add a 35 pixel space so they do not collide
             if (note->m_embellishment)
@@ -1652,6 +1653,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
             
             // draw the up-fermata
             DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
+        /*
         } else { // stem up fermata down
             
             // This works as above, only we check that the note head is not
@@ -1665,6 +1667,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
             
             DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
+        */
     } else if (dynamic_cast<Rest*>(element)) {
         // this is a rest
         // rests for the moment are always in the staff
