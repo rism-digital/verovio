@@ -229,7 +229,7 @@ private:
      */
     ///@{
     bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center);
-    std::string IntToObliqueFigures(unsigned int number);
+    std::string IntToObliqueFigures(unsigned short number);
     bool OneBeamInTuplet(Tuplet* tuplet);
     ///@}
     

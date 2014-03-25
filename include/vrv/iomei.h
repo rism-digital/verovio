@@ -136,7 +136,14 @@ private:
      * Write a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
-    void WriteSameAsAttr( pugi::xml_node meiElement, Object *element );
+    void WriteSameAsAttr( pugi::xml_node element, Object *object );
+    
+    /**
+     * @name Read attribute classes
+     */
+    ///@{
+    void WriteAttCommon( pugi::xml_node element, Object *object );
+    ///@}
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -235,6 +242,13 @@ private:
     /** Reads <app> elements. For now, only <app> within <layer> are taken into account */
     LayerElement *ReadMeiApp( pugi::xml_node app );
     bool ReadMeiRdg( pugi::xml_node rdg );
+    
+    /**
+     * @name Read attribute classes
+     */
+    ///@{
+    void ReadAttCommon( pugi::xml_node element, Object *object );
+    ///@}
     
     /**
      * Read a sameAs attribute

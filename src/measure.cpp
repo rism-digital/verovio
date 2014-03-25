@@ -29,7 +29,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure( bool measureMusic, int logMeasureNb ):
-    DocObject("measure-")
+    Common(), DocObject("measure-")
 {
 	Clear( );
     m_measuredMusic = measureMusic;
@@ -46,6 +46,7 @@ Measure::~Measure()
 
 void Measure::Clear()
 {
+    ClearAttCommon();
 	ClearChildren();
     m_parent = NULL;
     m_logMeasureNb = -1;

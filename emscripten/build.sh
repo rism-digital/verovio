@@ -68,6 +68,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
 	$VEROVIO_ROOT/src/app.cpp \
+	$VEROVIO_ROOT/src/attributes.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \

@@ -35,19 +35,19 @@ namespace vrv {
 #define TUPLET_OFFSET 20
 #define OBLIQUE_OFFSET 0x52 //move to oblique figures
 
-std::string View::IntToObliqueFigures(unsigned int number) {
-    char buf[16];
+std::string View::IntToObliqueFigures(unsigned short number) {
+    char buf[6];
     unsigned int len;
     
     memset(buf, 0x00, sizeof(buf));
     
     // We do not convert more that FF values
-    if (number > 0xFF) number = 0xFF;
+    if (number > 0xFFFF) number = 0xFFFF;
     
     sprintf(buf, "%i", number);
     
     len = strlen(buf);
-    assert((sizeof(buf) - 1) > len ); // String conversion overflow 
+    assert((sizeof(buf)) > len ); // String conversion overflow 
     
     for (unsigned int i = 0; i < strlen(buf); i++) {
         buf[i] += OBLIQUE_OFFSET;
@@ -282,7 +282,7 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     
     int txt_lenght, txt_height;
     
-    std::string notes = IntToObliqueFigures((unsigned int)tuplet->GetNum());
+    std::string notes = IntToObliqueFigures((short int)tuplet->GetNum());
     
     dc->GetTextExtent(notes, &txt_lenght, &txt_height);
     

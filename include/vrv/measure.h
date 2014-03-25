@@ -12,6 +12,7 @@
 #include "object.h"
 
 #include "aligner.h"
+#include "attributes.h"
 #include "barline.h"
 
 namespace vrv {
@@ -28,7 +29,7 @@ class Staff;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasure music is contained in one single measure object
  */
-class Measure: public DocObject
+class Measure: public Common, public DocObject
 {
     
 public:

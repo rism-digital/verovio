@@ -19,6 +19,7 @@
 
 #include "vrv.h"
 #include "app.h"
+#include "attributes.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
@@ -225,7 +226,8 @@ bool MeiOutput::WriteMeasure( Measure *measure )
     
     m_measure = m_system.append_child("measure");
     m_measure.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
-    m_measure.append_attribute( "n" ) = StringFormat( "%d", measure->m_logMeasureNb ).c_str();
+    //m_measure.append_attribute( "n" ) = StringFormat( "%d", measure->m_logMeasureNb ).c_str();
+    WriteAttCommon( m_measure, measure );
     
     return true;
 }
@@ -493,13 +495,25 @@ bool MeiOutput::WriteLayerRdg( LayerRdg *rdg )
 }
 
 
-void MeiOutput::WriteSameAsAttr( pugi::xml_node meiElement, Object *element )
+void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
 {
-    if ( !element->m_sameAs.empty() ) {
-        meiElement.append_attribute( "sameas" ) = element->m_sameAs.c_str();
+    if ( !object->m_sameAs.empty() ) {
+        element.append_attribute( "sameas" ) = object->m_sameAs.c_str();
     }
 }
 
+void MeiOutput::WriteAttCommon( pugi::xml_node element, Object *object )
+{
+    Common *common = dynamic_cast<Common*>( object );
+    assert( common );
+    if ( !common->GetLabel().empty() ) {
+        element.append_attribute( "label" ) = common->GetLabel().c_str();
+    }
+    if ( common->GetN() != VRV_UNSET ) {
+        element.append_attribute( "n" ) = StringFormat("%d", common->GetN()).c_str();;
+    }
+}
+    
 std::string MeiOutput::BoolToStr(bool value)
 {
     if (value) return "true";
@@ -1076,6 +1090,7 @@ bool MeiInput::ReadMeiMeasure( pugi::xml_node measure )
     assert( m_measure );
     assert( !m_staff );
     
+    ReadAttCommon( measure, m_measure );
     if ( measure.attribute( "right" ) ) {
         m_measure->GetRightBarline()->m_barlineType = StrToBarlineType( measure.attribute( "right" ).value() );
     }
@@ -1554,6 +1569,19 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     object->m_sameAs = element.attribute( "sameas" ).value();
 }
 
+    
+void MeiInput::ReadAttCommon( pugi::xml_node element, Object *object )
+{
+    Common *common = dynamic_cast<Common*>( object );
+    assert( common );
+    if ( element.attribute( "label" ) ) {
+        common->SetLabel( element.attribute( "label" ).value() );
+    }
+    if ( element.attribute( "n" ) ) {
+        common->SetN( atoi( element.attribute( "n" ).value() ) );
+    }
+}
+    
 
 void MeiInput::AddLayerElement( LayerElement *element )
 {

@@ -10,6 +10,7 @@ add_executable (verovio
 	main.cpp 
 	../src/aligner.cpp
 	../src/app.cpp
+	../src/attributes.cpp
 	../src/barline.cpp 
 	../src/bboxdevicecontext.cpp 
 	../src/beam.cpp
