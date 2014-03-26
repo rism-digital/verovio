@@ -1,6 +1,8 @@
 ---
 ---
-{% if site.baseurl == "" %}
+{% comment %}
+{% mei_supported_to_liquid supported-mei.yml %}
+{% endcomment %}
 
 <p>
 	This page documents the elements and attributes that are currently supported by Vevorio. It is also important to note that the hierarchy of elements supported by Verovio is limited and that it will also determine wherether an MEI document can be rendered or not.
@@ -33,4 +35,3 @@
 	{% for class in page.doc.loaded-classes %}
 		{% include mei-class.html %}
 	{% endfor %}
-{% endif %}
