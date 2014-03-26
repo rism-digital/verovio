@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
+<meiHead>
+	<fileDesc>
+		<titleStmt>
+			<title>CANZ_24-6</title>
+			<respStmt>
+				<persName/>
+			</respStmt>
+		</titleStmt>
+		<pubStmt>
+			<availability>
+				<useRestrict/>
+			</availability>
+		</pubStmt>
+	</fileDesc>
+	<encodingDesc>
+		<appInfo>
+			<application version="7" xml:id="sibelius7">
+				<name>Sibelius</name>
+			</application>
+		</appInfo>
+	</encodingDesc>
+	<workDesc>
+		<work>
+			<titleStmt>
+				<title>CANZ_24-6</title>
+				<respStmt/>
+			</titleStmt>
+		</work>
+	</workDesc>
+</meiHead>
+<music>
+	<body>
+		<mdiv>
+			<score>
+				<scoreDef meter.count="4" meter.unit="2" ppq="256">
+					<staffGrp symbol="line">
+						<staffGrp n="1" symbol="bracket" barthru="true">
+							<staffDef clef.line="2" clef.shape="G" key.mode="major" key.sig="1f" label="Canto I" lines="5" n="1" xml:id="sd1"/>
+							<staffDef clef.line="1" clef.shape="C" key.mode="major" key.sig="1f" label="Alto I" lines="5" n="2" xml:id="sd2"/>
+							<staffDef clef.line="3" clef.shape="C" key.mode="major" key.sig="1f" label="Tenor I" lines="5" n="3" xml:id="sd3"/>
+							<staffDef clef.line="3" clef.shape="F" key.mode="major" key.sig="1f" label="Basso I" lines="5" n="4" xml:id="sd4"/>
+						</staffGrp>
+					</staffGrp>
+				</scoreDef>
+				<section>
+					<pb n="1"/>
+					<scoreDef meter.count="3" meter.unit="1"/>
+					<measure n="24">
+						<staff n="1">
+							<layer n="1">
+								<note dur="1" dots="1" oct="5" pname="d" xml:id="p1cdd5n0v1b25s1"/>
+								<note dur="2" oct="5" pname="d" xml:id="p1cdd5n512v1b25s1"/>
+								<note dur="1" oct="5" pname="c" xml:id="p1ccd5n682v1b25s1"/>
+							</layer>
+						</staff>
+						<staff n="2">
+							<layer n="1">
+							    <note dur="1" dots="1"  oct="4" pname="b" xml:id="p1cbd4n0v1b25s2"/>
+								<note dur="2" oct="4" pname="b" xml:id="p1cbd4n512v1b25s2"/>
+								<note dur="1" oct="4" pname="a" xml:id="p1cad4n682v1b25s2"/>
+							</layer>
+						</staff>
+						<staff n="3">
+							<layer n="1">
+							    <note dur="1" dots="1"  oct="4" pname="f" xml:id="p1cfd4n0v1b25s3"/>
+								<note dur="2" oct="4" pname="f" xml:id="p1cfd4n512v1b25s3"/>
+								<note dur="1" oct="4" pname="f" xml:id="p1cfd4n682v1b25s3"/>
+							</layer>
+						</staff>
+						<staff n="4">
+							<layer n="1">
+							    <note dur="1" dots="1"  oct="3" pname="b" xml:id="p1cbd3n0v1b25s4"/>
+								<note dur="2" oct="3" pname="b" xml:id="p1cbd3n512v1b25s4"/>
+								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n682v1b25s4"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="25">
+						<staff n="1">
+							<layer n="1">
+								<note dur="2" oct="4" pname="b" xml:id="p1cbd4n0v1b26s1"/>
+								<note dur="2" oct="4" pname="a" xml:id="p1cad4n170v1b26s1"/>
+								<note dur="2" oct="4" pname="b" xml:id="p1cbd4n341v1b26s1"/>
+								<note dur="2" oct="4" pname="g" xml:id="p1cgd4n512v1b26s1"/>
+								<note dur="1" oct="4" pname="a" xml:id="p1cad4n682v1b26s1"/>
+							</layer>
+						</staff>
+						<staff n="2">
+							<layer n="1">
+							    <note dur="1" dots="1"  oct="4" pname="g" xml:id="p1cgd4n0v1b26s2"/>
+								<note dur="2" oct="4" pname="d" xml:id="p1cdd4n512v1b26s2"/>
+								<note dur="1" oct="4" pname="f" xml:id="p1cfd4n682v1b26s2"/>
+							</layer>
+						</staff>
+						<staff n="3">
+							<layer n="1">
+							    <note dur="1" dots="1"  oct="4" pname="d" xml:id="p1cdd4n0v1b26s3"/>
+								<note dur="2" oct="3" pname="b" xml:id="p1cbd3n512v1b26s3"/>
+								<note dur="1" oct="4" pname="c" xml:id="p1ccd4n682v1b26s3"/>
+							</layer>
+						</staff>
+						<staff n="4">
+							<layer n="1">
+							    <note dur="1" dots="1"  oct="3" pname="g" xml:id="p1cgd3n0v1b26s4"/>
+								<note dur="2" oct="3" pname="g" xml:id="p1cgd3n512v1b26s4"/>
+								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n682v1b26s4"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="26">
+						<staff n="1">
+							<layer n="1">
+								<note dur="2" oct="4" pname="f" xml:id="p1cfd4n0v1b27s1"/>
+							    <note dur="4" oct="4" pname="g" xml:id="p1cfd4n0v1b27s1"/>
+							    <note dur="4" oct="4" pname="a" xml:id="p1cfd4n0v1b27s1"/>
+							    <note dur="1" oct="4" pname="b" tie="t" xml:id="p1cad4n768v1b27s1"/>								
+								<note dur="1" oct="4" pname="a" tie="t" xml:id="p1cad4n768v1b27s1"/>
+							</layer>
+						</staff>
+						<staff n="2">
+							<layer n="1">
+								<note dur="1" oct="4" pname="f" colored="true" xml:id="p1cfd4n0v1b27s2"/>
+							    <note dur="brevis" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b27s2"/>
+							</layer>
+						</staff>
+						<staff n="3">
+							<layer n="1">
+							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b27s3"/>
+							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b27s3"/>
+							</layer>
+						</staff>
+						<staff n="4">
+							<layer n="1">
+							    <note dur="1" oct="3" pname="d" colored="true" xml:id="p1cdd3n0v1b27s4"/>
+							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27s4"/>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="27" right="end">
+						<staff n="1">
+							<layer n="1">
+							    <note dur="brevis" oct="4" pname="b" dots="1" xml:id="p1cbd4n0v1b28s1"/>
+							</layer>
+						</staff>
+						<staff n="2">
+							<layer n="1">
+							    <note dur="brevis" oct="4" pname="f" dots="1" xml:id="p1cfd4n0v1b28s2"/>
+							</layer>
+						</staff>
+						<staff n="3">
+							<layer n="1">
+							    <note dur="brevis" oct="4" pname="d" dots="1" xml:id="p1cdd4n0v1b28s3"/>
+							</layer>
+						</staff>
+						<staff n="4">
+							<layer n="1">
+								<note dur="brevis" oct="2" pname="b" dots="1" xml:id="p1cbd2n0v1b28s4"/>
+							</layer>
+						</staff>
+					</measure>
+				    <sb/>
+				</section>
+			</score>
+		</mdiv>
+	</body>
+</music>
+</mei>

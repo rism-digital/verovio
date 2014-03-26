@@ -23,12 +23,14 @@
 		<table class="table table-condensed">
 			<colgroup>
 		    	<col class="col-xs-1"/>
-		        <col class="col-xs-7"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
 			</colgroup>
 			<thead>
 		        <tr>
 		        	<th>Attribute</th>
 		        	<th>Comment</th>
+					<th>Class</th>
 		        </tr>
 			</thead>
 			<tbody>
@@ -36,6 +38,7 @@
 		        <tr>
 		          	<td><code>@{{ attribute[0] }}</code></td>
 		          	<td>{{ attribute[1] }}</td>
+					<td>{{ attribute[2] }}</td>
 				</tr>
 			{% endfor %}
 			</tbody>

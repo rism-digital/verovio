@@ -1,0 +1,125 @@
+att-classes:
+  - id: "common"
+    attributes:
+    - ["label", "TODO", ""]
+    - ["n", "TOO", ""]
+
+classes:
+  - id: "accid"
+    att-classes:
+      - common
+    attributes:
+    - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
+    - ["oloc", "", ""]
+    - ["ploc", "", ""] 
+  - id: "beam"
+  - id: "barLine"
+  - id: "clef"
+    attributes:
+      - ["line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
+      - ["shape", "Supported values are 'C', 'F' and 'G'.", ""]
+  - id: "custos"
+    attributes:
+    - ["oct", "", ""]
+    - ["pname", "", ""]
+  - id: "dot"
+    attributes:
+    - ["oloc", "", ""]
+    - ["ploc", "", ""]
+  - id: "layer"
+    attributes:
+      - ["n", "The order of the <code>&lt;layer&gt;</code> elements must correspond to the values (1-based).", ""]
+  - id: "measure"
+    attributes:
+      - ["n", "", ""]
+      - ["right", "Supported values are 'dbl', 'end', 'rptstart', 'rptboth', 'rptend' and 'single'.", ""]
+  - id: "mensur"
+    attributes: 
+      - ["dot", "", ""]
+      - ["orient", "Only reversed is supported.", ""]	  
+      - ["num", "", ""]
+      - ["numbase", "", ""]
+      - ["slash", "Only 1 slash is supported.", ""]
+  - id: "mRest"
+  - id: "multiRest"
+    attributes:
+      - ["num", "", ""]
+  - id: "note"
+    attributes:
+      - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
+      - ["colored", "", ""]
+      - ["dots", "", ""]
+      - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
+      - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
+      - ["grace", "Currently all values will be treated undifferently", ""]
+      - ["lig", "", ""]
+      - ["oct", "", ""]
+      - ["pname", "", ""]
+      - ["tie", "", ""]
+  - id: "rest"
+    attributes:
+      - ["dots", "", ""]
+      - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
+      - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
+      - ["oloc", "", ""]
+      - ["ploc", "", ""]
+  - id: "scoreDef"
+    attributes:
+      - ["clef.dis", "Only value '8' is supported and it assumes shape 'G' and line 2.", ""]
+      - ["clef.line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
+      - ["clef.shape", "Supported values are 'C', 'F' and 'G'.", ""]
+      - ["key.sig", "Mixed key signatures are not supported.", ""]
+  - id: "staff"
+    attributes:
+      - ["n", "The order of the <code>&lt;staff&gt;</code> elements must correspond to the values (1-based).", ""]
+      - ["uly", "This is used for positionned page-based encoding.", ""]
+  - id: "staffDef"
+    attributes:
+      - ["n", "The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).", ""]
+      - ["clef.line", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
+      - ["clef.shape", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
+      - ["clef.gis", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
+      - ["key.sig", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
+  - id: "staffGrp"
+    attributes:
+      - ["symbol", "Supported values are 'brace', 'bracket' and 'line'. Default value is 'none' (no symbol).", ""]
+      - ["barthru", "Default value is 'false'.", ""]
+  - id: "tuplet"
+    attributes:   
+      - ["num", "", ""]
+      - ["numbase", "", ""]
+
+page-based-classes:
+  - id: "page"
+    no-doc: true
+    comment: "Several attributes of <code>&lt;page&gt;</code> are stored in the <code>&lt;scoreDef&gt;</code> element in uncustomized MEI."
+    attributes:
+      - ["page.height", "", ""]
+      - ["page.leftmar", "", ""]
+      - ["page.rightmar", "", ""]
+      - ["page.topmar", "", ""]
+      - ["page.width", "", ""]
+      - ["surface", "", ""]
+  - id: "secb"
+    no-doc: true
+    comment: "Currently, <code>&lt;secb&gt;</code> elements are not handled."
+  - id: "system"
+    no-doc: true
+    comment: "Several attributes of <code>&lt;system&gt;</code> are stored in the <code>&lt;scoreDef&gt;</code> element in uncustomized MEI."
+    attributes:
+      - ["system.leftmar", "", ""]
+      - ["system.rightmar", "", ""]
+      - ["uly", "This is used for positionned page-based encoding.", ""]
+
+loaded-classes:
+  - id: "pb"
+    comment: "During import, <code>&lt;pb&gt;</code> elements are converted to <code>&lt;page&gt;</code> elements unless the <code>--ignore-layout</code> or the <code>--no-layout</code> option was selected."
+  - id: "sb"
+    comment: "During import, <code>&lt;sb&gt;</code> elements are converted to <code>&lt;system&gt;</code> elements unless the <code>--ignore-layout</code> or the <code>--no-layout</code> option was selected."
+  - id: "score"
+  - id: "section"
+    comment: "During import, <code>&lt;section&gt;</code> elements are converted to <code>&lt;secb&gt;</code> elements."
+  - id: "slur"
+    comment: "During import and whenever possible, <code>&lt;slur&gt;</code> elements are converted to <code>@slur</code> attributes. This is possible only when the <code>&lt;slur&gt;</code> element refers to two notes with a <code>@startid</code> and an <code>@endid</code> attribute."
+  - id: "tupletSpan"
+    comment: "During import and whenever possible, <code>&lt;tupletSpan&gt;</code> elements are converted to <code>&lt;tuplet&gt;</code> elements."
