@@ -25,10 +25,10 @@ mei-doc-root: http://music-encoding.org/documentation/guidelines2013/
 						The tag is defined in the MeiSupported plugin.
 						
 						For this to work properly:
-						1) uncomment {% mei_supported_to_liquid supported-mei.yml %} in doc.html
+						1) uncomment {_% mei_supported_to_liquid supported-mei.yml %_} in doc.html
 						2) compile the page
 						3) copy _site/doc.html to _include/doc.html
-						4) recomment  {% mei_supported_to_liquid supported-mei.yml %} in doc.html before commiting
+						4) recomment  {_% mei_supported_to_liquid supported-mei.yml %_} in doc.html before commiting
 					{% endcomment %}
 					{% include doc.html %}
 				
