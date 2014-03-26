@@ -1,13 +1,11 @@
 att-classes:
   - id: "common"
     attributes:
-    - ["label", "TODO", ""]
-    - ["n", "TOO", ""]
+    - ["label", "", ""]
+    - ["n", "Only numeric values are supported", ""]
 
 classes:
   - id: "accid"
-    att-classes:
-      - common
     attributes:
     - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
     - ["oloc", "", ""]
@@ -30,6 +28,8 @@ classes:
     attributes:
       - ["n", "The order of the <code>&lt;layer&gt;</code> elements must correspond to the values (1-based).", ""]
   - id: "measure"
+    att-classes:
+      - common
     attributes:
       - ["n", "", ""]
       - ["right", "Supported values are 'dbl', 'end', 'rptstart', 'rptboth', 'rptend' and 'single'.", ""]
