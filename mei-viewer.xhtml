@@ -321,7 +321,7 @@ downloads:
 						Navigation
 					</div>
 					<div class="col-xs-2">
-						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out.">
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out. On desktops, you can use [ctrl+] left or right arrows and +/- keys.">
 							<span class="glyphicon glyphicon-question-sign"/>
 						</button>
 					</div>
@@ -445,6 +445,32 @@ downloads:
 <script type="text/javascript">
 //<![CDATA[
 	$( document ).ready(function() {
+		
+		$(window).keyup(function(event){
+			// We need to make sure not to capture event on text fields
+			if ( $(event.target).hasClass('form-control') ) {
+				return;
+			}
+			if ( event.ctrlKey && (event.keyCode == 37) ) {
+				first_page();
+			}
+			else if ( event.keyCode == 37 ) {
+				prev_page();
+			}
+			else if ( event.ctrlKey && (event.keyCode == 39) ) {
+				last_page();
+			}
+			else if ( event.keyCode == 39 ) {
+				next_page();
+			}
+			else if ( event.keyCode == 107 ) {
+				zoom_in();
+			}
+			else if ( event.keyCode == 109 ) {
+				zoom_out();
+			}
+		});
+		
 		
 		// Toggle for the options help
 		$( "#options_help" ).click(function() {
