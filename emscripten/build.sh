@@ -1,4 +1,4 @@
-#/bin/bash
+#!/usr/bin/env bash
 
 function print_help {
 	 echo "Usage:
@@ -8,7 +8,12 @@ function print_help {
 
 VEROVIO_ROOT=../
 VEROVIO_INCLUDE=../include/vrv
-EMCC=`which emcc`
+if command -v emcc 2&>1; then
+	EMCC=`command -v emcc`
+else
+	echo >&2 "I require the emscripten compiler (emcc) but it's not installed.  Aborting.";
+	exit 1;
+fi
 
 if [ ! -d build ]; then mkdir build; fi
 
