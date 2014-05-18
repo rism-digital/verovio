@@ -61,7 +61,7 @@ FILENAME="verovio-toolkit$ASM_NAME$VERSION_NAME.js"
 echo "Sync svg resources"
 cp -r ../data/svg data/
 
-echo "Compliling"
+echo "Compiling"
 
 python $EMCC --closure 1 -O2 \
 	-I./lib/jsonxx \
