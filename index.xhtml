@@ -1,0 +1,93 @@
+---
+layout: verovio
+verovio-light: true
+title: Vevorio
+active: home
+---
+
+<div class="row">
+	
+	<div class="col-md-7">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p>
+					Verovio is a fast, portable and lightweight library for engraving <a href="http://www.music-encoding.org" target="_blank">Music Encoding Initiative</a> (MEI) music scores into SVG. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++ with no dependencies on third-party frameworks and libraries. Verovio implements its own rendering engine, which can render SVG with all the musical symbols embedded in it and without dependency on external fonts. In addition to MEI, Verovio can also render Plain and Easy (PAE) code and DARMS code. 
+				</p> 
+				
+				<p>
+					Since the rendering engine is defined as an abstract component, Verovio is highly modular and can be used in different contexts, including as a JavaScript toolkit. It is possible to implement easily a rendering output different from SVG if needed.
+				</p>
+					
+				<div class="text-center" style="padding: 10px 0px;">
+					<img src="{{ site.baseurl }}/images/verovio-modularity.png" width="320"/>
+				</div>
+			</div>
+		</div>
+		
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p>
+					Verovio is developped by the Swiss RISM Office and is supported by the Swiss National Science Foundation. It is available under the GPLv3 license.
+				</p>
+				<div class="text-center">
+					<a href="http://www.rism-ch.org" target="_blank">
+						<img src="{{ site.baseurl }}/images/rism_header_72a.png" style="padding: 20px 0px;" width="320"/>
+					</a>
+					<a href="http://www.snf.ch" target="_blank">
+						<img src="{{ site.baseurl }}/images/snf.png" style="padding: 20px"/>
+					</a>
+				</div>
+				
+			</div>
+		</div>
+		
+	</div>
+	
+	<div class="col-md-5">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<div id="hummel-p5" style="display: none;" class="text-center">
+					{% include svg/hummel-p5.svg %}
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<h5>Why Verovio?</h5>
+				<p>
+					Verovio is named after a Dutch music engraver, Simone Verovio, how was active in Rome in the late sixteenth century. He was one of the very first to use engraving on cupper plates for printing music, a technique that revealed to be the most suited to music about one century later.
+				</p>
+				<div class="text-center">
+					<img src="{{ site.baseurl }}/images/verovio-staff.png"/>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	function adjust_svg_size( div, pageWidth, pageHeight, zoom ) {
+		// adjust the size according to the width of the div
+		$( div ).show();
+		width = $( div ).width();
+		if ( width < zoom * pageWidth / 100 ) {
+			zoom = width * 100 / pageWidth;
+		}
+		$( div + ' svg g.page-scale').attr("transform", "scale(" + zoom / 100 + ", "+ zoom / 100 +")") ;
+		$( div + ' svg').height(pageHeight * zoom / 100 );
+		$( div + ' svg').width(pageWidth * zoom / 100 );		
+		
+		if ( $( div + ' svg') ) {
+			$( div + ' svg').height(pageHeight * zoom / 100 );
+			$( div + ' svg').width(pageWidth * zoom / 100 );	
+		}
+	}
+
+	$( document ).ready(function() {
+		adjust_svg_size( "#hummel-p5", 2100, 2800, 20 );
+	});
+//]]>
+</script>

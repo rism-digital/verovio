@@ -1,0 +1,2038 @@
+<svg width="2100px" height="2800px" version="1.1" xmlns="http://www.w3.org/2000/svg"  xmlns:xlink="http://www.w3.org/1999/xlink">
+	<defs>
+		<path id="clef_G" d="M614 906Q614 861 536 772Q468 695 394 641V735Q419 843 469 930T583 1063Q601 1036 607 998T614 906ZM367 -236Q301 -236 251 -216T162 -158Q98 -95 98 14Q98 23 98 32Q100 45 100 51Q100 125 134 188Q162 239 228 306T363 441L371 449V262Q273 243 221 161Q178 93 178 6Q178 -47 195 -78Q195 -83 203 -81T207 -71Q207 29 231 82Q269 166 371 166V-237L367 -236ZM591 -30Q591 -110 532 -169T394 -236V167Q490 167 543 109Q591 56 591 -30ZM655 858Q656 866 656 875T656 890Q656 967 636 1047T583 1154Q517 1120 441 1011Q371 911 371 872V620Q369 610 270 524Q156 424 94 334Q0 197 0 59Q0 -14 22 -72Q54 -156 128 -206Q220 -268 371 -268V-503Q371 -550 319 -590T204 -631Q159 -631 126 -608Q87 -581 66 -525Q93 -546 118 -556T166 -567Q211 -567 240 -530T269 -446Q269 -396 246 -365Q217 -327 157 -327Q96 -327 67 -367T37 -473Q37 -494 39 -514T47 -548Q68 -601 113 -628T211 -655Q284 -655 337 -612Q394 -565 394 -491V-267Q483 -267 566 -212Q679 -137 679 -1Q679 127 597 201Q525 266 425 266L394 265V473Q472 551 506 588Q570 659 605 718Q648 791 655 858Z" transform="scale(1.0, -1.0)"/>
+		<path id="alt_sharp" d="M136 200V382H153V205L197 220V123L153 108V-70L197 -57V-155L153 -169V-336H136V-174L60 -198V-364H43V-204L0 -218V-121L43 -106V73L0 58V157L43 171V353H60V177L136 200ZM60 78V-101L136 -77V103L60 78Z" transform="scale(1.0, -1.0)"/>
+		<path id="head_quarter" d="M185 135Q206 135 226 130T263 111T289 80T299 38Q299 1 272 -39T191 -107T81 -135Q-15 -135 -15 -39Q-15 15 34 69Q94 135 185 135Z" transform="scale(1.0, -1.0)"/>
+		<path id="slash_down" d="M417 511Q440 455 440 400Q440 332 405 268Q375 212 318 159Q277 120 237 83T164 20V196Q224 207 251 214Q320 235 365 281Q419 337 419 414Q419 458 404 499T370 566Q363 575 357 587Q356 589 355 592Q355 597 360 597Q364 597 373 590Q382 579 392 562T417 511Z" transform="scale(1.0, -1.0)"/>
+		<path id="slash_up" d="M206 -566Q224 -541 239 -500T255 -414Q255 -337 201 -281Q156 -235 87 -214Q60 -207 0 -196V-20Q24 -39 53 -65Q59 -70 154 -159Q209 -211 240 -267Q276 -333 276 -400Q276 -455 253 -511Q242 -538 233 -555T209 -590Q200 -597 196 -597Q191 -597 191 -592Q193 -587 195 -582T206 -566Z" transform="scale(1.0, -1.0)"/>
+		<path id="rest_4" d="M61 650Q60 651 59 652T58 655L56 658Q60 662 63 662Q82 662 105 641T200 554Q226 530 234 521T249 505T259 490Q268 478 268 461Q268 430 230 396Q211 380 198 368T178 346T165 319T154 265Q175 197 217 137Q234 110 259 79T324 0Q311 0 267 21L201 52L179 58L154 59Q114 59 90 27L86 13L85 0Q85 -31 106 -58Q114 -68 127 -83T154 -111Q182 -134 184 -143L181 -146Q163 -138 154 -130Q148 -128 132 -118T106 -102Q67 -80 39 -48Q7 -16 0 27Q0 128 85 128Q150 128 230 73Q200 114 171 143L137 175L94 212Q50 248 32 269T13 310Q133 412 133 505Q133 522 129 540T114 577Q96 615 61 650Z" transform="scale(1.0, -1.0)"/>
+		<path id="clef_F" d="M158 111Q186 111 200 105Q208 102 215 98T229 87T246 62L262 23Q262 -2 255 -17Q251 -34 236 -48Q229 -56 222 -61Q219 -63 203 -73Q193 -79 179 -84T152 -91Q122 -91 95 -83Q72 -74 40 -47Q5 -15 5 53Q5 84 13 114Q22 141 37 165Q60 206 98 226T183 256L220 262L236 266Q277 266 310 261T373 243Q428 219 460 176Q493 138 510 84Q528 36 528 -23Q528 -92 511 -154T460 -273Q393 -381 287 -450Q267 -463 232 -482Q204 -498 174 -512Q116 -539 48 -561L18 -566Q4 -566 4 -558Q6 -550 8 -548L14 -542Q45 -529 64 -520Q94 -506 110 -498L188 -455Q223 -434 249 -412T301 -360Q346 -308 375 -230Q379 -218 385 -197T397 -153T407 -97T413 -58Q402 45 390 82Q386 100 384 105T374 122Q362 140 343 156Q308 188 225 200Q191 200 163 194T112 172Q70 143 70 99Q70 91 70 83Q73 75 74 72Q110 105 158 111ZM642 -60Q654 -60 665 -64T682 -78T692 -95T698 -118Q698 -131 693 -139Q690 -148 680 -160Q665 -176 642 -176Q615 -176 601 -159Q585 -142 585 -118Q585 -94 601 -77Q615 -60 642 -60ZM642 177Q665 177 681 160T698 119Q698 97 682 79T642 61L619 64Q611 67 601 77Q585 95 585 119L588 142Q593 153 601 160Q616 177 642 177Z" transform="scale(1.0, -1.0)"/>
+		<path id="clef_C" d="M0 546H128V-536H0V546ZM190 546H237V50Q246 55 256 63T277 81Q294 100 306 123Q316 146 322 176Q327 209 327 244Q339 187 406 178Q468 193 491 235T515 358Q515 393 507 420T481 466Q451 504 406 504Q376 504 356 481T335 413Q340 423 349 428T377 439Q386 439 395 435L413 424L424 409L431 389Q424 337 371 337Q329 337 308 364T287 443Q294 468 301 483T320 510Q331 522 345 528Q347 530 357 534T374 540L411 544L449 546Q551 546 603 495T655 352L659 316Q659 231 593 171Q560 144 513 128Q463 114 403 114L302 19V-17L403 -107Q451 -107 483 -114T552 -137Q609 -166 628 -210Q634 -222 639 -234T647 -262Q655 -292 655 -323Q655 -376 639 -414T591 -481Q556 -507 515 -520T421 -534Q395 -534 373 -529T330 -511T297 -480Q285 -459 285 -438Q297 -338 369 -329Q393 -329 413 -348T434 -387Q425 -425 371 -431Q356 -431 339 -414Q339 -428 341 -435T343 -445L354 -469Q369 -486 411 -493Q442 -486 463 -473T493 -440T506 -390T510 -313Q510 -245 481 -206Q466 -188 448 -176Q429 -168 408 -168L380 -178Q368 -183 361 -189Q343 -204 324 -241Q324 -168 309 -121Q301 -97 285 -80T237 -50V-536H190V546Z" transform="scale(1.0, -1.0)"/>
+		<path id="head_half" d="M14 -66Q18 -84 27 -91T63 -98Q113 -90 178 -45T256 35Q263 48 263 61Q263 77 252 88T220 100Q202 100 179 90Q86 43 47 3Q14 -31 14 -66ZM185 135Q206 135 226 130T263 111T289 80T299 38Q299 1 272 -39T191 -107T81 -135Q-15 -135 -15 -39Q-15 15 34 69Q94 135 185 135Z" transform="scale(1.0, -1.0)"/>
+		<path id="oblique_figure_3" d="M255 87Q255 53 228 26Q208 8 173 -7Q212 -38 212 -71Q212 -110 174 -142Q168 -147 157 -154T136 -164Q118 -171 94 -171H82Q76 -171 62 -169Q46 -165 35 -160Q0 -145 0 -115Q0 -70 37 -66Q48 -66 58 -75T71 -97Q71 -105 60 -118L53 -123Q47 -129 47 -139L58 -148L75 -152Q106 -152 131 -115Q150 -83 150 -45Q143 -22 127 -16T84 -10L90 13Q141 13 167 26Q197 44 197 96Q194 119 185 127T158 136L138 133Q126 128 126 117Q129 107 131 103L135 92L138 82L135 70Q128 61 115 57Q104 55 92 62T79 84Q79 113 105 134T161 155Q202 155 229 140Q241 131 248 117T255 87Z" transform="scale(1.0, -1.0)"/>
+		<path id="oblique_figure_2" d="M260 75Q260 35 220 11L150 -21Q95 -36 54 -81H75L101 -83L113 -89L130 -96L155 -106Q164 -110 176 -110L191 -106L202 -98Q209 -91 221 -72L238 -81L222 -109Q219 -114 212 -126T202 -140Q174 -171 145 -171H135L125 -166L99 -151L84 -140Q66 -130 52 -130Q40 -133 31 -142L28 -147L23 -156H0Q0 -116 20 -84Q31 -70 39 -63L67 -38L105 -17L126 -5L145 4Q169 15 184 34Q203 56 203 79L204 91Q204 111 192 122Q183 136 164 136Q121 136 112 92L115 80L117 64Q117 52 115 48Q108 35 92 35Q81 35 72 44Q66 53 66 63Q66 98 97 126T166 155Q206 155 229 142Q260 123 260 75Z" transform="scale(1.0, -1.0)"/>
+		<path id="oblique_figure_1" d="M207 155L122 -120Q119 -125 127 -130L135 -133L153 -135H164L158 -156H0L6 -135H21Q31 -135 42 -130Q56 -128 62 -110L117 66L46 10L36 20L145 155H207Z" transform="scale(1.0, -1.0)"/>
+	</defs>
+	<g class="page-scale" transform="scale(1.000000, 1.000000)">
+		<g class="page-margin" transform="translate(50, 50)">
+			<g class="system" id="system-000000145749393" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+				<g class="measure" id="d1e16484" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+					<g class="staff" id="staff-000000186136885" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 158 L610 158" style="stroke-width:2;" />
+						<path d="M0 176 L610 176" style="stroke-width:2;" />
+						<path d="M0 194 L610 194" style="stroke-width:2;" />
+						<path d="M0 212 L610 212" style="stroke-width:2;" />
+						<path d="M0 230 L610 230" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000007279691" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 212) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000046164879" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 158) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 185) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 149) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 176) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16501" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 158) scale(0.067871, 0.067871)"/>
+							<path d="M206 221 L206 161" style="stroke-width:2;" />
+							<ellipse cx="239" cy="149" rx="3" ry="3" />
+							<ellipse cx="257" cy="149" rx="3" ry="3" />
+						</g>
+						<g class="note" id="d1e16519" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(369, 158) scale(0.067871, 0.067871)"/>
+							<path d="M369 230 L369 161" style="stroke-width:2;" />
+							<use xlink:href="#slash_down" transform="translate(358, 231) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#slash_down" transform="translate(358, 213) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16535" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M410 122 L440 122" style="stroke-width:2;" />
+							<path d="M410 140 L440 140" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(414, 122) scale(0.067871, 0.067871)"/>
+							<path d="M414 185 L414 125" style="stroke-width:2;" />
+							<path d="M410 122 L440 122" style="stroke-width:2;" />
+							<path d="M410 140 L440 140" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e16554" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M505 104 L535 104" style="stroke-width:2;" />
+							<path d="M505 122 L535 122" style="stroke-width:2;" />
+							<path d="M505 140 L535 140" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(509, 104) scale(0.067871, 0.067871)"/>
+							<path d="M509 167 L509 107" style="stroke-width:2;" />
+							<path d="M505 104 L535 104" style="stroke-width:2;" />
+							<path d="M505 122 L535 122" style="stroke-width:2;" />
+							<path d="M505 140 L535 140" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000069360123" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 338 L610 338" style="stroke-width:2;" />
+						<path d="M0 356 L610 356" style="stroke-width:2;" />
+						<path d="M0 374 L610 374" style="stroke-width:2;" />
+						<path d="M0 392 L610 392" style="stroke-width:2;" />
+						<path d="M0 410 L610 410" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000093587495" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 392) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000152234521" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 338) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 365) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 329) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 356) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16573" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 401) scale(0.067871, 0.067871)"/>
+							<path d="M226 338 L226 399" style="stroke-width:2;" />
+							<ellipse cx="239" cy="401" rx="3" ry="3" />
+							<ellipse cx="257" cy="401" rx="3" ry="3" />
+						</g>
+						<g class="note" id="d1e16591" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(369, 401) scale(0.067871, 0.067871)"/>
+							<path d="M389 329 L389 399" style="stroke-width:2;" />
+							<use xlink:href="#slash_up" transform="translate(390, 328) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#slash_up" transform="translate(390, 346) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16607" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(414, 365) scale(0.067871, 0.067871)"/>
+							<path d="M414 428 L414 368" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e16626" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(509, 347) scale(0.067871, 0.067871)"/>
+							<path d="M509 410 L509 350" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000154251632" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 518 L610 518" style="stroke-width:2;" />
+						<path d="M0 536 L610 536" style="stroke-width:2;" />
+						<path d="M0 554 L610 554" style="stroke-width:2;" />
+						<path d="M0 572 L610 572" style="stroke-width:2;" />
+						<path d="M0 590 L610 590" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000032519753" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 572) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000091858065" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 518) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 545) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 509) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 536) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16645" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 563) scale(0.067871, 0.067871)"/>
+							<path d="M226 500 L226 561" style="stroke-width:2;" />
+							<g class="accid" id="symb-000000054233705" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#alt_sharp" transform="translate(186, 563) scale(0.067871, 0.067871)"/>
+							</g>
+							<ellipse cx="239" cy="563" rx="3" ry="3" />
+							<ellipse cx="257" cy="563" rx="3" ry="3" />
+						</g>
+						<g class="note" id="d1e16665" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(369, 563) scale(0.067871, 0.067871)"/>
+							<path d="M389 491 L389 561" style="stroke-width:2;" />
+							<use xlink:href="#slash_up" transform="translate(390, 490) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#slash_up" transform="translate(390, 508) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16681" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(414, 563) scale(0.067871, 0.067871)"/>
+							<path d="M434 500 L434 561" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e16697" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(509, 563) scale(0.067871, 0.067871)"/>
+							<path d="M529 500 L529 561" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000090219077" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 698 L610 698" style="stroke-width:2;" />
+						<path d="M0 716 L610 716" style="stroke-width:2;" />
+						<path d="M0 734 L610 734" style="stroke-width:2;" />
+						<path d="M0 752 L610 752" style="stroke-width:2;" />
+						<path d="M0 770 L610 770" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000092917104" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 752) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000173048730" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 698) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 725) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 689) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 716) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(138, 743) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(156, 707) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16715" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 752) scale(0.067871, 0.067871)"/>
+							<path d="M226 689 L226 750" style="stroke-width:2;" />
+							<ellipse cx="239" cy="743" rx="3" ry="3" />
+							<ellipse cx="257" cy="743" rx="3" ry="3" />
+						</g>
+						<g class="note" id="d1e16733" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(369, 752) scale(0.067871, 0.067871)"/>
+							<path d="M389 680 L389 750" style="stroke-width:2;" />
+							<use xlink:href="#slash_up" transform="translate(390, 679) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#slash_up" transform="translate(390, 697) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16749" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(414, 716) scale(0.067871, 0.067871)"/>
+							<path d="M414 779 L414 719" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e16768" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(509, 698) scale(0.067871, 0.067871)"/>
+							<path d="M509 761 L509 701" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000173767809" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 878 L610 878" style="stroke-width:2;" />
+						<path d="M0 896 L610 896" style="stroke-width:2;" />
+						<path d="M0 914 L610 914" style="stroke-width:2;" />
+						<path d="M0 932 L610 932" style="stroke-width:2;" />
+						<path d="M0 950 L610 950" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000121269421" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 932) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000144173681" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 878) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 905) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 869) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 896) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(138, 923) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(156, 887) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16789" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 914) scale(0.067871, 0.067871)"/>
+							<path d="M226 851 L226 912" style="stroke-width:2;" />
+							<g class="accid" id="symb-000000113821828" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#alt_sharp" transform="translate(186, 914) scale(0.067871, 0.067871)"/>
+							</g>
+							<ellipse cx="239" cy="905" rx="3" ry="3" />
+							<ellipse cx="257" cy="905" rx="3" ry="3" />
+						</g>
+						<g class="note" id="d1e16809" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(369, 914) scale(0.067871, 0.067871)"/>
+							<path d="M389 842 L389 912" style="stroke-width:2;" />
+							<use xlink:href="#slash_up" transform="translate(390, 841) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#slash_up" transform="translate(390, 859) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16825" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(414, 914) scale(0.067871, 0.067871)"/>
+							<path d="M434 851 L434 912" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e16841" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(509, 914) scale(0.067871, 0.067871)"/>
+							<path d="M529 851 L529 912" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000048260015" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 1058 L610 1058" style="stroke-width:2;" />
+						<path d="M0 1076 L610 1076" style="stroke-width:2;" />
+						<path d="M0 1094 L610 1094" style="stroke-width:2;" />
+						<path d="M0 1112 L610 1112" style="stroke-width:2;" />
+						<path d="M0 1130 L610 1130" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000014711158" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 1112) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000067848427" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 1058) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 1085) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 1049) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 1076) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(138, 1103) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16859" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 1112) scale(0.067871, 0.067871)"/>
+							<path d="M226 1049 L226 1110" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000127051060" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e16875" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(295, 1112) scale(0.067871, 0.067871)"/>
+								<ellipse cx="328" cy="1103" rx="3" ry="3" />
+							</g>
+							<g class="note" id="d1e16894" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(369, 1112) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="note" id="d1e16914" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(414, 1112) scale(0.067871, 0.067871)"/>
+							<path d="M434 1049 L434 1110" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e16930" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(509, 1112) scale(0.067871, 0.067871)"/>
+							<path d="M529 1049 L529 1110" style="stroke-width:2;" />
+						</g>
+						<path d="M315 1110 L315 1047" style="stroke-width:2;" />
+						<path d="M389 1110 L389 1047" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="315,1045 389,1045 389,1054 315,1054 " /> 
+						<polygon style="fill-rule:nonzero; " points="374,1058 389,1058 389,1067 374,1067 " /> 
+					</g>
+					<g class="staff" id="staff-000000099831696" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 1238 L610 1238" style="stroke-width:2;" />
+						<path d="M0 1256 L610 1256" style="stroke-width:2;" />
+						<path d="M0 1274 L610 1274" style="stroke-width:2;" />
+						<path d="M0 1292 L610 1292" style="stroke-width:2;" />
+						<path d="M0 1310 L610 1310" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000015319369" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000051122956" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 1238) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 1265) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 1229) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 1256) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(138, 1283) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16948" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 1292) scale(0.067871, 0.067871)"/>
+							<path d="M226 1229 L226 1290" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e16964" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(295, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="rest" id="d1e16972" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="414" y="1265" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000123026726" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 1418 L610 1418" style="stroke-width:2;" />
+						<path d="M0 1436 L610 1436" style="stroke-width:2;" />
+						<path d="M0 1454 L610 1454" style="stroke-width:2;" />
+						<path d="M0 1472 L610 1472" style="stroke-width:2;" />
+						<path d="M0 1490 L610 1490" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000110191107" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 1472) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000143074173" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 1418) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 1445) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 1409) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 1436) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="mrest" id="d1e16982" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="402" y="1454" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000003736782" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 1598 L610 1598" style="stroke-width:2;" />
+						<path d="M0 1616 L610 1616" style="stroke-width:2;" />
+						<path d="M0 1634 L610 1634" style="stroke-width:2;" />
+						<path d="M0 1652 L610 1652" style="stroke-width:2;" />
+						<path d="M0 1670 L610 1670" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000126451236" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_F" transform="translate(9, 1616) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000030353651" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 1616) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 1643) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 1607) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 1634) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="mrest" id="d1e16990" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="402" y="1634" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000105224974" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 1778 L610 1778" style="stroke-width:2;" />
+						<path d="M0 1796 L610 1796" style="stroke-width:2;" />
+						<path d="M0 1814 L610 1814" style="stroke-width:2;" />
+						<path d="M0 1832 L610 1832" style="stroke-width:2;" />
+						<path d="M0 1850 L610 1850" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000104095616" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 1832) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000156988308" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 1778) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 1805) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 1769) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 1796) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e16998" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 1778) scale(0.067871, 0.067871)"/>
+							<path d="M206 1841 L206 1781" style="stroke-width:2;" />
+							<ellipse cx="239" cy="1769" rx="3" ry="3" />
+							<ellipse cx="257" cy="1769" rx="3" ry="3" />
+						</g>
+						<g class="note" id="d1e17016" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(369, 1778) scale(0.067871, 0.067871)"/>
+							<path d="M369 1850 L369 1781" style="stroke-width:2;" />
+							<use xlink:href="#slash_down" transform="translate(358, 1851) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#slash_down" transform="translate(358, 1833) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="beam" id="beam-000000038341663" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e17032" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M410 1742 L440 1742" style="stroke-width:2;" />
+								<path d="M410 1760 L440 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(414, 1742) scale(0.067871, 0.067871)"/>
+								<path d="M410 1742 L440 1742" style="stroke-width:2;" />
+								<path d="M410 1760 L440 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e17053" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M461 1760 L491 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(465, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M461 1760 L491 1760" style="stroke-width:2;" />
+								<g class="accid" id="symb-000000025045574" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(445, 1760) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e17076" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M505 1760 L535 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(509, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M505 1760 L535 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e17097" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M550 1724 L580 1724" style="stroke-width:2;" />
+								<path d="M550 1742 L580 1742" style="stroke-width:2;" />
+								<path d="M550 1760 L580 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(554, 1724) scale(0.067871, 0.067871)"/>
+								<path d="M550 1724 L580 1724" style="stroke-width:2;" />
+								<path d="M550 1742 L580 1742" style="stroke-width:2;" />
+								<path d="M550 1760 L580 1760" style="stroke-width:2;" />
+							</g>
+						</g>
+						<path d="M414 1745 L414 1837" style="stroke-width:2;" />
+						<path d="M465 1763 L465 1831" style="stroke-width:2;" />
+						<path d="M509 1763 L509 1826" style="stroke-width:2;" />
+						<path d="M554 1727 L554 1822" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="414,1839 554,1824 554,1815 414,1830 " /> 
+					</g>
+					<g class="staff" id="staff-000000101437357" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 1958 L610 1958" style="stroke-width:2;" />
+						<path d="M0 1976 L610 1976" style="stroke-width:2;" />
+						<path d="M0 1994 L610 1994" style="stroke-width:2;" />
+						<path d="M0 2012 L610 2012" style="stroke-width:2;" />
+						<path d="M0 2030 L610 2030" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000205501689" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_G" transform="translate(9, 2012) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000163459664" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 1958) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 1985) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 1949) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 1976) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="beam" id="beam-000000154534646" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e17118" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(206, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17134" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(250, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17150" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(295, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17166" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(339, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000100919751" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e17182" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(414, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17198" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(465, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17214" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(509, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17232" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(554, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M206 1970 L206 2028" style="stroke-width:2;" />
+						<path d="M250 1970 L250 2028" style="stroke-width:2;" />
+						<path d="M295 1970 L295 2028" style="stroke-width:2;" />
+						<path d="M339 1970 L339 2028" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="206,2030 339,2030 339,2021 206,2021 " /> 
+						<path d="M414 1970 L414 2028" style="stroke-width:2;" />
+						<path d="M465 1970 L465 2028" style="stroke-width:2;" />
+						<path d="M509 1961 L509 2028" style="stroke-width:2;" />
+						<path d="M554 1961 L554 2028" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="414,2030 554,2030 554,2021 414,2021 " /> 
+					</g>
+					<g class="staff" id="staff-000000143468640" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 2138 L610 2138" style="stroke-width:2;" />
+						<path d="M0 2156 L610 2156" style="stroke-width:2;" />
+						<path d="M0 2174 L610 2174" style="stroke-width:2;" />
+						<path d="M0 2192 L610 2192" style="stroke-width:2;" />
+						<path d="M0 2210 L610 2210" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000070765541" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_C" transform="translate(9, 2174) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000077255868" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 2147) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 2174) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 2138) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 2165) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="beam" id="beam-000000068994401" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e17253" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(206, 2129) scale(0.067871, 0.067871)"/>
+								<g class="accid" id="symb-000000034179170" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(186, 2129) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e17273" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(250, 2129) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17291" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(295, 2129) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17309" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(339, 2129) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000180519674" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e17327" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M410 2120 L440 2120" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(414, 2111) scale(0.067871, 0.067871)"/>
+								<path d="M410 2120 L440 2120" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e17345" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(465, 2156) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17361" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(509, 2147) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e17379" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(554, 2147) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M206 2132 L206 2190" style="stroke-width:2;" />
+						<path d="M250 2132 L250 2190" style="stroke-width:2;" />
+						<path d="M295 2132 L295 2190" style="stroke-width:2;" />
+						<path d="M339 2132 L339 2190" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="206,2192 339,2192 339,2183 206,2183 " /> 
+						<path d="M414 2114 L414 2206" style="stroke-width:2;" />
+						<path d="M465 2159 L465 2217" style="stroke-width:2;" />
+						<path d="M509 2150 L509 2227" style="stroke-width:2;" />
+						<path d="M554 2150 L554 2237" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="414,2208 554,2239 554,2230 414,2199 " /> 
+					</g>
+					<g class="staff" id="staff-000000089634209" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 2318 L610 2318" style="stroke-width:2;" />
+						<path d="M0 2336 L610 2336" style="stroke-width:2;" />
+						<path d="M0 2354 L610 2354" style="stroke-width:2;" />
+						<path d="M0 2372 L610 2372" style="stroke-width:2;" />
+						<path d="M0 2390 L610 2390" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000188239018" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_F" transform="translate(9, 2336) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000125152241" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 2336) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 2363) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 2327) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 2354) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17399" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 2363) scale(0.067871, 0.067871)"/>
+							<path d="M226 2300 L226 2361" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e17418" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(295, 2345) scale(0.067871, 0.067871)"/>
+							<path d="M295 2408 L295 2348" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e17435" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_half" transform="translate(414, 2363) scale(0.067871, 0.067871)"/>
+							<path d="M434 2300 L434 2361" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000029192527" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M0 2498 L610 2498" style="stroke-width:2;" />
+						<path d="M0 2516 L610 2516" style="stroke-width:2;" />
+						<path d="M0 2534 L610 2534" style="stroke-width:2;" />
+						<path d="M0 2552 L610 2552" style="stroke-width:2;" />
+						<path d="M0 2570 L610 2570" style="stroke-width:2;" />
+						<g class="clef" id="clef-000000159966883" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#clef_F" transform="translate(9, 2516) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="keysig" id="ksig-000000133225823" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#alt_sharp" transform="translate(66, 2516) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(84, 2543) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(102, 2507) scale(0.067871, 0.067871)"/>
+							<use xlink:href="#alt_sharp" transform="translate(120, 2534) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17453" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(206, 2543) scale(0.067871, 0.067871)"/>
+							<path d="M226 2480 L226 2541" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e17472" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(295, 2525) scale(0.067871, 0.067871)"/>
+							<path d="M295 2588 L295 2528" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e17489" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_half" transform="translate(414, 2543) scale(0.067871, 0.067871)"/>
+							<path d="M434 2480 L434 2541" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="barline" id="bline-000000163675726" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M609 157 L609 951" style="stroke-width:2;" />
+						<path d="M609 1057 L609 1311" style="stroke-width:2;" />
+						<path d="M609 1417 L609 1491" style="stroke-width:2;" />
+						<path d="M609 1597 L609 1671" style="stroke-width:2;" />
+						<path d="M609 1777 L609 2571" style="stroke-width:2;" />
+					</g>
+				</g>
+				<g class="measure" id="d1e17505" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+					<g class="staff" id="staff-000000091664066" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 158 L1053 158" style="stroke-width:2;" />
+						<path d="M610 176 L1053 176" style="stroke-width:2;" />
+						<path d="M610 194 L1053 194" style="stroke-width:2;" />
+						<path d="M610 212 L1053 212" style="stroke-width:2;" />
+						<path d="M610 230 L1053 230" style="stroke-width:2;" />
+						<g class="note" id="d1e17512" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M620 122 L650 122" style="stroke-width:2;" />
+							<path d="M620 140 L650 140" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(624, 113) scale(0.067871, 0.067871)"/>
+							<path d="M624 176 L624 116" style="stroke-width:2;" />
+							<path d="M620 122 L650 122" style="stroke-width:2;" />
+							<path d="M620 140 L650 140" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17528" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 212) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17536" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 167) scale(0.067871, 0.067871)"/>
+							<path d="M834 230 L834 170" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17550" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 212) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000042397149" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 338 L1053 338" style="stroke-width:2;" />
+						<path d="M610 356 L1053 356" style="stroke-width:2;" />
+						<path d="M610 374 L1053 374" style="stroke-width:2;" />
+						<path d="M610 392 L1053 392" style="stroke-width:2;" />
+						<path d="M610 410 L1053 410" style="stroke-width:2;" />
+						<g class="note" id="d1e17564" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M620 320 L650 320" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(624, 311) scale(0.067871, 0.067871)"/>
+							<path d="M624 374 L624 314" style="stroke-width:2;" />
+							<path d="M620 320 L650 320" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17578" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 392) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17586" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 347) scale(0.067871, 0.067871)"/>
+							<path d="M834 410 L834 350" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17600" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 392) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000067689015" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 518 L1053 518" style="stroke-width:2;" />
+						<path d="M610 536 L1053 536" style="stroke-width:2;" />
+						<path d="M610 554 L1053 554" style="stroke-width:2;" />
+						<path d="M610 572 L1053 572" style="stroke-width:2;" />
+						<path d="M610 590 L1053 590" style="stroke-width:2;" />
+						<g class="note" id="d1e17614" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(624, 518) scale(0.067871, 0.067871)"/>
+							<path d="M624 581 L624 521" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17630" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 572) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17638" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 563) scale(0.067871, 0.067871)"/>
+							<path d="M854 500 L854 561" style="stroke-width:2;" />
+							<g class="accid" id="symb-000000212198108" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#alt_sharp" transform="translate(814, 563) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="rest" id="d1e17656" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 572) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000090238374" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 698 L1053 698" style="stroke-width:2;" />
+						<path d="M610 716 L1053 716" style="stroke-width:2;" />
+						<path d="M610 734 L1053 734" style="stroke-width:2;" />
+						<path d="M610 752 L1053 752" style="stroke-width:2;" />
+						<path d="M610 770 L1053 770" style="stroke-width:2;" />
+						<g class="note" id="d1e17670" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M620 662 L650 662" style="stroke-width:2;" />
+							<path d="M620 680 L650 680" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(624, 662) scale(0.067871, 0.067871)"/>
+							<path d="M624 725 L624 665" style="stroke-width:2;" />
+							<path d="M620 662 L650 662" style="stroke-width:2;" />
+							<path d="M620 680 L650 680" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17686" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 752) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17694" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 698) scale(0.067871, 0.067871)"/>
+							<path d="M834 761 L834 701" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17710" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 752) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000032189529" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 878 L1053 878" style="stroke-width:2;" />
+						<path d="M610 896 L1053 896" style="stroke-width:2;" />
+						<path d="M610 914 L1053 914" style="stroke-width:2;" />
+						<path d="M610 932 L1053 932" style="stroke-width:2;" />
+						<path d="M610 950 L1053 950" style="stroke-width:2;" />
+						<g class="note" id="d1e17724" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(624, 869) scale(0.067871, 0.067871)"/>
+							<path d="M624 932 L624 872" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17740" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 932) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17748" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 914) scale(0.067871, 0.067871)"/>
+							<path d="M854 851 L854 912" style="stroke-width:2;" />
+							<g class="accid" id="symb-000000087516986" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#alt_sharp" transform="translate(814, 914) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="rest" id="d1e17766" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 932) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000152173488" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 1058 L1053 1058" style="stroke-width:2;" />
+						<path d="M610 1076 L1053 1076" style="stroke-width:2;" />
+						<path d="M610 1094 L1053 1094" style="stroke-width:2;" />
+						<path d="M610 1112 L1053 1112" style="stroke-width:2;" />
+						<path d="M610 1130 L1053 1130" style="stroke-width:2;" />
+						<g class="note" id="d1e17780" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(624, 1085) scale(0.067871, 0.067871)"/>
+							<path d="M624 1148 L624 1088" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17796" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 1112) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17804" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 1085) scale(0.067871, 0.067871)"/>
+							<path d="M834 1148 L834 1088" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17820" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 1112) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000168825292" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 1238 L1053 1238" style="stroke-width:2;" />
+						<path d="M610 1256 L1053 1256" style="stroke-width:2;" />
+						<path d="M610 1274 L1053 1274" style="stroke-width:2;" />
+						<path d="M610 1292 L1053 1292" style="stroke-width:2;" />
+						<path d="M610 1310 L1053 1310" style="stroke-width:2;" />
+						<g class="note" id="d1e17834" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(624, 1301) scale(0.067871, 0.067871)"/>
+							<path d="M644 1238 L644 1299" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17850" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17858" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 1310) scale(0.067871, 0.067871)"/>
+							<path d="M854 1247 L854 1308" style="stroke-width:2;" />
+							<g class="accid" id="symb-000000086443955" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#alt_sharp" transform="translate(814, 1310) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="rest" id="d1e17876" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000159220915" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 1418 L1053 1418" style="stroke-width:2;" />
+						<path d="M610 1436 L1053 1436" style="stroke-width:2;" />
+						<path d="M610 1454 L1053 1454" style="stroke-width:2;" />
+						<path d="M610 1472 L1053 1472" style="stroke-width:2;" />
+						<path d="M610 1490 L1053 1490" style="stroke-width:2;" />
+						<g class="mrest" id="d1e17890" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="832" y="1454" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000114208244" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 1598 L1053 1598" style="stroke-width:2;" />
+						<path d="M610 1616 L1053 1616" style="stroke-width:2;" />
+						<path d="M610 1634 L1053 1634" style="stroke-width:2;" />
+						<path d="M610 1652 L1053 1652" style="stroke-width:2;" />
+						<path d="M610 1670 L1053 1670" style="stroke-width:2;" />
+						<g class="note" id="d1e17902" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(624, 1652) scale(0.067871, 0.067871)"/>
+							<path d="M644 1589 L644 1650" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17916" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(713, 1652) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e17924" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 1616) scale(0.067871, 0.067871)"/>
+							<path d="M834 1679 L834 1619" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e17940" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(922, 1652) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000076744961" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 1778 L1053 1778" style="stroke-width:2;" />
+						<path d="M610 1796 L1053 1796" style="stroke-width:2;" />
+						<path d="M610 1814 L1053 1814" style="stroke-width:2;" />
+						<path d="M610 1832 L1053 1832" style="stroke-width:2;" />
+						<path d="M610 1850 L1053 1850" style="stroke-width:2;" />
+						<g class="note" id="d1e17954" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M620 1742 L650 1742" style="stroke-width:2;" />
+							<path d="M620 1760 L650 1760" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(624, 1733) scale(0.067871, 0.067871)"/>
+							<path d="M624 1796 L624 1736" style="stroke-width:2;" />
+							<path d="M620 1742 L650 1742" style="stroke-width:2;" />
+							<path d="M620 1760 L650 1760" style="stroke-width:2;" />
+							<ellipse cx="657" cy="1733" rx="3" ry="3" />
+						</g>
+						<g class="tuplet" id="tuplet-000000005215893" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="beam" id="beam-000000151547971" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<g class="note" id="d1e17971" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(757, 1814) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e17997" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(783, 1805) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18022" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(808, 1796) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+						</g>
+						<g class="note" id="d1e18050" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 1787) scale(0.067871, 0.067871)"/>
+							<path d="M834 1850 L834 1790" style="stroke-width:2;" />
+							<ellipse cx="867" cy="1787" rx="3" ry="3" />
+						</g>
+						<g class="tuplet" id="tuplet-000000072244902" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="beam" id="beam-000000096829041" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<g class="note" id="d1e18065" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(967, 1805) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18093" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(992, 1796) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18118" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(1018, 1787) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+						</g>
+						<path d="M757 1817 L757 1879" style="stroke-width:2;" />
+						<path d="M783 1808 L783 1871" style="stroke-width:2;" />
+						<path d="M808 1799 L808 1864" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="757,1881 808,1866 808,1857 757,1872 " /> 
+						<polygon style="fill-rule:nonzero; " points="757,1868 808,1853 808,1844 757,1859 " /> 
+						<path d="M967 1808 L967 1870" style="stroke-width:2;" />
+						<path d="M992 1799 L992 1863" style="stroke-width:2;" />
+						<path d="M1018 1790 L1018 1855" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="967,1872 1018,1857 1018,1848 967,1863 " /> 
+						<polygon style="fill-rule:nonzero; " points="967,1859 1018,1844 1018,1835 967,1850 " /> 
+						<use xlink:href="#oblique_figure_3" transform="translate(770, 1891) scale(0.067871, 0.067871)"/>
+						<use xlink:href="#oblique_figure_3" transform="translate(980, 1882) scale(0.067871, 0.067871)"/>
+						<g class="tie" id="slur-000000170657736" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000 fill-opacity:1.0; ">
+							<path d="M768,1800 C780,1770 804,1770 819,1782 C804,1776 780,1776 768,1800" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000065415060" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000 fill-opacity:1.0; ">
+							<path d="M978,1791 C990,1761 1014,1761 1029,1773 C1014,1767 990,1767 978,1791" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000026051409" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000 fill-opacity:1.0; ">
+						<path d="M610 1958 L1053 1958" style="stroke-width:2;" />
+						<path d="M610 1976 L1053 1976" style="stroke-width:2;" />
+						<path d="M610 1994 L1053 1994" style="stroke-width:2;" />
+						<path d="M610 2012 L1053 2012" style="stroke-width:2;" />
+						<path d="M610 2030 L1053 2030" style="stroke-width:2;" />
+						<g class="note" id="d1e18150" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M620 1940 L650 1940" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(624, 1931) scale(0.067871, 0.067871)"/>
+							<path d="M624 1994 L624 1934" style="stroke-width:2;" />
+							<path d="M620 1940 L650 1940" style="stroke-width:2;" />
+							<ellipse cx="657" cy="1931" rx="3" ry="3" />
+						</g>
+						<g class="tuplet" id="tuplet-000000134049647" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="beam" id="beam-000000160291903" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<g class="note" id="d1e18165" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(757, 1994) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18191" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(783, 1985) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18216" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(808, 1976) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+						</g>
+						<g class="note" id="d1e18244" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(834, 1967) scale(0.067871, 0.067871)"/>
+							<path d="M834 2030 L834 1970" style="stroke-width:2;" />
+							<ellipse cx="867" cy="1967" rx="3" ry="3" />
+						</g>
+						<g class="tuplet" id="tuplet-000000145496785" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="beam" id="beam-000000001459367" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<g class="note" id="d1e18259" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(967, 1985) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18287" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(992, 1976) scale(0.067871, 0.067871)"/>
+								</g>
+								<g class="note" id="d1e18312" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#head_quarter" transform="translate(1018, 1967) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+						</g>
+						<path d="M757 1997 L757 2059" style="stroke-width:2;" />
+						<path d="M783 1988 L783 2051" style="stroke-width:2;" />
+						<path d="M808 1979 L808 2044" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="757,2061 808,2046 808,2037 757,2052 " /> 
+						<polygon style="fill-rule:nonzero; " points="757,2048 808,2033 808,2024 757,2039 " /> 
+						<path d="M967 1988 L967 2050" style="stroke-width:2;" />
+						<path d="M992 1979 L992 2043" style="stroke-width:2;" />
+						<path d="M1018 1970 L1018 2035" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="967,2052 1018,2037 1018,2028 967,2043 " /> 
+						<polygon style="fill-rule:nonzero; " points="967,2039 1018,2024 1018,2015 967,2030 " /> 
+						<use xlink:href="#oblique_figure_3" transform="translate(770, 2071) scale(0.067871, 0.067871)"/>
+						<use xlink:href="#oblique_figure_3" transform="translate(980, 2062) scale(0.067871, 0.067871)"/>
+						<g class="tie" id="slur-000000173606460" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000 fill-opacity:1.0; ">
+							<path d="M768,1980 C780,1950 804,1950 819,1962 C804,1956 780,1956 768,1980" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000017752125" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000 fill-opacity:1.0; ">
+							<path d="M978,1971 C990,1941 1014,1941 1029,1953 C1014,1947 990,1947 978,1971" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000207016982" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000 fill-opacity:1.0; ">
+						<path d="M610 2138 L1053 2138" style="stroke-width:2;" />
+						<path d="M610 2156 L1053 2156" style="stroke-width:2;" />
+						<path d="M610 2174 L1053 2174" style="stroke-width:2;" />
+						<path d="M610 2192 L1053 2192" style="stroke-width:2;" />
+						<path d="M610 2210 L1053 2210" style="stroke-width:2;" />
+						<g class="beam" id="beam-000000180288540" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18340" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(624, 2183) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18356" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(668, 2165) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18374" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(713, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18392" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(757, 2183) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000155400250" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18408" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(834, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18426" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(878, 2156) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18442" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(922, 2165) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18460" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(967, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M644 2181 L644 2104" style="stroke-width:2;" />
+						<path d="M688 2163 L688 2104" style="stroke-width:2;" />
+						<path d="M733 2172 L733 2104" style="stroke-width:2;" />
+						<path d="M777 2181 L777 2104" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="644,2102 777,2102 777,2111 644,2111 " /> 
+						<path d="M834 2177 L834 2235" style="stroke-width:2;" />
+						<path d="M878 2159 L878 2235" style="stroke-width:2;" />
+						<path d="M922 2168 L922 2235" style="stroke-width:2;" />
+						<path d="M967 2177 L967 2235" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="834,2237 967,2237 967,2228 834,2228 " /> 
+					</g>
+					<g class="staff" id="staff-000000212101258" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 2318 L1053 2318" style="stroke-width:2;" />
+						<path d="M610 2336 L1053 2336" style="stroke-width:2;" />
+						<path d="M610 2354 L1053 2354" style="stroke-width:2;" />
+						<path d="M610 2372 L1053 2372" style="stroke-width:2;" />
+						<path d="M610 2390 L1053 2390" style="stroke-width:2;" />
+						<g class="beam" id="beam-000000191258906" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18484" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(624, 2372) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18500" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(668, 2354) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18518" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(713, 2363) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18536" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(757, 2372) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000127956245" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18552" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(834, 2363) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18570" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(878, 2345) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18586" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(922, 2354) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18604" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(967, 2363) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M644 2370 L644 2293" style="stroke-width:2;" />
+						<path d="M688 2352 L688 2293" style="stroke-width:2;" />
+						<path d="M733 2361 L733 2293" style="stroke-width:2;" />
+						<path d="M777 2370 L777 2293" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="644,2291 777,2291 777,2300 644,2300 " /> 
+						<path d="M854 2361 L854 2284" style="stroke-width:2;" />
+						<path d="M898 2343 L898 2284" style="stroke-width:2;" />
+						<path d="M942 2352 L942 2284" style="stroke-width:2;" />
+						<path d="M987 2361 L987 2284" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="854,2282 987,2282 987,2291 854,2291 " /> 
+					</g>
+					<g class="staff" id="staff-000000139238841" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M610 2498 L1053 2498" style="stroke-width:2;" />
+						<path d="M610 2516 L1053 2516" style="stroke-width:2;" />
+						<path d="M610 2534 L1053 2534" style="stroke-width:2;" />
+						<path d="M610 2552 L1053 2552" style="stroke-width:2;" />
+						<path d="M610 2570 L1053 2570" style="stroke-width:2;" />
+						<g class="beam" id="beam-000000148672860" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18628" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(624, 2552) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18644" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(668, 2534) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18662" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(713, 2543) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18680" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(757, 2552) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000171490979" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18696" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(834, 2543) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18714" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(878, 2525) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18730" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(922, 2534) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18748" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(967, 2543) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M644 2550 L644 2473" style="stroke-width:2;" />
+						<path d="M688 2532 L688 2473" style="stroke-width:2;" />
+						<path d="M733 2541 L733 2473" style="stroke-width:2;" />
+						<path d="M777 2550 L777 2473" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="644,2471 777,2471 777,2480 644,2480 " /> 
+						<path d="M854 2541 L854 2464" style="stroke-width:2;" />
+						<path d="M898 2523 L898 2464" style="stroke-width:2;" />
+						<path d="M942 2532 L942 2464" style="stroke-width:2;" />
+						<path d="M987 2541 L987 2464" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="854,2462 987,2462 987,2471 854,2471 " /> 
+					</g>
+					<g class="barline" id="bline-000000171272609" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 157 L1052 951" style="stroke-width:2;" />
+						<path d="M1052 1057 L1052 1311" style="stroke-width:2;" />
+						<path d="M1052 1417 L1052 1491" style="stroke-width:2;" />
+						<path d="M1052 1597 L1052 1671" style="stroke-width:2;" />
+						<path d="M1052 1777 L1052 2571" style="stroke-width:2;" />
+					</g>
+				</g>
+				<g class="measure" id="d1e18766" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+					<g class="staff" id="staff-000000116556126" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 158 L1525 158" style="stroke-width:2;" />
+						<path d="M1052 176 L1525 176" style="stroke-width:2;" />
+						<path d="M1052 194 L1525 194" style="stroke-width:2;" />
+						<path d="M1052 212 L1525 212" style="stroke-width:2;" />
+						<path d="M1052 230 L1525 230" style="stroke-width:2;" />
+						<g class="note" id="d1e18768" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 158) scale(0.067871, 0.067871)"/>
+							<path d="M1062 221 L1062 161" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000026309231" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18784" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1130, 149) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18804" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1160, 158) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18824" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1189, 167) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18842" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1219, 158) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000081537687" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18862" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1258 140 L1288 140" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1262, 140) scale(0.067871, 0.067871)"/>
+								<path d="M1258 140 L1288 140" style="stroke-width:2;" />
+								<g class="accid" id="symb-000000090879615" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(1242, 140) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e18884" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1296, 149) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18904" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1325, 158) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e18924" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1355, 149) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000159304489" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e18944" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1380 140 L1410 140" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1384, 131) scale(0.067871, 0.067871)"/>
+								<path d="M1380 140 L1410 140" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e18962" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1417 140 L1447 140" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1421, 140) scale(0.067871, 0.067871)"/>
+								<path d="M1417 140 L1447 140" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e18983" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1454, 149) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19003" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1480 140 L1510 140" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1484, 140) scale(0.067871, 0.067871)"/>
+								<path d="M1480 140 L1510 140" style="stroke-width:2;" />
+							</g>
+						</g>
+						<path d="M1130 152 L1130 225" style="stroke-width:2;" />
+						<path d="M1160 161 L1160 229" style="stroke-width:2;" />
+						<path d="M1189 170 L1189 232" style="stroke-width:2;" />
+						<path d="M1219 161 L1219 236" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1130,227 1219,238 1219,229 1130,218 " /> 
+						<polygon style="fill-rule:nonzero; " points="1130,214 1219,225 1219,216 1130,205 " /> 
+						<path d="M1262 143 L1262 216" style="stroke-width:2;" />
+						<path d="M1296 152 L1296 220" style="stroke-width:2;" />
+						<path d="M1325 161 L1325 223" style="stroke-width:2;" />
+						<path d="M1355 152 L1355 227" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1262,218 1355,229 1355,220 1262,209 " /> 
+						<polygon style="fill-rule:nonzero; " points="1262,205 1355,216 1355,207 1262,196 " /> 
+						<path d="M1384 134 L1384 206" style="stroke-width:2;" />
+						<path d="M1421 143 L1421 210" style="stroke-width:2;" />
+						<path d="M1454 152 L1454 214" style="stroke-width:2;" />
+						<path d="M1484 143 L1484 217" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1384,208 1484,219 1484,210 1384,199 " /> 
+						<polygon style="fill-rule:nonzero; " points="1384,195 1484,206 1484,197 1384,186 " /> 
+					</g>
+					<g class="staff" id="staff-000000081821467" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 338 L1525 338" style="stroke-width:2;" />
+						<path d="M1052 356 L1525 356" style="stroke-width:2;" />
+						<path d="M1052 374 L1525 374" style="stroke-width:2;" />
+						<path d="M1052 392 L1525 392" style="stroke-width:2;" />
+						<path d="M1052 410 L1525 410" style="stroke-width:2;" />
+						<g class="note" id="d1e19024" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 374) scale(0.067871, 0.067871)"/>
+							<path d="M1082 311 L1082 372" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19038" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 392) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e19046" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 347) scale(0.067871, 0.067871)"/>
+							<path d="M1262 410 L1262 350" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19060" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 338) scale(0.067871, 0.067871)"/>
+							<path d="M1384 401 L1384 341" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000098896932" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 518 L1525 518" style="stroke-width:2;" />
+						<path d="M1052 536 L1525 536" style="stroke-width:2;" />
+						<path d="M1052 554 L1525 554" style="stroke-width:2;" />
+						<path d="M1052 572 L1525 572" style="stroke-width:2;" />
+						<path d="M1052 590 L1525 590" style="stroke-width:2;" />
+						<g class="note" id="d1e19077" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 581) scale(0.067871, 0.067871)"/>
+							<path d="M1082 518 L1082 579" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19093" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 572) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e19101" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 554) scale(0.067871, 0.067871)"/>
+							<path d="M1282 491 L1282 552" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19115" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 545) scale(0.067871, 0.067871)"/>
+							<path d="M1384 608 L1384 548" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000053351045" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 698 L1525 698" style="stroke-width:2;" />
+						<path d="M1052 716 L1525 716" style="stroke-width:2;" />
+						<path d="M1052 734 L1525 734" style="stroke-width:2;" />
+						<path d="M1052 752 L1525 752" style="stroke-width:2;" />
+						<path d="M1052 770 L1525 770" style="stroke-width:2;" />
+						<g class="note" id="d1e19132" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 725) scale(0.067871, 0.067871)"/>
+							<path d="M1062 788 L1062 728" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19148" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 752) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e19156" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 698) scale(0.067871, 0.067871)"/>
+							<path d="M1262 761 L1262 701" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19172" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 689) scale(0.067871, 0.067871)"/>
+							<path d="M1384 752 L1384 692" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000159563343" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 878 L1525 878" style="stroke-width:2;" />
+						<path d="M1052 896 L1525 896" style="stroke-width:2;" />
+						<path d="M1052 914 L1525 914" style="stroke-width:2;" />
+						<path d="M1052 932 L1525 932" style="stroke-width:2;" />
+						<path d="M1052 950 L1525 950" style="stroke-width:2;" />
+						<g class="note" id="d1e19189" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 932) scale(0.067871, 0.067871)"/>
+							<path d="M1082 869 L1082 930" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19205" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 932) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e19213" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 905) scale(0.067871, 0.067871)"/>
+							<path d="M1262 968 L1262 908" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19229" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 896) scale(0.067871, 0.067871)"/>
+							<path d="M1384 959 L1384 899" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000111998268" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 1058 L1525 1058" style="stroke-width:2;" />
+						<path d="M1052 1076 L1525 1076" style="stroke-width:2;" />
+						<path d="M1052 1094 L1525 1094" style="stroke-width:2;" />
+						<path d="M1052 1112 L1525 1112" style="stroke-width:2;" />
+						<path d="M1052 1130 L1525 1130" style="stroke-width:2;" />
+						<g class="note" id="d1e19246" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 1085) scale(0.067871, 0.067871)"/>
+							<path d="M1062 1148 L1062 1088" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19262" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 1112) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="rest" id="d1e19270" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="1262" y="1085" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000161549259" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 1238 L1525 1238" style="stroke-width:2;" />
+						<path d="M1052 1256 L1525 1256" style="stroke-width:2;" />
+						<path d="M1052 1274 L1525 1274" style="stroke-width:2;" />
+						<path d="M1052 1292 L1525 1292" style="stroke-width:2;" />
+						<path d="M1052 1310 L1525 1310" style="stroke-width:2;" />
+						<g class="note" id="d1e19279" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 1301) scale(0.067871, 0.067871)"/>
+							<path d="M1082 1238 L1082 1299" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19295" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="rest" id="d1e19303" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="1262" y="1265" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000099509590" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 1418 L1525 1418" style="stroke-width:2;" />
+						<path d="M1052 1436 L1525 1436" style="stroke-width:2;" />
+						<path d="M1052 1454 L1525 1454" style="stroke-width:2;" />
+						<path d="M1052 1472 L1525 1472" style="stroke-width:2;" />
+						<path d="M1052 1490 L1525 1490" style="stroke-width:2;" />
+						<g class="mrest" id="d1e19312" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="1287" y="1454" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000040251122" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 1598 L1525 1598" style="stroke-width:2;" />
+						<path d="M1052 1616 L1525 1616" style="stroke-width:2;" />
+						<path d="M1052 1634 L1525 1634" style="stroke-width:2;" />
+						<path d="M1052 1652 L1525 1652" style="stroke-width:2;" />
+						<path d="M1052 1670 L1525 1670" style="stroke-width:2;" />
+						<g class="note" id="d1e19319" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 1652) scale(0.067871, 0.067871)"/>
+							<path d="M1082 1589 L1082 1650" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e19333" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1130, 1652) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="rest" id="d1e19341" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="1262" y="1625" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000067414429" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 1778 L1525 1778" style="stroke-width:2;" />
+						<path d="M1052 1796 L1525 1796" style="stroke-width:2;" />
+						<path d="M1052 1814 L1525 1814" style="stroke-width:2;" />
+						<path d="M1052 1832 L1525 1832" style="stroke-width:2;" />
+						<path d="M1052 1850 L1525 1850" style="stroke-width:2;" />
+						<g class="note" id="d1e19350" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 1778) scale(0.067871, 0.067871)"/>
+							<path d="M1062 1841 L1062 1781" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000116810237" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e19366" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1130, 1769) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19388" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1160, 1778) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19408" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1189, 1787) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19426" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1219, 1778) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000045585659" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e19448" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1258 1760 L1288 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1262, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M1258 1760 L1288 1760" style="stroke-width:2;" />
+								<g class="accid" id="symb-000000123333004" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(1242, 1760) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e19472" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1296, 1769) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19492" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1325, 1778) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19512" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1355, 1769) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000194419645" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e19534" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1380 1760 L1410 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1384, 1751) scale(0.067871, 0.067871)"/>
+								<path d="M1380 1760 L1410 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e19554" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1417 1760 L1447 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1421, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M1417 1760 L1447 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e19575" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1454, 1769) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19595" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1480 1760 L1510 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1484, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M1480 1760 L1510 1760" style="stroke-width:2;" />
+							</g>
+						</g>
+						<path d="M1130 1772 L1130 1845" style="stroke-width:2;" />
+						<path d="M1160 1781 L1160 1849" style="stroke-width:2;" />
+						<path d="M1189 1790 L1189 1852" style="stroke-width:2;" />
+						<path d="M1219 1781 L1219 1856" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1130,1847 1219,1858 1219,1849 1130,1838 " /> 
+						<polygon style="fill-rule:nonzero; " points="1130,1834 1219,1845 1219,1836 1130,1825 " /> 
+						<path d="M1262 1763 L1262 1836" style="stroke-width:2;" />
+						<path d="M1296 1772 L1296 1840" style="stroke-width:2;" />
+						<path d="M1325 1781 L1325 1843" style="stroke-width:2;" />
+						<path d="M1355 1772 L1355 1847" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1262,1838 1355,1849 1355,1840 1262,1829 " /> 
+						<polygon style="fill-rule:nonzero; " points="1262,1825 1355,1836 1355,1827 1262,1816 " /> 
+						<path d="M1384 1754 L1384 1826" style="stroke-width:2;" />
+						<path d="M1421 1763 L1421 1830" style="stroke-width:2;" />
+						<path d="M1454 1772 L1454 1834" style="stroke-width:2;" />
+						<path d="M1484 1763 L1484 1837" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1384,1828 1484,1839 1484,1830 1384,1819 " /> 
+						<polygon style="fill-rule:nonzero; " points="1384,1815 1484,1826 1484,1817 1384,1806 " /> 
+						<g class="tie" id="slur-000000031120355" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1141,1755 C1163,1737 1207,1737 1230,1764 C1207,1743 1163,1743 1141,1755" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000127538440" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1273,1746 C1296,1728 1342,1728 1366,1755 C1342,1734 1296,1734 1273,1746" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000135141412" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1395,1737 C1420,1719 1470,1719 1495,1746 C1470,1725 1420,1725 1395,1737" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000140240686" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 1958 L1525 1958" style="stroke-width:2;" />
+						<path d="M1052 1976 L1525 1976" style="stroke-width:2;" />
+						<path d="M1052 1994 L1525 1994" style="stroke-width:2;" />
+						<path d="M1052 2012 L1525 2012" style="stroke-width:2;" />
+						<path d="M1052 2030 L1525 2030" style="stroke-width:2;" />
+						<g class="note" id="d1e19618" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 1958) scale(0.067871, 0.067871)"/>
+							<path d="M1062 2021 L1062 1961" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000155757133" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e19634" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1130, 1949) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19656" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1160, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19676" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1189, 1967) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19694" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1219, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000119507072" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e19716" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1258 1940 L1288 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1262, 1940) scale(0.067871, 0.067871)"/>
+								<path d="M1258 1940 L1288 1940" style="stroke-width:2;" />
+								<g class="accid" id="symb-000000106585505" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(1242, 1940) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e19740" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1296, 1949) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19760" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1325, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19780" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1355, 1949) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000015484749" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e19802" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1380 1940 L1410 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1384, 1931) scale(0.067871, 0.067871)"/>
+								<path d="M1380 1940 L1410 1940" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e19822" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1417 1940 L1447 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1421, 1940) scale(0.067871, 0.067871)"/>
+								<path d="M1417 1940 L1447 1940" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e19843" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1454, 1949) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e19863" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1480 1940 L1510 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1484, 1940) scale(0.067871, 0.067871)"/>
+								<path d="M1480 1940 L1510 1940" style="stroke-width:2;" />
+							</g>
+						</g>
+						<path d="M1130 1952 L1130 2025" style="stroke-width:2;" />
+						<path d="M1160 1961 L1160 2029" style="stroke-width:2;" />
+						<path d="M1189 1970 L1189 2032" style="stroke-width:2;" />
+						<path d="M1219 1961 L1219 2036" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1130,2027 1219,2038 1219,2029 1130,2018 " /> 
+						<polygon style="fill-rule:nonzero; " points="1130,2014 1219,2025 1219,2016 1130,2005 " /> 
+						<path d="M1262 1943 L1262 2016" style="stroke-width:2;" />
+						<path d="M1296 1952 L1296 2020" style="stroke-width:2;" />
+						<path d="M1325 1961 L1325 2023" style="stroke-width:2;" />
+						<path d="M1355 1952 L1355 2027" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1262,2018 1355,2029 1355,2020 1262,2009 " /> 
+						<polygon style="fill-rule:nonzero; " points="1262,2005 1355,2016 1355,2007 1262,1996 " /> 
+						<path d="M1384 1934 L1384 2006" style="stroke-width:2;" />
+						<path d="M1421 1943 L1421 2010" style="stroke-width:2;" />
+						<path d="M1454 1952 L1454 2014" style="stroke-width:2;" />
+						<path d="M1484 1943 L1484 2017" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1384,2008 1484,2019 1484,2010 1384,1999 " /> 
+						<polygon style="fill-rule:nonzero; " points="1384,1995 1484,2006 1484,1997 1384,1986 " /> 
+						<g class="tie" id="slur-000000143019862" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1141,1935 C1163,1917 1207,1917 1230,1944 C1207,1923 1163,1923 1141,1935" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000056381269" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1273,1926 C1296,1908 1342,1908 1366,1935 C1342,1914 1296,1914 1273,1926" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000130214791" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1395,1917 C1420,1899 1470,1899 1495,1926 C1470,1905 1420,1905 1395,1917" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000000059214" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 2138 L1525 2138" style="stroke-width:2;" />
+						<path d="M1052 2156 L1525 2156" style="stroke-width:2;" />
+						<path d="M1052 2174 L1525 2174" style="stroke-width:2;" />
+						<path d="M1052 2192 L1525 2192" style="stroke-width:2;" />
+						<path d="M1052 2210 L1525 2210" style="stroke-width:2;" />
+						<g class="note" id="d1e19887" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 2183) scale(0.067871, 0.067871)"/>
+							<path d="M1082 2120 L1082 2181" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19905" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1130, 2183) scale(0.067871, 0.067871)"/>
+							<path d="M1150 2120 L1150 2181" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19923" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 2183) scale(0.067871, 0.067871)"/>
+							<path d="M1282 2120 L1282 2181" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19941" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 2174) scale(0.067871, 0.067871)"/>
+							<path d="M1404 2111 L1404 2172" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000214543332" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 2318 L1525 2318" style="stroke-width:2;" />
+						<path d="M1052 2336 L1525 2336" style="stroke-width:2;" />
+						<path d="M1052 2354 L1525 2354" style="stroke-width:2;" />
+						<path d="M1052 2372 L1525 2372" style="stroke-width:2;" />
+						<path d="M1052 2390 L1525 2390" style="stroke-width:2;" />
+						<g class="note" id="d1e19962" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 2354) scale(0.067871, 0.067871)"/>
+							<path d="M1082 2291 L1082 2352" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e19982" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1130, 2354) scale(0.067871, 0.067871)"/>
+							<path d="M1150 2291 L1150 2352" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e20002" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 2345) scale(0.067871, 0.067871)"/>
+							<path d="M1262 2408 L1262 2348" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e20020" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 2345) scale(0.067871, 0.067871)"/>
+							<path d="M1384 2408 L1384 2348" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000113715214" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1052 2498 L1525 2498" style="stroke-width:2;" />
+						<path d="M1052 2516 L1525 2516" style="stroke-width:2;" />
+						<path d="M1052 2534 L1525 2534" style="stroke-width:2;" />
+						<path d="M1052 2552 L1525 2552" style="stroke-width:2;" />
+						<path d="M1052 2570 L1525 2570" style="stroke-width:2;" />
+						<g class="note" id="d1e20039" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1062, 2534) scale(0.067871, 0.067871)"/>
+							<path d="M1082 2471 L1082 2532" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e20059" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1130, 2534) scale(0.067871, 0.067871)"/>
+							<path d="M1150 2471 L1150 2532" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e20079" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1262, 2525) scale(0.067871, 0.067871)"/>
+							<path d="M1262 2588 L1262 2528" style="stroke-width:2;" />
+						</g>
+						<g class="note" id="d1e20097" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1384, 2525) scale(0.067871, 0.067871)"/>
+							<path d="M1384 2588 L1384 2528" style="stroke-width:2;" />
+						</g>
+					</g>
+					<g class="barline" id="bline-000000023121101" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1524 157 L1524 951" style="stroke-width:2;" />
+						<path d="M1524 1057 L1524 1311" style="stroke-width:2;" />
+						<path d="M1524 1417 L1524 1491" style="stroke-width:2;" />
+						<path d="M1524 1597 L1524 1671" style="stroke-width:2;" />
+						<path d="M1524 1777 L1524 2571" style="stroke-width:2;" />
+					</g>
+				</g>
+				<g class="measure" id="d1e20115" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+					<g class="staff" id="staff-000000080866964" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 158 L2001 158" style="stroke-width:2;" />
+						<path d="M1525 176 L2001 176" style="stroke-width:2;" />
+						<path d="M1525 194 L2001 194" style="stroke-width:2;" />
+						<path d="M1525 212 L2001 212" style="stroke-width:2;" />
+						<path d="M1525 230 L2001 230" style="stroke-width:2;" />
+						<g class="note" id="d1e20117" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1535 140 L1565 140" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1539, 131) scale(0.067871, 0.067871)"/>
+							<path d="M1539 194 L1539 134" style="stroke-width:2;" />
+							<path d="M1535 140 L1565 140" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20131" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 212) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20139" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1768 140 L1798 140" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1772, 131) scale(0.067871, 0.067871)"/>
+							<path d="M1772 194 L1772 134" style="stroke-width:2;" />
+							<path d="M1768 140 L1798 140" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20153" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 212) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000194379756" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 338 L2001 338" style="stroke-width:2;" />
+						<path d="M1525 356 L2001 356" style="stroke-width:2;" />
+						<path d="M1525 374 L2001 374" style="stroke-width:2;" />
+						<path d="M1525 392 L2001 392" style="stroke-width:2;" />
+						<path d="M1525 410 L2001 410" style="stroke-width:2;" />
+						<g class="note" id="d1e20162" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1539, 338) scale(0.067871, 0.067871)"/>
+							<path d="M1539 401 L1539 341" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20178" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 392) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20186" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1772, 338) scale(0.067871, 0.067871)"/>
+							<path d="M1772 401 L1772 341" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20202" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 392) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000044851177" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 518 L2001 518" style="stroke-width:2;" />
+						<path d="M1525 536 L2001 536" style="stroke-width:2;" />
+						<path d="M1525 554 L2001 554" style="stroke-width:2;" />
+						<path d="M1525 572 L2001 572" style="stroke-width:2;" />
+						<path d="M1525 590 L2001 590" style="stroke-width:2;" />
+						<g class="note" id="d1e20211" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1539, 554) scale(0.067871, 0.067871)"/>
+							<path d="M1559 491 L1559 552" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20225" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 572) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20233" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1772, 554) scale(0.067871, 0.067871)"/>
+							<path d="M1792 491 L1792 552" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20247" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 572) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000018753947" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 698 L2001 698" style="stroke-width:2;" />
+						<path d="M1525 716 L2001 716" style="stroke-width:2;" />
+						<path d="M1525 734 L2001 734" style="stroke-width:2;" />
+						<path d="M1525 752 L2001 752" style="stroke-width:2;" />
+						<path d="M1525 770 L2001 770" style="stroke-width:2;" />
+						<g class="note" id="d1e20256" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1539, 689) scale(0.067871, 0.067871)"/>
+							<path d="M1539 752 L1539 692" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20272" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 752) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20280" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1772, 689) scale(0.067871, 0.067871)"/>
+							<path d="M1772 752 L1772 692" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20296" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 752) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000104218963" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 878 L2001 878" style="stroke-width:2;" />
+						<path d="M1525 896 L2001 896" style="stroke-width:2;" />
+						<path d="M1525 914 L2001 914" style="stroke-width:2;" />
+						<path d="M1525 932 L2001 932" style="stroke-width:2;" />
+						<path d="M1525 950 L2001 950" style="stroke-width:2;" />
+						<g class="note" id="d1e20305" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1539, 905) scale(0.067871, 0.067871)"/>
+							<path d="M1539 968 L1539 908" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20321" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 932) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20329" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1772, 905) scale(0.067871, 0.067871)"/>
+							<path d="M1772 968 L1772 908" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20345" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 932) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000076073697" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 1058 L2001 1058" style="stroke-width:2;" />
+						<path d="M1525 1076 L2001 1076" style="stroke-width:2;" />
+						<path d="M1525 1094 L2001 1094" style="stroke-width:2;" />
+						<path d="M1525 1112 L2001 1112" style="stroke-width:2;" />
+						<path d="M1525 1130 L2001 1130" style="stroke-width:2;" />
+						<g class="note" id="d1e20354" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1539, 1121) scale(0.067871, 0.067871)"/>
+							<path d="M1559 1058 L1559 1119" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20370" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 1112) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20378" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1772, 1121) scale(0.067871, 0.067871)"/>
+							<path d="M1792 1058 L1792 1119" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20394" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 1112) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000046648196" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 1238 L2001 1238" style="stroke-width:2;" />
+						<path d="M1525 1256 L2001 1256" style="stroke-width:2;" />
+						<path d="M1525 1274 L2001 1274" style="stroke-width:2;" />
+						<path d="M1525 1292 L2001 1292" style="stroke-width:2;" />
+						<path d="M1525 1310 L2001 1310" style="stroke-width:2;" />
+						<g class="note" id="d1e20403" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1535 1328 L1565 1328" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1539, 1328) scale(0.067871, 0.067871)"/>
+							<path d="M1559 1265 L1559 1326" style="stroke-width:2;" />
+							<path d="M1535 1328 L1565 1328" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20419" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20427" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1768 1328 L1798 1328" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1772, 1328) scale(0.067871, 0.067871)"/>
+							<path d="M1792 1265 L1792 1326" style="stroke-width:2;" />
+							<path d="M1768 1328 L1798 1328" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20443" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 1292) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000197636166" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 1418 L2001 1418" style="stroke-width:2;" />
+						<path d="M1525 1436 L2001 1436" style="stroke-width:2;" />
+						<path d="M1525 1454 L2001 1454" style="stroke-width:2;" />
+						<path d="M1525 1472 L2001 1472" style="stroke-width:2;" />
+						<path d="M1525 1490 L2001 1490" style="stroke-width:2;" />
+						<g class="mrest" id="d1e20452" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							 <rect x="1764" y="1454" width="22" height="9" rx="0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000198008247" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 1598 L2001 1598" style="stroke-width:2;" />
+						<path d="M1525 1616 L2001 1616" style="stroke-width:2;" />
+						<path d="M1525 1634 L2001 1634" style="stroke-width:2;" />
+						<path d="M1525 1652 L2001 1652" style="stroke-width:2;" />
+						<path d="M1525 1670 L2001 1670" style="stroke-width:2;" />
+						<g class="note" id="d1e20459" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1539, 1652) scale(0.067871, 0.067871)"/>
+							<path d="M1559 1589 L1559 1650" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20473" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1628, 1652) scale(0.067871, 0.067871)"/>
+						</g>
+						<g class="note" id="d1e20481" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#head_quarter" transform="translate(1772, 1652) scale(0.067871, 0.067871)"/>
+							<path d="M1792 1589 L1792 1650" style="stroke-width:2;" />
+						</g>
+						<g class="rest" id="d1e20495" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<use xlink:href="#rest_4" transform="translate(1860, 1652) scale(0.067871, 0.067871)"/>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000003288997" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 1778 L2001 1778" style="stroke-width:2;" />
+						<path d="M1525 1796 L2001 1796" style="stroke-width:2;" />
+						<path d="M1525 1814 L2001 1814" style="stroke-width:2;" />
+						<path d="M1525 1832 L2001 1832" style="stroke-width:2;" />
+						<path d="M1525 1850 L2001 1850" style="stroke-width:2;" />
+						<g class="note" id="d1e20504" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1535 1760 L1565 1760" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1539, 1751) scale(0.067871, 0.067871)"/>
+							<path d="M1539 1814 L1539 1754" style="stroke-width:2;" />
+							<path d="M1535 1760 L1565 1760" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000111884670" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e20521" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1624 1760 L1654 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1628, 1751) scale(0.067871, 0.067871)"/>
+								<path d="M1624 1760 L1654 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e20542" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1675 1760 L1705 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1679, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M1675 1760 L1705 1760" style="stroke-width:2;" />
+								<g class="accid" id="symb-000000166472572" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(1659, 1760) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e20566" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1712, 1769) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20586" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1742, 1778) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="note" id="d1e20608" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1768 1760 L1798 1760" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1772, 1751) scale(0.067871, 0.067871)"/>
+							<path d="M1772 1814 L1772 1754" style="stroke-width:2;" />
+							<path d="M1768 1760 L1798 1760" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000200501229" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e20625" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1856 1760 L1886 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1860, 1751) scale(0.067871, 0.067871)"/>
+								<path d="M1856 1760 L1886 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e20646" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1893 1760 L1923 1760" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1897, 1760) scale(0.067871, 0.067871)"/>
+								<path d="M1893 1760 L1923 1760" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e20668" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1930, 1769) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20688" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1960, 1778) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M1628 1754 L1628 1816" style="stroke-width:2;" />
+						<path d="M1679 1763 L1679 1828" style="stroke-width:2;" />
+						<path d="M1712 1772 L1712 1836" style="stroke-width:2;" />
+						<path d="M1742 1781 L1742 1843" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1628,1818 1742,1845 1742,1836 1628,1809 " /> 
+						<polygon style="fill-rule:nonzero; " points="1628,1805 1742,1832 1742,1823 1628,1796 " /> 
+						<path d="M1860 1754 L1860 1816" style="stroke-width:2;" />
+						<path d="M1897 1763 L1897 1826" style="stroke-width:2;" />
+						<path d="M1930 1772 L1930 1835" style="stroke-width:2;" />
+						<path d="M1960 1781 L1960 1843" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1860,1818 1960,1845 1960,1836 1860,1809 " /> 
+						<polygon style="fill-rule:nonzero; " points="1860,1805 1960,1832 1960,1823 1860,1796 " /> 
+						<g class="tie" id="tie-000000214052269" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1550,1737 C1572,1719 1616,1719 1639,1737 C1616,1725 1572,1725 1550,1737" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="tie-000000126826799" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1783,1737 C1805,1719 1849,1719 1871,1737 C1849,1725 1805,1725 1783,1737" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000140270405" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1690,1746 C1705,1731 1735,1731 1753,1764 C1735,1737 1705,1737 1690,1746" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000017159242" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1908,1746 C1923,1731 1953,1731 1971,1764 C1953,1737 1923,1737 1908,1746" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000096662049" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 1958 L2001 1958" style="stroke-width:2;" />
+						<path d="M1525 1976 L2001 1976" style="stroke-width:2;" />
+						<path d="M1525 1994 L2001 1994" style="stroke-width:2;" />
+						<path d="M1525 2012 L2001 2012" style="stroke-width:2;" />
+						<path d="M1525 2030 L2001 2030" style="stroke-width:2;" />
+						<g class="note" id="d1e20711" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1535 1940 L1565 1940" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1539, 1931) scale(0.067871, 0.067871)"/>
+							<path d="M1539 1994 L1539 1934" style="stroke-width:2;" />
+							<path d="M1535 1940 L1565 1940" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000060108232" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e20728" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1624 1940 L1654 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1628, 1931) scale(0.067871, 0.067871)"/>
+								<path d="M1624 1940 L1654 1940" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e20749" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1675 1940 L1705 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1679, 1940) scale(0.067871, 0.067871)"/>
+								<path d="M1675 1940 L1705 1940" style="stroke-width:2;" />
+								<g class="accid" id="symb-000000162827334" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+									<use xlink:href="#alt_sharp" transform="translate(1659, 1940) scale(0.067871, 0.067871)"/>
+								</g>
+							</g>
+							<g class="note" id="d1e20773" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1712, 1949) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20793" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1742, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="note" id="d1e20815" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1768 1940 L1798 1940" style="stroke-width:2;" />
+							<use xlink:href="#head_quarter" transform="translate(1772, 1931) scale(0.067871, 0.067871)"/>
+							<path d="M1772 1994 L1772 1934" style="stroke-width:2;" />
+							<path d="M1768 1940 L1798 1940" style="stroke-width:2;" />
+						</g>
+						<g class="beam" id="beam-000000042702022" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e20832" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1856 1940 L1886 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1860, 1931) scale(0.067871, 0.067871)"/>
+								<path d="M1856 1940 L1886 1940" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e20853" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<path d="M1893 1940 L1923 1940" style="stroke-width:2;" />
+								<use xlink:href="#head_quarter" transform="translate(1897, 1940) scale(0.067871, 0.067871)"/>
+								<path d="M1893 1940 L1923 1940" style="stroke-width:2;" />
+							</g>
+							<g class="note" id="d1e20875" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1930, 1949) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20895" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1960, 1958) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M1628 1934 L1628 1996" style="stroke-width:2;" />
+						<path d="M1679 1943 L1679 2008" style="stroke-width:2;" />
+						<path d="M1712 1952 L1712 2016" style="stroke-width:2;" />
+						<path d="M1742 1961 L1742 2023" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1628,1998 1742,2025 1742,2016 1628,1989 " /> 
+						<polygon style="fill-rule:nonzero; " points="1628,1985 1742,2012 1742,2003 1628,1976 " /> 
+						<path d="M1860 1934 L1860 1996" style="stroke-width:2;" />
+						<path d="M1897 1943 L1897 2006" style="stroke-width:2;" />
+						<path d="M1930 1952 L1930 2015" style="stroke-width:2;" />
+						<path d="M1960 1961 L1960 2023" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1860,1998 1960,2025 1960,2016 1860,1989 " /> 
+						<polygon style="fill-rule:nonzero; " points="1860,1985 1960,2012 1960,2003 1860,1976 " /> 
+						<g class="tie" id="tie-000000002214052" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1550,1917 C1572,1899 1616,1899 1639,1917 C1616,1905 1572,1905 1550,1917" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="tie-000000077369194" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1783,1917 C1805,1899 1849,1899 1871,1917 C1849,1905 1805,1905 1783,1917" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000203084950" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1690,1926 C1705,1911 1735,1911 1753,1944 C1735,1917 1705,1917 1690,1926" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+						<g class="tie" id="slur-000000038259553" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<path d="M1908,1926 C1923,1911 1953,1911 1971,1944 C1953,1917 1923,1917 1908,1926" style="fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:0" />
+						</g>
+					</g>
+					<g class="staff" id="staff-000000113137694" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 2138 L2001 2138" style="stroke-width:2;" />
+						<path d="M1525 2156 L2001 2156" style="stroke-width:2;" />
+						<path d="M1525 2174 L2001 2174" style="stroke-width:2;" />
+						<path d="M1525 2192 L2001 2192" style="stroke-width:2;" />
+						<path d="M1525 2210 L2001 2210" style="stroke-width:2;" />
+						<g class="beam" id="beam-000000168350138" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e20919" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1539, 2165) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20937" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1583, 2165) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20955" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1628, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e20973" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1712, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000086366318" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e20991" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1772, 2165) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21009" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1816, 2165) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21027" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1860, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21045" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1930, 2174) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M1539 2168 L1539 2235" style="stroke-width:2;" />
+						<path d="M1583 2168 L1583 2235" style="stroke-width:2;" />
+						<path d="M1628 2177 L1628 2235" style="stroke-width:2;" />
+						<path d="M1712 2177 L1712 2235" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1539,2237 1712,2237 1712,2228 1539,2228 " /> 
+						<path d="M1772 2168 L1772 2235" style="stroke-width:2;" />
+						<path d="M1816 2168 L1816 2235" style="stroke-width:2;" />
+						<path d="M1860 2177 L1860 2235" style="stroke-width:2;" />
+						<path d="M1930 2177 L1930 2235" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1772,2237 1930,2237 1930,2228 1772,2228 " /> 
+					</g>
+					<g class="staff" id="staff-000000041356176" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 2318 L2001 2318" style="stroke-width:2;" />
+						<path d="M1525 2336 L2001 2336" style="stroke-width:2;" />
+						<path d="M1525 2354 L2001 2354" style="stroke-width:2;" />
+						<path d="M1525 2372 L2001 2372" style="stroke-width:2;" />
+						<path d="M1525 2390 L2001 2390" style="stroke-width:2;" />
+						<g class="beam" id="beam-000000195924597" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e21064" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1539, 2354) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21082" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1583, 2354) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21100" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1628, 2345) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21116" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1712, 2345) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000023614519" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e21132" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1772, 2354) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21150" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1816, 2354) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21168" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1860, 2345) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21184" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1930, 2345) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M1539 2357 L1539 2415" style="stroke-width:2;" />
+						<path d="M1583 2357 L1583 2415" style="stroke-width:2;" />
+						<path d="M1628 2348 L1628 2415" style="stroke-width:2;" />
+						<path d="M1712 2348 L1712 2415" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1539,2417 1712,2417 1712,2408 1539,2408 " /> 
+						<path d="M1772 2357 L1772 2415" style="stroke-width:2;" />
+						<path d="M1816 2357 L1816 2415" style="stroke-width:2;" />
+						<path d="M1860 2348 L1860 2415" style="stroke-width:2;" />
+						<path d="M1930 2348 L1930 2415" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1772,2417 1930,2417 1930,2408 1772,2408 " /> 
+					</g>
+					<g class="staff" id="staff-000000007997024" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M1525 2498 L2001 2498" style="stroke-width:2;" />
+						<path d="M1525 2516 L2001 2516" style="stroke-width:2;" />
+						<path d="M1525 2534 L2001 2534" style="stroke-width:2;" />
+						<path d="M1525 2552 L2001 2552" style="stroke-width:2;" />
+						<path d="M1525 2570 L2001 2570" style="stroke-width:2;" />
+						<g class="beam" id="beam-000000048969091" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e21201" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1539, 2534) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21219" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1583, 2534) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21237" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1628, 2525) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21253" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1712, 2525) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<g class="beam" id="beam-000000079904788" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+							<g class="note" id="d1e21269" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1772, 2534) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21287" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1816, 2534) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21305" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1860, 2525) scale(0.067871, 0.067871)"/>
+							</g>
+							<g class="note" id="d1e21321" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+								<use xlink:href="#head_quarter" transform="translate(1930, 2525) scale(0.067871, 0.067871)"/>
+							</g>
+						</g>
+						<path d="M1539 2537 L1539 2595" style="stroke-width:2;" />
+						<path d="M1583 2537 L1583 2595" style="stroke-width:2;" />
+						<path d="M1628 2528 L1628 2595" style="stroke-width:2;" />
+						<path d="M1712 2528 L1712 2595" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1539,2597 1712,2597 1712,2588 1539,2588 " /> 
+						<path d="M1772 2537 L1772 2595" style="stroke-width:2;" />
+						<path d="M1816 2537 L1816 2595" style="stroke-width:2;" />
+						<path d="M1860 2528 L1860 2595" style="stroke-width:2;" />
+						<path d="M1930 2528 L1930 2595" style="stroke-width:2;" />
+						<polygon style="fill-rule:nonzero; " points="1772,2597 1930,2597 1930,2588 1772,2588 " /> 
+					</g>
+					<g class="barline" id="bline-000000214446520" style="stroke:#000000; stroke-opacity:1.0;  fill:#000000; fill-opacity:1.0; ">
+						<path d="M2000 157 L2000 951" style="stroke-width:2;" />
+						<path d="M2000 1057 L2000 1311" style="stroke-width:2;" />
+						<path d="M2000 1417 L2000 1491" style="stroke-width:2;" />
+						<path d="M2000 1597 L2000 1671" style="stroke-width:2;" />
+						<path d="M2000 1777 L2000 2571" style="stroke-width:2;" />
+					</g>
+				</g>
+				<path d="M0 157 L0 2571" style="stroke-width:2;" />
+				<path d="M-12 157 A26 18 0.0 0 0  6 150 " />
+				<path d="M6 957 A26 18 0.0 0 0  -12 951 " />
+				 <rect x="-13" y="157" width="9" height="794" rx="0" />
+				<path d="M-12 1057 A26 18 0.0 0 0  6 1050 " />
+				<path d="M6 1317 A26 18 0.0 0 0  -12 1311 " />
+				 <rect x="-13" y="1057" width="9" height="254" rx="0" />
+				<path d="M-12 1777 A26 18 0.0 0 0  6 1770 " />
+				<path d="M6 2577 A26 18 0.0 0 0  -12 2571 " />
+				 <rect x="-13" y="1777" width="9" height="794" rx="0" />
+				<use xlink:href="#oblique_figure_2" transform="translate(0, 98) scale(0.067871, 0.067871)"/>
+				<use xlink:href="#oblique_figure_1" transform="translate(17, 98) scale(0.067871, 0.067871)"/>
+			</g>
+		</g>
+	</g>
+</svg>
+

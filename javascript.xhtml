@@ -17,13 +17,13 @@ how-active: how-js
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<p>
-					Vevorio can be compiled to Javascript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The the SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a> illustrates its possible use.
+					Vevorio can be compiled to JavaScript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The the SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a> illustrates its possible use.
 				</p>
 				
 				<h3>Basic usage</h3>
 				
 				<p>
-					The Javascript version of Verovio is available as a toolkit that makes it very easy to integrate.
+					The JavaScript version of Verovio is available as a toolkit that makes it very easy to integrate.
 				</p>
 				{% highlight html %}<script src="http://rism-ch.github.io/verovio/javascript/verovio-toolkit.js"></script>{% endhighlight %}
 				
@@ -41,7 +41,7 @@ how-active: how-js
     @data:'6B/{8B+(6B''E'B})({AFD})/{6.E3G},8B-/({6'EGF})({FAG})({GEB})/";
   /* Create the Vevorio toolkit instance */
   var vrvToolkit = new verovio.toolkit();
-  /* Render the data and inserted as content of the #output div */
+  /* Render the data and insert it as content of the #output div */
   document.getElementById("output").innerHTML = vrvToolkit.renderData( data, "" );
 </script>
 {% endhighlight %}
@@ -61,7 +61,7 @@ how-active: how-js
 <div id="output"/>
 <script type="text/javascript">
   var vrvToolkit = new verovio.toolkit();
-  /* Load the file using a HTTP GET */
+  /* Load the file using HTTP GET */
   $.get( "examples/hello-world/Haydn_StringQuartet_Op1_No1-p1.mei", function( data ) {
     var svg = vrvToolkit.renderData( data + "\n", JSON.stringify({ inputFormat: 'mei' }) );
     $("#output").html(svg);
@@ -94,7 +94,7 @@ options = JSON.stringify({
 
 				<h3>Methods</h3>
 				<p>
-					In addition to the constructor and destructor, the Verovio Javascript toolkit provides a certain number of methods for manipulating the data.
+					In addition to the constructor and destructor, the Verovio JavaScript toolkit provides a certain number of methods for manipulating the data.
 				</p>
 				<div class="panel panel-default">
 					<div class="panel-heading panel-option"><code>void setOptions( string data )</code></div>
@@ -135,7 +135,7 @@ options = JSON.stringify({
 				
 				<h3>Compatibility</h3>
 				<p>
-					The Verovio Javascript tookit has been tested with recent versions of the most widely used web-browsers. Internet Explorer requires at least version 10.
+					The Verovio JavaScript tookit has been tested with recent versions of the most widely used web-browsers. Internet Explorer requires at least version 10.
 				</p>
 				<div class="row text-center">
 					<div class="col-sm-12" style="padding-bottom: 10px;">
