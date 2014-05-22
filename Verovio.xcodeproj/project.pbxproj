@@ -14,10 +14,10 @@
 		4D22C42418891FC000D0831F /* pugixml.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42318891FB900D0831F /* pugixml.hpp */; };
 		4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42218891FB900D0831F /* pugiconfig.hpp */; };
 		4D22C4271889214C00D0831F /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41F18891D6D00D0831F /* pugixml.cpp */; };
-		4D7D8A3B1886E35B00D78B62 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D8A3A1886E35B00D78B62 /* main.cpp */; };
 		4D97921418E1CFB0000F8D57 /* attributes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D97921318E1CFB0000F8D57 /* attributes.h */; };
 		4D97921618E1CFD1000F8D57 /* attributes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D97921518E1CFD1000F8D57 /* attributes.cpp */; };
 		4D97921718E1CFD1000F8D57 /* attributes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D97921518E1CFD1000F8D57 /* attributes.cpp */; };
+		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
@@ -164,9 +164,9 @@
 		4D22C42218891FB900D0831F /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/vrv/pugiconfig.hpp; sourceTree = "<group>"; };
 		4D22C42318891FB900D0831F /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/vrv/pugixml.hpp; sourceTree = "<group>"; };
 		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
-		4D7D8A3A1886E35B00D78B62 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../tools/main.cpp; sourceTree = "<group>"; };
 		4D97921318E1CFB0000F8D57 /* attributes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attributes.h; path = include/vrv/attributes.h; sourceTree = "<group>"; };
 		4D97921518E1CFD1000F8D57 /* attributes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = attributes.cpp; path = src/attributes.cpp; sourceTree = "<group>"; };
+		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; };
 		8F086EB7188539540037FD8E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = src/app.cpp; sourceTree = "<group>"; };
@@ -284,7 +284,7 @@
 		4D7D8A3C1886E36200D78B62 /* tools */ = {
 			isa = PBXGroup;
 			children = (
-				4D7D8A3A1886E35B00D78B62 /* main.cpp */,
+				4D983004192E959E00320037 /* main.cpp */,
 				4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */,
 			);
 			name = tools;
@@ -615,10 +615,10 @@
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
-				4D7D8A3B1886E35B00D78B62 /* main.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C42018891D6D00D0831F /* pugixml.cpp in Sources */,
 				4D97921618E1CFD1000F8D57 /* attributes.cpp in Sources */,
+				4D983005192E959E00320037 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
