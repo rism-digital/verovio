@@ -301,14 +301,10 @@ int main(int argc, char** argv)
         
     } else {
         // To be implemented in InterfaceController
-        /*
-        XMLOutput meioutput(doc, outfile.c_str());
-        if (!meioutput.ExportFile()) {
+        if ( !controller.SaveFile( outfile ) ) {
             cerr << "Unable to write MEI to " << outfile << "." << endl;
             exit(1);
         }
-        */
-        
     }
     cerr << "Output written to " << outfile << endl;
     

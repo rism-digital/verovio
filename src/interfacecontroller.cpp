@@ -214,6 +214,16 @@ bool InterfaceController::LoadString( std::string data )
     
     return true;
 }
+    
+bool InterfaceController::SaveFile( std::string filename )
+{
+    MeiOutput meioutput( &m_doc, filename.c_str());
+    if (!meioutput.ExportFile()) {
+        LogError( "Unknown error" );
+        return false;
+    }
+    return true;
+}
 
 bool InterfaceController::ParseOptions( std::string json_options ) {
 #ifdef USE_EMSCRIPTEN

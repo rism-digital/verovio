@@ -45,6 +45,11 @@ public:
     bool LoadString( std::string data );
     
     /**
+     * Save an MEI file.
+     */
+    bool SaveFile( std::string filename );
+    
+    /**
      * Parse the options passed as JSON string
      * only available for Emscripten based compiles
      **/
