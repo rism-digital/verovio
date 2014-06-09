@@ -717,8 +717,8 @@ public:
     void SetLabel(std::string label_) { m_label = label_; };
     std::string GetLabel() { return m_label; };
     //
-    void SetN(std::string n_) { m_n = n_; };
-    std::string GetN() { return m_n; };
+    void SetN(int n_) { m_n = n_; };
+    int GetN() { return m_n; };
     //
     void SetBase(std::string base_) { m_base = base_; };
     std::string GetBase() { return m_base; };
@@ -734,7 +734,7 @@ protected:
      * Provides a name or number designation for an element.
      * While the value need not be unique, it is required to be a single token.
      **/
-    std::string m_n;
+    int m_n;
     /** --- **/
     std::string m_base;
 

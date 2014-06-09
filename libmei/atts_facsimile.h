@@ -52,6 +52,7 @@ protected:
 	 * Test
 	 **/
     void getCoords();
+
 };
 
 } // vrv namespace

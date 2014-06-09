@@ -420,7 +420,7 @@ AttCommon::~AttCommon() {
 
 void AttCommon::ResetCommon() {
     m_label = "";
-    m_n = "";
+    m_n = 0;
     m_base = "";
 }
 
