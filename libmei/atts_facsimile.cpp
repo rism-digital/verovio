@@ -1,6 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        attributes.h
-// Author:      Laurent Pugin
+// Authors:     Laurent Pugin and Rodolfo Zitellini
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //

@@ -1,6 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        attributes.h
-// Author:      Laurent Pugin
+// Authors:     Laurent Pugin and Rodolfo Zitellini
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
@@ -13,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_HARMONYMIXIN_H__
-#define __VRV_HARMONYMIXIN_H__
+#ifndef __VRV_ATTS_HARMONY_H__
+#define __VRV_ATTS_HARMONY_H__
 
 #include <string>
 
@@ -115,5 +114,5 @@ protected:
 
 } // vrv namespace
 
-#endif  // __VRV_HARMONYMIXIN_H__
+#endif  // __VRV_ATTS_HARMONY_H__
 
