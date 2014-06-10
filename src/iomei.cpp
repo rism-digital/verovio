@@ -19,7 +19,6 @@
 
 #include "vrv.h"
 #include "app.h"
-#include "attributes.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
@@ -504,7 +503,7 @@ void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
 
 void MeiOutput::WriteAttCommon( pugi::xml_node element, Object *object )
 {
-    Common *common = dynamic_cast<Common*>( object );
+    AttCommon *common = dynamic_cast<AttCommon*>( object );
     assert( common );
     if ( !common->GetLabel().empty() ) {
         element.append_attribute( "label" ) = common->GetLabel().c_str();
@@ -1572,7 +1571,7 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     
 void MeiInput::ReadAttCommon( pugi::xml_node element, Object *object )
 {
-    Common *common = dynamic_cast<Common*>( object );
+    AttCommon *common = dynamic_cast<AttCommon*>( object );
     assert( common );
     if ( element.attribute( "label" ) ) {
         common->SetLabel( element.attribute( "label" ).value() );
