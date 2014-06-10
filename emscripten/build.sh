@@ -8,6 +8,7 @@ function print_help {
 
 VEROVIO_ROOT=../
 VEROVIO_INCLUDE=../include/vrv
+VEROVIO_LIBMEI=../libmei
 if command -v emcc 2&>1; then
 	EMCC=`command -v emcc`
 else
@@ -67,13 +68,13 @@ python $EMCC --closure 1 -O2 \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_ROOT/tinyxml \
+	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \
 	./emscripten_main.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
 	$VEROVIO_ROOT/src/app.cpp \
-	$VEROVIO_ROOT/src/attributes.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
@@ -116,6 +117,22 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
+	$VEROVIO_ROOT/libmei/atts_analysis.cpp \
+	$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp \
+	$VEROVIO_ROOT/libmei/atts_edittrans.cpp \
+	$VEROVIO_ROOT/libmei/atts_figtable.cpp \
+	$VEROVIO_ROOT/libmei/atts_header.cpp \
+	$VEROVIO_ROOT/libmei/atts_lyrics.cpp \
+	$VEROVIO_ROOT/libmei/atts_midi.cpp \
+	$VEROVIO_ROOT/libmei/atts_shared.cpp \
+	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
+	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
+	$VEROVIO_ROOT/libmei/atts_facsimile.cpp \
+	$VEROVIO_ROOT/libmei/atts_harmony.cpp \
+	$VEROVIO_ROOT/libmei/atts_linkalign.cpp \
+	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
+	$VEROVIO_ROOT/libmei/atts_neumes.cpp \
+	$VEROVIO_ROOT/libmei/atts_tablature.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="[\
