@@ -29,6 +29,14 @@ downloads:
 	var pageWidth = 2100;
 	var swipe_pages = false;
 	var log = false;
+	var thumbnails = false;
+	
+	// testing workers
+	/*var worker = new Worker("{{ site.baseurl }}/javascript/verovio-worker.js");
+	worker.onmessage = function(event) {
+	    alert("Reply: " + event.data);
+	}
+	worker.postMessage("Hello worker!");*/
 
 	function upload_file(option_form, format) {
 		
@@ -48,6 +56,7 @@ downloads:
 	};
 	
 	function load_data(data, option_form) {
+		//unload_thumbnails();
 		ignoreLayout = $("#ignoreLayout", option_form).is(':checked') ? 1 : 0;
 		pageHeight = $("#pageHeight", option_form).val().length ? Number( $("#pageHeight", option_form).val() ) : 2970;
 		pageWidth = $("#pageWidth", option_form).val().length ? Number( $("#pageWidth", option_form).val() ) : 2100;
@@ -72,6 +81,41 @@ downloads:
 		page = 1;
 		load_page();
 	}
+
+	/*
+	function unload_thumbnails() {
+		thumbnails = false;
+		$("#thumbnails_output").html("<div class=\"row\"/>");
+	}
+	
+	function load_thumbnails() {
+		if ( !$("#thumbnails_output").is(":visible") || thumbnails ) {
+			return;
+		}
+		thumbnails = true;
+		for (idx = 0; idx < vrvToolkit.getPageCount(); idx++) { 
+			cv_id = "cv-" + idx;
+		    $("#thumbnails_hidden_placeholder div a canvas").attr('id', cv_id );
+			$("#thumbnails_hidden_placeholder div").clone().appendTo("#thumbnails_output div.row");
+			// reset the id to ""
+			$("#thumbnails_hidden_placeholder div a canvas").attr('id', '' );
+			var image = new Image();
+			var svg = vrvToolkit.renderPage(idx + 1, "");
+			image.src = 'data:image/svg+xml,' + escape(svg);
+			image.onload = function(){
+				var canvas = document.getElementById(cv_id);
+			    canvas.width = image.width;
+			    canvas.height = image.height;
+				var context = canvas.getContext('2d');
+				// this does not work (not drawn in the appropriate message)
+			    context.drawImage(image, 0, 0);	
+			}
+			// alternative with canvg (slower but nicer)
+			//canvg( cv_id, vrvToolkit.renderPage( 1, ""), { ignoreMouse: true, ignoreAnimation: true } )
+	 	}
+		
+	}
+	*/
 
 	function load_page() {
 		$("#jump_text").val(page);
@@ -310,6 +354,16 @@ downloads:
 		<div id="svg_panel" class="panel panel-default">
 			<div id="svg_output" style="overflow:auto;">
 			</div>
+			<div id="thumbnails_output" style="margin: 10px; display: none;">
+			</div>
+			<div id="thumbnails_hidden_placeholder" style="display: none;">
+				<div class="col-lg-2 col-md-4 col-xs-6 thumb">
+				    <a class="thumbnail" href="#">
+						<canvas></canvas>
+				    </a>
+				</div>
+				<canvas id="canvas_output"/>
+			</div>
 		</div>
 	</div>
 	<div class="col-sm-4 col-md-3 sidebar-offcanvas hidden-print" id="sidebar" role="navigation">
@@ -380,6 +434,24 @@ downloads:
 					</div>
 					<!-- /.col-md-6 -->
 				</div>
+				<!-- /.row -->
+				<!--
+				<hr/>
+				<div class="row">
+					<div class="col-md-6">
+						<p>
+							View:
+						</p>
+						<div class="col-xs-2 input-group input-group-sm">
+							<span class="input-group-btn">
+								<button id="show_thumbnails" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-th"/>
+								</button>
+							</span>
+						</div>
+					</div>
+				</div>
+				-->
 				<!-- /.row -->
 			</div>
 		</div>
@@ -498,6 +570,16 @@ downloads:
 		  	// toggle icon
 		  	$("span", this).toggleClass("glyphicon-chevron-left glyphicon-chevron-down");
 		});
+		
+		/*
+		$( "#show_thumbnails" ).click(function() {
+			$( "#svg_output" ).toggle();
+			$( "#thumbnails_output" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-th glyphicon-file");
+			load_thumbnails();
+		});
+		*/
 		
 		// Set the popover for the btn
 		$( ".popover-btn" ).popover( );

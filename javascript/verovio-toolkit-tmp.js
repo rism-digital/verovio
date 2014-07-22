@@ -741,13 +741,13 @@ verovio.vrvInterfaceController.setOptions = Module.cwrap('vrvInterfaceController
 verovio.ptr = 0;
 
 // add a listener that will delete the object (if necessary) when the page is left
-if (window) {
-	window.addEventListener ("unload", function () {
-		if (verovio.ptr != 0) {
-			verovio.vrvInterfaceController.destructor( verovio.ptr );
-		}
-	});
-}
+/*
+window.addEventListener ("unload", function () {
+	if (verovio.ptr != 0) {
+		verovio.vrvInterfaceController.destructor( verovio.ptr );
+	}
+});
+*/
 /***************************************************************************************************************************/
 
 /***************************************************************************************************************************
