@@ -1862,8 +1862,13 @@ int MeiInput::StrToDur(std::string dur)
     else if (dur == "64") value = DUR_64;
     else if (dur == "128") value = DUR_128;
 	else {
-		LogWarning("Unknown @dur value '%s'", dur.c_str());
-        value = DUR_4;
+        if ((dur.length() > 0) && (dur[dur.length()-1] == 'p')) {
+            LogWarning("PPQ duration values are not supported");
+        }
+        else {
+            LogWarning("Unknown @dur value '%s'", dur.c_str());
+        }
+        value = VRV_UNSET;
 	}
     return value;
 }
