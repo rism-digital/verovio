@@ -15,6 +15,10 @@
 #ifndef __VRV_ATTS_MENSURAL_H__
 #define __VRV_ATTS_MENSURAL_H__
 
+#include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
 #include <string>
 
 namespace vrv {

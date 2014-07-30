@@ -15,6 +15,10 @@
 #ifndef __VRV_ATTS_SHARED_H__
 #define __VRV_ATTS_SHARED_H__
 
+#include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
 #include <string>
 
 namespace vrv {
@@ -1859,13 +1863,13 @@ public:
      * @name Setters and getters for class members
      */
     ///@{
-    void SetUnitDbl(double unitDbl_) { m_unitDbl = unitDbl_; };
-    double GetUnitDbl() { return m_unitDbl; };
+    void SetUnit(int unit_) { m_unit = unit_; };
+    int GetUnit() { return m_unit; };
     ///@}
 
 protected:
     /** Indicates the unit used for a measurement of size. **/
-    double m_unitDbl;
+    int m_unit;
 
 /* include <attunit> */
 };
@@ -2047,14 +2051,14 @@ public:
      * @name Setters and getters for class members
      */
     ///@{
-    void SetCountDbl(double countDbl_) { m_countDbl = countDbl_; };
-    double GetCountDbl() { return m_countDbl; };
+    void SetCount(int count_) { m_count = count_; };
+    int GetCount() { return m_count; };
     //
-    void SetSym(std::string sym_) { m_sym = sym_; };
-    std::string GetSym() { return m_sym; };
+    void SetSym(MeterSign sym_) { m_sym = sym_; };
+    MeterSign GetSym() { return m_sym; };
     //
-    void SetUnitDbl(double unitDbl_) { m_unitDbl = unitDbl_; };
-    double GetUnitDbl() { return m_unitDbl; };
+    void SetUnit(int unit_) { m_unit = unit_; };
+    int GetUnit() { return m_unit; };
     ///@}
 
 protected:
@@ -2062,14 +2066,14 @@ protected:
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
      **/
-    double m_countDbl;
+    int m_count;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
      **/
-    std::string m_sym;
+    MeterSign m_sym;
     /** Indicates the unit used for a measurement of size. **/
-    double m_unitDbl;
+    int m_unit;
 
 /* include <attunit> */
 };

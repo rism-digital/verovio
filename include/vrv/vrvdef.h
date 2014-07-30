@@ -202,7 +202,7 @@ enum StaffGrpSymbol {
 };
 
 // the maximum is 255 (unsigned char)
-enum MeterSymb {
+enum MeterSign {
     METER_SYMB_NONE = 0,
     METER_SYMB_COMMON,
     METER_SYMB_CUT,

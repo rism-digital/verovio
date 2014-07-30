@@ -14,6 +14,9 @@
 		4D22C42418891FC000D0831F /* pugixml.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42318891FB900D0831F /* pugixml.hpp */; };
 		4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42218891FB900D0831F /* pugiconfig.hpp */; };
 		4D22C4271889214C00D0831F /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41F18891D6D00D0831F /* pugixml.cpp */; };
+		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
+		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
+		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4DEE290D1940BCC100C76319 /* atts_analysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */; };
 		4DEE290E1940BCC100C76319 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
@@ -177,6 +180,8 @@
 		4D22C42218891FB900D0831F /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/vrv/pugiconfig.hpp; sourceTree = "<group>"; };
 		4D22C42318891FB900D0831F /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/vrv/pugixml.hpp; sourceTree = "<group>"; };
 		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
+		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
+		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analysis.cpp; path = libmei/atts_analysis.cpp; sourceTree = "<group>"; };
 		4DEE28EE1940BCC100C76319 /* atts_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analysis.h; path = libmei/atts_analysis.h; sourceTree = "<group>"; };
@@ -500,6 +505,8 @@
 				8F59291F18854BF800FE51AD /* leipzigbbox.h */,
 				8F086ECA188539540037FD8E /* mensur.cpp */,
 				8F59292118854BF800FE51AD /* mensur.h */,
+				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
+				4D763EC81987D067003FCAB5 /* metersig.h */,
 				4D22C41818890E6100D0831F /* mrest.cpp */,
 				4D22C41B18890E9900D0831F /* mrest.h */,
 				8F086ECB188539540037FD8E /* multirest.cpp */,
@@ -573,6 +580,7 @@
 				4D22C41C18890E9900D0831F /* mrest.h in Headers */,
 				4D22C42418891FC000D0831F /* pugixml.hpp in Headers */,
 				4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */,
+				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -706,6 +714,7 @@
 				4DEE291A1940BCC100C76319 /* atts_neumes.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
 				4DEE291C1940BCC100C76319 /* atts_tablature.cpp in Sources */,
+				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -758,6 +767,7 @@
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C4271889214C00D0831F /* pugixml.cpp in Sources */,
+				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

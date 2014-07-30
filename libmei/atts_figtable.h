@@ -15,6 +15,10 @@
 #ifndef __VRV_ATTS_FIGTABLE_H__
 #define __VRV_ATTS_FIGTABLE_H__
 
+#include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
 
 
 namespace vrv {

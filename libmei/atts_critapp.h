@@ -15,6 +15,10 @@
 #ifndef __VRV_ATTS_CRITAPP_H__
 #define __VRV_ATTS_CRITAPP_H__
 
+#include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
 #include <string>
 
 namespace vrv {

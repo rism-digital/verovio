@@ -15,6 +15,10 @@
 #ifndef __VRV_ATTS_NEUMES_H__
 #define __VRV_ATTS_NEUMES_H__
 
+#include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
 #include <string>
 
 namespace vrv {

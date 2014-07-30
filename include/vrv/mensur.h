@@ -50,7 +50,7 @@ public:
      * This is not available in the MEI <mensur> element (only in <staffdef>).
      * It was kept here because available in Wolfgang
      */
-    MeterSymb m_meterSymb;
+    MeterSign m_meterSymb;
     /** Indicates the numerator of the duration ratio. */
     int m_num;
     /** Indicates the denominator of the duration ratio. */
