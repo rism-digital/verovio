@@ -19,6 +19,7 @@ class Beam;
 class Clef;
 class Layer;
 class Mensur;
+class MeterSig;
 class MRest;
 class MultiRest;
 class Note;
@@ -94,6 +95,12 @@ private:
      * Callded from WriteLayerElement.
      */
     void WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur );
+    
+    /**
+     * Write a Mensur.
+     * Callded from WriteLayerElement.
+     */
+    void WriteMeiMeterSig( pugi::xml_node meiMeterSig, MeterSig *meterSig );
 
     /**
      * Write a MRest (represented by MultiRest class).
@@ -143,7 +150,9 @@ private:
      */
     ///@{
     void WriteAttCommon( pugi::xml_node element, Object *object );
+    void WriteAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault = false );
     ///@}
+    
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -155,7 +164,8 @@ private:
     std::string AccidToStr(unsigned char accid);
     std::string ClefLineToStr(ClefId clefId);
     std::string ClefShapeToStr(ClefId clefId);
-    std::string MensurSignToStr(MensurSign sign);
+    std::string MensurationSignToStr(MensurationSign sign);
+    std::string MeterSignToStr(MeterSign sign);
     std::string DocTypeToStr(DocType type);
     std::string KeySigToStr(int num, char alter_type );
     std::string BarlineTypeToStr(BarlineType type);
@@ -229,6 +239,7 @@ private:
     LayerElement *ReadMeiBeam( pugi::xml_node beam );
     LayerElement *ReadMeiClef( pugi::xml_node clef );
     LayerElement *ReadMeiMensur( pugi::xml_node mensur );
+    LayerElement *ReadMeiMeterSig( pugi::xml_node meterSig );
     LayerElement *ReadMeiMRest( pugi::xml_node mRest );
     LayerElement *ReadMeiMultiRest( pugi::xml_node multiRest );
     LayerElement *ReadMeiNote( pugi::xml_node note );
@@ -248,6 +259,11 @@ private:
      */
     ///@{
     void ReadAttCommon( pugi::xml_node element, Object *object );
+    /** 
+     * The isDefault flag is used to read MeterSigLogDefault attribute class from scoreDef or staffDef
+     * It returns true or false depending whether at least one attribute was set or not
+     */
+    bool ReadAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault = false );
     ///@}
     
     /**
@@ -282,7 +298,8 @@ private:
 	int StrToPitch(std::string pitch ); 
     unsigned char StrToAccid(std::string accid);
     ClefId StrToClef(std::string shape, std::string line);
-    MensurSign StrToMensurSign(std::string sign);
+    MensurationSign StrToMensurationSign(std::string sign);
+    MeterSign StrToMeterSign(std::string sign);
     DocType StrToDocType(std::string type);
     unsigned char StrToKeySigType(std::string accid);
     int StrToKeySigNum(std::string accid);

@@ -90,6 +90,15 @@ public:
      */
 	virtual void SetLigature( ) {};
     
+    /**
+     * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
+     * The value is false by default. Is it set to true of ScoreDef and StaffDef and used when
+     * drawing the element
+     */
+    ///@{
+    bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
+    void SetScoreOrStaffDefAttr( bool isScoreOrStaffDefAttr ) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; };
+    ///@}
     
     int GetElementIdx() const;
 
@@ -100,6 +109,7 @@ public:
     bool HasDurationInterface();
     bool IsKeySig();
     bool IsMensur();
+    bool IsMeterSig();
     bool IsMultiRest();
     bool IsMRest();
     bool IsNote();
@@ -157,6 +167,10 @@ public:
     
 protected:
     Alignment *m_alignment;
+    
+private:
+    /** Indicates whether it is a ScoreDef or StaffDef attribute */
+    bool m_isScoreOrStaffDefAttr;
     
 };
 

@@ -27,6 +27,7 @@
 #include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
+#include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
@@ -361,7 +362,7 @@ void MeiOutput::WriteMeiClef( pugi::xml_node meiClef, Clef *clef )
 void MeiOutput::WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur )
 {
     if ( mensur->m_sign ) {
-        meiMensur.append_attribute( "sign" ) = MensurSignToStr( mensur->m_sign ).c_str();
+        meiMensur.append_attribute( "sign" ) = MensurationSignToStr( mensur->m_sign ).c_str();
     }
     if ( mensur->m_dot ) {
         meiMensur.append_attribute( "dot" ) = "true";
@@ -382,6 +383,13 @@ void MeiOutput::WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur )
     
     return;
 }
+
+void MeiOutput::WriteMeiMeterSig( pugi::xml_node meiMeterSig, MeterSig *meterSig )
+{
+    WriteAttMeterSigLog( meiMeterSig, meterSig );
+    return;
+}
+    
     
 void MeiOutput::WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest )
 {
@@ -513,6 +521,27 @@ void MeiOutput::WriteAttCommon( pugi::xml_node element, Object *object )
     }
 }
     
+void MeiOutput::WriteAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault )
+{
+    std::string prefix = "";
+    if ( isMeterSigLogDefault ) {
+        prefix = "meter.";
+    }
+    AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>( object );
+    assert( att );
+    if ( att->GetCount() != 0 ) {
+        element.append_attribute( (prefix + "count").c_str() ) = StringFormat("%d", att->GetCount()).c_str();;
+    }
+    if ( att->GetSym() != METERSIGN_NONE ) {
+        element.append_attribute( (prefix + "sym").c_str() ) = MeterSignToStr( att->GetSym() ).c_str();
+    }
+    if ( att->GetUnit() != 0 ) {
+        element.append_attribute( (prefix + "unit").c_str() ) = StringFormat("%d", att->GetUnit()).c_str();;
+    }
+    return;
+}
+
+    
 std::string MeiOutput::BoolToStr(bool value)
 {
     if (value) return "true";
@@ -619,12 +648,12 @@ std::string MeiOutput::ClefShapeToStr( ClefId clefId )
 	return value;
 }
 
-std::string MeiOutput::MensurSignToStr(MensurSign sign)
+std::string MeiOutput::MensurationSignToStr(MensurationSign sign)
 {
  	std::string value; 
 	switch(sign)
-	{	case MENSUR_SIGN_C : value = "C"; break;
-		case MENSUR_SIGN_O : value = "O"; break;		
+	{	case MENSURATIONSIGN_C : value = "C"; break;
+		case MENSURATIONSIGN_O : value = "O"; break;		
         default: 
             LogWarning("Unknown mensur sign '%d'", sign);
             value = "";
@@ -633,6 +662,20 @@ std::string MeiOutput::MensurSignToStr(MensurSign sign)
 	return value;   
 }
 
+    
+std::string MeiOutput::MeterSignToStr(MeterSign sign)
+{
+    std::string value;
+    switch(sign)
+    {	case METERSIGN_COMMON : value = "common"; break;
+        case METERSIGN_CUT : value = "cut"; break;
+        default:
+            LogWarning("Unknown meterSig sym '%d'", sign);
+            value = "";
+            break;
+    }
+    return value;   
+}
 
 std::string MeiOutput::DurToStr( int dur )
 {
@@ -977,6 +1020,11 @@ bool MeiInput::ReadMeiScoreDef( pugi::xml_node scoreDef )
     assert( m_scoreDef );
     assert( m_staffGrps.empty() );
     
+    MeterSig meterSig;
+    if ( ReadAttMeterSigLog( scoreDef, &meterSig, true ) ) {
+        m_scoreDef->ReplaceMeterSig( &meterSig );
+    }
+    
     if ( scoreDef.attribute( "key.sig" ) ) {
         KeySignature keysig(
                 StrToKeySigNum( scoreDef.attribute( "key.sig" ).value() ),
@@ -1184,6 +1232,9 @@ bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
     else if ( std::string( xmlElement.name() ) == "mensur" ) {
         vrvElement = ReadMeiMensur( xmlElement );
     }
+    else if ( std::string( xmlElement.name() ) == "meterSig" ) {
+        vrvElement = ReadMeiMeterSig( xmlElement );
+    }
     else if ( std::string( xmlElement.name() ) == "note" ) {
         vrvElement = ReadMeiNote( xmlElement );
     }
@@ -1288,7 +1339,7 @@ LayerElement *MeiInput::ReadMeiMensur( pugi::xml_node mensur )
     Mensur *vrvMensur = new Mensur();
     
     if ( mensur.attribute( "sign" ) ) {
-        vrvMensur->m_sign = StrToMensurSign( mensur.attribute( "sign" ).value() );
+        vrvMensur->m_sign = StrToMensurationSign( mensur.attribute( "sign" ).value() );
     }
     if ( mensur.attribute( "dot" ) ) {
         vrvMensur->m_dot = ( strcmp( mensur.attribute( "dot" ).value(), "true" ) == 0 );
@@ -1310,10 +1361,16 @@ LayerElement *MeiInput::ReadMeiMensur( pugi::xml_node mensur )
     return vrvMensur;
 }
     
+LayerElement *MeiInput::ReadMeiMeterSig( pugi::xml_node meterSig )
+{
+    MeterSig *vrvMeterSig = new MeterSig();
+    ReadAttMeterSigLog(meterSig, vrvMeterSig);
+    return vrvMeterSig;
+}
+    
 LayerElement *MeiInput::ReadMeiMRest( pugi::xml_node mRest )
 {
-    MRest *vrvMRest = new MRest();
-    
+    MRest *vrvMRest = new MRest();    
     return vrvMRest;
 }
 
@@ -1571,16 +1628,39 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     
 void MeiInput::ReadAttCommon( pugi::xml_node element, Object *object )
 {
-    AttCommon *common = dynamic_cast<AttCommon*>( object );
-    assert( common );
+    AttCommon *att = dynamic_cast<AttCommon*>( object );
+    assert( att );
     if ( element.attribute( "label" ) ) {
-        common->SetLabel( element.attribute( "label" ).value() );
+        att->SetLabel( element.attribute( "label" ).value() );
     }
     if ( element.attribute( "n" ) ) {
-        common->SetN( atoi( element.attribute( "n" ).value() ) );
+        att->SetN( atoi( element.attribute( "n" ).value() ) );
     }
 }
     
+bool MeiInput::ReadAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault )
+{
+    std::string prefix = "";
+    bool hasAttribute = false;
+    if ( isMeterSigLogDefault ) {
+        prefix = "meter.";
+    }
+    AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>( object );
+    assert( att );
+    if ( element.attribute( (prefix + "count").c_str() ) ) {
+        att->SetCount( atoi( element.attribute( (prefix + "count").c_str() ).value() ) );
+        hasAttribute = true;
+    }
+    if ( element.attribute( (prefix + "sym").c_str() ) ) {
+        att->SetSym( StrToMeterSign( element.attribute( (prefix + "sym").c_str() ).value() ) );
+        hasAttribute = true;
+    }
+    if ( element.attribute( (prefix + "unit").c_str() ) ) {
+        att->SetUnit( atoi( element.attribute( (prefix + "unit").c_str() ).value() ) );
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
 
 void MeiInput::AddLayerElement( LayerElement *element )
 {
@@ -1935,15 +2015,26 @@ ClefId MeiInput::StrToClef( std::string shape, std::string line )
     return clefId;
 }
 
-MensurSign MeiInput::StrToMensurSign(std::string sign)
+MensurationSign MeiInput::StrToMensurationSign(std::string sign)
 {
-    if (sign == "C") return MENSUR_SIGN_C;
-    else if (sign == "O") return MENSUR_SIGN_O;
+    if (sign == "C") return MENSURATIONSIGN_C;
+    else if (sign == "O") return MENSURATIONSIGN_O;
     else {
         LogWarning("Unsupported mensur sign '%s'", sign.c_str() );
 	}
     // default
-	return MENSUR_SIGN_C;
+	return MENSURATIONSIGN_C;
+}
+    
+MeterSign MeiInput::StrToMeterSign(std::string sign)
+{
+    if (sign == "common") return METERSIGN_COMMON;
+    else if (sign == "cut") return METERSIGN_CUT;
+    else {
+        LogWarning("Unsupported meter sign '%s'", sign.c_str() );
+    }
+    // default
+    return METERSIGN_NONE;
 }
 
 DocType MeiInput::StrToDocType(std::string type)

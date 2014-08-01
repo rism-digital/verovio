@@ -16,6 +16,7 @@ namespace vrv {
 class Clef;
 class KeySignature;
 class Mensur;
+class MeterSig;
 class StaffGrp;
 class StaffDef;
 
@@ -58,12 +59,18 @@ public:
     void ReplaceMensur( Mensur *newMensur );
     
     /**
-     * @name Get  the clef, keysig and mensure.
+     * Replace the meterSig (if any) with the newMeterSig (if any).
+     */
+    void ReplaceMeterSig( MeterSig *newMeterSig );
+    
+    /**
+     * @name Get  the clef, keysig, mensur and meterSig.
      */
     ///@{
     Clef *GetClefAttr() const { return m_clef; };
     KeySignature *GetKeySigAttr() const { return m_keySig; };
     Mensur *GetMensurAttr() const { return m_mensur; };
+    MeterSig *GetMeterSigAttr() const { return m_meterSig; };
     ///@}
     
 protected:
@@ -71,9 +78,11 @@ protected:
     Clef *m_clef;
     /** The key signature */
     KeySignature *m_keySig;
-    /** The mensure (time signature */
+    /** The mensur */
     Mensur *m_mensur;
-    
+    /** The meter signature (time signature) */
+    MeterSig *m_meterSig;
+
 };
 
 
@@ -120,7 +129,7 @@ public:
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
      */
-    void SetRedrawFlags( bool clef, bool keysig, bool mensur );
+    void SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSig );
     
 protected:
     /**
@@ -243,6 +252,8 @@ public:
     void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
     bool DrawMensur() const { return m_drawMensur; };
     void SetDrawMensur( bool drawMensur ) { m_drawClef = drawMensur; };
+    bool DrawMeterSig() const { return m_drawMeterSig; };
+    void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
     ///@}
 
     // functors
@@ -281,6 +292,7 @@ private:
     bool m_drawClef;
     bool m_drawKeySig;
     bool m_drawMensur;
+    bool m_drawMeterSig;
     ///@}
     
 };

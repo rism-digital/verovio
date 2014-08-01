@@ -1037,7 +1037,7 @@ AttMeasurement::~AttMeasurement() {
 }
 
 void AttMeasurement::ResetMeasurement() {
-    m_unit = 4;
+    m_unit = 0;
 }
 
 /* include <attunit> */
@@ -1134,9 +1134,9 @@ AttMeterSigLog::~AttMeterSigLog() {
 }
 
 void AttMeterSigLog::ResetMeterSigLog() {
-    m_count = 4;
-    m_sym = METER_SYMB_NONE;
-    m_unit = 4;
+    m_count = 0;
+    m_sym = METERSIGN_NONE;
+    m_unit = 0;
 }
 
 /* include <attunit> */

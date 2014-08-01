@@ -168,6 +168,7 @@ protected:
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
     void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff ); 

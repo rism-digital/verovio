@@ -21,11 +21,10 @@ Mensur::Mensur():
 	LayerElement("mensur-")
 {
     m_dot = 0;
-    m_meterSymb = METER_SYMB_NONE;
     m_num = 0;
     m_numBase = 0;
     m_reversed = false;
-    m_sign = MENSUR_SIGN_NONE;
+    m_sign = MENSURATIONSIGN_NONE;
     m_slash = 0;
 }
 
@@ -41,9 +40,6 @@ bool Mensur::operator==( Object& other )
         return false;
     }
     if ( this->m_dot != otherMensur->m_dot ) {
-        return false;
-    }
-    if ( this->m_meterSymb != otherMensur->m_meterSymb ) {
         return false;
     }
     if ( this->m_num != otherMensur->m_num ) {
@@ -64,6 +60,7 @@ bool Mensur::operator==( Object& other )
     return true;
 }
 
+/*
 void Mensur::SetValue( int value, int flag ) 
 {
     this->m_num = 0;
@@ -71,94 +68,94 @@ void Mensur::SetValue( int value, int flag )
     switch ( value ) {
         // tempus perfectum
         case ('Q'): 
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_O;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_O;
             this->m_slash = 0;
             this->m_dot = 1;
             this->m_reversed = false;
             break;
         case ('W'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_O;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_O;
             this->m_slash = 1;
             this->m_dot = 1;
             this->m_reversed = false;
             break;
         case ('E'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_O;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_O;
             this->m_slash = 0;
             this->m_dot = 0;
             this->m_reversed = false;
             break;
         case ('R'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_O;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_O;
             this->m_slash = 1;
             this->m_dot = 0;
             this->m_reversed = false;
             break;
         // tempus imperfectum
         case ('A'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 0;
             this->m_dot = 1;
             this->m_reversed = false;
             break;
         case ('S'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 1;
             this->m_dot = 1;
             this->m_reversed = false;
             break;
         case ('D'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 0;
             this->m_dot = 0;
             this->m_reversed = false;
             break;
         case ('F'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 1;
             this->m_dot = 0;
             this->m_reversed = false;
             break;
         // tempus imperfectum diminutum
         case ('Y'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 0;
             this->m_dot = 1;
             this->m_reversed = true;
             break;
         case ('X'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 1;
             this->m_dot = 1;
             this->m_reversed = true;
             break;
         case ('C'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 0;
             this->m_dot = 0;
             this->m_reversed = true;
             break;
         case ('V'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_C;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_C;
             this->m_slash = 1;
             this->m_dot = 0;
             this->m_reversed = true;
             break;;
         case ('1'):
-            this->m_meterSymb = METER_SYMB_NONE;
-            this->m_sign = MENSUR_SIGN_NONE;
+            this->m_meterSymb = METERSIGN_NONE;
+            this->m_sign = MENSURATIONSIGN_NONE;
             this->m_slash = 0;
             this->m_dot = 0;
             this->m_reversed = false;
@@ -170,5 +167,6 @@ void Mensur::SetValue( int value, int flag )
         //case ('3'): this->code = 64; this->calte = 3; break;
     }
 }
+*/
 
 } // namespace vrv

@@ -28,6 +28,7 @@ add_executable (verovio
 	../src/layerelement.cpp 
 	../src/leipzigbbox.cpp
 	../src/mensur.cpp 
+	../src/metersig.cpp 
 	../src/measure.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
@@ -53,22 +54,22 @@ add_executable (verovio
 	../src/tuplet.cpp
 	../src/vrv.cpp
 	../src/pugixml.cpp
-	../libmei/atts_analysis.cpp
-	../libmei/atts_cmnornaments.cpp
-	../libmei/atts_edittrans.cpp
-	../libmei/atts_figtable.cpp
-	../libmei/atts_header.cpp
-	../libmei/atts_lyrics.cpp
-	../libmei/atts_midi.cpp
+	#../libmei/atts_analysis.cpp
+	#../libmei/atts_cmnornaments.cpp
+	#../libmei/atts_edittrans.cpp
+	#../libmei/atts_figtable.cpp
+	#../libmei/atts_header.cpp
+	#../libmei/atts_lyrics.cpp
+	#../libmei/atts_midi.cpp
 	../libmei/atts_shared.cpp
-	../libmei/atts_cmn.cpp
-	../libmei/atts_critapp.cpp
-	../libmei/atts_facsimile.cpp
-	../libmei/atts_harmony.cpp
-	../libmei/atts_linkalign.cpp
-	../libmei/atts_mensural.cpp
-	../libmei/atts_neumes.cpp
-	../libmei/atts_tablature.cpp
+	#../libmei/atts_cmn.cpp
+	#../libmei/atts_critapp.cpp
+	#../libmei/atts_facsimile.cpp
+	#../libmei/atts_harmony.cpp
+	#../libmei/atts_linkalign.cpp
+	#../libmei/atts_mensural.cpp
+	#../libmei/atts_neumes.cpp
+	#../libmei/atts_tablature.cpp
 	)
 
 install (TARGETS verovio DESTINATION /usr/local/bin)

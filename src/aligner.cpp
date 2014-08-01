@@ -265,7 +265,7 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
     // param 1: the functor to be redirected to the SystemAligner (unused)
     int *shift = static_cast<int*>(params[0]);
     
-    // integrates the m_xShift into the m_xRel
+    // integrates the m_yShift into the m_yRel
     m_yRel += m_yShift + (*shift);
     // cumulate the shift value
     (*shift) += m_yShift;
@@ -350,7 +350,9 @@ int Alignment::JustifyX( ArrayPtrVoid params )
     // param 2: the functor to be redirected to the MeasureAligner (unused)
     double *ratio =static_cast<double*>(params[0]);
     
-    this->m_xRel = ceil((*ratio) * (double)this->m_xRel);
+    if ((this->GetType() != ALIGNMENT_CLEF_ATTR) && (this->GetType() != ALIGNMENT_KEYSIG_ATTR)) {
+        this->m_xRel = ceil((*ratio) * (double)this->m_xRel);
+    }
 
     return FUNCTOR_CONTINUE;
 }

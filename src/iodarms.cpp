@@ -98,11 +98,10 @@ int DarmsInput::parseMeter(int pos, const char* data) {
     
     pos++;
     if (data[pos] == 'C') {
+        meter->m_sign = MENSURATIONSIGN_C;
         if (data[pos + 1] == '/') {
             pos++;
-            meter->m_meterSymb = METER_SYMB_CUT;
-        } else {
-            meter->m_meterSymb = METER_SYMB_COMMON;
+            meter->m_slash = 1;
         }
         pos++;
     } else if (data[pos] == 'O') {
@@ -110,7 +109,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             pos++;
             LogWarning("DarmsInput: O/ not supported");
         }
-        meter->m_sign = MENSUR_SIGN_O;
+        meter->m_sign = MENSURATIONSIGN_O;
         pos++;
     }
     

@@ -201,22 +201,24 @@ enum StaffGrpSymbol {
     STAFFGRP_BRACKET
 };
 
-// the maximum is 255 (unsigned char)
+/**
+ * MEI data.METERSIGN
+ * The maximum is 255 (unsigned char)
+ */
 enum MeterSign {
-    METER_SYMB_NONE = 0,
-    METER_SYMB_COMMON,
-    METER_SYMB_CUT,
-    METER_SYMB_2, // no MEI equivalent
-    METER_SYMB_3, // no MEI equivalent
-    METER_SYMB_2_CUT, // no MEI equivalent
-    METER_SYMB_3_CUT // no MEI equivalent
+    METERSIGN_NONE = 0,
+    METERSIGN_COMMON,
+    METERSIGN_CUT
 };
 
-// the maximum is 255 (unsigned char)
-enum MensurSign {
-    MENSUR_SIGN_NONE = 0,
-    MENSUR_SIGN_C,
-    MENSUR_SIGN_O
+/**
+ * MEI data.MENSURATIONSIGN
+ * The maximum is 255 (unsigned char)
+ */
+enum MensurationSign {
+    MENSURATIONSIGN_NONE = 0,
+    MENSURATIONSIGN_C,
+    MENSURATIONSIGN_O
 };
 
 // the maximum is 255 (unsigned char)

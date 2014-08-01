@@ -27,7 +27,7 @@
 #include "doc.h"
 #include "keysig.h"
 #include "measure.h"
-#include "mensur.h"
+#include "metersig.h"
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
@@ -168,9 +168,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         current_measure.key = k;
     }
     if (strlen(c_timesig)) {
-        Mensur *meter = new Mensur;
+        MeterSig *meter = new MeterSig;
         getTimeInfo( c_timesig, meter);
-        current_measure.time = meter;
+        // What about previous values? Potential memory leak? LP
+        current_measure.meter = meter;
     }   
     
     // read the incipit string
@@ -303,18 +304,19 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         
 		//time signature change
 		else if ((incipit[i] == '@') && (i+1 < length)) {
-            Mensur *meter = new Mensur;
+            MeterSig *meter = new MeterSig;
             i += getTimeInfo( incipit, meter, i + 1);
             if (current_measure.notes.size() == 0) {
-                if (current_measure.time) 
-                    delete current_measure.time;
-                
-                current_measure.time = meter;
+                if (current_measure.meter) {
+                    delete current_measure.meter;
+                }
+                // When will this be deleted? Potential memory leak? LP
+                current_measure.meter = meter;
             } else {
-                if (current_note.time)
-                    delete current_note.time;
-                
-                current_note.time = meter;
+                if (current_note.meter) {
+                    delete current_note.meter;
+                }
+                current_note.meter = meter;
             }
         } 
         
@@ -354,7 +356,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     
     std::vector<MeasureObject>::iterator it;
     for ( it = staff.begin() ; it < staff.end(); it++ ) {
-        
         
         m_staff = new Staff( 1 );
         m_measure = new Measure( true, measure_count );
@@ -705,7 +706,7 @@ int PaeInput::getPitch( char c_note ) {
 // getTimeInfo -- read the key signature.
 //
 
-int PaeInput::getTimeInfo( const char* incipit, Mensur *meter, int index) {
+int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
     
     int i = index;
     int length = strlen(incipit);
@@ -744,24 +745,27 @@ int PaeInput::getTimeInfo( const char* incipit, Mensur *meter, int index) {
         strcpy(buf_str, timesig_str);
         int beats = atoi(strtok(buf_str, "/"));
         int note_value = atoi(strtok(NULL, "/")); 
-        meter->m_num = beats;
-        meter->m_numBase = note_value;
+        meter->SetCount(beats);
+        meter->SetUnit(note_value);
     } else if ( is_one_number == 0) {
         int beats = atoi(timesig_str);
-        meter->m_num = beats;
-        meter->m_numBase = 1;
+        meter->SetCount(beats);
+        meter->SetUnit(1);
     } else if (strcmp(timesig_str, "c") == 0) {
         // C
-        meter->m_meterSymb = METER_SYMB_COMMON;
+        meter->SetSym(METERSIGN_COMMON);
     } else if (strcmp(timesig_str, "c/") == 0) {
         // C|
-        meter->m_meterSymb = METER_SYMB_CUT;
+        meter->SetSym(METERSIGN_CUT);
     } else if (strcmp(timesig_str, "c3") == 0) {
         // C3
-        meter->m_meterSymb = METER_SYMB_3;
+        meter->SetSym(METERSIGN_COMMON);
+        meter->SetCount(3);
     } else if (strcmp(timesig_str, "c3/2") == 0) {
         // C3/2
-        meter->m_meterSymb = METER_SYMB_3_CUT; // ??
+        meter->SetSym(METERSIGN_COMMON); // ??
+        meter->SetCount(3);
+        meter->SetUnit(2);
     } else {
         LogWarning("Unknown time signature: %s", timesig_str);
     }
@@ -1080,8 +1084,8 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
         m_layer->AddElement(measure->key);
     }
     
-    if ( measure->time != NULL ) {
-        m_layer->AddElement(measure->time);
+    if ( measure->meter != NULL ) {
+        m_layer->AddElement(measure->meter);
     }
     
     if ( measure->wholerest > 0 ) { 
@@ -1153,11 +1157,11 @@ void PaeInput::parseNote(NoteObject note) {
 
     // Same thing for time changes
     // You can find this sometimes
-    if (note.time)
-        addLayerElement(note.time);
+    if (note.meter)
+        addLayerElement(note.meter);
     
     // Handle key change. Evil if done in a beam
-    if (note.time)
+    if (note.key)
         addLayerElement(note.key);
     
     // Acciaccaturas are similar but do not get beamed (do they)

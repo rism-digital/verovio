@@ -39,18 +39,13 @@ public:
     /**
      * Set the value for the mensur.
      */
-	virtual void SetValue( int value, int flag = 0 );
+	//virtual void SetValue( int value, int flag = 0 );
     
 private:
     
 public:
     /** Indicates the number of dots with the sign (max 1 for now). */
     unsigned char m_dot;
-    /** Indicates the use of a meter symbol (C or C-cut) instead of a signature.
-     * This is not available in the MEI <mensur> element (only in <staffdef>).
-     * It was kept here because available in Wolfgang
-     */
-    MeterSign m_meterSymb;
     /** Indicates the numerator of the duration ratio. */
     int m_num;
     /** Indicates the denominator of the duration ratio. */
@@ -58,7 +53,7 @@ public:
     /** Indicates if the sign is reversed. */
     bool m_reversed;
     /** Indicates the sign of the mensuration signature. */
-    MensurSign m_sign;    
+    MensurationSign m_sign;    
     /** Indicates the number of slashes with the sign (max 1 for now). */
     unsigned char m_slash;
     

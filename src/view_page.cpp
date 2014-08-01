@@ -25,6 +25,7 @@
 #include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
+#include "metersig.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -792,6 +793,9 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     }
     if (layer->GetMensurAttr()) {
         DrawElement(dc, layer->GetMensurAttr(), layer, measure, staff);
+    }
+    if (layer->GetMeterSigAttr()) {
+        DrawElement(dc, layer->GetMeterSigAttr(), layer, measure, staff);
     }
     
 	for(j = 0; j < layer->GetElementCount(); j++)

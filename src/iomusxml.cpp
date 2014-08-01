@@ -22,7 +22,7 @@
 #include "keysig.h"
 #include "layerelement.h"
 #include "mensur.h"
-#include "mensur.h"
+#include "metersig.h"
 #include "note.h"
 #include "rest.h"
 #include "symbol.h"
@@ -331,7 +331,7 @@ void XMLOutput::WriteKey(LayerElement *element) {
 }
 
 void XMLOutput::WriteTime(LayerElement *element) {
-    Mensur *timesig = dynamic_cast<Mensur*>(element);
+    MeterSig *timesig = dynamic_cast<MeterSig*>(element);
     std::stringstream number;
     
     CreateAttributes();
@@ -339,18 +339,18 @@ void XMLOutput::WriteTime(LayerElement *element) {
     pugi::xml_node xtime = m_xml_attributes.append_child("time");
     
     // add symbol attribute if necessay
-    if (timesig->m_meterSymb == METER_SYMB_COMMON) {
+    if (timesig->GetSym() == METERSIGN_COMMON) {
         xtime.append_attribute("symbol") = "common";
         // if the number of beats was not specified, approximate it
-        if (timesig->m_num == 0){
-            timesig->m_num = 4;
-            timesig->m_numBase = 4;
+        if (timesig->GetCount() == 0){
+            timesig->SetCount(4);
+            timesig->SetUnit(4);
         }
-    } else if (timesig->m_meterSymb == METER_SYMB_CUT) {
+    } else if (timesig->GetSym() == METERSIGN_CUT) {
         xtime.append_attribute("symbol") = "cut";
-        if (timesig->m_num == 0){
-            timesig->m_num = 2;
-            timesig->m_numBase = 2;
+        if (timesig->GetCount() == 0){
+            timesig->SetCount(2);
+            timesig->SetUnit(2);
         }
     }
     
@@ -359,14 +359,14 @@ void XMLOutput::WriteTime(LayerElement *element) {
     pugi::xml_node xbtype = xtime.append_child("beat-type");
     
     // convert number to text for beats
-    number << timesig->m_num;
+    number << timesig->GetCount();
     xbeats.append_child(pugi::node_pcdata).set_value(number.str().c_str());
     //TiXmlText *beat_text = new TiXmlText(number.str().c_str());
     //xbeats->LinkEndChild(beat_text);
     
     // ditto as above
     number.clear();
-    number << timesig->m_numBase;
+    number << timesig->GetUnit();
     xbtype.append_child(pugi::node_pcdata).set_value(number.str().c_str());
     //TiXmlText *base_text = new TiXmlText(number.str().c_str());
     //xbtype->LinkEndChild(base_text);

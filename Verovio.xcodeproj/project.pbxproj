@@ -17,23 +17,9 @@
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
+		4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
-		4DEE290D1940BCC100C76319 /* atts_analysis.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */; };
-		4DEE290E1940BCC100C76319 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
-		4DEE290F1940BCC100C76319 /* atts_cmnornaments.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F11940BCC100C76319 /* atts_cmnornaments.cpp */; };
-		4DEE29101940BCC100C76319 /* atts_critapp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F31940BCC100C76319 /* atts_critapp.cpp */; };
-		4DEE29111940BCC100C76319 /* atts_edittrans.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F51940BCC100C76319 /* atts_edittrans.cpp */; };
-		4DEE29121940BCC100C76319 /* atts_facsimile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F71940BCC100C76319 /* atts_facsimile.cpp */; };
-		4DEE29131940BCC100C76319 /* atts_figtable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F91940BCC100C76319 /* atts_figtable.cpp */; };
-		4DEE29141940BCC100C76319 /* atts_harmony.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28FB1940BCC100C76319 /* atts_harmony.cpp */; };
-		4DEE29151940BCC100C76319 /* atts_header.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28FD1940BCC100C76319 /* atts_header.cpp */; };
-		4DEE29161940BCC100C76319 /* atts_linkalign.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28FF1940BCC100C76319 /* atts_linkalign.cpp */; };
-		4DEE29171940BCC100C76319 /* atts_lyrics.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29011940BCC100C76319 /* atts_lyrics.cpp */; };
-		4DEE29181940BCC100C76319 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
-		4DEE29191940BCC100C76319 /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
-		4DEE291A1940BCC100C76319 /* atts_neumes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29071940BCC100C76319 /* atts_neumes.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
-		4DEE291C1940BCC100C76319 /* atts_tablature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE290B1940BCC100C76319 /* atts_tablature.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
@@ -698,22 +684,7 @@
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C42018891D6D00D0831F /* pugixml.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
-				4DEE290D1940BCC100C76319 /* atts_analysis.cpp in Sources */,
-				4DEE290E1940BCC100C76319 /* atts_cmn.cpp in Sources */,
-				4DEE290F1940BCC100C76319 /* atts_cmnornaments.cpp in Sources */,
-				4DEE29101940BCC100C76319 /* atts_critapp.cpp in Sources */,
-				4DEE29111940BCC100C76319 /* atts_edittrans.cpp in Sources */,
-				4DEE29121940BCC100C76319 /* atts_facsimile.cpp in Sources */,
-				4DEE29131940BCC100C76319 /* atts_figtable.cpp in Sources */,
-				4DEE29141940BCC100C76319 /* atts_harmony.cpp in Sources */,
-				4DEE29151940BCC100C76319 /* atts_header.cpp in Sources */,
-				4DEE29161940BCC100C76319 /* atts_linkalign.cpp in Sources */,
-				4DEE29171940BCC100C76319 /* atts_lyrics.cpp in Sources */,
-				4DEE29181940BCC100C76319 /* atts_mensural.cpp in Sources */,
-				4DEE29191940BCC100C76319 /* atts_midi.cpp in Sources */,
-				4DEE291A1940BCC100C76319 /* atts_neumes.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
-				4DEE291C1940BCC100C76319 /* atts_tablature.cpp in Sources */,
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -768,6 +739,7 @@
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C4271889214C00D0831F /* pugixml.cpp in Sources */,
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
+				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

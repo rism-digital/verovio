@@ -20,6 +20,7 @@
 #include "io.h"
 #include "keysig.h"
 #include "mensur.h"
+#include "metersig.h"
 
 namespace vrv {
 
@@ -37,6 +38,7 @@ ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface()
     m_clef = NULL;
     m_keySig = NULL;
     m_mensur = NULL;
+    m_meterSig = NULL;
 }
 
 ScoreOrStaffDefAttrInterface::~ScoreOrStaffDefAttrInterface()
@@ -50,6 +52,9 @@ ScoreOrStaffDefAttrInterface::~ScoreOrStaffDefAttrInterface()
     if (m_mensur) {
         delete m_mensur;
     }
+    if (m_meterSig) {
+        delete m_meterSig;
+    }
 }
 
 ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface )
@@ -57,9 +62,11 @@ ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface( const ScoreOrStaffDe
     m_clef = NULL;
     m_keySig = NULL;
     m_mensur = NULL;
+    m_meterSig = NULL;
     this->ReplaceClef( interface.m_clef );
     this->ReplaceKeySig( interface.m_keySig );
     this->ReplaceMensur( interface.m_mensur );
+    this->ReplaceMeterSig( interface.m_meterSig );
 }
 
 ScoreOrStaffDefAttrInterface& ScoreOrStaffDefAttrInterface::operator=( const ScoreOrStaffDefAttrInterface& interface )
@@ -69,9 +76,11 @@ ScoreOrStaffDefAttrInterface& ScoreOrStaffDefAttrInterface::operator=( const Sco
         m_clef = NULL;
         m_keySig = NULL;
         m_mensur = NULL;
+        m_meterSig = NULL;
         this->ReplaceClef( interface.m_clef );
         this->ReplaceKeySig( interface.m_keySig );
         this->ReplaceMensur( interface.m_mensur );
+        this->ReplaceMeterSig( interface.m_meterSig );
 	}
 	return *this;
 }
@@ -83,6 +92,7 @@ void ScoreOrStaffDefAttrInterface::ReplaceClef( Clef *newClef )
             delete m_clef;
         }
         m_clef = new Clef( *newClef );
+        m_clef->SetScoreOrStaffDefAttr( true );
     }
 }
 
@@ -93,6 +103,7 @@ void ScoreOrStaffDefAttrInterface::ReplaceKeySig( KeySignature *newKeySig )
             delete m_keySig;
         }
         m_keySig = new KeySignature( *newKeySig );
+        m_keySig->SetScoreOrStaffDefAttr( true );
     }
 }
 
@@ -103,6 +114,18 @@ void ScoreOrStaffDefAttrInterface::ReplaceMensur( Mensur *newMensur )
             delete m_mensur;
         }
         m_mensur = new Mensur( *newMensur );
+        m_mensur->SetScoreOrStaffDefAttr( true );
+    }
+}
+    
+void ScoreOrStaffDefAttrInterface::ReplaceMeterSig( MeterSig *newMeterSig )
+{
+    if ( newMeterSig ) {
+        if (m_meterSig) {
+            delete m_meterSig;
+        }
+        m_meterSig = new MeterSig( *newMeterSig );
+        m_meterSig->SetScoreOrStaffDefAttr( true );
     }
 }
 
@@ -125,6 +148,7 @@ void ScoreDef::Clear()
     ReplaceClef(NULL);
     ReplaceKeySig(NULL);
     ReplaceMensur(NULL);
+    ReplaceMeterSig(NULL);
     ClearChildren();
 }
 
@@ -141,6 +165,7 @@ void ScoreDef::Replace( ScoreDef *newScoreDef )
     ReplaceClef( newScoreDef->m_clef );
     ReplaceKeySig( newScoreDef->m_keySig );
     ReplaceMensur( newScoreDef->m_mensur );
+    ReplaceMeterSig( newScoreDef->m_meterSig );
     
     ArrayPtrVoid params;
 	params.push_back( this );
@@ -158,6 +183,7 @@ void ScoreDef::Replace( StaffDef *newStaffDef )
         staffDef->ReplaceClef( newStaffDef->GetClefAttr() );
         staffDef->ReplaceKeySig( newStaffDef->GetKeySigAttr() );
         staffDef->ReplaceMensur( newStaffDef->GetMensurAttr() );
+        staffDef->ReplaceMeterSig( newStaffDef->GetMeterSigAttr() );
     }
 }
 
@@ -197,12 +223,13 @@ StaffDef *ScoreDef::GetStaffDef( int n )
 }
 
 
-void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur )
+void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSig )
 {
     ArrayPtrVoid params;
 	params.push_back( &clef );
     params.push_back( &keysig );
 	params.push_back( &mensur );
+    params.push_back( &meterSig );
     MusFunctor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
     this->Process( &setStaffDefDraw, params );
 }
@@ -274,6 +301,7 @@ StaffDef::StaffDef() :
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
+    m_drawMeterSig = false;
     m_lines = 5;
 }
 
@@ -310,10 +338,12 @@ int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid params )
 {
     // param 0: bool clef flag
     // param 1: bool keysig flag
-    // param 2: bool the mensur flag
+    // param 2: bool mensur flag
+    // param 3: bool meterSig flag
     bool *clef = static_cast<bool*>(params[0]);
     bool *keysig = static_cast<bool*>(params[1]);
     bool *mensur = static_cast<bool*>(params[2]);
+    bool *meterSig = static_cast<bool*>(params[3]);
     
     if ( (*clef) ) {
         this->SetDrawClef( true );
@@ -323,6 +353,9 @@ int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid params )
     }
     if ( (*mensur) ) {
         this->SetDrawMensur( true );
+    }
+    if ( (*meterSig) ) {
+        this->SetDrawMeterSig( true );
     }
     
     return FUNCTOR_CONTINUE;

@@ -21,7 +21,7 @@ class Barline;
 class Beam;
 class Clef;
 class Layer;
-class Mensur;
+class MeterSig;
 class MRest;
 class MultiRest;
 class Note;
@@ -80,7 +80,7 @@ private:
     pugi::xml_document m_xml_doc;
     pugi::xml_node m_xml_current_clef;
     
-    Mensur *m_current_time;
+    MeterSig *m_current_time;
     Beam *m_current_beam;
     bool m_in_beam;
     bool m_tied;

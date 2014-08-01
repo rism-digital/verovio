@@ -27,6 +27,8 @@
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "mensur.h"
+#include "metersig.h"
 #include "multirest.h"
 #include "page.h"
 #include "view.h"
@@ -713,7 +715,12 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new page
     Page *current_page = dynamic_cast<Page*>(this);
     if ( current_page  ) {
-        currentScoreDef->SetRedrawFlags( true, true, false );
+        if ( current_page->m_parent->GetChildIndex( current_page ) == 0 ) {
+            currentScoreDef->SetRedrawFlags( true, true, true, true );
+        }
+        else {
+            currentScoreDef->SetRedrawFlags( true, true, false, false );
+        }
         current_page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
@@ -721,7 +728,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new system
     System *current_system = dynamic_cast<System*>(this);
     if ( current_system  ) {
-        currentScoreDef->SetRedrawFlags( true, true, false );
+        currentScoreDef->SetRedrawFlags( true, true, false, false );
         return FUNCTOR_CONTINUE;
     }
 
@@ -815,6 +822,12 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         if (current_layer->GetKeySigAttr()) {
             current_layer->GetKeySigAttr()->SetBoundingBoxXShift( params );
         }
+        if (current_layer->GetMensurAttr()) {
+            current_layer->GetMensurAttr()->SetBoundingBoxXShift( params );
+        }
+        if (current_layer->GetMeterSigAttr()) {
+            current_layer->GetMeterSigAttr()->SetBoundingBoxXShift( params );
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -872,7 +885,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
+    //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     //(*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();

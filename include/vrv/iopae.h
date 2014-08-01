@@ -21,7 +21,7 @@ class Beam;
 class Clef;
 class Layer;
 class Measure;
-class Mensur;
+class MeterSig;
 class Note;
 class Staff;
 class Tie;
@@ -50,7 +50,7 @@ public:
         rest = old.rest;
         
         clef = old.clef;
-        time = old.time;
+        meter = old.meter;
         key = old.key;
 
         tuplet_notes = old.tuplet_notes;
@@ -74,7 +74,7 @@ public:
         tuplet_note = 0;
         
         clef = NULL;
-        time = NULL;
+        meter = NULL;
         key = NULL;
     };
     
@@ -96,7 +96,7 @@ public:
         rest = d.rest;
         
         clef = d.clef;
-        time = d.time;
+        meter = d.meter;
         key = d.key;
         
         tuplet_notes = d.tuplet_notes;
@@ -127,7 +127,7 @@ public:
     bool rest;
     
     Clef *clef;
-    Mensur *time;
+    MeterSig *meter;
     KeySignature *key;
     
 };
@@ -138,7 +138,7 @@ public:
     
     MeasureObject(const MeasureObject& d){ // for STL vector
         clef = d.clef;
-        time = d.time;
+        meter = d.meter;
         notes = d.notes;
         
         key = d.key;
@@ -154,7 +154,7 @@ public:
     
     MeasureObject& operator=(const MeasureObject& d){ // for STL vector
         clef = d.clef;
-        time = d.time;
+        meter = d.meter;
         notes = d.notes;
         
         key = d.key;
@@ -177,7 +177,7 @@ public:
     };
     void   reset(void) {
         clef = NULL;
-        time = NULL;
+        meter = NULL;
         key = NULL;
         notes.clear();
         barline = BARLINE_NONE;
@@ -185,7 +185,7 @@ public:
         abbreviation_offset = -1;
     };
     Clef *clef;
-    Mensur *time;
+    MeterSig *meter;
     KeySignature *key;
     
     std::vector<NoteObject> notes;
@@ -231,7 +231,7 @@ private:
      
      // parsing functions
      int       getKeyInfo          (const char* incipit, KeySignature *key, int index = 0);
-     int       getTimeInfo         (const char* incipit, Mensur *meter, int index = 0);
+     int       getTimeInfo         (const char* incipit, MeterSig *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
      int       getBarline          (const char *incipit, BarlineType *output, int index );
      int       getAccidental       (const char* incipit, unsigned char *accident, int index = 0);

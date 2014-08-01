@@ -94,6 +94,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/layerelement.cpp \
 	$VEROVIO_ROOT/src/leipzigbbox.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
+	$VEROVIO_ROOT/src/metersig.cpp \
 	$VEROVIO_ROOT/src/mrest.cpp \
 	$VEROVIO_ROOT/src/multirest.cpp \
 	$VEROVIO_ROOT/src/note.cpp \
@@ -117,22 +118,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
-	$VEROVIO_ROOT/libmei/atts_analysis.cpp \
-	$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp \
-	$VEROVIO_ROOT/libmei/atts_edittrans.cpp \
-	$VEROVIO_ROOT/libmei/atts_figtable.cpp \
-	$VEROVIO_ROOT/libmei/atts_header.cpp \
-	$VEROVIO_ROOT/libmei/atts_lyrics.cpp \
-	$VEROVIO_ROOT/libmei/atts_midi.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
-	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
-	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
-	$VEROVIO_ROOT/libmei/atts_facsimile.cpp \
-	$VEROVIO_ROOT/libmei/atts_harmony.cpp \
-	$VEROVIO_ROOT/libmei/atts_linkalign.cpp \
-	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
-	$VEROVIO_ROOT/libmei/atts_neumes.cpp \
-	$VEROVIO_ROOT/libmei/atts_tablature.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="[\

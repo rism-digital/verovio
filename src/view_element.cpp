@@ -27,6 +27,7 @@
 #include "leipzigbbox.h"
 #include "measure.h"
 #include "mensur.h"
+#include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
@@ -90,6 +91,9 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (dynamic_cast<Mensur*>(element)) {
         DrawMensur(dc, element, layer, staff);
+    }
+    else if (dynamic_cast<MeterSig*>(element)) {
+        DrawMeterSig(dc, element, layer, staff);
     }
     else if (dynamic_cast<MRest*>(element)) {
         DrawMRest(dc, element, layer, staff, measure);
@@ -1140,88 +1144,38 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
  
     dc->StartGraphic( element, "mensur", element->GetUuid() );
 	
-	int x, yp;
-	float mDen=1.0, mNum=1.0;
+	int x;
 
-	if (mensur->m_meterSymb)
-	{	
-		yp = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
-		
-		unsigned char fontChar = LEIPZIG_METER_SYMB_COMMON;
-		switch (mensur->m_meterSymb)
-		{	
-            case METER_SYMB_COMMON:
-				fontChar = LEIPZIG_METER_SYMB_COMMON;
-				mNum = 4; mDen = 4; break;
-			case METER_SYMB_CUT:
-				fontChar = LEIPZIG_METER_SYMB_CUT;
-				mNum = 2; mDen = 2; break;
-			case METER_SYMB_2:
-				fontChar = LEIPZIG_METER_SYMB_2;
-				mNum = 2; mDen = 2; break;
-			case METER_SYMB_3:
-				fontChar = LEIPZIG_METER_SYMB_3;
-				mNum = 3; mDen = 2; break;
-			case METER_SYMB_2_CUT:
-				fontChar = LEIPZIG_METER_SYMB_2_CUT;	
-				mNum = 4; mDen = 2; break;
-			case METER_SYMB_3_CUT:
-				fontChar = LEIPZIG_METER_SYMB_3_CUT;	
-				mNum = 6; mDen = 2; break;
-            default:
-                break;
-		}
-		if ( dc )
-		{	
-			DrawLeipzigFont( dc, element->GetDrawingX(), yp, fontChar, staff, staff->staffSize);
-		}
-	}
-	else
-	{
-		if (mensur->m_sign==MENSUR_SIGN_O)
-		{	
-            mNum = 2; mDen = 2;
-			DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-		}
-		else if (mensur->m_sign==MENSUR_SIGN_C && !mensur->m_reversed)
-		{	
-            mNum = 2; mDen = 2;
-			DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-		}
-		else if (mensur->m_sign==MENSUR_SIGN_C && mensur->m_reversed)
-		{	
-            mNum = 4; mDen = 2;
-			DrawMensurReversedHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-		}
-		if (mensur->m_slash) // we handle only one single slash
-		{	
-            DrawMensurSlash ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-			mDen = 1;
-		}
-		if (mensur->m_dot) // we handle only one single dot
-		{	
-            DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-			mNum = 9; mDen = 4;
-		}
-	}
-
+    if (mensur->m_sign==MENSURATIONSIGN_O)
+    {	
+        DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    }
+    else if (mensur->m_sign==MENSURATIONSIGN_C && !mensur->m_reversed)
+    {	
+        DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    }
+    else if (mensur->m_sign==MENSURATIONSIGN_C && mensur->m_reversed)
+    {	
+        DrawMensurReversedHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    }
+    if (mensur->m_slash) // we handle only one single slash
+    {	
+        DrawMensurSlash ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    }
+    if (mensur->m_dot) // we handle only one single dot
+    {	
+        DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
+    }
 
 	if (mensur->m_num)
 	{	
         x = element->GetDrawingX();
-		if (mensur->m_sign || mensur->m_meterSymb) 
+		if (mensur->m_sign) 
         {
 			x += m_doc->m_drawingStep1*5; // step forward because we have a sign or a meter symbol
         }
 		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->m_num, mensur->m_numBase, staff);
-		//mDen = max ( this->durDen, (unsigned short)1); // ax2
-		//mNum = max ( this->durNum, (unsigned short)1); // ax2
 	}
-    /*
-	MesVal = mNum / mDen;
-	mesureNum = (int)mNum;
-	mesureDen = (int)mDen;
-    */ // ax2 
     
     dc->EndGraphic(element, this ); //RZ
 
@@ -1349,6 +1303,38 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
 		DrawLeipzigString ( dc, x, yden, s, 1, staff->staffSize);	// '1' = centrer
 	}
 	return;
+}
+    
+    
+void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+{
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    assert(dynamic_cast<MeterSig*>(element)); // Element must be a Mensur"
+    
+    MeterSig *meterSig = dynamic_cast<MeterSig*>(element);
+    
+    dc->StartGraphic( element, "meterSig", element->GetUuid() );
+    
+    int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
+    int x = element->GetDrawingX();
+    
+    if ( meterSig->GetSym() == METERSIGN_COMMON ) {
+        DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_COMMON, staff, staff->staffSize);
+        x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
+    }
+    else if ( meterSig->GetSym() == METERSIGN_CUT ) {
+        DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_CUT, staff, staff->staffSize);
+        x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
+    }
+
+    if (meterSig->GetCount())
+    {	
+        DrawMensurFigures ( dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
+    }
+    
+    dc->EndGraphic(element, this );
+    
 }
 
 

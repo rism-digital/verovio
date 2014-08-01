@@ -26,6 +26,7 @@
 #include "keysig.h"
 #include "io.h"
 #include "mensur.h"
+#include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
@@ -70,6 +71,7 @@ void LayerElement::Init()
     m_drawingY = 0;
     m_in_layer_app = false;
     
+    m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
 }
     
@@ -240,7 +242,12 @@ bool LayerElement::IsMensur()
 {  
     return (dynamic_cast<Mensur*>(this));
 }
-
+    
+bool LayerElement::IsMeterSig()
+{
+    return (dynamic_cast<MeterSig*>(this));
+}
+    
 bool LayerElement::IsNote() 
 {  
     return (dynamic_cast<Note*>(this));
@@ -351,13 +358,36 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
         type = ALIGNMENT_BARLINE;
     }
     else if ( this->IsClef() ) {
-        type = ALIGNMENT_CLEF;
+        if ( this->GetScoreOrStaffDefAttr() ) {
+            type = ALIGNMENT_CLEF_ATTR;
+        }
+        else {
+            type = ALIGNMENT_CLEF;
+        }
     }
     else if ( this->IsKeySig() ) {
-        type = ALIGNMENT_KEYSIG;
+        if ( this->GetScoreOrStaffDefAttr() ) {
+            type = ALIGNMENT_KEYSIG_ATTR;
+        }
+        else {
+            type = ALIGNMENT_KEYSIG;
+        }
     }
     else if ( this->IsMensur() ) {
-        type = ALIGNMENT_MENSUR;
+        if ( this->GetScoreOrStaffDefAttr() ) {
+            type = ALIGNMENT_MENSUR_ATTR;
+        }
+        else {
+            type = ALIGNMENT_MENSUR;
+        }
+    }
+    else if ( this->IsMeterSig() ) {
+        if ( this->GetScoreOrStaffDefAttr() ) {
+            type = ALIGNMENT_METERSIG_ATTR;
+        }
+        else {
+            type = ALIGNMENT_METERSIG;
+        }
     }
     else if ( this->IsMultiRest() || this->IsMRest() ) {
         type = ALIGNMENT_MULTIREST;

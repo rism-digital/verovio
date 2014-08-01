@@ -20,6 +20,8 @@
 #include "keysig.h"
 #include "io.h"
 #include "layerelement.h"
+#include "mensur.h"
+#include "metersig.h"
 #include "note.h"
 #include "symbol.h"
 
@@ -228,6 +230,15 @@ void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffD
             this->ReplaceMensur( currentScoreDef->GetMensurAttr() );
         }
         currentStaffDef->SetDrawMensur( false );
+    }
+    if ( currentStaffDef->DrawMeterSig() ) {
+        if ( currentStaffDef->GetMeterSigAttr() ) {
+            this->ReplaceMeterSig( currentStaffDef->GetMeterSigAttr() );
+        }
+        else {
+            this->ReplaceMeterSig( currentScoreDef->GetMeterSigAttr() );
+        }
+        currentStaffDef->SetDrawMeterSig( false );
     }
     
     // also put the current clef (if any if the staffDef or the scoreDef)
@@ -497,6 +508,12 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     }
     if ( m_keySig ) {
         m_keySig->AlignHorizontally( params );
+    }
+    if ( m_mensur ) {
+        m_mensur->AlignHorizontally( params );
+    }
+    if ( m_meterSig ) {
+        m_meterSig->AlignHorizontally( params );
     }
 
     return FUNCTOR_CONTINUE;
