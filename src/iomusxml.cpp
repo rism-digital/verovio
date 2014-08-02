@@ -171,7 +171,7 @@ bool XMLOutput::WriteLayerElement( LayerElement *element )
         
     if (dynamic_cast<Clef*>(element)) {
         WriteClef(element);
-    } else if (dynamic_cast<KeySignature*>(element)) {
+    } else if (dynamic_cast<KeySig*>(element)) {
         WriteKey(element);
     } else if (dynamic_cast<Mensur*>(element)) {
         WriteTime(element);
@@ -281,7 +281,7 @@ void XMLOutput::WriteClef(LayerElement *element) {
 }
 
 void XMLOutput::WriteKey(LayerElement *element) {
-    KeySignature* key = dynamic_cast<KeySignature*>(element);
+    KeySig* key = dynamic_cast<KeySig*>(element);
     
     // Check for attrib element as above
     // or use existing one, all the attribute changes

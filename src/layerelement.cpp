@@ -224,7 +224,7 @@ bool LayerElement::IsSymbol( )
 
 bool LayerElement::IsKeySig()
 {
-    return (dynamic_cast<KeySignature*>(this));
+    return (dynamic_cast<KeySig*>(this));
 }
 
     

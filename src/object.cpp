@@ -755,7 +755,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     }
     
     // starting a new keysig
-    KeySignature *current_keysig = dynamic_cast<KeySignature*>(this);
+    KeySig *current_keysig = dynamic_cast<KeySig*>(this);
     if ( current_keysig  ) {
         assert( *currentStaffDef );
         (*currentStaffDef)->ReplaceKeySig( current_keysig );

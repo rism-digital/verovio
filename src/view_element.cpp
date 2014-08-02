@@ -86,7 +86,7 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     else if (dynamic_cast<Clef*>(element)) {
         DrawClef(dc, element, layer, staff);
     }
-    else if (dynamic_cast<KeySignature*>(element)) {
+    else if (dynamic_cast<KeySig*>(element)) {
         DrawKeySig(dc, element, layer, staff);
     }
     else if (dynamic_cast<Mensur*>(element)) {
@@ -1465,7 +1465,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
 
-    KeySignature *ks = dynamic_cast<KeySignature*>(element);
+    KeySig *ks = dynamic_cast<KeySig*>(element);
     int symb;
     int x, y;
     

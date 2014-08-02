@@ -26,7 +26,7 @@ class Note;
 class Staff;
 class Tie;
 class Tuplet;
-class KeySignature;
+class KeySig;
 class Barline;
 
 
@@ -128,7 +128,7 @@ public:
     
     Clef *clef;
     MeterSig *meter;
-    KeySignature *key;
+    KeySig *key;
     
 };
 
@@ -186,7 +186,7 @@ public:
     };
     Clef *clef;
     MeterSig *meter;
-    KeySignature *key;
+    KeySig *key;
     
     std::vector<NoteObject> notes;
     
@@ -230,7 +230,7 @@ private:
      void      parsePlainAndEasy( std::istream &infile );
      
      // parsing functions
-     int       getKeyInfo          (const char* incipit, KeySignature *key, int index = 0);
+     int       getKeyInfo          (const char* incipit, KeySig *key, int index = 0);
      int       getTimeInfo         (const char* incipit, MeterSig *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
      int       getBarline          (const char *incipit, BarlineType *output, int index );

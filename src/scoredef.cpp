@@ -96,13 +96,13 @@ void ScoreOrStaffDefAttrInterface::ReplaceClef( Clef *newClef )
     }
 }
 
-void ScoreOrStaffDefAttrInterface::ReplaceKeySig( KeySignature *newKeySig )
+void ScoreOrStaffDefAttrInterface::ReplaceKeySig( KeySig *newKeySig )
 {
     if ( newKeySig ) {
         if (m_keySig) {
             delete m_keySig;
         }
-        m_keySig = new KeySignature( *newKeySig );
+        m_keySig = new KeySig( *newKeySig );
         m_keySig->SetScoreOrStaffDefAttr( true );
     }
 }

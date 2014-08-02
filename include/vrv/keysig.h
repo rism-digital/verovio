@@ -17,18 +17,18 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// KeySignature
+// KeySig
 //----------------------------------------------------------------------------
 
-class KeySignature: public LayerElement, public PositionInterface
+class KeySig: public LayerElement
 {
 public:
     // constructors and destructors
-    KeySignature();
-    KeySignature(int num_alter, char alter);
-    virtual ~KeySignature();
+    KeySig();
+    KeySig(int num_alter, char alter);
+    virtual ~KeySig();
     
-    virtual std::string GetClassName( ) { return "KeySignature"; };
+    virtual std::string GetClassName( ) { return "KeySig"; };
     
     /**
      * Return the default horizontal spacing after a keysig.

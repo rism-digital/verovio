@@ -1026,7 +1026,7 @@ bool MeiInput::ReadMeiScoreDef( pugi::xml_node scoreDef )
     }
     
     if ( scoreDef.attribute( "key.sig" ) ) {
-        KeySignature keysig(
+        KeySig keysig(
                 StrToKeySigNum( scoreDef.attribute( "key.sig" ).value() ),
                 StrToKeySigType( scoreDef.attribute( "key.sig" ).value() ) );
         m_scoreDef->ReplaceKeySig( &keysig );
@@ -1114,7 +1114,7 @@ bool MeiInput::ReadMeiStaffDef( pugi::xml_node staffDef )
         LogWarning("No @n on <staffDef>");
     }
     if ( staffDef.attribute( "key.sig" ) ) {
-        KeySignature keysig(
+        KeySig keysig(
                          StrToKeySigNum( staffDef.attribute( "key.sig" ).value() ),
                          StrToKeySigType( staffDef.attribute( "key.sig" ).value() ) );
         m_staffDef->ReplaceKeySig( &keysig );

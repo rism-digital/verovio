@@ -163,7 +163,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     }
 
     if (strlen(c_keysig)) {
-        KeySignature *k = new KeySignature();
+        KeySig *k = new KeySig();
         getKeyInfo( c_keysig, k);
         current_measure.key = k;
     }
@@ -322,7 +322,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         
   		//key signature change
 		else if ((incipit[i] == '$') && (i+1 < length)) {
-            KeySignature *k = new KeySignature;
+            KeySig *k = new KeySig;
             i += getKeyInfo( incipit, k, i + 1);
             if (current_measure.notes.size() == 0) {
                 if (current_measure.key)
@@ -944,7 +944,7 @@ int PaeInput::getAbbreviation(const char* incipit, MeasureObject *measure, int i
 // getKeyInfo -- read the key signature.
 //
 
-int PaeInput::getKeyInfo(const char *incipit, KeySignature *key, int index ) {
+int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
     int alt_nr = 0;
 
     // at the key information line, extract data

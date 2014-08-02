@@ -75,7 +75,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
         accid = ACCID_SHARP;
     }
     
-    KeySignature *k = new KeySignature(quantity, accid);
+    KeySig *k = new KeySig(quantity, accid);
     m_layer->AddElement(k);
     return;
     //////

@@ -14,7 +14,7 @@
 namespace vrv {
 
 class Clef;
-class KeySignature;
+class KeySig;
 class Mensur;
 class MeterSig;
 class StaffGrp;
@@ -32,7 +32,7 @@ class StaffDef;
 
 /**
  * This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur.
- * For simplification, the attributes are stored as Clef, KeySignature and Mensur.
+ * For simplification, the attributes are stored as Clef, KeySig and Mensur.
  */
 class ScoreOrStaffDefAttrInterface
 {
@@ -51,7 +51,7 @@ public:
     /**
      * Replace the keysig (if any) with the newKeysig (if any).
      */
-    void ReplaceKeySig( KeySignature *newKeySig );
+    void ReplaceKeySig( KeySig *newKeySig );
     
     /**
      * Replace the mensur (if any) with the newMensur (if any).
@@ -68,7 +68,7 @@ public:
      */
     ///@{
     Clef *GetClefAttr() const { return m_clef; };
-    KeySignature *GetKeySigAttr() const { return m_keySig; };
+    KeySig *GetKeySigAttr() const { return m_keySig; };
     Mensur *GetMensurAttr() const { return m_mensur; };
     MeterSig *GetMeterSigAttr() const { return m_meterSig; };
     ///@}
@@ -77,7 +77,7 @@ protected:
     /** The clef attribute */
     Clef *m_clef;
     /** The key signature */
-    KeySignature *m_keySig;
+    KeySig *m_keySig;
     /** The mensur */
     Mensur *m_mensur;
     /** The meter signature (time signature) */

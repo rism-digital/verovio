@@ -12,13 +12,13 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// KeySignature
+// KeySig
 //----------------------------------------------------------------------------
 
-unsigned char KeySignature::flats[] = {PITCH_B, PITCH_E, PITCH_A, PITCH_D, PITCH_G, PITCH_C, PITCH_F};
-unsigned char KeySignature::sharps[] = {PITCH_F, PITCH_C, PITCH_G, PITCH_D, PITCH_A, PITCH_E, PITCH_B};
+unsigned char KeySig::flats[] = {PITCH_B, PITCH_E, PITCH_A, PITCH_D, PITCH_G, PITCH_C, PITCH_F};
+unsigned char KeySig::sharps[] = {PITCH_F, PITCH_C, PITCH_G, PITCH_D, PITCH_A, PITCH_E, PITCH_B};
 
-int KeySignature::octave_map[2][9][7] = {
+int KeySig::octave_map[2][9][7] = {
     {// flats
        //C,  D,  E,  F,  G,  A,  B 
         {01, 01, 01, 00, 00, 00, 00}, // treble
@@ -45,24 +45,24 @@ int KeySignature::octave_map[2][9][7] = {
     },
 };
 
-KeySignature::KeySignature():
-LayerElement(), PositionInterface()
+KeySig::KeySig():
+LayerElement()
 {
-    KeySignature(0, ACCID_NATURAL);
+    KeySig(0, ACCID_NATURAL);
 }
 
-KeySignature::KeySignature(int num_alter, char alter):
-    LayerElement("ksig-"), PositionInterface()
+KeySig::KeySig(int num_alter, char alter):
+    LayerElement("ksig-")
 {
     m_num_alter = num_alter;
     m_alteration = alter;
 }
 
-KeySignature::~KeySignature()
+KeySig::~KeySig()
 {
 }
 
-unsigned char KeySignature::GetAlterationAt(int pos) {
+unsigned char KeySig::GetAlterationAt(int pos) {
     unsigned char *alteration_set;
     
     if (pos > 6)
@@ -76,7 +76,7 @@ unsigned char KeySignature::GetAlterationAt(int pos) {
     return alteration_set[pos];
 }
 
-int KeySignature::GetOctave(unsigned char pitch, char clef) {
+int KeySig::GetOctave(unsigned char pitch, char clef) {
     int alter_set = 0; // flats
     int key_set = 0;
     
