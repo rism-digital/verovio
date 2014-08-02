@@ -177,6 +177,9 @@ bool MeiOutput::WriteScoreDef( ScoreDef *scoreDef )
         m_scoreDef.append_attribute( "key.sig" ) = KeySigToStr( scoreDef->GetKeySigAttr()->GetAlterationNumber(),
                                                          scoreDef->GetKeySigAttr()->GetAlteration() ).c_str();
     }
+    if ( scoreDef->GetMeterSigAttr() ) {
+        WriteAttMeterSigLog( m_scoreDef, scoreDef->GetMeterSigAttr(), true );
+    }
     
     // this needs to be fixed
     return true;
@@ -215,6 +218,9 @@ bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
     if (staffDef->GetKeySigAttr()) {
         m_staffDef.append_attribute( "key.sig" ) = KeySigToStr( staffDef->GetKeySigAttr()->GetAlterationNumber(),
                                                          staffDef->GetKeySigAttr()->GetAlteration() ).c_str();
+    }
+    if ( staffDef->GetMeterSigAttr() ) {
+        WriteAttMeterSigLog( m_staffDef, staffDef->GetMeterSigAttr(), true );
     }
     
     return true;
@@ -1113,6 +1119,12 @@ bool MeiInput::ReadMeiStaffDef( pugi::xml_node staffDef )
     else {
         LogWarning("No @n on <staffDef>");
     }
+    
+    MeterSig meterSig;
+    if ( ReadAttMeterSigLog( staffDef, &meterSig, true ) ) {
+        m_scoreDef->ReplaceMeterSig( &meterSig );
+    }
+    
     if ( staffDef.attribute( "key.sig" ) ) {
         KeySig keysig(
                          StrToKeySigNum( staffDef.attribute( "key.sig" ).value() ),
@@ -1755,7 +1767,7 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         m_page->AddSystem( m_system );
     }
     else if ( (std::string( element.name() ) == "scoreDef") && ( !m_hasScoreDef ) ) {
-        LogDebug( "scoreDef" );
+        LogDebug( "scoreDef (first)" );
         m_scoreDef = &m_doc->m_scoreDef;
         SetMeiUuid( element, m_scoreDef );
         if (ReadMeiScoreDef( element )) {
@@ -1764,6 +1776,18 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         else {
             m_hasScoreDef = false;
         }
+    }
+    else if ( std::string( element.name() ) == "scoreDef") {
+        LogDebug( "scoreDef (redefinition)" );
+        m_scoreDef = new ScoreDef();
+        SetMeiUuid( element, m_scoreDef );
+        if (ReadMeiScoreDef( element )) {
+            m_system->AddScoreDef( m_scoreDef );
+        }
+        else {
+            delete m_scoreDef;
+        }
+        m_scoreDef = NULL;
     }
     else {
         LogWarning( "Elements <%s> ignored", element.name() );

@@ -107,6 +107,9 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     for (i = 0; i < (int)system->GetMeasureCount(); i++)
 	{
 		measure = dynamic_cast<Measure*>(system->m_children[i]);
+        if (!measure) {
+            continue;
+        }
         DrawMeasure( dc , measure, system );
 	}
 

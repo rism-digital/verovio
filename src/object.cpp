@@ -724,11 +724,38 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
         current_page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
-   
+
     // starting a new system
     System *current_system = dynamic_cast<System*>(this);
     if ( current_system  ) {
         currentScoreDef->SetRedrawFlags( true, true, false, false );
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // starting a new scoreDef
+    ScoreDef *current_scoreDef= dynamic_cast<ScoreDef*>(this);
+    if ( current_scoreDef  ) {
+        bool drawClef = false;
+        bool drawKeySig = false;
+        bool drawMensur = false;
+        bool drawMeterSig = false;
+        if (current_scoreDef->GetClefAttr()) {
+            currentScoreDef->ReplaceClef(current_scoreDef->GetClefAttr());
+            drawClef = true;
+        }
+        if (current_scoreDef->GetKeySigAttr()) {
+            currentScoreDef->ReplaceKeySig(current_scoreDef->GetKeySigAttr());
+            drawKeySig = true;
+        }
+        if (current_scoreDef->GetMensurAttr()) {
+            currentScoreDef->ReplaceMensur(current_scoreDef->GetMensurAttr());
+            drawMensur = true;
+        }
+        if (current_scoreDef->GetMeterSigAttr()) {
+            currentScoreDef->ReplaceMeterSig(current_scoreDef->GetMeterSigAttr());
+            drawMeterSig = true;
+        }
+        currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig );
         return FUNCTOR_CONTINUE;
     }
 

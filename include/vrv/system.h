@@ -17,6 +17,7 @@ namespace vrv {
 
 class DeviceContext;
 class Measure;
+class ScoreDef;
 
 //----------------------------------------------------------------------------
 // System
@@ -40,6 +41,8 @@ public:
     void Clear();
 	
 	void AddMeasure( Measure *measure );
+    
+    void AddScoreDef( ScoreDef *scoreDef );
 	
 	Measure *GetFirst( );
 	Measure *GetLast( );

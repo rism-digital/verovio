@@ -89,6 +89,13 @@ void System::AddMeasure( Measure *measure )
     Modify();
 }
 
+void System::AddScoreDef( ScoreDef *scoreDef )
+{
+    scoreDef->SetParent( this );
+    m_children.push_back( scoreDef );
+    Modify();
+}
+
 int System::GetVerticalSpacing()
 {
     return 0; // arbitrary generic value
