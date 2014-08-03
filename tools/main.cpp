@@ -97,6 +97,10 @@ void display_usage() {
     
     cerr << " --adjust-page-height       Crop the page height to the height of the content" << endl;
     
+    cerr << " --all-pages                Output all pages with one output file per page" << endl;
+    
+    cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
+    
     cerr << " --help                     Display this message" << endl;
     
     cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
@@ -130,6 +134,7 @@ int main(int argc, char** argv)
     ConvertFileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
+    int all_pages = 0;
     int no_layout = 0;
     int ignore_layout = 0;
     int no_justification = 0;
@@ -153,6 +158,7 @@ int main(int argc, char** argv)
     {
         
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
+        {"all-pages",           no_argument,        &all_pages, 1},
         {"border",              required_argument,  0, 'b'},
         {"format",              required_argument,  0, 'f'},
         {"help",                no_argument,        &show_help, 1},
@@ -280,9 +286,12 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    // Hardvode svg ext for now
+    // Hardcode svg ext for now
     if (outfile.empty()) {
-        outfile = removeExtension(infile) + ".svg";
+        outfile = removeExtension(infile);
+    }
+    else {
+        outfile = removeExtension(outfile);
     }
     
     cerr << "Reading " << infile << "..." << endl;
@@ -291,22 +300,38 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    // Create SVG or mei
-    if (outformat == "svg") {
-        if ( !controller.RenderToSvgFile( outfile, page ) ) {
-            cerr << "Unable to write SVG to " << outfile << "." << endl;
-            exit(1);
-        }
-        // Write it to file
-        
-    } else {
-        // To be implemented in InterfaceController
-        if ( !controller.SaveFile( outfile ) ) {
-            cerr << "Unable to write MEI to " << outfile << "." << endl;
-            exit(1);
-        }
+    int from = page;
+    int to = page + 1;
+    if (all_pages) {
+        to = controller.GetPageCount() - 1;
     }
-    cerr << "Output written to " << outfile << endl;
+    
+        
+    int p;
+    for (p = from; p < to; p++) {
+        std::string cur_outfile = outfile;
+        if (all_pages) {
+            cur_outfile += StringFormat("_%03d", p);
+        }
+        // Create SVG or mei
+        if (outformat == "svg") {
+            cur_outfile += ".svg";
+            if ( !controller.RenderToSvgFile( cur_outfile, page ) ) {
+                cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
+                exit(1);
+            }
+            // Write it to file
+            
+        } else {
+            // To be implemented in InterfaceController
+            cur_outfile += ".mei";
+            if ( !controller.SaveFile( cur_outfile ) ) {
+                cerr << "Unable to write MEI to " << cur_outfile << "." << endl;
+                exit(1);
+            }
+        }
+        cerr << "Output written to " << cur_outfile << endl;
+    }
     
     return 0;
 }
