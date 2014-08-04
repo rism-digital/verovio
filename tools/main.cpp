@@ -300,6 +300,16 @@ int main(int argc, char** argv)
         exit(1);
     }
     
+    // Check the page range
+    if (page > controller.GetPageCount()) {
+        cerr << "The page requested (" << page << ") is not in the page range (max is " << controller.GetPageCount() << ")" << endl;
+        exit(1);
+    }
+    if (page < 1) {
+        cerr << "The page number has to be greater than 0" << endl;
+        exit(1);
+    }
+    
     int from = page;
     int to = page + 1;
     if (all_pages) {
