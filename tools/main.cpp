@@ -316,7 +316,7 @@ int main(int argc, char** argv)
         // Create SVG or mei
         if (outformat == "svg") {
             cur_outfile += ".svg";
-            if ( !controller.RenderToSvgFile( cur_outfile, page ) ) {
+            if ( !controller.RenderToSvgFile( cur_outfile, p) ) {
                 cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
             }
