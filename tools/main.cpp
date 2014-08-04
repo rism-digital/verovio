@@ -303,7 +303,7 @@ int main(int argc, char** argv)
     int from = page;
     int to = page + 1;
     if (all_pages) {
-        to = controller.GetPageCount() - 1;
+        to = controller.GetPageCount() + 1;
     }
     
         
