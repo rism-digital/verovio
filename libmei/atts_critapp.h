@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_CRITAPP_H__
 #define __VRV_ATTS_CRITAPP_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttCrit
 //----------------------------------------------------------------------------
 
-class AttCrit 
+class AttCrit: public Att
 {
 public:
     AttCrit();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCrit();
     
+    /** Read the values for the attribute class **/
+    bool ReadCrit( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCrit( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCause(std::string cause_) { m_cause = cause_; };
-    std::string GetCause() { return m_cause; };
+    std::string GetCause() const { return m_cause; };
     ///@}
 
 protected:
@@ -58,7 +65,7 @@ protected:
 // AttSource
 //----------------------------------------------------------------------------
 
-class AttSource 
+class AttSource: public Att
 {
 public:
     AttSource();
@@ -67,12 +74,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSource();
     
+    /** Read the values for the attribute class **/
+    bool ReadSource( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSource( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSource(std::string source_) { m_source = source_; };
-    std::string GetSource() { return m_source; };
+    std::string GetSource() const { return m_source; };
     ///@}
 
 protected:

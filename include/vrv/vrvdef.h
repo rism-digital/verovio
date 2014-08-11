@@ -9,6 +9,8 @@
 #ifndef __VRV_DEF_H__
 #define __VRV_DEF_H__
 
+#include "attdef.h"
+
 #include <algorithm>
 
 namespace vrv {
@@ -90,14 +92,6 @@ enum EditorMode {
 #define MIN_TIE_HEIGHT 12
 #define MIN_TIE_THICKNESS 6
 
-// PITCHES
-#define PITCH_C 1
-#define PITCH_D 2
-#define PITCH_E 3
-#define PITCH_F 4
-#define PITCH_G 5
-#define PITCH_A 6
-#define PITCH_B 7
 // used for automatic rest positions
 #define REST_AUTO 255
 
@@ -125,11 +119,6 @@ enum EditorMode {
 #define ACCID_QUARTER_SHARP 6
 #define ACCID_QUARTER_FLAT 7
 
-// SYSTEMS
-#define START 1
-#define END 2
-#define START_END 3
-
 // DIRECTIONS
 #define FORWARD 1
 #define BACKWARD 0
@@ -156,69 +145,12 @@ enum EditorMode {
 #define ACCENT_OBL_PNT 6
 #define ACCENT_VERT_PNT 7
 
-
-// the maximum is 255 (unsigned char)
-enum BarlineType {
-    BARLINE_NONE = 0, // None is used to indicated we are actually drawing the staffGrp
-    BARLINE_SINGLE,
-    BARLINE_END,
-    BARLINE_RPTBOTH,
-    BARLINE_RPTSTART,
-    BARLINE_RPTEND,
-    BARLINE_DBL
-};
-
-// the maximum is 255 (unsigned char)
-enum ClefId {
-    SOL2 = 1,
-    SOL1,
-    FA4,
-    FA3,
-    UT1,
-    UT2,
-    UT3,
-    UT4,
-    SOLva,
-    FA5,
-    UT5,
-    CLEPERC,
-    //neumatic clefs
-    nC1,
-    nC2,
-    nC3,
-    nC4,
-    nF1,
-    nF2,
-    nF3,
-    nF4
-};
-
 // the maximum is 255 (unsigned char)
 enum StaffGrpSymbol {
     STAFFGRP_NONE = 0,
     STAFFGRP_LINE,
     STAFFGRP_BRACE,
     STAFFGRP_BRACKET
-};
-
-/**
- * MEI data.METERSIGN
- * The maximum is 255 (unsigned char)
- */
-enum MeterSign {
-    METERSIGN_NONE = 0,
-    METERSIGN_COMMON,
-    METERSIGN_CUT
-};
-
-/**
- * MEI data.MENSURATIONSIGN
- * The maximum is 255 (unsigned char)
- */
-enum MensurationSign {
-    MENSURATIONSIGN_NONE = 0,
-    MENSURATIONSIGN_C,
-    MENSURATIONSIGN_O
 };
 
 // the maximum is 255 (unsigned char)
@@ -229,6 +161,29 @@ enum SymbolType {
     SYMBOL_CUSTOS = 3,
     SYMBOL_SB = 4,
     SYMBOL_PB = 5
+};
+    
+/* This is used for false clef offset calculation.
+ * It uses 4 bytes with, from right to left
+ * - line
+ * - shape
+ * - dis (0 or 1)
+ * - dis.place (0 or 1)
+ */
+enum ClefId {
+    G1 = CLEFSHAPE_G << 8 | 1,
+    G2 = CLEFSHAPE_G << 8 | 2,
+    G2va =  PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
+    G2vabassa = PLACE_below << 24 | OCTAVE_DIS_8 << 16 | G2,
+    F3 = CLEFSHAPE_F << 8 | 3,
+    F4 = CLEFSHAPE_F << 8 | 4,
+    F5 = CLEFSHAPE_F << 8 | 5,
+    C1 = CLEFSHAPE_C << 8 | 1,
+    C2 = CLEFSHAPE_C << 8 | 2,
+    C3 = CLEFSHAPE_C << 8 | 3,
+    C4 = CLEFSHAPE_C << 8 | 4,
+    C5 = CLEFSHAPE_C << 8 | 5,
+    perc = CLEFSHAPE_perc << 8 | 1
 };
 
 //----------------------------------------------------------------------------

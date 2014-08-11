@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_LINKALIGN_H__
 #define __VRV_ATTS_LINKALIGN_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttAlignment
 //----------------------------------------------------------------------------
 
-class AttAlignment 
+class AttAlignment: public Att
 {
 public:
     AttAlignment();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAlignment();
     
+    /** Read the values for the attribute class **/
+    bool ReadAlignment( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAlignment( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetWhen(std::string when_) { m_when = when_; };
-    std::string GetWhen() { return m_when; };
+    std::string GetWhen() const { return m_when; };
     ///@}
 
 protected:

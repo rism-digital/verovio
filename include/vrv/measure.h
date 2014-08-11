@@ -30,7 +30,7 @@ class Staff;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasure music is contained in one single measure object
  */
-class Measure: public AttCommon, public DocObject
+class Measure: public DocObject, public AttCommon, public AttMeasureLog
 {
     
 public:
@@ -58,12 +58,18 @@ public:
     
     /**
      * @name Set and get the left and right barline types
+     * This somehow conflicts with AttMeasureLog, which are transfered from and to the 
+     * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
+     * MeiOutput::ReadMeiMeasure
+     * Alternatively, we could keep them in sync here:
+     * data_BARRENDITION GetLeftBarlineType() { m_leftBarline.SetRend( GetRight() ); return m_leftBarline.GetRend(); };
+     * void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetRend(type); SetLeft(type); };
      */
     ///@{
-    BarlineType GetLeftBarlineType() const { return m_leftBarline.m_barlineType; };
-    void SetLeftBarlineType( BarlineType type ) { m_leftBarline.m_barlineType = type; };
-    BarlineType GetRightBarlineType() const { return m_rightBarline.m_barlineType; };
-    void SetRightBarlineType( BarlineType type ) { m_rightBarline.m_barlineType = type; };
+    data_BARRENDITION GetLeftBarlineType() const { return m_leftBarline.GetRend(); };
+    void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetRend(type); };
+    data_BARRENDITION GetRightBarlineType() const { return m_rightBarline.GetRend(); };
+    void SetRightBarlineType( data_BARRENDITION type ) { m_rightBarline.SetRend(type); };
     ///@}
     
     /**

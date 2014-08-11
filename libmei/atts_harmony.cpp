@@ -24,7 +24,7 @@ namespace vrv {
 // AttFretlocation
 //----------------------------------------------------------------------------
 
-AttFretlocation::AttFretlocation() {
+AttFretlocation::AttFretlocation(): Att() {
     ResetFretlocation();
 }
 
@@ -36,13 +36,31 @@ void AttFretlocation::ResetFretlocation() {
     m_fret = "";
 }
 
+bool AttFretlocation::ReadFretlocation(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("fret")) {
+        this->SetFret(StrToStr(element.attribute("fret").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttFretlocation::WriteFretlocation(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetFret() == "") {
+        element.append_attribute("fret") = StrToStr(this->GetFret()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
 /* include <attfret> */
 
 //----------------------------------------------------------------------------
 // AttHarmLog
 //----------------------------------------------------------------------------
 
-AttHarmLog::AttHarmLog() {
+AttHarmLog::AttHarmLog(): Att() {
     ResetHarmLog();
 }
 
@@ -54,13 +72,31 @@ void AttHarmLog::ResetHarmLog() {
     m_chordref = "";
 }
 
+bool AttHarmLog::ReadHarmLog(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("chordref")) {
+        this->SetChordref(StrToStr(element.attribute("chordref").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttHarmLog::WriteHarmLog(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetChordref() == "") {
+        element.append_attribute("chordref") = StrToStr(this->GetChordref()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
 /* include <attchordref> */
 
 //----------------------------------------------------------------------------
 // AttHarmVis
 //----------------------------------------------------------------------------
 
-AttHarmVis::AttHarmVis() {
+AttHarmVis::AttHarmVis(): Att() {
     ResetHarmVis();
 }
 
@@ -71,6 +107,32 @@ AttHarmVis::~AttHarmVis() {
 void AttHarmVis::ResetHarmVis() {
     m_extender = "";
     m_rendgrid = "";
+}
+
+bool AttHarmVis::ReadHarmVis(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("extender")) {
+        this->SetExtender(StrToStr(element.attribute("extender").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("rendgrid")) {
+        this->SetRendgrid(StrToStr(element.attribute("rendgrid").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttHarmVis::WriteHarmVis(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetExtender() == "") {
+        element.append_attribute("extender") = StrToStr(this->GetExtender()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->GetRendgrid() == "") {
+        element.append_attribute("rendgrid") = StrToStr(this->GetRendgrid()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 /* include <attrendgrid> */

@@ -16,7 +16,6 @@ namespace vrv {
 #define STAFF_OFFSET 190
 #define MAXCLE 100	// maximum number of clef on one staff
 
-class Clef;
 class DeviceContext;
 class Layer;
 class StaffAlignment;

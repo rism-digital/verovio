@@ -27,13 +27,10 @@ namespace vrv {
 Note::Note():
 	LayerElement("note-"), DurationInterface(), PitchInterface()
 {
-    m_artic = 0;
-    m_chord = 0;
     m_colored = false;
     m_headshape = 0;
     m_lig = 0;
     m_ligObliqua = false;
-    memset(m_slur, 0, sizeof(unsigned char) * NOTE_MAX_SLURS);
     m_stemDir = 0;
     m_stemLen = 0;
     m_acciaccatura = false;
@@ -58,12 +55,6 @@ bool Note::operator==( Object& other )
 {
     Note *otherNote = dynamic_cast<Note*>( &other );
     if ( !otherNote ) {
-        return false;
-    }
-    if ( this->m_artic != otherNote->m_artic ) {
-        return false;
-    }
-    if ( this->m_chord != otherNote->m_chord ) {
         return false;
     }
     if ( this->m_colored != otherNote->m_colored ) {

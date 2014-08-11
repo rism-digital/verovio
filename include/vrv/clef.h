@@ -11,9 +11,12 @@
 
 #include "vrvdef.h"
 #include "layerelement.h"
+#include "atts_shared.h"
 
 namespace vrv {
-
+    
+class ClefAttr;
+    
 //----------------------------------------------------------------------------
 // Clef
 //----------------------------------------------------------------------------
@@ -21,12 +24,21 @@ namespace vrv {
 /** 
  * This class models the MEI <clef> element. 
  */
-class Clef: public LayerElement
+class Clef: public LayerElement, public AttClefshape, public AttLineloc, public AttOctavedisplacement
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes.
+     */
+    ///@{
     Clef();
+    Clef( ClefAttr *clefAttr );
     virtual ~Clef();
+    void Reset();
+    virtual Object* Clone() { return new Clef(*this); };
+    virtual std::string GetClassName( ) { return "Clef"; };
+    ///@}
     
     /**
      * Comparison operator. 
@@ -34,7 +46,10 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string GetClassName( ) { return "Clef"; };
+    /**
+     * Return the default horizontal spacing after a clef.
+     */
+    virtual int GetHorizontalSpacing( ) { return 20; };
     
     /**
      * Return the offset of the clef
@@ -42,16 +57,51 @@ public:
     int GetClefOffset();
     
     /**
-     * Set the value for the clef.
+     * This is used for false clef offset calculation.
+     * Returns 4 bytes with, from right to left, line, shape, dis and displace
      */
-	virtual void SetValue( int value, int flag = 0 );
+    int GetClefId();
     
 private:
     
 public:
-    /** Indicates the shape and the line of the clef using clef ids  */
-    ClefId m_clefId;
 
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// ClefAttr
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI @clef attributes in scoreDef or staffDef elements.
+ */
+class ClefAttr: public Object, public AttCleffingLog
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    ClefAttr();
+    virtual ~ClefAttr();
+    void Reset();
+    virtual std::string GetClassName( ) { return "ClefAttr"; };
+    virtual Object* Clone() { return new ClefAttr(*this); };
+    ///@}
+    
+    /**
+     * Comparison operator.
+     * Check if the LayerElement if a ClefAttr and compare attributes
+     */
+    virtual bool operator==(Object& other);
+    
+private:
+    
+public:
+    
 private:
     
 };

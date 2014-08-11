@@ -739,20 +739,20 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
         bool drawKeySig = false;
         bool drawMensur = false;
         bool drawMeterSig = false;
-        if (current_scoreDef->GetClefAttr()) {
-            currentScoreDef->ReplaceClef(current_scoreDef->GetClefAttr());
+        if (current_scoreDef->GetClef()) {
+            currentScoreDef->ReplaceClef(current_scoreDef->GetClef());
             drawClef = true;
         }
-        if (current_scoreDef->GetKeySigAttr()) {
-            currentScoreDef->ReplaceKeySig(current_scoreDef->GetKeySigAttr());
+        if (current_scoreDef->GetKeySig()) {
+            currentScoreDef->ReplaceKeySig(current_scoreDef->GetKeySig());
             drawKeySig = true;
         }
-        if (current_scoreDef->GetMensurAttr()) {
-            currentScoreDef->ReplaceMensur(current_scoreDef->GetMensurAttr());
+        if (current_scoreDef->GetMensur()) {
+            currentScoreDef->ReplaceMensur(current_scoreDef->GetMensur());
             drawMensur = true;
         }
-        if (current_scoreDef->GetMeterSigAttr()) {
-            currentScoreDef->ReplaceMeterSig(current_scoreDef->GetMeterSigAttr());
+        if (current_scoreDef->GetMeterSig()) {
+            currentScoreDef->ReplaceMeterSig(current_scoreDef->GetMeterSig());
             drawMeterSig = true;
         }
         currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig );
@@ -829,7 +829,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         // we reset the measure width and the minimum position
         (*measure_width) = 0;
         (*min_pos) = 0;
-        if (current_measure->GetLeftBarlineType() != BARLINE_NONE) {
+        if (current_measure->GetLeftBarlineType() != BARRENDITION_NONE) {
             current_measure->GetLeftBarline()->SetBoundingBoxXShift( params );
         }
         return FUNCTOR_CONTINUE;
@@ -843,17 +843,17 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
         if (doc) (*min_pos) = doc->m_drawingStep1;
         // set scoreDef attr
-        if (current_layer->GetClefAttr()) {
-            current_layer->GetClefAttr()->SetBoundingBoxXShift( params );
+        if (current_layer->GetDrawingClef()) {
+            current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
         }
-        if (current_layer->GetKeySigAttr()) {
-            current_layer->GetKeySigAttr()->SetBoundingBoxXShift( params );
+        if (current_layer->GetDrawingKeySig()) {
+            current_layer->GetDrawingKeySig()->SetBoundingBoxXShift( params );
         }
-        if (current_layer->GetMensurAttr()) {
-            current_layer->GetMensurAttr()->SetBoundingBoxXShift( params );
+        if (current_layer->GetDrawingMensur()) {
+            current_layer->GetDrawingMensur()->SetBoundingBoxXShift( params );
         }
-        if (current_layer->GetMeterSigAttr()) {
-            current_layer->GetMeterSigAttr()->SetBoundingBoxXShift( params );
+        if (current_layer->GetDrawingMeterSig()) {
+            current_layer->GetDrawingMeterSig()->SetBoundingBoxXShift( params );
         }
         return FUNCTOR_CONTINUE;
     }
@@ -935,7 +935,7 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
     if ( current_measure  ) {
         // as minimum position of the barline use the measure width
         (*min_pos) = (*measure_width);
-        if (current_measure->GetRightBarlineType() != BARLINE_NONE) {
+        if (current_measure->GetRightBarlineType() != BARRENDITION_NONE) {
             current_measure->GetRightBarline()->SetBoundingBoxXShift( params );
         }
         return FUNCTOR_CONTINUE;

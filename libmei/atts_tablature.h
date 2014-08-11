@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_TABLATURE_H__
 #define __VRV_ATTS_TABLATURE_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttNoteGesTablature
 //----------------------------------------------------------------------------
 
-class AttNoteGesTablature 
+class AttNoteGesTablature: public Att
 {
 public:
     AttNoteGesTablature();
@@ -36,15 +37,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetNoteGesTablature();
     
+    /** Read the values for the attribute class **/
+    bool ReadNoteGesTablature( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteNoteGesTablature( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTabFret(std::string tabFret_) { m_tabFret = tabFret_; };
-    std::string GetTabFret() { return m_tabFret; };
+    std::string GetTabFret() const { return m_tabFret; };
     //
     void SetTabString(std::string tabString_) { m_tabString = tabString_; };
-    std::string GetTabString() { return m_tabString; };
+    std::string GetTabString() const { return m_tabString; };
     ///@}
 
 protected:
@@ -60,7 +67,7 @@ protected:
 // AttStaffDefGesTablature
 //----------------------------------------------------------------------------
 
-class AttStaffDefGesTablature 
+class AttStaffDefGesTablature: public Att
 {
 public:
     AttStaffDefGesTablature();
@@ -69,12 +76,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffDefGesTablature();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffDefGesTablature( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffDefGesTablature( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTabStrings(std::string tabStrings_) { m_tabStrings = tabStrings_; };
-    std::string GetTabStrings() { return m_tabStrings; };
+    std::string GetTabStrings() const { return m_tabStrings; };
     ///@}
 
 protected:

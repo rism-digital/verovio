@@ -9,8 +9,8 @@
 #ifndef __VRV_BARLINE_H__
 #define __VRV_BARLINE_H__
 
-#include "vrvdef.h"
 #include "layerelement.h"
+#include "atts_shared.h"
 
 namespace vrv {
 
@@ -21,12 +21,20 @@ namespace vrv {
 /** 
  * This class models the MEI <barline> element. 
  */
-class Barline: public LayerElement
+class Barline: public LayerElement, public AttBarLineLog
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes.
+     */
+    ///@{
     Barline();
     virtual ~Barline();
+    void Reset();
+    virtual Object* Clone() { return new Barline(*this); };
+    virtual std::string GetClassName( ) { return "Barline"; };
+    ///@}
     
     /**
      * Comparison operator. 
@@ -34,7 +42,6 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string GetClassName( ) { return "Barline"; };
     
     /**
      * Use to set the alignment for the Measure Barline members.
@@ -55,8 +62,6 @@ public:
 private:
     
 public:
-    /** Indicates the barline type (@rend) */
-    BarlineType m_barlineType;
     /** Indicates a partial barline (inbetween the staves) - no MEI equivalent */
     bool m_partialBarline;
     /** Indicates a barline displayed only on the staff - no MEI equivalent */

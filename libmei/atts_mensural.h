@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_MENSURAL_H__
 #define __VRV_ATTS_MENSURAL_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttLigatureLog
 //----------------------------------------------------------------------------
 
-class AttLigatureLog 
+class AttLigatureLog: public Att
 {
 public:
     AttLigatureLog();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLigatureLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadLigatureLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLigatureLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     ///@}
 
 protected:
@@ -55,7 +62,7 @@ protected:
 // AttMensurVis
 //----------------------------------------------------------------------------
 
-class AttMensurVis 
+class AttMensurVis: public Att
 {
 public:
     AttMensurVis();
@@ -64,22 +71,28 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMensurVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadMensurVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMensurVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     //
-    void SetOrient(std::string orient_) { m_orient = orient_; };
-    std::string GetOrient() { return m_orient; };
+    void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; };
+    data_ORIENTATION GetOrient() const { return m_orient; };
     ///@}
 
 protected:
     /** Records the function of the dot. **/
     std::string m_form;
     /** Describes the rotation or reflection of the base symbol. **/
-    std::string m_orient;
+    data_ORIENTATION m_orient;
 
 /* include <attorient> */
 };
@@ -88,7 +101,7 @@ protected:
 // AttMensurDefaultLog
 //----------------------------------------------------------------------------
 
-class AttMensurDefaultLog 
+class AttMensurDefaultLog: public Att
 {
 public:
     AttMensurDefaultLog();
@@ -97,35 +110,41 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMensurDefaultLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadMensurDefaultLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMensurDefaultLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetMensurDot(std::string mensurDot_) { m_mensurDot = mensurDot_; };
-    std::string GetMensurDot() { return m_mensurDot; };
+    void SetMensurDot(data_BOOLEAN mensurDot_) { m_mensurDot = mensurDot_; };
+    data_BOOLEAN GetMensurDot() const { return m_mensurDot; };
     //
     void SetMensurLocInt(int mensurLocInt_) { m_mensurLocInt = mensurLocInt_; };
-    int GetMensurLocInt() { return m_mensurLocInt; };
+    int GetMensurLocInt() const { return m_mensurLocInt; };
     //
-    void SetMensurSign(std::string mensurSign_) { m_mensurSign = mensurSign_; };
-    std::string GetMensurSign() { return m_mensurSign; };
+    void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; };
+    data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; };
     //
-    void SetMensurSlashInt(int mensurSlashInt_) { m_mensurSlashInt = mensurSlashInt_; };
-    int GetMensurSlashInt() { return m_mensurSlashInt; };
+    void SetMensurSlash(unsigned char mensurSlash_) { m_mensurSlash = mensurSlash_; };
+    unsigned char GetMensurSlash() const { return m_mensurSlash; };
     ///@}
 
 protected:
     /** Determines if a dot is to be added to the base symbol. **/
-    std::string m_mensurDot;
+    data_BOOLEAN m_mensurDot;
     /** Holds the staff location of the mensuration sign. **/
     int m_mensurLocInt;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
-    std::string m_mensurSign;
+    data_MENSURATIONSIGN m_mensurSign;
     /**
      * Indicates the number lines added to the mensuration sign.
      * For example, one slash is added for what we now call 'alla breve'.
      **/
-    int m_mensurSlashInt;
+    unsigned char m_mensurSlash;
 
 /* include <attmensur.slash> */
 };
@@ -134,7 +153,7 @@ protected:
 // AttMensurDefaultVis
 //----------------------------------------------------------------------------
 
-class AttMensurDefaultVis 
+class AttMensurDefaultVis: public Att
 {
 public:
     AttMensurDefaultVis();
@@ -143,21 +162,27 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMensurDefaultVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadMensurDefaultVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMensurDefaultVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; };
-    std::string GetMensurColor() { return m_mensurColor; };
+    std::string GetMensurColor() const { return m_mensurColor; };
     //
     void SetMensurForm(std::string mensurForm_) { m_mensurForm = mensurForm_; };
-    std::string GetMensurForm() { return m_mensurForm; };
+    std::string GetMensurForm() const { return m_mensurForm; };
     //
     void SetMensurOrient(std::string mensurOrient_) { m_mensurOrient = mensurOrient_; };
-    std::string GetMensurOrient() { return m_mensurOrient; };
+    std::string GetMensurOrient() const { return m_mensurOrient; };
     //
     void SetMensurSize(std::string mensurSize_) { m_mensurSize = mensurSize_; };
-    std::string GetMensurSize() { return m_mensurSize; };
+    std::string GetMensurSize() const { return m_mensurSize; };
     ///@}
 
 protected:
@@ -180,7 +205,7 @@ protected:
 // AttNoteLogMensural
 //----------------------------------------------------------------------------
 
-class AttNoteLogMensural 
+class AttNoteLogMensural: public Att
 {
 public:
     AttNoteLogMensural();
@@ -189,12 +214,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetNoteLogMensural();
     
+    /** Read the values for the attribute class **/
+    bool ReadNoteLogMensural( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteNoteLogMensural( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLig(std::string lig_) { m_lig = lig_; };
-    std::string GetLig() { return m_lig; };
+    std::string GetLig() const { return m_lig; };
     ///@}
 
 protected:
@@ -208,7 +239,7 @@ protected:
 // AttRestVisMensural
 //----------------------------------------------------------------------------
 
-class AttRestVisMensural 
+class AttRestVisMensural: public Att
 {
 public:
     AttRestVisMensural();
@@ -217,12 +248,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetRestVisMensural();
     
+    /** Read the values for the attribute class **/
+    bool ReadRestVisMensural( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteRestVisMensural( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSpacesInt(int spacesInt_) { m_spacesInt = spacesInt_; };
-    int GetSpacesInt() { return m_spacesInt; };
+    int GetSpacesInt() const { return m_spacesInt; };
     ///@}
 
 protected:
@@ -236,7 +273,7 @@ protected:
 // AttStaffDefLogMensural
 //----------------------------------------------------------------------------
 
-class AttStaffDefLogMensural 
+class AttStaffDefLogMensural: public Att
 {
 public:
     AttStaffDefLogMensural();
@@ -245,15 +282,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffDefLogMensural();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffDefLogMensural( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffDefLogMensural( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetProportNumInt(int proportNumInt_) { m_proportNumInt = proportNumInt_; };
-    int GetProportNumInt() { return m_proportNumInt; };
+    int GetProportNumInt() const { return m_proportNumInt; };
     //
     void SetProportNumbaseInt(int proportNumbaseInt_) { m_proportNumbaseInt = proportNumbaseInt_; };
-    int GetProportNumbaseInt() { return m_proportNumbaseInt; };
+    int GetProportNumbaseInt() const { return m_proportNumbaseInt; };
     ///@}
 
 protected:
@@ -277,7 +320,7 @@ protected:
 // AttStafflocPitched
 //----------------------------------------------------------------------------
 
-class AttStafflocPitched 
+class AttStafflocPitched: public Att
 {
 public:
     AttStafflocPitched();
@@ -286,15 +329,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStafflocPitched();
     
+    /** Read the values for the attribute class **/
+    bool ReadStafflocPitched( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStafflocPitched( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPloc(std::string ploc_) { m_ploc = ploc_; };
-    std::string GetPloc() { return m_ploc; };
+    std::string GetPloc() const { return m_ploc; };
     //
     void SetOloc(std::string oloc_) { m_oloc = oloc_; };
-    std::string GetOloc() { return m_oloc; };
+    std::string GetOloc() const { return m_oloc; };
     ///@}
 
 protected:

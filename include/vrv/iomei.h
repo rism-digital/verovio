@@ -144,15 +144,6 @@ private:
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
     void WriteSameAsAttr( pugi::xml_node element, Object *object );
-    
-    /**
-     * @name Read attribute classes
-     */
-    ///@{
-    void WriteAttCommon( pugi::xml_node element, Object *object );
-    void WriteAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault = false );
-    ///@}
-    
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -162,13 +153,7 @@ private:
 	std::string OctToStr(int oct);
 	std::string PitchToStr(int pitch);
     std::string AccidToStr(unsigned char accid);
-    std::string ClefLineToStr(ClefId clefId);
-    std::string ClefShapeToStr(ClefId clefId);
-    std::string MensurationSignToStr(MensurationSign sign);
-    std::string MeterSignToStr(MeterSign sign);
     std::string DocTypeToStr(DocType type);
-    std::string KeySigToStr(int num, char alter_type );
-    std::string BarlineTypeToStr(BarlineType type);
     std::string StaffGrpSymbolToStr(StaffGrpSymbol symbol);
     ///@}
 
@@ -255,18 +240,6 @@ private:
     bool ReadMeiRdg( pugi::xml_node rdg );
     
     /**
-     * @name Read attribute classes
-     */
-    ///@{
-    void ReadAttCommon( pugi::xml_node element, Object *object );
-    /** 
-     * The isDefault flag is used to read MeterSigLogDefault attribute class from scoreDef or staffDef
-     * It returns true or false depending whether at least one attribute was set or not
-     */
-    bool ReadAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault = false );
-    ///@}
-    
-    /**
      * Read a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
@@ -297,13 +270,7 @@ private:
 	int StrToOct(std::string oct);
 	int StrToPitch(std::string pitch ); 
     unsigned char StrToAccid(std::string accid);
-    ClefId StrToClef(std::string shape, std::string line);
-    MensurationSign StrToMensurationSign(std::string sign);
-    MeterSign StrToMeterSign(std::string sign);
     DocType StrToDocType(std::string type);
-    unsigned char StrToKeySigType(std::string accid);
-    int StrToKeySigNum(std::string accid);
-    BarlineType StrToBarlineType(std::string type);
     StaffGrpSymbol StrToStaffGrpSymbol(std::string sign);
     /** Extract the uuid for references to uuids with ..#uuid values */
     std::string ExtractUuidFragment(std::string refUuid);

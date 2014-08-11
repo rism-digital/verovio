@@ -30,7 +30,7 @@ class Note;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public ObjectListInterface, public ScoreOrStaffDefAttrInterface
+class Layer: public DocObject, public ObjectListInterface
 {
 public:
     // constructors and destructors
@@ -149,6 +149,26 @@ public:
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
     
+    /**
+     * @name Set the clef, keySig, mensur and meterSig to be drawn.
+     */
+    ///@{
+    void SetDrawingClef( Clef *clef );
+    void SetDrawingKeySig( KeySig *keySig );
+    void SetDrawingMensur( Mensur *mensur );
+    void SetDrawingMeterSig( MeterSig *meterSig );
+    ///@}
+    
+    /**
+     * @name Get the clef, keySig, mensur and meterSig to be drawn.
+     */
+    ///@{
+    Clef *GetDrawingClef( ) { return m_drawingClef; };
+    KeySig *GetDrawingKeySig( ) { return m_drawingKeySig; };
+    Mensur *GetDrawingMensur( ) { return m_drawingMensur; };
+    MeterSig *GetDrawingMeterSig( ) { return m_drawingMeterSig; };
+    ///@}
+    
 private:
     
 public:
@@ -159,6 +179,14 @@ protected:
     // drawing variables
     //LayerElement *beamListPremier; // we need to replace this with a proper beam class that handles a list of notes/rests
     ListOfObjects m_drawingList;
+    /** The clef attribute */
+    Clef *m_drawingClef;
+    /** The key signature */
+    KeySig *m_drawingKeySig;
+    /** The mensur */
+    Mensur *m_drawingMensur;
+    /** The meter signature (time signature) */
+    MeterSig *m_drawingMeterSig;
     
 private:
     /** The layer number */

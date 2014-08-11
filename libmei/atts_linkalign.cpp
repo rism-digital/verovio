@@ -24,7 +24,7 @@ namespace vrv {
 // AttAlignment
 //----------------------------------------------------------------------------
 
-AttAlignment::AttAlignment() {
+AttAlignment::AttAlignment(): Att() {
     ResetAlignment();
 }
 
@@ -34,6 +34,24 @@ AttAlignment::~AttAlignment() {
 
 void AttAlignment::ResetAlignment() {
     m_when = "";
+}
+
+bool AttAlignment::ReadAlignment(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("when")) {
+        this->SetWhen(StrToStr(element.attribute("when").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttAlignment::WriteAlignment(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetWhen() == "") {
+        element.append_attribute("when") = StrToStr(this->GetWhen()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 /* include <attwhen> */

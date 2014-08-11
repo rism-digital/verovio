@@ -310,6 +310,8 @@ int main(int argc, char** argv)
         exit(1);
     }
     
+    //cerr << "G1" << G1 << " C1=" << C1 << " C2=" << C2 << " C3=" << C3 << " F3=" << F3 << endl;
+    
     int from = page;
     int to = page + 1;
     if (all_pages) {

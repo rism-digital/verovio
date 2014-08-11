@@ -669,29 +669,29 @@ int PaeInput::getGraceNote(const char* incipit, NoteObject *note, int index ) {
 
 int PaeInput::getPitch( char c_note ) {
     
-    int pitch = PITCH_C;
+    int pitch = PITCHNAME_c;
     
     switch (c_note) {
         case 'A':
-            pitch = PITCH_A;
+            pitch = PITCHNAME_a;
             break;
         case 'B': 
-            pitch = PITCH_B;
+            pitch = PITCHNAME_b;
             break;
         case 'C': 
-            pitch = PITCH_C;
+            pitch = PITCHNAME_c;
             break;
         case 'D': 
-            pitch = PITCH_D;
+            pitch = PITCHNAME_d;
             break;
         case 'E': 
-            pitch = PITCH_E;
+            pitch = PITCHNAME_e;
             break;
         case 'F': 
-            pitch = PITCH_F;
+            pitch = PITCHNAME_f;
             break;
         case 'G': 
-            pitch = PITCH_G;
+            pitch = PITCHNAME_g;
             break;
         case '-': pitch = 255; break;
         default:
@@ -753,17 +753,17 @@ int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
         meter->SetUnit(1);
     } else if (strcmp(timesig_str, "c") == 0) {
         // C
-        meter->SetSym(METERSIGN_COMMON);
+        meter->SetSym(METERSIGN_common);
     } else if (strcmp(timesig_str, "c/") == 0) {
         // C|
-        meter->SetSym(METERSIGN_CUT);
+        meter->SetSym(METERSIGN_cut);
     } else if (strcmp(timesig_str, "c3") == 0) {
         // C3
-        meter->SetSym(METERSIGN_COMMON);
+        meter->SetSym(METERSIGN_common);
         meter->SetCount(3);
     } else if (strcmp(timesig_str, "c3/2") == 0) {
         // C3/2
-        meter->SetSym(METERSIGN_COMMON); // ??
+        meter->SetSym(METERSIGN_common); // ??
         meter->SetCount(3);
         meter->SetUnit(2);
     } else {
@@ -802,25 +802,19 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
 
     
     if (clef == 'C' || clef == 'c') {
-        switch (line) {
-            case '1': mclef->m_clefId = UT1; break;
-            case '2': mclef->m_clefId = UT2; break;
-            case '3': mclef->m_clefId = UT3; break;
-            case '4': mclef->m_clefId = UT4; break;
-        }
+        mclef->SetShape(CLEFSHAPE_C);
+        mclef->SetLine(line);
     } else if (clef == 'G') {
-        switch (line) {
-            case '1': mclef->m_clefId = SOL1; break;
-            case '2': mclef->m_clefId = SOL2; break;
-        }
+        mclef->SetShape(CLEFSHAPE_G);
+        mclef->SetLine(line);
     } else if (clef == 'g') {
-        mclef->m_clefId = SOLva;
+        mclef->SetShape(CLEFSHAPE_G);
+        mclef->SetLine(line);
+        mclef->SetDis(OCTAVE_DIS_8);
+        mclef->SetDisPlace(PLACE_above);
     } else if (clef == 'F' || clef == 'f') {
-        switch (line) {
-            case '3': mclef->m_clefId = FA3; break;
-            case '4': mclef->m_clefId = FA4; break;
-            case '5': mclef->m_clefId = FA5; break;
-        }
+        mclef->SetShape(CLEFSHAPE_F);
+        mclef->SetLine(line);
     } else {
         // what the...
         LogDebug("Clef %c is Undefined", clef);
@@ -861,15 +855,15 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
  * getBarline -- read the barline.
  * Translation from PAE to verovio representaion:
  *
- BARLINE_SINGLE     /
- BARLINE_END        does not exist
- BARLINE_RPTBOTH    ://:
- BARLINE_RPTSTART   ://
- BARLINE_RPTEND     //:
- BARLINE_DBL        //
+ BARRENDITION_single     /
+ BARRENDITION_end        does not exist
+ BARRENDITION_rptboth    ://:
+ BARRENDITION_rptstart   ://
+ BARRENDITION_rptend     //:
+ BARRENDITION_dbl        //
  */
 
-int PaeInput::getBarline( const char *incipit, BarlineType *output, int index ) {
+int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int index ) {
     regex_t re;
     
     regcomp(&re, "^://:", REG_EXTENDED);
@@ -890,19 +884,19 @@ int PaeInput::getBarline( const char *incipit, BarlineType *output, int index ) 
     
     int i = 0; // number of characters
     if (is_barline_rptboth == 0) {
-        *output = BARLINE_RPTBOTH;
+        *output = BARRENDITION_rptboth;
         i = 3;
     } else if (is_barline_rptstart == 0) {
-        *output = BARLINE_RPTSTART;
+        *output = BARRENDITION_rptstart;
         i = 2;
     } else if (is_barline_rptend == 0) {
-        *output = BARLINE_RPTEND;
+        *output = BARRENDITION_rptend;
         i = 2;
     } else if (is_barline_dbl == 0) {
-        *output = BARLINE_DBL;
+        *output = BARRENDITION_dbl;
         i = 1;
     } else {
-        *output = BARLINE_SINGLE;
+        *output = BARRENDITION_single;
         i = 0;
     }
     return i;
@@ -1103,7 +1097,7 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
     // Set barline
     // FIXME use flags for proper barline identification
     Barline *bline = m_measure->GetRightBarline();
-    bline->m_barlineType = measure->barline;
+    bline->SetRend( measure->barline );
 
 }
 

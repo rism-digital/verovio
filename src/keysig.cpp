@@ -1,4 +1,3 @@
-
 /////////////////////////////////////////////////////////////////////////////
 // Name:        keysig.cpp
 // Author:      Rodolfo Zitellini
@@ -15,8 +14,8 @@ namespace vrv {
 // KeySig
 //----------------------------------------------------------------------------
 
-unsigned char KeySig::flats[] = {PITCH_B, PITCH_E, PITCH_A, PITCH_D, PITCH_G, PITCH_C, PITCH_F};
-unsigned char KeySig::sharps[] = {PITCH_F, PITCH_C, PITCH_G, PITCH_D, PITCH_A, PITCH_E, PITCH_B};
+unsigned char KeySig::flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
+unsigned char KeySig::sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
 
 int KeySig::octave_map[2][9][7] = {
     {// flats
@@ -46,7 +45,7 @@ int KeySig::octave_map[2][9][7] = {
 };
 
 KeySig::KeySig():
-LayerElement()
+    LayerElement("ksig-")
 {
     KeySig(0, ACCID_NATURAL);
 }
@@ -54,11 +53,42 @@ LayerElement()
 KeySig::KeySig(int num_alter, char alter):
     LayerElement("ksig-")
 {
+    Reset();
     m_num_alter = num_alter;
     m_alteration = alter;
 }
+    
+KeySig::KeySig( KeySigAttr *keySigAttr ):
+    LayerElement("ksig-")
+{
+    KeySig(0, ACCID_NATURAL);
+    int key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
+    /* see data_KEYSIGNATURE order; key will be:
+      0 for KEYSIGNATURE_0
+     -1 for KEYSIGNATURE_1f
+      1 for KEYSIGNATURE_1s
+     -2 for KEYSIGNATURE_2f
+      2 for KEYSIGNATURE_2s
+     etc.
+     */
+    if ((key > KEYSIGNATURE_7s) || (key < KEYSIGNATURE_1f)) {
+        // other values are  KEYSIGNATURE_NONE or  KEYSIGNATURE_mixed (unsupported)
+        return;
+    }
+    if (key > KEYSIGNATURE_0) {
+        m_alteration = ACCID_SHARP;
+    }
+    else if (key < KEYSIGNATURE_0) {
+        m_alteration = ACCID_FLAT;
+    }
+    m_num_alter = abs(key);
+}
 
 KeySig::~KeySig()
+{
+}
+    
+void KeySig::Reset()
 {
 }
 
@@ -76,28 +106,63 @@ unsigned char KeySig::GetAlterationAt(int pos) {
     return alteration_set[pos];
 }
 
-int KeySig::GetOctave(unsigned char pitch, char clef) {
+int KeySig::GetOctave(unsigned char pitch, int clefId) {
     int alter_set = 0; // flats
     int key_set = 0;
     
     if (m_alteration == ACCID_SHARP)
         alter_set = 1;
     
-    switch (clef) {
-        case SOL2: key_set = 0; break;
-        case UT1: key_set = 1; break;
-        case UT2: key_set = 2; break;
-        case UT3: key_set = 3; break;
-        case UT4: key_set = 4; break;
-        case FA5: key_set = 5; break;
-        case FA4: key_set = 6; break;
-        case FA3: key_set = 7; break;
-        case SOL1: key_set = 8; break;
+    switch (clefId) {
+        case G2: key_set = 0; break;
+        case C1: key_set = 1; break;
+        case C2: key_set = 2; break;
+        case C3: key_set = 3; break;
+        case C4: key_set = 4; break;
+        case F5: key_set = 5; break;
+        case F4: key_set = 6; break;
+        case F3: key_set = 7; break;
+        case G1: key_set = 8; break;
             
         default: key_set = 0; break;
     }
     
     return octave_map[alter_set][key_set][pitch - 1];
+}
+
+    
+//----------------------------------------------------------------------------
+// KeySigAttr
+//----------------------------------------------------------------------------
+
+KeySigAttr::KeySigAttr():
+    Object(), AttKeySigDefaultLog()
+{
+    Reset();
+}
+
+
+KeySigAttr::~KeySigAttr()
+{
+}
+
+void KeySigAttr::Reset()
+{
+    ResetKeySigDefaultLog();
+}
+    
+bool KeySigAttr::operator==( Object& other )
+{
+    KeySigAttr *otherClefAttr = dynamic_cast<KeySigAttr*>( &other );
+    if ( !otherClefAttr ) {
+        return false;
+    }
+    /*
+     if ( this->m_clefId != otherClef->m_clefId ) {
+     return false;
+     }
+     */
+    return true;
 }
 
 } // namespace vrv

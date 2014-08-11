@@ -551,8 +551,8 @@ if (fPente)
             DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
             
 // ICI, bon endroit pour enfiler les STACCATOS - ne sont traités ici que ceux qui sont opposés à la tête (les autres, in wgnote.cpp)
-			if (((Note*)(crd+i)->chk)->m_artic
-				 && (!((Note*)(crd+i)->chk)->m_chord || (((Note*)(crd+i)->chk)->m_chord & CHORD_TERMINAL)))
+			//if (((Note*)(crd+i)->chk)->m_artic
+			//	 && (!((Note*)(crd+i)->chk)->m_chord || (((Note*)(crd+i)->chk)->m_chord & CHORD_TERMINAL)))
 			// les cas non traités par note()
 /*			{	if (fb.dir || (fb.mrq_port && m_stemLen && !crd[i].prov))
 					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);

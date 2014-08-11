@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_NEUMES_H__
 #define __VRV_ATTS_NEUMES_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttIneumeLog
 //----------------------------------------------------------------------------
 
-class AttIneumeLog 
+class AttIneumeLog: public Att
 {
 public:
     AttIneumeLog();
@@ -36,15 +37,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetIneumeLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadIneumeLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteIneumeLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     //
     void SetName(std::string name_) { m_name = name_; };
-    std::string GetName() { return m_name; };
+    std::string GetName() const { return m_name; };
     ///@}
 
 protected:
@@ -60,7 +67,7 @@ protected:
 // AttUneumeLog
 //----------------------------------------------------------------------------
 
-class AttUneumeLog 
+class AttUneumeLog: public Att
 {
 public:
     AttUneumeLog();
@@ -69,15 +76,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetUneumeLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadUneumeLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteUneumeLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     //
     void SetName(std::string name_) { m_name = name_; };
-    std::string GetName() { return m_name; };
+    std::string GetName() const { return m_name; };
     ///@}
 
 protected:

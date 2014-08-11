@@ -169,16 +169,17 @@ bool MeiOutput::WriteScoreDef( ScoreDef *scoreDef )
     m_scoreDef = m_system.append_child("scoreDef");
     m_scoreDef.append_attribute( "xml:id" ) =  UuidToMeiStr( scoreDef ).c_str();
     if (scoreDef->GetClefAttr()) {
-        m_scoreDef.append_attribute( "clef.line" ) = ClefLineToStr( scoreDef->GetClefAttr()->m_clefId ).c_str();
-        m_scoreDef.append_attribute( "clef.shape" ) = ClefShapeToStr( scoreDef->GetClefAttr()->m_clefId ).c_str();
-        // we should add 8va attr
+        scoreDef->GetClefAttr()->WriteCleffingLog(m_scoreDef);
     }
     if (scoreDef->GetKeySigAttr()) {
-        m_scoreDef.append_attribute( "key.sig" ) = KeySigToStr( scoreDef->GetKeySigAttr()->GetAlterationNumber(),
-                                                         scoreDef->GetKeySigAttr()->GetAlteration() ).c_str();
+        scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(m_scoreDef);
+    }
+    if ( scoreDef->GetMensurAttr() ) {
+        dynamic_cast<AttMensurDefaultLog*>(scoreDef)->WriteMensurDefaultLog(m_scoreDef);
     }
     if ( scoreDef->GetMeterSigAttr() ) {
-        WriteAttMeterSigLog( m_scoreDef, scoreDef->GetMeterSigAttr(), true );
+        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(m_scoreDef);
+        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(m_scoreDef);
     }
     
     // this needs to be fixed
@@ -211,16 +212,17 @@ bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
     m_staffDef.append_attribute( "xml:id" ) =  UuidToMeiStr( staffDef ).c_str();
     m_staffDef.append_attribute( "n" ) = StringFormat( "%d", staffDef->GetStaffNo() ).c_str();
     if (staffDef->GetClefAttr()) {
-        m_staffDef.append_attribute( "clef.line" ) = ClefLineToStr( staffDef->GetClefAttr()->m_clefId ).c_str();
-        m_staffDef.append_attribute( "clef.shape" ) = ClefShapeToStr( staffDef->GetClefAttr()->m_clefId ).c_str();
-        // we should add 8va attr
+        staffDef->GetClefAttr()->WriteCleffingLog(m_staffDef);
     }
     if (staffDef->GetKeySigAttr()) {
-        m_staffDef.append_attribute( "key.sig" ) = KeySigToStr( staffDef->GetKeySigAttr()->GetAlterationNumber(),
-                                                         staffDef->GetKeySigAttr()->GetAlteration() ).c_str();
+        staffDef->GetKeySigAttr()->WriteKeySigDefaultLog(m_staffDef);
+    }
+    if ( staffDef->GetMensurAttr() ) {
+        staffDef->GetMensurAttr()->WriteMensurDefaultLog(m_staffDef);
     }
     if ( staffDef->GetMeterSigAttr() ) {
-        WriteAttMeterSigLog( m_staffDef, staffDef->GetMeterSigAttr(), true );
+        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(m_staffDef);
+        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(m_staffDef);
     }
     
     return true;
@@ -232,8 +234,13 @@ bool MeiOutput::WriteMeasure( Measure *measure )
     
     m_measure = m_system.append_child("measure");
     m_measure.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
-    //m_measure.append_attribute( "n" ) = StringFormat( "%d", measure->m_logMeasureNb ).c_str();
-    WriteAttCommon( m_measure, measure );
+
+    measure->WriteCommon(m_measure);
+
+    // here we transfer the barline object values to @left and @right
+    measure->SetLeft( measure->GetLeftBarlineType() );
+    measure->SetRight( measure->GetRightBarlineType() );
+    measure->WriteMeasureLog(m_measure);
     
     return true;
 }
@@ -346,6 +353,7 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
 
 void MeiOutput::WriteMeiBarline( pugi::xml_node meiBarline, Barline *barline )
 {
+    barline->WriteBarLineLog(meiBarline);
     return;
 }
 
@@ -358,41 +366,25 @@ void MeiOutput::WriteMeiBeam( pugi::xml_node meiBeam, Beam *beam )
 
 void MeiOutput::WriteMeiClef( pugi::xml_node meiClef, Clef *clef )
 {
-    meiClef.append_attribute( "line" ) = ClefLineToStr( clef->m_clefId ).c_str();
-    meiClef.append_attribute( "shape" ) = ClefShapeToStr( clef->m_clefId ).c_str();
-    // we should add 8va attr
+    clef->WriteClefshape(meiClef);
+    clef->WriteLineloc(meiClef);
+    clef->WriteOctavedisplacement(meiClef);
     return;
 }
 
 
 void MeiOutput::WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur )
 {
-    if ( mensur->m_sign ) {
-        meiMensur.append_attribute( "sign" ) = MensurationSignToStr( mensur->m_sign ).c_str();
-    }
-    if ( mensur->m_dot ) {
-        meiMensur.append_attribute( "dot" ) = "true";
-    }
-    if ( mensur->m_slash ) {
-        meiMensur.append_attribute( "slash" ) = "1"; // only one slash for now
-    }
-    if ( mensur->m_reversed ) {
-        meiMensur.append_attribute( "orient" ) = "reversed"; // only orientation
-    }
-    if ( mensur->m_num ) {
-        meiMensur.append_attribute( "num" ) = StringFormat("%d", mensur->m_num ).c_str();
-    }
-    if ( mensur->m_numBase ) {
-        meiMensur.append_attribute( "numbase" ) = StringFormat("%d", mensur->m_numBase ).c_str();
-    }
-    // missing m_meterSymb
-    
+    mensur->WriteDurationRatio(meiMensur);
+    mensur->WriteMensurLog(meiMensur);
+    mensur->WriteMensurVis(meiMensur);
+    mensur->WriteSlashcount(meiMensur);
     return;
 }
 
 void MeiOutput::WriteMeiMeterSig( pugi::xml_node meiMeterSig, MeterSig *meterSig )
 {
-    WriteAttMeterSigLog( meiMeterSig, meterSig );
+    meterSig->WriteMeterSigLog(meiMeterSig);
     return;
 }
     
@@ -514,39 +506,6 @@ void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
         element.append_attribute( "sameas" ) = object->m_sameAs.c_str();
     }
 }
-
-void MeiOutput::WriteAttCommon( pugi::xml_node element, Object *object )
-{
-    AttCommon *common = dynamic_cast<AttCommon*>( object );
-    assert( common );
-    if ( !common->GetLabel().empty() ) {
-        element.append_attribute( "label" ) = common->GetLabel().c_str();
-    }
-    if ( common->GetN() != VRV_UNSET ) {
-        element.append_attribute( "n" ) = StringFormat("%d", common->GetN()).c_str();;
-    }
-}
-    
-void MeiOutput::WriteAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault )
-{
-    std::string prefix = "";
-    if ( isMeterSigLogDefault ) {
-        prefix = "meter.";
-    }
-    AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>( object );
-    assert( att );
-    if ( att->GetCount() != 0 ) {
-        element.append_attribute( (prefix + "count").c_str() ) = StringFormat("%d", att->GetCount()).c_str();;
-    }
-    if ( att->GetSym() != METERSIGN_NONE ) {
-        element.append_attribute( (prefix + "sym").c_str() ) = MeterSignToStr( att->GetSym() ).c_str();
-    }
-    if ( att->GetUnit() != 0 ) {
-        element.append_attribute( (prefix + "unit").c_str() ) = StringFormat("%d", att->GetUnit()).c_str();;
-    }
-    return;
-}
-
     
 std::string MeiOutput::BoolToStr(bool value)
 {
@@ -606,83 +565,6 @@ std::string MeiOutput::AccidToStr(unsigned char accid)
 	return value;
 }
 
-std::string MeiOutput::ClefLineToStr( ClefId clefId )
-{	
-	std::string value; 
-	switch(clefId)
-	{	
-        case SOL2 : value = "2"; break;
-		case SOL1 : value = "1"; break; 
-		case SOLva : value = "2"; break;
-		case FA5 : value = "5"; break;
-		case FA4 : value = "4"; break;
-		case FA3 : value = "3"; break;
-		case UT1 : value = "1"; break;
-        case UT2 : value = "2"; break;
-		case UT3 : value = "3"; break;
-		case UT4 : value = "4"; break;
-		case UT5 : value = "5"; break;
-        default: 
-            LogWarning("Unknown clef '%d'", clefId);
-            value = "";
-            break;
-	}
-	return value;
-}
-
-std::string MeiOutput::ClefShapeToStr( ClefId clefId )
-{	
-	std::string value; 
-	switch(clefId)
-	{	
-        case SOL2 : 
-		case SOL1 : 
-		case SOLva : value = "G"; break;
-		case FA5 : 
-		case FA4 :
-		case FA3 : value = "F"; break;
-        case UT1 :
-		case UT2 : 
-		case UT3 : 
-		case UT4 : 
-		case UT5 : value = "C"; break;		
-        default: 
-            LogWarning("Unknown clef '%d'", clefId);
-            value = "";
-            break;
-	}
-	return value;
-}
-
-std::string MeiOutput::MensurationSignToStr(MensurationSign sign)
-{
- 	std::string value; 
-	switch(sign)
-	{	case MENSURATIONSIGN_C : value = "C"; break;
-		case MENSURATIONSIGN_O : value = "O"; break;		
-        default: 
-            LogWarning("Unknown mensur sign '%d'", sign);
-            value = "";
-            break;
-	}
-	return value;   
-}
-
-    
-std::string MeiOutput::MeterSignToStr(MeterSign sign)
-{
-    std::string value;
-    switch(sign)
-    {	case METERSIGN_COMMON : value = "common"; break;
-        case METERSIGN_CUT : value = "cut"; break;
-        default:
-            LogWarning("Unknown meterSig sym '%d'", sign);
-            value = "";
-            break;
-    }
-    return value;   
-}
-
 std::string MeiOutput::DurToStr( int dur )
 {
     std::string value;
@@ -726,25 +608,6 @@ std::string MeiOutput::DocTypeToStr(DocType type)
 	return value;   
 }
 
-
-std::string MeiOutput::KeySigToStr(int num, char alter_type )
-{
- 	std::string value;
-    if (num == 0) {
-        return "0";
-    }
-	switch(alter_type)
-	{	case ACCID_FLAT : value = StringFormat("%df", num); break;
-		case ACCID_SHARP : value = StringFormat("%ds", num); break;
-        default:
-            LogWarning("Unknown key signature values '%d' and '%d", num, alter_type);
-            value = "0";
-            break;
-	}
-	return value;
-}
-
-
 std::string MeiOutput::StaffGrpSymbolToStr(StaffGrpSymbol symbol)
 {
  	std::string value;
@@ -759,7 +622,6 @@ std::string MeiOutput::StaffGrpSymbolToStr(StaffGrpSymbol symbol)
 	}
 	return value;
 }
-
 
 //----------------------------------------------------------------------------
 // MeiInput
@@ -1026,26 +888,21 @@ bool MeiInput::ReadMeiScoreDef( pugi::xml_node scoreDef )
     assert( m_scoreDef );
     assert( m_staffGrps.empty() );
     
-    MeterSig meterSig;
-    if ( ReadAttMeterSigLog( scoreDef, &meterSig, true ) ) {
+    ClefAttr clefAttr;
+    if ( clefAttr.ReadCleffingLog( scoreDef ) ) {
+        m_scoreDef->ReplaceClef( &clefAttr );
+    }
+    KeySigAttr keySigAttr;
+    if ( keySigAttr.ReadKeySigDefaultLog( scoreDef ) ) {
+        m_scoreDef->ReplaceKeySig( &keySigAttr );
+    }
+    MeterSigAttr meterSig;
+    if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
         m_scoreDef->ReplaceMeterSig( &meterSig );
     }
-    
-    if ( scoreDef.attribute( "key.sig" ) ) {
-        KeySig keysig(
-                StrToKeySigNum( scoreDef.attribute( "key.sig" ).value() ),
-                StrToKeySigType( scoreDef.attribute( "key.sig" ).value() ) );
-        m_scoreDef->ReplaceKeySig( &keysig );
-    }
-    if ( scoreDef.attribute( "clef.line" ) && scoreDef.attribute( "clef.shape" ).value() ) {
-        Clef clef;
-        clef.m_clefId = StrToClef( scoreDef.attribute( "clef.shape" ).value() , scoreDef.attribute( "clef.line" ).value() );
-        // this is obviously a short cut - assuming @clef.dis being SOLva
-        if ( scoreDef.attribute( "clef.dis" ) ) {
-            clef.m_clefId = SOLva;
-        }
-        m_scoreDef->ReplaceClef( &clef );
-        // add other attributes for SOLva
+    MensurAttr mensur;
+    if ( mensur.ReadMensurDefaultLog( scoreDef ) ) {
+        m_scoreDef->ReplaceMensur( &mensur );
     }
     
     pugi::xml_node current;
@@ -1120,26 +977,19 @@ bool MeiInput::ReadMeiStaffDef( pugi::xml_node staffDef )
         LogWarning("No @n on <staffDef>");
     }
     
-    MeterSig meterSig;
-    if ( ReadAttMeterSigLog( staffDef, &meterSig, true ) ) {
-        m_scoreDef->ReplaceMeterSig( &meterSig );
+    ClefAttr clefAttr;
+    if ( clefAttr.ReadCleffingLog( staffDef ) ) {
+        m_staffDef->ReplaceClef( &clefAttr );
     }
-    
-    if ( staffDef.attribute( "key.sig" ) ) {
-        KeySig keysig(
-                         StrToKeySigNum( staffDef.attribute( "key.sig" ).value() ),
-                         StrToKeySigType( staffDef.attribute( "key.sig" ).value() ) );
-        m_staffDef->ReplaceKeySig( &keysig );
+    KeySigAttr keySigAttr;
+    if ( keySigAttr.ReadKeySigDefaultLog( staffDef ) ) {
+        m_staffDef->ReplaceKeySig( &keySigAttr );
     }
-    if ( staffDef.attribute( "clef.line" ) && staffDef.attribute( "clef.shape" ) ) {
-        Clef clef;
-        clef.m_clefId = StrToClef( staffDef.attribute( "clef.shape" ).value() , staffDef.attribute( "clef.line" ).value() );
-        // this is obviously a short cut - assuming @clef.dis being SOLva
-        if ( staffDef.attribute( "clef.dis" ) ) {
-            clef.m_clefId = SOLva;
-        }
-        m_staffDef->ReplaceClef( &clef );
+    MeterSigAttr meterSig;
+    if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
+        m_staffDef->ReplaceMeterSig( &meterSig );
     }
+
     
     return true;
 }
@@ -1149,10 +999,12 @@ bool MeiInput::ReadMeiMeasure( pugi::xml_node measure )
     assert( m_measure );
     assert( !m_staff );
     
-    ReadAttCommon( measure, m_measure );
-    if ( measure.attribute( "right" ) ) {
-        m_measure->GetRightBarline()->m_barlineType = StrToBarlineType( measure.attribute( "right" ).value() );
-    }
+    m_measure->ReadCommon(measure);
+    m_measure->ReadMeasureLog(measure);
+    
+    // here we transfer the @left and @right values to the barline objects
+    m_measure->SetLeftBarlineType( m_measure->GetLeft() );
+    m_measure->SetRightBarlineType( m_measure->GetRight() );
     
     pugi::xml_node current;
     for( current = measure.first_child( ); current; current = current.next_sibling( ) ) {
@@ -1298,7 +1150,7 @@ bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
 LayerElement *MeiInput::ReadMeiBarline( pugi::xml_node barline )
 {
     Barline *vrvBarline = new Barline();
-    
+    vrvBarline->ReadBarLineLog(barline);
     return vrvBarline;    
 }
 
@@ -1337,11 +1189,10 @@ LayerElement *MeiInput::ReadMeiBeam( pugi::xml_node beam )
 
 LayerElement *MeiInput::ReadMeiClef( pugi::xml_node clef )
 { 
-    Clef *vrvClef = new Clef(); 
-    if ( clef.attribute( "shape" ) && clef.attribute( "line" ) ) {
-        vrvClef->m_clefId = StrToClef( clef.attribute( "shape" ).value() , clef.attribute( "line" ).value() );
-    }
-    
+    Clef *vrvClef = new Clef();
+    vrvClef->ReadClefshape( clef );
+    vrvClef->ReadLineloc( clef );
+    vrvClef->ReadOctavedisplacement( clef );
     return vrvClef;
 }
 
@@ -1349,34 +1200,17 @@ LayerElement *MeiInput::ReadMeiClef( pugi::xml_node clef )
 LayerElement *MeiInput::ReadMeiMensur( pugi::xml_node mensur )
 {
     Mensur *vrvMensur = new Mensur();
-    
-    if ( mensur.attribute( "sign" ) ) {
-        vrvMensur->m_sign = StrToMensurationSign( mensur.attribute( "sign" ).value() );
-    }
-    if ( mensur.attribute( "dot" ) ) {
-        vrvMensur->m_dot = ( strcmp( mensur.attribute( "dot" ).value(), "true" ) == 0 );
-    }
-    if ( mensur.attribute( "slash" ) ) {
-        vrvMensur->m_slash =  1; //atoi( mensur.attribute( "Slash" ) );
-    }
-    if ( mensur.attribute( "orient" ) ) {
-        vrvMensur->m_reversed = ( strcmp ( mensur.attribute( "orient" ).value(), "reversed" ) == 0 );
-    }
-    if ( mensur.attribute( "num" ) ) {
-        vrvMensur->m_num = atoi ( mensur.attribute( "num" ).value() );
-    }
-    if ( mensur.attribute( "numbase" ) ) {
-        vrvMensur->m_numBase = atoi ( mensur.attribute( "numbase" ).value() );
-    }
-    // missing m_meterSymb
-    
+    vrvMensur->ReadDurationRatio( mensur );
+    vrvMensur->ReadMensurLog( mensur );
+    vrvMensur->ReadMensurVis( mensur );
+    vrvMensur->ReadSlashcount( mensur );
     return vrvMensur;
 }
     
 LayerElement *MeiInput::ReadMeiMeterSig( pugi::xml_node meterSig )
 {
     MeterSig *vrvMeterSig = new MeterSig();
-    ReadAttMeterSigLog(meterSig, vrvMeterSig);
+    vrvMeterSig->ReadMeterSigLog(meterSig);
     return vrvMeterSig;
 }
     
@@ -1637,43 +1471,6 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     object->m_sameAs = element.attribute( "sameas" ).value();
 }
 
-    
-void MeiInput::ReadAttCommon( pugi::xml_node element, Object *object )
-{
-    AttCommon *att = dynamic_cast<AttCommon*>( object );
-    assert( att );
-    if ( element.attribute( "label" ) ) {
-        att->SetLabel( element.attribute( "label" ).value() );
-    }
-    if ( element.attribute( "n" ) ) {
-        att->SetN( atoi( element.attribute( "n" ).value() ) );
-    }
-}
-    
-bool MeiInput::ReadAttMeterSigLog( pugi::xml_node element, Object *object, bool isMeterSigLogDefault )
-{
-    std::string prefix = "";
-    bool hasAttribute = false;
-    if ( isMeterSigLogDefault ) {
-        prefix = "meter.";
-    }
-    AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>( object );
-    assert( att );
-    if ( element.attribute( (prefix + "count").c_str() ) ) {
-        att->SetCount( atoi( element.attribute( (prefix + "count").c_str() ).value() ) );
-        hasAttribute = true;
-    }
-    if ( element.attribute( (prefix + "sym").c_str() ) ) {
-        att->SetSym( StrToMeterSign( element.attribute( (prefix + "sym").c_str() ).value() ) );
-        hasAttribute = true;
-    }
-    if ( element.attribute( (prefix + "unit").c_str() ) ) {
-        att->SetUnit( atoi( element.attribute( (prefix + "unit").c_str() ).value() ) );
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
 void MeiInput::AddLayerElement( LayerElement *element )
 {
     assert( m_currentLayer );
@@ -1691,7 +1488,6 @@ void MeiInput::AddLayerElement( LayerElement *element )
     }
     
 }
-
 
 bool MeiInput::ReadUnsupported( pugi::xml_node element )
 {
@@ -1985,16 +1781,16 @@ int MeiInput::StrToOct(std::string oct)
 int MeiInput::StrToPitch(std::string pitch)
 {
     int value;
-    if (pitch == "c") value = PITCH_C;
-    else if (pitch == "d") value = PITCH_D;
-    else if (pitch == "e") value = PITCH_E;
-    else if (pitch == "f") value = PITCH_F;
-    else if (pitch == "g") value = PITCH_G;
-    else if (pitch == "a") value = PITCH_A;
-    else if (pitch == "b") value = PITCH_B;
+    if (pitch == "c") value = PITCHNAME_c;
+    else if (pitch == "d") value = PITCHNAME_d;
+    else if (pitch == "e") value = PITCHNAME_e;
+    else if (pitch == "f") value = PITCHNAME_f;
+    else if (pitch == "g") value = PITCHNAME_g;
+    else if (pitch == "a") value = PITCHNAME_a;
+    else if (pitch == "b") value = PITCHNAME_b;
     else {
 		LogWarning("Unknow @pname value '%s'", pitch.c_str());
-        value = PITCH_C;
+        value = PITCHNAME_c;
     }
     return value;
 }
@@ -2016,51 +1812,7 @@ unsigned char MeiInput::StrToAccid(std::string accid)
     }
 	return value;
 }
-
-
-ClefId MeiInput::StrToClef( std::string shape, std::string line )
-{
-    ClefId clefId = SOL2;
-    std::string clef = shape + line;
-    if ( clef == "G2" ) clefId = SOL2;
-    else if ( clef == "G1" ) clefId = SOL1; 
-    else if ( clef == "F5" ) clefId = FA5;
-    else if ( clef == "F4" ) clefId = FA4; 
-    else if ( clef == "F3" ) clefId = FA3; 
-    else if ( clef == "C1" ) clefId = UT1; 
-    else if ( clef == "C2" ) clefId = UT2; 
-    else if ( clef == "C3" ) clefId = UT3; 
-    else if ( clef == "C4" ) clefId = UT4; 
-    else if ( clef == "C5" ) clefId = UT5; 
-    else 
-    {
-        LogWarning("Unsupported clef with @shape '%s' and @line '%s'", shape.c_str(), line.c_str() );
-    }
-    return clefId;
-}
-
-MensurationSign MeiInput::StrToMensurationSign(std::string sign)
-{
-    if (sign == "C") return MENSURATIONSIGN_C;
-    else if (sign == "O") return MENSURATIONSIGN_O;
-    else {
-        LogWarning("Unsupported mensur sign '%s'", sign.c_str() );
-	}
-    // default
-	return MENSURATIONSIGN_C;
-}
     
-MeterSign MeiInput::StrToMeterSign(std::string sign)
-{
-    if (sign == "common") return METERSIGN_COMMON;
-    else if (sign == "cut") return METERSIGN_CUT;
-    else {
-        LogWarning("Unsupported meter sign '%s'", sign.c_str() );
-    }
-    // default
-    return METERSIGN_NONE;
-}
-
 DocType MeiInput::StrToDocType(std::string type)
 {
     if (type == "raw") return Raw;
@@ -2071,41 +1823,6 @@ DocType MeiInput::StrToDocType(std::string type)
 	}
     // default
 	return Raw;
-}
-
-unsigned char MeiInput::StrToKeySigType(std::string accid)
-{
-    if ( accid == "0" ) return  ACCID_NATURAL;
-    else if ( accid.at(1) == 'f' ) return ACCID_FLAT;
-    else if ( accid.at(1) == 's' ) return ACCID_SHARP;
-    else {
-        LogWarning("Unknown keysig '%s'", accid.c_str() );
-        return ACCID_NATURAL;
-    }
-}
-
-int MeiInput::StrToKeySigNum(std::string accid)
-{
-    if ( accid == "0" ) return  0;
-    else {
-        // low level way, remove '0', which is 48
-        return accid.at(0) - '0';
-    }
-}
-
-BarlineType MeiInput::StrToBarlineType(std::string type)
-{
-    if (type == "single") return BARLINE_SINGLE;
-    else if (type == "end") return BARLINE_END;
-    else if (type == "dbl") return BARLINE_DBL;
-    else if (type == "rptend") return BARLINE_RPTEND;
-    else if (type == "rptstart") return BARLINE_RPTSTART;
-    else if (type == "rptboth") return BARLINE_RPTBOTH;
-    else {
-        LogWarning("Unknown barline type '%s'", type.c_str() );
-	}
-    // default
-	return BARLINE_SINGLE;
 }
 
 StaffGrpSymbol MeiInput::StrToStaffGrpSymbol(std::string symbol)

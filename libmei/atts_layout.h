@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_LAYOUT_H__
 #define __VRV_ATTS_LAYOUT_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttBarline
 //----------------------------------------------------------------------------
 
-class AttBarline 
+class AttBarline: public Att
 {
 public:
     AttBarline();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetBarline();
     
+    /** Read the values for the attribute class **/
+    bool ReadBarline( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteBarline( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetBarline(std::string barline_) { m_barline = barline_; };
-    std::string GetBarline() { return m_barline; };
+    std::string GetBarline() const { return m_barline; };
     ///@}
 
 protected:
@@ -60,7 +67,7 @@ protected:
 // AttIgnore
 //----------------------------------------------------------------------------
 
-class AttIgnore 
+class AttIgnore: public Att
 {
 public:
     AttIgnore();
@@ -69,12 +76,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetIgnore();
     
+    /** Read the values for the attribute class **/
+    bool ReadIgnore( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteIgnore( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetIgnored(std::string ignored_) { m_ignored = ignored_; };
-    std::string GetIgnored() { return m_ignored; };
+    std::string GetIgnored() const { return m_ignored; };
     ///@}
 
 protected:
@@ -91,7 +104,7 @@ protected:
 // AttLayout
 //----------------------------------------------------------------------------
 
-class AttLayout 
+class AttLayout: public Att
 {
 public:
     AttLayout();
@@ -100,12 +113,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLayout();
     
+    /** Read the values for the attribute class **/
+    bool ReadLayout( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLayout( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetIgnored(std::string ignored_) { m_ignored = ignored_; };
-    std::string GetIgnored() { return m_ignored; };
+    std::string GetIgnored() const { return m_ignored; };
     ///@}
 
 protected:
@@ -122,7 +141,7 @@ protected:
 // AttMeasureRef
 //----------------------------------------------------------------------------
 
-class AttMeasureRef 
+class AttMeasureRef: public Att
 {
 public:
     AttMeasureRef();
@@ -131,12 +150,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeasureRef();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeasureRef( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeasureRef( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMeasureref(std::string measureref_) { m_measureref = measureref_; };
-    std::string GetMeasureref() { return m_measureref; };
+    std::string GetMeasureref() const { return m_measureref; };
     ///@}
 
 protected:
@@ -150,7 +175,7 @@ protected:
 // AttPageRef
 //----------------------------------------------------------------------------
 
-class AttPageRef 
+class AttPageRef: public Att
 {
 public:
     AttPageRef();
@@ -159,12 +184,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPageRef();
     
+    /** Read the values for the attribute class **/
+    bool ReadPageRef( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePageRef( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPbrefs(std::string pbrefs_) { m_pbrefs = pbrefs_; };
-    std::string GetPbrefs() { return m_pbrefs; };
+    std::string GetPbrefs() const { return m_pbrefs; };
     ///@}
 
 protected:
@@ -178,7 +209,7 @@ protected:
 // AttSurface
 //----------------------------------------------------------------------------
 
-class AttSurface 
+class AttSurface: public Att
 {
 public:
     AttSurface();
@@ -187,12 +218,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSurface();
     
+    /** Read the values for the attribute class **/
+    bool ReadSurface( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSurface( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSurface(std::string surface_) { m_surface = surface_; };
-    std::string GetSurface() { return m_surface; };
+    std::string GetSurface() const { return m_surface; };
     ///@}
 
 protected:
@@ -206,7 +243,7 @@ protected:
 // AttSystemRef
 //----------------------------------------------------------------------------
 
-class AttSystemRef 
+class AttSystemRef: public Att
 {
 public:
     AttSystemRef();
@@ -215,12 +252,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSystemRef();
     
+    /** Read the values for the attribute class **/
+    bool ReadSystemRef( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSystemRef( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSbrefs(std::string sbrefs_) { m_sbrefs = sbrefs_; };
-    std::string GetSbrefs() { return m_sbrefs; };
+    std::string GetSbrefs() const { return m_sbrefs; };
     ///@}
 
 protected:

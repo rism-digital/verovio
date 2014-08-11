@@ -21,6 +21,7 @@ class LayerRdg;
 
 /** 
  * This class models the MEI <app> element within a <layer> element.
+ * Needs to be updated.
  */
 class LayerApp: public LayerElement
 {
@@ -51,6 +52,7 @@ private:
 
 /** 
  * This class models the MEI <rdg> element for a <app> in a <layer>
+ * Needs to be updated.
  */
 class LayerRdg: public Object
 {

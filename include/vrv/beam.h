@@ -21,11 +21,15 @@ namespace vrv {
 class Beam: public LayerElement, public ObjectListInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes.
+     */
+    ///@{
     Beam();
     virtual ~Beam();
-    
     virtual std::string GetClassName( ) { return "Beam"; };
+    ///@}
     
     int GetNoteCount() const { return (int)m_children.size(); };
     

@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_MIDI_H__
 #define __VRV_ATTS_MIDI_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttChannelized
 //----------------------------------------------------------------------------
 
-class AttChannelized 
+class AttChannelized: public Att
 {
 public:
     AttChannelized();
@@ -36,21 +37,27 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetChannelized();
     
+    /** Read the values for the attribute class **/
+    bool ReadChannelized( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteChannelized( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMidiChannel(std::string midiChannel_) { m_midiChannel = midiChannel_; };
-    std::string GetMidiChannel() { return m_midiChannel; };
+    std::string GetMidiChannel() const { return m_midiChannel; };
     //
     void SetMidiDuty(std::string midiDuty_) { m_midiDuty = midiDuty_; };
-    std::string GetMidiDuty() { return m_midiDuty; };
+    std::string GetMidiDuty() const { return m_midiDuty; };
     //
     void SetMidiPort(std::string midiPort_) { m_midiPort = midiPort_; };
-    std::string GetMidiPort() { return m_midiPort; };
+    std::string GetMidiPort() const { return m_midiPort; };
     //
     void SetMidiTrackInt(int midiTrackInt_) { m_midiTrackInt = midiTrackInt_; };
-    int GetMidiTrackInt() { return m_midiTrackInt; };
+    int GetMidiTrackInt() const { return m_midiTrackInt; };
     ///@}
 
 protected:
@@ -70,7 +77,7 @@ protected:
 // AttMidiinstrument
 //----------------------------------------------------------------------------
 
-class AttMidiinstrument 
+class AttMidiinstrument: public Att
 {
 public:
     AttMidiinstrument();
@@ -79,21 +86,27 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMidiinstrument();
     
+    /** Read the values for the attribute class **/
+    bool ReadMidiinstrument( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMidiinstrument( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMidiInstrnum(std::string midiInstrnum_) { m_midiInstrnum = midiInstrnum_; };
-    std::string GetMidiInstrnum() { return m_midiInstrnum; };
+    std::string GetMidiInstrnum() const { return m_midiInstrnum; };
     //
     void SetMidiInstrname(std::string midiInstrname_) { m_midiInstrname = midiInstrname_; };
-    std::string GetMidiInstrname() { return m_midiInstrname; };
+    std::string GetMidiInstrname() const { return m_midiInstrname; };
     //
     void SetMidiPan(std::string midiPan_) { m_midiPan = midiPan_; };
-    std::string GetMidiPan() { return m_midiPan; };
+    std::string GetMidiPan() const { return m_midiPan; };
     //
     void SetMidiVolume(std::string midiVolume_) { m_midiVolume = midiVolume_; };
-    std::string GetMidiVolume() { return m_midiVolume; };
+    std::string GetMidiVolume() const { return m_midiVolume; };
     ///@}
 
 protected:
@@ -116,7 +129,7 @@ protected:
 // AttMidinumber
 //----------------------------------------------------------------------------
 
-class AttMidinumber 
+class AttMidinumber: public Att
 {
 public:
     AttMidinumber();
@@ -125,12 +138,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMidinumber();
     
+    /** Read the values for the attribute class **/
+    bool ReadMidinumber( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMidinumber( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() { return m_numInt; };
+    int GetNumInt() const { return m_numInt; };
     ///@}
 
 protected:
@@ -147,7 +166,7 @@ protected:
 // AttMiditempo
 //----------------------------------------------------------------------------
 
-class AttMiditempo 
+class AttMiditempo: public Att
 {
 public:
     AttMiditempo();
@@ -156,12 +175,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMiditempo();
     
+    /** Read the values for the attribute class **/
+    bool ReadMiditempo( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMiditempo( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMidiTempo(std::string midiTempo_) { m_midiTempo = midiTempo_; };
-    std::string GetMidiTempo() { return m_midiTempo; };
+    std::string GetMidiTempo() const { return m_midiTempo; };
     ///@}
 
 protected:
@@ -178,7 +203,7 @@ protected:
 // AttMidivalue
 //----------------------------------------------------------------------------
 
-class AttMidivalue 
+class AttMidivalue: public Att
 {
 public:
     AttMidivalue();
@@ -187,12 +212,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMidivalue();
     
+    /** Read the values for the attribute class **/
+    bool ReadMidivalue( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMidivalue( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetVal(std::string val_) { m_val = val_; };
-    std::string GetVal() { return m_val; };
+    std::string GetVal() const { return m_val; };
     ///@}
 
 protected:
@@ -206,7 +237,7 @@ protected:
 // AttTimebase
 //----------------------------------------------------------------------------
 
-class AttTimebase 
+class AttTimebase: public Att
 {
 public:
     AttTimebase();
@@ -215,12 +246,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTimebase();
     
+    /** Read the values for the attribute class **/
+    bool ReadTimebase( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTimebase( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPpqInt(int ppqInt_) { m_ppqInt = ppqInt_; };
-    int GetPpqInt() { return m_ppqInt; };
+    int GetPpqInt() const { return m_ppqInt; };
     ///@}
 
 protected:

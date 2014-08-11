@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_ANALYSIS_H__
 #define __VRV_ATTS_ANALYSIS_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttCommonAnl
 //----------------------------------------------------------------------------
 
-class AttCommonAnl 
+class AttCommonAnl: public Att
 {
 public:
     AttCommonAnl();
@@ -36,27 +37,33 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCommonAnl();
     
+    /** Read the values for the attribute class **/
+    bool ReadCommonAnl( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCommonAnl( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCopyof(std::string copyof_) { m_copyof = copyof_; };
-    std::string GetCopyof() { return m_copyof; };
+    std::string GetCopyof() const { return m_copyof; };
     //
     void SetCorresp(std::string corresp_) { m_corresp = corresp_; };
-    std::string GetCorresp() { return m_corresp; };
+    std::string GetCorresp() const { return m_corresp; };
     //
     void SetNext(std::string next_) { m_next = next_; };
-    std::string GetNext() { return m_next; };
+    std::string GetNext() const { return m_next; };
     //
     void SetPrev(std::string prev_) { m_prev = prev_; };
-    std::string GetPrev() { return m_prev; };
+    std::string GetPrev() const { return m_prev; };
     //
     void SetSameas(std::string sameas_) { m_sameas = sameas_; };
-    std::string GetSameas() { return m_sameas; };
+    std::string GetSameas() const { return m_sameas; };
     //
     void SetSynch(std::string synch_) { m_synch = synch_; };
-    std::string GetSynch() { return m_synch; };
+    std::string GetSynch() const { return m_synch; };
     ///@}
 
 protected:
@@ -86,7 +93,7 @@ protected:
 // AttHarmonicfunction
 //----------------------------------------------------------------------------
 
-class AttHarmonicfunction 
+class AttHarmonicfunction: public Att
 {
 public:
     AttHarmonicfunction();
@@ -95,12 +102,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetHarmonicfunction();
     
+    /** Read the values for the attribute class **/
+    bool ReadHarmonicfunction( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteHarmonicfunction( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetHfunc(std::string hfunc_) { m_hfunc = hfunc_; };
-    std::string GetHfunc() { return m_hfunc; };
+    std::string GetHfunc() const { return m_hfunc; };
     ///@}
 
 protected:
@@ -114,7 +127,7 @@ protected:
 // AttIntervalharmonic
 //----------------------------------------------------------------------------
 
-class AttIntervalharmonic 
+class AttIntervalharmonic: public Att
 {
 public:
     AttIntervalharmonic();
@@ -123,12 +136,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetIntervalharmonic();
     
+    /** Read the values for the attribute class **/
+    bool ReadIntervalharmonic( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteIntervalharmonic( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetInth(std::string inth_) { m_inth = inth_; };
-    std::string GetInth() { return m_inth; };
+    std::string GetInth() const { return m_inth; };
     ///@}
 
 protected:
@@ -145,7 +164,7 @@ protected:
 // AttIntervallicdesc
 //----------------------------------------------------------------------------
 
-class AttIntervallicdesc 
+class AttIntervallicdesc: public Att
 {
 public:
     AttIntervallicdesc();
@@ -154,12 +173,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetIntervallicdesc();
     
+    /** Read the values for the attribute class **/
+    bool ReadIntervallicdesc( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteIntervallicdesc( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetIntm(std::string intm_) { m_intm = intm_; };
-    std::string GetIntm() { return m_intm; };
+    std::string GetIntm() const { return m_intm; };
     ///@}
 
 protected:
@@ -177,7 +202,7 @@ protected:
 // AttMelodicfunction
 //----------------------------------------------------------------------------
 
-class AttMelodicfunction 
+class AttMelodicfunction: public Att
 {
 public:
     AttMelodicfunction();
@@ -186,12 +211,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMelodicfunction();
     
+    /** Read the values for the attribute class **/
+    bool ReadMelodicfunction( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMelodicfunction( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMfunc(std::string mfunc_) { m_mfunc = mfunc_; };
-    std::string GetMfunc() { return m_mfunc; };
+    std::string GetMfunc() const { return m_mfunc; };
     ///@}
 
 protected:
@@ -205,7 +236,7 @@ protected:
 // AttPitchclass
 //----------------------------------------------------------------------------
 
-class AttPitchclass 
+class AttPitchclass: public Att
 {
 public:
     AttPitchclass();
@@ -214,12 +245,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPitchclass();
     
+    /** Read the values for the attribute class **/
+    bool ReadPitchclass( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePitchclass( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPclass(std::string pclass_) { m_pclass = pclass_; };
-    std::string GetPclass() { return m_pclass; };
+    std::string GetPclass() const { return m_pclass; };
     ///@}
 
 protected:
@@ -233,7 +270,7 @@ protected:
 // AttSolfa
 //----------------------------------------------------------------------------
 
-class AttSolfa 
+class AttSolfa: public Att
 {
 public:
     AttSolfa();
@@ -242,12 +279,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSolfa();
     
+    /** Read the values for the attribute class **/
+    bool ReadSolfa( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSolfa( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPsolfa(std::string psolfa_) { m_psolfa = psolfa_; };
-    std::string GetPsolfa() { return m_psolfa; };
+    std::string GetPsolfa() const { return m_psolfa; };
     ///@}
 
 protected:

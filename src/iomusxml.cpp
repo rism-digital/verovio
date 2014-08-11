@@ -239,8 +239,9 @@ void XMLOutput::WriteClef(LayerElement *element) {
     // go in the same <attributes>
     CreateAttributes();
     
-    Clef *clef = dynamic_cast<Clef*>(element);
+    //Clef *clef = dynamic_cast<Clef*>(element);
     
+    /*
     switch (clef->m_clefId) {
         case SOL1: sign = "G"; line = "1"; break;
         case SOL2: sign = "G"; line = "2"; break;
@@ -254,6 +255,7 @@ void XMLOutput::WriteClef(LayerElement *element) {
         case FA5: sign = "F"; line = "5"; break;
         default: break;
     }
+    */
     
     //Create the <clef> element
     pugi::xml_node xclef = m_xml_attributes.append_child("clef");
@@ -339,14 +341,14 @@ void XMLOutput::WriteTime(LayerElement *element) {
     pugi::xml_node xtime = m_xml_attributes.append_child("time");
     
     // add symbol attribute if necessay
-    if (timesig->GetSym() == METERSIGN_COMMON) {
+    if (timesig->GetSym() == METERSIGN_common) {
         xtime.append_attribute("symbol") = "common";
         // if the number of beats was not specified, approximate it
         if (timesig->GetCount() == 0){
             timesig->SetCount(4);
             timesig->SetUnit(4);
         }
-    } else if (timesig->GetSym() == METERSIGN_CUT) {
+    } else if (timesig->GetSym() == METERSIGN_cut) {
         xtime.append_attribute("symbol") = "cut";
         if (timesig->GetCount() == 0){
             timesig->SetCount(2);
@@ -388,7 +390,7 @@ void XMLOutput::WriteTime(LayerElement *element) {
 
 void XMLOutput::WriteMultiMeasureRest(Rest *r) {
     std::stringstream num;
-    num << r->m_multimeasure_dur;
+    num << 1; //r->m_multimeasure_dur;
 
     
     // chech that <attributes> exists
@@ -407,7 +409,7 @@ void XMLOutput::WriteMultiMeasureRest(Rest *r) {
     //xmrest->LinkEndChild(mdur);
     
     // save the quantity of measures to create
-    m_multimeasure_rests = r->m_multimeasure_dur;
+    //m_multimeasure_rests = r->m_multimeasure_dur;
     
 }
 
@@ -421,7 +423,7 @@ void XMLOutput::CreateRestsForMultiMeasure() {
         
         // create a fresh new rest
         pugi::xml_node note = m_xml_part.append_child("note");
-        pugi::xml_node rest = note.append_child("rest");
+        //pugi::xml_node rest = note.append_child("rest");
         
         //note->LinkEndChild(rest);
         
@@ -531,7 +533,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     } else if (dynamic_cast<Rest*>(element)) {
         Rest *r = dynamic_cast<Rest*>(element);
         // rests just link a <rest /> item
-        pugi::xml_node rest = note.append_child("rest");
+        //pugi::xml_node rest = note.append_child("rest");
         
         //note->LinkEndChild(rest);
         
@@ -606,7 +608,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
             xbeam.append_attribute("number")  = num_of_beams.c_str();
             
             // write the arribute and attach it to beam
-            pugi::xml_node xtype = xbeam.append_child(btype.c_str());
+            //pugi::xml_node xtype = xbeam.append_child(btype.c_str());
             //xbeam->LinkEndChild(xtype);
             
             // attach the beam to the note

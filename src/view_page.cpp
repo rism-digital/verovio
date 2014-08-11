@@ -436,34 +436,34 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
 	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
-	if (barline->m_barlineType == BARLINE_SINGLE)
+	if (barline->GetRend() == BARRENDITION_single)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
     }
-    else if (barline->m_barlineType == BARLINE_RPTBOTH)
+    else if (barline->GetRend() == BARRENDITION_rptboth)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
         DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
     }
-    else if (barline->m_barlineType  == BARLINE_RPTSTART)
+    else if (barline->GetRend()  == BARRENDITION_rptstart)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
         DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
     }
-    else if (barline->m_barlineType == BARLINE_RPTEND)
+    else if (barline->GetRend() == BARRENDITION_rptend)
 	{
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
 	}
-	else if (barline->m_barlineType  == BARLINE_DBL)
+	else if (barline->GetRend()  == BARRENDITION_dbl)
 	{
         // Narrow the bars a little bit - should be centered?
         x1 += m_doc->m_env.m_barlineWidth;
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
 	}
-	else if (barline->m_barlineType  == BARLINE_END)
+	else if (barline->GetRend()  == BARRENDITION_end)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
@@ -482,13 +482,13 @@ void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
     int y_top = y_bottom + m_doc->m_drawingInterl[staff->staffSize];
  
-    if ((barline->m_barlineType  == BARLINE_RPTSTART) || (barline->m_barlineType == BARLINE_RPTBOTH))
+    if ((barline->GetRend()  == BARRENDITION_rptstart) || (barline->GetRend() == BARRENDITION_rptboth))
     {
         DrawDot(dc, x2, y_bottom );
         DrawDot(dc, x2, y_top );
 
     }
-    if ((barline->m_barlineType == BARLINE_RPTEND) || (barline->m_barlineType == BARLINE_RPTBOTH))
+    if ((barline->GetRend() == BARRENDITION_rptend) || (barline->GetRend() == BARRENDITION_rptboth))
 	{
         DrawDot(dc, x1, y_bottom );
         DrawDot(dc, x1, y_top );
@@ -559,10 +559,10 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 		DrawStaff( dc, staff, measure, system );
     }
 
-    if ( measure->GetLeftBarlineType() != BARLINE_NONE) {
+    if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
         DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarline() );
     }
-    if ( measure->GetRightBarlineType() != BARLINE_NONE) {
+    if ( measure->GetRightBarlineType() != BARRENDITION_NONE) {
         DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarlineX(), measure->GetRightBarline() );
     }
     
@@ -580,7 +580,7 @@ int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
 {
     assert(staff); // Pointer to staff cannot be NULL"
 	
-    static char touches[] = {PITCH_C,PITCH_D,PITCH_E,PITCH_F,PITCH_G,PITCH_A,PITCH_B};
+    static char touches[] = {PITCHNAME_c,PITCHNAME_d,PITCHNAME_e,PITCHNAME_f,PITCHNAME_g,PITCHNAME_a,PITCHNAME_b};
 	int y_int;
 	char *ptouche, i;
 	ptouche=&touches[0];
@@ -713,7 +713,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
     assert(layer->m_parent); // Pointer to staff cannot be NULL"
     assert(dynamic_cast<Staff*>(layer->m_parent)); // Pointer to parent has to be a staff
 	
-    static int touches[] = {PITCH_C,PITCH_D,PITCH_E,PITCH_F,PITCH_G,PITCH_A,PITCH_B};
+    static int touches[] = {PITCHNAME_c,PITCHNAME_d,PITCHNAME_e,PITCHNAME_f,PITCHNAME_g,PITCHNAME_a,PITCHNAME_b};
 	int y_dec, yb, plafond;
 	int degres, octaves, position, code;
 	char clefId=0;
@@ -736,7 +736,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 
 	Clef *clef = layer->GetClef (pelement);
     if (clef) {
-        clefId = clef->m_clefId;
+        clefId = clef->GetClefId();
         yb += (clef->GetClefOffset()) * m_doc->m_drawingHalfInterl[staffSize];	// UT1 reel
     }
 	yb -= 4 *  m_doc->m_drawingOctaveSize[staffSize];	// UT, note la plus grave
@@ -746,7 +746,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	if (y_dec< 0)
 		y_dec = 0;
 
-	degres = y_dec /  m_doc->m_drawingHalfInterl[staffSize];	// ecart en degres (PITCH_C..PITCH_B) par rapport a UT1
+	degres = y_dec /  m_doc->m_drawingHalfInterl[staffSize];	// ecart en degres (PITCHNAME_c..PITCHNAME_b) par rapport a UT1
 	octaves = degres / 7;
 	position = degres % 7;
 
@@ -788,17 +788,17 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
     
-    if (layer->GetClefAttr()) {
-        DrawElement(dc, layer->GetClefAttr(), layer, measure, staff);
+    if (layer->GetDrawingClef()) {
+        DrawElement(dc, layer->GetDrawingClef(), layer, measure, staff);
     }
-    if (layer->GetKeySigAttr()) {
-        DrawElement(dc, layer->GetKeySigAttr(), layer, measure, staff);
+    if (layer->GetDrawingKeySig()) {
+        DrawElement(dc, layer->GetDrawingKeySig(), layer, measure, staff);
     }
-    if (layer->GetMensurAttr()) {
-        DrawElement(dc, layer->GetMensurAttr(), layer, measure, staff);
+    if (layer->GetDrawingMensur()) {
+        DrawElement(dc, layer->GetDrawingMensur(), layer, measure, staff);
     }
-    if (layer->GetMeterSigAttr()) {
-        DrawElement(dc, layer->GetMeterSigAttr(), layer, measure, staff);
+    if (layer->GetDrawingMeterSig()) {
+        DrawElement(dc, layer->GetDrawingMeterSig(), layer, measure, staff);
     }
     
 	for(j = 0; j < layer->GetElementCount(); j++)

@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_EDITTRANS_H__
 #define __VRV_ATTS_EDITTRANS_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttAgentident
 //----------------------------------------------------------------------------
 
-class AttAgentident 
+class AttAgentident: public Att
 {
 public:
     AttAgentident();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAgentident();
     
+    /** Read the values for the attribute class **/
+    bool ReadAgentident( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAgentident( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAgent(std::string agent_) { m_agent = agent_; };
-    std::string GetAgent() { return m_agent; };
+    std::string GetAgent() const { return m_agent; };
     ///@}
 
 protected:
@@ -58,7 +65,7 @@ protected:
 // AttEdit
 //----------------------------------------------------------------------------
 
-class AttEdit 
+class AttEdit: public Att
 {
 public:
     AttEdit();
@@ -67,15 +74,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetEdit();
     
+    /** Read the values for the attribute class **/
+    bool ReadEdit( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteEdit( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCert(std::string cert_) { m_cert = cert_; };
-    std::string GetCert() { return m_cert; };
+    std::string GetCert() const { return m_cert; };
     //
     void SetEvidence(std::string evidence_) { m_evidence = evidence_; };
-    std::string GetEvidence() { return m_evidence; };
+    std::string GetEvidence() const { return m_evidence; };
     ///@}
 
 protected:
@@ -95,7 +108,7 @@ protected:
 // AttExtent
 //----------------------------------------------------------------------------
 
-class AttExtent 
+class AttExtent: public Att
 {
 public:
     AttExtent();
@@ -104,12 +117,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetExtent();
     
+    /** Read the values for the attribute class **/
+    bool ReadExtent( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteExtent( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetExtent(std::string extent_) { m_extent = extent_; };
-    std::string GetExtent() { return m_extent; };
+    std::string GetExtent() const { return m_extent; };
     ///@}
 
 protected:
@@ -123,7 +142,7 @@ protected:
 // AttReasonident
 //----------------------------------------------------------------------------
 
-class AttReasonident 
+class AttReasonident: public Att
 {
 public:
     AttReasonident();
@@ -132,12 +151,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetReasonident();
     
+    /** Read the values for the attribute class **/
+    bool ReadReasonident( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteReasonident( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetReason(std::string reason_) { m_reason = reason_; };
-    std::string GetReason() { return m_reason; };
+    std::string GetReason() const { return m_reason; };
     ///@}
 
 protected:

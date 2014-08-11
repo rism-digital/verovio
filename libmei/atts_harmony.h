@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_HARMONY_H__
 #define __VRV_ATTS_HARMONY_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttFretlocation
 //----------------------------------------------------------------------------
 
-class AttFretlocation 
+class AttFretlocation: public Att
 {
 public:
     AttFretlocation();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetFretlocation();
     
+    /** Read the values for the attribute class **/
+    bool ReadFretlocation( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteFretlocation( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetFret(std::string fret_) { m_fret = fret_; };
-    std::string GetFret() { return m_fret; };
+    std::string GetFret() const { return m_fret; };
     ///@}
 
 protected:
@@ -55,7 +62,7 @@ protected:
 // AttHarmLog
 //----------------------------------------------------------------------------
 
-class AttHarmLog 
+class AttHarmLog: public Att
 {
 public:
     AttHarmLog();
@@ -64,12 +71,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetHarmLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadHarmLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteHarmLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetChordref(std::string chordref_) { m_chordref = chordref_; };
-    std::string GetChordref() { return m_chordref; };
+    std::string GetChordref() const { return m_chordref; };
     ///@}
 
 protected:
@@ -83,7 +96,7 @@ protected:
 // AttHarmVis
 //----------------------------------------------------------------------------
 
-class AttHarmVis 
+class AttHarmVis: public Att
 {
 public:
     AttHarmVis();
@@ -92,15 +105,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetHarmVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadHarmVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteHarmVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetExtender(std::string extender_) { m_extender = extender_; };
-    std::string GetExtender() { return m_extender; };
+    std::string GetExtender() const { return m_extender; };
     //
     void SetRendgrid(std::string rendgrid_) { m_rendgrid = rendgrid_; };
-    std::string GetRendgrid() { return m_rendgrid; };
+    std::string GetRendgrid() const { return m_rendgrid; };
     ///@}
 
 protected:

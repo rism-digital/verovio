@@ -29,7 +29,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure( bool measureMusic, int logMeasureNb ):
-    AttCommon(), DocObject("measure-")
+    DocObject("measure-"), AttCommon(), AttMeasureLog()
 {
 	Clear( );
     m_measuredMusic = measureMusic;
@@ -47,6 +47,7 @@ Measure::~Measure()
 void Measure::Clear()
 {
     ResetCommon();
+    ResetMeasureLog();
 	ClearChildren();
     m_parent = NULL;
     m_logMeasureNb = -1;
@@ -55,8 +56,8 @@ void Measure::Clear()
     m_drawingXRel = 0;
     m_drawingX = 0;
     // by default, we have a single barline on the right (none on the left)
-    m_rightBarline.m_barlineType = BARLINE_SINGLE;
-    m_leftBarline.m_barlineType = BARLINE_NONE;
+    m_rightBarline.SetRend( this->GetRight() );
+    m_leftBarline.SetRend( this->GetLeft() );
 }
 
 int Measure::Save( ArrayPtrVoid params )
@@ -200,7 +201,7 @@ int Measure::AlignHorizontally( ArrayPtrVoid params )
     // point to it
     (*measureAligner) = &m_measureAligner;
     
-    if ( m_rightBarline.m_barlineType != BARLINE_NONE ) {
+    if ( m_rightBarline.GetRend() != BARRENDITION_NONE ) {
         m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
     
@@ -276,7 +277,7 @@ int Measure::AlignMeasures( ArrayPtrVoid params )
     (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
     
     // We also need to take into account the measure end (right) barline with here
-    if (GetRightBarlineType() != BARLINE_NONE) {
+    if (GetRightBarlineType() != BARRENDITION_NONE) {
         // shift the next measure of the total with
         (*shift) += GetRightBarline()->GetAlignment()->GetMaxWidth();
     }

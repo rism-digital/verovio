@@ -40,7 +40,6 @@ DurationInterface::DurationInterface()
     m_durGes = VRV_UNSET;
     m_num = 1;
     m_numBase = 1;
-    memset(m_tuplet, 0, DURATION_MAX_TUPLETS * sizeof(unsigned char));
     m_fermata = false;
 }
 

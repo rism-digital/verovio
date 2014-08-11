@@ -14,12 +14,17 @@
 namespace vrv {
 
 class Clef;
+class ClefAttr;
 class KeySig;
+class KeySigAttr;
 class Mensur;
+class MensurAttr;
 class MeterSig;
+class MeterSigAttr;
 class StaffGrp;
 class StaffDef;
 
+// unused? LP
 #define STAFFDEF_DRAW_NONE  0
 #define STAFFDEF_DRAW_CLEF  (1<<0)
 #define STAFFDEF_DRAW_KEYSIG  (1<<1)
@@ -32,7 +37,11 @@ class StaffDef;
 
 /**
  * This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur.
- * For simplification, the attributes are stored as Clef, KeySig and Mensur.
+ * It can either hold element or attribute values. Element values are hold in normal objects
+ * (e.g., Clef) and attribute values are hold in dedicated Object classes (e.g., ClefAttr)
+ * During rendering, only Element object are used. They are obained by the GetXXXCopy methods
+ * that create a copy of the Element object or a corresponding Element object if a attribute value
+ * object is hold.
  */
 class ScoreOrStaffDefAttrInterface
 {
@@ -44,44 +53,77 @@ public:
     ScoreOrStaffDefAttrInterface& operator=( const ScoreOrStaffDefAttrInterface& interface ); // copy assignement;
     
     /**
-     * Replace the clef (if any) with the newClef (if any).
+     * @name Replace the clef, keysig, mensur and meterSig.
+     * The current value (if any) is replaced by the new value (if any).
+     * Values passed and hold can be either a object or attribute value object.
+     * For example, it can be either a Clef or a ClefAttr.
+    ///@{
      */
-    void ReplaceClef( Clef *newClef );
+    void ReplaceClef( Object *newClef );
+    void ReplaceKeySig( Object *newKeySig );
+    void ReplaceMensur( Object *newMensur );
+    void ReplaceMeterSig( Object *newMeterSig );
+    ///@}
     
     /**
-     * Replace the keysig (if any) with the newKeysig (if any).
-     */
-    void ReplaceKeySig( KeySig *newKeySig );
-    
-    /**
-     * Replace the mensur (if any) with the newMensur (if any).
-     */
-    void ReplaceMensur( Mensur *newMensur );
-    
-    /**
-     * Replace the meterSig (if any) with the newMeterSig (if any).
-     */
-    void ReplaceMeterSig( MeterSig *newMeterSig );
-    
-    /**
-     * @name Get  the clef, keysig, mensur and meterSig.
+     * @name Get a copy of the clef, keysig, mensur and meterSig.
+     * These methods creates new objects that need to be deleted.
+     * The also convert attribute value object to an object. For example,
+     * if m_clef holds a ClefAttr object, the copy will be a Clef object.
+     * They are used when writing the MEI.
      */
     ///@{
-    Clef *GetClefAttr() const { return m_clef; };
-    KeySig *GetKeySigAttr() const { return m_keySig; };
-    Mensur *GetMensurAttr() const { return m_mensur; };
-    MeterSig *GetMeterSigAttr() const { return m_meterSig; };
+    Clef *GetClefCopy() const;
+    KeySig *GetKeySigCopy() const;
+    Mensur *GetMensurCopy() const;
+    MeterSig *GetMeterSigCopy() const;
+    ///@}
+    
+    /**
+     * @name Get the clef, keysig, mensur and meterSig.
+     * They will return a reference only if the value hold is
+     * an element (e.g., Clef) and not a attribute value object (ClefAttr).
+     * They are used when writing the MEI.
+     */
+    ///@{
+    Clef *GetClefElement() const;
+    KeySig *GetKeySigElement() const;
+    Mensur *GetMensurElement() const;
+    MeterSig *GetMeterSigElement() const;
+    ///@}
+    
+    /**
+     * @name Get the clef, keysig, mensur and meterSig attributes.
+     * They will return a reference only if the value hold is
+     * an attibute value object (e.g., ClefAtt) and not an element (Clef).
+     */
+    ///@{
+    ClefAttr *GetClefAttr() const;
+    KeySigAttr *GetKeySigAttr() const;
+    MensurAttr *GetMensurAttr() const;
+    MeterSigAttr *GetMeterSigAttr() const;
+    ///@}
+    
+    /**
+     * @name Get the clef, keysig, mensur and meterSig object.
+     * They will return a reference to the hold object (element or attribute).
+     */
+    ///@{
+    Object *GetClef() const { return m_clef; };
+    Object *GetKeySig() const { return m_keySig; };
+    Object *GetMensur() const { return m_mensur; };
+    Object *GetMeterSig() const { return m_meterSig; };
     ///@}
     
 protected:
-    /** The clef attribute */
-    Clef *m_clef;
+    /** The clef or clef attributes */
+    Object *m_clef;
     /** The key signature */
-    KeySig *m_keySig;
+    Object *m_keySig;
     /** The mensur */
-    Mensur *m_mensur;
+    Object *m_mensur;
     /** The meter signature (time signature) */
-    MeterSig *m_meterSig;
+    Object *m_meterSig;
 
 };
 

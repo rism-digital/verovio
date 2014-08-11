@@ -24,7 +24,7 @@ namespace vrv {
 // AttIneumeLog
 //----------------------------------------------------------------------------
 
-AttIneumeLog::AttIneumeLog() {
+AttIneumeLog::AttIneumeLog(): Att() {
     ResetIneumeLog();
 }
 
@@ -37,13 +37,39 @@ void AttIneumeLog::ResetIneumeLog() {
     m_name = "";
 }
 
+bool AttIneumeLog::ReadIneumeLog(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToStr(element.attribute("form").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("name")) {
+        this->SetName(StrToStr(element.attribute("name").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttIneumeLog::WriteIneumeLog(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetForm() == "") {
+        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->GetName() == "") {
+        element.append_attribute("name") = StrToStr(this->GetName()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
 /* include <attname> */
 
 //----------------------------------------------------------------------------
 // AttUneumeLog
 //----------------------------------------------------------------------------
 
-AttUneumeLog::AttUneumeLog() {
+AttUneumeLog::AttUneumeLog(): Att() {
     ResetUneumeLog();
 }
 
@@ -54,6 +80,32 @@ AttUneumeLog::~AttUneumeLog() {
 void AttUneumeLog::ResetUneumeLog() {
     m_form = "";
     m_name = "";
+}
+
+bool AttUneumeLog::ReadUneumeLog(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToStr(element.attribute("form").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("name")) {
+        this->SetName(StrToStr(element.attribute("name").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttUneumeLog::WriteUneumeLog(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetForm() == "") {
+        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->GetName() == "") {
+        element.append_attribute("name") = StrToStr(this->GetName()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 /* include <attname> */

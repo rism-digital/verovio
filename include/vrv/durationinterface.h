@@ -11,12 +11,6 @@
 
 namespace vrv {
 
-#define TUPLET_INITIAL  (1<<1)
-#define TUPLET_MEDIAL  (1<<2) 
-#define TUPLET_TERMINAL  (1<<3)
-
-#define DURATION_MAX_TUPLETS 6
-
 class Object;
 
 //----------------------------------------------------------------------------
@@ -81,8 +75,6 @@ public:
     /** Indicates the denominator of the duration ratio */
     int m_numBase;
     /** Indicates if intial, medial or termial part of a tuplet for up to 6 nesting/overlaping tuplets */
-    unsigned char m_tuplet[DURATION_MAX_TUPLETS];
-    /** Indicates if a fermata should be drawn on this note/rest */
     bool m_fermata;
     
 

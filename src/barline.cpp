@@ -15,15 +15,20 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Barline::Barline():
-	LayerElement("bline-")
+	LayerElement("bline-"), AttBarLineLog()
 {
-    m_barlineType = BARLINE_SINGLE;
+    Reset();
     m_partialBarline = false; // this was used unitialized
     m_onStaffOnly = false; // is this good?
 }
 
 Barline::~Barline()
 {
+}
+    
+void Barline::Reset()
+{
+    ResetBarLineLog();
 }
 
 bool Barline::operator==( Object& other )
@@ -37,7 +42,7 @@ bool Barline::operator==( Object& other )
 
 bool Barline::HasRepetitionDots()
 {
-    if (m_barlineType == BARLINE_RPTSTART || m_barlineType == BARLINE_RPTEND || m_barlineType == BARLINE_RPTBOTH) {
+    if (GetRend() == BARRENDITION_rptstart || GetRend() == BARRENDITION_rptend || GetRend() == BARRENDITION_rptboth) {
         return true;
     }
     return false;

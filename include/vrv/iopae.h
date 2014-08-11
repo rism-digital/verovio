@@ -180,7 +180,7 @@ public:
         meter = NULL;
         key = NULL;
         notes.clear();
-        barline = BARLINE_NONE;
+        barline = BARRENDITION_NONE;
         wholerest = 0; 
         abbreviation_offset = -1;
     };
@@ -193,7 +193,7 @@ public:
     std::vector<int> durations;
     std::vector<int> dots; // use the same offset as durations, they are used in parallel
     unsigned int durations_offset;
-    BarlineType    barline;
+    data_BARRENDITION    barline;
     int    abbreviation_offset;  
     int    wholerest;   // number of whole rests to process
 };
@@ -233,7 +233,7 @@ private:
      int       getKeyInfo          (const char* incipit, KeySig *key, int index = 0);
      int       getTimeInfo         (const char* incipit, MeterSig *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
-     int       getBarline          (const char *incipit, BarlineType *output, int index );
+     int       getBarline          (const char *incipit, data_BARRENDITION *output, int index );
      int       getAccidental       (const char* incipit, unsigned char *accident, int index = 0);
      int       getOctave           (const char* incipit, unsigned char *octave, int index = 0 );
      int       getDurations        (const char* incipit, MeasureObject *measure, int index = 0);

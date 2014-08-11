@@ -9,8 +9,9 @@
 #ifndef __VRV_MENSUR_H__
 #define __VRV_MENSUR_H__
 
-#include "vrvdef.h"
 #include "layerelement.h"
+#include "atts_shared.h"
+#include "atts_mensural.h"
 
 namespace vrv {
 
@@ -18,23 +19,29 @@ namespace vrv {
 // Mensur
 //----------------------------------------------------------------------------
 
+class MensurAttr;
+    
 /** 
  * This class models the MEI <mensur> element. 
  */
-class Mensur: public LayerElement
+class Mensur: public LayerElement, public AttDurationRatio, public AttMensurLog,
+    public AttMensurVis, public AttSlashcount
 {
 public:
     // constructors and destructors
     Mensur();
+    Mensur( MensurAttr *mensurAttr );
     virtual ~Mensur();
+    void Reset();
+    virtual std::string GetClassName( ) { return "Mensur"; };
+    virtual Object* Clone() { return new Mensur(*this); };
+    ///@}
     
     /**
      * Comparison operator. 
      * Check if the LayerElement if a Mensur and compare attributes
      */
     virtual bool operator==(Object& other);
-    
-    virtual std::string GetClassName( ) { return "Mensur"; };
     
     /**
      * Set the value for the mensur.
@@ -45,17 +52,17 @@ private:
     
 public:
     /** Indicates the number of dots with the sign (max 1 for now). */
-    unsigned char m_dot;
+    //unsigned char m_dot;
     /** Indicates the numerator of the duration ratio. */
-    int m_num;
+    //int m_num;
     /** Indicates the denominator of the duration ratio. */
-    int m_numBase;
+    //int m_numBase;
     /** Indicates if the sign is reversed. */
-    bool m_reversed;
+    //bool m_reversed;
     /** Indicates the sign of the mensuration signature. */
-    MensurationSign m_sign;    
+    //data_MENSURATIONSIGN m_sign;
     /** Indicates the number of slashes with the sign (max 1 for now). */
-    unsigned char m_slash;
+    //unsigned char m_slash;
     
     /** 
      * Static member for setting a value from a controller.
@@ -68,6 +75,43 @@ public:
      */
     static int s_numBase;
 
+private:
+    
+};
+
+    
+//----------------------------------------------------------------------------
+// MensurAttr
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI @mensur attributes in scoreDef or staffDef elements.
+ */
+class MensurAttr: public Object, public AttMensurDefaultLog
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    MensurAttr();
+    virtual ~MensurAttr();
+    void Reset();
+    virtual std::string GetClassName( ) { return "MensurAttr"; };
+    virtual Object* Clone() { return new MensurAttr(*this); };
+    ///@}
+    
+    /**
+     * Comparison operator.
+     * Check if the LayerElement if a MensurAttr and compare attributes
+     */
+    virtual bool operator==(Object& other);
+    
+private:
+    
+public:
+    
 private:
     
 };

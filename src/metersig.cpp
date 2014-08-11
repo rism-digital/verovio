@@ -19,6 +19,15 @@ MeterSig::MeterSig():
 {
     Reset();
 }
+    
+MeterSig::MeterSig( MeterSigAttr *meterSigAttr ):
+    LayerElement("msig-")
+{
+    MeterSig();
+    this->SetCount(meterSigAttr->GetMeterCount());
+    this->SetSym(meterSigAttr->GetMeterSym());
+    this->SetUnit(meterSigAttr->GetMeterUnit());
+}
 
 
 MeterSig::~MeterSig()
@@ -48,5 +57,38 @@ bool MeterSig::operator==( Object& other )
     }
     return true;
 }
+ 
+
+//----------------------------------------------------------------------------
+// MeterSigAttr
+//----------------------------------------------------------------------------
+
+MeterSigAttr::MeterSigAttr():
+    Object(), AttMeterSigDefaultLog(), AttMeterSigDefaultVis()
+{
+    Reset();
+}
+
+
+MeterSigAttr::~MeterSigAttr()
+{
+}
+
+void MeterSigAttr::Reset()
+{
+    ResetMeterSigDefaultLog();
+    ResetMeterSigDefaultVis();
+}
+
+bool MeterSigAttr::operator==( Object& other )
+{
+    MeterSigAttr *otherMeterSigAttr = dynamic_cast<MeterSigAttr*>( &other );
+    if ( !otherMeterSigAttr ) {
+        return false;
+    }
+    // we need member comparison here...
+    return true;
+}
+
 
 } // namespace vrv

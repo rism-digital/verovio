@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_HEADER_H__
 #define __VRV_ATTS_HEADER_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttRegularmethod
 //----------------------------------------------------------------------------
 
-class AttRegularmethod 
+class AttRegularmethod: public Att
 {
 public:
     AttRegularmethod();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetRegularmethod();
     
+    /** Read the values for the attribute class **/
+    bool ReadRegularmethod( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteRegularmethod( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMethod(std::string method_) { m_method = method_; };
-    std::string GetMethod() { return m_method; };
+    std::string GetMethod() const { return m_method; };
     ///@}
 
 protected:

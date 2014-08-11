@@ -14,6 +14,12 @@
 		4D22C42418891FC000D0831F /* pugixml.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42318891FB900D0831F /* pugixml.hpp */; };
 		4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42218891FB900D0831F /* pugiconfig.hpp */; };
 		4D22C4271889214C00D0831F /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41F18891D6D00D0831F /* pugixml.cpp */; };
+		4D422101199805E400963292 /* att.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4220FF199805E400963292 /* att.h */; };
+		4D422102199805E400963292 /* attdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D422100199805E400963292 /* attdef.h */; };
+		4D422104199805F800963292 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D422103199805F700963292 /* att.cpp */; };
+		4D422105199805F800963292 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D422103199805F700963292 /* att.cpp */; };
+		4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
+		4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
@@ -166,6 +172,9 @@
 		4D22C42218891FB900D0831F /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/vrv/pugiconfig.hpp; sourceTree = "<group>"; };
 		4D22C42318891FB900D0831F /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/vrv/pugixml.hpp; sourceTree = "<group>"; };
 		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
+		4D4220FF199805E400963292 /* att.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att.h; path = include/vrv/att.h; sourceTree = "<group>"; };
+		4D422100199805E400963292 /* attdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attdef.h; path = include/vrv/attdef.h; sourceTree = "<group>"; };
+		4D422103199805F700963292 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = src/att.cpp; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
@@ -394,6 +403,9 @@
 				8F086F3918853A190037FD8E /* view */,
 				8F086EB6188539540037FD8E /* aligner.cpp */,
 				8F59290D18854BF800FE51AD /* aligner.h */,
+				4D422103199805F700963292 /* att.cpp */,
+				4D4220FF199805E400963292 /* att.h */,
+				4D422100199805E400963292 /* attdef.h */,
 				8F086EBD188539540037FD8E /* doc.cpp */,
 				8F59291418854BF800FE51AD /* doc.h */,
 				8F086EBF188539540037FD8E /* interfacecontroller.cpp */,
@@ -567,6 +579,8 @@
 				4D22C42418891FC000D0831F /* pugixml.hpp in Headers */,
 				4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
+				4D422101199805E400963292 /* att.h in Headers */,
+				4D422102199805E400963292 /* attdef.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -686,6 +700,8 @@
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
+				4D422104199805F800963292 /* att.cpp in Sources */,
+				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -740,6 +756,8 @@
 				4D22C4271889214C00D0831F /* pugixml.cpp in Sources */,
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
+				4D422105199805F800963292 /* att.cpp in Sources */,
+				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

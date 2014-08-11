@@ -24,7 +24,7 @@ namespace vrv {
 // AttVerseLog
 //----------------------------------------------------------------------------
 
-AttVerseLog::AttVerseLog() {
+AttVerseLog::AttVerseLog(): Att() {
     ResetVerseLog();
 }
 
@@ -35,6 +35,32 @@ AttVerseLog::~AttVerseLog() {
 void AttVerseLog::ResetVerseLog() {
     m_refrain = "";
     m_rhythm = "";
+}
+
+bool AttVerseLog::ReadVerseLog(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("refrain")) {
+        this->SetRefrain(StrToStr(element.attribute("refrain").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("rhythm")) {
+        this->SetRhythm(StrToStr(element.attribute("rhythm").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttVerseLog::WriteVerseLog(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetRefrain() == "") {
+        element.append_attribute("refrain") = StrToStr(this->GetRefrain()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->GetRhythm() == "") {
+        element.append_attribute("rhythm") = StrToStr(this->GetRhythm()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 /* include <attrhythm> */

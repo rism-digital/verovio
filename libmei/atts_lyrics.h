@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_LYRICS_H__
 #define __VRV_ATTS_LYRICS_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttVerseLog
 //----------------------------------------------------------------------------
 
-class AttVerseLog 
+class AttVerseLog: public Att
 {
 public:
     AttVerseLog();
@@ -36,15 +37,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVerseLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadVerseLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVerseLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetRefrain(std::string refrain_) { m_refrain = refrain_; };
-    std::string GetRefrain() { return m_refrain; };
+    std::string GetRefrain() const { return m_refrain; };
     //
     void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; };
-    std::string GetRhythm() { return m_rhythm; };
+    std::string GetRhythm() const { return m_rhythm; };
     ///@}
 
 protected:

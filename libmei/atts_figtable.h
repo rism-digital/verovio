@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_FIGTABLE_H__
 #define __VRV_ATTS_FIGTABLE_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttTabular
 //----------------------------------------------------------------------------
 
-class AttTabular 
+class AttTabular: public Att
 {
 public:
     AttTabular();
@@ -36,15 +37,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTabular();
     
+    /** Read the values for the attribute class **/
+    bool ReadTabular( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTabular( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetColspanInt(int colspanInt_) { m_colspanInt = colspanInt_; };
-    int GetColspanInt() { return m_colspanInt; };
+    int GetColspanInt() const { return m_colspanInt; };
     //
     void SetRowspanInt(int rowspanInt_) { m_rowspanInt = rowspanInt_; };
-    int GetRowspanInt() { return m_rowspanInt; };
+    int GetRowspanInt() const { return m_rowspanInt; };
     ///@}
 
 protected:

@@ -24,7 +24,7 @@ namespace vrv {
 // AttFacsimile
 //----------------------------------------------------------------------------
 
-AttFacsimile::AttFacsimile() {
+AttFacsimile::AttFacsimile(): Att() {
     ResetFacsimile();
 }
 
@@ -34,6 +34,24 @@ AttFacsimile::~AttFacsimile() {
 
 void AttFacsimile::ResetFacsimile() {
     m_facs = "";
+}
+
+bool AttFacsimile::ReadFacsimile(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("facs")) {
+        this->SetFacs(StrToStr(element.attribute("facs").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttFacsimile::WriteFacsimile(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetFacs() == "") {
+        element.append_attribute("facs") = StrToStr(this->GetFacs()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 void AttFacsimile::getCoords() {

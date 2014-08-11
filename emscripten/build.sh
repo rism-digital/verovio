@@ -75,6 +75,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
 	$VEROVIO_ROOT/src/app.cpp \
+	$VEROVIO_ROOT/src/att.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
@@ -118,6 +119,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
+	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \

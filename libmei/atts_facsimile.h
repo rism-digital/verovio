@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_FACSIMILE_H__
 #define __VRV_ATTS_FACSIMILE_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttFacsimile
 //----------------------------------------------------------------------------
 
-class AttFacsimile 
+class AttFacsimile: public Att
 {
 public:
     AttFacsimile();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetFacsimile();
     
+    /** Read the values for the attribute class **/
+    bool ReadFacsimile( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteFacsimile( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetFacs(std::string facs_) { m_facs = facs_; };
-    std::string GetFacs() { return m_facs; };
+    std::string GetFacs() const { return m_facs; };
     ///@}
 
 protected:

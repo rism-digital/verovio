@@ -24,7 +24,7 @@ namespace vrv {
 // AttCrit
 //----------------------------------------------------------------------------
 
-AttCrit::AttCrit() {
+AttCrit::AttCrit(): Att() {
     ResetCrit();
 }
 
@@ -36,13 +36,31 @@ void AttCrit::ResetCrit() {
     m_cause = "";
 }
 
+bool AttCrit::ReadCrit(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("cause")) {
+        this->SetCause(StrToStr(element.attribute("cause").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCrit::WriteCrit(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetCause() == "") {
+        element.append_attribute("cause") = StrToStr(this->GetCause()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
 /* include <attcause> */
 
 //----------------------------------------------------------------------------
 // AttSource
 //----------------------------------------------------------------------------
 
-AttSource::AttSource() {
+AttSource::AttSource(): Att() {
     ResetSource();
 }
 
@@ -52,6 +70,24 @@ AttSource::~AttSource() {
 
 void AttSource::ResetSource() {
     m_source = "";
+}
+
+bool AttSource::ReadSource(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("source")) {
+        this->SetSource(StrToStr(element.attribute("source").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSource::WriteSource(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetSource() == "") {
+        element.append_attribute("source") = StrToStr(this->GetSource()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 /* include <attsource> */

@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_SHARED_H__
 #define __VRV_ATTS_SHARED_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttAccidLog
 //----------------------------------------------------------------------------
 
-class AttAccidLog 
+class AttAccidLog: public Att
 {
 public:
     AttAccidLog();
@@ -36,12 +37,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAccidLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadAccidLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAccidLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() { return m_func; };
+    std::string GetFunc() const { return m_func; };
     ///@}
 
 protected:
@@ -55,7 +62,7 @@ protected:
 // AttAccidental
 //----------------------------------------------------------------------------
 
-class AttAccidental 
+class AttAccidental: public Att
 {
 public:
     AttAccidental();
@@ -64,12 +71,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAccidental();
     
+    /** Read the values for the attribute class **/
+    bool ReadAccidental( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAccidental( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAccid(std::string accid_) { m_accid = accid_; };
-    std::string GetAccid() { return m_accid; };
+    std::string GetAccid() const { return m_accid; };
     ///@}
 
 protected:
@@ -83,7 +96,7 @@ protected:
 // AttAccidentalPerformed
 //----------------------------------------------------------------------------
 
-class AttAccidentalPerformed 
+class AttAccidentalPerformed: public Att
 {
 public:
     AttAccidentalPerformed();
@@ -92,12 +105,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAccidentalPerformed();
     
+    /** Read the values for the attribute class **/
+    bool ReadAccidentalPerformed( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAccidentalPerformed( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAccidGes(std::string accidGes_) { m_accidGes = accidGes_; };
-    std::string GetAccidGes() { return m_accidGes; };
+    std::string GetAccidGes() const { return m_accidGes; };
     ///@}
 
 protected:
@@ -114,7 +133,7 @@ protected:
 // AttAltsym
 //----------------------------------------------------------------------------
 
-class AttAltsym 
+class AttAltsym: public Att
 {
 public:
     AttAltsym();
@@ -123,12 +142,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAltsym();
     
+    /** Read the values for the attribute class **/
+    bool ReadAltsym( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAltsym( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAltsym(std::string altsym_) { m_altsym = altsym_; };
-    std::string GetAltsym() { return m_altsym; };
+    std::string GetAltsym() const { return m_altsym; };
     ///@}
 
 protected:
@@ -145,7 +170,7 @@ protected:
 // AttArticulation
 //----------------------------------------------------------------------------
 
-class AttArticulation 
+class AttArticulation: public Att
 {
 public:
     AttArticulation();
@@ -154,12 +179,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetArticulation();
     
+    /** Read the values for the attribute class **/
+    bool ReadArticulation( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteArticulation( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetArtic(std::string artic_) { m_artic = artic_; };
-    std::string GetArtic() { return m_artic; };
+    std::string GetArtic() const { return m_artic; };
     ///@}
 
 protected:
@@ -179,7 +210,7 @@ protected:
 // AttArticulationPerformed
 //----------------------------------------------------------------------------
 
-class AttArticulationPerformed 
+class AttArticulationPerformed: public Att
 {
 public:
     AttArticulationPerformed();
@@ -188,12 +219,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetArticulationPerformed();
     
+    /** Read the values for the attribute class **/
+    bool ReadArticulationPerformed( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteArticulationPerformed( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetArticGes(std::string articGes_) { m_articGes = articGes_; };
-    std::string GetArticGes() { return m_articGes; };
+    std::string GetArticGes() const { return m_articGes; };
     ///@}
 
 protected:
@@ -207,7 +244,7 @@ protected:
 // AttAugmentdots
 //----------------------------------------------------------------------------
 
-class AttAugmentdots 
+class AttAugmentdots: public Att
 {
 public:
     AttAugmentdots();
@@ -216,12 +253,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAugmentdots();
     
+    /** Read the values for the attribute class **/
+    bool ReadAugmentdots( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAugmentdots( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDots(std::string dots_) { m_dots = dots_; };
-    std::string GetDots() { return m_dots; };
+    std::string GetDots() const { return m_dots; };
     ///@}
 
 protected:
@@ -235,7 +278,7 @@ protected:
 // AttAuthorized
 //----------------------------------------------------------------------------
 
-class AttAuthorized 
+class AttAuthorized: public Att
 {
 public:
     AttAuthorized();
@@ -244,15 +287,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetAuthorized();
     
+    /** Read the values for the attribute class **/
+    bool ReadAuthorized( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteAuthorized( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAuthority(std::string authority_) { m_authority = authority_; };
-    std::string GetAuthority() { return m_authority; };
+    std::string GetAuthority() const { return m_authority; };
     //
     void SetAuthURI(std::string authURI_) { m_authURI = authURI_; };
-    std::string GetAuthURI() { return m_authURI; };
+    std::string GetAuthURI() const { return m_authURI; };
     ///@}
 
 protected:
@@ -274,7 +323,7 @@ protected:
 // AttBarLineLog
 //----------------------------------------------------------------------------
 
-class AttBarLineLog 
+class AttBarLineLog: public Att
 {
 public:
     AttBarLineLog();
@@ -283,17 +332,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetBarLineLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadBarLineLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteBarLineLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() { return m_rend; };
+    void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
+    data_BARRENDITION GetRend() const { return m_rend; };
     ///@}
 
 protected:
     /** Describes the line style of the curve. **/
-    std::string m_rend;
+    data_BARRENDITION m_rend;
 
 /* include <attrend> */
 };
@@ -302,7 +357,7 @@ protected:
 // AttBarplacement
 //----------------------------------------------------------------------------
 
-class AttBarplacement 
+class AttBarplacement: public Att
 {
 public:
     AttBarplacement();
@@ -311,15 +366,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetBarplacement();
     
+    /** Read the values for the attribute class **/
+    bool ReadBarplacement( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteBarplacement( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetBarplace(std::string barplace_) { m_barplace = barplace_; };
-    std::string GetBarplace() { return m_barplace; };
+    std::string GetBarplace() const { return m_barplace; };
     //
     void SetTaktplace(std::string taktplace_) { m_taktplace = taktplace_; };
-    std::string GetTaktplace() { return m_taktplace; };
+    std::string GetTaktplace() const { return m_taktplace; };
     ///@}
 
 protected:
@@ -344,7 +405,7 @@ protected:
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
-class AttBeamingVis 
+class AttBeamingVis: public Att
 {
 public:
     AttBeamingVis();
@@ -353,15 +414,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetBeamingVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadBeamingVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteBeamingVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetBeamRend(std::string beamRend_) { m_beamRend = beamRend_; };
-    std::string GetBeamRend() { return m_beamRend; };
+    std::string GetBeamRend() const { return m_beamRend; };
     //
     void SetBeamSlopeDbl(double beamSlopeDbl_) { m_beamSlopeDbl = beamSlopeDbl_; };
-    double GetBeamSlopeDbl() { return m_beamSlopeDbl; };
+    double GetBeamSlopeDbl() const { return m_beamSlopeDbl; };
     ///@}
 
 protected:
@@ -377,7 +444,7 @@ protected:
 // AttBibl
 //----------------------------------------------------------------------------
 
-class AttBibl 
+class AttBibl: public Att
 {
 public:
     AttBibl();
@@ -386,12 +453,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetBibl();
     
+    /** Read the values for the attribute class **/
+    bool ReadBibl( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteBibl( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAnalog(std::string analog_) { m_analog = analog_; };
-    std::string GetAnalog() { return m_analog; };
+    std::string GetAnalog() const { return m_analog; };
     ///@}
 
 protected:
@@ -408,7 +481,7 @@ protected:
 // AttCalendared
 //----------------------------------------------------------------------------
 
-class AttCalendared 
+class AttCalendared: public Att
 {
 public:
     AttCalendared();
@@ -417,12 +490,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCalendared();
     
+    /** Read the values for the attribute class **/
+    bool ReadCalendared( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCalendared( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCalendar(std::string calendar_) { m_calendar = calendar_; };
-    std::string GetCalendar() { return m_calendar; };
+    std::string GetCalendar() const { return m_calendar; };
     ///@}
 
 protected:
@@ -439,7 +518,7 @@ protected:
 // AttCanonical
 //----------------------------------------------------------------------------
 
-class AttCanonical 
+class AttCanonical: public Att
 {
 public:
     AttCanonical();
@@ -448,12 +527,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCanonical();
     
+    /** Read the values for the attribute class **/
+    bool ReadCanonical( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCanonical( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDbkey(std::string dbkey_) { m_dbkey = dbkey_; };
-    std::string GetDbkey() { return m_dbkey; };
+    std::string GetDbkey() const { return m_dbkey; };
     ///@}
 
 protected:
@@ -467,7 +552,7 @@ protected:
 // AttChordVis
 //----------------------------------------------------------------------------
 
-class AttChordVis 
+class AttChordVis: public Att
 {
 public:
     AttChordVis();
@@ -476,12 +561,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetChordVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadChordVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteChordVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCluster(std::string cluster_) { m_cluster = cluster_; };
-    std::string GetCluster() { return m_cluster; };
+    std::string GetCluster() const { return m_cluster; };
     ///@}
 
 protected:
@@ -499,7 +590,7 @@ protected:
 // AttClefLog
 //----------------------------------------------------------------------------
 
-class AttClefLog 
+class AttClefLog: public Att
 {
 public:
     AttClefLog();
@@ -508,12 +599,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetClefLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadClefLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteClefLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCautionary(std::string cautionary_) { m_cautionary = cautionary_; };
-    std::string GetCautionary() { return m_cautionary; };
+    std::string GetCautionary() const { return m_cautionary; };
     ///@}
 
 protected:
@@ -530,7 +627,7 @@ protected:
 // AttCleffingLog
 //----------------------------------------------------------------------------
 
-class AttCleffingLog 
+class AttCleffingLog: public Att
 {
 public:
     AttCleffingLog();
@@ -539,36 +636,42 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCleffingLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadCleffingLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCleffingLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetClefShape(std::string clefShape_) { m_clefShape = clefShape_; };
-    std::string GetClefShape() { return m_clefShape; };
+    void SetClefShape(data_CLEFSHAPE clefShape_) { m_clefShape = clefShape_; };
+    data_CLEFSHAPE GetClefShape() const { return m_clefShape; };
     //
-    void SetClefLine(std::string clefLine_) { m_clefLine = clefLine_; };
-    std::string GetClefLine() { return m_clefLine; };
+    void SetClefLine(unsigned char clefLine_) { m_clefLine = clefLine_; };
+    unsigned char GetClefLine() const { return m_clefLine; };
     //
-    void SetClefDis(std::string clefDis_) { m_clefDis = clefDis_; };
-    std::string GetClefDis() { return m_clefDis; };
+    void SetClefDis(data_OCTAVE_DIS clefDis_) { m_clefDis = clefDis_; };
+    data_OCTAVE_DIS GetClefDis() const { return m_clefDis; };
     //
-    void SetClefDisPlace(std::string clefDisPlace_) { m_clefDisPlace = clefDisPlace_; };
-    std::string GetClefDisPlace() { return m_clefDisPlace; };
+    void SetClefDisPlace(data_PLACE clefDisPlace_) { m_clefDisPlace = clefDisPlace_; };
+    data_PLACE GetClefDisPlace() const { return m_clefDisPlace; };
     ///@}
 
 protected:
     /** Encodes a value for the clef symbol. **/
-    std::string m_clefShape;
+    data_CLEFSHAPE m_clefShape;
     /**
      * Contains a default value for the position of the clef.
      * The value must be in the range between 1 and the number of lines on the staff.
      * The numbering of lines starts with the lowest line of the staff.
      **/
-    std::string m_clefLine;
+    unsigned char m_clefLine;
     /** Records the amount of octave displacement to be applied to the clef. **/
-    std::string m_clefDis;
+    data_OCTAVE_DIS m_clefDis;
     /** Records the direction of octave displacement to be applied to the clef. **/
-    std::string m_clefDisPlace;
+    data_PLACE m_clefDisPlace;
 
 /* include <attclef.dis.place> */
 };
@@ -577,7 +680,7 @@ protected:
 // AttCleffingVis
 //----------------------------------------------------------------------------
 
-class AttCleffingVis 
+class AttCleffingVis: public Att
 {
 public:
     AttCleffingVis();
@@ -586,15 +689,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCleffingVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadCleffingVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCleffingVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetClefColor(std::string clefColor_) { m_clefColor = clefColor_; };
-    std::string GetClefColor() { return m_clefColor; };
+    std::string GetClefColor() const { return m_clefColor; };
     //
     void SetClefVisible(std::string clefVisible_) { m_clefVisible = clefVisible_; };
-    std::string GetClefVisible() { return m_clefVisible; };
+    std::string GetClefVisible() const { return m_clefVisible; };
     ///@}
 
 protected:
@@ -610,7 +719,7 @@ protected:
 // AttClefshape
 //----------------------------------------------------------------------------
 
-class AttClefshape 
+class AttClefshape: public Att
 {
 public:
     AttClefshape();
@@ -619,17 +728,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetClefshape();
     
+    /** Read the values for the attribute class **/
+    bool ReadClefshape( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteClefshape( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetShape(std::string shape_) { m_shape = shape_; };
-    std::string GetShape() { return m_shape; };
+    void SetShape(data_CLEFSHAPE shape_) { m_shape = shape_; };
+    data_CLEFSHAPE GetShape() const { return m_shape; };
     ///@}
 
 protected:
     /** Describes a clef's shape. **/
-    std::string m_shape;
+    data_CLEFSHAPE m_shape;
 
 /* include <attshape> */
 };
@@ -638,7 +753,7 @@ protected:
 // AttColor
 //----------------------------------------------------------------------------
 
-class AttColor 
+class AttColor: public Att
 {
 public:
     AttColor();
@@ -647,12 +762,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetColor();
     
+    /** Read the values for the attribute class **/
+    bool ReadColor( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteColor( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetColor(std::string color_) { m_color = color_; };
-    std::string GetColor() { return m_color; };
+    std::string GetColor() const { return m_color; };
     ///@}
 
 protected:
@@ -669,7 +790,7 @@ protected:
 // AttColoration
 //----------------------------------------------------------------------------
 
-class AttColoration 
+class AttColoration: public Att
 {
 public:
     AttColoration();
@@ -678,12 +799,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetColoration();
     
+    /** Read the values for the attribute class **/
+    bool ReadColoration( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteColoration( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetColored(std::string colored_) { m_colored = colored_; };
-    std::string GetColored() { return m_colored; };
+    std::string GetColored() const { return m_colored; };
     ///@}
 
 protected:
@@ -704,7 +831,7 @@ protected:
 // AttCommon
 //----------------------------------------------------------------------------
 
-class AttCommon 
+class AttCommon: public Att
 {
 public:
     AttCommon();
@@ -713,18 +840,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCommon();
     
+    /** Read the values for the attribute class **/
+    bool ReadCommon( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCommon( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLabel(std::string label_) { m_label = label_; };
-    std::string GetLabel() { return m_label; };
+    std::string GetLabel() const { return m_label; };
     //
     void SetN(int n_) { m_n = n_; };
-    int GetN() { return m_n; };
+    int GetN() const { return m_n; };
     //
     void SetBase(std::string base_) { m_base = base_; };
-    std::string GetBase() { return m_base; };
+    std::string GetBase() const { return m_base; };
     ///@}
 
 protected:
@@ -748,7 +881,7 @@ protected:
 // AttCoordinated
 //----------------------------------------------------------------------------
 
-class AttCoordinated 
+class AttCoordinated: public Att
 {
 public:
     AttCoordinated();
@@ -757,21 +890,27 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCoordinated();
     
+    /** Read the values for the attribute class **/
+    bool ReadCoordinated( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCoordinated( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetUlxInt(int ulxInt_) { m_ulxInt = ulxInt_; };
-    int GetUlxInt() { return m_ulxInt; };
+    int GetUlxInt() const { return m_ulxInt; };
     //
     void SetUlyInt(int ulyInt_) { m_ulyInt = ulyInt_; };
-    int GetUlyInt() { return m_ulyInt; };
+    int GetUlyInt() const { return m_ulyInt; };
     //
     void SetLrxInt(int lrxInt_) { m_lrxInt = lrxInt_; };
-    int GetLrxInt() { return m_lrxInt; };
+    int GetLrxInt() const { return m_lrxInt; };
     //
     void SetLryInt(int lryInt_) { m_lryInt = lryInt_; };
-    int GetLryInt() { return m_lryInt; };
+    int GetLryInt() const { return m_lryInt; };
     ///@}
 
 protected:
@@ -791,7 +930,7 @@ protected:
 // AttCurvature
 //----------------------------------------------------------------------------
 
-class AttCurvature 
+class AttCurvature: public Att
 {
 public:
     AttCurvature();
@@ -800,18 +939,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCurvature();
     
+    /** Read the values for the attribute class **/
+    bool ReadCurvature( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCurvature( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetBezier(std::string bezier_) { m_bezier = bezier_; };
-    std::string GetBezier() { return m_bezier; };
+    std::string GetBezier() const { return m_bezier; };
     //
     void SetBulge(std::string bulge_) { m_bulge = bulge_; };
-    std::string GetBulge() { return m_bulge; };
+    std::string GetBulge() const { return m_bulge; };
     //
     void SetCurvedir(std::string curvedir_) { m_curvedir = curvedir_; };
-    std::string GetCurvedir() { return m_curvedir; };
+    std::string GetCurvedir() const { return m_curvedir; };
     ///@}
 
 protected:
@@ -837,7 +982,7 @@ protected:
 // AttCurverend
 //----------------------------------------------------------------------------
 
-class AttCurverend 
+class AttCurverend: public Att
 {
 public:
     AttCurverend();
@@ -846,17 +991,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCurverend();
     
+    /** Read the values for the attribute class **/
+    bool ReadCurverend( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCurverend( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() { return m_rend; };
+    void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
+    data_BARRENDITION GetRend() const { return m_rend; };
     ///@}
 
 protected:
     /** Describes the line style of the curve. **/
-    std::string m_rend;
+    data_BARRENDITION m_rend;
 
 /* include <attrend> */
 };
@@ -865,7 +1016,7 @@ protected:
 // AttCustosLog
 //----------------------------------------------------------------------------
 
-class AttCustosLog 
+class AttCustosLog: public Att
 {
 public:
     AttCustosLog();
@@ -874,12 +1025,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetCustosLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadCustosLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCustosLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTarget(std::string target_) { m_target = target_; };
-    std::string GetTarget() { return m_target; };
+    std::string GetTarget() const { return m_target; };
     ///@}
 
 protected:
@@ -896,7 +1053,7 @@ protected:
 // AttDatable
 //----------------------------------------------------------------------------
 
-class AttDatable 
+class AttDatable: public Att
 {
 public:
     AttDatable();
@@ -905,24 +1062,30 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDatable();
     
+    /** Read the values for the attribute class **/
+    bool ReadDatable( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDatable( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetEnddate(std::string enddate_) { m_enddate = enddate_; };
-    std::string GetEnddate() { return m_enddate; };
+    std::string GetEnddate() const { return m_enddate; };
     //
     void SetIsodate(std::string isodate_) { m_isodate = isodate_; };
-    std::string GetIsodate() { return m_isodate; };
+    std::string GetIsodate() const { return m_isodate; };
     //
     void SetNotafter(std::string notafter_) { m_notafter = notafter_; };
-    std::string GetNotafter() { return m_notafter; };
+    std::string GetNotafter() const { return m_notafter; };
     //
     void SetNotbefore(std::string notbefore_) { m_notbefore = notbefore_; };
-    std::string GetNotbefore() { return m_notbefore; };
+    std::string GetNotbefore() const { return m_notbefore; };
     //
     void SetStartdate(std::string startdate_) { m_startdate = startdate_; };
-    std::string GetStartdate() { return m_startdate; };
+    std::string GetStartdate() const { return m_startdate; };
     ///@}
 
 protected:
@@ -944,7 +1107,7 @@ protected:
 // AttDatapointing
 //----------------------------------------------------------------------------
 
-class AttDatapointing 
+class AttDatapointing: public Att
 {
 public:
     AttDatapointing();
@@ -953,12 +1116,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDatapointing();
     
+    /** Read the values for the attribute class **/
+    bool ReadDatapointing( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDatapointing( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetData(std::string data_) { m_data = data_; };
-    std::string GetData() { return m_data; };
+    std::string GetData() const { return m_data; };
     ///@}
 
 protected:
@@ -972,7 +1141,7 @@ protected:
 // AttDeclaring
 //----------------------------------------------------------------------------
 
-class AttDeclaring 
+class AttDeclaring: public Att
 {
 public:
     AttDeclaring();
@@ -981,12 +1150,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDeclaring();
     
+    /** Read the values for the attribute class **/
+    bool ReadDeclaring( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDeclaring( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDecls(std::string decls_) { m_decls = decls_; };
-    std::string GetDecls() { return m_decls; };
+    std::string GetDecls() const { return m_decls; };
     ///@}
 
 protected:
@@ -1003,7 +1178,7 @@ protected:
 // AttDistances
 //----------------------------------------------------------------------------
 
-class AttDistances 
+class AttDistances: public Att
 {
 public:
     AttDistances();
@@ -1012,18 +1187,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDistances();
     
+    /** Read the values for the attribute class **/
+    bool ReadDistances( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDistances( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDynamDistDbl(double dynamDistDbl_) { m_dynamDistDbl = dynamDistDbl_; };
-    double GetDynamDistDbl() { return m_dynamDistDbl; };
+    double GetDynamDistDbl() const { return m_dynamDistDbl; };
     //
     void SetHarmDistDbl(double harmDistDbl_) { m_harmDistDbl = harmDistDbl_; };
-    double GetHarmDistDbl() { return m_harmDistDbl; };
+    double GetHarmDistDbl() const { return m_harmDistDbl; };
     //
     void SetTextDistDbl(double textDistDbl_) { m_textDistDbl = textDistDbl_; };
-    double GetTextDistDbl() { return m_textDistDbl; };
+    double GetTextDistDbl() const { return m_textDistDbl; };
     ///@}
 
 protected:
@@ -1044,7 +1225,7 @@ protected:
 // AttDotLog
 //----------------------------------------------------------------------------
 
-class AttDotLog 
+class AttDotLog: public Att
 {
 public:
     AttDotLog();
@@ -1053,12 +1234,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDotLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadDotLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDotLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     ///@}
 
 protected:
@@ -1072,7 +1259,7 @@ protected:
 // AttDurationDefault
 //----------------------------------------------------------------------------
 
-class AttDurationDefault 
+class AttDurationDefault: public Att
 {
 public:
     AttDurationDefault();
@@ -1081,12 +1268,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDurationDefault();
     
+    /** Read the values for the attribute class **/
+    bool ReadDurationDefault( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDurationDefault( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDurDefault(std::string durDefault_) { m_durDefault = durDefault_; };
-    std::string GetDurDefault() { return m_durDefault; };
+    std::string GetDurDefault() const { return m_durDefault; };
     ///@}
 
 protected:
@@ -1104,7 +1297,7 @@ protected:
 // AttDurationMusical
 //----------------------------------------------------------------------------
 
-class AttDurationMusical 
+class AttDurationMusical: public Att
 {
 public:
     AttDurationMusical();
@@ -1113,12 +1306,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDurationMusical();
     
+    /** Read the values for the attribute class **/
+    bool ReadDurationMusical( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDurationMusical( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() { return m_dur; };
+    std::string GetDur() const { return m_dur; };
     ///@}
 
 protected:
@@ -1135,7 +1334,7 @@ protected:
 // AttDurationPerformed
 //----------------------------------------------------------------------------
 
-class AttDurationPerformed 
+class AttDurationPerformed: public Att
 {
 public:
     AttDurationPerformed();
@@ -1144,12 +1343,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDurationPerformed();
     
+    /** Read the values for the attribute class **/
+    bool ReadDurationPerformed( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDurationPerformed( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDurGes(std::string durGes_) { m_durGes = durGes_; };
-    std::string GetDurGes() { return m_durGes; };
+    std::string GetDurGes() const { return m_durGes; };
     ///@}
 
 protected:
@@ -1168,7 +1373,7 @@ protected:
 // AttDurationRatio
 //----------------------------------------------------------------------------
 
-class AttDurationRatio 
+class AttDurationRatio: public Att
 {
 public:
     AttDurationRatio();
@@ -1177,15 +1382,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDurationRatio();
     
+    /** Read the values for the attribute class **/
+    bool ReadDurationRatio( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDurationRatio( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() { return m_numInt; };
+    int GetNumInt() const { return m_numInt; };
     //
     void SetNumbaseInt(int numbaseInt_) { m_numbaseInt = numbaseInt_; };
-    int GetNumbaseInt() { return m_numbaseInt; };
+    int GetNumbaseInt() const { return m_numbaseInt; };
     ///@}
 
 protected:
@@ -1207,7 +1418,7 @@ protected:
 // AttDurationTimestamp
 //----------------------------------------------------------------------------
 
-class AttDurationTimestamp 
+class AttDurationTimestamp: public Att
 {
 public:
     AttDurationTimestamp();
@@ -1216,12 +1427,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetDurationTimestamp();
     
+    /** Read the values for the attribute class **/
+    bool ReadDurationTimestamp( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDurationTimestamp( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() { return m_dur; };
+    std::string GetDur() const { return m_dur; };
     ///@}
 
 protected:
@@ -1238,7 +1455,7 @@ protected:
 // AttEnclosingchars
 //----------------------------------------------------------------------------
 
-class AttEnclosingchars 
+class AttEnclosingchars: public Att
 {
 public:
     AttEnclosingchars();
@@ -1247,12 +1464,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetEnclosingchars();
     
+    /** Read the values for the attribute class **/
+    bool ReadEnclosingchars( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteEnclosingchars( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetEnclose(std::string enclose_) { m_enclose = enclose_; };
-    std::string GetEnclose() { return m_enclose; };
+    std::string GetEnclose() const { return m_enclose; };
     ///@}
 
 protected:
@@ -1271,7 +1494,7 @@ protected:
 // AttFermatapresent
 //----------------------------------------------------------------------------
 
-class AttFermatapresent 
+class AttFermatapresent: public Att
 {
 public:
     AttFermatapresent();
@@ -1280,12 +1503,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetFermatapresent();
     
+    /** Read the values for the attribute class **/
+    bool ReadFermatapresent( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteFermatapresent( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetFermata(std::string fermata_) { m_fermata = fermata_; };
-    std::string GetFermata() { return m_fermata; };
+    std::string GetFermata() const { return m_fermata; };
     ///@}
 
 protected:
@@ -1303,7 +1532,7 @@ protected:
 // AttHandident
 //----------------------------------------------------------------------------
 
-class AttHandident 
+class AttHandident: public Att
 {
 public:
     AttHandident();
@@ -1312,12 +1541,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetHandident();
     
+    /** Read the values for the attribute class **/
+    bool ReadHandident( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteHandident( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetHand(std::string hand_) { m_hand = hand_; };
-    std::string GetHand() { return m_hand; };
+    std::string GetHand() const { return m_hand; };
     ///@}
 
 protected:
@@ -1334,7 +1569,7 @@ protected:
 // AttHorizontalalign
 //----------------------------------------------------------------------------
 
-class AttHorizontalalign 
+class AttHorizontalalign: public Att
 {
 public:
     AttHorizontalalign();
@@ -1343,12 +1578,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetHorizontalalign();
     
+    /** Read the values for the attribute class **/
+    bool ReadHorizontalalign( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteHorizontalalign( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetHalign(std::string halign_) { m_halign = halign_; };
-    std::string GetHalign() { return m_halign; };
+    std::string GetHalign() const { return m_halign; };
     ///@}
 
 protected:
@@ -1362,7 +1603,7 @@ protected:
 // AttInstrumentident
 //----------------------------------------------------------------------------
 
-class AttInstrumentident 
+class AttInstrumentident: public Att
 {
 public:
     AttInstrumentident();
@@ -1371,12 +1612,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetInstrumentident();
     
+    /** Read the values for the attribute class **/
+    bool ReadInstrumentident( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteInstrumentident( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetInstr(std::string instr_) { m_instr = instr_; };
-    std::string GetInstr() { return m_instr; };
+    std::string GetInstr() const { return m_instr; };
     ///@}
 
 protected:
@@ -1393,7 +1640,7 @@ protected:
 // AttInternetmedia
 //----------------------------------------------------------------------------
 
-class AttInternetmedia 
+class AttInternetmedia: public Att
 {
 public:
     AttInternetmedia();
@@ -1402,12 +1649,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetInternetmedia();
     
+    /** Read the values for the attribute class **/
+    bool ReadInternetmedia( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteInternetmedia( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMimetype(std::string mimetype_) { m_mimetype = mimetype_; };
-    std::string GetMimetype() { return m_mimetype; };
+    std::string GetMimetype() const { return m_mimetype; };
     ///@}
 
 protected:
@@ -1425,7 +1678,7 @@ protected:
 // AttJoined
 //----------------------------------------------------------------------------
 
-class AttJoined 
+class AttJoined: public Att
 {
 public:
     AttJoined();
@@ -1434,12 +1687,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetJoined();
     
+    /** Read the values for the attribute class **/
+    bool ReadJoined( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteJoined( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetJoin(std::string join_) { m_join = join_; };
-    std::string GetJoin() { return m_join; };
+    std::string GetJoin() const { return m_join; };
     ///@}
 
 protected:
@@ -1460,7 +1719,7 @@ protected:
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
-class AttKeySigLog 
+class AttKeySigLog: public Att
 {
 public:
     AttKeySigLog();
@@ -1469,12 +1728,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadKeySigLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteKeySigLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMode(std::string mode_) { m_mode = mode_; };
-    std::string GetMode() { return m_mode; };
+    std::string GetMode() const { return m_mode; };
     ///@}
 
 protected:
@@ -1488,7 +1753,7 @@ protected:
 // AttKeySigDefaultLog
 //----------------------------------------------------------------------------
 
-class AttKeySigDefaultLog 
+class AttKeySigDefaultLog: public Att
 {
 public:
     AttKeySigDefaultLog();
@@ -1497,24 +1762,30 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadKeySigDefaultLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteKeySigDefaultLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetKeyAccid(std::string keyAccid_) { m_keyAccid = keyAccid_; };
-    std::string GetKeyAccid() { return m_keyAccid; };
+    void SetKeyAccid(data_ACCIDENTAL_IMPLICIT keyAccid_) { m_keyAccid = keyAccid_; };
+    data_ACCIDENTAL_IMPLICIT GetKeyAccid() const { return m_keyAccid; };
     //
-    void SetKeyMode(std::string keyMode_) { m_keyMode = keyMode_; };
-    std::string GetKeyMode() { return m_keyMode; };
+    void SetKeyMode(data_MODE keyMode_) { m_keyMode = keyMode_; };
+    data_MODE GetKeyMode() const { return m_keyMode; };
     //
-    void SetKeyPname(std::string keyPname_) { m_keyPname = keyPname_; };
-    std::string GetKeyPname() { return m_keyPname; };
+    void SetKeyPname(data_PITCHNAME keyPname_) { m_keyPname = keyPname_; };
+    data_PITCHNAME GetKeyPname() const { return m_keyPname; };
     //
-    void SetKeySig(std::string keySig_) { m_keySig = keySig_; };
-    std::string GetKeySig() { return m_keySig; };
+    void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; };
+    data_KEYSIGNATURE GetKeySig() const { return m_keySig; };
     //
     void SetKeySigMixed(std::string keySigMixed_) { m_keySigMixed = keySigMixed_; };
-    std::string GetKeySigMixed() { return m_keySigMixed; };
+    std::string GetKeySigMixed() const { return m_keySigMixed; };
     ///@}
 
 protected:
@@ -1522,16 +1793,16 @@ protected:
      * Contains an accidental for the tonic key, if one is required, e.g., if key.pname
      * equals 'c' and key.accid equals 's', then a tonic of C# is indicated.
      **/
-    std::string m_keyAccid;
+    data_ACCIDENTAL_IMPLICIT m_keyAccid;
     /** Indicates major, minor, or other tonality. **/
-    std::string m_keyMode;
+    data_MODE m_keyMode;
     /**
      * Holds the pitch name of the tonic key, e.g.
      * 'c' for the key of C.
      **/
-    std::string m_keyPname;
+    data_PITCHNAME m_keyPname;
     /** Indicates where the key lies in the circle of fifths. **/
-    std::string m_keySig;
+    data_KEYSIGNATURE m_keySig;
     /**
      * Mixed key signatures, e.g.
      * those consisting of a mixture of flats and sharps (Read, p. 143, ex. 9-39), and
@@ -1552,7 +1823,7 @@ protected:
 // AttKeySigDefaultVis
 //----------------------------------------------------------------------------
 
-class AttKeySigDefaultVis 
+class AttKeySigDefaultVis: public Att
 {
 public:
     AttKeySigDefaultVis();
@@ -1561,15 +1832,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadKeySigDefaultVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteKeySigDefaultVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetKeySigShow(std::string keySigShow_) { m_keySigShow = keySigShow_; };
-    std::string GetKeySigShow() { return m_keySigShow; };
+    std::string GetKeySigShow() const { return m_keySigShow; };
     //
     void SetKeySigShowchange(std::string keySigShowchange_) { m_keySigShowchange = keySigShowchange_; };
-    std::string GetKeySigShowchange() { return m_keySigShowchange; };
+    std::string GetKeySigShowchange() const { return m_keySigShowchange; };
     ///@}
 
 protected:
@@ -1585,7 +1862,7 @@ protected:
 // AttLabelsAddl
 //----------------------------------------------------------------------------
 
-class AttLabelsAddl 
+class AttLabelsAddl: public Att
 {
 public:
     AttLabelsAddl();
@@ -1594,12 +1871,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLabelsAddl();
     
+    /** Read the values for the attribute class **/
+    bool ReadLabelsAddl( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLabelsAddl( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLabelAbbr(std::string labelAbbr_) { m_labelAbbr = labelAbbr_; };
-    std::string GetLabelAbbr() { return m_labelAbbr; };
+    std::string GetLabelAbbr() const { return m_labelAbbr; };
     ///@}
 
 protected:
@@ -1616,7 +1899,7 @@ protected:
 // AttLang
 //----------------------------------------------------------------------------
 
-class AttLang 
+class AttLang: public Att
 {
 public:
     AttLang();
@@ -1625,12 +1908,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLang();
     
+    /** Read the values for the attribute class **/
+    bool ReadLang( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLang( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLang(std::string lang_) { m_lang = lang_; };
-    std::string GetLang() { return m_lang; };
+    std::string GetLang() const { return m_lang; };
     ///@}
 
 protected:
@@ -1644,7 +1933,7 @@ protected:
 // AttLayerLog
 //----------------------------------------------------------------------------
 
-class AttLayerLog 
+class AttLayerLog: public Att
 {
 public:
     AttLayerLog();
@@ -1653,12 +1942,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLayerLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadLayerLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLayerLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDef(std::string def_) { m_def = def_; };
-    std::string GetDef() { return m_def; };
+    std::string GetDef() const { return m_def; };
     ///@}
 
 protected:
@@ -1672,7 +1967,7 @@ protected:
 // AttLayerident
 //----------------------------------------------------------------------------
 
-class AttLayerident 
+class AttLayerident: public Att
 {
 public:
     AttLayerident();
@@ -1681,12 +1976,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLayerident();
     
+    /** Read the values for the attribute class **/
+    bool ReadLayerident( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLayerident( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLayer(std::string layer_) { m_layer = layer_; };
-    std::string GetLayer() { return m_layer; };
+    std::string GetLayer() const { return m_layer; };
     ///@}
 
 protected:
@@ -1700,7 +2001,7 @@ protected:
 // AttLineloc
 //----------------------------------------------------------------------------
 
-class AttLineloc 
+class AttLineloc: public Att
 {
 public:
     AttLineloc();
@@ -1709,12 +2010,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLineloc();
     
+    /** Read the values for the attribute class **/
+    bool ReadLineloc( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLineloc( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetLine(std::string line_) { m_line = line_; };
-    std::string GetLine() { return m_line; };
+    void SetLine(unsigned char line_) { m_line = line_; };
+    unsigned char GetLine() const { return m_line; };
     ///@}
 
 protected:
@@ -1723,7 +2030,7 @@ protected:
      * The value must be in the range between 1 and the number of lines on the staff.
      * The numbering of lines starts with the lowest line of the staff.
      **/
-    std::string m_line;
+    unsigned char m_line;
 
 /* include <attline> */
 };
@@ -1732,7 +2039,7 @@ protected:
 // AttLinerend
 //----------------------------------------------------------------------------
 
-class AttLinerend 
+class AttLinerend: public Att
 {
 public:
     AttLinerend();
@@ -1741,17 +2048,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLinerend();
     
+    /** Read the values for the attribute class **/
+    bool ReadLinerend( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLinerend( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() { return m_rend; };
+    void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
+    data_BARRENDITION GetRend() const { return m_rend; };
     ///@}
 
 protected:
     /** Describes the line style of the curve. **/
-    std::string m_rend;
+    data_BARRENDITION m_rend;
 
 /* include <attrend> */
 };
@@ -1760,7 +2073,7 @@ protected:
 // AttLyricstyle
 //----------------------------------------------------------------------------
 
-class AttLyricstyle 
+class AttLyricstyle: public Att
 {
 public:
     AttLyricstyle();
@@ -1769,27 +2082,33 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetLyricstyle();
     
+    /** Read the values for the attribute class **/
+    bool ReadLyricstyle( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteLyricstyle( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLyricAlignDbl(double lyricAlignDbl_) { m_lyricAlignDbl = lyricAlignDbl_; };
-    double GetLyricAlignDbl() { return m_lyricAlignDbl; };
+    double GetLyricAlignDbl() const { return m_lyricAlignDbl; };
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; };
-    std::string GetLyricFam() { return m_lyricFam; };
+    std::string GetLyricFam() const { return m_lyricFam; };
     //
     void SetLyricName(std::string lyricName_) { m_lyricName = lyricName_; };
-    std::string GetLyricName() { return m_lyricName; };
+    std::string GetLyricName() const { return m_lyricName; };
     //
     void SetLyricSizeDbl(double lyricSizeDbl_) { m_lyricSizeDbl = lyricSizeDbl_; };
-    double GetLyricSizeDbl() { return m_lyricSizeDbl; };
+    double GetLyricSizeDbl() const { return m_lyricSizeDbl; };
     //
     void SetLyricStyle(std::string lyricStyle_) { m_lyricStyle = lyricStyle_; };
-    std::string GetLyricStyle() { return m_lyricStyle; };
+    std::string GetLyricStyle() const { return m_lyricStyle; };
     //
     void SetLyricWeight(std::string lyricWeight_) { m_lyricWeight = lyricWeight_; };
-    std::string GetLyricWeight() { return m_lyricWeight; };
+    std::string GetLyricWeight() const { return m_lyricWeight; };
     ///@}
 
 protected:
@@ -1813,7 +2132,7 @@ protected:
 // AttMeasureLog
 //----------------------------------------------------------------------------
 
-class AttMeasureLog 
+class AttMeasureLog: public Att
 {
 public:
     AttMeasureLog();
@@ -1822,15 +2141,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeasureLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeasureLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeasureLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetLeft(std::string left_) { m_left = left_; };
-    std::string GetLeft() { return m_left; };
+    void SetLeft(data_BARRENDITION left_) { m_left = left_; };
+    data_BARRENDITION GetLeft() const { return m_left; };
     //
-    void SetRight(std::string right_) { m_right = right_; };
-    std::string GetRight() { return m_right; };
+    void SetRight(data_BARRENDITION right_) { m_right = right_; };
+    data_BARRENDITION GetRight() const { return m_right; };
     ///@}
 
 protected:
@@ -1839,9 +2164,9 @@ protected:
      * It is present here only for facilitation of translation from legacy encodings
      * which use it. Usually, it can be safely ignored.
      **/
-    std::string m_left;
+    data_BARRENDITION m_left;
     /** Indicates the function of the right bar line and is structurally important. **/
-    std::string m_right;
+    data_BARRENDITION m_right;
 
 /* include <attright> */
 };
@@ -1850,7 +2175,7 @@ protected:
 // AttMeasurement
 //----------------------------------------------------------------------------
 
-class AttMeasurement 
+class AttMeasurement: public Att
 {
 public:
     AttMeasurement();
@@ -1859,12 +2184,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeasurement();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeasurement( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeasurement( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetUnit(int unit_) { m_unit = unit_; };
-    int GetUnit() { return m_unit; };
+    int GetUnit() const { return m_unit; };
     ///@}
 
 protected:
@@ -1878,7 +2209,7 @@ protected:
 // AttMediabounds
 //----------------------------------------------------------------------------
 
-class AttMediabounds 
+class AttMediabounds: public Att
 {
 public:
     AttMediabounds();
@@ -1887,18 +2218,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMediabounds();
     
+    /** Read the values for the attribute class **/
+    bool ReadMediabounds( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMediabounds( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetBegin(std::string begin_) { m_begin = begin_; };
-    std::string GetBegin() { return m_begin; };
+    std::string GetBegin() const { return m_begin; };
     //
     void SetEnd(std::string end_) { m_end = end_; };
-    std::string GetEnd() { return m_end; };
+    std::string GetEnd() const { return m_end; };
     //
     void SetBetype(std::string betype_) { m_betype = betype_; };
-    std::string GetBetype() { return m_betype; };
+    std::string GetBetype() const { return m_betype; };
     ///@}
 
 protected:
@@ -1929,7 +2266,7 @@ protected:
 // AttMedium
 //----------------------------------------------------------------------------
 
-class AttMedium 
+class AttMedium: public Att
 {
 public:
     AttMedium();
@@ -1938,12 +2275,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMedium();
     
+    /** Read the values for the attribute class **/
+    bool ReadMedium( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMedium( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMedium(std::string medium_) { m_medium = medium_; };
-    std::string GetMedium() { return m_medium; };
+    std::string GetMedium() const { return m_medium; };
     ///@}
 
 protected:
@@ -1957,7 +2300,7 @@ protected:
 // AttMeiversion
 //----------------------------------------------------------------------------
 
-class AttMeiversion 
+class AttMeiversion: public Att
 {
 public:
     AttMeiversion();
@@ -1966,12 +2309,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeiversion();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeiversion( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeiversion( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMeiversion(std::string meiversion_) { m_meiversion = meiversion_; };
-    std::string GetMeiversion() { return m_meiversion; };
+    std::string GetMeiversion() const { return m_meiversion; };
     ///@}
 
 protected:
@@ -1985,7 +2334,7 @@ protected:
 // AttMensurLog
 //----------------------------------------------------------------------------
 
-class AttMensurLog 
+class AttMensurLog: public Att
 {
 public:
     AttMensurLog();
@@ -1994,32 +2343,38 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMensurLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadMensurLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMensurLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetDot(std::string dot_) { m_dot = dot_; };
-    std::string GetDot() { return m_dot; };
+    void SetDot(data_BOOLEAN dot_) { m_dot = dot_; };
+    data_BOOLEAN GetDot() const { return m_dot; };
     //
     void SetModusmaior(std::string modusmaior_) { m_modusmaior = modusmaior_; };
-    std::string GetModusmaior() { return m_modusmaior; };
+    std::string GetModusmaior() const { return m_modusmaior; };
     //
     void SetModusminor(std::string modusminor_) { m_modusminor = modusminor_; };
-    std::string GetModusminor() { return m_modusminor; };
+    std::string GetModusminor() const { return m_modusminor; };
     //
     void SetProlatio(std::string prolatio_) { m_prolatio = prolatio_; };
-    std::string GetProlatio() { return m_prolatio; };
+    std::string GetProlatio() const { return m_prolatio; };
     //
-    void SetSign(std::string sign_) { m_sign = sign_; };
-    std::string GetSign() { return m_sign; };
+    void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; };
+    data_MENSURATIONSIGN GetSign() const { return m_sign; };
     //
     void SetTempus(std::string tempus_) { m_tempus = tempus_; };
-    std::string GetTempus() { return m_tempus; };
+    std::string GetTempus() const { return m_tempus; };
     ///@}
 
 protected:
     /** Specifies whether a dot is to be added to the base symbol. **/
-    std::string m_dot;
+    data_BOOLEAN m_dot;
     /** Describes the maxima-long relationship. **/
     std::string m_modusmaior;
     /** Describes the long-breve relationship. **/
@@ -2027,7 +2382,7 @@ protected:
     /** Describes the semibreve-minim relationship. **/
     std::string m_prolatio;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
-    std::string m_sign;
+    data_MENSURATIONSIGN m_sign;
     /** Describes the breve-semibreve relationship. **/
     std::string m_tempus;
 
@@ -2038,7 +2393,7 @@ protected:
 // AttMeterSigLog
 //----------------------------------------------------------------------------
 
-class AttMeterSigLog 
+class AttMeterSigLog: public Att
 {
 public:
     AttMeterSigLog();
@@ -2047,18 +2402,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeterSigLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeterSigLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCount(int count_) { m_count = count_; };
-    int GetCount() { return m_count; };
+    int GetCount() const { return m_count; };
     //
-    void SetSym(MeterSign sym_) { m_sym = sym_; };
-    MeterSign GetSym() { return m_sym; };
+    void SetSym(data_METERSIGN sym_) { m_sym = sym_; };
+    data_METERSIGN GetSym() const { return m_sym; };
     //
     void SetUnit(int unit_) { m_unit = unit_; };
-    int GetUnit() { return m_unit; };
+    int GetUnit() const { return m_unit; };
     ///@}
 
 protected:
@@ -2071,7 +2432,7 @@ protected:
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
      **/
-    MeterSign m_sym;
+    data_METERSIGN m_sym;
     /** Indicates the unit used for a measurement of size. **/
     int m_unit;
 
@@ -2082,7 +2443,7 @@ protected:
 // AttMeterSigVis
 //----------------------------------------------------------------------------
 
-class AttMeterSigVis 
+class AttMeterSigVis: public Att
 {
 public:
     AttMeterSigVis();
@@ -2091,17 +2452,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeterSigVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeterSigVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() { return m_rend; };
+    void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
+    data_BARRENDITION GetRend() const { return m_rend; };
     ///@}
 
 protected:
     /** Describes the line style of the curve. **/
-    std::string m_rend;
+    data_BARRENDITION m_rend;
 
 /* include <attrend> */
 };
@@ -2110,7 +2477,7 @@ protected:
 // AttMeterSigDefaultLog
 //----------------------------------------------------------------------------
 
-class AttMeterSigDefaultLog 
+class AttMeterSigDefaultLog: public Att
 {
 public:
     AttMeterSigDefaultLog();
@@ -2119,15 +2486,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigDefaultLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeterSigDefaultLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeterSigDefaultLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetMeterCountDbl(double meterCountDbl_) { m_meterCountDbl = meterCountDbl_; };
-    double GetMeterCountDbl() { return m_meterCountDbl; };
+    void SetMeterCount(int meterCount_) { m_meterCount = meterCount_; };
+    int GetMeterCount() const { return m_meterCount; };
     //
-    void SetMeterUnitDbl(double meterUnitDbl_) { m_meterUnitDbl = meterUnitDbl_; };
-    double GetMeterUnitDbl() { return m_meterUnitDbl; };
+    void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; };
+    int GetMeterUnit() const { return m_meterUnit; };
     ///@}
 
 protected:
@@ -2135,12 +2508,12 @@ protected:
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
      **/
-    double m_meterCountDbl;
+    int m_meterCount;
     /**
      * Contains the number indicating the beat unit, that is, the bottom number of the
      * meter signature.
      **/
-    double m_meterUnitDbl;
+    int m_meterUnit;
 
 /* include <attmeter.unit> */
 };
@@ -2149,7 +2522,7 @@ protected:
 // AttMeterSigDefaultVis
 //----------------------------------------------------------------------------
 
-class AttMeterSigDefaultVis 
+class AttMeterSigDefaultVis: public Att
 {
 public:
     AttMeterSigDefaultVis();
@@ -2158,18 +2531,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeterSigDefaultVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeterSigDefaultVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeterSigDefaultVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMeterRend(std::string meterRend_) { m_meterRend = meterRend_; };
-    std::string GetMeterRend() { return m_meterRend; };
+    std::string GetMeterRend() const { return m_meterRend; };
     //
     void SetMeterShowchange(std::string meterShowchange_) { m_meterShowchange = meterShowchange_; };
-    std::string GetMeterShowchange() { return m_meterShowchange; };
+    std::string GetMeterShowchange() const { return m_meterShowchange; };
     //
-    void SetMeterSym(std::string meterSym_) { m_meterSym = meterSym_; };
-    std::string GetMeterSym() { return m_meterSym; };
+    void SetMeterSym(data_METERSIGN meterSym_) { m_meterSym = meterSym_; };
+    data_METERSIGN GetMeterSym() const { return m_meterSym; };
     ///@}
 
 protected:
@@ -2184,7 +2563,7 @@ protected:
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
      **/
-    std::string m_meterSym;
+    data_METERSIGN m_meterSym;
 
 /* include <attmeter.sym> */
 };
@@ -2193,7 +2572,7 @@ protected:
 // AttMeterconformance
 //----------------------------------------------------------------------------
 
-class AttMeterconformance 
+class AttMeterconformance: public Att
 {
 public:
     AttMeterconformance();
@@ -2202,12 +2581,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeterconformance();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeterconformance( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeterconformance( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMetcon(std::string metcon_) { m_metcon = metcon_; };
-    std::string GetMetcon() { return m_metcon; };
+    std::string GetMetcon() const { return m_metcon; };
     ///@}
 
 protected:
@@ -2224,7 +2609,7 @@ protected:
 // AttMeterconformanceBar
 //----------------------------------------------------------------------------
 
-class AttMeterconformanceBar 
+class AttMeterconformanceBar: public Att
 {
 public:
     AttMeterconformanceBar();
@@ -2233,15 +2618,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMeterconformanceBar();
     
+    /** Read the values for the attribute class **/
+    bool ReadMeterconformanceBar( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMeterconformanceBar( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMetcon(std::string metcon_) { m_metcon = metcon_; };
-    std::string GetMetcon() { return m_metcon; };
+    std::string GetMetcon() const { return m_metcon; };
     //
     void SetControl(std::string control_) { m_control = control_; };
-    std::string GetControl() { return m_control; };
+    std::string GetControl() const { return m_control; };
     ///@}
 
 protected:
@@ -2266,7 +2657,7 @@ protected:
 // AttMmtempo
 //----------------------------------------------------------------------------
 
-class AttMmtempo 
+class AttMmtempo: public Att
 {
 public:
     AttMmtempo();
@@ -2275,12 +2666,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMmtempo();
     
+    /** Read the values for the attribute class **/
+    bool ReadMmtempo( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMmtempo( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMm(std::string mm_) { m_mm = mm_; };
-    std::string GetMm() { return m_mm; };
+    std::string GetMm() const { return m_mm; };
     ///@}
 
 protected:
@@ -2298,7 +2695,7 @@ protected:
 // AttMultinummeasures
 //----------------------------------------------------------------------------
 
-class AttMultinummeasures 
+class AttMultinummeasures: public Att
 {
 public:
     AttMultinummeasures();
@@ -2307,12 +2704,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMultinummeasures();
     
+    /** Read the values for the attribute class **/
+    bool ReadMultinummeasures( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMultinummeasures( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetMultiNumber(std::string multiNumber_) { m_multiNumber = multiNumber_; };
-    std::string GetMultiNumber() { return m_multiNumber; };
+    std::string GetMultiNumber() const { return m_multiNumber; };
     ///@}
 
 protected:
@@ -2329,7 +2732,7 @@ protected:
 // AttName
 //----------------------------------------------------------------------------
 
-class AttName 
+class AttName: public Att
 {
 public:
     AttName();
@@ -2338,15 +2741,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetName();
     
+    /** Read the values for the attribute class **/
+    bool ReadName( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteName( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetNymref(std::string nymref_) { m_nymref = nymref_; };
-    std::string GetNymref() { return m_nymref; };
+    std::string GetNymref() const { return m_nymref; };
     //
     void SetRole(std::string role_) { m_role = role_; };
-    std::string GetRole() { return m_role; };
+    std::string GetRole() const { return m_role; };
     ///@}
 
 protected:
@@ -2368,7 +2777,7 @@ protected:
 // AttNoteGes
 //----------------------------------------------------------------------------
 
-class AttNoteGes 
+class AttNoteGes: public Att
 {
 public:
     AttNoteGes();
@@ -2377,18 +2786,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetNoteGes();
     
+    /** Read the values for the attribute class **/
+    bool ReadNoteGes( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteNoteGes( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetOctGes(std::string octGes_) { m_octGes = octGes_; };
-    std::string GetOctGes() { return m_octGes; };
+    std::string GetOctGes() const { return m_octGes; };
     //
     void SetPnameGes(std::string pnameGes_) { m_pnameGes = pnameGes_; };
-    std::string GetPnameGes() { return m_pnameGes; };
+    std::string GetPnameGes() const { return m_pnameGes; };
     //
     void SetPnum(std::string pnum_) { m_pnum = pnum_; };
-    std::string GetPnum() { return m_pnum; };
+    std::string GetPnum() const { return m_pnum; };
     ///@}
 
 protected:
@@ -2406,7 +2821,7 @@ protected:
 // AttNoteVis
 //----------------------------------------------------------------------------
 
-class AttNoteVis 
+class AttNoteVis: public Att
 {
 public:
     AttNoteVis();
@@ -2415,12 +2830,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetNoteVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadNoteVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteNoteVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetHeadshape(std::string headshape_) { m_headshape = headshape_; };
-    std::string GetHeadshape() { return m_headshape; };
+    std::string GetHeadshape() const { return m_headshape; };
     ///@}
 
 protected:
@@ -2434,7 +2855,7 @@ protected:
 // AttOctave
 //----------------------------------------------------------------------------
 
-class AttOctave 
+class AttOctave: public Att
 {
 public:
     AttOctave();
@@ -2443,12 +2864,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetOctave();
     
+    /** Read the values for the attribute class **/
+    bool ReadOctave( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteOctave( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetOct(std::string oct_) { m_oct = oct_; };
-    std::string GetOct() { return m_oct; };
+    std::string GetOct() const { return m_oct; };
     ///@}
 
 protected:
@@ -2462,7 +2889,7 @@ protected:
 // AttOctavedefault
 //----------------------------------------------------------------------------
 
-class AttOctavedefault 
+class AttOctavedefault: public Att
 {
 public:
     AttOctavedefault();
@@ -2471,12 +2898,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetOctavedefault();
     
+    /** Read the values for the attribute class **/
+    bool ReadOctavedefault( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteOctavedefault( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetOctaveDefault(std::string octaveDefault_) { m_octaveDefault = octaveDefault_; };
-    std::string GetOctaveDefault() { return m_octaveDefault; };
+    std::string GetOctaveDefault() const { return m_octaveDefault; };
     ///@}
 
 protected:
@@ -2494,7 +2927,7 @@ protected:
 // AttOctavedisplacement
 //----------------------------------------------------------------------------
 
-class AttOctavedisplacement 
+class AttOctavedisplacement: public Att
 {
 public:
     AttOctavedisplacement();
@@ -2503,22 +2936,28 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetOctavedisplacement();
     
+    /** Read the values for the attribute class **/
+    bool ReadOctavedisplacement( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteOctavedisplacement( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetDis(std::string dis_) { m_dis = dis_; };
-    std::string GetDis() { return m_dis; };
+    void SetDis(data_OCTAVE_DIS dis_) { m_dis = dis_; };
+    data_OCTAVE_DIS GetDis() const { return m_dis; };
     //
-    void SetDisPlace(std::string disPlace_) { m_disPlace = disPlace_; };
-    std::string GetDisPlace() { return m_disPlace; };
+    void SetDisPlace(data_PLACE disPlace_) { m_disPlace = disPlace_; };
+    data_PLACE GetDisPlace() const { return m_disPlace; };
     ///@}
 
 protected:
     /** Records the amount of octave displacement. **/
-    std::string m_dis;
+    data_OCTAVE_DIS m_dis;
     /** Records the direction of octave displacement. **/
-    std::string m_disPlace;
+    data_PLACE m_disPlace;
 
 /* include <attdis.place> */
 };
@@ -2527,7 +2966,7 @@ protected:
 // AttOnelinestaff
 //----------------------------------------------------------------------------
 
-class AttOnelinestaff 
+class AttOnelinestaff: public Att
 {
 public:
     AttOnelinestaff();
@@ -2536,12 +2975,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetOnelinestaff();
     
+    /** Read the values for the attribute class **/
+    bool ReadOnelinestaff( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteOnelinestaff( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetOntheline(std::string ontheline_) { m_ontheline = ontheline_; };
-    std::string GetOntheline() { return m_ontheline; };
+    std::string GetOntheline() const { return m_ontheline; };
     ///@}
 
 protected:
@@ -2559,7 +3004,7 @@ protected:
 // AttPadLog
 //----------------------------------------------------------------------------
 
-class AttPadLog 
+class AttPadLog: public Att
 {
 public:
     AttPadLog();
@@ -2568,12 +3013,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPadLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadPadLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePadLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() { return m_numInt; };
+    int GetNumInt() const { return m_numInt; };
     ///@}
 
 protected:
@@ -2590,7 +3041,7 @@ protected:
 // AttPbVis
 //----------------------------------------------------------------------------
 
-class AttPbVis 
+class AttPbVis: public Att
 {
 public:
     AttPbVis();
@@ -2599,12 +3050,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPbVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadPbVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePbVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() { return m_func; };
+    std::string GetFunc() const { return m_func; };
     ///@}
 
 protected:
@@ -2618,7 +3075,7 @@ protected:
 // AttPitch
 //----------------------------------------------------------------------------
 
-class AttPitch 
+class AttPitch: public Att
 {
 public:
     AttPitch();
@@ -2627,12 +3084,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPitch();
     
+    /** Read the values for the attribute class **/
+    bool ReadPitch( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePitch( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPname(std::string pname_) { m_pname = pname_; };
-    std::string GetPname() { return m_pname; };
+    std::string GetPname() const { return m_pname; };
     ///@}
 
 protected:
@@ -2646,7 +3109,7 @@ protected:
 // AttPlacement
 //----------------------------------------------------------------------------
 
-class AttPlacement 
+class AttPlacement: public Att
 {
 public:
     AttPlacement();
@@ -2655,12 +3118,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPlacement();
     
+    /** Read the values for the attribute class **/
+    bool ReadPlacement( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePlacement( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPlace(std::string place_) { m_place = place_; };
-    std::string GetPlace() { return m_place; };
+    std::string GetPlace() const { return m_place; };
     ///@}
 
 protected:
@@ -2677,7 +3146,7 @@ protected:
 // AttPlist
 //----------------------------------------------------------------------------
 
-class AttPlist 
+class AttPlist: public Att
 {
 public:
     AttPlist();
@@ -2686,15 +3155,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPlist();
     
+    /** Read the values for the attribute class **/
+    bool ReadPlist( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePlist( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetPlist(std::string plist_) { m_plist = plist_; };
-    std::string GetPlist() { return m_plist; };
+    std::string GetPlist() const { return m_plist; };
     //
     void SetEvaluate(std::string evaluate_) { m_evaluate = evaluate_; };
-    std::string GetEvaluate() { return m_evaluate; };
+    std::string GetEvaluate() const { return m_evaluate; };
     ///@}
 
 protected:
@@ -2713,7 +3188,7 @@ protected:
 // AttPointing
 //----------------------------------------------------------------------------
 
-class AttPointing 
+class AttPointing: public Att
 {
 public:
     AttPointing();
@@ -2722,27 +3197,33 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetPointing();
     
+    /** Read the values for the attribute class **/
+    bool ReadPointing( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WritePointing( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetActuate(std::string actuate_) { m_actuate = actuate_; };
-    std::string GetActuate() { return m_actuate; };
+    std::string GetActuate() const { return m_actuate; };
     //
     void SetRole(std::string role_) { m_role = role_; };
-    std::string GetRole() { return m_role; };
+    std::string GetRole() const { return m_role; };
     //
     void SetShow(std::string show_) { m_show = show_; };
-    std::string GetShow() { return m_show; };
+    std::string GetShow() const { return m_show; };
     //
     void SetTarget(std::string target_) { m_target = target_; };
-    std::string GetTarget() { return m_target; };
+    std::string GetTarget() const { return m_target; };
     //
     void SetTargettype(std::string targettype_) { m_targettype = targettype_; };
-    std::string GetTargettype() { return m_targettype; };
+    std::string GetTargettype() const { return m_targettype; };
     //
     void SetTitle(std::string title_) { m_title = title_; };
-    std::string GetTitle() { return m_title; };
+    std::string GetTitle() const { return m_title; };
     ///@}
 
 protected:
@@ -2775,7 +3256,7 @@ protected:
 // AttRelativesize
 //----------------------------------------------------------------------------
 
-class AttRelativesize 
+class AttRelativesize: public Att
 {
 public:
     AttRelativesize();
@@ -2784,12 +3265,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetRelativesize();
     
+    /** Read the values for the attribute class **/
+    bool ReadRelativesize( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteRelativesize( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSize(std::string size_) { m_size = size_; };
-    std::string GetSize() { return m_size; };
+    std::string GetSize() const { return m_size; };
     ///@}
 
 protected:
@@ -2803,7 +3290,7 @@ protected:
 // AttResponsibility
 //----------------------------------------------------------------------------
 
-class AttResponsibility 
+class AttResponsibility: public Att
 {
 public:
     AttResponsibility();
@@ -2812,12 +3299,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetResponsibility();
     
+    /** Read the values for the attribute class **/
+    bool ReadResponsibility( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteResponsibility( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetResp(std::string resp_) { m_resp = resp_; };
-    std::string GetResp() { return m_resp; };
+    std::string GetResp() const { return m_resp; };
     ///@}
 
 protected:
@@ -2835,7 +3328,7 @@ protected:
 // AttSbVis
 //----------------------------------------------------------------------------
 
-class AttSbVis 
+class AttSbVis: public Att
 {
 public:
     AttSbVis();
@@ -2844,17 +3337,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSbVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadSbVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSbVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() { return m_rend; };
+    void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
+    data_BARRENDITION GetRend() const { return m_rend; };
     ///@}
 
 protected:
     /** Describes the line style of the curve. **/
-    std::string m_rend;
+    data_BARRENDITION m_rend;
 
 /* include <attrend> */
 };
@@ -2863,7 +3362,7 @@ protected:
 // AttScalable
 //----------------------------------------------------------------------------
 
-class AttScalable 
+class AttScalable: public Att
 {
 public:
     AttScalable();
@@ -2872,12 +3371,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetScalable();
     
+    /** Read the values for the attribute class **/
+    bool ReadScalable( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteScalable( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetScale(std::string scale_) { m_scale = scale_; };
-    std::string GetScale() { return m_scale; };
+    std::string GetScale() const { return m_scale; };
     ///@}
 
 protected:
@@ -2891,7 +3396,7 @@ protected:
 // AttScoreDefGes
 //----------------------------------------------------------------------------
 
-class AttScoreDefGes 
+class AttScoreDefGes: public Att
 {
 public:
     AttScoreDefGes();
@@ -2900,18 +3405,24 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetScoreDefGes();
     
+    /** Read the values for the attribute class **/
+    bool ReadScoreDefGes( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteScoreDefGes( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTunePname(std::string tunePname_) { m_tunePname = tunePname_; };
-    std::string GetTunePname() { return m_tunePname; };
+    std::string GetTunePname() const { return m_tunePname; };
     //
     void SetTuneHzDbl(double tuneHzDbl_) { m_tuneHzDbl = tuneHzDbl_; };
-    double GetTuneHzDbl() { return m_tuneHzDbl; };
+    double GetTuneHzDbl() const { return m_tuneHzDbl; };
     //
     void SetTuneTemper(std::string tuneTemper_) { m_tuneTemper = tuneTemper_; };
-    std::string GetTuneTemper() { return m_tuneTemper; };
+    std::string GetTuneTemper() const { return m_tuneTemper; };
     ///@}
 
 protected:
@@ -2929,7 +3440,7 @@ protected:
 // AttScoreDefVis
 //----------------------------------------------------------------------------
 
-class AttScoreDefVis 
+class AttScoreDefVis: public Att
 {
 public:
     AttScoreDefVis();
@@ -2938,72 +3449,78 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetScoreDefVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadScoreDefVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteScoreDefVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetEndingRend(std::string endingRend_) { m_endingRend = endingRend_; };
-    std::string GetEndingRend() { return m_endingRend; };
+    std::string GetEndingRend() const { return m_endingRend; };
     //
     void SetMnumVisible(std::string mnumVisible_) { m_mnumVisible = mnumVisible_; };
-    std::string GetMnumVisible() { return m_mnumVisible; };
+    std::string GetMnumVisible() const { return m_mnumVisible; };
     //
     void SetMusicName(std::string musicName_) { m_musicName = musicName_; };
-    std::string GetMusicName() { return m_musicName; };
+    std::string GetMusicName() const { return m_musicName; };
     //
     void SetMusicSizeDbl(double musicSizeDbl_) { m_musicSizeDbl = musicSizeDbl_; };
-    double GetMusicSizeDbl() { return m_musicSizeDbl; };
+    double GetMusicSizeDbl() const { return m_musicSizeDbl; };
     //
     void SetOptimize(std::string optimize_) { m_optimize = optimize_; };
-    std::string GetOptimize() { return m_optimize; };
+    std::string GetOptimize() const { return m_optimize; };
     //
     void SetPageHeightDbl(double pageHeightDbl_) { m_pageHeightDbl = pageHeightDbl_; };
-    double GetPageHeightDbl() { return m_pageHeightDbl; };
+    double GetPageHeightDbl() const { return m_pageHeightDbl; };
     //
     void SetPageWidthDbl(double pageWidthDbl_) { m_pageWidthDbl = pageWidthDbl_; };
-    double GetPageWidthDbl() { return m_pageWidthDbl; };
+    double GetPageWidthDbl() const { return m_pageWidthDbl; };
     //
     void SetPageUnits(std::string pageUnits_) { m_pageUnits = pageUnits_; };
-    std::string GetPageUnits() { return m_pageUnits; };
+    std::string GetPageUnits() const { return m_pageUnits; };
     //
     void SetPageTopmarDbl(double pageTopmarDbl_) { m_pageTopmarDbl = pageTopmarDbl_; };
-    double GetPageTopmarDbl() { return m_pageTopmarDbl; };
+    double GetPageTopmarDbl() const { return m_pageTopmarDbl; };
     //
     void SetPageBotmarDbl(double pageBotmarDbl_) { m_pageBotmarDbl = pageBotmarDbl_; };
-    double GetPageBotmarDbl() { return m_pageBotmarDbl; };
+    double GetPageBotmarDbl() const { return m_pageBotmarDbl; };
     //
     void SetPageLeftmarDbl(double pageLeftmarDbl_) { m_pageLeftmarDbl = pageLeftmarDbl_; };
-    double GetPageLeftmarDbl() { return m_pageLeftmarDbl; };
+    double GetPageLeftmarDbl() const { return m_pageLeftmarDbl; };
     //
     void SetPageRightmarDbl(double pageRightmarDbl_) { m_pageRightmarDbl = pageRightmarDbl_; };
-    double GetPageRightmarDbl() { return m_pageRightmarDbl; };
+    double GetPageRightmarDbl() const { return m_pageRightmarDbl; };
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; };
-    std::string GetPagePanels() { return m_pagePanels; };
+    std::string GetPagePanels() const { return m_pagePanels; };
     //
     void SetPageScale(std::string pageScale_) { m_pageScale = pageScale_; };
-    std::string GetPageScale() { return m_pageScale; };
+    std::string GetPageScale() const { return m_pageScale; };
     //
     void SetSpacingPackexpDbl(double spacingPackexpDbl_) { m_spacingPackexpDbl = spacingPackexpDbl_; };
-    double GetSpacingPackexpDbl() { return m_spacingPackexpDbl; };
+    double GetSpacingPackexpDbl() const { return m_spacingPackexpDbl; };
     //
     void SetSpacingPackfactDbl(double spacingPackfactDbl_) { m_spacingPackfactDbl = spacingPackfactDbl_; };
-    double GetSpacingPackfactDbl() { return m_spacingPackfactDbl; };
+    double GetSpacingPackfactDbl() const { return m_spacingPackfactDbl; };
     //
     void SetSpacingStaffDbl(double spacingStaffDbl_) { m_spacingStaffDbl = spacingStaffDbl_; };
-    double GetSpacingStaffDbl() { return m_spacingStaffDbl; };
+    double GetSpacingStaffDbl() const { return m_spacingStaffDbl; };
     //
     void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; };
-    std::string GetSpacingSystem() { return m_spacingSystem; };
+    std::string GetSpacingSystem() const { return m_spacingSystem; };
     //
     void SetSystemLeftmarDbl(double systemLeftmarDbl_) { m_systemLeftmarDbl = systemLeftmarDbl_; };
-    double GetSystemLeftmarDbl() { return m_systemLeftmarDbl; };
+    double GetSystemLeftmarDbl() const { return m_systemLeftmarDbl; };
     //
     void SetSystemRightmarDbl(double systemRightmarDbl_) { m_systemRightmarDbl = systemRightmarDbl_; };
-    double GetSystemRightmarDbl() { return m_systemRightmarDbl; };
+    double GetSystemRightmarDbl() const { return m_systemRightmarDbl; };
     //
     void SetSystemTopmarDbl(double systemTopmarDbl_) { m_systemTopmarDbl = systemTopmarDbl_; };
-    double GetSystemTopmarDbl() { return m_systemTopmarDbl; };
+    double GetSystemTopmarDbl() const { return m_systemTopmarDbl; };
     ///@}
 
 protected:
@@ -3075,7 +3592,7 @@ protected:
 // AttSectionVis
 //----------------------------------------------------------------------------
 
-class AttSectionVis 
+class AttSectionVis: public Att
 {
 public:
     AttSectionVis();
@@ -3084,12 +3601,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSectionVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadSectionVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSectionVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetRestart(std::string restart_) { m_restart = restart_; };
-    std::string GetRestart() { return m_restart; };
+    std::string GetRestart() const { return m_restart; };
     ///@}
 
 protected:
@@ -3103,7 +3626,7 @@ protected:
 // AttSequence
 //----------------------------------------------------------------------------
 
-class AttSequence 
+class AttSequence: public Att
 {
 public:
     AttSequence();
@@ -3112,12 +3635,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSequence();
     
+    /** Read the values for the attribute class **/
+    bool ReadSequence( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSequence( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSeqInt(int seqInt_) { m_seqInt = seqInt_; };
-    int GetSeqInt() { return m_seqInt; };
+    int GetSeqInt() const { return m_seqInt; };
     ///@}
 
 protected:
@@ -3134,7 +3663,7 @@ protected:
 // AttSlashcount
 //----------------------------------------------------------------------------
 
-class AttSlashcount 
+class AttSlashcount: public Att
 {
 public:
     AttSlashcount();
@@ -3143,17 +3672,23 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSlashcount();
     
+    /** Read the values for the attribute class **/
+    bool ReadSlashcount( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSlashcount( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
-    void SetSlash(std::string slash_) { m_slash = slash_; };
-    std::string GetSlash() { return m_slash; };
+    void SetSlash(unsigned char slash_) { m_slash = slash_; };
+    unsigned char GetSlash() const { return m_slash; };
     ///@}
 
 protected:
     /** Indicates the number of slashes present. **/
-    std::string m_slash;
+    unsigned char m_slash;
 
 /* include <attslash> */
 };
@@ -3162,7 +3697,7 @@ protected:
 // AttSlurpresent
 //----------------------------------------------------------------------------
 
-class AttSlurpresent 
+class AttSlurpresent: public Att
 {
 public:
     AttSlurpresent();
@@ -3171,12 +3706,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSlurpresent();
     
+    /** Read the values for the attribute class **/
+    bool ReadSlurpresent( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSlurpresent( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSlur(std::string slur_) { m_slur = slur_; };
-    std::string GetSlur() { return m_slur; };
+    std::string GetSlur() const { return m_slur; };
     ///@}
 
 protected:
@@ -3194,7 +3735,7 @@ protected:
 // AttSpaceVis
 //----------------------------------------------------------------------------
 
-class AttSpaceVis 
+class AttSpaceVis: public Att
 {
 public:
     AttSpaceVis();
@@ -3203,12 +3744,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSpaceVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadSpaceVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSpaceVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCompressable(std::string compressable_) { m_compressable = compressable_; };
-    std::string GetCompressable() { return m_compressable; };
+    std::string GetCompressable() const { return m_compressable; };
     ///@}
 
 protected:
@@ -3225,7 +3772,7 @@ protected:
 // AttStaffLog
 //----------------------------------------------------------------------------
 
-class AttStaffLog 
+class AttStaffLog: public Att
 {
 public:
     AttStaffLog();
@@ -3234,12 +3781,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDef(std::string def_) { m_def = def_; };
-    std::string GetDef() { return m_def; };
+    std::string GetDef() const { return m_def; };
     ///@}
 
 protected:
@@ -3253,7 +3806,7 @@ protected:
 // AttStaffDefVis
 //----------------------------------------------------------------------------
 
-class AttStaffDefVis 
+class AttStaffDefVis: public Att
 {
 public:
     AttStaffDefVis();
@@ -3262,27 +3815,33 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffDefVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffDefVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffDefVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetGridShow(std::string gridShow_) { m_gridShow = gridShow_; };
-    std::string GetGridShow() { return m_gridShow; };
+    std::string GetGridShow() const { return m_gridShow; };
     //
     void SetLayerscheme(std::string layerscheme_) { m_layerscheme = layerscheme_; };
-    std::string GetLayerscheme() { return m_layerscheme; };
+    std::string GetLayerscheme() const { return m_layerscheme; };
     //
     void SetLinesInt(int linesInt_) { m_linesInt = linesInt_; };
-    int GetLinesInt() { return m_linesInt; };
+    int GetLinesInt() const { return m_linesInt; };
     //
     void SetLinesColor(std::string linesColor_) { m_linesColor = linesColor_; };
-    std::string GetLinesColor() { return m_linesColor; };
+    std::string GetLinesColor() const { return m_linesColor; };
     //
     void SetLinesVisible(std::string linesVisible_) { m_linesVisible = linesVisible_; };
-    std::string GetLinesVisible() { return m_linesVisible; };
+    std::string GetLinesVisible() const { return m_linesVisible; };
     //
     void SetSpacingDbl(double spacingDbl_) { m_spacingDbl = spacingDbl_; };
-    double GetSpacingDbl() { return m_spacingDbl; };
+    double GetSpacingDbl() const { return m_spacingDbl; };
     ///@}
 
 protected:
@@ -3318,7 +3877,7 @@ protected:
 // AttStaffGrpVis
 //----------------------------------------------------------------------------
 
-class AttStaffGrpVis 
+class AttStaffGrpVis: public Att
 {
 public:
     AttStaffGrpVis();
@@ -3327,12 +3886,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffGrpVis();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffGrpVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffGrpVis( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetBarthru(std::string barthru_) { m_barthru = barthru_; };
-    std::string GetBarthru() { return m_barthru; };
+    std::string GetBarthru() const { return m_barthru; };
     ///@}
 
 protected:
@@ -3349,7 +3914,7 @@ protected:
 // AttStaffgroupingsym
 //----------------------------------------------------------------------------
 
-class AttStaffgroupingsym 
+class AttStaffgroupingsym: public Att
 {
 public:
     AttStaffgroupingsym();
@@ -3358,12 +3923,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffgroupingsym();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffgroupingsym( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffgroupingsym( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSymbol(std::string symbol_) { m_symbol = symbol_; };
-    std::string GetSymbol() { return m_symbol; };
+    std::string GetSymbol() const { return m_symbol; };
     ///@}
 
 protected:
@@ -3377,7 +3948,7 @@ protected:
 // AttStaffident
 //----------------------------------------------------------------------------
 
-class AttStaffident 
+class AttStaffident: public Att
 {
 public:
     AttStaffident();
@@ -3386,12 +3957,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffident();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffident( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffident( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetStaff(std::string staff_) { m_staff = staff_; };
-    std::string GetStaff() { return m_staff; };
+    std::string GetStaff() const { return m_staff; };
     ///@}
 
 protected:
@@ -3409,7 +3986,7 @@ protected:
 // AttStaffloc
 //----------------------------------------------------------------------------
 
-class AttStaffloc 
+class AttStaffloc: public Att
 {
 public:
     AttStaffloc();
@@ -3418,12 +3995,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStaffloc();
     
+    /** Read the values for the attribute class **/
+    bool ReadStaffloc( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStaffloc( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetLoc(std::string loc_) { m_loc = loc_; };
-    std::string GetLoc() { return m_loc; };
+    std::string GetLoc() const { return m_loc; };
     ///@}
 
 protected:
@@ -3437,7 +4020,7 @@ protected:
 // AttStartendid
 //----------------------------------------------------------------------------
 
-class AttStartendid 
+class AttStartendid: public Att
 {
 public:
     AttStartendid();
@@ -3446,12 +4029,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStartendid();
     
+    /** Read the values for the attribute class **/
+    bool ReadStartendid( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStartendid( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetEndid(std::string endid_) { m_endid = endid_; };
-    std::string GetEndid() { return m_endid; };
+    std::string GetEndid() const { return m_endid; };
     ///@}
 
 protected:
@@ -3468,7 +4057,7 @@ protected:
 // AttStartid
 //----------------------------------------------------------------------------
 
-class AttStartid 
+class AttStartid: public Att
 {
 public:
     AttStartid();
@@ -3477,12 +4066,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStartid();
     
+    /** Read the values for the attribute class **/
+    bool ReadStartid( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStartid( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetStartid(std::string startid_) { m_startid = startid_; };
-    std::string GetStartid() { return m_startid; };
+    std::string GetStartid() const { return m_startid; };
     ///@}
 
 protected:
@@ -3499,7 +4094,7 @@ protected:
 // AttStemmed
 //----------------------------------------------------------------------------
 
-class AttStemmed 
+class AttStemmed: public Att
 {
 public:
     AttStemmed();
@@ -3508,24 +4103,30 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetStemmed();
     
+    /** Read the values for the attribute class **/
+    bool ReadStemmed( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStemmed( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetStemDir(std::string stemDir_) { m_stemDir = stemDir_; };
-    std::string GetStemDir() { return m_stemDir; };
+    std::string GetStemDir() const { return m_stemDir; };
     //
     void SetStemLenDbl(double stemLenDbl_) { m_stemLenDbl = stemLenDbl_; };
-    double GetStemLenDbl() { return m_stemLenDbl; };
+    double GetStemLenDbl() const { return m_stemLenDbl; };
     //
     void SetStemPos(std::string stemPos_) { m_stemPos = stemPos_; };
-    std::string GetStemPos() { return m_stemPos; };
+    std::string GetStemPos() const { return m_stemPos; };
     //
     void SetStemXDbl(double stemXDbl_) { m_stemXDbl = stemXDbl_; };
-    double GetStemXDbl() { return m_stemXDbl; };
+    double GetStemXDbl() const { return m_stemXDbl; };
     //
     void SetStemYDbl(double stemYDbl_) { m_stemYDbl = stemYDbl_; };
-    double GetStemYDbl() { return m_stemYDbl; };
+    double GetStemYDbl() const { return m_stemYDbl; };
     ///@}
 
 protected:
@@ -3547,7 +4148,7 @@ protected:
 // AttSylLog
 //----------------------------------------------------------------------------
 
-class AttSylLog 
+class AttSylLog: public Att
 {
 public:
     AttSylLog();
@@ -3556,15 +4157,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSylLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadSylLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSylLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetCon(std::string con_) { m_con = con_; };
-    std::string GetCon() { return m_con; };
+    std::string GetCon() const { return m_con; };
     //
     void SetWordpos(std::string wordpos_) { m_wordpos = wordpos_; };
-    std::string GetWordpos() { return m_wordpos; };
+    std::string GetWordpos() const { return m_wordpos; };
     ///@}
 
 protected:
@@ -3583,7 +4190,7 @@ protected:
 // AttSyltext
 //----------------------------------------------------------------------------
 
-class AttSyltext 
+class AttSyltext: public Att
 {
 public:
     AttSyltext();
@@ -3592,12 +4199,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetSyltext();
     
+    /** Read the values for the attribute class **/
+    bool ReadSyltext( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteSyltext( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetSyl(std::string syl_) { m_syl = syl_; };
-    std::string GetSyl() { return m_syl; };
+    std::string GetSyl() const { return m_syl; };
     ///@}
 
 protected:
@@ -3611,7 +4224,7 @@ protected:
 // AttTextstyle
 //----------------------------------------------------------------------------
 
-class AttTextstyle 
+class AttTextstyle: public Att
 {
 public:
     AttTextstyle();
@@ -3620,24 +4233,30 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTextstyle();
     
+    /** Read the values for the attribute class **/
+    bool ReadTextstyle( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTextstyle( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTextFam(std::string textFam_) { m_textFam = textFam_; };
-    std::string GetTextFam() { return m_textFam; };
+    std::string GetTextFam() const { return m_textFam; };
     //
     void SetTextName(std::string textName_) { m_textName = textName_; };
-    std::string GetTextName() { return m_textName; };
+    std::string GetTextName() const { return m_textName; };
     //
     void SetTextSizeDbl(double textSizeDbl_) { m_textSizeDbl = textSizeDbl_; };
-    double GetTextSizeDbl() { return m_textSizeDbl; };
+    double GetTextSizeDbl() const { return m_textSizeDbl; };
     //
     void SetTextStyle(std::string textStyle_) { m_textStyle = textStyle_; };
-    std::string GetTextStyle() { return m_textStyle; };
+    std::string GetTextStyle() const { return m_textStyle; };
     //
     void SetTextWeight(std::string textWeight_) { m_textWeight = textWeight_; };
-    std::string GetTextWeight() { return m_textWeight; };
+    std::string GetTextWeight() const { return m_textWeight; };
     ///@}
 
 protected:
@@ -3674,7 +4293,7 @@ protected:
 // AttTiepresent
 //----------------------------------------------------------------------------
 
-class AttTiepresent 
+class AttTiepresent: public Att
 {
 public:
     AttTiepresent();
@@ -3683,12 +4302,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTiepresent();
     
+    /** Read the values for the attribute class **/
+    bool ReadTiepresent( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTiepresent( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTie(std::string tie_) { m_tie = tie_; };
-    std::string GetTie() { return m_tie; };
+    std::string GetTie() const { return m_tie; };
     ///@}
 
 protected:
@@ -3706,7 +4331,7 @@ protected:
 // AttTimestampMusical
 //----------------------------------------------------------------------------
 
-class AttTimestampMusical 
+class AttTimestampMusical: public Att
 {
 public:
     AttTimestampMusical();
@@ -3715,12 +4340,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTimestampMusical();
     
+    /** Read the values for the attribute class **/
+    bool ReadTimestampMusical( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTimestampMusical( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTstamp(std::string tstamp_) { m_tstamp = tstamp_; };
-    std::string GetTstamp() { return m_tstamp; };
+    std::string GetTstamp() const { return m_tstamp; };
     ///@}
 
 protected:
@@ -3737,7 +4368,7 @@ protected:
 // AttTimestampPerformed
 //----------------------------------------------------------------------------
 
-class AttTimestampPerformed 
+class AttTimestampPerformed: public Att
 {
 public:
     AttTimestampPerformed();
@@ -3746,15 +4377,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTimestampPerformed();
     
+    /** Read the values for the attribute class **/
+    bool ReadTimestampPerformed( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTimestampPerformed( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTstampGesInt(int tstampGesInt_) { m_tstampGesInt = tstampGesInt_; };
-    int GetTstampGesInt() { return m_tstampGesInt; };
+    int GetTstampGesInt() const { return m_tstampGesInt; };
     //
     void SetTstampReal(std::string tstampReal_) { m_tstampReal = tstampReal_; };
-    std::string GetTstampReal() { return m_tstampReal; };
+    std::string GetTstampReal() const { return m_tstampReal; };
     ///@}
 
 protected:
@@ -3773,7 +4410,7 @@ protected:
 // AttTransposition
 //----------------------------------------------------------------------------
 
-class AttTransposition 
+class AttTransposition: public Att
 {
 public:
     AttTransposition();
@@ -3782,15 +4419,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTransposition();
     
+    /** Read the values for the attribute class **/
+    bool ReadTransposition( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTransposition( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTransDiatDbl(double transDiatDbl_) { m_transDiatDbl = transDiatDbl_; };
-    double GetTransDiatDbl() { return m_transDiatDbl; };
+    double GetTransDiatDbl() const { return m_transDiatDbl; };
     //
     void SetTransSemiDbl(double transSemiDbl_) { m_transSemiDbl = transSemiDbl_; };
-    double GetTransSemiDbl() { return m_transSemiDbl; };
+    double GetTransSemiDbl() const { return m_transSemiDbl; };
     ///@}
 
 protected:
@@ -3812,7 +4455,7 @@ protected:
 // AttTupletpresent
 //----------------------------------------------------------------------------
 
-class AttTupletpresent 
+class AttTupletpresent: public Att
 {
 public:
     AttTupletpresent();
@@ -3821,12 +4464,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTupletpresent();
     
+    /** Read the values for the attribute class **/
+    bool ReadTupletpresent( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTupletpresent( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTuplet(std::string tuplet_) { m_tuplet = tuplet_; };
-    std::string GetTuplet() { return m_tuplet; };
+    std::string GetTuplet() const { return m_tuplet; };
     ///@}
 
 protected:
@@ -3844,7 +4493,7 @@ protected:
 // AttTyped
 //----------------------------------------------------------------------------
 
-class AttTyped 
+class AttTyped: public Att
 {
 public:
     AttTyped();
@@ -3853,15 +4502,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTyped();
     
+    /** Read the values for the attribute class **/
+    bool ReadTyped( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTyped( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetType(std::string type_) { m_type = type_; };
-    std::string GetType() { return m_type; };
+    std::string GetType() const { return m_type; };
     //
     void SetSubtype(std::string subtype_) { m_subtype = subtype_; };
-    std::string GetSubtype() { return m_subtype; };
+    std::string GetSubtype() const { return m_subtype; };
     ///@}
 
 protected:
@@ -3883,7 +4538,7 @@ protected:
 // AttTypography
 //----------------------------------------------------------------------------
 
-class AttTypography 
+class AttTypography: public Att
 {
 public:
     AttTypography();
@@ -3892,24 +4547,30 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTypography();
     
+    /** Read the values for the attribute class **/
+    bool ReadTypography( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTypography( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetFontfam(std::string fontfam_) { m_fontfam = fontfam_; };
-    std::string GetFontfam() { return m_fontfam; };
+    std::string GetFontfam() const { return m_fontfam; };
     //
     void SetFontname(std::string fontname_) { m_fontname = fontname_; };
-    std::string GetFontname() { return m_fontname; };
+    std::string GetFontname() const { return m_fontname; };
     //
     void SetFontsizeDbl(double fontsizeDbl_) { m_fontsizeDbl = fontsizeDbl_; };
-    double GetFontsizeDbl() { return m_fontsizeDbl; };
+    double GetFontsizeDbl() const { return m_fontsizeDbl; };
     //
     void SetFontstyle(std::string fontstyle_) { m_fontstyle = fontstyle_; };
-    std::string GetFontstyle() { return m_fontstyle; };
+    std::string GetFontstyle() const { return m_fontstyle; };
     //
     void SetFontweight(std::string fontweight_) { m_fontweight = fontweight_; };
-    std::string GetFontweight() { return m_fontweight; };
+    std::string GetFontweight() const { return m_fontweight; };
     ///@}
 
 protected:
@@ -3931,7 +4592,7 @@ protected:
 // AttVisibility
 //----------------------------------------------------------------------------
 
-class AttVisibility 
+class AttVisibility: public Att
 {
 public:
     AttVisibility();
@@ -3940,12 +4601,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisibility();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisibility( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisibility( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetVisible(std::string visible_) { m_visible = visible_; };
-    std::string GetVisible() { return m_visible; };
+    std::string GetVisible() const { return m_visible; };
     ///@}
 
 protected:
@@ -3962,7 +4629,7 @@ protected:
 // AttVisualoffsetHo
 //----------------------------------------------------------------------------
 
-class AttVisualoffsetHo 
+class AttVisualoffsetHo: public Att
 {
 public:
     AttVisualoffsetHo();
@@ -3971,12 +4638,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisualoffsetHo();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisualoffsetHo( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisualoffsetHo( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetHo(std::string ho_) { m_ho = ho_; };
-    std::string GetHo() { return m_ho; };
+    std::string GetHo() const { return m_ho; };
     ///@}
 
 protected:
@@ -3994,7 +4667,7 @@ protected:
 // AttVisualoffsetTo
 //----------------------------------------------------------------------------
 
-class AttVisualoffsetTo 
+class AttVisualoffsetTo: public Att
 {
 public:
     AttVisualoffsetTo();
@@ -4003,12 +4676,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisualoffsetTo();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisualoffsetTo( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisualoffsetTo( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetTo(std::string to_) { m_to = to_; };
-    std::string GetTo() { return m_to; };
+    std::string GetTo() const { return m_to; };
     ///@}
 
 protected:
@@ -4025,7 +4704,7 @@ protected:
 // AttVisualoffsetVo
 //----------------------------------------------------------------------------
 
-class AttVisualoffsetVo 
+class AttVisualoffsetVo: public Att
 {
 public:
     AttVisualoffsetVo();
@@ -4034,12 +4713,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisualoffsetVo();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisualoffsetVo( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisualoffsetVo( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetVo(std::string vo_) { m_vo = vo_; };
-    std::string GetVo() { return m_vo; };
+    std::string GetVo() const { return m_vo; };
     ///@}
 
 protected:
@@ -4057,7 +4742,7 @@ protected:
 // AttVisualoffset2Ho
 //----------------------------------------------------------------------------
 
-class AttVisualoffset2Ho 
+class AttVisualoffset2Ho: public Att
 {
 public:
     AttVisualoffset2Ho();
@@ -4066,15 +4751,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisualoffset2Ho();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisualoffset2Ho( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisualoffset2Ho( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetStartho(std::string startho_) { m_startho = startho_; };
-    std::string GetStartho() { return m_startho; };
+    std::string GetStartho() const { return m_startho; };
     //
     void SetEndho(std::string endho_) { m_endho = endho_; };
-    std::string GetEndho() { return m_endho; };
+    std::string GetEndho() const { return m_endho; };
     ///@}
 
 protected:
@@ -4096,7 +4787,7 @@ protected:
 // AttVisualoffset2To
 //----------------------------------------------------------------------------
 
-class AttVisualoffset2To 
+class AttVisualoffset2To: public Att
 {
 public:
     AttVisualoffset2To();
@@ -4105,15 +4796,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisualoffset2To();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisualoffset2To( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisualoffset2To( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetStartto(std::string startto_) { m_startto = startto_; };
-    std::string GetStartto() { return m_startto; };
+    std::string GetStartto() const { return m_startto; };
     //
     void SetEndto(std::string endto_) { m_endto = endto_; };
-    std::string GetEndto() { return m_endto; };
+    std::string GetEndto() const { return m_endto; };
     ///@}
 
 protected:
@@ -4135,7 +4832,7 @@ protected:
 // AttVisualoffset2Vo
 //----------------------------------------------------------------------------
 
-class AttVisualoffset2Vo 
+class AttVisualoffset2Vo: public Att
 {
 public:
     AttVisualoffset2Vo();
@@ -4144,15 +4841,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetVisualoffset2Vo();
     
+    /** Read the values for the attribute class **/
+    bool ReadVisualoffset2Vo( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteVisualoffset2Vo( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetStartvo(std::string startvo_) { m_startvo = startvo_; };
-    std::string GetStartvo() { return m_startvo; };
+    std::string GetStartvo() const { return m_startvo; };
     //
     void SetEndvo(std::string endvo_) { m_endvo = endvo_; };
-    std::string GetEndvo() { return m_endvo; };
+    std::string GetEndvo() const { return m_endvo; };
     ///@}
 
 protected:
@@ -4174,7 +4877,7 @@ protected:
 // AttWidth
 //----------------------------------------------------------------------------
 
-class AttWidth 
+class AttWidth: public Att
 {
 public:
     AttWidth();
@@ -4183,12 +4886,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetWidth();
     
+    /** Read the values for the attribute class **/
+    bool ReadWidth( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteWidth( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetWidthDbl(double widthDbl_) { m_widthDbl = widthDbl_; };
-    double GetWidthDbl() { return m_widthDbl; };
+    double GetWidthDbl() const { return m_widthDbl; };
     ///@}
 
 protected:
@@ -4209,7 +4918,7 @@ protected:
 // AttXy
 //----------------------------------------------------------------------------
 
-class AttXy 
+class AttXy: public Att
 {
 public:
     AttXy();
@@ -4218,15 +4927,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetXy();
     
+    /** Read the values for the attribute class **/
+    bool ReadXy( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteXy( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetXDbl(double xDbl_) { m_xDbl = xDbl_; };
-    double GetXDbl() { return m_xDbl; };
+    double GetXDbl() const { return m_xDbl; };
     //
     void SetYDbl(double yDbl_) { m_yDbl = yDbl_; };
-    double GetYDbl() { return m_yDbl; };
+    double GetYDbl() const { return m_yDbl; };
     ///@}
 
 protected:
@@ -4250,7 +4965,7 @@ protected:
 // AttXy2
 //----------------------------------------------------------------------------
 
-class AttXy2 
+class AttXy2: public Att
 {
 public:
     AttXy2();
@@ -4259,15 +4974,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetXy2();
     
+    /** Read the values for the attribute class **/
+    bool ReadXy2( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteXy2( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetX2Dbl(double x2Dbl_) { m_x2Dbl = x2Dbl_; };
-    double GetX2Dbl() { return m_x2Dbl; };
+    double GetX2Dbl() const { return m_x2Dbl; };
     //
     void SetY2Dbl(double y2Dbl_) { m_y2Dbl = y2Dbl_; };
-    double GetY2Dbl() { return m_y2Dbl; };
+    double GetY2Dbl() const { return m_y2Dbl; };
     ///@}
 
 protected:

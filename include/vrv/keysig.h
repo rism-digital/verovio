@@ -12,22 +12,33 @@
 
 #include "vrvdef.h"
 #include "layerelement.h"
-#include "positioninterface.h"
+#include "atts_shared.h"
 
 namespace vrv {
+    
+class KeySigAttr;
 
 //----------------------------------------------------------------------------
 // KeySig
 //----------------------------------------------------------------------------
 
+/**
+ * This class models the MEI <keySig> element.
+ */
 class KeySig: public LayerElement
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes.
+     */
+    ///@{
     KeySig();
     KeySig(int num_alter, char alter);
+    KeySig( KeySigAttr *keySigAttr );
     virtual ~KeySig();
-    
+    void Reset();
+    virtual Object* Clone() { return new KeySig(*this); };
     virtual std::string GetClassName( ) { return "KeySig"; };
     
     /**
@@ -36,7 +47,7 @@ public:
     virtual int GetHorizontalSpacing( ) { return 20; };
     
     unsigned char GetAlterationAt(int pos);
-    int GetOctave(unsigned char pitch, char clef);
+    int GetOctave(unsigned char pitch, int clefId);
     
     /* Alteration number getter/setter */
     int GetAlterationNumber() { return m_num_alter; };
@@ -55,8 +66,45 @@ private:
     static unsigned char sharps[];
     static int octave_map[2][9][7];
     
+    // This is temporary - it needs to be changed to libMEI atts
     int m_num_alter;
     unsigned char m_alteration;
+    
+};
+    
+//----------------------------------------------------------------------------
+// KeySigAttr
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI @key attributes in scoreDef or staffDef elements.
+ */
+class KeySigAttr: public Object, public AttKeySigDefaultLog
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    KeySigAttr();
+    virtual ~KeySigAttr();
+    void Reset();
+    virtual std::string GetClassName( ) { return "KeySigAttr"; };
+    virtual Object* Clone() { return new KeySigAttr(*this); };
+    ///@}
+    
+    /**
+     * Comparison operator.
+     * Check if the LayerElement if a ClefAttr and compare attributes
+     */
+    virtual bool operator==(Object& other);
+    
+private:
+    
+public:
+    
+private:
     
 };
 

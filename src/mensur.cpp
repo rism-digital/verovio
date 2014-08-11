@@ -18,19 +18,32 @@ int Mensur::s_numBase = 2;
 //----------------------------------------------------------------------------
 
 Mensur::Mensur():
-	LayerElement("mensur-")
+	LayerElement("mensur-"), AttDurationRatio(), AttMensurLog(), AttMensurVis(), AttSlashcount()
 {
-    m_dot = 0;
-    m_num = 0;
-    m_numBase = 0;
-    m_reversed = false;
-    m_sign = MENSURATIONSIGN_NONE;
-    m_slash = 0;
+    Reset();
 }
-
+    
+Mensur::Mensur( MensurAttr *mensurAttr ):
+    LayerElement("mensur-")
+{
+    Mensur();
+    this->SetDot(mensurAttr->GetMensurDot());
+    this->SetSign(mensurAttr->GetMensurSign());
+    this->SetSlash(mensurAttr->GetMensurSlash());
+    // It is unclear why we don't have mensur.num and mensur.numbase attributes
+    // in att.mensura.default.log - ask Perry...
+}
 
 Mensur::~Mensur()
 {
+}
+    
+void Mensur::Reset()
+{
+    ResetDurationRatio();
+    ResetMensurLog();
+    ResetMensurVis();
+    ResetSlashcount();
 }
 
 bool Mensur::operator==( Object& other )
@@ -39,134 +52,55 @@ bool Mensur::operator==( Object& other )
     if ( !otherMensur ) {
         return false;
     }
-    if ( this->m_dot != otherMensur->m_dot ) {
+    if ( this->GetDot() != otherMensur->GetDot() ) {
         return false;
     }
-    if ( this->m_num != otherMensur->m_num ) {
+    if ( this->GetNumInt() != otherMensur->GetNumInt() ) {
         return false;
     }
-    if ( this->m_numBase != otherMensur->m_numBase ) {
+    if ( this->GetNumbaseInt() != otherMensur->GetNumbaseInt() ) {
         return false;
     }
-    if ( this->m_reversed != otherMensur->m_reversed ) {
+    if ( this->GetOrient() != otherMensur->GetOrient() ) {
         return false;
     }
-    if ( this->m_sign != otherMensur->m_sign ) {
+    if ( this->GetSign() != otherMensur->GetSign() ) {
         return false;
     }
-    if ( this->m_slash != otherMensur->m_slash ) {
+    if ( this->GetSlash() != otherMensur->GetSlash() ) {
         return false;
     }
     return true;
 }
+    
+//----------------------------------------------------------------------------
+// MensurAttr
+//----------------------------------------------------------------------------
 
-/*
-void Mensur::SetValue( int value, int flag ) 
+MensurAttr::MensurAttr():
+    Object(), AttMensurDefaultLog()
 {
-    this->m_num = 0;
-    this->m_numBase = 0;
-    switch ( value ) {
-        // tempus perfectum
-        case ('Q'): 
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_O;
-            this->m_slash = 0;
-            this->m_dot = 1;
-            this->m_reversed = false;
-            break;
-        case ('W'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_O;
-            this->m_slash = 1;
-            this->m_dot = 1;
-            this->m_reversed = false;
-            break;
-        case ('E'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_O;
-            this->m_slash = 0;
-            this->m_dot = 0;
-            this->m_reversed = false;
-            break;
-        case ('R'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_O;
-            this->m_slash = 1;
-            this->m_dot = 0;
-            this->m_reversed = false;
-            break;
-        // tempus imperfectum
-        case ('A'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 0;
-            this->m_dot = 1;
-            this->m_reversed = false;
-            break;
-        case ('S'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 1;
-            this->m_dot = 1;
-            this->m_reversed = false;
-            break;
-        case ('D'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 0;
-            this->m_dot = 0;
-            this->m_reversed = false;
-            break;
-        case ('F'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 1;
-            this->m_dot = 0;
-            this->m_reversed = false;
-            break;
-        // tempus imperfectum diminutum
-        case ('Y'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 0;
-            this->m_dot = 1;
-            this->m_reversed = true;
-            break;
-        case ('X'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 1;
-            this->m_dot = 1;
-            this->m_reversed = true;
-            break;
-        case ('C'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 0;
-            this->m_dot = 0;
-            this->m_reversed = true;
-            break;
-        case ('V'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_C;
-            this->m_slash = 1;
-            this->m_dot = 0;
-            this->m_reversed = true;
-            break;;
-        case ('1'):
-            this->m_meterSymb = METERSIGN_NONE;
-            this->m_sign = MENSURATIONSIGN_NONE;
-            this->m_slash = 0;
-            this->m_dot = 0;
-            this->m_reversed = false;
-            this->m_num = Mensur::s_num; 
-            this->m_numBase = Mensur::s_numBase; 
-            break;
-            
-        //case ('2'): this->code = 64; this->calte = 2; break;
-        //case ('3'): this->code = 64; this->calte = 3; break;
-    }
+    Reset();
 }
-*/
 
+
+MensurAttr::~MensurAttr()
+{
+}
+
+void MensurAttr::Reset()
+{
+    ResetMensurDefaultLog();
+}
+
+bool MensurAttr::operator==( Object& other )
+{
+    MensurAttr *otherMensurAttr = dynamic_cast<MensurAttr*>( &other );
+    if ( !otherMensurAttr ) {
+        return false;
+    }
+    // we need member comparison here...
+    return true;
+}
+    
 } // namespace vrv

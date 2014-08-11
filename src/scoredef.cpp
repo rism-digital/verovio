@@ -85,49 +85,162 @@ ScoreOrStaffDefAttrInterface& ScoreOrStaffDefAttrInterface::operator=( const Sco
 	return *this;
 }
 
-void ScoreOrStaffDefAttrInterface::ReplaceClef( Clef *newClef )
+void ScoreOrStaffDefAttrInterface::ReplaceClef( Object *newClef )
 {
     if ( newClef ) {
+        assert( dynamic_cast<ClefAttr*>(newClef) || dynamic_cast<Clef*>(newClef) );
         if (m_clef) {
             delete m_clef;
         }
-        m_clef = new Clef( *newClef );
-        m_clef->SetScoreOrStaffDefAttr( true );
+        m_clef = newClef->Clone();
     }
 }
 
-void ScoreOrStaffDefAttrInterface::ReplaceKeySig( KeySig *newKeySig )
+void ScoreOrStaffDefAttrInterface::ReplaceKeySig( Object *newKeySig )
 {
     if ( newKeySig ) {
+        assert( dynamic_cast<KeySigAttr*>(newKeySig) || dynamic_cast<KeySig*>(newKeySig) );
         if (m_keySig) {
             delete m_keySig;
         }
-        m_keySig = new KeySig( *newKeySig );
-        m_keySig->SetScoreOrStaffDefAttr( true );
+        m_keySig = newKeySig->Clone();
     }
 }
 
-void ScoreOrStaffDefAttrInterface::ReplaceMensur( Mensur *newMensur )
+void ScoreOrStaffDefAttrInterface::ReplaceMensur( Object *newMensur )
 {
     if ( newMensur ) {
+        assert( dynamic_cast<MensurAttr*>(newMensur) || dynamic_cast<Mensur*>(newMensur) );
         if (m_mensur) {
             delete m_mensur;
         }
-        m_mensur = new Mensur( *newMensur );
-        m_mensur->SetScoreOrStaffDefAttr( true );
+        m_mensur = newMensur->Clone();
     }
 }
     
-void ScoreOrStaffDefAttrInterface::ReplaceMeterSig( MeterSig *newMeterSig )
+void ScoreOrStaffDefAttrInterface::ReplaceMeterSig( Object *newMeterSig )
 {
     if ( newMeterSig ) {
+        assert( dynamic_cast<MeterSigAttr*>(newMeterSig) || dynamic_cast<MeterSig*>(newMeterSig) );
         if (m_meterSig) {
             delete m_meterSig;
         }
-        m_meterSig = new MeterSig( *newMeterSig );
-        m_meterSig->SetScoreOrStaffDefAttr( true );
+        m_meterSig = newMeterSig->Clone();
     }
 }
+    
+Clef *ScoreOrStaffDefAttrInterface::GetClefCopy() const
+{
+    // we should not call it without having checked if a clef is set
+    assert(m_clef);
+    Clef *copy = NULL;
+    Clef *current_clef = dynamic_cast<Clef*>(m_clef);
+    if (current_clef) {
+        copy = new Clef(*current_clef);
+    }
+    else {
+        ClefAttr *current_attr = dynamic_cast<ClefAttr*>(m_clef);
+        copy = new Clef(current_attr);
+    }
+    assert(copy);
+    copy->SetScoreOrStaffDefAttr(true);
+    return copy;
+}
+    
+KeySig *ScoreOrStaffDefAttrInterface::GetKeySigCopy() const
+{
+    // we should not call it without having checked if a clef is set
+    assert(m_keySig);
+    KeySig *copy = NULL;
+    KeySig *current_keySig = dynamic_cast<KeySig*>(m_keySig);
+    if (current_keySig) {
+        copy = new KeySig(*current_keySig);
+    }
+    else {
+        KeySigAttr *current_attr = dynamic_cast<KeySigAttr*>(m_keySig);
+        copy = new KeySig(current_attr);
+    }
+    assert(copy);
+    copy->SetScoreOrStaffDefAttr(true);
+    return copy;
+}
+    
+Mensur *ScoreOrStaffDefAttrInterface::GetMensurCopy() const
+{
+    // we should not call it without having checked if a clef is set
+    assert(m_mensur);
+    Mensur *copy = NULL;
+    Mensur *current_mensur = dynamic_cast<Mensur*>(m_mensur);
+    if (current_mensur) {
+        copy = new Mensur(*current_mensur);
+    }
+    else {
+        MensurAttr *current_attr = dynamic_cast<MensurAttr*>(m_mensur);
+        copy = new Mensur(current_attr);
+    }
+    assert(copy);
+    copy->SetScoreOrStaffDefAttr(true);
+    return copy;
+}
+    
+MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigCopy() const
+{
+    // we should not call it without having checked if a clef is set
+    assert(m_meterSig);
+    MeterSig *copy = NULL;
+    MeterSig *current_meterSig = dynamic_cast<MeterSig*>(m_meterSig);
+    if (current_meterSig) {
+        copy = new MeterSig(*current_meterSig);
+    }
+    else {
+        MeterSigAttr *current_attr = dynamic_cast<MeterSigAttr*>(m_meterSig);
+        copy = new MeterSig(current_attr);
+    }
+    assert(copy);
+    copy->SetScoreOrStaffDefAttr(true);
+    return copy;
+}
+    
+Clef *ScoreOrStaffDefAttrInterface::GetClefElement() const
+{
+    return dynamic_cast<Clef*>(m_clef);
+}
+    
+KeySig *ScoreOrStaffDefAttrInterface::GetKeySigElement() const
+{
+    return dynamic_cast<KeySig*>(m_keySig);
+}
+    
+Mensur *ScoreOrStaffDefAttrInterface::GetMensurElement() const
+{
+    return dynamic_cast<Mensur*>(m_mensur);
+}
+    
+MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigElement() const
+{
+    return dynamic_cast<MeterSig*>(m_meterSig);
+}
+
+ClefAttr *ScoreOrStaffDefAttrInterface::GetClefAttr() const
+{
+    return dynamic_cast<ClefAttr*>(m_clef);
+}
+    
+KeySigAttr *ScoreOrStaffDefAttrInterface::GetKeySigAttr() const
+{
+    return dynamic_cast<KeySigAttr*>(m_keySig);
+}
+    
+MensurAttr *ScoreOrStaffDefAttrInterface::GetMensurAttr() const
+{
+    return dynamic_cast<MensurAttr*>(m_mensur);
+}
+    
+MeterSigAttr *ScoreOrStaffDefAttrInterface::GetMeterSigAttr() const
+{
+    return dynamic_cast<MeterSigAttr*>(m_meterSig);
+}
+
 
 //----------------------------------------------------------------------------
 // ScoreDef
@@ -180,10 +293,10 @@ void ScoreDef::Replace( StaffDef *newStaffDef )
     
     // if found, replace attributes
     if (staffDef) {
-        staffDef->ReplaceClef( newStaffDef->GetClefAttr() );
-        staffDef->ReplaceKeySig( newStaffDef->GetKeySigAttr() );
-        staffDef->ReplaceMensur( newStaffDef->GetMensurAttr() );
-        staffDef->ReplaceMeterSig( newStaffDef->GetMeterSigAttr() );
+        staffDef->ReplaceClef( newStaffDef->GetClef() );
+        staffDef->ReplaceKeySig( newStaffDef->GetKeySig() );
+        staffDef->ReplaceMensur( newStaffDef->GetMensur() );
+        staffDef->ReplaceMeterSig( newStaffDef->GetMeterSig() );
     }
 }
 

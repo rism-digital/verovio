@@ -21,7 +21,7 @@ namespace vrv {
 PositionInterface::PositionInterface()
 {
     m_oct = 5;
-    m_pname = PITCH_C;
+    m_pname = PITCHNAME_c;
 }
 
 

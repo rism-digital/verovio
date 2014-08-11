@@ -13,15 +13,15 @@
 #include "layerelement.h"
 #include "pitchinterface.h"
 
+// To be removed
 #define LIG_INITIAL  (1<<1)
 #define LIG_MEDIAL  (1<<2) 
 #define LIG_TERMINAL  (1<<3) 
 
+// To be removed
 #define CHORD_INITIAL  (1<<1)
 #define CHORD_MEDIAL  (1<<2) 
 #define CHORD_TERMINAL  (1<<3) 
-
-#define NOTE_MAX_SLURS 6
 
 namespace vrv {
 
@@ -139,10 +139,6 @@ protected:
     ///@}
     
 public:
-    /** Indicates the articulation (0 == none) */
-    unsigned char m_artic;
-    /** Indicates if initial, medial or terminal part of a chord */
-    unsigned char m_chord;
     /** Indicates if colored (inversed) */
     bool m_colored;
     /** Indicates if intial, medial or terminal part of a ligature */
@@ -151,8 +147,6 @@ public:
     unsigned char m_headshape;
     /** Indicates if the ligature is obliqua (recta otherwise) */
     bool m_ligObliqua;
-    /** Indicates if intial, medial or terminal part of a slur for up to 6 nesting/overlaping slur */
-    unsigned char m_slur[NOTE_MAX_SLURS];
     /** Indicates the stem direction (0 == auto, -1 down, 1 up) */
     char m_stemDir;
     /** Indicates the stem length (0 == auto) */

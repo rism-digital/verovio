@@ -35,14 +35,14 @@ namespace vrv {
 
 // Ok, this is ugly, but since this is static data, why not?
 pitchmap DarmsInput::PitchMap[] = {
-    /* 00 */ {1, PITCH_C}, {1, PITCH_D}, {1, PITCH_E}, {1, PITCH_F}, {1, PITCH_G}, {1, PITCH_A}, {1, PITCH_B},
-    /* 07 */ {2, PITCH_C}, {2, PITCH_D}, {2, PITCH_E}, {2, PITCH_F}, {2, PITCH_G}, {2, PITCH_A}, {2, PITCH_B},
-    /* 14 */ {3, PITCH_C}, {3, PITCH_D}, {3, PITCH_E}, {3, PITCH_F}, {3, PITCH_G}, {3, PITCH_A}, {3, PITCH_B},
-    /* 21 */ {4, PITCH_C}, {4, PITCH_D}, {4, PITCH_E}, {4, PITCH_F}, {4, PITCH_G}, {4, PITCH_A}, {4, PITCH_B},
-    /* 28 */ {5, PITCH_C}, {5, PITCH_D}, {5, PITCH_E}, {5, PITCH_F}, {5, PITCH_G}, {5, PITCH_A}, {5, PITCH_B},
-    /* 35 */ {6, PITCH_C}, {6, PITCH_D}, {6, PITCH_E}, {6, PITCH_F}, {6, PITCH_G}, {6, PITCH_A}, {6, PITCH_B},
-    /* 42 */ {7, PITCH_C}, {7, PITCH_D}, {7, PITCH_E}, {7, PITCH_F}, {7, PITCH_G}, {7, PITCH_A}, {7, PITCH_B},
-    /* 49 */ {8, PITCH_C}, {8, PITCH_D}, {8, PITCH_E}, {8, PITCH_F}, {8, PITCH_G}, {8, PITCH_A}, {8, PITCH_B},
+    /* 00 */ {1, PITCHNAME_c}, {1, PITCHNAME_d}, {1, PITCHNAME_e}, {1, PITCHNAME_f}, {1, PITCHNAME_g}, {1, PITCHNAME_a}, {1, PITCHNAME_b},
+    /* 07 */ {2, PITCHNAME_c}, {2, PITCHNAME_d}, {2, PITCHNAME_e}, {2, PITCHNAME_f}, {2, PITCHNAME_g}, {2, PITCHNAME_a}, {2, PITCHNAME_b},
+    /* 14 */ {3, PITCHNAME_c}, {3, PITCHNAME_d}, {3, PITCHNAME_e}, {3, PITCHNAME_f}, {3, PITCHNAME_g}, {3, PITCHNAME_a}, {3, PITCHNAME_b},
+    /* 21 */ {4, PITCHNAME_c}, {4, PITCHNAME_d}, {4, PITCHNAME_e}, {4, PITCHNAME_f}, {4, PITCHNAME_g}, {4, PITCHNAME_a}, {4, PITCHNAME_b},
+    /* 28 */ {5, PITCHNAME_c}, {5, PITCHNAME_d}, {5, PITCHNAME_e}, {5, PITCHNAME_f}, {5, PITCHNAME_g}, {5, PITCHNAME_a}, {5, PITCHNAME_b},
+    /* 35 */ {6, PITCHNAME_c}, {6, PITCHNAME_d}, {6, PITCHNAME_e}, {6, PITCHNAME_f}, {6, PITCHNAME_g}, {6, PITCHNAME_a}, {6, PITCHNAME_b},
+    /* 42 */ {7, PITCHNAME_c}, {7, PITCHNAME_d}, {7, PITCHNAME_e}, {7, PITCHNAME_f}, {7, PITCHNAME_g}, {7, PITCHNAME_a}, {7, PITCHNAME_b},
+    /* 49 */ {8, PITCHNAME_c}, {8, PITCHNAME_d}, {8, PITCHNAME_e}, {8, PITCHNAME_f}, {8, PITCHNAME_g}, {8, PITCHNAME_a}, {8, PITCHNAME_b},
 };
 
 DarmsInput::DarmsInput( Doc *doc, std::string filename ) :
@@ -60,8 +60,8 @@ DarmsInput::~DarmsInput() {
 }
 
 void DarmsInput::UnrollKeysig(int quantity, char alter) {
-    int flats[] = {PITCH_B, PITCH_E, PITCH_A, PITCH_D, PITCH_G, PITCH_C, PITCH_F};
-    int sharps[] = {PITCH_F, PITCH_C, PITCH_G, PITCH_D, PITCH_A, PITCH_E, PITCH_B};
+    int flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
+    int sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
     int *alteration_set;
     unsigned char accid = ACCID_FLAT;
     
@@ -98,10 +98,10 @@ int DarmsInput::parseMeter(int pos, const char* data) {
     
     pos++;
     if (data[pos] == 'C') {
-        meter->m_sign = MENSURATIONSIGN_C;
+        meter->SetSign( MENSURATIONSIGN_C );
         if (data[pos + 1] == '/') {
             pos++;
-            meter->m_slash = 1;
+            meter->SetSlash(1);
         }
         pos++;
     } else if (data[pos] == 'O') {
@@ -109,7 +109,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             pos++;
             LogWarning("DarmsInput: O/ not supported");
         }
-        meter->m_sign = MENSURATIONSIGN_O;
+        meter->SetSign( MENSURATIONSIGN_O );
         pos++;
     }
     
@@ -121,13 +121,13 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             n2 = data[++pos] - ASCII_NUMBER_OFFSET; // idem
             n1 = (n1 * 10) + n2;
         }
-        meter->m_num = n1;
+        meter->SetNumbaseInt(n1);
         
         // we expect the next char a ':', or make a single digit meter
         // mini-hack in some cases it is a '-'...
         if (data[pos + 1] != ':' && data[pos + 1] != '-') {
             pos++;
-            meter->m_numBase = 1;
+            meter->SetNumbaseInt(1);
         } else {
             pos++;
             if (data[pos] == '-') LogWarning("DarmsInput: Time sig numbers should be divided with ':'.");
@@ -138,9 +138,9 @@ int DarmsInput::parseMeter(int pos, const char* data) {
                 n1 = (n1 * 10) + n2;
             }
             
-            meter->m_numBase = n1;
+            meter->SetNumbaseInt(n1);
         }
-        LogDebug("DarmsInput: Meter is: %i %i", meter->m_num, meter->m_numBase);
+        LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbaseInt(), meter->GetNumbaseInt());
     }
     
     m_layer->AddElement(meter);
@@ -215,26 +215,29 @@ int DarmsInput::do_Clef(int pos, const char* data) {
     Clef *mclef = new Clef();
     
     if (data[pos] == 'C') {
+        mclef->SetShape(CLEFSHAPE_C);
         switch (position) {
-            case 1: mclef->m_clefId = UT1; break;
-            case 3: mclef->m_clefId = UT2; break;
-            case 5: mclef->m_clefId = UT3; break;
-            case 7: mclef->m_clefId = UT4; break;
+            case 1: mclef->SetLine(1); break;
+            case 3: mclef->SetLine(2); break;
+            case 5: mclef->SetLine(3); break;
+            case 7: mclef->SetLine(4); break;
             default: LogWarning("DarmsInput: Invalid C clef on line %i", position); break;
         }
         m_clef_offset = 21 - position; // 21 is the position in the array, position is of the clef
     } else if (data[pos] == 'G') {
+        mclef->SetShape(CLEFSHAPE_G);
         switch (position) {
-            case 1: mclef->m_clefId = SOL1; break;
-            case 3: mclef->m_clefId = SOL2; break;
+            case 1: mclef->SetLine(1); break;
+            case 3: mclef->SetLine(2); break;
             default: LogWarning("DarmsInput: Invalid G clef on line %i", position); break;
         }
         m_clef_offset = 25 - position;
     } else if (data[pos] == 'F') {
+        mclef->SetShape(CLEFSHAPE_F);
         switch (position) {
-            case 3: mclef->m_clefId = FA3; break;
-            case 5: mclef->m_clefId = FA4; break;
-            case 7: mclef->m_clefId = FA5; break;
+            case 3: mclef->SetLine(3); break;
+            case 5: mclef->SetLine(4);; break;
+            case 7: mclef->SetLine(5); break;
             default: LogWarning("DarmsInput: Invalid F clef on line %i", position); break;
         }
         m_clef_offset = 15 - position;

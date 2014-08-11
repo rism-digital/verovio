@@ -15,7 +15,8 @@
 #ifndef __VRV_ATTS_CMNORNAMENTS_H__
 #define __VRV_ATTS_CMNORNAMENTS_H__
 
-#include "vrvdef.h"
+#include "att.h"
+#include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ namespace vrv {
 // AttMordentLog
 //----------------------------------------------------------------------------
 
-class AttMordentLog 
+class AttMordentLog: public Att
 {
 public:
     AttMordentLog();
@@ -36,15 +37,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetMordentLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadMordentLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMordentLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     //
     void SetLong(std::string long_) { m_long = long_; };
-    std::string GetLong() { return m_long; };
+    std::string GetLong() const { return m_long; };
     ///@}
 
 protected:
@@ -63,7 +70,7 @@ protected:
 // AttOrnam
 //----------------------------------------------------------------------------
 
-class AttOrnam 
+class AttOrnam: public Att
 {
 public:
     AttOrnam();
@@ -72,12 +79,18 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetOrnam();
     
+    /** Read the values for the attribute class **/
+    bool ReadOrnam( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteOrnam( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetOrnam(std::string ornam_) { m_ornam = ornam_; };
-    std::string GetOrnam() { return m_ornam; };
+    std::string GetOrnam() const { return m_ornam; };
     ///@}
 
 protected:
@@ -95,7 +108,7 @@ protected:
 // AttOrnamentaccid
 //----------------------------------------------------------------------------
 
-class AttOrnamentaccid 
+class AttOrnamentaccid: public Att
 {
 public:
     AttOrnamentaccid();
@@ -104,15 +117,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetOrnamentaccid();
     
+    /** Read the values for the attribute class **/
+    bool ReadOrnamentaccid( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteOrnamentaccid( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetAccidupper(std::string accidupper_) { m_accidupper = accidupper_; };
-    std::string GetAccidupper() { return m_accidupper; };
+    std::string GetAccidupper() const { return m_accidupper; };
     //
     void SetAccidlower(std::string accidlower_) { m_accidlower = accidlower_; };
-    std::string GetAccidlower() { return m_accidlower; };
+    std::string GetAccidlower() const { return m_accidlower; };
     ///@}
 
 protected:
@@ -128,7 +147,7 @@ protected:
 // AttTurnLog
 //----------------------------------------------------------------------------
 
-class AttTurnLog 
+class AttTurnLog: public Att
 {
 public:
     AttTurnLog();
@@ -137,15 +156,21 @@ public:
     /** Reset the default values for the attribute class **/
     void ResetTurnLog();
     
+    /** Read the values for the attribute class **/
+    bool ReadTurnLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTurnLog( pugi::xml_node element );
+    
     /**
      * @name Setters and getters for class members
      */
     ///@{
     void SetDelayed(std::string delayed_) { m_delayed = delayed_; };
-    std::string GetDelayed() { return m_delayed; };
+    std::string GetDelayed() const { return m_delayed; };
     //
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() { return m_form; };
+    std::string GetForm() const { return m_form; };
     ///@}
 
 protected:

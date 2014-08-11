@@ -24,7 +24,7 @@ namespace vrv {
 // AttRegularmethod
 //----------------------------------------------------------------------------
 
-AttRegularmethod::AttRegularmethod() {
+AttRegularmethod::AttRegularmethod(): Att() {
     ResetRegularmethod();
 }
 
@@ -34,6 +34,24 @@ AttRegularmethod::~AttRegularmethod() {
 
 void AttRegularmethod::ResetRegularmethod() {
     m_method = "";
+}
+
+bool AttRegularmethod::ReadRegularmethod(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("method")) {
+        this->SetMethod(StrToStr(element.attribute("method").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttRegularmethod::WriteRegularmethod(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->GetMethod() == "") {
+        element.append_attribute("method") = StrToStr(this->GetMethod()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
 }
 
 /* include <attmethod> */

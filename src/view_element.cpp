@@ -259,7 +259,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
 	int bby = staff->GetDrawingY();  // bby= y sommet portee
 	int ynn = element->GetDrawingY();
-	static int ynn_chrd;
+	//static int ynn_chrd;
 
 	xn += note->m_hOffset;
 	//val=note->m_dur;
@@ -328,19 +328,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		if (staff->notAnc)
 			milieu +=  m_doc->m_drawingHalfInterl[staffSize];
 
-		if (note->m_chord) { /*** && this == testchord)***/
-			ynn_chrd = ynn;
-        }
+		//if (note->m_chord) { /*** && this == testchord)***/
+		//	ynn_chrd = ynn;
+        //}
 		if (inBeam && formval > DUR_4)
         {
             // no stem
 		}
-		else if (note->m_headshape != SANSQUEUE && (!note->m_chord || (note->m_chord==CHORD_TERMINAL))) {	
-            if (note->m_chord==CHORD_TERMINAL) {	
-				/***up = testchord->obj.not.haste;
-				xn = testchord->m_drawingX;***/
+		//else if (note->m_headshape != SANSQUEUE && (!note->m_chord || (note->m_chord==CHORD_TERMINAL))) {
+        else {
+            /*if (note->m_chord==CHORD_TERMINAL) {
+				up = testchord->obj.not.haste;
+				xn = testchord->m_drawingX;
 			}
-			else {
+			else */
+            {
 				//***up = this->q_auto ? ((ynn < milieu)? ON :OFF):this->queue;
 				// ENZ
 				up = (ynn > milieu) ? ON : OFF;
@@ -369,9 +371,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 			y2 = ((formval>DUR_8) ? (ynn + espac7 + decval) : (ynn + espac7));
 
-			if ((note->m_chord==CHORD_INITIAL) || (note->m_chord==CHORD_MEDIAL)) {
+			/*if ((note->m_chord==CHORD_INITIAL) || (note->m_chord==CHORD_MEDIAL)) {
 				ynn = ynn_chrd;
-            }
+            }*/
 
 			/***if (this->q_auto)
 			{	this->queue = (up > 0);
@@ -451,23 +453,15 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
     
 	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);
-
-	if (note->m_slur[0])
-	{	
-        /***if (note->m_slur[0]==SLUR_TERMINAL)
-		{	liaison = OFF;	// pour tests de beam...
-			liais_note(hdc, this);
-		}***/
-		/***if (this->dliai && !attente)	premierLie = this;***/
-	}
     
 	if (note->m_accid) // && !this->accInvis) // ax2 no support invisible accidental yet
 	{
-		if (note->m_chord)
-            {}/***x1 = x_acc_chrd (this,0);***/
-		else
+		//if (note->m_chord)
+        //    {}/***x1 = x_acc_chrd (this,0);***/
+		//else
 			x1 -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
-		Symbol accid( SYMBOL_ACCID );
+		
+        Symbol accid( SYMBOL_ACCID );
         accid.m_oct = note->m_oct;
         accid.m_pname = note->m_pname;
 		accid.m_accid = note->m_accid;
@@ -475,7 +469,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         accid.SetDrawingY( staff->GetDrawingY() );
         DrawSymbol( dc, &accid, layer, staff, element ); // ax2
 	}
-	if (note->m_chord)
+	if (0) //if (note->m_chord)
 	{	
         /***x2 = testchord->m_drawingX + m_doc->m_drawingStep2;
 		if (this->haste)
@@ -1087,37 +1081,37 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
      *	au depart; ne faire operation sur b qu'une fois pour cas semblables,
      *  et au palier commun superieur, incrementer sym, sans break.
      */
-	switch(clef->m_clefId)
+	switch(clef->GetClefId())
 	{
-		case UT1 : 
+		case C1 :
             sym += 2;
-		case SOL1 : 
+		case G1 :
             b -= m_doc->m_drawingStaffSize[ staff->staffSize ]; 
             break;
-		case SOLva : 
+		case G2va :
             sym += 1;
-		case UT2 : 
+		case C2 :
             sym += 2;
-		case SOL2 : 
+		case G2 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*3; 
             break;
-		case FA3 : 
+		case F3 :
             sym--;
-		case UT3 : 
+		case C3 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*2; 
             sym += 2; 
             break;
-		case FA5 : 
+		case F5 :
             sym++; 
             break;
-		case FA4 : 
+		case F4 :
             sym--;
-		case UT4 : 
+		case C4 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ];
-		case UT5 :  
+		case C5 :
             sym += 2; 
             break;
-		case CLEPERC :  
+		case perc :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
             sym = LEIPZIG_CLEF_PERC; 
             break;
@@ -1146,35 +1140,35 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 	
 	int x;
 
-    if (mensur->m_sign==MENSURATIONSIGN_O)
+    if (mensur->GetSign()==MENSURATIONSIGN_O)
     {	
         DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    else if (mensur->m_sign==MENSURATIONSIGN_C && !mensur->m_reversed)
+    else if (mensur->GetSign()==MENSURATIONSIGN_C && !mensur->GetOrient()==ORIENTATION_reversed)
     {	
         DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    else if (mensur->m_sign==MENSURATIONSIGN_C && mensur->m_reversed)
+    else if (mensur->GetSign()==MENSURATIONSIGN_C && mensur->GetOrient()==ORIENTATION_reversed)
     {	
         DrawMensurReversedHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    if (mensur->m_slash) // we handle only one single slash
+    if (mensur->GetSlash()) // we handle only one single slash
     {	
         DrawMensurSlash ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    if (mensur->m_dot) // we handle only one single dot
+    if (mensur->GetDot()) // we handle only one single dot
     {	
         DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
 
-	if (mensur->m_num)
+	if (mensur->GetNumInt())
 	{	
         x = element->GetDrawingX();
-		if (mensur->m_sign) 
+		if (mensur->GetSign())
         {
 			x += m_doc->m_drawingStep1*5; // step forward because we have a sign or a meter symbol
         }
-		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->m_num, mensur->m_numBase, staff);
+		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNumInt(), mensur->GetNumbaseInt(), staff);
 	}
     
     dc->EndGraphic(element, this ); //RZ
@@ -1319,11 +1313,11 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
     int x = element->GetDrawingX();
     
-    if ( meterSig->GetSym() == METERSIGN_COMMON ) {
+    if ( meterSig->GetSym() == METERSIGN_common ) {
         DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_COMMON, staff, staff->staffSize);
         x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
     }
-    else if ( meterSig->GetSym() == METERSIGN_CUT ) {
+    else if ( meterSig->GetSym() == METERSIGN_cut ) {
         DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_CUT, staff, staff->staffSize);
         x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
     }
@@ -1479,7 +1473,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     for (int i = 0; i < ks->GetAlterationNumber(); i++) {
         
         x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] + 5) * i;
-        y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->m_clefId));;
+        y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->GetClefId()));;
         
         if (ks->GetAlteration() == ACCID_FLAT)
             symb = LEIPZIG_ACCID_FLAT;

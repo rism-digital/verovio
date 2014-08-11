@@ -10,6 +10,7 @@ add_executable (verovio
 	main.cpp 
 	../src/aligner.cpp
 	../src/app.cpp
+	../src/att.cpp
 	../src/barline.cpp 
 	../src/bboxdevicecontext.cpp 
 	../src/beam.cpp
@@ -67,7 +68,7 @@ add_executable (verovio
 	#../libmei/atts_facsimile.cpp
 	#../libmei/atts_harmony.cpp
 	#../libmei/atts_linkalign.cpp
-	#../libmei/atts_mensural.cpp
+	../libmei/atts_mensural.cpp
 	#../libmei/atts_neumes.cpp
 	#../libmei/atts_tablature.cpp
 	)

@@ -203,8 +203,7 @@ bool LayerElement::IsClef()
 {  
     return (dynamic_cast<Clef*>(this));
 }
-
-
+    
 bool LayerElement::HasDurationInterface() 
 {  
     return (dynamic_cast<DurationInterface*>(this));
@@ -298,18 +297,18 @@ int LayerElement::Save( ArrayPtrVoid params )
 
 void LayerElement::AdjustPname( int *pname, int *oct )
 {
-	if ((*pname) < PITCH_C)
+	if ((*pname) < PITCHNAME_c)
 	{
 		if ((*oct) > 0)
 			(*oct)-- ;
-        (*pname) = PITCH_B;
+        (*pname) = PITCHNAME_b;
         
 	}
-	else if ((*pname) > PITCH_B)
+	else if ((*pname) > PITCHNAME_b)
 	{
 		if ((*oct) < 7)
 			(*oct)++;
-        (*pname) = PITCH_C;
+        (*pname) = PITCHNAME_c;
 	}
 }
 
