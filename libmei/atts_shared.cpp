@@ -816,13 +816,13 @@ AttColoration::~AttColoration() {
 }
 
 void AttColoration::ResetColoration() {
-    m_colored = "";
+    m_colored = BOOLEAN_NONE;
 }
 
 bool AttColoration::ReadColoration(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("colored")) {
-        this->SetColored(StrToStr(element.attribute("colored").value()));
+        this->SetColored(StrToBool(element.attribute("colored").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -830,8 +830,8 @@ bool AttColoration::ReadColoration(  pugi::xml_node element ) {
 
 bool AttColoration::WriteColoration(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetColored() == "") {
-        element.append_attribute("colored") = StrToStr(this->GetColored()).c_str();
+    if (this->GetColored() == BOOLEAN_NONE) {
+        element.append_attribute("colored") = BoolToStr(this->GetColored()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;

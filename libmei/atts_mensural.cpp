@@ -240,13 +240,13 @@ AttNoteLogMensural::~AttNoteLogMensural() {
 }
 
 void AttNoteLogMensural::ResetNoteLogMensural() {
-    m_lig = "";
+    m_lig = LIGATURE_NONE;
 }
 
 bool AttNoteLogMensural::ReadNoteLogMensural(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("lig")) {
-        this->SetLig(StrToStr(element.attribute("lig").value()));
+        this->SetLig(StrToLigature(element.attribute("lig").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -254,8 +254,8 @@ bool AttNoteLogMensural::ReadNoteLogMensural(  pugi::xml_node element ) {
 
 bool AttNoteLogMensural::WriteNoteLogMensural(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetLig() == "") {
-        element.append_attribute("lig") = StrToStr(this->GetLig()).c_str();
+    if (this->GetLig() == LIGATURE_NONE) {
+        element.append_attribute("lig") = LigatureToStr(this->GetLig()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;

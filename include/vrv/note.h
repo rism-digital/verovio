@@ -8,15 +8,12 @@
 #ifndef __VRV_NOTE_H__
 #define __VRV_NOTE_H__
 
+#include "atts_mensural.h"
+#include "atts_shared.h"
 #include "beam.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
-
-// To be removed
-#define LIG_INITIAL  (1<<1)
-#define LIG_MEDIAL  (1<<2) 
-#define LIG_TERMINAL  (1<<3) 
 
 // To be removed
 #define CHORD_INITIAL  (1<<1)
@@ -43,14 +40,20 @@ class Tie;
 #define EMB_TRILL 1
 #define EMB_MORDENT 2
 
-class Note: public LayerElement, public DurationInterface, public PitchInterface
+class Note: public LayerElement, public DurationInterface, public PitchInterface,
+    public AttColoration, public AttNoteLogMensural
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Note();
     virtual ~Note();
-    
+    void Reset();
     virtual std::string GetClassName( ) { return "Note"; };
+    ///@}
     
      /** 
       * Set the duration.
@@ -64,21 +67,6 @@ public:
      * Check if the LayerElement if a Note and compare attributes
      */
     virtual bool operator==(Object& other);
-    
-    /**
-     * Change the coloration.
-     */ 
-	virtual void ChangeColoration( );
-    
-    /**
-     * Change the stem direction.
-     */
-	virtual void ChangeStem( );
-    
-    /**
-     * Set the note into a ligature.
-     */
-    virtual void SetLigature( );
     
     /**
      * Return the default horizontal spacing of notes.
@@ -139,14 +127,6 @@ protected:
     ///@}
     
 public:
-    /** Indicates if colored (inversed) */
-    bool m_colored;
-    /** Indicates if intial, medial or terminal part of a ligature */
-    unsigned char m_lig;
-    /** Indicates the headshape of the note */
-    unsigned char m_headshape;
-    /** Indicates if the ligature is obliqua (recta otherwise) */
-    bool m_ligObliqua;
     /** Indicates the stem direction (0 == auto, -1 down, 1 up) */
     char m_stemDir;
     /** Indicates the stem length (0 == auto) */

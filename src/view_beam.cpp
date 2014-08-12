@@ -154,7 +154,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 		/* retablir a la fin si provshp existe */
 
 	low = chk->GetDrawingY();	/* initialiser */
-    k = ((Note*)chk)->m_colored ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
+    k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
     
 	valref = k;		/* m_dur test conservee */
     //	valref = chk->m_dur;		/* m_dur test conservee */
@@ -190,7 +190,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         //LogDebug("-> %s", chk->GetClassName().c_str() );
         
         if ( chk->IsNote() ) {
-            k = ((Note*)chk)->m_colored ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
+            k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
         }
 
         // if (chk->type == NOTE && /*chk->sil == _NOT &&*/ k > DUR_4)
@@ -546,7 +546,7 @@ if (fPente)
                 crd[i].chk->m_drawingStemDir = false;
 			}
 		}
-		if ((crd+i)->chk->IsNote() && ((Note*)(crd+i)->chk)->m_headshape != SANSQUEUE)
+		if ((crd+i)->chk->IsNote())
 		{	
             DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
             

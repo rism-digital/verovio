@@ -263,7 +263,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	xn += note->m_hOffset;
 	//val=note->m_dur;
-	formval = (note->m_colored && note->m_dur > DUR_1) ? (note->m_dur+1) : note->m_dur;
+	formval = ((note->GetColored()==BOOLEAN_true) && note->m_dur > DUR_1) ? (note->m_dur+1) : note->m_dur;
 	queueCentre = 0;
 
 
@@ -294,15 +294,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);	// dessin lignes additionnelles
 
-	if (note->m_dur == DUR_LG || note->m_dur == DUR_BR || ((note->m_lig) && note->m_dur == DUR_1))	// dessin carrees
+	if (note->m_dur == DUR_LG || note->m_dur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->m_dur == DUR_1))	// dessin carrees
 	{
 		DrawLigature ( dc, ynn, element, layer, staff);
  	}
 	else if (note->m_dur==DUR_1)
 	{	
-        if ( is_in (note->m_headshape, LOSANGEVIDE, OPTIONLIBRE))
-			fontNo = LEIPZIG_OFFSET_NOTE_HEAD+note->m_headshape;
-		else if (note->m_colored) // && !note->m_ligObliqua) // in WG, use of obliq for coloration? 
+        if (note->GetColored()==BOOLEAN_true) // && !note->m_ligObliqua) // in WG, use of obliq for coloration?
 			fontNo = LEIPZIG_HEAD_WHOLE_FILLED;
 		else
 			fontNo = LEIPZIG_HEAD_WHOLE;
@@ -312,10 +310,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
 	else
 	{	
-        if ( is_in (note->m_headshape, LOSANGEVIDE, OPTIONLIBRE))
-			fontNo = LEIPZIG_OFFSET_NOTE_HEAD+note->m_headshape;
-
-		else if (note->m_colored || formval == DUR_2)
+        if ((note->GetColored()==BOOLEAN_true) || formval == DUR_2)
 			fontNo = LEIPZIG_HEAD_HALF;
 		else
 			fontNo = LEIPZIG_HEAD_QUARTER;
@@ -890,6 +885,7 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
 
 void View::CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff)
 {
+    /*
 	if (element == NULL) 
     {
     	return;
@@ -908,6 +904,7 @@ void View::CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *s
 	{	
         element->SetDrawingX( previous->GetDrawingX() + m_doc->m_drawingBrevisWidth[staff->staffSize] * 2 );
 	}
+    */
     return;
 }
 
@@ -917,6 +914,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
     assert(staff); // Pointer to staff cannot be NULL"
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
+    	/*
     Note *note = dynamic_cast<Note*>(element);
     
 
@@ -925,7 +923,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 
 	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
 	xn = element->GetDrawingX();
-	
+
 	if ((note->m_lig==LIG_MEDIAL) || (note->m_lig==LIG_TERMINAL))
     {
 		CalculateLigaturePosX ( element, layer, staff );
@@ -933,7 +931,6 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	else {
 		xn = element->GetDrawingX() + note->m_hOffset;
     }
-
 
 	// calcul des dimensions du rectangle
 	x1 = xn - m_doc->m_drawingBrevisWidth[staff->staffSize]; x2 = xn +  m_doc->m_drawingBrevisWidth[staff->staffSize];
@@ -944,7 +941,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 
 	if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
 	{
-		if ( !note->m_colored)
+		if (note->GetColored()!=BOOLEAN_true)
 		{				//	double base des carrees
 			DrawObliqueLine ( dc, x1,  y1,  x2,  y1, -epaisseur );
 			DrawObliqueLine ( dc, x1,  y2,  x2,  y2, epaisseur );
@@ -973,7 +970,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 			yy2 = y2;
 			y5 = y1+ m_doc->m_drawingInterl[staff->staffSize]; y2 += m_doc->m_drawingInterl[staff->staffSize];	// on monte d'un INTERL
 
-			if (note->m_colored)
+			if (note->GetColored()==BOOLEAN_true)
 				DrawObliqueLine ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingInterl[staff->staffSize]);
 			else
 			{	DrawObliqueLine ( dc,  x1,  y1,  x2,  yy2, 5);
@@ -1019,7 +1016,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
 	{	
 		milieu = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize]*6;
-		//***up = this->q_auto ? ((y < milieu)? ON :OFF):this->queue;
+		/// up = this->q_auto ? ((y < milieu)? ON :OFF):this->queue;
 		// ENZ
 		up = (y < milieu) ? ON : OFF;
 		// ENZ
@@ -1033,6 +1030,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 		}
 		DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_env.m_stemWidth );
 	}
+    */
 
 	return;
 }

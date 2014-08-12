@@ -224,13 +224,13 @@ public:
      * @name Setters and getters for class members
      */
     ///@{
-    void SetLig(std::string lig_) { m_lig = lig_; };
-    std::string GetLig() const { return m_lig; };
+    void SetLig(data_LIGATURE lig_) { m_lig = lig_; };
+    data_LIGATURE GetLig() const { return m_lig; };
     ///@}
 
 protected:
     /** Indicates this element's participation in a ligature. **/
-    std::string m_lig;
+    data_LIGATURE m_lig;
 
 /* include <attlig> */
 };

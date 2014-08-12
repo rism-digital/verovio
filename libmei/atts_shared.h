@@ -809,8 +809,8 @@ public:
      * @name Setters and getters for class members
      */
     ///@{
-    void SetColored(std::string colored_) { m_colored = colored_; };
-    std::string GetColored() const { return m_colored; };
+    void SetColored(data_BOOLEAN colored_) { m_colored = colored_; };
+    data_BOOLEAN GetColored() const { return m_colored; };
     ///@}
 
 protected:
@@ -822,7 +822,7 @@ protected:
      * an inverse color; that is, the note head is void when it would otherwise be
      * filled and vice versa.
      **/
-    std::string m_colored;
+    data_BOOLEAN m_colored;
 
 /* include <attcolored> */
 };

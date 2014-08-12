@@ -403,6 +403,9 @@ void MeiOutput::WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multi
 
 void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
 {
+    note->WriteColoration(meiNote);
+    note->WriteNoteLogMensural(meiNote);
+    
     meiNote.append_attribute( "pname" ) = PitchToStr( note->m_pname ).c_str();
     meiNote.append_attribute( "oct" ) = OctToStr( note->m_oct ).c_str();
     meiNote.append_attribute( "dur" ) = DurToStr( note->m_dur ).c_str();
@@ -418,20 +421,10 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
     if ( note->m_cueSize ) {
         meiNote.append_attribute( "grace" ) = "unknown";
     }
-    if ( note->m_lig ) {
-        if ( note->m_ligObliqua ) {
-            meiNote.append_attribute( "lig" ) = "obliqua";
-        }
-        else {
-            meiNote.append_attribute( "lig" ) = "recta";
-        }
-    }
+
     if ( note->m_stemDir ) {
         // this is not really correct because Note::m_stemDir indicates that it is opposite the normal position
         meiNote.append_attribute( "stem.dir" ) = "up";
-    }
-    if ( note->m_colored ) {
-        meiNote.append_attribute( "colored" ) = "true";
     }
     // missing m_artic, m_chord, m_headShape, m_slur, m_stemLen
     return;
@@ -1236,6 +1229,9 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 {
 	Note *vrvNote = new Note();
     
+    vrvNote->ReadColoration(note);
+    vrvNote->ReadNoteLogMensural(note);
+    
 	// pitch
 	if ( note.attribute( "pname" ) ) {
 		vrvNote->m_pname = StrToPitch( note.attribute( "pname" ).value() );
@@ -1264,23 +1260,12 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
     if ( note.attribute( "grace" ) ) {
 		vrvNote->m_cueSize = true; //
 	}
-    // ligature
-    if ( note.attribute( "lig" ) ) {
-        vrvNote->m_lig = true; // this has to be double checked
-        if ( strcmp( note.attribute( "lig" ).value(), "obliqua" ) == 0 ) {
-            vrvNote->m_ligObliqua = true;
-        }
-    }
     // stem direction
     if ( note.attribute( "stem.dir" ) ) {
         // we use it to indicate opposite direction
         //vrvNote->m_stemDir = 1;
     }
-    // coloration
-    if ( note.attribute( "colored" ) ) {
-        vrvNote->m_colored = ( strcmp ( note.attribute( "colored" ).value(), "true" ) == 0 );
-    }
-    // coloration
+    // tie
     if ( note.attribute( "tie" ) ) {
         if ( (strcmp ( note.attribute( "tie" ).value(), "i" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
             vrvNote->SetTieAttrInitial();

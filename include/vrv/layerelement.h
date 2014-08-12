@@ -76,21 +76,6 @@ public:
 	virtual void SetValue( int value, int flag = 0 );
     
     /**
-     * Change the coloration for Note elements.
-     */ 
-	virtual void ChangeColoration( ) {};
-    
-    /**
-     * Change the stem direction for Note elements.
-     */
-	virtual void ChangeStem( ) {};
-    
-    /**
-     * Set the ligature flag for Note elements.
-     */
-	virtual void SetLigature( ) {};
-    
-    /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
      * The value is false by default. Is it set to true of ScoreDef and StaffDef and used when
      * drawing the element

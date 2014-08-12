@@ -42,41 +42,52 @@ protected:
     std::string IntToStr(int data);
     ///@}
     
-    /** @name Converters for writing */
-    ///@{
-    std::string AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data);
-    std::string BarRenditionToStr(data_BARRENDITION data);
-    std::string BoolToStr(data_BOOLEAN data);
-    std::string ClefShapeToStr(data_CLEFSHAPE data);
-    std::string KeySignatureToStr(data_KEYSIGNATURE data);
-    std::string MensurationSignToStr(data_MENSURATIONSIGN data);
-    std::string MeterSignToStr(data_METERSIGN data);
-    std::string ModeToStr(data_MODE data);
-    std::string OctaveDisToStr(data_OCTAVE_DIS data);
-    std::string OrientationToStr(data_ORIENTATION data);
-    std::string PitchNameToStr(data_PITCHNAME data);
-    std::string PlaceToStr(data_PLACE data);
-    ///@}
-
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value);
     int StrToInt(std::string value);
     
-    /** @name Converters for reading */
+    /** @name Converters for writing and reading */
     ///@{
+    std::string AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data);
     data_ACCIDENTAL_IMPLICIT StrToAccidentalImplicit(std::string value);
+    
+    std::string BarRenditionToStr(data_BARRENDITION data);
     data_BARRENDITION StrToBarRendition(std::string value);
+    
+    std::string BoolToStr(data_BOOLEAN data);
     data_BOOLEAN StrToBool(std::string value);
+    
+    std::string ClefShapeToStr(data_CLEFSHAPE data);
     data_CLEFSHAPE StrToClefShape(std::string value);
+    
+    std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);
+    
+    std::string LigatureToStr(data_LIGATURE data);
+    data_LIGATURE StrToLigature(std::string value);
+    
+    std::string MensurationSignToStr(data_MENSURATIONSIGN data);
     data_MENSURATIONSIGN StrToMensurationSign(std::string value);
+    
+    std::string MeterSignToStr(data_METERSIGN data);
     data_METERSIGN StrToMeterSign(std::string value);
+    
+    std::string ModeToStr(data_MODE data);
     data_MODE StrToMode(std::string value);
+    
+    std::string OctaveDisToStr(data_OCTAVE_DIS data);
     data_OCTAVE_DIS StrToOctaveDis(std::string value);
+    
+    std::string OrientationToStr(data_ORIENTATION data);
     data_ORIENTATION StrToOrientation(std::string value);
+    
+    std::string PitchNameToStr(data_PITCHNAME data);
     data_PITCHNAME StrToPitchName(std::string value);
+    
+    std::string PlaceToStr(data_PLACE data);
     data_PLACE StrToPlace(std::string value);
+  
     ///@}
 
 };

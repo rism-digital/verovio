@@ -25,12 +25,25 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface()
+	LayerElement("note-"), DurationInterface(), PitchInterface(), AttColoration(), AttNoteLogMensural()
 {
-    m_colored = false;
-    m_headshape = 0;
-    m_lig = 0;
-    m_ligObliqua = false;
+    Reset();
+}
+
+
+Note::~Note()
+{
+    // This deletes the Tie and Slur objects if necessary
+    ResetTieAttrInitial();
+    ResetSlurAttrInitial();
+}
+    
+void Note::Reset()
+{
+    //DurationInterface::Reset();
+    //PitchInterface::Reset();
+    ResetColoration();
+    ResetNoteLogMensural();
     m_stemDir = 0;
     m_stemLen = 0;
     m_acciaccatura = false;
@@ -41,14 +54,7 @@ Note::Note():
     // slur pointers
     m_slurAttrInitial = NULL;
     m_slurAttrTerminal = NULL;
-}
-
-
-Note::~Note()
-{
-    // This deletes the Tie and Slur objects if necessary
-    ResetTieAttrInitial();
-    ResetSlurAttrInitial();
+    
 }
 
 bool Note::operator==( Object& other )
@@ -60,13 +66,7 @@ bool Note::operator==( Object& other )
     if ( this->m_colored != otherNote->m_colored ) {
         return false;
     }
-    if ( this->m_headshape != otherNote->m_headshape ) {
-        return false;
-    }
     if ( this->m_lig != otherNote->m_lig ) {
-        return false;
-    }
-    if ( this->m_ligObliqua != otherNote->m_ligObliqua ) {
         return false;
     }
     // slur need value by value comparison
@@ -101,11 +101,10 @@ void Note::SetValue( int value, int flag )
     
 	// remove ligature flag for  inadequate values	
 	if ( ( value < DUR_BR ) || ( value > DUR_1 ) ) {
-        this->m_lig = 0;
+        this->SetLig(LIGATURE_NONE);
     }
 
-	this->m_colored = false;
-	this->m_ligObliqua = false;
+	this->SetColored(BOOLEAN_NONE);
     
 	// remove qauto flag for silences and inadequate values	
 	if ( ( value > DUR_LG ) && ( value < DUR_2 ) ) {
@@ -178,30 +177,6 @@ void Note::ResetSlurAttrInitial( )
         delete m_tieAttrInitial;
         m_tieAttrInitial = NULL;
     }
-}
-
-void Note::ChangeColoration( )
-{
-    this->m_colored = !this->m_colored;
-}
-
-
-void Note::ChangeStem( )
-{
-	if ( ( this->m_dur > DUR_LG ) && ( this->m_dur < DUR_2 ) )
-		return;
-    
-	this->m_stemDir = !this->m_stemDir;
-}
-
-
-void Note::SetLigature( )
-{
-	if ( ( this->m_dur == DUR_LG ) || ( this->m_dur > DUR_1 ) ) {
-		return;
-    }
-	
-	this->m_lig = true;
 }
 
 int Note::GetHorizontalSpacing()

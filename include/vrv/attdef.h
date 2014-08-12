@@ -96,6 +96,15 @@ enum data_KEYSIGNATURE {
     KEYSIGNATURE_7s,
     KEYSIGNATURE_mixed
 };
+
+/**
+ * MEI values for @lig (no datatype in MEI)
+ */
+enum data_LIGATURE {
+    LIGATURE_NONE = 0,
+    LIGATURE_recta,
+    LIGATURE_obliqua
+};
     
 /**
  * MEI data.METERSIGN
