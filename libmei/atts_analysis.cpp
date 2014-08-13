@@ -72,32 +72,63 @@ bool AttCommonAnl::ReadCommonAnl(  pugi::xml_node element ) {
 
 bool AttCommonAnl::WriteCommonAnl(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetCopyof() == "") {
+    if (this->HasCopyof()) {
         element.append_attribute("copyof") = StrToStr(this->GetCopyof()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetCorresp() == "") {
+    if (this->HasCorresp()) {
         element.append_attribute("corresp") = StrToStr(this->GetCorresp()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetNext() == "") {
+    if (this->HasNext()) {
         element.append_attribute("next") = StrToStr(this->GetNext()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetPrev() == "") {
+    if (this->HasPrev()) {
         element.append_attribute("prev") = StrToStr(this->GetPrev()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetSameas() == "") {
+    if (this->HasSameas()) {
         element.append_attribute("sameas") = StrToStr(this->GetSameas()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetSynch() == "") {
+    if (this->HasSynch()) {
         element.append_attribute("synch") = StrToStr(this->GetSynch()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttCommonAnl::HasCopyof( )
+{
+    return (m_copyof != "");
+}
+
+bool AttCommonAnl::HasCorresp( )
+{
+    return (m_corresp != "");
+}
+
+bool AttCommonAnl::HasNext( )
+{
+    return (m_next != "");
+}
+
+bool AttCommonAnl::HasPrev( )
+{
+    return (m_prev != "");
+}
+
+bool AttCommonAnl::HasSameas( )
+{
+    return (m_sameas != "");
+}
+
+bool AttCommonAnl::HasSynch( )
+{
+    return (m_synch != "");
+}
+
 
 /* include <attsynch> */
 
@@ -128,12 +159,18 @@ bool AttHarmonicfunction::ReadHarmonicfunction(  pugi::xml_node element ) {
 
 bool AttHarmonicfunction::WriteHarmonicfunction(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetHfunc() == "") {
+    if (this->HasHfunc()) {
         element.append_attribute("hfunc") = StrToStr(this->GetHfunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttHarmonicfunction::HasHfunc( )
+{
+    return (m_hfunc != "");
+}
+
 
 /* include <atthfunc> */
 
@@ -164,12 +201,18 @@ bool AttIntervalharmonic::ReadIntervalharmonic(  pugi::xml_node element ) {
 
 bool AttIntervalharmonic::WriteIntervalharmonic(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetInth() == "") {
+    if (this->HasInth()) {
         element.append_attribute("inth") = StrToStr(this->GetInth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttIntervalharmonic::HasInth( )
+{
+    return (m_inth != "");
+}
+
 
 /* include <attinth> */
 
@@ -200,12 +243,18 @@ bool AttIntervallicdesc::ReadIntervallicdesc(  pugi::xml_node element ) {
 
 bool AttIntervallicdesc::WriteIntervallicdesc(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetIntm() == "") {
+    if (this->HasIntm()) {
         element.append_attribute("intm") = StrToStr(this->GetIntm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttIntervallicdesc::HasIntm( )
+{
+    return (m_intm != "");
+}
+
 
 /* include <attintm> */
 
@@ -236,12 +285,18 @@ bool AttMelodicfunction::ReadMelodicfunction(  pugi::xml_node element ) {
 
 bool AttMelodicfunction::WriteMelodicfunction(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetMfunc() == "") {
+    if (this->HasMfunc()) {
         element.append_attribute("mfunc") = StrToStr(this->GetMfunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMelodicfunction::HasMfunc( )
+{
+    return (m_mfunc != "");
+}
+
 
 /* include <attmfunc> */
 
@@ -272,12 +327,18 @@ bool AttPitchclass::ReadPitchclass(  pugi::xml_node element ) {
 
 bool AttPitchclass::WritePitchclass(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetPclass() == "") {
+    if (this->HasPclass()) {
         element.append_attribute("pclass") = StrToStr(this->GetPclass()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttPitchclass::HasPclass( )
+{
+    return (m_pclass != "");
+}
+
 
 /* include <attpclass> */
 
@@ -308,12 +369,18 @@ bool AttSolfa::ReadSolfa(  pugi::xml_node element ) {
 
 bool AttSolfa::WriteSolfa(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetPsolfa() == "") {
+    if (this->HasPsolfa()) {
         element.append_attribute("psolfa") = StrToStr(this->GetPsolfa()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttSolfa::HasPsolfa( )
+{
+    return (m_psolfa != "");
+}
+
 
 /* include <attpsolfa> */
 

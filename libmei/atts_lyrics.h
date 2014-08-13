@@ -44,14 +44,20 @@ public:
     bool WriteVerseLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRefrain(std::string refrain_) { m_refrain = refrain_; };
-    std::string GetRefrain() const { return m_refrain; };
+    std::string GetRefrain() const { return m_refrain; };    
+    bool HasRefrain( );
+    
     //
     void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; };
-    std::string GetRhythm() const { return m_rhythm; };
+    std::string GetRhythm() const { return m_rhythm; };    
+    bool HasRhythm( );
+    
     ///@}
 
 protected:

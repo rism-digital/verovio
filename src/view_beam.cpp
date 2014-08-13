@@ -77,7 +77,7 @@ double sy_up = 0.0;
 float hauteurBarreMoyenne = 3.0;
 double dA, dB;
 char extern_q_auto = 0;
-char extern_queue = 0;
+data_STEMDIRECTION extern_queue = STEMDIRECTION_NONE;
 
 /* This need to be put into a beam class */
 
@@ -93,8 +93,8 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 		unsigned mq_val   : 1;	/* marqueur de changement de valeur*/
 		unsigned fl_cond : 1;	/* flags concernant partage portees */
 		unsigned flsht    : 3;	/* garde le pnt->_shport */
-		unsigned dir	  : 3;	/* marqueur direction queues */
 		unsigned _grp	  : 1;	/* marqueur de groupes rythmiques */
+        data_STEMDIRECTION dir	  : 3;	/* marqueur direction queues */
 	}	fb;
 	int iHauteur=0;
 	float fPente = 0.0;
@@ -180,7 +180,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     ***/
     
     extern_q_auto = 1; //RZ was ((Note*)chk)->m_stemLen; bit it is always 0!
-    extern_queue =  ((Note*)chk)->m_stemDir;
+    extern_queue =  ((Note*)chk)->GetStemDir();
 
     ListOfObjects::iterator iter = beam->m_list.begin();
     
@@ -201,8 +201,8 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 
 			if (!calcBeam && chk->IsNote())	/* on ne se limite pas au calcul des queues */
 			{	
-                ((Note*)chk)->m_stemLen = extern_q_auto;
-				if (!extern_q_auto)	((Note*)chk)->m_stemDir = extern_queue;
+                ((Note*)chk)->d_stemLen = extern_q_auto;
+				if (!extern_q_auto)	((Note*)chk)->d_stemDir = extern_queue;
 				/***if ( !fb._liaison && (((Note*)chk)->m_slur[0] & SLUR_TERMINAL)) {
 					fb._liaison = ON;
                 }***/
@@ -321,7 +321,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     }
 
 
-	fb.dir = OFF;
+	fb.dir = STEMDIRECTION_NONE;
 	if (extern_q_auto && (!fb.mrq_port)) /*** || (bch.inpt && bch.markchrd))) ***/
 	/* direction queues: auto = moyenne */
 	/* bch.inpt: le flot de donnees a ete envoye par input et non rd_objet */
@@ -329,7 +329,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         milieu = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
 		y_moy /= ct;
 		if ( y_moy <  milieu )
-			fb.dir = ON;
+			fb.dir = STEMDIRECTION_up;
 
 		if (bch.inpt && bch.markchrd)
 		/* entree de input: de l'accord est dans l'air */
@@ -436,7 +436,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 			s_x2 += crd[i].a * crd[i].a;
 			s_xy += crd[i].a * _ybeam[i];
             if ( crd[i].chk->IsNote() ) {
-                ((Note*)crd[i].chk)->m_stemDir = fb.dir;
+                ((Note*)crd[i].chk)->d_stemDir = fb.dir;
             }
 		}
 

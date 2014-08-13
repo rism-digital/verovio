@@ -47,12 +47,18 @@ bool AttRegularmethod::ReadRegularmethod(  pugi::xml_node element ) {
 
 bool AttRegularmethod::WriteRegularmethod(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetMethod() == "") {
+    if (this->HasMethod()) {
         element.append_attribute("method") = StrToStr(this->GetMethod()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttRegularmethod::HasMethod( )
+{
+    return (m_method != "");
+}
+
 
 /* include <attmethod> */
 

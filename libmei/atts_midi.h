@@ -44,20 +44,30 @@ public:
     bool WriteChannelized( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMidiChannel(std::string midiChannel_) { m_midiChannel = midiChannel_; };
-    std::string GetMidiChannel() const { return m_midiChannel; };
+    std::string GetMidiChannel() const { return m_midiChannel; };    
+    bool HasMidiChannel( );
+    
     //
     void SetMidiDuty(std::string midiDuty_) { m_midiDuty = midiDuty_; };
-    std::string GetMidiDuty() const { return m_midiDuty; };
+    std::string GetMidiDuty() const { return m_midiDuty; };    
+    bool HasMidiDuty( );
+    
     //
     void SetMidiPort(std::string midiPort_) { m_midiPort = midiPort_; };
-    std::string GetMidiPort() const { return m_midiPort; };
+    std::string GetMidiPort() const { return m_midiPort; };    
+    bool HasMidiPort( );
+    
     //
     void SetMidiTrackInt(int midiTrackInt_) { m_midiTrackInt = midiTrackInt_; };
-    int GetMidiTrackInt() const { return m_midiTrackInt; };
+    int GetMidiTrackInt() const { return m_midiTrackInt; };    
+    bool HasMidiTrackInt( );
+    
     ///@}
 
 protected:
@@ -93,20 +103,30 @@ public:
     bool WriteMidiinstrument( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMidiInstrnum(std::string midiInstrnum_) { m_midiInstrnum = midiInstrnum_; };
-    std::string GetMidiInstrnum() const { return m_midiInstrnum; };
+    std::string GetMidiInstrnum() const { return m_midiInstrnum; };    
+    bool HasMidiInstrnum( );
+    
     //
     void SetMidiInstrname(std::string midiInstrname_) { m_midiInstrname = midiInstrname_; };
-    std::string GetMidiInstrname() const { return m_midiInstrname; };
+    std::string GetMidiInstrname() const { return m_midiInstrname; };    
+    bool HasMidiInstrname( );
+    
     //
     void SetMidiPan(std::string midiPan_) { m_midiPan = midiPan_; };
-    std::string GetMidiPan() const { return m_midiPan; };
+    std::string GetMidiPan() const { return m_midiPan; };    
+    bool HasMidiPan( );
+    
     //
     void SetMidiVolume(std::string midiVolume_) { m_midiVolume = midiVolume_; };
-    std::string GetMidiVolume() const { return m_midiVolume; };
+    std::string GetMidiVolume() const { return m_midiVolume; };    
+    bool HasMidiVolume( );
+    
     ///@}
 
 protected:
@@ -145,11 +165,15 @@ public:
     bool WriteMidinumber( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };
+    int GetNumInt() const { return m_numInt; };    
+    bool HasNumInt( );
+    
     ///@}
 
 protected:
@@ -182,11 +206,15 @@ public:
     bool WriteMiditempo( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMidiTempo(std::string midiTempo_) { m_midiTempo = midiTempo_; };
-    std::string GetMidiTempo() const { return m_midiTempo; };
+    std::string GetMidiTempo() const { return m_midiTempo; };    
+    bool HasMidiTempo( );
+    
     ///@}
 
 protected:
@@ -219,11 +247,15 @@ public:
     bool WriteMidivalue( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetVal(std::string val_) { m_val = val_; };
-    std::string GetVal() const { return m_val; };
+    std::string GetVal() const { return m_val; };    
+    bool HasVal( );
+    
     ///@}
 
 protected:
@@ -253,11 +285,15 @@ public:
     bool WriteTimebase( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPpqInt(int ppqInt_) { m_ppqInt = ppqInt_; };
-    int GetPpqInt() const { return m_ppqInt; };
+    int GetPpqInt() const { return m_ppqInt; };    
+    bool HasPpqInt( );
+    
     ///@}
 
 protected:

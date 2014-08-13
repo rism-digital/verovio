@@ -44,11 +44,15 @@ public:
     bool WriteLigatureLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     ///@}
 
 protected:
@@ -78,14 +82,20 @@ public:
     bool WriteMensurVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     //
     void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; };
-    data_ORIENTATION GetOrient() const { return m_orient; };
+    data_ORIENTATION GetOrient() const { return m_orient; };    
+    bool HasOrient( );
+    
     ///@}
 
 protected:
@@ -117,20 +127,30 @@ public:
     bool WriteMensurDefaultLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMensurDot(data_BOOLEAN mensurDot_) { m_mensurDot = mensurDot_; };
-    data_BOOLEAN GetMensurDot() const { return m_mensurDot; };
+    data_BOOLEAN GetMensurDot() const { return m_mensurDot; };    
+    bool HasMensurDot( );
+    
     //
     void SetMensurLocInt(int mensurLocInt_) { m_mensurLocInt = mensurLocInt_; };
-    int GetMensurLocInt() const { return m_mensurLocInt; };
+    int GetMensurLocInt() const { return m_mensurLocInt; };    
+    bool HasMensurLocInt( );
+    
     //
     void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; };
-    data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; };
+    data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; };    
+    bool HasMensurSign( );
+    
     //
     void SetMensurSlash(unsigned char mensurSlash_) { m_mensurSlash = mensurSlash_; };
-    unsigned char GetMensurSlash() const { return m_mensurSlash; };
+    unsigned char GetMensurSlash() const { return m_mensurSlash; };    
+    bool HasMensurSlash( );
+    
     ///@}
 
 protected:
@@ -169,20 +189,30 @@ public:
     bool WriteMensurDefaultVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; };
-    std::string GetMensurColor() const { return m_mensurColor; };
+    std::string GetMensurColor() const { return m_mensurColor; };    
+    bool HasMensurColor( );
+    
     //
     void SetMensurForm(std::string mensurForm_) { m_mensurForm = mensurForm_; };
-    std::string GetMensurForm() const { return m_mensurForm; };
+    std::string GetMensurForm() const { return m_mensurForm; };    
+    bool HasMensurForm( );
+    
     //
     void SetMensurOrient(std::string mensurOrient_) { m_mensurOrient = mensurOrient_; };
-    std::string GetMensurOrient() const { return m_mensurOrient; };
+    std::string GetMensurOrient() const { return m_mensurOrient; };    
+    bool HasMensurOrient( );
+    
     //
     void SetMensurSize(std::string mensurSize_) { m_mensurSize = mensurSize_; };
-    std::string GetMensurSize() const { return m_mensurSize; };
+    std::string GetMensurSize() const { return m_mensurSize; };    
+    bool HasMensurSize( );
+    
     ///@}
 
 protected:
@@ -221,11 +251,15 @@ public:
     bool WriteNoteLogMensural( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLig(data_LIGATURE lig_) { m_lig = lig_; };
-    data_LIGATURE GetLig() const { return m_lig; };
+    data_LIGATURE GetLig() const { return m_lig; };    
+    bool HasLig( );
+    
     ///@}
 
 protected:
@@ -255,11 +289,15 @@ public:
     bool WriteRestVisMensural( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSpacesInt(int spacesInt_) { m_spacesInt = spacesInt_; };
-    int GetSpacesInt() const { return m_spacesInt; };
+    int GetSpacesInt() const { return m_spacesInt; };    
+    bool HasSpacesInt( );
+    
     ///@}
 
 protected:
@@ -289,14 +327,20 @@ public:
     bool WriteStaffDefLogMensural( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetProportNumInt(int proportNumInt_) { m_proportNumInt = proportNumInt_; };
-    int GetProportNumInt() const { return m_proportNumInt; };
+    int GetProportNumInt() const { return m_proportNumInt; };    
+    bool HasProportNumInt( );
+    
     //
     void SetProportNumbaseInt(int proportNumbaseInt_) { m_proportNumbaseInt = proportNumbaseInt_; };
-    int GetProportNumbaseInt() const { return m_proportNumbaseInt; };
+    int GetProportNumbaseInt() const { return m_proportNumbaseInt; };    
+    bool HasProportNumbaseInt( );
+    
     ///@}
 
 protected:
@@ -336,14 +380,20 @@ public:
     bool WriteStafflocPitched( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPloc(std::string ploc_) { m_ploc = ploc_; };
-    std::string GetPloc() const { return m_ploc; };
+    std::string GetPloc() const { return m_ploc; };    
+    bool HasPloc( );
+    
     //
     void SetOloc(std::string oloc_) { m_oloc = oloc_; };
-    std::string GetOloc() const { return m_oloc; };
+    std::string GetOloc() const { return m_oloc; };    
+    bool HasOloc( );
+    
     ///@}
 
 protected:

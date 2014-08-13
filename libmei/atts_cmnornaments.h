@@ -44,14 +44,20 @@ public:
     bool WriteMordentLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     //
     void SetLong(std::string long_) { m_long = long_; };
-    std::string GetLong() const { return m_long; };
+    std::string GetLong() const { return m_long; };    
+    bool HasLong( );
+    
     ///@}
 
 protected:
@@ -86,11 +92,15 @@ public:
     bool WriteOrnam( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetOrnam(std::string ornam_) { m_ornam = ornam_; };
-    std::string GetOrnam() const { return m_ornam; };
+    std::string GetOrnam() const { return m_ornam; };    
+    bool HasOrnam( );
+    
     ///@}
 
 protected:
@@ -124,14 +134,20 @@ public:
     bool WriteOrnamentaccid( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAccidupper(std::string accidupper_) { m_accidupper = accidupper_; };
-    std::string GetAccidupper() const { return m_accidupper; };
+    std::string GetAccidupper() const { return m_accidupper; };    
+    bool HasAccidupper( );
+    
     //
     void SetAccidlower(std::string accidlower_) { m_accidlower = accidlower_; };
-    std::string GetAccidlower() const { return m_accidlower; };
+    std::string GetAccidlower() const { return m_accidlower; };    
+    bool HasAccidlower( );
+    
     ///@}
 
 protected:
@@ -163,14 +179,20 @@ public:
     bool WriteTurnLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDelayed(std::string delayed_) { m_delayed = delayed_; };
-    std::string GetDelayed() const { return m_delayed; };
+    std::string GetDelayed() const { return m_delayed; };    
+    bool HasDelayed( );
+    
     //
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     ///@}
 
 protected:

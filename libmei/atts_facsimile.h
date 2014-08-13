@@ -44,11 +44,15 @@ public:
     bool WriteFacsimile( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetFacs(std::string facs_) { m_facs = facs_; };
-    std::string GetFacs() const { return m_facs; };
+    std::string GetFacs() const { return m_facs; };    
+    bool HasFacs( );
+    
     ///@}
 
 protected:

@@ -44,11 +44,15 @@ public:
     bool WriteCrit( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCause(std::string cause_) { m_cause = cause_; };
-    std::string GetCause() const { return m_cause; };
+    std::string GetCause() const { return m_cause; };    
+    bool HasCause( );
+    
     ///@}
 
 protected:
@@ -81,11 +85,15 @@ public:
     bool WriteSource( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSource(std::string source_) { m_source = source_; };
-    std::string GetSource() const { return m_source; };
+    std::string GetSource() const { return m_source; };    
+    bool HasSource( );
+    
     ///@}
 
 protected:

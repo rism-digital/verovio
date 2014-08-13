@@ -405,6 +405,7 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
 {
     note->WriteColoration(meiNote);
     note->WriteNoteLogMensural(meiNote);
+    note->WriteStemmed(meiNote);
     
     meiNote.append_attribute( "pname" ) = PitchToStr( note->m_pname ).c_str();
     meiNote.append_attribute( "oct" ) = OctToStr( note->m_oct ).c_str();
@@ -421,12 +422,6 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
     if ( note->m_cueSize ) {
         meiNote.append_attribute( "grace" ) = "unknown";
     }
-
-    if ( note->m_stemDir ) {
-        // this is not really correct because Note::m_stemDir indicates that it is opposite the normal position
-        meiNote.append_attribute( "stem.dir" ) = "up";
-    }
-    // missing m_artic, m_chord, m_headShape, m_slur, m_stemLen
     return;
 }
 

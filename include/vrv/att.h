@@ -87,6 +87,12 @@ protected:
     
     std::string PlaceToStr(data_PLACE data);
     data_PLACE StrToPlace(std::string value);
+    
+    std::string StemDirectionToStr(data_STEMDIRECTION data);
+    data_STEMDIRECTION StrToStemDirection(std::string value);
+    
+    std::string StemPositionToStr(data_STEMPOSITION data);
+    data_STEMPOSITION StrToStemPosition(std::string value);
   
     ///@}
 

@@ -44,26 +44,40 @@ public:
     bool WriteCommonAnl( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCopyof(std::string copyof_) { m_copyof = copyof_; };
-    std::string GetCopyof() const { return m_copyof; };
+    std::string GetCopyof() const { return m_copyof; };    
+    bool HasCopyof( );
+    
     //
     void SetCorresp(std::string corresp_) { m_corresp = corresp_; };
-    std::string GetCorresp() const { return m_corresp; };
+    std::string GetCorresp() const { return m_corresp; };    
+    bool HasCorresp( );
+    
     //
     void SetNext(std::string next_) { m_next = next_; };
-    std::string GetNext() const { return m_next; };
+    std::string GetNext() const { return m_next; };    
+    bool HasNext( );
+    
     //
     void SetPrev(std::string prev_) { m_prev = prev_; };
-    std::string GetPrev() const { return m_prev; };
+    std::string GetPrev() const { return m_prev; };    
+    bool HasPrev( );
+    
     //
     void SetSameas(std::string sameas_) { m_sameas = sameas_; };
-    std::string GetSameas() const { return m_sameas; };
+    std::string GetSameas() const { return m_sameas; };    
+    bool HasSameas( );
+    
     //
     void SetSynch(std::string synch_) { m_synch = synch_; };
-    std::string GetSynch() const { return m_synch; };
+    std::string GetSynch() const { return m_synch; };    
+    bool HasSynch( );
+    
     ///@}
 
 protected:
@@ -109,11 +123,15 @@ public:
     bool WriteHarmonicfunction( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetHfunc(std::string hfunc_) { m_hfunc = hfunc_; };
-    std::string GetHfunc() const { return m_hfunc; };
+    std::string GetHfunc() const { return m_hfunc; };    
+    bool HasHfunc( );
+    
     ///@}
 
 protected:
@@ -143,11 +161,15 @@ public:
     bool WriteIntervalharmonic( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetInth(std::string inth_) { m_inth = inth_; };
-    std::string GetInth() const { return m_inth; };
+    std::string GetInth() const { return m_inth; };    
+    bool HasInth( );
+    
     ///@}
 
 protected:
@@ -180,11 +202,15 @@ public:
     bool WriteIntervallicdesc( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetIntm(std::string intm_) { m_intm = intm_; };
-    std::string GetIntm() const { return m_intm; };
+    std::string GetIntm() const { return m_intm; };    
+    bool HasIntm( );
+    
     ///@}
 
 protected:
@@ -218,11 +244,15 @@ public:
     bool WriteMelodicfunction( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMfunc(std::string mfunc_) { m_mfunc = mfunc_; };
-    std::string GetMfunc() const { return m_mfunc; };
+    std::string GetMfunc() const { return m_mfunc; };    
+    bool HasMfunc( );
+    
     ///@}
 
 protected:
@@ -252,11 +282,15 @@ public:
     bool WritePitchclass( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPclass(std::string pclass_) { m_pclass = pclass_; };
-    std::string GetPclass() const { return m_pclass; };
+    std::string GetPclass() const { return m_pclass; };    
+    bool HasPclass( );
+    
     ///@}
 
 protected:
@@ -286,11 +320,15 @@ public:
     bool WriteSolfa( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPsolfa(std::string psolfa_) { m_psolfa = psolfa_; };
-    std::string GetPsolfa() const { return m_psolfa; };
+    std::string GetPsolfa() const { return m_psolfa; };    
+    bool HasPsolfa( );
+    
     ///@}
 
 protected:

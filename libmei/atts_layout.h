@@ -44,11 +44,15 @@ public:
     bool WriteBarline( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetBarline(std::string barline_) { m_barline = barline_; };
-    std::string GetBarline() const { return m_barline; };
+    std::string GetBarline() const { return m_barline; };    
+    bool HasBarline( );
+    
     ///@}
 
 protected:
@@ -83,11 +87,15 @@ public:
     bool WriteIgnore( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetIgnored(std::string ignored_) { m_ignored = ignored_; };
-    std::string GetIgnored() const { return m_ignored; };
+    std::string GetIgnored() const { return m_ignored; };    
+    bool HasIgnored( );
+    
     ///@}
 
 protected:
@@ -120,11 +128,15 @@ public:
     bool WriteLayout( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetIgnored(std::string ignored_) { m_ignored = ignored_; };
-    std::string GetIgnored() const { return m_ignored; };
+    std::string GetIgnored() const { return m_ignored; };    
+    bool HasIgnored( );
+    
     ///@}
 
 protected:
@@ -157,11 +169,15 @@ public:
     bool WriteMeasureRef( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMeasureref(std::string measureref_) { m_measureref = measureref_; };
-    std::string GetMeasureref() const { return m_measureref; };
+    std::string GetMeasureref() const { return m_measureref; };    
+    bool HasMeasureref( );
+    
     ///@}
 
 protected:
@@ -191,11 +207,15 @@ public:
     bool WritePageRef( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPbrefs(std::string pbrefs_) { m_pbrefs = pbrefs_; };
-    std::string GetPbrefs() const { return m_pbrefs; };
+    std::string GetPbrefs() const { return m_pbrefs; };    
+    bool HasPbrefs( );
+    
     ///@}
 
 protected:
@@ -225,11 +245,15 @@ public:
     bool WriteSurface( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSurface(std::string surface_) { m_surface = surface_; };
-    std::string GetSurface() const { return m_surface; };
+    std::string GetSurface() const { return m_surface; };    
+    bool HasSurface( );
+    
     ///@}
 
 protected:
@@ -259,11 +283,15 @@ public:
     bool WriteSystemRef( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSbrefs(std::string sbrefs_) { m_sbrefs = sbrefs_; };
-    std::string GetSbrefs() const { return m_sbrefs; };
+    std::string GetSbrefs() const { return m_sbrefs; };    
+    bool HasSbrefs( );
+    
     ///@}
 
 protected:

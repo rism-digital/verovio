@@ -52,16 +52,27 @@ bool AttVerseLog::ReadVerseLog(  pugi::xml_node element ) {
 
 bool AttVerseLog::WriteVerseLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetRefrain() == "") {
+    if (this->HasRefrain()) {
         element.append_attribute("refrain") = StrToStr(this->GetRefrain()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetRhythm() == "") {
+    if (this->HasRhythm()) {
         element.append_attribute("rhythm") = StrToStr(this->GetRhythm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttVerseLog::HasRefrain( )
+{
+    return (m_refrain != "");
+}
+
+bool AttVerseLog::HasRhythm( )
+{
+    return (m_rhythm != "");
+}
+
 
 /* include <attrhythm> */
 

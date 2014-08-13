@@ -44,14 +44,20 @@ public:
     bool WriteIneumeLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     //
     void SetName(std::string name_) { m_name = name_; };
-    std::string GetName() const { return m_name; };
+    std::string GetName() const { return m_name; };    
+    bool HasName( );
+    
     ///@}
 
 protected:
@@ -83,14 +89,20 @@ public:
     bool WriteUneumeLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     //
     void SetName(std::string name_) { m_name = name_; };
-    std::string GetName() const { return m_name; };
+    std::string GetName() const { return m_name; };    
+    bool HasName( );
+    
     ///@}
 
 protected:

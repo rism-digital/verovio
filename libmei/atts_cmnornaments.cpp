@@ -52,16 +52,27 @@ bool AttMordentLog::ReadMordentLog(  pugi::xml_node element ) {
 
 bool AttMordentLog::WriteMordentLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetForm() == "") {
+    if (this->HasForm()) {
         element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetLong() == "") {
+    if (this->HasLong()) {
         element.append_attribute("long") = StrToStr(this->GetLong()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMordentLog::HasForm( )
+{
+    return (m_form != "");
+}
+
+bool AttMordentLog::HasLong( )
+{
+    return (m_long != "");
+}
+
 
 /* include <attlong> */
 
@@ -92,12 +103,18 @@ bool AttOrnam::ReadOrnam(  pugi::xml_node element ) {
 
 bool AttOrnam::WriteOrnam(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetOrnam() == "") {
+    if (this->HasOrnam()) {
         element.append_attribute("ornam") = StrToStr(this->GetOrnam()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttOrnam::HasOrnam( )
+{
+    return (m_ornam != "");
+}
+
 
 /* include <attornam> */
 
@@ -133,16 +150,27 @@ bool AttOrnamentaccid::ReadOrnamentaccid(  pugi::xml_node element ) {
 
 bool AttOrnamentaccid::WriteOrnamentaccid(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetAccidupper() == "") {
+    if (this->HasAccidupper()) {
         element.append_attribute("accidupper") = StrToStr(this->GetAccidupper()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetAccidlower() == "") {
+    if (this->HasAccidlower()) {
         element.append_attribute("accidlower") = StrToStr(this->GetAccidlower()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttOrnamentaccid::HasAccidupper( )
+{
+    return (m_accidupper != "");
+}
+
+bool AttOrnamentaccid::HasAccidlower( )
+{
+    return (m_accidlower != "");
+}
+
 
 /* include <attaccidlower> */
 
@@ -178,16 +206,27 @@ bool AttTurnLog::ReadTurnLog(  pugi::xml_node element ) {
 
 bool AttTurnLog::WriteTurnLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetDelayed() == "") {
+    if (this->HasDelayed()) {
         element.append_attribute("delayed") = StrToStr(this->GetDelayed()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetForm() == "") {
+    if (this->HasForm()) {
         element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttTurnLog::HasDelayed( )
+{
+    return (m_delayed != "");
+}
+
+bool AttTurnLog::HasForm( )
+{
+    return (m_form != "");
+}
+
 
 /* include <attform> */
 

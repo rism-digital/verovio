@@ -52,16 +52,27 @@ bool AttIneumeLog::ReadIneumeLog(  pugi::xml_node element ) {
 
 bool AttIneumeLog::WriteIneumeLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetForm() == "") {
+    if (this->HasForm()) {
         element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetName() == "") {
+    if (this->HasName()) {
         element.append_attribute("name") = StrToStr(this->GetName()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttIneumeLog::HasForm( )
+{
+    return (m_form != "");
+}
+
+bool AttIneumeLog::HasName( )
+{
+    return (m_name != "");
+}
+
 
 /* include <attname> */
 
@@ -97,16 +108,27 @@ bool AttUneumeLog::ReadUneumeLog(  pugi::xml_node element ) {
 
 bool AttUneumeLog::WriteUneumeLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetForm() == "") {
+    if (this->HasForm()) {
         element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetName() == "") {
+    if (this->HasName()) {
         element.append_attribute("name") = StrToStr(this->GetName()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttUneumeLog::HasForm( )
+{
+    return (m_form != "");
+}
+
+bool AttUneumeLog::HasName( )
+{
+    return (m_name != "");
+}
+
 
 /* include <attname> */
 

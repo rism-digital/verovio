@@ -47,12 +47,18 @@ bool AttAlignment::ReadAlignment(  pugi::xml_node element ) {
 
 bool AttAlignment::WriteAlignment(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetWhen() == "") {
+    if (this->HasWhen()) {
         element.append_attribute("when") = StrToStr(this->GetWhen()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttAlignment::HasWhen( )
+{
+    return (m_when != "");
+}
+
 
 /* include <attwhen> */
 

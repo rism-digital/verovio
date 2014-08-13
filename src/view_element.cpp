@@ -251,7 +251,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	//	int horphyspoint=h_pnt;
 	//int b = element->m_drawingY;
-	int up=0, i, valdec, fontNo, ledge, queueCentre;
+	int i, valdec, fontNo, ledge, queueCentre;
 	int x1, x2, y2, espac7, decval, vertical;
 	int formval = 0;	// pour permettre dessiner colorations avec dÇcalage de val
 	int rayon, milieu = 0;
@@ -340,12 +340,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             {
 				//***up = this->q_auto ? ((ynn < milieu)? ON :OFF):this->queue;
 				// ENZ
-				up = (ynn > milieu) ? ON : OFF;
+				note->d_stemDir = (ynn > milieu) ? STEMDIRECTION_down : STEMDIRECTION_up;
             }
 			
 			// ENZ
-			if ( note->m_stemDir == 0 ) {
-				up = (up == ON) ? OFF : ON;
+			if ( note->HasStemDir() ) {
+				//up = (up == ON) ? OFF : ON;
+                note->d_stemDir = note->GetStemDir();
             }
 			
 			espac7 = note->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
@@ -358,7 +359,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			// diminuer le rayon de la moitie de l'epaisseur du trait de queue
 			rayon -= (m_doc->m_env.m_stemWidth) / 2;
 
-			if (!up) {	// si queue vers le bas (a gauche)
+			if (note->d_stemDir == STEMDIRECTION_down) {	// si queue vers le bas (a gauche)
 				espac7 = -espac7;
 				decval = -decval;
 				rayon = -rayon;
@@ -383,7 +384,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				rayon = 0;
 			x2 = xn + rayon;
 
-			if (up)
+			if (note->d_stemDir == STEMDIRECTION_up)
 			{
 				if (formval > DUR_8 && !queueCentre)
 				// Le 24 Septembre 1993. Correction esthetique pour rapprocher tailles 
@@ -477,7 +478,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		}*///
 	}
 	else
-	{	if (note->m_dur < DUR_2 || (note->m_dur > DUR_8 && !inBeam && up))
+	{	if (note->m_dur < DUR_2 || (note->m_dur > DUR_8 && !inBeam && (note->d_stemDir == STEMDIRECTION_up)))
 			x2 = xn + m_doc->m_drawingStep1*7/2;
 		else
 			x2 = xn + m_doc->m_drawingStep1*5/2;
@@ -1495,6 +1496,10 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     LayerElement *note1 = NULL;
     LayerElement *note2 = NULL;
     
+    // coordinates for the tie/slur
+    int x1, x2, y1, y2;
+    up = true;
+    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     
     Tie *tie = dynamic_cast<Tie*>(element);
     Slur *slur = dynamic_cast<Slur*>(element);
@@ -1504,6 +1509,11 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     } else if ( slur ) {
         note1 = slur->GetFirstNote();
         note2 = slur->GetSecondNote();
+    }
+    
+    if ( !note1 && !note2 ) {
+        // no note, obviously nothing to do...
+        return;
     }
 
     System *currentSystem = dynamic_cast<System*>( staff->GetFirstParent( &typeid(System) ) );
@@ -1518,7 +1528,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if ( note2 ) {
         parentSystem2 = dynamic_cast<System*>( note2->GetFirstParent( &typeid(System) ) );
     }
-    
+
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     if ( parentSystem2 && currentSystem && ( parentSystem2 != currentSystem) ) {
@@ -1530,9 +1540,12 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (!nextAlignement) {
             return;
         }
-        int y = note1->GetDrawingY();
-        int x2 = measure->GetDrawingX() + nextAlignement->GetXRel();
-        DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y - 14, x2, y - 14, true);
+        y1 = y2 = note1->GetDrawingY();
+        x1 = note1->GetDrawingX();
+        x2 = measure->GetDrawingX() + nextAlignement->GetXRel();
+        assert(dynamic_cast<Note*>(note1));
+        noteStemDir = dynamic_cast<Note*>(note1)->d_stemDir;
+        //DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y - 14, x2, y - 14, true);
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( parentSystem1 && currentSystem && ( parentSystem1 != currentSystem) ) {
@@ -1544,36 +1557,61 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (!previousAlignement) {
             return;
         }
-        int y = note2->GetDrawingY();
-        //int x1 = measure->m_drawingX + previousAlignement->GetXRel() + previousAlignement->GetMaxWidth();
-        // is it actually better for x1 just to have a fixed value
-        int x1 = note2->GetDrawingX() - m_doc->m_drawingStep2;
-        DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);
+        y1 = y2 = note2->GetDrawingY();
+        x2 = note2->GetDrawingX();
+        x1 = x2 - m_doc->m_drawingStep2;
+        assert(dynamic_cast<Note*>(note2));
+        noteStemDir = dynamic_cast<Note*>(note2)->d_stemDir;
+        //DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);
     }
-    // Finally the normal case, but double check we have two notes
-    else if ( note1 && note2 ) {
-        
+    // Finally the normal case
+    else {
+        assert( note1 && note2 );
         // Copied from DrawNote
         // We could use the stamDir information
         // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
-        int y1 = note1->GetDrawingY();
-        int y2 = note2->GetDrawingY();
-        int bby = staff->GetDrawingY();
-        int milieu = bby - m_doc->m_drawingInterl[staff->staffSize] * 2;
-        
-        up = (y1 < milieu) ? true : false;
-        
-        dc->StartGraphic( element, "tie", element->GetUuid() );
-        
-        // FIXME, take in account elements that can be netween notes, eg keys time etc
-        // 20 height nice with 70, not nice with 50
-        if (up)
-            DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y1 - 14, note2->GetDrawingX(), y2 - 14, true);
-        else
-            DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y1 + 14, note2->GetDrawingX(), y2 + 14, false);
-
-        dc->EndGraphic(element, this );
+        y1 = note1->GetDrawingY();
+        y2 = note2->GetDrawingY();
+        x1 = note1->GetDrawingX();
+        x2 = note2->GetDrawingX();
+        assert(dynamic_cast<Note*>(note1));
+        // for now we only look at the first note - needs to be improved
+        // d_stemDir it not set properly in beam - needs to be fixed.
+        noteStemDir = dynamic_cast<Note*>(note1)->d_stemDir;
+        /*
+        assert(dynamic_cast<Note*>(note2));
+        if (dynamic_cast<Note*>(note2)->d_stemDir != noteStemDir) {
+            LogDebug("Diverging stem directions (%d;%d)", noteStemDir, dynamic_cast<Note*>(note2)->d_stemDir);
+        }
+        */
     }
+    
+    assert( dynamic_cast<Note*>(note1));
+    if (noteStemDir == STEMDIRECTION_up) {
+        up = false;
+    }
+    else if (noteStemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        int center = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize] * 2;
+        up = (y1 > center) ? true : false;
+    }
+    
+    // FIXME, take in account elements that can be netween notes, eg keys time etc
+    // 20 height nice with 70, not nice with 50
+    // Also remove hard-coded values!
+    if (up) {
+        y1 += 14;
+        y2 += 14;
+    }
+    else {
+        y1 -= 14;
+        y2 -= 14;
+    }
+    
+    dc->StartGraphic( element, "tie", element->GetUuid() );
+    DrawTieOrSlurBezier(dc, x1, y2, x2, y2, !up);
+    dc->EndGraphic(element, this );
+
     
 }
 

@@ -62,24 +62,45 @@ bool AttChannelized::ReadChannelized(  pugi::xml_node element ) {
 
 bool AttChannelized::WriteChannelized(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetMidiChannel() == "") {
+    if (this->HasMidiChannel()) {
         element.append_attribute("midi.channel") = StrToStr(this->GetMidiChannel()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetMidiDuty() == "") {
+    if (this->HasMidiDuty()) {
         element.append_attribute("midi.duty") = StrToStr(this->GetMidiDuty()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetMidiPort() == "") {
+    if (this->HasMidiPort()) {
         element.append_attribute("midi.port") = StrToStr(this->GetMidiPort()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetMidiTrackInt() == 0) {
+    if (this->HasMidiTrackInt()) {
         element.append_attribute("midi.track") = IntToStr(this->GetMidiTrackInt()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttChannelized::HasMidiChannel( )
+{
+    return (m_midiChannel != "");
+}
+
+bool AttChannelized::HasMidiDuty( )
+{
+    return (m_midiDuty != "");
+}
+
+bool AttChannelized::HasMidiPort( )
+{
+    return (m_midiPort != "");
+}
+
+bool AttChannelized::HasMidiTrackInt( )
+{
+    return (m_midiTrackInt != 0);
+}
+
 
 /* include <attmidi.track> */
 
@@ -125,24 +146,45 @@ bool AttMidiinstrument::ReadMidiinstrument(  pugi::xml_node element ) {
 
 bool AttMidiinstrument::WriteMidiinstrument(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetMidiInstrnum() == "") {
+    if (this->HasMidiInstrnum()) {
         element.append_attribute("midi.instrnum") = StrToStr(this->GetMidiInstrnum()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetMidiInstrname() == "") {
+    if (this->HasMidiInstrname()) {
         element.append_attribute("midi.instrname") = StrToStr(this->GetMidiInstrname()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetMidiPan() == "") {
+    if (this->HasMidiPan()) {
         element.append_attribute("midi.pan") = StrToStr(this->GetMidiPan()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetMidiVolume() == "") {
+    if (this->HasMidiVolume()) {
         element.append_attribute("midi.volume") = StrToStr(this->GetMidiVolume()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMidiinstrument::HasMidiInstrnum( )
+{
+    return (m_midiInstrnum != "");
+}
+
+bool AttMidiinstrument::HasMidiInstrname( )
+{
+    return (m_midiInstrname != "");
+}
+
+bool AttMidiinstrument::HasMidiPan( )
+{
+    return (m_midiPan != "");
+}
+
+bool AttMidiinstrument::HasMidiVolume( )
+{
+    return (m_midiVolume != "");
+}
+
 
 /* include <attmidi.volume> */
 
@@ -173,12 +215,18 @@ bool AttMidinumber::ReadMidinumber(  pugi::xml_node element ) {
 
 bool AttMidinumber::WriteMidinumber(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetNumInt() == 0) {
+    if (this->HasNumInt()) {
         element.append_attribute("num") = IntToStr(this->GetNumInt()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMidinumber::HasNumInt( )
+{
+    return (m_numInt != 0);
+}
+
 
 /* include <attnum> */
 
@@ -209,12 +257,18 @@ bool AttMiditempo::ReadMiditempo(  pugi::xml_node element ) {
 
 bool AttMiditempo::WriteMiditempo(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetMidiTempo() == "") {
+    if (this->HasMidiTempo()) {
         element.append_attribute("midi.tempo") = StrToStr(this->GetMidiTempo()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMiditempo::HasMidiTempo( )
+{
+    return (m_midiTempo != "");
+}
+
 
 /* include <attmidi.tempo> */
 
@@ -245,12 +299,18 @@ bool AttMidivalue::ReadMidivalue(  pugi::xml_node element ) {
 
 bool AttMidivalue::WriteMidivalue(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetVal() == "") {
+    if (this->HasVal()) {
         element.append_attribute("val") = StrToStr(this->GetVal()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMidivalue::HasVal( )
+{
+    return (m_val != "");
+}
+
 
 /* include <attval> */
 
@@ -281,12 +341,18 @@ bool AttTimebase::ReadTimebase(  pugi::xml_node element ) {
 
 bool AttTimebase::WriteTimebase(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetPpqInt() == 0) {
+    if (this->HasPpqInt()) {
         element.append_attribute("ppq") = IntToStr(this->GetPpqInt()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttTimebase::HasPpqInt( )
+{
+    return (m_ppqInt != 0);
+}
+
 
 /* include <attppq> */
 

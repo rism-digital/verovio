@@ -44,11 +44,15 @@ public:
     bool WriteAccidLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() const { return m_func; };
+    std::string GetFunc() const { return m_func; };    
+    bool HasFunc( );
+    
     ///@}
 
 protected:
@@ -78,11 +82,15 @@ public:
     bool WriteAccidental( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAccid(std::string accid_) { m_accid = accid_; };
-    std::string GetAccid() const { return m_accid; };
+    std::string GetAccid() const { return m_accid; };    
+    bool HasAccid( );
+    
     ///@}
 
 protected:
@@ -112,11 +120,15 @@ public:
     bool WriteAccidentalPerformed( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAccidGes(std::string accidGes_) { m_accidGes = accidGes_; };
-    std::string GetAccidGes() const { return m_accidGes; };
+    std::string GetAccidGes() const { return m_accidGes; };    
+    bool HasAccidGes( );
+    
     ///@}
 
 protected:
@@ -149,11 +161,15 @@ public:
     bool WriteAltsym( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAltsym(std::string altsym_) { m_altsym = altsym_; };
-    std::string GetAltsym() const { return m_altsym; };
+    std::string GetAltsym() const { return m_altsym; };    
+    bool HasAltsym( );
+    
     ///@}
 
 protected:
@@ -186,11 +202,15 @@ public:
     bool WriteArticulation( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetArtic(std::string artic_) { m_artic = artic_; };
-    std::string GetArtic() const { return m_artic; };
+    std::string GetArtic() const { return m_artic; };    
+    bool HasArtic( );
+    
     ///@}
 
 protected:
@@ -226,11 +246,15 @@ public:
     bool WriteArticulationPerformed( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetArticGes(std::string articGes_) { m_articGes = articGes_; };
-    std::string GetArticGes() const { return m_articGes; };
+    std::string GetArticGes() const { return m_articGes; };    
+    bool HasArticGes( );
+    
     ///@}
 
 protected:
@@ -260,11 +284,15 @@ public:
     bool WriteAugmentdots( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDots(std::string dots_) { m_dots = dots_; };
-    std::string GetDots() const { return m_dots; };
+    std::string GetDots() const { return m_dots; };    
+    bool HasDots( );
+    
     ///@}
 
 protected:
@@ -294,14 +322,20 @@ public:
     bool WriteAuthorized( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAuthority(std::string authority_) { m_authority = authority_; };
-    std::string GetAuthority() const { return m_authority; };
+    std::string GetAuthority() const { return m_authority; };    
+    bool HasAuthority( );
+    
     //
     void SetAuthURI(std::string authURI_) { m_authURI = authURI_; };
-    std::string GetAuthURI() const { return m_authURI; };
+    std::string GetAuthURI() const { return m_authURI; };    
+    bool HasAuthURI( );
+    
     ///@}
 
 protected:
@@ -339,11 +373,15 @@ public:
     bool WriteBarLineLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
-    data_BARRENDITION GetRend() const { return m_rend; };
+    data_BARRENDITION GetRend() const { return m_rend; };    
+    bool HasRend( );
+    
     ///@}
 
 protected:
@@ -373,14 +411,20 @@ public:
     bool WriteBarplacement( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetBarplace(std::string barplace_) { m_barplace = barplace_; };
-    std::string GetBarplace() const { return m_barplace; };
+    std::string GetBarplace() const { return m_barplace; };    
+    bool HasBarplace( );
+    
     //
     void SetTaktplace(std::string taktplace_) { m_taktplace = taktplace_; };
-    std::string GetTaktplace() const { return m_taktplace; };
+    std::string GetTaktplace() const { return m_taktplace; };    
+    bool HasTaktplace( );
+    
     ///@}
 
 protected:
@@ -421,14 +465,20 @@ public:
     bool WriteBeamingVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetBeamRend(std::string beamRend_) { m_beamRend = beamRend_; };
-    std::string GetBeamRend() const { return m_beamRend; };
+    std::string GetBeamRend() const { return m_beamRend; };    
+    bool HasBeamRend( );
+    
     //
     void SetBeamSlopeDbl(double beamSlopeDbl_) { m_beamSlopeDbl = beamSlopeDbl_; };
-    double GetBeamSlopeDbl() const { return m_beamSlopeDbl; };
+    double GetBeamSlopeDbl() const { return m_beamSlopeDbl; };    
+    bool HasBeamSlopeDbl( );
+    
     ///@}
 
 protected:
@@ -460,11 +510,15 @@ public:
     bool WriteBibl( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAnalog(std::string analog_) { m_analog = analog_; };
-    std::string GetAnalog() const { return m_analog; };
+    std::string GetAnalog() const { return m_analog; };    
+    bool HasAnalog( );
+    
     ///@}
 
 protected:
@@ -497,11 +551,15 @@ public:
     bool WriteCalendared( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCalendar(std::string calendar_) { m_calendar = calendar_; };
-    std::string GetCalendar() const { return m_calendar; };
+    std::string GetCalendar() const { return m_calendar; };    
+    bool HasCalendar( );
+    
     ///@}
 
 protected:
@@ -534,11 +592,15 @@ public:
     bool WriteCanonical( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDbkey(std::string dbkey_) { m_dbkey = dbkey_; };
-    std::string GetDbkey() const { return m_dbkey; };
+    std::string GetDbkey() const { return m_dbkey; };    
+    bool HasDbkey( );
+    
     ///@}
 
 protected:
@@ -568,11 +630,15 @@ public:
     bool WriteChordVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCluster(std::string cluster_) { m_cluster = cluster_; };
-    std::string GetCluster() const { return m_cluster; };
+    std::string GetCluster() const { return m_cluster; };    
+    bool HasCluster( );
+    
     ///@}
 
 protected:
@@ -606,11 +672,15 @@ public:
     bool WriteClefLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCautionary(std::string cautionary_) { m_cautionary = cautionary_; };
-    std::string GetCautionary() const { return m_cautionary; };
+    std::string GetCautionary() const { return m_cautionary; };    
+    bool HasCautionary( );
+    
     ///@}
 
 protected:
@@ -643,20 +713,30 @@ public:
     bool WriteCleffingLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetClefShape(data_CLEFSHAPE clefShape_) { m_clefShape = clefShape_; };
-    data_CLEFSHAPE GetClefShape() const { return m_clefShape; };
+    data_CLEFSHAPE GetClefShape() const { return m_clefShape; };    
+    bool HasClefShape( );
+    
     //
     void SetClefLine(unsigned char clefLine_) { m_clefLine = clefLine_; };
-    unsigned char GetClefLine() const { return m_clefLine; };
+    unsigned char GetClefLine() const { return m_clefLine; };    
+    bool HasClefLine( );
+    
     //
     void SetClefDis(data_OCTAVE_DIS clefDis_) { m_clefDis = clefDis_; };
-    data_OCTAVE_DIS GetClefDis() const { return m_clefDis; };
+    data_OCTAVE_DIS GetClefDis() const { return m_clefDis; };    
+    bool HasClefDis( );
+    
     //
     void SetClefDisPlace(data_PLACE clefDisPlace_) { m_clefDisPlace = clefDisPlace_; };
-    data_PLACE GetClefDisPlace() const { return m_clefDisPlace; };
+    data_PLACE GetClefDisPlace() const { return m_clefDisPlace; };    
+    bool HasClefDisPlace( );
+    
     ///@}
 
 protected:
@@ -696,14 +776,20 @@ public:
     bool WriteCleffingVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetClefColor(std::string clefColor_) { m_clefColor = clefColor_; };
-    std::string GetClefColor() const { return m_clefColor; };
+    std::string GetClefColor() const { return m_clefColor; };    
+    bool HasClefColor( );
+    
     //
     void SetClefVisible(std::string clefVisible_) { m_clefVisible = clefVisible_; };
-    std::string GetClefVisible() const { return m_clefVisible; };
+    std::string GetClefVisible() const { return m_clefVisible; };    
+    bool HasClefVisible( );
+    
     ///@}
 
 protected:
@@ -735,11 +821,15 @@ public:
     bool WriteClefshape( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetShape(data_CLEFSHAPE shape_) { m_shape = shape_; };
-    data_CLEFSHAPE GetShape() const { return m_shape; };
+    data_CLEFSHAPE GetShape() const { return m_shape; };    
+    bool HasShape( );
+    
     ///@}
 
 protected:
@@ -769,11 +859,15 @@ public:
     bool WriteColor( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetColor(std::string color_) { m_color = color_; };
-    std::string GetColor() const { return m_color; };
+    std::string GetColor() const { return m_color; };    
+    bool HasColor( );
+    
     ///@}
 
 protected:
@@ -806,11 +900,15 @@ public:
     bool WriteColoration( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetColored(data_BOOLEAN colored_) { m_colored = colored_; };
-    data_BOOLEAN GetColored() const { return m_colored; };
+    data_BOOLEAN GetColored() const { return m_colored; };    
+    bool HasColored( );
+    
     ///@}
 
 protected:
@@ -847,17 +945,25 @@ public:
     bool WriteCommon( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLabel(std::string label_) { m_label = label_; };
-    std::string GetLabel() const { return m_label; };
+    std::string GetLabel() const { return m_label; };    
+    bool HasLabel( );
+    
     //
     void SetN(int n_) { m_n = n_; };
-    int GetN() const { return m_n; };
+    int GetN() const { return m_n; };    
+    bool HasN( );
+    
     //
     void SetBase(std::string base_) { m_base = base_; };
-    std::string GetBase() const { return m_base; };
+    std::string GetBase() const { return m_base; };    
+    bool HasBase( );
+    
     ///@}
 
 protected:
@@ -897,20 +1003,30 @@ public:
     bool WriteCoordinated( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetUlxInt(int ulxInt_) { m_ulxInt = ulxInt_; };
-    int GetUlxInt() const { return m_ulxInt; };
+    int GetUlxInt() const { return m_ulxInt; };    
+    bool HasUlxInt( );
+    
     //
     void SetUlyInt(int ulyInt_) { m_ulyInt = ulyInt_; };
-    int GetUlyInt() const { return m_ulyInt; };
+    int GetUlyInt() const { return m_ulyInt; };    
+    bool HasUlyInt( );
+    
     //
     void SetLrxInt(int lrxInt_) { m_lrxInt = lrxInt_; };
-    int GetLrxInt() const { return m_lrxInt; };
+    int GetLrxInt() const { return m_lrxInt; };    
+    bool HasLrxInt( );
+    
     //
     void SetLryInt(int lryInt_) { m_lryInt = lryInt_; };
-    int GetLryInt() const { return m_lryInt; };
+    int GetLryInt() const { return m_lryInt; };    
+    bool HasLryInt( );
+    
     ///@}
 
 protected:
@@ -946,17 +1062,25 @@ public:
     bool WriteCurvature( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetBezier(std::string bezier_) { m_bezier = bezier_; };
-    std::string GetBezier() const { return m_bezier; };
+    std::string GetBezier() const { return m_bezier; };    
+    bool HasBezier( );
+    
     //
     void SetBulge(std::string bulge_) { m_bulge = bulge_; };
-    std::string GetBulge() const { return m_bulge; };
+    std::string GetBulge() const { return m_bulge; };    
+    bool HasBulge( );
+    
     //
     void SetCurvedir(std::string curvedir_) { m_curvedir = curvedir_; };
-    std::string GetCurvedir() const { return m_curvedir; };
+    std::string GetCurvedir() const { return m_curvedir; };    
+    bool HasCurvedir( );
+    
     ///@}
 
 protected:
@@ -998,11 +1122,15 @@ public:
     bool WriteCurverend( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
-    data_BARRENDITION GetRend() const { return m_rend; };
+    data_BARRENDITION GetRend() const { return m_rend; };    
+    bool HasRend( );
+    
     ///@}
 
 protected:
@@ -1032,11 +1160,15 @@ public:
     bool WriteCustosLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTarget(std::string target_) { m_target = target_; };
-    std::string GetTarget() const { return m_target; };
+    std::string GetTarget() const { return m_target; };    
+    bool HasTarget( );
+    
     ///@}
 
 protected:
@@ -1069,23 +1201,35 @@ public:
     bool WriteDatable( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetEnddate(std::string enddate_) { m_enddate = enddate_; };
-    std::string GetEnddate() const { return m_enddate; };
+    std::string GetEnddate() const { return m_enddate; };    
+    bool HasEnddate( );
+    
     //
     void SetIsodate(std::string isodate_) { m_isodate = isodate_; };
-    std::string GetIsodate() const { return m_isodate; };
+    std::string GetIsodate() const { return m_isodate; };    
+    bool HasIsodate( );
+    
     //
     void SetNotafter(std::string notafter_) { m_notafter = notafter_; };
-    std::string GetNotafter() const { return m_notafter; };
+    std::string GetNotafter() const { return m_notafter; };    
+    bool HasNotafter( );
+    
     //
     void SetNotbefore(std::string notbefore_) { m_notbefore = notbefore_; };
-    std::string GetNotbefore() const { return m_notbefore; };
+    std::string GetNotbefore() const { return m_notbefore; };    
+    bool HasNotbefore( );
+    
     //
     void SetStartdate(std::string startdate_) { m_startdate = startdate_; };
-    std::string GetStartdate() const { return m_startdate; };
+    std::string GetStartdate() const { return m_startdate; };    
+    bool HasStartdate( );
+    
     ///@}
 
 protected:
@@ -1123,11 +1267,15 @@ public:
     bool WriteDatapointing( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetData(std::string data_) { m_data = data_; };
-    std::string GetData() const { return m_data; };
+    std::string GetData() const { return m_data; };    
+    bool HasData( );
+    
     ///@}
 
 protected:
@@ -1157,11 +1305,15 @@ public:
     bool WriteDeclaring( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDecls(std::string decls_) { m_decls = decls_; };
-    std::string GetDecls() const { return m_decls; };
+    std::string GetDecls() const { return m_decls; };    
+    bool HasDecls( );
+    
     ///@}
 
 protected:
@@ -1194,17 +1346,25 @@ public:
     bool WriteDistances( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDynamDistDbl(double dynamDistDbl_) { m_dynamDistDbl = dynamDistDbl_; };
-    double GetDynamDistDbl() const { return m_dynamDistDbl; };
+    double GetDynamDistDbl() const { return m_dynamDistDbl; };    
+    bool HasDynamDistDbl( );
+    
     //
     void SetHarmDistDbl(double harmDistDbl_) { m_harmDistDbl = harmDistDbl_; };
-    double GetHarmDistDbl() const { return m_harmDistDbl; };
+    double GetHarmDistDbl() const { return m_harmDistDbl; };    
+    bool HasHarmDistDbl( );
+    
     //
     void SetTextDistDbl(double textDistDbl_) { m_textDistDbl = textDistDbl_; };
-    double GetTextDistDbl() const { return m_textDistDbl; };
+    double GetTextDistDbl() const { return m_textDistDbl; };    
+    bool HasTextDistDbl( );
+    
     ///@}
 
 protected:
@@ -1241,11 +1401,15 @@ public:
     bool WriteDotLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };
+    std::string GetForm() const { return m_form; };    
+    bool HasForm( );
+    
     ///@}
 
 protected:
@@ -1275,11 +1439,15 @@ public:
     bool WriteDurationDefault( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDurDefault(std::string durDefault_) { m_durDefault = durDefault_; };
-    std::string GetDurDefault() const { return m_durDefault; };
+    std::string GetDurDefault() const { return m_durDefault; };    
+    bool HasDurDefault( );
+    
     ///@}
 
 protected:
@@ -1313,11 +1481,15 @@ public:
     bool WriteDurationMusical( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() const { return m_dur; };
+    std::string GetDur() const { return m_dur; };    
+    bool HasDur( );
+    
     ///@}
 
 protected:
@@ -1350,11 +1522,15 @@ public:
     bool WriteDurationPerformed( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDurGes(std::string durGes_) { m_durGes = durGes_; };
-    std::string GetDurGes() const { return m_durGes; };
+    std::string GetDurGes() const { return m_durGes; };    
+    bool HasDurGes( );
+    
     ///@}
 
 protected:
@@ -1389,14 +1565,20 @@ public:
     bool WriteDurationRatio( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };
+    int GetNumInt() const { return m_numInt; };    
+    bool HasNumInt( );
+    
     //
     void SetNumbaseInt(int numbaseInt_) { m_numbaseInt = numbaseInt_; };
-    int GetNumbaseInt() const { return m_numbaseInt; };
+    int GetNumbaseInt() const { return m_numbaseInt; };    
+    bool HasNumbaseInt( );
+    
     ///@}
 
 protected:
@@ -1434,11 +1616,15 @@ public:
     bool WriteDurationTimestamp( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() const { return m_dur; };
+    std::string GetDur() const { return m_dur; };    
+    bool HasDur( );
+    
     ///@}
 
 protected:
@@ -1471,11 +1657,15 @@ public:
     bool WriteEnclosingchars( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetEnclose(std::string enclose_) { m_enclose = enclose_; };
-    std::string GetEnclose() const { return m_enclose; };
+    std::string GetEnclose() const { return m_enclose; };    
+    bool HasEnclose( );
+    
     ///@}
 
 protected:
@@ -1510,11 +1700,15 @@ public:
     bool WriteFermatapresent( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetFermata(std::string fermata_) { m_fermata = fermata_; };
-    std::string GetFermata() const { return m_fermata; };
+    std::string GetFermata() const { return m_fermata; };    
+    bool HasFermata( );
+    
     ///@}
 
 protected:
@@ -1548,11 +1742,15 @@ public:
     bool WriteHandident( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetHand(std::string hand_) { m_hand = hand_; };
-    std::string GetHand() const { return m_hand; };
+    std::string GetHand() const { return m_hand; };    
+    bool HasHand( );
+    
     ///@}
 
 protected:
@@ -1585,11 +1783,15 @@ public:
     bool WriteHorizontalalign( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetHalign(std::string halign_) { m_halign = halign_; };
-    std::string GetHalign() const { return m_halign; };
+    std::string GetHalign() const { return m_halign; };    
+    bool HasHalign( );
+    
     ///@}
 
 protected:
@@ -1619,11 +1821,15 @@ public:
     bool WriteInstrumentident( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetInstr(std::string instr_) { m_instr = instr_; };
-    std::string GetInstr() const { return m_instr; };
+    std::string GetInstr() const { return m_instr; };    
+    bool HasInstr( );
+    
     ///@}
 
 protected:
@@ -1656,11 +1862,15 @@ public:
     bool WriteInternetmedia( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMimetype(std::string mimetype_) { m_mimetype = mimetype_; };
-    std::string GetMimetype() const { return m_mimetype; };
+    std::string GetMimetype() const { return m_mimetype; };    
+    bool HasMimetype( );
+    
     ///@}
 
 protected:
@@ -1694,11 +1904,15 @@ public:
     bool WriteJoined( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetJoin(std::string join_) { m_join = join_; };
-    std::string GetJoin() const { return m_join; };
+    std::string GetJoin() const { return m_join; };    
+    bool HasJoin( );
+    
     ///@}
 
 protected:
@@ -1735,11 +1949,15 @@ public:
     bool WriteKeySigLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMode(std::string mode_) { m_mode = mode_; };
-    std::string GetMode() const { return m_mode; };
+    std::string GetMode() const { return m_mode; };    
+    bool HasMode( );
+    
     ///@}
 
 protected:
@@ -1769,23 +1987,35 @@ public:
     bool WriteKeySigDefaultLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetKeyAccid(data_ACCIDENTAL_IMPLICIT keyAccid_) { m_keyAccid = keyAccid_; };
-    data_ACCIDENTAL_IMPLICIT GetKeyAccid() const { return m_keyAccid; };
+    data_ACCIDENTAL_IMPLICIT GetKeyAccid() const { return m_keyAccid; };    
+    bool HasKeyAccid( );
+    
     //
     void SetKeyMode(data_MODE keyMode_) { m_keyMode = keyMode_; };
-    data_MODE GetKeyMode() const { return m_keyMode; };
+    data_MODE GetKeyMode() const { return m_keyMode; };    
+    bool HasKeyMode( );
+    
     //
     void SetKeyPname(data_PITCHNAME keyPname_) { m_keyPname = keyPname_; };
-    data_PITCHNAME GetKeyPname() const { return m_keyPname; };
+    data_PITCHNAME GetKeyPname() const { return m_keyPname; };    
+    bool HasKeyPname( );
+    
     //
     void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; };
-    data_KEYSIGNATURE GetKeySig() const { return m_keySig; };
+    data_KEYSIGNATURE GetKeySig() const { return m_keySig; };    
+    bool HasKeySig( );
+    
     //
     void SetKeySigMixed(std::string keySigMixed_) { m_keySigMixed = keySigMixed_; };
-    std::string GetKeySigMixed() const { return m_keySigMixed; };
+    std::string GetKeySigMixed() const { return m_keySigMixed; };    
+    bool HasKeySigMixed( );
+    
     ///@}
 
 protected:
@@ -1839,14 +2069,20 @@ public:
     bool WriteKeySigDefaultVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetKeySigShow(std::string keySigShow_) { m_keySigShow = keySigShow_; };
-    std::string GetKeySigShow() const { return m_keySigShow; };
+    std::string GetKeySigShow() const { return m_keySigShow; };    
+    bool HasKeySigShow( );
+    
     //
     void SetKeySigShowchange(std::string keySigShowchange_) { m_keySigShowchange = keySigShowchange_; };
-    std::string GetKeySigShowchange() const { return m_keySigShowchange; };
+    std::string GetKeySigShowchange() const { return m_keySigShowchange; };    
+    bool HasKeySigShowchange( );
+    
     ///@}
 
 protected:
@@ -1878,11 +2114,15 @@ public:
     bool WriteLabelsAddl( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLabelAbbr(std::string labelAbbr_) { m_labelAbbr = labelAbbr_; };
-    std::string GetLabelAbbr() const { return m_labelAbbr; };
+    std::string GetLabelAbbr() const { return m_labelAbbr; };    
+    bool HasLabelAbbr( );
+    
     ///@}
 
 protected:
@@ -1915,11 +2155,15 @@ public:
     bool WriteLang( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLang(std::string lang_) { m_lang = lang_; };
-    std::string GetLang() const { return m_lang; };
+    std::string GetLang() const { return m_lang; };    
+    bool HasLang( );
+    
     ///@}
 
 protected:
@@ -1949,11 +2193,15 @@ public:
     bool WriteLayerLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDef(std::string def_) { m_def = def_; };
-    std::string GetDef() const { return m_def; };
+    std::string GetDef() const { return m_def; };    
+    bool HasDef( );
+    
     ///@}
 
 protected:
@@ -1983,11 +2231,15 @@ public:
     bool WriteLayerident( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLayer(std::string layer_) { m_layer = layer_; };
-    std::string GetLayer() const { return m_layer; };
+    std::string GetLayer() const { return m_layer; };    
+    bool HasLayer( );
+    
     ///@}
 
 protected:
@@ -2017,11 +2269,15 @@ public:
     bool WriteLineloc( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLine(unsigned char line_) { m_line = line_; };
-    unsigned char GetLine() const { return m_line; };
+    unsigned char GetLine() const { return m_line; };    
+    bool HasLine( );
+    
     ///@}
 
 protected:
@@ -2055,11 +2311,15 @@ public:
     bool WriteLinerend( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
-    data_BARRENDITION GetRend() const { return m_rend; };
+    data_BARRENDITION GetRend() const { return m_rend; };    
+    bool HasRend( );
+    
     ///@}
 
 protected:
@@ -2089,26 +2349,40 @@ public:
     bool WriteLyricstyle( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLyricAlignDbl(double lyricAlignDbl_) { m_lyricAlignDbl = lyricAlignDbl_; };
-    double GetLyricAlignDbl() const { return m_lyricAlignDbl; };
+    double GetLyricAlignDbl() const { return m_lyricAlignDbl; };    
+    bool HasLyricAlignDbl( );
+    
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; };
-    std::string GetLyricFam() const { return m_lyricFam; };
+    std::string GetLyricFam() const { return m_lyricFam; };    
+    bool HasLyricFam( );
+    
     //
     void SetLyricName(std::string lyricName_) { m_lyricName = lyricName_; };
-    std::string GetLyricName() const { return m_lyricName; };
+    std::string GetLyricName() const { return m_lyricName; };    
+    bool HasLyricName( );
+    
     //
     void SetLyricSizeDbl(double lyricSizeDbl_) { m_lyricSizeDbl = lyricSizeDbl_; };
-    double GetLyricSizeDbl() const { return m_lyricSizeDbl; };
+    double GetLyricSizeDbl() const { return m_lyricSizeDbl; };    
+    bool HasLyricSizeDbl( );
+    
     //
     void SetLyricStyle(std::string lyricStyle_) { m_lyricStyle = lyricStyle_; };
-    std::string GetLyricStyle() const { return m_lyricStyle; };
+    std::string GetLyricStyle() const { return m_lyricStyle; };    
+    bool HasLyricStyle( );
+    
     //
     void SetLyricWeight(std::string lyricWeight_) { m_lyricWeight = lyricWeight_; };
-    std::string GetLyricWeight() const { return m_lyricWeight; };
+    std::string GetLyricWeight() const { return m_lyricWeight; };    
+    bool HasLyricWeight( );
+    
     ///@}
 
 protected:
@@ -2148,14 +2422,20 @@ public:
     bool WriteMeasureLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLeft(data_BARRENDITION left_) { m_left = left_; };
-    data_BARRENDITION GetLeft() const { return m_left; };
+    data_BARRENDITION GetLeft() const { return m_left; };    
+    bool HasLeft( );
+    
     //
     void SetRight(data_BARRENDITION right_) { m_right = right_; };
-    data_BARRENDITION GetRight() const { return m_right; };
+    data_BARRENDITION GetRight() const { return m_right; };    
+    bool HasRight( );
+    
     ///@}
 
 protected:
@@ -2191,11 +2471,15 @@ public:
     bool WriteMeasurement( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetUnit(int unit_) { m_unit = unit_; };
-    int GetUnit() const { return m_unit; };
+    int GetUnit() const { return m_unit; };    
+    bool HasUnit( );
+    
     ///@}
 
 protected:
@@ -2225,17 +2509,25 @@ public:
     bool WriteMediabounds( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetBegin(std::string begin_) { m_begin = begin_; };
-    std::string GetBegin() const { return m_begin; };
+    std::string GetBegin() const { return m_begin; };    
+    bool HasBegin( );
+    
     //
     void SetEnd(std::string end_) { m_end = end_; };
-    std::string GetEnd() const { return m_end; };
+    std::string GetEnd() const { return m_end; };    
+    bool HasEnd( );
+    
     //
     void SetBetype(std::string betype_) { m_betype = betype_; };
-    std::string GetBetype() const { return m_betype; };
+    std::string GetBetype() const { return m_betype; };    
+    bool HasBetype( );
+    
     ///@}
 
 protected:
@@ -2282,11 +2574,15 @@ public:
     bool WriteMedium( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMedium(std::string medium_) { m_medium = medium_; };
-    std::string GetMedium() const { return m_medium; };
+    std::string GetMedium() const { return m_medium; };    
+    bool HasMedium( );
+    
     ///@}
 
 protected:
@@ -2316,11 +2612,15 @@ public:
     bool WriteMeiversion( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMeiversion(std::string meiversion_) { m_meiversion = meiversion_; };
-    std::string GetMeiversion() const { return m_meiversion; };
+    std::string GetMeiversion() const { return m_meiversion; };    
+    bool HasMeiversion( );
+    
     ///@}
 
 protected:
@@ -2350,26 +2650,40 @@ public:
     bool WriteMensurLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDot(data_BOOLEAN dot_) { m_dot = dot_; };
-    data_BOOLEAN GetDot() const { return m_dot; };
+    data_BOOLEAN GetDot() const { return m_dot; };    
+    bool HasDot( );
+    
     //
     void SetModusmaior(std::string modusmaior_) { m_modusmaior = modusmaior_; };
-    std::string GetModusmaior() const { return m_modusmaior; };
+    std::string GetModusmaior() const { return m_modusmaior; };    
+    bool HasModusmaior( );
+    
     //
     void SetModusminor(std::string modusminor_) { m_modusminor = modusminor_; };
-    std::string GetModusminor() const { return m_modusminor; };
+    std::string GetModusminor() const { return m_modusminor; };    
+    bool HasModusminor( );
+    
     //
     void SetProlatio(std::string prolatio_) { m_prolatio = prolatio_; };
-    std::string GetProlatio() const { return m_prolatio; };
+    std::string GetProlatio() const { return m_prolatio; };    
+    bool HasProlatio( );
+    
     //
     void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; };
-    data_MENSURATIONSIGN GetSign() const { return m_sign; };
+    data_MENSURATIONSIGN GetSign() const { return m_sign; };    
+    bool HasSign( );
+    
     //
     void SetTempus(std::string tempus_) { m_tempus = tempus_; };
-    std::string GetTempus() const { return m_tempus; };
+    std::string GetTempus() const { return m_tempus; };    
+    bool HasTempus( );
+    
     ///@}
 
 protected:
@@ -2409,17 +2723,25 @@ public:
     bool WriteMeterSigLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCount(int count_) { m_count = count_; };
-    int GetCount() const { return m_count; };
+    int GetCount() const { return m_count; };    
+    bool HasCount( );
+    
     //
     void SetSym(data_METERSIGN sym_) { m_sym = sym_; };
-    data_METERSIGN GetSym() const { return m_sym; };
+    data_METERSIGN GetSym() const { return m_sym; };    
+    bool HasSym( );
+    
     //
     void SetUnit(int unit_) { m_unit = unit_; };
-    int GetUnit() const { return m_unit; };
+    int GetUnit() const { return m_unit; };    
+    bool HasUnit( );
+    
     ///@}
 
 protected:
@@ -2459,11 +2781,15 @@ public:
     bool WriteMeterSigVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
-    data_BARRENDITION GetRend() const { return m_rend; };
+    data_BARRENDITION GetRend() const { return m_rend; };    
+    bool HasRend( );
+    
     ///@}
 
 protected:
@@ -2493,14 +2819,20 @@ public:
     bool WriteMeterSigDefaultLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMeterCount(int meterCount_) { m_meterCount = meterCount_; };
-    int GetMeterCount() const { return m_meterCount; };
+    int GetMeterCount() const { return m_meterCount; };    
+    bool HasMeterCount( );
+    
     //
     void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; };
-    int GetMeterUnit() const { return m_meterUnit; };
+    int GetMeterUnit() const { return m_meterUnit; };    
+    bool HasMeterUnit( );
+    
     ///@}
 
 protected:
@@ -2538,17 +2870,25 @@ public:
     bool WriteMeterSigDefaultVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMeterRend(std::string meterRend_) { m_meterRend = meterRend_; };
-    std::string GetMeterRend() const { return m_meterRend; };
+    std::string GetMeterRend() const { return m_meterRend; };    
+    bool HasMeterRend( );
+    
     //
     void SetMeterShowchange(std::string meterShowchange_) { m_meterShowchange = meterShowchange_; };
-    std::string GetMeterShowchange() const { return m_meterShowchange; };
+    std::string GetMeterShowchange() const { return m_meterShowchange; };    
+    bool HasMeterShowchange( );
+    
     //
     void SetMeterSym(data_METERSIGN meterSym_) { m_meterSym = meterSym_; };
-    data_METERSIGN GetMeterSym() const { return m_meterSym; };
+    data_METERSIGN GetMeterSym() const { return m_meterSym; };    
+    bool HasMeterSym( );
+    
     ///@}
 
 protected:
@@ -2588,11 +2928,15 @@ public:
     bool WriteMeterconformance( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMetcon(std::string metcon_) { m_metcon = metcon_; };
-    std::string GetMetcon() const { return m_metcon; };
+    std::string GetMetcon() const { return m_metcon; };    
+    bool HasMetcon( );
+    
     ///@}
 
 protected:
@@ -2625,14 +2969,20 @@ public:
     bool WriteMeterconformanceBar( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMetcon(std::string metcon_) { m_metcon = metcon_; };
-    std::string GetMetcon() const { return m_metcon; };
+    std::string GetMetcon() const { return m_metcon; };    
+    bool HasMetcon( );
+    
     //
     void SetControl(std::string control_) { m_control = control_; };
-    std::string GetControl() const { return m_control; };
+    std::string GetControl() const { return m_control; };    
+    bool HasControl( );
+    
     ///@}
 
 protected:
@@ -2673,11 +3023,15 @@ public:
     bool WriteMmtempo( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMm(std::string mm_) { m_mm = mm_; };
-    std::string GetMm() const { return m_mm; };
+    std::string GetMm() const { return m_mm; };    
+    bool HasMm( );
+    
     ///@}
 
 protected:
@@ -2711,11 +3065,15 @@ public:
     bool WriteMultinummeasures( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMultiNumber(std::string multiNumber_) { m_multiNumber = multiNumber_; };
-    std::string GetMultiNumber() const { return m_multiNumber; };
+    std::string GetMultiNumber() const { return m_multiNumber; };    
+    bool HasMultiNumber( );
+    
     ///@}
 
 protected:
@@ -2748,14 +3106,20 @@ public:
     bool WriteName( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetNymref(std::string nymref_) { m_nymref = nymref_; };
-    std::string GetNymref() const { return m_nymref; };
+    std::string GetNymref() const { return m_nymref; };    
+    bool HasNymref( );
+    
     //
     void SetRole(std::string role_) { m_role = role_; };
-    std::string GetRole() const { return m_role; };
+    std::string GetRole() const { return m_role; };    
+    bool HasRole( );
+    
     ///@}
 
 protected:
@@ -2793,17 +3157,25 @@ public:
     bool WriteNoteGes( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetOctGes(std::string octGes_) { m_octGes = octGes_; };
-    std::string GetOctGes() const { return m_octGes; };
+    std::string GetOctGes() const { return m_octGes; };    
+    bool HasOctGes( );
+    
     //
     void SetPnameGes(std::string pnameGes_) { m_pnameGes = pnameGes_; };
-    std::string GetPnameGes() const { return m_pnameGes; };
+    std::string GetPnameGes() const { return m_pnameGes; };    
+    bool HasPnameGes( );
+    
     //
     void SetPnum(std::string pnum_) { m_pnum = pnum_; };
-    std::string GetPnum() const { return m_pnum; };
+    std::string GetPnum() const { return m_pnum; };    
+    bool HasPnum( );
+    
     ///@}
 
 protected:
@@ -2837,11 +3209,15 @@ public:
     bool WriteNoteVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetHeadshape(std::string headshape_) { m_headshape = headshape_; };
-    std::string GetHeadshape() const { return m_headshape; };
+    std::string GetHeadshape() const { return m_headshape; };    
+    bool HasHeadshape( );
+    
     ///@}
 
 protected:
@@ -2871,11 +3247,15 @@ public:
     bool WriteOctave( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetOct(std::string oct_) { m_oct = oct_; };
-    std::string GetOct() const { return m_oct; };
+    std::string GetOct() const { return m_oct; };    
+    bool HasOct( );
+    
     ///@}
 
 protected:
@@ -2905,11 +3285,15 @@ public:
     bool WriteOctavedefault( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetOctaveDefault(std::string octaveDefault_) { m_octaveDefault = octaveDefault_; };
-    std::string GetOctaveDefault() const { return m_octaveDefault; };
+    std::string GetOctaveDefault() const { return m_octaveDefault; };    
+    bool HasOctaveDefault( );
+    
     ///@}
 
 protected:
@@ -2943,14 +3327,20 @@ public:
     bool WriteOctavedisplacement( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDis(data_OCTAVE_DIS dis_) { m_dis = dis_; };
-    data_OCTAVE_DIS GetDis() const { return m_dis; };
+    data_OCTAVE_DIS GetDis() const { return m_dis; };    
+    bool HasDis( );
+    
     //
     void SetDisPlace(data_PLACE disPlace_) { m_disPlace = disPlace_; };
-    data_PLACE GetDisPlace() const { return m_disPlace; };
+    data_PLACE GetDisPlace() const { return m_disPlace; };    
+    bool HasDisPlace( );
+    
     ///@}
 
 protected:
@@ -2982,11 +3372,15 @@ public:
     bool WriteOnelinestaff( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetOntheline(std::string ontheline_) { m_ontheline = ontheline_; };
-    std::string GetOntheline() const { return m_ontheline; };
+    std::string GetOntheline() const { return m_ontheline; };    
+    bool HasOntheline( );
+    
     ///@}
 
 protected:
@@ -3020,11 +3414,15 @@ public:
     bool WritePadLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };
+    int GetNumInt() const { return m_numInt; };    
+    bool HasNumInt( );
+    
     ///@}
 
 protected:
@@ -3057,11 +3455,15 @@ public:
     bool WritePbVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() const { return m_func; };
+    std::string GetFunc() const { return m_func; };    
+    bool HasFunc( );
+    
     ///@}
 
 protected:
@@ -3091,11 +3493,15 @@ public:
     bool WritePitch( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPname(std::string pname_) { m_pname = pname_; };
-    std::string GetPname() const { return m_pname; };
+    std::string GetPname() const { return m_pname; };    
+    bool HasPname( );
+    
     ///@}
 
 protected:
@@ -3125,11 +3531,15 @@ public:
     bool WritePlacement( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPlace(std::string place_) { m_place = place_; };
-    std::string GetPlace() const { return m_place; };
+    std::string GetPlace() const { return m_place; };    
+    bool HasPlace( );
+    
     ///@}
 
 protected:
@@ -3162,14 +3572,20 @@ public:
     bool WritePlist( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetPlist(std::string plist_) { m_plist = plist_; };
-    std::string GetPlist() const { return m_plist; };
+    std::string GetPlist() const { return m_plist; };    
+    bool HasPlist( );
+    
     //
     void SetEvaluate(std::string evaluate_) { m_evaluate = evaluate_; };
-    std::string GetEvaluate() const { return m_evaluate; };
+    std::string GetEvaluate() const { return m_evaluate; };    
+    bool HasEvaluate( );
+    
     ///@}
 
 protected:
@@ -3204,26 +3620,40 @@ public:
     bool WritePointing( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetActuate(std::string actuate_) { m_actuate = actuate_; };
-    std::string GetActuate() const { return m_actuate; };
+    std::string GetActuate() const { return m_actuate; };    
+    bool HasActuate( );
+    
     //
     void SetRole(std::string role_) { m_role = role_; };
-    std::string GetRole() const { return m_role; };
+    std::string GetRole() const { return m_role; };    
+    bool HasRole( );
+    
     //
     void SetShow(std::string show_) { m_show = show_; };
-    std::string GetShow() const { return m_show; };
+    std::string GetShow() const { return m_show; };    
+    bool HasShow( );
+    
     //
     void SetTarget(std::string target_) { m_target = target_; };
-    std::string GetTarget() const { return m_target; };
+    std::string GetTarget() const { return m_target; };    
+    bool HasTarget( );
+    
     //
     void SetTargettype(std::string targettype_) { m_targettype = targettype_; };
-    std::string GetTargettype() const { return m_targettype; };
+    std::string GetTargettype() const { return m_targettype; };    
+    bool HasTargettype( );
+    
     //
     void SetTitle(std::string title_) { m_title = title_; };
-    std::string GetTitle() const { return m_title; };
+    std::string GetTitle() const { return m_title; };    
+    bool HasTitle( );
+    
     ///@}
 
 protected:
@@ -3272,11 +3702,15 @@ public:
     bool WriteRelativesize( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSize(std::string size_) { m_size = size_; };
-    std::string GetSize() const { return m_size; };
+    std::string GetSize() const { return m_size; };    
+    bool HasSize( );
+    
     ///@}
 
 protected:
@@ -3306,11 +3740,15 @@ public:
     bool WriteResponsibility( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetResp(std::string resp_) { m_resp = resp_; };
-    std::string GetResp() const { return m_resp; };
+    std::string GetResp() const { return m_resp; };    
+    bool HasResp( );
+    
     ///@}
 
 protected:
@@ -3344,11 +3782,15 @@ public:
     bool WriteSbVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRend(data_BARRENDITION rend_) { m_rend = rend_; };
-    data_BARRENDITION GetRend() const { return m_rend; };
+    data_BARRENDITION GetRend() const { return m_rend; };    
+    bool HasRend( );
+    
     ///@}
 
 protected:
@@ -3378,11 +3820,15 @@ public:
     bool WriteScalable( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetScale(std::string scale_) { m_scale = scale_; };
-    std::string GetScale() const { return m_scale; };
+    std::string GetScale() const { return m_scale; };    
+    bool HasScale( );
+    
     ///@}
 
 protected:
@@ -3412,17 +3858,25 @@ public:
     bool WriteScoreDefGes( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTunePname(std::string tunePname_) { m_tunePname = tunePname_; };
-    std::string GetTunePname() const { return m_tunePname; };
+    std::string GetTunePname() const { return m_tunePname; };    
+    bool HasTunePname( );
+    
     //
     void SetTuneHzDbl(double tuneHzDbl_) { m_tuneHzDbl = tuneHzDbl_; };
-    double GetTuneHzDbl() const { return m_tuneHzDbl; };
+    double GetTuneHzDbl() const { return m_tuneHzDbl; };    
+    bool HasTuneHzDbl( );
+    
     //
     void SetTuneTemper(std::string tuneTemper_) { m_tuneTemper = tuneTemper_; };
-    std::string GetTuneTemper() const { return m_tuneTemper; };
+    std::string GetTuneTemper() const { return m_tuneTemper; };    
+    bool HasTuneTemper( );
+    
     ///@}
 
 protected:
@@ -3456,71 +3910,115 @@ public:
     bool WriteScoreDefVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetEndingRend(std::string endingRend_) { m_endingRend = endingRend_; };
-    std::string GetEndingRend() const { return m_endingRend; };
+    std::string GetEndingRend() const { return m_endingRend; };    
+    bool HasEndingRend( );
+    
     //
     void SetMnumVisible(std::string mnumVisible_) { m_mnumVisible = mnumVisible_; };
-    std::string GetMnumVisible() const { return m_mnumVisible; };
+    std::string GetMnumVisible() const { return m_mnumVisible; };    
+    bool HasMnumVisible( );
+    
     //
     void SetMusicName(std::string musicName_) { m_musicName = musicName_; };
-    std::string GetMusicName() const { return m_musicName; };
+    std::string GetMusicName() const { return m_musicName; };    
+    bool HasMusicName( );
+    
     //
     void SetMusicSizeDbl(double musicSizeDbl_) { m_musicSizeDbl = musicSizeDbl_; };
-    double GetMusicSizeDbl() const { return m_musicSizeDbl; };
+    double GetMusicSizeDbl() const { return m_musicSizeDbl; };    
+    bool HasMusicSizeDbl( );
+    
     //
     void SetOptimize(std::string optimize_) { m_optimize = optimize_; };
-    std::string GetOptimize() const { return m_optimize; };
+    std::string GetOptimize() const { return m_optimize; };    
+    bool HasOptimize( );
+    
     //
     void SetPageHeightDbl(double pageHeightDbl_) { m_pageHeightDbl = pageHeightDbl_; };
-    double GetPageHeightDbl() const { return m_pageHeightDbl; };
+    double GetPageHeightDbl() const { return m_pageHeightDbl; };    
+    bool HasPageHeightDbl( );
+    
     //
     void SetPageWidthDbl(double pageWidthDbl_) { m_pageWidthDbl = pageWidthDbl_; };
-    double GetPageWidthDbl() const { return m_pageWidthDbl; };
+    double GetPageWidthDbl() const { return m_pageWidthDbl; };    
+    bool HasPageWidthDbl( );
+    
     //
     void SetPageUnits(std::string pageUnits_) { m_pageUnits = pageUnits_; };
-    std::string GetPageUnits() const { return m_pageUnits; };
+    std::string GetPageUnits() const { return m_pageUnits; };    
+    bool HasPageUnits( );
+    
     //
     void SetPageTopmarDbl(double pageTopmarDbl_) { m_pageTopmarDbl = pageTopmarDbl_; };
-    double GetPageTopmarDbl() const { return m_pageTopmarDbl; };
+    double GetPageTopmarDbl() const { return m_pageTopmarDbl; };    
+    bool HasPageTopmarDbl( );
+    
     //
     void SetPageBotmarDbl(double pageBotmarDbl_) { m_pageBotmarDbl = pageBotmarDbl_; };
-    double GetPageBotmarDbl() const { return m_pageBotmarDbl; };
+    double GetPageBotmarDbl() const { return m_pageBotmarDbl; };    
+    bool HasPageBotmarDbl( );
+    
     //
     void SetPageLeftmarDbl(double pageLeftmarDbl_) { m_pageLeftmarDbl = pageLeftmarDbl_; };
-    double GetPageLeftmarDbl() const { return m_pageLeftmarDbl; };
+    double GetPageLeftmarDbl() const { return m_pageLeftmarDbl; };    
+    bool HasPageLeftmarDbl( );
+    
     //
     void SetPageRightmarDbl(double pageRightmarDbl_) { m_pageRightmarDbl = pageRightmarDbl_; };
-    double GetPageRightmarDbl() const { return m_pageRightmarDbl; };
+    double GetPageRightmarDbl() const { return m_pageRightmarDbl; };    
+    bool HasPageRightmarDbl( );
+    
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; };
-    std::string GetPagePanels() const { return m_pagePanels; };
+    std::string GetPagePanels() const { return m_pagePanels; };    
+    bool HasPagePanels( );
+    
     //
     void SetPageScale(std::string pageScale_) { m_pageScale = pageScale_; };
-    std::string GetPageScale() const { return m_pageScale; };
+    std::string GetPageScale() const { return m_pageScale; };    
+    bool HasPageScale( );
+    
     //
     void SetSpacingPackexpDbl(double spacingPackexpDbl_) { m_spacingPackexpDbl = spacingPackexpDbl_; };
-    double GetSpacingPackexpDbl() const { return m_spacingPackexpDbl; };
+    double GetSpacingPackexpDbl() const { return m_spacingPackexpDbl; };    
+    bool HasSpacingPackexpDbl( );
+    
     //
     void SetSpacingPackfactDbl(double spacingPackfactDbl_) { m_spacingPackfactDbl = spacingPackfactDbl_; };
-    double GetSpacingPackfactDbl() const { return m_spacingPackfactDbl; };
+    double GetSpacingPackfactDbl() const { return m_spacingPackfactDbl; };    
+    bool HasSpacingPackfactDbl( );
+    
     //
     void SetSpacingStaffDbl(double spacingStaffDbl_) { m_spacingStaffDbl = spacingStaffDbl_; };
-    double GetSpacingStaffDbl() const { return m_spacingStaffDbl; };
+    double GetSpacingStaffDbl() const { return m_spacingStaffDbl; };    
+    bool HasSpacingStaffDbl( );
+    
     //
     void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; };
-    std::string GetSpacingSystem() const { return m_spacingSystem; };
+    std::string GetSpacingSystem() const { return m_spacingSystem; };    
+    bool HasSpacingSystem( );
+    
     //
     void SetSystemLeftmarDbl(double systemLeftmarDbl_) { m_systemLeftmarDbl = systemLeftmarDbl_; };
-    double GetSystemLeftmarDbl() const { return m_systemLeftmarDbl; };
+    double GetSystemLeftmarDbl() const { return m_systemLeftmarDbl; };    
+    bool HasSystemLeftmarDbl( );
+    
     //
     void SetSystemRightmarDbl(double systemRightmarDbl_) { m_systemRightmarDbl = systemRightmarDbl_; };
-    double GetSystemRightmarDbl() const { return m_systemRightmarDbl; };
+    double GetSystemRightmarDbl() const { return m_systemRightmarDbl; };    
+    bool HasSystemRightmarDbl( );
+    
     //
     void SetSystemTopmarDbl(double systemTopmarDbl_) { m_systemTopmarDbl = systemTopmarDbl_; };
-    double GetSystemTopmarDbl() const { return m_systemTopmarDbl; };
+    double GetSystemTopmarDbl() const { return m_systemTopmarDbl; };    
+    bool HasSystemTopmarDbl( );
+    
     ///@}
 
 protected:
@@ -3608,11 +4106,15 @@ public:
     bool WriteSectionVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetRestart(std::string restart_) { m_restart = restart_; };
-    std::string GetRestart() const { return m_restart; };
+    std::string GetRestart() const { return m_restart; };    
+    bool HasRestart( );
+    
     ///@}
 
 protected:
@@ -3642,11 +4144,15 @@ public:
     bool WriteSequence( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSeqInt(int seqInt_) { m_seqInt = seqInt_; };
-    int GetSeqInt() const { return m_seqInt; };
+    int GetSeqInt() const { return m_seqInt; };    
+    bool HasSeqInt( );
+    
     ///@}
 
 protected:
@@ -3679,11 +4185,15 @@ public:
     bool WriteSlashcount( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSlash(unsigned char slash_) { m_slash = slash_; };
-    unsigned char GetSlash() const { return m_slash; };
+    unsigned char GetSlash() const { return m_slash; };    
+    bool HasSlash( );
+    
     ///@}
 
 protected:
@@ -3713,11 +4223,15 @@ public:
     bool WriteSlurpresent( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSlur(std::string slur_) { m_slur = slur_; };
-    std::string GetSlur() const { return m_slur; };
+    std::string GetSlur() const { return m_slur; };    
+    bool HasSlur( );
+    
     ///@}
 
 protected:
@@ -3751,11 +4265,15 @@ public:
     bool WriteSpaceVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCompressable(std::string compressable_) { m_compressable = compressable_; };
-    std::string GetCompressable() const { return m_compressable; };
+    std::string GetCompressable() const { return m_compressable; };    
+    bool HasCompressable( );
+    
     ///@}
 
 protected:
@@ -3788,11 +4306,15 @@ public:
     bool WriteStaffLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetDef(std::string def_) { m_def = def_; };
-    std::string GetDef() const { return m_def; };
+    std::string GetDef() const { return m_def; };    
+    bool HasDef( );
+    
     ///@}
 
 protected:
@@ -3822,26 +4344,40 @@ public:
     bool WriteStaffDefVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetGridShow(std::string gridShow_) { m_gridShow = gridShow_; };
-    std::string GetGridShow() const { return m_gridShow; };
+    std::string GetGridShow() const { return m_gridShow; };    
+    bool HasGridShow( );
+    
     //
     void SetLayerscheme(std::string layerscheme_) { m_layerscheme = layerscheme_; };
-    std::string GetLayerscheme() const { return m_layerscheme; };
+    std::string GetLayerscheme() const { return m_layerscheme; };    
+    bool HasLayerscheme( );
+    
     //
     void SetLinesInt(int linesInt_) { m_linesInt = linesInt_; };
-    int GetLinesInt() const { return m_linesInt; };
+    int GetLinesInt() const { return m_linesInt; };    
+    bool HasLinesInt( );
+    
     //
     void SetLinesColor(std::string linesColor_) { m_linesColor = linesColor_; };
-    std::string GetLinesColor() const { return m_linesColor; };
+    std::string GetLinesColor() const { return m_linesColor; };    
+    bool HasLinesColor( );
+    
     //
     void SetLinesVisible(std::string linesVisible_) { m_linesVisible = linesVisible_; };
-    std::string GetLinesVisible() const { return m_linesVisible; };
+    std::string GetLinesVisible() const { return m_linesVisible; };    
+    bool HasLinesVisible( );
+    
     //
     void SetSpacingDbl(double spacingDbl_) { m_spacingDbl = spacingDbl_; };
-    double GetSpacingDbl() const { return m_spacingDbl; };
+    double GetSpacingDbl() const { return m_spacingDbl; };    
+    bool HasSpacingDbl( );
+    
     ///@}
 
 protected:
@@ -3893,11 +4429,15 @@ public:
     bool WriteStaffGrpVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetBarthru(std::string barthru_) { m_barthru = barthru_; };
-    std::string GetBarthru() const { return m_barthru; };
+    std::string GetBarthru() const { return m_barthru; };    
+    bool HasBarthru( );
+    
     ///@}
 
 protected:
@@ -3930,11 +4470,15 @@ public:
     bool WriteStaffgroupingsym( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSymbol(std::string symbol_) { m_symbol = symbol_; };
-    std::string GetSymbol() const { return m_symbol; };
+    std::string GetSymbol() const { return m_symbol; };    
+    bool HasSymbol( );
+    
     ///@}
 
 protected:
@@ -3964,11 +4508,15 @@ public:
     bool WriteStaffident( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetStaff(std::string staff_) { m_staff = staff_; };
-    std::string GetStaff() const { return m_staff; };
+    std::string GetStaff() const { return m_staff; };    
+    bool HasStaff( );
+    
     ///@}
 
 protected:
@@ -4002,11 +4550,15 @@ public:
     bool WriteStaffloc( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetLoc(std::string loc_) { m_loc = loc_; };
-    std::string GetLoc() const { return m_loc; };
+    std::string GetLoc() const { return m_loc; };    
+    bool HasLoc( );
+    
     ///@}
 
 protected:
@@ -4036,11 +4588,15 @@ public:
     bool WriteStartendid( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetEndid(std::string endid_) { m_endid = endid_; };
-    std::string GetEndid() const { return m_endid; };
+    std::string GetEndid() const { return m_endid; };    
+    bool HasEndid( );
+    
     ///@}
 
 protected:
@@ -4073,11 +4629,15 @@ public:
     bool WriteStartid( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetStartid(std::string startid_) { m_startid = startid_; };
-    std::string GetStartid() const { return m_startid; };
+    std::string GetStartid() const { return m_startid; };    
+    bool HasStartid( );
+    
     ///@}
 
 protected:
@@ -4110,36 +4670,48 @@ public:
     bool WriteStemmed( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
-    void SetStemDir(std::string stemDir_) { m_stemDir = stemDir_; };
-    std::string GetStemDir() const { return m_stemDir; };
+    void SetStemDir(data_STEMDIRECTION stemDir_) { m_stemDir = stemDir_; };
+    data_STEMDIRECTION GetStemDir() const { return m_stemDir; };    
+    bool HasStemDir( );
+    
     //
-    void SetStemLenDbl(double stemLenDbl_) { m_stemLenDbl = stemLenDbl_; };
-    double GetStemLenDbl() const { return m_stemLenDbl; };
+    void SetStemLen(int stemLen_) { m_stemLen = stemLen_; };
+    int GetStemLen() const { return m_stemLen; };    
+    bool HasStemLen( );
+    
     //
-    void SetStemPos(std::string stemPos_) { m_stemPos = stemPos_; };
-    std::string GetStemPos() const { return m_stemPos; };
+    void SetStemPos(data_STEMPOSITION stemPos_) { m_stemPos = stemPos_; };
+    data_STEMPOSITION GetStemPos() const { return m_stemPos; };    
+    bool HasStemPos( );
+    
     //
-    void SetStemXDbl(double stemXDbl_) { m_stemXDbl = stemXDbl_; };
-    double GetStemXDbl() const { return m_stemXDbl; };
+    void SetStemX(int stemX_) { m_stemX = stemX_; };
+    int GetStemX() const { return m_stemX; };    
+    bool HasStemX( );
+    
     //
-    void SetStemYDbl(double stemYDbl_) { m_stemYDbl = stemYDbl_; };
-    double GetStemYDbl() const { return m_stemYDbl; };
+    void SetStemY(int stemY_) { m_stemY = stemY_; };
+    int GetStemY() const { return m_stemY; };    
+    bool HasStemY( );
+    
     ///@}
 
 protected:
     /** Describes the direction of a stem. **/
-    std::string m_stemDir;
+    data_STEMDIRECTION m_stemDir;
     /** Encodes the stem length. **/
-    double m_stemLenDbl;
+    int m_stemLen;
     /** Records the position of the stem in relation to the note head(s). **/
-    std::string m_stemPos;
+    data_STEMPOSITION m_stemPos;
     /** Records the output x coordinate of the stem's attachment point. **/
-    double m_stemXDbl;
+    int m_stemX;
     /** Records the output y coordinate of the stem's attachment point. **/
-    double m_stemYDbl;
+    int m_stemY;
 
 /* include <attstem.y> */
 };
@@ -4164,14 +4736,20 @@ public:
     bool WriteSylLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCon(std::string con_) { m_con = con_; };
-    std::string GetCon() const { return m_con; };
+    std::string GetCon() const { return m_con; };    
+    bool HasCon( );
+    
     //
     void SetWordpos(std::string wordpos_) { m_wordpos = wordpos_; };
-    std::string GetWordpos() const { return m_wordpos; };
+    std::string GetWordpos() const { return m_wordpos; };    
+    bool HasWordpos( );
+    
     ///@}
 
 protected:
@@ -4206,11 +4784,15 @@ public:
     bool WriteSyltext( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetSyl(std::string syl_) { m_syl = syl_; };
-    std::string GetSyl() const { return m_syl; };
+    std::string GetSyl() const { return m_syl; };    
+    bool HasSyl( );
+    
     ///@}
 
 protected:
@@ -4240,23 +4822,35 @@ public:
     bool WriteTextstyle( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTextFam(std::string textFam_) { m_textFam = textFam_; };
-    std::string GetTextFam() const { return m_textFam; };
+    std::string GetTextFam() const { return m_textFam; };    
+    bool HasTextFam( );
+    
     //
     void SetTextName(std::string textName_) { m_textName = textName_; };
-    std::string GetTextName() const { return m_textName; };
+    std::string GetTextName() const { return m_textName; };    
+    bool HasTextName( );
+    
     //
     void SetTextSizeDbl(double textSizeDbl_) { m_textSizeDbl = textSizeDbl_; };
-    double GetTextSizeDbl() const { return m_textSizeDbl; };
+    double GetTextSizeDbl() const { return m_textSizeDbl; };    
+    bool HasTextSizeDbl( );
+    
     //
     void SetTextStyle(std::string textStyle_) { m_textStyle = textStyle_; };
-    std::string GetTextStyle() const { return m_textStyle; };
+    std::string GetTextStyle() const { return m_textStyle; };    
+    bool HasTextStyle( );
+    
     //
     void SetTextWeight(std::string textWeight_) { m_textWeight = textWeight_; };
-    std::string GetTextWeight() const { return m_textWeight; };
+    std::string GetTextWeight() const { return m_textWeight; };    
+    bool HasTextWeight( );
+    
     ///@}
 
 protected:
@@ -4309,11 +4903,15 @@ public:
     bool WriteTiepresent( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTie(std::string tie_) { m_tie = tie_; };
-    std::string GetTie() const { return m_tie; };
+    std::string GetTie() const { return m_tie; };    
+    bool HasTie( );
+    
     ///@}
 
 protected:
@@ -4347,11 +4945,15 @@ public:
     bool WriteTimestampMusical( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTstamp(std::string tstamp_) { m_tstamp = tstamp_; };
-    std::string GetTstamp() const { return m_tstamp; };
+    std::string GetTstamp() const { return m_tstamp; };    
+    bool HasTstamp( );
+    
     ///@}
 
 protected:
@@ -4384,14 +4986,20 @@ public:
     bool WriteTimestampPerformed( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTstampGesInt(int tstampGesInt_) { m_tstampGesInt = tstampGesInt_; };
-    int GetTstampGesInt() const { return m_tstampGesInt; };
+    int GetTstampGesInt() const { return m_tstampGesInt; };    
+    bool HasTstampGesInt( );
+    
     //
     void SetTstampReal(std::string tstampReal_) { m_tstampReal = tstampReal_; };
-    std::string GetTstampReal() const { return m_tstampReal; };
+    std::string GetTstampReal() const { return m_tstampReal; };    
+    bool HasTstampReal( );
+    
     ///@}
 
 protected:
@@ -4426,14 +5034,20 @@ public:
     bool WriteTransposition( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTransDiatDbl(double transDiatDbl_) { m_transDiatDbl = transDiatDbl_; };
-    double GetTransDiatDbl() const { return m_transDiatDbl; };
+    double GetTransDiatDbl() const { return m_transDiatDbl; };    
+    bool HasTransDiatDbl( );
+    
     //
     void SetTransSemiDbl(double transSemiDbl_) { m_transSemiDbl = transSemiDbl_; };
-    double GetTransSemiDbl() const { return m_transSemiDbl; };
+    double GetTransSemiDbl() const { return m_transSemiDbl; };    
+    bool HasTransSemiDbl( );
+    
     ///@}
 
 protected:
@@ -4471,11 +5085,15 @@ public:
     bool WriteTupletpresent( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTuplet(std::string tuplet_) { m_tuplet = tuplet_; };
-    std::string GetTuplet() const { return m_tuplet; };
+    std::string GetTuplet() const { return m_tuplet; };    
+    bool HasTuplet( );
+    
     ///@}
 
 protected:
@@ -4509,14 +5127,20 @@ public:
     bool WriteTyped( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetType(std::string type_) { m_type = type_; };
-    std::string GetType() const { return m_type; };
+    std::string GetType() const { return m_type; };    
+    bool HasType( );
+    
     //
     void SetSubtype(std::string subtype_) { m_subtype = subtype_; };
-    std::string GetSubtype() const { return m_subtype; };
+    std::string GetSubtype() const { return m_subtype; };    
+    bool HasSubtype( );
+    
     ///@}
 
 protected:
@@ -4554,23 +5178,35 @@ public:
     bool WriteTypography( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetFontfam(std::string fontfam_) { m_fontfam = fontfam_; };
-    std::string GetFontfam() const { return m_fontfam; };
+    std::string GetFontfam() const { return m_fontfam; };    
+    bool HasFontfam( );
+    
     //
     void SetFontname(std::string fontname_) { m_fontname = fontname_; };
-    std::string GetFontname() const { return m_fontname; };
+    std::string GetFontname() const { return m_fontname; };    
+    bool HasFontname( );
+    
     //
     void SetFontsizeDbl(double fontsizeDbl_) { m_fontsizeDbl = fontsizeDbl_; };
-    double GetFontsizeDbl() const { return m_fontsizeDbl; };
+    double GetFontsizeDbl() const { return m_fontsizeDbl; };    
+    bool HasFontsizeDbl( );
+    
     //
     void SetFontstyle(std::string fontstyle_) { m_fontstyle = fontstyle_; };
-    std::string GetFontstyle() const { return m_fontstyle; };
+    std::string GetFontstyle() const { return m_fontstyle; };    
+    bool HasFontstyle( );
+    
     //
     void SetFontweight(std::string fontweight_) { m_fontweight = fontweight_; };
-    std::string GetFontweight() const { return m_fontweight; };
+    std::string GetFontweight() const { return m_fontweight; };    
+    bool HasFontweight( );
+    
     ///@}
 
 protected:
@@ -4608,11 +5244,15 @@ public:
     bool WriteVisibility( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetVisible(std::string visible_) { m_visible = visible_; };
-    std::string GetVisible() const { return m_visible; };
+    std::string GetVisible() const { return m_visible; };    
+    bool HasVisible( );
+    
     ///@}
 
 protected:
@@ -4645,11 +5285,15 @@ public:
     bool WriteVisualoffsetHo( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetHo(std::string ho_) { m_ho = ho_; };
-    std::string GetHo() const { return m_ho; };
+    std::string GetHo() const { return m_ho; };    
+    bool HasHo( );
+    
     ///@}
 
 protected:
@@ -4683,11 +5327,15 @@ public:
     bool WriteVisualoffsetTo( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTo(std::string to_) { m_to = to_; };
-    std::string GetTo() const { return m_to; };
+    std::string GetTo() const { return m_to; };    
+    bool HasTo( );
+    
     ///@}
 
 protected:
@@ -4720,11 +5368,15 @@ public:
     bool WriteVisualoffsetVo( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetVo(std::string vo_) { m_vo = vo_; };
-    std::string GetVo() const { return m_vo; };
+    std::string GetVo() const { return m_vo; };    
+    bool HasVo( );
+    
     ///@}
 
 protected:
@@ -4758,14 +5410,20 @@ public:
     bool WriteVisualoffset2Ho( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetStartho(std::string startho_) { m_startho = startho_; };
-    std::string GetStartho() const { return m_startho; };
+    std::string GetStartho() const { return m_startho; };    
+    bool HasStartho( );
+    
     //
     void SetEndho(std::string endho_) { m_endho = endho_; };
-    std::string GetEndho() const { return m_endho; };
+    std::string GetEndho() const { return m_endho; };    
+    bool HasEndho( );
+    
     ///@}
 
 protected:
@@ -4803,14 +5461,20 @@ public:
     bool WriteVisualoffset2To( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetStartto(std::string startto_) { m_startto = startto_; };
-    std::string GetStartto() const { return m_startto; };
+    std::string GetStartto() const { return m_startto; };    
+    bool HasStartto( );
+    
     //
     void SetEndto(std::string endto_) { m_endto = endto_; };
-    std::string GetEndto() const { return m_endto; };
+    std::string GetEndto() const { return m_endto; };    
+    bool HasEndto( );
+    
     ///@}
 
 protected:
@@ -4848,14 +5512,20 @@ public:
     bool WriteVisualoffset2Vo( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetStartvo(std::string startvo_) { m_startvo = startvo_; };
-    std::string GetStartvo() const { return m_startvo; };
+    std::string GetStartvo() const { return m_startvo; };    
+    bool HasStartvo( );
+    
     //
     void SetEndvo(std::string endvo_) { m_endvo = endvo_; };
-    std::string GetEndvo() const { return m_endvo; };
+    std::string GetEndvo() const { return m_endvo; };    
+    bool HasEndvo( );
+    
     ///@}
 
 protected:
@@ -4893,11 +5563,15 @@ public:
     bool WriteWidth( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetWidthDbl(double widthDbl_) { m_widthDbl = widthDbl_; };
-    double GetWidthDbl() const { return m_widthDbl; };
+    double GetWidthDbl() const { return m_widthDbl; };    
+    bool HasWidthDbl( );
+    
     ///@}
 
 protected:
@@ -4934,14 +5608,20 @@ public:
     bool WriteXy( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetXDbl(double xDbl_) { m_xDbl = xDbl_; };
-    double GetXDbl() const { return m_xDbl; };
+    double GetXDbl() const { return m_xDbl; };    
+    bool HasXDbl( );
+    
     //
     void SetYDbl(double yDbl_) { m_yDbl = yDbl_; };
-    double GetYDbl() const { return m_yDbl; };
+    double GetYDbl() const { return m_yDbl; };    
+    bool HasYDbl( );
+    
     ///@}
 
 protected:
@@ -4981,14 +5661,20 @@ public:
     bool WriteXy2( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetX2Dbl(double x2Dbl_) { m_x2Dbl = x2Dbl_; };
-    double GetX2Dbl() const { return m_x2Dbl; };
+    double GetX2Dbl() const { return m_x2Dbl; };    
+    bool HasX2Dbl( );
+    
     //
     void SetY2Dbl(double y2Dbl_) { m_y2Dbl = y2Dbl_; };
-    double GetY2Dbl() const { return m_y2Dbl; };
+    double GetY2Dbl() const { return m_y2Dbl; };    
+    bool HasY2Dbl( );
+    
     ///@}
 
 protected:

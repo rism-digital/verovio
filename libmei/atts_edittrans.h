@@ -44,11 +44,15 @@ public:
     bool WriteAgentident( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetAgent(std::string agent_) { m_agent = agent_; };
-    std::string GetAgent() const { return m_agent; };
+    std::string GetAgent() const { return m_agent; };    
+    bool HasAgent( );
+    
     ///@}
 
 protected:
@@ -81,14 +85,20 @@ public:
     bool WriteEdit( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetCert(std::string cert_) { m_cert = cert_; };
-    std::string GetCert() const { return m_cert; };
+    std::string GetCert() const { return m_cert; };    
+    bool HasCert( );
+    
     //
     void SetEvidence(std::string evidence_) { m_evidence = evidence_; };
-    std::string GetEvidence() const { return m_evidence; };
+    std::string GetEvidence() const { return m_evidence; };    
+    bool HasEvidence( );
+    
     ///@}
 
 protected:
@@ -124,11 +134,15 @@ public:
     bool WriteExtent( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetExtent(std::string extent_) { m_extent = extent_; };
-    std::string GetExtent() const { return m_extent; };
+    std::string GetExtent() const { return m_extent; };    
+    bool HasExtent( );
+    
     ///@}
 
 protected:
@@ -158,11 +172,15 @@ public:
     bool WriteReasonident( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetReason(std::string reason_) { m_reason = reason_; };
-    std::string GetReason() const { return m_reason; };
+    std::string GetReason() const { return m_reason; };    
+    bool HasReason( );
+    
     ///@}
 
 protected:

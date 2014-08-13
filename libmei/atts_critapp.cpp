@@ -47,12 +47,18 @@ bool AttCrit::ReadCrit(  pugi::xml_node element ) {
 
 bool AttCrit::WriteCrit(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetCause() == "") {
+    if (this->HasCause()) {
         element.append_attribute("cause") = StrToStr(this->GetCause()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttCrit::HasCause( )
+{
+    return (m_cause != "");
+}
+
 
 /* include <attcause> */
 
@@ -83,12 +89,18 @@ bool AttSource::ReadSource(  pugi::xml_node element ) {
 
 bool AttSource::WriteSource(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetSource() == "") {
+    if (this->HasSource()) {
         element.append_attribute("source") = StrToStr(this->GetSource()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttSource::HasSource( )
+{
+    return (m_source != "");
+}
+
 
 /* include <attsource> */
 

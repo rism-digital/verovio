@@ -182,6 +182,25 @@ enum data_PLACE {
     PLACE_below
 };
 
+/**
+ * MEI data.STEMDIRECTION
+ */
+enum data_STEMDIRECTION {
+    STEMDIRECTION_NONE = 0,
+    STEMDIRECTION_up,
+    STEMDIRECTION_down
+};
+
+/**
+ * MEI data.STEMPOSITION
+ */
+enum data_STEMPOSITION {
+    STEMPOSITION_NONE = 0,
+    STEMPOSITION_left,
+    STEMPOSITION_right,
+    STEMPOSITION_center
+};
+    
 } // namespace vrv
 
 #endif // __ATT_DEF_H__

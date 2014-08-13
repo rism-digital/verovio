@@ -52,16 +52,27 @@ bool AttTabular::ReadTabular(  pugi::xml_node element ) {
 
 bool AttTabular::WriteTabular(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetColspanInt() == 0) {
+    if (this->HasColspanInt()) {
         element.append_attribute("colspan") = IntToStr(this->GetColspanInt()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetRowspanInt() == 0) {
+    if (this->HasRowspanInt()) {
         element.append_attribute("rowspan") = IntToStr(this->GetRowspanInt()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttTabular::HasColspanInt( )
+{
+    return (m_colspanInt != 0);
+}
+
+bool AttTabular::HasRowspanInt( )
+{
+    return (m_rowspanInt != 0);
+}
+
 
 /* include <attrowspan> */
 

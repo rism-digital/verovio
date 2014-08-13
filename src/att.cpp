@@ -484,6 +484,58 @@ data_PLACE Att::StrToPlace(std::string value)
     }
     // default
     return PLACE_NONE;
+}    
+
+std::string Att::StemDirectionToStr(data_STEMDIRECTION data)
+{
+    std::string value;
+    switch(data)
+    {
+        case STEMDIRECTION_up : value = "up"; break;
+        case STEMDIRECTION_down : value = "down"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMDIRECTION Att::StrToStemDirection(std::string value)
+{
+    if (value == "up") return STEMDIRECTION_up;
+    else if (value == "down") return STEMDIRECTION_down;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return STEMDIRECTION_NONE;
+}
+
+std::string Att::StemPositionToStr(data_STEMPOSITION data)
+{
+    std::string value;
+    switch(data)
+    {
+        case STEMPOSITION_left : value = "left"; break;
+        case STEMPOSITION_right : value = "right"; break;
+        case STEMPOSITION_center : value = "center"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMPOSITION Att::StrToStemPosition(std::string value)
+{
+    if (value == "left") return STEMPOSITION_left;
+    else if (value == "right") return STEMPOSITION_right;
+    else if (value == "center") return STEMPOSITION_center;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return STEMPOSITION_NONE;
 }
 
 } // namespace vrv

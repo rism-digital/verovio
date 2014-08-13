@@ -44,14 +44,20 @@ public:
     bool WriteTabular( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetColspanInt(int colspanInt_) { m_colspanInt = colspanInt_; };
-    int GetColspanInt() const { return m_colspanInt; };
+    int GetColspanInt() const { return m_colspanInt; };    
+    bool HasColspanInt( );
+    
     //
     void SetRowspanInt(int rowspanInt_) { m_rowspanInt = rowspanInt_; };
-    int GetRowspanInt() const { return m_rowspanInt; };
+    int GetRowspanInt() const { return m_rowspanInt; };    
+    bool HasRowspanInt( );
+    
     ///@}
 
 protected:

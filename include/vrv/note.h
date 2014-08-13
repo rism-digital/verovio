@@ -33,15 +33,15 @@ class Tie;
  * This class models the MEI <note> element. 
  */
 
-
 // embellishments
 // for the moment only the trill is implemented
+// to be change to MEI Att
 #define EMB_NONE 0
 #define EMB_TRILL 1
 #define EMB_MORDENT 2
 
 class Note: public LayerElement, public DurationInterface, public PitchInterface,
-    public AttColoration, public AttNoteLogMensural
+    public AttColoration, public AttNoteLogMensural, public AttStemmed
 {
 public:
     /**
@@ -127,15 +127,16 @@ protected:
     ///@}
     
 public:
-    /** Indicates the stem direction (0 == auto, -1 down, 1 up) */
-    char m_stemDir;
-    /** Indicates the stem length (0 == auto) */
-    unsigned char m_stemLen;
     /** indicates if the appoggiatura is slashed (i.e. it is an acciaccatura)
      used with cueSize = true */
-    bool m_acciaccatura;
+    bool m_acciaccatura; // To be changed to Att
     /** embellishment on this note **/
-    unsigned int m_embellishment;
+    unsigned int m_embellishment; // To be changed to Att
+    
+    /** drawing stem direction */
+    data_STEMDIRECTION d_stemDir;
+    /** drawing stem length */
+    int d_stemLen;
     
 private:
     

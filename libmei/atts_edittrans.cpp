@@ -47,12 +47,18 @@ bool AttAgentident::ReadAgentident(  pugi::xml_node element ) {
 
 bool AttAgentident::WriteAgentident(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetAgent() == "") {
+    if (this->HasAgent()) {
         element.append_attribute("agent") = StrToStr(this->GetAgent()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttAgentident::HasAgent( )
+{
+    return (m_agent != "");
+}
+
 
 /* include <attagent> */
 
@@ -88,16 +94,27 @@ bool AttEdit::ReadEdit(  pugi::xml_node element ) {
 
 bool AttEdit::WriteEdit(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetCert() == "") {
+    if (this->HasCert()) {
         element.append_attribute("cert") = StrToStr(this->GetCert()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetEvidence() == "") {
+    if (this->HasEvidence()) {
         element.append_attribute("evidence") = StrToStr(this->GetEvidence()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttEdit::HasCert( )
+{
+    return (m_cert != "");
+}
+
+bool AttEdit::HasEvidence( )
+{
+    return (m_evidence != "");
+}
+
 
 /* include <attevidence> */
 
@@ -128,12 +145,18 @@ bool AttExtent::ReadExtent(  pugi::xml_node element ) {
 
 bool AttExtent::WriteExtent(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetExtent() == "") {
+    if (this->HasExtent()) {
         element.append_attribute("extent") = StrToStr(this->GetExtent()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttExtent::HasExtent( )
+{
+    return (m_extent != "");
+}
+
 
 /* include <attextent> */
 
@@ -164,12 +187,18 @@ bool AttReasonident::ReadReasonident(  pugi::xml_node element ) {
 
 bool AttReasonident::WriteReasonident(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetReason() == "") {
+    if (this->HasReason()) {
         element.append_attribute("reason") = StrToStr(this->GetReason()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttReasonident::HasReason( )
+{
+    return (m_reason != "");
+}
+
 
 /* include <attreason> */
 

@@ -44,11 +44,15 @@ public:
     bool WriteRegularmethod( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetMethod(std::string method_) { m_method = method_; };
-    std::string GetMethod() const { return m_method; };
+    std::string GetMethod() const { return m_method; };    
+    bool HasMethod( );
+    
     ///@}
 
 protected:

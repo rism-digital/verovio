@@ -52,16 +52,27 @@ bool AttNoteGesTablature::ReadNoteGesTablature(  pugi::xml_node element ) {
 
 bool AttNoteGesTablature::WriteNoteGesTablature(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetTabFret() == "") {
+    if (this->HasTabFret()) {
         element.append_attribute("tab.fret") = StrToStr(this->GetTabFret()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetTabString() == "") {
+    if (this->HasTabString()) {
         element.append_attribute("tab.string") = StrToStr(this->GetTabString()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttNoteGesTablature::HasTabFret( )
+{
+    return (m_tabFret != "");
+}
+
+bool AttNoteGesTablature::HasTabString( )
+{
+    return (m_tabString != "");
+}
+
 
 /* include <atttab.string> */
 
@@ -92,12 +103,18 @@ bool AttStaffDefGesTablature::ReadStaffDefGesTablature(  pugi::xml_node element 
 
 bool AttStaffDefGesTablature::WriteStaffDefGesTablature(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetTabStrings() == "") {
+    if (this->HasTabStrings()) {
         element.append_attribute("tab.strings") = StrToStr(this->GetTabStrings()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttStaffDefGesTablature::HasTabStrings( )
+{
+    return (m_tabStrings != "");
+}
+
 
 /* include <atttab.strings> */
 

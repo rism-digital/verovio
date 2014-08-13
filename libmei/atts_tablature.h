@@ -44,14 +44,20 @@ public:
     bool WriteNoteGesTablature( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTabFret(std::string tabFret_) { m_tabFret = tabFret_; };
-    std::string GetTabFret() const { return m_tabFret; };
+    std::string GetTabFret() const { return m_tabFret; };    
+    bool HasTabFret( );
+    
     //
     void SetTabString(std::string tabString_) { m_tabString = tabString_; };
-    std::string GetTabString() const { return m_tabString; };
+    std::string GetTabString() const { return m_tabString; };    
+    bool HasTabString( );
+    
     ///@}
 
 protected:
@@ -83,11 +89,15 @@ public:
     bool WriteStaffDefGesTablature( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetTabStrings(std::string tabStrings_) { m_tabStrings = tabStrings_; };
-    std::string GetTabStrings() const { return m_tabStrings; };
+    std::string GetTabStrings() const { return m_tabStrings; };    
+    bool HasTabStrings( );
+    
     ///@}
 
 protected:

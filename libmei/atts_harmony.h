@@ -44,11 +44,15 @@ public:
     bool WriteFretlocation( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetFret(std::string fret_) { m_fret = fret_; };
-    std::string GetFret() const { return m_fret; };
+    std::string GetFret() const { return m_fret; };    
+    bool HasFret( );
+    
     ///@}
 
 protected:
@@ -78,11 +82,15 @@ public:
     bool WriteHarmLog( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetChordref(std::string chordref_) { m_chordref = chordref_; };
-    std::string GetChordref() const { return m_chordref; };
+    std::string GetChordref() const { return m_chordref; };    
+    bool HasChordref( );
+    
     ///@}
 
 protected:
@@ -112,14 +120,20 @@ public:
     bool WriteHarmVis( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetExtender(std::string extender_) { m_extender = extender_; };
-    std::string GetExtender() const { return m_extender; };
+    std::string GetExtender() const { return m_extender; };    
+    bool HasExtender( );
+    
     //
     void SetRendgrid(std::string rendgrid_) { m_rendgrid = rendgrid_; };
-    std::string GetRendgrid() const { return m_rendgrid; };
+    std::string GetRendgrid() const { return m_rendgrid; };    
+    bool HasRendgrid( );
+    
     ///@}
 
 protected:

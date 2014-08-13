@@ -44,11 +44,15 @@ public:
     bool WriteAlignment( pugi::xml_node element );
     
     /**
-     * @name Setters and getters for class members
-     */
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
     ///@{
     void SetWhen(std::string when_) { m_when = when_; };
-    std::string GetWhen() const { return m_when; };
+    std::string GetWhen() const { return m_when; };    
+    bool HasWhen( );
+    
     ///@}
 
 protected:

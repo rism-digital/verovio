@@ -47,12 +47,18 @@ bool AttBarline::ReadBarline(  pugi::xml_node element ) {
 
 bool AttBarline::WriteBarline(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetBarline() == "") {
+    if (this->HasBarline()) {
         element.append_attribute("barline") = StrToStr(this->GetBarline()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttBarline::HasBarline( )
+{
+    return (m_barline != "");
+}
+
 
 /* include <attbarline> */
 
@@ -83,12 +89,18 @@ bool AttIgnore::ReadIgnore(  pugi::xml_node element ) {
 
 bool AttIgnore::WriteIgnore(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetIgnored() == "") {
+    if (this->HasIgnored()) {
         element.append_attribute("ignored") = StrToStr(this->GetIgnored()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttIgnore::HasIgnored( )
+{
+    return (m_ignored != "");
+}
+
 
 /* include <attignored> */
 
@@ -119,12 +131,18 @@ bool AttLayout::ReadLayout(  pugi::xml_node element ) {
 
 bool AttLayout::WriteLayout(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetIgnored() == "") {
+    if (this->HasIgnored()) {
         element.append_attribute("ignored") = StrToStr(this->GetIgnored()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttLayout::HasIgnored( )
+{
+    return (m_ignored != "");
+}
+
 
 /* include <attignored> */
 
@@ -155,12 +173,18 @@ bool AttMeasureRef::ReadMeasureRef(  pugi::xml_node element ) {
 
 bool AttMeasureRef::WriteMeasureRef(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetMeasureref() == "") {
+    if (this->HasMeasureref()) {
         element.append_attribute("measureref") = StrToStr(this->GetMeasureref()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttMeasureRef::HasMeasureref( )
+{
+    return (m_measureref != "");
+}
+
 
 /* include <attmeasureref> */
 
@@ -191,12 +215,18 @@ bool AttPageRef::ReadPageRef(  pugi::xml_node element ) {
 
 bool AttPageRef::WritePageRef(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetPbrefs() == "") {
+    if (this->HasPbrefs()) {
         element.append_attribute("pbrefs") = StrToStr(this->GetPbrefs()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttPageRef::HasPbrefs( )
+{
+    return (m_pbrefs != "");
+}
+
 
 /* include <attpbrefs> */
 
@@ -227,12 +257,18 @@ bool AttSurface::ReadSurface(  pugi::xml_node element ) {
 
 bool AttSurface::WriteSurface(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetSurface() == "") {
+    if (this->HasSurface()) {
         element.append_attribute("surface") = StrToStr(this->GetSurface()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttSurface::HasSurface( )
+{
+    return (m_surface != "");
+}
+
 
 /* include <attsurface> */
 
@@ -263,12 +299,18 @@ bool AttSystemRef::ReadSystemRef(  pugi::xml_node element ) {
 
 bool AttSystemRef::WriteSystemRef(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetSbrefs() == "") {
+    if (this->HasSbrefs()) {
         element.append_attribute("sbrefs") = StrToStr(this->GetSbrefs()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttSystemRef::HasSbrefs( )
+{
+    return (m_sbrefs != "");
+}
+
 
 /* include <attsbrefs> */
 

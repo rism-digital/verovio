@@ -47,12 +47,18 @@ bool AttFretlocation::ReadFretlocation(  pugi::xml_node element ) {
 
 bool AttFretlocation::WriteFretlocation(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetFret() == "") {
+    if (this->HasFret()) {
         element.append_attribute("fret") = StrToStr(this->GetFret()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttFretlocation::HasFret( )
+{
+    return (m_fret != "");
+}
+
 
 /* include <attfret> */
 
@@ -83,12 +89,18 @@ bool AttHarmLog::ReadHarmLog(  pugi::xml_node element ) {
 
 bool AttHarmLog::WriteHarmLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetChordref() == "") {
+    if (this->HasChordref()) {
         element.append_attribute("chordref") = StrToStr(this->GetChordref()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttHarmLog::HasChordref( )
+{
+    return (m_chordref != "");
+}
+
 
 /* include <attchordref> */
 
@@ -124,16 +136,27 @@ bool AttHarmVis::ReadHarmVis(  pugi::xml_node element ) {
 
 bool AttHarmVis::WriteHarmVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetExtender() == "") {
+    if (this->HasExtender()) {
         element.append_attribute("extender") = StrToStr(this->GetExtender()).c_str();
         wroteAttribute = true;
     }
-    if (this->GetRendgrid() == "") {
+    if (this->HasRendgrid()) {
         element.append_attribute("rendgrid") = StrToStr(this->GetRendgrid()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttHarmVis::HasExtender( )
+{
+    return (m_extender != "");
+}
+
+bool AttHarmVis::HasRendgrid( )
+{
+    return (m_rendgrid != "");
+}
+
 
 /* include <attrendgrid> */
 

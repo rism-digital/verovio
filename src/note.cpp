@@ -25,7 +25,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface(), AttColoration(), AttNoteLogMensural()
+	LayerElement("note-"), DurationInterface(), PitchInterface(), AttColoration(), AttNoteLogMensural(),
+    AttStemmed()
 {
     Reset();
 }
@@ -44,8 +45,8 @@ void Note::Reset()
     //PitchInterface::Reset();
     ResetColoration();
     ResetNoteLogMensural();
-    m_stemDir = 0;
-    m_stemLen = 0;
+    ResetStemmed();
+    // TO BE REMOVED
     m_acciaccatura = false;
     m_embellishment = EMB_NONE;
     // tie pointers
@@ -55,6 +56,8 @@ void Note::Reset()
     m_slurAttrInitial = NULL;
     m_slurAttrTerminal = NULL;
     
+    d_stemDir = STEMDIRECTION_NONE;
+    d_stemLen = 0;
 }
 
 bool Note::operator==( Object& other )
@@ -108,8 +111,8 @@ void Note::SetValue( int value, int flag )
     
 	// remove qauto flag for silences and inadequate values	
 	if ( ( value > DUR_LG ) && ( value < DUR_2 ) ) {
-		this->m_stemDir = 0;
-        this->m_stemLen = 0;
+		this->SetStemDir(STEMDIRECTION_NONE);
+        this->SetStemLen(0);
     }    
 }
 

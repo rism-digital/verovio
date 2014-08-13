@@ -47,12 +47,18 @@ bool AttFacsimile::ReadFacsimile(  pugi::xml_node element ) {
 
 bool AttFacsimile::WriteFacsimile(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->GetFacs() == "") {
+    if (this->HasFacs()) {
         element.append_attribute("facs") = StrToStr(this->GetFacs()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
+
+bool AttFacsimile::HasFacs( )
+{
+    return (m_facs != "");
+}
+
 
 void AttFacsimile::getCoords() {
     return;
