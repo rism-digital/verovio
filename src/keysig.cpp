@@ -8,6 +8,8 @@
 
 #include "keysig.h"
 
+//----------------------------------------------------------------------------
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -81,7 +83,7 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
     else if (key < KEYSIGNATURE_0) {
         m_alteration = ACCID_FLAT;
     }
-    m_num_alter = abs(key);
+    m_num_alter = key < 0 ? - key : key; // abs equivalent
 }
 
 KeySig::~KeySig()
