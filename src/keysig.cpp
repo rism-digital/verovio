@@ -49,7 +49,7 @@ int KeySig::octave_map[2][9][7] = {
 KeySig::KeySig():
     LayerElement("ksig-")
 {
-    KeySig(0, ACCID_NATURAL);
+    Reset();
 }
 
 KeySig::KeySig(int num_alter, char alter):
@@ -63,8 +63,8 @@ KeySig::KeySig(int num_alter, char alter):
 KeySig::KeySig( KeySigAttr *keySigAttr ):
     LayerElement("ksig-")
 {
-    KeySig(0, ACCID_NATURAL);
-    int key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
+    Reset();
+    char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
     /* see data_KEYSIGNATURE order; key will be:
       0 for KEYSIGNATURE_0
      -1 for KEYSIGNATURE_1f
@@ -73,7 +73,7 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
       2 for KEYSIGNATURE_2s
      etc.
      */
-    if ((key > KEYSIGNATURE_7s) || (key < KEYSIGNATURE_1f)) {
+    if ((key > (KEYSIGNATURE_7s - KEYSIGNATURE_0)) || (key < (KEYSIGNATURE_7f - KEYSIGNATURE_0))) {
         // other values are  KEYSIGNATURE_NONE or  KEYSIGNATURE_mixed (unsupported)
         return;
     }
@@ -83,7 +83,7 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
     else if (key < KEYSIGNATURE_0) {
         m_alteration = ACCID_FLAT;
     }
-    m_num_alter = key < 0 ? - key : key; // abs equivalent
+    m_num_alter = key < 0 ? -key : key; // abs equivalent
 }
 
 KeySig::~KeySig()
@@ -92,6 +92,8 @@ KeySig::~KeySig()
     
 void KeySig::Reset()
 {
+    m_num_alter = 0;
+    m_alteration = ACCID_NATURAL;
 }
 
 unsigned char KeySig::GetAlterationAt(int pos) {
