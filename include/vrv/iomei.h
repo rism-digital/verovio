@@ -24,8 +24,10 @@ class MRest;
 class MultiRest;
 class Note;
 class Rest;
+class Syl;
 class Symbol;
 class Tuplet;
+class Verse;
 
 
 //----------------------------------------------------------------------------
@@ -140,10 +142,22 @@ private:
     pugi::xml_node WriteMeiSymbol( Symbol *symbol, pugi::xml_node currentParent );
     
     /**
+     * Write a Verse and syl
+     */
+    //void WriteVerse( Verse *verse, pugi::xml_node currentParent );
+    //void WriteSyl( Syl *syl, pugi::xml_node currentParent );
+    
+    /**
      * Write a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
+     * To be changed to Att
      */
     void WriteSameAsAttr( pugi::xml_node element, Object *object );
+    
+    /**
+     * Write the XML text content
+     */
+    void WriteText( pugi::xml_node element, Object *object );
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -233,6 +247,10 @@ private:
     LayerElement *ReadMeiAccid( pugi::xml_node accid );
     LayerElement *ReadMeiCustos( pugi::xml_node custos );
     LayerElement *ReadMeiDot( pugi::xml_node dot );
+    //
+    bool ReadVerse( Note *note, pugi::xml_node verse );
+    bool ReadSyl( Verse *verse, pugi::xml_node syl );
+    //
     bool ReadTupletSpanAsTuplet( pugi::xml_node tupletSpan );
     bool ReadSlurAsSlurAttr( pugi::xml_node slur );
     /** Reads <app> elements. For now, only <app> within <layer> are taken into account */
@@ -244,6 +262,12 @@ private:
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
     void ReadSameAsAttr( pugi::xml_node element, Object *object );
+    
+    /**
+     * Read the XML text content.
+     * It has to be called explicitly for elements with text (e.g., <syl>).
+     */
+    void ReadText( pugi::xml_node element, Object *object );
     
     /**
      * Add the LayerElement to the appropriate parent (e.g., Layer, LayerRdg)

@@ -25,6 +25,12 @@
 		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
 		4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
+		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
+		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		4D9A9C1A199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		4D9A9C1C199F576100028D93 /* syl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C1B199F576100028D93 /* syl.h */; };
+		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
+		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
@@ -178,6 +184,10 @@
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
+		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
+		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
+		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
+		4D9A9C1D19A1DE2000028D93 /* syl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = syl.cpp; path = src/syl.cpp; sourceTree = "<group>"; };
 		4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analysis.cpp; path = libmei/atts_analysis.cpp; sourceTree = "<group>"; };
 		4DEE28EE1940BCC100C76319 /* atts_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analysis.h; path = libmei/atts_analysis.h; sourceTree = "<group>"; };
 		4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmn.cpp; path = libmei/atts_cmn.cpp; sourceTree = "<group>"; };
@@ -519,12 +529,16 @@
 				8F59292818854BF800FE51AD /* rest.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
+				4D9A9C1D19A1DE2000028D93 /* syl.cpp */,
+				4D9A9C1B199F576100028D93 /* syl.h */,
 				8F086ED6188539540037FD8E /* symbol.cpp */,
 				8F59292D18854BF800FE51AD /* symbol.h */,
 				8F086ED8188539540037FD8E /* tie.cpp */,
 				8F59292F18854BF800FE51AD /* tie.h */,
 				8F086ED9188539540037FD8E /* tuplet.cpp */,
 				8F59293018854BF800FE51AD /* tuplet.h */,
+				4D9A9C18199F561200028D93 /* verse.cpp */,
+				4D9A9C16199F560200028D93 /* verse.h */,
 			);
 			name = elements;
 			sourceTree = "<group>";
@@ -581,6 +595,8 @@
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 				4D422101199805E400963292 /* att.h in Headers */,
 				4D422102199805E400963292 /* attdef.h in Headers */,
+				4D9A9C17199F560200028D93 /* verse.h in Headers */,
+				4D9A9C1C199F576100028D93 /* syl.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,6 +718,8 @@
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
+				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
+				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -758,6 +776,8 @@
 				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
 				4D422105199805F800963292 /* att.cpp in Sources */,
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
+				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
+				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

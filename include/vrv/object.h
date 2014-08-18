@@ -194,6 +194,17 @@ public:
      */
     bool GetSameAs( std::string *id, std::string *filename, int idx = 0 );
     
+    
+    /**
+     * @name Set and get the text content.
+     * The text content is a std::wstring that needs to be converted to UTF16.
+     * See MeiInput::ReadText and MeiInput ::WriteText
+     */
+    ///@{
+    void SetText( std::wstring text ) { m_text = text; };
+    std::wstring GetText() const { return m_text; };
+    ///@}
+    
     /**
      * Check if the content was modified or not
      */
@@ -409,6 +420,7 @@ public:
 protected:
     std::string m_uuid;
     std::string m_classid;
+    std::wstring m_text;
 
 private:
     

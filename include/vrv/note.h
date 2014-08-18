@@ -24,7 +24,8 @@ namespace vrv {
 
 class Slur;
 class Tie;
-
+class Verse;
+    
 //----------------------------------------------------------------------------
 // Note
 //----------------------------------------------------------------------------
@@ -67,6 +68,11 @@ public:
      * Check if the LayerElement if a Note and compare attributes
      */
     virtual bool operator==(Object& other);
+    
+    /**
+     * Add verse to a note.
+     */
+    void AddVerse(Verse *child);
     
     /**
      * Return the default horizontal spacing of notes.

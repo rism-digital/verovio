@@ -17,6 +17,7 @@
 #include "vrv.h"
 #include "slur.h"
 #include "tie.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -96,6 +97,13 @@ bool Note::operator==( Object& other )
     }
     
     return true;
+}
+    
+void Note::AddVerse(Verse *child)
+{    
+    child->SetParent( this );
+    m_children.push_back(child);
+    Modify();
 }
 
 void Note::SetValue( int value, int flag )

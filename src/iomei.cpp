@@ -35,9 +35,11 @@
 #include "rest.h"
 #include "scoredef.h"
 #include "staff.h"
+#include "syl.h"
 #include "symbol.h"
 #include "system.h"
 #include "tuplet.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -467,6 +469,27 @@ void MeiOutput::WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet )
 {
     return;
 }
+    
+/* To be refactored - make a single MeiOutput::Write method that call the appropriate method
+void MeiOutput::WriteVerse( Verse *verse, pugi::xml_node currentParent )
+{
+    pugi::xml_node xmlVerse = currentParent.append_child("verse");
+    m_staff.append_attribute( "xml:id" ) =  UuidToMeiStr( staff ).c_str();
+    // y position
+    if ( staff->notAnc ) {
+        m_staff.append_attribute( "label" ) = "mensural";
+    }
+    m_staff.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
+    m_staff.append_attribute( "n" ) = StringFormat( "%d", staff->GetStaffNo() ).c_str();
+    
+    return;
+}
+
+void MeiOutput::WriteSyl( Syl *syl, pugi::xml_node currentParent )
+{
+    
+}
+*/
 
 bool MeiOutput::WriteLayerApp( LayerApp *app )
 {    
@@ -487,11 +510,18 @@ bool MeiOutput::WriteLayerRdg( LayerRdg *rdg )
     return true;
 }
 
-
 void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
 {
     if ( !object->m_sameAs.empty() ) {
         element.append_attribute( "sameas" ) = object->m_sameAs.c_str();
+    }
+}
+    
+    
+void MeiOutput::WriteText( pugi::xml_node element, Object *object )
+{
+    if ( !object->GetText().empty() ) {
+        element.text() =  UTF16to8(object->GetText().c_str() ).c_str();
     }
 }
     
@@ -1131,6 +1161,16 @@ bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
     ReadSameAsAttr( xmlElement, vrvElement );
     SetMeiUuid( xmlElement, vrvElement );
     
+    pugi::xml_node current;
+    for( current = xmlElement.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "accid" && vrvElement->IsNote() ) {
+            //ReadAccid(  vrvElement, current );
+        }
+        if ( std::string( current.name() ) == "verse" && vrvElement->IsNote() ) {
+            ReadVerse(  dynamic_cast<Note*>(vrvElement), current );
+        }
+    }
+    
     AddLayerElement( vrvElement );
     return true;
 }
@@ -1219,6 +1259,8 @@ LayerElement *MeiInput::ReadMeiMultiRest( pugi::xml_node multiRest )
 	
 	return vrvMultiRest;
 }
+    
+#include <clocale>
 
 LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 {
@@ -1376,6 +1418,34 @@ LayerElement *MeiInput::ReadMeiCustos( pugi::xml_node custos )
 	
 	return vrvCustos;    
 }
+    
+bool MeiInput::ReadVerse(vrv::Note *vrvNote, pugi::xml_node verse)
+{
+    Verse *vrvVerse = new Verse();
+    SetMeiUuid( verse , vrvVerse );
+    
+    pugi::xml_node current;
+    for( current = verse.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "syl" ) {
+            ReadSyl( vrvVerse, current );
+        }
+    }
+
+    vrvNote->AddVerse( vrvVerse );
+    return true;
+}
+
+bool MeiInput::ReadSyl(Verse *vrvVerse, pugi::xml_node syl)
+{
+    Syl *vrvSyl = new Syl();
+    SetMeiUuid( syl , vrvSyl );
+    
+    ReadText( syl, vrvSyl );
+    
+    vrvVerse->AddSyl( vrvSyl );
+    return true;
+}
+
 
 LayerElement *MeiInput::ReadMeiDot( pugi::xml_node dot )
 {
@@ -1449,6 +1519,13 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     }
     
     object->m_sameAs = element.attribute( "sameas" ).value();
+}
+
+void MeiInput::ReadText( pugi::xml_node element, Object *object )
+{
+    if (element.text()) {
+        object->SetText(UTF8to16( element.text().as_string() ));
+    }
 }
 
 void MeiInput::AddLayerElement( LayerElement *element )
