@@ -199,6 +199,43 @@ data_CLEFSHAPE Att::StrToClefShape( std::string value )
         LogWarning("Unsupported clef with @shape '%s'", value.c_str());
     }
     return data;
+}    
+
+std::string Att::ConToStr(data_CON data)
+{
+    std::string value;
+    switch(data)
+    {
+        case CON_s : value = "s"; break;
+        case CON_d : value = "d"; break;
+        case CON_u : value = "u"; break;
+        case CON_t : value = "t"; break;
+        case CON_c : value = "c"; break;
+        case CON_v : value = "v"; break;
+        case CON_i : value = "i"; break;
+        case CON_b : value = "b"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_CON Att::StrToCon(std::string value)
+{
+    if (value == "s") return CON_s;
+    else if (value == "d") return CON_d;
+    else if (value == "u") return CON_u;
+    else if (value == "t") return CON_t;
+    else if (value == "c") return CON_c;
+    else if (value == "v") return CON_v;
+    else if (value == "i") return CON_i;
+    else if (value == "b") return CON_b;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return CON_NONE;
 }
     
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
@@ -538,5 +575,32 @@ data_STEMPOSITION Att::StrToStemPosition(std::string value)
     return STEMPOSITION_NONE;
 }
 
+std::string Att::WordPosToStr(data_WORDPOS data)
+{
+    std::string value;
+    switch(data)
+    {
+        case WORDPOS_i : value = "i"; break;
+        case WORDPOS_m : value = "m"; break;
+        case WORDPOS_t : value = "t"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_WORDPOS Att::StrToWordPos(std::string value)
+{
+    if (value == "i") return WORDPOS_i;
+    else if (value == "m") return WORDPOS_m;
+    else if (value == "t") return WORDPOS_t;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return WORDPOS_NONE;
+}
+    
 } // namespace vrv
 

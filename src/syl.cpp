@@ -19,10 +19,16 @@ namespace vrv {
 Syl::Syl():
     DocObject("syl-")
 {
+    Reset();
 }
 
 Syl::~Syl()
 {
+}
+    
+void Syl::Reset()
+{
+    ResetSylLog();
 }
 
 } // namespace vrv

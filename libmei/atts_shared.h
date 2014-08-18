@@ -4741,13 +4741,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCon(std::string con_) { m_con = con_; };
-    std::string GetCon() const { return m_con; };    
+    void SetCon(data_CON con_) { m_con = con_; };
+    data_CON GetCon() const { return m_con; };    
     bool HasCon( );
     
     //
-    void SetWordpos(std::string wordpos_) { m_wordpos = wordpos_; };
-    std::string GetWordpos() const { return m_wordpos; };    
+    void SetWordpos(data_WORDPOS wordpos_) { m_wordpos = wordpos_; };
+    data_WORDPOS GetWordpos() const { return m_wordpos; };    
     bool HasWordpos( );
     
     ///@}
@@ -4757,9 +4757,9 @@ protected:
      * Describes the symbols typically used to indicate breaks between syllables and
      * their functions.
      **/
-    std::string m_con;
+    data_CON m_con;
     /** Records the position of a syllable within a word. **/
-    std::string m_wordpos;
+    data_WORDPOS m_wordpos;
 
 /* include <attwordpos> */
 };

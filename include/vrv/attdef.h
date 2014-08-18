@@ -70,6 +70,21 @@ enum data_CLEFSHAPE {
     CLEFSHAPE_perc,
     CLEFSHAPE_TAB
 };
+
+/**
+ * MEI values for @con (no datatype in MEI)
+ */
+enum data_CON {
+    CON_NONE = 0,
+    CON_s,
+    CON_d,
+    CON_u,
+    CON_t,
+    CON_c,
+    CON_v,
+    CON_i,
+    CON_b
+};
     
 /**
  * MEI data.KEYSIGNATURE
@@ -199,6 +214,16 @@ enum data_STEMPOSITION {
     STEMPOSITION_left,
     STEMPOSITION_right,
     STEMPOSITION_center
+};
+        
+/**
+ * MEI values for @wordpos (no datatype in MEI)
+ */
+enum data_WORDPOS {
+    WORDPOS_NONE = 0,
+    WORDPOS_i,
+    WORDPOS_m,
+    WORDPOS_t
 };
     
 } // namespace vrv

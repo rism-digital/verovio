@@ -5437,18 +5437,18 @@ AttSylLog::~AttSylLog() {
 }
 
 void AttSylLog::ResetSylLog() {
-    m_con = "";
-    m_wordpos = "";
+    m_con = CON_NONE;
+    m_wordpos = WORDPOS_NONE;
 }
 
 bool AttSylLog::ReadSylLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("con")) {
-        this->SetCon(StrToStr(element.attribute("con").value()));
+        this->SetCon(StrToCon(element.attribute("con").value()));
         hasAttribute = true;
     }
     if (element.attribute("wordpos")) {
-        this->SetWordpos(StrToStr(element.attribute("wordpos").value()));
+        this->SetWordpos(StrToWordPos(element.attribute("wordpos").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5457,11 +5457,11 @@ bool AttSylLog::ReadSylLog(  pugi::xml_node element ) {
 bool AttSylLog::WriteSylLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasCon()) {
-        element.append_attribute("con") = StrToStr(this->GetCon()).c_str();
+        element.append_attribute("con") = ConToStr(this->GetCon()).c_str();
         wroteAttribute = true;
     }
     if (this->HasWordpos()) {
-        element.append_attribute("wordpos") = StrToStr(this->GetWordpos()).c_str();
+        element.append_attribute("wordpos") = WordPosToStr(this->GetWordpos()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5469,12 +5469,12 @@ bool AttSylLog::WriteSylLog(  pugi::xml_node element ) {
 
 bool AttSylLog::HasCon( )
 {
-    return (m_con != "");
+    return (m_con != CON_NONE);
 }
 
 bool AttSylLog::HasWordpos( )
 {
-    return (m_wordpos != "");
+    return (m_wordpos != WORDPOS_NONE);
 }
 
 

@@ -61,6 +61,9 @@ protected:
     std::string ClefShapeToStr(data_CLEFSHAPE data);
     data_CLEFSHAPE StrToClefShape(std::string value);
     
+    std::string ConToStr(data_CON data);
+    data_CON StrToCon(std::string value);
+        
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);
     
@@ -93,6 +96,9 @@ protected:
     
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
+    
+    std::string WordPosToStr(data_WORDPOS data);
+    data_WORDPOS StrToWordPos(std::string value);
   
     ///@}
 

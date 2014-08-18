@@ -1440,6 +1440,7 @@ bool MeiInput::ReadSyl(Verse *vrvVerse, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     SetMeiUuid( syl , vrvSyl );
     
+    vrvSyl->ReadSylLog( syl );
     ReadText( syl, vrvSyl );
     
     vrvVerse->AddSyl( vrvSyl );
