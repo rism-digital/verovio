@@ -85,7 +85,6 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 {
 	assert( system ); // other asserted before
     
-	int i;
     Measure *measure;
     
     dc->StartGraphic( system, "system", system->GetUuid() );
@@ -104,12 +103,19 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     }
     
     
-    for (i = 0; i < (int)system->GetMeasureCount(); i++)
+    /*for (i = 0; i < (int)system->GetMeasureCount(); i++)
 	{
 		measure = dynamic_cast<Measure*>(system->m_children[i]);
         if (!measure) {
             continue;
         }
+        DrawMeasure( dc , measure, system );
+	}*/
+
+    Object* current;
+    for (current = system->GetFirst( &typeid(Measure) ); current; current = system->GetNext( ) )
+	{
+		measure = dynamic_cast<Measure*>(current);
         DrawMeasure( dc , measure, system );
 	}
 

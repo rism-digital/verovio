@@ -25,9 +25,12 @@ class LayerElement;
 class Measure;
 class Page;
 class Staff;
+class Syl;
 class System;
 class Tie;
 class Tuplet;
+class Verse;
+
 
 //----------------------------------------------------------------------------
 // View
@@ -164,38 +167,40 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
+    void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
+    void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
+    void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
+    void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff ); 
+    void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff); 
     void DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff ); 
     void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
+    void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
+    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawSyl( DeviceContext *dc, Syl *syl, LayerElement *element, Layer *layer, Staff *staff);
     void DrawSymbol( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent = NULL );
     void DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
-    void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );  
-    void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
-    void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
-    void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff);
+    void DrawVerse( DeviceContext *dc, Verse *verse, LayerElement *element, Layer *layer, Staff *staff);
     void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
-    void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
-    void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     ///@}
     

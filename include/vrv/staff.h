@@ -82,12 +82,6 @@ public:
     
 	void CopyAttributes( Staff *staff ); // copy all attributes but none of the elements
 
-	Layer *GetFirst( );
-	Layer *GetLast( );
-	Layer *GetNext( Layer *layer );
-	Layer *GetPrevious( Layer *layer );
-    Layer *GetLayerWithIdx( int LayerIdx );
-    
     /**
      * Align the content of a staff vertically.
      */

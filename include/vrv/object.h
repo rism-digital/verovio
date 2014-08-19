@@ -74,6 +74,7 @@ public:
      * Used for classes with several types of children
      */
     int GetChildCount() { return (int)m_children.size(); };
+    int GetChildCount( const std::type_info *elementType );
     
     /**
      * Child access (generic)
@@ -84,6 +85,18 @@ public:
      * Clear the children vector and delete all the objects.
      */
     void ClearChildren();
+    
+    /**
+     * @name Iterator methods for accessing children.
+     * GetFirst returns the first element child of the specified type.
+     * Its position and the specified type are stored and used of accessing next elements
+     * The methods returns NULL when no child is found or when the end is reached.
+     * Always call GetFirst before calling GetNext
+     */
+    ///@{
+    Object *GetFirst( const std::type_info *elementType = &typeid(Object) );
+    Object *GetNext( );
+    ///@}
     
     /**
      * Set the parent of the Object.
@@ -435,6 +448,13 @@ private:
      */
     bool m_isModified;
     
+    /**
+     * Members used for caching iterator values.
+     * See Object::IterGetFirst, Object::IterGetNext and Object::IterIsNotEnd
+     * Values are set when GetFirst is called (which is mandatory)
+     */
+    ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
+    const std::type_info *m_iteratorElementType;    
 };
 
 
@@ -591,6 +611,21 @@ public:
     
 private:
     
+};
+
+class ObjectComparison
+{
+
+public:
+    ObjectComparison( const std::type_info *elementType ) { m_elementType = elementType; };
+    
+    bool operator() (Object *object)
+    {
+        return (typeid(*object) == *m_elementType);
+    }
+    
+private:
+    const std::type_info *m_elementType;;
 };
 
 } // namespace vrv

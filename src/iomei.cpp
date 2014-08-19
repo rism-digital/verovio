@@ -1095,6 +1095,7 @@ bool MeiInput::ReadMeiLayer( pugi::xml_node layer )
     for( current = layer.first_child( ); current; current = current.next_sibling( ) ) {
         ReadMeiLayerElement( current );
     }
+    
     // success in any case
     return true;
 }

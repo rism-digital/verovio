@@ -89,27 +89,6 @@ void View::SetPage( int pageIdx, bool doLayout )
     m_currentMeasure = NULL;
     m_currentStaff = NULL;
     m_currentSystem = NULL;
-    
-    
-    /*
-	// selectionne le premier element
-	if ( m_page->GetSystemCount() > 0 ) 
-    {
-		m_currentSystem = m_page->GetFirst();
-    	if ( m_currentSystem->GetStaffCount() > 0 ) 
-        {
-            m_currentStaff = m_currentSystem->GetFirst();
-            if (m_currentStaff->GetLayerCount() > 0 ) 
-            {
-                m_currentLayer = m_currentStaff->GetFirst();
-                if ( m_currentLayer->GetElementCount() > 0 ) 
-                {
-                    m_currentElement = m_currentLayer->GetFirst();
-                }
-            }
-        }
-	}
-    */
 
     OnPageChange();
     DoRefresh();

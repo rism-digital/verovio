@@ -74,9 +74,6 @@ public:
     
 	void CopyAttributes( Layer *layer ); // copy all attributes but none of the elements
     
-	LayerElement *GetFirst( );
-	LayerElement *GetLast( );
-	LayerElement *GetNext( LayerElement *element );
 	LayerElement *GetPrevious( LayerElement *element );
 	LayerElement *GetAtPos( int x );
 	LayerElement *Insert( LayerElement *element, int x ); // return a pointer on the inserted element
@@ -90,7 +87,7 @@ public:
      * Looks FORWARD of BACKWARD depending on the direction parameter.
      * Returns the retrieved element if *succ == true or the original element if not.
      */
-    LayerElement *GetFirst( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ );
+    LayerElement *GetFirstOld( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ );
     
     /** 
      * Get the current clef for the test element.
@@ -131,12 +128,6 @@ public:
      * Used for building collations (See CmpFile::Collate).
      */
     void RemoveClefAndCustos( );
-    
-    /**
-     * Checks that the X position of the currentElement is not before the previous element or after the next one.
-     * This works for facsimile (transcription) encodings only because it looks at the m_xAbs position
-     */ 
-    void CheckXPosition( LayerElement *currentElement );
     
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.

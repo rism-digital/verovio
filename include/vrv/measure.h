@@ -88,12 +88,6 @@ public:
     
 	void CopyAttributes( Measure *measure ); // copy all attributes but none of the elements
     
-	Staff *GetFirst( );
-	Staff *GetLast( );
-	Staff *GetNext( Staff *layer );
-	Staff *GetPrevious( Staff *layer );
-    Staff *GetStaffWithIdx( int staffIdx );
-    
     Staff *GetStaffWithNo( int staffNo );
     
     int GetXRel( );

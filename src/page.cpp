@@ -87,59 +87,16 @@ int Page::GetStaffPosOnPage( Staff *staff )
     return 0;
 }
 
-
-System *Page::GetFirst( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	return dynamic_cast<System*>(m_children[0]);
-}
-
-System *Page::GetLast( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	int i = GetSystemCount() - 1;
-	return dynamic_cast<System*>(m_children[i]);
-}
-
-System *Page::GetNext( System *system )
-{
-    if ( !system || m_children.empty())
-        return NULL;
-        
-	int i = this->GetChildIndex( system );
-
-	if ((i == -1 ) || ( i >= GetSystemCount() - 1 ))
-		return NULL;
-	
-	return dynamic_cast<System*>(m_children[i + 1]);
-}
-
-System *Page::GetPrevious( System *system  )
-{
-    if ( !system || m_children.empty())
-        return NULL;
-        
-	int i = GetChildIndex( system );
-
-	if ((i == -1 ) || ( i <= 0 ))
-        return NULL;
-	
-    return dynamic_cast<System*>(m_children[i - 1]);
-}
-
-
 System *Page::GetAtPos( int y )
 {
 
 	//y -= ( SYSTEM_OFFSET / 2 ); // SYSTEM_OFFSET used to be 190
-    System *system = this->GetFirst();
+    System *system = dynamic_cast<System*>( this->GetFirst( &typeid(System) ) );
 	if ( !system )
 		return NULL;
 	
     System *next = NULL;
-	while ( (next = this->GetNext(system)) )
+	while ( (next = dynamic_cast<System*>( this->GetNext() ) ) )
 	{
 		if ( (int)next->m_yAbs < y )
 		{

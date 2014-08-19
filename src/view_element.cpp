@@ -38,6 +38,7 @@
 #include "slur.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -577,7 +578,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         layer->AddToDrawingList( note->GetSlurAttrTerminal() );
     }
 
-	
+	if (note->GetChildCount( &typeid(Verse) ) ) {
+        //DrawVerse(, <#vrv::Verse *verse#>, <#vrv::LayerElement *element#>, <#vrv::Layer *layer#>, <#vrv::Staff *staff#>)
+    }
 
     if (note->m_fermata)
         DrawFermata(dc, element, staff);

@@ -56,7 +56,7 @@ public:
     virtual std::string GetClassName( ) { return "Note"; };
     ///@}
     
-     /** 
+     /**
       * Set the duration.
       * Because we need to perform additonal check, this method override the LayerElement::SetValue method.
       * The DurationInterface::SetDuration method has to be called explicitly.

@@ -112,56 +112,6 @@ void Staff::CopyAttributes( Staff *nstaff )
 	nstaff->m_drawingY = m_drawingY;
 }
 
-Layer *Staff::GetFirst( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	return dynamic_cast<Layer*>(m_children[0]);
-}
-
-Layer *Staff::GetLast( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	int i = GetLayerCount() - 1;
-	return dynamic_cast<Layer*>(m_children[i]);
-}
-
-Layer *Staff::GetNext( Layer *layer )
-{	
-    if ( !layer || m_children.empty())
-        return NULL;
-        
-	int i = GetChildIndex( layer );
-
-	if ((i == -1 ) || ( i >= GetLayerCount() - 1 ))
-		return NULL;
-
-	return dynamic_cast<Layer*>(m_children[i + 1]);
-}
-
-Layer *Staff::GetPrevious( Layer *layer )
-{
-    if ( !layer || m_children.empty())
-        return NULL;
-        
-	int i = GetChildIndex( layer );
-
-	if ((i == -1 ) || ( i <= 0 ))
-        return NULL;
-	
-    return dynamic_cast<Layer*>(m_children[i - 1]);
-}
-
-
-Layer *Staff::GetLayerWithIdx( int LayerIdx )
-{
-    if ( LayerIdx > (int)m_children.size() - 1 )
-        return NULL;
-	
-	return dynamic_cast<Layer*>(m_children[LayerIdx]);
-}
-
 int Staff::GetVerticalSpacing()
 {
     return 160; // arbitrary generic value

@@ -16,6 +16,10 @@
 #include <vector>
 
 namespace vrv {
+    
+class Object;
+    
+bool IsNote( Object *object );
 
 /**
  * The following functions are helpers for formating, conversion, or loging

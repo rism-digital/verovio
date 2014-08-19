@@ -81,57 +81,6 @@ void Measure::AddStaff( Staff *staff )
     }
 }
 
-Staff *Measure::GetFirst( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	return dynamic_cast<Staff*>(m_children[0]);
-}
-
-Staff *Measure::GetLast( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	int i = GetStaffCount() - 1;
-	return dynamic_cast<Staff*>(m_children[i]);
-}
-
-Staff *Measure::GetNext( Staff *staff )
-{
-    if ( !staff || m_children.empty())
-        return NULL;
-    
-	int i = 0; GetChildIndex( staff );
-    
-	if ((i == -1 ) || ( i >= GetStaffCount() - 1 ))
-		return NULL;
-    
-	return dynamic_cast<Staff*>(m_children[i + 1]);
-}
-
-Staff *Measure::GetPrevious( Staff *staff )
-{
-    if ( !staff || m_children.empty())
-        return NULL;
-    
-	int i = GetChildIndex( staff );
-    
-	if ((i == -1 ) || ( i <= 0 ))
-        return NULL;
-	
-    return dynamic_cast<Staff*>(m_children[i - 1]);
-}
-
-
-Staff *Measure::GetStaffWithIdx( int staffIdx )
-{
-    if ( staffIdx > (int)m_children.size() - 1 )
-        return NULL;
-	
-	return dynamic_cast<Staff*>(m_children[staffIdx]);
-}
-
-
 Staff *Measure::GetStaffWithNo( int staffNo )
 {
     int i;

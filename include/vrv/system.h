@@ -44,11 +44,7 @@ public:
     
     void AddScoreDef( ScoreDef *scoreDef );
 	
-	Measure *GetFirst( );
-	Measure *GetLast( );
-	Measure *GetNext( Measure *measure );
-	Measure *GetPrevious( Measure *measure );
-	Measure *GetAtPos( int x );
+    Measure *GetAtPos( int x );
     
     /**
      * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)

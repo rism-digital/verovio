@@ -113,58 +113,16 @@ void System::ResetVerticalAlignment()
     m_drawingYRel = 0;
     m_drawingY = 0;
 }
-    
-Measure *System::GetFirst( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	return dynamic_cast<Measure*>(m_children[0]);
-}
-
-Measure *System::GetLast( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	int i = (int)m_children.size() - 1;
-	return dynamic_cast<Measure*>(m_children[i]);
-}
-
-Measure *System::GetNext( Measure *measure )
-{
-    if ( !measure || m_children.empty())
-        return NULL;
-        
-	int i = GetChildIndex( measure );
-    
-	if ((i == -1 ) || ( i >= GetMeasureCount() - 1 ))
-		return NULL;
-	
-	return dynamic_cast<Measure*>(m_children[i + 1]);
-	
-}
-
-Measure *System::GetPrevious( Measure *measure  )
-{
-    if ( !measure || m_children.empty() )
-        return NULL;
-        
-	int i = GetChildIndex( measure );
-
-	if ((i == -1 ) || ( i <= 0 ))
-        return NULL;
-	
-    return dynamic_cast<Measure*>(m_children[i - 1]);
-}
 
 Measure *System::GetAtPos( int x )
 {
 	//y += ( STAFF_OFFSET / 2 );
-	Measure *measure = this->GetFirst();
+	Measure *measure = dynamic_cast<Measure*>( this->GetFirst( &typeid(Measure) ) );
 	if ( !measure )
 		return NULL;
     
     Measure *next = NULL;
-	while ( (next = this->GetNext(measure) ) )
+	while ( (next = dynamic_cast<Measure*>( this->GetNext() ) ) )
 	{
 		if ( (int)measure->GetDrawingX() < x )
 		{

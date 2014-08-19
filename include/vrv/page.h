@@ -40,11 +40,7 @@ public:
     void Clear();
 	
 	void AddSystem( System *system );
-    
-	System *GetFirst( );
-	System *GetLast( );
-	System *GetNext( System *system );
-	System *GetPrevious( System *system );
+
 	System *GetAtPos( int y );
 	
 	int GetSystemCount() const { return (int)m_children.size(); };

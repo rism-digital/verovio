@@ -50,9 +50,11 @@ add_executable (verovio
 	../src/staff.cpp 
 	../src/svgdevicecontext.cpp 
 	../src/symbol.cpp 
+	../src/syl.cpp
 	../src/system.cpp 
 	../src/tie.cpp
 	../src/tuplet.cpp
+	../src/verse.cpp
 	../src/vrv.cpp
 	../src/pugixml.cpp
 	#../libmei/atts_analysis.cpp

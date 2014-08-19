@@ -100,32 +100,7 @@ void Layer::CopyAttributes( Layer *nlayer )
 	nlayer->Clear();
 	nlayer->voix = voix;
 }
-
-LayerElement *Layer::GetFirst( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	return dynamic_cast<LayerElement*>(m_children[0]);
-}
-
-LayerElement *Layer::GetLast( )
-{
-	if ( m_children.empty() )
-		return NULL;
-	int i = (int)m_children.size() - 1;
-	return dynamic_cast<LayerElement*>(m_children[i]);
-}
-
-LayerElement *Layer::GetNext( LayerElement *element )
-{	
-    this->ResetList( this );
     
-    if ( !element || m_list.empty() )
-        return NULL;
-    
-    return dynamic_cast<LayerElement*>( GetListNext( element ) );
-}
-
 LayerElement *Layer::GetPrevious( LayerElement *element )
 {
     this->ResetList( this );
@@ -138,14 +113,14 @@ LayerElement *Layer::GetPrevious( LayerElement *element )
 
 LayerElement *Layer::GetAtPos( int x )
 {
-	LayerElement *element = this->GetFirst();
+	LayerElement *element = dynamic_cast<LayerElement*>( this->GetFirst() );
 	if ( !element )
 		return NULL;
 
     
 	int dif = x - element->GetDrawingX();
     LayerElement *next = NULL;
-	while ( (next = this->GetNext( element )) && (int)element->GetDrawingX() < x ){
+	while ( (next = dynamic_cast<LayerElement*>( this->GetNext() ) ) && (int)element->GetDrawingX() < x ){
 		element = next;
 		if ( (int)element->GetDrawingX() > x && dif < (int)element->GetDrawingX() - x )
 			return this->GetPrevious( element );
@@ -214,15 +189,15 @@ LayerElement *Layer::Insert( LayerElement *element, int x )
     // If not, it will be NULL
     // We are also updating the section and measure ( TODO, not necessary for now )
     int idx = 0;
-	LayerElement *next = this->GetFirst();
+	LayerElement *next = dynamic_cast<LayerElement*>( this->GetFirst() );
 	while ( next && (next->GetDrawingX() < x) )
 	{
         idx++;
         // update section and measure if necessary (no section breaks and measure breaks for now)
-		if ( this->GetNext( next ) )
-			next = this->GetNext( next );
-		else
+		next = dynamic_cast<LayerElement*>( this->GetNext( ) );
+		if ( !next ) {
 			break;
+        }
 	}
     
     // Insert in the logical tree - this works only for facsimile (transcription) encoding
@@ -333,7 +308,7 @@ void Layer::Delete( LayerElement *element )
 // symbol, de la nature indiquee (flg). Retourne le ptr si succes, ou 
 // l'element de depart; le ptr succ est vrai si symb trouve.
 
-LayerElement *Layer::GetFirst( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ)
+LayerElement *Layer::GetFirstOld( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ)
 {	
     LayerElement *original = element;
 
@@ -372,23 +347,6 @@ LayerElement *Layer::GetFirst( LayerElement *element, unsigned int direction, co
 	return (*succ ? element : original);
 }
 
-void Layer::CheckXPosition( LayerElement *currentElement )
-{
-    if (!currentElement) {
-        return;
-    }
-    
-    LayerElement *previous = GetPrevious( currentElement );
-    LayerElement *next = GetNext( currentElement );
-    
-    if ( previous && previous->m_xAbs >= currentElement->m_xAbs ) {
-        currentElement->m_xAbs = previous->m_xAbs + 2;
-    }
-    if ( next && next->m_xAbs <= currentElement->m_xAbs ) {
-        currentElement->m_xAbs = next->m_xAbs - 2;
-    }
-}
-
 Clef* Layer::GetClef( LayerElement *test )
 {
 	bool succ=false;
@@ -399,7 +357,7 @@ Clef* Layer::GetClef( LayerElement *test )
 	
     if ( !test->IsClef() )
     {	
-        test = GetFirst(test, BACKWARD, &typeid(Clef), &succ);
+        test = GetFirstOld(test, BACKWARD, &typeid(Clef), &succ);
     }
     if ( dynamic_cast<Clef*>(test) ) {
         return dynamic_cast<Clef*>(test);

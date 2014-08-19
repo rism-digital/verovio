@@ -133,6 +133,29 @@ void Object::ClearChildren()
     }
     m_children.clear();
 }
+ 
+    
+int Object::GetChildCount( const std::type_info *elementType )
+{
+    return count_if (m_children.begin(), m_children.end(), ObjectComparison( elementType ));
+}
+    
+    
+Object* Object::GetFirst( const std::type_info *elementType )
+{
+    m_iteratorElementType = elementType;
+    m_iteratorEnd = m_children.end();
+    m_iteratorCurrent = std::find_if(m_children.begin(), m_iteratorEnd, ObjectComparison( m_iteratorElementType ) );
+    return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
+}
+    
+    
+Object* Object::GetNext( )
+{
+    m_iteratorCurrent++;
+    m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison( m_iteratorElementType ) );
+    return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
+}
 
 int Object::GetIdx() const
 {
