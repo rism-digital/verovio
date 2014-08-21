@@ -40,8 +40,13 @@ void Beam::FilterList()
     
     while ( iter != m_list.end()) {
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
-        if ( currentElement && !currentElement->HasDurationInterface() )
+        if ( !currentElement ) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+            iter = m_list.erase( iter );           
+        }
+        else if ( !currentElement->HasDurationInterface() )
         {
+            // remove anything that has not a DurationInterface
             iter = m_list.erase( iter );
         } else {
             // Drop notes that are signaled as grace notes
