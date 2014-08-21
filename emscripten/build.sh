@@ -114,10 +114,12 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/slur.cpp \
 	$VEROVIO_ROOT/src/staff.cpp \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
+	$VEROVIO_ROOT/src/syl.cpp \
 	$VEROVIO_ROOT/src/symbol.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
+	$VEROVIO_ROOT/src/verse.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \

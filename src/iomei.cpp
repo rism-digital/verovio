@@ -1260,8 +1260,6 @@ LayerElement *MeiInput::ReadMeiMultiRest( pugi::xml_node multiRest )
 	
 	return vrvMultiRest;
 }
-    
-#include <clocale>
 
 LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 {
@@ -1406,6 +1404,7 @@ LayerElement *MeiInput::ReadMeiAccid( pugi::xml_node accid )
 
 LayerElement *MeiInput::ReadMeiCustos( pugi::xml_node custos )
 {
+    
     Symbol *vrvCustos = new Symbol( SYMBOL_CUSTOS );
     
 	// position (pitch)
