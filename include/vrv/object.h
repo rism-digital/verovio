@@ -19,7 +19,7 @@
 namespace vrv {
 
 class Doc;
-class MusFunctor;
+class Functor;
 class Object;
 
 typedef std::vector<Object*> ArrayOfObjects;
@@ -233,7 +233,7 @@ public:
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
      */
-    virtual void Process( MusFunctor *functor, ArrayPtrVoid params, MusFunctor *endFunctor = NULL );
+    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL );
     
     //----------//
     // Functors //
@@ -307,7 +307,7 @@ public:
     
     /**
      * Lay out the X positions of the staff content looking that the bounding boxes.
-     * This is the MusFunctor called at the end of the measure or a layer.
+     * This is the Functor called at the end of the measure or a layer.
      */
     virtual int SetBoundingBoxXShiftEnd( ArrayPtrVoid params );
     
@@ -356,7 +356,7 @@ public:
     
     /**
      * Lay out the Y positions of the staff looking that the bounding boxes of each staff
-     * This is the MusFunctor called at the end of the system or a measure.
+     * This is the Functor called at the end of the system or a measure.
      */
     virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid params );
     
@@ -583,14 +583,14 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// abstract base class MusFunctor
+// abstract base class Functor
 //----------------------------------------------------------------------------
 
 /** 
  * This class is an abstact Functor for the object hierarchy.
  * Needs testing.
  */
-class MusFunctor
+class Functor
 {
 private:
     int (Object::*obj_fpt)( ArrayPtrVoid params );   // pointer to member function
@@ -599,9 +599,9 @@ public:
     
     // constructor - takes pointer to an object and pointer to a member and stores
     // them in two private variables
-    MusFunctor( );
-    MusFunctor( int(Object::*_obj_fpt)( ArrayPtrVoid ));
-	virtual ~MusFunctor() {};
+    Functor( );
+    Functor( int(Object::*_obj_fpt)( ArrayPtrVoid ));
+	virtual ~Functor() {};
     
     // override function "Call"
     virtual void Call( Object *ptr, ArrayPtrVoid params );
@@ -612,7 +612,17 @@ public:
 private:
     
 };
+    
+    
+//----------------------------------------------------------------------------
+// ObjectComparison
+//----------------------------------------------------------------------------
 
+/**
+ * Unary predicate for comparing object types.
+ * This is used for example in std::find_if.
+ * See Object::GetFirst or Object::GetNext
+ */
 class ObjectComparison
 {
 

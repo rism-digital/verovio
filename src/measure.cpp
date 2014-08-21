@@ -179,7 +179,7 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift (unused)
     // param 1: the functor to be redirected to Aligner
-    MusFunctor *integrateBoundingBoxShift = static_cast<MusFunctor*>(params[1]);
+    Functor *integrateBoundingBoxShift = static_cast<Functor*>(params[1]);
     
     m_measureAligner.Process( integrateBoundingBoxShift, params );
     
@@ -191,7 +191,7 @@ int Measure::SetAligmentXPos( ArrayPtrVoid params )
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
     // param 2: the functor to be redirected to Aligner
-    MusFunctor *setAligmnentPosX = static_cast<MusFunctor*>(params[2]);
+    Functor *setAligmnentPosX = static_cast<Functor*>(params[2]);
     
     m_measureAligner.Process( setAligmnentPosX, params);
     
@@ -204,7 +204,7 @@ int Measure::JustifyX( ArrayPtrVoid params )
     // param 1: the system full width (without system margins) (unused)
     // param 2: the functor to be redirected to the MeasureAligner
     double *ratio = static_cast<double*>(params[0]);
-    MusFunctor *justifyX = static_cast<MusFunctor*>(params[2]);
+    Functor *justifyX = static_cast<Functor*>(params[2]);
     
     this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
     

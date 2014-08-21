@@ -282,7 +282,7 @@ void ScoreDef::Replace( ScoreDef *newScoreDef )
     
     ArrayPtrVoid params;
 	params.push_back( this );
-    MusFunctor replaceStaffDefsInScoreDef( &Object::ReplaceStaffDefsInScoreDef );
+    Functor replaceStaffDefsInScoreDef( &Object::ReplaceStaffDefsInScoreDef );
     newScoreDef->Process( &replaceStaffDefsInScoreDef, params );
 }
 
@@ -343,7 +343,7 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSi
     params.push_back( &keysig );
 	params.push_back( &mensur );
     params.push_back( &meterSig );
-    MusFunctor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
+    Functor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
     this->Process( &setStaffDefDraw, params );
 }
 

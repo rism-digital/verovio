@@ -142,7 +142,7 @@ void Page::LayOutHorizontally( )
     double time = 0.0;
     params.push_back( &measureAlignerPtr );
     params.push_back( &time );
-    MusFunctor alignHorizontally( &Object::AlignHorizontally );
+    Functor alignHorizontally( &Object::AlignHorizontally );
     this->Process( &alignHorizontally, params );
     
     // Set the X position of each Alignment
@@ -152,7 +152,7 @@ void Page::LayOutHorizontally( )
     int previousXRel = 0;
     params.push_back( &previousTime );
     params.push_back( &previousXRel );
-    MusFunctor setAlignmentX( &Object::SetAligmentXPos );
+    Functor setAlignmentX( &Object::SetAligmentXPos );
     // Special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentX );
     this->Process( &setAlignmentX, params );
@@ -172,8 +172,8 @@ void Page::LayOutHorizontally( )
     int measure_width = 0;
     params.push_back( &min_pos );
     params.push_back( &measure_width );
-    MusFunctor setBoundingBoxXShift( &Object::SetBoundingBoxXShift );
-    MusFunctor setBoundingBoxXShiftEnd( &Object::SetBoundingBoxXShiftEnd );
+    Functor setBoundingBoxXShift( &Object::SetBoundingBoxXShift );
+    Functor setBoundingBoxXShiftEnd( &Object::SetBoundingBoxXShiftEnd );
     this->Process( &setBoundingBoxXShift, params, &setBoundingBoxXShiftEnd );
     
     // Integrate the X bounding box shift of the elements
@@ -181,7 +181,7 @@ void Page::LayOutHorizontally( )
     params.clear();
     int shift = 0;
     params.push_back( &shift );
-    MusFunctor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
+    Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );
     this->Process( &integrateBoundingBoxXShift, params );
@@ -190,8 +190,8 @@ void Page::LayOutHorizontally( )
     params.clear();
     shift = 0;
     params.push_back( &shift );
-    MusFunctor alignMeasures( &Object::AlignMeasures );
-    MusFunctor alignMeasuresEnd( &Object::AlignMeasuresEnd );
+    Functor alignMeasures( &Object::AlignMeasures );
+    Functor alignMeasuresEnd( &Object::AlignMeasuresEnd );
     this->Process( &alignMeasures, params, &alignMeasuresEnd );
 }
     
@@ -216,7 +216,7 @@ void Page::LayOutVertically( )
     int staffNb = 0;
     params.push_back( &systemAlignerPtr );
     params.push_back( &staffNb );
-    MusFunctor alignVertically( &Object::AlignVertically );
+    Functor alignVertically( &Object::AlignVertically );
     this->Process( &alignVertically, params );
     
     // Render it for filling the bounding boxing
@@ -234,8 +234,8 @@ void Page::LayOutVertically( )
     int system_height = 0;
     params.push_back( &previous_height );
     params.push_back( &system_height );
-    MusFunctor setBoundingBoxYShift( &Object::SetBoundingBoxYShift );
-    MusFunctor setBoundingBoxYShiftEnd( &Object::SetBoundingBoxYShiftEnd );
+    Functor setBoundingBoxYShift( &Object::SetBoundingBoxYShift );
+    Functor setBoundingBoxYShiftEnd( &Object::SetBoundingBoxYShiftEnd );
     this->Process( &setBoundingBoxYShift, params, &setBoundingBoxYShiftEnd );
     
     // Set the Y position of each StaffAlignment
@@ -247,7 +247,7 @@ void Page::LayOutVertically( )
     params.push_back( &previousStaffHeight );
     params.push_back( &staffMargin );
     params.push_back( &interlineSizes );
-    MusFunctor setAlignmentY( &Object::SetAligmentYPos );
+    Functor setAlignmentY( &Object::SetAligmentYPos );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentY );
     this->Process( &setAlignmentY, params );
@@ -257,7 +257,7 @@ void Page::LayOutVertically( )
     params.clear();
     int shift = 0;
     params.push_back( &shift );
-    MusFunctor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
+    Functor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxYShift );
     this->Process( &integrateBoundingBoxYShift, params );
@@ -268,8 +268,8 @@ void Page::LayOutVertically( )
     int systemMargin = doc->GetSpacingSystem() * doc->m_drawingInterl[0];
     params.push_back( &shift );
     params.push_back( &systemMargin );
-    MusFunctor alignSystems( &Object::AlignSystems );
-    MusFunctor alignSystemsEnd( &Object::AlignSystemsEnd );
+    Functor alignSystems( &Object::AlignSystems );
+    Functor alignSystemsEnd( &Object::AlignSystemsEnd );
     this->Process( &alignSystems, params, &alignSystemsEnd );
 }
     
@@ -293,7 +293,7 @@ void Page::JustifyHorizontally( )
     int systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
     params.push_back( &ratio );
     params.push_back( &systemFullWidth );
-    MusFunctor justifyX( &Object::JustifyX );
+    Functor justifyX( &Object::JustifyX );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &justifyX );
     this->Process( &justifyX, params );

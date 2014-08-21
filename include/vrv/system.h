@@ -120,7 +120,7 @@ public:
     
     /**
      * Lay out the Y positions of the staff looking that the bounding boxes of each staff
-     * This is the MusFunctor called at the end of the system or a measure.
+     * This is the Functor called at the end of the system or a measure.
      */
     virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid params );
     

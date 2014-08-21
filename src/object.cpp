@@ -199,7 +199,7 @@ Object *Object::Relinquish( int idx )
     
 Object *Object::FindChildByUuid( std::string uuid )
 {
-    MusFunctor findByUuid( &Object::FindByUuid );
+    Functor findByUuid( &Object::FindByUuid );
     Object *element = NULL;
     ArrayPtrVoid params;
     params.push_back( &uuid );
@@ -281,7 +281,7 @@ void Object::Modify( bool modified )
 
 void Object::FillList( ListOfObjects *list )
 {
-    MusFunctor addToList( &Object::AddLayerElementToList );
+    Functor addToList( &Object::AddLayerElementToList );
     ArrayPtrVoid params;
     params.push_back ( &list );
     this->Process( &addToList, params );
@@ -440,7 +440,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(MusFunctor *functor, ArrayPtrVoid params, MusFunctor *endFunctor )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -667,24 +667,24 @@ Object *ObjectListInterface::GetListNext( const Object *listElement )
 }
 
 //----------------------------------------------------------------------------
-// MusFunctor
+// Functor
 //----------------------------------------------------------------------------
 
-MusFunctor::MusFunctor( )
+Functor::Functor( )
 { 
     m_returnCode = FUNCTOR_CONTINUE;
     m_reverse = false;
     obj_fpt = NULL; 
 }
 
-MusFunctor::MusFunctor( int(Object::*_obj_fpt)( ArrayPtrVoid ))
+Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid ))
 { 
     m_returnCode = FUNCTOR_CONTINUE;
     m_reverse = false;
     obj_fpt = _obj_fpt; 
 }
 
-void MusFunctor::Call( Object *ptr, ArrayPtrVoid params )
+void Functor::Call( Object *ptr, ArrayPtrVoid params )
 {
     // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
     m_returnCode = (*ptr.*obj_fpt)( params );

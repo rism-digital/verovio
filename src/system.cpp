@@ -171,7 +171,7 @@ int System::SetAligmentYPos( ArrayPtrVoid params )
     // param 2: the staff interline sizes (int[2]) (unused)
     // param 2: the functor to be redirected to SystemAligner
     int *previousStaffHeight = static_cast<int*>(params[0]);
-    MusFunctor *setAligmnentPosY = static_cast<MusFunctor*>(params[3]);
+    Functor *setAligmnentPosY = static_cast<Functor*>(params[3]);
     
     (*previousStaffHeight) = 0;
     
@@ -186,7 +186,7 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
     // param 0: the cumulated shift
     // param 1: the functor to be redirected to SystemAligner
     int *shift = static_cast<int*>(params[0]);
-    MusFunctor *integrateBoundingBoxYShift = static_cast<MusFunctor*>(params[1]);
+    Functor *integrateBoundingBoxYShift = static_cast<Functor*>(params[1]);
     
     m_drawingXRel = this->m_systemLeftMar;
     (*shift) = 0;

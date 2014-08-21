@@ -28,7 +28,7 @@ namespace vrv {
 #define VRV_UNSET -0x7FFFFFFF
 
 /**
- * Codes returned by MusFunctors.
+ * Codes returned by Functors.
  * Default is FUNCTOR_CONTINUE.
  * FUNCTOR_SIBLINGS will no go any deeper in the tree.
  * FUNCTOR_STOP wil stop the tree processing.

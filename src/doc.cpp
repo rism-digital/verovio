@@ -96,7 +96,7 @@ void Doc::SetCurrentScoreDef( bool force )
     ArrayPtrVoid params;
     params.push_back( &currentScoreDef );
     params.push_back( &staffDef );
-    MusFunctor SetCurrentScoreDef( &Object::SetCurrentScoreDef );
+    Functor SetCurrentScoreDef( &Object::SetCurrentScoreDef );
     this->Process( &SetCurrentScoreDef, params );
     
     m_currentScoreDefDone = true;
@@ -124,7 +124,7 @@ void Doc::Layout( )
     params.push_back( &currentSystem );
     params.push_back( &shift );
     params.push_back( &systemFullWidth );
-    MusFunctor castOffSystems( &Object::CastOffSystems );
+    Functor castOffSystems( &Object::CastOffSystems );
     contentSystem->Process( &castOffSystems, params );
     delete contentSystem;
     
@@ -148,7 +148,7 @@ void Doc::Layout( )
     params.push_back( &currentPage );
     params.push_back( &shift );
     params.push_back( &pageFullHeight );
-    MusFunctor castOffPages( &Object::CastOffPages );
+    Functor castOffPages( &Object::CastOffPages );
     contentPage->Process( &castOffPages, params );
     delete contentPage;
     
@@ -364,7 +364,7 @@ int Doc::Save( FileOutputStream *output )
     ArrayPtrVoid params;
 	params.push_back( output );
 
-    MusFunctor save( &Object::Save );
+    Functor save( &Object::Save );
     this->Process( &save, params );
     
     return true;
