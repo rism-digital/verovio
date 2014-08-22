@@ -152,6 +152,7 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
       
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
+ 
     /*
     if (view) // GetDrawBoundingBoxes())
     {
@@ -159,17 +160,29 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         SetBrush( AxWHITE, AxTRANSPARENT );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasSelfBB() ) {
-            this->DrawRectangle( view->ToDeviceContextX( object->m_selfBB_x1 ), view->ToDeviceContextY( object->m_selfBB_y1 ),
-                                view->ToDeviceContextX( object->m_selfBB_x2 ) - view->ToDeviceContextX( object->m_selfBB_x1 ),
-                                view->ToDeviceContextY( object->m_selfBB_y2 ) - view->ToDeviceContextY( object->m_selfBB_y1 ));
-        }
-        
-        if ( object->HasContentBB() ) {
-            //this->DrawRectangle( view->ToDeviceContextX( object->m_contentBB_x1 ), view->ToDeviceContextY( object->m_contentBB_y1 ),
-            //                    view->ToDeviceContextX( object->m_contentBB_x2 ) - view->ToDeviceContextX( object->m_contentBB_x1 ),
-                            //view->ToDeviceContextY( object->m_contentBB_y2 ) - view->ToDeviceContextY( object->m_contentBB_y1 ));
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ),
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x2 ) -
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y2 ) -
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ));
         }
         EndGraphic( object, NULL );
+        
+        SetPen( AxBLUE, 1, AxDOT_DASH );
+        StartGraphic( object, "bounding-box", "0");
+        if ( object->HasContentBB() ) {
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ),
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x2 ) -
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y2 ) -
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ));
+        }
+        EndGraphic( object, NULL );
+        
+        SetPen( AxBLACK, 1 );
+        SetBrush(AxBLACK, AxSOLID);
    
     }
     */
@@ -462,8 +475,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         
 void SvgDeviceContext::DrawText(const std::string& text, int x, int y)
 {
-    //DrawRotatedText( text, x, y, 0.0 );
-    DrawMusicText(text, x, y);
+    DrawRotatedText( text, x, y, 0.0 );
 }
 
 
@@ -483,13 +495,14 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
 
     
     //if (m_backgroundMode == AxSOLID)
-    {
-        WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
-    }
-    /*
-    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" ", x, y, 1, 1) ;
+    //{
+    //    WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
+    //    WriteLine( text ) ;
+    //}
+    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" font-family=\"Garamond, Georgia, serif;\" font-size=\"36px\">", x, y, 0, 0) ;
 
     // For some reason, some browsers (e.g., Chrome) do not like spaces or dots in font names...
+    /*
     sTmp.Replace(" ", "");
     sTmp.Replace(".", "");
     if (sTmp.Len () > 0)  s = s + "style=\"font-family: '" + sTmp + "'; ";
@@ -506,10 +519,9 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
     // remove the color information because normaly already in the graphic element
     //s = s + "fill:#" + wxColStr (m_textForegroundColour) + "; stroke:#" + wxColStr (m_textForegroundColour) + "; " ;
     sTmp.Printf ( "stroke-width:0;\"  transform=\"rotate( %.2g %d %d )  \" >",  -angle, x,y ) ;
-    s = s + sTmp + sText + "</text> " + newline ;
-
-    write(s);
     */
+    s = s + text + "</text> " ;
+    WriteLine(s);
 }
 
 std::string FilenameLookup(unsigned char c) {

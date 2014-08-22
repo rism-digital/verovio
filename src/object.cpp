@@ -1026,8 +1026,9 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap );
     
-    // the next minimal position if given by the right side of the bounding box + the spacing of the element
+    // the next minimal position if given by the bottom side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_y1;
+    current->GetAlignment()->SetMaxHeight( current->m_contentBB_y2 - current->m_contentBB_y1 );
     
     // do not go further down the tree in this case
     return FUNCTOR_SIBLINGS;

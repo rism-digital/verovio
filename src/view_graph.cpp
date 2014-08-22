@@ -182,10 +182,10 @@ void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, i
 }
 
 void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize, bool cursor)
-{ 
+{
 	assert( dc ); // DC cannot be NULL
-
-    dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
+    
+    //dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
 	x = ToDeviceContextX(x);
 
 	dc->SetTextForeground( m_currentColour );

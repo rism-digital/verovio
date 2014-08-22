@@ -34,6 +34,7 @@
 #include "rest.h"
 #include "symbol.h"
 #include "staff.h"
+#include "syl.h"
 #include "system.h"
 #include "slur.h"
 #include "tie.h"
@@ -579,7 +580,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
 	if (note->GetChildCount( &typeid(Verse) ) ) {
-        //DrawVerse(, <#vrv::Verse *verse#>, <#vrv::LayerElement *element#>, <#vrv::Layer *layer#>, <#vrv::Staff *staff#>)
+        DrawVerse(dc, dynamic_cast<Verse*>( note->GetFirst( &typeid(Verse) ) ), note, layer, staff );
     }
 
     if (note->m_fermata)
@@ -1455,7 +1456,29 @@ void View::DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer
     dc->EndGraphic(element, this );
 
 }
+    
+void View::DrawSyl( DeviceContext *dc, Syl *syl, LayerElement *element, Layer *layer, Staff *staff )
+{
+    
+    int x = element->GetDrawingX();
+    int y = element->GetDrawingY();
+    if (staff->GetAlignment() ) {
+        y = staff->GetDrawingY() - staff->GetAlignment()->GetMaxHeight();
+    }
+    dc->StartGraphic( syl, "syl", syl->GetUuid() );
+    DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
+    dc->EndGraphic(syl, this );
 
+}
+    
+void View::DrawVerse( DeviceContext *dc, Verse *verse, LayerElement *element, Layer *layer, Staff *staff )
+{
+    if (verse->GetChildCount( &typeid(Syl) ) ) {
+        DrawSyl(dc, dynamic_cast<Syl*>( verse->GetFirst( &typeid(Syl) ) ), element, layer, staff );
+    }
+}
+
+    
 void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
 {
     assert(layer); // Pointer to layer cannot be NULL"

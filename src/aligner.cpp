@@ -82,6 +82,7 @@ StaffAlignment::StaffAlignment():
 {
     m_yRel = 0;
     m_yShift = 0;
+    m_maxHeight = 0;
 }
 
 StaffAlignment::~StaffAlignment()
@@ -96,6 +97,15 @@ void StaffAlignment::SetYShift( int yShift )
         m_yShift = yShift;
     }
 }
+
+void StaffAlignment::SetMaxHeight( int max_height )
+{
+    if ( max_height > m_maxHeight )
+    {
+        m_maxHeight = max_height;
+    }
+}
+
 
 //----------------------------------------------------------------------------
 // MeasureAligner

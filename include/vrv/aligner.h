@@ -108,6 +108,9 @@ public:
     void SetYShift( int yShift );
     int GetYShift() { return m_yShift; };
     
+    void SetMaxHeight( int max_height );
+    int GetMaxHeight() { return m_maxHeight; };
+    
     /**
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
@@ -130,6 +133,11 @@ private:
      */
     int m_yRel;
     int m_yShift;
+    /**
+     * Stores temporally the maximum height of the of the staff pointing to it.
+     * It is set and integrated as m_yShift.
+     */
+    int m_maxHeight;
 };
 
 
