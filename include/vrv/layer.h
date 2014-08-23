@@ -160,6 +160,15 @@ public:
     MeterSig *GetDrawingMeterSig( ) { return m_drawingMeterSig; };
     ///@}
     
+    /**
+     * @name Set and get the stem direction of the layer.
+     * This stays STEMDIRECTION_NONE with on single layer in the staff. 
+     */
+    ///@{
+    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
+    ///@}
+    
 private:
     
 public:
@@ -180,7 +189,7 @@ protected:
     MeterSig *m_drawingMeterSig;
     
 private:
-    /** The layer number */
+    /** The layer number - to be changed to AttCommon */
     int m_n;
 
     /**
@@ -188,6 +197,10 @@ private:
      * This is used for getting the clef when interacting, for example by clicking in order to get the pitch from a position
      */
     Clef m_currentClef;
+    /**
+     *
+     */
+    data_STEMDIRECTION m_drawingStemDir;
     
 };
 

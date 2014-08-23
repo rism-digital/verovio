@@ -339,16 +339,15 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				xn = testchord->m_drawingX;
 			}
 			else */
-            {
-				//***up = this->q_auto ? ((ynn < milieu)? ON :OFF):this->queue;
-				// ENZ
-				note->d_stemDir = (ynn > milieu) ? STEMDIRECTION_down : STEMDIRECTION_up;
-            }
-			
-			// ENZ
+            
 			if ( note->HasStemDir() ) {
-				//up = (up == ON) ? OFF : ON;
-                note->d_stemDir = note->GetStemDir();
+                note->m_drawingStemDir = note->GetStemDir();
+            }
+            else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+                note->m_drawingStemDir = layer->GetDrawingStemDir();
+            }
+            else {
+                note->m_drawingStemDir = (ynn > milieu) ? STEMDIRECTION_down : STEMDIRECTION_up;
             }
 			
 			espac7 = note->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
@@ -361,7 +360,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			// diminuer le rayon de la moitie de l'epaisseur du trait de queue
 			rayon -= (m_doc->m_env.m_stemWidth) / 2;
 
-			if (note->d_stemDir == STEMDIRECTION_down) {	// si queue vers le bas (a gauche)
+			if (note->m_drawingStemDir == STEMDIRECTION_down) {	// si queue vers le bas (a gauche)
 				espac7 = -espac7;
 				decval = -decval;
 				rayon = -rayon;
@@ -386,7 +385,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				rayon = 0;
 			x2 = xn + rayon;
 
-			if (note->d_stemDir == STEMDIRECTION_up)
+			if (note->m_drawingStemDir == STEMDIRECTION_up)
 			{
 				if (formval > DUR_8 && !queueCentre)
 				// Le 24 Septembre 1993. Correction esthetique pour rapprocher tailles 
@@ -480,7 +479,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		}*///
 	}
 	else
-	{	if (note->m_dur < DUR_2 || (note->m_dur > DUR_8 && !inBeam && (note->d_stemDir == STEMDIRECTION_up)))
+	{	if (note->m_dur < DUR_2 || (note->m_dur > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
 			x2 = xn + m_doc->m_drawingStep1*7/2;
 		else
 			x2 = xn + m_doc->m_drawingStep1*5/2;
@@ -1571,7 +1570,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         x1 = note1->GetDrawingX();
         x2 = measure->GetDrawingX() + nextAlignement->GetXRel();
         assert(dynamic_cast<Note*>(note1));
-        noteStemDir = dynamic_cast<Note*>(note1)->d_stemDir;
+        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
         //DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y - 14, x2, y - 14, true);
     }
     // Now this is the case when the tie is split but we are drawing the end of it
@@ -1588,7 +1587,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         x2 = note2->GetDrawingX();
         x1 = x2 - m_doc->m_drawingStep2;
         assert(dynamic_cast<Note*>(note2));
-        noteStemDir = dynamic_cast<Note*>(note2)->d_stemDir;
+        noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
         //DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);
     }
     // Finally the normal case
@@ -1603,12 +1602,12 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         x2 = note2->GetDrawingX();
         assert(dynamic_cast<Note*>(note1));
         // for now we only look at the first note - needs to be improved
-        // d_stemDir it not set properly in beam - needs to be fixed.
-        noteStemDir = dynamic_cast<Note*>(note1)->d_stemDir;
+        // m_drawingStemDir it not set properly in beam - needs to be fixed.
+        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
         /*
         assert(dynamic_cast<Note*>(note2));
-        if (dynamic_cast<Note*>(note2)->d_stemDir != noteStemDir) {
-            LogDebug("Diverging stem directions (%d;%d)", noteStemDir, dynamic_cast<Note*>(note2)->d_stemDir);
+        if (dynamic_cast<Note*>(note2)->m_drawingStemDir != noteStemDir) {
+            LogDebug("Diverging stem directions (%d;%d)", noteStemDir, dynamic_cast<Note*>(note2)->m_drawingStemDir);
         }
         */
     }

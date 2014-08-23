@@ -823,12 +823,15 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
+        // setting the layer stem direction. Alternatively, this could be done in
+        // View::DrawLayer. If this (and other things) is kept here, renaming the method to something more
+        // generic (PrepareDrawing?) might be a good idea...
         if (current_layer->m_parent->GetChildCount() > 1) {
             if (current_layer->m_parent->GetChildIndex(current_layer)==0) {
-                current_layer->SetDrawingStemDirection(STEMDIRECTION_up);
+                current_layer->SetDrawingStemDir(STEMDIRECTION_up);
             }
             else {
-                current_layer->SetDrawingStemDirection(STEMDIRECTION_down);
+                current_layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
         current_layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );

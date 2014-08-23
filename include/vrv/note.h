@@ -140,7 +140,7 @@ public:
     unsigned int m_embellishment; // To be changed to Att
     
     /** drawing stem direction */
-    data_STEMDIRECTION d_stemDir;
+    data_STEMDIRECTION m_drawingStemDir;
     /** drawing stem length */
     int d_stemLen;
     

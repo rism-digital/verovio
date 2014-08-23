@@ -57,7 +57,7 @@ void Note::Reset()
     m_slurAttrInitial = NULL;
     m_slurAttrTerminal = NULL;
     
-    d_stemDir = STEMDIRECTION_NONE;
+    m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
 }
 

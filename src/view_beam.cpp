@@ -61,8 +61,6 @@ static struct coord {  float a;
             LayerElement *chk;
 	     } 	crd[NbREL]; /* garde les coord.d'entree*/
 
-
-int calcBeam = 0;
 /**
  * This structure is used for calculating the beam internally.
 */
@@ -76,8 +74,6 @@ struct BeamFlag bch;
 double sy_up = 0.0;
 float hauteurBarreMoyenne = 3.0;
 double dA, dB;
-char extern_q_auto = 0;
-data_STEMDIRECTION extern_queue = STEMDIRECTION_NONE;
 
 /* This need to be put into a beam class */
 
@@ -93,7 +89,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 		unsigned mq_val   : 1;	/* marqueur de changement de valeur*/
 		unsigned fl_cond : 1;	/* flags concernant partage portees */
 		unsigned flsht    : 3;	/* garde le pnt->_shport */
-		unsigned _grp	  : 1;	/* marqueur de groupes rythmiques */
+		unsigned _grp	  : 1;	/* marqueur de groupes rythmiques */ // unused in Verovio
         data_STEMDIRECTION dir	  : 3;	/* marqueur direction queues */
 	}	fb;
 	int iHauteur=0;
@@ -126,11 +122,6 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 	int apax;	 	/* test pour valeur breve isolee en debut  de groupes */
 	//int provshp=0;
 	int deltabar, deltanbbar, deltablanc;
-
-	if (!calcBeam)	/* eviter side-effect de circuit... */
-	{	fb._liaison = OFF;
-		fb._grp = OFF;			/* reinitialisation du test (static) */
-	}
 	
     beam->ResetList( beam );
     
@@ -172,16 +163,6 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     }
 	_yy[0] = staff->GetDrawingY();
 
-    /***
-	if (calcBeam)	// eviter side-effect de circuit...
-	{	extern_q_auto = chk->m_stemLen;
-		extern_queue =  chk->m_stemDir;
-	}
-    ***/
-    
-    extern_q_auto = 1; //RZ was ((Note*)chk)->m_stemLen; bit it is always 0!
-    extern_queue =  ((Note*)chk)->GetStemDir();
-
     ListOfObjects::iterator iter = beam->m_list.begin();
     
 	do
@@ -199,18 +180,6 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 			(crd+ct)->chk = chk;
 			/* garantir uniformite des flags */
 
-			if (!calcBeam && chk->IsNote())	/* on ne se limite pas au calcul des queues */
-			{	
-                ((Note*)chk)->d_stemLen = extern_q_auto;
-				if (!extern_q_auto)	((Note*)chk)->d_stemDir = extern_queue;
-				/***if ( !fb._liaison && (((Note*)chk)->m_slur[0] & SLUR_TERMINAL)) {
-					fb._liaison = ON;
-                }***/
-                /***if (chk->grp==END) {	
-                    fb._grp = ON; 
-                    group.fin = chk;
-                }***/
-			}
 			/***if (!fb.mrq_port && chk->_shport) {
 				fb.mrq_port = chk->_shport;
             }***/
@@ -225,7 +194,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 			{	bch.markchrd=ON;
 				fb.flsht = fb.flsht ? fb.flsht : chk->_shport;
 			}***/
-            if (chk->IsNote())	// ‚viter de prendre en compte silences
+            if (chk->IsNote())	// Žviter de prendre en compte silences
             {
                 shortest = std::max(k,shortest);
                 if (!fb.mq_val && k != valref) fb.mq_val = ON; /* plus d'une valeur est presente*/
@@ -277,9 +246,11 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 		}
 	}
     ***/
+    
 	for (i = 0; i < ct; i++)
 	{	switch (fb.mrq_port)
-		{	case 0: crd[i].prov = OFF;
+		{
+            case 0: crd[i].prov = OFF;
 					(crd+i)->b = crd[i].chk->GetDrawingY();
 					break;
             /**
@@ -321,28 +292,16 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
     }
 
 
-	fb.dir = STEMDIRECTION_NONE;
-	if (extern_q_auto && (!fb.mrq_port)) /*** || (bch.inpt && bch.markchrd))) ***/
-	/* direction queues: auto = moyenne */
-	/* bch.inpt: le flot de donnees a ete envoye par input et non rd_objet */
+	fb.dir = layer->GetDrawingStemDir();
+	if (!fb.mrq_port)
 	{	
         milieu = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
 		y_moy /= ct;
-		if ( y_moy <  milieu )
-			fb.dir = STEMDIRECTION_up;
-
-		if (bch.inpt && bch.markchrd)
-		/* entree de input: de l'accord est dans l'air */
-		{	if (!fb.flsht)
-				return;  //(fb.dir+1);
-			else
-				return; //(fb.flsht+2);
-	/* ce sera la valeur de bch.beam_chrd retournee a input; beam() sera
-		rappelee par corrchrd() qui se sert de bch. ... */
-		}
+        if (fb.dir == STEMDIRECTION_NONE) {
+            if ( y_moy <  milieu ) fb.dir = STEMDIRECTION_up;
+            else fb.dir = STEMDIRECTION_down;
+        }
 	}
-	else
-		fb.dir = extern_queue;	// si mrq_port, dir tjrs egal a m_stemDir
 
     if (crd[_ct].chk->m_cueSize == false)
     {
@@ -410,8 +369,9 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         //   Le 24 Septembre 1993: obtenir des DUR_8 reliees a la hauteur des separees 
 			ecart += (shortest > DUR_8) ? m_doc->m_drawingInterl[staff->staffSize]*hauteurBarreMoyenne : m_doc->m_drawingInterl[staff->staffSize]*(hauteurBarreMoyenne+0.5);
 
-		if (!fb.dir && !staff->notAnc)
-		{	dx[0] = - dx[0];
+		if (fb.dir == STEMDIRECTION_down)
+		{
+            dx[0] = - dx[0];
 			dx[1] = - dx[1];
 		}
         /***
@@ -421,14 +381,16 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         }
         ***/
 
-		ecart = (fb.dir ? ecart : -ecart);
+		ecart = (fb.dir == STEMDIRECTION_up ? ecart : -ecart);
 
 		y_moy += ecart;
-		if (extern_q_auto && ((fb.dir && y_moy <  milieu) || (!fb.dir && y_moy > milieu)) )
+        if ((fb.dir == STEMDIRECTION_up && y_moy <  milieu) || (fb.dir == STEMDIRECTION_down && y_moy > milieu)) {
 			ecart += milieu-y_moy;
+        }
 
 		for (i=0; i<ct; i++)
-		{	*(_ybeam+i) = crd[i].b + ecart;
+		{
+            *(_ybeam+i) = crd[i].b + ecart;
 			(crd+i)->a +=  dx[crd[i].chk->m_cueSize];
 			s_y += _ybeam[i];
  			s_y2 += _ybeam[i] * _ybeam[i];
@@ -436,7 +398,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 			s_x2 += crd[i].a * crd[i].a;
 			s_xy += crd[i].a * _ybeam[i];
             if ( crd[i].chk->IsNote() ) {
-                ((Note*)crd[i].chk)->d_stemDir = fb.dir;
+                ((Note*)crd[i].chk)->m_drawingStemDir = fb.dir;
             }
 		}
 
@@ -500,19 +462,16 @@ if (fPente)
 		
 		/* test pour garantir l'absence de recoupement */
         if (!iHauteur)
-            if (!fb.mrq_port || !extern_q_auto)
-            {	if ((fb.dir && xr > *(_ybeam+i)) || (!fb.dir && xr < *(_ybeam+i)))
-                {	sy_up += xr - *(_ybeam+i);
+            if (!fb.mrq_port)
+            {	if ((fb.dir == STEMDIRECTION_up && xr > *(_ybeam+i)) || (fb.dir == STEMDIRECTION_down && xr < *(_ybeam+i)))
+                {
+                    sy_up += xr - *(_ybeam+i);
                     i = -1;	/* on refait la boucle avec un sy_up */
                 }
             }	
 
 
 	}
-
-	if (calcBeam) return;
-
-
 
 	/* dessin de la barre pilote et des queues */
 
@@ -529,7 +488,7 @@ if (fPente)
 			}
 		}
 		else	// on tient compte de l'‚paisseur qui fait des "bosses"
-		{	if (fb.dir)	// m_stemDir en haut
+		{	if (fb.dir == STEMDIRECTION_up)	// m_stemDir en haut
 			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
 				fy2 = crd[i].b+m_doc->m_drawingVerticalUnit2[staff->staffSize];
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
@@ -554,7 +513,7 @@ if (fPente)
 			//if (((Note*)(crd+i)->chk)->m_artic
 			//	 && (!((Note*)(crd+i)->chk)->m_chord || (((Note*)(crd+i)->chk)->m_chord & CHORD_TERMINAL)))
 			// les cas non traités par note()
-/*			{	if (fb.dir || (fb.mrq_port && m_stemLen && !crd[i].prov))
+/*			{	if (fb.dir == STEMDIRECTION_up || (fb.mrq_port && m_stemLen && !crd[i].prov))
 					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				else
 					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
@@ -567,7 +526,7 @@ if (fPente)
 					else
 						putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				}
-				else if (fb.dir)
+				else if (fb.dir == STEMDIRECTION_up)
 					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				else
 					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
@@ -583,7 +542,7 @@ if (fPente)
 	(*crd).a -= (m_doc->m_env.m_stemWidth-1) / 3;
 	(crd+_ct)->a += (m_doc->m_env.m_stemWidth-1) / 3;
 
-	delt_y = (!fb.dir || fb.fl_cond ) ? 1.0 : -1.0;
+	delt_y = (fb.dir == STEMDIRECTION_down || fb.fl_cond ) ? 1.0 : -1.0;
 	/* on choisit une direction pour faire le premier paquet horizontal */
 
 	fy1 = *_ybeam; fy2 = *(_ybeam+_ct);
@@ -654,7 +613,7 @@ if (fPente)
             barre_y = deltabar;
 
         /* h contient nombre de barres communes deja dessinees */
-        if (fb.dir)	/* queues ascendantes: on descend */
+        if (fb.dir == STEMDIRECTION_up)	/* queues ascendantes: on descend */
             barre_y = -barre_y;
 
         while (valtest <= shortest)

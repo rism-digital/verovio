@@ -41,6 +41,7 @@ Layer::Layer( int n ):
     m_drawingKeySig = NULL;
     m_drawingMensur = NULL;
     m_drawingMeterSig = NULL;
+    m_drawingStemDir = STEMDIRECTION_NONE;
     
 	Clear( );
 }
