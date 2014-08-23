@@ -191,7 +191,7 @@ protected:
     void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawSyl( DeviceContext *dc, Syl *syl, LayerElement *element, Layer *layer, Staff *staff);
+    void DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff);
     void DrawSymbol( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent = NULL );
     void DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );

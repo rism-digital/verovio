@@ -153,8 +153,8 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
  
-    /*
-    if (view) // GetDrawBoundingBoxes())
+    
+    if (false) //(view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
         SetPen( AxRED, 1, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
@@ -185,7 +185,6 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         SetBrush(AxBLACK, AxSOLID);
    
     }
-    */
     
     m_graphics--;
     m_indents--;

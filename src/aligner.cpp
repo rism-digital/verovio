@@ -83,6 +83,7 @@ StaffAlignment::StaffAlignment():
     m_yRel = 0;
     m_yShift = 0;
     m_maxHeight = 0;
+    m_verseCount = 0;
 }
 
 StaffAlignment::~StaffAlignment()
@@ -100,12 +101,22 @@ void StaffAlignment::SetYShift( int yShift )
 
 void StaffAlignment::SetMaxHeight( int max_height )
 {
-    if ( max_height > m_maxHeight )
+    if ( max_height < m_maxHeight )
     {
         m_maxHeight = max_height;
     }
 }
 
+
+void StaffAlignment::SetVerseCount(int verse_count)
+{
+    // if 0, then assume 1;
+    verse_count = std::max(verse_count, 1);
+    if ( verse_count > m_verseCount )
+    {
+        m_verseCount = verse_count;
+    }
+}
 
 //----------------------------------------------------------------------------
 // MeasureAligner
@@ -256,6 +267,8 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid params )
     int *previousStaffHeight = static_cast<int*>(params[0]);
     int *staffMargin = static_cast<int*>(params[1]);
     int **interlineSizes = static_cast<int**>(params[2]);
+    
+    m_yShift -= this->GetVerseCount() * 2 * 18 + 24; //m_doc->m_env.m_interlDefin;
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
     
@@ -277,6 +290,7 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
     
     // integrates the m_yShift into the m_yRel
     m_yRel += m_yShift + (*shift);
+    
     // cumulate the shift value
     (*shift) += m_yShift;
     m_yShift = 0;

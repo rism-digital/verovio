@@ -143,6 +143,12 @@ public:
     Object *FindChildByUuid( std::string uuid );
     
     /**
+     * Look for a child with the specified type (returns NULL if not found)
+     * This method is a wrapper to a Object::FindByType functor.
+     */
+    Object *FindChildByType( const std::type_info *elementType );
+    
+    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to used only in very particular case where the child
      * object cannot be detached straight away. It is typically the case 
@@ -255,6 +261,13 @@ public:
      * param 1: the pointer to pointer to the Object retrieved (if found).
      */
     virtual int FindByUuid( ArrayPtrVoid params );
+    
+    /**
+     * Find a Object of a specified type.
+     * param 0: the type we are looking for
+     * param 1: the pointer to pointer to the Object retrieved (if found).
+     */
+    virtual int FindByType( ArrayPtrVoid params );
     
     /**
      * Save the content of and object by calling the appropriate FileOutputStream method

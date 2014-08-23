@@ -208,6 +208,17 @@ Object *Object::FindChildByUuid( std::string uuid )
     return element;
 }
 
+Object *Object::FindChildByType(const std::type_info *elementType)
+{
+    Functor findByType( &Object::FindByType );
+    Object *element = NULL;
+    ArrayPtrVoid params;
+    params.push_back( &elementType );
+    params.push_back( &element );
+    this->Process( &findByType, params );
+    return element;
+}
+    
 Object* Object::GetChild( int idx )
 {
     if ( (idx < 0) || (idx >= (int)m_children.size()) ) {
@@ -724,8 +735,28 @@ int Object::FindByUuid( ArrayPtrVoid params )
     //LogDebug("Still looking for uuid...");
     return FUNCTOR_CONTINUE;
 }
-
-
+    
+int Object::FindByType( ArrayPtrVoid params )
+{
+    // param 0: the type we are looking for
+    // param 1: the pointer to pointer to the Object
+    const std::type_info **elementType = static_cast<const std::type_info**>(params[0]);
+    Object **element = static_cast<Object**>(params[1]);
+    
+    if ( (*element) ) {
+        // this should not happen, but just in case
+        return FUNCTOR_STOP;
+    }
+    
+    if ( typeid(*this) == **elementType ) {
+        (*element) = this;
+        //LogDebug("Found it!");
+        return FUNCTOR_STOP;
+    }
+    //LogDebug("Still looking for uuid...");
+    return FUNCTOR_CONTINUE;
+}
+    
 int Object::SetCurrentScoreDef( ArrayPtrVoid params )
 {
 
@@ -792,6 +823,14 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
+        if (current_layer->m_parent->GetChildCount() > 1) {
+            if (current_layer->m_parent->GetChildIndex(current_layer)==0) {
+                current_layer->SetDrawingStemDirection(STEMDIRECTION_up);
+            }
+            else {
+                current_layer->SetDrawingStemDirection(STEMDIRECTION_down);
+            }
+        }
         current_layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
@@ -1028,7 +1067,7 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     
     // the next minimal position if given by the bottom side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_y1;
-    current->GetAlignment()->SetMaxHeight( current->m_contentBB_y2 - current->m_contentBB_y1 );
+    current->GetAlignment()->SetMaxHeight( current->m_contentBB_y1 );
     
     // do not go further down the tree in this case
     return FUNCTOR_SIBLINGS;

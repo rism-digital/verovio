@@ -1424,6 +1424,8 @@ bool MeiInput::ReadVerse(vrv::Note *vrvNote, pugi::xml_node verse)
     Verse *vrvVerse = new Verse();
     SetMeiUuid( verse , vrvVerse );
     
+    vrvVerse->ReadCommon(verse);
+    
     pugi::xml_node current;
     for( current = verse.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "syl" ) {

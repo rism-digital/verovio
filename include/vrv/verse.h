@@ -39,6 +39,12 @@ public:
      */
     void AddSyl(Syl *syl);
     
+    /**
+     * Align the content of a staff vertically.
+     * See Object::AlignVertically
+     */
+    virtual int AlignVertically( ArrayPtrVoid params );
+    
 protected:
 
 private:

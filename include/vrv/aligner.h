@@ -112,6 +112,15 @@ public:
     int GetMaxHeight() { return m_maxHeight; };
     
     /**
+     * @name Set and get verse count.
+     * When setting a value of 0, then 1 is assumed. This occurs
+     * Typically with one single verse and no @n in <verse>
+     */
+    ///@{
+    void SetVerseCount( int verse_count );
+    int GetVerseCount() { return m_verseCount; };
+    
+    /**
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
      */
@@ -138,6 +147,10 @@ private:
      * It is set and integrated as m_yShift.
      */
     int m_maxHeight;
+    /**
+     * Stores the number of verse of the staves attached to the aligner
+     */
+    int m_verseCount;
 };
 
 

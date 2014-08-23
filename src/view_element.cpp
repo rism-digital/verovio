@@ -579,8 +579,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         layer->AddToDrawingList( note->GetSlurAttrTerminal() );
     }
 
-	if (note->GetChildCount( &typeid(Verse) ) ) {
-        DrawVerse(dc, dynamic_cast<Verse*>( note->GetFirst( &typeid(Verse) ) ), note, layer, staff );
+    Verse *verse = NULL;
+    for ( verse = dynamic_cast<Verse*>( note->GetFirst( &typeid(Verse) ) ); verse; verse = dynamic_cast<Verse*> (note->GetNext() ) ) {
+        DrawVerse(dc, verse, note, layer, staff );
     }
 
     if (note->m_fermata)
@@ -1457,13 +1458,13 @@ void View::DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer
 
 }
     
-void View::DrawSyl( DeviceContext *dc, Syl *syl, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff )
 {
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     if (staff->GetAlignment() ) {
-        y = staff->GetDrawingY() - staff->GetAlignment()->GetMaxHeight();
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * 2 * m_doc->m_env.m_interlDefin;
     }
     dc->StartGraphic( syl, "syl", syl->GetUuid() );
     DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
@@ -1474,7 +1475,7 @@ void View::DrawSyl( DeviceContext *dc, Syl *syl, LayerElement *element, Layer *l
 void View::DrawVerse( DeviceContext *dc, Verse *verse, LayerElement *element, Layer *layer, Staff *staff )
 {
     if (verse->GetChildCount( &typeid(Syl) ) ) {
-        DrawSyl(dc, dynamic_cast<Syl*>( verse->GetFirst( &typeid(Syl) ) ), element, layer, staff );
+        DrawSyl(dc, dynamic_cast<Syl*>( verse->GetFirst( &typeid(Syl) ) ), std::max(verse->GetN(), 1), element, layer, staff );
     }
 }
 

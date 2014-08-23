@@ -20,6 +20,7 @@
 #include "io.h"
 #include "layer.h"
 #include "system.h"
+#include "verse.h"
 
 namespace vrv {
 

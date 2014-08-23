@@ -178,7 +178,7 @@ void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, i
         
 	}
 	dc->SetTextForeground( m_currentColour );
-	dc->DrawText( s, x, ToDeviceContextY(y + fontCorr ));
+	dc->DrawMusicText( s, x, ToDeviceContextY(y + fontCorr ));
 }
 
 void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize, bool cursor)
