@@ -181,18 +181,14 @@ void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, i
 	dc->DrawMusicText( s, x, ToDeviceContextY(y + fontCorr ));
 }
 
-void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize, bool cursor)
+void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize)
 {
 	assert( dc ); // DC cannot be NULL
     
     //dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
 	x = ToDeviceContextX(x);
-
 	dc->SetTextForeground( m_currentColour );
 	dc->DrawText( s, x, ToDeviceContextY( y ) );
-    
-    if (cursor)
-        DoLyricCursor( x, y, dc, s );	
 }
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)

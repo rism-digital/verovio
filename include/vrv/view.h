@@ -59,7 +59,6 @@ public:
     virtual void OnEndEditionClef() {}
     virtual void DoRefresh() {}
     virtual void DoResize() {}
-    virtual void DoLyricCursor( int x, int y, DeviceContext *dc, std::string lyric ) {}
     virtual void DoReset() {}
     virtual void OnPageChange() {};
     ///@}
@@ -223,7 +222,7 @@ protected:
 	void DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, Staff *staff, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
 	void DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize = 0);
-	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0, bool cursor = false);
+	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
 	void DrawDot ( DeviceContext *dc, int x, int y );
