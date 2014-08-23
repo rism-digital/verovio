@@ -1635,7 +1635,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
     
     dc->StartGraphic( element, "tie", element->GetUuid() );
-    DrawTieOrSlurBezier(dc, x1, y2, x2, y2, !up);
+    DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
     dc->EndGraphic(element, this );
 
     
