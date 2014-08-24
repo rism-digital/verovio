@@ -16,6 +16,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "verse.h"
 
 //----------------------------------------------------------------------------
 
@@ -96,8 +97,45 @@ void Doc::SetCurrentScoreDef( bool force )
     ArrayPtrVoid params;
     params.push_back( &currentScoreDef );
     params.push_back( &staffDef );
-    Functor SetCurrentScoreDef( &Object::SetCurrentScoreDef );
-    this->Process( &SetCurrentScoreDef, params );
+    Functor setCurrentScoreDef( &Object::SetCurrentScoreDef );
+    
+    LogElapsedTimeStart( );
+    this->Process( &setCurrentScoreDef, params );
+    LogElapsedTimeEnd ( "Setting scoreDefs" );
+    
+    params.clear();
+    IntTree tree;
+    params.push_back( &tree );
+
+    // We first fill a tree of int with the staff/layer/verse numbers to be process
+
+    LogElapsedTimeStart( );
+    Functor prepareDrawing( &Object::PrepareDrawing );
+    this->Process( &prepareDrawing, params );
+    
+    // The tree is used to process each staff/layer/verse separatly
+    // For this, we use a MapOfTypeN that looks for each object if it is of the type
+    // and with @n specified
+    
+    std::map<int,IntTree>::iterator staves;
+    std::map<int,IntTree>::iterator layers;
+    std::map<int,IntTree>::iterator verses;
+    for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
+                //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
+                MapOfTypeN map;
+                map[ &typeid(Staff) ] = staves->first;
+                map[ &typeid(Layer) ] = layers->first;
+                map[ &typeid(Verse) ] = verses->first;
+                
+                ArrayPtrVoid paramsLyrics;
+                Functor prepareLyrics( &Object::PrepareLyrics );
+                this->Process( &prepareLyrics, paramsLyrics, NULL, &map );
+            }
+        }
+    }
+    LogElapsedTimeEnd ( "Preparing drawing" );
     
     m_currentScoreDefDone = true;
 }

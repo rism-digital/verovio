@@ -39,11 +39,28 @@ public:
      */
     void AddSyl(Syl *syl);
     
+    //----------//
+    // Functors //
+    //----------//
+    
     /**
      * Align the content of a staff vertically.
      * See Object::AlignVertically
      */
     virtual int AlignVertically( ArrayPtrVoid params );
+    
+    /**
+     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * to be processed.
+     */
+    virtual int PrepareDrawing( ArrayPtrVoid params );
+    
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by staff/layer/verse using a MapOfTypeN
+     * See PrepareDarwing
+     */
+    virtual int PrepareLyrics( ArrayPtrVoid params );
     
 protected:
 

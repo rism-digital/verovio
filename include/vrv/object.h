@@ -10,6 +10,7 @@
 #define __VRV_OBJECT_H__
 
 #include <list>
+#include <map>
 #include <string>
 #include <typeinfo>
 #include <vector>
@@ -27,6 +28,13 @@ typedef std::vector<Object*> ArrayOfObjects;
 typedef std::list<Object*> ListOfObjects;
 
 typedef std::vector<void*> ArrayPtrVoid;
+    
+typedef std::map<const std::type_info*, int> MapOfTypeN;
+    
+struct IntTree {
+    std::map<int,IntTree> child;
+};
+    
 
 //----------------------------------------------------------------------------
 // Object
@@ -238,8 +246,10 @@ public:
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
+     * The last parameter MapOfTypeN makes is possible to process object of a type given a key in the map
+     * with value @n. They must also be of type AttCommon
      */
-    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL );
+    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL, MapOfTypeN *map = NULL );
     
     //----------//
     // Functors //
@@ -400,6 +410,21 @@ public:
      * param 2: bool the mensur flag.
      */
     virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    
+    /**
+     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * to be processed.
+     * param 0: IntTree *
+     */
+    virtual int PrepareDrawing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by staff/layer/verse using a MapOfTypeN.
+     * not param
+     */
+    virtual int PrepareLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     ///@}
     

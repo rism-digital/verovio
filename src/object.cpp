@@ -37,6 +37,7 @@
 #include "system.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -451,7 +452,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, MapOfTypeN *mapOfTypeN )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -468,14 +469,36 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor 
     ArrayOfObjects::iterator iter;
     for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
     {
-        (*iter)->Process( functor, params, endFunctor );
+        
+        if ( mapOfTypeN ) {
+            MapOfTypeN::iterator typeN = mapOfTypeN->find( &typeid(**iter) );
+            if(typeN != mapOfTypeN->end()) {
+                // We need to change this once Staff and Layer become AttCommon
+                // We also need to add a break once we have processed it.
+                Staff *staff = dynamic_cast<Staff*>(*iter);
+                if (staff && staff->GetStaffNo() != typeN->second) {
+                    continue;
+                }
+                //if ( staff )
+                //    std::cout << "Staff " << staff->GetStaffNo() << " being processed" << std::endl;
+                Layer *layer = dynamic_cast<Layer*>(*iter);
+                if (layer && layer->GetLayerNo() != typeN->second) {
+                    continue;
+                }
+                Verse *verse = dynamic_cast<Verse*>(*iter);
+                if (verse && verse->GetN() != typeN->second) {
+                    continue;
+                }
+            }
+        }
+        (*iter)->Process( functor, params, endFunctor, mapOfTypeN );
     }
     
     if ( endFunctor ) {
         endFunctor->Call( this, params );
     }
 }
-
+    
 //----------------------------------------------------------------------------
 // DocObject
 //----------------------------------------------------------------------------

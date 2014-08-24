@@ -15,6 +15,8 @@
 //----------------------------------------------------------------------------
 
 #include "aligner.h"
+#include "layer.h"
+#include "staff.h"
 #include "syl.h"
 
 namespace vrv {
@@ -57,6 +59,32 @@ int Verse::AlignVertically( ArrayPtrVoid params )
     // Add the number count
     alignment->SetVerseCount(this->GetN());
     
+    return FUNCTOR_CONTINUE;
+}
+
+    
+int Verse::PrepareDrawing( ArrayPtrVoid params )
+{
+    // param 0: the IntTree
+    IntTree *tree = static_cast<IntTree*>(params[0]);
+    
+    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
+    Layer *layer = dynamic_cast<Layer*>( this->GetFirstParent( &typeid( Layer ) ) );
+    
+    assert( staff && layer );
+    
+    tree->child[ staff->GetStaffNo() ].child[ layer->GetLayerNo() ].child[ this->GetN() ];
+    
+    return FUNCTOR_SIBLINGS;
+}
+    
+int Verse::PrepareLyrics( ArrayPtrVoid params )
+{
+    
+    Syl *syl = dynamic_cast<Syl*>( this->GetFirst( &typeid(Syl) ) );
+    if (syl) {
+        //std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
+    }
     return FUNCTOR_CONTINUE;
 }
     
