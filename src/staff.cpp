@@ -29,9 +29,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Staff::Staff( int n ):
-	DocObject("staff-")
+	DocObject("staff-"), AttCommon()
 {
-	Clear( );
+	Reset();
     //wxASSERT ( n > 0 );
     m_n = n;
 }
@@ -63,8 +63,9 @@ Staff::~Staff()
     
 }
 
-void Staff::Clear()
+void Staff::Reset()
 {
+    ResetCommon();
 	ClearChildren();
     m_parent = NULL;
 	notAnc = false; // LP we want modern notation :))
@@ -93,8 +94,8 @@ void Staff::AddLayer( Layer *layer )
 	layer->SetParent( this );
 	m_children.push_back( layer );
     
-    if ( layer->GetLayerNo() == -1 ) {
-        layer->SetLayerNo( this->GetLayerCount() );
+    if ( layer->GetN() < 1 ) {
+        layer->SetN( this->GetLayerCount() );
     }
 }
 
@@ -103,7 +104,7 @@ void Staff::CopyAttributes( Staff *nstaff )
 	if ( !nstaff )
 		return;
 
-	nstaff->Clear();
+	nstaff->Reset();
 	nstaff->notAnc = notAnc;
 	nstaff->grise = grise;
 	nstaff->invisible = invisible;

@@ -289,7 +289,7 @@ void ScoreDef::Replace( ScoreDef *newScoreDef )
 void ScoreDef::Replace( StaffDef *newStaffDef )
 {
     // first find the staffDef with the same @n
-    StaffDef *staffDef = this->GetStaffDef( newStaffDef->GetStaffNo() );
+    StaffDef *staffDef = this->GetStaffDef( newStaffDef->GetN() );
     
     // if found, replace attributes
     if (staffDef) {
@@ -327,7 +327,7 @@ StaffDef *ScoreDef::GetStaffDef( int n )
     for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++)
     {
         staffDef = dynamic_cast<StaffDef*>(*iter);
-        if (staffDef && (staffDef->GetStaffNo() == n) ) {
+        if (staffDef && (staffDef->GetN() == n) ) {
             return staffDef;
         }
     }

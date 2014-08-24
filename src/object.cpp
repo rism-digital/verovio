@@ -469,25 +469,22 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     ArrayOfObjects::iterator iter;
     for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
     {
-        
+        // The MapOfTypeN is used to filter according to a type and an @n
+        // For example, to process only staff @n="x" and @layer="y"
         if ( mapOfTypeN ) {
             MapOfTypeN::iterator typeN = mapOfTypeN->find( &typeid(**iter) );
             if(typeN != mapOfTypeN->end()) {
-                // We need to change this once Staff and Layer become AttCommon
-                // We also need to add a break once we have processed it.
-                Staff *staff = dynamic_cast<Staff*>(*iter);
-                if (staff && staff->GetStaffNo() != typeN->second) {
+                AttCommon *child = dynamic_cast<AttCommon*>(*iter);
+                // The filtered type must be of AttCommon because GetN called
+                assert( child );
+                if (child->GetN() != typeN->second) {
+                    // skip it
                     continue;
                 }
-                //if ( staff )
-                //    std::cout << "Staff " << staff->GetStaffNo() << " being processed" << std::endl;
-                Layer *layer = dynamic_cast<Layer*>(*iter);
-                if (layer && layer->GetLayerNo() != typeN->second) {
-                    continue;
-                }
-                Verse *verse = dynamic_cast<Verse*>(*iter);
-                if (verse && verse->GetN() != typeN->second) {
-                    continue;
+                else {
+                    // process this one and quit
+                    (*iter)->Process( functor, params, endFunctor, mapOfTypeN );
+                    break;
                 }
             }
         }
@@ -839,7 +836,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     // starting a new staff
     Staff *current_staff = dynamic_cast<Staff*>(this);
     if ( current_staff  ) {
-        (*currentStaffDef) = currentScoreDef->GetStaffDef( current_staff->GetStaffNo() );
+        (*currentStaffDef) = currentScoreDef->GetStaffDef( current_staff->GetN() );
         return FUNCTOR_CONTINUE;
     }
 

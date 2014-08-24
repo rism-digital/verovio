@@ -9,6 +9,7 @@
 #ifndef __VRV_STAFF_H__
 #define __VRV_STAFF_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -30,18 +31,21 @@ class StaffAlignment;
  * It contains Measure objects.
  * For unmeasured music, on single Measure is added for simplifying internal processing
 */
-class Staff: public DocObject
+class Staff: public DocObject, public AttCommon
 {
     
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Staff( int n = -1 );
 	Staff( const Staff& staff ); // copy contructor
     virtual ~Staff();
-
+    void Reset();
     virtual std::string GetClassName( ) { return "Staff"; };	
-    
-    void Clear();
+    ///@}
     
     void AddLayer( Layer *layer );
 	
@@ -51,15 +55,6 @@ public:
      * Return the index position of the staff in its measure parent
      */
     int GetStaffIdx() const { return Object::GetIdx(); };
-    
-    /**
-     * @name Set and get  the staff number which is 1-based.
-     * This can be different from the index position in the parent measure.
-     */
-    ///@{
-    int GetStaffNo() const { return m_n; };
-    void SetStaffNo( int n ) { m_n = n; };
-    ///@}
     
     /**
      * Return the default horizontal spacing of staves.
@@ -108,10 +103,7 @@ public:
 	/** taille. 0 = normale1 = petite (wolfgang legacy) */
 	unsigned char staffSize;
 
-private:
-    /** The staff number */
-    int m_n;
-    
+private:    
     /**
      * A pointer to a StaffAlignment for aligning the staves
      */

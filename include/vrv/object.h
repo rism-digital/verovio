@@ -247,7 +247,8 @@ public:
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
      * The last parameter MapOfTypeN makes is possible to process object of a type given a key in the map
-     * with value @n. They must also be of type AttCommon
+     * with value @n. They must be of type AttCommon. This is very powerfull for operation on parts, e.g.,
+     * for extracting one single staff, or layer.
      */
     virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL, MapOfTypeN *map = NULL );
     

@@ -76,8 +76,8 @@ void Measure::AddStaff( Staff *staff )
 	staff->SetParent( this );
 	m_children.push_back( staff );
     
-    if ( staff->GetStaffNo() == -1 ) {
-        staff->SetStaffNo( this->GetStaffCount() );
+    if ( staff->GetN() < 1 ) {
+        staff->SetN( this->GetStaffCount() );
     }
 }
 
@@ -87,7 +87,7 @@ Staff *Measure::GetStaffWithNo( int staffNo )
     Staff *staff = NULL;
     for (i = 0; i < this->GetStaffCount(); i++ ) {
         staff = dynamic_cast<Staff*>(m_children[i]);
-        if ( staff && (staff->GetStaffNo() == staffNo ) ) {
+        if ( staff && (staff->GetN() == staffNo ) ) {
             return staff;
         }
     }

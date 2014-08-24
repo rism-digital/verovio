@@ -359,7 +359,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         
         m_staff = new Staff( 1 );
         m_measure = new Measure( true, measure_count );
-        m_layer = new Layer( 1 );
+        m_layer = new Layer( );
+        m_layer->SetN( 1 );
         
         m_staff->AddLayer(m_layer);
         m_measure->AddStaff( m_staff );

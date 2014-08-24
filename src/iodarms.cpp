@@ -410,7 +410,8 @@ bool DarmsInput::ImportString(std::string data_str) {
     Page *page = new Page();
     m_staff = new Staff( 1 );
     m_measure = new Measure( true, 1 );
-    m_layer = new Layer( 1 );
+    m_layer = new Layer( );
+    m_layer->SetN( 1 );
     
     m_current_tie = NULL;
     m_staff->AddLayer(m_layer);

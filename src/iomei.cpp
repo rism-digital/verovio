@@ -212,7 +212,7 @@ bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
     
     m_staffDef = m_staffGrp.append_child("staffDef");
     m_staffDef.append_attribute( "xml:id" ) =  UuidToMeiStr( staffDef ).c_str();
-    m_staffDef.append_attribute( "n" ) = StringFormat( "%d", staffDef->GetStaffNo() ).c_str();
+    m_staffDef.append_attribute( "n" ) = StringFormat( "%d", staffDef->GetN() ).c_str();
     if (staffDef->GetClefAttr()) {
         staffDef->GetClefAttr()->WriteCleffingLog(m_staffDef);
     }
@@ -253,12 +253,14 @@ bool MeiOutput::WriteStaff( Staff *staff )
     
     m_staff = m_measure.append_child("staff");
     m_staff.append_attribute( "xml:id" ) =  UuidToMeiStr( staff ).c_str();
+    
+    staff->WriteCommon(m_staff);
+    
     // y position
     if ( staff->notAnc ) {
         m_staff.append_attribute( "label" ) = "mensural";
     }
     m_staff.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
-    m_staff.append_attribute( "n" ) = StringFormat( "%d", staff->GetStaffNo() ).c_str();
 
     return true;
 }
@@ -268,8 +270,11 @@ bool MeiOutput::WriteLayer( Layer *layer )
 {
     assert( !m_staff.empty() );
     m_layer = m_staff.append_child("layer");
+    
+    layer->WriteCommon(m_layer);
+    
     m_layer.append_attribute( "xml:id" ) =  UuidToMeiStr( layer ).c_str();
-    m_layer.append_attribute( "n" ) = StringFormat( "%d", layer->GetLayerNo() ).c_str();
+    
     return true;
 }
 
@@ -480,7 +485,7 @@ void MeiOutput::WriteVerse( Verse *verse, pugi::xml_node currentParent )
         m_staff.append_attribute( "label" ) = "mensural";
     }
     m_staff.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
-    m_staff.append_attribute( "n" ) = StringFormat( "%d", staff->GetStaffNo() ).c_str();
+    m_staff.append_attribute( "n" ) = StringFormat( "%d", staff->GetN() ).c_str();
     
     return;
 }
@@ -1048,12 +1053,8 @@ bool MeiInput::ReadMeiStaff( pugi::xml_node staff )
     assert( m_staff );
     assert( !m_layer );
     
-    if ( staff.attribute( "n" ) ) {
-        m_staff->SetStaffNo( atoi ( staff.attribute( "n" ).value() ) );
-    }
-    else {
-        LogWarning("No @n on <staff>");
-    }
+    m_staff->ReadCommon(staff);
+    
     if ( staff.attribute( "uly" ) ) {
         m_staff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
     }
@@ -1064,7 +1065,7 @@ bool MeiInput::ReadMeiStaff( pugi::xml_node staff )
     
     pugi::xml_node current;
     for( current = staff.child( "layer" ); current; current = current.next_sibling( "layer" ) ) {
-        m_layer = new Layer( 1 );
+        m_layer = new Layer( );
         m_currentLayer = m_layer;
         SetMeiUuid( current , m_layer );
         if (ReadMeiLayer( current )) {
@@ -1084,12 +1085,7 @@ bool MeiInput::ReadMeiLayer( pugi::xml_node layer )
 {
     assert( m_layer );
     
-    if ( layer.attribute( "n" ) ) {
-        m_layer->SetLayerNo( atoi ( layer.attribute( "n" ).value() ) );
-    }
-    else {
-        LogWarning("No @n on <layer>");
-    }
+    m_layer->ReadCommon(layer);
     
     pugi::xml_node current;
     for( current = layer.first_child( ); current; current = current.next_sibling( ) ) {
@@ -1768,11 +1764,11 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
         // is because we are in the same staff or layer (e.g., beam) and they have not been added
         //to their parent (staff or layer) yet.
         // If we have one, compare the number
-        if ( (parentStaff) && (m_staff->GetStaffNo() != parentStaff->GetStaffNo()) ) {
+        if ( (parentStaff) && (m_staff->GetN() != parentStaff->GetN()) ) {
             continue;
         }
         // same layer?
-        if ( (parentLayer) && (m_layer->GetLayerNo() != parentLayer->GetLayerNo()) ) {
+        if ( (parentLayer) && (m_layer->GetN() != parentLayer->GetN()) ) {
             continue;
         }
         // we only compare oct and pname because alteration is not relevant for ties

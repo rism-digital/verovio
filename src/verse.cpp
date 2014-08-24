@@ -11,6 +11,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -18,6 +19,7 @@
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -73,7 +75,7 @@ int Verse::PrepareDrawing( ArrayPtrVoid params )
     
     assert( staff && layer );
     
-    tree->child[ staff->GetStaffNo() ].child[ layer->GetLayerNo() ].child[ this->GetN() ];
+    tree->child[ staff->GetN() ].child[ layer->GetN() ].child[ this->GetN() ];
     
     return FUNCTOR_SIBLINGS;
 }
@@ -83,7 +85,7 @@ int Verse::PrepareLyrics( ArrayPtrVoid params )
     
     Syl *syl = dynamic_cast<Syl*>( this->GetFirst( &typeid(Syl) ) );
     if (syl) {
-        //std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
+        std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
     }
     return FUNCTOR_CONTINUE;
 }

@@ -9,11 +9,12 @@
 #ifndef __VRV_LAYER_H__
 #define __VRV_LAYER_H__
 
-#include <typeinfo>
-
+#include "atts_shared.h"
 #include "clef.h"
 #include "object.h"
 #include "scoredef.h"
+
+#include <typeinfo>
 
 namespace vrv {
 
@@ -30,16 +31,19 @@ class Note;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public ObjectListInterface
+class Layer: public DocObject, public ObjectListInterface, public AttCommon
 {
 public:
-    // constructors and destructors
-    Layer( int n );
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Layer( );
     virtual ~Layer();
-    
+    void Reset();
     virtual std::string GetClassName( ) { return "Layer"; };
-    
-    void Clear();
+    ///@}
 	
 	void AddElement( LayerElement *element, int idx = -1 );
     	
@@ -50,16 +54,6 @@ public:
      * The index position is 0-based.
      */
     int GetLayerIdx() const { return Object::GetIdx(); };
-    
-    
-    /**
-     * @name Set and get the layer number which is 1-based.
-     * This can be different from the index position in the parent staff.
-     */
-    ///@{
-    int GetLayerNo() const { return m_n; };
-    void SetLayerNo( int n ) { m_n = n; };
-    ///@}
 
     // functors
     /**
@@ -189,9 +183,6 @@ protected:
     MeterSig *m_drawingMeterSig;
     
 private:
-    /** The layer number - to be changed to AttCommon */
-    int m_n;
-
     /**
      * The current clef.
      * This is used for getting the clef when interacting, for example by clicking in order to get the pitch from a position

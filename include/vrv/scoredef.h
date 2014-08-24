@@ -270,7 +270,7 @@ public:
      * This can be different from the index position in the parent measure.
      */
     ///@{
-    int GetStaffNo() const { return m_n; };
+    int GetN() const { return m_n; };
     void SetStaffNo( int n ) { m_n = n; };
     ///@}
     

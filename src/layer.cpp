@@ -31,19 +31,11 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer( int n ):
-	DocObject("layer-"), ObjectListInterface()
+Layer::Layer( ):
+	DocObject("layer-"), ObjectListInterface(), AttCommon()
 {
-    assert( n > 0 );
-    m_n = n;
     
-    m_drawingClef = NULL;
-    m_drawingKeySig = NULL;
-    m_drawingMensur = NULL;
-    m_drawingMeterSig = NULL;
-    m_drawingStemDir = STEMDIRECTION_NONE;
-    
-	Clear( );
+	Reset();
 }
 
 Layer::~Layer()
@@ -62,9 +54,17 @@ Layer::~Layer()
     }    
 }
 
-void Layer::Clear()
+void Layer::Reset()
 {
+    ResetCommon();
     ClearChildren();
+    
+    m_drawingClef = NULL;
+    m_drawingKeySig = NULL;
+    m_drawingMensur = NULL;
+    m_drawingMeterSig = NULL;
+    m_drawingStemDir = STEMDIRECTION_NONE;
+    
 	voix = 0;
     m_drawingList.clear();
 }
@@ -98,7 +98,7 @@ void Layer::CopyAttributes( Layer *nlayer )
 	if ( !nlayer )
 		return;
 
-	nlayer->Clear();
+	nlayer->Reset();
 	nlayer->voix = voix;
 }
     

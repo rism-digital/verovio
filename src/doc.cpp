@@ -109,7 +109,7 @@ void Doc::SetCurrentScoreDef( bool force )
 
     // We first fill a tree of int with the staff/layer/verse numbers to be process
 
-    LogElapsedTimeStart( );
+    //LogElapsedTimeStart( );
     Functor prepareDrawing( &Object::PrepareDrawing );
     this->Process( &prepareDrawing, params );
     
@@ -123,7 +123,7 @@ void Doc::SetCurrentScoreDef( bool force )
     for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
-                //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
+                std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 MapOfTypeN map;
                 map[ &typeid(Staff) ] = staves->first;
                 map[ &typeid(Layer) ] = layers->first;
@@ -135,7 +135,7 @@ void Doc::SetCurrentScoreDef( bool force )
             }
         }
     }
-    LogElapsedTimeEnd ( "Preparing drawing" );
+    //LogElapsedTimeEnd ( "Preparing drawing" );
     
     m_currentScoreDefDone = true;
 }
