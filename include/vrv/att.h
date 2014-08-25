@@ -8,9 +8,9 @@
 #ifndef __VRV_ATT_H__
 #define __VRV_ATT_H__
 
-#include "attdef.h"
-
 #include <string>
+
+#include "attdef.h"
 
 namespace vrv {
 

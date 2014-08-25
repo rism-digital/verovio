@@ -69,7 +69,8 @@ int Clef::GetClefOffset ()
     {
         case G1 : offset = -4; break;
         case G2 : offset = -2; break;
-        case G2va : offset = 5; break;
+        case G2va : offset = -2; break;
+        case G2vabassa : offset = -2; break;
         case F3 : offset = 8; break;
         case F4 : offset = 10; break;
         case F5 : offset = 12; break;

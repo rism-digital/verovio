@@ -1093,6 +1093,8 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
 		case G2va :
             sym += 1;
+        case G2vabassa :
+            sym += 1;
 		case C2 :
             sym += 2;
 		case G2 :

@@ -9,12 +9,12 @@
 #ifndef __VRV_DOC_H__
 #define __VRV_DOC_H__
 
-#include "vrv.h"
 #include "devicecontext.h"
-#include "vrvdef.h"
 #include "io.h"
 #include "object.h"
 #include "scoredef.h"
+#include "vrv.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
