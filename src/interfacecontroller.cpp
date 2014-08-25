@@ -20,8 +20,8 @@
 #include "iomusxml.h"
 #include "iopae.h"
 #include "page.h"
-#include "view.h"
 #include "svgdevicecontext.h"
+#include "view.h"
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"

@@ -9,9 +9,11 @@
 #ifndef __VRV_DEF_H__
 #define __VRV_DEF_H__
 
-#include "attdef.h"
-
 #include <algorithm>
+
+//----------------------------------------------------------------------------
+
+#include "attdef.h"
 
 namespace vrv {
     

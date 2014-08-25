@@ -9,12 +9,14 @@
 #ifndef __VRV_LAYER_H__
 #define __VRV_LAYER_H__
 
+#include <typeinfo>
+
+//----------------------------------------------------------------------------
+
 #include "atts_shared.h"
 #include "clef.h"
 #include "object.h"
 #include "scoredef.h"
-
-#include <typeinfo>
 
 namespace vrv {
 

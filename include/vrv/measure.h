@@ -9,12 +9,10 @@
 #ifndef __VRV_MEASURE_H__
 #define __VRV_MEASURE_H__
 
-#include "object.h"
-
 #include "aligner.h"
-#include "barline.h"
-
 #include "atts_shared.h"
+#include "barline.h"
+#include "object.h"
 
 namespace vrv {
 

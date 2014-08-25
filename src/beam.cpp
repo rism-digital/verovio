@@ -5,8 +5,12 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "vrv.h"
+
 #include "beam.h"
+
+//----------------------------------------------------------------------------
+
+#include "vrv.h"
 
 namespace vrv {
 

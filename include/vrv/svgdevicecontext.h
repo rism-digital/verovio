@@ -9,13 +9,15 @@
 #ifndef __VRV_SVG_DC_H__
 #define __VRV_SVG_DC_H__
 
-#include "devicecontext.h"
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <vector>
+
+//----------------------------------------------------------------------------
+
+#include "devicecontext.h"
 
 namespace vrv {
 

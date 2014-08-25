@@ -9,9 +9,9 @@
 #ifndef __VRV_SYMBOL_H__
 #define __VRV_SYMBOL_H__
 
-#include "vrvdef.h"
 #include "layerelement.h"
 #include "positioninterface.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

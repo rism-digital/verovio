@@ -14,10 +14,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
 #include "slur.h"
 #include "tie.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 

@@ -9,8 +9,8 @@
 #ifndef __VRV_METERSIG_H__
 #define __VRV_METERSIG_H__
 
-#include "layerelement.h"
 #include "atts_shared.h"
+#include "layerelement.h"
 
 namespace vrv {
     

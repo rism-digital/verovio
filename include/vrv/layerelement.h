@@ -10,8 +10,8 @@
 #define __VRV_LAYER_ELEMENT_H__
 
 #include "devicecontext.h" // for MusPoint
-#include "vrvdef.h"
 #include "object.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

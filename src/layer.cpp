@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
-#include "vrvdef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "io.h"
@@ -24,6 +23,7 @@
 #include "metersig.h"
 #include "note.h"
 #include "symbol.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

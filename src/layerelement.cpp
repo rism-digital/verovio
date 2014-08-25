@@ -15,13 +15,11 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
 #include "aligner.h"
 #include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
-#include "vrvdef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "io.h"
@@ -34,6 +32,8 @@
 #include "symbol.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "vrv.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

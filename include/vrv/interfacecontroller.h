@@ -9,10 +9,12 @@
 #ifndef __VRV_CONTROLLER_H__
 #define __VRV_CONTROLLER_H__
 
+#include <string>
+
+//----------------------------------------------------------------------------
+
 #include "doc.h"
 #include "view.h"
-
-#include <string>
 
 namespace vrv {
 

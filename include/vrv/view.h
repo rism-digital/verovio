@@ -11,6 +11,8 @@
 
 #include <typeinfo>
 
+//----------------------------------------------------------------------------
+
 #include "devicecontext.h"
 #include "scoredef.h"
 #include "vrvdef.h"

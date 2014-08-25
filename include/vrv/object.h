@@ -15,6 +15,8 @@
 #include <typeinfo>
 #include <vector>
 
+//----------------------------------------------------------------------------
+
 #include "vrvdef.h"
 
 namespace vrv {

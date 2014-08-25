@@ -15,12 +15,12 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
 #include "clef.h"
 #include "io.h"
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "vrv.h"
 
 namespace vrv {
 

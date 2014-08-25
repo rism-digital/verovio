@@ -16,11 +16,11 @@
 
 #include "aligner.h"
 #include "bboxdevicecontext.h"
-#include "vrvdef.h"
 #include "doc.h"
-#include "view.h"
 #include "staff.h"
 #include "system.h"
+#include "view.h"
+#include "vrvdef.h"
 
 namespace vrv {
 

@@ -9,7 +9,6 @@
 #define __VRV_IOMEI_H__
 
 #include "doc.h"
-
 #include "pugixml.hpp"
 
 namespace vrv {

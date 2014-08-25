@@ -18,7 +18,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
 #include "aligner.h"
 #include "beam.h"
 #include "clef.h"
@@ -31,13 +30,14 @@
 #include "metersig.h"
 #include "multirest.h"
 #include "page.h"
-#include "view.h"
 #include "scoredef.h"
 #include "staff.h"
 #include "system.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "view.h"
+#include "vrv.h"
 
 namespace vrv {
 

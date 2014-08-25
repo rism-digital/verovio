@@ -11,9 +11,8 @@
 
 #include "doc.h"
 #include "layer.h"
-#include "tie.h"
-
 #include "pugixml.hpp"
+#include "tie.h"
 
 namespace vrv {
 

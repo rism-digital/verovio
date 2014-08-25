@@ -12,6 +12,8 @@
 #include <string>
 #include <vector>
 
+//----------------------------------------------------------------------------
+
 #include "io.h"
 #include "vrvdef.h"
 

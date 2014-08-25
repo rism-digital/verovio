@@ -9,7 +9,6 @@
 #ifndef __VRV_MREST_H__
 #define __VRV_MREST_H__
 
-#include "vrvdef.h"
 #include "layerelement.h"
 
 namespace vrv {

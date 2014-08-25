@@ -16,7 +16,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
 #include "app.h"
 #include "barline.h"
 #include "beam.h"
@@ -40,6 +39,7 @@
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
