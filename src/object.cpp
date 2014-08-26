@@ -1018,7 +1018,7 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
     // ending a measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
     if ( current_measure  ) {
-        // as minimum position of the barline use the measure width
+        // as minimum position of the barLine use the measure width
         (*min_pos) = (*measure_width);
         if (current_measure->GetRightBarlineType() != BARRENDITION_NONE) {
             current_measure->GetRightBarline()->SetBoundingBoxXShift( params );
@@ -1031,7 +1031,7 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
     if ( current_layer  ) {
         // mininimum position is the with the layer
         // we keep it if is higher than what we had so far
-        // this will be used for shifting the right barline
+        // this will be used for shifting the right barLine
         (*measure_width) = std::max( (*measure_width), (*min_pos) );
         return FUNCTOR_CONTINUE;
     }

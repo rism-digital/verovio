@@ -125,13 +125,13 @@ protected:
      */
     ///@{
     void DrawSystem( DeviceContext *dc, System *system );
-	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barline = NULL );
+	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
 	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
 	void DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
-    void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barline );
-    void DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barline );
-	void DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barline );
+    void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine );
+    void DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barLine );
+	void DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barLine );
 	void DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff *pportee);
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );

@@ -148,7 +148,7 @@ public:
         durations = d.durations;
         dots = d.dots; 
         durations_offset = d.durations_offset;
-        barline = d.barline;
+        barLine = d.barLine;
         abbreviation_offset = d.abbreviation_offset;  
         wholerest = d.wholerest;
     } 
@@ -164,7 +164,7 @@ public:
         durations = d.durations;
         dots = d.dots; 
         durations_offset = d.durations_offset;
-        barline = d.barline;
+        barLine = d.barLine;
         abbreviation_offset = d.abbreviation_offset;  
         wholerest = d.wholerest;   
         return *this;
@@ -182,7 +182,7 @@ public:
         meter = NULL;
         key = NULL;
         notes.clear();
-        barline = BARRENDITION_NONE;
+        barLine = BARRENDITION_NONE;
         wholerest = 0; 
         abbreviation_offset = -1;
     };
@@ -195,7 +195,7 @@ public:
     std::vector<int> durations;
     std::vector<int> dots; // use the same offset as durations, they are used in parallel
     unsigned int durations_offset;
-    data_BARRENDITION    barline;
+    data_BARRENDITION    barLine;
     int    abbreviation_offset;  
     int    wholerest;   // number of whole rests to process
 };

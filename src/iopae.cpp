@@ -270,9 +270,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
                 current_measure.notes[0].tie = 0;
         }
         
-        //barline
+        //barLine
         else if ((incipit[i] == ':') || (incipit[i] == '/')) {
-            i += getBarline(incipit, &current_measure.barline, i);
+            i += getBarline(incipit, &current_measure.barLine, i);
             current_measure.abbreviation_offset = 0; // just in case...
             staff.push_back( current_measure );
             current_measure.reset();
@@ -337,9 +337,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         i++;
     }
     
-    // we need to add the last measure if it has no barline at the end
+    // we need to add the last measure if it has no barLine at the end
     if (current_measure.notes.size() != 0) {
-        //current_measure.barline = "=-";
+        //current_measure.barLine = "=-";
         staff.push_back( current_measure );
         current_measure.notes.clear();
     }
@@ -801,18 +801,18 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
     
     if (clef == 'C' || clef == 'c') {
         mclef->SetShape(CLEFSHAPE_C);
-        mclef->SetLine(line);
+        mclef->SetLine(line - 48);
     } else if (clef == 'G') {
         mclef->SetShape(CLEFSHAPE_G);
-        mclef->SetLine(line);
+        mclef->SetLine(line - 48);
     } else if (clef == 'g') {
         mclef->SetShape(CLEFSHAPE_G);
-        mclef->SetLine(line);
+        mclef->SetLine(line - 48);
         mclef->SetDis(OCTAVE_DIS_8);
         mclef->SetDisPlace(PLACE_above);
     } else if (clef == 'F' || clef == 'f') {
         mclef->SetShape(CLEFSHAPE_F);
-        mclef->SetLine(line);
+        mclef->SetLine(line - 48);
     } else {
         // what the...
         LogDebug("Clef %c is Undefined", clef);
@@ -850,7 +850,7 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
 
 /**********************************
  *
- * getBarline -- read the barline.
+ * getBarline -- read the barLine.
  * Translation from PAE to verovio representaion:
  *
  BARRENDITION_single     /
@@ -1092,10 +1092,10 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
         parseNote(note);
     }
     
-    // Set barline
-    // FIXME use flags for proper barline identification
+    // Set barLine
+    // FIXME use flags for proper barLine identification
     Barline *bline = m_measure->GetRightBarline();
-    bline->SetRend( measure->barline );
+    bline->SetRend( measure->barLine );
 
 }
 

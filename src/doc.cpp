@@ -123,7 +123,7 @@ void Doc::SetCurrentScoreDef( bool force )
     for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
-                std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
+                //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 MapOfTypeN map;
                 map[ &typeid(Staff) ] = staves->first;
                 map[ &typeid(Layer) ] = layers->first;

@@ -723,8 +723,8 @@ public:
     bool HasClefShape( );
     
     //
-    void SetClefLine(unsigned char clefLine_) { m_clefLine = clefLine_; };
-    unsigned char GetClefLine() const { return m_clefLine; };    
+    void SetClefLine(char clefLine_) { m_clefLine = clefLine_; };
+    char GetClefLine() const { return m_clefLine; };    
     bool HasClefLine( );
     
     //
@@ -747,7 +747,7 @@ protected:
      * The value must be in the range between 1 and the number of lines on the staff.
      * The numbering of lines starts with the lowest line of the staff.
      **/
-    unsigned char m_clefLine;
+    char m_clefLine;
     /** Records the amount of octave displacement to be applied to the clef. **/
     data_OCTAVE_DIS m_clefDis;
     /** Records the direction of octave displacement to be applied to the clef. **/
@@ -2274,8 +2274,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLine(unsigned char line_) { m_line = line_; };
-    unsigned char GetLine() const { return m_line; };    
+    void SetLine(char line_) { m_line = line_; };
+    char GetLine() const { return m_line; };    
     bool HasLine( );
     
     ///@}
@@ -2286,7 +2286,7 @@ protected:
      * The value must be in the range between 1 and the number of lines on the staff.
      * The numbering of lines starts with the lowest line of the staff.
      **/
-    unsigned char m_line;
+    char m_line;
 
 /* include <attline> */
 };
@@ -2996,7 +2996,7 @@ protected:
      * point of alignment across all the parts.
      * Bar lines within a score are usually controlling; that is, they "line up". Bar
      * lines within parts may or may not be controlling. When applied to <measure>,
-     * this attribute indicates the nature of the right barline but not the left.
+     * this attribute indicates the nature of the right barLine but not the left.
      **/
     std::string m_control;
 
@@ -4190,15 +4190,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSlash(unsigned char slash_) { m_slash = slash_; };
-    unsigned char GetSlash() const { return m_slash; };    
+    void SetSlash(char slash_) { m_slash = slash_; };
+    char GetSlash() const { return m_slash; };    
     bool HasSlash( );
     
     ///@}
 
 protected:
     /** Indicates the number of slashes present. **/
-    unsigned char m_slash;
+    char m_slash;
 
 /* include <attslash> */
 };

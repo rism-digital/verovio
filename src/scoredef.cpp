@@ -132,7 +132,7 @@ void ScoreOrStaffDefAttrInterface::ReplaceMeterSig( Object *newMeterSig )
 Clef *ScoreOrStaffDefAttrInterface::GetClefCopy() const
 {
     // we should not call it without having checked if a clef is set
-    assert(m_clef);
+    if (!m_clef) return NULL;
     Clef *copy = NULL;
     Clef *current_clef = dynamic_cast<Clef*>(m_clef);
     if (current_clef) {
@@ -149,8 +149,8 @@ Clef *ScoreOrStaffDefAttrInterface::GetClefCopy() const
     
 KeySig *ScoreOrStaffDefAttrInterface::GetKeySigCopy() const
 {
-    // we should not call it without having checked if a clef is set
-    assert(m_keySig);
+    // we should not call it without having checked if a keysig is set
+    if (!m_keySig) return NULL;
     KeySig *copy = NULL;
     KeySig *current_keySig = dynamic_cast<KeySig*>(m_keySig);
     if (current_keySig) {
@@ -167,8 +167,8 @@ KeySig *ScoreOrStaffDefAttrInterface::GetKeySigCopy() const
     
 Mensur *ScoreOrStaffDefAttrInterface::GetMensurCopy() const
 {
-    // we should not call it without having checked if a clef is set
-    assert(m_mensur);
+    // we should not call it without having checked if a mensur is set
+    if (!m_mensur) return NULL;
     Mensur *copy = NULL;
     Mensur *current_mensur = dynamic_cast<Mensur*>(m_mensur);
     if (current_mensur) {
@@ -185,8 +185,8 @@ Mensur *ScoreOrStaffDefAttrInterface::GetMensurCopy() const
     
 MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigCopy() const
 {
-    // we should not call it without having checked if a clef is set
-    assert(m_meterSig);
+    // we should not call it without having checked if a meterSig is set
+    if (!m_meterSig) return NULL;
     MeterSig *copy = NULL;
     MeterSig *current_meterSig = dynamic_cast<MeterSig*>(m_meterSig);
     if (current_meterSig) {

@@ -55,7 +55,7 @@ public:
     int GetMeasureIdx() const { return Object::GetIdx(); };
     
     /**
-     * @name Set and get the left and right barline types
+     * @name Set and get the left and right barLine types
      * This somehow conflicts with AttMeasureLog, which are transfered from and to the 
      * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
@@ -91,12 +91,12 @@ public:
     int GetXRel( );
     
     /** 
-     * Return the X rel position of the right barline (without its width)
+     * Return the X rel position of the right barLine (without its width)
      */
     int GetRightBarlineX( );
     
     /**
-     * Return the width of the measure, including the barline width
+     * Return the width of the measure, including the barLine width
      */
     int GetWidth( );
     
@@ -130,7 +130,7 @@ public:
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * This method also moves the end position of the measure according to the barline width.
+     * This method also moves the end position of the measure according to the barLine width.
      */
     virtual int AlignMeasures( ArrayPtrVoid params );
     

@@ -131,7 +131,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
-        if ( (measure->GetN() != VRV_UNSET) && (measure->GetN() != 1) ) {
+        if ( (measure->GetN() != VRV_UNSET) && (measure->GetN() > 1) ) {
             dc->DrawMusicText( IntToObliqueFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->m_drawingStaffSize[0]  * 2 / 3) );
         }
     }
@@ -140,7 +140,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 
 }
 
-void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barline  )
+void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine  )
 {
     assert( scoreDef ); // other asserted before
 
@@ -152,15 +152,15 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
         return;
     }
     
-    if ( barline == NULL) {
+    if ( barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp( dc, measure, staffGrp, x );
     }
     else{
-        barline->SetDrawingX( x );
-        dc->StartGraphic( barline, "barline", barline->GetUuid() );
-        DrawBarlines( dc, measure, staffGrp, barline );
-        dc->EndGraphic( barline, this );
+        barLine->SetDrawingX( x );
+        dc->StartGraphic( barLine, "barLine", barLine->GetUuid() );
+        DrawBarlines( dc, measure, staffGrp, barLine );
+        dc->EndGraphic( barLine, this );
     }
     
 	return;
@@ -348,7 +348,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 }
 
 
-void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barline )
+void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine )
 {
     assert( measure );
     assert( staffGrp );
@@ -362,7 +362,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             childStaffGrp = dynamic_cast<StaffGrp*>(staffGrp->GetChild( i ));
             childStaffDef = dynamic_cast<StaffDef*>(staffGrp->GetChild( i ));
             if ( childStaffGrp ) {
-                DrawBarlines( dc, measure, childStaffGrp, barline );
+                DrawBarlines( dc, measure, childStaffGrp, barLine );
             }
             else if ( childStaffDef ) {
                 Staff *staff = measure->GetStaffWithNo( childStaffDef->GetN() );
@@ -373,9 +373,9 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 int y_top = staff->GetDrawingY();
                 // for the bottom position we need to take into account the number of lines and the staff size
                 int y_bottom = staff->GetDrawingY() - (childStaffDef->GetLines() - 1) * m_doc->m_drawingInterl[staff->staffSize];
-                DrawBarline( dc, y_top, y_bottom, barline );
-                if ( barline->HasRepetitionDots() ) {
-                    DrawBarlineDots( dc, childStaffDef, staff, barline );
+                DrawBarline( dc, y_top, y_bottom, barLine );
+                if ( barLine->HasRepetitionDots() ) {
+                    DrawBarlineDots( dc, childStaffDef, staff, barLine );
                 }
             }
         }
@@ -409,10 +409,10 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         // for the bottom position we need to take into account the number of lines and the staff size
         int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
         
-        DrawBarline( dc, y_top, y_bottom, barline );
+        DrawBarline( dc, y_top, y_bottom, barLine );
         
-        // Now we have a barthru barline, but we have dots so we still need to go through each staff
-        if ( barline->HasRepetitionDots() ) {
+        // Now we have a barthru barLine, but we have dots so we still need to go through each staff
+        if ( barLine->HasRepetitionDots() ) {
             int i;
             StaffDef *childStaffDef = NULL;
             for (i = 0; i < staffGrp->GetChildCount(); i++) {
@@ -423,14 +423,14 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                         LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
                         continue;
                     }
-                    DrawBarlineDots( dc, childStaffDef, staff, barline );
+                    DrawBarlineDots( dc, childStaffDef, staff, barLine );
                 }
             }
         }
     }
 }
 
-void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barline )
+void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barLine )
 {
     assert( dc );
     
@@ -438,38 +438,38 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
     y_top += m_doc->m_env.m_staffLineWidth / 2;
     y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
 
-    int x = barline->GetDrawingX();
+    int x = barLine->GetDrawingX();
 	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
-	if (barline->GetRend() == BARRENDITION_single)
+	if (barLine->GetRend() == BARRENDITION_single)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
     }
-    else if (barline->GetRend() == BARRENDITION_rptboth)
+    else if (barLine->GetRend() == BARRENDITION_rptboth)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
         DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
     }
-    else if (barline->GetRend()  == BARRENDITION_rptstart)
+    else if (barLine->GetRend()  == BARRENDITION_rptstart)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
         DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
     }
-    else if (barline->GetRend() == BARRENDITION_rptend)
+    else if (barLine->GetRend() == BARRENDITION_rptend)
 	{
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
 	}
-	else if (barline->GetRend()  == BARRENDITION_dbl)
+	else if (barLine->GetRend()  == BARRENDITION_dbl)
 	{
         // Narrow the bars a little bit - should be centered?
         x1 += m_doc->m_env.m_barlineWidth;
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
 	}
-	else if (barline->GetRend()  == BARRENDITION_end)
+	else if (barLine->GetRend()  == BARRENDITION_end)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
@@ -477,24 +477,24 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
 }
 
  
-void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barline )
+void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barLine )
 {
 	assert( dc ); // DC cannot be NULL
     
-    int x = barline->GetDrawingX();
+    int x = barLine->GetDrawingX();
 	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
 	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
     
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
     int y_top = y_bottom + m_doc->m_drawingInterl[staff->staffSize];
  
-    if ((barline->GetRend()  == BARRENDITION_rptstart) || (barline->GetRend() == BARRENDITION_rptboth))
+    if ((barLine->GetRend()  == BARRENDITION_rptstart) || (barLine->GetRend() == BARRENDITION_rptboth))
     {
         DrawDot(dc, x2, y_bottom );
         DrawDot(dc, x2, y_top );
 
     }
-    if ((barline->GetRend() == BARRENDITION_rptend) || (barline->GetRend() == BARRENDITION_rptboth))
+    if ((barLine->GetRend() == BARRENDITION_rptend) || (barLine->GetRend() == BARRENDITION_rptboth))
 	{
         DrawDot(dc, x1, y_bottom );
         DrawDot(dc, x1, y_top );

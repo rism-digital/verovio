@@ -55,7 +55,7 @@ void Measure::Clear()
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
     m_drawingX = 0;
-    // by default, we have a single barline on the right (none on the left)
+    // by default, we have a single barLine on the right (none on the left)
     m_rightBarline.SetRend( this->GetRight() );
     m_leftBarline.SetRend( this->GetLeft() );
 }
@@ -225,7 +225,7 @@ int Measure::AlignMeasures( ArrayPtrVoid params )
     
     (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
     
-    // We also need to take into account the measure end (right) barline with here
+    // We also need to take into account the measure end (right) barLine with here
     if (GetRightBarlineType() != BARRENDITION_NONE) {
         // shift the next measure of the total with
         (*shift) += GetRightBarline()->GetAlignment()->GetMaxWidth();

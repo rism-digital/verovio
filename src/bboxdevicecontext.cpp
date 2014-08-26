@@ -312,7 +312,7 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         
 void BBoxDeviceContext::DrawText(const std::string& text, int x, int y)
 {
-    //DrawMusicText( text, x, y);
+    DrawMusicText( text, x, y);
 }
 
 

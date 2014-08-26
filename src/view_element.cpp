@@ -1047,18 +1047,18 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff->m_parent); // Pointer to system cannot be NULL"
     assert(dynamic_cast<Barline*>(element)); // Element must be a Barline"
     
-    Barline *barline = dynamic_cast<Barline*>(element);
-    int x = element->GetDrawingX() + barline->m_hOffset;
+    Barline *barLine = dynamic_cast<Barline*>(element);
+    int x = element->GetDrawingX() + barLine->m_hOffset;
 
-    dc->StartGraphic( element, "barline", element->GetUuid() );
+    dc->StartGraphic( element, "barLine", element->GetUuid() );
     
-    if (barline->m_partialBarline)
+    if (barLine->m_partialBarline)
     {
         DrawPartialBarline ( dc, dynamic_cast<System*>( staff->m_parent ), x, staff);
     }
     else
     {
-        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_env.m_barlineWidth, barline->m_onStaffOnly, staff);
+        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_env.m_barlineWidth, barLine->m_onStaffOnly, staff);
     }
     
 
@@ -1461,8 +1461,8 @@ void View::DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer
     
 void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff )
 {
-    
-    int x = element->GetDrawingX();
+    // to be updated
+    int x = element->GetDrawingX() - 1 * m_doc->m_env.m_interlDefin;
     int y = element->GetDrawingY();
     if (staff->GetAlignment() ) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * 2 * m_doc->m_env.m_interlDefin;

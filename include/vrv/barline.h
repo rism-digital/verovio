@@ -19,7 +19,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /** 
- * This class models the MEI <barline> element. 
+ * This class models the MEI <barLine> element. 
  */
 class Barline: public LayerElement, public AttBarLineLog
 {
@@ -50,7 +50,7 @@ public:
     void SetAlignment( Alignment *alignment ) { m_alignment = alignment; };
     
     /*
-     * Return true if the barline type requires repetition dots to be drawn.
+     * Return true if the barLine type requires repetition dots to be drawn.
      */
     bool HasRepetitionDots( );
     
@@ -62,9 +62,9 @@ public:
 private:
     
 public:
-    /** Indicates a partial barline (inbetween the staves) - no MEI equivalent */
+    /** Indicates a partial barLine (inbetween the staves) - no MEI equivalent */
     bool m_partialBarline;
-    /** Indicates a barline displayed only on the staff - no MEI equivalent */
+    /** Indicates a barLine displayed only on the staff - no MEI equivalent */
     bool m_onStaffOnly;
 
 private:

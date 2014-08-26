@@ -147,8 +147,8 @@ public:
     bool HasMensurSign( );
     
     //
-    void SetMensurSlash(unsigned char mensurSlash_) { m_mensurSlash = mensurSlash_; };
-    unsigned char GetMensurSlash() const { return m_mensurSlash; };    
+    void SetMensurSlash(char mensurSlash_) { m_mensurSlash = mensurSlash_; };
+    char GetMensurSlash() const { return m_mensurSlash; };    
     bool HasMensurSlash( );
     
     ///@}
@@ -164,7 +164,7 @@ protected:
      * Indicates the number lines added to the mensuration sign.
      * For example, one slash is added for what we now call 'alla breve'.
      **/
-    unsigned char m_mensurSlash;
+    char m_mensurSlash;
 
 /* include <attmensur.slash> */
 };

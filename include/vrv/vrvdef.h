@@ -23,7 +23,7 @@ namespace vrv {
     
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 0
+#define VERSION_REVISION 2
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 

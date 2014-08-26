@@ -239,7 +239,7 @@ bool MeiOutput::WriteMeasure( Measure *measure )
 
     measure->WriteCommon(m_measure);
 
-    // here we transfer the barline object values to @left and @right
+    // here we transfer the barLine object values to @left and @right
     measure->SetLeft( measure->GetLeftBarlineType() );
     measure->SetRight( measure->GetRightBarlineType() );
     measure->WriteMeasureLog(m_measure);
@@ -302,7 +302,7 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
     
     pugi::xml_node xmlElement;
     if (dynamic_cast<Barline*>(element)) {
-        xmlElement = currentParent.append_child( "barline" );
+        xmlElement = currentParent.append_child( "barLine" );
         WriteMeiBarline( xmlElement, dynamic_cast<Barline*>(element) );
     }
     else if (dynamic_cast<Beam*>(element)) {
@@ -358,9 +358,9 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
     }    
 }
 
-void MeiOutput::WriteMeiBarline( pugi::xml_node meiBarline, Barline *barline )
+void MeiOutput::WriteMeiBarline( pugi::xml_node meiBarline, Barline *barLine )
 {
-    barline->WriteBarLineLog(meiBarline);
+    barLine->WriteBarLineLog(meiBarline);
     return;
 }
 
@@ -1025,7 +1025,7 @@ bool MeiInput::ReadMeiMeasure( pugi::xml_node measure )
     m_measure->ReadCommon(measure);
     m_measure->ReadMeasureLog(measure);
     
-    // here we transfer the @left and @right values to the barline objects
+    // here we transfer the @left and @right values to the barLine objects
     m_measure->SetLeftBarlineType( m_measure->GetLeft() );
     m_measure->SetRightBarlineType( m_measure->GetRight() );
     
@@ -1172,10 +1172,10 @@ bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
     return true;
 }
 
-LayerElement *MeiInput::ReadMeiBarline( pugi::xml_node barline )
+LayerElement *MeiInput::ReadMeiBarline( pugi::xml_node barLine )
 {
     Barline *vrvBarline = new Barline();
-    vrvBarline->ReadBarLineLog(barline);
+    vrvBarline->ReadBarLineLog(barLine);
     return vrvBarline;    
 }
 

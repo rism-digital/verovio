@@ -77,7 +77,7 @@ private:
      * Write a Barline. 
      * Callded from WriteLayerElement.
      */
-    void WriteMeiBarline( pugi::xml_node meiBarline, Barline *barline );
+    void WriteMeiBarline( pugi::xml_node meiBarline, Barline *barLine );
     
     /**
      * Write a Beam. 
@@ -233,7 +233,7 @@ private:
     bool ReadMeiStaff( pugi::xml_node staff );
     bool ReadMeiLayer( pugi::xml_node layer );
     bool ReadMeiLayerElement( pugi::xml_node XmlElement );
-    LayerElement *ReadMeiBarline( pugi::xml_node barline );
+    LayerElement *ReadMeiBarline( pugi::xml_node barLine );
     LayerElement *ReadMeiBeam( pugi::xml_node beam );
     LayerElement *ReadMeiClef( pugi::xml_node clef );
     LayerElement *ReadMeiMensur( pugi::xml_node mensur );

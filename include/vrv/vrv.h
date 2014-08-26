@@ -155,7 +155,7 @@ public:
     unsigned char m_staffLineWidth;
     /** The stem width */
     unsigned char m_stemWidth;
-    /** The barline width */
+    /** The barLine width */
     unsigned char m_barlineWidth;
     /** The maximum beam slope */
     unsigned char m_beamMaxSlope;
