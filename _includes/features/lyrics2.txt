@@ -1,0 +1,46 @@
+<layer n="2">
+  <note xml:id="d23378e177" pname="e" oct="4" dur="4" stem.dir="down">
+    <verse n="1">
+      <syl>1. Je-</syl>
+    </verse>
+    <verse n="2">
+      <syl>2. Tau-</syl>
+    </verse>
+    <verse n="3">
+      <syl>3. Wei-</syl>
+    </verse>
+  </note>
+  <note xml:id="d23378e206" pname="e" oct="4" dur="4" stem.dir="down">
+    <verse n="1">
+      <syl>su,</syl>
+    </verse>
+    <verse n="2">
+      <syl>send-</syl>
+    </verse>
+    <verse n="3">
+      <syl>de</syl>
+    </verse>
+  </note>
+  <note xml:id="d23378e235" pname="e" oct="4" dur="4" stem.dir="down">
+    <verse n="1">
+      <syl>mei-</syl>
+    </verse>
+    <verse n="2">
+      <syl>mal</syl>
+    </verse>
+    <verse n="3">
+      <syl>mich</syl>
+    </verse>
+  </note>
+  <note xml:id="d23378e265" pname="f" oct="4" dur="4" stem.dir="down">
+    <verse n="1">
+      <syl>nes</syl>
+    </verse>
+    <verse n="2">
+      <syl>ge-</syl>
+    </verse>
+    <verse n="3">
+      <syl>und</syl>
+    </verse>
+  </note>
+</layer>

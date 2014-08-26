@@ -1,0 +1,63 @@
+---
+---
+<h3>Lyrics</h3>
+
+
+<p>
+	Verovio supports basic <code>&lt;verse&gt;</code> and <code>&lt;syl&gt;</code> elements. The layout algorithm takes into account the lyrics and spaces the notes and the staves appropriately.
+</p>
+
+<div id="svg_output" style="overflow:auto;"/>
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	pageWidth = 1450;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+
+	$.get( "{{ site.baseurl }}/examples/features/lyrics1.mei" , function( data ) {
+		load_data( data, $('#svg_output') );
+	});
+//]]>
+</script>
+
+{% include mei-excerpt.html id="code1" file="lyrics1.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/lyrics1.txt %}
+{% endhighlight %}
+</div>
+
+<br/>
+<p>
+	Verovio also supports multiple lines of lyrics. In that case, each line needs to have a corresponding <code>@n</code> attribute in the <code>&lt;verse&gt;</code> element. The layout algorithm takes into account the multiple lines and spaces the   staves appropriately.
+</p>
+
+<div id="svg_output-2" style="overflow:auto;"/>
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	pageWidth = 1450;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+
+	$.get( "{{ site.baseurl }}/examples/features/lyrics2.mei" , function( data ) {
+		load_data( data, $('#svg_output-2') );
+	});
+//]]>
+</script>
+
+{% include mei-excerpt.html id="code2" file="lyrics2.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/lyrics2.txt %}
+{% endhighlight %}
+</div>

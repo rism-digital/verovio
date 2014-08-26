@@ -1,8 +1,86 @@
 att-classes:
+  - id: "barLine.log"
+    attributes:
+    - ["rend", "Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.", ""]
+  - id: "coloration"
+    attributes:
+    - ["colored", "", ""]
+  - id: "cleffing.log"
+    attributes:
+    - ["clef.shape", "Supported values are 'C', 'F' and 'G'.", ""]
+    - ["clef.line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
+    - ["clef.dis", "Only value '8' is supported and it assumes shape 'G' and line 2.", ""]
+    - ["clef.place", "Supported values: 'below'", ""]
+  - id: "clefshape"
+    attributes:
+    - ["shape", "Supported values are 'C', 'F' and 'G'.", ""]
   - id: "common"
     attributes:
     - ["label", "", ""]
     - ["n", "Only numeric values are supported", ""]
+  - id: "duration.ratio"
+    attributes:
+    - ["num", "", ""]
+    - ["numbase", "", ""]
+  - id: "keySigDefault.log"
+    attributes:
+    - ["key.accid", "", ""] 
+    - ["key.mode", "", ""] 
+    - ["key.pname", "", ""] 
+    - ["key.sig", "Mixed key signatures are not supported.", ""]
+  - id: "lineloc"
+    attributes:
+    - ["line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
+  - id: "measure.log"
+    attributes:
+    - ["left", "", ""] 
+    - ["right", "", ""] 
+  - id: "mensur.log"
+    attributes:
+    - ["dot", "", ""] 
+    - ["sign", "", ""] 
+  - id: "meterSig.log"
+    attributes:
+    - ["count", "", ""] 
+    - ["sym", "", ""] 
+    - ["unit", "", ""] 
+  - id: "meterSigDefault.log"
+    attributes:
+    - ["meter.count", "", ""] 
+    - ["meter.unit", "", ""] 
+  - id: "meterSigDefault.vis"
+    attributes:
+    - ["meter.sym", "", ""] 
+  - id: "octavedisplacement"
+    attributes:
+    - ["dis", "Only value '8' is supported and it assumes shape 'G' and line 2.", ""]
+    - ["dis.place", "Supported values: 'below'", ""]
+  - id: "slashcount"
+    attributes:
+    - ["slash", "", ""] 
+  - id: "stemmed"
+    attributes:
+    - ["stem.dir", "", ""] 
+    - ["stem.len", "Not supported yet", ""] 
+    - ["stem.pos", "Not supported yet", ""] 
+    - ["stem.x", "Not supported yet", ""] 
+    - ["stem.y", "Not supported yet", ""] 
+  - id: "syl.log"
+    attributes:
+    - ["con", "Not supported yet", ""] 
+    - ["wordpos", "Not supported yet", ""] 
+
+  - id: "note.log.mensural"
+    attributes:
+    - ["lig", "", ""] 
+  - id: "mensur.default.log"
+    attributes:
+    - ["mensur.dot", "", ""] 
+    - ["mensur.sign", "", ""] 
+    - ["mensur.slash", "Only 1 slash is supported.", ""] 
+  - id: "mensur.vis"
+    attributes:
+    - ["orient", "Only reversed is supported.", ""] 
 
 classes:
   - id: "accid"
@@ -12,10 +90,15 @@ classes:
     - ["ploc", "", ""] 
   - id: "beam"
   - id: "barLine"
+    att-classes:
+      - barLine.log
+    attributes: []
   - id: "clef"
-    attributes:
-      - ["line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
-      - ["shape", "Supported values are 'C', 'F' and 'G'.", ""]
+    att-classes:
+      - clefshape
+      - lineloc
+      - octavedisplacement
+    attributes: []
   - id: "custos"
     attributes:
     - ["oct", "", ""]
@@ -25,34 +108,39 @@ classes:
     - ["oloc", "", ""]
     - ["ploc", "", ""]
   - id: "layer"
-    attributes:
-      - ["n", "The order of the <code>&lt;layer&gt;</code> elements must correspond to the values (1-based).", ""]
+    att-classes:
+      - common
+    attributes: []
   - id: "measure"
     att-classes:
       - common
-    attributes:
-      - ["n", "", ""]
-      - ["right", "Supported values are 'dbl', 'end', 'rptstart', 'rptboth', 'rptend' and 'single'.", ""]
+      - measure.log  
+    attributes: []
   - id: "mensur"
-    attributes: 
-      - ["dot", "", ""]
-      - ["orient", "Only reversed is supported.", ""]	  
-      - ["num", "", ""]
-      - ["numbase", "", ""]
-      - ["slash", "Only 1 slash is supported.", ""]
+    att-classes:
+      - meterSig.log
+    attributes: []
+  - id: "meterSig"
+    att-classes:
+      - duration.ratio
+      - mensur.log
+      - mensur.vis
+      - slashcount
+    attributes: []
   - id: "mRest"
   - id: "multiRest"
     attributes:
       - ["num", "", ""]
   - id: "note"
+    att-classes:
+      - coloration
+      - note.log.mensural
+      - stemmed
     attributes:
       - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
-      - ["colored", "", ""]
-      - ["dots", "", ""]
       - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
       - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
       - ["grace", "Currently all values will be treated undifferently", ""]
-      - ["lig", "", ""]
       - ["oct", "", ""]
       - ["pname", "", ""]
       - ["tie", "", ""]
@@ -64,30 +152,41 @@ classes:
       - ["oloc", "", ""]
       - ["ploc", "", ""]
   - id: "scoreDef"
-    attributes:
-      - ["clef.dis", "Only value '8' is supported and it assumes shape 'G' and line 2.", ""]
-      - ["clef.line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
-      - ["clef.shape", "Supported values are 'C', 'F' and 'G'.", ""]
-      - ["key.sig", "Mixed key signatures are not supported.", ""]
+    att-classes:
+      - cleffing.log
+      - keySigDefault.log
+      - meterSigDefault.log
+      - mensur.default.log
+    attributes: []
   - id: "staff"
+    att-classes:
+      - common
     attributes:
-      - ["n", "The order of the <code>&lt;staff&gt;</code> elements must correspond to the values (1-based).", ""]
       - ["uly", "This is used for positionned page-based encoding.", ""]
   - id: "staffDef"
+    att-classes:
+      - cleffing.log
+      - keySigDefault.log
+      - meterSigDefault.log
+      - mensur.default.log
     attributes:
       - ["n", "The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).", ""]
-      - ["clef.line", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
-      - ["clef.shape", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
-      - ["clef.gis", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
-      - ["key.sig", "Supported values are the same as for <code>&lt;scoreDef&gt;</code>.", ""]
   - id: "staffGrp"
     attributes:
       - ["symbol", "Supported values are 'brace', 'bracket' and 'line'. Default value is 'none' (no symbol).", ""]
       - ["barthru", "Default value is 'false'.", ""]
+  - id: "syl"
+    att-classes:
+      - syl.log
+    attributes: []
   - id: "tuplet"
     attributes:   
       - ["num", "", ""]
       - ["numbase", "", ""]
+  - id: "verse"
+    att-classes:
+      - common
+    attributes: []
 
 page-based-classes:
   - id: "page"

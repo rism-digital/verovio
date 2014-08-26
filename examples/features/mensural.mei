@@ -112,29 +112,29 @@
 					<measure n="26">
 						<staff n="1">
 							<layer n="1">
-								<note dur="2" oct="4" pname="f" xml:id="p1cfd4n0v1b27s1"/>
-							    <note dur="4" oct="4" pname="g" xml:id="p1cfd4n0v1b27s1"/>
-							    <note dur="4" oct="4" pname="a" xml:id="p1cfd4n0v1b27s1"/>
-							    <note dur="1" oct="4" pname="b" tie="t" xml:id="p1cad4n768v1b27s1"/>								
-								<note dur="1" oct="4" pname="a" tie="t" xml:id="p1cad4n768v1b27s1"/>
+								<note dur="2" oct="4" pname="f" xml:id="p1cfd4n0v1b27s2"/>
+							    <note dur="4" oct="4" pname="g" xml:id="p1cfd4n0v1b27s3"/>
+							    <note dur="4" oct="4" pname="a" xml:id="p1cfd4n0v1b27s4"/>
+							    <note dur="1" oct="4" pname="b" tie="t" xml:id="p1cad4n768v1b27s4"/>								
+								<note dur="1" oct="4" pname="a" tie="t" xml:id="p1cad4n768v1b27s6"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="1" oct="4" pname="f" colored="true" xml:id="p1cfd4n0v1b27s2"/>
-							    <note dur="brevis" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b27s2"/>
+								<note dur="1" oct="4" pname="f" colored="true" xml:id="p1cfd4n0v1b27s7"/>
+							    <note dur="brevis" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b27s8"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b27s3"/>
-							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b27s3"/>
+							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b27s9"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="d" colored="true" xml:id="p1cdd3n0v1b27s4"/>
-							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27s4"/>
+							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27z1"/>
 							</layer>
 						</staff>
 					</measure>

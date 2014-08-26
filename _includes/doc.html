@@ -7,7 +7,7 @@
 					
 <h3>MEI elements</h3>
 <p>
-	Vevorio supports a subset of MEI elements and attributes that are documented here. Additional elements and attributes will be added in the future.
+	Verovio supports a subset of MEI elements and attributes that are documented here. Additional elements and attributes will be added in the future.
 </p>				
 
 	
@@ -116,6 +116,35 @@
 	
 	</div>
 	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@rend</code></td>
+		          	<td>Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.</td>
+					<td>barLine.log</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
 </div>
 	
 		<div class="panel panel-default">
@@ -156,15 +185,27 @@
 			<tbody>
 			
 		        <tr>
+		          	<td><code>@dis</code></td>
+		          	<td>Only value '8' is supported and it assumes shape 'G' and line 2.</td>
+					<td>octavedisplacement</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@dis.place</code></td>
+		          	<td>Supported values: 'below'</td>
+					<td>octavedisplacement</td>
+				</tr>
+			
+		        <tr>
 		          	<td><code>@line</code></td>
 		          	<td>Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.</td>
-					<td></td>
+					<td>lineloc</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@shape</code></td>
 		          	<td>Supported values are 'C', 'F' and 'G'.</td>
-					<td></td>
+					<td>clefshape</td>
 				</tr>
 			
 			</tbody>
@@ -327,9 +368,15 @@
 			<tbody>
 			
 		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
 		          	<td><code>@n</code></td>
-		          	<td>The order of the <code>&lt;layer&gt;</code> elements must correspond to the values (1-based).</td>
-					<td></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
 				</tr>
 			
 			</tbody>
@@ -384,9 +431,9 @@
 				</tr>
 			
 		        <tr>
-		          	<td><code>@n</code></td>
+		          	<td><code>@left</code></td>
 		          	<td></td>
-					<td></td>
+					<td>measure.log</td>
 				</tr>
 			
 		        <tr>
@@ -397,8 +444,8 @@
 			
 		        <tr>
 		          	<td><code>@right</code></td>
-		          	<td>Supported values are 'dbl', 'end', 'rptstart', 'rptboth', 'rptend' and 'single'.</td>
-					<td></td>
+		          	<td></td>
+					<td>measure.log</td>
 				</tr>
 			
 			</tbody>
@@ -447,33 +494,102 @@
 			<tbody>
 			
 		        <tr>
-		          	<td><code>@dot</code></td>
+		          	<td><code>@count</code></td>
 		          	<td></td>
-					<td></td>
+					<td>meterSig.log</td>
 				</tr>
 			
 		        <tr>
-		          	<td><code>@orient</code></td>
-		          	<td>Only reversed is supported.</td>
-					<td></td>
+		          	<td><code>@sym</code></td>
+		          	<td></td>
+					<td>meterSig.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@unit</code></td>
+		          	<td></td>
+					<td>meterSig.log</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;meterSig&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/meterSig" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@dot</code></td>
+		          	<td></td>
+					<td>mensur.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@num</code></td>
 		          	<td></td>
-					<td></td>
+					<td>duration.ratio</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@numbase</code></td>
 		          	<td></td>
-					<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@orient</code></td>
+		          	<td>Only reversed is supported.</td>
+					<td>mensur.vis</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@sign</code></td>
+		          	<td></td>
+					<td>mensur.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@slash</code></td>
-		          	<td>Only 1 slash is supported.</td>
-					<td></td>
+		          	<td></td>
+					<td>slashcount</td>
 				</tr>
 			
 			</tbody>
@@ -603,13 +719,7 @@
 		        <tr>
 		          	<td><code>@colored</code></td>
 		          	<td></td>
-					<td></td>
-				</tr>
-			
-		        <tr>
-		          	<td><code>@dots</code></td>
-		          	<td></td>
-					<td></td>
+					<td>coloration</td>
 				</tr>
 			
 		        <tr>
@@ -633,7 +743,7 @@
 		        <tr>
 		          	<td><code>@lig</code></td>
 		          	<td></td>
-					<td></td>
+					<td>note.log.mensural</td>
 				</tr>
 			
 		        <tr>
@@ -646,6 +756,36 @@
 		          	<td><code>@pname</code></td>
 		          	<td></td>
 					<td></td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.dir</code></td>
+		          	<td></td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.len</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.pos</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.x</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.y</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
 				</tr>
 			
 		        <tr>
@@ -777,25 +917,79 @@
 		        <tr>
 		          	<td><code>@clef.dis</code></td>
 		          	<td>Only value '8' is supported and it assumes shape 'G' and line 2.</td>
-					<td></td>
+					<td>cleffing.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@clef.line</code></td>
 		          	<td>Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.</td>
-					<td></td>
+					<td>cleffing.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@clef.place</code></td>
+		          	<td>Supported values: 'below'</td>
+					<td>cleffing.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@clef.shape</code></td>
 		          	<td>Supported values are 'C', 'F' and 'G'.</td>
-					<td></td>
+					<td>cleffing.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@key.accid</code></td>
+		          	<td></td>
+					<td>keySigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@key.mode</code></td>
+		          	<td></td>
+					<td>keySigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@key.pname</code></td>
+		          	<td></td>
+					<td>keySigDefault.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@key.sig</code></td>
 		          	<td>Mixed key signatures are not supported.</td>
-					<td></td>
+					<td>keySigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@mensur.dot</code></td>
+		          	<td></td>
+					<td>mensur.default.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@mensur.sign</code></td>
+		          	<td></td>
+					<td>mensur.default.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@mensur.slash</code></td>
+		          	<td>Only 1 slash is supported.</td>
+					<td>mensur.default.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@meter.count</code></td>
+		          	<td></td>
+					<td>meterSigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@meter.unit</code></td>
+		          	<td></td>
+					<td>meterSigDefault.log</td>
 				</tr>
 			
 			</tbody>
@@ -844,9 +1038,15 @@
 			<tbody>
 			
 		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
 		          	<td><code>@n</code></td>
-		          	<td>The order of the <code>&lt;staff&gt;</code> elements must correspond to the values (1-based).</td>
-					<td></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
 				</tr>
 			
 		        <tr>
@@ -901,32 +1101,86 @@
 			<tbody>
 			
 		        <tr>
-		          	<td><code>@n</code></td>
-		          	<td>The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).</td>
-					<td></td>
+		          	<td><code>@clef.dis</code></td>
+		          	<td>Only value '8' is supported and it assumes shape 'G' and line 2.</td>
+					<td>cleffing.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@clef.line</code></td>
-		          	<td>Supported values are the same as for <code>&lt;scoreDef&gt;</code>.</td>
-					<td></td>
+		          	<td>Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.</td>
+					<td>cleffing.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@clef.place</code></td>
+		          	<td>Supported values: 'below'</td>
+					<td>cleffing.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@clef.shape</code></td>
-		          	<td>Supported values are the same as for <code>&lt;scoreDef&gt;</code>.</td>
-					<td></td>
+		          	<td>Supported values are 'C', 'F' and 'G'.</td>
+					<td>cleffing.log</td>
 				</tr>
 			
 		        <tr>
-		          	<td><code>@clef.gis</code></td>
-		          	<td>Supported values are the same as for <code>&lt;scoreDef&gt;</code>.</td>
-					<td></td>
+		          	<td><code>@key.accid</code></td>
+		          	<td></td>
+					<td>keySigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@key.mode</code></td>
+		          	<td></td>
+					<td>keySigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@key.pname</code></td>
+		          	<td></td>
+					<td>keySigDefault.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@key.sig</code></td>
-		          	<td>Supported values are the same as for <code>&lt;scoreDef&gt;</code>.</td>
+		          	<td>Mixed key signatures are not supported.</td>
+					<td>keySigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@mensur.dot</code></td>
+		          	<td></td>
+					<td>mensur.default.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@mensur.sign</code></td>
+		          	<td></td>
+					<td>mensur.default.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@mensur.slash</code></td>
+		          	<td>Only 1 slash is supported.</td>
+					<td>mensur.default.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@meter.count</code></td>
+		          	<td></td>
+					<td>meterSigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@meter.unit</code></td>
+		          	<td></td>
+					<td>meterSigDefault.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@n</code></td>
+		          	<td>The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).</td>
 					<td></td>
 				</tr>
 			
@@ -1000,6 +1254,63 @@
 		
 		<div class="row">
 			<div class="col-xs-10">
+				<code class="panel-header">&lt;syl&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/syl" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@con</code></td>
+		          	<td>Not supported yet</td>
+					<td>syl.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@wordpos</code></td>
+		          	<td>Not supported yet</td>
+					<td>syl.log</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
 				<code class="panel-header">&lt;tuplet&gt;</code>
 			</div>
 			<div class="col-xs-2">
@@ -1042,6 +1353,63 @@
 		          	<td><code>@numbase</code></td>
 		          	<td></td>
 					<td></td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;verse&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/verse" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@n</code></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
 				</tr>
 			
 			</tbody>

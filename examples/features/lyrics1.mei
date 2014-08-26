@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
+<meiHead>
+	<fileDesc>
+		<titleStmt>
+			<title/>
+			<respStmt>
+				<persName/>
+			</respStmt>
+		</titleStmt>
+	</fileDesc>
+	<workDesc>
+		<work>
+			<titleStmt>
+				<title/>
+				<respStmt/>
+			</titleStmt>
+		</work>
+	</workDesc>
+</meiHead>
+<music>
+	<body>
+		<mdiv>
+			<score>
+				<scoreDef>
+					<staffGrp>>
+    					<staffDef clef.line="2" clef.shape="G" lines="5" n="1" xml:id="sd1"/>
+					</staffGrp>
+				</scoreDef>
+				<section>
+					<pb n="1"/>
+					<measure n="1">
+						<staff n="1">
+							<layer n="1">
+							    <note dur="4" oct="4" pname="a" xml:id="ed4n0v1b1s1">
+								    <verse>
+								        <syl>O</syl>
+								    </verse>
+								</note>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="2">
+						<staff n="1">
+							<layer n="1">
+							    <note label="feature-example" dur="4" oct="4" pname="d" xml:id="cd4n0v1b2s1">
+								    <verse>
+								        <syl>mi-</syl>
+								    </verse>
+								</note>
+							    <note label="feature-example" dur="4" oct="3" pname="a" xml:id="bd3n128v1b2s1">
+								    <verse>
+								        <syl>stress</syl>
+								    </verse>
+								</note>
+							    <note label="feature-example" dur="4" oct="3" pname="f" accid="s" xml:id="cd4n256v1b2s1">
+								    <verse>
+								        <syl>mine,</syl>
+								    </verse>
+								</note>
+							    <rest label="feature-example" dur="8" xml:id="bd3r384v1b2s1"/>
+							    <note label="feature-example" dur="8" oct="4" pname="e" xml:id="bd3n384v1b2s1">
+							        <verse>
+							            <syl>where</syl>
+							        </verse>
+							    </note>
+							</layer>
+						</staff>
+					</measure>
+					<measure n="3">
+						<staff n="1">
+							<layer n="1">
+								<note dur="4" oct="4" pname="a" xml:id="ed4n0v1b3s1">
+								    <verse>
+								        <syl>are</syl>
+								    </verse>
+								</note>
+								<note dur="4" oct="4" pname="d" xml:id="dd4n128v1b3s1">
+								    <verse>
+								        <syl>you</syl>
+								    </verse>
+								</note>
+								<note dur="4" oct="3" pname="g" xml:id="ed4n256v1b3s1">
+								    <verse>
+								        <syl>roam-</syl>
+								    </verse>
+								</note>
+								<note dur="4" oct="4" pname="d" xml:id="dd4n384v1b3s1"/>
+							</layer>
+						</staff>
+					    <slur startid="ed4n256v1b3s1" endid="dd4n384v1b3s1"/>
+					</measure>
+					<measure n="4" right="none">
+						<staff n="1">
+							<layer n="1">
+							    <note dur="4" oct="3" pname="b" xml:id="bd3n512v1b4s1"  tie="t">
+							        <verse>
+							            <syl>ing?</syl>
+							        </verse>
+							    </note>
+							</layer>
+						</staff>
+					</measure>
+				</section>
+			</score>
+		</mdiv>
+	</body>
+</music>
+</mei>

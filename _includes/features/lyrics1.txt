@@ -1,0 +1,21 @@
+<note dur="4" oct="4" pname="d" xml:id="cd4n0v1b2s1">
+  <verse>
+    <syl>mi-</syl>
+  </verse>
+</note>
+<note dur="4" oct="3" pname="a" xml:id="bd3n128v1b2s1">
+  <verse>
+    <syl>stress</syl>
+  </verse>
+</note>
+<note dur="4" oct="3" pname="f" accid="s" xml:id="cd4n256v1b2s1">
+  <verse>
+    <syl>mine,</syl>
+  </verse>
+</note>
+<rest dur="8" xml:id="bd3r384v1b2s1"/>
+<note dur="8" oct="4" pname="e" xml:id="bd3n384v1b2s1">
+  <verse>
+    <syl>where</syl>
+  </verse>
+</note>
