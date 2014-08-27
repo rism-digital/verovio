@@ -150,6 +150,10 @@ int Measure::AlignHorizontally( ArrayPtrVoid params )
     // point to it
     (*measureAligner) = &m_measureAligner;
     
+    if ( m_leftBarline.GetRend() != BARRENDITION_NONE ) {
+        m_leftBarline.SetAlignment( m_measureAligner.GetLeftAlignment() );
+    }
+    
     if ( m_rightBarline.GetRend() != BARRENDITION_NONE ) {
         m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
