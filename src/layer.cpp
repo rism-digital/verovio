@@ -64,7 +64,7 @@ void Layer::Reset()
     m_drawingMensur = NULL;
     m_drawingMeterSig = NULL;
     m_drawingStemDir = STEMDIRECTION_NONE;
-    
+
     m_drawingList.clear();
 }
 

@@ -206,7 +206,7 @@ bool InterfaceController::LoadString( std::string data )
     if (!input->HasLayoutInformation() && !m_noLayout) {
         //LogElapsedTimeStart();
         m_doc.Layout();
-        //LogElapsedTimeEnd("Layout");
+        //LogElapsedTimeEnd("layout");
     }
     
     delete input;
@@ -302,7 +302,7 @@ std::string InterfaceController::GetLogString() {
 
 void  InterfaceController::ResetLogBuffer() {
 #ifdef USE_EMSCRIPTEN 
-    logBuffer.clear();
+    vrv::logBuffer.clear();
 #endif
 }
 
