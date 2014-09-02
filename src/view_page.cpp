@@ -791,6 +791,9 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 	LayerElement *element = NULL;
 	int j;
     
+    
+    dc->StartGraphic( layer, "layer", layer->GetUuid());
+    
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
     
@@ -824,6 +827,9 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     DrawLayerList(dc, layer, staff, measure, &typeid(Tie) );
     // then slurs
     DrawLayerList(dc, layer, staff, measure, &typeid(Slur) );
+    
+    
+    dc->EndGraphic( layer, this );
     
 }
 
