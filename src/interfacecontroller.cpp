@@ -146,6 +146,11 @@ bool InterfaceController::SetFormat( std::string informat )
 bool InterfaceController::LoadFile( std::string filename )
 {
     std::ifstream in( filename.c_str() );
+    
+    if (!in.is_open()) {
+        return false;
+    }
+    
     in.seekg(0, std::ios::end);
     std::streamsize fileSize = (std::streamsize)in.tellg();
     in.seekg(0, std::ios::beg);

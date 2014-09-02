@@ -297,6 +297,7 @@ int main(int argc, char** argv)
     cerr << "Reading " << infile << "..." << endl;
     
     if ( !controller.LoadFile( infile ) ) {
+        cerr << "The file '" << infile << "' could not be open" << endl;
         exit(1);
     }
     
