@@ -65,7 +65,6 @@ void Layer::Reset()
     m_drawingMeterSig = NULL;
     m_drawingStemDir = STEMDIRECTION_NONE;
     
-	voix = 0;
     m_drawingList.clear();
 }
 
@@ -99,7 +98,6 @@ void Layer::CopyAttributes( Layer *nlayer )
 		return;
 
 	nlayer->Reset();
-	nlayer->voix = voix;
 }
     
 LayerElement *Layer::GetPrevious( LayerElement *element )

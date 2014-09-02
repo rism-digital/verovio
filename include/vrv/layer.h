@@ -168,8 +168,6 @@ public:
 private:
     
 public:
-	/** voix de la portee*/
-	unsigned short voix;
     
 protected:
     // drawing variables
