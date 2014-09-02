@@ -92,6 +92,7 @@ KeySig::~KeySig()
     
 void KeySig::Reset()
 {
+    LayerElement::Reset();
     m_num_alter = 0;
     m_alteration = ACCID_NATURAL;
 }
@@ -152,6 +153,7 @@ KeySigAttr::~KeySigAttr()
 
 void KeySigAttr::Reset()
 {
+    Object::Reset();
     ResetKeySigDefaultLog();
 }
     

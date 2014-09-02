@@ -28,6 +28,7 @@ Syl::~Syl()
     
 void Syl::Reset()
 {
+    DocObject::Reset();
     ResetSylLog();
 }
 

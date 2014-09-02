@@ -37,7 +37,7 @@ SystemAligner::~SystemAligner()
 
 void SystemAligner::Reset()
 {
-    this->ClearChildren();
+    Object::Reset();
     m_bottomAlignment = NULL;
     m_bottomAlignment = GetStaffAlignment( 0 );
 }
@@ -135,7 +135,7 @@ MeasureAligner::~MeasureAligner()
 
 void MeasureAligner::Reset()
 {
-    this->ClearChildren();
+    Object::Reset();
     m_leftAlignment = new Alignment( 0.0, ALIGNMENT_MEASURE_START );
     AddAlignment( m_leftAlignment );
     m_rightAlignment = new Alignment( 0.0, ALIGNMENT_MEASURE_END );

@@ -43,7 +43,6 @@ public:
     ///@{
     Layer( );
     virtual ~Layer();
-    void Reset();
     virtual std::string GetClassName( ) { return "Layer"; };
     ///@}
 	
@@ -67,8 +66,6 @@ public:
     void GetMaxXY( ArrayPtrVoid params ); // unused
     virtual int Save( ArrayPtrVoid params );
     void CheckAndResetSectionOrMeasure( ArrayPtrVoid params ); // unused
-    
-	void CopyAttributes( Layer *layer ); // copy all attributes but none of the elements
     
 	LayerElement *GetPrevious( LayerElement *element );
 	LayerElement *GetAtPos( int x );

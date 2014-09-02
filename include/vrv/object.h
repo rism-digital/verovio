@@ -54,6 +54,12 @@ public:
     virtual ~Object();
     
     /**
+     * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
+     * The method is virual, so _always_ call the parent in the method overriding it.
+     */
+    virtual void Reset() {  ClearChildren(); };
+    
+    /**
      * Copy constructor that also copy the children.
      * The children are copied using the Object::Clone virtual method that
      * Needs to be overwritten in the child class - we make it crash otherwise,
@@ -62,7 +68,7 @@ public:
      * UUID: the uuid is copied, is needs to be reset later if this is not wished
      */
     Object( const Object& object );
-    
+
     /**
      * See copy constructor.
      */
@@ -90,11 +96,6 @@ public:
      * Child access (generic)
      */
     Object *GetChild( int idx );
-    
-    /**
-     * Clear the children vector and delete all the objects.
-     */
-    void ClearChildren();
     
     /**
      * @name Iterator methods for accessing children.
@@ -465,6 +466,12 @@ public:
     virtual int CastOffPages( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     ///@}
+    
+protected:
+    /**
+     * Clear the children vector and delete all the objects.
+     */
+    void ClearChildren();
 
 public:
     ArrayOfObjects m_children;

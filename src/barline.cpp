@@ -28,6 +28,7 @@ Barline::~Barline()
     
 void Barline::Reset()
 {
+    LayerElement::Reset();
     ResetBarLineLog();
 }
 

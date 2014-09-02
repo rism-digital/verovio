@@ -43,7 +43,7 @@ public:
     Staff( int n = -1 );
 	Staff( const Staff& staff ); // copy contructor
     virtual ~Staff();
-    void Reset();
+    //virtual void Reset();
     virtual std::string GetClassName( ) { return "Staff"; };	
     ///@}
     
@@ -75,8 +75,6 @@ public:
     virtual int Save( ArrayPtrVoid params );
     virtual bool GetPosOnPage( ArrayPtrVoid params );
     
-	void CopyAttributes( Staff *staff ); // copy all attributes but none of the elements
-
     /**
      * Align the content of a staff vertically.
      */

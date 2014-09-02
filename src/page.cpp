@@ -31,17 +31,7 @@ namespace vrv {
 Page::Page() :
 	DocObject("page-")
 {
-	Clear( );
-}
-
-Page::~Page()
-{
-}
-
-void Page::Clear( )
-{
-	ClearChildren( );
-    m_drawingScoreDef.Clear();
+    m_drawingScoreDef.Reset();
     m_layoutDone = false;
     // by default we have no values and use the document ones
     m_pageHeight = -1;
@@ -50,6 +40,10 @@ void Page::Clear( )
     m_pageRightMar = 0;
     m_pageTopMar = 0;
     this->ResetUuid();
+}
+
+Page::~Page()
+{
 }
 
 

@@ -52,7 +52,7 @@ public:
     ///@{
     Note();
     virtual ~Note();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Note"; };
     ///@}
     

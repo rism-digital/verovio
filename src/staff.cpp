@@ -31,8 +31,15 @@ namespace vrv {
 Staff::Staff( int n ):
 	DocObject("staff-"), AttCommon()
 {
-	Reset();
-    //wxASSERT ( n > 0 );
+    ResetCommon();
+	notAnc = false; // LP we want modern notation :))
+	grise = false;
+	invisible = false;
+	staffSize = 0;
+	m_drawingLines = 5;
+	m_yAbs = VRV_UNSET;
+	m_drawingY = 0;
+    m_staffAlignment = NULL;
     m_n = n;
 }
 
@@ -63,21 +70,6 @@ Staff::~Staff()
     
 }
 
-void Staff::Reset()
-{
-    ResetCommon();
-	ClearChildren();
-    m_parent = NULL;
-	notAnc = false; // LP we want modern notation :))
-	grise = false;
-	invisible = false;
-	staffSize = 0; 
-	m_drawingLines = 5;
-	m_yAbs = VRV_UNSET;
-	m_drawingY = 0;
-    m_staffAlignment = NULL;
-}
-
 int Staff::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
@@ -97,21 +89,6 @@ void Staff::AddLayer( Layer *layer )
     if ( layer->GetN() < 1 ) {
         layer->SetN( this->GetLayerCount() );
     }
-}
-
-void Staff::CopyAttributes( Staff *nstaff )
-{
-	if ( !nstaff )
-		return;
-
-	nstaff->Reset();
-	nstaff->notAnc = notAnc;
-	nstaff->grise = grise;
-	nstaff->invisible = invisible;
-	nstaff->staffSize = staffSize;
-	nstaff->m_drawingLines = m_drawingLines;
-	nstaff->m_yAbs = m_yAbs;
-	nstaff->m_drawingY = m_drawingY;
 }
 
 int Staff::GetVerticalSpacing()

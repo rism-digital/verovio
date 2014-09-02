@@ -42,6 +42,7 @@ Note::~Note()
     
 void Note::Reset()
 {
+    LayerElement::Reset();
     //DurationInterface::Reset();
     //PitchInterface::Reset();
     ResetColoration();

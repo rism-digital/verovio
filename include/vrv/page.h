@@ -36,9 +36,7 @@ public:
     virtual ~Page();
     
     virtual std::string GetClassName( ) { return "Page"; };
-    
-    void Clear();
-	
+
 	void AddSystem( System *system );
 
 	System *GetAtPos( int y );

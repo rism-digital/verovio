@@ -253,16 +253,15 @@ ScoreDef::ScoreDef() :
 
 ScoreDef::~ScoreDef()
 {
-    
 }
 
-void ScoreDef::Clear()
+void ScoreDef::Reset()
 {
+    Object::Reset();
     ReplaceClef(NULL);
     ReplaceKeySig(NULL);
     ReplaceMensur(NULL);
     ReplaceMeterSig(NULL);
-    ClearChildren();
 }
 
 void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )

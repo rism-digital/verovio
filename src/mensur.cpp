@@ -40,6 +40,7 @@ Mensur::~Mensur()
     
 void Mensur::Reset()
 {
+    LayerElement::Reset();
     ResetDurationRatio();
     ResetMensurLog();
     ResetMensurVis();
@@ -90,6 +91,7 @@ MensurAttr::~MensurAttr()
 
 void MensurAttr::Reset()
 {
+    Object::Reset();
     ResetMensurDefaultLog();
 }
 

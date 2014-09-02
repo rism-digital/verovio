@@ -34,8 +34,14 @@ namespace vrv {
 Layer::Layer( ):
 	DocObject("layer-"), ObjectListInterface(), AttCommon()
 {
+    ResetCommon();
+    m_drawingClef = NULL;
+    m_drawingKeySig = NULL;
+    m_drawingMensur = NULL;
+    m_drawingMeterSig = NULL;
+    m_drawingStemDir = STEMDIRECTION_NONE;
     
-	Reset();
+    m_drawingList.clear();
 }
 
 Layer::~Layer()
@@ -53,21 +59,6 @@ Layer::~Layer()
         delete m_drawingMeterSig;
     }    
 }
-
-void Layer::Reset()
-{
-    ResetCommon();
-    ClearChildren();
-    
-    m_drawingClef = NULL;
-    m_drawingKeySig = NULL;
-    m_drawingMensur = NULL;
-    m_drawingMeterSig = NULL;
-    m_drawingStemDir = STEMDIRECTION_NONE;
-
-    m_drawingList.clear();
-}
-
 
 int Layer::Save( ArrayPtrVoid params )
 {
@@ -90,14 +81,6 @@ void Layer::AddElement( LayerElement *element, int idx )
         InsertChild( element, idx );
     }
     Modify();
-}
-
-void Layer::CopyAttributes( Layer *nlayer )
-{
-	if ( !nlayer )
-		return;
-
-	nlayer->Reset();
 }
     
 LayerElement *Layer::GetPrevious( LayerElement *element )

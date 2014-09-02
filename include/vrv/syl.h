@@ -28,7 +28,7 @@ public:
     ///@{
     Syl();
     virtual ~Syl();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Syl"; };
     ///@}
     

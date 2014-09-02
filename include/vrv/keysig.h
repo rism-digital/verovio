@@ -37,7 +37,7 @@ public:
     KeySig(int num_alter, char alter);
     KeySig( KeySigAttr *keySigAttr );
     virtual ~KeySig();
-    void Reset();
+    virtual void Reset();
     virtual Object* Clone() { return new KeySig(*this); };
     virtual std::string GetClassName( ) { return "KeySig"; };
     
@@ -89,7 +89,7 @@ public:
     ///@{
     KeySigAttr();
     virtual ~KeySigAttr();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "KeySigAttr"; };
     virtual Object* Clone() { return new KeySigAttr(*this); };
     ///@}

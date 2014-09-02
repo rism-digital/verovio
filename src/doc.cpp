@@ -42,12 +42,11 @@ Doc::~Doc()
 
 void Doc::Reset( DocType type )
 {
+    Object::Reset();
+    
     UpdateFontValues();
     
-    m_type = type;
-    
-    ClearChildren();
-    
+    m_type = type;    
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
@@ -60,7 +59,7 @@ void Doc::Reset( DocType type )
     m_drawingPage = NULL;
     m_currentScoreDefDone = false;
     
-    m_scoreDef.Clear();
+    m_scoreDef.Reset();
 }
 
 int Doc::Save( ArrayPtrVoid params )

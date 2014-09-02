@@ -43,8 +43,6 @@ public:
      */
     bool IsMeasuredMusic() { return m_measuredMusic; };
     
-    void Clear();
-    
 	void AddStaff( Staff *staff );
 	
 	int GetStaffCount() const { return (int)m_children.size(); };
@@ -83,8 +81,6 @@ public:
        
     // functors
     virtual int Save( ArrayPtrVoid params );
-    
-	void CopyAttributes( Measure *measure ); // copy all attributes but none of the elements
     
     Staff *GetStaffWithNo( int staffNo );
     

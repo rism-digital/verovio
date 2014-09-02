@@ -31,9 +31,23 @@ namespace vrv {
 Measure::Measure( bool measureMusic, int logMeasureNb ):
     DocObject("measure-"), AttCommon(), AttMeasureLog()
 {
-	Clear( );
+    ResetCommon();
+    ResetMeasureLog();
+    
+    m_parent = NULL;
+    m_logMeasureNb = -1;
+    m_measuredMusic = true;
+    m_xAbs = VRV_UNSET;
+    m_drawingXRel = 0;
+    m_drawingX = 0;
+    
+    // by default, we have a single barLine on the right (none on the left)
+    m_rightBarline.SetRend( this->GetRight() );
+    m_leftBarline.SetRend( this->GetLeft() );
+    
     m_measuredMusic = measureMusic;
     m_logMeasureNb = logMeasureNb;
+    
     if ( !m_measuredMusic ) {
         m_xAbs = 0;
     }
@@ -41,23 +55,6 @@ Measure::Measure( bool measureMusic, int logMeasureNb ):
 
 Measure::~Measure()
 {
-    
-}
-
-void Measure::Clear()
-{
-    ResetCommon();
-    ResetMeasureLog();
-	ClearChildren();
-    m_parent = NULL;
-    m_logMeasureNb = -1;
-    m_measuredMusic = true;
-    m_xAbs = VRV_UNSET;
-    m_drawingXRel = 0;
-    m_drawingX = 0;
-    // by default, we have a single barLine on the right (none on the left)
-    m_rightBarline.SetRend( this->GetRight() );
-    m_leftBarline.SetRend( this->GetLeft() );
 }
 
 int Measure::Save( ArrayPtrVoid params )

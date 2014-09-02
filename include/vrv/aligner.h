@@ -61,7 +61,7 @@ public:
     /**
      * Reset the aligner (clear the content) and creates the end (bottom) alignement
      */
-    void Reset();
+    virtual void Reset();
     
     /**
      * Get bottom StaffAlignment for the system.
@@ -272,7 +272,7 @@ public:
     /**
      * Reset the aligner (clear the content) and creates the start (left) and end (right) alignement
      */
-    void Reset();
+    virtual void Reset();
     
     Alignment* GetAlignmentAtTime( double time, AlignmentType type );
     

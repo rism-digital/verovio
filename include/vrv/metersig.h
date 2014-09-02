@@ -34,7 +34,7 @@ public:
     MeterSig();
     MeterSig( MeterSigAttr *meterSigAttr );
     virtual ~MeterSig();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "MeterSig"; };
     virtual Object* Clone() { return new MeterSig(*this); };
     ///@}
@@ -76,7 +76,7 @@ public:
     ///@{
     MeterSigAttr();
     virtual ~MeterSigAttr();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "MeterSigAttr"; };
     virtual Object* Clone() { return new MeterSigAttr(*this); };
     ///@}

@@ -36,6 +36,7 @@ Clef::~Clef()
     
 void Clef::Reset()
 {
+    LayerElement::Reset();
     ResetClefshape();
     ResetLineloc();
     ResetOctavedisplacement();
@@ -102,6 +103,7 @@ ClefAttr::~ClefAttr()
     
 void ClefAttr::Reset()
 {
+    Object::Reset();
     ResetCleffingLog();
 }
 

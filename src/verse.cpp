@@ -30,10 +30,17 @@ namespace vrv {
 Verse::Verse():
     DocObject("verse-")
 {
+    Reset();
 }
 
 Verse::~Verse()
 {
+}
+
+void Verse::Reset()
+{
+    DocObject::Reset();
+    ResetCommon();
 }
 
 void Verse::AddSyl(Syl *syl) {

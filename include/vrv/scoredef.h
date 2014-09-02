@@ -146,7 +146,7 @@ public:
         
     virtual std::string GetClassName( ) { return "ScoreDef"; };
     
-    void Clear();
+    virtual void Reset();
     
 	void AddStaffGrp( StaffGrp *staffGrp );
     

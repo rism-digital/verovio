@@ -36,6 +36,7 @@ MeterSig::~MeterSig()
     
 void MeterSig::Reset()
 {
+    LayerElement::Reset();
     ResetMeterSigLog();
 }
     
@@ -76,6 +77,7 @@ MeterSigAttr::~MeterSigAttr()
 
 void MeterSigAttr::Reset()
 {
+    Object::Reset();
     ResetMeterSigDefaultLog();
     ResetMeterSigDefaultVis();
 }

@@ -37,8 +37,6 @@ public:
     virtual ~System();
         
     virtual std::string GetClassName( ) { return "System"; };
-    
-    void Clear();
 	
 	void AddMeasure( Measure *measure );
     

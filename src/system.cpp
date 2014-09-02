@@ -29,7 +29,15 @@ namespace vrv {
 System::System() :
 	DocObject("system-")
 {
-	Clear( );
+    m_systemLeftMar = 0;
+	m_systemRightMar = 0;
+	m_xAbs = VRV_UNSET;
+    m_drawingXRel = 0;
+	m_drawingX = 0;
+	m_yAbs = VRV_UNSET;
+    m_drawingYRel = 0;
+	m_drawingY = 0;
+    m_drawingTotalWidth = 0;
 }
 
 System::System( const System& system )
@@ -55,21 +63,6 @@ System::System( const System& system )
 System::~System()
 {
 }
-
-void System::Clear( )
-{
-	ClearChildren();
-	m_systemLeftMar = 0;
-	m_systemRightMar = 0;
-	m_xAbs = VRV_UNSET;
-    m_drawingXRel = 0;
-	m_drawingX = 0;
-	m_yAbs = VRV_UNSET;
-    m_drawingYRel = 0;
-	m_drawingY = 0;
-    m_drawingTotalWidth = 0;
-}
-
 
 int System::Save( ArrayPtrVoid params )
 {
