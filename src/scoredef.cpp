@@ -73,10 +73,22 @@ ScoreOrStaffDefAttrInterface& ScoreOrStaffDefAttrInterface::operator=( const Sco
 {
 	if ( this != &interface ) // not self assignement
 	{
-        m_clef = NULL;
-        m_keySig = NULL;
-        m_mensur = NULL;
-        m_meterSig = NULL;
+        if (m_clef) {
+            delete m_clef;
+            m_clef = NULL;
+        }
+        if (m_keySig) {
+            delete m_keySig;
+            m_keySig = NULL;
+        }
+        if (m_mensur) {
+            delete m_mensur;
+            m_mensur = NULL;
+        }
+        if (m_meterSig) {
+            delete m_meterSig;
+            m_meterSig = NULL;
+        }        
         this->ReplaceClef( interface.m_clef );
         this->ReplaceKeySig( interface.m_keySig );
         this->ReplaceMensur( interface.m_mensur );
