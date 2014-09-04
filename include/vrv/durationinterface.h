@@ -27,7 +27,10 @@ class Object;
 class DurationInterface:
     public AttAugmentdots,
     public AttBeamsecondary,
-    public AttDurationMusical
+    public AttDurationMusical,
+    public AttDurationPerformed,
+    public AttDurationRatio,
+    public AttFermatapresent
 {
 public:
     // constructors and destructors
@@ -67,15 +70,6 @@ public:
 private:
     
 public:
-    /** Indicates the logical (gestural) duration */
-    int m_durGes;
-    /** Indicates the numerator of the duration ratio */
-    int m_num;
-    /** Indicates the denominator of the duration ratio */
-    int m_numBase;
-    /** Indicates if intial, medial or termial part of a tuplet for up to 6 nesting/overlaping tuplets */
-    bool m_fermata;
-    
 
 private:
     

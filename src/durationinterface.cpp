@@ -35,7 +35,10 @@ namespace vrv {
 DurationInterface::DurationInterface():
     AttAugmentdots(),
     AttBeamsecondary(),
-    AttDurationMusical()
+    AttDurationMusical(),
+    AttDurationPerformed(),
+    AttDurationRatio(),
+    AttFermatapresent()
 {
     Reset();
 }
@@ -51,11 +54,9 @@ void DurationInterface::Reset()
     ResetAugmentdots();
     ResetBeamsecondary();
     ResetDurationMusical();
-
-    m_durGes = VRV_UNSET;
-    m_num = 1;
-    m_numBase = 1;
-    m_fermata = false;
+    ResetDurationPerformed();
+    ResetDurationRatio();
+    ResetDurationRatio();
 }
 
 void DurationInterface::SetDurationGes( int value )
@@ -132,10 +133,10 @@ bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherD
     if ( this->m_dur != otherDurationInterface->m_dur ) {
         return false;
     }
-    if ( this->m_num != otherDurationInterface->m_num ) {
+    if ( this->GetNum() != otherDurationInterface->GetNum() ) {
         return false;
     }
-    if ( this->m_numBase != otherDurationInterface->m_numBase ) {
+    if ( this->GetNumbase() != otherDurationInterface->GetNumbase() ) {
         return false;
     }
     // tuplet requires value by value comparison

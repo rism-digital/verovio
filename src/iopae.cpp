@@ -1110,8 +1110,9 @@ void PaeInput::parseNote(NoteObject note) {
         rest->SetDots( note.dots );
         rest->SetDur(note.duration);
 
-        if (note.fermata)
-            rest->m_fermata = true;
+        if (note.fermata) {
+            rest->SetFermata(PLACE_above); // always above for now
+        }
         
         element = rest;
     } else {
@@ -1124,8 +1125,9 @@ void PaeInput::parseNote(NoteObject note) {
         mnote->SetDots( note.dots );
         mnote->SetDur(note.duration);
         
-        if (note.fermata)
-            mnote->m_fermata = true;
+        if (note.fermata) {
+            mnote->SetFermata(PLACE_above); // always above for now
+        }
         
         if (note.trill == true)
             mnote->m_embellishment = EMB_TRILL;

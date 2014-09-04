@@ -417,9 +417,6 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
     
     meiNote.append_attribute( "pname" ) = PitchToStr( note->m_pname ).c_str();
     meiNote.append_attribute( "oct" ) = OctToStr( note->m_oct ).c_str();
-    if (note->m_durGes != VRV_UNSET) {
-        //meiNote.append_attribute( "dur.ges" ) = DurToStr( note->m_durGes ).c_str();
-    }
     if ( note->m_accid ) {
         meiNote.append_attribute( "accid" ) = AccidToStr( note->m_accid ).c_str();
     }
@@ -514,7 +511,10 @@ void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInte
 {
     durationInterface->WriteAugmentdots(element);
     durationInterface->WriteBeamsecondary(element);
-    durationInterface->WriteAugmentdots(element);
+    durationInterface->WriteDurationMusical(element);
+    durationInterface->WriteDurationPerformed(element);
+    durationInterface->WriteDurationRatio(element);
+    durationInterface->WriteFermatapresent(element);
 }
 
 void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
@@ -1478,6 +1478,9 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     durationInterface->ReadAugmentdots(element);
     durationInterface->ReadBeamsecondary(element);
     durationInterface->ReadDurationMusical(element);
+    durationInterface->ReadDurationPerformed(element);
+    durationInterface->ReadDurationRatio(element);
+    durationInterface->ReadFermatapresent(element);
     return true;
 }
 

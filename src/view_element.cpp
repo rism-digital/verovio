@@ -583,11 +583,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         DrawVerse(dc, verse, note, layer, staff );
     }
 
-    if (note->m_fermata)
+    if (note->GetFermata() != PLACE_NONE) {
         DrawFermata(dc, element, staff);
+    }
 
-    if (note->m_embellishment == EMB_TRILL)
+    if (note->m_embellishment == EMB_TRILL) {
         DrawTrill(dc, element, staff);
+    }
     
 	return;
 }
@@ -624,8 +626,9 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         default: DrawQuarterRest( dc, x, y, formval, rest->GetDots(), rest->m_cueSize, staff);
     }
     
-    if(rest->m_fermata)
+    if(rest->GetFermata() != PLACE_NONE) {
         DrawFermata(dc, element, staff);
+    }
     
 	return;
 }
@@ -1166,14 +1169,14 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
         DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
 
-	if (mensur->GetNumInt())
+	if (mensur->GetNum())
 	{	
         x = element->GetDrawingX();
 		if (mensur->GetSign())
         {
 			x += m_doc->m_drawingStep1*5; // step forward because we have a sign or a meter symbol
         }
-		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNumInt(), mensur->GetNumbaseInt(), staff);
+		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), mensur->GetNumbase(), staff);
 	}
     
     dc->EndGraphic(element, this ); //RZ

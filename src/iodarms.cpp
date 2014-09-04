@@ -121,13 +121,13 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             n2 = data[++pos] - ASCII_NUMBER_OFFSET; // idem
             n1 = (n1 * 10) + n2;
         }
-        meter->SetNumbaseInt(n1);
+        meter->SetNumbase(n1);
         
         // we expect the next char a ':', or make a single digit meter
         // mini-hack in some cases it is a '-'...
         if (data[pos + 1] != ':' && data[pos + 1] != '-') {
             pos++;
-            meter->SetNumbaseInt(1);
+            meter->SetNumbase(1);
         } else {
             pos++;
             if (data[pos] == '-') LogWarning("DarmsInput: Time sig numbers should be divided with ':'.");
@@ -138,9 +138,9 @@ int DarmsInput::parseMeter(int pos, const char* data) {
                 n1 = (n1 * 10) + n2;
             }
             
-            meter->SetNumbaseInt(n1);
+            meter->SetNumbase(n1);
         }
-        LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbaseInt(), meter->GetNumbaseInt());
+        LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
     }
     
     m_layer->AddElement(meter);
@@ -331,7 +331,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     if (rest) {
         Rest *rest =  new Rest;
         rest->SetDur(duration);
-        rest->m_durGes = DUR_8;
+        rest->SetDurGes(DUR_8);
         rest->m_pname = REST_AUTO;
         rest->SetDots( dot );
         m_layer->AddElement(rest);
@@ -342,7 +342,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         
         Note *note = new Note;
         note->SetDur(duration);
-        note->m_durGes = DUR_8;
+        note->SetDurGes(DUR_8);
         note->m_accid = accidental;
         note->m_oct = PitchMap[position + m_clef_offset].oct;
         note->m_pname = PitchMap[position + m_clef_offset].pitch;

@@ -1527,8 +1527,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDurGes(std::string durGes_) { m_durGes = durGes_; };
-    std::string GetDurGes() const { return m_durGes; };    
+    void SetDurGes(int durGes_) { m_durGes = durGes_; };
+    int GetDurGes() const { return m_durGes; };    
     bool HasDurGes( );
     
     ///@}
@@ -1540,7 +1540,7 @@ protected:
      * beat[s].beatpart, ppq (MIDI clicks), Humdrum **recip values, or MusicXML
      * 'divisions', etc.
      **/
-    std::string m_durGes;
+    int m_durGes;
 
 /* include <attdur.ges> */
 };
@@ -1570,14 +1570,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };    
-    bool HasNumInt( );
+    void SetNum(int num_) { m_num = num_; };
+    int GetNum() const { return m_num; };    
+    bool HasNum( );
     
     //
-    void SetNumbaseInt(int numbaseInt_) { m_numbaseInt = numbaseInt_; };
-    int GetNumbaseInt() const { return m_numbaseInt; };    
-    bool HasNumbaseInt( );
+    void SetNumbase(int numbase_) { m_numbase = numbase_; };
+    int GetNumbase() const { return m_numbase; };    
+    bool HasNumbase( );
     
     ///@}
 
@@ -1586,12 +1586,12 @@ protected:
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
      **/
-    int m_numInt;
+    int m_num;
     /**
      * Along with num, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
      **/
-    int m_numbaseInt;
+    int m_numbase;
 
 /* include <attnumbase> */
 };
@@ -1705,8 +1705,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFermata(std::string fermata_) { m_fermata = fermata_; };
-    std::string GetFermata() const { return m_fermata; };    
+    void SetFermata(data_PLACE fermata_) { m_fermata = fermata_; };
+    data_PLACE GetFermata() const { return m_fermata; };    
     bool HasFermata( );
     
     ///@}
@@ -1717,7 +1717,7 @@ protected:
      * If visual information about the fermata needs to be recorded, then a <fermata>
      * element should be employed instead.
      **/
-    std::string m_fermata;
+    data_PLACE m_fermata;
 
 /* include <attfermata> */
 };
@@ -3419,9 +3419,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };    
-    bool HasNumInt( );
+    void SetNum(int num_) { m_num = num_; };
+    int GetNum() const { return m_num; };    
+    bool HasNum( );
     
     ///@}
 
@@ -3430,7 +3430,7 @@ protected:
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
      **/
-    int m_numInt;
+    int m_num;
 
 /* include <attnum> */
 };

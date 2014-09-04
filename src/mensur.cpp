@@ -60,10 +60,10 @@ bool Mensur::operator==( Object& other )
     if ( this->GetDot() != otherMensur->GetDot() ) {
         return false;
     }
-    if ( this->GetNumInt() != otherMensur->GetNumInt() ) {
+    if ( this->GetNum() != otherMensur->GetNum() ) {
         return false;
     }
-    if ( this->GetNumbaseInt() != otherMensur->GetNumbaseInt() ) {
+    if ( this->GetNumbase() != otherMensur->GetNumbase() ) {
         return false;
     }
     if ( this->GetOrient() != otherMensur->GetOrient() ) {

@@ -1699,13 +1699,13 @@ AttDurationPerformed::~AttDurationPerformed() {
 }
 
 void AttDurationPerformed::ResetDurationPerformed() {
-    m_durGes = "";
+    m_durGes = VRV_UNSET;
 }
 
 bool AttDurationPerformed::ReadDurationPerformed(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("dur.ges")) {
-        this->SetDurGes(StrToStr(element.attribute("dur.ges").value()));
+        this->SetDurGes(StrToDur(element.attribute("dur.ges").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1714,7 +1714,7 @@ bool AttDurationPerformed::ReadDurationPerformed(  pugi::xml_node element ) {
 bool AttDurationPerformed::WriteDurationPerformed(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasDurGes()) {
-        element.append_attribute("dur.ges") = StrToStr(this->GetDurGes()).c_str();
+        element.append_attribute("dur.ges") = DurToStr(this->GetDurGes()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1722,7 +1722,7 @@ bool AttDurationPerformed::WriteDurationPerformed(  pugi::xml_node element ) {
 
 bool AttDurationPerformed::HasDurGes( )
 {
-    return (m_durGes != "");
+    return (m_durGes != VRV_UNSET);
 }
 
 
@@ -1741,18 +1741,18 @@ AttDurationRatio::~AttDurationRatio() {
 }
 
 void AttDurationRatio::ResetDurationRatio() {
-    m_numInt = 0;
-    m_numbaseInt = 0;
+    m_num = 1;
+    m_numbase = 1;
 }
 
 bool AttDurationRatio::ReadDurationRatio(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num")) {
-        this->SetNumInt(StrToInt(element.attribute("num").value()));
+        this->SetNum(StrToInt(element.attribute("num").value()));
         hasAttribute = true;
     }
     if (element.attribute("numbase")) {
-        this->SetNumbaseInt(StrToInt(element.attribute("numbase").value()));
+        this->SetNumbase(StrToInt(element.attribute("numbase").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1760,25 +1760,25 @@ bool AttDurationRatio::ReadDurationRatio(  pugi::xml_node element ) {
 
 bool AttDurationRatio::WriteDurationRatio(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasNumInt()) {
-        element.append_attribute("num") = IntToStr(this->GetNumInt()).c_str();
+    if (this->HasNum()) {
+        element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasNumbaseInt()) {
-        element.append_attribute("numbase") = IntToStr(this->GetNumbaseInt()).c_str();
+    if (this->HasNumbase()) {
+        element.append_attribute("numbase") = IntToStr(this->GetNumbase()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttDurationRatio::HasNumInt( )
+bool AttDurationRatio::HasNum( )
 {
-    return (m_numInt != 0);
+    return (m_num != 1);
 }
 
-bool AttDurationRatio::HasNumbaseInt( )
+bool AttDurationRatio::HasNumbase( )
 {
-    return (m_numbaseInt != 0);
+    return (m_numbase != 1);
 }
 
 
@@ -1881,13 +1881,13 @@ AttFermatapresent::~AttFermatapresent() {
 }
 
 void AttFermatapresent::ResetFermatapresent() {
-    m_fermata = "";
+    m_fermata = PLACE_NONE;
 }
 
 bool AttFermatapresent::ReadFermatapresent(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("fermata")) {
-        this->SetFermata(StrToStr(element.attribute("fermata").value()));
+        this->SetFermata(StrToPlace(element.attribute("fermata").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1896,7 +1896,7 @@ bool AttFermatapresent::ReadFermatapresent(  pugi::xml_node element ) {
 bool AttFermatapresent::WriteFermatapresent(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasFermata()) {
-        element.append_attribute("fermata") = StrToStr(this->GetFermata()).c_str();
+        element.append_attribute("fermata") = PlaceToStr(this->GetFermata()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1904,7 +1904,7 @@ bool AttFermatapresent::WriteFermatapresent(  pugi::xml_node element ) {
 
 bool AttFermatapresent::HasFermata( )
 {
-    return (m_fermata != "");
+    return (m_fermata != PLACE_NONE);
 }
 
 
@@ -3827,13 +3827,13 @@ AttPadLog::~AttPadLog() {
 }
 
 void AttPadLog::ResetPadLog() {
-    m_numInt = 0;
+    m_num = 1;
 }
 
 bool AttPadLog::ReadPadLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num")) {
-        this->SetNumInt(StrToInt(element.attribute("num").value()));
+        this->SetNum(StrToInt(element.attribute("num").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -3841,16 +3841,16 @@ bool AttPadLog::ReadPadLog(  pugi::xml_node element ) {
 
 bool AttPadLog::WritePadLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasNumInt()) {
-        element.append_attribute("num") = IntToStr(this->GetNumInt()).c_str();
+    if (this->HasNum()) {
+        element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttPadLog::HasNumInt( )
+bool AttPadLog::HasNum( )
 {
-    return (m_numInt != 0);
+    return (m_num != 1);
 }
 
 

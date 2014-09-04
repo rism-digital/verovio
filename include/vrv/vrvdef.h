@@ -27,8 +27,6 @@ namespace vrv {
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
-#define VRV_UNSET -0x7FFFFFFF
-
 /**
  * Codes returned by Functors.
  * Default is FUNCTOR_CONTINUE.
