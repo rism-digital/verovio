@@ -20,7 +20,8 @@ class Syl;
 // Verse
 //----------------------------------------------------------------------------
 
-class Verse: public DocObject, public AttCommon
+class Verse: public DocObject,
+    public AttCommon
 {
 public:
     /**

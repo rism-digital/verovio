@@ -31,6 +31,8 @@
 		4D9A9C1C199F576100028D93 /* syl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C1B199F576100028D93 /* syl.h */; };
 		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
+		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
+		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
@@ -720,6 +722,7 @@
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
+				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -778,6 +781,7 @@
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
+				4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

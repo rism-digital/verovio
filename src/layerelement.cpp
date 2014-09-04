@@ -185,7 +185,7 @@ void LayerElement::SetValue( int value, int flag )
 {
     if ( this->HasDurationInterface() ){
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
-        duration->SetDuration( value );
+        duration->SetDur( value );
     }
 }
 

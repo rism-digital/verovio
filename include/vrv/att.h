@@ -65,6 +65,9 @@ protected:
     
     std::string ConToStr(data_CON data);
     data_CON StrToCon(std::string value);
+    
+    std::string DurToStr(int data);
+    int StrToDur(std::string value);
         
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);

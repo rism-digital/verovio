@@ -28,7 +28,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Verse::Verse():
-    DocObject("verse-")
+    DocObject("verse-"),
+    AttCommon()
 {
     Reset();
 }

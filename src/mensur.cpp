@@ -18,7 +18,11 @@ int Mensur::s_numBase = 2;
 //----------------------------------------------------------------------------
 
 Mensur::Mensur():
-	LayerElement("mensur-"), AttDurationRatio(), AttMensurLog(), AttMensurVis(), AttSlashcount()
+	LayerElement("mensur-"),
+    AttDurationRatio(),
+    AttMensurLog(),
+    AttMensurVis(),
+    AttSlashcount()
 {
     Reset();
 }
@@ -79,7 +83,8 @@ bool Mensur::operator==( Object& other )
 //----------------------------------------------------------------------------
 
 MensurAttr::MensurAttr():
-    Object(), AttMensurDefaultLog()
+    Object(),
+    AttMensurDefaultLog()
 {
     Reset();
 }

@@ -410,18 +410,15 @@ void MeiOutput::WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multi
 
 void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
 {
+    WriteDurationInterface(meiNote, note);
     note->WriteColoration(meiNote);
     note->WriteNoteLogMensural(meiNote);
     note->WriteStemmed(meiNote);
     
     meiNote.append_attribute( "pname" ) = PitchToStr( note->m_pname ).c_str();
     meiNote.append_attribute( "oct" ) = OctToStr( note->m_oct ).c_str();
-    meiNote.append_attribute( "dur" ) = DurToStr( note->m_dur ).c_str();
     if (note->m_durGes != VRV_UNSET) {
-        meiNote.append_attribute( "dur.ges" ) = DurToStr( note->m_durGes ).c_str();
-    }
-    if ( note->m_dots ) {
-        meiNote.append_attribute( "dots" ) = StringFormat("%d", note->m_dots).c_str();
+        //meiNote.append_attribute( "dur.ges" ) = DurToStr( note->m_durGes ).c_str();
     }
     if ( note->m_accid ) {
         meiNote.append_attribute( "accid" ) = AccidToStr( note->m_accid ).c_str();
@@ -433,11 +430,9 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
 }
 
 void MeiOutput::WriteMeiRest( pugi::xml_node meiRest, Rest *rest )
-{    
-    meiRest.append_attribute( "dur" ) = DurToStr( rest->m_dur ).c_str();
-    if ( rest->m_dots ) {
-        meiRest.append_attribute( "dots" ) = StringFormat("%d", rest->m_dots).c_str();
-    }
+{
+    WriteDurationInterface(meiRest, rest);
+
     // missing position
     meiRest.append_attribute( "ploc" ) = PitchToStr( rest->m_pname ).c_str();
     meiRest.append_attribute( "oloc" ) = OctToStr( rest->m_oct ).c_str();
@@ -514,6 +509,13 @@ bool MeiOutput::WriteLayerRdg( LayerRdg *rdg )
 
     return true;
 }
+    
+void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *durationInterface)
+{
+    durationInterface->WriteAugmentdots(element);
+    durationInterface->WriteBeamsecondary(element);
+    durationInterface->WriteAugmentdots(element);
+}
 
 void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
 {
@@ -586,33 +588,6 @@ std::string MeiOutput::AccidToStr(unsigned char accid)
             break;
     }
 	return value;
-}
-
-std::string MeiOutput::DurToStr( int dur )
-{
-    std::string value;
-    if (dur == DUR_LG) value = "longa";
-    else if (dur == DUR_BR) value = "brevis";
-    else if (dur == DUR_1) value = "semibrevis";
-    else if (dur == DUR_2) value = "minima";
-    else if (dur == DUR_4) value = "semiminima";
-    else if (dur == DUR_8) value = "fusa";
-    else if (dur == DUR_16) value = "semifusa";
-    else if (dur == DUR_LG) value = "long";
-    else if (dur == DUR_BR) value = "breve";
-    else if (dur == DUR_1) value = "1";
-    else if (dur == DUR_2) value = "2";
-    else if (dur == DUR_4) value = "4";
-    else if (dur == DUR_8) value = "8";
-    else if (dur == DUR_16) value = "16";
-    else if (dur == DUR_32) value = "32";
-    else if (dur == DUR_64) value = "64";
-    else if (dur == DUR_128) value = "128";
-	else {
-		LogWarning("Unknown duration '%d'", dur);
-        value = "4";
-	}
-    return value;
 }
 
 std::string MeiOutput::DocTypeToStr(DocType type)
@@ -1261,6 +1236,7 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 {
 	Note *vrvNote = new Note();
     
+    ReadDurationInterface(note, vrvNote);
     vrvNote->ReadColoration(note);
     vrvNote->ReadNoteLogMensural(note);
     
@@ -1272,17 +1248,9 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 	if ( note.attribute( "oct" ) ) {
 		vrvNote->m_oct = StrToOct( note.attribute( "oct" ).value() );
 	}
-	// duration
-	if ( note.attribute( "dur" ) ) {
-		vrvNote->m_dur = StrToDur( note.attribute( "dur" ).value() );
-	}
     // duration gestural
 	if ( note.attribute( "dur.ges" ) ) {
-		vrvNote->m_durGes = StrToDur( note.attribute( "dur.ges" ).value() );
-	}
-    // dots
-    if ( note.attribute( "dots" ) ) {
-		vrvNote->m_dots = atoi( note.attribute( "dots" ).value() );
+		//vrvNote->m_durGes = StrToDur( note.attribute( "dur.ges" ).value() );
 	}
     // accid
     if ( note.attribute( "accid" ) ) {
@@ -1318,13 +1286,8 @@ LayerElement *MeiInput::ReadMeiRest( pugi::xml_node rest )
 {
     Rest *vrvRest = new Rest();
     
-	// duration
-	if ( rest.attribute( "dur" ) ) {
-		vrvRest->m_dur = StrToDur( rest.attribute( "dur" ).value() );
-	}
-    if ( rest.attribute( "dots" ) ) {
-		vrvRest->m_dots = atoi( rest.attribute( "dots" ).value() );
-	}
+    ReadDurationInterface(rest, vrvRest);
+    
     // position
 	if ( rest.attribute( "ploc" ) ) {
 		vrvRest->m_pname = StrToPitch( rest.attribute( "ploc" ).value() );
@@ -1510,6 +1473,13 @@ bool MeiInput::ReadMeiRdg( pugi::xml_node rdg )
     return layerRdg;
 }
 
+bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *durationInterface)
+{
+    durationInterface->ReadAugmentdots(element);
+    durationInterface->ReadBeamsecondary(element);
+    durationInterface->ReadDurationMusical(element);
+    return true;
+}
 
 void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
 {
@@ -1795,38 +1765,6 @@ bool MeiInput::StrToBool(std::string value)
 {
     if (value == "false") return false;
 	return true;
-}
-
-int MeiInput::StrToDur(std::string dur)
-{
-    int value;
-    if (dur == "longa") value = DUR_LG;
-    else if (dur == "brevis") value = DUR_BR;
-    else if (dur == "semibrevis") value = DUR_1;
-    else if (dur == "minima") value = DUR_2;
-    else if (dur == "semiminima") value = DUR_4;
-    else if (dur == "fusa") value = DUR_8;
-    else if (dur == "semifusa") value = DUR_16;
-    else if (dur == "long") value = DUR_LG;
-    else if (dur == "breve") value = DUR_BR;
-    else if (dur == "1") value = DUR_1;
-    else if (dur == "2") value = DUR_2;
-    else if (dur == "4") value = DUR_4;
-    else if (dur == "8") value = DUR_8;
-    else if (dur == "16") value = DUR_16;
-    else if (dur == "32") value = DUR_32;
-    else if (dur == "64") value = DUR_64;
-    else if (dur == "128") value = DUR_128;
-	else {
-        if ((dur.length() > 0) && (dur[dur.length()-1] == 'p')) {
-            LogWarning("PPQ duration values are not supported");
-        }
-        else {
-            LogWarning("Unknown @dur value '%s'", dur.c_str());
-        }
-        value = VRV_UNSET;
-	}
-    return value;
 }
 
 int MeiInput::StrToOct(std::string oct)

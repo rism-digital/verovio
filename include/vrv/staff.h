@@ -31,7 +31,8 @@ class StaffAlignment;
  * It contains Measure objects.
  * For unmeasured music, on single Measure is added for simplifying internal processing
 */
-class Staff: public DocObject, public AttCommon
+class Staff: public DocObject,
+    public AttCommon
 {
     
 public:

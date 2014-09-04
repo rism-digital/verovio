@@ -32,25 +32,30 @@ namespace vrv {
 // DurationInterface
 //----------------------------------------------------------------------------
 
-DurationInterface::DurationInterface()
+DurationInterface::DurationInterface():
+    AttAugmentdots(),
+    AttBeamsecondary(),
+    AttDurationMusical()
 {
-    m_breakSec = 0;
-    m_dots = 0;
-    m_dur = 0;
-    m_durGes = VRV_UNSET;
-    m_num = 1;
-    m_numBase = 1;
-    m_fermata = false;
+    Reset();
 }
 
 
 DurationInterface::~DurationInterface()
 {
 }
-
-void DurationInterface::SetDuration( int value )
+    
+    
+void DurationInterface::Reset()
 {
-    this->m_dur = value;
+    ResetAugmentdots();
+    ResetBeamsecondary();
+    ResetDurationMusical();
+
+    m_durGes = VRV_UNSET;
+    m_num = 1;
+    m_numBase = 1;
+    m_fermata = false;
 }
 
 void DurationInterface::SetDurationGes( int value )
@@ -63,8 +68,8 @@ double DurationInterface::GetAlignementDuration( int num, int numbase )
     int note_dur = m_durGes != VRV_UNSET ? m_durGes : m_dur;
     
     double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
-    if ( m_dots > 0 ) {
-        duration = 2 * duration - (duration / pow(2, m_dots));
+    if ( GetDots() > 0 ) {
+        duration = 2 * duration - (duration / pow(2, GetDots()));
     }
     //LogDebug("Duration %d; Dot %d; Alignement %f", m_dur, m_dots, duration );
     return duration;
@@ -118,9 +123,9 @@ bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherD
     //if ( this->m_beam != otherDurationInterface->m_beam ) {
     //    return false;
     //}
-    if ( this->m_breakSec != otherDurationInterface->m_breakSec ) {
-        return false;
-    }
+    //if ( this->m_breakSec != otherDurationInterface->m_breakSec ) {
+    //    return false;
+    //}
     if ( this->m_dots != otherDurationInterface->m_dots ) {
         return false;
     }

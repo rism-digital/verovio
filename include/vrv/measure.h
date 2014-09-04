@@ -28,7 +28,9 @@ class Staff;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasure music is contained in one single measure object
  */
-class Measure: public DocObject, public AttCommon, public AttMeasureLog
+class Measure: public DocObject,
+    public AttCommon,
+    public AttMeasureLog
 {
     
 public:

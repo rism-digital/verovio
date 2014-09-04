@@ -19,6 +19,7 @@ Rest::Rest():
 {
     // by default set automatic height
     m_pname = REST_AUTO;
+    Reset();
 }
 
 Rest::~Rest()
@@ -38,6 +39,14 @@ bool Rest::operator==( Object& other )
         return false;
     }
     return true;
+}
+    
+void Rest::Reset()
+{
+    LayerElement::Reset();
+    DurationInterface::Reset();
+    //DurationInterface::Reset();
+    //PitchInterface::Reset();
 }
 
 } // namespace vrv

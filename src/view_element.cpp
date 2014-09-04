@@ -154,7 +154,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         
         // Automatically calculate rest position, if so requested
         if (rest->m_pname == REST_AUTO)
-            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->m_dur) );
+            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetDur()) );
         else
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->m_pname, layer->GetClefOffset( element ), oct) );
 		
@@ -265,13 +265,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	xn += note->m_hOffset;
 	//val=note->m_dur;
-	formval = ((note->GetColored()==BOOLEAN_true) && note->m_dur > DUR_1) ? (note->m_dur+1) : note->m_dur;
+	formval = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
 	queueCentre = 0;
 
 
 	rayon = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
 
-	if (note->m_dur > DUR_1 || (note->m_dur == DUR_1 && staff->notAnc))	// annuler provisoirement la modif. des lignes addit.
+	if (note->GetDur() > DUR_1 || (note->GetDur() == DUR_1 && staff->notAnc))	// annuler provisoirement la modif. des lignes addit.
 		ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 	else
 	{	
@@ -296,11 +296,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);	// dessin lignes additionnelles
 
-	if (note->m_dur == DUR_LG || note->m_dur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->m_dur == DUR_1))	// dessin carrees
+	if (note->GetDur() == DUR_LG || note->GetDur() == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->GetDur() == DUR_1))	// dessin carrees
 	{
 		DrawLigature ( dc, ynn, element, layer, staff);
  	}
-	else if (note->m_dur==DUR_1)
+	else if (note->GetDur()==DUR_1)
 	{	
         if (note->GetColored()==BOOLEAN_true) // && !note->m_ligObliqua) // in WG, use of obliq for coloration?
 			fontNo = LEIPZIG_HEAD_WHOLE_FILLED;
@@ -479,7 +479,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		}*///
 	}
 	else
-	{	if (note->m_dur < DUR_2 || (note->m_dur > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+	{	if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
 			x2 = xn + m_doc->m_drawingStep1*7/2;
 		else
 			x2 = xn + m_doc->m_drawingStep1*5/2;
@@ -488,9 +488,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         //    x2 += rayon*2;
 	}
 
-	if (note->m_dots) // && (!this->pointInvisible)) // ax2 - no support of invisible dots yet
+	if (note->GetDots()) // && (!this->pointInvisible)) // ax2 - no support of invisible dots yet
 	{
-		DrawDots( dc, x2, ynn, note->m_dots, staff );
+		DrawDots( dc, x2, ynn, note->GetDots(), staff );
 	}
 /*
 	if (this->stacc && (!this->rel || !this->queue_lig))
@@ -601,7 +601,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
     Rest *rest = dynamic_cast<Rest*>(element);
 
-	int formval = rest->m_dur;
+	int formval = rest->GetDur();
 	int x = element->GetDrawingX() + rest->m_hOffset;
     int y = element->GetDrawingY();
     
@@ -620,8 +620,8 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         case DUR_LG: DrawLongRest ( dc, x, y, staff); break;
         case DUR_BR: DrawBreveRest( dc, x, y, staff); break;
         case DUR_1:
-        case DUR_2: DrawWholeRest ( dc, x, y, formval, rest->m_dots, rest->m_cueSize, staff); break;
-        default: DrawQuarterRest( dc, x, y, formval, rest->m_dots, rest->m_cueSize, staff);
+        case DUR_2: DrawWholeRest ( dc, x, y, formval, rest->GetDots(), rest->m_cueSize, staff); break;
+        default: DrawQuarterRest( dc, x, y, formval, rest->GetDots(), rest->m_cueSize, staff);
     }
     
     if(rest->m_fermata)
@@ -1647,7 +1647,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     
     Note *note = dynamic_cast<Note*>(element);
     
-    if (note->m_dur < DUR_8)
+    if (note->GetDur() < DUR_8)
         return;
     
     dc->SetPen(AxBLACK, 2, AxSOLID);

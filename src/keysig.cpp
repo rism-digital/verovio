@@ -141,7 +141,8 @@ int KeySig::GetOctave(unsigned char pitch, int clefId) {
 //----------------------------------------------------------------------------
 
 KeySigAttr::KeySigAttr():
-    Object(), AttKeySigDefaultLog()
+    Object(),
+    AttKeySigDefaultLog()
 {
     Reset();
 }

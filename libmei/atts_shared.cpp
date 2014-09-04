@@ -285,13 +285,13 @@ AttAugmentdots::~AttAugmentdots() {
 }
 
 void AttAugmentdots::ResetAugmentdots() {
-    m_dots = "";
+    m_dots = 0;
 }
 
 bool AttAugmentdots::ReadAugmentdots(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("dots")) {
-        this->SetDots(StrToStr(element.attribute("dots").value()));
+        this->SetDots(StrToInt(element.attribute("dots").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -300,7 +300,7 @@ bool AttAugmentdots::ReadAugmentdots(  pugi::xml_node element ) {
 bool AttAugmentdots::WriteAugmentdots(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasDots()) {
-        element.append_attribute("dots") = StrToStr(this->GetDots()).c_str();
+        element.append_attribute("dots") = IntToStr(this->GetDots()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -308,7 +308,7 @@ bool AttAugmentdots::WriteAugmentdots(  pugi::xml_node element ) {
 
 bool AttAugmentdots::HasDots( )
 {
-    return (m_dots != "");
+    return (m_dots != 0);
 }
 
 
@@ -1657,13 +1657,13 @@ AttDurationMusical::~AttDurationMusical() {
 }
 
 void AttDurationMusical::ResetDurationMusical() {
-    m_dur = "";
+    m_dur = 0;
 }
 
 bool AttDurationMusical::ReadDurationMusical(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("dur")) {
-        this->SetDur(StrToStr(element.attribute("dur").value()));
+        this->SetDur(StrToDur(element.attribute("dur").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1672,7 +1672,7 @@ bool AttDurationMusical::ReadDurationMusical(  pugi::xml_node element ) {
 bool AttDurationMusical::WriteDurationMusical(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasDur()) {
-        element.append_attribute("dur") = StrToStr(this->GetDur()).c_str();
+        element.append_attribute("dur") = DurToStr(this->GetDur()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1680,7 +1680,7 @@ bool AttDurationMusical::WriteDurationMusical(  pugi::xml_node element ) {
 
 bool AttDurationMusical::HasDur( )
 {
-    return (m_dur != "");
+    return (m_dur != 0);
 }
 
 
@@ -1797,13 +1797,13 @@ AttDurationTimestamp::~AttDurationTimestamp() {
 }
 
 void AttDurationTimestamp::ResetDurationTimestamp() {
-    m_dur = "";
+    m_dur = 0;
 }
 
 bool AttDurationTimestamp::ReadDurationTimestamp(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("dur")) {
-        this->SetDur(StrToStr(element.attribute("dur").value()));
+        this->SetDur(StrToDur(element.attribute("dur").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1812,7 +1812,7 @@ bool AttDurationTimestamp::ReadDurationTimestamp(  pugi::xml_node element ) {
 bool AttDurationTimestamp::WriteDurationTimestamp(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasDur()) {
-        element.append_attribute("dur") = StrToStr(this->GetDur()).c_str();
+        element.append_attribute("dur") = DurToStr(this->GetDur()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1820,7 +1820,7 @@ bool AttDurationTimestamp::WriteDurationTimestamp(  pugi::xml_node element ) {
 
 bool AttDurationTimestamp::HasDur( )
 {
-    return (m_dur != "");
+    return (m_dur != 0);
 }
 
 

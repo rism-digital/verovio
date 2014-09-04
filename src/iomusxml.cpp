@@ -478,7 +478,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     // duration is common in notes and rests
     pugi::xml_node duration = note.append_child("duration");
     
-    switch (di->m_dur) {
+    switch (di->GetDur()) {
         case DUR_LG: dur = "64"; t = "long"; break;
         case DUR_BR: dur = "32"; t = "breve"; break;
         case DUR_1: dur = "16"; t = "whole"; break;
@@ -539,7 +539,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
         
         // handle multi measure rest
         // break from the generation of this element
-        if (r->m_dur == VALSilSpec) {
+        if (r->GetDur() == VALSilSpec) {
             WriteMultiMeasureRest(r);
             return;
         }
@@ -568,7 +568,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     
     // add eventual dots to note/rest
     // they go after <tie> and before <beam>
-    for (unsigned int i = 1; i == di->m_dots; i++) {
+    for (unsigned int i = 1; i == di->GetDots(); i++) {
         // a <dot /> for every dot
         note.append_child("dot");
         //note->LinkEndChild(dot);

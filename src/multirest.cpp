@@ -15,7 +15,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MultiRest::MultiRest():
-LayerElement("multirest-")
+    LayerElement("multirest-")
 {
     m_number = 0;
 }

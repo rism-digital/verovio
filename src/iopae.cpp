@@ -1107,8 +1107,8 @@ void PaeInput::parseNote(NoteObject note) {
         Rest *rest =  new Rest();
 
         rest->m_pname = REST_AUTO;
-        rest->m_dots = note.dots;
-        rest->m_dur = note.duration;
+        rest->SetDots( note.dots );
+        rest->SetDur(note.duration);
 
         if (note.fermata)
             rest->m_fermata = true;
@@ -1121,8 +1121,8 @@ void PaeInput::parseNote(NoteObject note) {
         mnote->m_oct = note.octave;
         mnote->m_accid = note.accidental;
         
-        mnote->m_dots = note.dots;
-        mnote->m_dur = note.duration;
+        mnote->SetDots( note.dots );
+        mnote->SetDur(note.duration);
         
         if (note.fermata)
             mnote->m_fermata = true;

@@ -79,7 +79,8 @@ private:
 /**
  * This class models the MEI @key attributes in scoreDef or staffDef elements.
  */
-class KeySigAttr: public Object, public AttKeySigDefaultLog
+class KeySigAttr: public Object,
+    public AttKeySigDefaultLog
 {
 public:
     /**
@@ -96,7 +97,7 @@ public:
     
     /**
      * Comparison operator.
-     * Check if the LayerElement if a ClefAttr and compare attributes
+     * Check if the LayerElement if a KeySigAttr and compare attributes
      */
     virtual bool operator==(Object& other);
     

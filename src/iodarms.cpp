@@ -330,10 +330,10 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     
     if (rest) {
         Rest *rest =  new Rest;
-        rest->m_dur = duration;
+        rest->SetDur(duration);
         rest->m_durGes = DUR_8;
         rest->m_pname = REST_AUTO;
-        rest->m_dots = dot;
+        rest->SetDots( dot );
         m_layer->AddElement(rest);
     } else {
         
@@ -341,12 +341,12 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
             position = 0;
         
         Note *note = new Note;
-        note->m_dur = duration;
+        note->SetDur(duration);
         note->m_durGes = DUR_8;
         note->m_accid = accidental;
         note->m_oct = PitchMap[position + m_clef_offset].oct;
         note->m_pname = PitchMap[position + m_clef_offset].pitch;
-        note->m_dots = dot;
+        note->SetDots( dot );
         m_layer->AddElement(note);
         
         // Ties are between two notes and have a reference to the two notes

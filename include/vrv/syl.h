@@ -18,7 +18,8 @@ namespace vrv {
 // Syl
 //----------------------------------------------------------------------------
 
-class Syl: public DocObject, public AttSylLog
+class Syl: public DocObject,
+    public AttSylLog
 {
 public:
     /**

@@ -289,15 +289,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDots(std::string dots_) { m_dots = dots_; };
-    std::string GetDots() const { return m_dots; };    
+    void SetDots(char dots_) { m_dots = dots_; };
+    char GetDots() const { return m_dots; };    
     bool HasDots( );
     
     ///@}
 
 protected:
     /** Records the number of augmentation dots required by a dotted duration. **/
-    std::string m_dots;
+    char m_dots;
 
 /* include <attdots> */
 };
@@ -1486,8 +1486,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() const { return m_dur; };    
+    void SetDur(int dur_) { m_dur = dur_; };
+    int GetDur() const { return m_dur; };    
     bool HasDur( );
     
     ///@}
@@ -1497,7 +1497,7 @@ protected:
      * Records the duration of a feature using the relative durational values provided
      * by the data.DURATION datatype.
      **/
-    std::string m_dur;
+    int m_dur;
 
 /* include <attdur> */
 };
@@ -1621,8 +1621,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() const { return m_dur; };    
+    void SetDur(int dur_) { m_dur = dur_; };
+    int GetDur() const { return m_dur; };    
     bool HasDur( );
     
     ///@}
@@ -1632,7 +1632,7 @@ protected:
      * Records the duration of a feature using the relative durational values provided
      * by the data.DURATION datatype.
      **/
-    std::string m_dur;
+    int m_dur;
 
 /* include <attdur> */
 };
@@ -2996,7 +2996,7 @@ protected:
      * point of alignment across all the parts.
      * Bar lines within a score are usually controlling; that is, they "line up". Bar
      * lines within parts may or may not be controlling. When applied to <measure>,
-     * this attribute indicates the nature of the right barLine but not the left.
+     * this attribute indicates the nature of the right barline but not the left.
      **/
     std::string m_control;
 

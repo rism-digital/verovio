@@ -42,7 +42,9 @@ class Verse;
 #define EMB_MORDENT 2
 
 class Note: public LayerElement, public DurationInterface, public PitchInterface,
-    public AttColoration, public AttNoteLogMensural, public AttStemmed
+    public AttColoration,
+    public AttNoteLogMensural,
+    public AttStemmed
 {
 public:
     /**

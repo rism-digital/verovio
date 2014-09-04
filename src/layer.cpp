@@ -32,7 +32,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer( ):
-	DocObject("layer-"), ObjectListInterface(), AttCommon()
+	DocObject("layer-"), ObjectListInterface(),
+    AttCommon()
 {
     ResetCommon();
     m_drawingClef = NULL;
@@ -376,7 +377,7 @@ void Layer::RemoveClefAndCustos()
                 if ( (i > 0) && previous && previous->IsNote() )
                 {
                     Note *note = dynamic_cast<Note*>(m_children[i - 1]);
-                    if ( note && (note->m_dur == DUR_LG) )
+                    if ( note && (note->GetDur() == DUR_LG) )
                     {
                         bool removeLonga = false;
                         // we check only for the pitch, not the octave, but should be enough

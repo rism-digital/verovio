@@ -15,7 +15,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Barline::Barline():
-	LayerElement("bline-"), AttBarLineLog()
+	LayerElement("bline-"),
+    AttBarLineLog()
 {
     Reset();
     m_partialBarline = false; // this was used unitialized

@@ -17,7 +17,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Syl::Syl():
-    DocObject("syl-")
+    DocObject("syl-"),
+    AttSylLog()
 {
     Reset();
 }

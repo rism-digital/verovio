@@ -9,6 +9,9 @@
 #ifndef __VRV_DURATION_INTERFACE_H__
 #define __VRV_DURATION_INTERFACE_H__
 
+#include "atts_cmn.h"
+#include "atts_shared.h"
+
 namespace vrv {
 
 class Object;
@@ -21,17 +24,19 @@ class Object;
  * This class is an interface for elements with duration, such as notes and rests.
  * It is not an abstract class but should not be instanciate directly.
  */
-class DurationInterface
+class DurationInterface:
+    public AttAugmentdots,
+    public AttBeamsecondary,
+    public AttDurationMusical
 {
 public:
     // constructors and destructors
     DurationInterface();
     virtual ~DurationInterface();
+    virtual void Reset();
     
-    virtual void SetDuration( int value );
     /* Set the logic (gestural) duration */
     virtual void SetDurationGes( int value );
-    
     
     virtual double GetAlignementDuration( int num, int numbase );
     
@@ -62,12 +67,6 @@ public:
 private:
     
 public:
-    /** Indicates a break in the beaming */
-    unsigned char m_breakSec;
-    /** Indicates the number of augmentation dots */
-    unsigned char m_dots;
-    /** Indicates the duration */
-    int m_dur;
     /** Indicates the logical (gestural) duration */
     int m_durGes;
     /** Indicates the numerator of the duration ratio */

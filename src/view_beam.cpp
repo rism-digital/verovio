@@ -142,7 +142,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 		/* retablir a la fin si provshp existe */
 
 	low = chk->GetDrawingY();	/* initialiser */
-    k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
+    k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->GetDur()+1 : ((Note*)chk)->GetDur();
     
 	valref = k;		/* m_dur test conservee */
     //	valref = chk->m_dur;		/* m_dur test conservee */
@@ -168,7 +168,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
         //LogDebug("-> %s", chk->GetClassName().c_str() );
         
         if ( chk->IsNote() ) {
-            k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->m_dur+1 : ((Note*)chk)->m_dur;
+            k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->GetDur()+1 : ((Note*)chk)->GetDur();
         }
 
         // if (chk->type == NOTE && /*chk->sil == _NOT &&*/ k > DUR_4)
@@ -183,7 +183,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 
 			(crd+ct)->a = chk->GetDrawingX() + chk->m_hOffset - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
-			if (chk->IsNote() && ((Note*)chk)->m_breakSec && ct)
+			if (chk->IsNote() && ((Note*)chk)->GetBreaksecInt() && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
 				*(st_rl + (cpte_stop++)) = ct;
 

@@ -15,7 +15,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Clef::Clef():
-    LayerElement("clef-"), AttClefshape(), AttLineloc(), AttOctavedisplacement()
+    LayerElement("clef-"),
+    AttClefshape(),
+    AttLineloc(),
+    AttOctavedisplacement()
 {
     Reset();
 }
@@ -91,7 +94,8 @@ int Clef::GetClefOffset ()
 //----------------------------------------------------------------------------
 
 ClefAttr::ClefAttr():
-    Object(), AttCleffingLog()
+    Object(),
+    AttCleffingLog()
 {
     Reset();
 }

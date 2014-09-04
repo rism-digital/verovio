@@ -29,7 +29,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Staff::Staff( int n ):
-	DocObject("staff-"), AttCommon()
+	DocObject("staff-"),
+    AttCommon()
 {
     ResetCommon();
 	notAnc = false; // LP we want modern notation :))

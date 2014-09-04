@@ -24,7 +24,10 @@ class ClefAttr;
 /** 
  * This class models the MEI <clef> element. 
  */
-class Clef: public LayerElement, public AttClefshape, public AttLineloc, public AttOctavedisplacement
+class Clef: public LayerElement,
+    public AttClefshape,
+    public AttLineloc,
+    public AttOctavedisplacement
 {
 public:
     /**
@@ -77,7 +80,8 @@ private:
 /**
  * This class models the MEI @clef attributes in scoreDef or staffDef elements.
  */
-class ClefAttr: public Object, public AttCleffingLog
+class ClefAttr: public Object,
+    public AttCleffingLog
 {
 public:
     /**

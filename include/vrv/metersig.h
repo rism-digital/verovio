@@ -23,7 +23,8 @@ class MeterSigAttr;
 /** 
  * This class models the MEI <meterSig> element. 
  */
-class MeterSig: public LayerElement, public AttMeterSigLog
+class MeterSig: public LayerElement,
+    public AttMeterSigLog
 {
 public:
     /**
@@ -66,7 +67,9 @@ private:
 /**
  * This class models the MEI @meter attributes in scoreDef or staffDef elements.
  */
-class MeterSigAttr: public Object, public AttMeterSigDefaultLog, public AttMeterSigDefaultVis
+class MeterSigAttr: public Object,
+    public AttMeterSigDefaultLog,
+    public AttMeterSigDefaultVis
 {
 public:
     /**

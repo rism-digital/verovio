@@ -33,7 +33,8 @@ class Note;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public ObjectListInterface, public AttCommon
+class Layer: public DocObject, public ObjectListInterface,
+    public AttCommon
 {
 public:
     /**

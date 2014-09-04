@@ -121,6 +121,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/verse.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
+	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	lib/jsonxx/jsonxx.cc \

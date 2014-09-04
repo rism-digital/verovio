@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "vrv.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -236,6 +237,65 @@ data_CON Att::StrToCon(std::string value)
         LogWarning("Unsupported pitch name '%s'", value.c_str() );
     }
     return CON_NONE;
+}
+    
+std::string Att::DurToStr(int data)
+{
+    std::string value;
+    if (data == DUR_LG) value = "longa";
+    else if (data == DUR_BR) value = "brevis";
+    else if (data == DUR_1) value = "semibrevis";
+    else if (data == DUR_2) value = "minima";
+    else if (data == DUR_4) value = "semiminima";
+    else if (data == DUR_8) value = "fusa";
+    else if (data == DUR_16) value = "semifusa";
+    else if (data == DUR_LG) value = "long";
+    else if (data == DUR_BR) value = "breve";
+    else if (data == DUR_1) value = "1";
+    else if (data == DUR_2) value = "2";
+    else if (data == DUR_4) value = "4";
+    else if (data == DUR_8) value = "8";
+    else if (data == DUR_16) value = "16";
+    else if (data == DUR_32) value = "32";
+    else if (data == DUR_64) value = "64";
+    else if (data == DUR_128) value = "128";
+    else {
+        LogWarning("Unknown duration '%d'", data);
+        value = "4";
+    }
+    return value;
+}
+
+int Att::StrToDur(std::string value)
+{
+    int dur;
+    if (value == "longa") dur = DUR_LG;
+    else if (value == "brevis") dur = DUR_BR;
+    else if (value == "semibrevis") dur = DUR_1;
+    else if (value == "minima") dur = DUR_2;
+    else if (value == "semiminima") dur = DUR_4;
+    else if (value == "fusa") dur = DUR_8;
+    else if (value == "semifusa") dur = DUR_16;
+    else if (value == "long") dur = DUR_LG;
+    else if (value == "breve") dur = DUR_BR;
+    else if (value == "1") dur = DUR_1;
+    else if (value == "2") dur = DUR_2;
+    else if (value == "4") dur = DUR_4;
+    else if (value == "8") dur = DUR_8;
+    else if (value == "16") dur = DUR_16;
+    else if (value == "32") dur = DUR_32;
+    else if (value == "64") dur = DUR_64;
+    else if (value == "128") dur = DUR_128;
+    else {
+        if ((value.length() > 0) && (value[value.length()-1] == 'p')) {
+            LogWarning("PPQ duration dur_s are not supported");
+        }
+        else {
+            LogWarning("Unknown @dur dur '%s'", value.c_str());
+        }
+        dur = VRV_UNSET;
+    }
+    return dur;
 }
     
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)

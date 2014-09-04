@@ -25,17 +25,22 @@ namespace vrv {
 class Rest: public LayerElement, public DurationInterface, public PositionInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Rest();
     virtual ~Rest();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Rest"; };
+    ///@}
     
     /**
      * Comparison operator. 
      * Check if the LayerElement if a Rest and compare attributes
      */
     virtual bool operator==(Object& other);
-    
-    virtual std::string GetClassName( ) { return "Rest"; };
     
 private:
     

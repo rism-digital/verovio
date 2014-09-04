@@ -29,7 +29,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure( bool measureMusic, int logMeasureNb ):
-    DocObject("measure-"), AttCommon(), AttMeasureLog()
+    DocObject("measure-"),
+    AttCommon(),
+    AttMeasureLog()
 {
     ResetCommon();
     ResetMeasureLog();

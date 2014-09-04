@@ -15,7 +15,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MeterSig::MeterSig():
-	LayerElement("msig-"), AttMeterSigLog()
+	LayerElement("msig-"),
+    AttMeterSigLog()
 {
     Reset();
 }
@@ -65,7 +66,9 @@ bool MeterSig::operator==( Object& other )
 //----------------------------------------------------------------------------
 
 MeterSigAttr::MeterSigAttr():
-    Object(), AttMeterSigDefaultLog(), AttMeterSigDefaultVis()
+    Object(),
+    AttMeterSigDefaultLog(),
+    AttMeterSigDefaultVis()
 {
     Reset();
 }

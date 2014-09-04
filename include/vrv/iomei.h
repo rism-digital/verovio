@@ -16,6 +16,7 @@ namespace vrv {
 class Barline;
 class Beam;
 class Clef;
+class DurationInterface;
 class Layer;
 class Mensur;
 class MeterSig;
@@ -154,6 +155,12 @@ private:
     void WriteSameAsAttr( pugi::xml_node element, Object *object );
     
     /**
+     * Write a DurationInterface.
+     * Callded from WriteNote, for example.
+     */
+    void WriteDurationInterface( pugi::xml_node element, DurationInterface *durationInterface );
+    
+    /**
      * Write the XML text content
      */
     void WriteText( pugi::xml_node element, Object *object );
@@ -162,7 +169,6 @@ private:
     ///@{
     std::string UuidToMeiStr( Object *element );
     std::string BoolToStr(bool value );
-	std::string DurToStr(int dur);
 	std::string OctToStr(int oct);
 	std::string PitchToStr(int pitch);
     std::string AccidToStr(unsigned char accid);
@@ -247,6 +253,7 @@ private:
     LayerElement *ReadMeiCustos( pugi::xml_node custos );
     LayerElement *ReadMeiDot( pugi::xml_node dot );
     //
+    bool ReadDurationInterface( pugi::xml_node element, DurationInterface *durationInterface );
     bool ReadVerse( Note *note, pugi::xml_node verse );
     bool ReadSyl( Verse *verse, pugi::xml_node syl );
     //
@@ -289,7 +296,6 @@ private:
 	//
     void SetMeiUuid( pugi::xml_node element, Object *object );
     bool StrToBool(std::string value);
-	int StrToDur(std::string dur);
 	int StrToOct(std::string oct);
 	int StrToPitch(std::string pitch ); 
     unsigned char StrToAccid(std::string accid);

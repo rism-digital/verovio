@@ -26,7 +26,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface(), AttColoration(), AttNoteLogMensural(),
+	LayerElement("note-"), DurationInterface(), PitchInterface(),
+    AttColoration(),
+    AttNoteLogMensural(),
     AttStemmed()
 {
     Reset();
@@ -43,7 +45,7 @@ Note::~Note()
 void Note::Reset()
 {
     LayerElement::Reset();
-    //DurationInterface::Reset();
+    DurationInterface::Reset();
     //PitchInterface::Reset();
     ResetColoration();
     ResetNoteLogMensural();
@@ -109,7 +111,7 @@ void Note::AddVerse(Verse *child)
 
 void Note::SetValue( int value, int flag )
 {
-    DurationInterface::SetDuration( value ); 
+    DurationInterface::SetDur( value );
     
 	// remove ligature flag for  inadequate values	
 	if ( ( value < DUR_BR ) || ( value > DUR_1 ) ) {
