@@ -263,7 +263,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int ynn = element->GetDrawingY();
 	//static int ynn_chrd;
 
-	xn += note->m_hOffset;
 	//val=note->m_dur;
 	formval = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
 	queueCentre = 0;
@@ -604,7 +603,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     Rest *rest = dynamic_cast<Rest*>(element);
 
 	int formval = rest->GetDur();
-	int x = element->GetDrawingX() + rest->m_hOffset;
+	int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
     // Temporary fix for rest within tuplet because drawing tuplet requires m_drawingStemXXX to be set
@@ -689,20 +688,20 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff); // Pointer to staff cannot be NULL"
     assert(dynamic_cast<MRest*>(element)); // Element must be a MultiRest"
     
-    MRest *mrest = dynamic_cast<MRest*>(element);
+    //MRest *mrest = dynamic_cast<MRest*>(element);
     
     dc->StartGraphic( element, "mrest", element->GetUuid() );
     
     //LogMessage("Measure %d - X %d - RightX %d;", measure->GetIdx(), element->m_drawingX, measure->GetRightBarlineX() );
     
-    int x = element->GetDrawingX() + mrest->m_hOffset;
+    int x = element->GetDrawingX();
     int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
     int y = element->GetDrawingY();
     
     // move it down according to the number of line in the staff
     y -= staff->m_drawingLines / 2 * m_doc->m_drawingInterl[staff->staffSize];
     
-    DrawWholeRest ( dc, xCentered, y, DUR_1, 0, false, staff);
+    DrawWholeRest ( dc, xCentered, y, DUR_1, 0, false, staff );
     
     dc->EndGraphic(element, this);
     
@@ -724,7 +723,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     dc->StartGraphic( element, "multirest", element->GetUuid() );
     
-    int x = element->GetDrawingX() + multirest->m_hOffset;
+    int x = element->GetDrawingX();
     
     // We do not support more than three chars
     if (multirest->GetNumber() > 999)
@@ -937,7 +936,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 		CalculateLigaturePosX ( element, layer, staff );
     }
 	else {
-		xn = element->GetDrawingX() + note->m_hOffset;
+		xn = element->GetDrawingX();
     }
 
 	// calcul des dimensions du rectangle
@@ -1051,8 +1050,8 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(dynamic_cast<Barline*>(element)); // Element must be a Barline"
     
     Barline *barLine = dynamic_cast<Barline*>(element);
-    int x = element->GetDrawingX() + barLine->m_hOffset;
-
+    int x = element->GetDrawingX();
+    
     dc->StartGraphic( element, "barLine", element->GetUuid() );
     
     if (barLine->m_partialBarline)
@@ -1377,7 +1376,7 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
     Symbol *accid = dynamic_cast<Symbol*>(element);
     dc->StartGraphic( element, "accid", element->GetUuid() );
     
-    int x = element->GetDrawingX() + accid->m_hOffset;
+    int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
     int symc;
@@ -1430,7 +1429,7 @@ void View::DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *la
     Symbol *custos = dynamic_cast<Symbol*>(element);
     dc->StartGraphic( element, "custos", element->GetUuid() );
 
-    int x = element->GetDrawingX() + custos->m_hOffset;
+    int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
@@ -1449,7 +1448,7 @@ void View::DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer
     Symbol *dot = dynamic_cast<Symbol*>(element);
     dc->StartGraphic( element, "dot", element->GetUuid() );
     
-    int x = element->GetDrawingX() + dot->m_hOffset;
+    int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
     switch (dot->m_dot)

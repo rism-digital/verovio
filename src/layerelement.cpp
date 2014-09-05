@@ -50,26 +50,24 @@ namespace vrv {
 LayerElement::LayerElement():
     DocObject("le-")
 {
-    Init();
+    Reset();
 }
 
 LayerElement::LayerElement(std::string classid):
 	DocObject(classid)
 {
-    Init();
+    Reset();
 }
 
-void LayerElement::Init()
+void LayerElement::Reset()
 {
+    DocObject::Reset();
+    
     m_cueSize = false;
-    m_hOffset = 0;
-    m_staffShift = 0;
-    m_visible = true;
     
     m_xAbs = VRV_UNSET;
     m_drawingX = 0;
     m_drawingY = 0;
-    m_in_layer_app = false;
     
     m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
@@ -86,9 +84,6 @@ LayerElement& LayerElement::operator=( const LayerElement& element )
 	{
         // is this necessary?
         m_cueSize = element.m_cueSize;
-        m_hOffset = element.m_hOffset;
-        m_staffShift = element.m_staffShift;
-        m_visible = element.m_visible;
         // pointers have to be NULL
         m_parent = NULL;
         m_alignment = NULL;

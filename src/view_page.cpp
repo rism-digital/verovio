@@ -814,7 +814,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 	{
 		element = dynamic_cast<LayerElement*>(layer->m_children[j]);
         
-        if ( element && !element->m_in_layer_app ) {
+        if ( element ) {
             DrawElement( dc, element, layer, measure, staff );
         }
 	}

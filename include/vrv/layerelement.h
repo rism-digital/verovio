@@ -28,10 +28,16 @@ class Alignment;
 class LayerElement: public DocObject
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     LayerElement();
     LayerElement(std::string classid);
     virtual ~LayerElement();
+    virtual void Reset();
+    ///@}
     
     LayerElement& operator=( const LayerElement& element ); // copy assignement - this need to be changed to the Object::Clone way;
     
@@ -128,21 +134,12 @@ public:
     virtual int AlignHorizontally( ArrayPtrVoid params );
     
 private:
-    void Init();
     
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-    /** for elements in LayerApp. They will be drawn from the LayerElement of the app (and not from the layer) */
-    bool m_in_layer_app;
-    /** Indicates if cue size */
+    /** Indicates if cue size - to be changed to MEI equivalent */
     bool m_cueSize;
-    /** Indicates an horizontal offset */
-    int m_hOffset;
-    /** Indicates if occurs on staff above (-1) or below (1) */
-    char m_staffShift;
-    /** Indicates if visible (default) or not */
-    bool m_visible;
 
     /** If this is a note, store here the stem coordinates (useful for ex. tuplets) */
     MusPoint m_drawingStemStart; // beginning point, the one near the note
