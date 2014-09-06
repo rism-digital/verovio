@@ -54,7 +54,7 @@ bool AttChannelized::ReadChannelized(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("midi.track")) {
-        this->SetMidiTrackInt(StrToInt(element.attribute("midi.track").value()));
+        this->SetMidiTrack(StrToInt(element.attribute("midi.track").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -74,8 +74,8 @@ bool AttChannelized::WriteChannelized(  pugi::xml_node element ) {
         element.append_attribute("midi.port") = StrToStr(this->GetMidiPort()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasMidiTrackInt()) {
-        element.append_attribute("midi.track") = IntToStr(this->GetMidiTrackInt()).c_str();
+    if (this->HasMidiTrack()) {
+        element.append_attribute("midi.track") = IntToStr(this->GetMidiTrack()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -96,7 +96,7 @@ bool AttChannelized::HasMidiPort( )
     return (m_midiPort != "");
 }
 
-bool AttChannelized::HasMidiTrackInt( )
+bool AttChannelized::HasMidiTrack( )
 {
     return (m_midiTrackInt != 0);
 }
@@ -207,7 +207,7 @@ void AttMidinumber::ResetMidinumber() {
 bool AttMidinumber::ReadMidinumber(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num")) {
-        this->SetNumInt(StrToInt(element.attribute("num").value()));
+        this->SetNum(StrToInt(element.attribute("num").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -215,14 +215,14 @@ bool AttMidinumber::ReadMidinumber(  pugi::xml_node element ) {
 
 bool AttMidinumber::WriteMidinumber(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasNumInt()) {
-        element.append_attribute("num") = IntToStr(this->GetNumInt()).c_str();
+    if (this->HasNum()) {
+        element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttMidinumber::HasNumInt( )
+bool AttMidinumber::HasNum( )
 {
     return (m_numInt != 0);
 }
@@ -333,7 +333,7 @@ void AttTimebase::ResetTimebase() {
 bool AttTimebase::ReadTimebase(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("ppq")) {
-        this->SetPpqInt(StrToInt(element.attribute("ppq").value()));
+        this->SetPpq(StrToInt(element.attribute("ppq").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -341,14 +341,14 @@ bool AttTimebase::ReadTimebase(  pugi::xml_node element ) {
 
 bool AttTimebase::WriteTimebase(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasPpqInt()) {
-        element.append_attribute("ppq") = IntToStr(this->GetPpqInt()).c_str();
+    if (this->HasPpq()) {
+        element.append_attribute("ppq") = IntToStr(this->GetPpq()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttTimebase::HasPpqInt( )
+bool AttTimebase::HasPpq( )
 {
     return (m_ppqInt != 0);
 }

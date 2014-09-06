@@ -12,7 +12,7 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "atts_figtable.h"
+#include "atts_pagebased.h"
 
 //----------------------------------------------------------------------------
 
@@ -21,60 +21,46 @@
 namespace vrv {
     
 //----------------------------------------------------------------------------
-// AttTabular
+// AttSurface
 //----------------------------------------------------------------------------
 
-AttTabular::AttTabular(): Att() {
-    ResetTabular();
+AttSurface::AttSurface(): Att() {
+    ResetSurface();
 }
 
-AttTabular::~AttTabular() {
+AttSurface::~AttSurface() {
 
 }
 
-void AttTabular::ResetTabular() {
-    m_colspanInt = 0;
-    m_rowspanInt = 0;
+void AttSurface::ResetSurface() {
+    m_surface = "";
 }
 
-bool AttTabular::ReadTabular(  pugi::xml_node element ) {
+bool AttSurface::ReadSurface(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("colspan")) {
-        this->SetColspan(StrToInt(element.attribute("colspan").value()));
-        hasAttribute = true;
-    }
-    if (element.attribute("rowspan")) {
-        this->SetRowspan(StrToInt(element.attribute("rowspan").value()));
+    if (element.attribute("surface")) {
+        this->SetSurface(StrToStr(element.attribute("surface").value()));
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttTabular::WriteTabular(  pugi::xml_node element ) {
+bool AttSurface::WriteSurface(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasColspan()) {
-        element.append_attribute("colspan") = IntToStr(this->GetColspan()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasRowspan()) {
-        element.append_attribute("rowspan") = IntToStr(this->GetRowspan()).c_str();
+    if (this->HasSurface()) {
+        element.append_attribute("surface") = StrToStr(this->GetSurface()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttTabular::HasColspan( )
+bool AttSurface::HasSurface( )
 {
-    return (m_colspanInt != 0);
-}
-
-bool AttTabular::HasRowspan( )
-{
-    return (m_rowspanInt != 0);
+    return (m_surface != "");
 }
 
 
-/* include <attrowspan> */
+/* include <attsurface> */
 
 } // vrv namespace
 

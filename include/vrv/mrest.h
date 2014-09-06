@@ -23,17 +23,23 @@ namespace vrv {
 class MRest: public LayerElement
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     MRest( );
     virtual ~MRest();
+    virtual void Reset();
+    virtual std::string GetClassName( ){ return "MRest"; }; ;
+    ///@}
     
     /**
      * Comparison operator. 
      * Check if the LayerElement if a Clef and compare attributes
      */
     virtual bool operator==(Object& other);
-    
-    virtual std::string GetClassName( ){ return "MRest"; }; ;
+
 
 private:
     

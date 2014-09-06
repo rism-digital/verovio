@@ -14,6 +14,7 @@
 		4D22C42418891FC000D0831F /* pugixml.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42318891FB900D0831F /* pugixml.hpp */; };
 		4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C42218891FB900D0831F /* pugiconfig.hpp */; };
 		4D22C4271889214C00D0831F /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41F18891D6D00D0831F /* pugixml.cpp */; };
+		4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
 		4D422101199805E400963292 /* att.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D4220FF199805E400963292 /* att.h */; };
 		4D422102199805E400963292 /* attdef.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D422100199805E400963292 /* attdef.h */; };
 		4D422104199805F800963292 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D422103199805F700963292 /* att.cpp */; };
@@ -180,6 +181,8 @@
 		4D22C42218891FB900D0831F /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugiconfig.hpp; path = include/vrv/pugiconfig.hpp; sourceTree = "<group>"; };
 		4D22C42318891FB900D0831F /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = pugixml.hpp; path = include/vrv/pugixml.hpp; sourceTree = "<group>"; };
 		4D2E09B118A92371001EEEB8 /* emscripten_main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = emscripten_main.cpp; path = emscripten/emscripten_main.cpp; sourceTree = SOURCE_ROOT; };
+		4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_pagebased.cpp; path = libmei/atts_pagebased.cpp; sourceTree = "<group>"; };
+		4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_pagebased.h; path = libmei/atts_pagebased.h; sourceTree = "<group>"; };
 		4D4220FF199805E400963292 /* att.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att.h; path = include/vrv/att.h; sourceTree = "<group>"; };
 		4D422100199805E400963292 /* attdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attdef.h; path = include/vrv/attdef.h; sourceTree = "<group>"; };
 		4D422103199805F700963292 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = src/att.cpp; sourceTree = "<group>"; };
@@ -375,6 +378,8 @@
 				4DEE29041940BCC100C76319 /* atts_mensural.h */,
 				4DEE29051940BCC100C76319 /* atts_midi.cpp */,
 				4DEE29061940BCC100C76319 /* atts_midi.h */,
+				4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */,
+				4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */,
 				4DEE29071940BCC100C76319 /* atts_neumes.cpp */,
 				4DEE29081940BCC100C76319 /* atts_neumes.h */,
 				4DEE29091940BCC100C76319 /* atts_shared.cpp */,
@@ -484,6 +489,7 @@
 			isa = PBXGroup;
 			children = (
 				8F086EC8188539540037FD8E /* leipzigbbox.cpp */,
+				8F59291F18854BF800FE51AD /* leipzigbbox.h */,
 				8F086EE0188539540037FD8E /* view.cpp */,
 				8F59293118854BF800FE51AD /* view.h */,
 				8F086EDA188539540037FD8E /* view_beam.cpp */,
@@ -512,7 +518,6 @@
 				8F59291C18854BF800FE51AD /* keysig.h */,
 				8F086EC7188539540037FD8E /* layerelement.cpp */,
 				8F59291E18854BF800FE51AD /* layerelement.h */,
-				8F59291F18854BF800FE51AD /* leipzigbbox.h */,
 				8F086ECA188539540037FD8E /* mensur.cpp */,
 				8F59292118854BF800FE51AD /* mensur.h */,
 				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
@@ -723,6 +728,7 @@
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
+				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

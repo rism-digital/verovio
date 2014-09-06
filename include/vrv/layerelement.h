@@ -59,7 +59,9 @@ public:
      */
     virtual void ResetHorizontalAlignment( );
     
-    /** Adjust the pname and the octave for values outside the range */
+    /** 
+     * Adjust the pname and the octave for values outside the range
+     */
     static void AdjustPname( int *pname, int *oct );
     
     /** 
@@ -90,10 +92,11 @@ public:
     bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
     void SetScoreOrStaffDefAttr( bool isScoreOrStaffDefAttr ) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; };
     ///@}
-    
-    int GetElementIdx() const;
 
-    
+    /**
+     * @name Child type checkers.
+     */
+    ///@{
     bool IsBarline();
     bool IsBeam();
     bool IsClef();
@@ -112,14 +115,16 @@ public:
     bool IsTie();
     bool IsTuplet();
     bool IsGraceNote();
-    
-    virtual double GetAlignementDuration();
-    
+    ///@}
+
     Alignment *GetAlignment() { return m_alignment; };
     
     int GetXRel();
     
-    // functors
+    //----------//
+    // Functors //
+    //----------//
+    
     /**
      * Save the object (virtual).
      * Most of the child classes do not override it. In these cases, the actual 
@@ -132,6 +137,12 @@ public:
      * Align horizontally the LayerElement.
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
+    
+protected:
+    /**
+     * Returns the duration if the child element has a DurationInterface
+     */
+    virtual double GetAlignementDuration();
     
 private:
     

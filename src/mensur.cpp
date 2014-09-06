@@ -84,7 +84,7 @@ bool Mensur::operator==( Object& other )
 
 MensurAttr::MensurAttr():
     Object(),
-    AttMensurDefaultLog()
+    AttMensuralLog()
 {
     Reset();
 }
@@ -97,7 +97,7 @@ MensurAttr::~MensurAttr()
 void MensurAttr::Reset()
 {
     Object::Reset();
-    ResetMensurDefaultLog();
+    ResetMensuralLog();
 }
 
 bool MensurAttr::operator==( Object& other )

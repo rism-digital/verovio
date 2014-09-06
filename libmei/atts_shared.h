@@ -385,7 +385,7 @@ public:
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
 /* include <attrend> */
@@ -470,18 +470,25 @@ public:
      * to the default value)
      **/
     ///@{
+    void SetBeamColor(std::string beamColor_) { m_beamColor = beamColor_; };
+    std::string GetBeamColor() const { return m_beamColor; };    
+    bool HasBeamColor( );
+    
+    //
     void SetBeamRend(std::string beamRend_) { m_beamRend = beamRend_; };
     std::string GetBeamRend() const { return m_beamRend; };    
     bool HasBeamRend( );
     
     //
-    void SetBeamSlopeDbl(double beamSlopeDbl_) { m_beamSlopeDbl = beamSlopeDbl_; };
-    double GetBeamSlopeDbl() const { return m_beamSlopeDbl; };    
-    bool HasBeamSlopeDbl( );
+    void SetBeamSlope(double beamSlopeDbl_) { m_beamSlopeDbl = beamSlopeDbl_; };
+    double GetBeamSlope() const { return m_beamSlopeDbl; };    
+    bool HasBeamSlope( );
     
     ///@}
 
 protected:
+    /** Color of beams, including those associated with tuplets. **/
+    std::string m_beamColor;
     /** Encodes whether a beam is "feathered" and in which direction. **/
     std::string m_beamRend;
     /** Captures beam slope. **/
@@ -840,6 +847,44 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// AttCoded
+//----------------------------------------------------------------------------
+
+class AttCoded: public Att
+{
+public:
+    AttCoded();
+    virtual ~AttCoded();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetCoded();
+    
+    /** Read the values for the attribute class **/
+    bool ReadCoded( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteCoded( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetCode(std::string code_) { m_code = code_; };
+    std::string GetCode() const { return m_code; };    
+    bool HasCode( );
+    
+    ///@}
+
+protected:
+    /** Captures one or more coded values for the textual content of this element. **/
+    std::string m_code;
+
+/* include <attcode> */
+};
+
+//----------------------------------------------------------------------------
 // AttColor
 //----------------------------------------------------------------------------
 
@@ -1008,24 +1053,24 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetUlxInt(int ulxInt_) { m_ulxInt = ulxInt_; };
-    int GetUlxInt() const { return m_ulxInt; };    
-    bool HasUlxInt( );
+    void SetUlx(int ulxInt_) { m_ulxInt = ulxInt_; };
+    int GetUlx() const { return m_ulxInt; };    
+    bool HasUlx( );
     
     //
-    void SetUlyInt(int ulyInt_) { m_ulyInt = ulyInt_; };
-    int GetUlyInt() const { return m_ulyInt; };    
-    bool HasUlyInt( );
+    void SetUly(int ulyInt_) { m_ulyInt = ulyInt_; };
+    int GetUly() const { return m_ulyInt; };    
+    bool HasUly( );
     
     //
-    void SetLrxInt(int lrxInt_) { m_lrxInt = lrxInt_; };
-    int GetLrxInt() const { return m_lrxInt; };    
-    bool HasLrxInt( );
+    void SetLrx(int lrxInt_) { m_lrxInt = lrxInt_; };
+    int GetLrx() const { return m_lrxInt; };    
+    bool HasLrx( );
     
     //
-    void SetLryInt(int lryInt_) { m_lryInt = lryInt_; };
-    int GetLryInt() const { return m_lryInt; };    
-    bool HasLryInt( );
+    void SetLry(int lryInt_) { m_lryInt = lryInt_; };
+    int GetLry() const { return m_lryInt; };    
+    bool HasLry( );
     
     ///@}
 
@@ -1134,7 +1179,7 @@ public:
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
 /* include <attrend> */
@@ -1173,8 +1218,8 @@ public:
 
 protected:
     /**
-     * Allows the use of one or more previously-undeclared URIs to identify an external
-     * electronic object.
+     * Encodes the target note when its pitch differs from the pitch at which the
+     * custos appears.
      **/
     std::string m_target;
 
@@ -1351,32 +1396,32 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDynamDistDbl(double dynamDistDbl_) { m_dynamDistDbl = dynamDistDbl_; };
-    double GetDynamDistDbl() const { return m_dynamDistDbl; };    
-    bool HasDynamDistDbl( );
+    void SetDynamDist(std::string dynamDist_) { m_dynamDist = dynamDist_; };
+    std::string GetDynamDist() const { return m_dynamDist; };    
+    bool HasDynamDist( );
     
     //
-    void SetHarmDistDbl(double harmDistDbl_) { m_harmDistDbl = harmDistDbl_; };
-    double GetHarmDistDbl() const { return m_harmDistDbl; };    
-    bool HasHarmDistDbl( );
+    void SetHarmDist(std::string harmDist_) { m_harmDist = harmDist_; };
+    std::string GetHarmDist() const { return m_harmDist; };    
+    bool HasHarmDist( );
     
     //
-    void SetTextDistDbl(double textDistDbl_) { m_textDistDbl = textDistDbl_; };
-    double GetTextDistDbl() const { return m_textDistDbl; };    
-    bool HasTextDistDbl( );
+    void SetTextDist(std::string textDist_) { m_textDist = textDist_; };
+    std::string GetTextDist() const { return m_textDist; };    
+    bool HasTextDist( );
     
     ///@}
 
 protected:
-    /** Records the distance from the staff for dynamic marks in 1/2 inter-line units. **/
-    double m_dynamDistDbl;
+    /** Records the default distance from the staff for dynamic marks. **/
+    std::string m_dynamDist;
     /**
      * Records the default distance from the staff of harmonic indications, such as
      * guitar chord grids or functional labels.
      **/
-    double m_harmDistDbl;
+    std::string m_harmDist;
     /** Determines how far from the staff to render text elements. **/
-    double m_textDistDbl;
+    std::string m_textDist;
 
 /* include <atttext.dist> */
 };
@@ -1420,6 +1465,50 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// AttDurationAdditive
+//----------------------------------------------------------------------------
+
+class AttDurationAdditive: public Att
+{
+public:
+    AttDurationAdditive();
+    virtual ~AttDurationAdditive();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetDurationAdditive();
+    
+    /** Read the values for the attribute class **/
+    bool ReadDurationAdditive( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteDurationAdditive( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetDur(int dur_) { m_dur = dur_; };
+    int GetDur() const { return m_dur; };    
+    bool HasDur( );
+    
+    ///@}
+
+protected:
+    /**
+     * Records duration using ident dotted, relative durational values provided by the
+     * data.DURATION datatype.
+     * When the duration is "irrational", as is sometimes the case with tuplets,
+     * multiple space-separated values that add up to the total duration may be used.
+     * When dotted values are present, the dots attribute must be ignored.
+     **/
+    int m_dur;
+
+/* include <attdur> */
+};
+
+//----------------------------------------------------------------------------
 // AttDurationDefault
 //----------------------------------------------------------------------------
 
@@ -1448,6 +1537,16 @@ public:
     std::string GetDurDefault() const { return m_durDefault; };    
     bool HasDurDefault( );
     
+    //
+    void SetNumDefault(int numDefaultInt_) { m_numDefaultInt = numDefaultInt_; };
+    int GetNumDefault() const { return m_numDefaultInt; };    
+    bool HasNumDefault( );
+    
+    //
+    void SetNumbaseDefault(int numbaseDefaultInt_) { m_numbaseDefaultInt = numbaseDefaultInt_; };
+    int GetNumbaseDefault() const { return m_numbaseDefaultInt; };    
+    bool HasNumbaseDefault( );
+    
     ///@}
 
 protected:
@@ -1457,8 +1556,18 @@ protected:
      * in a measure does not have a duration specified.
      **/
     std::string m_durDefault;
+    /**
+     * Along with numbase.default, describes the default duration as a ratio.
+     * num.default is the first value in the ratio.
+     **/
+    int m_numDefaultInt;
+    /**
+     * Along with num.default, describes the default duration as a ratio.
+     * numbase.default is the second value in the ratio.
+     **/
+    int m_numbaseDefaultInt;
 
-/* include <attdur.default> */
+/* include <attnumbase.default> */
 };
 
 //----------------------------------------------------------------------------
@@ -1494,8 +1603,11 @@ public:
 
 protected:
     /**
-     * Records the duration of a feature using the relative durational values provided
-     * by the data.DURATION datatype.
+     * Records duration using ident dotted, relative durational values provided by the
+     * data.DURATION datatype.
+     * When the duration is "irrational", as is sometimes the case with tuplets,
+     * multiple space-separated values that add up to the total duration may be used.
+     * When dotted values are present, the dots attribute must be ignored.
      **/
     int m_dur;
 
@@ -1535,10 +1647,10 @@ public:
 
 protected:
     /**
-     * Records performed duration information that differs from written duration.
-     * Its value may be expressed in any convenient form, such as measures[s]+
-     * beat[s].beatpart, ppq (MIDI clicks), Humdrum **recip values, or MusicXML
-     * 'divisions', etc.
+     * Records performed duration information that differs from the written duration.
+     * Its value may be expressed in several forms; that is, ppq (MIDI clicks and
+     * MusicXML 'divisions'), Humdrum **recip values, beats, seconds, or mensural
+     * duration values.
      **/
     int m_durGes;
 
@@ -1594,47 +1706,6 @@ protected:
     int m_numbase;
 
 /* include <attnumbase> */
-};
-
-//----------------------------------------------------------------------------
-// AttDurationTimestamp
-//----------------------------------------------------------------------------
-
-class AttDurationTimestamp: public Att
-{
-public:
-    AttDurationTimestamp();
-    virtual ~AttDurationTimestamp();
-    
-    /** Reset the default values for the attribute class **/
-    void ResetDurationTimestamp();
-    
-    /** Read the values for the attribute class **/
-    bool ReadDurationTimestamp( pugi::xml_node element );
-    
-    /** Write the values for the attribute class **/
-    bool WriteDurationTimestamp( pugi::xml_node element );
-    
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
-     * to the default value)
-     **/
-    ///@{
-    void SetDur(int dur_) { m_dur = dur_; };
-    int GetDur() const { return m_dur; };    
-    bool HasDur( );
-    
-    ///@}
-
-protected:
-    /**
-     * Records the duration of a feature using the relative durational values provided
-     * by the data.DURATION datatype.
-     **/
-    int m_dur;
-
-/* include <attdur> */
 };
 
 //----------------------------------------------------------------------------
@@ -2323,7 +2394,7 @@ public:
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
 /* include <attrend> */
@@ -2354,9 +2425,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLyricAlignDbl(double lyricAlignDbl_) { m_lyricAlignDbl = lyricAlignDbl_; };
-    double GetLyricAlignDbl() const { return m_lyricAlignDbl; };    
-    bool HasLyricAlignDbl( );
+    void SetLyricAlign(std::string lyricAlign_) { m_lyricAlign = lyricAlign_; };
+    std::string GetLyricAlign() const { return m_lyricAlign; };    
+    bool HasLyricAlign( );
     
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; };
@@ -2369,9 +2440,9 @@ public:
     bool HasLyricName( );
     
     //
-    void SetLyricSizeDbl(double lyricSizeDbl_) { m_lyricSizeDbl = lyricSizeDbl_; };
-    double GetLyricSizeDbl() const { return m_lyricSizeDbl; };    
-    bool HasLyricSizeDbl( );
+    void SetLyricSize(std::string lyricSize_) { m_lyricSize = lyricSize_; };
+    std::string GetLyricSize() const { return m_lyricSize; };    
+    bool HasLyricSize( );
     
     //
     void SetLyricStyle(std::string lyricStyle_) { m_lyricStyle = lyricStyle_; };
@@ -2387,13 +2458,13 @@ public:
 
 protected:
     /** Describes the alignment of lyric syllables associated with a note or chord. **/
-    double m_lyricAlignDbl;
+    std::string m_lyricAlign;
     /** Sets the font family default value for lyrics. **/
     std::string m_lyricFam;
     /** Sets the font name default value for lyrics. **/
     std::string m_lyricName;
     /** Sets the default font size value for lyrics. **/
-    double m_lyricSizeDbl;
+    std::string m_lyricSize;
     /** Sets the default font style value for lyrics. **/
     std::string m_lyricStyle;
     /** Sets the default font weight value for lyrics. **/
@@ -2621,13 +2692,20 @@ public:
     std::string GetMeiversion() const { return m_meiversion; };    
     bool HasMeiversion( );
     
+    //
+    void SetMeiversionNum(std::string meiversionNum_) { m_meiversionNum = meiversionNum_; };
+    std::string GetMeiversionNum() const { return m_meiversionNum; };    
+    bool HasMeiversionNum( );
+    
     ///@}
 
 protected:
-    /** Specifies the version number of the MEI Guidelines in use. **/
+    /** Specifies a generic MEI version label. **/
     std::string m_meiversion;
+    /** Records a detailed MEI version number. **/
+    std::string m_meiversionNum;
 
-/* include <attmeiversion> */
+/* include <attmeiversion.num> */
 };
 
 //----------------------------------------------------------------------------
@@ -2660,47 +2738,19 @@ public:
     bool HasDot( );
     
     //
-    void SetModusmaior(std::string modusmaior_) { m_modusmaior = modusmaior_; };
-    std::string GetModusmaior() const { return m_modusmaior; };    
-    bool HasModusmaior( );
-    
-    //
-    void SetModusminor(std::string modusminor_) { m_modusminor = modusminor_; };
-    std::string GetModusminor() const { return m_modusminor; };    
-    bool HasModusminor( );
-    
-    //
-    void SetProlatio(std::string prolatio_) { m_prolatio = prolatio_; };
-    std::string GetProlatio() const { return m_prolatio; };    
-    bool HasProlatio( );
-    
-    //
     void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; };
     data_MENSURATIONSIGN GetSign() const { return m_sign; };    
     bool HasSign( );
-    
-    //
-    void SetTempus(std::string tempus_) { m_tempus = tempus_; };
-    std::string GetTempus() const { return m_tempus; };    
-    bool HasTempus( );
     
     ///@}
 
 protected:
     /** Specifies whether a dot is to be added to the base symbol. **/
     data_BOOLEAN m_dot;
-    /** Describes the maxima-long relationship. **/
-    std::string m_modusmaior;
-    /** Describes the long-breve relationship. **/
-    std::string m_modusminor;
-    /** Describes the semibreve-minim relationship. **/
-    std::string m_prolatio;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
     data_MENSURATIONSIGN m_sign;
-    /** Describes the breve-semibreve relationship. **/
-    std::string m_tempus;
 
-/* include <atttempus> */
+/* include <attsign> */
 };
 
 //----------------------------------------------------------------------------
@@ -2748,6 +2798,8 @@ protected:
     /**
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
+     * It must contain a decimal number or an additive expression that evaluates to a
+     * decimal number, such as 2+3.
      **/
     int m_count;
     /**
@@ -2793,7 +2845,7 @@ public:
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
 /* include <attrend> */
@@ -2839,6 +2891,8 @@ protected:
     /**
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
+     * It must contain a decimal number or an additive expression that evaluates to a
+     * decimal number, such as 2+3.
      **/
     int m_meterCount;
     /**
@@ -3032,17 +3086,31 @@ public:
     std::string GetMm() const { return m_mm; };    
     bool HasMm( );
     
+    //
+    void SetMmUnit(std::string mmUnit_) { m_mmUnit = mmUnit_; };
+    std::string GetMmUnit() const { return m_mmUnit; };    
+    bool HasMmUnit( );
+    
+    //
+    void SetMmDots(std::string mmDots_) { m_mmDots = mmDots_; };
+    std::string GetMmDots() const { return m_mmDots; };    
+    bool HasMmDots( );
+    
     ///@}
 
 protected:
     /**
-     * Used to describe tempo in terms of beats (meter signature denominator) per
-     * minute, ala M.M.
+     * Used to describe tempo in terms of beats (often the meter signature denominator)
+     * per minute, ala M.M.
      * (Maezel's Metronome).
      **/
     std::string m_mm;
+    /** Captures the metronomic unit. **/
+    std::string m_mmUnit;
+    /** Records the number of augmentation dots required by a dotted metronome unit. **/
+    std::string m_mmDots;
 
-/* include <attmm> */
+/* include <attmm.dots> */
 };
 
 //----------------------------------------------------------------------------
@@ -3667,8 +3735,8 @@ protected:
     /** --- **/
     std::string m_show;
     /**
-     * Allows the use of one or more previously-undeclared URIs to identify an external
-     * electronic object.
+     * Encodes the target note when its pitch differs from the pitch at which the
+     * custos appears.
      **/
     std::string m_target;
     /**
@@ -3794,7 +3862,7 @@ public:
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
 /* include <attrend> */
@@ -3868,9 +3936,9 @@ public:
     bool HasTunePname( );
     
     //
-    void SetTuneHzDbl(double tuneHzDbl_) { m_tuneHzDbl = tuneHzDbl_; };
-    double GetTuneHzDbl() const { return m_tuneHzDbl; };    
-    bool HasTuneHzDbl( );
+    void SetTuneHz(double tuneHzDbl_) { m_tuneHzDbl = tuneHzDbl_; };
+    double GetTuneHz() const { return m_tuneHzDbl; };    
+    bool HasTuneHz( );
     
     //
     void SetTuneTemper(std::string tuneTemper_) { m_tuneTemper = tuneTemper_; };
@@ -3930,9 +3998,9 @@ public:
     bool HasMusicName( );
     
     //
-    void SetMusicSizeDbl(double musicSizeDbl_) { m_musicSizeDbl = musicSizeDbl_; };
-    double GetMusicSizeDbl() const { return m_musicSizeDbl; };    
-    bool HasMusicSizeDbl( );
+    void SetMusicSize(std::string musicSize_) { m_musicSize = musicSize_; };
+    std::string GetMusicSize() const { return m_musicSize; };    
+    bool HasMusicSize( );
     
     //
     void SetOptimize(std::string optimize_) { m_optimize = optimize_; };
@@ -3940,39 +4008,34 @@ public:
     bool HasOptimize( );
     
     //
-    void SetPageHeightDbl(double pageHeightDbl_) { m_pageHeightDbl = pageHeightDbl_; };
-    double GetPageHeightDbl() const { return m_pageHeightDbl; };    
-    bool HasPageHeightDbl( );
+    void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; };
+    std::string GetPageHeight() const { return m_pageHeight; };    
+    bool HasPageHeight( );
     
     //
-    void SetPageWidthDbl(double pageWidthDbl_) { m_pageWidthDbl = pageWidthDbl_; };
-    double GetPageWidthDbl() const { return m_pageWidthDbl; };    
-    bool HasPageWidthDbl( );
+    void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; };
+    std::string GetPageWidth() const { return m_pageWidth; };    
+    bool HasPageWidth( );
     
     //
-    void SetPageUnits(std::string pageUnits_) { m_pageUnits = pageUnits_; };
-    std::string GetPageUnits() const { return m_pageUnits; };    
-    bool HasPageUnits( );
+    void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; };
+    std::string GetPageTopmar() const { return m_pageTopmar; };    
+    bool HasPageTopmar( );
     
     //
-    void SetPageTopmarDbl(double pageTopmarDbl_) { m_pageTopmarDbl = pageTopmarDbl_; };
-    double GetPageTopmarDbl() const { return m_pageTopmarDbl; };    
-    bool HasPageTopmarDbl( );
+    void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; };
+    std::string GetPageBotmar() const { return m_pageBotmar; };    
+    bool HasPageBotmar( );
     
     //
-    void SetPageBotmarDbl(double pageBotmarDbl_) { m_pageBotmarDbl = pageBotmarDbl_; };
-    double GetPageBotmarDbl() const { return m_pageBotmarDbl; };    
-    bool HasPageBotmarDbl( );
+    void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; };
+    std::string GetPageLeftmar() const { return m_pageLeftmar; };    
+    bool HasPageLeftmar( );
     
     //
-    void SetPageLeftmarDbl(double pageLeftmarDbl_) { m_pageLeftmarDbl = pageLeftmarDbl_; };
-    double GetPageLeftmarDbl() const { return m_pageLeftmarDbl; };    
-    bool HasPageLeftmarDbl( );
-    
-    //
-    void SetPageRightmarDbl(double pageRightmarDbl_) { m_pageRightmarDbl = pageRightmarDbl_; };
-    double GetPageRightmarDbl() const { return m_pageRightmarDbl; };    
-    bool HasPageRightmarDbl( );
+    void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; };
+    std::string GetPageRightmar() const { return m_pageRightmar; };    
+    bool HasPageRightmar( );
     
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; };
@@ -3985,19 +4048,19 @@ public:
     bool HasPageScale( );
     
     //
-    void SetSpacingPackexpDbl(double spacingPackexpDbl_) { m_spacingPackexpDbl = spacingPackexpDbl_; };
-    double GetSpacingPackexpDbl() const { return m_spacingPackexpDbl; };    
-    bool HasSpacingPackexpDbl( );
+    void SetSpacingPackexp(double spacingPackexpDbl_) { m_spacingPackexpDbl = spacingPackexpDbl_; };
+    double GetSpacingPackexp() const { return m_spacingPackexpDbl; };    
+    bool HasSpacingPackexp( );
     
     //
-    void SetSpacingPackfactDbl(double spacingPackfactDbl_) { m_spacingPackfactDbl = spacingPackfactDbl_; };
-    double GetSpacingPackfactDbl() const { return m_spacingPackfactDbl; };    
-    bool HasSpacingPackfactDbl( );
+    void SetSpacingPackfact(double spacingPackfactDbl_) { m_spacingPackfactDbl = spacingPackfactDbl_; };
+    double GetSpacingPackfact() const { return m_spacingPackfactDbl; };    
+    bool HasSpacingPackfact( );
     
     //
-    void SetSpacingStaffDbl(double spacingStaffDbl_) { m_spacingStaffDbl = spacingStaffDbl_; };
-    double GetSpacingStaffDbl() const { return m_spacingStaffDbl; };    
-    bool HasSpacingStaffDbl( );
+    void SetSpacingStaff(std::string spacingStaff_) { m_spacingStaff = spacingStaff_; };
+    std::string GetSpacingStaff() const { return m_spacingStaff; };    
+    bool HasSpacingStaff( );
     
     //
     void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; };
@@ -4005,19 +4068,24 @@ public:
     bool HasSpacingSystem( );
     
     //
-    void SetSystemLeftmarDbl(double systemLeftmarDbl_) { m_systemLeftmarDbl = systemLeftmarDbl_; };
-    double GetSystemLeftmarDbl() const { return m_systemLeftmarDbl; };    
-    bool HasSystemLeftmarDbl( );
+    void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; };
+    std::string GetSystemLeftmar() const { return m_systemLeftmar; };    
+    bool HasSystemLeftmar( );
     
     //
-    void SetSystemRightmarDbl(double systemRightmarDbl_) { m_systemRightmarDbl = systemRightmarDbl_; };
-    double GetSystemRightmarDbl() const { return m_systemRightmarDbl; };    
-    bool HasSystemRightmarDbl( );
+    void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; };
+    std::string GetSystemRightmar() const { return m_systemRightmar; };    
+    bool HasSystemRightmar( );
     
     //
-    void SetSystemTopmarDbl(double systemTopmarDbl_) { m_systemTopmarDbl = systemTopmarDbl_; };
-    double GetSystemTopmarDbl() const { return m_systemTopmarDbl; };    
-    bool HasSystemTopmarDbl( );
+    void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; };
+    std::string GetSystemTopmar() const { return m_systemTopmar; };    
+    bool HasSystemTopmar( );
+    
+    //
+    void SetVuHeight(std::string vuHeight_) { m_vuHeight = vuHeight_; };
+    std::string GetVuHeight() const { return m_vuHeight; };    
+    bool HasVuHeight( );
     
     ///@}
 
@@ -4029,29 +4097,30 @@ protected:
     /** Sets the default music font name. **/
     std::string m_musicName;
     /** Sets the default music font size. **/
-    double m_musicSizeDbl;
+    std::string m_musicSize;
     /**
      * Indicates whether staves without notes, rests, etc.
      * should be displayed. When the value is 'true', empty staves are displayed.
      **/
     std::string m_optimize;
-    /** Describes the physical height of the rendered output page. **/
-    double m_pageHeightDbl;
-    /** Describes the physical width of the rendered output page. **/
-    double m_pageWidthDbl;
     /**
-     * Contains the real-world measurement units (inches, centimeters, millimeters)
-     * used to describe the rendered page height, width, and margins.
+     * Specifies the height of the page; may be expressed in real-world units or staff
+     * steps.
      **/
-    std::string m_pageUnits;
-    /** Indicates the amount of whitespace at the top of a rendered score page. **/
-    double m_pageTopmarDbl;
-    /** Indicates the amount of whitespace at the bottom of a rendered score page. **/
-    double m_pageBotmarDbl;
-    /** Indicates the amount of whitespace at the left side of a rendered score page. **/
-    double m_pageLeftmarDbl;
-    /** Indicates the amount of whitespace at the right side of a rendered score page. **/
-    double m_pageRightmarDbl;
+    std::string m_pageHeight;
+    /**
+     * Describes the width of the page; may be expressed in real-world units or staff
+     * steps.
+     **/
+    std::string m_pageWidth;
+    /** Indicates the amount of whitespace at the top of a page. **/
+    std::string m_pageTopmar;
+    /** Indicates the amount of whitespace at the bottom of a page. **/
+    std::string m_pageBotmar;
+    /** Indicates the amount of whitespace at the left side of a page. **/
+    std::string m_pageLeftmar;
+    /** Indicates the amount of whitespace at the right side of a page. **/
+    std::string m_pageRightmar;
     /** Indicates the number of logical pages to be rendered on a single physical page. **/
     std::string m_pagePanels;
     /** Indicates how the page should be scaled when rendered. **/
@@ -4060,30 +4129,42 @@ protected:
     double m_spacingPackexpDbl;
     /** Describes the note spacing of output. **/
     double m_spacingPackfactDbl;
-    /** Sets the minimum amount of space between staves in the same system. **/
-    double m_spacingStaffDbl;
     /**
-     * Contains a space-separated pair of numbers describing the minimum and maximum
-     * amount of space between systems.
+     * Specifies the minimum amount of space between adjacent staves in the same
+     * system; measured from the bottom line of the staff above to the top line of the
+     * staff below.
+     **/
+    std::string m_spacingStaff;
+    /**
+     * Describes the space between adjacent systems; a pair of space-separated values
+     * (minimum and maximum, respectively) provides a range between which a rendering
+     * system-supplied value may fall, while a single value indicates a fixed amount of
+     * space; that is, the minimum and maximum values are equal.
      **/
     std::string m_spacingSystem;
     /**
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
      **/
-    double m_systemLeftmarDbl;
+    std::string m_systemLeftmar;
     /**
      * Describes the amount of whitespace at the right system margin relative to
      * page.rightmar.
      **/
-    double m_systemRightmarDbl;
+    std::string m_systemRightmar;
     /**
      * Describes the distance from page's top edge to the first system; used for first
      * page only.
      **/
-    double m_systemTopmarDbl;
+    std::string m_systemTopmar;
+    /**
+     * Defines the height of a "virtual unit" (vu) in terms of real-world units.
+     * A single vu is half the distance between the vertical center point of a staff
+     * line and that of an adjacent staff line.
+     **/
+    std::string m_vuHeight;
 
-/* include <attsystem.topmar> */
+/* include <attvu.height> */
 };
 
 //----------------------------------------------------------------------------
@@ -4149,9 +4230,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSeqInt(int seqInt_) { m_seqInt = seqInt_; };
-    int GetSeqInt() const { return m_seqInt; };    
-    bool HasSeqInt( );
+    void SetSeq(int seqInt_) { m_seqInt = seqInt_; };
+    int GetSeq() const { return m_seqInt; };    
+    bool HasSeq( );
     
     ///@}
 
@@ -4359,9 +4440,9 @@ public:
     bool HasLayerscheme( );
     
     //
-    void SetLinesInt(int linesInt_) { m_linesInt = linesInt_; };
-    int GetLinesInt() const { return m_linesInt; };    
-    bool HasLinesInt( );
+    void SetLines(int linesInt_) { m_linesInt = linesInt_; };
+    int GetLines() const { return m_linesInt; };    
+    bool HasLines( );
     
     //
     void SetLinesColor(std::string linesColor_) { m_linesColor = linesColor_; };
@@ -4374,9 +4455,9 @@ public:
     bool HasLinesVisible( );
     
     //
-    void SetSpacingDbl(double spacingDbl_) { m_spacingDbl = spacingDbl_; };
-    double GetSpacingDbl() const { return m_spacingDbl; };    
-    bool HasSpacingDbl( );
+    void SetSpacing(std::string spacing_) { m_spacing = spacing_; };
+    std::string GetSpacing() const { return m_spacing; };    
+    bool HasSpacing( );
     
     ///@}
 
@@ -4404,7 +4485,7 @@ protected:
      * This value is meaningless for the first staff in a system since the
      * spacing.system attribute indicates the spacing between systems.
      **/
-    double m_spacingDbl;
+    std::string m_spacing;
 
 /* include <attspacing> */
 };
@@ -4566,6 +4647,51 @@ protected:
     std::string m_loc;
 
 /* include <attloc> */
+};
+
+//----------------------------------------------------------------------------
+// AttStafflocPitched
+//----------------------------------------------------------------------------
+
+class AttStafflocPitched: public Att
+{
+public:
+    AttStafflocPitched();
+    virtual ~AttStafflocPitched();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetStafflocPitched();
+    
+    /** Read the values for the attribute class **/
+    bool ReadStafflocPitched( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteStafflocPitched( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetPloc(std::string ploc_) { m_ploc = ploc_; };
+    std::string GetPloc() const { return m_ploc; };    
+    bool HasPloc( );
+    
+    //
+    void SetOloc(std::string oloc_) { m_oloc = oloc_; };
+    std::string GetOloc() const { return m_oloc; };    
+    bool HasOloc( );
+    
+    ///@}
+
+protected:
+    /** Captures staff location in terms of written pitch name. **/
+    std::string m_ploc;
+    /** Records staff location in terms of written octave. **/
+    std::string m_oloc;
+
+/* include <attoloc> */
 };
 
 //----------------------------------------------------------------------------
@@ -4837,9 +4963,9 @@ public:
     bool HasTextName( );
     
     //
-    void SetTextSizeDbl(double textSizeDbl_) { m_textSizeDbl = textSizeDbl_; };
-    double GetTextSizeDbl() const { return m_textSizeDbl; };    
-    bool HasTextSizeDbl( );
+    void SetTextSize(std::string textSize_) { m_textSize = textSize_; };
+    std::string GetTextSize() const { return m_textSize; };    
+    bool HasTextSize( );
     
     //
     void SetTextStyle(std::string textStyle_) { m_textStyle = textStyle_; };
@@ -4868,7 +4994,7 @@ protected:
      * Provides a default value for the font size of text (other than lyrics) when this
      * information is not provided on the individual elements.
      **/
-    double m_textSizeDbl;
+    std::string m_textSize;
     /**
      * Provides a default value for the font style of text (other than lyrics) when
      * this information is not provided on the individual elements.
@@ -4991,9 +5117,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstampGesInt(int tstampGesInt_) { m_tstampGesInt = tstampGesInt_; };
-    int GetTstampGesInt() const { return m_tstampGesInt; };    
-    bool HasTstampGesInt( );
+    void SetTstampGes(int tstampGesInt_) { m_tstampGesInt = tstampGesInt_; };
+    int GetTstampGes() const { return m_tstampGesInt; };    
+    bool HasTstampGes( );
     
     //
     void SetTstampReal(std::string tstampReal_) { m_tstampReal = tstampReal_; };
@@ -5012,6 +5138,47 @@ protected:
     std::string m_tstampReal;
 
 /* include <atttstamp.real> */
+};
+
+//----------------------------------------------------------------------------
+// AttTimestamp2Musical
+//----------------------------------------------------------------------------
+
+class AttTimestamp2Musical: public Att
+{
+public:
+    AttTimestamp2Musical();
+    virtual ~AttTimestamp2Musical();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetTimestamp2Musical();
+    
+    /** Read the values for the attribute class **/
+    bool ReadTimestamp2Musical( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteTimestamp2Musical( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetTstamp2(std::string tstamp2_) { m_tstamp2 = tstamp2_; };
+    std::string GetTstamp2() const { return m_tstamp2; };    
+    bool HasTstamp2( );
+    
+    ///@}
+
+protected:
+    /**
+     * Encodes the ending point of an event in terms of musical time, i.e., a count of
+     * measures plus a beat location.
+     **/
+    std::string m_tstamp2;
+
+/* include <atttstamp2> */
 };
 
 //----------------------------------------------------------------------------
@@ -5039,14 +5206,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTransDiatDbl(double transDiatDbl_) { m_transDiatDbl = transDiatDbl_; };
-    double GetTransDiatDbl() const { return m_transDiatDbl; };    
-    bool HasTransDiatDbl( );
+    void SetTransDiat(double transDiatDbl_) { m_transDiatDbl = transDiatDbl_; };
+    double GetTransDiat() const { return m_transDiatDbl; };    
+    bool HasTransDiat( );
     
     //
-    void SetTransSemiDbl(double transSemiDbl_) { m_transSemiDbl = transSemiDbl_; };
-    double GetTransSemiDbl() const { return m_transSemiDbl; };    
-    bool HasTransSemiDbl( );
+    void SetTransSemi(double transSemiDbl_) { m_transSemiDbl = transSemiDbl_; };
+    double GetTransSemi() const { return m_transSemiDbl; };    
+    bool HasTransSemi( );
     
     ///@}
 
@@ -5193,9 +5360,9 @@ public:
     bool HasFontname( );
     
     //
-    void SetFontsizeDbl(double fontsizeDbl_) { m_fontsizeDbl = fontsizeDbl_; };
-    double GetFontsizeDbl() const { return m_fontsizeDbl; };    
-    bool HasFontsizeDbl( );
+    void SetFontsize(double fontsizeDbl_) { m_fontsizeDbl = fontsizeDbl_; };
+    double GetFontsize() const { return m_fontsizeDbl; };    
+    bool HasFontsize( );
     
     //
     void SetFontstyle(std::string fontstyle_) { m_fontstyle = fontstyle_; };
@@ -5544,6 +5711,44 @@ protected:
 };
 
 //----------------------------------------------------------------------------
+// AttWhitespace
+//----------------------------------------------------------------------------
+
+class AttWhitespace: public Att
+{
+public:
+    AttWhitespace();
+    virtual ~AttWhitespace();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetWhitespace();
+    
+    /** Read the values for the attribute class **/
+    bool ReadWhitespace( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteWhitespace( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetSpace(std::string space_) { m_space = space_; };
+    std::string GetSpace() const { return m_space; };    
+    bool HasSpace( );
+    
+    ///@}
+
+protected:
+    /** --- **/
+    std::string m_space;
+
+/* include <attspace> */
+};
+
+//----------------------------------------------------------------------------
 // AttWidth
 //----------------------------------------------------------------------------
 
@@ -5568,22 +5773,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWidthDbl(double widthDbl_) { m_widthDbl = widthDbl_; };
-    double GetWidthDbl() const { return m_widthDbl; };    
-    bool HasWidthDbl( );
+    void SetWidth(std::string width_) { m_width = width_; };
+    std::string GetWidth() const { return m_width; };    
+    bool HasWidth( );
     
     ///@}
 
 protected:
     /**
      * Measurement of the horizontal dimension of an entity.
-     * This value can only be interpreted meaningfully in combination with the units
-     * attribute. The width attribute may be used to capture measure width data for
-     * interchange with music printing systems that utilize this information for
-     * printing. On <barLine> the width attribute captures the width of the preceding
-     * measure.
+     * The width attribute may be used to capture measure width data for interchange
+     * with music printing systems that utilize this information for printing. On
+     * <barLine> the width attribute captures the width of the preceding measure.
      **/
-    double m_widthDbl;
+    std::string m_width;
 
 /* include <attwidth> */
 };
@@ -5613,14 +5816,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetXDbl(double xDbl_) { m_xDbl = xDbl_; };
-    double GetXDbl() const { return m_xDbl; };    
-    bool HasXDbl( );
+    void SetX(double xDbl_) { m_xDbl = xDbl_; };
+    double GetX() const { return m_xDbl; };    
+    bool HasX( );
     
     //
-    void SetYDbl(double yDbl_) { m_yDbl = yDbl_; };
-    double GetYDbl() const { return m_yDbl; };    
-    bool HasYDbl( );
+    void SetY(double yDbl_) { m_yDbl = yDbl_; };
+    double GetY() const { return m_yDbl; };    
+    bool HasY( );
     
     ///@}
 
@@ -5666,14 +5869,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetX2Dbl(double x2Dbl_) { m_x2Dbl = x2Dbl_; };
-    double GetX2Dbl() const { return m_x2Dbl; };    
-    bool HasX2Dbl( );
+    void SetX2(double x2Dbl_) { m_x2Dbl = x2Dbl_; };
+    double GetX2() const { return m_x2Dbl; };    
+    bool HasX2( );
     
     //
-    void SetY2Dbl(double y2Dbl_) { m_y2Dbl = y2Dbl_; };
-    double GetY2Dbl() const { return m_y2Dbl; };    
-    bool HasY2Dbl( );
+    void SetY2(double y2Dbl_) { m_y2Dbl = y2Dbl_; };
+    double GetY2() const { return m_y2Dbl; };    
+    bool HasY2( );
     
     ///@}
 

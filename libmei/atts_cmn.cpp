@@ -310,7 +310,7 @@ bool AttBeamrend::ReadBeamrend(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("slope")) {
-        this->SetSlopeDbl(StrToDbl(element.attribute("slope").value()));
+        this->SetSlope(StrToDbl(element.attribute("slope").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -322,8 +322,8 @@ bool AttBeamrend::WriteBeamrend(  pugi::xml_node element ) {
         element.append_attribute("rend") = StrToStr(this->GetRend()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasSlopeDbl()) {
-        element.append_attribute("slope") = DblToStr(this->GetSlopeDbl()).c_str();
+    if (this->HasSlope()) {
+        element.append_attribute("slope") = DblToStr(this->GetSlope()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -334,7 +334,7 @@ bool AttBeamrend::HasRend( )
     return (m_rend != "");
 }
 
-bool AttBeamrend::HasSlopeDbl( )
+bool AttBeamrend::HasSlope( )
 {
     return (m_slopeDbl != 0.0);
 }
@@ -361,7 +361,7 @@ void AttBeamsecondary::ResetBeamsecondary() {
 bool AttBeamsecondary::ReadBeamsecondary(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("breaksec")) {
-        this->SetBreaksecInt(StrToInt(element.attribute("breaksec").value()));
+        this->SetBreaksec(StrToInt(element.attribute("breaksec").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -369,14 +369,14 @@ bool AttBeamsecondary::ReadBeamsecondary(  pugi::xml_node element ) {
 
 bool AttBeamsecondary::WriteBeamsecondary(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasBreaksecInt()) {
-        element.append_attribute("breaksec") = IntToStr(this->GetBreaksecInt()).c_str();
+    if (this->HasBreaksec()) {
+        element.append_attribute("breaksec") = IntToStr(this->GetBreaksec()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttBeamsecondary::HasBreaksecInt( )
+bool AttBeamsecondary::HasBreaksec( )
 {
     return (m_breaksecInt != 0);
 }
@@ -1103,7 +1103,7 @@ void AttNumbered::ResetNumbered() {
 bool AttNumbered::ReadNumbered(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num")) {
-        this->SetNumInt(StrToInt(element.attribute("num").value()));
+        this->SetNum(StrToInt(element.attribute("num").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1111,14 +1111,14 @@ bool AttNumbered::ReadNumbered(  pugi::xml_node element ) {
 
 bool AttNumbered::WriteNumbered(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasNumInt()) {
-        element.append_attribute("num") = IntToStr(this->GetNumInt()).c_str();
+    if (this->HasNum()) {
+        element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttNumbered::HasNumInt( )
+bool AttNumbered::HasNum( )
 {
     return (m_numInt != 0);
 }
@@ -1617,48 +1617,6 @@ bool AttTremmeasured::HasMeasperf( )
 /* include <attmeasperf> */
 
 //----------------------------------------------------------------------------
-// AttTupletLog
-//----------------------------------------------------------------------------
-
-AttTupletLog::AttTupletLog(): Att() {
-    ResetTupletLog();
-}
-
-AttTupletLog::~AttTupletLog() {
-
-}
-
-void AttTupletLog::ResetTupletLog() {
-    m_dur = "";
-}
-
-bool AttTupletLog::ReadTupletLog(  pugi::xml_node element ) {
-    bool hasAttribute = false;
-    if (element.attribute("dur")) {
-        this->SetDur(StrToStr(element.attribute("dur").value()));
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttTupletLog::WriteTupletLog(  pugi::xml_node element ) {
-    bool wroteAttribute = false;
-    if (this->HasDur()) {
-        element.append_attribute("dur") = StrToStr(this->GetDur()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttTupletLog::HasDur( )
-{
-    return (m_dur != "");
-}
-
-
-/* include <attdur> */
-
-//----------------------------------------------------------------------------
 // AttTupletVis
 //----------------------------------------------------------------------------
 
@@ -1741,48 +1699,6 @@ bool AttTupletVis::HasNumFormat( )
 
 
 /* include <attnum.format> */
-
-//----------------------------------------------------------------------------
-// AttTupletSpanLog
-//----------------------------------------------------------------------------
-
-AttTupletSpanLog::AttTupletSpanLog(): Att() {
-    ResetTupletSpanLog();
-}
-
-AttTupletSpanLog::~AttTupletSpanLog() {
-
-}
-
-void AttTupletSpanLog::ResetTupletSpanLog() {
-    m_dur = "";
-}
-
-bool AttTupletSpanLog::ReadTupletSpanLog(  pugi::xml_node element ) {
-    bool hasAttribute = false;
-    if (element.attribute("dur")) {
-        this->SetDur(StrToStr(element.attribute("dur").value()));
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttTupletSpanLog::WriteTupletSpanLog(  pugi::xml_node element ) {
-    bool wroteAttribute = false;
-    if (this->HasDur()) {
-        element.append_attribute("dur") = StrToStr(this->GetDur()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttTupletSpanLog::HasDur( )
-{
-    return (m_dur != "");
-}
-
-
-/* include <attdur> */
 
 } // vrv namespace
 

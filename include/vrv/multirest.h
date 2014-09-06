@@ -9,6 +9,7 @@
 #ifndef __VRV_MULTIREST_H__
 #define __VRV_MULTIREST_H__
 
+#include "atts_cmn.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -20,13 +21,21 @@ namespace vrv {
 /** 
  * This class models the MEI <multiRest> element. 
  */
-class MultiRest: public LayerElement
+class MultiRest: public LayerElement,
+    public AttNumbered
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     MultiRest();
     MultiRest(int number);
     virtual ~MultiRest();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "MultiRest"; };
+    ///@}
     
     /**
      * Comparison operator. 
@@ -34,21 +43,7 @@ public:
      */
     virtual bool operator==(Object& other);
     
-    virtual std::string GetClassName( ) { return "MultiRest"; };
-    
-    /**
-     * Get the multi measure rest number
-     */
-    int GetNumber() {return m_number;};
-    
-    /**
-     * Set the multi measure rest number.
-     */
-	void SetNumber( int number ) {m_number = number;};
-    
 private:
-    /** Indicates the shape and the line of the clef using clef ids  */
-    int m_number;
     
 public:
 

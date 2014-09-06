@@ -33,14 +33,25 @@ class DurationInterface:
     public AttFermatapresent
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     DurationInterface();
     virtual ~DurationInterface();
     virtual void Reset();
+    ///@}
     
     /* Set the logic (gestural) duration */
     virtual void SetDurationGes( int value );
     
+    /**
+     * Returns the duration (in double) for the element.
+     * It returns 0.0 for grace notes.
+     * Careful: this method is not overriding LayerElement::GetAlignementDuration since
+     * LayerElement and DurationInterface have no inheritance link.
+     */
     virtual double GetAlignementDuration( int num, int numbase );
     
     /**
@@ -59,7 +70,6 @@ public:
      * Return true if the note or rest is the last of a beam.
      */
     bool IsLastInBeam( Object *noteOrRest );
-    
     
     /**
      * Inteface comparison operator. 

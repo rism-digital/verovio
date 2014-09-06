@@ -12,36 +12,36 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_FIGTABLE_H__
-#define __VRV_ATTS_FIGTABLE_H__
+#ifndef __VRV_ATTS_PAGEBASED_H__
+#define __VRV_ATTS_PAGEBASED_H__
 
 #include "att.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
-
+#include <string>
 
 namespace vrv {
     
 //----------------------------------------------------------------------------
-// AttTabular
+// AttSurface
 //----------------------------------------------------------------------------
 
-class AttTabular: public Att
+class AttSurface: public Att
 {
 public:
-    AttTabular();
-    virtual ~AttTabular();
+    AttSurface();
+    virtual ~AttSurface();
     
     /** Reset the default values for the attribute class **/
-    void ResetTabular();
+    void ResetSurface();
     
     /** Read the values for the attribute class **/
-    bool ReadTabular( pugi::xml_node element );
+    bool ReadSurface( pugi::xml_node element );
     
     /** Write the values for the attribute class **/
-    bool WriteTabular( pugi::xml_node element );
+    bool WriteSurface( pugi::xml_node element );
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -49,27 +49,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetColspan(int colspanInt_) { m_colspanInt = colspanInt_; };
-    int GetColspan() const { return m_colspanInt; };    
-    bool HasColspan( );
-    
-    //
-    void SetRowspan(int rowspanInt_) { m_rowspanInt = rowspanInt_; };
-    int GetRowspan() const { return m_rowspanInt; };    
-    bool HasRowspan( );
+    void SetSurface(std::string surface_) { m_surface = surface_; };
+    std::string GetSurface() const { return m_surface; };    
+    bool HasSurface( );
     
     ///@}
 
 protected:
-    /** The number of columns spanned by this cell. **/
-    int m_colspanInt;
-    /** The number of rows spanned by this cell. **/
-    int m_rowspanInt;
+    /** Contains a reference to a surface element **/
+    std::string m_surface;
 
-/* include <attrowspan> */
+/* include <attsurface> */
 };
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_FIGTABLE_H__
+#endif  // __VRV_ATTS_PAGEBASED_H__
 

@@ -91,7 +91,7 @@ private:
  * This class models the MEI @mensur attributes in scoreDef or staffDef elements.
  */
 class MensurAttr: public Object,
-    public AttMensurDefaultLog
+    public AttMensuralLog
 {
 public:
     /**

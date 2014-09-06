@@ -15,15 +15,16 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MultiRest::MultiRest():
-    LayerElement("multirest-")
+    LayerElement("multirest-"),
+    AttNumbered()
 {
-    m_number = 0;
+    Reset();
 }
 
 MultiRest::MultiRest(int number):
     LayerElement("multirest-")
 {
-    m_number = number;
+    Reset();
 }
 
 
@@ -31,6 +32,11 @@ MultiRest::~MultiRest()
 {
 }
 
+void MultiRest::Reset()
+{
+    LayerElement::Reset();
+    ResetNumbered();
+}
 
 bool MultiRest::operator==( Object& other )
 {
@@ -38,7 +44,7 @@ bool MultiRest::operator==( Object& other )
     if ( !otherM ) {
         return false;
     }
-    if ( this->m_number != otherM->m_number ) {
+    if ( this->GetNum() != otherM->GetNum() ) {
         return false;
     }
     return true;

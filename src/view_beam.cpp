@@ -183,7 +183,7 @@ void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff 
 
 			(crd+ct)->a = chk->GetDrawingX() - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
-			if (chk->IsNote() && ((Note*)chk)->GetBreaksecInt() && ct)
+			if (chk->IsNote() && ((Note*)chk)->GetBreaksec() && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
 				*(st_rl + (cpte_stop++)) = ct;
 

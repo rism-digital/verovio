@@ -40,7 +40,6 @@ void MeterSig::Reset()
     LayerElement::Reset();
     ResetMeterSigLog();
 }
-    
 
 bool MeterSig::operator==( Object& other )
 {

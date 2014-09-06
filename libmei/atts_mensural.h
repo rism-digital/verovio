@@ -108,23 +108,23 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-// AttMensurDefaultLog
+// AttMensuralLog
 //----------------------------------------------------------------------------
 
-class AttMensurDefaultLog: public Att
+class AttMensuralLog: public Att
 {
 public:
-    AttMensurDefaultLog();
-    virtual ~AttMensurDefaultLog();
+    AttMensuralLog();
+    virtual ~AttMensuralLog();
     
     /** Reset the default values for the attribute class **/
-    void ResetMensurDefaultLog();
+    void ResetMensuralLog();
     
     /** Read the values for the attribute class **/
-    bool ReadMensurDefaultLog( pugi::xml_node element );
+    bool ReadMensuralLog( pugi::xml_node element );
     
     /** Write the values for the attribute class **/
-    bool WriteMensurDefaultLog( pugi::xml_node element );
+    bool WriteMensuralLog( pugi::xml_node element );
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -137,11 +137,6 @@ public:
     bool HasMensurDot( );
     
     //
-    void SetMensurLocInt(int mensurLocInt_) { m_mensurLocInt = mensurLocInt_; };
-    int GetMensurLocInt() const { return m_mensurLocInt; };    
-    bool HasMensurLocInt( );
-    
-    //
     void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; };
     data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; };    
     bool HasMensurSign( );
@@ -151,13 +146,21 @@ public:
     char GetMensurSlash() const { return m_mensurSlash; };    
     bool HasMensurSlash( );
     
+    //
+    void SetProportNum(int proportNumInt_) { m_proportNumInt = proportNumInt_; };
+    int GetProportNum() const { return m_proportNumInt; };    
+    bool HasProportNum( );
+    
+    //
+    void SetProportNumbase(int proportNumbaseInt_) { m_proportNumbaseInt = proportNumbaseInt_; };
+    int GetProportNumbase() const { return m_proportNumbaseInt; };    
+    bool HasProportNumbase( );
+    
     ///@}
 
 protected:
     /** Determines if a dot is to be added to the base symbol. **/
     data_BOOLEAN m_mensurDot;
-    /** Holds the staff location of the mensuration sign. **/
-    int m_mensurLocInt;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
     data_MENSURATIONSIGN m_mensurSign;
     /**
@@ -165,28 +168,99 @@ protected:
      * For example, one slash is added for what we now call 'alla breve'.
      **/
     char m_mensurSlash;
+    /**
+     * Together, proport.num and proport.numbase specify a proportional change as a
+     * ratio, e.g., 1:3.
+     * Proport.num is for the first value in the ratio.
+     **/
+    int m_proportNumInt;
+    /**
+     * Together, proport.num and proport.numbase specify a proportional change as a
+     * ratio, e.g., 1:3.
+     * Proport.numbase is for the second value in the ratio.
+     **/
+    int m_proportNumbaseInt;
 
-/* include <attmensur.slash> */
+/* include <attproport.numbase> */
 };
 
 //----------------------------------------------------------------------------
-// AttMensurDefaultVis
+// AttMensuralShared
 //----------------------------------------------------------------------------
 
-class AttMensurDefaultVis: public Att
+class AttMensuralShared: public Att
 {
 public:
-    AttMensurDefaultVis();
-    virtual ~AttMensurDefaultVis();
+    AttMensuralShared();
+    virtual ~AttMensuralShared();
     
     /** Reset the default values for the attribute class **/
-    void ResetMensurDefaultVis();
+    void ResetMensuralShared();
     
     /** Read the values for the attribute class **/
-    bool ReadMensurDefaultVis( pugi::xml_node element );
+    bool ReadMensuralShared( pugi::xml_node element );
     
     /** Write the values for the attribute class **/
-    bool WriteMensurDefaultVis( pugi::xml_node element );
+    bool WriteMensuralShared( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetModusmaior(std::string modusmaior_) { m_modusmaior = modusmaior_; };
+    std::string GetModusmaior() const { return m_modusmaior; };    
+    bool HasModusmaior( );
+    
+    //
+    void SetModusminor(std::string modusminor_) { m_modusminor = modusminor_; };
+    std::string GetModusminor() const { return m_modusminor; };    
+    bool HasModusminor( );
+    
+    //
+    void SetProlatio(std::string prolatio_) { m_prolatio = prolatio_; };
+    std::string GetProlatio() const { return m_prolatio; };    
+    bool HasProlatio( );
+    
+    //
+    void SetTempus(std::string tempus_) { m_tempus = tempus_; };
+    std::string GetTempus() const { return m_tempus; };    
+    bool HasTempus( );
+    
+    ///@}
+
+protected:
+    /** Describes the maxima-long relationship. **/
+    std::string m_modusmaior;
+    /** Describes the long-breve relationship. **/
+    std::string m_modusminor;
+    /** Describes the semibreve-minim relationship. **/
+    std::string m_prolatio;
+    /** Describes the breve-semibreve relationship. **/
+    std::string m_tempus;
+
+/* include <atttempus> */
+};
+
+//----------------------------------------------------------------------------
+// AttMensuralVis
+//----------------------------------------------------------------------------
+
+class AttMensuralVis: public Att
+{
+public:
+    AttMensuralVis();
+    virtual ~AttMensuralVis();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetMensuralVis();
+    
+    /** Read the values for the attribute class **/
+    bool ReadMensuralVis( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMensuralVis( pugi::xml_node element );
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -202,6 +276,11 @@ public:
     void SetMensurForm(std::string mensurForm_) { m_mensurForm = mensurForm_; };
     std::string GetMensurForm() const { return m_mensurForm; };    
     bool HasMensurForm( );
+    
+    //
+    void SetMensurLoc(std::string mensurLoc_) { m_mensurLoc = mensurLoc_; };
+    std::string GetMensurLoc() const { return m_mensurLoc; };    
+    bool HasMensurLoc( );
     
     //
     void SetMensurOrient(std::string mensurOrient_) { m_mensurOrient = mensurOrient_; };
@@ -223,6 +302,8 @@ protected:
     std::string m_mensurColor;
     /** Indicates whether the base symbol is written vertically or horizontally. **/
     std::string m_mensurForm;
+    /** Holds the staff location of the mensuration sign. **/
+    std::string m_mensurLoc;
     /** Describes the rotation or reflection of the base symbol. **/
     std::string m_mensurOrient;
     /** Describes the relative size of the mensuration sign. **/
@@ -294,9 +375,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSpacesInt(int spacesInt_) { m_spacesInt = spacesInt_; };
-    int GetSpacesInt() const { return m_spacesInt; };    
-    bool HasSpacesInt( );
+    void SetSpaces(int spacesInt_) { m_spacesInt = spacesInt_; };
+    int GetSpaces() const { return m_spacesInt; };    
+    bool HasSpaces( );
     
     ///@}
 
@@ -305,104 +386,6 @@ protected:
     int m_spacesInt;
 
 /* include <attspaces> */
-};
-
-//----------------------------------------------------------------------------
-// AttStaffDefLogMensural
-//----------------------------------------------------------------------------
-
-class AttStaffDefLogMensural: public Att
-{
-public:
-    AttStaffDefLogMensural();
-    virtual ~AttStaffDefLogMensural();
-    
-    /** Reset the default values for the attribute class **/
-    void ResetStaffDefLogMensural();
-    
-    /** Read the values for the attribute class **/
-    bool ReadStaffDefLogMensural( pugi::xml_node element );
-    
-    /** Write the values for the attribute class **/
-    bool WriteStaffDefLogMensural( pugi::xml_node element );
-    
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
-     * to the default value)
-     **/
-    ///@{
-    void SetProportNumInt(int proportNumInt_) { m_proportNumInt = proportNumInt_; };
-    int GetProportNumInt() const { return m_proportNumInt; };    
-    bool HasProportNumInt( );
-    
-    //
-    void SetProportNumbaseInt(int proportNumbaseInt_) { m_proportNumbaseInt = proportNumbaseInt_; };
-    int GetProportNumbaseInt() const { return m_proportNumbaseInt; };    
-    bool HasProportNumbaseInt( );
-    
-    ///@}
-
-protected:
-    /**
-     * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio, e.g., 1:3.
-     * Proport.num is for the first value in the ratio.
-     **/
-    int m_proportNumInt;
-    /**
-     * Together, proport.num and proport.numbase specify a proportional change as a
-     * ratio, e.g., 1:3.
-     * Proport.numbase is for the second value in the ratio.
-     **/
-    int m_proportNumbaseInt;
-
-/* include <attproport.numbase> */
-};
-
-//----------------------------------------------------------------------------
-// AttStafflocPitched
-//----------------------------------------------------------------------------
-
-class AttStafflocPitched: public Att
-{
-public:
-    AttStafflocPitched();
-    virtual ~AttStafflocPitched();
-    
-    /** Reset the default values for the attribute class **/
-    void ResetStafflocPitched();
-    
-    /** Read the values for the attribute class **/
-    bool ReadStafflocPitched( pugi::xml_node element );
-    
-    /** Write the values for the attribute class **/
-    bool WriteStafflocPitched( pugi::xml_node element );
-    
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
-     * to the default value)
-     **/
-    ///@{
-    void SetPloc(std::string ploc_) { m_ploc = ploc_; };
-    std::string GetPloc() const { return m_ploc; };    
-    bool HasPloc( );
-    
-    //
-    void SetOloc(std::string oloc_) { m_oloc = oloc_; };
-    std::string GetOloc() const { return m_oloc; };    
-    bool HasOloc( );
-    
-    ///@}
-
-protected:
-    /** Captures staff location in terms of written pitch name. **/
-    std::string m_ploc;
-    /** Records staff location in terms of written octave. **/
-    std::string m_oloc;
-
-/* include <attoloc> */
 };
 
 } // vrv namespace

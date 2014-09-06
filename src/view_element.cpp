@@ -726,8 +726,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     
     // We do not support more than three chars
-    if (multirest->GetNumber() > 999)
-        multirest->SetNumber(999);
+    if (multirest->GetNum() > 999)
+        multirest->SetNum(999);
     
     // This is 1/2 the length of th black rectangle
 	length = (m_doc->m_drawingStep1 * 5);
@@ -757,7 +757,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     // convert to string
     std::stringstream text;
-    text << multirest->GetNumber();
+    text << multirest->GetNum();
     
     dc->GetTextExtent( text.str(), &w, &h);
     start_offset = (x2 - x1 - w) / 2; // calculate offset to center text

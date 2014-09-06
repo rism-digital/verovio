@@ -177,7 +177,7 @@ bool MeiOutput::WriteScoreDef( ScoreDef *scoreDef )
         scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(m_scoreDef);
     }
     if ( scoreDef->GetMensurAttr() ) {
-        dynamic_cast<AttMensurDefaultLog*>(scoreDef)->WriteMensurDefaultLog(m_scoreDef);
+        dynamic_cast<AttMensuralLog*>(scoreDef)->WriteMensuralLog(m_scoreDef);
     }
     if ( scoreDef->GetMeterSigAttr() ) {
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(m_scoreDef);
@@ -220,7 +220,7 @@ bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
         staffDef->GetKeySigAttr()->WriteKeySigDefaultLog(m_staffDef);
     }
     if ( staffDef->GetMensurAttr() ) {
-        staffDef->GetMensurAttr()->WriteMensurDefaultLog(m_staffDef);
+        staffDef->GetMensurAttr()->WriteMensuralLog(m_staffDef);
     }
     if ( staffDef->GetMeterSigAttr() ) {
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(m_staffDef);
@@ -403,9 +403,8 @@ void MeiOutput::WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest )
 
 void MeiOutput::WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multiRest )
 {
-    meiMultiRest.append_attribute( "num" ) = StringFormat("%d", multiRest->GetNumber()).c_str();
-
-    return;
+    multiRest->WriteNumbered(meiMultiRest);
+   return;
 }
 
 void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
@@ -899,7 +898,7 @@ bool MeiInput::ReadMeiScoreDef( pugi::xml_node scoreDef )
         m_scoreDef->ReplaceMeterSig( &meterSig );
     }
     MensurAttr mensur;
-    if ( mensur.ReadMensurDefaultLog( scoreDef ) ) {
+    if ( mensur.ReadMensuralLog( scoreDef ) ) {
         m_scoreDef->ReplaceMensur( &mensur );
     }
     
@@ -1223,12 +1222,7 @@ LayerElement *MeiInput::ReadMeiMRest( pugi::xml_node mRest )
 LayerElement *MeiInput::ReadMeiMultiRest( pugi::xml_node multiRest )
 {
 	MultiRest *vrvMultiRest = new MultiRest( 1 );
-    
-	// pitch
-    if ( multiRest.attribute( "num" ) ) {
-        vrvMultiRest->SetNumber( atoi ( multiRest.attribute( "num" ).value() ) );
-    }
-	
+    vrvMultiRest->ReadNumbered(multiRest);	
 	return vrvMultiRest;
 }
 

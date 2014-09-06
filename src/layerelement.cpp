@@ -129,16 +129,6 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
     return element;
 }
 
-
-
-int LayerElement::GetElementIdx() const
-{
-    assert( m_parent ); // Layer cannot be NULL
-    
-    return m_parent->GetChildIndex( this );
-}
-
-
 int LayerElement::GetHorizontalSpacing()
 {
     return 10; // arbitrary generic value

@@ -22,6 +22,11 @@ MRest::MRest( ):
 MRest::~MRest()
 {
 }
+    
+void MRest::Reset()
+{
+    LayerElement::Reset();
+}
 
 bool MRest::operator==( Object& other )
 {

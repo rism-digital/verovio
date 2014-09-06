@@ -119,32 +119,29 @@ bool AttMensurVis::HasOrient( )
 /* include <attorient> */
 
 //----------------------------------------------------------------------------
-// AttMensurDefaultLog
+// AttMensuralLog
 //----------------------------------------------------------------------------
 
-AttMensurDefaultLog::AttMensurDefaultLog(): Att() {
-    ResetMensurDefaultLog();
+AttMensuralLog::AttMensuralLog(): Att() {
+    ResetMensuralLog();
 }
 
-AttMensurDefaultLog::~AttMensurDefaultLog() {
+AttMensuralLog::~AttMensuralLog() {
 
 }
 
-void AttMensurDefaultLog::ResetMensurDefaultLog() {
+void AttMensuralLog::ResetMensuralLog() {
     m_mensurDot = BOOLEAN_NONE;
-    m_mensurLocInt = 0;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSlash = 0;
+    m_proportNumInt = 0;
+    m_proportNumbaseInt = 0;
 }
 
-bool AttMensurDefaultLog::ReadMensurDefaultLog(  pugi::xml_node element ) {
+bool AttMensuralLog::ReadMensuralLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("mensur.dot")) {
         this->SetMensurDot(StrToBool(element.attribute("mensur.dot").value()));
-        hasAttribute = true;
-    }
-    if (element.attribute("mensur.loc")) {
-        this->SetMensurLocInt(StrToInt(element.attribute("mensur.loc").value()));
         hasAttribute = true;
     }
     if (element.attribute("mensur.sign")) {
@@ -155,17 +152,21 @@ bool AttMensurDefaultLog::ReadMensurDefaultLog(  pugi::xml_node element ) {
         this->SetMensurSlash(StrToInt(element.attribute("mensur.slash").value()));
         hasAttribute = true;
     }
+    if (element.attribute("proport.num")) {
+        this->SetProportNum(StrToInt(element.attribute("proport.num").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("proport.numbase")) {
+        this->SetProportNumbase(StrToInt(element.attribute("proport.numbase").value()));
+        hasAttribute = true;
+    }
     return hasAttribute;
 }
 
-bool AttMensurDefaultLog::WriteMensurDefaultLog(  pugi::xml_node element ) {
+bool AttMensuralLog::WriteMensuralLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasMensurDot()) {
         element.append_attribute("mensur.dot") = BoolToStr(this->GetMensurDot()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMensurLocInt()) {
-        element.append_attribute("mensur.loc") = IntToStr(this->GetMensurLocInt()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMensurSign()) {
@@ -176,52 +177,150 @@ bool AttMensurDefaultLog::WriteMensurDefaultLog(  pugi::xml_node element ) {
         element.append_attribute("mensur.slash") = IntToStr(this->GetMensurSlash()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasProportNum()) {
+        element.append_attribute("proport.num") = IntToStr(this->GetProportNum()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasProportNumbase()) {
+        element.append_attribute("proport.numbase") = IntToStr(this->GetProportNumbase()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
-bool AttMensurDefaultLog::HasMensurDot( )
+bool AttMensuralLog::HasMensurDot( )
 {
     return (m_mensurDot != BOOLEAN_NONE);
 }
 
-bool AttMensurDefaultLog::HasMensurLocInt( )
-{
-    return (m_mensurLocInt != 0);
-}
-
-bool AttMensurDefaultLog::HasMensurSign( )
+bool AttMensuralLog::HasMensurSign( )
 {
     return (m_mensurSign != MENSURATIONSIGN_NONE);
 }
 
-bool AttMensurDefaultLog::HasMensurSlash( )
+bool AttMensuralLog::HasMensurSlash( )
 {
     return (m_mensurSlash != 0);
 }
 
-
-/* include <attmensur.slash> */
-
-//----------------------------------------------------------------------------
-// AttMensurDefaultVis
-//----------------------------------------------------------------------------
-
-AttMensurDefaultVis::AttMensurDefaultVis(): Att() {
-    ResetMensurDefaultVis();
+bool AttMensuralLog::HasProportNum( )
+{
+    return (m_proportNumInt != 0);
 }
 
-AttMensurDefaultVis::~AttMensurDefaultVis() {
+bool AttMensuralLog::HasProportNumbase( )
+{
+    return (m_proportNumbaseInt != 0);
+}
+
+
+/* include <attproport.numbase> */
+
+//----------------------------------------------------------------------------
+// AttMensuralShared
+//----------------------------------------------------------------------------
+
+AttMensuralShared::AttMensuralShared(): Att() {
+    ResetMensuralShared();
+}
+
+AttMensuralShared::~AttMensuralShared() {
 
 }
 
-void AttMensurDefaultVis::ResetMensurDefaultVis() {
+void AttMensuralShared::ResetMensuralShared() {
+    m_modusmaior = "";
+    m_modusminor = "";
+    m_prolatio = "";
+    m_tempus = "";
+}
+
+bool AttMensuralShared::ReadMensuralShared(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("modusmaior")) {
+        this->SetModusmaior(StrToStr(element.attribute("modusmaior").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("modusminor")) {
+        this->SetModusminor(StrToStr(element.attribute("modusminor").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("prolatio")) {
+        this->SetProlatio(StrToStr(element.attribute("prolatio").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("tempus")) {
+        this->SetTempus(StrToStr(element.attribute("tempus").value()));
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMensuralShared::WriteMensuralShared(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasModusmaior()) {
+        element.append_attribute("modusmaior") = StrToStr(this->GetModusmaior()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasModusminor()) {
+        element.append_attribute("modusminor") = StrToStr(this->GetModusminor()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasProlatio()) {
+        element.append_attribute("prolatio") = StrToStr(this->GetProlatio()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTempus()) {
+        element.append_attribute("tempus") = StrToStr(this->GetTempus()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMensuralShared::HasModusmaior( )
+{
+    return (m_modusmaior != "");
+}
+
+bool AttMensuralShared::HasModusminor( )
+{
+    return (m_modusminor != "");
+}
+
+bool AttMensuralShared::HasProlatio( )
+{
+    return (m_prolatio != "");
+}
+
+bool AttMensuralShared::HasTempus( )
+{
+    return (m_tempus != "");
+}
+
+
+/* include <atttempus> */
+
+//----------------------------------------------------------------------------
+// AttMensuralVis
+//----------------------------------------------------------------------------
+
+AttMensuralVis::AttMensuralVis(): Att() {
+    ResetMensuralVis();
+}
+
+AttMensuralVis::~AttMensuralVis() {
+
+}
+
+void AttMensuralVis::ResetMensuralVis() {
     m_mensurColor = "";
     m_mensurForm = "";
+    m_mensurLoc = "";
     m_mensurOrient = "";
     m_mensurSize = "";
 }
 
-bool AttMensurDefaultVis::ReadMensurDefaultVis(  pugi::xml_node element ) {
+bool AttMensuralVis::ReadMensuralVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("mensur.color")) {
         this->SetMensurColor(StrToStr(element.attribute("mensur.color").value()));
@@ -229,6 +328,10 @@ bool AttMensurDefaultVis::ReadMensurDefaultVis(  pugi::xml_node element ) {
     }
     if (element.attribute("mensur.form")) {
         this->SetMensurForm(StrToStr(element.attribute("mensur.form").value()));
+        hasAttribute = true;
+    }
+    if (element.attribute("mensur.loc")) {
+        this->SetMensurLoc(StrToStr(element.attribute("mensur.loc").value()));
         hasAttribute = true;
     }
     if (element.attribute("mensur.orient")) {
@@ -242,7 +345,7 @@ bool AttMensurDefaultVis::ReadMensurDefaultVis(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttMensurDefaultVis::WriteMensurDefaultVis(  pugi::xml_node element ) {
+bool AttMensuralVis::WriteMensuralVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasMensurColor()) {
         element.append_attribute("mensur.color") = StrToStr(this->GetMensurColor()).c_str();
@@ -250,6 +353,10 @@ bool AttMensurDefaultVis::WriteMensurDefaultVis(  pugi::xml_node element ) {
     }
     if (this->HasMensurForm()) {
         element.append_attribute("mensur.form") = StrToStr(this->GetMensurForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMensurLoc()) {
+        element.append_attribute("mensur.loc") = StrToStr(this->GetMensurLoc()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMensurOrient()) {
@@ -263,22 +370,27 @@ bool AttMensurDefaultVis::WriteMensurDefaultVis(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttMensurDefaultVis::HasMensurColor( )
+bool AttMensuralVis::HasMensurColor( )
 {
     return (m_mensurColor != "");
 }
 
-bool AttMensurDefaultVis::HasMensurForm( )
+bool AttMensuralVis::HasMensurForm( )
 {
     return (m_mensurForm != "");
 }
 
-bool AttMensurDefaultVis::HasMensurOrient( )
+bool AttMensuralVis::HasMensurLoc( )
+{
+    return (m_mensurLoc != "");
+}
+
+bool AttMensuralVis::HasMensurOrient( )
 {
     return (m_mensurOrient != "");
 }
 
-bool AttMensurDefaultVis::HasMensurSize( )
+bool AttMensuralVis::HasMensurSize( )
 {
     return (m_mensurSize != "");
 }
@@ -347,7 +459,7 @@ void AttRestVisMensural::ResetRestVisMensural() {
 bool AttRestVisMensural::ReadRestVisMensural(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("spaces")) {
-        this->SetSpacesInt(StrToInt(element.attribute("spaces").value()));
+        this->SetSpaces(StrToInt(element.attribute("spaces").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -355,132 +467,20 @@ bool AttRestVisMensural::ReadRestVisMensural(  pugi::xml_node element ) {
 
 bool AttRestVisMensural::WriteRestVisMensural(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasSpacesInt()) {
-        element.append_attribute("spaces") = IntToStr(this->GetSpacesInt()).c_str();
+    if (this->HasSpaces()) {
+        element.append_attribute("spaces") = IntToStr(this->GetSpaces()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttRestVisMensural::HasSpacesInt( )
+bool AttRestVisMensural::HasSpaces( )
 {
     return (m_spacesInt != 0);
 }
 
 
 /* include <attspaces> */
-
-//----------------------------------------------------------------------------
-// AttStaffDefLogMensural
-//----------------------------------------------------------------------------
-
-AttStaffDefLogMensural::AttStaffDefLogMensural(): Att() {
-    ResetStaffDefLogMensural();
-}
-
-AttStaffDefLogMensural::~AttStaffDefLogMensural() {
-
-}
-
-void AttStaffDefLogMensural::ResetStaffDefLogMensural() {
-    m_proportNumInt = 0;
-    m_proportNumbaseInt = 0;
-}
-
-bool AttStaffDefLogMensural::ReadStaffDefLogMensural(  pugi::xml_node element ) {
-    bool hasAttribute = false;
-    if (element.attribute("proport.num")) {
-        this->SetProportNumInt(StrToInt(element.attribute("proport.num").value()));
-        hasAttribute = true;
-    }
-    if (element.attribute("proport.numbase")) {
-        this->SetProportNumbaseInt(StrToInt(element.attribute("proport.numbase").value()));
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttStaffDefLogMensural::WriteStaffDefLogMensural(  pugi::xml_node element ) {
-    bool wroteAttribute = false;
-    if (this->HasProportNumInt()) {
-        element.append_attribute("proport.num") = IntToStr(this->GetProportNumInt()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasProportNumbaseInt()) {
-        element.append_attribute("proport.numbase") = IntToStr(this->GetProportNumbaseInt()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttStaffDefLogMensural::HasProportNumInt( )
-{
-    return (m_proportNumInt != 0);
-}
-
-bool AttStaffDefLogMensural::HasProportNumbaseInt( )
-{
-    return (m_proportNumbaseInt != 0);
-}
-
-
-/* include <attproport.numbase> */
-
-//----------------------------------------------------------------------------
-// AttStafflocPitched
-//----------------------------------------------------------------------------
-
-AttStafflocPitched::AttStafflocPitched(): Att() {
-    ResetStafflocPitched();
-}
-
-AttStafflocPitched::~AttStafflocPitched() {
-
-}
-
-void AttStafflocPitched::ResetStafflocPitched() {
-    m_ploc = "";
-    m_oloc = "";
-}
-
-bool AttStafflocPitched::ReadStafflocPitched(  pugi::xml_node element ) {
-    bool hasAttribute = false;
-    if (element.attribute("ploc")) {
-        this->SetPloc(StrToStr(element.attribute("ploc").value()));
-        hasAttribute = true;
-    }
-    if (element.attribute("oloc")) {
-        this->SetOloc(StrToStr(element.attribute("oloc").value()));
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttStafflocPitched::WriteStafflocPitched(  pugi::xml_node element ) {
-    bool wroteAttribute = false;
-    if (this->HasPloc()) {
-        element.append_attribute("ploc") = StrToStr(this->GetPloc()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasOloc()) {
-        element.append_attribute("oloc") = StrToStr(this->GetOloc()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttStafflocPitched::HasPloc( )
-{
-    return (m_ploc != "");
-}
-
-bool AttStafflocPitched::HasOloc( )
-{
-    return (m_oloc != "");
-}
-
-
-/* include <attoloc> */
 
 } // vrv namespace
 

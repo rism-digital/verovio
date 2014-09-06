@@ -128,17 +128,23 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHfunc(std::string hfunc_) { m_hfunc = hfunc_; };
-    std::string GetHfunc() const { return m_hfunc; };    
-    bool HasHfunc( );
+    void SetDeg(std::string deg_) { m_deg = deg_; };
+    std::string GetDeg() const { return m_deg; };    
+    bool HasDeg( );
     
     ///@}
 
 protected:
-    /** Describes harmonic function in any convenient typology. **/
-    std::string m_hfunc;
+    /**
+     * Captures relative scale degree information using Humdrum **deg syntax -- an
+     * optional indicator of melodic approach (^ = ascending approach, v = descending
+     * approach), a scale degree value (1 = tonic ...
+     * 7 = leading tone), and an optional indication of chromatic alteration. The
+     * amount of chromatic alternation is not indicated.
+     **/
+    std::string m_deg;
 
-/* include <atthfunc> */
+/* include <attdeg> */
 };
 
 //----------------------------------------------------------------------------
@@ -216,8 +222,9 @@ public:
 protected:
     /**
      * Encodes the melodic interval from the previous pitch.
-     * The value may be a general directional indication (u, d, s) or a precise numeric
-     * value in half steps.
+     * The value may be a general directional indication (u, d, s), an indication of
+     * diatonic interval direction, quality, and size, or a precise numeric value in
+     * half steps.
      **/
     std::string m_intm;
 
@@ -256,7 +263,7 @@ public:
     ///@}
 
 protected:
-    /** Describes melodic function in any convenient typology. **/
+    /** Describes melodic function using Humdrum **embel syntax. **/
     std::string m_mfunc;
 
 /* include <attmfunc> */

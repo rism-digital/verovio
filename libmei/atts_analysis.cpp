@@ -145,13 +145,13 @@ AttHarmonicfunction::~AttHarmonicfunction() {
 }
 
 void AttHarmonicfunction::ResetHarmonicfunction() {
-    m_hfunc = "";
+    m_deg = "";
 }
 
 bool AttHarmonicfunction::ReadHarmonicfunction(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("hfunc")) {
-        this->SetHfunc(StrToStr(element.attribute("hfunc").value()));
+    if (element.attribute("deg")) {
+        this->SetDeg(StrToStr(element.attribute("deg").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -159,20 +159,20 @@ bool AttHarmonicfunction::ReadHarmonicfunction(  pugi::xml_node element ) {
 
 bool AttHarmonicfunction::WriteHarmonicfunction(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasHfunc()) {
-        element.append_attribute("hfunc") = StrToStr(this->GetHfunc()).c_str();
+    if (this->HasDeg()) {
+        element.append_attribute("deg") = StrToStr(this->GetDeg()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttHarmonicfunction::HasHfunc( )
+bool AttHarmonicfunction::HasDeg( )
 {
-    return (m_hfunc != "");
+    return (m_deg != "");
 }
 
 
-/* include <atthfunc> */
+/* include <attdeg> */
 
 //----------------------------------------------------------------------------
 // AttIntervalharmonic

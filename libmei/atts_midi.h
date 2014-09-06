@@ -64,9 +64,9 @@ public:
     bool HasMidiPort( );
     
     //
-    void SetMidiTrackInt(int midiTrackInt_) { m_midiTrackInt = midiTrackInt_; };
-    int GetMidiTrackInt() const { return m_midiTrackInt; };    
-    bool HasMidiTrackInt( );
+    void SetMidiTrack(int midiTrackInt_) { m_midiTrackInt = midiTrackInt_; };
+    int GetMidiTrack() const { return m_midiTrackInt; };    
+    bool HasMidiTrack( );
     
     ///@}
 
@@ -170,9 +170,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };    
-    bool HasNumInt( );
+    void SetNum(int numInt_) { m_numInt = numInt_; };
+    int GetNum() const { return m_numInt; };    
+    bool HasNum( );
     
     ///@}
 
@@ -290,9 +290,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPpqInt(int ppqInt_) { m_ppqInt = ppqInt_; };
-    int GetPpqInt() const { return m_ppqInt; };    
-    bool HasPpqInt( );
+    void SetPpq(int ppqInt_) { m_ppqInt = ppqInt_; };
+    int GetPpq() const { return m_ppqInt; };    
+    bool HasPpq( );
     
     ///@}
 

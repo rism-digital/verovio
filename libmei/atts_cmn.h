@@ -299,14 +299,14 @@ public:
     bool HasRend( );
     
     //
-    void SetSlopeDbl(double slopeDbl_) { m_slopeDbl = slopeDbl_; };
-    double GetSlopeDbl() const { return m_slopeDbl; };    
-    bool HasSlopeDbl( );
+    void SetSlope(double slopeDbl_) { m_slopeDbl = slopeDbl_; };
+    double GetSlope() const { return m_slopeDbl; };    
+    bool HasSlope( );
     
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_rend;
     /** Records the slope of the beam. **/
     double m_slopeDbl;
@@ -339,9 +339,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBreaksecInt(int breaksecInt_) { m_breaksecInt = breaksecInt_; };
-    int GetBreaksecInt() const { return m_breaksecInt; };    
-    bool HasBreaksecInt( );
+    void SetBreaksec(int breaksecInt_) { m_breaksecInt = breaksecInt_; };
+    int GetBreaksec() const { return m_breaksecInt; };    
+    bool HasBreaksec( );
     
     ///@}
 
@@ -389,7 +389,7 @@ public:
     ///@}
 
 protected:
-    /** Describes the line style of the curve. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_rend;
 
 /* include <attrend> */
@@ -992,9 +992,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumInt(int numInt_) { m_numInt = numInt_; };
-    int GetNumInt() const { return m_numInt; };    
-    bool HasNumInt( );
+    void SetNum(int numInt_) { m_numInt = numInt_; };
+    int GetNum() const { return m_numInt; };    
+    bool HasNum( );
     
     ///@}
 
@@ -1454,47 +1454,6 @@ protected:
 };
 
 //----------------------------------------------------------------------------
-// AttTupletLog
-//----------------------------------------------------------------------------
-
-class AttTupletLog: public Att
-{
-public:
-    AttTupletLog();
-    virtual ~AttTupletLog();
-    
-    /** Reset the default values for the attribute class **/
-    void ResetTupletLog();
-    
-    /** Read the values for the attribute class **/
-    bool ReadTupletLog( pugi::xml_node element );
-    
-    /** Write the values for the attribute class **/
-    bool WriteTupletLog( pugi::xml_node element );
-    
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
-     * to the default value)
-     **/
-    ///@{
-    void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() const { return m_dur; };    
-    bool HasDur( );
-    
-    ///@}
-
-protected:
-    /**
-     * Records the duration of a feature using the relative durational values provided
-     * by the data.DURATION datatype.
-     **/
-    std::string m_dur;
-
-/* include <attdur> */
-};
-
-//----------------------------------------------------------------------------
 // AttTupletVis
 //----------------------------------------------------------------------------
 
@@ -1554,47 +1513,6 @@ protected:
     std::string m_numFormat;
 
 /* include <attnum.format> */
-};
-
-//----------------------------------------------------------------------------
-// AttTupletSpanLog
-//----------------------------------------------------------------------------
-
-class AttTupletSpanLog: public Att
-{
-public:
-    AttTupletSpanLog();
-    virtual ~AttTupletSpanLog();
-    
-    /** Reset the default values for the attribute class **/
-    void ResetTupletSpanLog();
-    
-    /** Read the values for the attribute class **/
-    bool ReadTupletSpanLog( pugi::xml_node element );
-    
-    /** Write the values for the attribute class **/
-    bool WriteTupletSpanLog( pugi::xml_node element );
-    
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
-     * to the default value)
-     **/
-    ///@{
-    void SetDur(std::string dur_) { m_dur = dur_; };
-    std::string GetDur() const { return m_dur; };    
-    bool HasDur( );
-    
-    ///@}
-
-protected:
-    /**
-     * Records the duration of a feature using the relative durational values provided
-     * by the data.DURATION datatype.
-     **/
-    std::string m_dur;
-
-/* include <attdur> */
 };
 
 } // vrv namespace
