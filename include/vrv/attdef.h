@@ -16,6 +16,30 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // MEI data defines
 //----------------------------------------------------------------------------
+ 
+/**
+ * MEI data.ACCIDENTAL.EXPLICIT
+ */
+enum data_ACCIDENTAL_EXPLICIT {
+    ACCIDENTAL_EXPLICIT_NONE = 0,
+    ACCIDENTAL_EXPLICIT_s,
+    ACCIDENTAL_EXPLICIT_f,
+    ACCIDENTAL_EXPLICIT_ss,
+    ACCIDENTAL_EXPLICIT_x,
+    ACCIDENTAL_EXPLICIT_ff,
+    ACCIDENTAL_EXPLICIT_xs,
+    ACCIDENTAL_EXPLICIT_ts,
+    ACCIDENTAL_EXPLICIT_tf,
+    ACCIDENTAL_EXPLICIT_n,
+    ACCIDENTAL_EXPLICIT_nf,
+    ACCIDENTAL_EXPLICIT_ns,
+    ACCIDENTAL_EXPLICIT_su,
+    ACCIDENTAL_EXPLICIT_sd,
+    ACCIDENTAL_EXPLICIT_fu,
+    ACCIDENTAL_EXPLICIT_fd,
+    ACCIDENTAL_EXPLICIT_nu,
+    ACCIDENTAL_EXPLICIT_nd
+};
     
 /**
  * MEI data.ACCIDENTAL.IMPLICIT

@@ -17,10 +17,13 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
+#include "custos.h"
+#include "dot.h"
 #include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -35,7 +38,6 @@
 #include "scoredef.h"
 #include "staff.h"
 #include "syl.h"
-#include "symbol.h"
 #include "system.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -301,7 +303,11 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
     // we should do the same for any LayerElement container (slur, tuplet, etc. )
     
     pugi::xml_node xmlElement;
-    if (dynamic_cast<Barline*>(element)) {
+    if (dynamic_cast<Accid*>(element)) {
+        xmlElement = currentParent.append_child("accid");
+        WriteMeiAccid( xmlElement, dynamic_cast<Accid*>(element) );
+    }
+    else if (dynamic_cast<Barline*>(element)) {
         xmlElement = currentParent.append_child( "barLine" );
         WriteMeiBarline( xmlElement, dynamic_cast<Barline*>(element) );
     }
@@ -313,6 +319,14 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
     else if (dynamic_cast<Clef*>(element)) {
         xmlElement = currentParent.append_child("clef");
         WriteMeiClef( xmlElement, dynamic_cast<Clef*>(element) );
+    }
+    else if (dynamic_cast<Custos*>(element)) {
+        xmlElement = currentParent.append_child( "custos" );
+        WriteMeiCustos( xmlElement, dynamic_cast<Custos*>(element) );
+    }
+    else if (dynamic_cast<Dot*>(element)) {
+        xmlElement = currentParent.append_child( "dot" );
+        WriteMeiDot( xmlElement, dynamic_cast<Dot*>(element) );
     }
     else if (dynamic_cast<Mensur*>(element)) {
         xmlElement = currentParent.append_child("mensur");
@@ -339,9 +353,6 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
         m_tuplet = xmlElement;
         WriteMeiTuplet( xmlElement, dynamic_cast<Tuplet*>(element) );
     }
-    else if (dynamic_cast<Symbol*>(element)) {        
-        xmlElement = WriteMeiSymbol( dynamic_cast<Symbol*>(element), currentParent );
-    }
     
     // we have it, set the uuid we read
     if ( !xmlElement.empty() ) {
@@ -356,6 +367,12 @@ bool MeiOutput::WriteLayerElement( LayerElement *element )
         LogWarning( "Element class %s could not be saved", element->GetClassName().c_str() );
         return false;
     }    
+}
+    
+void MeiOutput::WriteMeiAccid( pugi::xml_node meiAccid, Accid *accid )
+{
+    WritePositionInterface(meiAccid, accid);
+    accid->WriteAccidental(meiAccid);
 }
 
 void MeiOutput::WriteMeiBarline( pugi::xml_node meiBarline, Barline *barLine )
@@ -379,6 +396,15 @@ void MeiOutput::WriteMeiClef( pugi::xml_node meiClef, Clef *clef )
     return;
 }
 
+void MeiOutput::WriteMeiCustos( pugi::xml_node meiCustos, Custos *custos )
+{
+    WritePositionInterface(meiCustos, custos);
+}
+
+void MeiOutput::WriteMeiDot( pugi::xml_node meiDot, Dot *dot )
+{
+    WritePositionInterface(meiDot, dot);
+}
 
 void MeiOutput::WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur )
 {
@@ -410,15 +436,11 @@ void MeiOutput::WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multi
 void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
 {
     WriteDurationInterface(meiNote, note);
+    WritePitchInterface(meiNote, note);
     note->WriteColoration(meiNote);
     note->WriteNoteLogMensural(meiNote);
     note->WriteStemmed(meiNote);
     
-    meiNote.append_attribute( "pname" ) = PitchToStr( note->m_pname ).c_str();
-    meiNote.append_attribute( "oct" ) = OctToStr( note->m_oct ).c_str();
-    if ( note->m_accid ) {
-        meiNote.append_attribute( "accid" ) = AccidToStr( note->m_accid ).c_str();
-    }
     if ( note->m_cueSize ) {
         meiNote.append_attribute( "grace" ) = "unknown";
     }
@@ -428,38 +450,9 @@ void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
 void MeiOutput::WriteMeiRest( pugi::xml_node meiRest, Rest *rest )
 {
     WriteDurationInterface(meiRest, rest);
-
-    // missing position
-    meiRest.append_attribute( "ploc" ) = PitchToStr( rest->m_pname ).c_str();
-    meiRest.append_attribute( "oloc" ) = OctToStr( rest->m_oct ).c_str();
+    WritePositionInterface(meiRest, rest);
     return;
 }
-
-pugi::xml_node MeiOutput::WriteMeiSymbol( Symbol *symbol, pugi::xml_node currentParent )
-{
-    pugi::xml_node xmlElement = currentParent.append_child();
-    if (symbol->m_type==SYMBOL_ACCID) {
-        xmlElement.set_value("accid");
-        xmlElement.append_attribute( "accid" ) = AccidToStr( symbol->m_accid ).c_str();
-        // position
-        xmlElement.append_attribute( "ploc" ) = PitchToStr( symbol->m_pname ).c_str();
-        xmlElement.append_attribute( "oloc" ) = OctToStr( symbol->m_oct ).c_str();
-    }
-    else if (symbol->m_type==SYMBOL_CUSTOS) {
-        xmlElement.set_value("custos");
-        xmlElement.append_attribute( "pname" ) = PitchToStr( symbol->m_pname ).c_str();
-        xmlElement.append_attribute( "oct" ) = OctToStr( symbol->m_oct ).c_str();
-    }
-    else if (symbol->m_type==SYMBOL_DOT) {
-        xmlElement.set_value("dot");
-        // missing m_dots
-        // position
-        xmlElement.append_attribute( "ploc" ) = PitchToStr( symbol->m_pname ).c_str();
-        xmlElement.append_attribute( "oloc" ) = OctToStr( symbol->m_oct ).c_str();
-    }
-    return xmlElement;
-}
-
 
 void MeiOutput::WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet )
 {
@@ -506,14 +499,26 @@ bool MeiOutput::WriteLayerRdg( LayerRdg *rdg )
     return true;
 }
     
-void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *durationInterface)
+void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *interface)
 {
-    durationInterface->WriteAugmentdots(element);
-    durationInterface->WriteBeamsecondary(element);
-    durationInterface->WriteDurationMusical(element);
-    durationInterface->WriteDurationPerformed(element);
-    durationInterface->WriteDurationRatio(element);
-    durationInterface->WriteFermatapresent(element);
+    interface->WriteAugmentdots(element);
+    interface->WriteBeamsecondary(element);
+    interface->WriteDurationMusical(element);
+    interface->WriteDurationPerformed(element);
+    interface->WriteDurationRatio(element);
+    interface->WriteFermatapresent(element);
+}
+    
+void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface *interface)
+{
+    interface->WriteAccidental(element);
+    interface->WriteOctave(element);
+    interface->WritePitch(element);
+}
+    
+void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInterface *interface)
+{
+
 }
 
 void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
@@ -537,6 +542,7 @@ std::string MeiOutput::BoolToStr(bool value)
     return "false";
 }
 
+/*
 std::string MeiOutput::OctToStr(int oct)
 {
 	char buf[3];
@@ -548,46 +554,7 @@ std::string MeiOutput::OctToStr(int oct)
 	//oss << oct;
 	//return oss.str();    
 }
-
-
-std::string MeiOutput::PitchToStr(int pitch)
-{
-    std::string value;
-    switch (pitch) {
-        case 7:
-        case 0: value = "b"; break;
-        case 1: value = "c"; break;
-        case 2: value = "d"; break;
-        case 3: value = "e"; break;
-        case 4: value = "f"; break;
-        case 5: value = "g"; break;
-        case 6: value = "a"; break;
-        default: 
-            LogWarning("Unknown pitch '%d'", pitch);
-            value = "";
-            break;
-    }
-	return value;
-}
-
-std::string MeiOutput::AccidToStr(unsigned char accid)
-{
-    std::string value;
-    switch (accid) {
-        case ACCID_SHARP: value = "s"; break;
-        case ACCID_FLAT: value = "f"; break;
-        case ACCID_NATURAL: value = "n"; break;
-        case ACCID_DOUBLE_SHARP: value = "x"; break;
-        case ACCID_DOUBLE_FLAT: value = "ff"; break;
-        case ACCID_QUARTER_SHARP: value = "ns"; break;
-        case ACCID_QUARTER_FLAT: value = "nf"; break;
-        default: 
-            LogWarning("Unknown accid '%d'", accid);
-            value = "";
-            break;
-    }
-	return value;
-}
+*/
 
 std::string MeiOutput::DocTypeToStr(DocType type)
 {
@@ -1231,34 +1198,15 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
 	Note *vrvNote = new Note();
     
     ReadDurationInterface(note, vrvNote);
+    ReadPitchInterface(note, vrvNote);
     vrvNote->ReadColoration(note);
     vrvNote->ReadNoteLogMensural(note);
+    vrvNote->ReadStemmed(note);
     
-	// pitch
-	if ( note.attribute( "pname" ) ) {
-		vrvNote->m_pname = StrToPitch( note.attribute( "pname" ).value() );
-	}
-	// oct
-	if ( note.attribute( "oct" ) ) {
-		vrvNote->m_oct = StrToOct( note.attribute( "oct" ).value() );
-	}
-    // duration gestural
-	if ( note.attribute( "dur.ges" ) ) {
-		//vrvNote->m_durGes = StrToDur( note.attribute( "dur.ges" ).value() );
-	}
-    // accid
-    if ( note.attribute( "accid" ) ) {
-		vrvNote->m_accid = StrToAccid( note.attribute( "accid" ).value() );
-	}
     // grace
     if ( note.attribute( "grace" ) ) {
 		vrvNote->m_cueSize = true; //
 	}
-    // stem direction
-    if ( note.attribute( "stem.dir" ) ) {
-        // we use it to indicate opposite direction
-        //vrvNote->m_stemDir = 1;
-    }
     // tie
     if ( note.attribute( "tie" ) ) {
         if ( (strcmp ( note.attribute( "tie" ).value(), "i" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
@@ -1281,15 +1229,7 @@ LayerElement *MeiInput::ReadMeiRest( pugi::xml_node rest )
     Rest *vrvRest = new Rest();
     
     ReadDurationInterface(rest, vrvRest);
-    
-    // position
-	if ( rest.attribute( "ploc" ) ) {
-		vrvRest->m_pname = StrToPitch( rest.attribute( "ploc" ).value() );
-	}
-	// oct
-	if ( rest.attribute( "oloc" ) ) {
-		vrvRest->m_oct = StrToOct( rest.attribute( "oloc" ).value() );
-	}
+    ReadPositionInterface(rest, vrvRest);
 	
     return vrvRest;
 }
@@ -1338,38 +1278,26 @@ LayerElement *MeiInput::ReadMeiTuplet( pugi::xml_node tuplet )
 
 LayerElement *MeiInput::ReadMeiAccid( pugi::xml_node accid )
 {
-    Symbol *vrvAccid = new Symbol( SYMBOL_ACCID );
-    
-    if ( accid.attribute( "accid" ) ) {
-        vrvAccid->m_accid = StrToAccid( accid.attribute( "accid" ).value() );
-    }
-    // position
-	if ( accid.attribute( "ploc" ) ) {
-		vrvAccid->m_pname = StrToPitch( accid.attribute( "ploc" ).value() );
-	}
-	// oct
-	if ( accid.attribute( "oloc" ) ) {
-		vrvAccid->m_oct = StrToOct( accid.attribute( "oloc" ).value() );
-	}
-	
+    Accid *vrvAccid = new Accid( );
+    ReadPositionInterface(accid, vrvAccid);
+    vrvAccid->ResetAccidental();	
 	return vrvAccid;
 }
 
 LayerElement *MeiInput::ReadMeiCustos( pugi::xml_node custos )
 {
     
-    Symbol *vrvCustos = new Symbol( SYMBOL_CUSTOS );
+    Custos *vrvCustos = new Custos( );
+    ReadPositionInterface(custos, vrvCustos);
+	return vrvCustos;
+}
     
-	// position (pitch)
-	if ( custos.attribute( "pname" ) ) {
-		vrvCustos->m_pname = StrToPitch( custos.attribute( "pname" ).value() );
-	}
-	// oct
-	if ( custos.attribute( "oct" ) ) {
-		vrvCustos->m_oct = StrToOct( custos.attribute( "oct" ).value() );
-	}
-	
-	return vrvCustos;    
+    
+LayerElement *MeiInput::ReadMeiDot( pugi::xml_node dot )
+{
+    Dot *vrvDot = new Dot( );
+    ReadPositionInterface(dot, vrvDot);
+    return vrvDot;
 }
     
 bool MeiInput::ReadVerse(vrv::Note *vrvNote, pugi::xml_node verse)
@@ -1400,25 +1328,6 @@ bool MeiInput::ReadSyl(Verse *vrvVerse, pugi::xml_node syl)
     
     vrvVerse->AddSyl( vrvSyl );
     return true;
-}
-
-
-LayerElement *MeiInput::ReadMeiDot( pugi::xml_node dot )
-{
-    Symbol *vrvDot = new Symbol( SYMBOL_DOT );
-    
-    vrvDot->m_dot = 0;
-    // missing m_dots
-    // position
-	if ( dot.attribute( "ploc" ) ) {
-		vrvDot->m_pname = StrToPitch( dot.attribute( "ploc" ).value() );
-	}
-	// oct
-	if ( dot.attribute( "oloc" ) ) {
-		vrvDot->m_oct = StrToOct( dot.attribute( "oloc" ).value() );
-	}
-	
-	return vrvDot;
 }
 
 LayerElement *MeiInput::ReadMeiApp( pugi::xml_node app )
@@ -1467,17 +1376,31 @@ bool MeiInput::ReadMeiRdg( pugi::xml_node rdg )
     return layerRdg;
 }
 
-bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *durationInterface)
+bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
-    durationInterface->ReadAugmentdots(element);
-    durationInterface->ReadBeamsecondary(element);
-    durationInterface->ReadDurationMusical(element);
-    durationInterface->ReadDurationPerformed(element);
-    durationInterface->ReadDurationRatio(element);
-    durationInterface->ReadFermatapresent(element);
+    interface->ReadAugmentdots(element);
+    interface->ReadBeamsecondary(element);
+    interface->ReadDurationMusical(element);
+    interface->ReadDurationPerformed(element);
+    interface->ReadDurationRatio(element);
+    interface->ReadFermatapresent(element);
     return true;
 }
 
+bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interface)
+{
+    interface->ReadAccidental(element);
+    interface->ReadOctave(element);
+    interface->ReadPitch(element);
+    return true;
+}
+
+bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
+{
+    interface->ReadStafflocPitched(element);
+    return true;
+}
+    
 void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
 {
     if ( !element.attribute( "sameas" ) ) {
@@ -1739,7 +1662,7 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
             continue;
         }
         // we only compare oct and pname because alteration is not relevant for ties
-        if ( (terminalNote->m_oct == (*iter)->m_oct) && (terminalNote->m_pname == (*iter)->m_pname) ) {
+        if ( (terminalNote->GetOct() == (*iter)->GetOct()) && (terminalNote->GetPname() == (*iter)->GetPname()) ) {
             terminalNote->SetTieAttrTerminal( *iter );
             m_openTies.erase(iter);
             return true;
@@ -1764,46 +1687,13 @@ bool MeiInput::StrToBool(std::string value)
 	return true;
 }
 
+    /*
 int MeiInput::StrToOct(std::string oct)
 {
 	return atoi(oct.c_str());
 }
-
-int MeiInput::StrToPitch(std::string pitch)
-{
-    int value;
-    if (pitch == "c") value = PITCHNAME_c;
-    else if (pitch == "d") value = PITCHNAME_d;
-    else if (pitch == "e") value = PITCHNAME_e;
-    else if (pitch == "f") value = PITCHNAME_f;
-    else if (pitch == "g") value = PITCHNAME_g;
-    else if (pitch == "a") value = PITCHNAME_a;
-    else if (pitch == "b") value = PITCHNAME_b;
-    else {
-		LogWarning("Unknow @pname value '%s'", pitch.c_str());
-        value = PITCHNAME_c;
-    }
-    return value;
-}
-
-
-unsigned char MeiInput::StrToAccid(std::string accid)
-{
-    unsigned char value;
-    if ( accid == "s" ) value = ACCID_SHARP;
-    else if ( accid == "f" ) value = ACCID_FLAT;
-    else if ( accid == "n" ) value = ACCID_NATURAL;
-    else if ( accid == "x" ) value = ACCID_DOUBLE_SHARP;
-    else if ( accid == "ff" ) value = ACCID_DOUBLE_FLAT;
-    else if ( accid == "ns" ) value = ACCID_QUARTER_SHARP;
-    else if ( accid == "nf" ) value = ACCID_QUARTER_FLAT;
-    else {
-        LogWarning("Unknown accid '%s'", accid.c_str() );
-        value = ACCID_NATURAL;
-    }
-	return value;
-}
-    
+     */
+   
 DocType MeiInput::StrToDocType(std::string type)
 {
     if (type == "raw") return Raw;

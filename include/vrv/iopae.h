@@ -66,9 +66,9 @@ public:
         
         octave = 4;
         beam = 0;
-        pitch = 0;
+        pitch = PITCHNAME_NONE;
         duration = 0;
-        accidental = 0;
+        accidental = ACCIDENTAL_EXPLICIT_NONE;
         dots = 0;
         rest = false;
         
@@ -120,11 +120,11 @@ public:
     bool   fermata;
     bool   trill;
     
-    unsigned char octave;
+    char octave;
     unsigned char beam;
-    unsigned char pitch;
-    unsigned char duration;
-    unsigned char accidental;
+    data_PITCHNAME pitch;
+    char duration;
+    data_ACCIDENTAL_EXPLICIT accidental;
     unsigned int dots;
     bool rest;
     
@@ -236,8 +236,8 @@ private:
      int       getTimeInfo         (const char* incipit, MeterSig *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
      int       getBarline          (const char *incipit, data_BARRENDITION *output, int index );
-     int       getAccidental       (const char* incipit, unsigned char *accident, int index = 0);
-     int       getOctave           (const char* incipit, unsigned char *octave, int index = 0 );
+     int       getAccidental       (const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
+     int       getOctave           (const char* incipit, char *octave, int index = 0 );
      int       getDurations        (const char* incipit, MeasureObject *measure, int index = 0);
      int       getDuration         (const char* incipit, int *duration, int *dot, int index );
      int       getTupletFermata    (const char* incipit, NoteObject *note, int index = 0);
@@ -247,7 +247,7 @@ private:
      int       getAbbreviation     (const char* incipit, MeasureObject *measure, int index = 0 ); 
      int       getNote             (const char* incipit, NoteObject *note, MeasureObject *measure, int index = 0 );
      
-     int       getPitch            (char c_note );
+     data_PITCHNAME       getPitch            (char c_note );
      
      // output functions
      void      addLayerElement     (LayerElement *element);

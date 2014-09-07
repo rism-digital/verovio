@@ -75,13 +75,13 @@ AttAccidental::~AttAccidental() {
 }
 
 void AttAccidental::ResetAccidental() {
-    m_accid = "";
+    m_accid = ACCIDENTAL_EXPLICIT_NONE;
 }
 
 bool AttAccidental::ReadAccidental(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("accid")) {
-        this->SetAccid(StrToStr(element.attribute("accid").value()));
+        this->SetAccid(StrToAccidentalExplicit(element.attribute("accid").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -90,7 +90,7 @@ bool AttAccidental::ReadAccidental(  pugi::xml_node element ) {
 bool AttAccidental::WriteAccidental(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasAccid()) {
-        element.append_attribute("accid") = StrToStr(this->GetAccid()).c_str();
+        element.append_attribute("accid") = AccidentalExplicitToStr(this->GetAccid()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -98,7 +98,7 @@ bool AttAccidental::WriteAccidental(  pugi::xml_node element ) {
 
 bool AttAccidental::HasAccid( )
 {
-    return (m_accid != "");
+    return (m_accid != ACCIDENTAL_EXPLICIT_NONE);
 }
 
 
@@ -3715,13 +3715,13 @@ AttOctave::~AttOctave() {
 }
 
 void AttOctave::ResetOctave() {
-    m_oct = "";
+    m_oct = 0;
 }
 
 bool AttOctave::ReadOctave(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("oct")) {
-        this->SetOct(StrToStr(element.attribute("oct").value()));
+        this->SetOct(StrToInt(element.attribute("oct").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -3730,7 +3730,7 @@ bool AttOctave::ReadOctave(  pugi::xml_node element ) {
 bool AttOctave::WriteOctave(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasOct()) {
-        element.append_attribute("oct") = StrToStr(this->GetOct()).c_str();
+        element.append_attribute("oct") = IntToStr(this->GetOct()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -3738,7 +3738,7 @@ bool AttOctave::WriteOctave(  pugi::xml_node element ) {
 
 bool AttOctave::HasOct( )
 {
-    return (m_oct != "");
+    return (m_oct != 0);
 }
 
 
@@ -3981,13 +3981,13 @@ AttPitch::~AttPitch() {
 }
 
 void AttPitch::ResetPitch() {
-    m_pname = "";
+    m_pname = PITCHNAME_NONE;
 }
 
 bool AttPitch::ReadPitch(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("pname")) {
-        this->SetPname(StrToStr(element.attribute("pname").value()));
+        this->SetPname(StrToPitchName(element.attribute("pname").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -3996,7 +3996,7 @@ bool AttPitch::ReadPitch(  pugi::xml_node element ) {
 bool AttPitch::WritePitch(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasPname()) {
-        element.append_attribute("pname") = StrToStr(this->GetPname()).c_str();
+        element.append_attribute("pname") = PitchNameToStr(this->GetPname()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4004,7 +4004,7 @@ bool AttPitch::WritePitch(  pugi::xml_node element ) {
 
 bool AttPitch::HasPname( )
 {
-    return (m_pname != "");
+    return (m_pname != PITCHNAME_NONE);
 }
 
 
@@ -5325,18 +5325,18 @@ AttStafflocPitched::~AttStafflocPitched() {
 }
 
 void AttStafflocPitched::ResetStafflocPitched() {
-    m_ploc = "";
-    m_oloc = "";
+    m_ploc = PITCHNAME_NONE;
+    m_oloc = 0;
 }
 
 bool AttStafflocPitched::ReadStafflocPitched(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("ploc")) {
-        this->SetPloc(StrToStr(element.attribute("ploc").value()));
+        this->SetPloc(StrToPitchName(element.attribute("ploc").value()));
         hasAttribute = true;
     }
     if (element.attribute("oloc")) {
-        this->SetOloc(StrToStr(element.attribute("oloc").value()));
+        this->SetOloc(StrToInt(element.attribute("oloc").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5345,11 +5345,11 @@ bool AttStafflocPitched::ReadStafflocPitched(  pugi::xml_node element ) {
 bool AttStafflocPitched::WriteStafflocPitched(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasPloc()) {
-        element.append_attribute("ploc") = StrToStr(this->GetPloc()).c_str();
+        element.append_attribute("ploc") = PitchNameToStr(this->GetPloc()).c_str();
         wroteAttribute = true;
     }
     if (this->HasOloc()) {
-        element.append_attribute("oloc") = StrToStr(this->GetOloc()).c_str();
+        element.append_attribute("oloc") = IntToStr(this->GetOloc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5357,12 +5357,12 @@ bool AttStafflocPitched::WriteStafflocPitched(  pugi::xml_node element ) {
 
 bool AttStafflocPitched::HasPloc( )
 {
-    return (m_ploc != "");
+    return (m_ploc != PITCHNAME_NONE);
 }
 
 bool AttStafflocPitched::HasOloc( )
 {
-    return (m_oloc != "");
+    return (m_oloc != 0);
 }
 
 

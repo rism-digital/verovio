@@ -1,44 +1,34 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.cpp
+// Name:        dot.cpp
 // Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "element.h"
+#include "dot.h"
 
 //----------------------------------------------------------------------------
-
-#include "childElement.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Element
+// Dot
 //----------------------------------------------------------------------------
 
-Element::Element():
-    DocObject("element-"),
-    AttCommon()
+Dot::Dot():
+    LayerElement("dot-"), PositionInterface()
 {
     Reset();
 }
 
-Element::~Element()
+Dot::~Dot()
 {
-}
-
-void Element::AddChildElement(ChildElement *child)
-{    
-    child->SetParent( this );
-    m_children.push_back(child);
-    Modify();
 }
     
-void Element::Reset()
+void Dot::Reset()
 {
-    LayerElement::Reset()
-    ResetCommon();
+    LayerElement::Reset();
+    PositionInterface::Reset();
 }    
 
 } // namespace vrv

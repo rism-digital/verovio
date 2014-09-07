@@ -1,27 +1,26 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.h
-// Author:      Author_Name
+// Name:        dot.h
+// Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_ELEMENT_H__
-#define __VRV_ELEMENT_H__
+#ifndef __VRV_DOT_H__
+#define __VRV_DOT_H__
 
-#include "atts_shared.h"
 #include "layerelement.h"
+#include "positioninterface.h"
 
 namespace vrv {
     
 class ChildElement;
 
 //----------------------------------------------------------------------------
-// Element
+// Dot
 //----------------------------------------------------------------------------
 
-class Element: public LayerElement,
-    public AttCommon
+class Dot: public LayerElement, public PositionInterface
 {
 public:
     /**
@@ -29,16 +28,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Element();
-    virtual ~Element();
+    Dot();
+    virtual ~Dot();
     void Reset();
-    virtual std::string GetClassName( ) { return "Element"; };
+    virtual std::string GetClassName( ) { return "Dot"; };
     ///@}
-    
-    /**
-     * Add childElement to a element.
-     */
-    void AddChildElement(Object *childElement);
     
 protected:
 

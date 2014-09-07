@@ -18,39 +18,31 @@ namespace vrv {
 // PositionInterface
 //----------------------------------------------------------------------------
 
-PositionInterface::PositionInterface()
+PositionInterface::PositionInterface():
+    AttStafflocPitched()
 {
-    m_oct = 5;
-    m_pname = PITCHNAME_c;
+    Reset();
 }
 
 
 PositionInterface::~PositionInterface()
 {
-}
+}    
 
-void PositionInterface::SetPosition(int pname, int oct) 
+void PositionInterface::Reset()
 {
-    m_oct = oct;
-    m_pname = pname;
+    ResetStafflocPitched();
 }
-
-bool PositionInterface::GetPosition(int *pname, int *oct) 
-{
-    *oct = m_oct;
-    *pname = m_pname;
-    return true;
-}
-
+    
 bool PositionInterface::HasIdenticalPositionInterface( PositionInterface *otherPositionInterface )
 {
     if ( !otherPositionInterface ) {
         return false;
     }
-    if ( this->m_oct != otherPositionInterface->m_oct ) {
+    if ( this->GetOloc() != otherPositionInterface->GetOloc() ) {
         return false;
     }
-    if ( this->m_pname != otherPositionInterface->m_pname ) {
+    if ( this->GetPloc() != otherPositionInterface->GetPloc() ) {
         return false;
     }
     return true;

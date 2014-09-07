@@ -8,6 +8,7 @@ include_directories(/usr/local/include ../include/vrv ../tinyxml ../libmei)
 
 add_executable (verovio 
 	main.cpp 
+	../src/accid.cpp 
 	../src/aligner.cpp
 	../src/app.cpp
 	../src/att.cpp
@@ -15,8 +16,10 @@ add_executable (verovio
 	../src/bboxdevicecontext.cpp 
 	../src/beam.cpp
 	../src/clef.cpp 
+	../src/custos.cpp
 	../src/devicecontext.cpp 
 	../src/doc.cpp 	
+	../src/dot.cpp 
 	../src/durationinterface.cpp 
 	../src/io.cpp 
 	../src/iodarms.cpp
@@ -49,7 +52,6 @@ add_executable (verovio
 	../src/slur.cpp
 	../src/staff.cpp 
 	../src/svgdevicecontext.cpp 
-	../src/symbol.cpp 
 	../src/syl.cpp
 	../src/system.cpp 
 	../src/tie.cpp
@@ -71,6 +73,7 @@ add_executable (verovio
 	#../libmei/atts_harmony.cpp
 	#../libmei/atts_linkalign.cpp
 	../libmei/atts_mensural.cpp
+	../libmei/atts_pagebased.cpp
 	#../libmei/atts_neumes.cpp
 	#../libmei/atts_tablature.cpp
 	)

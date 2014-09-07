@@ -51,6 +51,9 @@ protected:
     
     /** @name Converters for writing and reading */
     ///@{
+    std::string AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data);
+    data_ACCIDENTAL_EXPLICIT StrToAccidentalExplicit(std::string value);
+    
     std::string AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data);
     data_ACCIDENTAL_IMPLICIT StrToAccidentalImplicit(std::string value);
     

@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attdef.h"
 #include "io.h"
 
 namespace vrv {
@@ -31,8 +32,8 @@ class Tie;
 #define ASCII_NUMBER_OFFSET 0x30 // for homebrewed char to int
 
 typedef struct _pitchmap {
-    unsigned int oct;
-    unsigned int pitch; 
+    char oct;
+    data_PITCHNAME pitch;
 } pitchmap;
 
 class DarmsInput: public FileInputStream

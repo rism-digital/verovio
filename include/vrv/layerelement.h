@@ -63,20 +63,7 @@ public:
      * Adjust the pname and the octave for values outside the range
      */
     static void AdjustPname( int *pname, int *oct );
-    
-    /** 
-     * Set the pitch or position for PitchInterface or PositionInterface elements.
-     * Because PitchInterface and PositionInterface are not child classes of LayerElement,
-     * the call had to be done explicitly from this method. The method can still be overriden.
-     */
-    virtual void SetPitchOrPosition( int pname, int oct );
-    
-    /**
-     * Get the pitch or position for PitchInterface or PositionInterface elements.
-     * See LayerElement::SetPitchOrPosition for more comments.
-     */
-    virtual bool GetPitchOrPosition( int *pname, int *oct );
-    
+
     /**
      * Set the value for child element of LayerElement.
      * For example, set the duration for DurationInterface elements (call explicitly) 
@@ -97,9 +84,12 @@ public:
      * @name Child type checkers.
      */
     ///@{
+    bool IsAccid();
     bool IsBarline();
     bool IsBeam();
     bool IsClef();
+    bool IsCustos();
+    bool IsDot();
     bool HasDurationInterface();
     bool IsKeySig();
     bool IsMensur();
@@ -110,8 +100,6 @@ public:
     bool HasPitchInterface();
     bool HasPositionInterface();
     bool IsRest();
-    bool IsSymbol( SymbolType type );
-    bool IsSymbol( );
     bool IsTie();
     bool IsTuplet();
     bool IsGraceNote();

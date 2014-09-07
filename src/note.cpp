@@ -46,10 +46,12 @@ void Note::Reset()
 {
     LayerElement::Reset();
     DurationInterface::Reset();
-    //PitchInterface::Reset();
+    PitchInterface::Reset();
+    
     ResetColoration();
     ResetNoteLogMensural();
     ResetStemmed();
+    
     // TO BE REMOVED
     m_acciaccatura = false;
     m_embellishment = EMB_NONE;

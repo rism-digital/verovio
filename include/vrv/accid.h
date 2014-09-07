@@ -1,27 +1,25 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.h
-// Author:      Author_Name
-// Created:     2014
+// Name:        accid.h
+// Author:      Laurent Pugin
+// Created:     201X
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_ELEMENT_H__
-#define __VRV_ELEMENT_H__
+#ifndef __VRV_ACCID_H__
+#define __VRV_ACCID_H__
 
-#include "atts_shared.h"
 #include "layerelement.h"
+#include "positioninterface.h"
 
 namespace vrv {
-    
-class ChildElement;
 
 //----------------------------------------------------------------------------
-// Element
+// Accid
 //----------------------------------------------------------------------------
 
-class Element: public LayerElement,
-    public AttCommon
+class Accid: public LayerElement, public PositionInterface,
+    public AttAccidental
 {
 public:
     /**
@@ -29,16 +27,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Element();
-    virtual ~Element();
+    Accid();
+    virtual ~Accid();
     void Reset();
-    virtual std::string GetClassName( ) { return "Element"; };
+    virtual std::string GetClassName( ) { return "Accid"; };
     ///@}
-    
-    /**
-     * Add childElement to a element.
-     */
-    void AddChildElement(Object *childElement);
     
 protected:
 

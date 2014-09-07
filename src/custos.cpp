@@ -1,44 +1,34 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.cpp
+// Name:        custos.cpp
 // Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "element.h"
+#include "custos.h"
 
 //----------------------------------------------------------------------------
-
-#include "childElement.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Element
+// Custos
 //----------------------------------------------------------------------------
 
-Element::Element():
-    DocObject("element-"),
-    AttCommon()
+Custos::Custos():
+    LayerElement("custos-"), PositionInterface()
 {
     Reset();
 }
 
-Element::~Element()
+Custos::~Custos()
 {
-}
-
-void Element::AddChildElement(ChildElement *child)
-{    
-    child->SetParent( this );
-    m_children.push_back(child);
-    Modify();
 }
     
-void Element::Reset()
+void Custos::Reset()
 {
-    LayerElement::Reset()
-    ResetCommon();
+    LayerElement::Reset();
+    PositionInterface::Reset();
 }    
 
 } // namespace vrv

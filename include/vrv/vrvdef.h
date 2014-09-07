@@ -92,9 +92,6 @@ enum EditorMode {
 #define MIN_TIE_HEIGHT 12
 #define MIN_TIE_THICKNESS 6
 
-// used for automatic rest positions
-#define REST_AUTO 255
-
 // DURATION
 #define DUR_LG 0  // longa
 #define DUR_BR 1  // brevis
@@ -152,18 +149,8 @@ enum StaffGrpSymbol {
     STAFFGRP_BRACE,
     STAFFGRP_BRACKET
 };
-
-// the maximum is 255 (unsigned char)
-enum SymbolType {
-    SYMBOL_UNDEFINED = 0, // needed for default constructor
-    SYMBOL_DOT = 1, 
-    SYMBOL_ACCID = 2,
-    SYMBOL_CUSTOS = 3,
-    SYMBOL_SB = 4,
-    SYMBOL_PB = 5
-};
     
-/* This is used for false clef offset calculation.
+/* This is used for fast clef offset calculation.
  * It uses 4 bytes with, from right to left
  * - line
  * - shape

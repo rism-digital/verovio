@@ -73,7 +73,8 @@ python $EMCC --closure 1 -O2 \
 	$ASM \
 	./emscripten_main.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
-	$VEROVIO_ROOT/src/aligner.cpp \
+	$VEROVIO_ROOT/src/accid.cpp \
+    $VEROVIO_ROOT/src/aligner.cpp \
 	$VEROVIO_ROOT/src/app.cpp \
 	$VEROVIO_ROOT/src/att.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
@@ -81,9 +82,11 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
+    $VEROVIO_ROOT/src/custos.cpp \
 	$VEROVIO_ROOT/src/interfacecontroller.cpp \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
+    $VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
@@ -115,7 +118,6 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/staff.cpp \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
-	$VEROVIO_ROOT/src/symbol.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
@@ -124,6 +126,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
+    $VEROVIO_ROOT/libmei/atts_pagebased.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="[\

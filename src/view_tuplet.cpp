@@ -26,7 +26,6 @@
 #include "mensur.h"
 #include "note.h"
 #include "rest.h"
-#include "symbol.h"
 #include "tie.h"
 #include "tuplet.h"
 

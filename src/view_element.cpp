@@ -16,11 +16,14 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
+#include "custos.h"
 #include "doc.h"
+#include "dot.h"
 #include "keysig.h"
 #include "layerelement.h"
 #include "leipzigbbox.h"
@@ -31,7 +34,6 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
-#include "symbol.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
@@ -79,7 +81,10 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
         element->SetDrawingY( staff->GetDrawingY() );
     }
     
-    if (dynamic_cast<Barline*>(element)) {
+    if (dynamic_cast<Accid*>(element)) {
+        DrawAccid(dc, element, layer, staff);
+    }
+    else if (dynamic_cast<Barline*>(element)) {
         DrawBarline(dc, element, layer, staff);
     }
     else if (dynamic_cast<Beam*>(element)) {
@@ -87,6 +92,12 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (dynamic_cast<Clef*>(element)) {
         DrawClef(dc, element, layer, staff);
+    }
+    else if (dynamic_cast<Custos*>(element)) {
+        DrawCustos(dc, element, layer, staff);
+    }
+    else if (dynamic_cast<Dot*>(element)) {
+        DrawDot(dc, element, layer, staff);
     }
     else if (dynamic_cast<KeySig*>(element)) {
         DrawKeySig(dc, element, layer, staff);
@@ -108,9 +119,6 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (dynamic_cast<Rest*>(element)) {
         DrawDurationElement(dc, element, layer, staff);
-    }
-    else if (dynamic_cast<Symbol*>(element)) {
-        DrawSymbol(dc, element, layer, staff);
     }
     else if (dynamic_cast<Tie*>(element)) {
         DrawTie(dc, element, layer, staff, measure);
@@ -141,22 +149,22 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
     if (dynamic_cast<Note*>(element)) 
     {
         Note *note = dynamic_cast<Note*>(element);
-        int oct = note->m_oct - 4;
+        int oct = note->GetOct() - 4;
         
-        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->m_pname, layer->GetClefOffset( element ), oct ) );
+        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
         dc->StartGraphic( element, "note", element->GetUuid() );
         DrawNote(dc, element, layer, staff);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
         Rest *rest = dynamic_cast<Rest*>(element);
-        int oct = rest->m_oct - 4;
+        int oct = rest->GetOloc() - 4;
         
         // Automatically calculate rest position, if so requested
-        if (rest->m_pname == REST_AUTO)
+        if (rest->GetPloc() == PITCHNAME_NONE)
             element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetDur()) );
         else
-            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->m_pname, layer->GetClefOffset( element ), oct) );
+            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
 		
         dc->StartGraphic( element, "rest", element->GetUuid() );
         DrawRest( dc, element, layer, staff );
@@ -450,20 +458,20 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);
     
-	if (note->m_accid) // && !this->accInvis) // ax2 no support invisible accidental yet
+	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) // && !this->accInvis) // ax2 no support invisible accidental yet
 	{
 		//if (note->m_chord)
         //    {}/***x1 = x_acc_chrd (this,0);***/
 		//else
 			x1 -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
 		
-        Symbol accid( SYMBOL_ACCID );
-        accid.m_oct = note->m_oct;
-        accid.m_pname = note->m_pname;
-		accid.m_accid = note->m_accid;
+        Accid accid;
+        accid.SetOloc(note->GetOct());
+        accid.SetPloc(note->GetPname());
+		accid.SetAccid(note->GetAccid());
         accid.SetDrawingX( x1 );
         accid.SetDrawingY( staff->GetDrawingY() );
-        DrawSymbol( dc, &accid, layer, staff, element ); // ax2
+        DrawAccid( dc, &accid, layer, staff, element ); // ax2
 	}
 	if (0) //if (note->m_chord)
 	{	
@@ -1338,50 +1346,30 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
 }
 
-
-void View::DrawSymbol( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent )
+void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Symbol*>(element)); // Element must be a Symbol"
+    assert(dynamic_cast<Accid*>(element)); // Element must be a Symbol"
+    
+    Accid *accid = dynamic_cast<Accid*>(element);
+    dc->StartGraphic( element, "accid", element->GetUuid() );
     
     // This is used when we add dynamically an element (eg. accidentals before notes)
     // So we can get the clef without adding the new elem in the list
     LayerElement *list_elem = element;
     if (parent) list_elem = parent;
-    
-    Symbol *symbol = dynamic_cast<Symbol*>(element);
-    int oct = symbol->m_oct - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, symbol->m_pname, layer->GetClefOffset( list_elem ), oct) );
-    
-    if (symbol->m_type==SYMBOL_ACCID) {
-        DrawSymbolAccid(dc, element, layer, staff);
-    }
-    else if (symbol->m_type==SYMBOL_CUSTOS) {
-        DrawSymbolCustos(dc, element, layer, staff);
-    }
-    else if (symbol->m_type==SYMBOL_DOT) {
-        DrawSymbolDot(dc, element, layer, staff);
-    }
-    
-}
 
-
-void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
-{
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Symbol*>(element)); // Element must be a Symbol"
-    
-    Symbol *accid = dynamic_cast<Symbol*>(element);
-    dc->StartGraphic( element, "accid", element->GetUuid() );
+    int oct = accid->GetOloc() - 4;
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( list_elem ), oct) );
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
-    int symc;
-    switch (accid->m_accid)
-    {	case ACCID_NATURAL :  symc = LEIPZIG_ACCID_NATURAL; break;
+    int symc = LEIPZIG_ACCID_NATURAL;
+    switch (accid->GetAccid())
+    {
+        case ACCIDENTAL_EXPLICIT_n :  symc = LEIPZIG_ACCID_NATURAL; break;
         
         /* The ACCID_DOUBLE_SHARP definition is used in two ways:
          * 1) Antique notation (notAnc == true): it displays the two
@@ -1395,7 +1383,7 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
          * case it is used ONLY ad stacked flats (no double flat
          * glyph).
          */
-        case ACCID_DOUBLE_SHARP :
+        case ACCIDENTAL_EXPLICIT_ss :
             if (staff->notAnc) {
                     symc = LEIPZIG_ACCID_SHARP;
                     DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );    
@@ -1404,13 +1392,14 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
                 symc = LEIPZIG_ACCID_DOUBLE_SHARP;
                 break;
             }
-        case ACCID_SHARP : symc = LEIPZIG_ACCID_SHARP; break;
-        case ACCID_DOUBLE_FLAT :  
+        case ACCIDENTAL_EXPLICIT_s : symc = LEIPZIG_ACCID_SHARP; break;
+        case ACCIDENTAL_EXPLICIT_ff :
             symc = LEIPZIG_ACCID_FLAT; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
             y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
-        case ACCID_FLAT :  symc = LEIPZIG_ACCID_FLAT; break;
-        case ACCID_QUARTER_SHARP : symc = LEIPZIG_ACCID_QUARTER_SHARP; break;
-        case ACCID_QUARTER_FLAT :  symc= LEIPZIG_ACCID_QUARTER_FLAT; break;
+        case ACCIDENTAL_EXPLICIT_f :  symc = LEIPZIG_ACCID_FLAT; break;
+        case ACCIDENTAL_EXPLICIT_su : symc = LEIPZIG_ACCID_QUARTER_SHARP; break; // Not sure this is correct...
+        case ACCIDENTAL_EXPLICIT_fu :  symc= LEIPZIG_ACCID_QUARTER_FLAT; break; // Same
+        default : break;
     }
     DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
 
@@ -1420,17 +1409,21 @@ void View::DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *lay
 }
 
 
-void View::DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Symbol*>(element)); // Element must be a Symbol"
+    assert(dynamic_cast<Custos*>(element)); // Element must be a Symbol"
     
-    Symbol *custos = dynamic_cast<Symbol*>(element);
+    Custos *custos = dynamic_cast<Custos*>(element);
     dc->StartGraphic( element, "custos", element->GetUuid() );
+    
+    int oct = custos->GetOloc() - 4;
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), oct) );
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
+    
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
     DrawLeipzigFont( dc, x, y, 35, staff, custos->m_cueSize );
@@ -1439,23 +1432,22 @@ void View::DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *la
 
 }
 
-void View::DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Symbol*>(element)); // Element must be a Symbol"
+    assert(dynamic_cast<Dot*>(element)); // Element must be a Symbol"
     
-    Symbol *dot = dynamic_cast<Symbol*>(element);
+    Dot *dot = dynamic_cast<Dot*>(element);
     dc->StartGraphic( element, "dot", element->GetUuid() );
+    
+    int oct = dot->GetOloc() - 4;
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), oct) );
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
-    switch (dot->m_dot)
-    {	
-        case 1 : DrawDot( dc, x, y ); x += std::max (6, m_doc->m_drawingStep1);
-        case 0 : DrawDot ( dc, x, y );
-    }
+    DrawDot ( dc, x, y );
     
     dc->EndGraphic(element, this );
 

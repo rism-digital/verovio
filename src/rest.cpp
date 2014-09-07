@@ -17,8 +17,6 @@ namespace vrv {
 Rest::Rest():
 	LayerElement("rest-"), DurationInterface(), PositionInterface()
 {
-    // by default set automatic height
-    m_pname = REST_AUTO;
     Reset();
 }
 
@@ -45,8 +43,7 @@ void Rest::Reset()
 {
     LayerElement::Reset();
     DurationInterface::Reset();
-    //DurationInterface::Reset();
-    //PitchInterface::Reset();
+    PositionInterface::Reset();
 }
 
 } // namespace vrv

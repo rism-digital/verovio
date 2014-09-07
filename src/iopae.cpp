@@ -19,6 +19,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "barline.h"
 #include "clef.h"
 #include "doc.h"
@@ -29,7 +30,6 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
-#include "symbol.h"
 #include "system.h"
 #include "staff.h"
 #include "tie.h"
@@ -386,7 +386,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
 // getOctave --
 //
 #define BASE_OCT 4
-int PaeInput::getOctave (const char* incipit, unsigned char *octave, int index ) {
+int PaeInput::getOctave (const char* incipit, char *octave, int index ) {
     
     int i = index;
     int length = strlen(incipit);
@@ -496,23 +496,23 @@ int PaeInput::getDurations(const char* incipit, MeasureObject* measure, int inde
 // getAccidental --
 //
 
-int PaeInput::getAccidental(const char* incipit, unsigned char *accident, int index ) {
+int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index ) {
     
     int i = index;
     int length = strlen(incipit);
     
     if (incipit[i] == 'n') {
-        *accident = ACCID_NATURAL;
+        *accident = ACCIDENTAL_EXPLICIT_n;
     } else if (incipit[i] == 'x') {
-        *accident = ACCID_SHARP;
+        *accident = ACCIDENTAL_EXPLICIT_s;
         if ((i+1 < length) && (incipit[i+1] == 'x')) {
-            *accident = ACCID_DOUBLE_SHARP;
+            *accident = ACCIDENTAL_EXPLICIT_ss;
             i++;
         }
     } else if (incipit[i] == 'b') {
-        *accident = ACCID_FLAT;
+        *accident = ACCIDENTAL_EXPLICIT_f;
         if ((i+1 < length) && (incipit[i+1] == 'b')) {
-            *accident = ACCID_DOUBLE_FLAT;
+            *accident = ACCIDENTAL_EXPLICIT_ff;
             i++;
         }
     }
@@ -665,9 +665,9 @@ int PaeInput::getGraceNote(const char* incipit, NoteObject *note, int index ) {
 // getPitch --
 //
 
-int PaeInput::getPitch( char c_note ) {
+data_PITCHNAME PaeInput::getPitch( char c_note ) {
     
-    int pitch = PITCHNAME_c;
+    data_PITCHNAME pitch = PITCHNAME_c;
     
     switch (c_note) {
         case 'A':
@@ -691,7 +691,7 @@ int PaeInput::getPitch( char c_note ) {
         case 'G': 
             pitch = PITCHNAME_g;
             break;
-        case '-': pitch = 255; break;
+        case '-': pitch = PITCHNAME_NONE; break;
         default:
             break;
     }
@@ -999,9 +999,9 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     }
     note->pitch = getPitch( incipit[i] );
     
-    // lookout, hack. If it is a rest (255 val) then create the rest object.
+    // lookout, hack. If it is a rest (PITCHNAME_NONE val) then create the rest object.
     // it will be added instead of the note
-    if (note->pitch == 255)
+    if (note->pitch == PITCHNAME_NONE)
         note->rest = true;
     
     // trills
@@ -1105,8 +1105,7 @@ void PaeInput::parseNote(NoteObject note) {
     
     if (note.rest) {
         Rest *rest =  new Rest();
-
-        rest->m_pname = REST_AUTO;
+        
         rest->SetDots( note.dots );
         rest->SetDur(note.duration);
 
@@ -1118,9 +1117,9 @@ void PaeInput::parseNote(NoteObject note) {
     } else {
         Note *mnote = new Note();
         
-        mnote->m_pname = note.pitch;
-        mnote->m_oct = note.octave;
-        mnote->m_accid = note.accidental;
+        mnote->SetPname(note.pitch);
+        mnote->SetOct(note.octave);
+        mnote->SetAccid(note.accidental);
         
         mnote->SetDots( note.dots );
         mnote->SetDur(note.duration);

@@ -17,6 +17,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "clef.h"
 #include "doc.h"
 #include "keysig.h"
@@ -25,7 +26,6 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
-#include "symbol.h"
 #include "system.h"
 #include "staff.h"
 #include "tie.h"
@@ -60,19 +60,19 @@ DarmsInput::~DarmsInput() {
 }
 
 void DarmsInput::UnrollKeysig(int quantity, char alter) {
-    int flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
-    int sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
-    int *alteration_set;
-    unsigned char accid = ACCID_FLAT;
+    data_PITCHNAME flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
+    data_PITCHNAME sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
+    data_PITCHNAME *alteration_set;
+    data_ACCIDENTAL_EXPLICIT accid = ACCIDENTAL_EXPLICIT_NONE;
     
     if (quantity == 0) quantity++;
     
     if (alter == '-') {
         alteration_set = flats;
-        accid = ACCID_FLAT;
+        accid = ACCIDENTAL_EXPLICIT_f;
     } else {
         alteration_set = sharps;
-        accid = ACCID_SHARP;
+        accid = ACCIDENTAL_EXPLICIT_s;
     }
     
     KeySig *k = new KeySig(quantity, accid);
@@ -80,10 +80,10 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
     return;
     //////
     for (int i = 0; i < quantity; i++) {
-        Symbol *alter = new Symbol( SYMBOL_ACCID );
-        alter->m_oct = 4;
-        alter->m_pname = alteration_set[i];
-        alter->m_accid = accid;
+        Accid *alter = new Accid();
+        alter->SetOloc(4);
+        alter->SetPloc(alteration_set[i]);
+        alter->SetAccid(accid);
         m_layer->AddElement(alter);
     }
 
@@ -253,7 +253,7 @@ int DarmsInput::do_Clef(int pos, const char* data) {
 
 int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     int position;
-    int accidental = 0;
+    data_ACCIDENTAL_EXPLICIT accidental = ACCIDENTAL_EXPLICIT_NONE;
     int duration;
     int dot = 0;
     int tie = 0;
@@ -279,13 +279,13 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     }
     
     if (data[pos + 1] == '-') {
-        accidental = ACCID_FLAT;
+        accidental = ACCIDENTAL_EXPLICIT_f;
         pos++;
     } else if (data[pos + 1] == '#') {
-        accidental = ACCID_SHARP;
+        accidental = ACCIDENTAL_EXPLICIT_s;
         pos++;
     } else if (data[pos + 1] == '*') {
-        accidental = ACCID_NATURAL;
+        accidental = ACCIDENTAL_EXPLICIT_n;
         pos++;
     }
     
@@ -332,7 +332,6 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         Rest *rest =  new Rest;
         rest->SetDur(duration);
         rest->SetDurGes(DUR_8);
-        rest->m_pname = REST_AUTO;
         rest->SetDots( dot );
         m_layer->AddElement(rest);
     } else {
@@ -343,9 +342,9 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         Note *note = new Note;
         note->SetDur(duration);
         note->SetDurGes(DUR_8);
-        note->m_accid = accidental;
-        note->m_oct = PitchMap[position + m_clef_offset].oct;
-        note->m_pname = PitchMap[position + m_clef_offset].pitch;
+        note->SetAccid(accidental);
+        note->SetOct( PitchMap[position + m_clef_offset].oct );
+        note->SetPname( PitchMap[position + m_clef_offset].pitch );
         note->SetDots( dot );
         m_layer->AddElement(note);
         

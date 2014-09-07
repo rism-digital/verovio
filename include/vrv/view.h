@@ -169,9 +169,12 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
+    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent = NULL );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
@@ -193,10 +196,6 @@ protected:
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff);
-    void DrawSymbol( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent = NULL );
-    void DrawSymbolAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawSymbolCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawSymbolDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff);

@@ -1,27 +1,24 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.h
-// Author:      Author_Name
+// Name:        custos.h
+// Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_ELEMENT_H__
-#define __VRV_ELEMENT_H__
+#ifndef __VRV_CUSTOS_H__
+#define __VRV_CUSTOS_H__
 
-#include "atts_shared.h"
 #include "layerelement.h"
+#include "positioninterface.h"
 
 namespace vrv {
-    
-class ChildElement;
 
 //----------------------------------------------------------------------------
-// Element
+// Custos
 //----------------------------------------------------------------------------
 
-class Element: public LayerElement,
-    public AttCommon
+class Custos: public LayerElement, public PositionInterface
 {
 public:
     /**
@@ -29,16 +26,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Element();
-    virtual ~Element();
+    Custos();
+    virtual ~Custos();
     void Reset();
-    virtual std::string GetClassName( ) { return "Element"; };
+    virtual std::string GetClassName( ) { return "Custos"; };
     ///@}
-    
-    /**
-     * Add childElement to a element.
-     */
-    void AddChildElement(Object *childElement);
     
 protected:
 

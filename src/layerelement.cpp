@@ -15,12 +15,15 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "aligner.h"
 #include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
+#include "custos.h"
 #include "doc.h"
+#include "dot.h"
 #include "keysig.h"
 #include "io.h"
 #include "mensur.h"
@@ -29,7 +32,6 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
-#include "symbol.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "vrv.h"
@@ -99,18 +101,22 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
     // Yes, change this to the Object::Clone method - however, newUuid will not be possible in this way
     LayerElement *element = NULL;
 
-    if ( this->IsBarline() )
+    if ( this->IsAccid() )
+        element = new Accid( *(Accid*)this );
+    else if ( this->IsBarline() )
         element = new Barline( *(Barline*)this );
     else if (this->IsClef() )
         element = new Clef( *(Clef*)this );
+    else if (this->IsCustos() )
+        element = new Custos( *(Custos*)this );
+    else if (this->IsDot() )
+        element = new Dot( *(Dot*)this );
     else if (this->IsMensur() )
         element = new Mensur( *(Mensur*)this );
     else if (this->IsNote() )
         element = new Note( *(Note*)this );
     else if (this->IsRest() )
         element = new Rest( *(Rest*)this );
-    else if (this->IsSymbol() )
-        element = new Symbol( *(Symbol*)this );
     else {
         LogDebug( "Missing %s", this->GetClassName().c_str() );
         assert( false ); // Copy of this type unimplemented
@@ -140,38 +146,18 @@ void LayerElement::ResetHorizontalAlignment()
     m_drawingX = 0;
 }
 
-
-void LayerElement::SetPitchOrPosition(int pname, int oct)
-{
-    if ( this->HasPitchInterface() ){
-        PitchInterface *pitch = dynamic_cast<PitchInterface*>(this);
-        pitch->SetPitch( pname, oct );
-    }
-    else if ( this->HasPositionInterface() ) {
-        PositionInterface *position = dynamic_cast<PositionInterface*>(this);
-        position->SetPosition( pname, oct );
-    }
-}
-
-bool LayerElement::GetPitchOrPosition(int *pname, int *oct) 
-{
-    if ( this->HasPitchInterface() ){
-        PitchInterface *pitch = dynamic_cast<PitchInterface*>(this);
-        return pitch->GetPitch( pname, oct );
-    }
-    else if ( this->HasPositionInterface() ) {
-        PositionInterface *position = dynamic_cast<PositionInterface*>(this);
-        return position->GetPosition( pname, oct );
-    }
-    return false;
-}
-
 void LayerElement::SetValue( int value, int flag )
 {
     if ( this->HasDurationInterface() ){
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
         duration->SetDur( value );
     }
+}
+    
+    
+bool LayerElement::IsAccid( )
+{
+    return (dynamic_cast<Accid*>(this));
 }
 
 bool LayerElement::IsBarline() 
@@ -188,23 +174,21 @@ bool LayerElement::IsClef()
 {  
     return (dynamic_cast<Clef*>(this));
 }
+
+bool LayerElement::IsCustos( )
+{
+    return (dynamic_cast<Custos*>(this));
+}
+
+bool LayerElement::IsDot( )
+{
+    return (dynamic_cast<Dot*>(this));
+}
     
 bool LayerElement::HasDurationInterface() 
 {  
     return (dynamic_cast<DurationInterface*>(this));
 }
-
-bool LayerElement::IsSymbol( SymbolType type ) 
-{  
-    Symbol *symbol = dynamic_cast<Symbol*>(this);
-    return (symbol && (symbol->m_type == type));
-}
-
-bool LayerElement::IsSymbol( ) 
-{  
-    return (dynamic_cast<Symbol*>(this));
-}
-
 
 bool LayerElement::IsKeySig()
 {

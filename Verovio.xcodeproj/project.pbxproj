@@ -34,6 +34,15 @@
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
+		4DC34BA219BC4A71006175CD /* accid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34B9F19BC4A70006175CD /* accid.h */; };
+		4DC34BA319BC4A71006175CD /* custos.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA019BC4A70006175CD /* custos.h */; };
+		4DC34BA419BC4A71006175CD /* dot.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA119BC4A70006175CD /* dot.h */; };
+		4DC34BA819BC4A83006175CD /* accid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA519BC4A82006175CD /* accid.cpp */; };
+		4DC34BA919BC4A83006175CD /* accid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA519BC4A82006175CD /* accid.cpp */; };
+		4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA619BC4A83006175CD /* custos.cpp */; };
+		4DC34BAB19BC4A83006175CD /* custos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA619BC4A83006175CD /* custos.cpp */; };
+		4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
+		4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
@@ -67,7 +76,6 @@
 		8F086EFF188539540037FD8E /* slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED3188539540037FD8E /* slur.cpp */; };
 		8F086F00188539540037FD8E /* staff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED4188539540037FD8E /* staff.cpp */; };
 		8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
-		8F086F02188539540037FD8E /* symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED6188539540037FD8E /* symbol.cpp */; };
 		8F086F03188539540037FD8E /* system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED7188539540037FD8E /* system.cpp */; };
 		8F086F04188539540037FD8E /* tie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED8188539540037FD8E /* tie.cpp */; };
 		8F086F05188539540037FD8E /* tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED9188539540037FD8E /* tuplet.cpp */; };
@@ -106,7 +114,6 @@
 		8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED0188539540037FD8E /* positioninterface.cpp */; };
 		8F3DD35218854B2E0051330C /* rest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED1188539540037FD8E /* rest.cpp */; };
 		8F3DD35418854B2E0051330C /* slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED3188539540037FD8E /* slur.cpp */; };
-		8F3DD35618854B2E0051330C /* symbol.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED6188539540037FD8E /* symbol.cpp */; };
 		8F3DD35818854B2E0051330C /* tie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED8188539540037FD8E /* tie.cpp */; };
 		8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED9188539540037FD8E /* tuplet.cpp */; };
 		8F3DD35C18854B390051330C /* leipzigbbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC8188539540037FD8E /* leipzigbbox.cpp */; };
@@ -153,7 +160,6 @@
 		8F59295118854BF800FE51AD /* slur.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292A18854BF800FE51AD /* slur.h */; };
 		8F59295218854BF800FE51AD /* staff.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292B18854BF800FE51AD /* staff.h */; };
 		8F59295318854BF800FE51AD /* svgdevicecontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292C18854BF800FE51AD /* svgdevicecontext.h */; };
-		8F59295418854BF800FE51AD /* symbol.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292D18854BF800FE51AD /* symbol.h */; };
 		8F59295518854BF800FE51AD /* system.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292E18854BF800FE51AD /* system.h */; };
 		8F59295618854BF800FE51AD /* tie.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292F18854BF800FE51AD /* tie.h */; };
 		8F59295718854BF800FE51AD /* tuplet.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59293018854BF800FE51AD /* tuplet.h */; };
@@ -193,6 +199,12 @@
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
 		4D9A9C1D19A1DE2000028D93 /* syl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = syl.cpp; path = src/syl.cpp; sourceTree = "<group>"; };
+		4DC34B9F19BC4A70006175CD /* accid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accid.h; path = include/vrv/accid.h; sourceTree = "<group>"; };
+		4DC34BA019BC4A70006175CD /* custos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = custos.h; path = include/vrv/custos.h; sourceTree = "<group>"; };
+		4DC34BA119BC4A70006175CD /* dot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dot.h; path = include/vrv/dot.h; sourceTree = "<group>"; };
+		4DC34BA519BC4A82006175CD /* accid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = accid.cpp; path = src/accid.cpp; sourceTree = "<group>"; };
+		4DC34BA619BC4A83006175CD /* custos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = custos.cpp; path = src/custos.cpp; sourceTree = "<group>"; };
+		4DC34BA719BC4A83006175CD /* dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dot.cpp; path = src/dot.cpp; sourceTree = "<group>"; };
 		4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analysis.cpp; path = libmei/atts_analysis.cpp; sourceTree = "<group>"; };
 		4DEE28EE1940BCC100C76319 /* atts_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analysis.h; path = libmei/atts_analysis.h; sourceTree = "<group>"; };
 		4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmn.cpp; path = libmei/atts_cmn.cpp; sourceTree = "<group>"; };
@@ -258,7 +270,6 @@
 		8F086ED3188539540037FD8E /* slur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = slur.cpp; path = src/slur.cpp; sourceTree = "<group>"; };
 		8F086ED4188539540037FD8E /* staff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = staff.cpp; path = src/staff.cpp; sourceTree = "<group>"; };
 		8F086ED5188539540037FD8E /* svgdevicecontext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = svgdevicecontext.cpp; path = src/svgdevicecontext.cpp; sourceTree = "<group>"; };
-		8F086ED6188539540037FD8E /* symbol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = symbol.cpp; path = src/symbol.cpp; sourceTree = "<group>"; };
 		8F086ED7188539540037FD8E /* system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = system.cpp; path = src/system.cpp; sourceTree = "<group>"; };
 		8F086ED8188539540037FD8E /* tie.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tie.cpp; path = src/tie.cpp; sourceTree = "<group>"; };
 		8F086ED9188539540037FD8E /* tuplet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tuplet.cpp; path = src/tuplet.cpp; sourceTree = "<group>"; };
@@ -302,7 +313,6 @@
 		8F59292A18854BF800FE51AD /* slur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = slur.h; path = include/vrv/slur.h; sourceTree = "<group>"; };
 		8F59292B18854BF800FE51AD /* staff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = staff.h; path = include/vrv/staff.h; sourceTree = "<group>"; };
 		8F59292C18854BF800FE51AD /* svgdevicecontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = svgdevicecontext.h; path = include/vrv/svgdevicecontext.h; sourceTree = "<group>"; };
-		8F59292D18854BF800FE51AD /* symbol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = symbol.h; path = include/vrv/symbol.h; sourceTree = "<group>"; };
 		8F59292E18854BF800FE51AD /* system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = system.h; path = include/vrv/system.h; sourceTree = "<group>"; };
 		8F59292F18854BF800FE51AD /* tie.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tie.h; path = include/vrv/tie.h; sourceTree = "<group>"; };
 		8F59293018854BF800FE51AD /* tuplet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tuplet.h; path = include/vrv/tuplet.h; sourceTree = "<group>"; };
@@ -347,6 +357,19 @@
 			);
 			name = tools;
 			path = tinyxml;
+			sourceTree = "<group>";
+		};
+		4DC34B9E19BC33A0006175CD /* interfaces */ = {
+			isa = PBXGroup;
+			children = (
+				8F086EBE188539540037FD8E /* durationinterface.cpp */,
+				8F59291518854BF800FE51AD /* durationinterface.h */,
+				8F086ECF188539540037FD8E /* pitchinterface.cpp */,
+				8F59292618854BF800FE51AD /* pitchinterface.h */,
+				8F086ED0188539540037FD8E /* positioninterface.cpp */,
+				8F59292718854BF800FE51AD /* positioninterface.h */,
+			);
+			name = interfaces;
 			sourceTree = "<group>";
 		};
 		4DEE28EC1940BCA100C76319 /* libmei */ = {
@@ -417,6 +440,7 @@
 				8F086F37188539C50037FD8E /* io */,
 				8F086F38188539F00037FD8E /* containers */,
 				8F086F3A18853A540037FD8E /* elements */,
+				4DC34B9E19BC33A0006175CD /* interfaces */,
 				8F086F3918853A190037FD8E /* view */,
 				8F086EB6188539540037FD8E /* aligner.cpp */,
 				8F59290D18854BF800FE51AD /* aligner.h */,
@@ -504,6 +528,8 @@
 		8F086F3A18853A540037FD8E /* elements */ = {
 			isa = PBXGroup;
 			children = (
+				4DC34BA519BC4A82006175CD /* accid.cpp */,
+				4DC34B9F19BC4A70006175CD /* accid.h */,
 				8F086EB7188539540037FD8E /* app.cpp */,
 				8F59290E18854BF800FE51AD /* app.h */,
 				8F086EB8188539540037FD8E /* barline.cpp */,
@@ -512,8 +538,10 @@
 				8F59291118854BF800FE51AD /* beam.h */,
 				8F086EBB188539540037FD8E /* clef.cpp */,
 				8F59291218854BF800FE51AD /* clef.h */,
-				8F086EBE188539540037FD8E /* durationinterface.cpp */,
-				8F59291518854BF800FE51AD /* durationinterface.h */,
+				4DC34BA619BC4A83006175CD /* custos.cpp */,
+				4DC34BA019BC4A70006175CD /* custos.h */,
+				4DC34BA719BC4A83006175CD /* dot.cpp */,
+				4DC34BA119BC4A70006175CD /* dot.h */,
 				8F086EC5188539540037FD8E /* keysig.cpp */,
 				8F59291C18854BF800FE51AD /* keysig.h */,
 				8F086EC7188539540037FD8E /* layerelement.cpp */,
@@ -528,18 +556,12 @@
 				8F59292218854BF800FE51AD /* multirest.h */,
 				8F086ECC188539540037FD8E /* note.cpp */,
 				8F59292318854BF800FE51AD /* note.h */,
-				8F086ECF188539540037FD8E /* pitchinterface.cpp */,
-				8F59292618854BF800FE51AD /* pitchinterface.h */,
-				8F086ED0188539540037FD8E /* positioninterface.cpp */,
-				8F59292718854BF800FE51AD /* positioninterface.h */,
 				8F086ED1188539540037FD8E /* rest.cpp */,
 				8F59292818854BF800FE51AD /* rest.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
 				4D9A9C1D19A1DE2000028D93 /* syl.cpp */,
 				4D9A9C1B199F576100028D93 /* syl.h */,
-				8F086ED6188539540037FD8E /* symbol.cpp */,
-				8F59292D18854BF800FE51AD /* symbol.h */,
 				8F086ED8188539540037FD8E /* tie.cpp */,
 				8F59292F18854BF800FE51AD /* tie.h */,
 				8F086ED9188539540037FD8E /* tuplet.cpp */,
@@ -589,7 +611,6 @@
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
 				8F59295318854BF800FE51AD /* svgdevicecontext.h in Headers */,
-				8F59295418854BF800FE51AD /* symbol.h in Headers */,
 				8F59295518854BF800FE51AD /* system.h in Headers */,
 				8F59295618854BF800FE51AD /* tie.h in Headers */,
 				8F59295718854BF800FE51AD /* tuplet.h in Headers */,
@@ -604,6 +625,9 @@
 				4D422102199805E400963292 /* attdef.h in Headers */,
 				4D9A9C17199F560200028D93 /* verse.h in Headers */,
 				4D9A9C1C199F576100028D93 /* syl.h in Headers */,
+				4DC34BA219BC4A71006175CD /* accid.h in Headers */,
+				4DC34BA319BC4A71006175CD /* custos.h in Headers */,
+				4DC34BA419BC4A71006175CD /* dot.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -707,7 +731,6 @@
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
-				8F086F02188539540037FD8E /* symbol.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
@@ -729,6 +752,9 @@
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
+				4DC34BA819BC4A83006175CD /* accid.cpp in Sources */,
+				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
+				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -762,7 +788,6 @@
 				8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */,
 				8F3DD35218854B2E0051330C /* rest.cpp in Sources */,
 				8F3DD35418854B2E0051330C /* slur.cpp in Sources */,
-				8F3DD35618854B2E0051330C /* symbol.cpp in Sources */,
 				8F3DD35818854B2E0051330C /* tie.cpp in Sources */,
 				8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */,
 				8F3DD32E18854B250051330C /* layer.cpp in Sources */,
@@ -788,6 +813,9 @@
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */,
+				4DC34BA919BC4A83006175CD /* accid.cpp in Sources */,
+				4DC34BAB19BC4A83006175CD /* custos.cpp in Sources */,
+				4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

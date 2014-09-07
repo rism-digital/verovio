@@ -14,29 +14,25 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface()
+PitchInterface::PitchInterface():
+    AttAccidental(),
+    AttOctave(),
+    AttPitch()
+    
 {
-    m_accid = 0;
-    m_oct = 0;
-    m_pname = 0;
+    Reset();
 }
 
 
 PitchInterface::~PitchInterface()
 {
 }
-
-void PitchInterface::SetPitch(int pname, int oct) 
+    
+void PitchInterface::Reset()
 {
-    m_oct = oct;
-    m_pname = pname;
-}
-
-bool PitchInterface::GetPitch(int *pname, int *oct) 
-{
-    *oct = m_oct;
-    *pname = m_pname;
-    return true;
+    ResetAccidental();
+    ResetOctave();
+    ResetPitch();
 }
 
 bool PitchInterface::HasIdenticalPitchInterface( PitchInterface *otherPitchInterface )

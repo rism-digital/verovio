@@ -25,7 +25,6 @@
 #include "metersig.h"
 #include "note.h"
 #include "rest.h"
-#include "symbol.h"
 #include "tie.h"
 
 namespace vrv {
@@ -502,19 +501,19 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
         pugi::xml_node step = pitch.append_child("step");
         pugi::xml_node octave = pitch.append_child("octave");
         
-        number << steps[n->m_pname - 1];
+        number << steps[n->GetPname() - 1];
         step.append_child(pugi::node_pcdata).set_value(number.str().c_str());
         //TiXmlText *step_name = new TiXmlText(number.str().c_str());
         //step->LinkEndChild(step_name);
         
         number.clear();
-        number << (int)n->m_oct;
+        number << (int)n->GetOct();
         octave.append_child(pugi::node_pcdata).set_value(number.str().c_str());
         //TiXmlText *octave_name = new TiXmlText(number.str().c_str());
         //octave->LinkEndChild(octave_name);
         
         // do we have an alteration?
-        if (n->m_accid != 0) {
+        if (n->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
             number.clear();
             number << 1;
             pugi::xml_node xalter = pitch.append_child("alter");

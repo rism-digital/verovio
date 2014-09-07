@@ -13,9 +13,12 @@
 
 namespace vrv {
 
+class Accid;
 class Barline;
 class Beam;
 class Clef;
+class Custos;
+class Dot;
 class DurationInterface;
 class Layer;
 class Mensur;
@@ -23,6 +26,8 @@ class MeterSig;
 class MRest;
 class MultiRest;
 class Note;
+class PitchInterface;
+class PositionInterface;
 class Rest;
 class Syl;
 class Symbol;
@@ -75,71 +80,23 @@ public:
 private:
     
     /**
-     * Write a Barline. 
-     * Callded from WriteLayerElement.
+     * Write an LayerElement child. 
+     * Called from WriteLayerElement.
      */
+    ///@{
+    void WriteMeiAccid( pugi::xml_node meiAccid, Accid *accid );
     void WriteMeiBarline( pugi::xml_node meiBarline, Barline *barLine );
-    
-    /**
-     * Write a Beam. 
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiBeam( pugi::xml_node meiBeam, Beam *beam );
-    
-    /**
-     * Write a Clef.  
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiClef( pugi::xml_node meiClef, Clef *clef );
-    
-    /**
-     * Write a Mensur. 
-     * Callded from WriteLayerElement.
-     */
+    void WriteMeiCustos( pugi::xml_node meiCustos, Custos *custos );
+    void WriteMeiDot( pugi::xml_node meiDot, Dot *dot );
     void WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur );
-    
-    /**
-     * Write a Mensur.
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiMeterSig( pugi::xml_node meiMeterSig, MeterSig *meterSig );
-
-    /**
-     * Write a MRest (represented by MultiRest class).
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest );
-    
-    /**
-     * Write a MultiRest. 
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multiRest );
-    
-    /**
-     * Write a Note. 
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiNote( pugi::xml_node meiNote, Note *note );
-    
-    /**
-     * Write a Rest. 
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiRest( pugi::xml_node meiRest, Rest *rest );
-    
-    /**
-     * Write a Tuplet. 
-     * Callded from WriteLayerElement.
-     */
     void WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet );
-    
-    /**
-     * Write a Symbol. 
-     * The appropriate MeiElement is created by the method and returned.
-     * Callded from WriteLayerElement.
-     */
-    pugi::xml_node WriteMeiSymbol( Symbol *symbol, pugi::xml_node currentParent );
     
     /**
      * Write a Verse and syl
@@ -155,10 +112,14 @@ private:
     void WriteSameAsAttr( pugi::xml_node element, Object *object );
     
     /**
-     * Write a DurationInterface.
-     * Callded from WriteNote, for example.
+     * Write a interfaces.
+     * Call WriteDurationInferface from WriteNote, for example.
      */
-    void WriteDurationInterface( pugi::xml_node element, DurationInterface *durationInterface );
+    ///@{
+    void WriteDurationInterface( pugi::xml_node element, DurationInterface *interface );
+    void WritePitchInterface( pugi::xml_node element, PitchInterface *interface );
+    void WritePositionInterface( pugi::xml_node element, PositionInterface *interface );
+    ///@}
     
     /**
      * Write the XML text content
@@ -169,9 +130,6 @@ private:
     ///@{
     std::string UuidToMeiStr( Object *element );
     std::string BoolToStr(bool value );
-	std::string OctToStr(int oct);
-	std::string PitchToStr(int pitch);
-    std::string AccidToStr(unsigned char accid);
     std::string DocTypeToStr(DocType type);
     std::string StaffGrpSymbolToStr(StaffGrpSymbol symbol);
     ///@}
@@ -253,7 +211,10 @@ private:
     LayerElement *ReadMeiCustos( pugi::xml_node custos );
     LayerElement *ReadMeiDot( pugi::xml_node dot );
     //
-    bool ReadDurationInterface( pugi::xml_node element, DurationInterface *durationInterface );
+    bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
+    bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
+    bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
+    //
     bool ReadVerse( Note *note, pugi::xml_node verse );
     bool ReadSyl( Verse *verse, pugi::xml_node syl );
     //
@@ -296,9 +257,6 @@ private:
 	//
     void SetMeiUuid( pugi::xml_node element, Object *object );
     bool StrToBool(std::string value);
-	int StrToOct(std::string oct);
-	int StrToPitch(std::string pitch ); 
-    unsigned char StrToAccid(std::string accid);
     DocType StrToDocType(std::string type);
     StaffGrpSymbol StrToStaffGrpSymbol(std::string sign);
     /** Extract the uuid for references to uuids with ..#uuid values */

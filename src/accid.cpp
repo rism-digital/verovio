@@ -1,44 +1,38 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.cpp
+// Name:        accid.cpp
 // Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "element.h"
+#include "accid.h"
 
 //----------------------------------------------------------------------------
-
-#include "childElement.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Element
+// Accid
 //----------------------------------------------------------------------------
 
-Element::Element():
-    DocObject("element-"),
-    AttCommon()
+Accid::Accid():
+    LayerElement("accid-"), PositionInterface(),
+    AttAccidental()
 {
     Reset();
 }
 
-Element::~Element()
+Accid::~Accid()
 {
-}
-
-void Element::AddChildElement(ChildElement *child)
-{    
-    child->SetParent( this );
-    m_children.push_back(child);
-    Modify();
 }
     
-void Element::Reset()
+void Accid::Reset()
 {
-    LayerElement::Reset()
-    ResetCommon();
-}    
+    LayerElement::Reset();
+    PositionInterface::Reset();
+    
+    ResetAccidental();
+}
+    
 
 } // namespace vrv

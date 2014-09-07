@@ -9,6 +9,8 @@
 #ifndef __VRV_POSITION_INTERFACE_H__
 #define __VRV_POSITION_INTERFACE_H__
 
+#include "atts_shared.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -20,18 +22,18 @@ namespace vrv {
  * It is not an abstract class but should not be instanciate directly.
  * For now, the position is handled in a similar way that for PitchInterface, that is with a pitch and octave. 
  */
-class PositionInterface
+class PositionInterface: public AttStafflocPitched
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     PositionInterface();
     virtual ~PositionInterface();
-    
-    /** Set the position */
-    virtual void SetPosition( int pname, int oct );
-    
-    /** Get the position */
-    virtual bool GetPosition( int *pname, int *oct );
+    virtual void Reset();
+    ///@}
     
     /**
      * Inteface comparison operator. 
@@ -39,14 +41,9 @@ public:
      */
     bool HasIdenticalPositionInterface(PositionInterface  *otherPitchInterface);
 
-    
 private:
     
 public:
-    /** Indicates the octave information */
-    char m_oct;
-    /** Indicates the pitch name */
-    unsigned char m_pname;
 
 private:
     

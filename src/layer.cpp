@@ -14,15 +14,17 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "clef.h"
+#include "custos.h"
 #include "doc.h"
+#include "dot.h"
 #include "keysig.h"
 #include "io.h"
 #include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
-#include "symbol.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -381,11 +383,11 @@ void Layer::RemoveClefAndCustos()
                     {
                         bool removeLonga = false;
                         // we check only for the pitch, not the octave, but should be enough
-                        if ( (clef->GetClefId() == F3) && ( note->m_pname == PITCHNAME_g ) )
+                        if ( (clef->GetClefId() == F3) && ( note->GetPname() == PITCHNAME_g ) )
                             removeLonga = true;
-                        else if ( (clef->GetClefId() == F4) && ( note->m_pname == PITCHNAME_b ) )
+                        else if ( (clef->GetClefId() == F4) && ( note->GetPname() == PITCHNAME_b ) )
                             removeLonga = true;
-                        else if ( (clef->GetClefId() == F5) && ( note->m_pname == PITCHNAME_d ) )
+                        else if ( (clef->GetClefId() == F5) && ( note->GetPname() == PITCHNAME_d ) )
                             removeLonga = true;
                         if ( removeLonga ) {
                             this->Delete( note );
@@ -398,8 +400,8 @@ void Layer::RemoveClefAndCustos()
                 elementCount--;
                 // now remove alterations (keys)
                 for (; i < elementCount; i++) {
-                    Symbol *accid = dynamic_cast<Symbol*>(m_children[i]);
-                    if ( accid && accid->IsSymbol( SYMBOL_ACCID ) ) {
+                    Accid *accid = dynamic_cast<Accid*>(m_children[i]);
+                    if ( accid ) {
                         this->Delete( accid );
                         elementCount--;
                         i--;                        
@@ -414,9 +416,9 @@ void Layer::RemoveClefAndCustos()
                 currentClef = clef;
             }
         }
-        else if ( element && element->IsSymbol( SYMBOL_CUSTOS ) ) {
-            Symbol *symbol = dynamic_cast<Symbol*>( m_children[i] );
-            this->Delete( symbol );
+        else if ( element && element->IsCustos( ) ) {
+            Custos *custos = dynamic_cast<Custos*>( m_children[i] );
+            this->Delete( custos );
             elementCount--;
             i--;
         }

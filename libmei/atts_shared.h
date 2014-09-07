@@ -87,15 +87,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAccid(std::string accid_) { m_accid = accid_; };
-    std::string GetAccid() const { return m_accid; };    
+    void SetAccid(data_ACCIDENTAL_EXPLICIT accid_) { m_accid = accid_; };
+    data_ACCIDENTAL_EXPLICIT GetAccid() const { return m_accid; };    
     bool HasAccid( );
     
     ///@}
 
 protected:
     /** Captures a written accidental. **/
-    std::string m_accid;
+    data_ACCIDENTAL_EXPLICIT m_accid;
 
 /* include <attaccid> */
 };
@@ -3320,15 +3320,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOct(std::string oct_) { m_oct = oct_; };
-    std::string GetOct() const { return m_oct; };    
+    void SetOct(char oct_) { m_oct = oct_; };
+    char GetOct() const { return m_oct; };    
     bool HasOct( );
     
     ///@}
 
 protected:
     /** Captures written octave information. **/
-    std::string m_oct;
+    char m_oct;
 
 /* include <attoct> */
 };
@@ -3566,15 +3566,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPname(std::string pname_) { m_pname = pname_; };
-    std::string GetPname() const { return m_pname; };    
+    void SetPname(data_PITCHNAME pname_) { m_pname = pname_; };
+    data_PITCHNAME GetPname() const { return m_pname; };    
     bool HasPname( );
     
     ///@}
 
 protected:
     /** Contains a written pitch name. **/
-    std::string m_pname;
+    data_PITCHNAME m_pname;
 
 /* include <attpname> */
 };
@@ -4674,22 +4674,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPloc(std::string ploc_) { m_ploc = ploc_; };
-    std::string GetPloc() const { return m_ploc; };    
+    void SetPloc(data_PITCHNAME ploc_) { m_ploc = ploc_; };
+    data_PITCHNAME GetPloc() const { return m_ploc; };    
     bool HasPloc( );
     
     //
-    void SetOloc(std::string oloc_) { m_oloc = oloc_; };
-    std::string GetOloc() const { return m_oloc; };    
+    void SetOloc(char oloc_) { m_oloc = oloc_; };
+    char GetOloc() const { return m_oloc; };    
     bool HasOloc( );
     
     ///@}
 
 protected:
     /** Captures staff location in terms of written pitch name. **/
-    std::string m_ploc;
+    data_PITCHNAME m_ploc;
     /** Records staff location in terms of written octave. **/
-    std::string m_oloc;
+    char m_oloc;
 
 /* include <attoloc> */
 };

@@ -61,6 +61,61 @@ int Att::StrToInt(std::string value)
 
 // Converters for writing and reading
 
+std::string Att::AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data)
+{
+    std::string value;
+    switch(data)
+    {
+        case ACCIDENTAL_EXPLICIT_s : value = "s"; break;
+        case ACCIDENTAL_EXPLICIT_f : value = "f"; break;
+        case ACCIDENTAL_EXPLICIT_ss : value = "ss"; break;
+        case ACCIDENTAL_EXPLICIT_x : value = "x"; break;
+        case ACCIDENTAL_EXPLICIT_ff : value = "ff"; break;
+        case ACCIDENTAL_EXPLICIT_xs : value = "xs"; break;
+        case ACCIDENTAL_EXPLICIT_ts : value = "ts"; break;
+        case ACCIDENTAL_EXPLICIT_tf : value = "tf"; break;
+        case ACCIDENTAL_EXPLICIT_n : value = "n"; break;
+        case ACCIDENTAL_EXPLICIT_nf : value = "nf"; break;
+        case ACCIDENTAL_EXPLICIT_ns : value = "ns"; break;
+        case ACCIDENTAL_EXPLICIT_su : value = "su"; break;
+        case ACCIDENTAL_EXPLICIT_sd : value = "sd"; break;
+        case ACCIDENTAL_EXPLICIT_fu : value = "fu"; break;
+        case ACCIDENTAL_EXPLICIT_fd : value = "fd"; break;
+        case ACCIDENTAL_EXPLICIT_nu : value = "nu"; break;
+        case ACCIDENTAL_EXPLICIT_nd : value = "nd"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_ACCIDENTAL_EXPLICIT Att::StrToAccidentalExplicit(std::string value)
+{
+    if (value == "s") return ACCIDENTAL_EXPLICIT_s;
+    else if (value == "f") return ACCIDENTAL_EXPLICIT_f;
+    else if (value == "ss") return ACCIDENTAL_EXPLICIT_ss;
+    else if (value == "x") return ACCIDENTAL_EXPLICIT_x;
+    else if (value == "ff") return ACCIDENTAL_EXPLICIT_ff;
+    else if (value == "xs") return ACCIDENTAL_EXPLICIT_xs;
+    else if (value == "ts") return ACCIDENTAL_EXPLICIT_ts;
+    else if (value == "tf") return ACCIDENTAL_EXPLICIT_tf;
+    else if (value == "n") return ACCIDENTAL_EXPLICIT_n;
+    else if (value == "nf") return ACCIDENTAL_EXPLICIT_nf;
+    else if (value == "ns") return ACCIDENTAL_EXPLICIT_ns;
+    else if (value == "su") return ACCIDENTAL_EXPLICIT_su;
+    else if (value == "sd") return ACCIDENTAL_EXPLICIT_sd;
+    else if (value == "fu") return ACCIDENTAL_EXPLICIT_fu;
+    else if (value == "fd") return ACCIDENTAL_EXPLICIT_fd;
+    else if (value == "nu") return ACCIDENTAL_EXPLICIT_nu;
+    else if (value == "nd") return ACCIDENTAL_EXPLICIT_nd;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return ACCIDENTAL_EXPLICIT_NONE;
+}
+    
 std::string Att::AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data)
 {
     std::string value;

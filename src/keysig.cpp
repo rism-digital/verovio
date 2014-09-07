@@ -77,10 +77,10 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
         // other values are  KEYSIGNATURE_NONE or  KEYSIGNATURE_mixed (unsupported)
         return;
     }
-    if (key > KEYSIGNATURE_0) {
+    if (key > 0) {
         m_alteration = ACCID_SHARP;
     }
-    else if (key < KEYSIGNATURE_0) {
+    else if (key < 0) {
         m_alteration = ACCID_FLAT;
     }
     m_num_alter = key < 0 ? -key : key; // abs equivalent
