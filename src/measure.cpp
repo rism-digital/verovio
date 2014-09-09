@@ -34,7 +34,6 @@ Measure::Measure( bool measureMusic, int logMeasureNb ):
     AttMeasureLog()
 {    
     m_measuredMusic = measureMusic;
-    m_logMeasureNb = logMeasureNb;
     Reset();
 }
 
@@ -49,7 +48,6 @@ void Measure::Reset()
     ResetMeasureLog();
     
     m_parent = NULL;
-    m_logMeasureNb = -1;
     m_measuredMusic = true;
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;

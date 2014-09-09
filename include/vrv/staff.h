@@ -72,8 +72,16 @@ public:
     
     int GetYRel();
 
-    // functors
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Functor method for saving
+     */
     virtual int Save( ArrayPtrVoid params );
+    
     virtual bool GetPosOnPage( ArrayPtrVoid params );
     
     /**

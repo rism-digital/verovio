@@ -57,17 +57,17 @@ public:
      * The index position is 0-based.
      */
     int GetLayerIdx() const { return Object::GetIdx(); };
+    
+    //----------//
+    // Functors //
+    //----------//
 
-    // functors
     /**
      * Copy the elements to a Layer passed in parameters. 
      * Also take into account a start and end uuid for the page (if any)
      */ 
     virtual int CopyToLayer( ArrayPtrVoid params );
-    void CopyElements( ArrayPtrVoid params ); // unused
-    void GetMaxXY( ArrayPtrVoid params ); // unused
     virtual int Save( ArrayPtrVoid params );
-    void CheckAndResetSectionOrMeasure( ArrayPtrVoid params ); // unused
     
 	LayerElement *GetPrevious( LayerElement *element );
 	LayerElement *GetAtPos( int x );

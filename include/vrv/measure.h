@@ -86,8 +86,6 @@ public:
     Barline *GetRightBarline() { return &m_rightBarline; };
     ///@}
        
-    // functors
-    virtual int Save( ArrayPtrVoid params );
     
     Staff *GetStaffWithNo( int staffNo );
     
@@ -102,6 +100,13 @@ public:
      * Return the width of the measure, including the barLine width
      */
     int GetWidth( );
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    virtual int Save( ArrayPtrVoid params );
+
     
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
@@ -150,8 +155,6 @@ public:
     virtual int CastOffSystems( ArrayPtrVoid params );
         
 public:
-    /** The logical staff */
-    int m_logMeasureNb;
 	/**
      * The X absolute position of the measure for facsimile (transcription) encodings.
      * This is the top left position of the measure.

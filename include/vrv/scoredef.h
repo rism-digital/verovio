@@ -239,7 +239,11 @@ public:
     void SetBarthru( bool barthru ) { m_barthru = barthru; };
     ///@}
     
-    // functors
+    
+    //----------//
+    // Functors //
+    //----------//
+    
     virtual int Save( ArrayPtrVoid params );
     
 protected:
@@ -315,7 +319,11 @@ public:
     void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
     ///@}
 
-    // functors
+    
+    //----------//
+    // Functors //
+    //----------//
+    
     virtual int Save( ArrayPtrVoid params );
     
     /**
