@@ -1463,6 +1463,7 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         m_measure = NULL;
     }
     else if ( std::string( element.name() ) == "chord" ) {
+        // We just read the first note for now
         pugi::xml_node note = element.child("note");
         note.append_attribute( "dur" ) =  element.attribute("dur").value();
         if (ReadMeiLayerElement( note )) {

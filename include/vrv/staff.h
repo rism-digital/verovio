@@ -72,7 +72,6 @@ public:
     
     int GetYRel();
 
-    
     //----------//
     // Functors //
     //----------//

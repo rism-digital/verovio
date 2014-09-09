@@ -58,17 +58,6 @@ public:
      */
     int GetLayerIdx() const { return Object::GetIdx(); };
     
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * Copy the elements to a Layer passed in parameters. 
-     * Also take into account a start and end uuid for the page (if any)
-     */ 
-    virtual int CopyToLayer( ArrayPtrVoid params );
-    virtual int Save( ArrayPtrVoid params );
-    
 	LayerElement *GetPrevious( LayerElement *element );
 	LayerElement *GetAtPos( int x );
 	LayerElement *Insert( LayerElement *element, int x ); // return a pointer on the inserted element
@@ -163,6 +152,18 @@ public:
     void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
     data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
     ///@}
+    
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Copy the elements to a Layer passed in parameters.
+     * Also take into account a start and end uuid for the page (if any)
+     */
+    virtual int CopyToLayer( ArrayPtrVoid params );
+    virtual int Save( ArrayPtrVoid params );
     
 private:
     
