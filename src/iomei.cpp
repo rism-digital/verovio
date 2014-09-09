@@ -694,7 +694,7 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         m_doc->AddPage( m_page );
         pugi::xml_node current;
         for( current = mdiv.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadUnsupported( m_system, current );
+            ReadScoreBasedMei( m_system, current );
         }
     }
     
@@ -1012,7 +1012,7 @@ bool MeiInput::ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement )
     // chord - temporary, read only the first note
     else if ( std::string( xmlElement.name() ) == "chord" ) {
         LogDebug("Only first note of chords is read" );
-        //ReadUnsupported(xmlElement);
+        //ReadScoreBasedMei(xmlElement);
     }
     // unknown
     else {
@@ -1312,48 +1312,33 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
     }
 }
     
-    void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
-    {
-        if (!m_hasScoreDef) {
-            m_hasScoreDef = true;
-        }
-        /*
-        if ( dynamic_cast<Layer*>( parent ) ) {
-            dynamic_cast<Layer*>( parent )->AddElement( element );
-        }
-        else if ( dynamic_cast<Beam*>( parent ) ) {
-            dynamic_cast<Beam*>( parent )->AddElement( element );
-        }
-        else if ( dynamic_cast<Tuplet*>( parent ) ) {
-            dynamic_cast<Tuplet*>( parent )->AddElement( element );
-        }
-        */
-        else {
-            LogWarning("'%s' not supported within '%s'", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str() );
-            delete scoreDef;
-        }
-        
+void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
+{
+    if (!m_hasScoreDef) {
+        m_hasScoreDef = true;
     }
+    else if ( dynamic_cast<System*>( parent ) ) {
+        dynamic_cast<System*>( parent )->AddScoreDef( scoreDef );
+    }
+    else {
+        LogWarning("'%s' not supported within '%s'", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str() );
+        delete scoreDef;
+    }    
+}
     
-    void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
-    {
-        /*
-         if ( dynamic_cast<Layer*>( parent ) ) {
-         dynamic_cast<Layer*>( parent )->AddElement( element );
-         }
-         else if ( dynamic_cast<Beam*>( parent ) ) {
-         dynamic_cast<Beam*>( parent )->AddElement( element );
-         }
-         else if ( dynamic_cast<Tuplet*>( parent ) ) {
-         dynamic_cast<Tuplet*>( parent )->AddElement( element );
-         }
-         */
-        {
-            LogWarning("'%s' not supported within '%s'", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str() );
-            delete staffGrp;
-        }
-        
+void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
+{
+    if ( dynamic_cast<ScoreDef*>( parent ) ) {
+        dynamic_cast<ScoreDef*>( parent )->AddStaffGrp( staffGrp );
     }
+    else if ( dynamic_cast<StaffGrp*>( parent ) ) {
+        dynamic_cast<StaffGrp*>( parent )->AddStaffGrp( staffGrp );
+    }
+    else {
+        LogWarning("'%s' not supported within '%s'", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str() );
+        delete staffGrp;
+    }
+}
 
 void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
 {
@@ -1372,27 +1357,27 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     }
 }
 
-bool MeiInput::ReadUnsupported( Object *parent, pugi::xml_node element )
+bool MeiInput::ReadScoreBasedMei( Object *parent, pugi::xml_node element )
 {
     if ( std::string( element.name() ) == "score" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadUnsupported( parent, current );
+            ReadScoreBasedMei( parent, current );
         }
     }
     if ( std::string( element.name() ) == "section" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadUnsupported( parent, current );
+            ReadScoreBasedMei( parent, current );
         }       
     }
     else if ( std::string( element.name() ) == "measure" ) {
-        if (parent != m_system) {
-            LogDebug( "<measure> supported only as <section> child" );
-        }
-        else {
+        //if (parent != m_system) {
+        //    LogDebug( "<measure> supported only as <section> child" );
+        //}
+        //else {
             ReadMeiMeasure( m_system, element );
-        }
+        //}
     }
     else if ( std::string( element.name() ) == "chord" ) {
         // We just read the first note for now
@@ -1433,22 +1418,23 @@ bool MeiInput::ReadUnsupported( Object *parent, pugi::xml_node element )
     }
     */
     else if (std::string( element.name() ) == "pb") {
-        if (parent != m_system) {
-            LogDebug( "<pb> supported only between <measure> elements" );
-        }
-        else if ( (m_system->GetMeasureCount() > 0) && !m_ignoreLayoutInformation) {
+        //if (parent != m_system) {
+        //    LogDebug( "<pb> supported only between <measure> elements" );
+        //}
+        if ( (m_system->GetMeasureCount() > 0) && !m_ignoreLayoutInformation) {
             LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
             m_page = new Page( );
             m_system = new System( );
+            parent = m_system;
             m_page->AddSystem( m_system );
             m_doc->AddPage( m_page );
         }        
     }
     else if (std::string( element.name() ) == "sb") {
-        if (parent != m_system) {
-            LogDebug( "<sb> supported only between <measure> elements" );
-        }
+        //if (parent != m_system) {
+        //    LogDebug( "<sb> supported only between <measure> elements" );
+        //}
         if ( (m_page->GetSystemCount() > 0)  && !m_ignoreLayoutInformation) {
             LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
@@ -1457,7 +1443,7 @@ bool MeiInput::ReadUnsupported( Object *parent, pugi::xml_node element )
         }
     }
     else if ( (std::string( element.name() ) == "scoreDef") ) {
-        ReadMeiScoreDef( parent, element );
+        ReadMeiScoreDef( m_system, element );
     }
     else {
         LogWarning( "Elements <%s> ignored", element.name() );

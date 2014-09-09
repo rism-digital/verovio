@@ -187,7 +187,7 @@ public:
 private:
     bool ReadMei( pugi::xml_node root );
     bool ReadMeiHeader( pugi::xml_node meihead );
-    /** Reads the content of a <layer> or of a <rdg> for <app> within <layer> */
+    // Containers
     bool ReadMeiPage( pugi::xml_node page );
     bool ReadMeiSystem( Page* page, pugi::xml_node system );
     bool ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef );
@@ -196,6 +196,7 @@ private:
     bool ReadMeiMeasure( System *system, pugi::xml_node measure );
     bool ReadMeiStaff( Measure *measure, pugi::xml_node staff );
     bool ReadMeiLayer( Staff *staff, pugi::xml_node layer );
+    // Elements
     bool ReadMeiLayerElement( Object *parent, pugi::xml_node XmlElement );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
@@ -221,9 +222,6 @@ private:
     //
     bool ReadTupletSpanAsTuplet( pugi::xml_node tupletSpan );
     bool ReadSlurAsSlurAttr( pugi::xml_node slur );
-    /** Reads <app> elements. For now, only <app> within <layer> are taken into account */
-    LayerElement *ReadMeiApp( pugi::xml_node app );
-    bool ReadMeiRdg( pugi::xml_node rdg );
     
     /**
      * Read a sameAs attribute
@@ -245,9 +243,9 @@ private:
     void AddStaffGrp( Object *parent, StaffGrp *element );
     
     /**
-     * Read unsupported element and try to convert them
+     * Read score-based MEI
      */
-    bool ReadUnsupported( Object *parent, pugi::xml_node element );
+    bool ReadScoreBasedMei( Object *parent, pugi::xml_node element );
     
     /**
      * Look through the list of notes with open tie stored in MeiInput::m_openTies.
