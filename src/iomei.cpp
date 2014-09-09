@@ -33,6 +33,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "object.h"
 #include "page.h"
 #include "rest.h"
 #include "scoredef.h"
@@ -598,18 +599,7 @@ MeiInput::MeiInput( Doc *doc, std::string filename ) :
     m_filename = filename;
     m_doc->m_fname = GetFilename( filename );
     m_page = NULL;
-    m_scoreDef = NULL;
-    m_staffDef = NULL;
     m_system = NULL;
-	m_staff = NULL;
-    m_measure = NULL;
-	m_layer = NULL;
-    m_layerApp = NULL;
-    m_layerRdg = NULL;
-    m_beam = NULL;
-    m_tuplet = NULL;
-    //
-    m_currentLayer = NULL;
     //
     m_hasScoreDef = false;
 }
@@ -693,26 +683,18 @@ bool MeiInput::ReadMei( pugi::xml_node root )
             // because we are in a page-based MEI
             this->m_hasLayoutInformation = true;
             for( current = pages.child( "page" ); current; current = current.next_sibling( "page" ) ) {
-                m_page = new Page( );
-                SetMeiUuid( current, m_page );
-                if (ReadMeiPage( current )) {
-                    m_doc->AddPage( m_page );
-                }
-                else {
-                    delete m_page;
-                }
-                m_page = NULL;
+                ReadMeiPage( current );
             }
         }
     }
     else {
         m_page = new Page( );
-        m_system = new System( );
+        m_system  = new System( );
         m_page->AddSystem( m_system );
         m_doc->AddPage( m_page );
         pugi::xml_node current;
         for( current = mdiv.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadUnsupported( current );
+            ReadUnsupported( m_system, current );
         }
     }
     
@@ -735,7 +717,8 @@ bool MeiInput::ReadMeiHeader( pugi::xml_node meiHead )
 
 bool MeiInput::ReadMeiPage( pugi::xml_node page )
 {
-    assert( m_page );
+    Page *vrvPage = new Page();
+    SetMeiUuid( page, vrvPage );
     
     if ( page.attribute( "page.height" ) ) {
         m_page->m_pageHeight = atoi ( page.attribute( "page.height" ).value() );
@@ -756,187 +739,137 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
         m_page->m_surface = page.attribute( "surface" ).value();
     }
     
-    pugi::xml_node current;
-    for( current = page.child( "system" ); current; current = current.next_sibling( "system" ) ) {
-        m_system = new System( );
-        SetMeiUuid( current, m_system );
-        if (ReadMeiSystem( current )) {
-            m_page->AddSystem( m_system );
-        }
-        else {
-            delete m_system;
-        }
-        m_system = NULL;
-    }
-    // success only if at least one system was added to the page
-    return (m_page->GetSystemCount() > 0);
-}
-
-bool MeiInput::ReadMeiSystem( pugi::xml_node system )
-{
-    assert( m_system );
-    assert( !m_measure );
-    assert( !m_staff );
-    
-    if ( system.attribute( "system.leftmar") ) {
-        m_system->m_systemLeftMar = atoi ( system.attribute( "system.leftmar" ).value() );
-    }
-    if ( system.attribute( "system.rightmar" ) ) {
-        m_system->m_systemRightMar = atoi ( system.attribute( "system.rightmar" ).value() );
-    }
-    if ( system.attribute( "uly" ) ) {
-        m_system->m_yAbs = atoi ( system.attribute( "uly" ).value() );
-    }
+    m_doc->AddPage( vrvPage );
     
     pugi::xml_node current;
-    
-    
-    // load the first scoreDef (if any) - temporary since we want to load all scoreDef elements
-    if ( !m_hasScoreDef && ( current = system.first_child() ) && ( std::string( current.name() ) == "scoreDef") ) {
-        LogDebug( "scoreDef" );
-        m_scoreDef = &m_doc->m_scoreDef;
-        SetMeiUuid( current, m_scoreDef );
-        if (ReadMeiScoreDef( current )) {
-            m_hasScoreDef = true;
+    for( current = page.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "system" ) {
+            ReadMeiSystem( vrvPage, current );
         }
-        else {
-            m_hasScoreDef = false;
+        // can we have scoreDef between system in the current page-based cusotmization? To be checked
+        else if ( std::string( current.name() ) == "scoreDef" ) {
+            ReadMeiScoreDef( vrvPage, current );
         }
-    }
-    
-    // unmeasured music
-    if ( system.child( "staff" ) ) {
-        // this is the trick for un-measured music: we add one measure ( false )
-        if ( !m_measure ) {
-            m_measure = new Measure( false );
-        }
-        for( current = system.child( "staff" ); current; current = current.next_sibling( "staff" ) ) {
-            m_staff = new Staff( );
-            SetMeiUuid( current , m_staff );
-            if ( ReadMeiStaff( current )) {
-                m_measure->AddStaff( m_staff );
-            }
-            else {
-                delete m_staff;
-            }
-            m_staff = NULL;
-        }
-        if ( m_measure->GetStaffCount() > 0) {
-            m_system->AddMeasure( m_measure );
-        }
-        else {
-            delete m_measure;
-        }
-        m_measure = NULL;
-    }
-    else {
-        // measured
-        for( current = system.child( "measure" ); current; current = current.next_sibling( "measure" ) ) {
-            m_measure = new Measure( );
-            SetMeiUuid( current, m_measure );
-            if (ReadMeiMeasure( current )) {
-                m_system->AddMeasure( m_measure );
-            }
-            else {
-                delete m_measure;
-            }
-            m_measure = NULL;
-        }
-    }
-    
-    // success only if at least one measure was added to the system
-    return (m_system->GetMeasureCount() > 0);
-}
-
-bool MeiInput::ReadMeiScoreDef( pugi::xml_node scoreDef )
-{
-    assert( m_scoreDef );
-    assert( m_staffGrps.empty() );
-    
-    ClefAttr clefAttr;
-    if ( clefAttr.ReadCleffingLog( scoreDef ) ) {
-        m_scoreDef->ReplaceClef( &clefAttr );
-    }
-    KeySigAttr keySigAttr;
-    if ( keySigAttr.ReadKeySigDefaultLog( scoreDef ) ) {
-        m_scoreDef->ReplaceKeySig( &keySigAttr );
-    }
-    MeterSigAttr meterSig;
-    if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
-        m_scoreDef->ReplaceMeterSig( &meterSig );
-    }
-    MensurAttr mensur;
-    if ( mensur.ReadMensuralLog( scoreDef ) ) {
-        m_scoreDef->ReplaceMensur( &mensur );
-    }
-    
-    pugi::xml_node current;
-    for( current = scoreDef.child( "staffGrp" ); current; current = current.next_sibling( "staffGrp" ) ) {
-        StaffGrp *staffGrp = new StaffGrp( );
-        m_staffGrps.push_back( staffGrp );
-        SetMeiUuid( current , staffGrp );
-        if (ReadMeiStaffGrp( current )) {
-            m_scoreDef->AddStaffGrp( staffGrp );
-        }
-        else {
-            delete staffGrp;
-        }
-        m_staffGrps.pop_back();
     }
     
     return true;
 }
 
-bool MeiInput::ReadMeiStaffGrp( pugi::xml_node staffGrp )
+bool MeiInput::ReadMeiSystem( Page *page, pugi::xml_node system )
 {
-    assert( !m_staffGrps.empty() );
-    assert( !m_staffDef );
+    System *vrvSystem = new System();
+    SetMeiUuid(system, vrvSystem);
     
-    StaffGrp *currentStaffGrp = m_staffGrps.back();
+    if ( system.attribute( "system.leftmar") ) {
+        vrvSystem->m_systemLeftMar = atoi ( system.attribute( "system.leftmar" ).value() );
+    }
+    if ( system.attribute( "system.rightmar" ) ) {
+        vrvSystem->m_systemRightMar = atoi ( system.attribute( "system.rightmar" ).value() );
+    }
+    if ( system.attribute( "uly" ) ) {
+        vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() );
+    }
+    
+        page->AddSystem(vrvSystem);
+    
+    pugi::xml_node current;
+    Measure *unmeasured = NULL;
+    for( current = system.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "scoreDef" ) {
+            // we should not have scoredef with unmeasured within a system... (?)
+            assert(!unmeasured);
+            ReadMeiScoreDef( vrvSystem, current );
+        }
+        // unmeasured music
+        else if ( system.child( "staff" ) ) {
+            if (!unmeasured) {
+                unmeasured = new Measure( false );
+                vrvSystem->AddMeasure(unmeasured);
+            }
+            ReadMeiStaff( unmeasured, current );
+        }
+        else {
+            // we should not mix measure and unmeasured within a system...
+            assert(!unmeasured);
+            ReadMeiMeasure(vrvSystem, current);
+        }
+    }
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
+{
+    ScoreDef *vrvScoreDef;
+    if (!m_hasScoreDef) {
+        vrvScoreDef = &m_doc->m_scoreDef;
+    }
+    else {
+        vrvScoreDef = new ScoreDef();
+    }
+    SetMeiUuid(scoreDef, vrvScoreDef);
+    
+    ClefAttr clefAttr;
+    if ( clefAttr.ReadCleffingLog( scoreDef ) ) {
+        vrvScoreDef->ReplaceClef( &clefAttr );
+    }
+    KeySigAttr keySigAttr;
+    if ( keySigAttr.ReadKeySigDefaultLog( scoreDef ) ) {
+        vrvScoreDef->ReplaceKeySig( &keySigAttr );
+    }
+    MeterSigAttr meterSig;
+    if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
+        vrvScoreDef->ReplaceMeterSig( &meterSig );
+    }
+    MensurAttr mensur;
+    if ( mensur.ReadMensuralLog( scoreDef ) ) {
+        vrvScoreDef->ReplaceMensur( &mensur );
+    }
+    
+    AddScoreDef(parent, vrvScoreDef);
+    
+    pugi::xml_node current;
+    for( current = scoreDef.child( "staffGrp" ); current; current = current.next_sibling( "staffGrp" ) ) {
+        ReadMeiStaffGrp(vrvScoreDef, current);
+    }
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
+{
+    StaffGrp *vrvStaffGrp = new StaffGrp( );
+    SetMeiUuid( staffGrp, vrvStaffGrp );
     
     if ( staffGrp.attribute( "symbol" ) ) {
-        currentStaffGrp->SetSymbol( StrToStaffGrpSymbol( staffGrp.attribute( "symbol" ).value() ) );
+        vrvStaffGrp->SetSymbol( StrToStaffGrpSymbol( staffGrp.attribute( "symbol" ).value() ) );
     }
     if ( staffGrp.attribute( "barthru" ) ) {
-        currentStaffGrp->SetBarthru( StrToBool( staffGrp.attribute( "barthru" ).value() ) );
+        vrvStaffGrp->SetBarthru( StrToBool( staffGrp.attribute( "barthru" ).value() ) );
     }
+    
+    AddStaffGrp(parent, vrvStaffGrp);
     
     pugi::xml_node current;
     for( current = staffGrp.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "staffGrp" ) {
-            StaffGrp *staffGrp = new StaffGrp( );
-            m_staffGrps.push_back( staffGrp );
-            SetMeiUuid( current , staffGrp );
-            if (ReadMeiStaffGrp( current )) {
-                currentStaffGrp->AddStaffGrp( staffGrp );
-            }
-            else {
-                delete staffGrp;
-            }
-            m_staffGrps.pop_back();            
+            ReadMeiStaffGrp( vrvStaffGrp, current);           
         }
         else if ( std::string( current.name() ) == "staffDef" ) {
-            m_staffDef = new StaffDef( );
-            SetMeiUuid( current , m_staffDef );
-            if (ReadMeiStaffDef( current )) {
-                currentStaffGrp->AddStaffDef( m_staffDef );
-            }
-            else {
-                delete m_staffDef;
-            }
-            m_staffDef = NULL;
+            ReadMeiStaffDef( vrvStaffGrp, current );
         }        
     }
     
     return true;
 }
 
-bool MeiInput::ReadMeiStaffDef( pugi::xml_node staffDef )
+bool MeiInput::ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node staffDef )
 {
-    assert( m_staffDef );
+    StaffDef *vrvStaffDef = new StaffDef( );
+    SetMeiUuid( staffDef, vrvStaffDef );
     
     if ( staffDef.attribute( "n" ) ) {
-        m_staffDef->SetStaffNo( atoi ( staffDef.attribute( "n" ).value() ) );
+        vrvStaffDef->SetStaffNo( atoi ( staffDef.attribute( "n" ).value() ) );
     }
     else {
         LogWarning("No @n on <staffDef>");
@@ -944,264 +877,295 @@ bool MeiInput::ReadMeiStaffDef( pugi::xml_node staffDef )
     
     ClefAttr clefAttr;
     if ( clefAttr.ReadCleffingLog( staffDef ) ) {
-        m_staffDef->ReplaceClef( &clefAttr );
+        vrvStaffDef->ReplaceClef( &clefAttr );
     }
     KeySigAttr keySigAttr;
     if ( keySigAttr.ReadKeySigDefaultLog( staffDef ) ) {
-        m_staffDef->ReplaceKeySig( &keySigAttr );
+        vrvStaffDef->ReplaceKeySig( &keySigAttr );
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
-        m_staffDef->ReplaceMeterSig( &meterSig );
+        vrvStaffDef->ReplaceMeterSig( &meterSig );
     }
 
+    staffGrp->AddStaffDef(vrvStaffDef);
     
     return true;
 }
 
-bool MeiInput::ReadMeiMeasure( pugi::xml_node measure )
+bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
 {
-    assert( m_measure );
-    assert( !m_staff );
+    Measure *vrvMeasure = new Measure( );
+    SetMeiUuid( measure, vrvMeasure );
     
-    m_measure->ReadCommon(measure);
-    m_measure->ReadMeasureLog(measure);
+    vrvMeasure->ReadCommon(measure);
+    vrvMeasure->ReadMeasureLog(measure);
     
     // here we transfer the @left and @right values to the barLine objects
-    m_measure->SetLeftBarlineType( m_measure->GetLeft() );
-    m_measure->SetRightBarlineType( m_measure->GetRight() );
+    vrvMeasure->SetLeftBarlineType( vrvMeasure->GetLeft() );
+    vrvMeasure->SetRightBarlineType( vrvMeasure->GetRight() );
+    
+    system->AddMeasure(vrvMeasure);
     
     pugi::xml_node current;
     for( current = measure.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "staff" ) {
-            m_staff = new Staff( );
-            SetMeiUuid( current , m_staff );
-            if ( ReadMeiStaff( current )) {
-                m_measure->AddStaff( m_staff );
-            }
-            else {
-                delete m_staff;
-            }
-            m_staff = NULL;
-        }
-        else ReadUnsupported( current );
-    }
-    // success only if at least one staff was added to the measure
-    return (m_measure->GetStaffCount() > 0);
-}
-
-bool MeiInput::ReadMeiStaff( pugi::xml_node staff )
-{
-    assert( m_staff );
-    assert( !m_layer );
-    
-    m_staff->ReadCommon(staff);
-    
-    if ( staff.attribute( "uly" ) ) {
-        m_staff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
-    }
-    if ( staff.attribute( "label" ) ) {
-        // we use type only for typing mensural notation
-        m_staff->notAnc = true;
-    }
-    
-    pugi::xml_node current;
-    for( current = staff.child( "layer" ); current; current = current.next_sibling( "layer" ) ) {
-        m_layer = new Layer( );
-        m_currentLayer = m_layer;
-        SetMeiUuid( current , m_layer );
-        if (ReadMeiLayer( current )) {
-            m_staff->AddLayer( m_layer );
+            ReadMeiStaff( vrvMeasure, current);
         }
         else {
-            delete m_layer;
+            LogWarning("Unsupported '<%s>' within <measure>", current.name() );
         }
-        m_layer = NULL;
     }
-    
-    // success only if at least one measure was added to the staff
-    return (m_staff->GetLayerCount() > 0);
-}
 
-bool MeiInput::ReadMeiLayer( pugi::xml_node layer )
-{
-    assert( m_layer );
-    
-    m_layer->ReadCommon(layer);
-    
-    pugi::xml_node current;
-    for( current = layer.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( current );
-    }
-    
-    // success in any case
     return true;
 }
 
-bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
+bool MeiInput::ReadMeiStaff( Measure *measure, pugi::xml_node staff )
 {
-    LayerElement *vrvElement = NULL;
+    Staff *vrvStaff = new Staff();
+    SetMeiUuid(staff, vrvStaff);
+    
+    vrvStaff->ReadCommon(staff);
+    
+    if ( staff.attribute( "uly" ) ) {
+        vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
+    }
+    if ( staff.attribute( "label" ) ) {
+        // we use type only for typing mensural notation
+        vrvStaff->notAnc = true;
+    }
+    
+    measure->AddStaff(vrvStaff);
+    
+    pugi::xml_node current;
+    for( current = staff.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "layer" ) {
+            ReadMeiLayer( vrvStaff, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <staff>", current.name() );
+        }
+    }
+
+    return true;
+}
+
+bool MeiInput::ReadMeiLayer( Staff *staff, pugi::xml_node layer )
+{
+    Layer *vrvLayer = new Layer();
+    SetMeiUuid(layer, vrvLayer);
+    
+    vrvLayer->ReadCommon(layer);
+    
+    staff->AddLayer(vrvLayer);
+    
+    pugi::xml_node current;
+    for( current = layer.first_child( ); current; current = current.next_sibling( ) ) {
+        ReadMeiLayerElement( vrvLayer, current );
+    }
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement )
+{
     if ( std::string( xmlElement.name() )  == "barLine" ) {
-        vrvElement = ReadMeiBarline( xmlElement );
+        ReadMeiBarline( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "beam" ) {
-        vrvElement = ReadMeiBeam( xmlElement );
+        ReadMeiBeam( parent, xmlElement);
     }
     else if ( std::string( xmlElement.name() ) == "clef" ) {
-        vrvElement = ReadMeiClef( xmlElement );
+        ReadMeiClef( parent, xmlElement);
     }
     else if ( std::string( xmlElement.name() ) == "mensur" ) {
-        vrvElement = ReadMeiMensur( xmlElement );
+        ReadMeiMensur( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "meterSig" ) {
-        vrvElement = ReadMeiMeterSig( xmlElement );
+        ReadMeiMeterSig( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "note" ) {
-        vrvElement = ReadMeiNote( xmlElement );
+        ReadMeiNote( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "rest" ) {
-        vrvElement = ReadMeiRest( xmlElement );
+        ReadMeiRest( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "mRest" ) {
-        vrvElement = ReadMeiMRest( xmlElement );
+        ReadMeiMRest( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "multiRest" ) {
-        vrvElement = ReadMeiMultiRest( xmlElement );
+        ReadMeiMultiRest( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "tuplet" ) {
-        vrvElement = ReadMeiTuplet( xmlElement );
+        ReadMeiTuplet( parent, xmlElement );
     }
     // symbols
     else if ( std::string( xmlElement.name() ) == "accid" ) {
-        vrvElement = ReadMeiAccid( xmlElement );
+        ReadMeiAccid( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "custos" ) {
-        vrvElement = ReadMeiCustos( xmlElement );
+        ReadMeiCustos( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "dot" ) {
-        vrvElement = ReadMeiDot( xmlElement );
-    }
-    // app
-    else if ( std::string( xmlElement.name() ) == "app" ) {
-        vrvElement = ReadMeiApp( xmlElement );
+        ReadMeiDot( parent, xmlElement );
     }
     // chord - temporary, read only the first note
     else if ( std::string( xmlElement.name() ) == "chord" ) {
         LogDebug("Only first note of chords is read" );
-        ReadUnsupported(xmlElement);
+        //ReadUnsupported(xmlElement);
     }
     // unknown
     else {
         LogDebug("Element %s ignored", xmlElement.name() );
     }
     
-    if ( !vrvElement ) {
-        return false;
-    }
+    return true;
+}
     
-    if ( xmlElement.attribute( "ulx" ) ) {
-        vrvElement->m_xAbs = atoi ( xmlElement.attribute( "ulx" ).value() );
+bool MeiInput::ReadLayerElement( pugi::xml_node element, LayerElement *object )
+{
+    if ( element.attribute( "ulx" ) ) {
+        object->m_xAbs = atoi ( element.attribute( "ulx" ).value() );
     }
-    ReadSameAsAttr( xmlElement, vrvElement );
-    SetMeiUuid( xmlElement, vrvElement );
+    ReadSameAsAttr( element, object );
+    SetMeiUuid( element, object );
     
-    pugi::xml_node current;
-    for( current = xmlElement.first_child( ); current; current = current.next_sibling( ) ) {
-        if ( std::string( current.name() ) == "accid" && vrvElement->IsNote() ) {
-            //ReadAccid(  vrvElement, current );
-        }
-        if ( std::string( current.name() ) == "verse" && vrvElement->IsNote() ) {
-            ReadVerse(  dynamic_cast<Note*>(vrvElement), current );
-        }
-    }
-    
-    AddLayerElement( vrvElement );
     return true;
 }
 
-LayerElement *MeiInput::ReadMeiBarline( pugi::xml_node barLine )
+bool MeiInput::ReadMeiAccid( Object *parent, pugi::xml_node accid )
 {
-    Barline *vrvBarline = new Barline();
-    vrvBarline->ReadBarLineLog(barLine);
-    return vrvBarline;    
+    Accid *vrvAccid = new Accid( );
+    ReadLayerElement(accid, vrvAccid);
+    
+    ReadPositionInterface(accid, vrvAccid);
+    vrvAccid->ResetAccidental();
+    
+    AddLayerElement(parent, vrvAccid);
+    return true;
 }
 
-LayerElement *MeiInput::ReadMeiBeam( pugi::xml_node beam )
+bool MeiInput::ReadMeiBarline( Object *parent, pugi::xml_node barLine )
 {
-    assert ( !m_beam );
+    Barline *vrvBarline = new Barline();
+    ReadLayerElement(barLine, vrvBarline);
     
-    // m_beam will be used for adding elements to the beam
-    m_beam = new Beam();
+    vrvBarline->ReadBarLineLog(barLine);
     
-    Object *previousLayer = m_currentLayer;
-    m_currentLayer = m_beam;
+    AddLayerElement(parent, vrvBarline);
+    
+    return true;
+    
+}
+
+bool MeiInput::ReadMeiBeam( Object *parent, pugi::xml_node beam )
+{
+    Beam *vrvBeam = new Beam();
+    ReadLayerElement(beam, vrvBeam);
+    
+    AddLayerElement(parent, vrvBeam);
     
     pugi::xml_node current;
     for( current = beam.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( current );
+        ReadMeiLayerElement( vrvBeam, current );
     }
     
-    if ( m_beam->GetNoteCount() == 1 ) {
+    if ( vrvBeam->GetNoteCount() == 1 ) {
         LogWarning("<beam> with only one note");
     }
-    // switch back to the previous one
-    m_currentLayer = previousLayer;
-    if ( m_beam->GetNoteCount() < 1 ) {
-        delete m_beam;
-        m_beam = NULL;
-        return NULL;
-    } 
-    else {
-        // set the member to NULL but keep a pointer to be returned        
-        Beam *vrvBeam = m_beam;
-        m_beam = NULL;
-        return vrvBeam;
-    }
+    
+    return true;
 }
 
-LayerElement *MeiInput::ReadMeiClef( pugi::xml_node clef )
+bool MeiInput::ReadMeiClef( Object *parent, pugi::xml_node clef )
 { 
     Clef *vrvClef = new Clef();
+    ReadLayerElement(clef, vrvClef);
+    
     vrvClef->ReadClefshape( clef );
     vrvClef->ReadLineloc( clef );
     vrvClef->ReadOctavedisplacement( clef );
-    return vrvClef;
+
+    AddLayerElement(parent, vrvClef);
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiCustos( Object *parent, pugi::xml_node custos )
+{
+    Custos *vrvCustos = new Custos( );
+    ReadLayerElement(custos, vrvCustos);
+    
+    ReadPositionInterface(custos, vrvCustos);
+    
+    AddLayerElement(parent, vrvCustos);
+    
+    return true;
 }
 
 
-LayerElement *MeiInput::ReadMeiMensur( pugi::xml_node mensur )
+bool MeiInput::ReadMeiDot( Object *parent, pugi::xml_node dot )
+{
+    Dot *vrvDot = new Dot( );
+    ReadLayerElement(dot, vrvDot);
+    
+    ReadPositionInterface(dot, vrvDot);
+    
+    AddLayerElement(parent, vrvDot);
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiMensur( Object *parent, pugi::xml_node mensur )
 {
     Mensur *vrvMensur = new Mensur();
+    ReadLayerElement(mensur, vrvMensur);
+    
     vrvMensur->ReadDurationRatio( mensur );
     vrvMensur->ReadMensurLog( mensur );
     vrvMensur->ReadMensurVis( mensur );
     vrvMensur->ReadSlashcount( mensur );
-    return vrvMensur;
+
+    AddLayerElement(parent, vrvMensur);
+    
+    return true;
 }
     
-LayerElement *MeiInput::ReadMeiMeterSig( pugi::xml_node meterSig )
+bool MeiInput::ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig )
 {
     MeterSig *vrvMeterSig = new MeterSig();
+    ReadLayerElement(meterSig, vrvMeterSig);
+    
     vrvMeterSig->ReadMeterSigLog(meterSig);
-    return vrvMeterSig;
+    
+    AddLayerElement(parent, vrvMeterSig);
+    return true;
 }
     
-LayerElement *MeiInput::ReadMeiMRest( pugi::xml_node mRest )
+bool MeiInput::ReadMeiMRest( Object *parent, pugi::xml_node mRest )
 {
-    MRest *vrvMRest = new MRest();    
-    return vrvMRest;
+    MRest *vrvMRest = new MRest();
+    ReadLayerElement(mRest, vrvMRest);
+    
+    AddLayerElement(parent, vrvMRest);
+    return true;
 }
 
-LayerElement *MeiInput::ReadMeiMultiRest( pugi::xml_node multiRest )
+bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
 {
 	MultiRest *vrvMultiRest = new MultiRest( 1 );
-    vrvMultiRest->ReadNumbered(multiRest);	
-	return vrvMultiRest;
+    ReadLayerElement(multiRest, vrvMultiRest);
+    
+    vrvMultiRest->ReadNumbered(multiRest);
+    
+    AddLayerElement(parent, vrvMultiRest);
+	return true;
 }
 
-LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
+bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
 {
 	Note *vrvNote = new Note();
+    ReadLayerElement(note, vrvNote);
     
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
@@ -1225,83 +1189,59 @@ LayerElement *MeiInput::ReadMeiNote( pugi::xml_node note )
             }
         }
     }
+    
+    AddLayerElement(parent, vrvNote);
+    
+    pugi::xml_node current;
+    for( current = note.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "accid" ) {
+            //ReadAccid(  vrvElement, current );
+        }
+        if ( std::string( current.name() ) == "verse" ) {
+            ReadVerse(  vrvNote, current );
+        }
+    }
 	
-	return vrvNote;
+	return true;
 }
 
 
-LayerElement *MeiInput::ReadMeiRest( pugi::xml_node rest )
+bool MeiInput::ReadMeiRest( Object *parent, pugi::xml_node rest )
 {
     Rest *vrvRest = new Rest();
+    ReadLayerElement(rest, vrvRest);
     
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
 	
-    return vrvRest;
+    AddLayerElement(parent, vrvRest);
+    return true;
 }
 
 
-LayerElement *MeiInput::ReadMeiTuplet( pugi::xml_node tuplet )
+bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
 {
-    assert ( !m_tuplet );
-    
-    // m_tuplet will be used for adding elements to the beam
-    m_tuplet = new Tuplet();
-    
-    Object *previousLayer = m_currentLayer;
-    m_currentLayer = m_tuplet;
+    Tuplet *vrvTuplet = new Tuplet();
+    ReadLayerElement(tuplet, vrvTuplet);
     
     // Read in the numerator and denominator properties
-    m_tuplet->ReadDurationRatio(tuplet);
+    vrvTuplet->ReadDurationRatio(tuplet);
+    
+    AddLayerElement(parent, vrvTuplet);
     
     pugi::xml_node current;
     for( current = tuplet.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( current );
+        ReadMeiLayerElement( vrvTuplet, current );
     }
     
-    if ( m_tuplet->GetNoteCount() == 1 ) {
+    if ( vrvTuplet->GetNoteCount() == 1 ) {
         LogWarning("<tuplet> with only one note");
     }
-    // switch back to the previous one
-    m_currentLayer = previousLayer;
-    if ( m_tuplet->GetNoteCount() < 1 ) {
-        delete m_tuplet;
-        return NULL;
-    }
-    else {
-        // set the member to NULL but keep a pointer to be returned
-        Tuplet *vrvTuplet = m_tuplet;
-        m_tuplet = NULL;
-        return vrvTuplet;
-    }
-}
-
-
-LayerElement *MeiInput::ReadMeiAccid( pugi::xml_node accid )
-{
-    Accid *vrvAccid = new Accid( );
-    ReadPositionInterface(accid, vrvAccid);
-    vrvAccid->ResetAccidental();	
-	return vrvAccid;
-}
-
-LayerElement *MeiInput::ReadMeiCustos( pugi::xml_node custos )
-{
     
-    Custos *vrvCustos = new Custos( );
-    ReadPositionInterface(custos, vrvCustos);
-	return vrvCustos;
+    return true;
 }
     
-    
-LayerElement *MeiInput::ReadMeiDot( pugi::xml_node dot )
-{
-    Dot *vrvDot = new Dot( );
-    ReadPositionInterface(dot, vrvDot);
-    return vrvDot;
-}
-    
-bool MeiInput::ReadVerse(vrv::Note *vrvNote, pugi::xml_node verse)
+bool MeiInput::ReadVerse( Note *vrvNote, pugi::xml_node verse)
 {
     Verse *vrvVerse = new Verse();
     SetMeiUuid( verse , vrvVerse );
@@ -1319,7 +1259,7 @@ bool MeiInput::ReadVerse(vrv::Note *vrvNote, pugi::xml_node verse)
     return true;
 }
 
-bool MeiInput::ReadSyl(Verse *vrvVerse, pugi::xml_node syl)
+bool MeiInput::ReadSyl( Verse *vrvVerse, pugi::xml_node syl)
 {
     Syl *vrvSyl = new Syl();
     SetMeiUuid( syl , vrvSyl );
@@ -1329,52 +1269,6 @@ bool MeiInput::ReadSyl(Verse *vrvVerse, pugi::xml_node syl)
     
     vrvVerse->AddSyl( vrvSyl );
     return true;
-}
-
-LayerElement *MeiInput::ReadMeiApp( pugi::xml_node app )
-{
-    m_layerApp = new LayerApp( );
-   
-    pugi::xml_node current;
-    for( current = app.child( "rdg" ); current; current = current.next_sibling( "rdg" ) ) {
-        ReadMeiRdg( current );
-	}
-	
-    // set the member to NULL but keep a pointer to be returned
-    LayerApp *layerApp = m_layerApp;
-    m_layerApp = NULL;
-    
-    return layerApp;
-}
-
-bool MeiInput::ReadMeiRdg( pugi::xml_node rdg )
-{
-    assert ( !m_layerRdg );
-    assert( m_layerApp );
-    
-    m_layerRdg = new LayerRdg( );
-    
-    if ( rdg.attribute( "source" ) ) {
-        m_layerRdg->m_source = rdg.attribute( "source" ).value();
-    }
-    
-    // switch to the rdg
-    Object *previousLayer = m_currentLayer;
-    m_currentLayer = m_layerRdg;
- 
-    pugi::xml_node current;
-    for( current = rdg.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( current );
-    }
-    
-    // switch back to the previous one
-    m_currentLayer = previousLayer;
-
-    // set the member to NULL but keep a pointer to be returned
-    LayerRdg *layerRdg = m_layerRdg;
-    m_layerRdg = NULL;
-    
-    return layerRdg;
 }
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
@@ -1417,58 +1311,96 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
         object->SetText(UTF8to16( element.text().as_string() ));
     }
 }
-
-void MeiInput::AddLayerElement( LayerElement *element )
-{
-    assert( m_currentLayer );
-    if ( dynamic_cast<Layer*>( m_currentLayer ) ) {
-        ((Layer*)m_currentLayer)->AddElement( element );
-    }
-    else if ( dynamic_cast<LayerRdg*>( m_currentLayer ) ) {
-        ((LayerRdg*)m_currentLayer)->AddElement( element );
-    }
-    else if ( dynamic_cast<Beam*>( m_currentLayer ) ) {
-        ((Beam*)m_currentLayer)->AddElement( element );
-    }
-    else if ( dynamic_cast<Tuplet*>( m_currentLayer ) ) {
-        ((Tuplet*)m_currentLayer)->AddElement( element );
+    
+    void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
+    {
+        if (!m_hasScoreDef) {
+            m_hasScoreDef = true;
+        }
+        /*
+        if ( dynamic_cast<Layer*>( parent ) ) {
+            dynamic_cast<Layer*>( parent )->AddElement( element );
+        }
+        else if ( dynamic_cast<Beam*>( parent ) ) {
+            dynamic_cast<Beam*>( parent )->AddElement( element );
+        }
+        else if ( dynamic_cast<Tuplet*>( parent ) ) {
+            dynamic_cast<Tuplet*>( parent )->AddElement( element );
+        }
+        */
+        else {
+            LogWarning("'%s' not supported within '%s'", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str() );
+            delete scoreDef;
+        }
+        
     }
     
+    void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
+    {
+        /*
+         if ( dynamic_cast<Layer*>( parent ) ) {
+         dynamic_cast<Layer*>( parent )->AddElement( element );
+         }
+         else if ( dynamic_cast<Beam*>( parent ) ) {
+         dynamic_cast<Beam*>( parent )->AddElement( element );
+         }
+         else if ( dynamic_cast<Tuplet*>( parent ) ) {
+         dynamic_cast<Tuplet*>( parent )->AddElement( element );
+         }
+         */
+        {
+            LogWarning("'%s' not supported within '%s'", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str() );
+            delete staffGrp;
+        }
+        
+    }
+
+void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
+{
+    if ( dynamic_cast<Layer*>( parent ) ) {
+        dynamic_cast<Layer*>( parent )->AddElement( element );
+    }
+    else if ( dynamic_cast<Beam*>( parent ) ) {
+        dynamic_cast<Beam*>( parent )->AddElement( element );
+    }
+    else if ( dynamic_cast<Tuplet*>( parent ) ) {
+        dynamic_cast<Tuplet*>( parent )->AddElement( element );
+    }
+    else {
+        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
+        delete element;
+    }
 }
 
-bool MeiInput::ReadUnsupported( pugi::xml_node element )
+bool MeiInput::ReadUnsupported( Object *parent, pugi::xml_node element )
 {
     if ( std::string( element.name() ) == "score" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadUnsupported( current );
+            ReadUnsupported( parent, current );
         }
     }
     if ( std::string( element.name() ) == "section" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadUnsupported( current );
+            ReadUnsupported( parent, current );
         }       
     }
     else if ( std::string( element.name() ) == "measure" ) {
-        LogDebug( "measure" );
-        m_measure = new Measure( );
-        SetMeiUuid( element, m_measure );
-        if (ReadMeiMeasure( element )) {
-            m_system->AddMeasure( m_measure );
+        if (parent != m_system) {
+            LogDebug( "<measure> supported only as <section> child" );
         }
         else {
-            delete m_measure;
+            ReadMeiMeasure( m_system, element );
         }
-        m_measure = NULL;
     }
     else if ( std::string( element.name() ) == "chord" ) {
         // We just read the first note for now
         pugi::xml_node note = element.child("note");
         note.append_attribute( "dur" ) =  element.attribute("dur").value();
-        if (ReadMeiLayerElement( note )) {
-            LogMessage( "<note> in chord read!" );
-        }
+        //if (ReadMeiLayerElement( note )) {
+        //    LogMessage( "<note> in chord read!" );
+        //}
     }
     else if ( std::string( element.name() ) == "tupletSpan" ) {
         if (!ReadTupletSpanAsTuplet( element )) {
@@ -1500,45 +1432,32 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
         ReadMeiStaff( element );
     }
     */
-    else if ( (std::string( element.name() ) == "pb")
-             && (m_system->GetMeasureCount() > 0 )  && !m_ignoreLayoutInformation) {
-        LogDebug( "pb" );
-        this->m_hasLayoutInformation = true;
-        m_page = new Page( );
-        m_system = new System( );
-        m_page->AddSystem( m_system );
-        m_doc->AddPage( m_page );
-        
-    }
-    else if ( (std::string( element.name() ) == "sb")
-             && (m_page->GetSystemCount() > 0 )  && !m_ignoreLayoutInformation) {
-        LogDebug( "sb" );
-        this->m_hasLayoutInformation = true;
-        m_system = new System( );
-        m_page->AddSystem( m_system );
-    }
-    else if ( (std::string( element.name() ) == "scoreDef") && ( !m_hasScoreDef ) ) {
-        LogDebug( "scoreDef (first)" );
-        m_scoreDef = &m_doc->m_scoreDef;
-        SetMeiUuid( element, m_scoreDef );
-        if (ReadMeiScoreDef( element )) {
-            m_hasScoreDef = true;
+    else if (std::string( element.name() ) == "pb") {
+        if (parent != m_system) {
+            LogDebug( "<pb> supported only between <measure> elements" );
         }
-        else {
-            m_hasScoreDef = false;
+        else if ( (m_system->GetMeasureCount() > 0) && !m_ignoreLayoutInformation) {
+            LogDebug( "pb" );
+            this->m_hasLayoutInformation = true;
+            m_page = new Page( );
+            m_system = new System( );
+            m_page->AddSystem( m_system );
+            m_doc->AddPage( m_page );
+        }        
+    }
+    else if (std::string( element.name() ) == "sb") {
+        if (parent != m_system) {
+            LogDebug( "<sb> supported only between <measure> elements" );
+        }
+        if ( (m_page->GetSystemCount() > 0)  && !m_ignoreLayoutInformation) {
+            LogDebug( "pb" );
+            this->m_hasLayoutInformation = true;
+            m_system = new System( );
+            m_page->AddSystem( m_system );
         }
     }
-    else if ( std::string( element.name() ) == "scoreDef") {
-        LogDebug( "scoreDef (redefinition)" );
-        m_scoreDef = new ScoreDef();
-        SetMeiUuid( element, m_scoreDef );
-        if (ReadMeiScoreDef( element )) {
-            m_system->AddScoreDef( m_scoreDef );
-        }
-        else {
-            delete m_scoreDef;
-        }
-        m_scoreDef = NULL;
+    else if ( (std::string( element.name() ) == "scoreDef") ) {
+        ReadMeiScoreDef( parent, element );
     }
     else {
         LogWarning( "Elements <%s> ignored", element.name() );
@@ -1548,6 +1467,7 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
     
 bool MeiInput::ReadSlurAsSlurAttr(pugi::xml_node slur)
 {
+    /*
     assert( m_measure );
     
     LayerElement *start = NULL;
@@ -1580,12 +1500,15 @@ bool MeiInput::ReadSlurAsSlurAttr(pugi::xml_node slur)
     
     startNote->SetSlurAttrInitial();
     endNote->SetSlurAttrTerminal( startNote );
+    */
     return true;
+     
 
 }
     
 bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
 {
+    /*
     assert( m_measure );
     
     Tuplet *tuplet = new Tuplet();
@@ -1644,12 +1567,16 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
         tuplet->AddElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
     }
     parentLayer->InsertChild( tuplet, startIdx );
+    */
     return true;
     
 }
 
 bool MeiInput::FindOpenTie( Note *terminalNote )
 {
+    return true;
+    
+    /*
     assert( m_staff );
     assert( m_layer );
     
@@ -1678,6 +1605,7 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
         }
         
     }
+    */
     return false;
 }
 

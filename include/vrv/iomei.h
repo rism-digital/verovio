@@ -189,28 +189,29 @@ private:
     bool ReadMeiHeader( pugi::xml_node meihead );
     /** Reads the content of a <layer> or of a <rdg> for <app> within <layer> */
     bool ReadMeiPage( pugi::xml_node page );
-    bool ReadMeiSystem( pugi::xml_node system );
-    bool ReadMeiScoreDef( pugi::xml_node scoreDef );
-    bool ReadMeiStaffGrp( pugi::xml_node system );
-    bool ReadMeiStaffDef( pugi::xml_node system );
-    bool ReadMeiMeasure( pugi::xml_node measure );
-    bool ReadMeiStaff( pugi::xml_node staff );
-    bool ReadMeiLayer( pugi::xml_node layer );
-    bool ReadMeiLayerElement( pugi::xml_node XmlElement );
-    LayerElement *ReadMeiBarline( pugi::xml_node barLine );
-    LayerElement *ReadMeiBeam( pugi::xml_node beam );
-    LayerElement *ReadMeiClef( pugi::xml_node clef );
-    LayerElement *ReadMeiMensur( pugi::xml_node mensur );
-    LayerElement *ReadMeiMeterSig( pugi::xml_node meterSig );
-    LayerElement *ReadMeiMRest( pugi::xml_node mRest );
-    LayerElement *ReadMeiMultiRest( pugi::xml_node multiRest );
-    LayerElement *ReadMeiNote( pugi::xml_node note );
-    LayerElement *ReadMeiRest( pugi::xml_node rest );
-    LayerElement *ReadMeiTuplet( pugi::xml_node tuplet );
-    LayerElement *ReadMeiAccid( pugi::xml_node accid );
-    LayerElement *ReadMeiCustos( pugi::xml_node custos );
-    LayerElement *ReadMeiDot( pugi::xml_node dot );
+    bool ReadMeiSystem( Page* page, pugi::xml_node system );
+    bool ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef );
+    bool ReadMeiStaffGrp( Object *parent, pugi::xml_node system );
+    bool ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node system );
+    bool ReadMeiMeasure( System *system, pugi::xml_node measure );
+    bool ReadMeiStaff( Measure *measure, pugi::xml_node staff );
+    bool ReadMeiLayer( Staff *staff, pugi::xml_node layer );
+    bool ReadMeiLayerElement( Object *parent, pugi::xml_node XmlElement );
+    bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
+    bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
+    bool ReadMeiClef( Object *parent, pugi::xml_node clef );
+    bool ReadMeiMensur( Object *parent, pugi::xml_node mensur );
+    bool ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig );
+    bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );
+    bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
+    bool ReadMeiNote( Object *parent, pugi::xml_node note );
+    bool ReadMeiRest( Object *parent, pugi::xml_node rest );
+    bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
+    bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
+    bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
+    bool ReadMeiDot( Object *parent, pugi::xml_node dot );
     //
+    bool ReadLayerElement( pugi::xml_node element, LayerElement *object );
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
@@ -239,12 +240,14 @@ private:
     /**
      * Add the LayerElement to the appropriate parent (e.g., Layer, LayerRdg)
      */
-    void AddLayerElement( LayerElement *element );
+    void AddLayerElement( Object *parent, LayerElement *element );
+    void AddScoreDef( Object *parent, ScoreDef *element );
+    void AddStaffGrp( Object *parent, StaffGrp *element );
     
     /**
      * Read unsupported element and try to convert them
      */
-    bool ReadUnsupported( pugi::xml_node element );
+    bool ReadUnsupported( Object *parent, pugi::xml_node element );
     
     /**
      * Look through the list of notes with open tie stored in MeiInput::m_openTies.
@@ -268,17 +271,7 @@ private:
     std::string m_filename;
     Page *m_page;
     System *m_system;
-    ScoreDef *m_scoreDef;
-    std::list<StaffGrp*> m_staffGrps;
-    StaffDef *m_staffDef;
-    Measure *m_measure;
-	Staff *m_staff;
-	Layer *m_layer;
-    LayerRdg *m_layerRdg;
-    Beam *m_beam;
-    Tuplet *m_tuplet;
-    Object *m_currentLayer;
-    LayerApp *m_layerApp;
+    
     /**
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.
      */
