@@ -34,11 +34,16 @@ class Measure: public DocObject,
 {
     
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Measure( bool measuredMusic = true, int logMeasureNb = -1 );
     virtual ~Measure();
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Measure"; };
+    ///@}
     
     /**
      * Return true if measured music (otherwise we have fakes measures)

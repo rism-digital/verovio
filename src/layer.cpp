@@ -37,14 +37,7 @@ Layer::Layer( ):
 	DocObject("layer-"), ObjectListInterface(),
     AttCommon()
 {
-    ResetCommon();
-    m_drawingClef = NULL;
-    m_drawingKeySig = NULL;
-    m_drawingMensur = NULL;
-    m_drawingMeterSig = NULL;
-    m_drawingStemDir = STEMDIRECTION_NONE;
-    
-    m_drawingList.clear();
+    Reset();
 }
 
 Layer::~Layer()
@@ -63,10 +56,23 @@ Layer::~Layer()
     }    
 }
 
+void Layer::Reset()
+{
+    DocObject::Reset();
+    ResetCommon();
+    
+    m_drawingClef = NULL;
+    m_drawingKeySig = NULL;
+    m_drawingMensur = NULL;
+    m_drawingMeterSig = NULL;
+    m_drawingStemDir = STEMDIRECTION_NONE;
+    m_drawingList.clear();
+}
+    
 int Layer::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
     if (!output->WriteLayer( this )) {
         return FUNCTOR_STOP;
     }

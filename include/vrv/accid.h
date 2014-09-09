@@ -29,7 +29,7 @@ public:
     ///@{
     Accid();
     virtual ~Accid();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Accid"; };
     ///@}
     

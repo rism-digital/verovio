@@ -32,15 +32,7 @@ Staff::Staff( int n ):
 	DocObject("staff-"),
     AttCommon()
 {
-    ResetCommon();
-	notAnc = false; // LP we want modern notation :))
-	grise = false;
-	invisible = false;
-	staffSize = 0;
-	m_drawingLines = 5;
-	m_yAbs = VRV_UNSET;
-	m_drawingY = 0;
-    m_staffAlignment = NULL;
+    Reset();
     m_n = n;
 }
 
@@ -69,6 +61,20 @@ Staff::Staff( const Staff& staff )
 Staff::~Staff()
 {
     
+}
+
+void Staff::Reset()
+{
+    DocObject::Reset();
+    ResetCommon();
+    notAnc = false; // LP we want modern notation :))
+    grise = false;
+    invisible = false;
+    staffSize = 0;
+    m_drawingLines = 5;
+    m_yAbs = VRV_UNSET;
+    m_drawingY = 0;
+    m_staffAlignment = NULL;
 }
 
 int Staff::Save( ArrayPtrVoid params )

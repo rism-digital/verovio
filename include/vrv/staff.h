@@ -44,7 +44,7 @@ public:
     Staff( int n = -1 );
 	Staff( const Staff& staff ); // copy contructor
     virtual ~Staff();
-    //virtual void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Staff"; };	
     ///@}
     

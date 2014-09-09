@@ -19,10 +19,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Slur::Slur():
-LayerElement("slur-")
+    LayerElement("slur-")
 {
-    m_first = NULL;
-    m_second = NULL;
+    Reset();
 }
 
 
@@ -34,6 +33,13 @@ Slur::~Slur()
     if (m_second && m_second->GetSlurAttrTerminal() == this) {
         m_second->ResetSlurAttrTerminal();
     }
+}
+        
+void Slur::Reset()
+{
+    LayerElement::Reset();
+    m_first = NULL;
+    m_second = NULL;
 }
 
 void Slur::SetFirstNote( Note *note )

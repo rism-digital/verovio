@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        element.h
-// Author:      Author_Name
+// Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -31,7 +31,7 @@ public:
     ///@{
     Element();
     virtual ~Element();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Element"; };
     ///@}
     

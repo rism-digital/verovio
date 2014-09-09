@@ -15,20 +15,27 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Tuplet::Tuplet():
-LayerElement("tuplet-"), ObjectListInterface()
+    LayerElement("tuplet-"), ObjectListInterface()
 {
-    Tuplet(1, 1);
+    Reset();
+
 }
 
 Tuplet::Tuplet(int num, int numbase):
-LayerElement("tuplet-"), ObjectListInterface()
+    LayerElement("tuplet-"), ObjectListInterface()
 {
+    Reset();
     m_num = num;
     m_numbase = numbase;
 }
 
 Tuplet::~Tuplet()
 {
+}
+
+void Tuplet::Reset()
+{
+    LayerElement::Reset();
 }
 
 void Tuplet::AddElement(LayerElement *element) {

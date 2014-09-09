@@ -32,7 +32,19 @@ Measure::Measure( bool measureMusic, int logMeasureNb ):
     DocObject("measure-"),
     AttCommon(),
     AttMeasureLog()
+{    
+    m_measuredMusic = measureMusic;
+    m_logMeasureNb = logMeasureNb;
+    Reset();
+}
+
+Measure::~Measure()
 {
+}
+
+void Measure::Reset()
+{
+    DocObject::Reset();
     ResetCommon();
     ResetMeasureLog();
     
@@ -47,16 +59,9 @@ Measure::Measure( bool measureMusic, int logMeasureNb ):
     m_rightBarline.SetRend( this->GetRight() );
     m_leftBarline.SetRend( this->GetLeft() );
     
-    m_measuredMusic = measureMusic;
-    m_logMeasureNb = logMeasureNb;
-    
     if ( !m_measuredMusic ) {
         m_xAbs = 0;
     }
-}
-
-Measure::~Measure()
-{
 }
 
 int Measure::Save( ArrayPtrVoid params )

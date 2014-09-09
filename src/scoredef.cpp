@@ -261,6 +261,7 @@ MeterSigAttr *ScoreOrStaffDefAttrInterface::GetMeterSigAttr() const
 ScoreDef::ScoreDef() :
 	Object("scoredef-"), ScoreOrStaffDefAttrInterface(), ObjectListInterface()
 {
+    Reset();
 }
 
 ScoreDef::~ScoreDef()
@@ -365,12 +366,18 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSi
 StaffGrp::StaffGrp() :
     Object(), ObjectListInterface()
 {
-    m_symbol = STAFFGRP_NONE;
-    m_barthru = false;
+    Reset();
 }
 
 StaffGrp::~StaffGrp()
 {
+}
+
+void StaffGrp::Reset()
+{
+    Object::Reset();
+    m_symbol = STAFFGRP_NONE;
+    m_barthru = false;
 }
 
 void StaffGrp::AddStaffDef( StaffDef *staffDef )
@@ -422,15 +429,21 @@ void StaffGrp::FilterList()
 StaffDef::StaffDef() :
     Object(), ScoreOrStaffDefAttrInterface()
 {
+    Reset();
+}
+
+StaffDef::~StaffDef()
+{
+}
+    
+void StaffDef::Reset()
+{
+    Object::Reset();
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
     m_drawMeterSig = false;
     m_lines = 5;
-}
-
-StaffDef::~StaffDef()
-{
 }
 
 int StaffDef::Save( ArrayPtrVoid params )

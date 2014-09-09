@@ -30,7 +30,7 @@ public:
     ///@{
     Dot();
     virtual ~Dot();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Dot"; };
     ///@}
     

@@ -28,7 +28,7 @@ public:
     ///@{
     Custos();
     virtual ~Custos();
-    void Reset();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Custos"; };
     ///@}
     

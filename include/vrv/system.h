@@ -31,12 +31,17 @@ class ScoreDef;
 class System: public DocObject
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     System();
 	System( const System& system ); // copy contructor
     virtual ~System();
-        
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "System"; };
+    ///@}
 	
 	void AddMeasure( Measure *measure );
     

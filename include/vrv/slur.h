@@ -22,11 +22,16 @@ namespace vrv {
 class Slur: public LayerElement
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Slur();
     virtual ~Slur();
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Slur"; };
+    ///@}
     
     /**
      * @name Set and get the first and second note of the tie

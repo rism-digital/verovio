@@ -46,11 +46,15 @@ class StaffDef;
 class ScoreOrStaffDefAttrInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
     ScoreOrStaffDefAttrInterface();
     virtual ~ScoreOrStaffDefAttrInterface();
     ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface ); // copy contructor
     ScoreOrStaffDefAttrInterface& operator=( const ScoreOrStaffDefAttrInterface& interface ); // copy assignement;
+    ///@}
     
     /**
      * @name Replace the clef, keysig, mensur and meterSig.
@@ -140,13 +144,16 @@ protected:
 class ScoreDef: public Object, public ScoreOrStaffDefAttrInterface, public ObjectListInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     ScoreDef();
-    virtual ~ScoreDef();
-        
-    virtual std::string GetClassName( ) { return "ScoreDef"; };
-    
+    virtual ~ScoreDef();    
     virtual void Reset();
+    virtual std::string GetClassName( ) { return "ScoreDef"; };
+    ///@}
     
 	void AddStaffGrp( StaffGrp *staffGrp );
     
@@ -200,12 +207,17 @@ private:
 class StaffGrp: public Object, public ObjectListInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     StaffGrp();
     virtual ~StaffGrp();
     virtual Object* Clone() { return new StaffGrp(*this); };
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffGrp"; };
+    ///@}
 	
 	void AddStaffDef( StaffDef *staffDef );
     
@@ -258,12 +270,17 @@ private:
 class StaffDef: public Object, public ScoreOrStaffDefAttrInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     StaffDef();
     virtual ~StaffDef();
     virtual Object* Clone() { return new StaffDef(*this); };
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
+    ///@}
     
     /**
      * @name Set and get  the staff number which is 1-based.

@@ -31,11 +31,16 @@ class System;
 class Page: public DocObject
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Page();
     virtual ~Page();
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Page"; };
+    ///@}
 
 	void AddSystem( System *system );
 

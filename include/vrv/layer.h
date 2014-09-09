@@ -44,6 +44,7 @@ public:
     ///@{
     Layer( );
     virtual ~Layer();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Layer"; };
     ///@}
 	

@@ -31,26 +31,33 @@ namespace vrv {
 Page::Page() :
 	DocObject("page-")
 {
+    Reset();
+}
+
+Page::~Page()
+{
+}
+    
+void Page::Reset()
+{
+    DocObject::Reset();
     m_drawingScoreDef.Reset();
     m_layoutDone = false;
+    this->ResetUuid();
+    
     // by default we have no values and use the document ones
     m_pageHeight = -1;
     m_pageWidth = -1;
     m_pageLeftMar = 0;
     m_pageRightMar = 0;
     m_pageTopMar = 0;
-    this->ResetUuid();
-}
-
-Page::~Page()
-{
 }
 
 
 int Page::Save( ArrayPtrVoid params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
     if (!output->WritePage( this )) {
         return FUNCTOR_STOP;
     }

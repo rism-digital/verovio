@@ -21,8 +21,7 @@ namespace vrv {
 Tie::Tie():
 LayerElement("tie-")
 {
-    m_first = NULL;
-    m_second = NULL;
+    Reset();
 }
 
 
@@ -34,6 +33,13 @@ Tie::~Tie()
     if (m_second && m_second->GetTieAttrTerminal() == this) {
         m_second->ResetTieAttrTerminal();
     }
+}
+    
+void Tie::Reset()
+{
+    LayerElement::Reset();
+    m_first = NULL;
+    m_second = NULL;
 }
 
 void Tie::SetFirstNote( Note *note )

@@ -26,7 +26,7 @@ namespace vrv {
 SystemAligner::SystemAligner():
     Object()
 {
-    m_bottomAlignment = NULL;
+    Reset();
 }
 
 SystemAligner::~SystemAligner()

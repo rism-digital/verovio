@@ -22,12 +22,17 @@ namespace vrv {
 class Tuplet: public LayerElement, public ObjectListInterface
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Tuplet();
     Tuplet(int num, int numbase);
     virtual ~Tuplet();
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Tuplet"; };
+    ///@}
 
 	int GetNoteCount() const { return (int)m_children.size(); };
     

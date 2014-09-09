@@ -24,11 +24,16 @@ namespace vrv {
 class Tie: public LayerElement
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Tie();
     virtual ~Tie();
-    
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Tie"; };
+    ///@}
     
     /**
      * @name Set and get the first and second note of the tie
