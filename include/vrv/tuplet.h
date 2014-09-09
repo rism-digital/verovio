@@ -9,6 +9,7 @@
 #ifndef __VRV_TUPLET_H__
 #define __VRV_TUPLET_H__
 
+#include "atts_shared.h"
 #include "layer.h"
 #include "note.h"
 #include "object.h"
@@ -19,7 +20,8 @@ namespace vrv {
 // Tuplet
 //----------------------------------------------------------------------------
 
-class Tuplet: public LayerElement, public ObjectListInterface
+class Tuplet: public LayerElement, public ObjectListInterface,
+    public AttDurationRatio
 {
 public:
     /**
@@ -42,12 +44,6 @@ public:
      */
     void AddElement(LayerElement *element);
     
-    int GetNum() { return m_num; };
-    void SetNum(int n) {m_num = n; };
-    
-    int GetNumBase() { return m_numbase; };
-    void SetNumBase(int n) {m_numbase = n; };
-    
 protected:
     /**
      * Filter the list for a specific class.
@@ -58,11 +54,9 @@ protected:
 private:
     
 public:
-
     
 private:
-    int m_num;
-    int m_numbase;
+
 };
 
 } // namespace vrv    

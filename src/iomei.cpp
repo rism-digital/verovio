@@ -456,6 +456,7 @@ void MeiOutput::WriteMeiRest( pugi::xml_node meiRest, Rest *rest )
 
 void MeiOutput::WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet )
 {
+    tuplet->WriteDurationRatio(meiTuplet);
     return;
 }
     
@@ -1246,12 +1247,7 @@ LayerElement *MeiInput::ReadMeiTuplet( pugi::xml_node tuplet )
     m_currentLayer = m_tuplet;
     
     // Read in the numerator and denominator properties
-    if ( tuplet.attribute( "num" ) ) {
-		m_tuplet->SetNum(atoi( tuplet.attribute( "num" ).value() ));
-	}
-    if ( tuplet.attribute( "numbase" ) ) {
-		m_tuplet->SetNumBase(atoi( tuplet.attribute( "numbase" ).value() ));
-	}
+    m_tuplet->ReadDurationRatio(tuplet);
     
     pugi::xml_node current;
     for( current = tuplet.first_child( ); current; current = current.next_sibling( ) ) {
@@ -1590,7 +1586,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
         tuplet->SetNum(atoi( tupletSpan.attribute( "num" ).value() ));
     }
     if ( tupletSpan.attribute( "numbase" ) ) {
-        tuplet->SetNumBase(atoi( tupletSpan.attribute( "numbase" ).value() ));
+        tuplet->SetNumbase(atoi( tupletSpan.attribute( "numbase" ).value() ));
     }
     
     // position (pitch)
