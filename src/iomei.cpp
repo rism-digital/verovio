@@ -1085,7 +1085,12 @@ bool MeiInput::ReadMeiLayerElement( pugi::xml_node xmlElement )
     else if ( std::string( xmlElement.name() ) == "app" ) {
         vrvElement = ReadMeiApp( xmlElement );
     }
-    // unkown            
+    // chord - temporary, read only the first note
+    else if ( std::string( xmlElement.name() ) == "chord" ) {
+        LogDebug("Only first note of chords is read" );
+        ReadUnsupported(xmlElement);
+    }
+    // unknown
     else {
         LogDebug("Element %s ignored", xmlElement.name() );
     }
@@ -1456,6 +1461,13 @@ bool MeiInput::ReadUnsupported( pugi::xml_node element )
             delete m_measure;
         }
         m_measure = NULL;
+    }
+    else if ( std::string( element.name() ) == "chord" ) {
+        pugi::xml_node note = element.child("note");
+        note.append_attribute( "dur" ) =  element.attribute("dur").value();
+        if (ReadMeiLayerElement( note )) {
+            LogMessage( "<note> in chord read!" );
+        }
     }
     else if ( std::string( element.name() ) == "tupletSpan" ) {
         if (!ReadTupletSpanAsTuplet( element )) {
