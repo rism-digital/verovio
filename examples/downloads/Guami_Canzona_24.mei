@@ -2660,7 +2660,7 @@
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="bervis" oct="2" pname="b" xml:id="p1cbd2n0v1b32s9"/>
+								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b32s9"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b32s9"/>
 							</layer>
 						</staff>
