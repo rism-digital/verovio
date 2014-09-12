@@ -394,18 +394,6 @@ void StaffGrp::AddStaffGrp( StaffGrp *staffGrp )
     Modify();
 }
 
-int StaffGrp::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);  
-    if (!output->WriteStaffGrp( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-    
-}
-
-
 void StaffGrp::FilterList()
 {
     // We want to keep only staffDef
@@ -444,17 +432,6 @@ void StaffDef::Reset()
     m_drawMensur = false;
     m_drawMeterSig = false;
     m_lines = 5;
-}
-
-int StaffDef::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);  
-    if (!output->WriteStaffDef( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-    
 }
 
 //----------------------------------------------------------------------------

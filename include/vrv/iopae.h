@@ -22,6 +22,7 @@ namespace vrv {
 class Beam;
 class Clef;
 class Layer;
+class LayerElement;
 class Measure;
 class MeterSig;
 class Note;

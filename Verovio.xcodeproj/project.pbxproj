@@ -45,7 +45,6 @@
 		4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
-		8F086EE3188539540037FD8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
 		8F086EE6188539540037FD8E /* beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBA188539540037FD8E /* beam.cpp */; };
@@ -100,7 +99,6 @@
 		8F3DD33418854B250051330C /* scoredef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED2188539540037FD8E /* scoredef.cpp */; };
 		8F3DD33618854B250051330C /* staff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED4188539540037FD8E /* staff.cpp */; };
 		8F3DD33818854B250051330C /* system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED7188539540037FD8E /* system.cpp */; };
-		8F3DD33A18854B2E0051330C /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB7188539540037FD8E /* app.cpp */; };
 		8F3DD33C18854B2E0051330C /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F3DD33E18854B2E0051330C /* beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBA188539540037FD8E /* beam.cpp */; };
 		8F3DD34018854B2E0051330C /* clef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBB188539540037FD8E /* clef.cpp */; };
@@ -129,7 +127,6 @@
 		8F3DD36C18854B410051330C /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECD188539540037FD8E /* object.cpp */; };
 		8F3DD36E18854B410051330C /* vrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE1188539540037FD8E /* vrv.cpp */; };
 		8F59293418854BF800FE51AD /* aligner.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290D18854BF800FE51AD /* aligner.h */; };
-		8F59293518854BF800FE51AD /* app.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290E18854BF800FE51AD /* app.h */; };
 		8F59293618854BF800FE51AD /* barline.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290F18854BF800FE51AD /* barline.h */; };
 		8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291018854BF800FE51AD /* bboxdevicecontext.h */; };
 		8F59293818854BF800FE51AD /* beam.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291118854BF800FE51AD /* beam.h */; };
@@ -239,7 +236,6 @@
 		4DEE290C1940BCC100C76319 /* atts_tablature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_tablature.h; path = libmei/atts_tablature.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; };
-		8F086EB7188539540037FD8E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = src/app.cpp; sourceTree = "<group>"; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
 		8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bboxdevicecontext.cpp; path = src/bboxdevicecontext.cpp; sourceTree = "<group>"; };
 		8F086EBA188539540037FD8E /* beam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beam.cpp; path = src/beam.cpp; sourceTree = "<group>"; };
@@ -282,7 +278,6 @@
 		8F086EE1188539540037FD8E /* vrv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vrv.cpp; path = src/vrv.cpp; sourceTree = "<group>"; };
 		8F086F4D18853CA90037FD8E /* liblibverovio.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibverovio.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F59290D18854BF800FE51AD /* aligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aligner.h; path = include/vrv/aligner.h; sourceTree = "<group>"; };
-		8F59290E18854BF800FE51AD /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = app.h; path = include/vrv/app.h; sourceTree = "<group>"; };
 		8F59290F18854BF800FE51AD /* barline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = barline.h; path = include/vrv/barline.h; sourceTree = "<group>"; };
 		8F59291018854BF800FE51AD /* bboxdevicecontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bboxdevicecontext.h; path = include/vrv/bboxdevicecontext.h; sourceTree = "<group>"; };
 		8F59291118854BF800FE51AD /* beam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beam.h; path = include/vrv/beam.h; sourceTree = "<group>"; };
@@ -530,8 +525,6 @@
 			children = (
 				4DC34BA519BC4A82006175CD /* accid.cpp */,
 				4DC34B9F19BC4A70006175CD /* accid.h */,
-				8F086EB7188539540037FD8E /* app.cpp */,
-				8F59290E18854BF800FE51AD /* app.h */,
 				8F086EB8188539540037FD8E /* barline.cpp */,
 				8F59290F18854BF800FE51AD /* barline.h */,
 				8F086EBA188539540037FD8E /* beam.cpp */,
@@ -580,7 +573,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8F59293418854BF800FE51AD /* aligner.h in Headers */,
-				8F59293518854BF800FE51AD /* app.h in Headers */,
 				8F59293618854BF800FE51AD /* barline.h in Headers */,
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
 				8F59293818854BF800FE51AD /* beam.h in Headers */,
@@ -700,7 +692,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8F086EE2188539540037FD8E /* aligner.cpp in Sources */,
-				8F086EE3188539540037FD8E /* app.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
@@ -774,7 +765,6 @@
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
-				8F3DD33A18854B2E0051330C /* app.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,

@@ -17,7 +17,6 @@
 
 #include "accid.h"
 #include "aligner.h"
-#include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
@@ -250,18 +249,6 @@ bool LayerElement::IsTie()
 bool LayerElement::IsTuplet()
 {
     return (dynamic_cast<Tuplet*>(this));
-}
-
-
-int LayerElement::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);           
-    if (!output->WriteLayerElement( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-
 }
 
 void LayerElement::AdjustPname( int *pname, int *oct )

@@ -62,16 +62,6 @@ void Doc::Reset( DocType type )
     m_scoreDef.Reset();
 }
 
-int Doc::Save( ArrayPtrVoid params )
-{  
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
-    if (!output->WriteDoc( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 void Doc::AddPage( Page *page )
 {
 	page->SetParent( this );
@@ -402,7 +392,8 @@ int Doc::Save( FileOutputStream *output )
 	params.push_back( output );
 
     Functor save( &Object::Save );
-    this->Process( &save, params );
+    Functor saveEnd( &Object::SaveEnd );
+    this->Process( &save, params, &saveEnd );
     
     return true;
 }

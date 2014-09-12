@@ -104,12 +104,6 @@ public:
     // Functors //
     //----------//
     
-    /**
-     * Save the content of the page using the FileOutputStream passed as parameter
-     * param 0: a pointer to the FileOutputStream.
-     */
-    virtual int Save( ArrayPtrVoid params );
-    
 private:
     
 public:

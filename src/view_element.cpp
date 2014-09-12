@@ -17,7 +17,6 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
@@ -128,9 +127,6 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (dynamic_cast<Tuplet*>(element)) {
         DrawTupletElement(dc, element, layer, measure, staff);
-    }
-    else if (dynamic_cast<LayerApp*>(element)) {
-        DrawLayerApp(dc, element, layer, measure, staff);
     }
     
     m_currentColour = previousColor;
@@ -354,7 +350,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 note->m_drawingStemDir = layer->GetDrawingStemDir();
             }
             else {
-                note->m_drawingStemDir = (ynn > milieu) ? STEMDIRECTION_down : STEMDIRECTION_up;
+                note->m_drawingStemDir = (ynn >= milieu) ? STEMDIRECTION_down : STEMDIRECTION_up;
             }
 			
 			espac7 = note->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
@@ -1728,52 +1724,6 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
         y = (element->GetDrawingY()) + 30;
     
     DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_EMB_TRILL, staff, false );
-}
-
-
-void View::DrawLayerApp( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff ){
-    
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(staff->m_parent); // Pointer to staff system cannot be NULL"
-    
-    LayerApp *app = dynamic_cast<LayerApp*>(element);    
-    int i;
-    for (i = 0; i < app->GetRdgCount(); i++ )
-    {
-        Layer *rdg = dynamic_cast<Layer*>( app->m_children[i] );
-        assert( rdg );
-        int j;
-        for (j = 0; j < rdg->GetElementCount(); j++ ) {
-            
-            LayerElement *lelem = dynamic_cast<LayerElement*>( rdg->m_children[j] );
-            assert( lelem );
-            if (i == 0) {
-                m_currentColour = AxGREEN;
-            }
-            else {
-                m_currentColour = AxBLUE;
-            }
-            DrawElement(dc, lelem, layer, measure, staff );
-            /*
-            LayerElement rdgElement(&rdg->m_elements[j] );
-            rdgElement.m_layer = element->m_layer;
-            rdgElement.SetLayout( m_doc );
-            rdgElement.m_drawingX = element->m_drawingX;
-            DrawElement(dc, &rdgElement, layer, staff );
-            rdgElement.m_layer = NULL;
-            */
-        }
-        
-        /*
-        Staff *appStaff = new Staff( staff->m_n );
-        appStaff->m_drawingY = staff->m_drawingY + m_doc->m_drawingStaffSize[staff->staffSize];
-        appStaff->m_system = staff->m_system;
-        appStaff->SetLayout( m_doc );
-        DrawStaff(dc, appStaff, staff->m_system );
-        delete appStaff;
-        */
-    }
 }
 
 } // namespace vrv    

@@ -244,8 +244,6 @@ public:
     // Functors //
     //----------//
     
-    virtual int Save( ArrayPtrVoid params );
-    
 protected:
     /**
      * Filter the list for a specific class.
@@ -323,8 +321,6 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    virtual int Save( ArrayPtrVoid params );
     
     /**
      * Replace all the staffDefs in a scoreDef.

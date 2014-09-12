@@ -21,6 +21,8 @@ class Custos;
 class Dot;
 class DurationInterface;
 class Layer;
+class LayerElement;
+class Measure;
 class Mensur;
 class MeterSig;
 class MRest;
@@ -29,8 +31,10 @@ class Note;
 class PitchInterface;
 class PositionInterface;
 class Rest;
+class ScoreDef;
+class Staff;
 class Syl;
-class Symbol;
+class System;
 class Tuplet;
 class Verse;
 
@@ -57,74 +61,85 @@ public:
      * The main method for exporting the file to MEI.
      */ 
     virtual bool ExportFile( );
-    
-    /** @name Writing element methods
-     * Overriding methods for writing the MEI file.
+
+    /**
+     * The main method for write objects.
      */
-    ///@{
-    virtual bool WriteDoc( Doc *doc );
-    virtual bool WritePage( Page *page );
-    virtual bool WriteSystem( System *system );
-    virtual bool WriteScoreDef( ScoreDef *scoreDef );
-    virtual bool WriteStaffGrp( StaffGrp *staffGrp );
-    virtual bool WriteStaffDef( StaffDef *staffDef );
-    virtual bool WriteMeasure( Measure *measure );
-    virtual bool WriteStaff( Staff *staff );
-    virtual bool WriteLayer( Layer *layer );
-    virtual bool WriteLayerElement( LayerElement *element );
-    // app
-    virtual bool WriteLayerApp( LayerApp *app );
-    virtual bool WriteLayerRdg( LayerRdg *rdg );
-    ///@}
+    virtual bool WriteObject( Object *object );
+    
+    /**
+     * Writing object method that must be overriden in child class.
+     */
+    virtual bool WriteObjectEnd( Object *object );
 
 private:
+    
+    bool WriteMeiDoc( Doc *doc );
+    
+    /**
+     * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
+     */
+    ///@{
+    bool WriteMeiPage( pugi::xml_node currentNode, Page *page );
+    bool WriteMeiSystem( pugi::xml_node currentNode, System *system );
+    bool WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef );
+    bool WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp );
+    bool WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef );
+    bool WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure );
+    bool WriteMeiStaff( pugi::xml_node currentNode, Staff *staff );
+    bool WriteMeiLayer( pugi::xml_node currentNode, Layer *layer );
+    ///@}
     
     /**
      * Write an LayerElement child. 
      * Called from WriteLayerElement.
      */
     ///@{
-    void WriteMeiAccid( pugi::xml_node meiAccid, Accid *accid );
-    void WriteMeiBarline( pugi::xml_node meiBarline, Barline *barLine );
-    void WriteMeiBeam( pugi::xml_node meiBeam, Beam *beam );
-    void WriteMeiClef( pugi::xml_node meiClef, Clef *clef );
-    void WriteMeiCustos( pugi::xml_node meiCustos, Custos *custos );
-    void WriteMeiDot( pugi::xml_node meiDot, Dot *dot );
-    void WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur );
-    void WriteMeiMeterSig( pugi::xml_node meiMeterSig, MeterSig *meterSig );
-    void WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest );
-    void WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multiRest );
-    void WriteMeiNote( pugi::xml_node meiNote, Note *note );
-    void WriteMeiRest( pugi::xml_node meiRest, Rest *rest );
-    void WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet );
+    void WriteMeiAccid( pugi::xml_node currentNode, Accid *accid );
+    void WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine );
+    void WriteMeiBeam( pugi::xml_node currentNode, Beam *beam );
+    void WriteMeiClef( pugi::xml_node currentNode, Clef *clef );
+    void WriteMeiCustos( pugi::xml_node currentNode, Custos *custos );
+    void WriteMeiDot( pugi::xml_node currentNode, Dot *dot );
+    void WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur );
+    void WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig );
+    void WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest );
+    void WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest );
+    void WriteMeiNote( pugi::xml_node currentNode, Note *note );
+    void WriteMeiRest( pugi::xml_node currentNode, Rest *rest );
+    void WriteMeiTuplet( pugi::xml_node currentNode, Tuplet *tuplet );
+    ///@}
     
     /**
-     * Write a Verse and syl
+     * Write other mei elements
      */
-    //void WriteVerse( Verse *verse, pugi::xml_node currentParent );
-    //void WriteSyl( Syl *syl, pugi::xml_node currentParent );
+    ///@{
+    void WriteMeiVerse( pugi::xml_node currentNode, Verse *verse );
+    void WriteMeiSyl( pugi::xml_node currentNode, Syl *syl );
+    ///@}
     
     /**
      * Write a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      * To be changed to Att
      */
-    void WriteSameAsAttr( pugi::xml_node element, Object *object );
+    void WriteSameAsAttr( pugi::xml_node currentNode, Object *object );
     
     /**
-     * Write a interfaces.
+     * Write a LayerElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
-    void WriteDurationInterface( pugi::xml_node element, DurationInterface *interface );
-    void WritePitchInterface( pugi::xml_node element, PitchInterface *interface );
-    void WritePositionInterface( pugi::xml_node element, PositionInterface *interface );
+    void WriteLayerElement( pugi::xml_node currentNode, LayerElement *element );
+    void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
+    void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
+    void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
     ///@}
     
     /**
      * Write the XML text content
      */
-    void WriteText( pugi::xml_node element, Object *object );
+    void WriteText( pugi::xml_node currentNode, Object *object );
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -141,27 +156,9 @@ public:
 private:
     std::string m_filename;
     pugi::xml_node m_mei;
-    /** @name Members for pointers to the current element */
-    ///@{
-    pugi::xml_node m_pages;
-    pugi::xml_node m_page;
-    pugi::xml_node m_scoreDef;
-    pugi::xml_node m_system;
-    pugi::xml_node m_staffGrp;
-    pugi::xml_node m_staffDef;
-    pugi::xml_node m_measure;
-    pugi::xml_node m_staff;
-    /** The pointer for the layer within a staff */
-    pugi::xml_node m_layer;
-    /** The pointer for the rdg within an app (LayerRdg) */
-    pugi::xml_node m_rdgLayer;
-    /** The pointer for a beam */
-    pugi::xml_node m_beam;
-    /** The pointer for a tuplet */
-    pugi::xml_node m_tuplet;
-    // app
-    pugi::xml_node m_app;
-    ///@}
+    /** @name Current element */
+    pugi::xml_node m_currentNode;
+    std::list<pugi::xml_node> m_nodeStack;
 };
 
 
@@ -187,7 +184,11 @@ public:
 private:
     bool ReadMei( pugi::xml_node root );
     bool ReadMeiHeader( pugi::xml_node meihead );
-    // Containers
+    
+    /**
+     * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related. 
+     */
+    ///@{
     bool ReadMeiPage( pugi::xml_node page );
     bool ReadMeiSystem( Page* page, pugi::xml_node system );
     bool ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef );
@@ -196,11 +197,19 @@ private:
     bool ReadMeiMeasure( System *system, pugi::xml_node measure );
     bool ReadMeiStaff( Measure *measure, pugi::xml_node staff );
     bool ReadMeiLayer( Staff *staff, pugi::xml_node layer );
-    // Elements
-    bool ReadMeiLayerElement( Object *parent, pugi::xml_node XmlElement );
+    ///@}
+
+    /**
+     * @name Methods for reading MEI layer elements
+     */
+    ///@{
+    bool ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement );
+    bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
     bool ReadMeiClef( Object *parent, pugi::xml_node clef );
+    bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
+    bool ReadMeiDot( Object *parent, pugi::xml_node dot );
     bool ReadMeiMensur( Object *parent, pugi::xml_node mensur );
     bool ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig );
     bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );
@@ -208,20 +217,27 @@ private:
     bool ReadMeiNote( Object *parent, pugi::xml_node note );
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
     bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
-    bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
-    bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
-    bool ReadMeiDot( Object *parent, pugi::xml_node dot );
-    //
+    ///@}
+    
+    /**
+     * @name Methods for reading MEI LayerElement and interfaces
+     */
+    ///@{
     bool ReadLayerElement( pugi::xml_node element, LayerElement *object );
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
-    //
+    ///@}
+
+    /**
+     * @name Methods for reading other MEI elements.
+     */
+    ///@{
     bool ReadVerse( Note *note, pugi::xml_node verse );
     bool ReadSyl( Verse *verse, pugi::xml_node syl );
-    //
-    bool ReadTupletSpanAsTuplet( pugi::xml_node tupletSpan );
-    bool ReadSlurAsSlurAttr( pugi::xml_node slur );
+    bool ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan );
+    bool ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur );
+    ///@}
     
     /**
      * Read a sameAs attribute
@@ -236,16 +252,21 @@ private:
     void ReadText( pugi::xml_node element, Object *object );
     
     /**
-     * Add the LayerElement to the appropriate parent (e.g., Layer, LayerRdg)
+     * Method for adding the element to the appropriate parent (e.g., Layer, Beam).
+     * This used for any element that supports different types of child.
+     * For example, the StaffGrp can contain StaffGrp or StaffDef.
+     * These methods dynamically case the parent to the appropriate class.
      */
+    ///@{
     void AddLayerElement( Object *parent, LayerElement *element );
     void AddScoreDef( Object *parent, ScoreDef *element );
     void AddStaffGrp( Object *parent, StaffGrp *element );
+    ///@}
     
     /**
      * Read score-based MEI
      */
-    bool ReadScoreBasedMei( Object *parent, pugi::xml_node element );
+    bool ReadScoreBasedMei( pugi::xml_node element );
     
     /**
      * Look through the list of notes with open tie stored in MeiInput::m_openTies.
@@ -255,19 +276,26 @@ private:
      */
     bool FindOpenTie( Note *terminalNote );
     
-	//
+    /**
+     * @name Various methods for reading / converting values.
+     */
+    ///@{
     void SetMeiUuid( pugi::xml_node element, Object *object );
     bool StrToBool(std::string value);
     DocType StrToDocType(std::string type);
     StaffGrpSymbol StrToStaffGrpSymbol(std::string sign);
     /** Extract the uuid for references to uuids with ..#uuid values */
     std::string ExtractUuidFragment(std::string refUuid);
+    ///@}
      
 public:
     
 private:
     std::string m_filename;
+    
+    /** The current page when reading score-based MEI */
     Page *m_page;
+    /** The current system when reading score-based MEI */
     System *m_system;
     
     /**
@@ -277,6 +305,7 @@ private:
     
     /**
      * A vector of keeping the notes with open ties.
+     * This should be moved to the Object::PrepareDrawing functor
      */
     std::vector<Note*> m_openTies;
 };

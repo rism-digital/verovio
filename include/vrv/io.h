@@ -15,16 +15,7 @@
 namespace vrv {
 
 class Doc;
-class Layer;
-class LayerApp;
-class LayerElement;
-class LayerRdg;
-class Measure;
-class Page;
-class Staff;
-class StaffDef;
-class StaffGrp;
-class System;
+class Object;
 
 //----------------------------------------------------------------------------
 // FileOutputStream
@@ -41,31 +32,22 @@ public:
     FileOutputStream( Doc *doc, std::string filename );
 	FileOutputStream( Doc *doc );
     FileOutputStream() {};
-	//FileOutputStream( Doc *file, wxFile *wxfile );
     virtual ~FileOutputStream();
     
+    /**
+     * Writing start export method that must be overriden in child class.
+     */
     virtual bool ExportFile( ) { return true; }
     
-    /** @name Writing element methods
-     * The following methods actually write the elements.
-     * They must be overriden in the child classes.
-     * The children of the elements do not have to be writen from theses methods.
-     * This actually happen in the Save method of the Object classes
+    /**
+     * Writing object method that must be overriden in child class.
      */
-    ///@{
-    virtual bool WriteDoc( Doc *doc ) { return true; };
-    virtual bool WritePage( Page *page ) { return true; };
-    virtual bool WriteSystem( System *system ) { return true; };
-    virtual bool WriteStaffGrp( StaffGrp *system ) { return true; };
-    virtual bool WriteStaffDef( StaffDef *system ) { return true; };
-    virtual bool WriteMeasure( Measure *measure ) { return true; };
-    virtual bool WriteStaff( Staff *staff ) { return true; };
-    virtual bool WriteLayer( Layer *layer ) { return true; };
-    virtual bool WriteLayerElement( LayerElement *element ) { return true; };
-    // app
-    virtual bool WriteLayerApp( LayerApp *app ) { return true; };
-    virtual bool WriteLayerRdg( LayerRdg *rdg ) { return true; };
-    ///@}
+    virtual bool WriteObject( Object *object ) { return true; };
+    
+    /**
+     * Writing object method that must be overriden in child class.
+     */
+    virtual bool WriteObjectEnd( Object *object ) { return true; };
     
 public:
     

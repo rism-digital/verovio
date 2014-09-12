@@ -77,17 +77,6 @@ void Staff::Reset()
     m_staffAlignment = NULL;
 }
 
-int Staff::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);           
-    if (!output->WriteStaff( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-
-}
-
 void Staff::AddLayer( Layer *layer )
 {
 	layer->SetParent( this );

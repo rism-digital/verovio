@@ -25,7 +25,8 @@ class MRest;
 class MultiRest;
 class Note;
 class Rest;
-class Symbol;
+class Staff;
+class System;
 class Tuplet;
 
 
@@ -42,22 +43,21 @@ public:
     
     virtual bool ExportFile( );
     
+private:
+
     virtual bool WriteDoc( Doc *doc );
     // logical
-    virtual bool WriteStaff( Staff *staff );
-    virtual bool WriteLayer( Layer *layer );
-    virtual bool WriteLayerElement( LayerElement *element );
+    bool WriteStaff( Staff *staff );
+    bool WriteLayer( Layer *layer );
+    bool WriteLayerElement( LayerElement *element );
     // layout
-    virtual bool WriteLayout( Doc *layout );
-    virtual bool WritePage( Page *page );
-    virtual bool WriteSystem( System *system );
-    virtual bool WriteLaidOutStaff( Staff *laidOutStaff );
-    virtual bool WriteLaidOutLayer( Layer *laidOutLayer );
-    virtual bool WriteLaidOutLayerElement( LayerElement *laidOutLayerElement );
+    bool WriteLayout( Doc *layout );
+    bool WritePage( Page *page );
+    bool WriteSystem( System *system );
+    bool WriteLaidOutStaff( Staff *laidOutStaff );
+    bool WriteLaidOutLayer( Layer *laidOutLayer );
+    bool WriteLaidOutLayerElement( LayerElement *laidOutLayerElement );
     
-private:
-    
-public:
     void WriteClef(LayerElement *element);
     void WriteKey(LayerElement *element);
     void WriteTime(LayerElement *element);

@@ -70,17 +70,6 @@ void System::Reset()
     m_drawingTotalWidth = 0;
 }
 
-int System::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);         
-    if (!output->WriteSystem( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-
-}
-
 void System::AddMeasure( Measure *measure )
 {
 	measure->SetParent( this );

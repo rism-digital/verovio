@@ -159,12 +159,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    /**
-     * Functor method for saving the page
-     */
-    virtual int Save( ArrayPtrVoid params );
-    
+
 private:
     /**
      * Calculates the Leipzig font size according to the m_interlDefin reference value.

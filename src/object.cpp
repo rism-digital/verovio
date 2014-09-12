@@ -1116,6 +1116,27 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
 
     return FUNCTOR_CONTINUE;
 }
+        
+int Object::Save( ArrayPtrVoid params )
+{
+    // param 0: output stream
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
+    if (!output->WriteObject( this )) {
+        return FUNCTOR_STOP;
+    }
+    return FUNCTOR_CONTINUE;
+}
+    
+    
+int Object::SaveEnd( ArrayPtrVoid params )
+{
+    // param 0: output stream
+    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
+    if (!output->WriteObjectEnd( this )) {
+        return FUNCTOR_STOP;
+    }
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv
 

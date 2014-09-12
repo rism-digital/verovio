@@ -104,10 +104,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    virtual int Save( ArrayPtrVoid params );
-
-    
+        
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
      * Called by AlignHorizontally

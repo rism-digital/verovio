@@ -39,9 +39,6 @@ public:
      */
     void AddElement(LayerElement *element);
     
-    // functor
-    //virtual int Save( ArrayPtrVoid params );
-    
 protected:
     /**
      * Filter the list for a specific class.

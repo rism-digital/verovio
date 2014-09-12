@@ -69,17 +69,6 @@ void Layer::Reset()
     m_drawingList.clear();
 }
     
-int Layer::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
-    if (!output->WriteLayer( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-
-}
-
 void Layer::AddElement( LayerElement *element, int idx )
 {
 	element->SetParent( this );

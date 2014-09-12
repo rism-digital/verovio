@@ -163,7 +163,6 @@ public:
      * Also take into account a start and end uuid for the page (if any)
      */
     virtual int CopyToLayer( ArrayPtrVoid params );
-    virtual int Save( ArrayPtrVoid params );
     
 private:
     

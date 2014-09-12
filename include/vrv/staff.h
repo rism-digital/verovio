@@ -77,10 +77,8 @@ public:
     //----------//
     
     /**
-     * Functor method for saving
+     * Currently unused - kept for "documentation"
      */
-    virtual int Save( ArrayPtrVoid params );
-    
     virtual bool GetPosOnPage( ArrayPtrVoid params );
     
     /**

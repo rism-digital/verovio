@@ -79,9 +79,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    virtual int Save( ArrayPtrVoid params );
-    
+        
     /**
      * Align the content of a system vertically.
      */

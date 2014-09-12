@@ -285,10 +285,15 @@ public:
     
     /**
      * Save the content of and object by calling the appropriate FileOutputStream method
-     * Overriden in all classes.
      * param 0: a pointer to the FileOutputStream.
      */
-    virtual int Save( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int Save( ArrayPtrVoid params );
+    
+    /**
+     * Save the content of and object by calling the appropriate FileOutputStream method
+     * param 0: a pointer to the FileOutputStream.
+     */
+    virtual int SaveEnd( ArrayPtrVoid params );
 
     /**
      * @name Functors for aligning the content horizontally

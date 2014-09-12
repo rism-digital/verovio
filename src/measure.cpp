@@ -62,17 +62,6 @@ void Measure::Reset()
     }
 }
 
-int Measure::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);  
-    if (!output->WriteMeasure( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-
-}
-
 void Measure::AddStaff( Staff *staff )
 {    
 	staff->SetParent( this );

@@ -53,18 +53,6 @@ void Page::Reset()
     m_pageTopMar = 0;
 }
 
-
-int Page::Save( ArrayPtrVoid params )
-{
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
-    if (!output->WritePage( this )) {
-        return FUNCTOR_STOP;
-    }
-    return FUNCTOR_CONTINUE;
-}
-
-
 void Page::AddSystem( System *system )
 {
 	system->SetParent( this );

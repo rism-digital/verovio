@@ -18,7 +18,6 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "app.h"
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
@@ -68,15 +67,6 @@ bool MeiOutput::ExportFile( )
         m_mei = meiDoc.append_child("mei");
         m_mei.append_attribute( "xmlns" ) = "http://www.music-encoding.org/ns/mei";
         m_mei.append_attribute( "meiversion" ) = "2013";
-
-        pugi::xml_node music = m_mei.append_child("music");
-        pugi::xml_node body = music.append_child("body");
-        pugi::xml_node mdiv = body.append_child("mdiv");
-        
-        
-        // element to place the pages
-        m_pages = mdiv.append_child("pages");
-        m_pages.append_attribute( "type" ) = DocTypeToStr( m_doc->GetType() ).c_str();
         
         // this starts the call of all the functors
         m_doc->Save( this );
@@ -96,20 +86,141 @@ bool MeiOutput::ExportFile( )
     }
 	return true;    
 }
+    
+bool MeiOutput::WriteObject( Object *object )
+{    
+    // Containers and scoreDef related
+    if (dynamic_cast<Doc*>(object)) {
+        WriteMeiDoc( dynamic_cast<Doc*>(object) );        
+        m_nodeStack.push_back(m_currentNode);
+        return true;
+    }
+    
+    if (dynamic_cast<Page*>(object)) {
+        m_currentNode = m_currentNode.append_child("page");
+        WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
+    }
+    else if (dynamic_cast<System*>(object)) {
+        m_currentNode = m_currentNode.append_child("system");
+        WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
+    }
+    else if (dynamic_cast<ScoreDef*>(object)) {
+        m_currentNode = m_currentNode.append_child("scoreDef");
+        WriteMeiScoreDef( m_currentNode, dynamic_cast<ScoreDef*>(object) );
+    }
+    else if (dynamic_cast<StaffGrp*>(object)) {
+        m_currentNode = m_currentNode.append_child("staffGrp");
+        WriteMeiStaffGrp( m_currentNode, dynamic_cast<StaffGrp*>(object) );
+    }
+    else if (dynamic_cast<StaffDef*>(object)) {
+        m_currentNode = m_currentNode.append_child("staffDef");
+        WriteMeiStaffDef( m_currentNode, dynamic_cast<StaffDef*>(object) );
+    }
+    else if (dynamic_cast<Measure*>(object)) {
+        m_currentNode = m_currentNode.append_child("measure");
+        WriteMeiMeasure( m_currentNode, dynamic_cast<Measure*>(object) );
+    }
+    else if (dynamic_cast<Staff*>(object)) {
+        m_currentNode = m_currentNode.append_child("staff");
+        WriteMeiStaff( m_currentNode, dynamic_cast<Staff*>(object) );
+    }
+    else if (dynamic_cast<Layer*>(object)) {
+        m_currentNode = m_currentNode.append_child("layer");
+        WriteMeiLayer( m_currentNode, dynamic_cast<Layer*>(object) );
+    }
+    
+    // Layer elements
+    else if (dynamic_cast<Accid*>(object)) {
+        m_currentNode = m_currentNode.append_child("accid");
+        WriteMeiAccid( m_currentNode, dynamic_cast<Accid*>(object) );
+    }
+    else if (dynamic_cast<Barline*>(object)) {
+        m_currentNode = m_currentNode.append_child( "barLine" );
+        WriteMeiBarline( m_currentNode, dynamic_cast<Barline*>(object) );
+    }
+    else if (dynamic_cast<Beam*>(object)) {
+        m_currentNode = m_currentNode.append_child("beam");
+        WriteMeiBeam( m_currentNode, dynamic_cast<Beam*>(object) );
+    }
+    else if (dynamic_cast<Clef*>(object)) {
+        m_currentNode = m_currentNode.append_child("clef");
+        WriteMeiClef( m_currentNode, dynamic_cast<Clef*>(object) );
+    }
+    else if (dynamic_cast<Custos*>(object)) {
+        m_currentNode = m_currentNode.append_child( "custos" );
+        WriteMeiCustos( m_currentNode, dynamic_cast<Custos*>(object) );
+    }
+    else if (dynamic_cast<Dot*>(object)) {
+        m_currentNode = m_currentNode.append_child( "dot" );
+        WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
+    }
+    else if (dynamic_cast<Mensur*>(object)) {
+        m_currentNode = m_currentNode.append_child("mensur");
+        WriteMeiMensur( m_currentNode, dynamic_cast<Mensur*>(object) );
+    }
+    else if (dynamic_cast<MRest*>(object)) {
+        m_currentNode = m_currentNode.append_child("mRest");
+        WriteMeiMRest( m_currentNode, dynamic_cast<MRest*>(object) );
+    }
+    else if (dynamic_cast<MultiRest*>(object)) {
+        m_currentNode = m_currentNode.append_child("multiRest");
+        WriteMeiMultiRest( m_currentNode, dynamic_cast<MultiRest*>(object) );
+    }
+    else if (dynamic_cast<Note*>(object)) {
+        m_currentNode = m_currentNode.append_child("note");
+        WriteMeiNote( m_currentNode, dynamic_cast<Note*>(object) );
+    }
+    else if (dynamic_cast<Rest*>(object)) {
+        m_currentNode = m_currentNode.append_child("rest");
+        WriteMeiRest( m_currentNode, dynamic_cast<Rest*>(object) );
+    }
+    else if (dynamic_cast<Tuplet*>(object)) {
+        m_currentNode = m_currentNode.append_child("tuplet");
+        WriteMeiTuplet( m_currentNode, dynamic_cast<Tuplet*>(object) );
+    }
+    
+    // others
+    else if (dynamic_cast<Verse*>(object)) {
+        m_currentNode = m_currentNode.append_child("verse");
+        WriteMeiVerse( m_currentNode, dynamic_cast<Verse*>(object) );
+    }
+    else if (dynamic_cast<Syl*>(object)) {
+        m_currentNode = m_currentNode.append_child("syl");
+        WriteMeiSyl( m_currentNode, dynamic_cast<Syl*>(object) );
+    }
+    
+    else {
+        // Missing output method for the class
+        assert( false ); // let's make it stop because this should not happen
+    }
+    
+    //LogDebug( "Current: %s ", m_currentNode.value() );
+    m_nodeStack.push_back(m_currentNode);
+    
+    return true;
+}
+    
+bool MeiOutput::WriteObjectEnd( Object *object )
+{
+    m_nodeStack.pop_back();
+    m_currentNode = m_nodeStack.back();
+    return true;
+}
 
 std::string MeiOutput::UuidToMeiStr( Object *element )
 {
     std::string out = element->GetUuid();
     std::transform(out.begin(), out.end(), out.begin(), ::tolower);
-    LogDebug("uuid: %s\n", out.c_str());
+    //LogDebug("uuid: %s", out.c_str());
     return out;
 }
 
-bool MeiOutput::WriteDoc( Doc *doc )
+bool MeiOutput::WriteMeiDoc( Doc *doc )
 {
     assert( !m_mei.empty() );
     
     // ---- header ----
+    
     pugi::xml_node meiHead = m_mei.append_child("meiHead");
     
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
@@ -127,378 +238,271 @@ bool MeiOutput::WriteDoc( Doc *doc )
     time_t now = time(0);
     date.append_child(pugi::node_pcdata).set_value( ctime( &now ) );
     
+    // ---- music ----
+   
+    pugi::xml_node music = m_mei.append_child("music");
+    pugi::xml_node body = music.append_child("body");
+    pugi::xml_node mdiv = body.append_child("mdiv");
+    
+    // element to place the pages
+    m_currentNode = mdiv.append_child("pages");
+    m_currentNode.append_attribute( "type" ) = DocTypeToStr( m_doc->GetType() ).c_str();
+    m_currentNode.append_child(pugi::node_comment).set_value( "Coordinates in MEI axis direction" );
+    
     return true;
 }
 
 
-bool MeiOutput::WritePage( Page *page )
+bool MeiOutput::WriteMeiPage( pugi::xml_node currentNode, Page *page )
 {
-    assert( !m_pages.empty() );
-    
-    m_page = m_pages.append_child("page");
-    m_page.append_attribute( "xml:id" ) =  UuidToMeiStr( page ).c_str();
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( page ).c_str();
     // size and margins but only if any - we rely on page.height only to check this
     if ( page->m_pageHeight != -1 ) {
-        m_page.append_attribute( "page.width" ) = StringFormat( "%d", page->m_pageWidth ).c_str();
-        m_page.append_attribute( "page.height" ) = StringFormat( "%d", page->m_pageHeight ).c_str();
-        m_page.append_attribute( "page.leftmar" ) = StringFormat( "%d", page->m_pageLeftMar ).c_str();
-        m_page.append_attribute( "page.rightmar" ) = StringFormat( "%d", page->m_pageRightMar ).c_str();
-        m_page.append_attribute( "page.rightmar" ) = StringFormat( "%d", page->m_pageRightMar ).c_str();
+        currentNode.append_attribute( "page.width" ) = StringFormat( "%d", page->m_pageWidth ).c_str();
+        currentNode.append_attribute( "page.height" ) = StringFormat( "%d", page->m_pageHeight ).c_str();
+        currentNode.append_attribute( "page.leftmar" ) = StringFormat( "%d", page->m_pageLeftMar ).c_str();
+        currentNode.append_attribute( "page.rightmar" ) = StringFormat( "%d", page->m_pageRightMar ).c_str();
+        currentNode.append_attribute( "page.rightmar" ) = StringFormat( "%d", page->m_pageRightMar ).c_str();
     }
     if ( !page->m_surface.empty() ) {
-        m_page.append_attribute( "surface" ) = page->m_surface.c_str();
+        currentNode.append_attribute( "surface" ) = page->m_surface.c_str();
     }
-    //
-    m_pages.append_child(pugi::node_comment).set_value( "Coordinates in MEI axis direction" );
-    
     return true;
 }
 
-bool MeiOutput::WriteSystem( System *system )
+bool MeiOutput::WriteMeiSystem( pugi::xml_node currentNode, System *system )
 {
-    assert( !m_page.empty() );
-    m_system = m_page.append_child("system");
-    m_system.append_attribute( "xml:id" ) =  UuidToMeiStr( system ).c_str();
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( system ).c_str();
     // margins
-    m_system.append_attribute( "system.leftmar" ) = StringFormat( "%d", system->m_systemLeftMar ).c_str();
-    m_system.append_attribute( "system.rightmar") = StringFormat( "%d", system->m_systemRightMar ).c_str();
+    currentNode.append_attribute( "system.leftmar" ) = StringFormat( "%d", system->m_systemLeftMar ).c_str();
+    currentNode.append_attribute( "system.rightmar") = StringFormat( "%d", system->m_systemRightMar ).c_str();
     // y positions
-    m_system.append_attribute( "uly" ) = StringFormat( "%d", system->m_yAbs ).c_str();
+    currentNode.append_attribute( "uly" ) = StringFormat( "%d", system->m_yAbs ).c_str();
     
     return true;
 }
 
-bool MeiOutput::WriteScoreDef( ScoreDef *scoreDef )
+bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef )
 {
-    assert( !m_system.empty() );
-    m_scoreDef = m_system.append_child("scoreDef");
-    m_scoreDef.append_attribute( "xml:id" ) =  UuidToMeiStr( scoreDef ).c_str();
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( scoreDef ).c_str();
     if (scoreDef->GetClefAttr()) {
-        scoreDef->GetClefAttr()->WriteCleffingLog(m_scoreDef);
+        scoreDef->GetClefAttr()->WriteCleffingLog(currentNode);
     }
     if (scoreDef->GetKeySigAttr()) {
-        scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(m_scoreDef);
+        scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
     }
     if ( scoreDef->GetMensurAttr() ) {
-        dynamic_cast<AttMensuralLog*>(scoreDef)->WriteMensuralLog(m_scoreDef);
+        dynamic_cast<AttMensuralLog*>(scoreDef)->WriteMensuralLog(currentNode);
     }
     if ( scoreDef->GetMeterSigAttr() ) {
-        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(m_scoreDef);
-        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(m_scoreDef);
+        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
+        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
     }
     
     // this needs to be fixed
     return true;
-    
 }
 
-bool MeiOutput::WriteStaffGrp( StaffGrp *staffGrp )
+bool MeiOutput::WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp )
 {
-    // for now only as part of a system - this needs to be fixed
-    assert( !m_system.empty() );
-    
-    m_staffGrp = m_system.append_child("staffGrp");
-    m_staffGrp.append_attribute( "xml:id" ) = UuidToMeiStr( staffGrp ).c_str();
+    currentNode.append_attribute( "xml:id" ) = UuidToMeiStr( staffGrp ).c_str();
     if ( staffGrp->GetSymbol() != STAFFGRP_NONE ) {
-        m_staffGrp.append_attribute( "symbol" ) = StaffGrpSymbolToStr( staffGrp->GetSymbol() ).c_str();
+        currentNode.append_attribute( "symbol" ) = StaffGrpSymbolToStr( staffGrp->GetSymbol() ).c_str();
     }
     if ( staffGrp->GetBarthru() ) {
-        m_staffGrp.append_attribute( "barthru" ) = BoolToStr( staffGrp->GetBarthru() ).c_str();
+        currentNode.append_attribute( "barthru" ) = BoolToStr( staffGrp->GetBarthru() ).c_str();
     }
     
     return true;
 }
 
-bool MeiOutput::WriteStaffDef( StaffDef *staffDef )
+bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef )
 {
-    assert( !m_staffGrp.empty() );
-    
-    m_staffDef = m_staffGrp.append_child("staffDef");
-    m_staffDef.append_attribute( "xml:id" ) =  UuidToMeiStr( staffDef ).c_str();
-    m_staffDef.append_attribute( "n" ) = StringFormat( "%d", staffDef->GetN() ).c_str();
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( staffDef ).c_str();
+    currentNode.append_attribute( "n" ) = StringFormat( "%d", staffDef->GetN() ).c_str();
     if (staffDef->GetClefAttr()) {
-        staffDef->GetClefAttr()->WriteCleffingLog(m_staffDef);
+        staffDef->GetClefAttr()->WriteCleffingLog(currentNode);
     }
     if (staffDef->GetKeySigAttr()) {
-        staffDef->GetKeySigAttr()->WriteKeySigDefaultLog(m_staffDef);
+        staffDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
     }
     if ( staffDef->GetMensurAttr() ) {
-        staffDef->GetMensurAttr()->WriteMensuralLog(m_staffDef);
+        staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
     }
     if ( staffDef->GetMeterSigAttr() ) {
-        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(m_staffDef);
-        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(m_staffDef);
+        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
+        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
     }
     
     return true;
 }
       
-bool MeiOutput::WriteMeasure( Measure *measure )
+bool MeiOutput::WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure )
 {
-    assert( !m_system.empty() );
-    
-    m_measure = m_system.append_child("measure");
-    m_measure.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
 
-    measure->WriteCommon(m_measure);
+    measure->WriteCommon(currentNode);
 
     // here we transfer the barLine object values to @left and @right
     measure->SetLeft( measure->GetLeftBarlineType() );
     measure->SetRight( measure->GetRightBarlineType() );
-    measure->WriteMeasureLog(m_measure);
+    measure->WriteMeasureLog(currentNode);
     
     return true;
 }
 
-bool MeiOutput::WriteStaff( Staff *staff )
+bool MeiOutput::WriteMeiStaff( pugi::xml_node currentNode, Staff *staff )
 {
-    assert( !m_measure.empty() );
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( staff ).c_str();
     
-    m_staff = m_measure.append_child("staff");
-    m_staff.append_attribute( "xml:id" ) =  UuidToMeiStr( staff ).c_str();
-    
-    staff->WriteCommon(m_staff);
+    staff->WriteCommon(currentNode);
     
     // y position
     if ( staff->notAnc ) {
-        m_staff.append_attribute( "label" ) = "mensural";
+        currentNode.append_attribute( "label" ) = "mensural";
     }
-    m_staff.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
+    currentNode.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
 
     return true;
 }
 
 
-bool MeiOutput::WriteLayer( Layer *layer )
+bool MeiOutput::WriteMeiLayer( pugi::xml_node currentNode, Layer *layer )
 {
-    assert( !m_staff.empty() );
-    m_layer = m_staff.append_child("layer");
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( layer ).c_str();
     
-    layer->WriteCommon(m_layer);
-    
-    m_layer.append_attribute( "xml:id" ) =  UuidToMeiStr( layer ).c_str();
+    layer->WriteCommon(currentNode);
     
     return true;
 }
 
-bool MeiOutput::WriteLayerElement( LayerElement *element )
+void MeiOutput::WriteLayerElement( pugi::xml_node currentNode, LayerElement *element )
 {
-    assert( !m_layer.empty() );
+    this->WriteSameAsAttr( currentNode, element );
     
-    // Here we look at what is the parent.
-    // For example, if we are in a beam, we vrvT attach it to the beam xml element (m_beam)
-    // By default, we attach it to m_layer
-    pugi::xml_node currentParent = m_layer;
-    if ( dynamic_cast<LayerRdg*>(element->m_parent) ) {
-        assert( m_rdgLayer );
-        currentParent = m_rdgLayer;
-    }
-    else if ( dynamic_cast<Beam*>(element->m_parent) ) {
-        assert( m_beam );
-        currentParent = m_beam;
-    }
-    else if ( dynamic_cast<Tuplet*>(element->m_parent) ) {
-        assert( m_tuplet );
-        currentParent = m_tuplet;
-    }
-    // we should do the same for any LayerElement container (slur, tuplet, etc. )
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( element ).c_str();
     
-    pugi::xml_node xmlElement;
-    if (dynamic_cast<Accid*>(element)) {
-        xmlElement = currentParent.append_child("accid");
-        WriteMeiAccid( xmlElement, dynamic_cast<Accid*>(element) );
+    if ( element->m_xAbs != VRV_UNSET) {
+        currentNode.append_attribute( "ulx" ) = StringFormat( "%d", element->m_xAbs ).c_str();
     }
-    else if (dynamic_cast<Barline*>(element)) {
-        xmlElement = currentParent.append_child( "barLine" );
-        WriteMeiBarline( xmlElement, dynamic_cast<Barline*>(element) );
-    }
-    else if (dynamic_cast<Beam*>(element)) {
-        xmlElement = currentParent.append_child("beam");
-        m_beam = xmlElement;
-        WriteMeiBeam( xmlElement, dynamic_cast<Beam*>(element) );
-    }
-    else if (dynamic_cast<Clef*>(element)) {
-        xmlElement = currentParent.append_child("clef");
-        WriteMeiClef( xmlElement, dynamic_cast<Clef*>(element) );
-    }
-    else if (dynamic_cast<Custos*>(element)) {
-        xmlElement = currentParent.append_child( "custos" );
-        WriteMeiCustos( xmlElement, dynamic_cast<Custos*>(element) );
-    }
-    else if (dynamic_cast<Dot*>(element)) {
-        xmlElement = currentParent.append_child( "dot" );
-        WriteMeiDot( xmlElement, dynamic_cast<Dot*>(element) );
-    }
-    else if (dynamic_cast<Mensur*>(element)) {
-        xmlElement = currentParent.append_child("mensur");
-        WriteMeiMensur( xmlElement, dynamic_cast<Mensur*>(element) );
-    }
-    else if (dynamic_cast<MRest*>(element)) {
-        xmlElement = currentParent.append_child("mRest");
-        WriteMeiMRest( xmlElement, dynamic_cast<MRest*>(element) );
-    }
-    else if (dynamic_cast<MultiRest*>(element)) {
-        xmlElement = currentParent.append_child("multiRest");
-        WriteMeiMultiRest( xmlElement, dynamic_cast<MultiRest*>(element) );
-    }
-    else if (dynamic_cast<Note*>(element)) {
-        xmlElement = currentParent.append_child("note");
-        WriteMeiNote( xmlElement, dynamic_cast<Note*>(element) );
-    }
-    else if (dynamic_cast<Rest*>(element)) {
-        xmlElement = currentParent.append_child("rest");
-        WriteMeiRest( xmlElement, dynamic_cast<Rest*>(element) );
-    }
-    else if (dynamic_cast<Tuplet*>(element)) {
-        xmlElement = currentParent.append_child("tuplet");
-        m_tuplet = xmlElement;
-        WriteMeiTuplet( xmlElement, dynamic_cast<Tuplet*>(element) );
-    }
-    
-    // we have it, set the uuid we read
-    if ( !xmlElement.empty() ) {
-        this->WriteSameAsAttr( xmlElement, element );
-        xmlElement.append_attribute( "xml:id" ) =  UuidToMeiStr( element ).c_str();
-        if ( element->m_xAbs != VRV_UNSET) {
-            xmlElement.append_attribute( "ulx" ) = StringFormat( "%d", element->m_xAbs ).c_str();
-        }
-        return true;
-    }
-    else {
-        LogWarning( "Element class %s could not be saved", element->GetClassName().c_str() );
-        return false;
-    }    
 }
     
-void MeiOutput::WriteMeiAccid( pugi::xml_node meiAccid, Accid *accid )
+void MeiOutput::WriteMeiAccid( pugi::xml_node currentNode, Accid *accid )
 {
-    WritePositionInterface(meiAccid, accid);
-    accid->WriteAccidental(meiAccid);
+    WriteLayerElement( currentNode, accid );
+    WritePositionInterface(currentNode, accid);
+    accid->WriteAccidental(currentNode);
 }
 
-void MeiOutput::WriteMeiBarline( pugi::xml_node meiBarline, Barline *barLine )
+void MeiOutput::WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine )
 {
-    barLine->WriteBarLineLog(meiBarline);
+    WriteLayerElement( currentNode, barLine );
+    barLine->WriteBarLineLog(currentNode);
     return;
 }
 
 
-void MeiOutput::WriteMeiBeam( pugi::xml_node meiBeam, Beam *beam )
+void MeiOutput::WriteMeiBeam( pugi::xml_node currentNode, Beam *beam )
 {
+    WriteLayerElement( currentNode, beam );
     return;
 }
 
 
-void MeiOutput::WriteMeiClef( pugi::xml_node meiClef, Clef *clef )
+void MeiOutput::WriteMeiClef( pugi::xml_node currentNode, Clef *clef )
 {
-    clef->WriteClefshape(meiClef);
-    clef->WriteLineloc(meiClef);
-    clef->WriteOctavedisplacement(meiClef);
+    WriteLayerElement( currentNode, clef );
+    clef->WriteClefshape(currentNode);
+    clef->WriteLineloc(currentNode);
+    clef->WriteOctavedisplacement(currentNode);
     return;
 }
 
-void MeiOutput::WriteMeiCustos( pugi::xml_node meiCustos, Custos *custos )
+void MeiOutput::WriteMeiCustos( pugi::xml_node currentNode, Custos *custos )
 {
-    WritePositionInterface(meiCustos, custos);
+    WriteLayerElement( currentNode, custos );
+    WritePositionInterface(currentNode, custos);
 }
 
-void MeiOutput::WriteMeiDot( pugi::xml_node meiDot, Dot *dot )
+void MeiOutput::WriteMeiDot( pugi::xml_node currentNode, Dot *dot )
 {
-    WritePositionInterface(meiDot, dot);
+    WriteLayerElement( currentNode, dot );
+    WritePositionInterface(currentNode, dot);
 }
 
-void MeiOutput::WriteMeiMensur( pugi::xml_node meiMensur, Mensur *mensur )
+void MeiOutput::WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur )
 {
-    mensur->WriteDurationRatio(meiMensur);
-    mensur->WriteMensurLog(meiMensur);
-    mensur->WriteMensurVis(meiMensur);
-    mensur->WriteSlashcount(meiMensur);
+    WriteLayerElement( currentNode, mensur );
+    mensur->WriteDurationRatio(currentNode);
+    mensur->WriteMensurLog(currentNode);
+    mensur->WriteMensurVis(currentNode);
+    mensur->WriteSlashcount(currentNode);
     return;
 }
 
-void MeiOutput::WriteMeiMeterSig( pugi::xml_node meiMeterSig, MeterSig *meterSig )
+void MeiOutput::WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig )
 {
-    meterSig->WriteMeterSigLog(meiMeterSig);
+    WriteLayerElement( currentNode, meterSig );
+    meterSig->WriteMeterSigLog(currentNode);
     return;
 }
     
     
-void MeiOutput::WriteMeiMRest( pugi::xml_node meiMRest, MRest *mRest )
+void MeiOutput::WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest )
 {
      return;
 }
 
-void MeiOutput::WriteMeiMultiRest( pugi::xml_node meiMultiRest, MultiRest *multiRest )
+void MeiOutput::WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest )
 {
-    multiRest->WriteNumbered(meiMultiRest);
-   return;
+    WriteLayerElement( currentNode, multiRest );
+    multiRest->WriteNumbered(currentNode);
+    return;
 }
 
-void MeiOutput::WriteMeiNote( pugi::xml_node meiNote, Note *note )
+void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
 {
-    WriteDurationInterface(meiNote, note);
-    WritePitchInterface(meiNote, note);
-    note->WriteColoration(meiNote);
-    note->WriteNoteLogMensural(meiNote);
-    note->WriteStemmed(meiNote);
+    WriteLayerElement( currentNode, note );
+    WriteDurationInterface(currentNode, note);
+    WritePitchInterface(currentNode, note);
+    note->WriteColoration(currentNode);
+    note->WriteNoteLogMensural(currentNode);
+    note->WriteStemmed(currentNode);
     
     if ( note->m_cueSize ) {
-        meiNote.append_attribute( "grace" ) = "unknown";
+        currentNode.append_attribute( "grace" ) = "unknown";
     }
     return;
 }
 
-void MeiOutput::WriteMeiRest( pugi::xml_node meiRest, Rest *rest )
+void MeiOutput::WriteMeiRest( pugi::xml_node currentNode, Rest *rest )
 {
-    WriteDurationInterface(meiRest, rest);
-    WritePositionInterface(meiRest, rest);
+    WriteLayerElement( currentNode, rest );
+    WriteDurationInterface(currentNode, rest);
+    WritePositionInterface(currentNode, rest);
     return;
 }
 
-void MeiOutput::WriteMeiTuplet( pugi::xml_node meiTuplet, Tuplet *tuplet )
+void MeiOutput::WriteMeiTuplet( pugi::xml_node currentNode, Tuplet *tuplet )
 {
-    tuplet->WriteDurationRatio(meiTuplet);
+    WriteLayerElement( currentNode, tuplet  );
+    tuplet->WriteDurationRatio( currentNode );
     return;
 }
     
-/* To be refactored - make a single MeiOutput::Write method that call the appropriate method
-void MeiOutput::WriteVerse( Verse *verse, pugi::xml_node currentParent )
+
+void MeiOutput::WriteMeiVerse( pugi::xml_node currentNode, Verse *verse )
 {
-    pugi::xml_node xmlVerse = currentParent.append_child("verse");
-    m_staff.append_attribute( "xml:id" ) =  UuidToMeiStr( staff ).c_str();
-    // y position
-    if ( staff->notAnc ) {
-        m_staff.append_attribute( "label" ) = "mensural";
-    }
-    m_staff.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
-    m_staff.append_attribute( "n" ) = StringFormat( "%d", staff->GetN() ).c_str();
-    
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( verse ).c_str();
+    verse->WriteCommon( currentNode );    
     return;
 }
 
-void MeiOutput::WriteSyl( Syl *syl, pugi::xml_node currentParent )
+void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
 {
-    
-}
-*/
-
-bool MeiOutput::WriteLayerApp( LayerApp *app )
-{    
-    assert( !m_layer.empty() );
-    
-    m_app = m_layer.append_child("app");
-    
-    return true;
-}
-
-bool MeiOutput::WriteLayerRdg( LayerRdg *rdg )
-{   
-    assert( !m_app.empty() );
-    
-    m_rdgLayer = m_app.append_child("rdg");
-    m_rdgLayer.append_attribute( "source" ) = rdg->m_source.c_str();
-
-    return true;
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( syl ).c_str();
+    WriteText( currentNode, syl );
+    return;
 }
     
 void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *interface)
@@ -523,7 +527,7 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInte
 
 }
 
-void MeiOutput::WriteSameAsAttr( pugi::xml_node element, Object *object )
+void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
 {
     if ( !object->m_sameAs.empty() ) {
         element.append_attribute( "sameas" ) = object->m_sameAs.c_str();
@@ -694,7 +698,7 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         m_doc->AddPage( m_page );
         pugi::xml_node current;
         for( current = mdiv.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( m_system, current );
+            ReadScoreBasedMei( current );
         }
     }
     
@@ -912,6 +916,16 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
         if ( std::string( current.name() ) == "staff" ) {
             ReadMeiStaff( vrvMeasure, current);
         }
+        else if ( std::string( current.name() ) == "tupletSpan" ) {
+            if (!ReadTupletSpanAsTuplet( vrvMeasure, current )) {
+                LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
+            }
+        }
+        else if ( std::string( current.name() ) == "slur" ) {
+            if (!ReadSlurAsSlurAttr( vrvMeasure, current )) {
+                LogWarning( "<slur> not readable as @slur and ignored" );
+            }
+        }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name() );
         }
@@ -1009,10 +1023,14 @@ bool MeiInput::ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement )
     else if ( std::string( xmlElement.name() ) == "dot" ) {
         ReadMeiDot( parent, xmlElement );
     }
-    // chord - temporary, read only the first note
     else if ( std::string( xmlElement.name() ) == "chord" ) {
-        LogDebug("Only first note of chords is read" );
-        //ReadScoreBasedMei(xmlElement);
+        // We just read the first note for now
+        pugi::xml_node note = xmlElement.child("note");
+        if ( note ) {
+            note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
+            ReadMeiNote( parent, note );
+            LogDebug("Only first note of chords is read" );
+        }
     }
     // unknown
     else {
@@ -1177,7 +1195,10 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     if ( note.attribute( "grace" ) ) {
 		vrvNote->m_cueSize = true; //
 	}
-    // tie
+    
+    AddLayerElement(parent, vrvNote);
+    
+    // Ties - this should be moved to the Object::PrepareDrawing functor
     if ( note.attribute( "tie" ) ) {
         if ( (strcmp ( note.attribute( "tie" ).value(), "i" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
             vrvNote->SetTieAttrInitial();
@@ -1189,8 +1210,6 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
             }
         }
     }
-    
-    AddLayerElement(parent, vrvNote);
     
     pugi::xml_node current;
     for( current = note.first_child( ); current; current = current.next_sibling( ) ) {
@@ -1357,45 +1376,23 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     }
 }
 
-bool MeiInput::ReadScoreBasedMei( Object *parent, pugi::xml_node element )
+bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
 {
     if ( std::string( element.name() ) == "score" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( parent, current );
+            ReadScoreBasedMei( current );
         }
     }
     if ( std::string( element.name() ) == "section" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( parent, current );
+            ReadScoreBasedMei( current );
         }       
     }
     else if ( std::string( element.name() ) == "measure" ) {
-        //if (parent != m_system) {
-        //    LogDebug( "<measure> supported only as <section> child" );
-        //}
-        //else {
-            ReadMeiMeasure( m_system, element );
-        //}
-    }
-    else if ( std::string( element.name() ) == "chord" ) {
-        // We just read the first note for now
-        pugi::xml_node note = element.child("note");
-        note.append_attribute( "dur" ) =  element.attribute("dur").value();
-        //if (ReadMeiLayerElement( note )) {
-        //    LogMessage( "<note> in chord read!" );
-        //}
-    }
-    else if ( std::string( element.name() ) == "tupletSpan" ) {
-        if (!ReadTupletSpanAsTuplet( element )) {
-            LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
-        }
-    }
-    else if ( std::string( element.name() ) == "slur" ) {
-        if (!ReadSlurAsSlurAttr( element )) {
-            LogWarning( "<slur> not readable as @slur and ignored" );
-        }
+        // This is the call that will put us back on the page-based reading loop
+        ReadMeiMeasure( m_system, element );
     }
     /*
     else if ( std::string( element.name() ) == "staff" ) {
@@ -1418,23 +1415,16 @@ bool MeiInput::ReadScoreBasedMei( Object *parent, pugi::xml_node element )
     }
     */
     else if (std::string( element.name() ) == "pb") {
-        //if (parent != m_system) {
-        //    LogDebug( "<pb> supported only between <measure> elements" );
-        //}
         if ( (m_system->GetMeasureCount() > 0) && !m_ignoreLayoutInformation) {
             LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
             m_page = new Page( );
             m_system = new System( );
-            parent = m_system;
             m_page->AddSystem( m_system );
             m_doc->AddPage( m_page );
         }        
     }
     else if (std::string( element.name() ) == "sb") {
-        //if (parent != m_system) {
-        //    LogDebug( "<sb> supported only between <measure> elements" );
-        //}
         if ( (m_page->GetSystemCount() > 0)  && !m_ignoreLayoutInformation) {
             LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
@@ -1451,18 +1441,15 @@ bool MeiInput::ReadScoreBasedMei( Object *parent, pugi::xml_node element )
     return true;
 }
     
-bool MeiInput::ReadSlurAsSlurAttr(pugi::xml_node slur)
+bool MeiInput::ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur)
 {
-    /*
-    assert( m_measure );
-    
     LayerElement *start = NULL;
     LayerElement *end = NULL;
     
 	// position (pitch)
 	if ( slur.attribute( "startid" ) ) {
         std::string refId = ExtractUuidFragment( slur.attribute( "startid" ).value() );
-        start = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+        start = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
 
         if (!start || !start->IsNote()) {
             LogWarning( "Note with @startid '%s' not found when trying to read the <slur>", refId.c_str() );
@@ -1471,7 +1458,7 @@ bool MeiInput::ReadSlurAsSlurAttr(pugi::xml_node slur)
 	}
 	if ( slur.attribute( "endid" ) ) {
         std::string refId = ExtractUuidFragment( slur.attribute( "endid" ).value() );
-        end = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+        end = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
         
         if (!end || !end->IsNote()) {
             LogWarning( "Note with @endid '%s' not found when trying to read the <slur>", refId.c_str() );
@@ -1486,17 +1473,12 @@ bool MeiInput::ReadSlurAsSlurAttr(pugi::xml_node slur)
     
     startNote->SetSlurAttrInitial();
     endNote->SetSlurAttrTerminal( startNote );
-    */
+    
     return true;
-     
-
 }
     
-bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
-{
-    /*
-    assert( m_measure );
-    
+bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan)
+{    
     Tuplet *tuplet = new Tuplet();
     SetMeiUuid(tupletSpan, tuplet);
     
@@ -1514,7 +1496,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     // position (pitch)
     if ( tupletSpan.attribute( "startid" ) ) {
         std::string refId = ExtractUuidFragment( tupletSpan.attribute( "startid" ).value() );
-        start = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+        start = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
         
         if (!start) {
             LogWarning( "Element with @startid '%s' not found when trying to read the <tupletSpan>", refId.c_str() );
@@ -1523,7 +1505,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     }
     if ( tupletSpan.attribute( "endid" ) ) {
         std::string refId = ExtractUuidFragment( tupletSpan.attribute( "endid" ).value() );
-        end = dynamic_cast<LayerElement*>( m_measure->FindChildByUuid( refId ) );
+        end = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
         
         if (!end) {
             LogWarning( "Element with @endid '%s' not found when trying to read the <tupletSpan>", refId.c_str() );
@@ -1547,24 +1529,22 @@ bool MeiInput::ReadTupletSpanAsTuplet(pugi::xml_node tupletSpan)
     
     int startIdx = startChild->GetIdx();
     int endIdx = endChild->GetIdx();
-    LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
+    //LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
     int i;
     for (i = endIdx; i >= startIdx; i--) {
         tuplet->AddElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
     }
     parentLayer->InsertChild( tuplet, startIdx );
-    */
-    return true;
-    
+
+    return true;    
 }
 
 bool MeiInput::FindOpenTie( Note *terminalNote )
 {
-    return true;
-    
-    /*
-    assert( m_staff );
-    assert( m_layer );
+    Layer *currentLayer = dynamic_cast<Layer*>( terminalNote->GetFirstParent( &typeid(Layer) ) );
+    Staff *currentStaff = dynamic_cast<Staff*>( terminalNote->GetFirstParent( &typeid(Staff) ) );
+    assert( currentLayer );
+    assert( currentStaff );
     
     std::vector<Note*>::iterator iter;
     for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
@@ -1576,11 +1556,11 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
         // is because we are in the same staff or layer (e.g., beam) and they have not been added
         //to their parent (staff or layer) yet.
         // If we have one, compare the number
-        if ( (parentStaff) && (m_staff->GetN() != parentStaff->GetN()) ) {
+        if ( (parentStaff) && (currentStaff->GetN() != parentStaff->GetN()) ) {
             continue;
         }
         // same layer?
-        if ( (parentLayer) && (m_layer->GetN() != parentLayer->GetN()) ) {
+        if ( (parentLayer) && (currentLayer->GetN() != parentLayer->GetN()) ) {
             continue;
         }
         // we only compare oct and pname because alteration is not relevant for ties
@@ -1591,7 +1571,7 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
         }
         
     }
-    */
+
     return false;
 }
 
