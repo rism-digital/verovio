@@ -106,9 +106,15 @@ public:
      void SetCurrentScoreDef( bool force = false );
     
     /**
-     * Performs the layout of the entire document
+     * Performs the layout of the entire document.
      */
     void Layout( );
+    
+    /**
+     * Undo the layout of the entire document.
+     * The document will then contain one single page with one single system.
+     */
+    void ContinuousLayout( );
     
     /**
      * To be implemented.

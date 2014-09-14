@@ -290,4 +290,18 @@ int System::CastOffPages( ArrayPtrVoid params )
     return FUNCTOR_SIBLINGS;
 }
 
+int System::UnCastOff( ArrayPtrVoid params )
+{
+    // param 0: a pointer to the system we are adding system to
+    System *currentSystem = static_cast<System*>(params[0]);
+    
+    // Just move all the content of the system to the continous one (parameter)
+    // Use the MoveChildren method that move the and relinquishes them
+    // See Object::Relinquish
+    currentSystem->MoveChildren( this );
+    
+    // No need to go deeper
+    return FUNCTOR_SIBLINGS;
+}
+    
 } // namespace vrv

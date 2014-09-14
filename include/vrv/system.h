@@ -130,6 +130,13 @@ public:
      */
     virtual int CastOffPages( ArrayPtrVoid params );
     
+    /**
+     * Undo the cast of the system.
+     * This is used by Doc::ContinuousLayout
+     */
+    virtual int UnCastOff( ArrayPtrVoid params );
+
+    
 private:
     SystemAligner m_systemAligner;
     

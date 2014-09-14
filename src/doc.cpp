@@ -187,6 +187,30 @@ void Doc::Layout( )
     this->SetCurrentScoreDef( true );
 }
     
+void Doc::ContinuousLayout( )
+{  
+    Page *contentPage = new Page();
+    System *contentSystem = new System();
+    contentPage->AddSystem( contentSystem );
+
+    ArrayPtrVoid params;
+    params.push_back( contentSystem );
+
+    Functor unCastOff( &Object::UnCastOff );
+    this->Process( &unCastOff, params );
+    
+    this->ClearChildren();
+    
+    this->AddPage(contentPage);
+    
+    LogDebug("ContinousLayout: %d pages", this->GetChildCount());
+    
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage( );
+    this->SetCurrentScoreDef( true );
+}
+    
 bool Doc::HasPage( int pageIdx )
 {
     return ( (pageIdx >= 0 ) && (pageIdx < GetChildCount() ) );

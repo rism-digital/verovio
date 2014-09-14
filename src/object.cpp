@@ -102,7 +102,7 @@ Object& Object::operator=( const Object& object )
 	}
 	return *this;
 }
-
+    
 Object::~Object()
 {
     ClearChildren();
@@ -114,6 +114,23 @@ void Object::Init(std::string classid)
     m_isModified = true;
     m_classid = classid;
     this->GenerateUuid();
+}
+       
+void Object::MoveChildren(  Object *object )
+{
+    if ( this == object ){
+        assert( "Object cannot be copied to itself");
+    }
+    if ( &typeid(*this) != &typeid(*object) ) {
+        assert( "Object must be of the same type");
+    }
+    
+    int i;
+    for (i = 0; i < (int)object->m_children.size(); i++)
+    {
+        this->m_children.push_back( object->Relinquish(i) );
+        object->m_children[i]->m_parent = this;
+    }
 }
 
 void Object::SetUuid( std::string uuid )

@@ -75,6 +75,13 @@ public:
     Object& operator=( const Object& object ); // copy assignement;
     
     /**
+     * Move all the children of the object passed as parameter to this one.
+     * Objects must be of the same type.
+     * After this operation, the object passed as parameter has no child anymore.
+     */
+    void MoveChildren( Object *object );
+    
+    /**
      * Method call for copying child classes
      */
     virtual Object* Clone();
@@ -460,7 +467,7 @@ public:
     ///@{
     
     /**
-     * Fill a page by adding systems with the appropriate length
+     * Fill a page by adding systems with the appropriate length.
      * 
      */
     virtual int CastOffSystems( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
@@ -470,6 +477,12 @@ public:
      */
     virtual int CastOffPages( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
+    /**
+     * Undo the cast of of both pages and system.
+     * This is used by Doc::ContinuousLayout for putting all pages / system continously.
+     */
+    virtual int UnCastOff( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+
     ///@}
     
 protected:
