@@ -71,7 +71,7 @@ bool MeiOutput::ExportFile( )
         // this starts the call of all the functors
         m_doc->Save( this );
         
-        /*
+        /* To be change to pugixml
         TiXmlUnknown *schema = new TiXmlUnknown();
         schema->SetValue("?xml-model href=\"http://www.aruspix.net/mei-page-based-2013-08-29.rng\" type=\"application/xml\" schematypens=\"http://relaxng.org/ns/structure/1.0\"?");
         
