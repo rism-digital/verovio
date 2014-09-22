@@ -82,7 +82,6 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/beam.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
     $VEROVIO_ROOT/src/custos.cpp \
-	$VEROVIO_ROOT/src/interfacecontroller.cpp \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
     $VEROVIO_ROOT/src/dot.cpp \
@@ -119,6 +118,7 @@ python $EMCC --closure 1 -O2 \
 	$VEROVIO_ROOT/src/syl.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
+	$VEROVIO_ROOT/src/toolkit.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/verse.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
@@ -129,14 +129,15 @@ python $EMCC --closure 1 -O2 \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="[\
-		'_vrvInterfaceController_constructor',\
-		'_vrvInterfaceController_destructor',\
-		'_vrvInterfaceController_getLog',\
-		'_vrvInterfaceController_getPageCount',\
-		'_vrv_InterfaceController_loadData',\
-		'_vrvInterfaceController_renderData',\
-		'_vrvInterfaceController_renderPage',\
-		'_vrvInterfaceController_setOptions']" \
+		'_vrvToolkit_constructor',\
+		'_vrvToolkit_destructor',\
+		'_vrvToolkit_getLog',\
+		'_vrvToolkit_getPageCount',\
+		'_vrvToolkit_loadData',\
+		'_vrvToolkit_redoLayout',\
+		'_vrvToolkit_renderData',\
+		'_vrvToolkit_renderPage',\
+		'_vrvToolkit_setOptions']" \
     -o build/verovio.js
 
 if [ $? -eq 0 ]; then 

@@ -1,22 +1,20 @@
-//
-//  emscripten_main.cpp
-//  aruspix
-//
-//  Created by Rodolfo Zitellini on 05/11/13.
-//  Copyright (c) 2013 com.aruspix.www. All rights reserved.
-//
+/////////////////////////////////////////////////////////////////////////////
+// Name:        emscripten_main.cpp
+// Author:      Rodolfo Zitellini
+// Created:     05/11/2013
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
 
-#include <cstdlib>
-#include <iostream>
-#include <ctime>
 #include <assert.h>
-
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 
 #include "vrv.h"
-#include "interfacecontroller.h"
+#include "toolkit.h"
 
 using namespace std;
 using namespace vrv;
@@ -26,9 +24,9 @@ bool initialized = false;
 extern "C" {
 
 	/****************************************************************
-	* Methods exported to use the InterfaceController class from js
+	* Methods exported to use the Toolkit class from js
 	****************************************************************/
-	void *vrvInterfaceController_constructor() {
+	void *vrvToolkit_constructor() {
 		
 		// Init the random number generator
 		// for mei ids
@@ -40,46 +38,50 @@ extern "C" {
 		// set the resource path in the js blob
 		Resources::SetPath("/data");
 		
-		return new InterfaceController();
+		return new Toolkit();
 	}
 	
-	void vrvInterfaceController_destructor(InterfaceController *ic) {
-		delete ic;
+	void vrvToolkit_destructor(Toolkit *tk) {
+		delete tk;
 	}
 	
-	const char *vrvInterfaceController_getLog(InterfaceController *ic) {
-        ic->SetCString(ic->GetLogString());
-        return ic->GetCString();
+	const char *vrvToolkit_getLog(Toolkit *tk) {
+        tk->SetCString(tk->GetLogString());
+        return tk->GetCString();
     }
 	
-	int vrvInterfaceController_getPageCount(InterfaceController *ic) {
-		return ic->GetPageCount();
+	int vrvToolkit_getPageCount(Toolkit *tk) {
+		return tk->GetPageCount();
 	}
 
-	bool vrv_InterfaceController_loadData(InterfaceController *ic, const char *data) {
-		ic->ResetLogBuffer();
-        return ic->LoadString( data );
+	bool vrvToolkit_loadData(Toolkit *tk, const char *data) {
+		tk->ResetLogBuffer();
+        return tk->LoadString( data );
 	}
 
 
-	const char *vrvInterfaceController_renderPage(InterfaceController *ic, int page_no, const char *c_options) {
-		ic->ResetLogBuffer();
-		ic->SetCString(ic->RenderToSvg(page_no, false));
-		return ic->GetCString();
+	const char *vrvToolkit_renderPage(Toolkit *tk, int page_no, const char *c_options) {
+		tk->ResetLogBuffer();
+		tk->SetCString(tk->RenderToSvg(page_no, false));
+		return tk->GetCString();
 	}
 	
-	void vrvInterfaceController_setOptions(InterfaceController *ic, const char *options) {		
-        if (!ic->ParseOptions( options )) {
+	void vrvToolkit_setOptions(Toolkit *tk, const char *options) {		
+        if (!tk->ParseOptions( options )) {
             vrv::LogError( "Could not load JSON options." );
         }
 	}
+    
+    void vrvToolkit_redoLayout(Toolkit *tk) {
+        tk->RedoLayout();
+	}
 
-	const char* vrvInterfaceController_renderData(InterfaceController *ic, const char *data, const char *options) {
-		ic->ResetLogBuffer();
-		vrvInterfaceController_setOptions(ic, options);
-		vrv_InterfaceController_loadData(ic, data);
+	const char* vrvToolkit_renderData(Toolkit *tk, const char *data, const char *options) {
+		tk->ResetLogBuffer();
+		vrvToolkit_setOptions(tk, options);
+		vrvToolkit_loadData(tk, data);
 		
-		return vrvInterfaceController_renderPage(ic, 1, options);
+		return vrvToolkit_renderPage(tk, 1, options);
 	}
 
 

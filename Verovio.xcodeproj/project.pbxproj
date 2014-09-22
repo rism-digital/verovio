@@ -52,7 +52,7 @@
 		8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
 		8F086EE9188539540037FD8E /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
 		8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
-		8F086EEB188539540037FD8E /* interfacecontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* interfacecontroller.cpp */; };
+		8F086EEB188539540037FD8E /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
 		8F086EEC188539540037FD8E /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
 		8F086EED188539540037FD8E /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
 		8F086EEE188539540037FD8E /* iomei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC2188539540037FD8E /* iomei.cpp */; };
@@ -123,7 +123,7 @@
 		8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDF188539540037FD8E /* view_tuplet.cpp */; };
 		8F3DD36718854B410051330C /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F3DD36818854B410051330C /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
-		8F3DD36A18854B410051330C /* interfacecontroller.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* interfacecontroller.cpp */; };
+		8F3DD36A18854B410051330C /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
 		8F3DD36C18854B410051330C /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECD188539540037FD8E /* object.cpp */; };
 		8F3DD36E18854B410051330C /* vrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE1188539540037FD8E /* vrv.cpp */; };
 		8F59293418854BF800FE51AD /* aligner.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59290D18854BF800FE51AD /* aligner.h */; };
@@ -134,7 +134,7 @@
 		8F59293A18854BF800FE51AD /* devicecontext.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291318854BF800FE51AD /* devicecontext.h */; };
 		8F59293B18854BF800FE51AD /* doc.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291418854BF800FE51AD /* doc.h */; };
 		8F59293C18854BF800FE51AD /* durationinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291518854BF800FE51AD /* durationinterface.h */; };
-		8F59293D18854BF800FE51AD /* interfacecontroller.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291618854BF800FE51AD /* interfacecontroller.h */; };
+		8F59293D18854BF800FE51AD /* toolkit.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291618854BF800FE51AD /* toolkit.h */; };
 		8F59293E18854BF800FE51AD /* io.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291718854BF800FE51AD /* io.h */; };
 		8F59293F18854BF800FE51AD /* iodarms.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291818854BF800FE51AD /* iodarms.h */; };
 		8F59294018854BF800FE51AD /* iomei.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291918854BF800FE51AD /* iomei.h */; };
@@ -243,7 +243,7 @@
 		8F086EBC188539540037FD8E /* devicecontext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = devicecontext.cpp; path = src/devicecontext.cpp; sourceTree = "<group>"; };
 		8F086EBD188539540037FD8E /* doc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = doc.cpp; path = src/doc.cpp; sourceTree = "<group>"; };
 		8F086EBE188539540037FD8E /* durationinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = durationinterface.cpp; path = src/durationinterface.cpp; sourceTree = "<group>"; };
-		8F086EBF188539540037FD8E /* interfacecontroller.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = interfacecontroller.cpp; path = src/interfacecontroller.cpp; sourceTree = "<group>"; };
+		8F086EBF188539540037FD8E /* toolkit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = toolkit.cpp; path = src/toolkit.cpp; sourceTree = "<group>"; };
 		8F086EC0188539540037FD8E /* io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = io.cpp; path = src/io.cpp; sourceTree = "<group>"; };
 		8F086EC1188539540037FD8E /* iodarms.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iodarms.cpp; path = src/iodarms.cpp; sourceTree = "<group>"; };
 		8F086EC2188539540037FD8E /* iomei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = iomei.cpp; path = src/iomei.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
@@ -285,7 +285,7 @@
 		8F59291318854BF800FE51AD /* devicecontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontext.h; path = include/vrv/devicecontext.h; sourceTree = "<group>"; };
 		8F59291418854BF800FE51AD /* doc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = doc.h; path = include/vrv/doc.h; sourceTree = "<group>"; };
 		8F59291518854BF800FE51AD /* durationinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = durationinterface.h; path = include/vrv/durationinterface.h; sourceTree = "<group>"; };
-		8F59291618854BF800FE51AD /* interfacecontroller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = interfacecontroller.h; path = include/vrv/interfacecontroller.h; sourceTree = "<group>"; };
+		8F59291618854BF800FE51AD /* toolkit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = toolkit.h; path = include/vrv/toolkit.h; sourceTree = "<group>"; };
 		8F59291718854BF800FE51AD /* io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = io.h; path = include/vrv/io.h; sourceTree = "<group>"; };
 		8F59291818854BF800FE51AD /* iodarms.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iodarms.h; path = include/vrv/iodarms.h; sourceTree = "<group>"; };
 		8F59291918854BF800FE51AD /* iomei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = iomei.h; path = include/vrv/iomei.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
@@ -444,13 +444,13 @@
 				4D422100199805E400963292 /* attdef.h */,
 				8F086EBD188539540037FD8E /* doc.cpp */,
 				8F59291418854BF800FE51AD /* doc.h */,
-				8F086EBF188539540037FD8E /* interfacecontroller.cpp */,
-				8F59291618854BF800FE51AD /* interfacecontroller.h */,
 				8F086ECD188539540037FD8E /* object.cpp */,
 				8F59292418854BF800FE51AD /* object.h */,
 				8F086EE1188539540037FD8E /* vrv.cpp */,
 				8F59293218854BF800FE51AD /* vrv.h */,
 				8F59293318854BF800FE51AD /* vrvdef.h */,
+				8F086EBF188539540037FD8E /* toolkit.cpp */,
+				8F59291618854BF800FE51AD /* toolkit.h */,
 			);
 			name = source;
 			sourceTree = "<group>";
@@ -580,7 +580,7 @@
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
-				8F59293D18854BF800FE51AD /* interfacecontroller.h in Headers */,
+				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
@@ -699,7 +699,7 @@
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
-				8F086EEB188539540037FD8E /* interfacecontroller.cpp in Sources */,
+				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
@@ -755,7 +755,7 @@
 			files = (
 				8F3DD36718854B410051330C /* aligner.cpp in Sources */,
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
-				8F3DD36A18854B410051330C /* interfacecontroller.cpp in Sources */,
+				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				8F3DD35C18854B390051330C /* leipzigbbox.cpp in Sources */,

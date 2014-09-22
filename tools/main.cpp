@@ -5,22 +5,18 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include <cstdlib>
-#include <iostream>
-#include <ctime>
-
-#include <sstream>
-#include <string>
 
 #include <assert.h>
-
+#include <cstdlib>
+#include <ctime>
 #include <getopt.h>
-
-// Used to check if a dir exists
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <sys/stat.h>
 
 #include "vrv.h"
-#include "interfacecontroller.h"
+#include "toolkit.h"
 
 using namespace std;
 using namespace vrv;
@@ -142,7 +138,7 @@ int main(int argc, char** argv)
     int page = 1;
     int show_help = 0;
       
-    InterfaceController controller;
+    Toolkit toolkit;
     
     // read pae by default
     type = pae_file;
@@ -190,31 +186,31 @@ int main(int argc, char** argv)
                 if (strcmp(long_options[option_index].name,"page") == 0)
                     page = atoi(optarg);
                 else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {
-                    if ( !controller.SetSpacingStaff( atoi(optarg) ) ) {
+                    if ( !toolkit.SetSpacingStaff( atoi(optarg) ) ) {
                         exit(1);
                     }
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-system") == 0) {
-                    if ( !controller.SetSpacingSystem( atoi(optarg) ) ) {
+                    if ( !toolkit.SetSpacingSystem( atoi(optarg) ) ) {
                         exit(1);
                     }
                 }
                 break;
                 
             case 'b':
-                if ( !controller.SetBorder( atoi(optarg) ) ) {
+                if ( !toolkit.SetBorder( atoi(optarg) ) ) {
                     exit(1);
                 }
                 break;
             
             case 'f':
-                if ( !controller.SetFormat ( string(optarg) ) ) {
+                if ( !toolkit.SetFormat ( string(optarg) ) ) {
                     exit(1);
                 };
                 break;
                 
             case 'h':
-                if ( !controller.SetPageHeight( atoi(optarg) ) ) {
+                if ( !toolkit.SetPageHeight( atoi(optarg) ) ) {
                     exit(1);
                 };
                 break;
@@ -232,13 +228,13 @@ int main(int argc, char** argv)
                 break;
                 
             case 's':
-                if( !controller.SetScale( atoi(optarg) ) ) {
+                if( !toolkit.SetScale( atoi(optarg) ) ) {
                      exit(1);
                 }
                 break;
             
             case 'w':
-                if ( !controller.SetPageWidth( atoi(optarg) ) ) {
+                if ( !toolkit.SetPageWidth( atoi(optarg) ) ) {
                     exit(1);
                 }
                 break;
@@ -259,11 +255,11 @@ int main(int argc, char** argv)
     }
     
     // Set the various flags
-    controller.SetAdjustPageHeight(adjust_page_height);
-    controller.SetNoLayout(no_layout);
-    controller.SetIgnoreLayout(ignore_layout);
-    controller.SetNoJustification(no_justification);
-    controller.SetShowBoundingBoxes(show_bounding_boxes);
+    toolkit.SetAdjustPageHeight(adjust_page_height);
+    toolkit.SetNoLayout(no_layout);
+    toolkit.SetIgnoreLayout(ignore_layout);
+    toolkit.SetNoJustification(no_justification);
+    toolkit.SetShowBoundingBoxes(show_bounding_boxes);
     
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
@@ -296,14 +292,14 @@ int main(int argc, char** argv)
     
     cerr << "Reading " << infile << "..." << endl;
     
-    if ( !controller.LoadFile( infile ) ) {
+    if ( !toolkit.LoadFile( infile ) ) {
         cerr << "The file '" << infile << "' could not be open" << endl;
         exit(1);
     }
     
     // Check the page range
-    if (page > controller.GetPageCount()) {
-        cerr << "The page requested (" << page << ") is not in the page range (max is " << controller.GetPageCount() << ")" << endl;
+    if (page > toolkit.GetPageCount()) {
+        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount() << ")" << endl;
         exit(1);
     }
     if (page < 1) {
@@ -311,12 +307,10 @@ int main(int argc, char** argv)
         exit(1);
     }
     
-    //cerr << "G1" << G1 << " C1=" << C1 << " C2=" << C2 << " C3=" << C3 << " F3=" << F3 << endl;
-    
     int from = page;
     int to = page + 1;
     if (all_pages) {
-        to = controller.GetPageCount() + 1;
+        to = toolkit.GetPageCount() + 1;
     }
     
         
@@ -329,16 +323,16 @@ int main(int argc, char** argv)
         // Create SVG or mei
         if (outformat == "svg") {
             cur_outfile += ".svg";
-            if ( !controller.RenderToSvgFile( cur_outfile, p) ) {
+            if ( !toolkit.RenderToSvgFile( cur_outfile, p) ) {
                 cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
             }
             // Write it to file
             
         } else {
-            // To be implemented in InterfaceController
+            // To be implemented in Toolkit
             cur_outfile += ".mei";
-            if ( !controller.SaveFile( cur_outfile ) ) {
+            if ( !toolkit.SaveFile( cur_outfile ) ) {
                 cerr << "Unable to write MEI to " << cur_outfile << "." << endl;
                 exit(1);
             }

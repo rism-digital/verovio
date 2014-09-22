@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        controller.cpp
+// Name:        toolkit.cpp
 // Author:      Laurent Pugin
 // Created:     17/10/2013
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "interfacecontroller.h"
+#include "toolkit.h"
 
 //----------------------------------------------------------------------------
 
@@ -30,10 +30,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// InterfaceController
+// Toolkit
 //----------------------------------------------------------------------------
 
-InterfaceController::InterfaceController()
+Toolkit::Toolkit()
 {
 
     m_scale = DEFAULT_SCALE;
@@ -56,14 +56,14 @@ InterfaceController::InterfaceController()
 }
 
 
-InterfaceController::~InterfaceController()
+Toolkit::~Toolkit()
 {
     if (m_cString) {
         free( m_cString );
     }
 }
     
-bool InterfaceController::SetBorder( int border )
+bool Toolkit::SetBorder( int border )
 {
     // We use left margin values because for now we cannot specify different values for each margin
     if (border < MIN_PAGE_LEFT_MAR || border > MAX_PAGE_LEFT_MAR) {
@@ -74,7 +74,7 @@ bool InterfaceController::SetBorder( int border )
     return true;
 }
     
-bool InterfaceController::SetScale( int scale )
+bool Toolkit::SetScale( int scale )
 {
     if (scale < MIN_SCALE || scale > MAX_SCALE) {
         LogError( "Scale out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE, MAX_SCALE );
@@ -84,7 +84,7 @@ bool InterfaceController::SetScale( int scale )
     return true;
 }
     
-bool InterfaceController::SetPageHeight( int h )
+bool Toolkit::SetPageHeight( int h )
 {
     if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
         LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT );
@@ -94,7 +94,7 @@ bool InterfaceController::SetPageHeight( int h )
     return true;
 }
     
-bool InterfaceController::SetPageWidth( int w )
+bool Toolkit::SetPageWidth( int w )
 {
     if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
         LogError( "Page width out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_WIDTH, MIN_PAGE_WIDTH, MAX_PAGE_WIDTH );
@@ -104,7 +104,7 @@ bool InterfaceController::SetPageWidth( int w )
     return true;
 };
     
-bool InterfaceController::SetSpacingStaff( int spacingStaff )
+bool Toolkit::SetSpacingStaff( int spacingStaff )
 {
     if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
         LogError( "Spacing staff out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_STAFF, MIN_SPACING_STAFF, MAX_SPACING_STAFF );
@@ -115,7 +115,7 @@ bool InterfaceController::SetSpacingStaff( int spacingStaff )
 }
     
     
-bool InterfaceController::SetSpacingSystem( int spacingSystem )
+bool Toolkit::SetSpacingSystem( int spacingSystem )
 {
     if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
         LogError( "Spacing system out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM );
@@ -126,7 +126,7 @@ bool InterfaceController::SetSpacingSystem( int spacingSystem )
 }
     
 
-bool InterfaceController::SetFormat( std::string informat )
+bool Toolkit::SetFormat( std::string informat )
 {
     if (informat == "pae")
         m_format = pae_file;
@@ -143,7 +143,7 @@ bool InterfaceController::SetFormat( std::string informat )
     
 
     
-bool InterfaceController::LoadFile( std::string filename )
+bool Toolkit::LoadFile( std::string filename )
 {
     std::ifstream in( filename.c_str() );
     
@@ -162,7 +162,7 @@ bool InterfaceController::LoadFile( std::string filename )
     return LoadString( content );
 }
 
-bool InterfaceController::LoadString( std::string data )
+bool Toolkit::LoadString( std::string data )
 {
     FileInputStream *input = NULL;
     if (m_format == pae_file) {
@@ -220,7 +220,7 @@ bool InterfaceController::LoadString( std::string data )
     return true;
 }
     
-bool InterfaceController::SaveFile( std::string filename )
+bool Toolkit::SaveFile( std::string filename )
 {
     MeiOutput meioutput( &m_doc, filename.c_str());
     if (!meioutput.ExportFile()) {
@@ -230,7 +230,7 @@ bool InterfaceController::SaveFile( std::string filename )
     return true;
 }
 
-bool InterfaceController::ParseOptions( std::string json_options ) {
+bool Toolkit::ParseOptions( std::string json_options ) {
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
@@ -290,7 +290,7 @@ bool InterfaceController::ParseOptions( std::string json_options ) {
 }
     
 
-std::string InterfaceController::GetLogString() {
+std::string Toolkit::GetLogString() {
 #ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
@@ -305,13 +305,13 @@ std::string InterfaceController::GetLogString() {
 }
   
 
-void  InterfaceController::ResetLogBuffer() {
+void  Toolkit::ResetLogBuffer() {
 #ifdef USE_EMSCRIPTEN 
     vrv::logBuffer.clear();
 #endif
 }
 
-std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
+std::string Toolkit::RenderToSvg( int pageNo, bool xml_tag )
 {
     // Page number is one-based - correction to 0-based first
     pageNo--;
@@ -346,9 +346,22 @@ std::string InterfaceController::RenderToSvg( int pageNo, bool xml_tag )
     std::string out_str = svg.GetStringSVG( xml_tag );
     return out_str;
 }
+    
+void Toolkit::RedoLayout()
+{
+    m_doc.SetPageHeight( this->GetPageHeight() );
+    m_doc.SetPageWidth( this->GetPageWidth() );
+    m_doc.SetPageRightMar( this->GetBorder() );
+    m_doc.SetPageLeftMar( this->GetBorder() );
+    m_doc.SetPageTopMar( this->GetBorder() );
+    m_doc.SetSpacingStaff( this->GetSpacingStaff() );
+    m_doc.SetSpacingSystem( this->GetSpacingSystem() );
+    
+    m_doc.ContinuousLayout();
+    m_doc.Layout();
+}
 
-
-bool InterfaceController::RenderToSvgFile( std::string filename, int pageNo )
+bool Toolkit::RenderToSvgFile( std::string filename, int pageNo )
 {
     std::string output = RenderToSvg( pageNo, true );
     
@@ -366,11 +379,11 @@ bool InterfaceController::RenderToSvgFile( std::string filename, int pageNo )
 }
 
 
-int InterfaceController::GetPageCount() {
+int Toolkit::GetPageCount() {
 	return m_doc.GetPageCount();
 }
 
-void InterfaceController::SetCString( std::string data )
+void Toolkit::SetCString( std::string data )
 {
     if (m_cString) {
         free(m_cString);
@@ -386,7 +399,7 @@ void InterfaceController::SetCString( std::string data )
     strcpy(m_cString, data.c_str());
 }
 
-const char *InterfaceController::GetCString( )
+const char *Toolkit::GetCString( )
 {
     if (m_cString) {
         return m_cString;

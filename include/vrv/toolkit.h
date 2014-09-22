@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        controller.h
+// Name:        toolkit.h
 // Author:      Laurent Pugin
 // Created:     17/10/2013
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_CONTROLLER_H__
-#define __VRV_CONTROLLER_H__
+#ifndef __VRV_TOOLKIT_H__
+#define __VRV_TOOLKIT_H__
 
 #include <string>
 
@@ -26,15 +26,15 @@ typedef enum _file_formats {
 
 
 //----------------------------------------------------------------------------
-// InterfaceController
+// Toolkit
 //----------------------------------------------------------------------------
 
-class InterfaceController
+class Toolkit
 {
 public:
     // constructors and destructors
-    InterfaceController();
-    virtual ~InterfaceController();
+    Toolkit();
+    virtual ~Toolkit();
     
     /**
      * Load a file with the specified type.
@@ -81,6 +81,13 @@ public:
      * Page number is 1-based.
      */
     bool RenderToSvgFile( std::string filename, int pageNo =  1 );
+    
+    /**
+     * Redo the layout of the loaded data
+     * This can be called once the rendering option were changed,
+     * For example with a new page (sceen) height or a new zoom level.
+     */
+    void RedoLayout();
     
 	/**
 	* @name Set and get a std::string into a char * buffer.
@@ -186,14 +193,14 @@ public:
     int GetFormat() { return m_format; };
     ///@}
 	
-   /**
-    * @name Get the pages for a loaded file
-    * The SetFormat with ConvertFileFormat does not perform any validation
-    */
-   ///@{
-   int GetPageCount( );
-   ///@}
-    
+    /**
+     * @name Get the pages for a loaded file
+     * The SetFormat with ConvertFileFormat does not perform any validation
+     */
+    ///@{
+    int GetPageCount( );
+    ///@}
+
 private:
     
 public:

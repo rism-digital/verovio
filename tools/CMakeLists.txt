@@ -25,7 +25,6 @@ add_executable (verovio
 	../src/iomei.cpp 
 	../src/iopae.cpp 
 	../src/iomusxml.cpp
-	../src/interfacecontroller.cpp
 	../src/keysig.cpp
 	../src/layer.cpp
 	../src/layerelement.cpp 
@@ -54,6 +53,7 @@ add_executable (verovio
 	../src/syl.cpp
 	../src/system.cpp 
 	../src/tie.cpp
+	../src/toolkit.cpp
 	../src/tuplet.cpp
 	../src/verse.cpp
 	../src/vrv.cpp
