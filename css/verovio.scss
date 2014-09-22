@@ -1,3 +1,7 @@
+---
+
+---
+
 body {
 	margin-top: 65px;
 }
@@ -53,7 +57,6 @@ code.panel-header {
 	color: #f9f2f4;
 }
 
-
 // Does not work with Firefox and not very well with Safari
 @media print 
 {
@@ -71,6 +74,9 @@ code.panel-header {
 		padding: 0px;
 		margin: 0 30px;
 	}
+    #sidebar {
+        display: none;
+    }
 }
 
 span.keyboard-00 { background-image: url(icons/00.png) !important; }

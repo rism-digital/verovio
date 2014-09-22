@@ -1,4 +1,10 @@
 att-classes:
+  - id: "augmentdots"
+    attributes:
+    - ["dots", "", ""]
+  - id: "beamsecondary"
+    attributes:
+    - ["breaksec", "Not supported yet", ""]
   - id: "barLine.log"
     attributes:
     - ["rend", "Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.", ""]
@@ -18,10 +24,19 @@ att-classes:
     attributes:
     - ["label", "", ""]
     - ["n", "Only numeric values are supported", ""]
+  - id: "duration.musical"
+    attributes:
+    - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
+  - id: "duration.preformed"
+    attributes:
+    - ["dur.ges", "", ""]
   - id: "duration.ratio"
     attributes:
     - ["num", "", ""]
     - ["numbase", "", ""]
+  - id: "fermatapresent"
+    attributes:
+    - ["fermata", "Currently always place above", ""]
   - id: "keySigDefault.log"
     attributes:
     - ["key.accid", "", ""] 
@@ -73,7 +88,7 @@ att-classes:
   - id: "note.log.mensural"
     attributes:
     - ["lig", "", ""] 
-  - id: "mensur.default.log"
+  - id: "mensural.log"
     attributes:
     - ["mensur.dot", "", ""] 
     - ["mensur.sign", "", ""] 
@@ -133,6 +148,12 @@ classes:
       - ["num", "", ""]
   - id: "note"
     att-classes:
+      - augmentdots # durationInterface
+      - beamsecondary # durationInterface
+      - duration.musical # durationInterface
+      - duration.performed # durationInterface      
+      - duration.ratio # durationInterface
+      - fermatapresent # durationInterface
       - coloration
       - note.log.mensural
       - stemmed
@@ -145,9 +166,13 @@ classes:
       - ["pname", "", ""]
       - ["tie", "", ""]
   - id: "rest"
+      - augmentdots # durationInterface
+      - beamsecondary # durationInterface
+      - duration.musical # durationInterface
+      - duration.performed # durationInterface      
+      - duration.ratio # durationInterface
+      - fermatapresent # durationInterface
     attributes:
-      - ["dots", "", ""]
-      - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
       - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
       - ["oloc", "", ""]
       - ["ploc", "", ""]
@@ -156,7 +181,7 @@ classes:
       - cleffing.log
       - keySigDefault.log
       - meterSigDefault.log
-      - mensur.default.log
+      - mensural.log
     attributes: []
   - id: "staff"
     att-classes:
@@ -168,7 +193,7 @@ classes:
       - cleffing.log
       - keySigDefault.log
       - meterSigDefault.log
-      - mensur.default.log
+      - mensural.log
     attributes:
       - ["n", "The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).", ""]
   - id: "staffGrp"

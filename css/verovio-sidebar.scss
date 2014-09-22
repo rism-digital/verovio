@@ -1,0 +1,85 @@
+---
+
+---
+
+
+$sidebar-width: 280px;
+$sidebar-margin: 0px;
+$sidebar-fullwidth: $sidebar-width + (2 * $sidebar-margin);
+$sidebar-background: #e7e7e7;
+
+html {
+    height: 100%;
+}
+
+body {
+	margin-top: 0px;
+    height: 100%;
+    background-color: $sidebar-background;
+}
+
+.navbar {
+    margin-bottom: 0px;
+}
+
+
+// forcing the toggle button to be always displayed
+.sidebar-toggle {
+  display: inherit !important;
+}
+
+.navbar-with-sidebar {
+    border-radius: 0;
+}
+
+.sidebar-panel {
+    margin: 20px;
+}
+
+.sidebar-row {
+    padding-bottom: 10px;
+}
+
+.row-offcanvas {
+    position: relative;
+    -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+    -o-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.row-offcanvas.active {
+    overflow-x: visible;
+}
+
+.row-offcanvas-right
+.sidebar-offcanvas {
+    right: - $sidebar-fullwidth;
+}
+
+.row-offcanvas-left
+.sidebar-offcanvas {
+    left: - $sidebar-fullwidth;
+}
+
+.row-offcanvas-right.active {
+    right: $sidebar-fullwidth;
+}
+
+.row-offcanvas-left.active {
+    left: $sidebar-fullwidth;
+}
+
+.sidebar-offcanvas {
+    height: 100%;
+    position: absolute;
+    margin: $sidebar-margin;
+    top: 0;
+    width: $sidebar-width;
+    overflow-y: auto;
+    background-color: $sidebar-background;
+    padding-right: 0px;
+    padding-top: 0px;
+}
