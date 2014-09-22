@@ -39,7 +39,6 @@ downloads:
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-        console.log(zoom, pageHeight, pageWidth, $(document).height(), $(document).width(), $( "#navbar" ).height() );
 		border = 50;
 		options = JSON.stringify({
 					inputFormat: 'mei',
@@ -371,12 +370,14 @@ downloads:
 	
 		// Load the default file or the file passed in the URL
 		var file = location.search.substring(1);
-		if (file.length != 0) {
-			$( "#toggle_options" ).click();
-			$.get( file , function( data ) {
-				load_data( data );
-			});
-		}
+        console.log( file );
+		if (file.length == 0) {
+            file = "examples/downloads/Beethoven_op.18_1.mei";
+        }
+		$( "#toggle_options" ).click();
+		$.get( file , function( data ) {
+			load_data( data );
+		});
 	});
 //]]>
 </script>
