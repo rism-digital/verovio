@@ -76,7 +76,7 @@ void Doc::Refresh()
     
 void Doc::SetCurrentScoreDef( bool force )
 {
-    if ( m_currentScoreDefDone && ! force ) {
+    if ( m_currentScoreDefDone && !force ) {
         return;
     }
     

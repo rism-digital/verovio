@@ -206,6 +206,11 @@ void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffD
         return;
     }
     
+    this->SetDrawingClef( NULL );
+    this->SetDrawingKeySig( NULL );
+    this->SetDrawingMensur( NULL );
+    this->SetDrawingMeterSig( NULL );
+    
     if ( currentStaffDef->DrawClef() ) {
         if ( currentStaffDef->GetClef() ) {
             this->SetDrawingClef( currentStaffDef->GetClefCopy() );
