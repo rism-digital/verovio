@@ -1534,6 +1534,7 @@ bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSp
     for (i = endIdx; i >= startIdx; i--) {
         tuplet->AddElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
     }
+    tuplet->SetParent( parentLayer );
     parentLayer->InsertChild( tuplet, startIdx );
 
     return true;    

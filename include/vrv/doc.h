@@ -108,13 +108,13 @@ public:
     /**
      * Performs the layout of the entire document.
      */
-    void Layout( );
+    void LayOut( );
     
     /**
      * Undo the layout of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void ContinuousLayout( );
+    void LayOutContinuously( );
     
     /**
      * To be implemented.

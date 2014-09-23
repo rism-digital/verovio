@@ -341,6 +341,8 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid params )
     (*previousTime) = 0.0;
     (*previousXRel) = 0;
     
+    SetDocParent();
+    
     return FUNCTOR_CONTINUE;
 }
 

@@ -231,7 +231,6 @@ public:
      */
     bool GetSameAs( std::string *id, std::string *filename, int idx = 0 );
     
-    
     /**
      * @name Set and get the text content.
      * The text content is a std::wstring that needs to be converted to UTF16.
@@ -490,6 +489,13 @@ protected:
      * Clear the children vector and delete all the objects.
      */
     void ClearChildren();
+    
+    /**
+     * Set the m_doc pointer by looking at the parent Doc (assert if none).
+     * This is cached to it we do not need to look at everytime.
+     * The methods checks if the pointers is already set.
+     */
+    void SetDocParent();
 
 public:
     ArrayOfObjects m_children;
@@ -500,6 +506,9 @@ protected:
     std::string m_uuid;
     std::string m_classid;
     std::wstring m_text;
+    
+    /** A pointer to the parent doc for accessing environment variables when drawing */
+    Doc *m_doc;
 
 private:
     

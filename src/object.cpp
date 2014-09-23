@@ -112,6 +112,7 @@ void Object::Init(std::string classid)
 {
     m_parent = NULL;
     m_isModified = true;
+    m_doc = NULL;
     m_classid = classid;
     this->GenerateUuid();
 }
@@ -184,6 +185,9 @@ int Object::GetIdx() const
 
 void Object::InsertChild( Object *element, int idx )
 {
+    // With this method we require the parent to be set before
+    assert( element->m_parent == this );
+    
     if ( idx >= (int)m_children.size() ) {
         m_children.push_back( element );
         return;
@@ -337,6 +341,14 @@ void Object::AddSameAs( std::string id, std::string filename )
         m_sameAs += " ";
     }
     m_sameAs += sameAs;
+}
+    
+void Object::SetDocParent()
+{
+    if (!m_doc) {
+        m_doc = dynamic_cast<Doc*>( this->GetFirstParent( &typeid(Doc) ) );
+        assert( m_doc );
+    }
 }
 
 Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps )

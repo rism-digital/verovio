@@ -88,9 +88,9 @@ void Doc::SetCurrentScoreDef( bool force )
     params.push_back( &staffDef );
     Functor setCurrentScoreDef( &Object::SetCurrentScoreDef );
     
-    LogElapsedTimeStart( );
+    //LogElapsedTimeStart( );
     this->Process( &setCurrentScoreDef, params );
-    LogElapsedTimeEnd ( "Setting scoreDefs" );
+    //LogElapsedTimeEnd ( "Setting scoreDefs" );
     
     params.clear();
     IntTree tree;
@@ -129,7 +129,7 @@ void Doc::SetCurrentScoreDef( bool force )
     m_currentScoreDefDone = true;
 }
 
-void Doc::Layout( )
+void Doc::LayOut( )
 {
     this->SetCurrentScoreDef();
     
@@ -187,7 +187,7 @@ void Doc::Layout( )
     this->SetCurrentScoreDef( true );
 }
     
-void Doc::ContinuousLayout( )
+void Doc::LayOutContinuously( )
 {  
     Page *contentPage = new Page();
     System *contentSystem = new System();
