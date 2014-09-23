@@ -176,8 +176,9 @@ int Measure::AlignVertically( ArrayPtrVoid params )
 int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift (unused)
-    // param 1: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor*>(params[1]);
+    // param 1: the cumulated justifiable shift (unused)
+    // param 2: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxShift = static_cast<Functor*>(params[2]);
     
     m_measureAligner.Process( integrateBoundingBoxShift, params );
     
@@ -199,10 +200,12 @@ int Measure::SetAligmentXPos( ArrayPtrVoid params )
 int Measure::JustifyX( ArrayPtrVoid params )
 {
     // param 0: the justification ratio
-    // param 1: the system full width (without system margins) (unused)
-    // param 2: the functor to be redirected to the MeasureAligner
+    // param 1: the justification ratio for the measure (depends on the margin) (unused)
+    // param 2: the non justifiable margin (unused)
+    // param 3: the system full width (without system margins) (unused)
+    // param 4: the functor to be redirected to the MeasureAligner
     double *ratio = static_cast<double*>(params[0]);
-    Functor *justifyX = static_cast<Functor*>(params[2]);
+    Functor *justifyX = static_cast<Functor*>(params[4]);
     
     this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
     

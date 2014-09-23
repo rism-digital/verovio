@@ -56,7 +56,7 @@ void DurationInterface::Reset()
     ResetDurationMusical();
     ResetDurationPerformed();
     ResetDurationRatio();
-    ResetDurationRatio();
+    ResetFermatapresent();
 }
 
 void DurationInterface::SetDurationGes( int value )

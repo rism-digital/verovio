@@ -203,6 +203,8 @@ bool Toolkit::LoadString( std::string data )
     m_doc.SetSpacingStaff( this->GetSpacingStaff() );
     m_doc.SetSpacingSystem( this->GetSpacingSystem() );
     
+    m_doc.PrepareDrawing();
+    
     // do the layout? this depends on the options and of the
     // file. PAE and DARMS of no layout information. MEI files
     // can have, but this might have been ignored because of the

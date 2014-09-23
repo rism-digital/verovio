@@ -147,7 +147,7 @@ int System::AlignVertically( ArrayPtrVoid params )
     this->ResetVerticalAlignment();
     
     // When calculating the alignment, the position has to be 0
-    m_drawingXRel = 0;
+    m_drawingYRel = 0;
     m_systemAligner.Reset();
     (*systemAligner) = &m_systemAligner;
     
@@ -179,7 +179,6 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
     int *shift = static_cast<int*>(params[0]);
     Functor *integrateBoundingBoxYShift = static_cast<Functor*>(params[1]);
     
-    m_drawingXRel = this->m_systemLeftMar;
     (*shift) = 0;
     m_systemAligner.Process( integrateBoundingBoxYShift, params);
     
@@ -191,6 +190,7 @@ int System::AlignMeasures( ArrayPtrVoid params )
     // param 0: the cumulated shift
     int *shift = static_cast<int*>(params[0]);
     
+    m_drawingXRel = this->m_systemLeftMar;
     (*shift) = 0;
     
     return FUNCTOR_CONTINUE;
@@ -225,11 +225,13 @@ int System::AlignSystems( ArrayPtrVoid params )
 
 int System::JustifyX( ArrayPtrVoid params )
 {
-    // param 0: the justification ratio (unused)
-    // param 1: the system full width (without system margins)
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
+    // param 0: the justification ratio
+    // param 1: the justification ratio for the measure (depends on the margin) (unused)
+    // param 2: the non justifiable margin (unused)
+    // param 3: the system full width (without system margins)
+    // param 4: the functor to be redirected to the MeasureAligner
     double *ratio = static_cast<double*>(params[0]);
-    int *systemFullWidth = static_cast<int*>(params[1]);
+    int *systemFullWidth = static_cast<int*>(params[3]);
     
     assert( m_parent );
     assert( m_parent->m_parent );

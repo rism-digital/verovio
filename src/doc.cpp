@@ -74,30 +74,14 @@ void Doc::Refresh()
     RefreshViews();
 }
     
-void Doc::SetCurrentScoreDef( bool force )
+void Doc::PrepareDrawing()
 {
-    if ( m_currentScoreDefDone && !force ) {
-        return;
-    }
-    
-    ScoreDef currentScoreDef;
-    currentScoreDef = m_scoreDef;
-    StaffDef *staffDef = NULL;
     ArrayPtrVoid params;
-    params.push_back( &currentScoreDef );
-    params.push_back( &staffDef );
-    Functor setCurrentScoreDef( &Object::SetCurrentScoreDef );
-    
-    //LogElapsedTimeStart( );
-    this->Process( &setCurrentScoreDef, params );
-    //LogElapsedTimeEnd ( "Setting scoreDefs" );
-    
-    params.clear();
     IntTree tree;
     params.push_back( &tree );
-
+    
     // We first fill a tree of int with the staff/layer/verse numbers to be process
-
+    
     //LogElapsedTimeStart( );
     Functor prepareDrawing( &Object::PrepareDrawing );
     this->Process( &prepareDrawing, params );
@@ -125,6 +109,25 @@ void Doc::SetCurrentScoreDef( bool force )
         }
     }
     //LogElapsedTimeEnd ( "Preparing drawing" );
+}
+    
+void Doc::SetCurrentScoreDef( bool force )
+{
+    if ( m_currentScoreDefDone && !force ) {
+        return;
+    }
+    
+    ScoreDef currentScoreDef;
+    currentScoreDef = m_scoreDef;
+    StaffDef *staffDef = NULL;
+    ArrayPtrVoid params;
+    params.push_back( &currentScoreDef );
+    params.push_back( &staffDef );
+    Functor setCurrentScoreDef( &Object::SetCurrentScoreDef );
+    
+    //LogElapsedTimeStart( );
+    this->Process( &setCurrentScoreDef, params );
+    //LogElapsedTimeEnd ( "Setting scoreDefs" );
     
     m_currentScoreDefDone = true;
 }

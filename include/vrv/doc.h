@@ -106,6 +106,13 @@ public:
      void SetCurrentScoreDef( bool force = false );
     
     /**
+     * Prepare the document for drawing.
+     * This sets drawing pointers and value and needs to be done after loading and any editing.
+     * For example, it sets the approriate values for the lyrics connectors
+     */
+    void PrepareDrawing( );
+    
+    /**
      * Performs the layout of the entire document.
      */
     void LayOut( );

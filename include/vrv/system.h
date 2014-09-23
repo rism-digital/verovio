@@ -165,11 +165,14 @@ public:
      * It is used internally when calculating the layout andd it is not stored in the file.
      */
     int m_drawingXRel;
+    
     /**
-     * The total width of the system.
+     * @name The total width of the system.
      * It is computed during the layout processed and used for calculating the justification ratio.
      */
+    ///@{
     int m_drawingTotalWidth;
+    ///@}
 
 private:
     

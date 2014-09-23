@@ -11,9 +11,11 @@
 //----------------------------------------------------------------------------
 
 #include <cstring>
+#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "slur.h"
 #include "tie.h"
 #include "verse.h"
@@ -197,8 +199,9 @@ void Note::ResetSlurAttrInitial( )
 
 int Note::GetHorizontalSpacing()
 {
+    SetDocParent();
     if (this->m_cueSize) {
-        return 8;
+        return 0;
     }
     return 5; // arbitrary generic value
 }

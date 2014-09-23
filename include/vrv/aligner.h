@@ -24,11 +24,12 @@ class MeasureAligner;
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
-    ALIGNMENT_DEFAULT = 0,
+    ALIGNMENT_MEASURE_START = 0,
     ALIGNMENT_CLEF_ATTR,
     ALIGNMENT_KEYSIG_ATTR,
     ALIGNMENT_MENSUR_ATTR,
     ALIGNMENT_METERSIG_ATTR,
+    ALIGNMENT_DEFAULT,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
@@ -37,7 +38,6 @@ enum AlignmentType {
     ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_MULTIREST,
-    ALIGNMENT_MEASURE_START,
     ALIGNMENT_MEASURE_END
 };
 
@@ -284,11 +284,11 @@ public:
     void SetMaxTime( double time );
     
     /**
-     * @name Set and get the total width
+     * @name Set and get the non justifiable margin
      */
     ///@{
-    //void SetTotalWidh( int width ) { m_totalWidth = width; };
-    //int GetTotalWidth() { return m_totalWidth; };
+    void SetNonJustifiableMargin( int margin ) { m_nonJustifiableLeftMargin = margin; };
+    int GetNonJustifiableMargin() { return m_nonJustifiableLeftMargin; };
     ///@}
     
     /**
@@ -322,7 +322,7 @@ public:
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    //virtual int JustifyX( ArrayPtrVoid params );
+    virtual int JustifyX( ArrayPtrVoid params );
     
 private:
     void AddAlignment( Alignment *alignment, int idx = -1 );
@@ -341,9 +341,9 @@ private:
     Alignment *m_rightAlignment;
     
     /**
-     * Store the system width in order to calculate the justification ratio
+     * Store the measure non justifiable margin used by the scoreDef attributes.
      */
-    //int m_totalWidth;
+    int m_nonJustifiableLeftMargin;
 };
 
 } // namespace vrv

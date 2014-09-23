@@ -169,7 +169,9 @@ void Page::LayOutHorizontally( )
     // Once the m_xShift have been calculated, move all positions accordingly
     params.clear();
     int shift = 0;
+    int justifiable_shift = 0;
     params.push_back( &shift );
+    params.push_back( &justifiable_shift );
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );
@@ -278,9 +280,13 @@ void Page::JustifyHorizontally( )
     
     // Justify X position
     params.clear();
-    double ratio = 0.0;
+    double ratio = 1.0;
+    double measureRatio = 1.0;
+    int margin = 1;
     int systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
     params.push_back( &ratio );
+    params.push_back( &measureRatio );
+    params.push_back( &margin );
     params.push_back( &systemFullWidth );
     Functor justifyX( &Object::JustifyX );
     // special case: because we redirect the functor, pass is a parameter to itself (!)

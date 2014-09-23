@@ -126,7 +126,7 @@ MeasureAligner::MeasureAligner():
 {
     m_leftAlignment = NULL;
     m_rightAlignment = NULL;
-    //m_totalWidth = 0;
+    m_nonJustifiableLeftMargin = 0;
 }
 
 MeasureAligner::~MeasureAligner()
@@ -300,13 +300,15 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
 int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
-    // param 1: the cumulated width
+    // param 1: the cumulated justifiable shift
     // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>(params[0]);
+    int *justifiable_shift = static_cast<int*>(params[1]);
     
     // We start a new MeasureAligner
     // Reset the cumulated shift to 0;
     (*shift) = 0;
+    (*justifiable_shift) = -1;
     
     return FUNCTOR_CONTINUE;
 }
@@ -314,13 +316,20 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift
-    // param 1: the functor to be redirected to the MeasureAligner (unused)
+    // param 1: the cumulated justifiable shift
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>(params[0]);
+    int *justifiable_shift = static_cast<int*>(params[1]);
     
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
     // cumulate the shift value and the width
     (*shift) += m_xShift;
+    
+    if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
+        dynamic_cast<MeasureAligner*>(m_parent)->SetNonJustifiableMargin(m_xRel);
+        (*justifiable_shift) = m_xRel;
+    }
 
     // reset member to 0
     m_xShift = 0;
@@ -340,8 +349,6 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid params )
     // Reset the previous time position and x_rel to 0;
     (*previousTime) = 0.0;
     (*previousXRel) = 0;
-    
-    SetDocParent();
     
     return FUNCTOR_CONTINUE;
 }
@@ -366,17 +373,60 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int MeasureAligner::JustifyX( ArrayPtrVoid params )
+{
+    // param 0: the justification ratio
+    // param 1: the justification ratio for the measure (depends on the margin)
+    // param 2: the non justifiable margin
+    // param 3: the system full width (without system margins) (unused)
+    // param 4: the functor to be redirected to the MeasureAligner (unused)
+    double *ratio =static_cast<double*>(params[0]);
+    double *measureRatio =static_cast<double*>(params[1]);
+    int *margin =static_cast<int*>(params[2]);
+    
+    int width = GetRightAlignment()->GetXRel() + GetRightAlignment()->GetMaxWidth();
+    
+    // the ratio in the measure has to take into account the non justifiable width
+    // for element within the margin, we do not move them
+    // for after the margin (right) we have a position that is given by:
+    // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
+    // (ratio - 1) * (margin / justifiable) + ratio
+    
+    (*measureRatio) = ((*ratio) - 1) * ((double)m_nonJustifiableLeftMargin / (double)width) + (*ratio);
+    (*margin) = m_nonJustifiableLeftMargin;
+    
+    return FUNCTOR_CONTINUE;
+}
 
 
 int Alignment::JustifyX( ArrayPtrVoid params )
 {
     // param 0: the justification ratio
-    // param 1: the system full width (without system margins) (unused)
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
+    // param 1: the justification ratio for the measure (depends on the margin)
+    // param 2: the non justifiable margin
+    // param 3: the system full width (without system margins) (unused)
+    // param 4: the functor to be redirected to the MeasureAligner (unused)
     double *ratio =static_cast<double*>(params[0]);
+    double *measureRatio =static_cast<double*>(params[1]);
+    int *margin =static_cast<int*>(params[2]);
     
-    if ((this->GetType() != ALIGNMENT_CLEF_ATTR) && (this->GetType() != ALIGNMENT_KEYSIG_ATTR)) {
+    if (GetType() == ALIGNMENT_MEASURE_START) {
+        return FUNCTOR_CONTINUE;
+    }
+    else if (GetType() == ALIGNMENT_MEASURE_END) {
         this->m_xRel = ceil((*ratio) * (double)this->m_xRel);
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // the ratio in the measure has to take into account the non justifiable width
+    // for element within the margin, we do not move them
+    // for after the margin (right) we have a position that is given by:
+    // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
+    // (ratio - 1) * (margin / justifiable) + ratio
+    
+    if ((GetType() < ALIGNMENT_CLEF_ATTR) || (GetType() > ALIGNMENT_METERSIG_ATTR)) {
+        this->m_xRel = ceil(((double)this->m_xRel - (double)(*margin)) * (*measureRatio)) + (*margin);
     }
 
     return FUNCTOR_CONTINUE;
