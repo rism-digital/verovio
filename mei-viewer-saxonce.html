@@ -370,16 +370,13 @@ downloads:
 	});
     
     var onSaxonLoad = function() {
-		var file = location.search.substring(1);
-        console.log( file );
+		
+        var file = location.search.substring(1);
 		if (file.length == 0) {
             file = "examples/downloads/Ahle_Jesu_meines_Herzens_Freud.mei";
         }
 
-        
-        console.log( "data" );
         var xsl = Saxon.requestXML("{{ site.baseurl }}/xslt/stripVerses.xsl");
-        console.log( "data - 2" );
         var xml = Saxon.requestXML( file );
         var proc = Saxon.newXSLT20Processor(xsl);
         load_data( Saxon.serializeXML( proc.transformToDocument(  xml ) ) );
