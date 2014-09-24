@@ -113,10 +113,12 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 	}*/
 
     Object* current;
-    for (current = system->GetFirst( &typeid(Measure) ); current; current = system->GetNext( ) )
+    for (current = system->GetFirst( ); current; current = system->GetNext( ) )
 	{
 		measure = dynamic_cast<Measure*>(current);
-        DrawMeasure( dc , measure, system );
+        if (measure) {
+            DrawMeasure( dc , measure, system );
+        }
 	}
 
     // We draw the groups after the staves because we use the m_drawingY member of the staves

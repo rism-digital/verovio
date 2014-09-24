@@ -112,7 +112,7 @@ public:
      * Always call GetFirst before calling GetNext
      */
     ///@{
-    Object *GetFirst( const std::type_info *elementType = &typeid(Object) );
+    Object *GetFirst( const std::type_info *elementType = NULL );
     Object *GetNext( );
     ///@}
     
@@ -706,6 +706,9 @@ public:
     
     bool operator() (Object *object)
     {
+        if (!m_elementType) {
+            return true;
+        }
         return (typeid(*object) == *m_elementType);
     }
     

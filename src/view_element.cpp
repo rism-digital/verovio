@@ -925,9 +925,8 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
     assert(staff); // Pointer to staff cannot be NULL"
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
-    	/*
+
     Note *note = dynamic_cast<Note*>(element);
-    
 
 	int xn, x1, x2, yy2, y1, y2, y3, y4, y5;
 	int milieu, up, epaisseur;
@@ -935,11 +934,13 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
 	xn = element->GetDrawingX();
 
+    /*
 	if ((note->m_lig==LIG_MEDIAL) || (note->m_lig==LIG_TERMINAL))
     {
 		CalculateLigaturePosX ( element, layer, staff );
     }
-	else {
+	else 
+    */{
 		xn = element->GetDrawingX();
     }
 
@@ -950,7 +951,8 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	y3 = (int)(y1 + m_doc->m_drawingVerticalUnit1[staff->staffSize]);	// partie d'encadrement qui depasse
 	y4 = (int)(y2 - m_doc->m_drawingVerticalUnit1[staff->staffSize]);	
 
-	if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
+    
+	//if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
 	{
 		if (note->GetColored()!=BOOLEAN_true)
 		{				//	double base des carrees
@@ -963,8 +965,9 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 		DrawVerticalLine ( dc, y3, y4, x1, m_doc->m_env.m_stemWidth );	// corset lateral
 		DrawVerticalLine ( dc, y3, y4, x2, m_doc->m_env.m_stemWidth );
 	}
-	else			// traitement des obliques
-	{
+	/*
+    else			// traitement des obliques
+    {
 		if (!View::s_drawingLigObliqua)	// 1e passage: ligne verticale initiale
 		{
 			DrawVerticalLine (dc,y3,y4,x1, m_doc->m_env.m_stemWidth );
@@ -1025,23 +1028,32 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 		} 
 	}
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
-	{	
-		milieu = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize]*6;
-		/// up = this->q_auto ? ((y < milieu)? ON :OFF):this->queue;
+	*/
+    {
+		milieu = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize]*2;
 		// ENZ
 		up = (y < milieu) ? ON : OFF;
 		// ENZ
-		if ( !note->m_stemDir == 0 )
-			up = (up == ON) ? OFF : ON;
+		if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
+            if ( note->m_drawingStemDir == STEMDIRECTION_up) {
+                up = ON;
+            }
+            else {
+                up = OFF;
+            }
+        }
 			
-		if (up)
+		if (!up)
 		{	
-            y3 = y1 + m_doc->m_drawingHalfInterl[staff->staffSize]*6;
+            y3 = y1 - m_doc->m_drawingHalfInterl[staff->staffSize]*8;
 			y2 = y1;
 		}
+        else {
+            y3 = y1 + m_doc->m_drawingHalfInterl[staff->staffSize]*6;
+			y2 = y1;
+        }
 		DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_env.m_stemWidth );
 	}
-    */
 
 	return;
 }
