@@ -1,0 +1,649 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- See http://www.w3.org/TR/xsd-unicode-blocknames/ -->
+<!-- Where the code range for a block has changed between Unicode versions,
+     this table generally gives the maximum range -->
+<blocks>
+   <block name="Basic Latin">
+      <range from="#x0000" to="#x007F"/>
+   </block>
+   <block name="Latin-1 Supplement">
+      <range from="#x0080" to="#x00FF"/>
+   </block>
+   <block name="Latin Extended-A">
+      <range from="#x0100" to="#x017F"/>
+   </block>
+   <block name="Latin Extended-B">
+      <range from="#x0180" to="#x024F"/>
+   </block>
+   <block name="IPA Extensions">
+      <range from="#x0250" to="#x02AF"/>
+   </block>
+   <block name="Spacing Modifier Letters">
+      <range from="#x02B0" to="#x02FF"/>
+   </block>
+   <block name="Combining Diacritical Marks">
+      <range from="#x0300" to="#x036F"/>
+   </block>
+   <block name="Greek" toVersion="3.1.1">
+      <range from="#x0370" to="#x03FF"/>
+   </block>
+   <block name="Greek and Coptic" fromVersion="3.2.0">
+      <range from="#x0370" to="#x03FF"/>
+   </block>
+   <block name="Cyrillic">
+      <range from="#x0400" to="#x04FF"/>
+   </block>
+   <block name="Cyrillic Supplementary" fromVersion="3.2.0">
+      <range from="#x0500" to="#x052F"/>
+   </block>
+   <block name="Cyrillic Supplement" fromVersion="4.0.1">
+      <range from="#x0500" to="#x052F"/>
+   </block>
+   <block name="Armenian">
+      <range from="#x0530" to="#x058F"/>
+   </block>
+   <block name="Hebrew">
+      <range from="#x0590" to="#x05FF"/>
+   </block>
+   <block name="Arabic">
+      <range from="#x0600" to="#x06FF"/>
+   </block>
+   <block name="Syriac" fromVersion="3.2.0">
+      <range from="#x0700" to="#x074F"/>
+   </block>
+   <block name="Arabic Supplement" fromVersion="4.1.0">
+      <range from="#x0750" to="#x077F"/>
+   </block>
+   <block name="Thaana" fromVersion="3.0.0">
+      <range from="#x0780" to="#x07BF"/>
+   </block>
+   <block name="NKo" fromVersion="5.0.0">
+      <range from="#x07C0" to="#x07FF"/>
+   </block>
+   <block name="Samaritan" fromVersion="5.2.0">
+      <range from="#x0800" to="#x083F"/>
+   </block>
+   <block name="Mandaic" fromVersion="6.0.0">
+      <range from="#x0840" to="#x085F"/>
+   </block>
+   <block name="Devanagari">
+      <range from="#x0900" to="#x097F"/>
+   </block>
+   <block name="Bengali">
+      <range from="#x0980" to="#x09FF"/>
+   </block>
+   <block name="Gurmukhi">
+      <range from="#x0A00" to="#x0A7F"/>
+   </block>
+   <block name="Gujarati">
+      <range from="#x0A80" to="#x0AFF"/>
+   </block>
+   <block name="Oriya">
+      <range from="#x0B00" to="#x0B7F"/>
+   </block>
+   <block name="Tamil">
+      <range from="#x0B80" to="#x0BFF"/>
+   </block>
+   <block name="Telugu">
+      <range from="#x0C00" to="#x0C7F"/>
+   </block>
+   <block name="Kannada">
+      <range from="#x0C80" to="#x0CFF"/>
+   </block>
+   <block name="Malayalam">
+      <range from="#x0D00" to="#x0D7F"/>
+   </block>
+   <block name="Sinhala" fromVersion="3.0.0">
+      <range from="#x0D80" to="#x0DFF"/>
+   </block>
+   <block name="Thai">
+      <range from="#x0E00" to="#x0E7F"/>
+   </block>
+   <block name="Lao">
+      <range from="#x0E80" to="#x0EFF"/>
+   </block>
+   <block name="Tibetan">
+      <range from="#x0F00" to="#x0FFF"/>
+   </block>
+   <block name="Myanmar" fromVersion="3.2.0">
+      <range from="#x1000" to="#x109F"/>
+   </block>
+   <block name="Georgian">
+      <range from="#x10A0" to="#x10FF"/>
+   </block>
+   <block name="Hangul Jamo">
+      <range from="#x1100" to="#x11FF"/>
+   </block>
+   <block name="Ethiopic" fromVersion="3.0.0">
+      <range from="#x1200" to="#x137F"/>
+   </block>
+   <block name="Ethiopic Supplement" fromVersion="4.1.0">
+      <range from="#x1380" to="#x139F"/>
+   </block>
+   <block name="Cherokee" fromVersion="3.0.0">
+      <range from="#x13A0" to="#x13FF"/>
+   </block>
+   <block name="Unified Canadian Aboriginal Syllabics" fromVersion="3.0.0">
+      <range from="#x1400" to="#x167F"/>
+   </block>
+   <block name="Ogham" fromVersion="3.0.0">
+      <range from="#x1680" to="#x169F"/>
+   </block>
+   <block name="Runic" fromVersion="3.0.0">
+      <range from="#x16A0" to="#x16FF"/>
+   </block>
+   <block name="Tagalog" fromVersion="3.2.0">
+      <range from="#x1700" to="#x171F"/>
+   </block>
+   <block name="Hanunoo" fromVersion="3.2.0">
+      <range from="#x1720" to="#x173F"/>
+   </block>
+   <block name="Buhid" fromVersion="3.2.0">
+      <range from="#x1740" to="#x175F"/>
+   </block>
+   <block name="Tagbanwa" fromVersion="3.2.0">
+      <range from="#x1760" to="#x177F"/>
+   </block>
+   <block name="Khmer" fromVersion="3.0.0">
+      <range from="#x1780" to="#x17FF"/>
+   </block>
+   <block name="Mongolian" fromVersion="3.0.0">
+      <range from="#x1800" to="#x18AF"/>
+   </block>
+   <block name="Unified Canadian Aboriginal Syllabics Extended" fromVersion="5.2.0">
+      <range from="#x18B0" to="#x18FF"/>
+   </block>
+   <block name="Limbu" fromVersion="4.0.0">
+      <range from="#x1900" to="#x194F"/>
+   </block>
+   <block name="Tai Le" fromVersion="4.0.0">
+      <range from="#x1950" to="#x197F"/>
+   </block>
+   <block name="New Tai Lue" fromVersion="4.1.0">
+      <range from="#x1980" to="#x19DF"/>
+   </block>
+   <block name="Khmer Symbols" fromVersion="4.0.0">
+      <range from="#x19E0" to="#x19FF"/>
+   </block>
+   <block name="Buginese" fromVersion="4.1.0">
+      <range from="#x1A00" to="#x1A1F"/>
+   </block>
+   <block name="Tai Tham" fromVersion="5.2.0">
+      <range from="#x1A20" to="#x1AAF"/>
+   </block>
+   <block name="Balinese" fromVersion="5.0.0">
+      <range from="#x1B00" to="#x1B7F"/>
+   </block>
+   <block name="Sundanese" fromVersion="5.1.0">
+      <range from="#x1B80" to="#x1BBF"/>
+   </block>
+   <block name="Batak" version="6.0.0">
+      <range from="#x1BC0" to="#x1BFF"/>
+   </block>
+   <block name="Lepcha" fromVersion="5.1.0">
+      <range from="#x1C00" to="#x1C4F"/>
+   </block>
+   <block name="Ol Chiki" fromVersion="5.1.0">
+      <range from="#x1C50" to="#x1C7F"/>
+   </block>
+   <block name="Vedic Extensions" fromVersion="5.2.0">
+      <range from="#x1CD0" to="#x1CFF"/>
+   </block>
+   <block name="Phonetic Extensions" fromVersion="4.0.0">
+      <range from="#x1D00" to="#x1D7F"/>
+   </block>
+   <block name="Phonetic Extensions Supplement" fromVersion="4.1.0">
+      <range from="#x1D80" to="#x1DBF"/>
+   </block>
+   <block name="Combining Diacritical Marks Supplement" fromVersion="4.1.0">
+      <range from="#x1DC0" to="#x1DFF"/>
+   </block>
+   <block name="Latin Extended Additional">
+      <range from="#x1E00" to="#x1EFF"/>
+   </block>
+   <block name="Greek Extended">
+      <range from="#x1F00" to="#x1FFF"/>
+   </block>
+   <block name="General Punctuation">
+      <range from="#x2000" to="#x206F"/>
+   </block>
+   <block name="Superscripts and Subscripts">
+      <range from="#x2070" to="#x209F"/>
+   </block>
+   <block name="Currency Symbols">
+      <range from="#x20A0" to="#x20CF"/>
+   </block>
+   <block name="Combining Marks for Symbols"
+          toVersion="3.1.1">
+      <range from="#x20D0" to="#x20FF"/>
+   </block>
+   <block name="Combining Diacritical Marks for Symbols" fromVersion="3.2.0">
+      <range from="#x20D0" to="#x20FF"/>
+   </block>
+   <block name="Letterlike Symbols">
+      <range from="#x2100" to="#x214F"/>
+   </block>
+   <block name="Number Forms">
+      <range from="#x2150" to="#x218F"/>
+   </block>
+   <block name="Arrows">
+      <range from="#x2190" to="#x21FF"/>
+   </block>
+   <block name="Mathematical Operators">
+      <range from="#x2200" to="#x22FF"/>
+   </block>
+   <block name="Miscellaneous Technical">
+      <range from="#x2300" to="#x23FF"/>
+   </block>
+   <block name="Control Pictures">
+      <range from="#x2400" to="#x243F"/>
+   </block>
+   <block name="Optical Character Recognition">
+      <range from="#x2440" to="#x245F"/>
+   </block>
+   <block name="Enclosed Alphanumerics">
+      <range from="#x2460" to="#x24FF"/>
+   </block>
+   <block name="Box Drawing">
+      <range from="#x2500" to="#x257F"/>
+   </block>
+   <block name="Block Elements">
+      <range from="#x2580" to="#x259F"/>
+   </block>
+   <block name="Geometric Shapes">
+      <range from="#x25A0" to="#x25FF"/>
+   </block>
+   <block name="Miscellaneous Symbols">
+      <range from="#x2600" to="#x26FF"/>
+   </block>
+   <block name="Dingbats">
+      <range from="#x2700" to="#x27BF"/>
+   </block>
+   <block name="Miscellaneous Mathematical Symbols-A" fromVersion="3.2.0">
+      <range from="#x27C0" to="#x27EF"/>
+   </block>
+   <block name="Supplemental Arrows-A" fromVersion="3.2.0">
+      <range from="#x27F0" to="#x27FF"/>
+   </block>
+   <block name="Braille Patterns" fromVersion="3.0.0">
+      <range from="#x2800" to="#x28FF"/>
+   </block>
+   <block name="Supplemental Arrows-B" fromVersion="3.2.0">
+      <range from="#x2900" to="#x297F"/>
+   </block>
+   <block name="Miscellaneous Mathematical Symbols-B" fromVersion="3.2.0">
+      <range from="#x2980" to="#x29FF"/>
+   </block>
+   <block name="Supplemental Mathematical Operators" fromVersion="3.2.0">
+      <range from="#x2A00" to="#x2AFF"/>
+   </block>
+   <block name="Miscellaneous Symbols and Arrows" fromVersion="4.0.0">
+      <range from="#x2B00" to="#x2BFF"/>
+   </block>
+   <block name="Glagolitic" fromVersion="4.1.0">
+      <range from="#x2C00" to="#x2C5F"/>
+   </block>
+   <block name="Latin Extended-C" fromVersion="5.0.0">
+      <range from="#x2C60" to="#x2C7F"/>
+   </block>
+   <block name="Coptic" fromVersion="4.1.0">
+      <range from="#x2C80" to="#x2CFF"/>
+   </block>
+   <block name="Georgian Supplement" fromVersion="4.1.0">
+      <range from="#x2D00" to="#x2D2F"/>
+   </block>
+   <block name="Tifinagh" fromVersion="4.1.0">
+      <range from="#x2D30" to="#x2D7F"/>
+   </block>
+   <block name="Ethiopic Extended" fromVersion="4.1.0">
+      <range from="#x2D80" to="#x2DDF"/>
+   </block>
+   <block name="Cyrillic Extended-A" fromVersion="5.1.0">
+      <range from="#x2DE0" to="#x2DFF"/>
+   </block>
+   <block name="Supplemental Punctuation" fromVersion="4.1.0">
+      <range from="#x2E00" to="#x2E7F"/>
+   </block>
+   <block name="CJK Radicals Supplement" fromVersion="3.0.0">
+      <range from="#x2E80" to="#x2EFF"/>
+   </block>
+   <block name="Kangxi Radicals" fromVersion="3.0.0">
+      <range from="#x2F00" to="#x2FDF"/>
+   </block>
+   <block name="Ideographic Description Characters" fromVersion="3.0.0">
+      <range from="#x2FF0" to="#x2FFF"/>
+   </block>
+   <block name="CJK Symbols and Punctuation">
+      <range from="#x3000" to="#x303F"/>
+   </block>
+   <block name="Hiragana">
+      <range from="#x3040" to="#x309F"/>
+   </block>
+   <block name="Katakana">
+      <range from="#x30A0" to="#x30FF"/>
+   </block>
+   <block name="Bopomofo">
+      <range from="#x3100" to="#x312F"/>
+   </block>
+   <block name="Hangul Compatibility Jamo">
+      <range from="#x3130" to="#x318F"/>
+   </block>
+   <block name="Kanbun">
+      <range from="#x3190" to="#x319F"/>
+   </block>
+   <block name="Bopomofo Extended" fromVersion="3.0.0">
+      <range from="#x31A0" to="#x31BF"/>
+   </block>
+   <block name="CJK Strokes" fromVersion="4.1.0">
+      <range from="#x31C0" to="#x31EF"/>
+   </block>
+   <block name="Katakana Phonetic Extensions" fromVersion="3.2.0">
+      <range from="#x31F0" to="#x31FF"/>
+   </block>
+   <block name="Enclosed CJK Letters and Months">
+      <range from="#x3200" to="#x32FF"/>
+   </block>
+   <block name="CJK Compatibility">
+      <range from="#x3300" to="#x33FF"/>
+   </block>
+   <block name="CJK Unified Ideographs Extension A" fromVersion="3.2.0">
+      <range from="#x3400" to="#x4DBF"/>
+   </block>
+   <block name="Yijing Hexagram Symbols" fromVersion="4.0.0">
+      <range from="#x4DC0" to="#x4DFF"/>
+   </block>
+   <block name="CJK Unified Ideographs">
+      <range from="#x4E00" to="#x9FFF"/>
+   </block>
+   <block name="Yi Syllables" fromVersion="3.0.0">
+      <range from="#xA000" to="#xA48F"/>
+   </block>
+   <block name="Yi Radicals" fromVersion="3.0.0">
+      <range from="#xA490" to="#xA4CF"/>
+   </block>
+   <block name="Lisu" fromVersion="5.2.0">
+      <range from="#xA4D0" to="#xA4FF"/>
+   </block>
+   <block name="Vai" fromVersion="5.1.0">
+      <range from="#xA500" to="#xA63F"/>
+   </block>
+   <block name="Cyrillic Extended-B" fromVersion="5.1.0">
+      <range from="#xA640" to="#xA69F"/>
+   </block>
+   <block name="Bamum" fromVersion="5.2.0">
+      <range from="#xA6A0" to="#xA6FF"/>
+   </block>
+   <block name="Modifier Tone Letters" fromVersion="4.1.0">
+      <range from="#xA700" to="#xA71F"/>
+   </block>
+   <block name="Latin Extended-D" fromVersion="5.0.0">
+      <range from="#xA720" to="#xA7FF"/>
+   </block>
+   <block name="Syloti Nagri" fromVersion="4.1.0">
+      <range from="#xA800" to="#xA82F"/>
+   </block>
+   <block name="Common Indic Number Forms" fromVersion="5.2.0">
+      <range from="#xA830" to="#xA83F"/>
+   </block>
+   <block name="Phags-pa" fromVersion="5.0.0">
+      <range from="#xA840" to="#xA87F"/>
+   </block>
+   <block name="Saurashtra" fromVersion="5.1.0">
+      <range from="#xA880" to="#xA8DF"/>
+   </block>
+   <block name="Devanagari Extended" fromVersion="5.2.0">
+      <range from="#xA8E0" to="#xA8FF"/>
+   </block>
+   <block name="Kayah Li" fromVersion="5.1.0">
+      <range from="#xA900" to="#xA92F"/>
+   </block>
+   <block name="Rejang" fromVersion="5.1.0">
+      <range from="#xA930" to="#xA95F"/>
+   </block>
+   <block name="Hangul Jamo Extended-A" fromVersion="5.2.0">
+      <range from="#xA960" to="#xA97F"/>
+   </block>
+   <block name="Javanese" fromVersion="5.2.0">
+      <range from="#xA980" to="#xA9DF"/>
+   </block>
+   <block name="Cham" fromVersion="5.1.0">
+      <range from="#xAA00" to="#xAA5F"/>
+   </block>
+   <block name="Myanmar Extended-A" fromVersion="5.2.0">
+      <range from="#xAA60" to="#xAA7F"/>
+   </block>
+   <block name="Tai Viet" fromVersion="5.2.0">
+      <range from="#xAA80" to="#xAADF"/>
+   </block>
+   <block name="Ethiopic Extended-A" fromVersion="6.0.0">
+      <range from="#xAB00" to="#xAB2F"/>
+   </block>
+   <block name="Meetei Mayek" fromVersion="5.2.0">
+      <range from="#xABC0" to="#xABFF"/>
+   </block>
+   <block name="Hangul Syllables" fromVersion="3.2.0">
+      <range from="#xAC00" to="#xD7AF"/>
+   </block>
+   <block name="Hangul Jamo Extended-B" fromVersion="5.2.0">
+      <range from="#xD7B0" to="#xD7FF"/>
+   </block>
+   <block name="High Surrogates">
+      <range from="#xD800" to="#xDB7F"/>
+   </block>
+   <block name="High Private Use Surrogates">
+      <range from="#xDB80" to="#xDBFF"/>
+   </block>
+   <block name="Low Surrogates">
+      <range from="#xDC00" to="#xDFFF"/>
+   </block>
+   <block name="Private Use" toVersion="3.1.1">
+      <range from="#xE000" to="#xF8FF"/>
+      <range from="#xF0000" to="#xFFFFD"/>
+      <range from="#x100000" to="#x10FFFD"/>
+   </block>
+   <block name="Private Use Area" fromVersion="3.2.0">
+      <range from="#xE000" to="#xF8FF"/>
+   </block>
+   <block name="CJK Compatibility Ideographs">
+      <range from="#xF900" to="#xFAFF"/>
+   </block>
+   <block name="Alphabetic Presentation Forms">
+      <range from="#xFB00" to="#xFB4F"/>
+   </block>
+   <block name="Arabic Presentation Forms-A">
+      <range from="#xFB50" to="#xFDFF"/>
+   </block>
+   <block name="Variation Selectors" fromVersion="3.2.0">
+      <range from="#xFE00" to="#xFE0F"/>
+   </block>
+   <block name="Vertical Forms" fromVersion="4.1.0">
+      <range from="#xFE10" to="#xFE1F"/>
+   </block>
+   <block name="Combining Half Marks">
+      <range from="#xFE20" to="#xFE2F"/>
+   </block>
+   <block name="CJK Compatibility Forms">
+      <range from="#xFE30" to="#xFE4F"/>
+   </block>
+   <block name="Small Form Variants">
+      <range from="#xFE50" to="#xFE6F"/>
+   </block>
+   <block name="Arabic Presentation Forms-B">
+      <range from="#xFE70" to="#xFEFF"/>
+   </block>
+   <block name="Halfwidth and Fullwidth Forms">
+      <range from="#xFF00" to="#xFFEF"/>
+   </block>
+   <block name="Specials">
+      <range from="#xFEFF" to="#xFEFF"/>
+      <range from="#xFFF0" to="#xFFFF"/>
+   </block>
+   <block name="Linear B Syllabary" fromVersion="4.0.0">
+      <range from="#x10000" to="#x1007F"/>
+   </block>
+   <block name="Linear B Ideograms" fromVersion="4.0.0">
+      <range from="#x10080" to="#x100FF"/>
+   </block>
+   <block name="Aegean Numbers" fromVersion="4.0.0">
+      <range from="#x10100" to="#x1013F"/>
+   </block>
+   <block name="Ancient Greek Numbers" fromVersion="4.1.0">
+      <range from="#x10140" to="#x1018F"/>
+   </block>
+   <block name="Ancient Symbols" fromVersion="5.1.0">
+      <range from="#x10190" to="#x101CF"/>
+   </block>
+   <block name="Phaistos Disc" fromVersion="5.1.0">
+      <range from="#x101D0" to="#x101FF"/>
+   </block>
+   <block name="Lycian" fromVersion="5.1.0">
+      <range from="#x10280" to="#x1029F"/>
+   </block>
+   <block name="Carian" fromVersion="5.1.0">
+      <range from="#x102A0" to="#x102DF"/>
+   </block>
+   <block name="Old Italic" fromVersion="3.1.0">
+      <range from="#x10300" to="#x1032F"/>
+   </block>
+   <block name="Gothic" fromVersion="3.1.0">
+      <range from="#x10330" to="#x1034F"/>
+   </block>
+   <block name="Ugaritic" fromVersion="4.0.0">
+      <range from="#x10380" to="#x1039F"/>
+   </block>
+   <block name="Old Persian" fromVersion="4.1.0">
+      <range from="#x103A0" to="#x103DF"/>
+   </block>
+   <block name="Deseret" fromVersion="3.1.0">
+      <range from="#x10400" to="#x1044F"/>
+   </block>
+   <block name="Shavian" fromVersion="4.0.0">
+      <range from="#x10450" to="#x1047F"/>
+   </block>
+   <block name="Osmanya" fromVersion="4.0.0">
+      <range from="#x10480" to="#x104AF"/>
+   </block>
+   <block name="Cypriot Syllabary" fromVersion="4.0.0">
+      <range from="#x10800" to="#x1083F"/>
+   </block>
+   <block name="Imperial Aramaic" fromVersion="5.2.0">
+      <range from="#x10840" to="#x1085F"/>
+   </block>
+   <block name="Phoenician" fromVersion="5.0.0">
+      <range from="#x10900" to="#x1091F"/>
+   </block>
+   <block name="Lydian" fromVersion="5.1.0">
+      <range from="#x10920" to="#x1093F"/>
+   </block>
+   <block name="Kharoshthi" fromVersion="4.1.0">
+      <range from="#x10A00" to="#x10A5F"/>
+   </block>
+   <block name="Old South Arabian" fromVersion="5.2.0">
+      <range from="#x10A60" to="#x10A7F"/>
+   </block>
+   <block name="Avestan" fromVersion="5.2.0">
+      <range from="#x10B00" to="#x10B3F"/>
+   </block>
+   <block name="Inscriptional Parthian" fromVersion="5.2.0">
+      <range from="#x10B40" to="#x10B5F"/>
+   </block>
+   <block name="Inscriptional Pahlavi" fromVersion="5.2.0">
+      <range from="#x10B60" to="#x10B7F"/>
+   </block>
+   <block name="Old Turkic" fromVersion="5.2.0">
+      <range from="#x10C00" to="#x10C4F"/>
+   </block>
+   <block name="Rumi Numeral Symbols" fromVersion="5.2.0">
+      <range from="#x10E60" to="#x10E7F"/>
+   </block>
+   <block name="Brahmi" fromVersion="6.0.0">
+      <range from="#x11000" to="#x1107F"/>
+   </block>
+   <block name="Kaithi" fromVersion="5.2.0">
+      <range from="#x11080" to="#x110CF"/>
+   </block>
+   <block name="Cuneiform" fromVersion="5.0.0">
+      <range from="#x12000" to="#x123FF"/>
+   </block>
+   <block name="Cuneiform Numbers and Punctuation" fromVersion="5.0.0">
+      <range from="#x12400" to="#x1247F"/>
+   </block>
+   <block name="Egyptian Hieroglyphs" fromVersion="5.2.0">
+      <range from="#x13000" to="#x1342F"/>
+   </block>
+   <block name="Bamum Supplement" fromVersion="6.0.0">
+      <range from="#x16800" to="#x16A3F"/>
+   </block>
+   <block name="Kana Supplement" fromVersion="6.0.0">
+      <range from="#x1B000" to="#x1B0FF"/>
+   </block>
+   <block name="Byzantine Musical Symbols" fromVersion="3.1.0">
+      <range from="#x1D000" to="#x1D0FF"/>
+   </block>
+   <block name="Musical Symbols" fromVersion="3.1.0">
+      <range from="#x1D100" to="#x1D1FF"/>
+   </block>
+   <block name="Ancient Greek Musical Notation" fromVersion="4.1.0">
+      <range from="#x1D200" to="#x1D24F"/>
+   </block>
+   <block name="Tai Xuan Jing Symbols" fromVersion="4.0.0">
+      <range from="#x1D300" to="#x1D35F"/>
+   </block>
+   <block name="Counting Rod Numerals" fromVersion="5.0.0">
+      <range from="#x1D360" to="#x1D37F"/>
+   </block>
+   <block name="Mathematical Alphanumeric Symbols" fromVersion="3.1.0">
+      <range from="#x1D400" to="#x1D7FF"/>
+   </block>
+   <block name="Mahjong Tiles" fromVersion="5.1.0">
+      <range from="#x1F000" to="#x1F02F"/>
+   </block>
+   <block name="Domino Tiles" fromVersion="5.1.0">
+      <range from="#x1F030" to="#x1F09F"/>
+   </block>
+   <block name="Playing Cards" fromVersion="6.0.0">
+      <range from="#x1F0A0" to="#x1F0FF"/>
+   </block>
+   <block name="Enclosed Alphanumeric Supplement" fromVersion="5.2.0">
+      <range from="#x1F100" to="#x1F1FF"/>
+   </block>
+   <block name="Enclosed Ideographic Supplement" fromVersion="5.2.0">
+      <range from="#x1F200" to="#x1F2FF"/>
+   </block>
+   <block name="Miscellaneous Symbols And Pictographs" fromVersion="6.0.0">
+      <range from="#x1F300" to="#x1F5FF"/>
+   </block>
+   <block name="Emoticons" fromVersion="6.0.0">
+      <range from="#x1F600" to="#x1F64F"/>
+   </block>
+   <block name="Transport And Map Symbols" fromVersion="6.0.0">
+      <range from="#x1F680" to="#x1F6FF"/>
+   </block>
+   <block name="Alchemical Symbols" fromVersion="6.0.0">
+      <range from="#x1F700" to="#x1F77F"/>
+   </block>
+   <block name="CJK Unified Ideographs Extension B">
+      <range from="#x20000" to="#x2A6DF"/>
+   </block>
+   <block name="CJK Unified Ideographs Extension C" fromVersion="5.2.0">
+      <range from="#x2A700" to="#x2B73F"/>
+   </block>
+   <block name="CJK Unified Ideographs Extension D" version="6.0.0">
+      <range from="#x2B740" to="#x2B81F"/>
+   </block>
+   <block name="CJK Compatibility Ideographs Supplement" fromVersion="3.1.0">
+      <range from="#x2F800" to="#x2FA1F"/>
+   </block>
+   <block name="Tags" fromVersion="3.1.0">
+      <range from="#xE0000" to="#xE007F"/>
+   </block>
+   <block name="Variation Selectors Supplement" fromVersion="4.0.0">
+      <range from="#xE0100" to="#xE01EF"/>
+   </block>
+   <block name="Supplementary Private Use Area-A" fromVersion="3.2.0">
+      <range from="#xF0000" to="#xFFFFF"/>
+   </block>
+   <block name="Supplementary Private Use Area-B" fromVersion="3.2.0">
+      <range from="#x100000" to="#x10FFFF"/>
+   </block>
+</blocks>
