@@ -16,9 +16,11 @@
 	</head>
 	<body>
         
+        {% if page.saxon %}
         <!-- Saxon-CE -->
         <script type="text/javascript" language="javascript" 
             src="{{ site.baseurl }}/javascript/Saxonce/Saxonce.nocache.js"></script>
+        {% endif %}  
 		
 		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 		<script src="{{ site.baseurl }}/javascript/jquery.min.js" type="text/javascript" ></script>
