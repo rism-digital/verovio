@@ -192,6 +192,14 @@ public:
     void SetFormat( ConvertFileFormat format ) { m_format = format; };
     int GetFormat() { return m_format; };
     ///@}
+    
+    /**
+     * @name Set and get the xPath query for selecting <rdg> (if any)
+     */
+    ///@{
+    void SetRdgXPathQuery( std::string rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
+    std::string GetRdgXPathQuery() { return m_rdgXPathQuery; };
+    ///@}
 	
     /**
      * @name Get the pages for a loaded file
@@ -221,6 +229,7 @@ private:
     bool m_noLayout;
     bool m_ignoreLayout;
     bool m_adjustPageHeight;
+    std::string m_rdgXPathQuery;
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;

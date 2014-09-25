@@ -91,6 +91,11 @@ public:
      */
     bool HasLayoutInformation() { return m_hasLayoutInformation; };
     
+    /**
+     * Set XPath query for <rdg> (MEI only)
+     */
+    virtual void SetRdgXPathQuery( std::string xPathQuery ) {};
+    
 private:
     /**
      * Init values (called by the constructors

@@ -181,6 +181,14 @@ public:
     virtual bool ImportFile( );
     virtual bool ImportString(std::string mei);
     
+    /**
+     * Set an xPath query for selecting specific <rdg>.
+     * By default, the first <lem> or <rdg> is loaded.
+     * If a query is provided, the element retieved by the specified xPath
+     * query will be selected (if any, otherwise the first one will be used).
+     */
+    virtual void SetRdgXPathQuery( std::string rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
+    
 private:
     bool ReadMei( pugi::xml_node root );
     bool ReadMeiHeader( pugi::xml_node meihead );
@@ -306,6 +314,11 @@ private:
     Page *m_page;
     /** The current system when reading score-based MEI */
     System *m_system;
+    
+    /**
+     *
+     */
+    std::string m_rdgXPathQuery;
     
     /**
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.

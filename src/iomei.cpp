@@ -1337,7 +1337,17 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
     
 bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app )
 {
-    pugi::xml_node current = app.first_child( );
+    pugi::xml_node current;
+    if ( m_rdgXPathQuery.length() > 0 ) {
+        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
+        if ( selection ) {
+            current = selection.node();
+        }
+    }
+    if ( !current ) {
+        current = app.first_child( );
+    }
+    
     if ( current ) {
         // we assume this to be a lem or rdg; we read only the first one
         ReadMeiLemOrRdg( parent, current );

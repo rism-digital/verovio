@@ -106,6 +106,9 @@ void display_usage() {
     cerr << "                            and output one single page with one single system" << endl;
     
     cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
+    
+    cerr << " --rdg-xpath-query          Set the xPath query for selecting <rdg> elements," << endl;
+    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;
@@ -166,6 +169,7 @@ int main(int argc, char** argv)
         {"page",                required_argument,  0, 0},
         {"page-height",         required_argument,  0, 'h'},
         {"page-width",          required_argument,  0, 'w'},
+        {"rdg-xpath-query",     required_argument,  0, 0},
         {"resources",           required_argument,  0, 'r'},
         {"scale",               required_argument,  0, 's'},
         {"show-bounding-boxes", no_argument,        &show_bounding_boxes, 1},
@@ -185,6 +189,9 @@ int main(int argc, char** argv)
                     break;
                 if (strcmp(long_options[option_index].name,"page") == 0)
                     page = atoi(optarg);
+                else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
+                    toolkit.SetRdgXPathQuery( string(optarg) );
+                }
                 else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {
                     if ( !toolkit.SetSpacingStaff( atoi(optarg) ) ) {
                         exit(1);
