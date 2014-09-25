@@ -754,6 +754,10 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
         else if ( std::string( current.name() ) == "scoreDef" ) {
             ReadMeiScoreDef( vrvPage, current );
         }
+        // can we have scoreDef between system in the current page-based cusotmization? To be checked
+        else if ( std::string( current.name() ) == "app" ) {
+            ReadMeiApp( vrvPage, current );
+        }
     }
     
     return true;
@@ -793,7 +797,7 @@ bool MeiInput::ReadMeiSystem( Page *page, pugi::xml_node system )
             ReadMeiStaff( unmeasured, current );
         }
         else {
-            // we should not mix measure and unmeasured within a system...
+            // we should not mix measured and unmeasured within a system...
             assert(!unmeasured);
             ReadMeiMeasure(vrvSystem, current);
         }
@@ -1331,6 +1335,33 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
     }
 }
     
+bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app )
+{
+    pugi::xml_node current = app.first_child( );
+    if ( current ) {
+        // we assume this to be a lem or rdg; we read only the first one
+        ReadMeiLemOrRdg( parent, current );
+    }
+    return true;   
+}
+    
+bool MeiInput::ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg )
+{
+    pugi::xml_node current;
+    for( current = lemOrRdg.first_child( ); current; current = current.next_sibling( ) ) {
+        if ( std::string( current.name() ) == "scoreDef" ) {
+            ReadMeiScoreDef( parent, current );
+        }
+        else if ( ( std::string( current.name() ) == "measure" ) || dynamic_cast<System*>(parent) ) {
+            ReadMeiMeasure( dynamic_cast<System*>(parent), current );
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <lem> or <rdg>", current.name() );
+        }
+    }
+    return true;
+}
+    
 void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
 {
     if (!m_hasScoreDef) {
@@ -1378,45 +1409,17 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
 
 bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
 {
-    if ( std::string( element.name() ) == "score" ) {
-        pugi::xml_node current;
-        for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( current );
-        }
-    }
-    if ( std::string( element.name() ) == "section" ) {
-        pugi::xml_node current;
-        for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( current );
-        }       
+    if ( (std::string( element.name() ) == "app") ) {
+        // We need to read <app> in case we have <app> outside measures
+        ReadMeiApp( m_system, element );
     }
     else if ( std::string( element.name() ) == "measure" ) {
         // This is the call that will put us back on the page-based reading loop
         ReadMeiMeasure( m_system, element );
     }
-    /*
-    else if ( std::string( element.name() ) == "staff" ) {
-        LogDebug( "staff" );
-        int n = 1;
-        if ( element.attribute( "n" ) ) {
-            element.attribute( "n", &n );
-        }
-        Staff *staff = m_system->GetStaff( n - 1 );
-        if ( staff ) {
-            m_staff = staff;
-        }
-        else
-        {
-            m_staff = new Staff( n );
-            m_system->AddStaff( m_staff );
-        }
-        m_measure = new Measure( *m_contentBasedMeasure );
-        ReadMeiStaff( element );
-    }
-    */
     else if (std::string( element.name() ) == "pb") {
         if ( (m_system->GetMeasureCount() > 0) && !m_ignoreLayoutInformation) {
-            LogDebug( "pb" );
+            //LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
             m_page = new Page( );
             m_system = new System( );
@@ -1426,14 +1429,26 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
     }
     else if (std::string( element.name() ) == "sb") {
         if ( (m_page->GetSystemCount() > 0)  && !m_ignoreLayoutInformation) {
-            LogDebug( "pb" );
+            //LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
             m_system = new System( );
             m_page->AddSystem( m_system );
         }
     }
+    else if ( std::string( element.name() ) == "score" ) {
+        pugi::xml_node current;
+        for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
+            ReadScoreBasedMei( current );
+        }
+    }
     else if ( (std::string( element.name() ) == "scoreDef") ) {
         ReadMeiScoreDef( m_system, element );
+    }
+    else if ( std::string( element.name() ) == "section" ) {
+        pugi::xml_node current;
+        for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
+            ReadScoreBasedMei( current );
+        }
     }
     else {
         LogWarning( "Elements <%s> ignored", element.name() );

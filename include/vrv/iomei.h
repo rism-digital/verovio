@@ -218,6 +218,15 @@ private:
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
     bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
     ///@}
+  
+    /**
+     * @name Methods for reading critical apparatus.
+     * Only one child of <app> is loaded
+     */
+    ///@{
+    bool ReadMeiApp( Object *parent, pugi::xml_node app );
+    bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg );
+    ///@}
     
     /**
      * @name Methods for reading MEI LayerElement and interfaces
@@ -266,7 +275,7 @@ private:
     /**
      * Read score-based MEI
      */
-    bool ReadScoreBasedMei( pugi::xml_node element );
+    bool ReadScoreBasedMei( pugi::xml_node element );    
     
     /**
      * Look through the list of notes with open tie stored in MeiInput::m_openTies.
