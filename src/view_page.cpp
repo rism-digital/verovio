@@ -157,10 +157,10 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     if ( barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp( dc, measure, staffGrp, x );
-        if ( scoreDef->DrawLabels() ) {
-            DrawStaffDefLabels( dc, measure, scoreDef );
-            scoreDef->SetDrawLabels( false );
-        }
+        
+        DrawStaffDefLabels( dc, measure, scoreDef, !scoreDef->DrawLabels() );
+        // if this was true (non-abbreviated labels), set it to false for next one
+        scoreDef->SetDrawLabels( false );
     }
     else{
         barLine->SetDrawingX( x );
@@ -232,7 +232,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
 }
 
     
-void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef )
+void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations )
 {
     assert( measure );
     assert( scoreDef );
@@ -254,12 +254,22 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
             return;
         }
         
+        std::string label = staffDef->GetLabel();
+        if ( abbreviations ) {
+            label = staffDef->GetLabelAbbr();
+        }
+        
+        if ( label.length() == 0) {
+            ++iter;
+            continue;
+        }
+        
         // keep the widest width for the system; the 1.1 is an arbitrary avg value of each letter with
-        system->SetDrawingLabelsWidth( staffDef->GetLabel().length() * m_doc->m_drawingInterl[staff->staffSize] * 1.1 );
+        system->SetDrawingLabelsWidth( label.length() * m_doc->m_drawingInterl[staff->staffSize] * 1.1 );
         
         int x = system->GetDrawingX() - 3 * m_doc->m_drawingBeamWidth[0];
         int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->m_drawingInterl[staff->staffSize] / 2);
-        dc->DrawText( staffDef->GetLabel(), ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
+        dc->DrawText( label, ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
         
         ++iter;
     }

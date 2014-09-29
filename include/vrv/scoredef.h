@@ -280,7 +280,8 @@ private:
  * This class represents a MEI staffDef.
  */
 class StaffDef: public Object, public ScoreOrStaffDefAttrInterface,
-    public AttCommon
+    public AttCommon,
+    public AttLabelsAddl
 {
 public:
     /**

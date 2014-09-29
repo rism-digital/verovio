@@ -201,7 +201,7 @@ int Note::GetHorizontalSpacing()
 {
     SetDocParent();
     if (this->m_cueSize) {
-        return 0;
+        return 5;
     }
     return 5; // arbitrary generic value
 }

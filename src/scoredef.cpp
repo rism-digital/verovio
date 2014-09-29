@@ -417,7 +417,8 @@ void StaffGrp::FilterList()
 
 StaffDef::StaffDef() :
     Object(), ScoreOrStaffDefAttrInterface(),
-    AttCommon()
+    AttCommon(),
+    AttLabelsAddl()
 {
     Reset();
 }
@@ -430,6 +431,7 @@ void StaffDef::Reset()
 {
     Object::Reset();
     ResetCommon();
+    ResetLabelsAddl();
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;

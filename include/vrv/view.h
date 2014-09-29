@@ -127,7 +127,7 @@ protected:
     void DrawSystem( DeviceContext *dc, System *system );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
 	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
-    void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef );
+    void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
 	void DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine );
