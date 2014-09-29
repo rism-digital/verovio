@@ -96,6 +96,7 @@ void System::ResetHorizontalAlignment()
 {
     m_drawingXRel = 0;
 	m_drawingX = 0;
+    m_drawingLabelsWidth = 0;
 }
 
     
@@ -131,6 +132,13 @@ int System::GetHeight()
         return -m_systemAligner.GetBottomAlignment()->GetYRel();
     }
     return 0;
+}
+    
+void System::SetDrawingLabelsWidth( int width )
+{
+    if ( m_drawingLabelsWidth < width ) {
+        m_drawingLabelsWidth = width;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -190,7 +198,7 @@ int System::AlignMeasures( ArrayPtrVoid params )
     // param 0: the cumulated shift
     int *shift = static_cast<int*>(params[0]);
     
-    m_drawingXRel = this->m_systemLeftMar;
+    m_drawingXRel = this->m_systemLeftMar + this->GetDrawingLabelsWidth();
     (*shift) = 0;
     
     return FUNCTOR_CONTINUE;
@@ -201,7 +209,7 @@ int System::AlignMeasuresEnd( ArrayPtrVoid params )
     // param 0: the cumulated shift
     int *shift = static_cast<int*>(params[0]);
     
-    m_drawingTotalWidth = (*shift);
+    m_drawingTotalWidth = (*shift) + this->GetDrawingLabelsWidth();
     
     return FUNCTOR_CONTINUE;
 }
@@ -236,12 +244,12 @@ int System::JustifyX( ArrayPtrVoid params )
     assert( m_parent );
     assert( m_parent->m_parent );
     
-    (*ratio) = (double)((*systemFullWidth) - this->m_systemLeftMar - this->m_systemRightMar) / (double)m_drawingTotalWidth;
+    (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar) / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
     
     if ((*ratio) < 0.8 ) {
         // Arbitrary value for avoiding over-compressed justification
         LogWarning("Justification stop because of a ratio smaller the 0.8");
-        return FUNCTOR_SIBLINGS;
+        //return FUNCTOR_SIBLINGS;
     }
     
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.0

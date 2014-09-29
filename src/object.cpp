@@ -820,9 +820,11 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     if ( current_page  ) {
         if ( current_page->m_parent->GetChildIndex( current_page ) == 0 ) {
             currentScoreDef->SetRedrawFlags( true, true, true, true );
+            currentScoreDef->SetDrawLabels( true );
         }
         else {
             currentScoreDef->SetRedrawFlags( true, true, false, false );
+            currentScoreDef->SetDrawLabels( false );
         }
         current_page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
@@ -910,6 +912,7 @@ int Object::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time (unused)
+    // param 2: the current scoreDef (unused)
         
     // reset all the drawing values - this also need to be called
     // from any functor overriding this one!

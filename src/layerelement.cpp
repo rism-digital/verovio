@@ -302,6 +302,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner
     // param 1: the time
+    // param 2: the current scoreDef (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
     double *time = static_cast<double*>(params[1]);
     

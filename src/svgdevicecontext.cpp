@@ -472,9 +472,22 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 }
 
         
-void SvgDeviceContext::DrawText(const std::string& text, int x, int y)
+void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
 {
-    DrawRotatedText( text, x, y, 0.0 );
+    
+    std::string s;
+    std::string anchor;
+    
+    if ( alignement == RIGHT ) {
+        anchor = " text-anchor=\"end\"";
+    }
+    if ( alignement == CENTER ) {
+        anchor = " text-anchor=\"middle\"";
+    }
+    
+    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 36px;\" %s>", x, y, 0, 0, anchor.c_str()) ;
+    s = s + text + "</text> " ;
+    WriteLine(s);
 }
 
 

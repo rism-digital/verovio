@@ -22,7 +22,7 @@ namespace vrv {
 
 extern "C" {
 static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
-static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; }
+//static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; }
 }
 
 //----------------------------------------------------------------------------
@@ -310,8 +310,9 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
 }
 
         
-void BBoxDeviceContext::DrawText(const std::string& text, int x, int y)
+void BBoxDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
 {
+    // alignment not taken into account!
     DrawMusicText( text, x, y);
 }
 

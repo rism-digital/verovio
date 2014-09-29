@@ -95,7 +95,7 @@ public:
     
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
     
-    virtual void DrawText(const std::string& text, int x, int y);
+    virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT );
     
     virtual void DrawMusicText(const std::string& text, int x, int y);
     

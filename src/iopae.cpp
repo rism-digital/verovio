@@ -371,7 +371,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     // add miniaml scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
-    staffDef->SetStaffNo( 1 );
+    staffDef->SetN( 1 );
     staffGrp->AddStaffDef( staffDef );
     m_doc->m_scoreDef.AddStaffGrp( staffGrp );
 

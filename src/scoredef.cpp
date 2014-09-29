@@ -275,6 +275,7 @@ void ScoreDef::Reset()
     ReplaceKeySig(NULL);
     ReplaceMensur(NULL);
     ReplaceMeterSig(NULL);
+    m_drawLabels = false;
 }
 
 void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )
@@ -415,7 +416,8 @@ void StaffGrp::FilterList()
 //----------------------------------------------------------------------------
 
 StaffDef::StaffDef() :
-    Object(), ScoreOrStaffDefAttrInterface()
+    Object(), ScoreOrStaffDefAttrInterface(),
+    AttCommon()
 {
     Reset();
 }
@@ -427,6 +429,7 @@ StaffDef::~StaffDef()
 void StaffDef::Reset()
 {
     Object::Reset();
+    ResetCommon();
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;

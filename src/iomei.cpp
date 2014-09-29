@@ -319,7 +319,9 @@ bool MeiOutput::WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp
 bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef )
 {
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( staffDef ).c_str();
-    currentNode.append_attribute( "n" ) = StringFormat( "%d", staffDef->GetN() ).c_str();
+    
+    staffDef->WriteCommon(currentNode);
+    
     if (staffDef->GetClefAttr()) {
         staffDef->GetClefAttr()->WriteCleffingLog(currentNode);
     }
@@ -876,10 +878,9 @@ bool MeiInput::ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node staffDef )
     StaffDef *vrvStaffDef = new StaffDef( );
     SetMeiUuid( staffDef, vrvStaffDef );
     
-    if ( staffDef.attribute( "n" ) ) {
-        vrvStaffDef->SetStaffNo( atoi ( staffDef.attribute( "n" ).value() ) );
-    }
-    else {
+    vrvStaffDef->ReadCommon(staffDef);
+    
+    if ( vrvStaffDef->HasN() ) {
         LogWarning("No @n on <staffDef>");
     }
     

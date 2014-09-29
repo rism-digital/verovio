@@ -79,6 +79,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
     m_layer->AddElement(k);
     return;
     //////
+    /*
     for (int i = 0; i < quantity; i++) {
         Accid *alter = new Accid();
         alter->SetOloc(4);
@@ -86,7 +87,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
         alter->SetAccid(accid);
         m_layer->AddElement(alter);
     }
-
+    */
 }
 
 /*
@@ -380,7 +381,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
 
 bool DarmsInput::ImportFile() {
     char data[10000];
-    int len;
+    size_t len;
     
     std::ifstream infile;
     
@@ -399,7 +400,8 @@ bool DarmsInput::ImportFile() {
 }
     
 bool DarmsInput::ImportString(std::string data_str) {
-    int len, res;
+    size_t len;
+    int res;
     int pos = 0;
     const char *data = data_str.c_str();
     len = data_str.length();
@@ -450,7 +452,7 @@ bool DarmsInput::ImportString(std::string data_str) {
     // add miniaml scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
-    staffDef->SetStaffNo( 1 );
+    staffDef->SetN( 1 );
     staffGrp->AddStaffDef( staffDef );
     m_doc->m_scoreDef.AddStaffGrp( staffGrp );
     

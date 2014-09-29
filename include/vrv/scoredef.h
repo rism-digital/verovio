@@ -9,6 +9,7 @@
 #ifndef __VRV_SCOREDEF_H__
 #define __VRV_SCOREDEF_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -180,6 +181,14 @@ public:
      */
     void SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSig );
     
+    /**
+     * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
+     */
+    ///@{
+    bool DrawLabels() const { return m_drawLabels; };
+    void SetDrawLabels( bool drawLabels ) { m_drawLabels = drawLabels; };
+    ///@}
+    
 protected:
     /**
      * Filter the list for a specific class.
@@ -192,6 +201,8 @@ private:
 public:
 
 private:
+    /** Flags for indicating whether lables needs to be drawn or not */
+    bool m_drawLabels;
     
 };
 
@@ -239,7 +250,6 @@ public:
     void SetBarthru( bool barthru ) { m_barthru = barthru; };
     ///@}
     
-    
     //----------//
     // Functors //
     //----------//
@@ -258,7 +268,7 @@ public:
 private:
     StaffGrpSymbol m_symbol;
     bool m_barthru;
-    
+
 };
 
 
@@ -269,7 +279,8 @@ private:
 /**
  * This class represents a MEI staffDef.
  */
-class StaffDef: public Object, public ScoreOrStaffDefAttrInterface
+class StaffDef: public Object, public ScoreOrStaffDefAttrInterface,
+    public AttCommon
 {
 public:
     /**
@@ -282,15 +293,6 @@ public:
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
-    ///@}
-    
-    /**
-     * @name Set and get  the staff number which is 1-based.
-     * This can be different from the index position in the parent measure.
-     */
-    ///@{
-    int GetN() const { return m_n; };
-    void SetStaffNo( int n ) { m_n = n; };
     ///@}
     
     /**
@@ -343,8 +345,6 @@ private:
 public:
     
 private:
-    /** The staff number */
-    int m_n;
     /** The staff number of lines */
     int m_lines;
     

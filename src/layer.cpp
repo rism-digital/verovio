@@ -490,6 +490,7 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time
+    // param 2: the current scoreDef (unused)
     double *time = static_cast<double*>(params[1]);
     
     // we need to call it because we are overriding Object::AlignHorizontally

@@ -39,6 +39,14 @@ enum
     AxUSER_DASH,
     AxTRANSPARENT
 };
+    
+enum
+{
+    /*  text alignme */
+    LEFT = 0,
+    RIGHT,
+    CENTER
+};
 
 class MusPoint;
 class MusRect;
@@ -120,7 +128,7 @@ public:
     
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
     
-    virtual void DrawText(const std::string& text, int x, int y) = 0;
+    virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT ) = 0;
     
     virtual void DrawMusicText(const std::string& text, int x, int y) = 0;
     

@@ -57,6 +57,14 @@ public:
     virtual void ResetHorizontalAlignment( );
     virtual void ResetVerticalAlignment( );
     ///@}
+    
+    /**
+     * @name Set and get the labels drawing width.
+     */
+    ///@{
+    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; };
+    void SetDrawingLabelsWidth( int width );
+    ///@}
 
     /**
      * Return the height of the system
@@ -165,7 +173,11 @@ public:
      * It is used internally when calculating the layout andd it is not stored in the file.
      */
     int m_drawingXRel;
-    
+    /**
+     * The width used by the labels at the left of the system.
+     * It is used internally when calculating the layout andd it is not stored in the file.
+     */
+    int m_drawingLabelsWidth;
     /**
      * @name The total width of the system.
      * It is computed during the layout processed and used for calculating the justification ratio.

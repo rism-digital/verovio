@@ -157,6 +157,10 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     if ( barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp( dc, measure, staffGrp, x );
+        if ( scoreDef->DrawLabels() ) {
+            DrawStaffDefLabels( dc, measure, scoreDef );
+            scoreDef->SetDrawLabels( false );
+        }
     }
     else{
         barLine->SetDrawingX( x );
@@ -167,7 +171,6 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     
 	return;
 }
-
 
 void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x )
 {
@@ -228,6 +231,40 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     }
 }
 
+    
+void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef )
+{
+    assert( measure );
+    assert( scoreDef );
+    
+    ListOfObjects::iterator iter = scoreDef->m_list.begin();
+    while (iter != scoreDef->m_list.end()) {
+        StaffDef *staffDef = dynamic_cast<StaffDef*>(*iter);
+        
+        if (!staffDef) {
+            LogDebug("Should be staffDef in View::DrawStaffDefLabels");
+            return;
+        }
+        
+        Staff *staff = measure->GetStaffWithNo( staffDef->GetN() );
+        System *system = dynamic_cast<System*>(measure->m_parent);
+        
+        if (!staff || !system) {
+            LogDebug("Staff or System missing in View::DrawStaffDefLabels");
+            return;
+        }
+        
+        // keep the widest width for the system; the 1.1 is an arbitrary avg value of each letter with
+        system->SetDrawingLabelsWidth( staffDef->GetLabel().length() * m_doc->m_drawingInterl[staff->staffSize] * 1.1 );
+        
+        int x = system->GetDrawingX() - 3 * m_doc->m_drawingBeamWidth[0];
+        int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->m_drawingInterl[staff->staffSize] / 2);
+        dc->DrawText( staffDef->GetLabel(), ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
+        
+        ++iter;
+    }
+}
+    
 
 void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
