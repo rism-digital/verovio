@@ -129,7 +129,7 @@ private:
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-    /** Indicates if cue size - to be changed to MEI equivalent */
+    /** Indicates if cue size - to be changed to MEI equivalent (size="cue") */
     bool m_cueSize;
 
     /** If this is a note, store here the stem coordinates (useful for ex. tuplets) */

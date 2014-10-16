@@ -18,19 +18,22 @@ verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number
 // int getPageCount(Toolkit *ic)
 verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'number', ['number']);
 
-// bool loadData(Toolkit *ic, char * data )
+// int getPageWithElement(Toolkit *ic, const char *xmlId)
+verovio.vrvToolkit.getPageWithElement = Module.cwrap('vrvToolkit_getPageWithElement', 'number', ['number', 'string']);
+
+// bool loadData(Toolkit *ic, const char *data )
 verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['number', 'string']);
 
 // void redoLayout(Toolkit *ic)
 verovio.vrvToolkit.redoLayout = Module.cwrap('vrvToolkit_redoLayout', null, ['number']);
 
-// char *renderData(Toolkit *ic, char *data, char *options )
+// char *renderData(Toolkit *ic, const char *data, const char *options )
 verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', ['number', 'string', 'string']);
 
-// char *renderPage(Toolkit *ic, int pageNo, char *rendering_options )
+// char *renderPage(Toolkit *ic, int pageNo, const char *rendering_options )
 verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', ['number', 'number', 'string']);
 
-// void setOptions(Toolkit *ic, options) 
+// void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['number', 'string']);
 
 // A pointer to the object - only one instance can be created for now
@@ -68,6 +71,10 @@ verovio.toolkit.prototype.getLog = function () {
 
 verovio.toolkit.prototype.getPageCount = function () {
   	return verovio.vrvToolkit.getPageCount(this.ptr);
+};
+
+verovio.toolkit.prototype.getPageWithElement = function (xmlId) {
+  	return verovio.vrvToolkit.getPageWithElement(this.ptr, xmlId);
 };
 
 verovio.toolkit.prototype.loadData = function (data) {

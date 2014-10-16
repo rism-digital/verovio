@@ -89,6 +89,13 @@ public:
      */
     void RedoLayout();
     
+    /**
+     * Return the page on which the element is the ID (xml:id) is rendered
+     * This takes into account the current layout options.
+     * Retruns 0 if the element is not found.
+     */
+    int GetPageWithElement( std::string xmlId );
+    
 	/**
 	* @name Set and get a std::string into a char * buffer.
 	* This is used for returning a string buffer to emscripten.

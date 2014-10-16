@@ -64,7 +64,7 @@ cp -r ../data/svg data/
 
 echo "Compiling"
 
-python $EMCC --closure 1 -O2 \
+python $EMCC --closure 1 -O3  --memory-init-file 0 \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_ROOT/tinyxml \
@@ -132,7 +132,8 @@ python $EMCC --closure 1 -O2 \
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
 		'_vrvToolkit_getLog',\
-		'_vrvToolkit_getPageCount',\
+        '_vrvToolkit_getPageCount',\
+		'_vrvToolkit_getPageWithElement',\
 		'_vrvToolkit_loadData',\
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\

@@ -104,7 +104,7 @@ public:
 	char grise;
 	/** portee invisible (wolfgang legacy) */
 	char invisible;
-	/** taille. 0 = normale1 = petite (wolfgang legacy) */
+	/** taille. 0 = normale1 = petite (wolfgang legacy) (to be set as scale in staffDef) */
 	unsigned char staffSize;
 
 private:    

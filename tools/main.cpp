@@ -319,7 +319,6 @@ int main(int argc, char** argv)
     if (all_pages) {
         to = toolkit.GetPageCount() + 1;
     }
-    
         
     int p;
     for (p = from; p < to; p++) {

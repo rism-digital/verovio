@@ -392,6 +392,18 @@ bool Toolkit::RenderToSvgFile( std::string filename, int pageNo )
 int Toolkit::GetPageCount() {
 	return m_doc.GetPageCount();
 }
+    
+int Toolkit::GetPageWithElement( std::string xmlId ) {
+    Object *element = m_doc.FindChildByUuid(xmlId);
+    if (!element) {
+        return 0;
+    }
+    Page *page = dynamic_cast<Page*>( element->GetFirstParent( &typeid(Page) ) );
+    if (!page) {
+        return 0;
+    }
+    return page->GetIdx() + 1;
+}
 
 void Toolkit::SetCString( std::string data )
 {

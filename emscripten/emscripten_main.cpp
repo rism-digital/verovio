@@ -53,12 +53,15 @@ extern "C" {
 	int vrvToolkit_getPageCount(Toolkit *tk) {
 		return tk->GetPageCount();
 	}
+    
+    int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId) {
+        return tk->GetPageWithElement( xmlId );
+    }
 
 	bool vrvToolkit_loadData(Toolkit *tk, const char *data) {
 		tk->ResetLogBuffer();
         return tk->LoadString( data );
 	}
-
 
 	const char *vrvToolkit_renderPage(Toolkit *tk, int page_no, const char *c_options) {
 		tk->ResetLogBuffer();
