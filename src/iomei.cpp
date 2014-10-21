@@ -1221,7 +1221,7 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     pugi::xml_node current;
     for( current = note.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "accid" ) {
-            //ReadAccid(  vrvElement, current );
+            ReadAccidAsAttr(  vrvNote, current );
         }
         if ( std::string( current.name() ) == "verse" ) {
             ReadVerse(  vrvNote, current );
@@ -1319,6 +1319,14 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStafflocPitched(element);
+    return true;
+}
+    
+bool MeiInput::ReadAccidAsAttr( Note *note, pugi::xml_node accid )
+{
+    Accid vrvAccid;
+    vrvAccid.ReadAccidental( accid );
+    note->SetAccid( vrvAccid.GetAccid() );
     return true;
 }
     

@@ -250,6 +250,7 @@ private:
      * @name Methods for reading other MEI elements.
      */
     ///@{
+    bool ReadAccidAsAttr( Note *note, pugi::xml_node verse );
     bool ReadVerse( Note *note, pugi::xml_node verse );
     bool ReadSyl( Verse *verse, pugi::xml_node syl );
     bool ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan );
