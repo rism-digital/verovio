@@ -39,23 +39,23 @@ public:
     /**
      * Load a file with the specified type.
      */
-    bool LoadFile( std::string filename );
+    bool LoadFile( const std::string &filename );
     
     /**
      * Load a string data witht he specified type.
      */
-    bool LoadString( std::string data );
+    bool LoadString( const std::string &data );
     
     /**
      * Save an MEI file.
      */
-    bool SaveFile( std::string filename );
+    bool SaveFile( const std::string &filename );
     
     /**
      * Parse the options passed as JSON string
      * only available for Emscripten based compiles
      **/
-    bool ParseOptions( std::string json_options );
+    bool ParseOptions( const std::string &json_options );
     
     /**
      * Concatenates the vrv::logBuffer into a string an returns it.
@@ -80,7 +80,13 @@ public:
      * Render the page in SVG and save it to the file.
      * Page number is 1-based.
      */
-    bool RenderToSvgFile( std::string filename, int pageNo =  1 );
+    bool RenderToSvgFile( const std::string &filename, int pageNo =  1 );
+    
+    /**
+     * Get the MEI as a string.
+     * Get all the pages unless a page number (1-based) is specified
+     */
+    std::string GetMEI( int pageNo =  0 );
     
     /**
      * Redo the layout of the loaded data
@@ -94,7 +100,7 @@ public:
      * This takes into account the current layout options.
      * Retruns 0 if the element is not found.
      */
-    int GetPageWithElement( std::string xmlId );
+    int GetPageWithElement( const std::string &xmlId );
     
 	/**
 	* @name Set and get a std::string into a char * buffer.
@@ -102,7 +108,7 @@ public:
 	* The buffer is freed when reset or in MusController destructor.
 	*/
 	///@{
-	void SetCString( std::string data );
+	void SetCString( const std::string &data );
 	const char *GetCString( );
 	///@}
 
@@ -195,7 +201,7 @@ public:
      * The SetFormat with ConvertFileFormat does not perform any validation
      */
     ///@{
-    bool SetFormat( std::string informat );
+    bool SetFormat( std::string const &informat );
     void SetFormat( ConvertFileFormat format ) { m_format = format; };
     int GetFormat() { return m_format; };
     ///@}
@@ -204,7 +210,7 @@ public:
      * @name Set and get the xPath query for selecting <rdg> (if any)
      */
     ///@{
-    void SetRdgXPathQuery( std::string rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
+    void SetRdgXPathQuery( std::string const &rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
     std::string GetRdgXPathQuery() { return m_rdgXPathQuery; };
     ///@}
 	

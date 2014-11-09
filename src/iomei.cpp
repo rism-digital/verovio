@@ -53,6 +53,7 @@ MeiOutput::MeiOutput( Doc *doc, std::string filename ) :
 	FileOutputStream( doc )
 {
     m_filename = filename;
+    m_writeToStreamString = false;
 }
 
 MeiOutput::~MeiOutput()
@@ -78,13 +79,26 @@ bool MeiOutput::ExportFile( )
         meiDoc->LinkEndChild( new TiXmlDeclaration( "1.0", "UTF-8", "" ) );
         meiDoc->LinkEndChild(schema);
         */
-        meiDoc.save_file( m_filename.c_str() );
+        if ( m_writeToStreamString ) {
+            meiDoc.save(m_streamStringOutput);
+        }
+        else {
+            meiDoc.save_file( m_filename.c_str() );
+        }
     }
     catch( char * str ) {
         LogError("%s", str );
         return false;
     }
 	return true;    
+}
+    
+std::string MeiOutput::GetOutput()
+{
+    m_writeToStreamString = true;
+    this->ExportFile();
+    m_writeToStreamString = false;
+    return m_streamStringOutput.str();
 }
     
 bool MeiOutput::WriteObject( Object *object )
@@ -882,7 +896,7 @@ bool MeiInput::ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node staffDef )
     vrvStaffDef->ReadCommon(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
     
-    if ( vrvStaffDef->HasN() ) {
+    if ( !vrvStaffDef->HasN() ) {
         LogWarning("No @n on <staffDef>");
     }
     

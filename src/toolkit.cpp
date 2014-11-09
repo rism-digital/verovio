@@ -126,7 +126,7 @@ bool Toolkit::SetSpacingSystem( int spacingSystem )
 }
     
 
-bool Toolkit::SetFormat( std::string informat )
+bool Toolkit::SetFormat( std::string const &informat )
 {
     if (informat == "pae")
         m_format = pae_file;
@@ -143,7 +143,7 @@ bool Toolkit::SetFormat( std::string informat )
     
 
     
-bool Toolkit::LoadFile( std::string filename )
+bool Toolkit::LoadFile( const std::string &filename )
 {
     std::ifstream in( filename.c_str() );
     
@@ -162,7 +162,7 @@ bool Toolkit::LoadFile( std::string filename )
     return LoadString( content );
 }
 
-bool Toolkit::LoadString( std::string data )
+bool Toolkit::LoadString( const std::string &data )
 {
     FileInputStream *input = NULL;
     if (m_format == pae_file) {
@@ -227,7 +227,15 @@ bool Toolkit::LoadString( std::string data )
     return true;
 }
     
-bool Toolkit::SaveFile( std::string filename )
+
+std::string Toolkit::GetMEI( int pageNo )
+{
+    MeiOutput meioutput( &m_doc, "" );
+    return meioutput.GetOutput();
+}
+
+    
+bool Toolkit::SaveFile( const std::string &filename )
 {
     MeiOutput meioutput( &m_doc, filename.c_str());
     if (!meioutput.ExportFile()) {
@@ -237,7 +245,7 @@ bool Toolkit::SaveFile( std::string filename )
     return true;
 }
 
-bool Toolkit::ParseOptions( std::string json_options ) {
+bool Toolkit::ParseOptions( const std::string &json_options ) {
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
@@ -371,7 +379,7 @@ void Toolkit::RedoLayout()
     m_doc.LayOut();
 }
 
-bool Toolkit::RenderToSvgFile( std::string filename, int pageNo )
+bool Toolkit::RenderToSvgFile( const std::string &filename, int pageNo )
 {
     std::string output = RenderToSvg( pageNo, true );
     
@@ -393,7 +401,7 @@ int Toolkit::GetPageCount() {
 	return m_doc.GetPageCount();
 }
     
-int Toolkit::GetPageWithElement( std::string xmlId ) {
+int Toolkit::GetPageWithElement( const std::string &xmlId ) {
     Object *element = m_doc.FindChildByUuid(xmlId);
     if (!element) {
         return 0;
@@ -405,7 +413,7 @@ int Toolkit::GetPageWithElement( std::string xmlId ) {
     return page->GetIdx() + 1;
 }
 
-void Toolkit::SetCString( std::string data )
+void Toolkit::SetCString( const std::string &data )
 {
     if (m_cString) {
         free(m_cString);

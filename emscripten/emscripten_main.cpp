@@ -63,6 +63,11 @@ extern "C" {
         return tk->LoadString( data );
 	}
 
+    const char *vrvToolkit_getMEI(Toolkit *tk, int page_no) {
+        tk->SetCString(tk->GetMEI( page_no ));
+        return tk->GetCString();
+    }
+    
 	const char *vrvToolkit_renderPage(Toolkit *tk, int page_no, const char *c_options) {
 		tk->ResetLogBuffer();
 		tk->SetCString(tk->RenderToSvg(page_no, false));

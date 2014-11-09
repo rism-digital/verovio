@@ -24,6 +24,7 @@ if [ ! -d data ]; then mkdir data; fi
 # memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
 # we can disable this for a light version 	
 ASM="\
+    --closure 1 -O2 --memory-init-file 0 \
 	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=160000 \
 	-s TOTAL_MEMORY=256*1024*1024 \
@@ -38,7 +39,9 @@ while getopts "lv:h" opt; do
   	case $opt in
 		l)
  	   		echo "light version (-l)"
-	  	  	ASM="-s ASM_JS=0"
+	  	  	ASM="-s ASM_JS=0 \
+                -O2 \
+                --memory-init-file 0"
 			ASM_NAME="-light"
 			;;
 		v)
@@ -64,7 +67,7 @@ cp -r ../data/svg data/
 
 echo "Compiling"
 
-python $EMCC --closure 1 -O3  --memory-init-file 0 \
+python $EMCC \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_ROOT/tinyxml \
@@ -132,6 +135,7 @@ python $EMCC --closure 1 -O3  --memory-init-file 0 \
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
 		'_vrvToolkit_getLog',\
+        '_vrvToolkit_getMEI',\
         '_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\
 		'_vrvToolkit_loadData',\

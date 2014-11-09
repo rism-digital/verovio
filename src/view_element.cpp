@@ -1489,6 +1489,11 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff); // Pointer to staff cannot be NULL"
 
     KeySig *ks = dynamic_cast<KeySig*>(element);
+    
+    if (ks->GetAlterationNumber()==0) {
+        return;
+    }
+    
     int symb;
     int x, y;
     

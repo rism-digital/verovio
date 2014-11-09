@@ -33,6 +33,10 @@ verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', 
 // char *renderPage(Toolkit *ic, int pageNo, const char *rendering_options )
 verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', ['number', 'number', 'string']);
 
+
+// char *getMEI(Toolkit *ic, int pageNo )
+verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number']);
+
 // void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['number', 'string']);
 
@@ -91,6 +95,10 @@ verovio.toolkit.prototype.renderData = function (data, options) {
 
 verovio.toolkit.prototype.renderPage = function (page_no, options) {
   	return verovio.vrvToolkit.renderPage(this.ptr, page_no, options);
+};
+
+verovio.toolkit.prototype.getMEI = function (page_no) {
+  	return verovio.vrvToolkit.getMEI(this.ptr, page_no);
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {

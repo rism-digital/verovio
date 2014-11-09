@@ -8,6 +8,10 @@
 #ifndef __VRV_IOMEI_H__
 #define __VRV_IOMEI_H__
 
+#include <sstream>
+
+//----------------------------------------------------------------------------
+
 #include "doc.h"
 #include "pugixml.hpp"
 
@@ -71,6 +75,11 @@ public:
      * Writing object method that must be overriden in child class.
      */
     virtual bool WriteObjectEnd( Object *object );
+    
+    /**
+     * Return the output as a string by writing it to the stringstream member.
+     */
+    std::string GetOutput();
 
 private:
     
@@ -155,6 +164,8 @@ public:
 
 private:
     std::string m_filename;
+    std::stringstream m_streamStringOutput;
+    bool m_writeToStreamString;
     pugi::xml_node m_mei;
     /** @name Current element */
     pugi::xml_node m_currentNode;
