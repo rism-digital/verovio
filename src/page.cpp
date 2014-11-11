@@ -322,7 +322,8 @@ int Page::GetContentWidth( )
         assert( false );
         return 0;
     }
-    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    Doc *doc = NULL;
+    doc = dynamic_cast<Doc*>(m_parent);
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page

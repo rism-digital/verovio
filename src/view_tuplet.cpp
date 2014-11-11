@@ -36,7 +36,6 @@ namespace vrv {
 
 std::string View::IntToObliqueFigures(unsigned short number) {
     char buf[6];
-    unsigned int len;
     
     memset(buf, 0x00, sizeof(buf));
     
@@ -45,6 +44,7 @@ std::string View::IntToObliqueFigures(unsigned short number) {
     
     sprintf(buf, "%i", number);
     
+    size_t len;
     len = strlen(buf);
     assert((sizeof(buf)) > len ); // String conversion overflow 
     

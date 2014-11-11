@@ -132,7 +132,7 @@ int main(int argc, char** argv)
     bool std_output = false;
     
     // Init random number generator for uuids
-    std::srand(std::time(0));
+    std::srand((unsigned int)std::time(0));
     
     ConvertFileFormat type;
     int no_mei_hdr = 0;

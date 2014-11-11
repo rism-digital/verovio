@@ -928,7 +928,8 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 
     Note *note = dynamic_cast<Note*>(element);
 
-	int xn, x1, x2, yy2, y1, y2, y3, y4, y5;
+	int xn, x1, x2, y1, y2, y3, y4;
+    // int yy2, y5; // unused
 	int milieu, up, epaisseur;
 
 	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
@@ -1167,7 +1168,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
     {	
         DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    else if (mensur->GetSign()==MENSURATIONSIGN_C && !mensur->GetOrient()==ORIENTATION_reversed)
+    else if ((mensur->GetSign()==MENSURATIONSIGN_C) && (mensur->GetOrient()!=ORIENTATION_reversed))
     {	
         DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }

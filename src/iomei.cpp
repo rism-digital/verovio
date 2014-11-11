@@ -1674,7 +1674,7 @@ StaffGrpSymbol MeiInput::StrToStaffGrpSymbol(std::string symbol)
     
 std::string MeiInput::ExtractUuidFragment(std::string refUuid)
 {
-    unsigned pos = refUuid.find_last_of("#");
+    size_t pos = refUuid.find_last_of("#");
     if ( (pos != std::string::npos) && (pos < refUuid.length() - 1) ) {
         refUuid = refUuid.substr( pos + 1 );
     }

@@ -59,6 +59,7 @@ Object *Object::Clone( )
 {
     // This should never happen because the method should be overwritten
     assert( false );
+    return NULL;
 }
 
 Object::Object( const Object& object )
@@ -156,7 +157,7 @@ void Object::ClearChildren()
     
 int Object::GetChildCount( const std::type_info *elementType )
 {
-    return count_if (m_children.begin(), m_children.end(), ObjectComparison( elementType ));
+    return (int)count_if (m_children.begin(), m_children.end(), ObjectComparison( elementType ));
 }
     
     

@@ -133,9 +133,8 @@ int Measure::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner
     // param 1: the time (unused)
-    // param 2: the current scoreDef
+    // param 2: the current scoreDef (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
-    ScoreDef **scoreDef = static_cast<ScoreDef**>(params[2]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();

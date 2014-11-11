@@ -32,7 +32,7 @@ namespace vrv {
 
 extern "C" {
 static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
-static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; }
+//static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; } // unused
 }
 
 //----------------------------------------------------------------------------
@@ -153,8 +153,8 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
  
-    
-    if (false) //(view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
+    bool drawBoundingBox = false;
+    if (drawBoundingBox) //(view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
         SetPen( AxRED, 1, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
