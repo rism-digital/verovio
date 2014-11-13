@@ -37,7 +37,7 @@ Toolkit::Toolkit()
 {
 
     m_scale = DEFAULT_SCALE;
-    m_format = pae_file;
+    m_format = mei_file;
     
     // default page size
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
