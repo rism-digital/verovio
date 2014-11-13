@@ -30,6 +30,7 @@ void LogDebug(  const char *fmt, ... );
 void LogError(  const char *fmt, ... );
 void LogMessage(  const char *fmt, ... );
 void LogWarning(  const char *fmt, ... );
+void DisableLog( );
 
 /**
  * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
@@ -78,6 +79,11 @@ std::string GetFilename( std::string fullpath );
  * Return the version number (X.X.X)
  */
 std::string GetVersion();
+
+/**
+ *
+ */
+extern bool noLog;
  
 /**
  * Functions for logging in milliseconds the elapsed time of an

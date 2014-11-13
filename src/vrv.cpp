@@ -31,6 +31,7 @@ std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
 // Global for LogElapsedTimeXXX functions (debugging purposes)
 struct timeval start;
 
+bool noLog = false;
     
 #ifdef EMSCRIPTEN
 std::vector<std::string> logBuffer;
@@ -58,6 +59,7 @@ void LogElapsedTimeEnd( const char *msg )
     
 void LogDebug(const char *fmt, ...)
 {
+    if (noLog) return;
 #if defined(DEBUG)
 #ifdef EMSCRIPTEN
     std::string s;
@@ -79,6 +81,7 @@ void LogDebug(const char *fmt, ...)
 
 void LogError(const char *fmt, ...)
 {
+    if (noLog) return;
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
@@ -98,6 +101,7 @@ void LogError(const char *fmt, ...)
 
 void LogMessage(const char *fmt, ...)
 {
+    if (noLog) return;
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
@@ -117,6 +121,7 @@ void LogMessage(const char *fmt, ...)
 
 void LogWarning(const char *fmt, ...)
 {
+    if (noLog) return;
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
@@ -132,6 +137,11 @@ void LogWarning(const char *fmt, ...)
     printf("\n");
     va_end ( args );
 #endif
+}
+    
+void DisableLog( )
+{
+    noLog = true;
 }
     
     
