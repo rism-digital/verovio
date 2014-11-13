@@ -1,0 +1,89 @@
+---
+layout: verovio
+verovio-light: true
+title: Verovio – Python Toolkit
+active: how
+how-active: how-py
+---
+
+<div class="row">
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			{% include how-sidebar.html %}
+		</div>
+	</div>
+	
+	<div class="col-md-9">
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<p>
+					Vevorio can be compiled to a Python extention using the <a href="http://www.swig.org" target="_blank">SWIG</a>. The extension module contains a toolkit class similar to the one available in the JavaScript toolkit that can be used for rendering MEI data into SVG strings.
+				</p>
+				
+				<h3>Basic usage</h3>
+				
+				<p>
+					The information for building the Python extension is provided in the <a href="{{ site.baseurl }}/mei-viewer.xhtml">Download</a> page. Once compiled and installed, you need to run:
+				</p>
+				{% highlight python %}>>> import verovio{% endhighlight %}
+				
+				<p>
+					You can then create an instance of the toolkit. For example:
+				</p>
+{% highlight python %}
+>>> tk = verovio.toolkit()
+>>> tk.loadFile("~/gh-pages/examples/hello-world/Haydn_StringQuartet_Op1_No1-p1.mei")
+[Warning] Unsupported '<dir>' within <measure>
+True
+>>> tk.getPageCount()
+1
+{% endhighlight %}
+
+				<p>
+					Once loaded, the data can be rendered to a string:
+				</p>
+
+{% highlight python %}
+>>> svg_string = tk.renderToSvg(1)
+{% endhighlight %}
+
+				<p>
+					It can also be rendered to a file:
+				</p>
+
+{% highlight python %}
+>>> tk.renderToSvgFile( "page.svg", 1 )
+True
+{% endhighlight %}
+
+				<h3>Options</h3>
+				<p>
+					The options are set on the tookit instance. For example, the following code will change to a landscape format and redo the layout for the previously loaded data:
+				</p>
+{% highlight javascript %}
+>>> tk.setPageHeight(2100)
+True
+>>> tk.setPageWidth(2900)
+True
+>>> tk.setScale(25)
+True
+>>> tk.redoLayout()
+>>> tk.renderToSvgFile( "page-scaled.svg", 1 )
+{% endhighlight %}
+
+				<h3>Methods</h3>
+				<p>
+					See the <code>./include/vrv/toolkit.h</code> file for the toolkit methods (to be further documented).
+				</p>			
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	$( document ).ready(function() {
+
+	});
+//]]>
+</script>

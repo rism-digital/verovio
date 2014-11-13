@@ -7,7 +7,7 @@ active: download
 
 <div class="row">
 	
-	<div class="col-md-7">
+	<div class="col-md-5">
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<h4>Source code</h4>
@@ -36,7 +36,7 @@ active: download
 		
 	</div>
 	
-	<div class="col-md-5">
+	<div class="col-md-7">
 		<div class="panel panel-default">
 			<div class="panel-body">
 				<h4>Building the command-line tool</h4>
@@ -78,6 +78,29 @@ $ ./build.sh
 			</div>
 		</div>
 		
+		<div class="panel panel-default">
+			<div class="panel-body">
+				<h4>Building the Python toolkit</h4>
+				<p>
+					To build the Python toolkit you need to have swig and swig-python installed on your machine (see <a href="http://www.swigg.org" target="_blank">SWIG</a>) and the Python distutils package. Then, to build it in-place, run:
+				</p>
+{% highlight bash %}
+$ cd python
+$ python setup.py build_ext --inplace
+{% endhighlight %}
+				<p>
+					If you want to install it, run:
+				</p>
+
+{% highlight bash %}
+$ cd python
+$ python setup.py build_ext
+$ sudo python setup.py install
+{% endhighlight %}
+
+			</div>
+		</div>
+        
 	</div>
 
 </div>
