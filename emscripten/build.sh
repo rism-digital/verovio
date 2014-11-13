@@ -3,8 +3,9 @@
 function print_help {
 	 echo "Usage:
 -l		Light version without ASM and no increased memory allocation
--v N		Version number (e.g., 1.0.0); no number by default" >&2 ; 
- } 
+-v N		Version number (e.g., 1.0.0); no number by default
+-c		Turns on \"Chatty\" compiling; Will print the compiler progress" >&2 ; 
+} 
 
 VEROVIO_ROOT=../
 VEROVIO_INCLUDE=../include/vrv
@@ -19,12 +20,12 @@ fi
 if [ ! -d build ]; then mkdir build; fi
 
 if [ ! -d data ]; then mkdir data; fi
-	
+
 # default is with ASM an large file support
 # memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
 # we can disable this for a light version 	
 ASM="\
-    --closure 1 -O2 --memory-init-file 0 \
+	--closure 1 -O2 --memory-init-file 0 \
 	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=160000 \
 	-s TOTAL_MEMORY=256*1024*1024 \
@@ -34,23 +35,28 @@ ASM_NAME=""
 # default is master (no version)
 VERSION=""
 VERSION_NAME=""
-	
-while getopts "lv:h" opt; do
-  	case $opt in
+CHATTY=""
+
+while getopts "lv:h:c" opt; do
+	case $opt in
 		l)
- 	   		echo "light version (-l)"
-	  	  	ASM="-s ASM_JS=0 \
-                -O2 \
-                --memory-init-file 0"
+			echo "light version (-l)"
+			ASM="-s ASM_JS=0 \
+				-O2 \
+				--memory-init-file 0"
 			ASM_NAME="-light"
 			;;
 		v)
- 	   		echo "version (-v) $OPTARG"
+			echo "version (-v) $OPTARG"
 			VERSION="$OPTARG"
 			VERSION_NAME="-$VERSION"
 			;;
+		c)
+			CHATTY="-v"
+			echo $EMCC
+			;;
 		h)
- 	   		print_help
+			print_help
 			exit 2
 			;;
 		\?)
@@ -67,7 +73,7 @@ cp -r ../data/svg data/
 
 echo "Compiling"
 
-python $EMCC \
+python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_ROOT/tinyxml \
@@ -77,17 +83,17 @@ python $EMCC \
 	./emscripten_main.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/accid.cpp \
-    $VEROVIO_ROOT/src/aligner.cpp \
+	$VEROVIO_ROOT/src/aligner.cpp \
 	$VEROVIO_ROOT/src/att.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
-    $VEROVIO_ROOT/src/custos.cpp \
+	$VEROVIO_ROOT/src/custos.cpp \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
-    $VEROVIO_ROOT/src/dot.cpp \
+	$VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
@@ -128,22 +134,22 @@ python $EMCC \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
-    $VEROVIO_ROOT/libmei/atts_pagebased.cpp \
+	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/svg/ \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
 		'_vrvToolkit_getLog',\
-        '_vrvToolkit_getMEI',\
-        '_vrvToolkit_getPageCount',\
+		'_vrvToolkit_getMEI',\
+		'_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\
 		'_vrvToolkit_loadData',\
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\
 		'_vrvToolkit_renderPage',\
 		'_vrvToolkit_setOptions']" \
-    -o build/verovio.js
+	-o build/verovio.js
 
 if [ $? -eq 0 ]; then 
 	echo "Done."
