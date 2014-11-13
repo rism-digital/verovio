@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(Verovio)
 
+SET(CMAKE_BUILD_TYPE Release)
+
 add_definitions(-g)
 
 include_directories(/usr/local/include ../include/vrv ../tinyxml ../libmei)
