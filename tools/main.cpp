@@ -72,13 +72,16 @@ void display_usage() {
     // Options
     cerr << "Options" << endl;
     
+    
+    cerr << " -                          Use \"-\" as input file for reading from the standard input" << endl;
+    
     cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
     
     cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae (default is pae)" << endl;
     
     cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
     
-    cerr << " -o, --outfile=FILE_NAME    Output file name" << endl;
+    cerr << " -o, --outfile=FILE_NAME    Output file name (use \"-\" for standard output)" << endl;
     
     cerr << " -r, --recources=PATH       Path to SVG resources (default is " <<  vrv::Resources::GetPath() << ")" << endl;
     
@@ -126,6 +129,7 @@ int main(int argc, char** argv)
     string svgdir;
     string outfile;
     string outformat = "svg";
+    bool std_output = false;
     
     // Init random number generator for uuids
     std::srand(std::time(0));
@@ -289,21 +293,41 @@ int main(int argc, char** argv)
         exit(1);
     }
     
+    // Make sure we provide a file name or output to std output with std input
+    if ((infile == "-") && (outfile.empty())) {
+        cerr << "Standard input can be used only with standard output or output filename." << endl;
+        exit(1);
+    }
+    
     // Hardcode svg ext for now
     if (outfile.empty()) {
         outfile = removeExtension(infile);
+    }
+    else if (outfile == "-") {
+        std_output = true;
     }
     else {
         outfile = removeExtension(outfile);
     }
     
-    cerr << "Reading " << infile << "..." << endl;
-    
-    if ( !toolkit.LoadFile( infile ) ) {
-        cerr << "The file '" << infile << "' could not be open" << endl;
-        exit(1);
+    // Load the std input or load the file
+    if ( infile == "-" ) {
+        stringstream data_stream;
+        for (string line; getline(cin, line);) {
+            data_stream << line << endl;
+        }
+        if ( !toolkit.LoadString( data_stream.str() ) ) {
+            cerr << "The input could not be loaded" << endl;
+            exit(1);
+        }
     }
-    
+    else {
+        if ( !toolkit.LoadFile( infile ) ) {
+            cerr << "The file '" << infile << "' could not be open" << endl;
+            exit(1);
+        }
+    }
+
     // Check the page range
     if (page > toolkit.GetPageCount()) {
         cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount() << ")" << endl;
@@ -329,21 +353,33 @@ int main(int argc, char** argv)
         // Create SVG or mei
         if (outformat == "svg") {
             cur_outfile += ".svg";
-            if ( !toolkit.RenderToSvgFile( cur_outfile, p) ) {
+            if (std_output) {
+                cout << toolkit.RenderToSvg( p );
+            }
+            else if ( !toolkit.RenderToSvgFile( cur_outfile, p) ) {
                 cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
+            }
+            else {
+                cerr << "Output written to " << cur_outfile << endl;
             }
             // Write it to file
             
         } else {
             // To be implemented in Toolkit
             cur_outfile += ".mei";
-            if ( !toolkit.SaveFile( cur_outfile ) ) {
+            if (std_output) {
+                cout << toolkit.GetMEI( p );
+            }
+            else if ( !toolkit.SaveFile( cur_outfile ) ) {
                 cerr << "Unable to write MEI to " << cur_outfile << "." << endl;
                 exit(1);
             }
+            else {
+                cerr << "Output written to " << cur_outfile << endl;
+            }
         }
-        cerr << "Output written to " << cur_outfile << endl;
+        
     }
     
     return 0;
