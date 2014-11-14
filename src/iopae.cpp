@@ -809,7 +809,7 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
         mclef->SetShape(CLEFSHAPE_G);
         mclef->SetLine(line - 48);
         mclef->SetDis(OCTAVE_DIS_8);
-        mclef->SetDisPlace(PLACE_above);
+        mclef->SetDisPlace(PLACE_below);
     } else if (clef == 'F' || clef == 'f') {
         mclef->SetShape(CLEFSHAPE_F);
         mclef->SetLine(line - 48);

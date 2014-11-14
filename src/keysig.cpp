@@ -120,10 +120,13 @@ int KeySig::GetOctave(unsigned char pitch, int clefId) {
     
     switch (clefId) {
         case G2: key_set = 0; break;
+        case G2_8va: key_set = 0; break;
+        case G2_8vb: key_set = 3; break;
         case C1: key_set = 1; break;
         case C2: key_set = 2; break;
         case C3: key_set = 3; break;
         case C4: key_set = 4; break;
+        case C5: key_set = 5; break;
         case F5: key_set = 5; break;
         case F4: key_set = 6; break;
         case F3: key_set = 7; break;
