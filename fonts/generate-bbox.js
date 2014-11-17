@@ -24,34 +24,26 @@ function serialize() {
         }
     }
     
-    var header = "/*\n\
-    * This list is used for getting the bounding box of the Leipzig glyphs.\n\
-    * The values were obtained with ./varia/svg/split.xsl and boundingbox.svg.\n\
-    * It should not be modified by hand.\n\
-    */\n";
-    var impl = header;
+    var impl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bounding-boxes>\n";
 
     var i;
     for (i = 0; i < items.length; i++) {
         item = items[i];
-        label = "LEIPZIG_BBOX_" + item.getAttribute("id").toUpperCase();
+        impl += "   <glyph glyph-code=\"" + item.getAttribute("id").toUpperCase() + "\" "; 
         r = item.getBBox();
         
-        // add the define to the header
-        header += "#define " + label + " " + i + "\n";
-        
         // add the bb value to the implementation
-        impl += "m_bBox[" + label + "].m_x = " + r.x.toFixed(1) + ";\n";
-        impl += "m_bBox[" + label + "].m_y = " + r.y.toFixed(1) + ";\n";
-        impl += "m_bBox[" + label + "].m_width = " + r.width.toFixed(1) + ";\n";
-        impl += "m_bBox[" + label + "].m_height = " + r.height.toFixed(1) + ";\n";
+        impl += "x=\"" + r.x.toFixed(1) + "\" ";
+        impl += "y=\"" + r.y.toFixed(1) + "\" ";
+        impl += "width=\"" + r.width.toFixed(1) + "\" ";
+        impl += "height=\"" + r.height.toFixed(1) + "\" ";
+        
+        impl += "/>\n";
     }
     
-    header += "#define LEIPZIG_GLYPHS " + i + "\n";
-    header += "/* end of the generated data */\n\n";
-    impl += "/* end of the generated data */\n\n";
+    impl += "</bounding-boxes>\n\n";
     
-    return [impl, header];
+    return impl;
 }
 
 function extract() {
@@ -62,12 +54,12 @@ function extract() {
             var code = page.evaluate(serialize);
             try {
                 // We write the impl to the file...
-                fs.write(output, code[0], 'w');
+                fs.write(output, code, 'w');
             } catch(e) {
                 console.log(e);
             }
             // ... and log the header
-            console.log(code[1]);
+            //console.log(code[1]);
         }
         phantom.exit();
     };
