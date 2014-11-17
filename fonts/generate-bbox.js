@@ -11,10 +11,12 @@ var output = system.args[2];
 var page = require('webpage').create();
 
 function serialize() {
+    
     var items = document.documentElement.getElementsByTagName('path');
     var bb = null;
     var getScreenBBox_impl = null;
     var svgns = "http://www.w3.org/2000/svg";
+    var unitsPerEm = document.documentElement.getElementsByTagName('font-face')[0].getAttribute("units-per-em");
     
     function getScreenBBox(e) {
         if (e.getScreenBBox) {
@@ -24,7 +26,10 @@ function serialize() {
         }
     }
     
-    var impl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<bounding-boxes>\n";
+    var impl = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    impl += "<bounding-boxes ";
+    impl += "font-family=\"" + document.documentElement.getAttribute("font-family") + "\" ";
+    impl += "units-per-em=\"" + unitsPerEm + "\">\n";
 
     var i;
     for (i = 0; i < items.length; i++) {
@@ -41,7 +46,7 @@ function serialize() {
         impl += "/>\n";
     }
     
-    impl += "</bounding-boxes>\n\n";
+    impl += "</bounding-boxes>\n";
     
     return impl;
 }

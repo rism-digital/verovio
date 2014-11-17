@@ -13,11 +13,11 @@
             <glyph glyph-code="E05C" smufl-name="cClef"/>
             <glyph glyph-code="E05D" smufl-name="cClef8vb"/>
 
-            <glyph glyph-code="E071" smufl-name="fClef"/>
-            <glyph glyph-code="E072" smufl-name="fClef15mb"/>
-            <glyph glyph-code="E073" smufl-name="fClef8vb"/>
-            <glyph glyph-code="E074" smufl-name="fClef8va"/>
-            <glyph glyph-code="E075" smufl-name="fClef8vb"/>
+            <glyph glyph-code="E062" smufl-name="fClef"/>
+            <glyph glyph-code="E063" smufl-name="fClef15mb"/>
+            <glyph glyph-code="E064" smufl-name="fClef8vb"/>
+            <glyph glyph-code="E065" smufl-name="fClef8va"/>
+            <glyph glyph-code="E066" smufl-name="fClef8vb"/>
 
             <!-- Time signatures (U+E080 ‒ U+E09F) -->
             <glyph glyph-code="E080" smufl-name="timeSig0"/>
@@ -38,6 +38,20 @@
             <glyph glyph-code="E0A4" smufl-name="noteheadBlack"/>
 
             <glyph glyph-code="E0FA" smufl-name="noteheadWholeFilled"/>
+            
+            <!-- Standard accidentals (12-EDO) (U+E260 – U+E26F) -->
+            <glyph glyph-code="E260" smufl-name="accidentalFlat"/>
+            <glyph glyph-code="E261" smufl-name="accidentalNatural"/>
+            <glyph glyph-code="E262" smufl-name="accidentalSharp"/>
+            <glyph glyph-code="E263" smufl-name="accidentalDoubleSharp"/>
+            <glyph glyph-code="E264" smufl-name="accidentalDoubleFlat"/>
+            <glyph glyph-code="E265" smufl-name="accidentalTripleSharp"/>
+            <glyph glyph-code="E266" smufl-name="accidentalTripleFlat"/>
+            <glyph glyph-code="E267" smufl-name="accidentalNaturalFlat"/>
+            <glyph glyph-code="E268" smufl-name="accidentalNaturalSharp"/>
+            <glyph glyph-code="E269" smufl-name="accidentalSharpSharp"/>
+            <glyph glyph-code="E26A" smufl-name="accidentalParensLeft"/>
+            <glyph glyph-code="E26B" smufl-name="accidentalParensRight"/>
 
             <!-- Medieval and Renaissance clefs (U+E900 ‒ U+E90F) -->
 

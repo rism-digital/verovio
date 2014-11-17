@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bounding-boxes font-family="Bravura" units-per-em="2048">
+   <glyph glyph-code="E050" x="12.0" y="-1348.0" width="1374.0" height="3605.0" />
+   <glyph glyph-code="E051" x="10.0" y="-1794.0" width="1358.0" height="4035.0" />
+   <glyph glyph-code="E052" x="8.0" y="-1772.0" width="1362.0" height="4027.0" />
+   <glyph glyph-code="E053" x="8.0" y="-1333.0" width="1372.0" height="4065.0" />
+   <glyph glyph-code="E054" x="8.0" y="-1317.0" width="1358.0" height="4010.1" />
+   <glyph glyph-code="E05C" x="0.0" y="-1030.0" width="1432.0" height="2060.0" />
+   <glyph glyph-code="E05D" x="0.0" y="-1542.0" width="1432.0" height="2572.0" />
+   <glyph glyph-code="E062" x="-43.0" y="-1272.5" width="1436.0" height="1809.5" />
+   <glyph glyph-code="E063" x="-43.0" y="-1546.0" width="1436.0" height="2083.0" />
+   <glyph glyph-code="E064" x="-43.0" y="-1536.0" width="1436.0" height="2073.0" />
+   <glyph glyph-code="E065" x="-43.0" y="-1272.0" width="1436.0" height="2243.0" />
+   <glyph glyph-code="E066" x="-45.0" y="-1272.0" width="1436.0" height="2302.0" />
+   <glyph glyph-code="E080" x="0.0" y="-512.0" width="881.0" height="1026.0" />
+   <glyph glyph-code="E081" x="-2.1" y="-512.0" width="602.1" height="1026.0" />
+   <glyph glyph-code="E082" x="16.0" y="-526.0" width="832.0" height="1046.0" />
+   <glyph glyph-code="E083" x="8.0" y="-514.0" width="780.0" height="1024.0" />
+   <glyph glyph-code="E084" x="4.0" y="-512.0" width="881.0" height="1026.0" />
+   <glyph glyph-code="E085" x="0.0" y="-514.0" width="743.0" height="1018.0" />
+   <glyph glyph-code="E086" x="-2.0" y="-510.0" width="807.0" height="1023.0" />
+   <glyph glyph-code="E087" x="0.0" y="-512.0" width="821.0" height="1022.0" />
+   <glyph glyph-code="E088" x="-12.0" y="-530.0" width="811.0" height="1060.0" />
+   <glyph glyph-code="E089" x="0.0" y="-511.0" width="807.0" height="1023.0" />
+   <glyph glyph-code="E0A2" x="0.0" y="-279.0" width="940.0" height="560.0" />
+   <glyph glyph-code="E0A3" x="0.0" y="-297.0" width="698.0" height="594.0" />
+   <glyph glyph-code="E0A4" x="0.0" y="-289.0" width="680.0" height="578.0" />
+   <glyph glyph-code="E0FA" x="0.0" y="-279.0" width="940.0" height="560.0" />
+   <glyph glyph-code="E260" x="0.0" y="-358.0" width="463.0" height="1257.0" />
+   <glyph glyph-code="E261" x="0.0" y="-686.0" width="344.0" height="1384.1" />
+   <glyph glyph-code="E262" x="0.0" y="-713.0" width="510.0" height="1430.0" />
+   <glyph glyph-code="E263" x="0.0" y="-256.0" width="506.0" height="516.0" />
+   <glyph glyph-code="E264" x="0.0" y="-358.0" width="842.0" height="1253.0" />
+   <glyph glyph-code="E265" x="0.0" y="-713.0" width="1063.0" height="1430.0" />
+   <glyph glyph-code="E266" x="0.0" y="-358.0" width="1221.0" height="1257.0" />
+   <glyph glyph-code="E267" x="0.0" y="-686.0" width="940.0" height="1585.0" />
+   <glyph glyph-code="E268" x="0.0" y="-713.0" width="985.0" height="1430.0" />
+   <glyph glyph-code="E269" x="0.0" y="-713.0" width="1063.0" height="1430.0" />
+   <glyph glyph-code="E26A" x="0.0" y="-514.0" width="334.0" height="1026.0" />
+   <glyph glyph-code="E26B" x="0.0" y="-514.0" width="334.0" height="1026.0" />
+</bounding-boxes>
