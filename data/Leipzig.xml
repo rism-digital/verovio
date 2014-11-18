@@ -37,5 +37,7 @@
    <glyph glyph-code="E269" x="0.0" y="-339.0" width="412.0" height="694.0" />
    <glyph glyph-code="E26A" x="0.0" y="-251.0" width="163.0" height="501.0" />
    <glyph glyph-code="E26B" x="0.0" y="-251.0" width="163.0" height="501.0" />
+   <glyph glyph-code="E4C0" x="0.0" y="-3.0" width="605.0" height="323.0" />
+   <glyph glyph-code="E4C1" x="0.0" y="-320.0" width="605.0" height="323.0" />
    <glyph glyph-code="E0FA" x="-0.0" y="-133.0" width="405.0" height="266.0" />
 </bounding-boxes>

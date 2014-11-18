@@ -27,9 +27,9 @@
         <xsl:param name="fontName"/>
         <xsl:param name="unitsPerEm"/>
         <xsl:variable name="thisGlyph" select="@glyph-name"/>
-        <xsl:if test="$supported/supported/glyph[concat('uni', @glyph-code)=$thisGlyph]">
+        <xsl:if test="$supported/*/glyph[concat('uni', @glyph-code)=$thisGlyph]">
             <xsl:variable name="glyphCode" select="substring-after(@glyph-name, 'uni')"/>
-            <xsl:variable name="smuflName" select="$supported/supported/glyph[@glyph-code=$glyphCode]/@smufl-name"/>
+            <xsl:variable name="smuflName" select="$supported/*/glyph[@glyph-code=$glyphCode]/@smufl-name"/>
 
             <!-- redirect to a file for each glyph -->
             <xsl:result-document href="../data/{$fontName}/{$glyphCode}-{$smuflName}.xml">
