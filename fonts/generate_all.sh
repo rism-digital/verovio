@@ -22,9 +22,8 @@ if ! command -v phantomjs >/dev/null 2>&1 ; then
 	exit 1;
 fi
 
-echo "Generating C++ files ..."
-# saxon9ee supported.xsl generate-h.xsl
-# saxon9ee supported.xsl generate-cpp.xsl
+echo "Generating C++ header file ..."
+saxon9ee supported.xsl generate-h.xsl > ../include/vrv/smufl.h
 
 echo "Generating Bravura files ..."
 saxon9ee Bravura.svg extract-glyphs.xsl > tmp/Bravura-bounding-boxes.svg
