@@ -32,9 +32,14 @@ typedef enum _file_formats {
 class Toolkit
 {
 public:
-    // constructors and destructors
-    Toolkit();
+    /**
+     * @name Constructors and destructors
+     */
+    ///@{
+    /** If initFont is set to false, Resources::InitFont will have to be called explicitely */
+    Toolkit( bool initFont = true );
     virtual ~Toolkit();
+    ///@}
     
     /**
      * Load a file with the specified type.

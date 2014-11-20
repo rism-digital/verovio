@@ -22,7 +22,7 @@
 #include "clef.h"
 #include "keysig.h"
 #include "layerelement.h"
-#include "leipzigbbox.h"
+//#include "leipzigbbox.h"
 #include "mensur.h"
 #include "note.h"
 #include "rest.h"

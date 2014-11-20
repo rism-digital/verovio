@@ -144,8 +144,11 @@ int main(int argc, char** argv)
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
-      
-    Toolkit toolkit;
+    
+    // Create the toolkit instance without loading the font because
+    // the resource path might be specified in the parameters
+    // The fonts will be loaded later with Resources::InitFont()
+    Toolkit toolkit( false );
     
     // read pae by default
     type = pae_file;
@@ -287,7 +290,13 @@ int main(int argc, char** argv)
         cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found, please use -r option." << endl;
         exit(1);
     }
-    
+
+    // Loaded the music font from the resource diretory
+    if (!Resources::InitFont()) {
+        cerr << "The music font could not be loaded, please verify the content of the directory." << endl;
+        exit(1);
+    }
+
     if (outformat != "svg" && outformat != "mei") {
         cerr << "Output format can only be: mei svg" << endl;
         exit(1);

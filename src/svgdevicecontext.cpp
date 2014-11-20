@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "leipzigbbox.h"
+//#include "leipzigbbox.h"
 #include "view.h"
 #include "vrvdef.h"
 
@@ -318,7 +318,7 @@ void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h 
     
     for (unsigned int i = 0; i < string.length(); i++) {
         
-        LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
+        //LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
         
         partial_w *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
         partial_h *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
@@ -648,7 +648,7 @@ void SvgDeviceContext::DrawMusicText(const std::string& text, int x, int y)
                                      ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) );
         
         // Get the bounds of the char
-        LeipzigBBox::GetCharBounds(c, &gx, &gy, &w, &h);
+        //LeipzigBBox::GetCharBounds(c, &gx, &gy, &w, &h);
         // Sum it to x so we move it to the start of the next char
         x += (w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
     }

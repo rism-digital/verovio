@@ -15,7 +15,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "leipzigbbox.h"
+#include "glyph.h"
 #include "view.h"
 
 namespace vrv {
@@ -136,7 +136,7 @@ void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h
     
     for (unsigned int i = 0; i < string.length(); i++) {
         
-        LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
+        //LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
         
         partial_w *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
         partial_h *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
@@ -348,7 +348,7 @@ void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
     for (unsigned int i = 0; i < text.length(); i++) {
         unsigned char c = (unsigned char)text[i];
         
-        LeipzigBBox::GetCharBounds(c, &g_x, &g_y, &g_w, &g_h);
+        //LeipzigBBox::GetCharBounds(c, &g_x, &g_y, &g_w, &g_h);
     
         int x_off = x + (g_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
         // because we are in the drawing context, y position are already flipped

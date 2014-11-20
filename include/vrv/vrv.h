@@ -10,6 +10,7 @@
 #define __VRV_H__
 
 #include <cstring>
+#include <map>
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
@@ -17,6 +18,7 @@
 
 namespace vrv {
     
+class Glyph;
 class Object;
     
 bool IsNote( Object *object );
@@ -119,11 +121,15 @@ public:
     ///@{
     static std::string GetPath( ) { return m_path; };
     static void SetPath( std::string path ) { m_path = path; };
+    static bool InitFont( );
     static std::string GetMusicFontDescStr( ) { return m_musicFontDesc; };
     static void SetMusicFontDescStr( std::string lyricFontDesc ) { m_musicFontDesc = lyricFontDesc; };
     static std::string GetLyricFontDescStr( ) { return m_lyricFontDesc; };
     static void SetLyricFontDescStr( std::string lyricFontDesc ) { m_lyricFontDesc = lyricFontDesc; };
     ///@}
+    
+private:
+    static bool LoadFont(std::string fontName);
     
     
 private:
@@ -133,6 +139,8 @@ private:
     static std::string m_musicFontDesc;
     /** The FontInfo string for the default lyric font */
     static std::string m_lyricFontDesc;
+    /** */
+    static std::map<int, Glyph> m_font;
 };
 
 

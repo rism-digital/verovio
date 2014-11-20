@@ -33,7 +33,7 @@ namespace vrv {
 // Toolkit
 //----------------------------------------------------------------------------
 
-Toolkit::Toolkit()
+Toolkit::Toolkit( bool initFont )
 {
 
     m_scale = DEFAULT_SCALE;
@@ -53,6 +53,10 @@ Toolkit::Toolkit()
     m_showBoundingBoxes = false;
 	
 	m_cString = NULL;
+    
+    if ( initFont ) {
+        Resources::InitFont();
+    }
 }
 
 

@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733B1A1D0390001E08F6 /* smufl.h */; };
+		4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733D1A1D08CD001E08F6 /* glyph.h */; };
+		4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
+		4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
 		4D22C41918890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41A18890E6100D0831F /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
 		4D22C41C18890E9900D0831F /* mrest.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D22C41B18890E9900D0831F /* mrest.h */; };
@@ -61,7 +65,6 @@
 		8F086EF1188539540037FD8E /* keysig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC5188539540037FD8E /* keysig.cpp */; };
 		8F086EF2188539540037FD8E /* layer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC6188539540037FD8E /* layer.cpp */; };
 		8F086EF3188539540037FD8E /* layerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC7188539540037FD8E /* layerelement.cpp */; };
-		8F086EF4188539540037FD8E /* leipzigbbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC8188539540037FD8E /* leipzigbbox.cpp */; };
 		8F086EF5188539540037FD8E /* measure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC9188539540037FD8E /* measure.cpp */; };
 		8F086EF6188539540037FD8E /* mensur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECA188539540037FD8E /* mensur.cpp */; };
 		8F086EF7188539540037FD8E /* multirest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECB188539540037FD8E /* multirest.cpp */; };
@@ -114,7 +117,6 @@
 		8F3DD35418854B2E0051330C /* slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED3188539540037FD8E /* slur.cpp */; };
 		8F3DD35818854B2E0051330C /* tie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED8188539540037FD8E /* tie.cpp */; };
 		8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED9188539540037FD8E /* tuplet.cpp */; };
-		8F3DD35C18854B390051330C /* leipzigbbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC8188539540037FD8E /* leipzigbbox.cpp */; };
 		8F3DD35E18854B390051330C /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE0188539540037FD8E /* view.cpp */; };
 		8F3DD36018854B390051330C /* view_beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDA188539540037FD8E /* view_beam.cpp */; };
 		8F3DD36218854B390051330C /* view_element.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDC188539540037FD8E /* view_element.cpp */; };
@@ -143,7 +145,6 @@
 		8F59294318854BF800FE51AD /* keysig.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291C18854BF800FE51AD /* keysig.h */; };
 		8F59294418854BF800FE51AD /* layer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291D18854BF800FE51AD /* layer.h */; };
 		8F59294518854BF800FE51AD /* layerelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291E18854BF800FE51AD /* layerelement.h */; };
-		8F59294618854BF800FE51AD /* leipzigbbox.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59291F18854BF800FE51AD /* leipzigbbox.h */; };
 		8F59294718854BF800FE51AD /* measure.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292018854BF800FE51AD /* measure.h */; };
 		8F59294818854BF800FE51AD /* mensur.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292118854BF800FE51AD /* mensur.h */; };
 		8F59294918854BF800FE51AD /* multirest.h in Headers */ = {isa = PBXBuildFile; fileRef = 8F59292218854BF800FE51AD /* multirest.h */; };
@@ -178,6 +179,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; };
+		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
+		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
 		4D22C41818890E6100D0831F /* mrest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mrest.cpp; path = src/mrest.cpp; sourceTree = "<group>"; };
 		4D22C41B18890E9900D0831F /* mrest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mrest.h; path = include/vrv/mrest.h; sourceTree = "<group>"; };
 		4D22C41F18891D6D00D0831F /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pugixml.cpp; path = src/pugixml.cpp; sourceTree = "<group>"; };
@@ -252,7 +256,6 @@
 		8F086EC5188539540037FD8E /* keysig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = keysig.cpp; path = src/keysig.cpp; sourceTree = "<group>"; };
 		8F086EC6188539540037FD8E /* layer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layer.cpp; path = src/layer.cpp; sourceTree = "<group>"; };
 		8F086EC7188539540037FD8E /* layerelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerelement.cpp; path = src/layerelement.cpp; sourceTree = "<group>"; };
-		8F086EC8188539540037FD8E /* leipzigbbox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = leipzigbbox.cpp; path = src/leipzigbbox.cpp; sourceTree = "<group>"; };
 		8F086EC9188539540037FD8E /* measure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = measure.cpp; path = src/measure.cpp; sourceTree = "<group>"; };
 		8F086ECA188539540037FD8E /* mensur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mensur.cpp; path = src/mensur.cpp; sourceTree = "<group>"; };
 		8F086ECB188539540037FD8E /* multirest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multirest.cpp; path = src/multirest.cpp; sourceTree = "<group>"; };
@@ -294,7 +297,6 @@
 		8F59291C18854BF800FE51AD /* keysig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = keysig.h; path = include/vrv/keysig.h; sourceTree = "<group>"; };
 		8F59291D18854BF800FE51AD /* layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layer.h; path = include/vrv/layer.h; sourceTree = "<group>"; };
 		8F59291E18854BF800FE51AD /* layerelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerelement.h; path = include/vrv/layerelement.h; sourceTree = "<group>"; };
-		8F59291F18854BF800FE51AD /* leipzigbbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = leipzigbbox.h; path = include/vrv/leipzigbbox.h; sourceTree = "<group>"; };
 		8F59292018854BF800FE51AD /* measure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = measure.h; path = include/vrv/measure.h; sourceTree = "<group>"; };
 		8F59292118854BF800FE51AD /* mensur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mensur.h; path = include/vrv/mensur.h; sourceTree = "<group>"; };
 		8F59292218854BF800FE51AD /* multirest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multirest.h; path = include/vrv/multirest.h; sourceTree = "<group>"; };
@@ -449,6 +451,7 @@
 				8F086EE1188539540037FD8E /* vrv.cpp */,
 				8F59293218854BF800FE51AD /* vrv.h */,
 				8F59293318854BF800FE51AD /* vrvdef.h */,
+				4D1D733B1A1D0390001E08F6 /* smufl.h */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
 			);
@@ -507,8 +510,8 @@
 		8F086F3918853A190037FD8E /* view */ = {
 			isa = PBXGroup;
 			children = (
-				8F086EC8188539540037FD8E /* leipzigbbox.cpp */,
-				8F59291F18854BF800FE51AD /* leipzigbbox.h */,
+				4D1D733F1A1D08DC001E08F6 /* glyph.cpp */,
+				4D1D733D1A1D08CD001E08F6 /* glyph.h */,
 				8F086EE0188539540037FD8E /* view.cpp */,
 				8F59293118854BF800FE51AD /* view.h */,
 				8F086EDA188539540037FD8E /* view_beam.cpp */,
@@ -577,10 +580,12 @@
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
 				8F59293818854BF800FE51AD /* beam.h in Headers */,
 				8F59293918854BF800FE51AD /* clef.h in Headers */,
+				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
+				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
@@ -589,7 +594,6 @@
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
-				8F59294618854BF800FE51AD /* leipzigbbox.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
 				8F59294818854BF800FE51AD /* mensur.h in Headers */,
 				8F59294918854BF800FE51AD /* multirest.h in Headers */,
@@ -708,7 +712,6 @@
 				8F086EF1188539540037FD8E /* keysig.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
-				8F086EF4188539540037FD8E /* leipzigbbox.cpp in Sources */,
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
@@ -740,6 +743,7 @@
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
+				4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
@@ -758,11 +762,11 @@
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
-				8F3DD35C18854B390051330C /* leipzigbbox.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
+				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,

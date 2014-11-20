@@ -25,7 +25,7 @@
 #include "dot.h"
 #include "keysig.h"
 #include "layerelement.h"
-#include "leipzigbbox.h"
+//#include "leipzigbbox.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
