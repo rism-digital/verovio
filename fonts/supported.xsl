@@ -143,8 +143,8 @@
             <glyph glyph-code="E087" smufl-name="timeSig7"/>
             <glyph glyph-code="E088" smufl-name="timeSig8"/>
             <glyph glyph-code="E089" smufl-name="timeSig9"/>
-            <!--<glyph glyph-code="E08A" smufl-name="timeSigCommon"/>-->
-            <!--<glyph glyph-code="E08B" smufl-name="timeSigCutCommon"/>-->
+            <glyph glyph-code="E08A" smufl-name="timeSigCommon"/>
+            <glyph glyph-code="E08B" smufl-name="timeSigCutCommon"/>
             <!--<glyph glyph-code="E08C" smufl-name="timeSigPlus"/>-->
             <!--<glyph glyph-code="E08D" smufl-name="timeSigPlusSmall"/>-->
             <!--<glyph glyph-code="E08E" smufl-name="timeSigFractionalSlash"/>-->
@@ -577,8 +577,8 @@
         </tremolos>
         <flags>
             <description>Flags</description>
-            <!--<glyph glyph-code="E240" smufl-name="flag8thUp"/>-->
-            <!--<glyph glyph-code="E241" smufl-name="flag8thDown"/>-->
+            <glyph glyph-code="E240" smufl-name="flag8thUp"/>
+            <glyph glyph-code="E241" smufl-name="flag8thDown"/>
             <!--<glyph glyph-code="E242" smufl-name="flag16thUp"/>-->
             <!--<glyph glyph-code="E243" smufl-name="flag16thDown"/>-->
             <!--<glyph glyph-code="E244" smufl-name="flag32ndUp"/>-->
@@ -1174,12 +1174,12 @@
             <!--<glyph glyph-code="E4E2" smufl-name="restDoubleWhole"/>-->
             <!--<glyph glyph-code="E4E3" smufl-name="restWhole"/>-->
             <!--<glyph glyph-code="E4E4" smufl-name="restHalf"/>-->
-            <!--<glyph glyph-code="E4E5" smufl-name="restQuarter"/>-->
-            <!--<glyph glyph-code="E4E6" smufl-name="rest8th"/>-->
-            <!--<glyph glyph-code="E4E7" smufl-name="rest16th"/>-->
-            <!--<glyph glyph-code="E4E8" smufl-name="rest32nd"/>-->
-            <!--<glyph glyph-code="E4E9" smufl-name="rest64th"/>-->
-            <!--<glyph glyph-code="E4EA" smufl-name="rest128th"/>-->
+            <glyph glyph-code="E4E5" smufl-name="restQuarter"/>
+            <glyph glyph-code="E4E6" smufl-name="rest8th"/>
+            <glyph glyph-code="E4E7" smufl-name="rest16th"/>
+            <glyph glyph-code="E4E8" smufl-name="rest32nd"/>
+            <glyph glyph-code="E4E9" smufl-name="rest64th"/>
+            <glyph glyph-code="E4EA" smufl-name="rest128th"/>
             <!--<glyph glyph-code="E4EB" smufl-name="rest256th"/>-->
             <!--<glyph glyph-code="E4EC" smufl-name="rest512th"/>-->
             <!--<glyph glyph-code="E4ED" smufl-name="rest1024th"/>-->
@@ -1276,14 +1276,14 @@
             <!--<glyph glyph-code="E563" smufl-name="graceNoteAppoggiaturaStemDown"/>-->
             <!--<glyph glyph-code="E564" smufl-name="graceNoteSlashStemUp"/>-->
             <!--<glyph glyph-code="E565" smufl-name="graceNoteSlashStemDown"/>-->
-            <!--<glyph glyph-code="E566" smufl-name="ornamentTrill"/>-->
+            <glyph glyph-code="E566" smufl-name="ornamentTrill"/>
             <!--<glyph glyph-code="E567" smufl-name="ornamentTurn"/>-->
             <!--<glyph glyph-code="E568" smufl-name="ornamentTurnInverted"/>-->
             <!--<glyph glyph-code="E569" smufl-name="ornamentTurnSlash"/>-->
             <!--<glyph glyph-code="E56A" smufl-name="ornamentTurnUp"/>-->
             <!--<glyph glyph-code="E56B" smufl-name="ornamentTurnUpS"/>-->
-            <!--<glyph glyph-code="E56C" smufl-name="ornamentMordent"/>-->
-            <!--<glyph glyph-code="E56D" smufl-name="ornamentMordentInverted"/>-->
+            <glyph glyph-code="E56C" smufl-name="ornamentMordent"/>
+            <glyph glyph-code="E56D" smufl-name="ornamentMordentInverted"/>
             <!--<glyph glyph-code="E56E" smufl-name="ornamentTremblement"/>-->
             <!--<glyph glyph-code="E56F" smufl-name="ornamentHaydn"/>-->
             <range_end>U+E56F</range_end>
@@ -2005,16 +2005,16 @@
         </chordSymbols>
         <tuplets>
             <description>Tuplets</description>
-            <!--<glyph glyph-code="E880" smufl-name="tuplet0"/>-->
-            <!--<glyph glyph-code="E881" smufl-name="tuplet1"/>-->
-            <!--<glyph glyph-code="E882" smufl-name="tuplet2"/>-->
-            <!--<glyph glyph-code="E883" smufl-name="tuplet3"/>-->
-            <!--<glyph glyph-code="E884" smufl-name="tuplet4"/>-->
-            <!--<glyph glyph-code="E885" smufl-name="tuplet5"/>-->
-            <!--<glyph glyph-code="E886" smufl-name="tuplet6"/>-->
-            <!--<glyph glyph-code="E887" smufl-name="tuplet7"/>-->
-            <!--<glyph glyph-code="E888" smufl-name="tuplet8"/>-->
-            <!--<glyph glyph-code="E889" smufl-name="tuplet9"/>-->
+            <glyph glyph-code="E880" smufl-name="tuplet0"/>
+            <glyph glyph-code="E881" smufl-name="tuplet1"/>
+            <glyph glyph-code="E882" smufl-name="tuplet2"/>
+            <glyph glyph-code="E883" smufl-name="tuplet3"/>
+            <glyph glyph-code="E884" smufl-name="tuplet4"/>
+            <glyph glyph-code="E885" smufl-name="tuplet5"/>
+            <glyph glyph-code="E886" smufl-name="tuplet6"/>
+            <glyph glyph-code="E887" smufl-name="tuplet7"/>
+            <glyph glyph-code="E888" smufl-name="tuplet8"/>
+            <glyph glyph-code="E889" smufl-name="tuplet9"/>
             <!--<glyph glyph-code="E88A" smufl-name="tupletColon"/>-->
             <range_end>U+E88F</range_end>
             <range_start>U+E880</range_start>

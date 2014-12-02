@@ -44,10 +44,14 @@ enum {
   SMUFL_E087_timeSig7 = 0xE087,
   SMUFL_E088_timeSig8 = 0xE088,
   SMUFL_E089_timeSig9 = 0xE089,
+  SMUFL_E08A_timeSigCommon = 0xE08A,
+  SMUFL_E08B_timeSigCutCommon = 0xE08B,
   SMUFL_E0A2_noteheadWhole = 0xE0A2,
   SMUFL_E0A3_noteheadHalf = 0xE0A3,
   SMUFL_E0A4_noteheadBlack = 0xE0A4,
   SMUFL_E0FA_noteheadWholeFilled = 0xE0FA,
+  SMUFL_E240_flag8thUp = 0xE240,
+  SMUFL_E241_flag8thDown = 0xE241,
   SMUFL_E260_accidentalFlat = 0xE260,
   SMUFL_E261_accidentalNatural = 0xE261,
   SMUFL_E262_accidentalSharp = 0xE262,
@@ -62,10 +66,29 @@ enum {
   SMUFL_E26B_accidentalParensRight = 0xE26B,
   SMUFL_E4C0_fermataAbove = 0xE4C0,
   SMUFL_E4C1_fermataBelow = 0xE4C1,
+  SMUFL_E4E5_restQuarter = 0xE4E5,
+  SMUFL_E4E6_rest8th = 0xE4E6,
+  SMUFL_E4E7_rest16th = 0xE4E7,
+  SMUFL_E4E8_rest32nd = 0xE4E8,
+  SMUFL_E4E9_rest64th = 0xE4E9,
+  SMUFL_E4EA_rest128th = 0xE4EA,
+  SMUFL_E566_ornamentTrill = 0xE566,
+  SMUFL_E56C_ornamentMordent = 0xE56C,
+  SMUFL_E56D_ornamentMordentInverted = 0xE56D,
+  SMUFL_E880_tuplet0 = 0xE880,
+  SMUFL_E881_tuplet1 = 0xE881,
+  SMUFL_E882_tuplet2 = 0xE882,
+  SMUFL_E883_tuplet3 = 0xE883,
+  SMUFL_E884_tuplet4 = 0xE884,
+  SMUFL_E885_tuplet5 = 0xE885,
+  SMUFL_E886_tuplet6 = 0xE886,
+  SMUFL_E887_tuplet7 = 0xE887,
+  SMUFL_E888_tuplet8 = 0xE888,
+  SMUFL_E889_tuplet9 = 0xE889,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 40
+#define SMUFL_COUNT 63
 
 } // vrv namespace
 
