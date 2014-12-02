@@ -856,8 +856,8 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
  BARRENDITION_single     /
  BARRENDITION_end        does not exist
  BARRENDITION_rptboth    ://:
- BARRENDITION_rptstart   ://
- BARRENDITION_rptend     //:
+ BARRENDITION_rptend     ://
+ BARRENDITION_rptstart   //:
  BARRENDITION_dbl        //
  */
 
@@ -869,11 +869,11 @@ int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int in
     regfree(&re);
     
     regcomp(&re, "^://", REG_EXTENDED);
-    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
     
     regcomp(&re, "^//:", REG_EXTENDED);
-    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
     
     regcomp(&re, "^//", REG_EXTENDED);
