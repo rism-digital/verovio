@@ -1081,7 +1081,8 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
     }
     
     if ( measure->wholerest > 0 ) { 
-        MultiRest *mr = new MultiRest(measure->wholerest);
+        MultiRest *mr = new MultiRest();
+        mr->SetNum(measure->wholerest);
         m_layer->AddElement(mr);
     }
     
