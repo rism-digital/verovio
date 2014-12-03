@@ -17,6 +17,7 @@
 
 #include "glyph.h"
 #include "view.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -125,26 +126,34 @@ void BBoxDeviceContext::SetUserScale( double xScale, double yScale )
     //// no idea how to handle this with the BB
     m_userScaleX = xScale;
     m_userScaleY = yScale;
-}       
-
+}
+    
 void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
 {
-    int x, y, partial_w, partial_h;
-    
+    LogDebug("BBoxDeviceContext::GetTextExtent not implemented");
+}
+
+void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+{
+    double x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
     
-    for (unsigned int i = 0; i < string.length(); i++) {
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
         
-        //LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
+        partial_w *= (((double)m_font.GetPointSize() / glyph->GetUnitsPerEm()));
+        partial_h *= (((double)m_font.GetPointSize() / glyph->GetUnitsPerEm()));
         
-        partial_w *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
-        partial_h *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
-        
-        *w += partial_w;
-        *h += partial_h;
+        *w += (int)partial_w;
+        *h += (int)partial_h;
     }
-    
 }
        
 
@@ -313,7 +322,8 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
 void BBoxDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
 {
     // alignment not taken into account!
-    DrawMusicText( text, x, y);
+    //std::wstring wtext = std::wstring(text.begin(), text.end());
+    //DrawMusicText( wtext, x, y);
 }
 
 
@@ -339,44 +349,36 @@ void BBoxDeviceContext::DrawRotatedText(const std::string& text, int x, int y, d
 }
 
 
-void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
+void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {  
     
-    int g_x, g_y, g_w, g_h;
+    double g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
     
-    for (unsigned int i = 0; i < text.length(); i++) {
-        unsigned char c = (unsigned char)text[i];
-        
-        //LeipzigBBox::GetCharBounds(c, &g_x, &g_y, &g_w, &g_h);
+    for (unsigned int i = 0; i < text.length(); i++)
+    {
+        wchar_t c = text[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + (g_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
+        int x_off = x + (int)(g_x * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
         // because we are in the drawing context, y position are already flipped
-        int y_off = y - (g_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
+        int y_off = y - (int)(g_y * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
         // the +/- 2 is to compesate a couple pixels down the figure (rounding error?)
          
         UpdateBB(x_off, y_off, 
-                  x_off + (g_w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ),
+                  x_off + (int)(g_w * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm()))),
         // idem, y position are flipped
-                  y_off - (g_h * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ));
+                  y_off - (int)(g_h * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm()))));
         
-        lastCharWidth = (g_w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
+        lastCharWidth = (int)(g_w * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
         x += lastCharWidth; // move x to next char
      
     }
-    
-    /*
-    int x_off = x + (bbox->m_bBox[glyph].m_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
-    // because we are in the drawing context, y position are already flipped
-    int y_off = y - (bbox->m_bBox[glyph].m_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
-    
-    UpdateBB(x_off, y_off, 
-        x_off + (bbox->m_bBox[glyph].m_width * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ),
-        // idem, y position are flipped
-        y_off - (bbox->m_bBox[glyph].m_height * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ));
-    */
 }
-
 
 void BBoxDeviceContext::DrawSpline(int n, MusPoint points[])
 {

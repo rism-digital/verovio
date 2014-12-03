@@ -25,7 +25,6 @@
 #include "dot.h"
 #include "keysig.h"
 #include "layerelement.h"
-//#include "leipzigbbox.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -37,6 +36,7 @@
 #include "syl.h"
 #include "system.h"
 #include "slur.h"
+#include "smufl.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -257,7 +257,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	//	int horphyspoint=h_pnt;
 	//int b = element->m_drawingY;
-	int i, valdec, fontNo, ledge, queueCentre;
+    wchar_t fontNo;
+	int i, valdec, ledge, queueCentre;
 	int x1, x2, y2, espac7, decval, vertical;
 	int formval = 0;	// pour permettre dessiner colorations avec dÇcalage de val
 	int rayon, milieu = 0;
@@ -306,21 +307,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	else if (note->GetDur()==DUR_1)
 	{	
         if (note->GetColored()==BOOLEAN_true) // && !note->m_ligObliqua) // in WG, use of obliq for coloration?
-			fontNo = LEIPZIG_HEAD_WHOLE_FILLED;
+			fontNo = SMUFL_E0FA_noteheadWholeFilled;
 		else
-			fontNo = LEIPZIG_HEAD_WHOLE;
+			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawLeipzigFont( dc, x1, ynn, fontNo, staff, note->m_cueSize );
+		DrawSmuflCode( dc, x1, ynn, fontNo, staff, note->m_cueSize );
 		decval = ynn;
 	}
 	else
 	{	
         if ((note->GetColored()==BOOLEAN_true) || formval == DUR_2)
-			fontNo = LEIPZIG_HEAD_HALF;
+			fontNo = SMUFL_E0A3_noteheadHalf;
 		else
-			fontNo = LEIPZIG_HEAD_QUARTER;
+			fontNo = SMUFL_E0A4_noteheadBlack;
 
-		DrawLeipzigFont( dc,x1, ynn, fontNo, staff, note->m_cueSize );
+		DrawSmuflCode( dc,x1, ynn, fontNo, staff, note->m_cueSize );
 
 		milieu = bby - m_doc->m_drawingInterl[staffSize]*2;
 
@@ -408,9 +409,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				if (formval > DUR_4)
 				{
                     y2 += m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawLeipzigFont( dc,x2,y2,LEIPZIG_STEM_FLAG_UP, staff, note->m_cueSize );
+					DrawSmuflCode( dc,x2,y2,SMUFL_E240_flag8thUp, staff, note->m_cueSize );
 					for (i=0; i < valdec; i++)
-						DrawLeipzigFont( dc,x2,y2-=vertical,LEIPZIG_STEM_FLAG_UP, staff, note->m_cueSize );
+						DrawSmuflCode( dc,x2,y2-=vertical,SMUFL_E240_flag8thUp, staff, note->m_cueSize );
 				}
 			}
 			else
@@ -431,18 +432,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 element->m_drawingStemEnd.y = y2;
                 element->m_drawingStemDir = false;
                 
-				// ENZ
-				// decalage du crochet vers la gauche
-				// changement dans la fonte Leipzig 4.3 ‡ cause de problemes d'affichage
-				// en deÁ‡ de 0 avec la notation ancienne
-				// dans la fonte les crochets ont ete decales de 164 vers la droite
-				int cr_offset = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize]  + (m_doc->m_env.m_stemWidth / 2);
 				if (formval > DUR_4)
 				{
                     y2 -= m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawLeipzigFont( dc,x2 - cr_offset,y2,LEIPZIG_STEM_FLAG_DOWN , staff, note->m_cueSize );
+					DrawSmuflCode( dc,x2,y2,SMUFL_E241_flag8thDown , staff, note->m_cueSize );
 					for (i=0; i < valdec; i++)
-						DrawLeipzigFont( dc,x2  - cr_offset,y2+=vertical,LEIPZIG_STEM_FLAG_DOWN, staff, 
+						DrawSmuflCode( dc,x2,y2+=vertical,SMUFL_E241_flag8thDown, staff,
 									 note->m_cueSize );
 				}
 			}
@@ -762,11 +757,13 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     // convert to string
     std::stringstream text;
     text << multirest->GetNum();
+    // FIXME
+    std::wstring wtext;
     
     dc->GetTextExtent( text.str(), &w, &h);
     start_offset = (x2 - x1 - w) / 2; // calculate offset to center text
     
-    DrawLeipzigString(dc, x1 + start_offset, staff->GetDrawingY() + 5, text.str(), false);
+    DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 5, wtext, false);
     
     dc->EndGraphic(element, this);
     
@@ -866,7 +863,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 
 void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
 {
-	DrawLeipzigFont( dc, x, y, LEIPZIG_REST_QUARTER + (valeur-DUR_4), staff, smaller );
+	DrawSmuflCode( dc, x, y, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff, smaller );
 
 	if (dots)
 	{	if (valeur < DUR_16)
@@ -1097,7 +1094,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	
 	int b = staff->GetDrawingY();
 	int a = element->GetDrawingX();
-    int sym = LEIPZIG_CLEF_G;	//sSOL, position d'ordre des cles sol fa ut in fonts
+    int sym = SMUFL_E050_gClef;	//sSOL, position d'ordre des cles sol fa ut in fonts
 
     /*  poser sym=no de position sSOL dans la fonte
      *	au depart; ne faire operation sur b qu'une fois pour cas semblables,
@@ -1106,38 +1103,39 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	switch(clef->GetClefId())
 	{
 		case C1 :
-            sym += 2;
+            sym = SMUFL_E05C_cClef;
 		case G1 :
             b -= m_doc->m_drawingStaffSize[ staff->staffSize ]; 
             break;
 		case G2va :
-            sym += 1;
+            sym = SMUFL_E053_gClef8va;
         case G2vabassa :
-            sym += 1;
+            sym = SMUFL_E052_gClef8vb;
 		case C2 :
-            sym += 2;
+            sym = SMUFL_E05C_cClef;
 		case G2 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*3; 
             break;
 		case F3 :
-            sym--;
+            sym = SMUFL_E062_fClef;
 		case C3 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*2; 
-            sym += 2; 
+            sym = SMUFL_E05C_cClef;
             break;
 		case F5 :
-            sym++; 
+            sym =SMUFL_E062_fClef;
             break;
 		case F4 :
-            sym--;
+            sym = SMUFL_E062_fClef;
 		case C4 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ];
 		case C5 :
-            sym += 2; 
+            sym = SMUFL_E05C_cClef;
             break;
 		case perc :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
-            sym = LEIPZIG_CLEF_PERC; 
+            // FIXME
+            sym = SMUFL_E05C_cClef;
             break;
 		default: 
             break;
@@ -1147,7 +1145,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	if (clef->m_cueSize)
 		a+= m_doc->m_drawingStep1;
 
-	DrawLeipzigFont ( dc, a, b, sym, staff, clef->m_cueSize  );
+	DrawSmuflCode ( dc, a, b, sym, staff, clef->m_cueSize  );
    
     dc->EndGraphic(element, this ); //RZ
 }
@@ -1300,6 +1298,7 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
     	
 	int ynum, yden;
 	std::string s;
+    std::wstring wtext;
 
 	if (numBase)
 	{	
@@ -1313,12 +1312,14 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
 		x += m_doc->m_drawingStep1*2;
 
 	s = StringFormat("%u",num);
-	DrawLeipzigString ( dc, x, ynum, s, 1, staff->staffSize);	// '1' = centrer
+    // FIXME (wtext instead of w)
+	DrawSmuflString ( dc, x, ynum, wtext, 1, staff->staffSize);	// '1' = centrer
 
 	if (numBase)
 	{
         s = StringFormat("%u",numBase);
-		DrawLeipzigString ( dc, x, yden, s, 1, staff->staffSize);	// '1' = centrer
+            // FIXME (wtext instead of w)
+		DrawSmuflString ( dc, x, yden, wtext, 1, staff->staffSize);	// '1' = centrer
 	}
 	return;
 }
@@ -1338,11 +1339,11 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     
     if ( meterSig->GetSym() == METERSIGN_common ) {
-        DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_COMMON, staff, staff->staffSize);
+        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff, staff->staffSize);
         x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
     }
     else if ( meterSig->GetSym() == METERSIGN_cut ) {
-        DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_CUT, staff, staff->staffSize);
+        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff, staff->staffSize);
         x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
     }
 
@@ -1375,10 +1376,10 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
-    int symc = LEIPZIG_ACCID_NATURAL;
+    int symc = SMUFL_E261_accidentalNatural;
     switch (accid->GetAccid())
     {
-        case ACCIDENTAL_EXPLICIT_n :  symc = LEIPZIG_ACCID_NATURAL; break;
+        case ACCIDENTAL_EXPLICIT_n :  symc = SMUFL_E261_accidentalNatural; break;
         
         /* The ACCID_DOUBLE_SHARP definition is used in two ways:
          * 1) Antique notation (notAnc == true): it displays the two
@@ -1393,24 +1394,24 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
          * glyph).
          */
         case ACCIDENTAL_EXPLICIT_ss :
+            // This needs to be fixed because it is the old Wolfgang way to handle
+            // mensural notation
             if (staff->notAnc) {
-                    symc = LEIPZIG_ACCID_SHARP;
-                    DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );    
+                    symc = SMUFL_E262_accidentalSharp;
+                    DrawSmuflCode ( dc, x, y, symc, staff, accid->m_cueSize );    
                     y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
             } else {
-                symc = LEIPZIG_ACCID_DOUBLE_SHARP;
+                symc = SMUFL_E263_accidentalDoubleSharp;
                 break;
             }
-        case ACCIDENTAL_EXPLICIT_s : symc = LEIPZIG_ACCID_SHARP; break;
-        case ACCIDENTAL_EXPLICIT_ff :
-            symc = LEIPZIG_ACCID_FLAT; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
-            y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
-        case ACCIDENTAL_EXPLICIT_f :  symc = LEIPZIG_ACCID_FLAT; break;
-        case ACCIDENTAL_EXPLICIT_su : symc = LEIPZIG_ACCID_QUARTER_SHARP; break; // Not sure this is correct...
-        case ACCIDENTAL_EXPLICIT_fu :  symc= LEIPZIG_ACCID_QUARTER_FLAT; break; // Same
+        case ACCIDENTAL_EXPLICIT_s : symc = SMUFL_E262_accidentalSharp; break;
+        case ACCIDENTAL_EXPLICIT_ff : symc = SMUFL_E264_accidentalDoubleFlat;
+        case ACCIDENTAL_EXPLICIT_f : symc = SMUFL_E260_accidentalFlat; break;
+        case ACCIDENTAL_EXPLICIT_su : symc = SMUFL_E268_accidentalNaturalSharp; break; // Not sure this is correct...
+        case ACCIDENTAL_EXPLICIT_fu : symc= SMUFL_E267_accidentalNaturalFlat; break; // Same
         default : break;
     }
-    DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
+    DrawSmuflCode ( dc, x, y, symc, staff, accid->m_cueSize );
 
     
     dc->EndGraphic(element, this );
@@ -1435,7 +1436,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
-    DrawLeipzigFont( dc, x, y, 35, staff, custos->m_cueSize );
+    DrawSmuflCode( dc, x, y, 35, staff, custos->m_cueSize );
     
     dc->EndGraphic(element, this ); //RZ
 
@@ -1511,11 +1512,11 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
         y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->GetClefId()));;
         
         if (ks->GetAlteration() == ACCID_FLAT)
-            symb = LEIPZIG_ACCID_FLAT;
+            symb = SMUFL_E260_accidentalFlat;
         else
-            symb = LEIPZIG_ACCID_SHARP;
+            symb = SMUFL_E262_accidentalSharp;
         
-        DrawLeipzigFont ( dc, x, y, symb, staff, false );
+        DrawSmuflCode ( dc, x, y, symb, staff, false );
     }
     
     dc->EndGraphic(element, this ); //RZ
@@ -1704,7 +1705,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
                 y = (element->GetDrawingY()) + 20 + emb_offset;
             
             // draw the up-fermata
-            DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
+            DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C0_fermataAbove, staff, false );
         /*
         } else { // stem up fermata down
             
@@ -1717,7 +1718,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
                 // notehead under staff, set 20 px under notehead
                 y = (element->GetDrawingY()) - 20;
             
-            DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_DOWN, staff, false );
+            DrawSmuflCode ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
         */
     } else if (dynamic_cast<Rest*>(element)) {
@@ -1725,7 +1726,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         // rests for the moment are always in the staff
         // so just place the fermata above the staff + 20 px
         y = staff->GetDrawingY() + 20;
-        DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
+        DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C1_fermataBelow, staff, false );
     }
 }
 
@@ -1741,7 +1742,7 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     else
         y = (element->GetDrawingY()) + 30;
     
-    DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_EMB_TRILL, staff, false );
+    DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E566_ornamentTrill, staff, false );
 }
 
 } // namespace vrv    

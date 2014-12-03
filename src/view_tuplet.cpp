@@ -34,7 +34,9 @@ namespace vrv {
 #define TUPLET_OFFSET 20
 #define OBLIQUE_OFFSET 0x52 //move to oblique figures
 
-std::string View::IntToObliqueFigures(unsigned short number) {
+std::wstring View::IntToObliqueFigures(unsigned short number)
+{
+    /*
     char buf[6];
     
     memset(buf, 0x00, sizeof(buf));
@@ -53,6 +55,9 @@ std::string View::IntToObliqueFigures(unsigned short number) {
     }
     
     return std::string(buf);
+    */
+    std::wstring str;
+    return str;
 }
 
 /**
@@ -281,9 +286,9 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     
     int txt_lenght, txt_height;
     
-    std::string notes = IntToObliqueFigures((short int)tuplet->GetNum());
+    std::wstring notes = IntToObliqueFigures((short int)tuplet->GetNum());
     
-    dc->GetTextExtent(notes, &txt_lenght, &txt_height);
+    dc->GetSmuflTextExtent(notes, &txt_lenght, &txt_height);
     
     MusPoint start, end, center;
     bool direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
@@ -292,9 +297,9 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     // since the number is slanted, move the center left
     // by 4 pixels so it seems more centered to the eye
     int txt_x = center.x - (txt_lenght / 2) - 4;
-    //DrawLeipzigFont ( dc, txt_x,  center.y, notes + 0x82, staff, false);
+    //DrawSmuflCode ( dc, txt_x,  center.y, notes + 0x82, staff, false);
     
-    DrawLeipzigString(dc, txt_x, center.y, notes, 0);
+    DrawSmuflString(dc, txt_x, center.y, notes, 0);
     
     //dc->SetPen(AxBLACK);
     dc->SetPen(AxBLACK, 2, AxSOLID);

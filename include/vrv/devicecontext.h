@@ -104,6 +104,8 @@ public:
     
     virtual void GetTextExtent( const std::string& string, int *w, int *h ) = 0;
     
+    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h ) = 0;
+    
     virtual MusPoint GetLogicalOrigin( ) = 0;
     
     virtual bool CorrectMusicAscent( ) { return m_correctMusicAscent; };
@@ -130,7 +132,7 @@ public:
     
     virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT ) = 0;
     
-    virtual void DrawMusicText(const std::string& text, int x, int y) = 0;
+    virtual void DrawMusicText(const std::wstring& text, int x, int y) = 0;
     
     virtual void DrawSpline(int n, MusPoint points[]) = 0;
     
@@ -185,7 +187,7 @@ public:
     }
     virtual ~FontMetricsInfo() {};
     
-        // accessors and modifiers for the font elements
+    // accessors and modifiers for the font elements
     int GetPointSize() { return pointSize; }
     int GetStyle() { return style; };
     int GetWeight() { return weight; }

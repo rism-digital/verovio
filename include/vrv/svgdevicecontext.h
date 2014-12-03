@@ -67,6 +67,8 @@ public:
     
     virtual void GetTextExtent( const std::string& string, int *w, int *h );
     
+    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
+    
     virtual MusPoint GetLogicalOrigin( );
 
     /**
@@ -97,7 +99,7 @@ public:
     
     virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT );
     
-    virtual void DrawMusicText(const std::string& text, int x, int y);
+    virtual void DrawMusicText(const std::wstring& text, int x, int y);
     
     virtual void DrawSpline(int n, MusPoint points[]);
     

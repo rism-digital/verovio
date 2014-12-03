@@ -122,6 +122,8 @@ public:
     static std::string GetPath( ) { return m_path; };
     static void SetPath( std::string path ) { m_path = path; };
     static bool InitFont( );
+    static bool SetFont( std::string fontName );
+    static Glyph* GetGlyph( wchar_t smuflCode );
     static std::string GetMusicFontDescStr( ) { return m_musicFontDesc; };
     static void SetMusicFontDescStr( std::string lyricFontDesc ) { m_musicFontDesc = lyricFontDesc; };
     static std::string GetLyricFontDescStr( ) { return m_lyricFontDesc; };
@@ -140,7 +142,7 @@ private:
     /** The FontInfo string for the default lyric font */
     static std::string m_lyricFontDesc;
     /** */
-    static std::map<int, Glyph> m_font;
+    static std::map<wchar_t, Glyph> m_font;
 };
 
 

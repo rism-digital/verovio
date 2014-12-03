@@ -98,7 +98,7 @@ void display_usage() {
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
-    cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura is also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
     
@@ -129,6 +129,7 @@ int main(int argc, char** argv)
     string svgdir;
     string outfile;
     string outformat = "svg";
+    string font = "";
     bool std_output = false;
     
     // Init random number generator for uuids
@@ -166,6 +167,7 @@ int main(int argc, char** argv)
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"all-pages",           no_argument,        &all_pages, 1},
         {"border",              required_argument,  0, 'b'},
+        {"font",                required_argument,  0, 0},
         {"format",              required_argument,  0, 'f'},
         {"help",                no_argument,        &show_help, 1},
         {"ignore-layout",       no_argument,        &ignore_layout, 1},
@@ -194,8 +196,12 @@ int main(int argc, char** argv)
             case 0:
                 if (long_options[option_index].flag != 0)
                     break;
-                if (strcmp(long_options[option_index].name,"page") == 0)
+                if (strcmp(long_options[option_index].name,"font") == 0) {
+                    font = string(optarg);
+                }
+                else if (strcmp(long_options[option_index].name,"page") == 0) {
                     page = atoi(optarg);
+                }
                 else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
                     toolkit.SetRdgXPathQuery( string(optarg) );
                 }
@@ -294,6 +300,12 @@ int main(int argc, char** argv)
     // Loaded the music font from the resource diretory
     if (!Resources::InitFont()) {
         cerr << "The music font could not be loaded, please verify the content of the directory." << endl;
+        exit(1);
+    }
+    
+    // Load a specified font
+    if (!font.empty() && !Resources::SetFont(font)) {
+        cerr << "Font '" << font << "' could not be loaded." << endl;
         exit(1);
     }
 

@@ -16,6 +16,7 @@
 
 #include "doc.h"
 //#include "leipzigbbox.h"
+#include "glyph.h"
 #include "view.h"
 #include "vrvdef.h"
 
@@ -122,7 +123,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
         {
             m_outdata << "\t\t";
-            CopyFileToStream( Resources::GetPath() + "/svg/" + (*it) + ".xml", m_outdata );
+            CopyFileToStream( (*it), m_outdata );
         }
         m_outdata << "\t</defs>\n";
     }
@@ -308,23 +309,32 @@ void SvgDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleY = yScale;
 }       
 
-// Copied from bBoxDc, TODO find another more generic solution
 void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
 {
-    int x, y, partial_w, partial_h;
+    LogDebug("SvgDeviceContext::GetTextExtent not implemented");
+}
     
+// Copied from bBoxDc, TODO find another more generic solution
+void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+{
+    double x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
     
-    for (unsigned int i = 0; i < string.length(); i++) {
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+    
+        partial_w *= ((m_font.GetPointSize() / glyph->GetUnitsPerEm()));
+        partial_h *= ((m_font.GetPointSize() / glyph->GetUnitsPerEm()));
         
-        //LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
-        
-        partial_w *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
-        partial_h *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
-        
-        *w += partial_w;
-        *h += partial_h;
+        *w += (int)partial_w;
+        *h += (int)partial_h;
     }
 }
        
@@ -538,119 +548,44 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
 
 std::string FilenameLookup(unsigned char c) {
     std::string glyph;
-    switch (c) {
-            /* figures */
-        case 48: glyph = "figure_0"; break;
-        case 49: glyph = "figure_1"; break;
-        case 50: glyph = "figure_2"; break;
-        case 51: glyph = "figure_3"; break;
-        case 52: glyph = "figure_4"; break;
-        case 53: glyph = "figure_5"; break;
-        case 54: glyph = "figure_6"; break;
-        case 55: glyph = "figure_7"; break;
-        case 56: glyph = "figure_8"; break;
-        case 57: glyph = "figure_9"; break;
-            /* oblique figures */
-        case 0x82: glyph = "oblique_figure_0"; break;
-        case 0x83: glyph = "oblique_figure_1"; break;
-        case 0x84: glyph = "oblique_figure_2"; break;
-        case 0x85: glyph = "oblique_figure_3"; break;
-        case 0x86: glyph = "oblique_figure_4"; break;
-        case 0x87: glyph = "oblique_figure_5"; break;
-        case 0x88: glyph = "oblique_figure_6"; break;
-        case 0x89: glyph = "oblique_figure_7"; break;
-        case 0x8A: glyph = "oblique_figure_8"; break;
-        case 0x8B: glyph = "oblique_figure_9"; break;
-            /* fermatas */
-        case LEIPZIG_FERMATA_UP: glyph = "fermata_up"; break;
-        case LEIPZIG_FERMATA_DOWN: glyph = "fermata_down"; break;          
-            /* clef */
-        case LEIPZIG_CLEF_G: glyph = "clef_G"; break;
-        case LEIPZIG_CLEF_F: glyph = "clef_F"; break;
-        case LEIPZIG_CLEF_C: glyph = "clef_C"; break;
-        case LEIPZIG_CLEF_8va: glyph = "clef_G8"; break;
-        case LEIPZIG_CLEF_G + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_G_mensural"; break;
-        case LEIPZIG_CLEF_F + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_F_mensural"; break;
-        case LEIPZIG_CLEF_C + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_C_mensural"; break;
-        case LEIPZIG_CLEF_8va + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_G_chiavette"; break;
-            /* meter */
-        case LEIPZIG_METER_SYMB_COMMON: glyph = "meter_symb_common"; break;
-        case LEIPZIG_METER_SYMB_CUT: glyph = "meter_symb_cut"; break;
-        case LEIPZIG_METER_SYMB_2_CUT: glyph = "meter_symb_2_cut"; break;
-        case LEIPZIG_METER_SYMB_3_CUT: glyph = "meter_symb_3_cut"; break;
-            /* alterations */
-        case LEIPZIG_ACCID_SHARP: glyph = "alt_sharp"; break;
-        case LEIPZIG_ACCID_NATURAL: glyph = "alt_natural"; break;
-        case LEIPZIG_ACCID_FLAT: glyph = "alt_flat"; break;
-        case LEIPZIG_ACCID_DOUBLE_SHARP: glyph = "alt_double_sharp"; break;
-        case LEIPZIG_ACCID_SHARP + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_sharp_mensural"; break;
-        case LEIPZIG_ACCID_NATURAL + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_natural_mensural"; break;
-        case LEIPZIG_ACCID_FLAT + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_flat_mensural"; break;
-        case LEIPZIG_ACCID_DOUBLE_SHARP + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_double_sharp_mensural"; break;
-            /* rests */
-        case LEIPZIG_REST_QUARTER: glyph = "rest_4"; break;
-        case LEIPZIG_REST_QUARTER + 1: glyph = "rest_8"; break;
-        case LEIPZIG_REST_QUARTER + 2: glyph = "rest_16"; break;
-        case LEIPZIG_REST_QUARTER + 3: glyph = "rest_32"; break;
-        case LEIPZIG_REST_QUARTER + 4: glyph = "rest_64"; break;
-        case LEIPZIG_REST_QUARTER + 5: glyph = "rest_128"; break;
-        case LEIPZIG_REST_QUARTER + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_4_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 1 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_8_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 2 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_16_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 3 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_32_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 4 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_64_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 5 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_128_mensural"; break;
-            /* note heads */
-        case LEIPZIG_HEAD_WHOLE: glyph = "head_whole"; break;
-        case LEIPZIG_HEAD_WHOLE_FILLED: glyph = "head_whole_fill"; break;
-        case LEIPZIG_HEAD_HALF: glyph = "head_half"; break;
-        case LEIPZIG_HEAD_QUARTER: glyph = "head_quarter"; break;
-        case LEIPZIG_HEAD_WHOLE + LEIPZIG_OFFSET_MENSURAL: glyph = "head_whole_diamond"; break;
-        case LEIPZIG_HEAD_WHOLE_FILLED + LEIPZIG_OFFSET_MENSURAL: glyph = "head_whole_filldiamond"; break;
-        case LEIPZIG_HEAD_HALF + LEIPZIG_OFFSET_MENSURAL: glyph = "head_half_diamond"; break;
-        case LEIPZIG_HEAD_QUARTER + LEIPZIG_OFFSET_MENSURAL: glyph = "head_quarter_filldiamond"; break;
-            /* slashes */
-        case LEIPZIG_STEM_FLAG_UP: glyph = "slash_up"; break;
-        case LEIPZIG_STEM_FLAG_DOWN: glyph = "slash_down"; break;
-        case LEIPZIG_STEM_FLAG_UP + LEIPZIG_OFFSET_MENSURAL: glyph = "slash_up_mensural"; break;
-        case LEIPZIG_STEM_FLAG_DOWN + LEIPZIG_OFFSET_MENSURAL: glyph = "slash_down_mensural"; break;
-            /* ornaments */
-        case 35: glyph = "orn_mordent"; break;
-        case LEIPZIG_EMB_TRILL: glyph = "orn_trill"; break;
-            /* todo */
-        default: glyph = "clef_G_chiavette";
-    }
-
     return glyph;
 }
 
-void SvgDeviceContext::DrawMusicText(const std::string& text, int x, int y)
+void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {
 
     int w, h, gx, gy;
         
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); i++) {
-        unsigned char c = (unsigned char)text[i];
-        
-        std::string glyph = FilenameLookup(c);
-        
-        // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_leipzig_glyphs.begin(), m_leipzig_glyphs.end(), glyph);
-        if (it == m_leipzig_glyphs.end())
+    for (unsigned int i = 0; i < text.length(); i++)
+    {
+        wchar_t c = text[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph)
         {
-            m_leipzig_glyphs.push_back( glyph );
+            continue;
         }
         
+        std::string path = glyph->GetPath();
+        
+        // Add the glyph to the array for the <defs>
+        std::vector<std::string>::const_iterator it = std::find(m_leipzig_glyphs.begin(), m_leipzig_glyphs.end(), path);
+        if (it == m_leipzig_glyphs.end())
+        {
+            m_leipzig_glyphs.push_back( path );
+        }
+        
+        
         // Write the char in the SVG
-        WriteLine ( StringFormat("<use xlink:href=\"#%s\" transform=\"translate(%d, %d) scale(%f, %f)\"/>",
-                                     glyph.c_str(), x, y, ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)),
-                                     ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) );
+        WriteLine ( StringFormat( "<use xlink:href=\"#%s\" x=\"%d\" y=\"%d\" height=\"%dpx\" width=\"%dpx\"></use>",
+            glyph->GetCodeStr().c_str(), x, y, m_font.GetPointSize(), m_font.GetPointSize() )  );
         
         // Get the bounds of the char
         //LeipzigBBox::GetCharBounds(c, &gx, &gy, &w, &h);
         // Sum it to x so we move it to the start of the next char
-        x += (w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
+        // FIXME
+        //x += (w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
+
     }
 }
 

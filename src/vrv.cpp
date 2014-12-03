@@ -34,7 +34,7 @@ namespace vrv {
 std::string Resources::m_path = "/usr/local/share/verovio";
 std::string Resources::m_musicFontDesc = "0;13;70;90;90;0;Leipzig 4.9;33";
 std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0";
-std::map<int, Glyph> Resources::m_font;
+std::map<wchar_t, Glyph> Resources::m_font;
   
 //----------------------------------------------------------------------------
 // Font related methods
@@ -53,6 +53,16 @@ bool Resources::InitFont()
     return true;
 }
     
+bool Resources::SetFont(std::string fontName)
+{
+    return LoadFont(fontName);
+}
+
+Glyph *Resources::GetGlyph(wchar_t smuflCode)
+{
+    return &m_font[smuflCode];
+}
+    
 bool Resources::LoadFont(std::string fontName)
 {
     DIR*    dir;
@@ -60,18 +70,25 @@ bool Resources::LoadFont(std::string fontName)
     std::string dirname =  Resources::GetPath() + "/" + fontName;
     dir = opendir(dirname.c_str());
     
+    if (!dir) {
+        LogError("Font directory '%s' cannot be read", dirname.c_str());
+        return false;
+    }
+    
     // First loop through the fontName directory and load each glyph
     // Since the filename starts with the Unicode code, it is used
     // to assign the glyph to the corresponding position in m_fonts
     while ((pdir = readdir(dir))) {
         if ( strstr( pdir->d_name, ".xml" )) {
             // E.g, : E053-gClef8va.xml => strtol extracts E053 as hex
-            int smuflCode = (int)strtol( pdir->d_name, NULL, 16);
+            wchar_t smuflCode = (wchar_t)strtol( pdir->d_name, NULL, 16);
             if (smuflCode == 0) {
                 LogError("Invalid SMUFL code (0)");
                 continue;
             }
-            Glyph glyph( Resources::GetPath() + "/" + fontName + "/" + pdir->d_name );
+            std::string codeStr = pdir->d_name;
+            codeStr = codeStr.substr(0, 4);
+            Glyph glyph( Resources::GetPath() + "/" + fontName + "/" + pdir->d_name , codeStr );
             m_font[smuflCode] = glyph;
         }
     }
@@ -95,13 +112,13 @@ bool Resources::LoadFont(std::string fontName)
     pugi::xml_node current;
     for( current = root.child("glyph"); current; current = current.next_sibling("glyph") ) {
         if ( current.attribute( "glyph-code" ) ) {
-            int smuflCode = (int)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
+            wchar_t smuflCode = (wchar_t)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
             if (!m_font.count(smuflCode)) {
                 LogWarning("Glyph with code '%d' not found.", smuflCode);
                 continue;
             }
             Glyph *glyph = &m_font[smuflCode];
-            if (glyph->GetUnitsPerEm() != unitsPerEm) {
+            if ((int)glyph->GetUnitsPerEm() != unitsPerEm) {
                 LogWarning("Glyph and bounding box units-per-em for code '%d' miss-match (bounding box: %d)", smuflCode, unitsPerEm);
                 continue;
             }

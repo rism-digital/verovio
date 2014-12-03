@@ -177,6 +177,7 @@ enum ClefId {
 // Music - Leipzig font
 //----------------------------------------------------------------------------
 
+/*
 #define LEIPZIG_OFFSET_IN_FONT 200
 #define LEIPZIG_OFFSET_MENSURAL 20
 #define LEIPZIG_OFFSET_NOTE_HEAD 249
@@ -223,22 +224,7 @@ enum ClefId {
 #define sBEBUNG 'k'
 #define sSTAC_AIGU_SUP ':'
 #define sSTAC_AIGU_INF ';'
-
-/*
- The following values have been obtain using FreeType2
- See ./varia/glyph_info.c
- For now, hardcoded values are ok because we do not change the music/neumes fonts
- 
- If we want to enable this (changing font at runtime) we would need to
- add a method similar to glyph_info.c to get the glyph size for the note head (and others)
- */
-
-#define LEIPZIG_UNITS_PER_EM 2048.0
-#define LEIPZIG_ASCENT 1183.0
-#define LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT 266.0
-#define LEIPZIG_WHOLE_NOTE_HEAD_WIDTH 405.0
-#define LEIPZIG_HALF_NOTE_HEAD_WIDTH 314.0
-#define LEIPZIG_SHARP_WIDTH 197.0
+*/
 
 } // namespace vrv
 

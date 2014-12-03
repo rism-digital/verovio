@@ -15,9 +15,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "glyph.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "page.h"
+#include "smufl.h"
 #include "staff.h"
 #include "system.h"
 #include "verse.h"
@@ -314,10 +316,12 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
     m_drawingFontHeight = CalcLeipzigFontSize();
+    /*
     m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
 	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
     m_drawingFontHeightAscent[1][0] = (m_drawingFontHeightAscent[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
 	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
+    */
     
     m_drawingFontSize[0][0] = m_drawingFontHeight;
     m_drawingFontSize[0][1] = (m_drawingFontSize[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
@@ -338,7 +342,13 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingVerticalUnit2[1] = (float)m_drawingInterl[1]/8;
     
     float glyph_size;
-    glyph_size = (LEIPZIG_HALF_NOTE_HEAD_WIDTH * (float)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    Glyph *glyph;
+    double x, y, w, h;
+    glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+
+    glyph_size = round(w * (double)m_drawingFontHeight / glyph->GetUnitsPerEm());
     m_drawingNoteRadius[0][0] = ceil(glyph_size / 2);
     m_drawingNoteRadius[0][1] = (m_drawingNoteRadius[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingNoteRadius[1][0] = (m_drawingNoteRadius[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
@@ -349,14 +359,20 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingLedgerLine[1][0] = (m_drawingLedgerLine[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
     m_drawingLedgerLine[1][1] = (m_drawingLedgerLine[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     
-    glyph_size = round(LEIPZIG_WHOLE_NOTE_HEAD_WIDTH * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    glyph = Resources::GetGlyph(SMUFL_E0A2_noteheadWhole);
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+    glyph_size = round(w * (double)m_drawingFontHeight / glyph->GetUnitsPerEm());
     m_drawingLedgerLine[0][2] = (int)(glyph_size * .66);
     m_drawingLedgerLine[1][2] = (m_drawingLedgerLine[0][2] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     
     m_drawingBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
     m_drawingBrevisWidth[1] = (m_drawingBrevisWidth[0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    
-    glyph_size = round(LEIPZIG_SHARP_WIDTH * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+ 
+    glyph = Resources::GetGlyph(SMUFL_E262_accidentalSharp);
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+    glyph_size = round(w * (double)m_drawingFontHeight / glyph->GetUnitsPerEm());
     m_drawingAccidWidth[0][0] = glyph_size;
     m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
@@ -368,7 +384,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
 int Doc::CalcLeipzigFontSize( )
 {
     // We just have the Leipzig font for now
-    return round((double)m_env.m_interlDefin * LEIPZIG_UNITS_PER_EM / LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT);
+    return m_env.m_interlDefin * 4;
 }
 
 void Doc::UpdateFontValues() 

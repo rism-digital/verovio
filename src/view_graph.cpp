@@ -102,50 +102,31 @@ void View::DrawDot ( DeviceContext *dc, int x, int y )
     dc->ResetBrush();
 }
 
-void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, 
+void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
 						 Staff *staff, bool dimin )
 {  
 	int staffSize = staff->staffSize;
 	int fontCorr = 0;
+    
     if (dc->CorrectMusicAscent()) {
         fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][dimin];
     }
 
 	assert( dc ); // DC cannot be NULL
-
-    // Font offset management for clef in mensural mode - needs improvement (font modification?)
-	if (staff->notAnc && (unsigned char)c >= LEIPZIG_OFFSET_IN_FONT)
-	{	
-		c+= LEIPZIG_OFFSET_MENSURAL;
-		if (dimin && is_in (c, 227, 229))	// les trois clefs
-		{	
-			c+= 14;	// les cles d===e tablature
-            if (dc->CorrectMusicAscent()) {
-                fontCorr = m_doc->m_drawingFontHeightAscent[ staffSize][0];
-            }
-		}
-	}
-	if (!staff->notAnc || !is_in (c, 241, 243))	// tout sauf clefs de tablature
-	{
-        dc->SetFont( &m_doc->m_drawingFonts[ staffSize ][ dimin ] );
-	}
+    
+    dc->SetFont( &m_doc->m_drawingFonts[staffSize][dimin] );
 
 	if ( dc)
 	{	
 		dc->SetBackground( AxBLUE );
 		dc->SetBackgroundMode( AxTRANSPARENT );
         
-        char str_c[2];
-        str_c[0] = c;
-        str_c[1] = 0;
-        std::string str = str_c;
+        std::wstring str;
+        str.push_back(code);
 		dc->SetTextForeground( m_currentColour );
         dc->SetPen( m_currentColour, 1, AxSOLID );
         dc->SetBrush( m_currentColour, AxSOLID );
 
-		//LogDebug("Drawing text here, x: %d, y: %d, y (zoomed): %d, y + fontcorr: %d"
-		//	   , ToDeviceContextX(x), y, ToDeviceContextY(y), ToDeviceContextY(y + fontCorr));
-        // DrawMusicText is the same with AxWxDc but different with SvgDeviceContext
 		dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y + fontCorr) );
 
         dc->ResetPen();
@@ -155,7 +136,7 @@ void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c,
 	return;
 }
 
-void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize)
+void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize)
 { 
 	assert( dc ); // DC cannot be NULL
 
@@ -173,7 +154,7 @@ void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, i
         LogDebug("Centering string not implemented with DeviceContext");
 		
         int w, h;
-		dc->GetTextExtent( s, &w, &h );
+		dc->GetSmuflTextExtent( s, &w, &h );
 		x -= w / 2;
         
 	}

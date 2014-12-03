@@ -220,9 +220,9 @@ protected:
     ///@{
 	void DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
-	void DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, Staff *staff, bool dimin );
+	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, Staff *staff, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
-	void DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize = 0);
+	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
@@ -235,7 +235,7 @@ private:
      */
     ///@{
     bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center);
-    std::string IntToObliqueFigures(unsigned short number);
+    std::wstring IntToObliqueFigures(unsigned short number);
     bool OneBeamInTuplet(Tuplet* tuplet);
     ///@}
     

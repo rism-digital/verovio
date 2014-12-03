@@ -25,7 +25,7 @@ public:
      */
     ///@{
     Glyph() {};
-    Glyph(std::string path);
+    Glyph(std::string path, std::string codeStr);
     virtual ~Glyph();
     ///@}
     
@@ -34,7 +34,13 @@ public:
     void SetBoundingBox(double x, double y, double w, double h);
     
     /** Get the units per EM */
-    int GetUnitsPerEm() { return m_unitsPerEm; };
+    double GetUnitsPerEm() { return m_unitsPerEm; };
+    
+    /** Get the path */
+    std::string GetPath() { return m_path; };
+    
+    /** Get the code string */
+    std::string GetCodeStr() { return m_codeStr; };
 
 private:
     
@@ -49,9 +55,11 @@ private:
     double m_width;
     double m_height;
     /** Units per EM for the glyph */
-    int m_unitsPerEm;
+    double m_unitsPerEm;
     /** Path to the file */
     std::string m_path;
+    /** The Unicode code in hexa as string */
+    std::string m_codeStr;
 };
 
 
