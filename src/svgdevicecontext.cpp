@@ -45,7 +45,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     DeviceContext()
 {	
 	
-    m_correctMusicAscent = false; // do not correct the ascent in the Leipzig font
+    m_correctMusicAscent = false; // do not correct the ascent in the music font
 
     m_width = width;
     m_height = height;
@@ -554,7 +554,7 @@ std::string FilenameLookup(unsigned char c) {
 void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {
 
-    int w, h, gx, gy;
+    double w, h, gx, gy;
         
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); i++)
@@ -581,11 +581,8 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
             glyph->GetCodeStr().c_str(), x, y, m_font.GetPointSize(), m_font.GetPointSize() )  );
         
         // Get the bounds of the char
-        //LeipzigBBox::GetCharBounds(c, &gx, &gy, &w, &h);
-        // Sum it to x so we move it to the start of the next char
-        // FIXME
-        //x += (w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
-
+        glyph->GetBoundingBox(&gx, &gy, &w, &h);
+        x += (int)(w * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
     }
 }
 

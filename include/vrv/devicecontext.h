@@ -159,7 +159,7 @@ public:
     
 protected:
     
-    bool m_correctMusicAscent; // specify if the ascent has to be correct when view the Leipzig font (true wxDC, false SVG)
+    bool m_correctMusicAscent; // specify if the ascent has to be correct when view the music font (true wxDC, false SVG)
     bool m_drawingBoundingBoxes;
 };
 

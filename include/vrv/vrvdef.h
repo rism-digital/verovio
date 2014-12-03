@@ -173,59 +173,6 @@ enum ClefId {
     perc = CLEFSHAPE_perc << 8 | 1
 };
 
-//----------------------------------------------------------------------------
-// Music - Leipzig font
-//----------------------------------------------------------------------------
-
-/*
-#define LEIPZIG_OFFSET_IN_FONT 200
-#define LEIPZIG_OFFSET_MENSURAL 20
-#define LEIPZIG_OFFSET_NOTE_HEAD 249
-//
-#define LEIPZIG_FERMATA_UP 63
-#define LEIPZIG_FERMATA_DOWN 64
-//
-#define LEIPZIG_EMB_TRILL 116
-//
-#define LEIPZIG_HEAD_WHOLE 201
-#define LEIPZIG_HEAD_WHOLE_FILLED 202
-#define LEIPZIG_HEAD_HALF 203
-#define LEIPZIG_HEAD_QUARTER 204
-#define LEIPZIG_STEM_FLAG_UP 205
-#define LEIPZIG_STEM_FLAG_DOWN 206
-//
-#define LEIPZIG_CLEF_PERC 152
-#define LEIPZIG_CLEF_G 207
-#define LEIPZIG_CLEF_F 208
-#define LEIPZIG_CLEF_C 209
-#define LEIPZIG_CLEF_8va 210
-//
-#define LEIPZIG_ACCID_SHARP 211
-#define LEIPZIG_ACCID_NATURAL 212
-#define LEIPZIG_ACCID_FLAT 213
-#define LEIPZIG_ACCID_DOUBLE_SHARP 214
-#define LEIPZIG_ACCID_QUARTER_FLAT 246
-#define LEIPZIG_ACCID_QUARTER_SHARP 244
-//
-#define LEIPZIG_REST_QUARTER 215
-//
-#define LEIPZIG_METER_SYMB_COMMON 140
-#define LEIPZIG_METER_SYMB_CUT 183 // was 129, works only with font 4.8
-#define LEIPZIG_METER_SYMB_2_CUT 127
-#define LEIPZIG_METER_SYMB_3_CUT 249    // was 128
-#define LEIPZIG_METER_SYMB_2 '2'
-#define LEIPZIG_METER_SYMB_3 '3'
-// TODO
-#define sSTACC 0
-#define sLOURE 'k'
-#define sACCENT_OBL '>'
-#define sACCENT_VERT_SUP '<'
-#define sACCENT_VERT_INF ','
-#define sBEBUNG 'k'
-#define sSTAC_AIGU_SUP ':'
-#define sSTAC_AIGU_INF ';'
-*/
-
 } // namespace vrv
 
 #endif // __VRV_DEF_H__

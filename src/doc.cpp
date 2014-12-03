@@ -315,7 +315,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
-    m_drawingFontHeight = CalcLeipzigFontSize();
+    m_drawingFontHeight = CalcMusicFontSize();
     /*
     m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
 	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
@@ -381,30 +381,20 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	return m_drawingPage;
 }
 
-int Doc::CalcLeipzigFontSize( )
+int Doc::CalcMusicFontSize( )
 {
-    // We just have the Leipzig font for now
     return m_env.m_interlDefin * 4;
 }
 
 void Doc::UpdateFontValues() 
 {	
-	if ( !m_drawingLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
-        LogWarning( "Impossible to load font 'Leipzig'" );
-	
-	//LogMessage( "Size %d, Family %d, Style %d, Weight %d, Underline %d, Face %s, Desc %s",
-	//	m_drawingLeipzigFont.GetPointSize(),
-	//	m_drawingLeipzigFont.GetFamily(),
-	//	m_drawingLeipzigFont.GetStyle(),
-	//	m_drawingLeipzigFont.GetWeight(),
-	//	m_drawingLeipzigFont.GetUnderlined(),
-	//	m_drawingLeipzigFont.GetFaceName().c_str(),
-	//	m_drawingLeipzigFont.GetNativeFontInfoDesc().c_str());
+	if ( !m_drawingMusicFont.FromString( Resources::GetMusicFontDescStr() ) )
+        LogWarning( "Impossible to load the music font" );
     
-	m_drawingFonts[0][0] = m_drawingLeipzigFont;
-    m_drawingFonts[0][1] = m_drawingLeipzigFont;
-    m_drawingFonts[1][0] = m_drawingLeipzigFont;
-    m_drawingFonts[1][1] = m_drawingLeipzigFont;
+	m_drawingFonts[0][0] = m_drawingMusicFont;
+    m_drawingFonts[0][1] = m_drawingMusicFont;
+    m_drawingFonts[1][0] = m_drawingMusicFont;
+    m_drawingFonts[1][1] = m_drawingMusicFont;
 	
 	// Lyrics
 	if ( !m_drawingLyricFont.FromString( Resources::GetLyricFontDescStr() ) )

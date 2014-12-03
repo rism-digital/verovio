@@ -27,7 +27,7 @@ namespace vrv {
 
 /** 
  * This class implements a drawing context for generating SVG files.
- * The Leipzig font is embedded by incorporating ./data/svg/xxx.xml glyphs within
+ * The music font is embedded by incorporating ./data/[fontname]/[glyph].xml glyphs within
  * the SVG file.
  */
 class SvgDeviceContext: public DeviceContext

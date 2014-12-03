@@ -175,11 +175,9 @@ public:
 
 private:
     /**
-     * Calculates the Leipzig font size according to the m_interlDefin reference value.
-     * The size is calculated using  LEIPZIG_UNITS_PER_EM and LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT.
-     * See vrvdef.h for more information about these values.
+     * Calculates the music font size according to the m_interlDefin reference value.
      */
-    int CalcLeipzigFontSize( );
+    int CalcMusicFontSize( );
     
 public:
     
@@ -257,10 +255,10 @@ public:
     float m_drawingVerticalUnit1[2];
     /** A vertical unit corresponding to the 1/8 of an interline */
     float m_drawingVerticalUnit2[2];
-    /** Current Leipzig font for normal and small staff and normal and grace size */
+    /** Current music font for normal and small staff and normal and grace size */
     FontMetricsInfo m_drawingFonts[2][2];				
-    /** Leipzig font */
-    FontMetricsInfo m_drawingLeipzigFont;
+    /** music font */
+    FontMetricsInfo m_drawingMusicFont;
     /** Current lyric font for normal and small staff and normal and grace size */
     FontMetricsInfo m_drawingLyricFonts[2];
     /** Lyric font by default */

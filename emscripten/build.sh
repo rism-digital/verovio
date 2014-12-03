@@ -69,7 +69,7 @@ done
 FILENAME="verovio-toolkit$ASM_NAME$VERSION_NAME.js"
 
 echo "Sync svg resources"
-cp -r ../data/svg data/
+cp -r ../data/* data/
 
 echo "Compiling"
 
@@ -95,6 +95,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
+	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
 	$VEROVIO_ROOT/src/iomei.cpp \
@@ -103,7 +104,6 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/keysig.cpp \
 	$VEROVIO_ROOT/src/layer.cpp \
 	$VEROVIO_ROOT/src/layerelement.cpp \
-	$VEROVIO_ROOT/src/leipzigbbox.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
 	$VEROVIO_ROOT/src/metersig.cpp \
 	$VEROVIO_ROOT/src/mrest.cpp \
@@ -136,7 +136,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
 	lib/jsonxx/jsonxx.cc \
-	--embed-file data/svg/ \
+	--embed-file data/ \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
