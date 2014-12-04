@@ -31,7 +31,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_y = 0.0;
     m_width = 0.0;
     m_height = 0.0;
-    m_unitsPerEm = 2048.0;
+    m_unitsPerEm = 20480;
     m_path = path;
     m_codeStr = codeStr;
     
@@ -60,7 +60,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
         return;
     }
     
-    m_unitsPerEm = atof( viewBox.substr( viewBox.find_last_of(' ') ).c_str() );
+    m_unitsPerEm = atoi( viewBox.substr( viewBox.find_last_of(' ') ).c_str() ) * 10;
 }
 
 Glyph::~Glyph()
@@ -69,7 +69,7 @@ Glyph::~Glyph()
     m_y = 0.0;
     m_width = 0.0;
     m_height = 0.0;
-    m_unitsPerEm = 2048.0;
+    m_unitsPerEm = 20480;
     m_path = "[unset]";
     m_codeStr = "[unset]";
 
@@ -77,13 +77,13 @@ Glyph::~Glyph()
     
 void Glyph::SetBoundingBox(double x, double y, double w, double h)
 {
-    m_x = x;
-    m_y = y;
-    m_width = w;
-    m_height = h;
+    m_x = (int)(10.0  * x);
+    m_y = (int)(10.0  * y);
+    m_width = (int)(10.0  * w);
+    m_height = (int)(10.0  * h);
 }
     
-void Glyph::GetBoundingBox(double *x, double *y, double *w, double *h)
+void Glyph::GetBoundingBox(int *x, int *y, int *w, int *h)
 {
     (*x) = m_x;
     (*y) = m_y;

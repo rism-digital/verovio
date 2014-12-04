@@ -135,7 +135,7 @@ void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h
 
 void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
 {
-    double x, y, partial_w, partial_h;
+    int x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
     
@@ -148,11 +148,11 @@ void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, 
         }
         glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
         
-        partial_w *= (((double)m_font.GetPointSize() / glyph->GetUnitsPerEm()));
-        partial_h *= (((double)m_font.GetPointSize() / glyph->GetUnitsPerEm()));
+        partial_w *= (m_font.GetPointSize() / glyph->GetUnitsPerEm());
+        partial_h *= (m_font.GetPointSize() / glyph->GetUnitsPerEm());
         
-        *w += (int)partial_w;
-        *h += (int)partial_h;
+        *w += partial_w;
+        *h += partial_h;
     }
 }
        
@@ -352,7 +352,7 @@ void BBoxDeviceContext::DrawRotatedText(const std::string& text, int x, int y, d
 void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {  
     
-    double g_x, g_y, g_w, g_h;
+    int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
     
     for (unsigned int i = 0; i < text.length(); i++)
@@ -364,17 +364,17 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         }
         glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + (int)(g_x * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
+        int x_off = x + (int)(g_x * ((m_font.GetPointSize() / glyph->GetUnitsPerEm())));
         // because we are in the drawing context, y position are already flipped
         int y_off = y - (int)(g_y * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
         // the +/- 2 is to compesate a couple pixels down the figure (rounding error?)
          
         UpdateBB(x_off, y_off, 
-                  x_off + (int)(g_w * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm()))),
+                  x_off + g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm(),
         // idem, y position are flipped
-                  y_off - (int)(g_h * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm()))));
+                  y_off - g_h * m_font.GetPointSize() / glyph->GetUnitsPerEm());
         
-        lastCharWidth = (int)(g_w * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
+        lastCharWidth = g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
      
     }
