@@ -412,9 +412,9 @@ DefaultEnv::DefaultEnv()
     
     m_interlDefin = DEFAULT_UNIT * 2;
     m_landscape = false;
-    m_staffLineWidth = 2;
-    m_stemWidth = 2;
-    m_barlineWidth = 2;
+    m_staffLineWidth = 20;
+    m_stemWidth = 20;
+    m_barlineWidth = 20;
     m_beamMaxSlope = 30;
     m_beamMinSlope = 10;
     
