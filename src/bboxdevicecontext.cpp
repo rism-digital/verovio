@@ -364,10 +364,9 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         }
         glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + (int)(g_x * ((m_font.GetPointSize() / glyph->GetUnitsPerEm())));
+        int x_off = x + g_x * m_font.GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position are already flipped
-        int y_off = y - (int)(g_y * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
-        // the +/- 2 is to compesate a couple pixels down the figure (rounding error?)
+        int y_off = y - g_y * m_font.GetPointSize() / glyph->GetUnitsPerEm();
          
         UpdateBB(x_off, y_off, 
                   x_off + g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm(),
