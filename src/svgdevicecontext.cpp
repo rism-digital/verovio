@@ -317,7 +317,7 @@ void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h 
 // Copied from bBoxDc, TODO find another more generic solution
 void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
 {
-    double x, y, partial_w, partial_h;
+    int x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
     
@@ -330,11 +330,11 @@ void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, i
         }
         glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
     
-        partial_w *= ((m_font.GetPointSize() / glyph->GetUnitsPerEm()));
-        partial_h *= ((m_font.GetPointSize() / glyph->GetUnitsPerEm()));
+        partial_w *= m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        partial_h *= m_font.GetPointSize() / glyph->GetUnitsPerEm();
         
-        *w += (int)partial_w;
-        *h += (int)partial_h;
+        *w += partial_w;
+        *h += partial_h;
     }
 }
        
@@ -554,7 +554,7 @@ std::string FilenameLookup(unsigned char c) {
 void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {
 
-    double w, h, gx, gy;
+    int w, h, gx, gy;
         
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); i++)
@@ -582,7 +582,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         
         // Get the bounds of the char
         glyph->GetBoundingBox(&gx, &gy, &w, &h);
-        x += (int)(w * ((double)(m_font.GetPointSize() / glyph->GetUnitsPerEm())));
+        x += w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
     }
 }
 

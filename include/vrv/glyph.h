@@ -30,11 +30,11 @@ public:
     ///@}
     
     /** Get the bounds of the glyph */
-    void GetBoundingBox(double *x, double *y, double *w, double *h);
+    void GetBoundingBox(int *x, int *y, int *w, int *h);
     void SetBoundingBox(double x, double y, double w, double h);
     
     /** Get the units per EM */
-    double GetUnitsPerEm() { return m_unitsPerEm; };
+    int GetUnitsPerEm() { return m_unitsPerEm; };
     
     /** Get the path */
     std::string GetPath() { return m_path; };
@@ -50,12 +50,12 @@ public:
     
 private:
     /** The bounding box values of the glyph */
-    double m_x;
-    double m_y;
-    double m_width;
-    double m_height;
+    int m_x;
+    int m_y;
+    int m_width;
+    int m_height;
     /** Units per EM for the glyph */
-    double m_unitsPerEm;
+    int m_unitsPerEm;
     /** Path to the file */
     std::string m_path;
     /** The Unicode code in hexa as string */

@@ -343,12 +343,12 @@ Page *Doc::SetDrawingPage( int pageIdx )
     
     float glyph_size;
     Glyph *glyph;
-    double x, y, w, h;
+    int x, y, w, h;
     glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
 
-    glyph_size = round(w * (double)m_drawingFontHeight / glyph->GetUnitsPerEm());
+    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
     m_drawingNoteRadius[0][0] = ceil(glyph_size / 2);
     m_drawingNoteRadius[0][1] = (m_drawingNoteRadius[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingNoteRadius[1][0] = (m_drawingNoteRadius[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
@@ -362,7 +362,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     glyph = Resources::GetGlyph(SMUFL_E0A2_noteheadWhole);
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
-    glyph_size = round(w * (double)m_drawingFontHeight / glyph->GetUnitsPerEm());
+    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
     m_drawingLedgerLine[0][2] = (int)(glyph_size * .66);
     m_drawingLedgerLine[1][2] = (m_drawingLedgerLine[0][2] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     
@@ -372,7 +372,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     glyph = Resources::GetGlyph(SMUFL_E262_accidentalSharp);
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
-    glyph_size = round(w * (double)m_drawingFontHeight / glyph->GetUnitsPerEm());
+    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
     m_drawingAccidWidth[0][0] = glyph_size;
     m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
