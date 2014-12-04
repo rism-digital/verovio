@@ -16,6 +16,13 @@ namespace vrv {
 
 /**
  * This class is used for storing a music font glyph.
+ * All glyph values are integers. However, for keeping precision as high
+ * as possible, they are 10 times the original values. Since the unit
+ * per em value is also 10 times the original, there is no incident on
+ * calculations elsewhere. However, it does increase the precision because
+ * units are always multiplied by a point size before being devided by the
+ * unit per em. See 
+ * Ex: 10.2 become 102, with a unit per em of 20480 (instead of 2048)
  */
 class Glyph
 {
@@ -31,6 +38,12 @@ public:
     
     /** Get the bounds of the glyph */
     void GetBoundingBox(int *x, int *y, int *w, int *h);
+    
+    /** 
+     * Set the bounds of the glyph
+     * These are original values from the font and will be
+     * stored as (int)(10.0 * x) in the glyph
+     */
     void SetBoundingBox(double x, double y, double w, double h);
     
     /** Get the units per EM */
