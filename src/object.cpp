@@ -343,14 +343,6 @@ void Object::AddSameAs( std::string id, std::string filename )
     }
     m_sameAs += sameAs;
 }
-    
-void Object::SetDocParent()
-{
-    if (!m_doc) {
-        m_doc = dynamic_cast<Doc*>( this->GetFirstParent( &typeid(Doc) ) );
-        assert( m_doc );
-    }
-}
 
 Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps )
 {
@@ -959,7 +951,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         // reset it as the minimum position to the step (if doc found)
         (*min_pos) = 0;
         Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
-        if (doc) (*min_pos) = doc->m_drawingStep1;
+        if (doc) (*min_pos) = doc->m_drawingUnit * 1;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );

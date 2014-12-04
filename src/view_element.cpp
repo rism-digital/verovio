@@ -478,9 +478,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
 	else
 	{	if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
-			x2 = xn + m_doc->m_drawingStep1*7/2;
+			x2 = xn + m_doc->m_drawingUnit*7/2;
 		else
-			x2 = xn + m_doc->m_drawingStep1*5/2;
+			x2 = xn + m_doc->m_drawingUnit*5/2;
 
 		//if (this->lat) // ax2 - no support of note head flip
         //    x2 += rayon*2;
@@ -729,7 +729,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         multirest->SetNum(999);
     
     // This is 1/2 the length of th black rectangle
-	length = (m_doc->m_drawingStep1 * 5);
+	length = (m_doc->m_drawingUnit * 5);
     
     // Position centered in third line
     // it would be m_drawingInterl * 6.5, or m_drawingInterl / 2 * 13
@@ -777,7 +777,7 @@ void View::DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff)
     
     y1 = y;
 	x1 = x;
-	x2 = x + (m_doc->m_drawingStep1 * 2 / 3);
+	x2 = x + (m_doc->m_drawingUnit * 2 / 3);
     
     // look if on line or between line
 	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
@@ -794,7 +794,7 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
     int x1, x2, y1, y2;
     y1 = y;
 	x1 = x;
-	x2 = x + (m_doc->m_drawingStep1 * 2 / 3);
+	x2 = x + (m_doc->m_drawingUnit * 2 / 3);
     
     // look if one line or between line
 	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
@@ -804,8 +804,8 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
 	DrawFullRectangle( dc, x1, y2, x2, y1);
 	
     // lines
-    x1 = x - m_doc->m_drawingStep1;
-    x2 = x + m_doc->m_drawingStep1;
+    x1 = x - m_doc->m_drawingUnit;
+    x2 = x + m_doc->m_drawingUnit;
 
 	DrawHorizontalLine ( dc, x1, x2, y2, 1);
 	DrawHorizontalLine ( dc, x1, x2, y1, 1);
@@ -822,7 +822,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 	float foff;
 
 	if (staff->notAnc)
-		foff = (m_doc->m_drawingStep1 *1 / 3);
+		foff = (m_doc->m_drawingUnit *1 / 3);
 	else
 		foff = (m_doc->m_drawingLedgerLine[staff->staffSize][2] * 2) / 3; // i.e., la moitie de la ronde
 
@@ -857,7 +857,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_env.m_staffLineWidth);
 
 	if (dots)
-		DrawDots ( dc, (x2 + m_doc->m_drawingStep1), y2, dots, staff);
+		DrawDots ( dc, (x2 + m_doc->m_drawingUnit), y2, dots, staff);
 }
 
 
@@ -868,7 +868,7 @@ void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsign
 	if (dots)
 	{	if (valeur < DUR_16)
 			y += m_doc->m_drawingInterl[staff->staffSize];
-		DrawDots ( dc, (x + m_doc->m_drawingStep2), y, dots, staff);
+		DrawDots ( dc, (x + m_doc->m_drawingInterl[staff->staffSize]), y, dots, staff);
 	}
 	return;
 }
@@ -884,7 +884,7 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
 	int i;
 	for (i = 0; i < dots; i++) {
 		DrawDot ( dc, x, y );
-		x += std::max (6, 2 * m_doc->m_drawingStep1);
+		x += std::max (6, 2 * m_doc->m_drawingUnit);
 	}
 	return;
 }
@@ -1141,9 +1141,9 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
 	}
 
-	a -= m_doc->m_drawingStep1*2;
+	a -= m_doc->m_drawingUnit*2;
 	if (clef->m_cueSize)
-		a+= m_doc->m_drawingStep1;
+		a+= m_doc->m_drawingUnit;
 
 	DrawSmuflCode ( dc, a, b, sym, staff, clef->m_cueSize  );
    
@@ -1188,7 +1188,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
         x = element->GetDrawingX();
 		if (mensur->GetSign())
         {
-			x += m_doc->m_drawingStep1*5; // step forward because we have a sign or a meter symbol
+			x += m_doc->m_drawingUnit*5; // step forward because we have a sign or a meter symbol
         }
 		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), mensur->GetNumbase(), staff);
 	}
@@ -1309,7 +1309,7 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
 		ynum = y - (m_doc->m_drawingHalfInterl[staff->staffSize]*6);
 
 	if (numBase > 9 || num > 9)	// avancer
-		x += m_doc->m_drawingStep1*2;
+		x += m_doc->m_drawingUnit*2;
 
 	s = StringFormat("%u",num);
     // FIXME (wtext instead of w)
@@ -1340,11 +1340,11 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
     if ( meterSig->GetSym() == METERSIGN_common ) {
         DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff, staff->staffSize);
-        x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
+        x += m_doc->m_drawingUnit*5; // step forward because we have a symbol
     }
     else if ( meterSig->GetSym() == METERSIGN_cut ) {
         DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff, staff->staffSize);
-        x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
+        x += m_doc->m_drawingUnit*5; // step forward because we have a symbol
     }
 
     if (meterSig->GetCount())
@@ -1466,10 +1466,10 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff )
 {
     // to be updated
-    int x = element->GetDrawingX() - 1 * m_doc->m_env.m_interlDefin;
+    int x = element->GetDrawingX() - 1 * m_doc->m_drawingUnit * 2;
     int y = element->GetDrawingY();
     if (staff->GetAlignment() ) {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * 2 * m_doc->m_env.m_interlDefin;
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * m_doc->m_drawingUnit * 4;
     }
     dc->StartGraphic( syl, "syl", syl->GetUuid() );
     DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
@@ -1596,7 +1596,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         y1 = y2 = note2->GetDrawingY();
         x2 = note2->GetDrawingX();
-        x1 = x2 - m_doc->m_drawingStep2;
+        x1 = x2 - m_doc->m_drawingInterl[ staff->staffSize ];
         assert(dynamic_cast<Note*>(note2));
         noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
         //DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);

@@ -215,12 +215,8 @@ public:
   
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** Editor step (10 by default) */
-    int m_drawingStep1;
-    /** Editor medium step (3 * m_drawingStep1) */
-    int m_drawingStep2;
-    /** Editor large step (6 * m_drawingStep1) */
-    int m_drawingStep3;
+    /** The page drawing unit */
+    int m_drawingUnit;
     /** Half a the space between to staff lines for normal and small staff (10 and 8 by default) */
     int m_drawingHalfInterl[2];
     /** Space between to staff lines for normal and small staff (20 and 16 by default) */

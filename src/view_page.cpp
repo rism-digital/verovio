@@ -332,11 +332,11 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     
 	points[0].x = ToDeviceContextX(x);
 	points[0].y = ToDeviceContextY(y1);
-	points[1].x = ToDeviceContextX(x - m_doc->m_drawingStep2);
+	points[1].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ] );
 	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*3);
-	points[3].x = ToDeviceContextX(x - m_doc->m_drawingStep1*2);
+	points[3].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ] );
 	points[3].y = ToDeviceContextY(ymed);
-	points[2].x = ToDeviceContextX(x + m_doc->m_drawingStep1);
+	points[2].x = ToDeviceContextX(x + m_doc->m_drawingUnit);
 	points[2].y = points[3].y + ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]);
     
     new_coords[0][0] = points[1].x;

@@ -48,7 +48,7 @@ void Doc::Reset( DocType type )
     
     UpdateFontValues();
     
-    m_type = type;    
+    m_type = type;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
@@ -59,6 +59,7 @@ void Doc::Reset( DocType type )
     m_spacingSystem = m_env.m_spacingSystem;
     
     m_drawingPage = NULL;
+    m_drawingUnit = 0;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Reset();
@@ -280,6 +281,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     // Since  m_env.m_interlDefin stays the same, it useless to do it
     // every time for now.
     
+    m_drawingUnit = this->m_env.m_unit;
+    
 	m_drawingBeamMaxSlope = this->m_env.m_beamMaxSlope;
 	m_drawingBeamMinSlope = this->m_env.m_beamMinSlope;
 	m_drawingBeamMaxSlope /= 100;
@@ -291,7 +294,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingGraceRatio[1] = this->m_env.m_graceDen;
     
     // half of the space between two lines
-    m_drawingHalfInterl[0] = m_env.m_interlDefin/2;
+    m_drawingHalfInterl[0] = m_env.m_unit;
     // same for small staves
     m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
@@ -305,13 +308,9 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
     m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
     
-    m_drawingStep1 = m_drawingHalfInterl[0];
-    m_drawingStep2 = m_drawingStep1 * 3;
-    m_drawingStep3 = m_drawingStep1 * 6;
-    
     // values for beams
-    m_drawingBeamWidth[0] = this->m_env.m_interlDefin / 2;
-    m_drawingBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
+    m_drawingBeamWidth[0] = this->m_env.m_unit;
+    m_drawingBeamWhiteWidth[0] = this->m_env.m_unit / 2;
     m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
@@ -383,7 +382,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
 
 int Doc::CalcMusicFontSize( )
 {
-    return m_env.m_interlDefin * 4;
+    return m_env.m_unit * 8;
 }
 
 void Doc::UpdateFontValues() 

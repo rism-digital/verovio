@@ -163,8 +163,8 @@ public:
     
     
 public:
-    /** The reference interline definition  */
-    int m_interlDefin;
+    /** The unit (1⁄2 of the distance between staff lines) **/
+    int m_unit;
     /** The landscape paper orientation flag */
     char m_landscape;
     /** The staff line width */

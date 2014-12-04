@@ -410,7 +410,7 @@ std::string GetVersion() {
 DefaultEnv::DefaultEnv()
 {
     
-    m_interlDefin = DEFAULT_UNIT * 2;
+    m_unit = DEFAULT_UNIT;
     m_landscape = false;
     m_staffLineWidth = 20;
     m_stemWidth = 20;
