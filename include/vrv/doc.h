@@ -162,12 +162,6 @@ public:
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
     int GetAdjustedDrawingPageHeight( );
-    
-    /**
-     * Initializes fonts from the resources (music and lyrics)
-     * The method is called when the doc is reset.
-     */
-	virtual void UpdateFontValues();
         
     //----------//
     // Functors //

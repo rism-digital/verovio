@@ -124,10 +124,6 @@ public:
     static bool InitFont( );
     static bool SetFont( std::string fontName );
     static Glyph* GetGlyph( wchar_t smuflCode );
-    static std::string GetMusicFontDescStr( ) { return m_musicFontDesc; };
-    static void SetMusicFontDescStr( std::string lyricFontDesc ) { m_musicFontDesc = lyricFontDesc; };
-    static std::string GetLyricFontDescStr( ) { return m_lyricFontDesc; };
-    static void SetLyricFontDescStr( std::string lyricFontDesc ) { m_lyricFontDesc = lyricFontDesc; };
     ///@}
     
 private:
@@ -137,10 +133,6 @@ private:
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static std::string m_path;
-    /** The FontInfo string for the music font */
-    static std::string m_musicFontDesc;
-    /** The FontInfo string for the default lyric font */
-    static std::string m_lyricFontDesc;
     /** */
     static std::map<wchar_t, Glyph> m_font;
 };

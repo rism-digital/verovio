@@ -46,8 +46,6 @@ void Doc::Reset( DocType type )
 {
     Object::Reset();
     
-    UpdateFontValues();
-    
     m_type = type;
     m_pageWidth = -1;
     m_pageHeight = -1;
@@ -383,24 +381,6 @@ Page *Doc::SetDrawingPage( int pageIdx )
 int Doc::CalcMusicFontSize( )
 {
     return m_env.m_unit * 8;
-}
-
-void Doc::UpdateFontValues() 
-{	
-	if ( !m_drawingMusicFont.FromString( Resources::GetMusicFontDescStr() ) )
-        LogWarning( "Impossible to load the music font" );
-    
-	m_drawingFonts[0][0] = m_drawingMusicFont;
-    m_drawingFonts[0][1] = m_drawingMusicFont;
-    m_drawingFonts[1][0] = m_drawingMusicFont;
-    m_drawingFonts[1][1] = m_drawingMusicFont;
-	
-	// Lyrics
-	if ( !m_drawingLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
-		LogWarning( "Impossible to load font for the lyrics" );
-    
-	m_drawingLyricFonts[0] = m_drawingLyricFont;
-    m_drawingLyricFonts[1] = m_drawingLyricFont;
 }
     
 int Doc::GetAdjustedDrawingPageHeight()
