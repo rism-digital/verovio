@@ -41,11 +41,6 @@ public:
     virtual Object* Clone() { return new KeySig(*this); };
     virtual std::string GetClassName( ) { return "KeySig"; };
     
-    /**
-     * Return the default horizontal spacing after a keysig.
-     */
-    virtual int GetHorizontalSpacing( ) { return 20; };
-    
     unsigned char GetAlterationAt(int pos);
     int GetOctave(unsigned char pitch, int clefId);
     

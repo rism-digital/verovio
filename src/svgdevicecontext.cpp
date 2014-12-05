@@ -110,8 +110,10 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
     }
     
-    s += StringFormat ( "<svg width=\"%dpx\" height=\"%dpx\"", (int)((double)m_width * m_userScaleX), (int)((double)m_height * m_userScaleY));
-    s += " version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
+    s += StringFormat ( "<svg width=\"%dpx\" height=\"%dpx\"",
+                       (int)((double)m_width * m_userScaleX) / 10,
+                       (int)((double)m_height * m_userScaleY) / 10);
+    s += " version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  xmlns:xlink=\"http://www.w3.org/1999/xlink\" overflow=\"visible\">\n";
     
     m_outdata << s;
     
@@ -195,8 +197,13 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
 
 void SvgDeviceContext::StartPage( )
 {
-    // a graphic for scaling
-    WriteLine(StringFormat("<g class=\"page-scale\" transform=\"scale(%f, %f)\">", m_userScaleX, m_userScaleY ) );
+    // a graphic for page (user) scaling
+    //WriteLine(StringFormat("<g class=\"page-scale\" transform=\"scale(%f, %f)\">", m_userScaleX, m_userScaleY ) );
+    //m_graphics++;
+    //m_indents++;
+    // a graphic for definition scaling
+    //WriteLine(StringFormat("<g class=\"definition-scale\" transform=\"scale(0.1, 0.1)\">" ) );
+    WriteLine(StringFormat("<svg id=\"definition-scale\" viewBox=\"0 0 %d %d\">", m_width, m_height ) );
     m_graphics++;
     m_indents++;
     // a graphic for the origin
@@ -212,10 +219,14 @@ void SvgDeviceContext::EndPage()
     m_graphics--;
     m_indents--;
     WriteLine("</g>");
-    // end page-scale
+    // end definition-scale
     m_graphics--;
     m_indents--;
-    WriteLine("</g>");
+    WriteLine("</svg>");
+    // end page-scale
+    //m_graphics--;
+    //m_indents--;
+    //WriteLine("</g>");
 }
 
         
@@ -495,7 +506,7 @@ void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alig
         anchor = " text-anchor=\"middle\"";
     }
     
-    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 36px;\" %s>", x, y, 0, 0, anchor.c_str()) ;
+    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 360px;\" %s>", x, y, 0, 0, anchor.c_str()) ;
     s = s + text + "</text> " ;
     WriteLine(s);
 }

@@ -490,13 +490,6 @@ protected:
      * Clear the children vector and delete all the objects.
      */
     void ClearChildren();
-    
-    /**
-     * Set the m_doc pointer by looking at the parent Doc (assert if none).
-     * This is cached to it we do not need to look at everytime.
-     * The methods checks if the pointers is already set.
-     */
-    void SetDocParent();
 
 public:
     ArrayOfObjects m_children;

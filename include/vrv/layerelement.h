@@ -48,12 +48,6 @@ public:
     LayerElement *GetChildCopy( bool newUuid = true );
     
     /**
-     * Return the default horizontal spacing of elements.
-     * This method should be redefined whenever necessary in the child classes.
-     */
-    virtual int GetHorizontalSpacing( );
-    
-    /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
      * Called by AlignHorizontally
      */

@@ -133,12 +133,6 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
     
     return element;
 }
-
-int LayerElement::GetHorizontalSpacing()
-{
-    return 10; // arbitrary generic value
-}
-    
     
 void LayerElement::ResetHorizontalAlignment()
 {

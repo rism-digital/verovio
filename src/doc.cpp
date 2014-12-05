@@ -16,8 +16,14 @@
 //----------------------------------------------------------------------------
 
 #include "glyph.h"
+#include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "mensur.h"
+#include "metersig.h"
+#include "mrest.h"
+#include "multirest.h"
+#include "note.h"
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
@@ -46,9 +52,7 @@ void Doc::Reset( DocType type )
 {
     Object::Reset();
     
-    UpdateFontValues();
-    
-    m_type = type;    
+    m_type = type;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
@@ -59,6 +63,7 @@ void Doc::Reset( DocType type )
     m_spacingSystem = m_env.m_spacingSystem;
     
     m_drawingPage = NULL;
+    m_drawingUnit = 0;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Reset();
@@ -225,6 +230,41 @@ int Doc::GetPageCount( )
 {
     return GetChildCount() ;
 }
+/*
+short Doc::GetLeftMargin( const std::type_info *elementType )
+{
+    if (&typeid(Note) == elementType)
+        return 5;
+    return 0;
+}
+*/
+    
+    short Doc::GetLeftMargin( const Object *object )
+    {
+        const std::type_info *elementType = &typeid(*object);
+        //if (typeid(Note) == *elementType) return 10;
+        if (typeid(Barline) == *elementType) return 5;
+        else if (typeid(Clef) == *elementType) return -10;
+        return 0;
+
+    }
+    
+
+    
+    
+short Doc::GetRightMargin( const std::type_info *elementType )
+{
+    if (typeid(Clef) == *elementType) return 20;
+    else if (typeid(KeySig) == *elementType)  return 40;
+    else if (typeid(Mensur) == *elementType) return 30;
+    else if (typeid(MeterSig) == *elementType) return 30;
+    else if (typeid(Barline) == *elementType) return 0;
+    else if (typeid(MRest) == *elementType) return 0;
+    else if (typeid(MultiRest) == *elementType) return 0;
+    //else if (typeid(Note) == *elementType) return 10;
+    return 15;
+}
+
 
 Page *Doc::SetDrawingPage( int pageIdx )
 {
@@ -280,6 +320,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     // Since  m_env.m_interlDefin stays the same, it useless to do it
     // every time for now.
     
+    m_drawingUnit = this->m_env.m_unit;
+    
 	m_drawingBeamMaxSlope = this->m_env.m_beamMaxSlope;
 	m_drawingBeamMinSlope = this->m_env.m_beamMinSlope;
 	m_drawingBeamMaxSlope /= 100;
@@ -291,7 +333,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingGraceRatio[1] = this->m_env.m_graceDen;
     
     // half of the space between two lines
-    m_drawingHalfInterl[0] = m_env.m_interlDefin/2;
+    m_drawingHalfInterl[0] = m_env.m_unit;
     // same for small staves
     m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
@@ -305,13 +347,9 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
     m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
     
-    m_drawingStep1 = m_drawingHalfInterl[0];
-    m_drawingStep2 = m_drawingStep1 * 3;
-    m_drawingStep3 = m_drawingStep1 * 6;
-    
     // values for beams
-    m_drawingBeamWidth[0] = this->m_env.m_interlDefin / 2;
-    m_drawingBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
+    m_drawingBeamWidth[0] = this->m_env.m_unit;
+    m_drawingBeamWhiteWidth[0] = this->m_env.m_unit / 2;
     m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
@@ -383,25 +421,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
 
 int Doc::CalcMusicFontSize( )
 {
-    return m_env.m_interlDefin * 4;
-}
-
-void Doc::UpdateFontValues() 
-{	
-	if ( !m_drawingMusicFont.FromString( Resources::GetMusicFontDescStr() ) )
-        LogWarning( "Impossible to load the music font" );
-    
-	m_drawingFonts[0][0] = m_drawingMusicFont;
-    m_drawingFonts[0][1] = m_drawingMusicFont;
-    m_drawingFonts[1][0] = m_drawingMusicFont;
-    m_drawingFonts[1][1] = m_drawingMusicFont;
-	
-	// Lyrics
-	if ( !m_drawingLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
-		LogWarning( "Impossible to load font for the lyrics" );
-    
-	m_drawingLyricFonts[0] = m_drawingLyricFont;
-    m_drawingLyricFonts[1] = m_drawingLyricFont;
+    return m_env.m_unit * 8;
 }
     
 int Doc::GetAdjustedDrawingPageHeight()

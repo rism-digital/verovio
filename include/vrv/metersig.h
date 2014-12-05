@@ -41,11 +41,6 @@ public:
     ///@}
     
     /**
-     * Return the default horizontal spacing after a keysig.
-     */
-    virtual int GetHorizontalSpacing( ) { return 20; };
-    
-    /**
      * Comparison operator. 
      * Check if the LayerElement if a MeterSig and compare attributes
      */

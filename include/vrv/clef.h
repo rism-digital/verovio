@@ -50,11 +50,6 @@ public:
     virtual bool operator==(Object& other);
     
     /**
-     * Return the default horizontal spacing after a clef.
-     */
-    virtual int GetHorizontalSpacing( ) { return 20; };
-    
-    /**
      * Return the offset of the clef
      */
     int GetClefOffset();

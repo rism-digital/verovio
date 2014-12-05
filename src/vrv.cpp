@@ -33,8 +33,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
     
 std::string Resources::m_path = "/usr/local/share/verovio";
-std::string Resources::m_musicFontDesc = "0;13;70;90;90;0;Leipzig 4.9;33"; //obsolete
-std::string Resources::m_lyricFontDesc = "0;12;70;93;90;0;Garamond;0"; // obsolete
 std::map<wchar_t, Glyph> Resources::m_font;
   
 //----------------------------------------------------------------------------
@@ -410,11 +408,11 @@ std::string GetVersion() {
 DefaultEnv::DefaultEnv()
 {
     
-    m_interlDefin = DEFAULT_UNIT * 2;
+    m_unit = DEFAULT_UNIT;
     m_landscape = false;
-    m_staffLineWidth = 2;
-    m_stemWidth = 2;
-    m_barlineWidth = 2;
+    m_staffLineWidth = 20;
+    m_stemWidth = 20;
+    m_barlineWidth = 20;
     m_beamMaxSlope = 30;
     m_beamMinSlope = 10;
     
