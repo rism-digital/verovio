@@ -809,7 +809,7 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
         mclef->SetShape(CLEFSHAPE_G);
         mclef->SetLine(line - 48);
         mclef->SetDis(OCTAVE_DIS_8);
-        mclef->SetDisPlace(PLACE_above);
+        mclef->SetDisPlace(PLACE_below);
     } else if (clef == 'F' || clef == 'f') {
         mclef->SetShape(CLEFSHAPE_F);
         mclef->SetLine(line - 48);
@@ -856,8 +856,8 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
  BARRENDITION_single     /
  BARRENDITION_end        does not exist
  BARRENDITION_rptboth    ://:
- BARRENDITION_rptstart   ://
- BARRENDITION_rptend     //:
+ BARRENDITION_rptend     ://
+ BARRENDITION_rptstart   //:
  BARRENDITION_dbl        //
  */
 
@@ -869,11 +869,11 @@ int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int in
     regfree(&re);
     
     regcomp(&re, "^://", REG_EXTENDED);
-    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
     
     regcomp(&re, "^//:", REG_EXTENDED);
-    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
+    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
     
     regcomp(&re, "^//", REG_EXTENDED);
@@ -1081,7 +1081,8 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
     }
     
     if ( measure->wholerest > 0 ) { 
-        MultiRest *mr = new MultiRest(measure->wholerest);
+        MultiRest *mr = new MultiRest();
+        mr->SetNum(measure->wholerest);
         m_layer->AddElement(mr);
     }
     

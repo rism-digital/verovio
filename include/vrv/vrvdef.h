@@ -176,8 +176,8 @@ enum StaffGrpSymbol {
 enum ClefId {
     G1 = CLEFSHAPE_G << 8 | 1,
     G2 = CLEFSHAPE_G << 8 | 2,
-    G2va =  PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
-    G2vabassa = PLACE_below << 24 | OCTAVE_DIS_8 << 16 | G2,
+    G2_8va =  PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
+    G2_8vb = PLACE_below << 24 | OCTAVE_DIS_8 << 16 | G2,
     F3 = CLEFSHAPE_F << 8 | 3,
     F4 = CLEFSHAPE_F << 8 | 4,
     F5 = CLEFSHAPE_F << 8 | 5,

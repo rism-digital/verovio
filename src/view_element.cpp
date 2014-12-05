@@ -1105,9 +1105,9 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 		case G1 :
             b -= m_doc->m_drawingStaffSize[ staff->staffSize ]; 
             break;
-		case G2va :
+		case G2_8va :
             sym = SMUFL_E053_gClef8va;
-        case G2vabassa :
+        case G2_8vb :
             sym = SMUFL_E052_gClef8vb;
 		case C2 :
             sym = SMUFL_E05C_cClef;

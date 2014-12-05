@@ -178,6 +178,10 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
             else if ( (alignment->GetType() == type) && (type != ALIGNMENT_GRACENOTE) ) {
                 return alignment;
             }
+            else if ( alignment->GetType() > type ) {
+                idx = i;
+                break;
+            }
         }
         // nothing found, do not go any further but keep the index
         if (alignment->GetTime() > time) {

@@ -10,7 +10,7 @@ function print_help {
 VEROVIO_ROOT=../
 VEROVIO_INCLUDE=../include/vrv
 VEROVIO_LIBMEI=../libmei
-if command -v emcc 2&>1; then
+if command -v emcc >/dev/null 2>&1 ; then
 	EMCC=`command -v emcc`
 else
 	echo >&2 "I require the emscripten compiler (emcc) but it's not installed.  Aborting.";
@@ -25,7 +25,7 @@ if [ ! -d data ]; then mkdir data; fi
 # memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
 # we can disable this for a light version 	
 ASM="\
-	--closure 1 -O2 --memory-init-file 0 \
+	-O2 --memory-init-file 0 \
 	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=160000 \
 	-s TOTAL_MEMORY=256*1024*1024 \
