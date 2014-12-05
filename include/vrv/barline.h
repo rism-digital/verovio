@@ -55,11 +55,6 @@ public:
      */
     bool HasRepetitionDots( );
     
-    /**
-     * Return the default horizontal spacing of notes.
-     */
-    virtual int GetHorizontalSpacing( ) { return 0; }
-    
 private:
     
 public:

@@ -16,8 +16,14 @@
 //----------------------------------------------------------------------------
 
 #include "glyph.h"
+#include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "mensur.h"
+#include "metersig.h"
+#include "mrest.h"
+#include "multirest.h"
+#include "note.h"
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
@@ -224,6 +230,41 @@ int Doc::GetPageCount( )
 {
     return GetChildCount() ;
 }
+/*
+short Doc::GetLeftMargin( const std::type_info *elementType )
+{
+    if (&typeid(Note) == elementType)
+        return 5;
+    return 0;
+}
+*/
+    
+    short Doc::GetLeftMargin( const Object *object )
+    {
+        const std::type_info *elementType = &typeid(*object);
+        //if (typeid(Note) == *elementType) return 10;
+        if (typeid(Barline) == *elementType) return 5;
+        else if (typeid(Clef) == *elementType) return -10;
+        return 0;
+
+    }
+    
+
+    
+    
+short Doc::GetRightMargin( const std::type_info *elementType )
+{
+    if (typeid(Clef) == *elementType) return 20;
+    else if (typeid(KeySig) == *elementType)  return 40;
+    else if (typeid(Mensur) == *elementType) return 30;
+    else if (typeid(MeterSig) == *elementType) return 30;
+    else if (typeid(Barline) == *elementType) return 0;
+    else if (typeid(MRest) == *elementType) return 0;
+    else if (typeid(MultiRest) == *elementType) return 0;
+    //else if (typeid(Note) == *elementType) return 10;
+    return 15;
+}
+
 
 Page *Doc::SetDrawingPage( int pageIdx )
 {

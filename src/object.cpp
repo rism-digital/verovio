@@ -930,8 +930,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
+    // param 2: the Doc
     int *min_pos = static_cast<int*>(params[0]);
     int *measure_width = static_cast<int*>(params[1]);
+    Doc *doc = static_cast<Doc*>(params[2]);
 
     // starting a new measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -948,10 +950,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // starting an new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
-        // reset it as the minimum position to the step (if doc found)
-        (*min_pos) = 0;
-        Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
-        if (doc) (*min_pos) = doc->m_drawingUnit * 1;
+        // reset it as the minimum position to the step
+        (*min_pos) = 20 * doc->m_drawingUnit / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -998,14 +998,17 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         // We need to reconsider this: if the mrest is on the top staff, the aligner will be before any other note
         // aligner. This means that it will not be shifted. We need to shift it but not take into account its own width.
         //current->GetAlignment()->SetXShift( current->GetAlignment()->GetXRel() );
+        (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
     }
+    
+    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / 10;
     
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
-    int negative_offset = - current->m_contentBB_x1;
+    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(current) * doc->m_drawingUnit / 10);
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
@@ -1025,10 +1028,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    //(*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
-    //current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 - current->GetAlignment()->GetXRel() + current->GetHorizontalSpacing() );
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + current->GetHorizontalSpacing();
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + current->GetHorizontalSpacing() );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / 10;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / 10 );
     
     return FUNCTOR_CONTINUE;
 }

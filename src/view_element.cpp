@@ -298,8 +298,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		}
 	}*/ // ax2 - not support of lat
 
-	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);	// dessin lignes additionnelles
-
 	if (note->GetDur() == DUR_LG || note->GetDur() == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->GetDur() == DUR_1))	// dessin carrees
 	{
 		DrawLigature ( dc, ynn, element, layer, staff);

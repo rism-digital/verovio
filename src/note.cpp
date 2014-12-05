@@ -197,12 +197,4 @@ void Note::ResetSlurAttrInitial( )
     }
 }
 
-int Note::GetHorizontalSpacing()
-{
-    if (this->m_cueSize) {
-        return 3;
-    }
-    return 5; // arbitrary generic value
-}
-
 } // namespace vrv

@@ -92,6 +92,15 @@ public:
     ///@}
     
     /**
+     * @name Getters for the object margins (left and right)
+     * These should eventually be set at parameters.
+     */
+    ///@{
+    short GetLeftMargin( const Object *object );
+    short GetRightMargin( const std::type_info *elementType );
+    ///@}
+    
+    /**
      * Saves the document using the specified output stream.
      * Creates a functors that will parse the full tree.
      */
