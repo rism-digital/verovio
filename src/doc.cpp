@@ -57,6 +57,7 @@ void Doc::Reset( DocType type )
     m_spacingSystem = m_env.m_spacingSystem;
     
     m_drawingPage = NULL;
+    m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Reset();
