@@ -1434,6 +1434,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
+    // HARDCODED (smufl code wrong)
     DrawSmuflCode( dc, x, y, 35, staff, custos->m_cueSize );
     
     dc->EndGraphic(element, this ); //RZ
@@ -1506,7 +1507,8 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     for (int i = 0; i < ks->GetAlterationNumber(); i++) {
         
-        x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] + 5) * i;
+        // HARDCODED
+        x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.2) * i;
         y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->GetClefId()));;
         
         if (ks->GetAlteration() == ACCID_FLAT)
@@ -1633,7 +1635,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     // FIXME, take in account elements that can be netween notes, eg keys time etc
     // 20 height nice with 70, not nice with 50
-    // Also remove hard-coded values!
+    // Also remove HARDCODED values!
     if (up) {
         y1 += 14;
         y2 += 14;
@@ -1660,6 +1662,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     dc->SetPen(AxBLACK, 2, AxSOLID);
     dc->SetBrush( AxBLACK, AxSOLID );
     
+    // HARDCODED
     if (element->m_drawingStemDir)
         dc->DrawLine(element->m_drawingStemStart.x - 10, ToDeviceContextY(element->m_drawingStemStart.y + 10), element->m_drawingStemStart.x + 20, ToDeviceContextY(element->m_drawingStemStart.y + 40));
     else
@@ -1691,10 +1694,12 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         */
             // only for up-fermatas, if there is a trill on the same note
             // add a 35 pixel space so they do not collide
+            // HARDCODED
             if (note->m_embellishment)
                 emb_offset = 35;
             
             // check that the notehead is in the staff.
+            // HARDCODED
             if ((element->GetDrawingY()) < staff->GetDrawingY())
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
                 y = staff->GetDrawingY() + 20 + emb_offset;
@@ -1723,6 +1728,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         // this is a rest
         // rests for the moment are always in the staff
         // so just place the fermata above the staff + 20 px
+        // HARDCODED
         y = staff->GetDrawingY() + 20;
         DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C1_fermataBelow, staff, false );
     }
@@ -1735,6 +1741,7 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;    
     x = element->GetDrawingX();
 
+    // HARDCODED
     if ((element->GetDrawingY()) < staff->GetDrawingY())
         y = staff->GetDrawingY() + 30;
     else

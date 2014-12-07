@@ -63,4 +63,6 @@
    <glyph glyph-code="E566" x="0.0" y="0.0" width="432.0" height="364.0" />
    <glyph glyph-code="E56C" x="0.0" y="-2.0" width="605.0" height="242.0" />
    <glyph glyph-code="E56D" x="0.0" y="-90.0" width="586.0" height="399.0" />
+   <glyph glyph-code="E004" x="0.0" y="-282.1" width="399.0" height="282.8" />
+   <glyph glyph-code="E003" x="0.0" y="-0.6" width="399.0" height="282.8" />
 </bounding-boxes>

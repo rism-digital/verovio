@@ -6,8 +6,8 @@
             <!--<glyph glyph-code="E000" smufl-name="brace"/>-->
             <!--<glyph glyph-code="E001" smufl-name="reversedBrace"/>-->
             <!--<glyph glyph-code="E002" smufl-name="bracket"/>-->
-            <!--<glyph glyph-code="E003" smufl-name="bracketTop"/>-->
-            <!--<glyph glyph-code="E004" smufl-name="bracketBottom"/>-->
+            <glyph glyph-code="E003" smufl-name="bracketTop"/>
+            <glyph glyph-code="E004" smufl-name="bracketBottom"/>
             <!--<glyph glyph-code="E005" smufl-name="reversedBracketTop"/>-->
             <!--<glyph glyph-code="E006" smufl-name="reversedBracketBottom"/>-->
             <!--<glyph glyph-code="E007" smufl-name="systemDivider"/>-->

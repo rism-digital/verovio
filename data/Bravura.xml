@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bounding-boxes font-family="Bravura" units-per-em="2048">
+   <glyph glyph-code="E003" x="0.0" y="0.0" width="1083.0" height="1022.0" />
+   <glyph glyph-code="E004" x="0.0" y="-1022.0" width="1083.0" height="1022.0" />
    <glyph glyph-code="E050" x="12.0" y="-1348.0" width="1374.0" height="3605.0" />
    <glyph glyph-code="E051" x="10.0" y="-1794.0" width="1358.0" height="4035.0" />
    <glyph glyph-code="E052" x="8.0" y="-1772.0" width="1362.0" height="4027.0" />

@@ -22,6 +22,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 enum {
+  SMUFL_E003_bracketTop = 0xE003,
+  SMUFL_E004_bracketBottom = 0xE004,
   SMUFL_E050_gClef = 0xE050,
   SMUFL_E051_gClef15mb = 0xE051,
   SMUFL_E052_gClef8vb = 0xE052,
@@ -88,7 +90,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 63
+#define SMUFL_COUNT 65
 
 } // vrv namespace
 

@@ -950,8 +950,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // starting an new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
-        // reset it as the minimum position to the step
-        (*min_pos) = 20 * doc->m_drawingUnit / 10;
+        // reset it as the minimum position to the step (HARDCODED)
+        (*min_pos) = 30 * doc->m_drawingUnit / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );

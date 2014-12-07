@@ -244,7 +244,7 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
         const std::type_info *elementType = &typeid(*object);
         //if (typeid(Note) == *elementType) return 10;
         if (typeid(Barline) == *elementType) return 5;
-        else if (typeid(Clef) == *elementType) return -10;
+        else if (typeid(Clef) == *elementType) return -20;
         return 0;
 
     }
@@ -255,7 +255,7 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
 short Doc::GetRightMargin( const std::type_info *elementType )
 {
     if (typeid(Clef) == *elementType) return 20;
-    else if (typeid(KeySig) == *elementType)  return 40;
+    else if (typeid(KeySig) == *elementType)  return 30;
     else if (typeid(Mensur) == *elementType) return 30;
     else if (typeid(MeterSig) == *elementType) return 30;
     else if (typeid(Barline) == *elementType) return 0;
