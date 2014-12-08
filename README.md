@@ -1,10 +1,8 @@
 Verovio is a fast, portable and lightweight library for engraving Music Encoding Initiative (MEI) music scores into SVG. Verovio can also render Plain and Easy (PAE) code and DARMS code. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++ with no dependencies on third-party frameworks and libraries.
 
-The main project page is at http://www.verovio.org.
-
 Verovio can be used as a standalone command-line tool for converting a files, as the music rendering library for applications, or it can be compiled to Javascript using the Emscripten LLVM-to-JavaScript compiler.
 
-Verovio is available under the GPL license, see LICENSE.txt.
+The project page is http://www.verovio.org. Verovio is available under the GPL license (see LICENSE.txt).
 
 LibMEI
 ------
@@ -13,5 +11,7 @@ The code for the attribute classes of Verovio are generated from the MEI schema 
 
 Example output
 --------------
+
+This page was generated with version 0.9.0
 
 ![Example page](/images/page.png)
