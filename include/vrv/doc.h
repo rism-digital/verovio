@@ -122,15 +122,16 @@ public:
     void PrepareDrawing( );
     
     /**
-     * Performs the layout of the entire document.
+     * Casts off the entire document.
+     * Starting from a single system, create and fill pages and systems.
      */
-    void LayOut( );
+    void CastOff( );
     
     /**
-     * Undo the layout of the entire document.
+     * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void LayOutContinuously( );
+    void UnCastOff( );
     
     /**
      * To be implemented.

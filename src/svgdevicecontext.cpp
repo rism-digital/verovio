@@ -506,6 +506,7 @@ void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alig
         anchor = " text-anchor=\"middle\"";
     }
     
+    // HARDCODED
     s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 360px;\" %s>", x, y, 0, 0, anchor.c_str()) ;
     s = s + text + "</text> " ;
     WriteLine(s);
@@ -532,6 +533,7 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
     //    WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
     //    WriteLine( text ) ;
     //}
+    // HARDCODED
     s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 36px;\">", x, y, 0, 0) ;
 
     // For some reason, some browsers (e.g., Chrome) do not like spaces or dots in font names...

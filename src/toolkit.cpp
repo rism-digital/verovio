@@ -221,7 +221,7 @@ bool Toolkit::LoadString( const std::string &data )
     // was set, though.
     if (!input->HasLayoutInformation() && !m_noLayout) {
         //LogElapsedTimeStart();
-        m_doc.LayOut();
+        m_doc.CastOff();
         //LogElapsedTimeEnd("layout");
     }
     
@@ -379,8 +379,8 @@ void Toolkit::RedoLayout()
     m_doc.SetSpacingStaff( this->GetSpacingStaff() );
     m_doc.SetSpacingSystem( this->GetSpacingSystem() );
     
-    m_doc.LayOutContinuously();
-    m_doc.LayOut();
+    m_doc.UnCastOff();
+    m_doc.CastOff();
 }
 
 bool Toolkit::RenderToSvgFile( const std::string &filename, int pageNo )

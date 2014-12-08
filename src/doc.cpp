@@ -139,7 +139,7 @@ void Doc::SetCurrentScoreDef( bool force )
     m_currentScoreDefDone = true;
 }
 
-void Doc::LayOut( )
+void Doc::CastOff( )
 {
     this->SetCurrentScoreDef();
     
@@ -197,7 +197,7 @@ void Doc::LayOut( )
     this->SetCurrentScoreDef( true );
 }
     
-void Doc::LayOutContinuously( )
+void Doc::UnCastOff( )
 {  
     Page *contentPage = new Page();
     System *contentSystem = new System();
