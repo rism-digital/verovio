@@ -43,13 +43,6 @@ verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['nu
 // A pointer to the object - only one instance can be created for now
 verovio.ptr = 0;
 
-// add a listener that will delete the object (if necessary) when the page is left
-window.addEventListener ("unload", function () {
-	if (verovio.ptr != 0) {
-		verovio.vrvToolkit.destructor( verovio.ptr );
-	}
-});
-
 /***************************************************************************************************************************/
 
 verovio.toolkit = function() {
