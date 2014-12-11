@@ -3,6 +3,7 @@
 function print_help {
 	 echo "Usage:
 -l		Light version without ASM and no increased memory allocation
+-w 		WebWorker-compatible build.
 -v N		Version number (e.g., 1.0.0); no number by default
 -c		Turns on \"Chatty\" compiling; Will print the compiler progress" >&2 ; 
 } 
@@ -36,8 +37,9 @@ ASM_NAME=""
 VERSION=""
 VERSION_NAME=""
 CHATTY=""
+WEBWORKER=false
 
-while getopts "lv:h:c" opt; do
+while getopts "lwv:h:c" opt; do
 	case $opt in
 		l)
 			echo "light version (-l)"
@@ -54,6 +56,10 @@ while getopts "lv:h:c" opt; do
 		c)
 			CHATTY="-v"
 			echo $EMCC
+			;;
+		w)
+			WEBWORKER=true
+			echo "building with webworker compatibility"
 			;;
 		h)
 			print_help
@@ -154,7 +160,11 @@ python $EMCC $CHATTY \
 if [ $? -eq 0 ]; then 
 	echo "Done."
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
-	cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js > "build/$FILENAME"
+	if [ "$WEBWORKER" = true ]; then
+		cat build/verovio.js verovio-proxy.js > "build/$FILENAME"
+	else
+		cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
+	fi
 	# all good
 	echo "build/$FILENAME written"
 	# create also a zip file if version name is given
