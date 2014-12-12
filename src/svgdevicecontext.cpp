@@ -57,9 +57,6 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
-
-    m_graphics = 0;
-    m_indents = 1;
     
     m_leipzig_glyphs.clear();
     
@@ -80,6 +77,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     m_svgNode.append_attribute( "version" ) = "1.1";
     m_svgNode.append_attribute( "xmlns" ) = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute( "xmlns:xlink" ) = "http://www.w3.org/1999/xlink";
+    m_svgNode.append_attribute( "overflow" ) = "visible";
     
     //start the stack
     m_svgNodeStack.push_back(m_svgNode);
@@ -111,8 +109,6 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         return;
     }
     
-    int i;
-    
     //take care of width/height once userScale is updated
     m_svgNode.append_attribute( "width" ) = (int)((double)m_width * m_userScaleX);
     m_svgNode.append_attribute( "height" ) = (int)((double)m_height * m_userScaleY);
@@ -129,8 +125,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
         {
             //load the XML file that contains it as a pugi::xml_document
-            std::string filename = Resources::GetPath() + "/svg/" + (*it) + ".xml";
-            std::ifstream source( filename.c_str() );
+            std::ifstream source( (*it).c_str() );
             sourceDoc.load(source);
             
             //copy all the nodes inside into the master document
@@ -153,20 +148,9 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
     
     // save the glyph data to m_outdata
     svgDoc.save(m_outdata);
-    svgDoc.save_file("/Users/ahorwitz/Desktop/out.svg");
-
     
     //m_outdata << m_svg.str();
     m_committed = true;
-}
-
-
-void SvgDeviceContext::WriteLine( std::string string )
-{
-    std::string output;
-    output.append( m_indents, '\t' );
-    output += string + "\n"; 
-    m_svg << output;
 }
 
 
@@ -237,7 +221,7 @@ void SvgDeviceContext::StartPage( )
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
-    m_currentNode.append_attribute("viewbox") = StringFormat("0 0 %d, %d", m_width, m_height).c_str();
+    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d, %d", m_width, m_height).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
@@ -516,7 +500,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }   
 
-    pugi::xml_node rectChild = m_currentNode.append_child( "rect ");
+    pugi::xml_node rectChild = m_currentNode.append_child( "rect" );
     rectChild.append_attribute( "x" ) = x;
     rectChild.append_attribute( "y" ) = y;
     rectChild.append_attribute( "width" ) = width;
@@ -634,7 +618,10 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         // Write the char in the SVG
         pugi::xml_node useChild = m_currentNode.append_child( "use" );
         useChild.append_attribute( "xlink:href" ) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
-        useChild.append_attribute( "transform" ) = StringFormat("translate(%d, %d) scale(%f, %f)", x, y, m_font.GetPointSize(), m_font.GetPointSize()).c_str();
+        useChild.append_attribute( "x" ) = x;
+        useChild.append_attribute( "y" ) = y;
+        useChild.append_attribute( "height" ) = m_font.GetPointSize();
+        useChild.append_attribute( "width" ) = m_font.GetPointSize();
         
         // Get the bounds of the char
         glyph->GetBoundingBox(&gx, &gy, &w, &h);
