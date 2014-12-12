@@ -110,8 +110,8 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
     }
     
     //take care of width/height once userScale is updated
-    m_svgNode.append_attribute( "width" ) = (int)((double)m_width * m_userScaleX);
-    m_svgNode.append_attribute( "height" ) = (int)((double)m_height * m_userScaleY);
+    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY) / 10).c_str();
+    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX) / 10).c_str();
     
     // header
     if (m_leipzig_glyphs.size() > 0)
@@ -218,10 +218,10 @@ void SvgDeviceContext::StartPage( )
     m_currentNode.append_attribute("class") = "definition-scale";
     m_currentNode.append_attribute("transform") = "scale(0.1, 0.1)".c_str();*/
     // a graphic for definition scaling
-    m_currentNode = m_currentNode.append_child("g");
+    m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
-    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d, %d", m_width, m_height).c_str();
+    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d", m_width, m_height).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
@@ -620,8 +620,8 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         useChild.append_attribute( "xlink:href" ) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute( "x" ) = x;
         useChild.append_attribute( "y" ) = y;
-        useChild.append_attribute( "height" ) = m_font.GetPointSize();
-        useChild.append_attribute( "width" ) = m_font.GetPointSize();
+        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
+        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
         
         // Get the bounds of the char
         glyph->GetBoundingBox(&gx, &gy, &w, &h);
