@@ -89,7 +89,7 @@ bool SvgDeviceContext::CopyFileToStream(const std::string& filename, std::ostrea
 
 
 void SvgDeviceContext::Commit( bool xml_tag ) {
-
+    
     if (m_committed) {
         return;
     }
@@ -102,34 +102,49 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         m_indents--;
     }
     m_indents = 0;
-    WriteLine("</svg>\n") ;
-
+    WriteLine("</svg>") ;
+    
     // header
-    std::string s;
-    if ( xml_tag ) {
-        s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
-    }
+    pugi::xml_node decl = svgDoc.prepend_child(pugi::node_declaration);
+    decl.append_attribute("version") = "1.0";
+    decl.append_attribute("encoding") = "UTF-8";
+    decl.append_attribute("standalone") = "no";
     
-    s += StringFormat ( "<svg width=\"%dpx\" height=\"%dpx\"",
-                       (int)((double)m_width * m_userScaleX) / 10,
-                       (int)((double)m_height * m_userScaleY) / 10);
-    s += " version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  xmlns:xlink=\"http://www.w3.org/1999/xlink\" overflow=\"visible\">\n";
-    
-    m_outdata << s;
+    //prep the SVG element - this is broken right now as it actually cuts off the "svg" element after the "defs" element
+    m_svgNode = svgDoc.append_child("svg");
+    m_svgNode.append_attribute( "width" ) = (int)((double)m_width * m_userScaleX);
+    m_svgNode.append_attribute( "height" ) = (int)((double)m_height * m_userScaleY);
+    m_svgNode.append_attribute( "version" ) = "1.1";
+    m_svgNode.append_attribute( "xmlns" ) = "http://www.w3.org/2000/svg";
+    m_svgNode.append_attribute( "xmlns:xlink" ) = "http://www.w3.org/1999/xlink";
     
     if (m_leipzig_glyphs.size() > 0)
     {
-        m_outdata << "\t<defs>\n";
         
+        pugi::xml_node defs = m_svgNode.append_child( "defs" );
+        pugi::xml_document sourceDoc;
+        
+        //for each needed glyph
         std::vector<std::string>::const_iterator it;
         for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
         {
-            m_outdata << "\t\t";
-            CopyFileToStream( (*it), m_outdata );
+            //load the XML file that contains it as a pugi::xml_document
+            std::string filename = Resources::GetPath() + "/svg/" + (*it) + ".xml";
+            std::ifstream source( filename.c_str() );
+            sourceDoc.load(source);
+            
+            //copy all the nodes inside into the master document
+            for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling())
+            {
+                defs.append_copy(child);
+            }
         }
-        m_outdata << "\t</defs>\n";
     }
-    // finally concatenate the svg
+    
+    // save the glyph data to m_outdata
+    svgDoc.save(m_outdata);
+    
+    // finally concatenate the svg XML
     m_outdata << m_svg.str();
     m_committed = true;
 }

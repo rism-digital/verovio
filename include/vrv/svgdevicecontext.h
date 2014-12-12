@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -158,7 +159,11 @@ private:
     std::string m_penStyle;
     
     std::string GetColour( int colour );
-        
+    
+    //pugixml data
+    pugi::xml_document svgDoc;
+    pugi::xml_node m_svgNode;
+    
 };
 
 } // namespace vrv
