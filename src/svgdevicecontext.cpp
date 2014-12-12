@@ -112,13 +112,6 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
     }
     
     int i;
-    // close unclosed graphics, just in case
-    for (i = m_graphics; i < 0; m_graphics-- ) {
-        WriteLine("/*- SvgDeviceContext::Flush - Unclosed graphic */");
-        WriteLine("</g>");
-        m_indents--;
-    }
-    m_indents = 0;
     
     //take care of width/height once userScale is updated
     m_svgNode.append_attribute( "width" ) = (int)((double)m_width * m_userScaleX);
