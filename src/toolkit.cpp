@@ -225,6 +225,11 @@ bool Toolkit::LoadString( const std::string &data )
         //LogElapsedTimeEnd("layout");
     }
     
+    // disable justification if no layout or no justification
+    if (m_noLayout || m_noJustification) {
+        m_doc.SetJustificationX(false);
+    }
+    
     delete input;
     m_view.SetDoc( &m_doc );
     

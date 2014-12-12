@@ -275,6 +275,10 @@ void Page::JustifyHorizontally( )
     }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
     
+    if (!doc->GetJustificationX()) {
+        return;
+    }
+    
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert( this == doc->GetDrawingPage() );

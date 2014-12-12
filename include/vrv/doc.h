@@ -99,6 +99,16 @@ public:
     short GetLeftMargin( const Object *object );
     short GetRightMargin( const std::type_info *elementType );
     ///@}
+
+    /*
+     * @name Setter and getter for the justification (x-axis) flag.
+     * Justification is enabled by default. It need to be disable
+     * for drawing all the document on one single system.
+     */
+    ///@{
+    void SetJustificationX( bool drawingJustifyX ) { m_drawingJustifyX = drawingJustifyX; };
+    bool GetJustificationX( ) { return m_drawingJustifyX; };
+    ///@}
     
     /**
      * Saves the document using the specified output stream.
@@ -276,6 +286,8 @@ public:
 	float m_drawingBeamMinSlope;
     /** the current beam maximal slope */
     float m_drawingBeamMaxSlope;
+    /** flag for disabling justification */
+    bool m_drawingJustifyX;
     
 private:
     /**

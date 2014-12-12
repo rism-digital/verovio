@@ -696,7 +696,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int y = element->GetDrawingY();
     
     // move it down according to the number of line in the staff
-    y -= staff->m_drawingLines / 2 * m_doc->m_drawingInterl[staff->staffSize];
+    y -= staff->m_drawingLines / 2 * m_doc->m_drawingInterl[staff->staffSize] - m_doc->m_drawingInterl[staff->staffSize];
     
     DrawWholeRest ( dc, xCentered, y, DUR_1, 0, false, staff );
     
