@@ -14,10 +14,12 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <list>
 
 //----------------------------------------------------------------------------
 
 #include "devicecontext.h"
+#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -131,8 +133,6 @@ private:
     std::stringstream m_svg;
     
     bool m_committed; // did we flushed the file?
-    int m_graphics;
-    int m_indents;
     int m_width, m_height;
     int m_originX, m_originY;
     double m_userScaleX, m_userScaleY;
@@ -158,7 +158,13 @@ private:
     std::string m_penStyle;
     
     std::string GetColour( int colour );
-        
+    
+    //pugixml data
+    pugi::xml_document svgDoc;
+    pugi::xml_node m_svgNode;
+    pugi::xml_node m_currentNode;
+    std::list<pugi::xml_node> m_svgNodeStack;
+    
 };
 
 } // namespace vrv

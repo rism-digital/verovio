@@ -64,6 +64,7 @@ void Doc::Reset( DocType type )
     
     m_drawingPage = NULL;
     m_drawingUnit = 0;
+    m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Reset();
