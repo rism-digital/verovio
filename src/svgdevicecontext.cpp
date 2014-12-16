@@ -11,25 +11,21 @@
 //----------------------------------------------------------------------------
 
 #include <fstream>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-//#include "leipzigbbox.h"
 #include "glyph.h"
 #include "view.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
-#include <math.h>
-
 namespace vrv {
 
 #define space " "
 #define semicolon ";"
- 
-//#include "app/axapp.h"
 
 extern "C" {
 static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
@@ -58,7 +54,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
     
-    m_leipzig_glyphs.clear();
+    m_smufl_glyphs.clear();
     
     m_committed = false;
     
@@ -66,14 +62,14 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     m_svg.clear();
     
     //edit the xml declaration
-    pugi::xml_node decl = svgDoc.prepend_child(pugi::node_declaration);
+    pugi::xml_node decl = m_svgDoc.prepend_child(pugi::node_declaration);
     decl.append_attribute("version") = "1.0";
     decl.append_attribute("encoding") = "UTF-8";
     decl.append_attribute("standalone") = "no";
     
     //create the initial SVG element
     //width and height need to be set later; these are taken care of in "commit"
-    m_svgNode = svgDoc.append_child("svg");
+    m_svgNode = m_svgDoc.append_child("svg");
     m_svgNode.append_attribute( "version" ) = "1.1";
     m_svgNode.append_attribute( "xmlns" ) = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute( "xmlns:xlink" ) = "http://www.w3.org/1999/xlink";
@@ -114,7 +110,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
     m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX) / 10).c_str();
     
     // header
-    if (m_leipzig_glyphs.size() > 0)
+    if (m_smufl_glyphs.size() > 0)
     {
         
         pugi::xml_node defs = m_svgNode.prepend_child( "defs" );
@@ -122,7 +118,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         
         //for each needed glyph
         std::vector<std::string>::const_iterator it;
-        for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
+        for(it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it)
         {
             //load the XML file that contains it as a pugi::xml_document
             std::ifstream source( (*it).c_str() );
@@ -147,7 +143,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
     
     
     // save the glyph data to m_outdata
-    svgDoc.save(m_outdata);
+    m_svgDoc.save(m_outdata);
     
     //m_outdata << m_svg.str();
     m_committed = true;
@@ -610,10 +606,10 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         std::string path = glyph->GetPath();
         
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_leipzig_glyphs.begin(), m_leipzig_glyphs.end(), path);
-        if (it == m_leipzig_glyphs.end())
+        std::vector<std::string>::const_iterator it = std::find(m_smufl_glyphs.begin(), m_smufl_glyphs.end(), path);
+        if (it == m_smufl_glyphs.end())
         {
-            m_leipzig_glyphs.push_back( path );
+            m_smufl_glyphs.push_back( path );
         }
         
         
