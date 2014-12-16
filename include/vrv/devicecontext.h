@@ -53,6 +53,59 @@ class MusRect;
 class FontMetricsInfo;
 class DocObject;
 class View;
+    
+// ---------------------------------------------------------------------------
+// Pen/Brush
+// ---------------------------------------------------------------------------
+
+/**
+ * These classes are used for storing drawing style parameters during SVG and 
+ * bounding box engraving.
+ */
+
+class Pen{
+    
+public:
+    Pen()
+    : penColour(0), penWidth(0), penOpacity(0.0)
+    { }
+    Pen(int colour, int width, float opacity)
+    : penColour(colour), penWidth(width), penOpacity(opacity)
+    { }
+    
+    int getColour() const { return penColour; }
+    void setColour(int colour) { penColour = colour; }
+    int getWidth() const { return penWidth; }
+    void setWidth (int width) { penWidth = width; }
+    float getOpacity() const { return penOpacity; }
+    void setOpacity (float opacity) { penOpacity = opacity; }
+    
+public:
+    int penColour, penWidth;
+    float penOpacity;
+    
+};
+
+class Brush{
+    
+public:
+    Brush()
+    : brushColour(0), brushOpacity(0.0)
+    { }
+    Brush(int colour, float opacity)
+    : brushColour(colour), brushOpacity(opacity)
+    { }
+    
+    int getColour() const { return brushColour; }
+    void setColour(int colour) { brushColour = colour; }
+    float getOpacity() const { return brushOpacity; }
+    void setOpacity(float opacity) { brushOpacity = opacity; }
+    
+public:
+    int brushColour;
+    float brushOpacity;
+};
+
 
 // ---------------------------------------------------------------------------
 // DeviceContext
@@ -161,6 +214,9 @@ protected:
     
     bool m_correctMusicAscent; // specify if the ascent has to be correct when view the music font (true wxDC, false SVG)
     bool m_drawingBoundingBoxes;
+    
+    Pen m_currentPen;
+    Brush m_currentBrush;
 };
 
 // ---------------------------------------------------------------------------
@@ -345,7 +401,7 @@ public:
 public:
     int x, y, width, height;
 };
-
+    
 } // namespace vrv
 
 #endif // __AX_DC_H__

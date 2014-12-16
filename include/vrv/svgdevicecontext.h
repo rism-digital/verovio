@@ -150,13 +150,6 @@ private:
     
     void WriteLine( std::string );
     
-    //
-    std::string m_brushColour;
-    std::string m_brushStyle;
-    std::string m_penColour;
-    std::string m_penWidth;
-    std::string m_penStyle;
-    
     std::string GetColour( int colour );
     
     //pugixml data

@@ -160,7 +160,7 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute( "class" ) = gClass.c_str();
     m_currentNode.append_attribute( "id" ) = gId.c_str();
-    m_currentNode.append_attribute( "style" ) = StringFormat("%s %s %s %s", m_penColour.c_str(), m_penStyle.c_str(), m_brushColour.c_str(), m_brushStyle.c_str()).c_str();
+    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(m_currentPen.getColour()).c_str(), m_currentPen.getOpacity(), GetColour(m_currentBrush.getColour()).c_str(), m_currentBrush.getOpacity()).c_str();
 }
   
       
@@ -243,20 +243,21 @@ void SvgDeviceContext::EndPage()
 }
 
         
-void SvgDeviceContext::SetBrush( int colour, int style )
+void SvgDeviceContext::SetBrush( int colour, int opacity )
 {
-    m_brushColour = "fill:#" + GetColour(colour) + semicolon;
-    switch ( style )
+    m_currentBrush.setColour(colour);
+    
+    switch ( opacity )
     {
         case AxSOLID :
-            m_brushStyle = "fill-opacity:1.0; ";
+            m_currentBrush.setOpacity(1.0);
             break ;
         case AxTRANSPARENT:
-            m_brushStyle = "fill-opacity:0.0; ";
+            m_currentBrush.setOpacity(0.0);
             break ;
         default :
-            m_brushStyle = "fill-opacity:1.0; "; // solid brush as default
-    }
+            m_currentBrush.setOpacity(1.0); // solid brush as default
+     }
 }
         
 void SvgDeviceContext::SetBackground( int colour, int style )
@@ -274,20 +275,21 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
     // nothing to do, we do not handle Background Mode
 }
         
-void SvgDeviceContext::SetPen( int colour, int width, int style )
+void SvgDeviceContext::SetPen( int colour, int width, int opacity )
 {
-    m_penColour = "stroke:#" + GetColour(colour)  + semicolon;
-    m_penWidth = "stroke-width:" + StringFormat("%d", width) + semicolon;
-    switch ( style )
+    m_currentPen.setColour(colour);
+    m_currentPen.setWidth(width);
+    
+    switch ( opacity )
     {
         case AxSOLID :
-            m_penStyle = "stroke-opacity:1.0; ";
+            m_currentPen.setOpacity(1.0);
             break ;
         case AxTRANSPARENT:
-            m_penStyle = "stroke-opacity:0.0; ";
+            m_currentPen.setOpacity(0.0);
             break ;
         default :
-            m_penStyle = "stroke-opacity:1.0; "; // solid brush as default
+            m_currentPen.setOpacity(1.0); // solid brush as default
     }
 }
         
@@ -303,7 +305,7 @@ void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 
 void SvgDeviceContext::SetTextForeground( int colour )
 {
-    m_brushColour = "fill:#" + GetColour(colour); // we use the brush colour for text
+    m_currentBrush.setColour(colour); // we use the brush colour for text
 }
         
 void SvgDeviceContext::SetTextBackground( int colour )
@@ -459,7 +461,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = m_currentNode.append_child("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1,y1,x2,y2).c_str();
-    pathChild.append_attribute("style") = m_penWidth.c_str();
+    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_currentPen.getWidth()).c_str();
 }
  
                
