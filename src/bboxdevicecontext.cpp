@@ -90,7 +90,7 @@ void BBoxDeviceContext::SetBackgroundMode( int mode )
         
 void BBoxDeviceContext::SetPen( int colour, int width, int style )
 {
-    m_penWidth = width;
+    m_currentPen.setWidth(width);
 }
         
 void BBoxDeviceContext::SetFont( FontMetricsInfo *font_info )
@@ -237,7 +237,7 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye) ) );
     
-    int penWidth = m_penWidth;
+    int penWidth = m_currentPen.getWidth();
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
@@ -258,12 +258,14 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
         y1 = y2;
         y2 = tmp;
     }
-    int p1 = m_penWidth / 2;
+    
+    int penWidth = m_currentPen.getWidth();
+    int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
     // however, we expect the actualy with to be shifted on the left/top
     // e.g. with 7, 4 on the left and 3 on the right
-    if ( m_penWidth % 2 ) {
+    if ( penWidth % 2 ) {
         p1++;
     }
     
@@ -310,12 +312,12 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         width = -width;
         x -= width;
     }
-    int penWidth = m_penWidth;
+    int penWidth = m_currentPen.getWidth();
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
     
-    UpdateBB( x - penWidth / 2, y - m_penWidth / 2, x + width + m_penWidth / 2, y + height + m_penWidth / 2);
+    UpdateBB( x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
 
         

@@ -123,7 +123,7 @@ private:
     View *m_view;
    
     //
-    int m_penWidth;
+    Pen m_currentPen;
     
     void UpdateBB(int x1, int y1, int x2, int y2);
     
