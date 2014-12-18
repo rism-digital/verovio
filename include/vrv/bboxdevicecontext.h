@@ -121,9 +121,6 @@ private:
      * The view are calling from - used to flip back the Y coordinates
      */
     View *m_view;
-   
-    //
-    int m_penWidth;
     
     void UpdateBB(int x1, int y1, int x2, int y2);
     
