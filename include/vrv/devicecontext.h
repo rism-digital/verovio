@@ -10,6 +10,7 @@
 #define __VRV_DC_H__
 
 #include <string>
+#include <stack>
 
 namespace vrv {
 
@@ -215,8 +216,8 @@ protected:
     bool m_correctMusicAscent; // specify if the ascent has to be correct when view the music font (true wxDC, false SVG)
     bool m_drawingBoundingBoxes;
     
-    Pen m_currentPen;
-    Brush m_currentBrush;
+    std::stack<Pen> m_penStack;
+    std::stack<Brush> m_brushStack;
 };
 
 // ---------------------------------------------------------------------------

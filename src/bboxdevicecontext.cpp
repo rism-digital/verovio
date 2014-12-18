@@ -90,7 +90,9 @@ void BBoxDeviceContext::SetBackgroundMode( int mode )
         
 void BBoxDeviceContext::SetPen( int colour, int width, int style )
 {
-    m_currentPen.setWidth(width);
+    Pen currentPen = Pen();
+    currentPen.setWidth(width);
+    m_penStack.push(currentPen);
 }
         
 void BBoxDeviceContext::SetFont( FontMetricsInfo *font_info )
@@ -114,7 +116,7 @@ void BBoxDeviceContext::ResetBrush( )
         
 void BBoxDeviceContext::ResetPen( )
 {
-    SetPen( AxBLACK, 1, AxSOLID );
+    m_penStack.pop();
 } 
 
 void BBoxDeviceContext::SetLogicalOrigin( int x, int y ) 
@@ -237,7 +239,7 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye) ) );
     
-    int penWidth = m_currentPen.getWidth();
+    int penWidth = m_penStack.top().getWidth();
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
@@ -259,7 +261,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
         y2 = tmp;
     }
     
-    int penWidth = m_currentPen.getWidth();
+    int penWidth = m_penStack.top().getWidth();
     int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
@@ -312,7 +314,7 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         width = -width;
         x -= width;
     }
-    int penWidth = m_currentPen.getWidth();
+    int penWidth = m_penStack.top().getWidth();;
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
