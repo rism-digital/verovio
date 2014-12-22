@@ -934,7 +934,10 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
     
     pugi::xml_node current;
     for( current = measure.first_child( ); current; current = current.next_sibling( ) ) {
-        if ( std::string( current.name() ) == "staff" ) {
+        if ( std::string( current.name() ) == "app" ) {
+            ReadMeiMeasure( system, GetSelectedReading(current) );
+        }
+        else if ( std::string( current.name() ) == "staff" ) {
             ReadMeiStaff( vrvMeasure, current);
         }
         else if ( std::string( current.name() ) == "tupletSpan" ) {
@@ -994,75 +997,71 @@ bool MeiInput::ReadMeiLayer( Staff *staff, pugi::xml_node layer )
     
     staff->AddLayer(vrvLayer);
     
-    pugi::xml_node current;
-    for( current = layer.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( vrvLayer, current );
-    }
+    ReadMeiLayerChildren( vrvLayer, layer );
     
     return true;
 }
 
-bool MeiInput::ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement )
+bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode )
 {
-    if ( std::string( xmlElement.name() )  == "app" ) {
-        pugi::xml_node appChild = GetSelectedReading( xmlElement );
-        pugi::xml_node current;
-        for( current = appChild.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadMeiLayerElement( parent, current );
+    pugi::xml_node xmlElement;
+    for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ){
+        if ( std::string( xmlElement.name() )  == "app" ) {
+            ReadMeiLayerChildren( parent, GetSelectedReading( xmlElement ) );
         }
-    }
-    else if ( std::string( xmlElement.name() )  == "barLine" ) {
-        ReadMeiBarline( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "beam" ) {
-        ReadMeiBeam( parent, xmlElement);
-    }
-    else if ( std::string( xmlElement.name() ) == "clef" ) {
-        ReadMeiClef( parent, xmlElement);
-    }
-    else if ( std::string( xmlElement.name() ) == "mensur" ) {
-        ReadMeiMensur( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "meterSig" ) {
-        ReadMeiMeterSig( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "note" ) {
-        ReadMeiNote( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "rest" ) {
-        ReadMeiRest( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "mRest" ) {
-        ReadMeiMRest( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "multiRest" ) {
-        ReadMeiMultiRest( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "tuplet" ) {
-        ReadMeiTuplet( parent, xmlElement );
-    }
-    // symbols
-    else if ( std::string( xmlElement.name() ) == "accid" ) {
-        ReadMeiAccid( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "custos" ) {
-        ReadMeiCustos( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "dot" ) {
-        ReadMeiDot( parent, xmlElement );
-    }
-    else if ( std::string( xmlElement.name() ) == "chord" ) {
-        // We just read the first note for now
-        pugi::xml_node note = xmlElement.child("note");
-        if ( note ) {
-            note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
-            ReadMeiNote( parent, note );
-            LogDebug("Only first note of chords is read" );
+        else if ( std::string( xmlElement.name() )  == "barLine" ) {
+            ReadMeiBarline( parent, xmlElement );
         }
-    }
-    // unknown
-    else {
-        LogDebug("Element %s ignored", xmlElement.name() );
+        else if ( std::string( xmlElement.name() ) == "beam" ) {
+            ReadMeiBeam( parent, xmlElement);
+        }
+        else if ( std::string( xmlElement.name() ) == "clef" ) {
+            ReadMeiClef( parent, xmlElement);
+        }
+        else if ( std::string( xmlElement.name() ) == "mensur" ) {
+            ReadMeiMensur( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "meterSig" ) {
+            ReadMeiMeterSig( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "note" ) {
+            ReadMeiNote( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "rest" ) {
+            ReadMeiRest( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "mRest" ) {
+            ReadMeiMRest( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "multiRest" ) {
+            ReadMeiMultiRest( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "tuplet" ) {
+            ReadMeiTuplet( parent, xmlElement );
+        }
+        // symbols
+        else if ( std::string( xmlElement.name() ) == "accid" ) {
+            ReadMeiAccid( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "custos" ) {
+            ReadMeiCustos( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "dot" ) {
+            ReadMeiDot( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "chord" ) {
+            // We just read the first note for now
+            pugi::xml_node note = xmlElement.child("note");
+            if ( note ) {
+                note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
+                ReadMeiNote( parent, note );
+                LogDebug("Only first note of chords is read" );
+            }
+        }
+        // unknown
+        else {
+            LogDebug("Element %s ignored", xmlElement.name() );
+        }
     }
     
     return true;
@@ -1111,10 +1110,7 @@ bool MeiInput::ReadMeiBeam( Object *parent, pugi::xml_node beam )
     
     AddLayerElement(parent, vrvBeam);
     
-    pugi::xml_node current;
-    for( current = beam.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( vrvBeam, current );
-    }
+    ReadMeiLayerChildren(vrvBeam, beam);
     
     if ( vrvBeam->GetNoteCount() == 1 ) {
         LogWarning("<beam> with only one note");
@@ -1276,10 +1272,7 @@ bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
     
     AddLayerElement(parent, vrvTuplet);
     
-    pugi::xml_node current;
-    for( current = tuplet.first_child( ); current; current = current.next_sibling( ) ) {
-        ReadMeiLayerElement( vrvTuplet, current );
-    }
+    ReadMeiLayerChildren( vrvTuplet, tuplet);
     
     if ( vrvTuplet->GetNoteCount() == 1 ) {
         LogWarning("<tuplet> with only one note");
