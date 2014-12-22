@@ -932,10 +932,16 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
     
     system->AddMeasure(vrvMeasure);
     
+    ReadMeiMeasureChildren(system, vrvMeasure, measure);
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiMeasureChildren( System *system, Measure *vrvMeasure, pugi::xml_node parentNode){
     pugi::xml_node current;
-    for( current = measure.first_child( ); current; current = current.next_sibling( ) ) {
+    for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "app" ) {
-            ReadMeiMeasure( system, GetSelectedReading(current) );
+            ReadMeiMeasureChildren( system, vrvMeasure, GetSelectedReading(current) );
         }
         else if ( std::string( current.name() ) == "staff" ) {
             ReadMeiStaff( vrvMeasure, current);
@@ -954,7 +960,7 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
             LogWarning("Unsupported '<%s>' within <measure>", current.name() );
         }
     }
-
+    
     return true;
 }
 
