@@ -244,6 +244,7 @@ private:
      */
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app );
+    pugi::xml_node GetSelectedReading( pugi::xml_node app );
     bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg );
     ///@}
     

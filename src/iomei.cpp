@@ -1004,7 +1004,14 @@ bool MeiInput::ReadMeiLayer( Staff *staff, pugi::xml_node layer )
 
 bool MeiInput::ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement )
 {
-    if ( std::string( xmlElement.name() )  == "barLine" ) {
+    if ( std::string( xmlElement.name() )  == "app" ) {
+        pugi::xml_node appChild = GetSelectedReading( xmlElement );
+        pugi::xml_node current;
+        for( current = appChild.first_child( ); current; current = current.next_sibling( ) ) {
+            ReadMeiLayerElement( parent, current );
+        }
+    }
+    else if ( std::string( xmlElement.name() )  == "barLine" ) {
         ReadMeiBarline( parent, xmlElement );
     }
     else if ( std::string( xmlElement.name() ) == "beam" ) {
@@ -1380,6 +1387,22 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app )
     return true;   
 }
     
+pugi::xml_node MeiInput::GetSelectedReading( pugi::xml_node app )
+{
+    pugi::xml_node current;
+    if ( m_rdgXPathQuery.length() > 0 ) {
+        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
+        if ( selection ) {
+            current = selection.node();
+        }
+    }
+    if ( !current ) {
+        current = app.first_child( );
+    }
+
+    return current;
+}
+    
 bool MeiInput::ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg )
 {
     pugi::xml_node current;
@@ -1445,7 +1468,11 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
 bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
 {
     if ( (std::string( element.name() ) == "app") ) {
-        // We need to read <app> in case we have <app> outside measures
+        /*element = GetSelectedReading( element );
+        pugi::xml_node current;
+        for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
+            ReadScoreBasedMei( current );
+        }*/
         ReadMeiApp( m_system, element );
     }
     else if ( std::string( element.name() ) == "measure" ) {
