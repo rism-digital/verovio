@@ -163,7 +163,7 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute( "class" ) = gClass.c_str();
     m_currentNode.append_attribute( "id" ) = gId.c_str();
-    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.getColour()).c_str(), currentPen.getOpacity(), GetColour(currentBrush.getColour()).c_str(), currentBrush.getOpacity()).c_str();
+    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
   
       
@@ -198,7 +198,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         }
         EndGraphic( object, NULL );
         
-        SetPen( AxBLACK, 1 );
+        SetPen( AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);
    
     }
@@ -244,27 +244,6 @@ void SvgDeviceContext::EndPage()
     //m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
-
-        
-void SvgDeviceContext::SetBrush( int colour, int opacity )
-{
-    float opacityValue;
-    
-    switch ( opacity )
-    {
-        case AxSOLID :
-            opacityValue = 1.0;
-            break ;
-        case AxTRANSPARENT:
-            opacityValue = 0.0;
-            break ;
-        default :
-            opacityValue = 1.0; // solid brush as default
-     }
-    
-    Brush currentBrush = Brush(colour, opacityValue);
-    m_brushStack.push(currentBrush);
-}
         
 void SvgDeviceContext::SetBackground( int colour, int style )
 {
@@ -280,27 +259,7 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-        
-void SvgDeviceContext::SetPen( int colour, int width, int opacity )
-{
-    float opacityValue;
     
-    switch ( opacity )
-    {
-        case AxSOLID :
-            opacityValue = 1.0;
-            break ;
-        case AxTRANSPARENT:
-            opacityValue = 0.0;
-            break ;
-        default :
-            opacityValue = 1.0; // solid brush as default
-    }
-    
-    Pen currentPen = Pen(colour, width, opacityValue);
-    m_penStack.push(currentPen);
-}
-        
 void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 {
     m_font = *font_info;
@@ -313,23 +272,13 @@ void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 
 void SvgDeviceContext::SetTextForeground( int colour )
 {
-    m_brushStack.top().setColour(colour); // we use the brush colour for text
+    m_brushStack.top().SetColour(colour); // we use the brush colour for text
 }
         
 void SvgDeviceContext::SetTextBackground( int colour )
 {
     // nothing to do, we do not handle Text Background Mode
 }
-       
-void SvgDeviceContext::ResetBrush( )
-{
-    m_brushStack.pop();
-}
-        
-void SvgDeviceContext::ResetPen( )
-{
-    m_penStack.pop();
-} 
 
 void SvgDeviceContext::SetLogicalOrigin( int x, int y ) 
 {
@@ -469,7 +418,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = m_currentNode.append_child("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1,y1,x2,y2).c_str();
-    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().getWidth()).c_str();
+    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
  
                
