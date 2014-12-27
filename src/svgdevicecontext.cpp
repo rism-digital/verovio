@@ -62,9 +62,6 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     
     m_committed = false;
     
-    m_svg.str("");
-    m_svg.clear();
-    
     //edit the xml declaration
     pugi::xml_node decl = svgDoc.prepend_child(pugi::node_declaration);
     decl.append_attribute("version") = "1.0";
@@ -136,20 +133,9 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         }
     }
     
-    // finally concatenate the svg XML
-    pugi::xml_document svg_xml_doc;
-    
-    svg_xml_doc.load(m_svg);
-    for (pugi::xml_node child = svg_xml_doc.first_child(); child; child = child.next_sibling())
-    {
-        m_svgNode.append_copy(child);
-    }
-    
-    
     // save the glyph data to m_outdata
     svgDoc.save(m_outdata);
     
-    //m_outdata << m_svg.str();
     m_committed = true;
 }
 

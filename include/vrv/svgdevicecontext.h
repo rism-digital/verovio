@@ -121,9 +121,6 @@ private:
     // for this reason, the full svg is finally written a string from the destructor or when Flush() is called
     std::stringstream m_outdata;
     
-    // the std::stringstream we are writing the svg (without <defs>)
-    std::stringstream m_svg;
-    
     bool m_committed; // did we flushed the file?
     int m_width, m_height;
     int m_originX, m_originY;
