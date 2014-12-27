@@ -371,7 +371,7 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid params )
         intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an abritrary value
     }
     
-    m_xRel = (*previousXRel) + (intervalXRel) * RESOLUTI0N;
+    m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
     (*previousXRel) = m_xRel;
     

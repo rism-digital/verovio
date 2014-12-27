@@ -241,6 +241,7 @@ private:
     int m_pageWidth;
     int m_border; // to be replace by pageRightMar, pageLeftMar, pageTopMar
     int m_unit;
+    /** given in units **/
     int m_spacingStaff;
     int m_spacingSystem;
     

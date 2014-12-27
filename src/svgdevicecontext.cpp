@@ -100,8 +100,8 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
     }
     
     //take care of width/height once userScale is updated
-    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY) / 10).c_str();
-    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX) / 10).c_str();
+    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
+    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
     
     // header
     if (m_smufl_glyphs.size() > 0)
@@ -223,7 +223,8 @@ void SvgDeviceContext::StartPage( )
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
-    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d", m_width, m_height).c_str();
+    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
+        m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
