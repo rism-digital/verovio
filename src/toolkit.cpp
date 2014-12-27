@@ -338,7 +338,7 @@ void  Toolkit::ResetLogBuffer() {
 #endif
 }
 
-std::string Toolkit::RenderToSvg( int pageNo, bool xml_tag )
+std::string Toolkit::RenderToSvg( int pageNo, bool xml_declaration )
 {
     // Page number is one-based - correction to 0-based first
     pageNo--;
@@ -370,7 +370,7 @@ std::string Toolkit::RenderToSvg( int pageNo, bool xml_tag )
     // render the page
     m_view.DrawCurrentPage( &svg, false );
     
-    std::string out_str = svg.GetStringSVG( xml_tag );
+    std::string out_str = svg.GetStringSVG( xml_declaration );
     return out_str;
 }
     

@@ -61,12 +61,6 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     m_svg.str("");
     m_svg.clear();
     
-    //edit the xml declaration
-    pugi::xml_node decl = m_svgDoc.prepend_child(pugi::node_declaration);
-    decl.append_attribute("version") = "1.0";
-    decl.append_attribute("encoding") = "UTF-8";
-    decl.append_attribute("standalone") = "no";
-    
     //create the initial SVG element
     //width and height need to be set later; these are taken care of in "commit"
     m_svgNode = m_svgDoc.append_child("svg");
@@ -99,7 +93,7 @@ bool SvgDeviceContext::CopyFileToStream(const std::string& filename, std::ostrea
 
 
 
-void SvgDeviceContext::Commit( bool xml_tag ) {
+void SvgDeviceContext::Commit( bool xml_declaration ) {
     
     if (m_committed) {
         return;
@@ -141,9 +135,18 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         m_svgNode.append_copy(child);
     }
     
+    unsigned int output_flags = pugi::format_default | pugi::format_no_declaration;
+    if (xml_declaration) {
+        //edit the xml declaration
+        output_flags = pugi::format_default;
+        pugi::xml_node decl = m_svgDoc.prepend_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
+        decl.append_attribute("standalone") = "no";
+    }
     
     // save the glyph data to m_outdata
-    m_svgDoc.save(m_outdata);
+    m_svgDoc.save(m_outdata, "\t", output_flags);
     
     //m_outdata << m_svg.str();
     m_committed = true;
@@ -673,10 +676,10 @@ std::string SvgDeviceContext::GetColour( int colour )
     }
 }
 
-std::string SvgDeviceContext::GetStringSVG( bool xml_tag )
+std::string SvgDeviceContext::GetStringSVG( bool xml_declaration )
 {
     if (!m_committed)
-        Commit( xml_tag );
+        Commit( xml_declaration );
     
     return m_outdata.str();
 }
