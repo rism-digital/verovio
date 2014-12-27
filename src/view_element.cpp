@@ -1637,12 +1637,12 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // 20 height nice with 70, not nice with 50
     // Also remove HARDCODED values!
     if (up) {
-        y1 += 14;
-        y2 += 14;
+        y1 += m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
+        y2 += m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
     }
     else {
-        y1 -= 14;
-        y2 -= 14;
+        y1 -= m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
+        y2 -= m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
     }
     
     dc->StartGraphic( element, "tie", element->GetUuid() );
