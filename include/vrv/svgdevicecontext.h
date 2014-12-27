@@ -145,7 +145,8 @@ private:
     pugi::xml_document svgDoc;
     pugi::xml_node m_svgNode;
     pugi::xml_node m_currentNode;
-    std::list<pugi::xml_node> m_svgNodeStack;
+    std::stack<pugi::xml_node> m_svgNodeStack;
+    std::vector<std::string> m_rdgClassStack;
     
 };
 

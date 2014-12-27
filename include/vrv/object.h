@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "vrvdef.h"
+#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -569,6 +570,11 @@ public:
      * We need this to avoid not updating bounding boxes to screw up the layout with their intial values.
      */
     bool HasUpdatedBB( ) { return m_updatedBB; };
+    
+    /**
+     *
+     */
+    void ReadRdgClass( pugi::xml_node node );
 
 private:
     bool m_updatedBB;
@@ -588,6 +594,7 @@ protected:
 public:
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
+    std::vector<std::string> m_rdgClasses;
 };
 
 

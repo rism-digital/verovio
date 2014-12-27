@@ -760,6 +760,8 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
         m_page->m_surface = page.attribute( "surface" ).value();
     }
     
+    vrvPage->ReadRdgClass( page );
+    
     m_doc->AddPage( vrvPage );
     
     pugi::xml_node current;
@@ -794,8 +796,9 @@ bool MeiInput::ReadMeiSystem( Page *page, pugi::xml_node system )
     if ( system.attribute( "uly" ) ) {
         vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() );
     }
+    vrvSystem->ReadRdgClass( system );
     
-        page->AddSystem(vrvSystem);
+    page->AddSystem(vrvSystem);
     
     pugi::xml_node current;
     Measure *unmeasured = NULL;
@@ -925,6 +928,7 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
     
     vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
+    vrvMeasure->ReadRdgClass( measure );
     
     // here we transfer the @left and @right values to the barLine objects
     vrvMeasure->SetLeftBarlineType( vrvMeasure->GetLeft() );
@@ -937,7 +941,8 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
     return true;
 }
 
-bool MeiInput::ReadMeiMeasureChildren( System *system, Measure *vrvMeasure, pugi::xml_node parentNode){
+bool MeiInput::ReadMeiMeasureChildren( System *system, Measure *vrvMeasure, pugi::xml_node parentNode)
+{
     pugi::xml_node current;
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "app" ) {
@@ -970,6 +975,7 @@ bool MeiInput::ReadMeiStaff( Measure *measure, pugi::xml_node staff )
     SetMeiUuid(staff, vrvStaff);
     
     vrvStaff->ReadCommon(staff);
+    vrvStaff->ReadRdgClass(staff);
     
     if ( staff.attribute( "uly" ) ) {
         vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
@@ -1000,6 +1006,7 @@ bool MeiInput::ReadMeiLayer( Staff *staff, pugi::xml_node layer )
     SetMeiUuid(layer, vrvLayer);
     
     vrvLayer->ReadCommon(layer);
+    vrvLayer->ReadRdgClass(layer);
     
     staff->AddLayer(vrvLayer);
     
@@ -1078,6 +1085,7 @@ bool MeiInput::ReadLayerElement( pugi::xml_node element, LayerElement *object )
     if ( element.attribute( "ulx" ) ) {
         object->m_xAbs = atoi ( element.attribute( "ulx" ).value() );
     }
+    object->ReadRdgClass( element );
     ReadSameAsAttr( element, object );
     SetMeiUuid( element, object );
     
@@ -1389,10 +1397,29 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app )
 pugi::xml_node MeiInput::GetSelectedReading( pugi::xml_node app )
 {
     pugi::xml_node current;
+    pugi::xpath_node selection;
     if ( m_rdgXPathQuery.length() > 0 ) {
-        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
+        selection = app.select_single_node( m_rdgXPathQuery.c_str() );
         if ( selection ) {
             current = selection.node();
+            if (strcmp(current.name(), "rdg") == 0)
+            {
+                pugi::char_t const *sourceName;
+                
+                if ( current.attribute("resp") ) {
+                    sourceName = current.attribute("resp").value();
+                }
+                else if ( current.attribute("source") ) {
+                    sourceName = current.attribute("source").value();
+                }
+                else {
+                    LogWarning("Could not find a source attribute for a <rdg> element that matched the xPath query.");
+                }
+                
+                for( pugi::xml_node currentChild = current.first_child(); currentChild == current.last_child(); currentChild = currentChild.next_sibling( ) ) {
+                    currentChild.append_attribute("source") = sourceName;
+                }
+            }
         }
     }
     if ( !current ) {
