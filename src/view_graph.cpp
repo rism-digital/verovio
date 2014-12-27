@@ -174,9 +174,9 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT, std::min( 2 * m_doc->m_drawingInterl[0] / 2, abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 2 * m_doc->m_drawingInterl[0] / 2, abs( x1 - x ) / 4 ) );
     
-    int thickness = std::max( m_doc->m_drawingInterl[0] / 3, MIN_TIE_THICKNESS );
+    int thickness = std::max( m_doc->m_drawingInterl[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
     
     int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point
@@ -209,7 +209,9 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
+    dc->SetPen( m_currentColour, std::max( 1, ToDeviceContextX( m_doc->m_env.m_stemWidth ) ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
+    dc->ResetPen();
 }
 
 } // namespace vrv

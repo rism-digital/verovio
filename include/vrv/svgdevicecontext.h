@@ -11,10 +11,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <list>
 #include <sstream>
 #include <string>
 #include <vector>
-#include <list>
 
 //----------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public:
      * Get the the SVG into a string
      * Add the xml tag if necessary.
      */
-    std::string GetStringSVG( bool xml_tag = false );
+    std::string GetStringSVG( bool xml_declaration = false );
     
     // Drawing methods
     
@@ -127,22 +127,22 @@ private:
     double m_userScaleX, m_userScaleY;
     FontMetricsInfo m_font;
       
-    // holds the list of glyphs from the leipzig font used so far
+    // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>
-    std::vector<std::string> m_leipzig_glyphs;
+    std::vector<std::string> m_smufl_glyphs;
     
     /**
      * Flush the data to the internal buffer.
-     * Adds the xml tag if necessary and the <defs> from m_leipzig_glyphs
+     * Adds the xml tag if necessary and the <defs> from m_smufl_glyphs
      */
-    void Commit( bool xml_tag );
+    void Commit( bool xml_declaration );
     
     void WriteLine( std::string );
     
     std::string GetColour( int colour );
     
     //pugixml data
-    pugi::xml_document svgDoc;
+    pugi::xml_document m_svgDoc;
     pugi::xml_node m_svgNode;
     pugi::xml_node m_currentNode;
     std::stack<pugi::xml_node> m_svgNodeStack;

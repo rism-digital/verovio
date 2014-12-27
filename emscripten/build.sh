@@ -82,7 +82,6 @@ echo "Compiling"
 python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
-	-I$VEROVIO_ROOT/tinyxml \
 	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \

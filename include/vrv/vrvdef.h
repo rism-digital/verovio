@@ -55,43 +55,42 @@ enum EditorMode {
 // Default layout values
 //----------------------------------------------------------------------------
     
-#define RESOLUTI0N 10
+#define DEFINITON_FACTOR 10
 
-#define DEFAULT_UNIT 90
-#define MIN_UNIT 60
-#define MAX_UNIT 180
+#define DEFAULT_UNIT 9
+#define MIN_UNIT 6
+#define MAX_UNIT 18
     
-#define DEFAULT_PAGE_RIGHT_MAR 500
+#define DEFAULT_PAGE_RIGHT_MAR 50
 #define MIN_PAGE_RIGHT_MAR 0
-#define MAX_PAGE_RIGHT_MAR 5000
+#define MAX_PAGE_RIGHT_MAR 500
     
-#define DEFAULT_PAGE_LEFT_MAR 500
+#define DEFAULT_PAGE_LEFT_MAR 50
 #define MIN_PAGE_LEFT_MAR 0
-#define MAX_PAGE_LEFT_MAR 5000
+#define MAX_PAGE_LEFT_MAR 500
     
-#define DEFAULT_PAGE_TOP_MAR 500
+#define DEFAULT_PAGE_TOP_MAR 50
 #define MIN_PAGE_TOP_MAR 0
-#define MAX_PAGE_TOP_MAR 5000
+#define MAX_PAGE_TOP_MAR 500
+    
+#define DEFAULT_PAGE_HEIGHT 2970
+#define MIN_PAGE_HEIGHT 100
+#define MAX_PAGE_HEIGHT 60000
+    
+#define DEFAULT_PAGE_WIDTH 2100
+#define MIN_PAGE_WIDTH 100
+#define MAX_PAGE_WIDTH 60000
+    
+#define MIN_TIE_HEIGHT 12
+#define MIN_TIE_THICKNESS 6
+    
+//----------------------------------------------------------------------------
+// Default scaling (%) and spacing (units) values
+//----------------------------------------------------------------------------
     
 #define DEFAULT_SCALE 100
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
-    
-#define DEFAULT_PAGE_HEIGHT 29700
-#define MIN_PAGE_HEIGHT 1000
-#define MAX_PAGE_HEIGHT 600000
-    
-#define DEFAULT_PAGE_WIDTH 21000
-#define MIN_PAGE_WIDTH 1000
-#define MAX_PAGE_WIDTH 600000
-    
-// SPACING
-#define MIN_TIE_HEIGHT 120
-#define MIN_TIE_THICKNESS 60
-    
-//----------------------------------------------------------------------------
-// Default spacing and scaling values
-//----------------------------------------------------------------------------
     
 #define DEFAULT_SPACING_STAFF 6
 #define MIN_SPACING_STAFF 0

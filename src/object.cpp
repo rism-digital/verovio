@@ -1035,8 +1035,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / 10;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / 10 );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / DEFINITON_FACTOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / DEFINITON_FACTOR );
     
     return FUNCTOR_CONTINUE;
 }

@@ -79,7 +79,7 @@ public:
      * Render the page in SVG and returns it as a string
      * Page number is 1-based
      */
-    std::string RenderToSvg( int pageNo =  1, bool xml_tag = false );
+    std::string RenderToSvg( int pageNo =  1, bool xml_declaration = false );
 
     /**
      * Render the page in SVG and save it to the file.
@@ -241,6 +241,7 @@ private:
     int m_pageWidth;
     int m_border; // to be replace by pageRightMar, pageLeftMar, pageTopMar
     int m_unit;
+    /** given in units **/
     int m_spacingStaff;
     int m_spacingSystem;
     

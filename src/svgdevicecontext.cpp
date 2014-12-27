@@ -11,25 +11,21 @@
 //----------------------------------------------------------------------------
 
 #include <fstream>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-//#include "leipzigbbox.h"
 #include "glyph.h"
 #include "view.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
-#include <math.h>
-
 namespace vrv {
 
 #define space " "
 #define semicolon ";"
- 
-//#include "app/axapp.h"
 
 extern "C" {
 static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
@@ -58,19 +54,13 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
     
-    m_leipzig_glyphs.clear();
+    m_smufl_glyphs.clear();
     
     m_committed = false;
     
-    //edit the xml declaration
-    pugi::xml_node decl = svgDoc.prepend_child(pugi::node_declaration);
-    decl.append_attribute("version") = "1.0";
-    decl.append_attribute("encoding") = "UTF-8";
-    decl.append_attribute("standalone") = "no";
-    
     //create the initial SVG element
     //width and height need to be set later; these are taken care of in "commit"
-    m_svgNode = svgDoc.append_child("svg");
+    m_svgNode = m_svgDoc.append_child("svg");
     m_svgNode.append_attribute( "version" ) = "1.1";
     m_svgNode.append_attribute( "xmlns" ) = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute( "xmlns:xlink" ) = "http://www.w3.org/1999/xlink";
@@ -100,18 +90,18 @@ bool SvgDeviceContext::CopyFileToStream(const std::string& filename, std::ostrea
 
 
 
-void SvgDeviceContext::Commit( bool xml_tag ) {
+void SvgDeviceContext::Commit( bool xml_declaration ) {
     
     if (m_committed) {
         return;
     }
     
     //take care of width/height once userScale is updated
-    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY) / 10).c_str();
-    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX) / 10).c_str();
+    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
+    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
     
     // header
-    if (m_leipzig_glyphs.size() > 0)
+    if (m_smufl_glyphs.size() > 0)
     {
         
         pugi::xml_node defs = m_svgNode.prepend_child( "defs" );
@@ -119,7 +109,7 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         
         //for each needed glyph
         std::vector<std::string>::const_iterator it;
-        for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
+        for(it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it)
         {
             //load the XML file that contains it as a pugi::xml_document
             std::ifstream source( (*it).c_str() );
@@ -133,8 +123,18 @@ void SvgDeviceContext::Commit( bool xml_tag ) {
         }
     }
     
+    unsigned int output_flags = pugi::format_default | pugi::format_no_declaration;
+    if (xml_declaration) {
+        //edit the xml declaration
+        output_flags = pugi::format_default;
+        pugi::xml_node decl = m_svgDoc.prepend_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
+        decl.append_attribute("standalone") = "no";
+    }
+    
     // save the glyph data to m_outdata
-    svgDoc.save(m_outdata);
+    m_svgDoc.save(m_outdata, "\t", output_flags);
     
     m_committed = true;
 }
@@ -223,7 +223,8 @@ void SvgDeviceContext::StartPage( )
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
-    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d", m_width, m_height).c_str();
+    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
+        m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
@@ -336,7 +337,7 @@ void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6],
        bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
        bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
        ).c_str();
-    pathChild.append_attribute("style") = "fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:1";
+    pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth() ).c_str();
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
@@ -568,10 +569,10 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         std::string path = glyph->GetPath();
         
         // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_leipzig_glyphs.begin(), m_leipzig_glyphs.end(), path);
-        if (it == m_leipzig_glyphs.end())
+        std::vector<std::string>::const_iterator it = std::find(m_smufl_glyphs.begin(), m_smufl_glyphs.end(), path);
+        if (it == m_smufl_glyphs.end())
         {
-            m_leipzig_glyphs.push_back( path );
+            m_smufl_glyphs.push_back( path );
         }
         
         
@@ -625,10 +626,10 @@ std::string SvgDeviceContext::GetColour( int colour )
     }
 }
 
-std::string SvgDeviceContext::GetStringSVG( bool xml_tag )
+std::string SvgDeviceContext::GetStringSVG( bool xml_declaration )
 {
     if (!m_committed)
-        Commit( xml_tag );
+        Commit( xml_declaration );
     
     return m_outdata.str();
 }

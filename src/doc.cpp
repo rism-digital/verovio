@@ -429,7 +429,7 @@ int Doc::GetAdjustedDrawingPageHeight()
 {
     assert( m_drawingPage );
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageTopMar * 2);
+    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
 }
 
     
@@ -437,7 +437,7 @@ int Doc::GetAdjustedDrawingPageWidth()
 {
     assert( m_drawingPage );
     int contentWidth = m_drawingPage->GetContentWidth();
-    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar);
+    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;;
 }
 
 int Doc::Save( FileOutputStream *output )
