@@ -41,25 +41,17 @@ public:
     
     // Setters
     
-    virtual void SetBrush( int colour, int style = AxSOLID );
-    
     virtual void SetBackground( int colour, int style = AxSOLID );
     
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 );
     
     virtual void SetBackgroundMode( int mode );
     
-    virtual void SetPen( int colour, int width = 1, int style = AxSOLID );
-    
     virtual void SetFont( FontMetricsInfo *font_info );
         
     virtual void SetTextForeground( int colour );
     
     virtual void SetTextBackground( int colour );
-    
-    virtual void ResetBrush( );
-    
-    virtual void ResetPen( );
     
     virtual void SetLogicalOrigin( int x, int y );
     
@@ -129,9 +121,6 @@ private:
     // for this reason, the full svg is finally written a string from the destructor or when Flush() is called
     std::stringstream m_outdata;
     
-    // the std::stringstream we are writing the svg (without <defs>)
-    std::stringstream m_svg;
-    
     bool m_committed; // did we flushed the file?
     int m_width, m_height;
     int m_originX, m_originY;
@@ -157,6 +146,7 @@ private:
     pugi::xml_node m_svgNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
+    std::vector<std::string> m_rdgClassStack;
     
 };
 

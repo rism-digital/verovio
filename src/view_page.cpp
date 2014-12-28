@@ -243,7 +243,8 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         
         if (!staffDef) {
             LogDebug("Should be staffDef in View::DrawStaffDefLabels");
-            return;
+            ++iter;
+            continue;
         }
         
         Staff *staff = measure->GetStaffWithNo( staffDef->GetN() );
@@ -251,7 +252,8 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
-            return;
+            ++iter;
+            continue;
         }
         
         std::string label = staffDef->GetLabel();
