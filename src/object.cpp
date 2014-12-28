@@ -626,12 +626,9 @@ bool DocObject::HasSelfBB()
     return ( (m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF) );
 }
 
-void DocObject::ReadRdgClass( pugi::xml_node node )
+void DocObject::AddRdgClass( std::string newClass )
 {
-    std::string sourceVal = node.attribute("source").value();
-    if(!sourceVal.empty()){
-        m_rdgClasses.push_back(sourceVal.substr(1));
-    }
+    m_rdgClasses.push_back(newClass);
 }
 
 //----------------------------------------------------------------------------

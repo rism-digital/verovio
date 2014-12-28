@@ -760,7 +760,7 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
         m_page->m_surface = page.attribute( "surface" ).value();
     }
     
-    vrvPage->ReadRdgClass( page );
+    GetRdgClass( page, vrvPage );
     
     m_doc->AddPage( vrvPage );
     
@@ -796,7 +796,8 @@ bool MeiInput::ReadMeiSystem( Page *page, pugi::xml_node system )
     if ( system.attribute( "uly" ) ) {
         vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() );
     }
-    vrvSystem->ReadRdgClass( system );
+    
+    GetRdgClass( system, vrvSystem );
     
     page->AddSystem(vrvSystem);
     
@@ -928,7 +929,7 @@ bool MeiInput::ReadMeiMeasure( System *system, pugi::xml_node measure )
     
     vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
-    vrvMeasure->ReadRdgClass( measure );
+    GetRdgClass( measure, vrvMeasure );
     
     // here we transfer the @left and @right values to the barLine objects
     vrvMeasure->SetLeftBarlineType( vrvMeasure->GetLeft() );
@@ -975,7 +976,7 @@ bool MeiInput::ReadMeiStaff( Measure *measure, pugi::xml_node staff )
     SetMeiUuid(staff, vrvStaff);
     
     vrvStaff->ReadCommon(staff);
-    vrvStaff->ReadRdgClass(staff);
+    GetRdgClass( staff, vrvStaff );
     
     if ( staff.attribute( "uly" ) ) {
         vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
@@ -1006,7 +1007,7 @@ bool MeiInput::ReadMeiLayer( Staff *staff, pugi::xml_node layer )
     SetMeiUuid(layer, vrvLayer);
     
     vrvLayer->ReadCommon(layer);
-    vrvLayer->ReadRdgClass(layer);
+    GetRdgClass( layer, vrvLayer );
     
     staff->AddLayer(vrvLayer);
     
@@ -1085,7 +1086,7 @@ bool MeiInput::ReadLayerElement( pugi::xml_node element, LayerElement *object )
     if ( element.attribute( "ulx" ) ) {
         object->m_xAbs = atoi ( element.attribute( "ulx" ).value() );
     }
-    object->ReadRdgClass( element );
+    GetRdgClass( element, object );
     ReadSameAsAttr( element, object );
     SetMeiUuid( element, object );
     
@@ -1394,12 +1395,19 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app )
     return true;   
 }
     
+void MeiInput::GetRdgClass( pugi::xml_node node, DocObject *object )
+{
+    std::string sourceVal = node.attribute("source").value();
+    if(!sourceVal.empty()){
+       object->AddRdgClass(sourceVal.substr(1));
+    }
+}
+    
 pugi::xml_node MeiInput::GetSelectedReading( pugi::xml_node app )
 {
     pugi::xml_node current;
-    pugi::xpath_node selection;
     if ( m_rdgXPathQuery.length() > 0 ) {
-        selection = app.select_single_node( m_rdgXPathQuery.c_str() );
+        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
         if ( selection ) {
             current = selection.node();
             if (strcmp(current.name(), "rdg") == 0)

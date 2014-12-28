@@ -246,6 +246,7 @@ private:
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app );
     pugi::xml_node GetSelectedReading( pugi::xml_node app );
+    void GetRdgClass( pugi::xml_node page, DocObject *object );
     bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg );
     ///@}
     

@@ -67,7 +67,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     m_svgNode.append_attribute( "overflow" ) = "visible";
     
     //start the stack
-    m_svgNodeStack.push(m_svgNode);
+    m_svgNodeStack.push_back(m_svgNode);
     m_currentNode = m_svgNode;
     
     m_outdata.clear();
@@ -155,7 +155,7 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     }
     
     m_currentNode = m_currentNode.append_child("g");
-    m_svgNodeStack.push(m_currentNode);
+    m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute( "class" ) = gClass.c_str();
     m_currentNode.append_attribute( "id" ) = gId.c_str();
     m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
@@ -202,8 +202,8 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         m_rdgClassStack.pop_back();
     }
     
-    m_svgNodeStack.pop();
-    m_currentNode = m_svgNodeStack.top();
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
 }
 
 
@@ -221,14 +221,14 @@ void SvgDeviceContext::StartPage( )
     m_currentNode.append_attribute("transform") = "scale(0.1, 0.1)".c_str();*/
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
-    m_svgNodeStack.push(m_currentNode);
+    m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
     m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
         m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
-    m_svgNodeStack.push(m_currentNode);
+    m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "page-margin";
     m_currentNode.append_attribute("transform") = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 }
@@ -237,12 +237,12 @@ void SvgDeviceContext::StartPage( )
 void SvgDeviceContext::EndPage() 
 {
     // end page-margin
-    m_svgNodeStack.pop();
+    m_svgNodeStack.pop_back();
     // end definition-scale
-    m_svgNodeStack.pop();
+    m_svgNodeStack.pop_back();
     // end page-scale
     //m_svgNodeStack.pop_back();
-    m_currentNode = m_svgNodeStack.top();
+    m_currentNode = m_svgNodeStack.back();
 }
         
 void SvgDeviceContext::SetBackground( int colour, int style )

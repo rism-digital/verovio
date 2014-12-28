@@ -18,7 +18,6 @@
 //----------------------------------------------------------------------------
 
 #include "vrvdef.h"
-#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -574,7 +573,7 @@ public:
     /**
      *
      */
-    void ReadRdgClass( pugi::xml_node node );
+    void AddRdgClass( std::string newClass );
 
 private:
     bool m_updatedBB;
