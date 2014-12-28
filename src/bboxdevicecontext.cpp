@@ -73,10 +73,6 @@ void BBoxDeviceContext::StartPage( )
 void BBoxDeviceContext::EndPage() 
 {
 }
-
-void BBoxDeviceContext::SetBrush( int colour, int style )
-{
-}
         
 void BBoxDeviceContext::SetBackground( int colour, int style )
 {
@@ -88,18 +84,10 @@ void BBoxDeviceContext::SetBackgroundMode( int mode )
     // nothing to do, we do not handle Background Mode
 }
         
-void BBoxDeviceContext::SetPen( int colour, int width, int style )
-{
-    Pen currentPen = Pen();
-    currentPen.setWidth(width);
-    m_penStack.push(currentPen);
-}
-        
 void BBoxDeviceContext::SetFont( FontMetricsInfo *font_info )
 {
     m_font = *font_info;
 }
-            
 
 void BBoxDeviceContext::SetTextForeground( int colour )
 {
@@ -109,15 +97,6 @@ void BBoxDeviceContext::SetTextBackground( int colour )
 {
     // nothing to do, we do not handle Text Background Mode
 }
-       
-void BBoxDeviceContext::ResetBrush( )
-{
-}
-        
-void BBoxDeviceContext::ResetPen( )
-{
-    m_penStack.pop();
-} 
 
 void BBoxDeviceContext::SetLogicalOrigin( int x, int y ) 
 {
@@ -239,7 +218,7 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye) ) );
     
-    int penWidth = m_penStack.top().getWidth();
+    int penWidth = m_penStack.top().GetWidth();
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
@@ -261,7 +240,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
         y2 = tmp;
     }
     
-    int penWidth = m_penStack.top().getWidth();
+    int penWidth = m_penStack.top().GetWidth();
     int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
@@ -314,7 +293,7 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         width = -width;
         x -= width;
     }
-    int penWidth = m_penStack.top().getWidth();;
+    int penWidth = m_penStack.top().GetWidth();;
     if ( penWidth % 2 ) {
         penWidth += 1;
     }

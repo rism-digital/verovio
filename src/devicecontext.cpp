@@ -18,6 +18,61 @@
 #include "doc.h"
 
 namespace vrv {
+    
+//----------------------------------------------------------------------------
+// DeviceContext
+//----------------------------------------------------------------------------
+
+void DeviceContext::SetPen( int colour, int width, int opacity )
+{
+    float opacityValue;
+    
+    switch ( opacity )
+    {
+        case AxSOLID :
+            opacityValue = 1.0;
+            break ;
+        case AxTRANSPARENT:
+            opacityValue = 0.0;
+            break ;
+        default :
+            opacityValue = 1.0; // solid brush as default
+    }
+    
+    Pen currentPen = Pen(colour, width, opacityValue);
+    m_penStack.push(currentPen);
+}
+
+void DeviceContext::SetBrush( int colour, int opacity )
+{
+    float opacityValue;
+    
+    switch ( opacity )
+    {
+        case AxSOLID :
+            opacityValue = 1.0;
+            break ;
+        case AxTRANSPARENT:
+            opacityValue = 0.0;
+            break ;
+        default :
+            opacityValue = 1.0; // solid brush as default
+    }
+    
+    Brush currentBrush = Brush(colour, opacityValue);
+    m_brushStack.push(currentBrush);
+
+}
+
+void DeviceContext::ResetPen( )
+{
+    m_penStack.pop();
+}
+
+void DeviceContext::ResetBrush( )
+{
+    m_brushStack.pop();
+}
 
 //----------------------------------------------------------------------------
 // FontMetricsInfo

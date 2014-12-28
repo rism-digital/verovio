@@ -68,22 +68,22 @@ class Pen{
     
 public:
     Pen()
-    : penColour(0), penWidth(0), penOpacity(0.0)
+    : m_penColour(0), m_penWidth(0), m_penOpacity(0.0)
     { }
     Pen(int colour, int width, float opacity)
-    : penColour(colour), penWidth(width), penOpacity(opacity)
+    : m_penColour(colour), m_penWidth(width), m_penOpacity(opacity)
     { }
     
-    int getColour() const { return penColour; }
-    void setColour(int colour) { penColour = colour; }
-    int getWidth() const { return penWidth; }
-    void setWidth (int width) { penWidth = width; }
-    float getOpacity() const { return penOpacity; }
-    void setOpacity (float opacity) { penOpacity = opacity; }
+    int GetColour() const { return m_penColour; }
+    void SetColour(int colour) { m_penColour = colour; }
+    int GetWidth() const { return m_penWidth; }
+    void SetWidth (int width) { m_penWidth = width; }
+    float GetOpacity() const { return m_penOpacity; }
+    void SetOpacity (float opacity) { m_penOpacity = opacity; }
     
 public:
-    int penColour, penWidth;
-    float penOpacity;
+    int m_penColour, m_penWidth;
+    float m_penOpacity;
     
 };
 
@@ -91,20 +91,20 @@ class Brush{
     
 public:
     Brush()
-    : brushColour(0), brushOpacity(0.0)
+    : m_brushColour(0), m_brushOpacity(0.0)
     { }
     Brush(int colour, float opacity)
-    : brushColour(colour), brushOpacity(opacity)
+    : m_brushColour(colour), m_brushOpacity(opacity)
     { }
     
-    int getColour() const { return brushColour; }
-    void setColour(int colour) { brushColour = colour; }
-    float getOpacity() const { return brushOpacity; }
-    void setOpacity(float opacity) { brushOpacity = opacity; }
+    int GetColour() const { return m_brushColour; }
+    void SetColour(int colour) { m_brushColour = colour; }
+    float GetOpacity() const { return m_brushOpacity; }
+    void SetOpacity(float opacity) { m_brushOpacity = opacity; }
     
 public:
-    int brushColour;
-    float brushOpacity;
+    int m_brushColour;
+    float m_brushOpacity;
 };
 
 
@@ -132,7 +132,7 @@ public:
     
     // Setters
     
-    virtual void SetBrush( int colour, int style = AxSOLID ) = 0;
+    void SetBrush( int colour, int opacity );
     
     virtual void SetBackground( int colour, int style = AxSOLID ) = 0;
     
@@ -140,7 +140,7 @@ public:
     
     virtual void SetBackgroundMode( int mode ) = 0;
     
-    virtual void SetPen( int colour, int width = 1, int style = AxSOLID ) = 0;
+    void SetPen( int colour, int width, int opacity );
     
     virtual void SetFont( FontMetricsInfo *font_info ) = 0;
 
@@ -148,9 +148,9 @@ public:
     
     virtual void SetTextBackground( int colour ) = 0;
     
-    virtual void ResetBrush( ) = 0;
+    void ResetBrush( );
     
-    virtual void ResetPen( ) = 0;
+    void ResetPen( );
     
     virtual void SetLogicalOrigin( int x, int y ) = 0;
     
