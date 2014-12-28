@@ -36,25 +36,17 @@ public:
     
     // Setters
     
-    virtual void SetBrush( int colour, int style = AxSOLID );
-    
     virtual void SetBackground( int colour, int style = AxSOLID );
     
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) {};
     
     virtual void SetBackgroundMode( int mode );
     
-    virtual void SetPen( int colour, int width = 1, int style = AxSOLID );
-    
     virtual void SetFont( FontMetricsInfo *font_info );
         
     virtual void SetTextForeground( int colour );
     
     virtual void SetTextBackground( int colour );
-    
-    virtual void ResetBrush( );
-    
-    virtual void ResetPen( );
     
     virtual void SetLogicalOrigin( int x, int y );
     

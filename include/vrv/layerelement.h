@@ -23,7 +23,7 @@ class Alignment;
 
 /** 
  * This class is a base class for the Layer (<layer>) content.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class LayerElement: public DocObject
 {

@@ -58,9 +58,6 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     
     m_committed = false;
     
-    m_svg.str("");
-    m_svg.clear();
-    
     //create the initial SVG element
     //width and height need to be set later; these are taken care of in "commit"
     m_svgNode = m_svgDoc.append_child("svg");
@@ -126,15 +123,6 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
         }
     }
     
-    // finally concatenate the svg XML
-    pugi::xml_document svg_xml_doc;
-    
-    svg_xml_doc.load(m_svg);
-    for (pugi::xml_node child = svg_xml_doc.first_child(); child; child = child.next_sibling())
-    {
-        m_svgNode.append_copy(child);
-    }
-    
     unsigned int output_flags = pugi::format_default | pugi::format_no_declaration;
     if (xml_declaration) {
         //edit the xml declaration
@@ -148,7 +136,6 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
     // save the glyph data to m_outdata
     m_svgDoc.save(m_outdata, "\t", output_flags);
     
-    //m_outdata << m_svg.str();
     m_committed = true;
 }
 
@@ -158,11 +145,20 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     Pen currentPen = m_penStack.top();
     Brush currentBrush = m_brushStack.top();
     
+    std::vector<std::string> newClasses = object->m_rdgClasses;
+    for(std::vector<int>::size_type i = 0; i != newClasses.size(); i++) {
+        m_rdgClassStack.push_back(newClasses[i]);
+    }
+    
+    for(std::vector<int>::size_type i = 0; i != m_rdgClassStack.size(); i++) {
+        gClass.append(" " + m_rdgClassStack[i]);
+    }
+    
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute( "class" ) = gClass.c_str();
     m_currentNode.append_attribute( "id" ) = gId.c_str();
-    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.getColour()).c_str(), currentPen.getOpacity(), GetColour(currentBrush.getColour()).c_str(), currentBrush.getOpacity()).c_str();
+    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
   
       
@@ -197,9 +193,13 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         }
         EndGraphic( object, NULL );
         
-        SetPen( AxBLACK, 1 );
+        SetPen( AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);
    
+    }
+    
+    for(std::vector<int>::size_type i = 0; i != object->m_rdgClasses.size(); i++) {
+        m_rdgClassStack.pop_back();
     }
     
     m_svgNodeStack.pop_back();
@@ -244,27 +244,6 @@ void SvgDeviceContext::EndPage()
     //m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
-
-        
-void SvgDeviceContext::SetBrush( int colour, int opacity )
-{
-    float opacityValue;
-    
-    switch ( opacity )
-    {
-        case AxSOLID :
-            opacityValue = 1.0;
-            break ;
-        case AxTRANSPARENT:
-            opacityValue = 0.0;
-            break ;
-        default :
-            opacityValue = 1.0; // solid brush as default
-     }
-    
-    Brush currentBrush = Brush(colour, opacityValue);
-    m_brushStack.push(currentBrush);
-}
         
 void SvgDeviceContext::SetBackground( int colour, int style )
 {
@@ -280,27 +259,7 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-        
-void SvgDeviceContext::SetPen( int colour, int width, int opacity )
-{
-    float opacityValue;
     
-    switch ( opacity )
-    {
-        case AxSOLID :
-            opacityValue = 1.0;
-            break ;
-        case AxTRANSPARENT:
-            opacityValue = 0.0;
-            break ;
-        default :
-            opacityValue = 1.0; // solid brush as default
-    }
-    
-    Pen currentPen = Pen(colour, width, opacityValue);
-    m_penStack.push(currentPen);
-}
-        
 void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 {
     m_font = *font_info;
@@ -313,23 +272,13 @@ void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 
 void SvgDeviceContext::SetTextForeground( int colour )
 {
-    m_brushStack.top().setColour(colour); // we use the brush colour for text
+    m_brushStack.top().SetColour(colour); // we use the brush colour for text
 }
         
 void SvgDeviceContext::SetTextBackground( int colour )
 {
     // nothing to do, we do not handle Text Background Mode
 }
-       
-void SvgDeviceContext::ResetBrush( )
-{
-    m_brushStack.pop();
-}
-        
-void SvgDeviceContext::ResetPen( )
-{
-    m_penStack.pop();
-} 
 
 void SvgDeviceContext::SetLogicalOrigin( int x, int y ) 
 {
@@ -388,8 +337,7 @@ void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6],
        bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
        bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
        ).c_str();
-    pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d",
-                                                       m_penStack.top().getWidth() ).c_str();
+    pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth() ).c_str();
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
@@ -470,7 +418,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = m_currentNode.append_child("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1,y1,x2,y2).c_str();
-    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().getWidth()).c_str();
+    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
  
                

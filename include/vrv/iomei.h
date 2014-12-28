@@ -214,6 +214,7 @@ private:
     bool ReadMeiStaffGrp( Object *parent, pugi::xml_node system );
     bool ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node system );
     bool ReadMeiMeasure( System *system, pugi::xml_node measure );
+    bool ReadMeiMeasureChildren( System *system, Measure *measure, pugi::xml_node parentNode );
     bool ReadMeiStaff( Measure *measure, pugi::xml_node staff );
     bool ReadMeiLayer( Staff *staff, pugi::xml_node layer );
     ///@}
@@ -222,7 +223,7 @@ private:
      * @name Methods for reading MEI layer elements
      */
     ///@{
-    bool ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement );
+    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
@@ -244,6 +245,8 @@ private:
      */
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app );
+    pugi::xml_node GetSelectedReading( pugi::xml_node app );
+    void GetRdgClass( pugi::xml_node page, DocObject *object );
     bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg );
     ///@}
     
