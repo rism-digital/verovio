@@ -745,21 +745,19 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     //Draw the to lines at beginning and end
     // make it 8 pixesl longers, and 4 pixels width
-    DrawVerticalLine(dc, y1 - 4, y2 + 4, x1, 4);
-    DrawVerticalLine(dc, y1 - 4, y2 + 4, x2, 4);
+    int border = m_doc->m_drawingHalfInterl[staff->staffSize] / 2;
+    DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->m_env.m_stemWidth * 2);
+    DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->m_env.m_stemWidth * 2);
     
     // Draw the text above
     int w, h;
-    unsigned int start_offset = 0; // offset from x to center text
+    int start_offset = 0; // offset from x to center text
     
     // convert to string
-    std::stringstream text;
-    text << multirest->GetNum();
-    // FIXME
-    std::wstring wtext;
+    std::wstring wtext = IntToTimeSigFigures(multirest->GetNum());
     
-    dc->GetTextExtent( text.str(), &w, &h);
-    start_offset = (x2 - x1 - w) / 2; // calculate offset to center text
+    dc->GetSmuflTextExtent( wtext, &w, &h);
+    start_offset = (x2 - x1 - w) /  2; // calculate offset to center text
     
     DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 5, wtext, false);
     

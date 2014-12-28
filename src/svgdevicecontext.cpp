@@ -364,8 +364,10 @@ void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, i
         }
         glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
     
-        partial_w *= m_font.GetPointSize() / glyph->GetUnitsPerEm();
-        partial_h *= m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        partial_w *= m_font.GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_font.GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
         
         *w += partial_w;
         *h += partial_h;

@@ -235,7 +235,9 @@ private:
      */
     ///@{
     bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center);
-    std::wstring IntToObliqueFigures(unsigned short number);
+    std::wstring IntToTupletFigures(unsigned short number);
+    std::wstring IntToTimeSigFigures(unsigned short number);
+    std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet* tuplet);
     ///@}
     

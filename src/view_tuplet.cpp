@@ -29,35 +29,9 @@
 #include "tuplet.h"
 
 namespace vrv {
-
+    
 #define TUPLET_OFFSET 20
 #define OBLIQUE_OFFSET 0x52 //move to oblique figures
-
-std::wstring View::IntToObliqueFigures(unsigned short number)
-{
-    /*
-    char buf[6];
-    
-    memset(buf, 0x00, sizeof(buf));
-    
-    // We do not convert more that FF values
-    if (number > 0xFFFF) number = 0xFFFF;
-    
-    sprintf(buf, "%i", number);
-    
-    size_t len;
-    len = strlen(buf);
-    assert((sizeof(buf)) > len ); // String conversion overflow 
-    
-    for (unsigned int i = 0; i < strlen(buf); i++) {
-        buf[i] += OBLIQUE_OFFSET;
-    }
-    
-    return std::string(buf);
-    */
-    std::wstring str;
-    return str;
-}
 
 /**
  * Analyze a tuplet object and figure out if all the notes are in the same beam
@@ -285,7 +259,7 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     
     int txt_lenght, txt_height;
     
-    std::wstring notes = IntToObliqueFigures((short int)tuplet->GetNum());
+    std::wstring notes = IntToTupletFigures((short int)tuplet->GetNum());
     
     dc->GetSmuflTextExtent(notes, &txt_lenght, &txt_height);
     
