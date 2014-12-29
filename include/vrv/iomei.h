@@ -17,6 +17,7 @@
 
 namespace vrv {
 
+class App;
 class Accid;
 class Barline;
 class Beam;
@@ -206,24 +207,33 @@ private:
     
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related. 
+     * For each container (page, system, measure, staff and layer) there is one method for 
+     * reading the element and one method for reading it children. The method for reading
+     * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
+     * for example.
      */
     ///@{
     bool ReadMeiPage( pugi::xml_node page );
-    bool ReadMeiSystem( Page* page, pugi::xml_node system );
+    bool ReadMeiPageChildren( Object* parent, pugi::xml_node parentNode );
+    bool ReadMeiSystem( Object* parent, pugi::xml_node system );
+    bool ReadMeiSystemChildren( Object* parent, pugi::xml_node parentNode );
     bool ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef );
-    bool ReadMeiStaffGrp( Object *parent, pugi::xml_node system );
-    bool ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node system );
-    bool ReadMeiMeasure( System *system, pugi::xml_node measure );
-    bool ReadMeiMeasureChildren( System *system, Measure *measure, pugi::xml_node parentNode );
-    bool ReadMeiStaff( Measure *measure, pugi::xml_node staff );
-    bool ReadMeiLayer( Staff *staff, pugi::xml_node layer );
+    bool ReadMeiScoreDefChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp );
+    bool ReadMeiStaffGrpChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef );
+    bool ReadMeiMeasure( Object *parent, pugi::xml_node measure );
+    bool ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiStaff( Object *parent, pugi::xml_node staff );
+    bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
+    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode );
     ///@}
 
     /**
      * @name Methods for reading MEI layer elements
      */
     ///@{
-    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
@@ -244,10 +254,8 @@ private:
      * Only one child of <app> is loaded
      */
     ///@{
-    bool ReadMeiApp( Object *parent, pugi::xml_node app );
-    pugi::xml_node GetSelectedReading( pugi::xml_node app );
-    void GetRdgClass( pugi::xml_node page, DocObject *object );
-    bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg );
+    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel type );
+    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel type );
     ///@}
     
     /**

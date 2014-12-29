@@ -22,6 +22,7 @@
 namespace vrv {
 
 class Doc;
+class App;
 class Functor;
 class Object;
 
@@ -123,6 +124,12 @@ public:
     void SetParent( Object *parent );
     
     virtual std::string GetClassName( ) { return "[MISSING]"; };
+    
+    /**
+     * Add an App as child.
+     * This can happen at many level.
+     */
+    void AddApp( App *child );
     
     /**
      * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)

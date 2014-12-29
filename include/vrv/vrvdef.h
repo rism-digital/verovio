@@ -157,6 +157,18 @@ enum EditorMode {
 #define ACCENT_OBL_PNT 6
 #define ACCENT_VERT_PNT 7
 
+    
+// the maximum is 255 (unsigned char)
+enum EditorialLevel {
+    EDITORIAL_SYSTEM = 0,
+    EDITORIAL_SCOREDEF,
+    EDITORIAL_STAFFGRP,    
+    EDITORIAL_MEASURE,
+    EDITORIAL_STAFF,
+    EDITORIAL_LAYER,
+    EDITORIAL_NOTE
+};
+    
 // the maximum is 255 (unsigned char)
 enum StaffGrpSymbol {
     STAFFGRP_NONE = 0,

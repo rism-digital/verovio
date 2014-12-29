@@ -22,6 +22,7 @@
 #include "beam.h"
 #include "clef.h"
 #include "doc.h"
+#include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -279,7 +280,21 @@ void Object::SetParent( Object *parent )
     assert( !m_parent );
     m_parent = parent;
 }
-
+    
+void Object::AddApp( App *child )
+{
+    assert(
+           dynamic_cast<System*>(this)
+        || dynamic_cast<Measure*>(this)
+        || dynamic_cast<Staff*>(this)
+        || dynamic_cast<Layer*>(this)
+        || dynamic_cast<LayerElement*>(this)
+        || dynamic_cast<Note*>(this)
+           );
+    child->SetParent( this );
+    m_children.push_back( child );
+    Modify();
+}
 
 bool Object::operator==( Object& other )
 {
