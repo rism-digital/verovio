@@ -113,6 +113,15 @@ App::App():
     Object("app-"),
     AttCommon()
 {
+    m_level = EDITORIAL_UNDEFINED;
+    Reset();
+}
+    
+App::App( EditorialLevel level ):
+    Object("app-"),
+    AttCommon()
+{
+    m_level = level;
     Reset();
 }
     

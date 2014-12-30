@@ -254,8 +254,8 @@ private:
      * Only one child of <app> is loaded
      */
     ///@{
-    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel type );
-    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel type );
+    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level );
+    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level );
     ///@}
     
     /**

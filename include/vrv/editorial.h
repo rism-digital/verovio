@@ -85,6 +85,7 @@ public:
      */
     ///@{
     App();
+    App( EditorialLevel level );
     virtual ~App();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "App"; };
@@ -97,6 +98,8 @@ public:
     void AddLemOrRdg(EditorialElement *lemOrRdg);
     
 protected:
+    /** We store the level of the <app> for integrity check */
+    EditorialLevel m_level;
 
 private:
     

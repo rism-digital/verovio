@@ -160,7 +160,8 @@ enum EditorMode {
     
 // the maximum is 255 (unsigned char)
 enum EditorialLevel {
-    EDITORIAL_SYSTEM = 0,
+    EDITORIAL_UNDEFINED = 0,
+    EDITORIAL_SYSTEM,
     EDITORIAL_SCOREDEF,
     EDITORIAL_STAFFGRP,    
     EDITORIAL_MEASURE,

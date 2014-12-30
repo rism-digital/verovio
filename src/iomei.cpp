@@ -669,6 +669,7 @@ bool MeiInput::ImportString( const std::string mei )
 bool MeiInput::ReadMei( pugi::xml_node root )
 {
     pugi::xml_node current;
+    bool success = true;
     
     if ( !root.empty() && (current = root.child("meiHead" ) ) )
     {
@@ -705,7 +706,8 @@ bool MeiInput::ReadMei( pugi::xml_node root )
             // because we are in a page-based MEI
             this->m_hasLayoutInformation = true;
             for( current = pages.child( "page" ); current; current = current.next_sibling( "page" ) ) {
-                ReadMeiPage( current );
+                if (!success) break;
+                success = ReadMeiPage( current );
             }
         }
     }
@@ -716,7 +718,8 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         m_doc->AddPage( m_page );
         pugi::xml_node current;
         for( current = mdiv.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( current );
+            if (!success) break;
+            success = ReadScoreBasedMei( current );
         }
     }
     
@@ -728,7 +731,7 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         }
     }
     
-    return true;
+    return success;
 }
 
 bool MeiInput::ReadMeiHeader( pugi::xml_node meiHead )
@@ -763,10 +766,7 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
 
     m_doc->AddPage( vrvPage );
     
-    ReadMeiPageChildren(vrvPage, page);
-    
-    
-    return true;
+    return ReadMeiPageChildren(vrvPage, page);
 }
     
 bool MeiInput::ReadMeiPageChildren( Object *parent, pugi::xml_node parentNode )
@@ -832,9 +832,11 @@ bool MeiInput::ReadMeiSystemChildren( Object *parent, pugi::xml_node parentNode 
 {
     assert( dynamic_cast<System*>( parent ) || dynamic_cast<EditorialElement*>( parent ) );
     
+    bool success = true;
     pugi::xml_node current;
     Measure *unmeasured = NULL;
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
+        if (!success) break;
         if ( std::string( current.name() ) == "scoreDef" ) {
             // we should not have scoredef with unmeasured within a system... (?)
             assert(!unmeasured);
@@ -848,26 +850,32 @@ bool MeiInput::ReadMeiSystemChildren( Object *parent, pugi::xml_node parentNode 
                     dynamic_cast<System*>( parent )->AddMeasure(unmeasured);
                 }
                 else {
-                    LogWarning( "Cannot read unmeasured music within editorial markup" );
+                    LogError( "Unmeasured music within editorial markup is currently not supported" );
                     return false;
                 }
             }
-            ReadMeiStaff( unmeasured, current );
+            success = ReadMeiStaff( unmeasured, current );
         }
         else if ( parentNode.child( "measure" ) ) {
             // we should not mix measured and unmeasured within a system...
             assert(!unmeasured);
-            ReadMeiMeasure(parent, current);
+            if ( dynamic_cast<EditorialElement*>( parent ) && !m_ignoreLayoutInformation ) {
+                LogError( "Cannot have <measure> within editorial markup unless layout information \
+                         is ignored (try with --ignore-layout)" );
+                return false;
+                
+            }
+            success = ReadMeiMeasure(parent, current);
         }
         else if ( std::string( current.name() ) == "app" ) {
-            ReadMeiApp( parent, current, EDITORIAL_SYSTEM );
+            success = ReadMeiApp( parent, current, EDITORIAL_SYSTEM );
         }
         else {
             LogWarning("Unsupported '<%s>' within <system>", current.name() );
         }
     }
     
-    return true;
+    return success;
 }
 
 bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
@@ -902,29 +910,29 @@ bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
     
     AddScoreDef(parent, vrvScoreDef);
     
-    ReadMeiScoreDefChildren( vrvScoreDef, scoreDef );
-    
-    return true;
+    return ReadMeiScoreDefChildren( vrvScoreDef, scoreDef );
 }
     
 bool MeiInput::ReadMeiScoreDefChildren( Object *parent, pugi::xml_node parentNode )
 {
     assert( dynamic_cast<ScoreDef*>( parent ) || dynamic_cast<EditorialElement*>( parent ) );
     
+    bool success = true;
     pugi::xml_node current;
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
+        if (!success) break;
         if ( std::string( current.name() ) == "app" ) {
-            ReadMeiApp( parent, current, EDITORIAL_SCOREDEF);
+            success = ReadMeiApp( parent, current, EDITORIAL_SCOREDEF);
         }
         else if ( std::string( current.name() ) == "staffGrp" ) {
-            ReadMeiStaffGrp( parent, current );
+            success = ReadMeiStaffGrp( parent, current );
         }
         else {
             LogWarning("Unsupported '<%s>' within <scoreDef>", current.name() );
         }
     }
     
-    return true;
+    return success;
 }
 
 bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
@@ -943,32 +951,32 @@ bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
     
     AddStaffGrp(parent, vrvStaffGrp);
     
-    ReadMeiStaffGrpChildren( vrvStaffGrp, staffGrp );
-    
-    return true;
+    return ReadMeiStaffGrpChildren( vrvStaffGrp, staffGrp );
 }    
 
 bool MeiInput::ReadMeiStaffGrpChildren( Object *parent, pugi::xml_node parentNode )
 {
     assert( dynamic_cast<StaffGrp*>( parent ) || dynamic_cast<EditorialElement*>( parent ) );
     
+    bool success = true;
     pugi::xml_node current;
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
+        if (!success) break;
         if ( std::string( current.name() ) == "app" ) {
-            ReadMeiApp( parent, current, EDITORIAL_STAFFGRP );
+            success = ReadMeiApp( parent, current, EDITORIAL_STAFFGRP );
         }
         else if ( std::string( current.name() ) == "staffGrp" ) {
-            ReadMeiStaffGrp( parent, current);
+            success = ReadMeiStaffGrp( parent, current);
         }
         else if ( std::string( current.name() ) == "staffDef" ) {
-            ReadMeiStaffDef( parent, current );
+            success = ReadMeiStaffDef( parent, current );
         }
         else {
             LogWarning("Unsupported '<%s>' within <staffGrp>", current.name() );
         }
     }
     
-    return true;
+    return success;
 }
 
 bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
@@ -1029,22 +1037,22 @@ bool MeiInput::ReadMeiMeasure( Object *parent, pugi::xml_node measure )
         dynamic_cast<EditorialElement*>( parent )->AddMeasure(vrvMeasure);
     }
     
-    ReadMeiMeasureChildren(vrvMeasure, measure);
-    
-    return true;
+    return ReadMeiMeasureChildren(vrvMeasure, measure);
 }
 
 bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode )
 {
     assert( dynamic_cast<Measure*>( parent ) || dynamic_cast<EditorialElement*>( parent ) );
     
+    bool success = true;
     pugi::xml_node current;
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
+        if (!success) break;
         if ( std::string( current.name() ) == "app" ) {
-            ReadMeiApp( parent, current, EDITORIAL_MEASURE);
+            success = ReadMeiApp( parent, current, EDITORIAL_MEASURE);
         }
         else if ( std::string( current.name() ) == "staff" ) {
-            ReadMeiStaff( parent, current);
+            success = ReadMeiStaff( parent, current);
         }
         else if ( std::string( current.name() ) == "tupletSpan" ) {
             if (!ReadTupletSpanAsTuplet( dynamic_cast<Measure*>( parent ), current )) {
@@ -1061,7 +1069,7 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
         }
     }
     
-    return true;
+    return success;
 }
 
 bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
@@ -1087,9 +1095,7 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
         dynamic_cast<EditorialElement*>( parent )->AddStaff( vrvStaff );
     }
 
-    ReadMeiStaffChildren( vrvStaff, staff );
-    
-    return true;
+    return ReadMeiStaffChildren( vrvStaff, staff );
 }
     
     
@@ -1097,20 +1103,22 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
 {
     assert( dynamic_cast<Staff*>( parent ) || dynamic_cast<EditorialElement*>( parent ) );
     
+    bool success = true;
     pugi::xml_node current;
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
+        if (!success) break;
         if ( std::string( current.name() ) == "app" ) {
-            ReadMeiApp( parent, current, EDITORIAL_STAFF);
+            success = ReadMeiApp( parent, current, EDITORIAL_STAFF);
         }
         else if ( std::string( current.name() ) == "layer" ) {
-            ReadMeiLayer( parent, current);
+            success = ReadMeiLayer( parent, current);
         }
         else {
             LogWarning("Unsupported '<%s>' within <staff>", current.name() );
         }
     }
     
-    return true;
+    return success;
 }
 
 bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
@@ -1128,64 +1136,63 @@ bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
         dynamic_cast<EditorialElement*>( parent )->AddLayer( vrvLayer );
     }
     
-    ReadMeiLayerChildren( vrvLayer, layer );
-    
-    return true;
+    return ReadMeiLayerChildren( vrvLayer, layer );
 }
 
 bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode )
 {
+    bool success = true;
     pugi::xml_node xmlElement;
     for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ){
-        if ( std::string( xmlElement.name() ) == "app" ) {
-            ReadMeiApp( parent, xmlElement, EDITORIAL_LAYER);
+        if (!success) break;
+        if ( std::string( xmlElement.name() ) == "accid" ) {
+            success = ReadMeiAccid( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "app" ) {
+            success = ReadMeiApp( parent, xmlElement, EDITORIAL_LAYER);
         }
         else if ( std::string( xmlElement.name() )  == "barLine" ) {
-            ReadMeiBarline( parent, xmlElement );
+            success = ReadMeiBarline( parent, xmlElement );
         }
         else if ( std::string( xmlElement.name() ) == "beam" ) {
-            ReadMeiBeam( parent, xmlElement);
+            success = ReadMeiBeam( parent, xmlElement);
         }
         else if ( std::string( xmlElement.name() ) == "clef" ) {
-            ReadMeiClef( parent, xmlElement);
-        }
-        else if ( std::string( xmlElement.name() ) == "mensur" ) {
-            ReadMeiMensur( parent, xmlElement );
-        }
-        else if ( std::string( xmlElement.name() ) == "meterSig" ) {
-            ReadMeiMeterSig( parent, xmlElement );
-        }
-        else if ( std::string( xmlElement.name() ) == "note" ) {
-            ReadMeiNote( parent, xmlElement );
-        }
-        else if ( std::string( xmlElement.name() ) == "rest" ) {
-            ReadMeiRest( parent, xmlElement );
-        }
-        else if ( std::string( xmlElement.name() ) == "mRest" ) {
-            ReadMeiMRest( parent, xmlElement );
-        }
-        else if ( std::string( xmlElement.name() ) == "multiRest" ) {
-            ReadMeiMultiRest( parent, xmlElement );
-        }
-        else if ( std::string( xmlElement.name() ) == "tuplet" ) {
-            ReadMeiTuplet( parent, xmlElement );
-        }
-        // symbols
-        else if ( std::string( xmlElement.name() ) == "accid" ) {
-            ReadMeiAccid( parent, xmlElement );
+            success = ReadMeiClef( parent, xmlElement);
         }
         else if ( std::string( xmlElement.name() ) == "custos" ) {
-            ReadMeiCustos( parent, xmlElement );
+            success = ReadMeiCustos( parent, xmlElement );
         }
         else if ( std::string( xmlElement.name() ) == "dot" ) {
-            ReadMeiDot( parent, xmlElement );
+            success = ReadMeiDot( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "mensur" ) {
+            success = ReadMeiMensur( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "meterSig" ) {
+            success = ReadMeiMeterSig( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "note" ) {
+            success = ReadMeiNote( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "rest" ) {
+            success = ReadMeiRest( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "mRest" ) {
+            success = ReadMeiMRest( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "multiRest" ) {
+            success = ReadMeiMultiRest( parent, xmlElement );
+        }
+        else if ( std::string( xmlElement.name() ) == "tuplet" ) {
+            success = ReadMeiTuplet( parent, xmlElement );
         }
         else if ( std::string( xmlElement.name() ) == "chord" ) {
             // We just read the first note for now
             pugi::xml_node note = xmlElement.child("note");
             if ( note ) {
                 note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
-                ReadMeiNote( parent, note );
+                success = ReadMeiNote( parent, note );
                 LogDebug("Only first note of chords is read" );
             }
         }
@@ -1195,7 +1202,7 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode )
         }
     }
     
-    return true;
+    return success;
 }
     
 bool MeiInput::ReadLayerElement( pugi::xml_node element, LayerElement *object )
@@ -1491,7 +1498,7 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
     }
 }
     
-bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel type )
+bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level )
 {
     // Special case where we select the child either by looking at the m_rdgXPathQuery or by
     // selecting the <lem> or the first child
@@ -1515,18 +1522,18 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel ty
         return false;
     }
     
-    App *vrvApp = new App();
+    App *vrvApp = new App( level );
     SetMeiUuid(app, vrvApp);
     vrvApp->ReadCommon(app);
     parent->AddApp(vrvApp);
     
-    ReadMeiAppChildren( vrvApp, selectedLemOrRdg, type);
+    ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level );
     
     return true;   
 }
     
     
-bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel type )
+bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level )
 {
     EditorialElement *vrvLemOrRdg;
     if ( std::string( lemOrRdg.name() ) == "lem" ) {
@@ -1540,26 +1547,27 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
     vrvLemOrRdg->ReadCommon(lemOrRdg);
     app->AddLemOrRdg(vrvLemOrRdg);
     
-    if (type == EDITORIAL_SYSTEM) {
-        ReadMeiSystemChildren(vrvLemOrRdg, lemOrRdg);
+    if (level == EDITORIAL_SYSTEM) {
+        return ReadMeiSystemChildren(vrvLemOrRdg, lemOrRdg);
     }
-    else if (type == EDITORIAL_SCOREDEF) {
-        ReadMeiScoreDefChildren(vrvLemOrRdg, lemOrRdg);
+    else if (level == EDITORIAL_SCOREDEF) {
+        return ReadMeiScoreDefChildren(vrvLemOrRdg, lemOrRdg);
     }
-    else if (type == EDITORIAL_STAFFGRP) {
-        ReadMeiStaffGrpChildren(vrvLemOrRdg, lemOrRdg);
+    else if (level == EDITORIAL_STAFFGRP) {
+        return ReadMeiStaffGrpChildren(vrvLemOrRdg, lemOrRdg);
     }
-    else if (type == EDITORIAL_MEASURE) {
-        ReadMeiMeasureChildren(vrvLemOrRdg, lemOrRdg);
+    else if (level == EDITORIAL_MEASURE) {
+        return ReadMeiMeasureChildren(vrvLemOrRdg, lemOrRdg);
     }
-    else if (type == EDITORIAL_STAFF) {
-        ReadMeiStaffChildren(vrvLemOrRdg, lemOrRdg);
+    else if (level == EDITORIAL_STAFF) {
+        return ReadMeiStaffChildren(vrvLemOrRdg, lemOrRdg);
     }
-    else if (type == EDITORIAL_LAYER) {
-        ReadMeiLayerChildren(vrvLemOrRdg, lemOrRdg);
+    else if (level == EDITORIAL_LAYER) {
+        return ReadMeiLayerChildren(vrvLemOrRdg, lemOrRdg);
     }
-    
-    return true;
+    else {
+        return false;
+    }
 }
 
 /*
