@@ -20,6 +20,7 @@
 #include "barline.h"
 #include "clef.h"
 #include "doc.h"
+#include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -85,7 +86,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 {
 	assert( system ); // other asserted before
     
-    Measure *measure;
+    Measure *measure = NULL;
+    App *app = NULL;
     
     dc->StartGraphic( system, "system", system->GetUuid() );
     
@@ -101,16 +103,6 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         system->SetDrawingX( system->m_xAbs );
         system->SetDrawingY( system->m_yAbs );
     }
-    
-    
-    /*for (i = 0; i < (int)system->GetMeasureCount(); i++)
-	{
-		measure = dynamic_cast<Measure*>(system->m_children[i]);
-        if (!measure) {
-            continue;
-        }
-        DrawMeasure( dc , measure, system );
-	}*/
 
     Object* current;
     for (current = system->GetFirst( ); current; current = system->GetNext( ) )
@@ -118,6 +110,11 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 		measure = dynamic_cast<Measure*>(current);
         if (measure) {
             DrawMeasure( dc , measure, system );
+        }
+        app = dynamic_cast<App*>(current);
+        if (app) {
+            assert( app->GetLevel() == EDITORIAL_SYSTEM );
+            DrawEditorialElement( dc , app, system );
         }
 	}
 
@@ -589,6 +586,9 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 {
 	assert( dc ); // DC cannot be NULL
     
+    Staff *staff = NULL;
+    App *app = NULL;
+    
     // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure if un-measured music
     if ( measure->IsMeasuredMusic()) {
         dc->StartGraphic( measure, "measure", measure->GetUuid() );
@@ -607,13 +607,18 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
         measure->SetDrawingX( measure->m_xAbs );
     }
     
-	Staff *staff = NULL;
-	int j;
-    
-	for(j = 0; j < measure->GetStaffCount(); j++)
-	{       
-		staff = static_cast<Staff*>(measure->m_children[j]);
-		DrawStaff( dc, staff, measure, system );
+    Object* current;
+    for (current = measure->GetFirst( ); current; current = measure->GetNext( ) )
+    {
+        staff = dynamic_cast<Staff*>(current);
+        if (staff) {
+            DrawStaff( dc, staff, measure, system );
+        }
+        app = dynamic_cast<App*>(current);
+        if (app) {
+            assert( app->GetLevel() == EDITORIAL_MEASURE );
+            DrawEditorialElement( dc , app, measure, system );
+        }
     }
 
     if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
@@ -687,6 +692,9 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 {
 	assert( dc ); // DC cannot be NULL
     
+    Layer *layer = NULL;
+    App *app = NULL;
+    
     dc->StartGraphic( staff, "staff", staff->GetUuid());
     
     // Here we set the appropriate y value to be used for drawing
@@ -706,16 +714,21 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     }
     
     DrawStaffLines( dc, staff, measure, system );
-        
-	Layer *layer = NULL;
-	int j;
     
-	for(j = 0; j < staff->GetLayerCount(); j++)
-	{
-		layer = dynamic_cast<Layer*>(staff->m_children[j]);
-		DrawLayer( dc, layer, staff, measure );
-	}
-    
+    Object* current;
+    for (current = staff->GetFirst( ); current; current = staff->GetNext( ) )
+    {
+        layer = dynamic_cast<Layer*>(current);
+        if (layer) {
+            DrawLayer( dc, layer, staff, measure );
+        }
+        app = dynamic_cast<App*>(current);
+        if (app) {
+            assert( app->GetLevel() == EDITORIAL_STAFF );
+            DrawEditorialElement( dc , app, staff, measure );
+        }
+    }
+
     dc->EndGraphic( staff, this );
 }
     
@@ -840,8 +853,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 	assert( dc ); // DC cannot be NULL
 
 	LayerElement *element = NULL;
-	int j;
-    
+    App *app = NULL;
     
     dc->StartGraphic( layer, "layer", layer->GetUuid());
     
@@ -860,15 +872,20 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     if (layer->GetDrawingMeterSig()) {
         DrawElement(dc, layer->GetDrawingMeterSig(), layer, measure, staff);
     }
-    
-	for(j = 0; j < layer->GetElementCount(); j++)
-	{
-		element = dynamic_cast<LayerElement*>(layer->m_children[j]);
-        
-        if ( element ) {
+
+    Object* current;
+    for (current = layer->GetFirst( ); current; current = layer->GetNext( ) )
+    {
+        element = dynamic_cast<LayerElement*>(current);
+        if (element) {
             DrawElement( dc, element, layer, measure, staff );
         }
-	}
+        app = dynamic_cast<App*>(current);
+        if (app) {
+            assert( app->GetLevel() == EDITORIAL_LAYER );
+            DrawEditorialElement( dc , app, layer, staff, measure );
+        }
+    }
     
     // first draw the beams
     DrawLayerList(dc, layer, staff, measure, &typeid(Beam) );

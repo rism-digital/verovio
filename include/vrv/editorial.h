@@ -91,6 +91,9 @@ public:
     virtual std::string GetClassName( ) { return "App"; };
     ///@}
     
+    /** Getter for level **/
+    EditorialLevel GetLevel() { return m_level; };
+    
     /**
      * Add children to a apparatus.
      * Tests if lemOrRdg is Lem or Rdg.

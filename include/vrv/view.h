@@ -143,6 +143,21 @@ protected:
     ///@}
     
     /**
+     * @name Methods for drawing App and EditorialElement
+     * Defined in view_page.cpp
+     */
+    ///@{
+    /** System level **/
+    void DrawEditorialElement( DeviceContext *dc, Object *element, System *system ) {};
+    /** Measure level **/
+    void DrawEditorialElement( DeviceContext *dc, Object *element, Measure *measure, System *system ) {};
+    /** Staff level **/
+    void DrawEditorialElement( DeviceContext *dc, Object *element, Staff *staff,  Measure *measure ) {};
+    /** Layer level **/
+    void DrawEditorialElement( DeviceContext *dc, Object *element, Layer *layer, Staff *staff, Measure *measure ) {};
+    ///@}
+    
+    /**
      * @name Methods for calculating drawing positions
      * Defined in view_element.cpp
      */
