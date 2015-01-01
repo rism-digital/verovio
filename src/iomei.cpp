@@ -990,7 +990,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     vrvStaffDef->ReadLabelsAddl(staffDef);
     
     if ( !vrvStaffDef->HasN() ) {
-        LogWarning("No @n on <staffDef>");
+        LogWarning("No @n on <staffDef> might yield unpredictable results");
     }
     
     ClefAttr clefAttr;
@@ -1087,6 +1087,10 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
         vrvStaff->notAnc = true;
     }
     
+    if ( !vrvStaff->HasN() ) {
+        LogWarning("No @n on <staff> might yield unpredictable results");
+    }
+    
     // This could me moved to an AddStaff method for consistency with AddLayerElement
     if ( dynamic_cast<Measure*>( parent ) ) {
         dynamic_cast<Measure*>( parent )->AddStaff( vrvStaff );
@@ -1127,6 +1131,10 @@ bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
     SetMeiUuid(layer, vrvLayer);
     
     vrvLayer->ReadCommon(layer);
+    
+    if ( !vrvLayer->HasN() ) {
+        LogWarning("No @n on <layer> might yield unpredictable results");
+    }
     
     // This could me moved to an AddLayer method for consistency with AddLayerElement
     if ( dynamic_cast<Staff*>( parent ) ) {
