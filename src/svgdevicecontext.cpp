@@ -160,6 +160,16 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     m_currentNode.append_attribute( "id" ) = gId.c_str();
     m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
+    
+void SvgDeviceContext::ReStartGraphic( DocObject *object, std::string gId )
+{
+    /* 
+     * Here we need to look in the m_currentNode children if we can find a node with @id == gId
+     * It should become the currentNode
+     * It should always be found - one issue might be if we have some duplicates in the @id value,
+     * but this should not be the case either
+     */
+}
   
       
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
@@ -205,7 +215,17 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
-
+    
+void SvgDeviceContext::ReEndGraphic(DocObject *object, View *view )
+{
+    /*
+     * I guess the only thing we need is to put the m_currentNode to the top of the stack.
+     * This would mean we cannot accept two calls of ReStartGraphic with a ReEndGraphic inbetween.
+     * We would add a member to check this (e.g. m_restarted = true in ReStartGraphic, and then
+     * (before this) do assert(!m_restarted);
+     * m_restarted would be reset to false in ReEndGraphic.
+     */
+}
 
 void SvgDeviceContext::StartPage( )
 {

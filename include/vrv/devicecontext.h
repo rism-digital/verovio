@@ -126,90 +126,97 @@ public:
 class DeviceContext
 {
 public:
-
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
     DeviceContext () { m_correctMusicAscent = true; m_drawingBoundingBoxes = false;};
     virtual ~DeviceContext() {};
+    ///@}
     
-    // Setters
-    
+    /**
+     * @name Setters
+     * Non virtual methods cannot be overriden and manage the Pen and Brush stacks
+     */
+    ///@{
     void SetBrush( int colour, int opacity );
-    
-    virtual void SetBackground( int colour, int style = AxSOLID ) = 0;
-    
-    virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) = 0;
-    
-    virtual void SetBackgroundMode( int mode ) = 0;
-    
     void SetPen( int colour, int width, int opacity );
-    
-    virtual void SetFont( FontMetricsInfo *font_info ) = 0;
-
-    virtual void SetTextForeground( int colour ) = 0;
-    
-    virtual void SetTextBackground( int colour ) = 0;
-    
     void ResetBrush( );
-    
     void ResetPen( );
-    
+    virtual void SetBackground( int colour, int style = AxSOLID ) = 0;
+    virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) = 0;
+    virtual void SetBackgroundMode( int mode ) = 0;
+    virtual void SetFont( FontMetricsInfo *font_info ) = 0;
+    virtual void SetTextForeground( int colour ) = 0;
+    virtual void SetTextBackground( int colour ) = 0;
     virtual void SetLogicalOrigin( int x, int y ) = 0;
+    ///}
     
-    // Getters 
-    
+    /**
+     * @name Getters
+     */
+    ///@{
     virtual void GetTextExtent( const std::string& string, int *w, int *h ) = 0;
-    
     virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h ) = 0;
-    
     virtual MusPoint GetLogicalOrigin( ) = 0;
-    
     virtual bool CorrectMusicAscent( ) { return m_correctMusicAscent; };
+    ///@}
 
-    // Drawing methods
-    
+    /**
+     * @name Drawing methods
+     */
+    ///@{
     virtual void DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6]) = 0;
-    
     virtual void DrawCircle(int x, int y, int radius) = 0;
-    
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
-    
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end) = 0;
-    
     virtual void DrawLine(int x1, int y1, int x2, int y2) = 0;
-    
     virtual void DrawPolygon(int n, MusPoint points[], int xoffset = 0, int yoffset = 0, int fill_style = AxODDEVEN_RULE) = 0;
-    
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
-    
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle) = 0;
-    
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
-    
     virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT ) = 0;
-    
     virtual void DrawMusicText(const std::wstring& text, int x, int y) = 0;
-    
     virtual void DrawSpline(int n, MusPoint points[]) = 0;
-    
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) = 0;
+    ///@}
     
-    // Method for starting and ending a graphic - for example for grouping shapes in <g></g> in SVG
-    
+    /**
+     * @name Method for starting and ending a graphic
+     * For example, the method can be used for grouping shapes in <g></g> in SVG
+     */
+    ///@{
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId ) = 0;
-    
     virtual void EndGraphic( DocObject *object, View *view  ) = 0;
+    ///@}
     
+    /**
+     * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
+     * The methods can be used to the output together, for example for a Beam
+     */
+    ///@{
+    virtual void ReStartGraphic( DocObject *object, std::string gId ) = 0;
+    virtual void ReEndGraphic( DocObject *object, View *view  ) = 0;
+    ///@}
+ 
+    /**
+     * @name Method for starting and ending page
+     */
+    ///@{
     virtual void StartPage( ) = 0;
-    
     virtual void EndPage( ) = 0;
+    ///@}
     
-    // Colour conversion method
-    
+    /** Colour conversion method **/
     static int RGB2Int( char red, char green, char blue ) { return (red << 16 | green << 8 | blue); };
 
-    
-    // debug bounding boxes?
+    /**
+     * @name Getter and setter for drawing bounding box option (debug)
+     */
+    ///@{
     virtual void SetDrawBoundingBoxes(bool b) {m_drawingBoundingBoxes = b;};
     virtual bool GetDrawBoundingBoxes() {return m_drawingBoundingBoxes;};
+    ///@}
     
 protected:
     

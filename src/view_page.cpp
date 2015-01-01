@@ -901,16 +901,22 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
             Beam *beam = dynamic_cast<Beam*>(element);
+            dc->ReStartGraphic(beam, beam->GetUuid());
             DrawBeam( dc, layer, beam, staff );
+            dc->ReEndGraphic(beam, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
+            dc->ReStartGraphic(tuplet, tuplet->GetUuid());
             DrawTuplet( dc, tuplet, layer, staff );
+            dc->ReEndGraphic(tuplet, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
+            // Not sure about ReStart and ReEnd Tie and Slur
             DrawTie( dc, element, layer, staff, measure );
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
+            // Not sure about ReStart and ReEnd Tie and Slur
             DrawTie( dc, element, layer, staff, measure );
         }
     }
