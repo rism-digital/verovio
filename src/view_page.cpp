@@ -108,13 +108,16 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     for (current = system->GetFirst( ); current; current = system->GetNext( ) )
 	{
 		measure = dynamic_cast<Measure*>(current);
+        app = dynamic_cast<App*>(current);
         if (measure) {
             DrawMeasure( dc , measure, system );
         }
-        app = dynamic_cast<App*>(current);
-        if (app) {
+        else if (app) {
             assert( app->GetLevel() == EDITORIAL_SYSTEM );
             DrawEditorialElement( dc , app, system );
+        }
+        else {
+            assert(false);
         }
 	}
 
@@ -611,13 +614,16 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     for (current = measure->GetFirst( ); current; current = measure->GetNext( ) )
     {
         staff = dynamic_cast<Staff*>(current);
+        app = dynamic_cast<App*>(current);
         if (staff) {
             DrawStaff( dc, staff, measure, system );
         }
-        app = dynamic_cast<App*>(current);
-        if (app) {
+        else if (app) {
             assert( app->GetLevel() == EDITORIAL_MEASURE );
             DrawEditorialElement( dc , app, measure, system );
+        }
+        else {
+            assert(false);
         }
     }
 
@@ -719,13 +725,16 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     for (current = staff->GetFirst( ); current; current = staff->GetNext( ) )
     {
         layer = dynamic_cast<Layer*>(current);
+        app = dynamic_cast<App*>(current);
         if (layer) {
             DrawLayer( dc, layer, staff, measure );
         }
-        app = dynamic_cast<App*>(current);
-        if (app) {
+        else if (app) {
             assert( app->GetLevel() == EDITORIAL_STAFF );
             DrawEditorialElement( dc , app, staff, measure );
+        }
+        else {
+            assert(false);
         }
     }
 
@@ -877,13 +886,16 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     for (current = layer->GetFirst( ); current; current = layer->GetNext( ) )
     {
         element = dynamic_cast<LayerElement*>(current);
+        app = dynamic_cast<App*>(current);
         if (element) {
             DrawElement( dc, element, layer, measure, staff );
         }
-        app = dynamic_cast<App*>(current);
-        if (app) {
+        else if (app) {
             assert( app->GetLevel() == EDITORIAL_LAYER );
             DrawEditorialElement( dc , app, layer, staff, measure );
+        }
+        else {
+            assert(false);
         }
     }
     
