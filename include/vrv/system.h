@@ -37,7 +37,6 @@ public:
      */
     ///@{
     System();
-	System( const System& system ); // copy contructor
     virtual ~System();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "System"; };
