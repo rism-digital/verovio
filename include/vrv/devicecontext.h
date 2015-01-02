@@ -223,7 +223,6 @@ protected:
     
     bool m_correctMusicAscent; // specify if the ascent has to be correct when view the music font (true wxDC, false SVG)
     bool m_drawingBoundingBoxes;
-    bool m_resumed;
     
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;

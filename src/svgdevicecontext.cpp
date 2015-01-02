@@ -46,8 +46,6 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     m_width = width;
     m_height = height;
     
-    m_resumed = false;
-    
     m_userScaleX = 1.0;
     m_userScaleY = 1.0;
     m_originX = 0;
@@ -166,7 +164,6 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
 void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
 {
     m_currentNode = m_currentNode.find_child_by_attribute("id", gId.c_str());
-    m_resumed = true;
 }
   
       
@@ -209,19 +206,14 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
     for(std::vector<int>::size_type i = 0; i != object->m_rdgClasses.size(); i++) {
         m_rdgClassStack.pop_back();
     }
-    
-    if (!m_resumed)
-    {
-        m_svgNodeStack.pop_back();
-    }
+
+    m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
     
 void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 {
-    assert(m_resumed);
-    EndGraphic(object, view);
-    m_resumed = false;
+    m_currentNode = m_svgNodeStack.back();
 }
 
 void SvgDeviceContext::StartPage( )
