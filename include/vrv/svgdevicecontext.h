@@ -103,8 +103,8 @@ public:
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ReStartGraphic( DocObject *object, std::string gId );
-    virtual void ReEndGraphic( DocObject *object, View *view  );
+    virtual void ResumeGraphic( DocObject *object, std::string gId );
+    virtual void EndResumedGraphic( DocObject *object, View *view  );
     ///@}
     
     /**
