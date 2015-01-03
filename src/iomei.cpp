@@ -1693,7 +1693,7 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
         ReadMeiMeasure( m_system, element );
     }
     else if (std::string( element.name() ) == "pb") {
-        if ( (m_system->GetMeasureCount() > 0) && !m_ignoreLayoutInformation) {
+        if ( (m_system->GetChildCount() > 0) && !m_ignoreLayoutInformation) {
             //LogDebug( "pb" );
             this->m_hasLayoutInformation = true;
             m_page = new Page( );

@@ -71,7 +71,9 @@ void Measure::AddStaff( Staff *staff )
 	m_children.push_back( staff );
     
     if ( staff->GetN() < 1 ) {
-        staff->SetN( this->GetStaffCount() );
+        // This is not 100% safe if we have a <app> and <rdg> with more than
+        // one staff as a previous child.
+        staff->SetN( this->GetChildCount() );
     }
 }
 

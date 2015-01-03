@@ -74,9 +74,6 @@ public:
      * Return the default horizontal spacing of system.
      */
     int GetVerticalSpacing();
-
-	
-	int GetMeasureCount() const { return (int)m_children.size(); };
     
     /**
      * Return the index position of the system in its page parent
