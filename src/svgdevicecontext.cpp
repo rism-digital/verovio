@@ -214,8 +214,8 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
     
 void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 {
-    m_currentNode = m_svgNodeStack.back();
     m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
 }
 
 void SvgDeviceContext::StartPage( )
