@@ -11,6 +11,7 @@
 
 #include <string>
 #include <stack>
+#include <assert.h>
 
 namespace vrv {
 
@@ -195,8 +196,8 @@ public:
      * The methods can be used to the output together, for example for a Beam
      */
     ///@{
-    virtual void ReStartGraphic( DocObject *object, std::string gId ) = 0;
-    virtual void ReEndGraphic( DocObject *object, View *view  ) = 0;
+    virtual void ResumeGraphic( DocObject *object, std::string gId ) = 0;
+    virtual void EndResumedGraphic( DocObject *object, View *view  ) = 0;
     ///@}
  
     /**
