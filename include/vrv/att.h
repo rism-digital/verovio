@@ -8,6 +8,7 @@
 #ifndef __VRV_ATT_H__
 #define __VRV_ATT_H__
 
+#include <typeinfo>
 #include <string>
 
 //----------------------------------------------------------------------------
@@ -15,6 +16,8 @@
 #include "attdef.h"
 
 namespace vrv {
+    
+class Object;
 
 //----------------------------------------------------------------------------
 // Att
@@ -110,6 +113,24 @@ protected:
   
     ///@}
 
+};
+    
+//----------------------------------------------------------------------------
+// AttComparison
+//----------------------------------------------------------------------------
+
+class AttComparison
+{
+    
+public:
+    AttComparison( const std::type_info *elementType ) {
+        m_elementType = elementType;
+    };
+    
+    virtual bool operator() (Object *object);
+    
+protected:
+    const std::type_info *m_elementType;
 };
     
 } // namespace vrv

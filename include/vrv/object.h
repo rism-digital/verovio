@@ -25,6 +25,7 @@ class Doc;
 class App;
 class Functor;
 class Object;
+class AttComparison;
 
 typedef std::vector<Object*> ArrayOfObjects;
 
@@ -174,6 +175,11 @@ public:
     Object *FindChildByType( const std::type_info *elementType );
     
     /**
+     * Return the first element matching the AttComparison functor
+     */
+    Object *FindChildByAttComparison( AttComparison *attComparison );
+    
+    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to used only in very particular case where the child
      * object cannot be detached straight away. It is typically the case 
@@ -290,11 +296,11 @@ public:
     virtual int FindByUuid( ArrayPtrVoid params );
     
     /**
-     * Find a Object of a specified type.
-     * param 0: the type we are looking for
+     * Find a Object with a AttComparison functor .
+     * param 0: the pointer to the AttComparsion we are evaluating.
      * param 1: the pointer to pointer to the Object retrieved (if found).
      */
-    virtual int FindByType( ArrayPtrVoid params );
+    virtual int FindByAttComparison( ArrayPtrVoid params );
     
     /**
      * Save the content of and object by calling the appropriate FileOutputStream method
@@ -720,7 +726,7 @@ public:
     }
     
 private:
-    const std::type_info *m_elementType;;
+    const std::type_info *m_elementType;
 };
 
 } // namespace vrv

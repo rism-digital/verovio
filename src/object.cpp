@@ -18,6 +18,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "aligner.h"
 #include "beam.h"
 #include "clef.h"
@@ -234,12 +235,18 @@ Object *Object::FindChildByUuid( std::string uuid )
 
 Object *Object::FindChildByType(const std::type_info *elementType)
 {
-    Functor findByType( &Object::FindByType );
+    AttComparison attComparison( elementType );
+    return FindChildByAttComparison( &attComparison );
+}
+    
+Object *Object::FindChildByAttComparison( AttComparison *attComparison )
+{
+    Functor findByAttComparison( &Object::FindByAttComparison );
     Object *element = NULL;
     ArrayPtrVoid params;
-    params.push_back( &elementType );
+    params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByType, params );
+    this->Process( &findByAttComparison, params );
     return element;
 }
     
@@ -796,12 +803,12 @@ int Object::FindByUuid( ArrayPtrVoid params )
     //LogDebug("Still looking for uuid...");
     return FUNCTOR_CONTINUE;
 }
-    
-int Object::FindByType( ArrayPtrVoid params )
+
+int Object::FindByAttComparison( ArrayPtrVoid params )
 {
     // param 0: the type we are looking for
     // param 1: the pointer to pointer to the Object
-    const std::type_info **elementType = static_cast<const std::type_info**>(params[0]);
+    AttComparison *test = static_cast<AttComparison*>(params[0]);
     Object **element = static_cast<Object**>(params[1]);
     
     if ( (*element) ) {
@@ -809,14 +816,17 @@ int Object::FindByType( ArrayPtrVoid params )
         return FUNCTOR_STOP;
     }
     
-    if ( typeid(*this) == **elementType ) {
+    // evaluate by applying the AttComparison operator()
+    if ((*test)(this)) {
         (*element) = this;
         //LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    //LogDebug("Still looking for uuid...");
+    
+    //LogDebug("Still looking for the object matching the AttComparison...");
     return FUNCTOR_CONTINUE;
 }
+
     
 int Object::SetCurrentScoreDef( ArrayPtrVoid params )
 {

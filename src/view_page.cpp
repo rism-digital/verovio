@@ -126,7 +126,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
     // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
-    measure  = dynamic_cast<Measure*>(system->GetFirstChild( &typeid(Measure) ) );
+    measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
         // NULL for the Barline parameters indicates that we are drawing the scoreDef
         DrawScoreDef( dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL );
