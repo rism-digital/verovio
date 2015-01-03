@@ -164,6 +164,7 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
 void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
 {
     m_currentNode = m_currentNode.find_child_by_attribute("id", gId.c_str());
+    m_svgNodeStack.push_back(m_currentNode);
 }
   
       
@@ -214,6 +215,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
 void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 {
     m_currentNode = m_svgNodeStack.back();
+    m_svgNodeStack.pop_back();
 }
 
 void SvgDeviceContext::StartPage( )
