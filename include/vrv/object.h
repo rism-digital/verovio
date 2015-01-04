@@ -34,11 +34,31 @@ typedef std::list<Object*> ListOfObjects;
 typedef std::vector<void*> ArrayPtrVoid;
     
 typedef std::map<const std::type_info*, int> MapOfTypeN;
-    
+
+/**
+ * Generic int map recursive sturcutre for storing hierachy of values
+ * For example, we want to process all staves one by one, and within each staff
+ * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store 
+ * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
+ * The stucture must be filled first an can then be use by instanciating a vector
+ * of corresponding AttComparison (typically AttCommonNComparison for @n attribute).
+ * See Doc::PrepareDrawing for an example.
+ */
 struct IntTree {
     std::map<int,IntTree> child;
 };
     
+typedef std::map<int, IntTree> IntTree_t;
+ 
+/**
+ * This is a alternate way of representing map of maps. With this solution,
+ * we can easily have different types of key (attribute) at each level. We could
+ * mix int, string, or even MEI data_* types. The drawback is that a type has to 
+ * be defined at each level. Also see Doc::PrepareDrawing for an example.
+ */
+typedef std::map<int, bool> VerseN_t;
+typedef std::map<int, VerseN_t> LayerN_VerserN_t;
+typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 
 //----------------------------------------------------------------------------
 // Object

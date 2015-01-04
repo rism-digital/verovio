@@ -87,6 +87,9 @@ void Doc::PrepareDrawing()
     ArrayPtrVoid params;
     IntTree tree;
     params.push_back( &tree );
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    //StaffN_LayerN_VerseN_t staffLayerVerseTree;
+    //params.push_back( &staffLayerVerseTree );
     
     // We first fill a tree of int with the staff/layer/verse numbers to be process
     
@@ -98,9 +101,9 @@ void Doc::PrepareDrawing()
     // For this, we use a MapOfTypeN that looks for each object if it is of the type
     // and with @n specified
     
-    std::map<int,IntTree>::iterator staves;
-    std::map<int,IntTree>::iterator layers;
-    std::map<int,IntTree>::iterator verses;
+    IntTree_t::iterator staves;
+    IntTree_t::iterator layers;
+    IntTree_t::iterator verses;
     for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
@@ -116,6 +119,29 @@ void Doc::PrepareDrawing()
             }
         }
     }
+    
+    /*
+    // Alternate solution with StaffN_LayerN_VerseN_t
+    StaffN_LayerN_VerseN_t::iterator staves;
+    LayerN_VerserN_t::iterator layers;
+    VerseN_t::iterator verses;
+    for (staves = staffLayerVerseTree.begin(); staves != staffLayerVerseTree.end(); ++staves) {
+        for (layers = staves->second.begin(); layers != staves->second.end(); ++layers) {
+            for (verses= layers->second.begin(); verses != layers->second.end(); ++verses) {
+                std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
+                MapOfTypeN map;
+                map[ &typeid(Staff) ] = staves->first;
+                map[ &typeid(Layer) ] = layers->first;
+                map[ &typeid(Verse) ] = verses->first;
+                
+                ArrayPtrVoid paramsLyrics;
+                Functor prepareLyrics( &Object::PrepareLyrics );
+                this->Process( &prepareLyrics, paramsLyrics, NULL, &map );
+            }
+        }
+    }
+    */
+    
     //LogElapsedTimeEnd ( "Preparing drawing" );
 }
     
