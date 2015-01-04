@@ -173,9 +173,9 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
-    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff);
-    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
+    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**

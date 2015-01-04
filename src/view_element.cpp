@@ -51,7 +51,7 @@ namespace vrv {
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures    
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
-void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff )
+void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -87,7 +87,7 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
         DrawBarline(dc, element, layer, staff);
     }
     else if (dynamic_cast<Beam*>(element)) {
-        DrawBeamElement(dc, element, layer, measure, staff);
+        DrawBeamElement(dc, element, layer, staff,  measure);
     }
     else if (dynamic_cast<Clef*>(element)) {
         DrawClef(dc, element, layer, staff);
@@ -126,7 +126,7 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
         DrawTie(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Tuplet*>(element)) {
-        DrawTupletElement(dc, element, layer, measure, staff);
+        DrawTupletElement(dc, element, layer, staff, measure);
     }
     
     m_currentColour = previousColor;
@@ -170,7 +170,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
 	return;
 }
 
-void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff) {
+void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
     
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -182,7 +182,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
     for (unsigned int i = 0; i < beam->m_children.size(); i++) {
         if ( dynamic_cast<LayerElement*>(beam->m_children[i]) ) {
             LayerElement *element = dynamic_cast<LayerElement*>(beam->m_children[i]);
-            DrawElement(dc, element, layer, measure, staff);
+            DrawElement(dc, element, layer, staff, measure);
         }
     }
     
@@ -192,7 +192,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
     dc->EndGraphic(element, this );
 }
 
-void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff) {
+void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
     
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -205,7 +205,7 @@ void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *la
     for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
         if ( dynamic_cast<LayerElement*>(tuplet->m_children[i]) ) {
             LayerElement *element = dynamic_cast<LayerElement*>(tuplet->m_children[i]);
-            DrawElement(dc, element, layer, measure, staff);
+            DrawElement(dc, element, layer, staff, measure);
         }
     }
     

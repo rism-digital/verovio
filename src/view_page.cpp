@@ -878,16 +878,16 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     layer->ResetDrawingList();
     
     if (layer->GetDrawingClef()) {
-        DrawElement(dc, layer->GetDrawingClef(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingClef(), layer, staff, measure);
     }
     if (layer->GetDrawingKeySig()) {
-        DrawElement(dc, layer->GetDrawingKeySig(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
     }
     if (layer->GetDrawingMensur()) {
-        DrawElement(dc, layer->GetDrawingMensur(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
     }
     if (layer->GetDrawingMeterSig()) {
-        DrawElement(dc, layer->GetDrawingMeterSig(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
     }
 
     Object* current;
@@ -896,7 +896,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
         element = dynamic_cast<LayerElement*>(current);
         app = dynamic_cast<App*>(current);
         if (element) {
-            DrawElement( dc, element, layer, measure, staff );
+            DrawElement( dc, element, layer, staff, measure );
         }
         else if (app) {
             assert( app->GetLevel() == EDITORIAL_LAYER );
@@ -1049,7 +1049,7 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *l
         layerElement = dynamic_cast<LayerElement*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
         if (layerElement) {
-            DrawElement( dc, layerElement, layer, measure, staff );
+            DrawElement( dc, layerElement, layer, staff, measure );
         }
         else if (editorialElement) {
             DrawEditorialElement( dc , editorialElement, layer, staff, measure );
