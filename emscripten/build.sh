@@ -100,6 +100,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
+	$VEROVIO_ROOT/src/editorial.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \

@@ -47,6 +47,9 @@
 		4DC34BAB19BC4A83006175CD /* custos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA619BC4A83006175CD /* custos.cpp */; };
 		4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
 		4DC34BAD19BC4A83006175CD /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
+		4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
+		4DCA95D91A515D0E008AD7E9 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
+		4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCA95DA1A515D33008AD7E9 /* editorial.h */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
@@ -195,6 +198,7 @@
 		4D422103199805F700963292 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = src/att.cpp; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
+		4D9234F11A586AE100763251 /* att_comparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att_comparison.h; path = include/vrv/att_comparison.h; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
@@ -206,6 +210,8 @@
 		4DC34BA519BC4A82006175CD /* accid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = accid.cpp; path = src/accid.cpp; sourceTree = "<group>"; };
 		4DC34BA619BC4A83006175CD /* custos.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = custos.cpp; path = src/custos.cpp; sourceTree = "<group>"; };
 		4DC34BA719BC4A83006175CD /* dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dot.cpp; path = src/dot.cpp; sourceTree = "<group>"; };
+		4DCA95D71A515D0E008AD7E9 /* editorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = editorial.cpp; path = src/editorial.cpp; sourceTree = "<group>"; };
+		4DCA95DA1A515D33008AD7E9 /* editorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = editorial.h; path = include/vrv/editorial.h; sourceTree = "<group>"; };
 		4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analysis.cpp; path = libmei/atts_analysis.cpp; sourceTree = "<group>"; };
 		4DEE28EE1940BCC100C76319 /* atts_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analysis.h; path = libmei/atts_analysis.h; sourceTree = "<group>"; };
 		4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_cmn.cpp; path = libmei/atts_cmn.cpp; sourceTree = "<group>"; };
@@ -443,6 +449,7 @@
 				8F59290D18854BF800FE51AD /* aligner.h */,
 				4D422103199805F700963292 /* att.cpp */,
 				4D4220FF199805E400963292 /* att.h */,
+				4D9234F11A586AE100763251 /* att_comparison.h */,
 				4D422100199805E400963292 /* attdef.h */,
 				8F086EBD188539540037FD8E /* doc.cpp */,
 				8F59291418854BF800FE51AD /* doc.h */,
@@ -491,6 +498,8 @@
 		8F086F38188539F00037FD8E /* containers */ = {
 			isa = PBXGroup;
 			children = (
+				4DCA95D71A515D0E008AD7E9 /* editorial.cpp */,
+				4DCA95DA1A515D33008AD7E9 /* editorial.h */,
 				8F086EC6188539540037FD8E /* layer.cpp */,
 				8F59291D18854BF800FE51AD /* layer.h */,
 				8F086EC9188539540037FD8E /* measure.cpp */,
@@ -589,6 +598,7 @@
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
+				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
@@ -726,6 +736,7 @@
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
+				4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
@@ -798,6 +809,7 @@
 				8F3DD31E18854AFB0051330C /* bboxdevicecontext.cpp in Sources */,
 				8F3DD32018854AFB0051330C /* devicecontext.cpp in Sources */,
 				8F3DD32218854AFB0051330C /* svgdevicecontext.cpp in Sources */,
+				4DCA95D91A515D0E008AD7E9 /* editorial.cpp in Sources */,
 				4D22C41A18890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C4271889214C00D0831F /* pugixml.cpp in Sources */,
 				4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */,

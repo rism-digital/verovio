@@ -36,28 +36,6 @@ Staff::Staff( int n ):
     m_n = n;
 }
 
-Staff::Staff( const Staff& staff )
-{
-    m_parent = NULL;
-	notAnc = staff.notAnc;
-	grise = staff.grise;
-	invisible = staff.invisible;
-	staffSize = staff.staffSize;
-	m_drawingLines = staff.m_drawingLines;
-	m_yAbs = staff.m_yAbs;
-	m_drawingY = staff.m_drawingY;
-    m_staffAlignment = NULL;
-
-    int i;
-	for (i = 0; i < staff.GetLayerCount(); i++)
-	{
-        Layer *nlayer = new Layer( *dynamic_cast<Layer*>( staff.m_children[i] ) );
-        this->AddLayer( nlayer );
-	}
-    
-    this->ResetUuid();
-}
-
 Staff::~Staff()
 {
     

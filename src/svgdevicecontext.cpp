@@ -145,18 +145,15 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     Pen currentPen = m_penStack.top();
     Brush currentBrush = m_brushStack.top();
     
-    std::vector<std::string> newClasses = object->m_rdgClasses;
-    for(std::vector<int>::size_type i = 0; i != newClasses.size(); i++) {
-        m_rdgClassStack.push_back(newClasses[i]);
-    }
-    
-    for(std::vector<int>::size_type i = 0; i != m_rdgClassStack.size(); i++) {
-        gClass.append(" " + m_rdgClassStack[i]);
+    std::string baseClass = object->GetClassName();
+    std::transform( baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower );
+    if (gClass.length() > 0) {
+        baseClass.append(" " + gClass);
     }
     
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute( "class" ) = gClass.c_str();
+    m_currentNode.append_attribute( "class" ) = baseClass.c_str();
     m_currentNode.append_attribute( "id" ) = gId.c_str();
     m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
@@ -202,10 +199,6 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         SetPen( AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);
    
-    }
-    
-    for(std::vector<int>::size_type i = 0; i != object->m_rdgClasses.size(); i++) {
-        m_rdgClassStack.pop_back();
     }
 
     m_svgNodeStack.pop_back();

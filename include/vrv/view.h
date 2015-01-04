@@ -143,6 +143,21 @@ protected:
     ///@}
     
     /**
+     * @name Methods for drawing App and EditorialElement
+     * Defined in view_page.cpp
+     */
+    ///@{
+    /** System level **/
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, System *system );
+    /** Measure level **/
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure *measure, System *system );
+    /** Staff level **/
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *staff,  Measure *measure );
+    /** Layer level **/
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *layer, Staff *staff, Measure *measure );
+    ///@}
+    
+    /**
      * @name Methods for calculating drawing positions
      * Defined in view_element.cpp
      */
@@ -158,9 +173,9 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
-    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff);
-    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
+    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**

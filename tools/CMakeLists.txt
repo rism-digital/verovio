@@ -22,6 +22,7 @@ add_executable (verovio
 	../src/doc.cpp	
 	../src/dot.cpp
 	../src/durationinterface.cpp
+	../src/editorial.cpp
 	../src/glyph.cpp
 	../src/io.cpp
 	../src/iodarms.cpp

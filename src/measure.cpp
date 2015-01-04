@@ -71,21 +71,10 @@ void Measure::AddStaff( Staff *staff )
 	m_children.push_back( staff );
     
     if ( staff->GetN() < 1 ) {
-        staff->SetN( this->GetStaffCount() );
+        // This is not 100% safe if we have a <app> and <rdg> with more than
+        // one staff as a previous child.
+        staff->SetN( this->GetChildCount() );
     }
-}
-
-Staff *Measure::GetStaffWithNo( int staffNo )
-{
-    int i;
-    Staff *staff = NULL;
-    for (i = 0; i < this->GetStaffCount(); i++ ) {
-        staff = dynamic_cast<Staff*>(m_children[i]);
-        if ( staff && (staff->GetN() == staffNo ) ) {
-            return staff;
-        }
-    }
-	return NULL;
 }
 
 void Measure::ResetHorizontalAlignment()
