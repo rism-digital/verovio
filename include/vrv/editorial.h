@@ -33,7 +33,7 @@ class StaffGrp;
  * content. For example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
  */
-class EditorialElement: public Object,
+class EditorialElement: public DocObject,
     public AttCommon
 {
 public:
@@ -75,7 +75,7 @@ private:
 // App
 //----------------------------------------------------------------------------
 
-class App: public Object,
+class App: public DocObject,
     public AttCommon
 {
 public:

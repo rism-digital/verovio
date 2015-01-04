@@ -952,7 +952,116 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         }
     }
 }
+    
 
+//----------------------------------------------------------------------------
+// View - Editorial
+//----------------------------------------------------------------------------
+
+void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *system )
+{
+    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    
+    Measure *measure = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        measure = dynamic_cast<Measure*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (measure) {
+            DrawMeasure( dc , measure, system );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, system );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+
+void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure *measure, System *system )
+{
+    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    
+    Staff *staff = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        staff = dynamic_cast<Staff*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (staff) {
+            DrawStaff( dc , staff, measure, system );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, measure, system );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+    
+void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *staff,  Measure *measure )
+{
+    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    
+    Layer *layer = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        layer = dynamic_cast<Layer*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (layer) {
+            DrawLayer( dc , layer, staff, measure );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, staff, measure );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+
+void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *layer, Staff *staff, Measure *measure )
+{
+    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    
+    LayerElement *layerElement = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        layerElement = dynamic_cast<LayerElement*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (layerElement) {
+            DrawElement( dc, layerElement, layer, measure, staff );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, layer, staff, measure );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+    
 } // namespace vrv
 
 

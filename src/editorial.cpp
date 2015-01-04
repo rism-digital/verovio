@@ -27,13 +27,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 EditorialElement::EditorialElement():
-    Object("ee-")
+    DocObject("ee-")
 {
     Reset();
 }
 
 EditorialElement::EditorialElement(std::string classid):
-    Object(classid)
+    DocObject(classid)
 {
     Reset();
 }
@@ -110,7 +110,7 @@ void EditorialElement::AddStaffGrp( StaffGrp *child )
 //----------------------------------------------------------------------------
 
 App::App():
-    Object("app-"),
+    DocObject("app-"),
     AttCommon()
 {
     m_level = EDITORIAL_UNDEFINED;
@@ -118,7 +118,7 @@ App::App():
 }
     
 App::App( EditorialLevel level ):
-    Object("app-"),
+    DocObject("app-"),
     AttCommon()
 {
     m_level = level;

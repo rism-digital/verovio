@@ -148,13 +148,13 @@ protected:
      */
     ///@{
     /** System level **/
-    void DrawEditorialElement( DeviceContext *dc, Object *element, System *system ) {};
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, System *system );
     /** Measure level **/
-    void DrawEditorialElement( DeviceContext *dc, Object *element, Measure *measure, System *system ) {};
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure *measure, System *system );
     /** Staff level **/
-    void DrawEditorialElement( DeviceContext *dc, Object *element, Staff *staff,  Measure *measure ) {};
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *staff,  Measure *measure );
     /** Layer level **/
-    void DrawEditorialElement( DeviceContext *dc, Object *element, Layer *layer, Staff *staff, Measure *measure ) {};
+    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**
