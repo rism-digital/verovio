@@ -77,19 +77,6 @@ void Measure::AddStaff( Staff *staff )
     }
 }
 
-Staff *Measure::GetStaffWithNo( int staffNo )
-{
-    int i;
-    Staff *staff = NULL;
-    for (i = 0; i < this->GetStaffCount(); i++ ) {
-        staff = dynamic_cast<Staff*>(m_children[i]);
-        if ( staff && (staff->GetN() == staffNo ) ) {
-            return staff;
-        }
-    }
-	return NULL;
-}
-
 void Measure::ResetHorizontalAlignment()
 {
     m_drawingXRel = 0;

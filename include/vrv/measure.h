@@ -85,9 +85,6 @@ public:
     Barline *GetLeftBarline() { return &m_leftBarline; };
     Barline *GetRightBarline() { return &m_rightBarline; };
     ///@}
-       
-    
-    Staff *GetStaffWithNo( int staffNo );
     
     int GetXRel( );
     
