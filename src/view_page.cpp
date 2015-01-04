@@ -90,7 +90,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     Measure *measure = NULL;
     App *app = NULL;
     
-    dc->StartGraphic( system, "system", system->GetUuid() );
+    dc->StartGraphic( system, "", system->GetUuid() );
     
     
     if ( system->m_yAbs == VRV_UNSET ) {
@@ -165,7 +165,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     }
     else{
         barLine->SetDrawingX( x );
-        dc->StartGraphic( barLine, "barLine", barLine->GetUuid() );
+        dc->StartGraphic( barLine, "", barLine->GetUuid() );
         DrawBarlines( dc, measure, staffGrp, barLine );
         dc->EndGraphic( barLine, this );
     }
@@ -602,7 +602,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     
     // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure if un-measured music
     if ( measure->IsMeasuredMusic()) {
-        dc->StartGraphic( measure, "measure", measure->GetUuid() );
+        dc->StartGraphic( measure, "", measure->GetUuid() );
     }
     
     // Here we set the appropriate y value to be used for drawing
@@ -709,7 +709,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     Layer *layer = NULL;
     App *app = NULL;
     
-    dc->StartGraphic( staff, "staff", staff->GetUuid());
+    dc->StartGraphic( staff, "", staff->GetUuid());
     
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
@@ -872,7 +872,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 	LayerElement *element = NULL;
     App *app = NULL;
     
-    dc->StartGraphic( layer, "layer", layer->GetUuid());
+    dc->StartGraphic( layer, "", layer->GetUuid());
     
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
@@ -960,7 +960,7 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
 
 void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *system )
 {
-    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    dc->StartGraphic( element, "", element->GetUuid());
     
     Measure *measure = NULL;
     EditorialElement *editorialElement = NULL;
@@ -986,7 +986,7 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *
 
 void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure *measure, System *system )
 {
-    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    dc->StartGraphic( element, "", element->GetUuid());
     
     Staff *staff = NULL;
     EditorialElement *editorialElement = NULL;
@@ -1012,7 +1012,7 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure 
     
 void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *staff,  Measure *measure )
 {
-    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    dc->StartGraphic( element, "", element->GetUuid());
     
     Layer *layer = NULL;
     EditorialElement *editorialElement = NULL;
@@ -1038,7 +1038,7 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *s
 
 void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    dc->StartGraphic( element, element->GetClassName(), element->GetUuid());
+    dc->StartGraphic( element, "", element->GetUuid());
     
     LayerElement *layerElement = NULL;
     EditorialElement *editorialElement = NULL;

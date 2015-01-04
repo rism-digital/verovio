@@ -148,7 +148,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         int oct = note->GetOct() - 4;
         
         element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
-        dc->StartGraphic( element, "note", element->GetUuid() );
+        dc->StartGraphic( element, "", element->GetUuid() );
         DrawNote(dc, element, layer, staff);
         dc->EndGraphic(element, this );
 	}
@@ -162,7 +162,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         else
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
 		
-        dc->StartGraphic( element, "rest", element->GetUuid() );
+        dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff );
         dc->EndGraphic(element, this );
 	}
@@ -177,7 +177,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
     
     Beam *beam = dynamic_cast<Beam*>(element);
 
-    dc->StartGraphic( element, "beam", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     for (unsigned int i = 0; i < beam->m_children.size(); i++) {
         if ( dynamic_cast<LayerElement*>(beam->m_children[i]) ) {
@@ -199,7 +199,7 @@ void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *la
     
     Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
     
-    dc->StartGraphic( element, "tuplet", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     // Draw the inner elements
     for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
@@ -687,7 +687,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     //MRest *mrest = dynamic_cast<MRest*>(element);
     
-    dc->StartGraphic( element, "mrest", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     //LogMessage("Measure %d - X %d - RightX %d;", measure->GetIdx(), element->m_drawingX, measure->GetRightBarlineX() );
     
@@ -718,7 +718,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     MultiRest *multirest = dynamic_cast<MultiRest*>(element);
     
-    dc->StartGraphic( element, "multirest", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int x = element->GetDrawingX();
     
@@ -1062,7 +1062,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     Barline *barLine = dynamic_cast<Barline*>(element);
     int x = element->GetDrawingX();
     
-    dc->StartGraphic( element, "barLine", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     if (barLine->m_partialBarline)
     {
@@ -1086,7 +1086,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     Clef *clef = dynamic_cast<Clef*>(element);
 
-    dc->StartGraphic( element, "clef", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
 	
 	int b = staff->GetDrawingY();
 	int a = element->GetDrawingX();
@@ -1154,7 +1154,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     Mensur *mensur = dynamic_cast<Mensur*>(element);
  
-    dc->StartGraphic( element, "mensur", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
 	
 	int x;
 
@@ -1329,7 +1329,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
     MeterSig *meterSig = dynamic_cast<MeterSig*>(element);
     
-    dc->StartGraphic( element, "meterSig", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
     int x = element->GetDrawingX();
@@ -1359,7 +1359,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Accid*>(element)); // Element must be a Symbol"
     
     Accid *accid = dynamic_cast<Accid*>(element);
-    dc->StartGraphic( element, "accid", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     // This is used when we add dynamically an element (eg. accidentals before notes)
     // So we can get the clef without adding the new elem in the list
@@ -1422,7 +1422,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(dynamic_cast<Custos*>(element)); // Element must be a Symbol"
     
     Custos *custos = dynamic_cast<Custos*>(element);
-    dc->StartGraphic( element, "custos", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int oct = custos->GetOloc() - 4;
     element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), oct) );
@@ -1446,7 +1446,7 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(dynamic_cast<Dot*>(element)); // Element must be a Symbol"
     
     Dot *dot = dynamic_cast<Dot*>(element);
-    dc->StartGraphic( element, "dot", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int oct = dot->GetOloc() - 4;
     element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), oct) );
@@ -1468,7 +1468,7 @@ void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *elem
     if (staff->GetAlignment() ) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * m_doc->m_drawingUnit * 4;
     }
-    dc->StartGraphic( syl, "syl", syl->GetUuid() );
+    dc->StartGraphic( syl, "", syl->GetUuid() );
     DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
     dc->EndGraphic(syl, this );
 
@@ -1501,7 +1501,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
         return;
     }
     
-    dc->StartGraphic( element, "keysig", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     for (int i = 0; i < ks->GetAlterationNumber(); i++) {
         
@@ -1643,7 +1643,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         y2 -= m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
     }
     
-    dc->StartGraphic( element, "tie", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
     dc->EndGraphic(element, this );
 
