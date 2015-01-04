@@ -145,16 +145,6 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     Pen currentPen = m_penStack.top();
     Brush currentBrush = m_brushStack.top();
     
-    
-    std::vector<std::string> newClasses = object->m_rdgClasses;
-    for(std::vector<int>::size_type i = 0; i != newClasses.size(); i++) {
-        m_rdgClassStack.push_back(newClasses[i]);
-    }
-    
-    for(std::vector<int>::size_type i = 0; i != m_rdgClassStack.size(); i++) {
-        gClass.append(" " + m_rdgClassStack[i]);
-    }
-    
     std::string baseClass = object->GetClassName();
     std::transform( baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower );
     if (gClass.length() > 0) {
@@ -203,10 +193,6 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         SetPen( AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);
    
-    }
-    
-    for(std::vector<int>::size_type i = 0; i != object->m_rdgClasses.size(); i++) {
-        m_rdgClassStack.pop_back();
     }
     
     m_svgNodeStack.pop_back();
