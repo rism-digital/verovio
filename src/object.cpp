@@ -239,14 +239,14 @@ Object *Object::FindChildByType(const std::type_info *elementType)
     return FindChildByAttComparison( &attComparison );
 }
     
-Object *Object::FindChildByAttComparison( AttComparison *attComparison )
+Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deepness )
 {
     Functor findByAttComparison( &Object::FindByAttComparison );
     Object *element = NULL;
     ArrayPtrVoid params;
     params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByAttComparison, params );
+    this->Process( &findByAttComparison, params, NULL, NULL, deepness );
     return element;
 }
     
@@ -496,7 +496,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, MapOfTypeN *mapOfTypeN )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, MapOfTypeN *mapOfTypeN, int deepness )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -510,6 +510,13 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         return;
     }
 
+    if (deepness == 0) {
+        return;
+    }
+    else if (!dynamic_cast<EditorialElement*>(this)) {
+        deepness--;
+    }
+    
     ArrayOfObjects::iterator iter;
     for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
     {
@@ -527,12 +534,12 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
                 }
                 else {
                     // process this one and quit
-                    (*iter)->Process( functor, params, endFunctor, mapOfTypeN );
+                    (*iter)->Process( functor, params, endFunctor, mapOfTypeN, deepness );
                     break;
                 }
             }
         }
-        (*iter)->Process( functor, params, endFunctor, mapOfTypeN );
+        (*iter)->Process( functor, params, endFunctor, mapOfTypeN, deepness );
     }
     
     if ( endFunctor ) {
@@ -822,7 +829,6 @@ int Object::FindByAttComparison( ArrayPtrVoid params )
         //LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    
     //LogDebug("Still looking for the object matching the AttComparison...");
     return FUNCTOR_CONTINUE;
 }

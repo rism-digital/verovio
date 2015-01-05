@@ -199,9 +199,9 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     
     // Get the corresponding staff looking at the previous (or first) measure
     AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
-    Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst));
+    Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
     AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
-    Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, true));
+    Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, 1));
     
     if (!first || !last ) {
         LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN() );
@@ -256,7 +256,7 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         }
         
         AttCommonNComparison comparison( &typeid(Staff), staffDef->GetN() );
-        Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison));
+        Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ));
         System *system = dynamic_cast<System*>(measure->GetFirstParent( &typeid(System) ) );
         
         if (!staff || !system) {
@@ -426,7 +426,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             }
             else if ( childStaffDef ) {
                 AttCommonNComparison comparison( &typeid(Staff), childStaffDef->GetN() );
-                Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison));
+                Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ) );
                 if (!staff ) {
                     LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
                     continue;
@@ -459,9 +459,9 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         
         // Get the corresponding staff looking at the previous (or first) measure
         AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
-        Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst));
+        Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
         AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
-        Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, true));
+        Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, 1));
         
         if (!first || !last ) {
             LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN() );
@@ -482,7 +482,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 childStaffDef = dynamic_cast<StaffDef*>(staffGrp->GetChild( i ));
                 if ( childStaffDef ) {
                     AttCommonNComparison comparison( &typeid(Staff), childStaffDef->GetN() );
-                    Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison));
+                    Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff ) {
                         LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
                         continue;

@@ -197,7 +197,7 @@ public:
     /**
      * Return the first element matching the AttComparison functor
      */
-    Object *FindChildByAttComparison( AttComparison *attComparison );
+    Object *FindChildByAttComparison( AttComparison *attComparison, int deepness = -1 );
     
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -291,8 +291,9 @@ public:
      * The last parameter MapOfTypeN makes is possible to process object of a type given a key in the map
      * with value @n. They must be of type AttCommon. This is very powerfull for operation on parts, e.g.,
      * for extracting one single staff, or layer.
+     * Deepness allow to specify how many child levels should be processed. -1 means no limit; EditorialLevel objects do not count.
      */
-    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL, MapOfTypeN *map = NULL );
+    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL, MapOfTypeN *map = NULL, int deepness = -1 );
     
     //----------//
     // Functors //
