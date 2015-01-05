@@ -838,9 +838,9 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     assert( currentScoreDef );
     
     // starting a new page
-    Page *current_page = dynamic_cast<Page*>(this);
-    if ( current_page  ) {
-        if ( current_page->m_parent->GetChildIndex( current_page ) == 0 ) {
+    Page *page = dynamic_cast<Page*>(this);
+    if ( page  ) {
+        if ( page->m_parent->GetChildIndex( page ) == 0 ) {
             currentScoreDef->SetRedrawFlags( true, true, true, true );
             currentScoreDef->SetDrawLabels( true );
         }
@@ -848,82 +848,105 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
             currentScoreDef->SetRedrawFlags( true, true, false, false );
             currentScoreDef->SetDrawLabels( false );
         }
-        current_page->m_drawingScoreDef = *currentScoreDef;
+        page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
-    System *current_system = dynamic_cast<System*>(this);
-    if ( current_system  ) {
+    System *system = dynamic_cast<System*>(this);
+    if ( system  ) {
         currentScoreDef->SetRedrawFlags( true, true, false, false );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new scoreDef
-    ScoreDef *current_scoreDef= dynamic_cast<ScoreDef*>(this);
-    if ( current_scoreDef  ) {
+    ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
+    if ( scoreDef  ) {
         bool drawClef = false;
         bool drawKeySig = false;
         bool drawMensur = false;
         bool drawMeterSig = false;
-        if (current_scoreDef->GetClef()) {
-            currentScoreDef->ReplaceClef(current_scoreDef->GetClef());
+        if (scoreDef->GetClef()) {
+            currentScoreDef->ReplaceClef(scoreDef->GetClef());
             drawClef = true;
         }
-        if (current_scoreDef->GetKeySig()) {
-            currentScoreDef->ReplaceKeySig(current_scoreDef->GetKeySig());
+        if (scoreDef->GetKeySig()) {
+            currentScoreDef->ReplaceKeySig(scoreDef->GetKeySig());
             drawKeySig = true;
         }
-        if (current_scoreDef->GetMensur()) {
-            currentScoreDef->ReplaceMensur(current_scoreDef->GetMensur());
+        if (scoreDef->GetMensur()) {
+            currentScoreDef->ReplaceMensur(scoreDef->GetMensur());
             drawMensur = true;
         }
-        if (current_scoreDef->GetMeterSig()) {
-            currentScoreDef->ReplaceMeterSig(current_scoreDef->GetMeterSig());
+        if (scoreDef->GetMeterSig()) {
+            currentScoreDef->ReplaceMeterSig(scoreDef->GetMeterSig());
             drawMeterSig = true;
         }
+        // Replace the current scoreDef with the new one, including its content (staffDef)
+        currentScoreDef->Replace(scoreDef);
         currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig );
         return FUNCTOR_CONTINUE;
     }
 
+
+    // starting a new staffDef
+    // Because staffDef have to be included in a scoreDef, a new staffDef was already
+    // replaced by the new scoreDef (see above). Here we only need to reset the drawing flags
+    StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
+    if ( staffDef  ) {
+        StaffDef *tmpStaffDef = currentScoreDef->GetStaffDef( staffDef->GetN() );
+        if (staffDef->GetClef()) {
+            tmpStaffDef->SetDrawClef( true );
+        }
+        if (staffDef->GetKeySig()) {
+            tmpStaffDef->SetDrawKeySig( true );
+        }
+        if (staffDef->GetMensur()) {
+            tmpStaffDef->SetDrawMensur( true );
+        }
+        if (staffDef->GetMeterSig()) {
+            tmpStaffDef->SetDrawMeterSig( true );
+        }
+    }
+    
     // starting a new staff
-    Staff *current_staff = dynamic_cast<Staff*>(this);
-    if ( current_staff  ) {
-        (*currentStaffDef) = currentScoreDef->GetStaffDef( current_staff->GetN() );
+    Staff *staff = dynamic_cast<Staff*>(this);
+    if ( staff  ) {
+        (*currentStaffDef) = currentScoreDef->GetStaffDef( staff->GetN() );
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new layer
-    Layer *current_layer = dynamic_cast<Layer*>(this);
-    if ( current_layer  ) {
+    Layer *layer = dynamic_cast<Layer*>(this);
+    if ( layer  ) {
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something more
         // generic (PrepareDrawing?) might be a good idea...
-        if (current_layer->m_parent->GetChildCount() > 1) {
-            if (current_layer->m_parent->GetChildIndex(current_layer)==0) {
-                current_layer->SetDrawingStemDir(STEMDIRECTION_up);
+        if (layer->m_parent->GetChildCount() > 1) {
+            if (layer->m_parent->GetChildIndex(layer)==0) {
+                layer->SetDrawingStemDir(STEMDIRECTION_up);
             }
             else {
-                current_layer->SetDrawingStemDir(STEMDIRECTION_down);
+                layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        current_layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
+        layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new clef
-    Clef *current_clef = dynamic_cast<Clef*>(this);
-    if ( current_clef  ) {
+    Clef *clef = dynamic_cast<Clef*>(this);
+    if ( clef  ) {
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceClef( current_clef );
+        (*currentStaffDef)->ReplaceClef( clef );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new keysig
-    KeySig *current_keysig = dynamic_cast<KeySig*>(this);
-    if ( current_keysig  ) {
+    KeySig *keysig = dynamic_cast<KeySig*>(this);
+    if ( keysig  ) {
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceKeySig( current_keysig );
+        (*currentStaffDef)->ReplaceKeySig( keysig );
         return FUNCTOR_CONTINUE;
     }
     

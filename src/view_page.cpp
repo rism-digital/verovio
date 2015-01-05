@@ -88,6 +88,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 	assert( system ); // other asserted before
     
     Measure *measure = NULL;
+    ScoreDef *scoreDef = NULL;
     App *app = NULL;
     
     dc->StartGraphic( system, "", system->GetUuid() );
@@ -109,6 +110,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     for (current = system->GetFirst( ); current; current = system->GetNext( ) )
 	{
 		measure = dynamic_cast<Measure*>(current);
+        scoreDef = dynamic_cast<ScoreDef*>(current);
         app = dynamic_cast<App*>(current);
         if (measure) {
             DrawMeasure( dc , measure, system );
@@ -117,7 +119,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
             assert( app->GetLevel() == EDITORIAL_SYSTEM );
             DrawEditorialElement( dc , app, system );
         }
-        else {
+        // scoreDef are not drawn directly, but anything else should not be possible
+        else if (!scoreDef) {
             assert(false);
         }
 	}
@@ -983,7 +986,7 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *
             DrawEditorialElement( dc , editorialElement, system );
         }
         else {
-            assert(false);
+            //assert(false);
         }
     }
     

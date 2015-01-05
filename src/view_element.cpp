@@ -1100,31 +1100,45 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	{
 		case C1 :
             sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingStaffSize[ staff->staffSize ];
+            break;
 		case G1 :
             b -= m_doc->m_drawingStaffSize[ staff->staffSize ]; 
             break;
 		case G2_8va :
             sym = SMUFL_E053_gClef8va;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*3;
+            break;
         case G2_8vb :
             sym = SMUFL_E052_gClef8vb;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*3;
+            break;
 		case C2 :
             sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*3;
+            break;
 		case G2 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*3; 
             break;
 		case F3 :
             sym = SMUFL_E062_fClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
+            break;
 		case C3 :
-            b -= m_doc->m_drawingInterl[ staff->staffSize ]*2; 
             sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
             break;
 		case F5 :
             sym =SMUFL_E062_fClef;
             break;
 		case F4 :
             sym = SMUFL_E062_fClef;
-		case C4 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ];
+            break;
+		case C4 :
+            sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ];
+            break;
 		case C5 :
             sym = SMUFL_E05C_cClef;
             break;
