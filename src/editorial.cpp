@@ -110,16 +110,14 @@ void EditorialElement::AddStaffGrp( StaffGrp *child )
 //----------------------------------------------------------------------------
 
 App::App():
-    DocObject("app-"),
-    AttCommon()
+    EditorialElement("app-")
 {
     m_level = EDITORIAL_UNDEFINED;
     Reset();
 }
     
 App::App( EditorialLevel level ):
-    DocObject("app-"),
-    AttCommon()
+    EditorialElement("app-")
 {
     m_level = level;
     Reset();

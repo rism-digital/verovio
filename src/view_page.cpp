@@ -89,7 +89,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     Measure *measure = NULL;
     ScoreDef *scoreDef = NULL;
-    App *app = NULL;
+    EditorialElement *editorialElement = NULL;
     
     dc->StartGraphic( system, "", system->GetUuid() );
     
@@ -111,13 +111,12 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 	{
 		measure = dynamic_cast<Measure*>(current);
         scoreDef = dynamic_cast<ScoreDef*>(current);
-        app = dynamic_cast<App*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
         if (measure) {
             DrawMeasure( dc , measure, system );
         }
-        else if (app) {
-            assert( app->GetLevel() == EDITORIAL_SYSTEM );
-            DrawEditorialElement( dc , app, system );
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, system );
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (scoreDef) {
@@ -202,7 +201,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
     Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst));
     AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
-    Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast));
+    Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, true));
     
     if (!first || !last ) {
         LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN() );
@@ -462,7 +461,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
         Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst));
         AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
-        Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast));
+        Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, true));
         
         if (!first || !last ) {
             LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN() );
@@ -604,7 +603,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 	assert( dc ); // DC cannot be NULL
     
     Staff *staff = NULL;
-    App *app = NULL;
+    EditorialElement *editorialElement = NULL;
     
     // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure if un-measured music
     if ( measure->IsMeasuredMusic()) {
@@ -628,13 +627,12 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     for (current = measure->GetFirst( ); current; current = measure->GetNext( ) )
     {
         staff = dynamic_cast<Staff*>(current);
-        app = dynamic_cast<App*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
         if (staff) {
             DrawStaff( dc, staff, measure, system );
         }
-        else if (app) {
-            assert( app->GetLevel() == EDITORIAL_MEASURE );
-            DrawEditorialElement( dc , app, measure, system );
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, measure, system );
         }
         else {
             assert(false);
@@ -713,7 +711,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 	assert( dc ); // DC cannot be NULL
     
     Layer *layer = NULL;
-    App *app = NULL;
+    EditorialElement *editorialElement = NULL;
     
     dc->StartGraphic( staff, "", staff->GetUuid());
     
@@ -739,13 +737,12 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     for (current = staff->GetFirst( ); current; current = staff->GetNext( ) )
     {
         layer = dynamic_cast<Layer*>(current);
-        app = dynamic_cast<App*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
         if (layer) {
             DrawLayer( dc, layer, staff, measure );
         }
-        else if (app) {
-            assert( app->GetLevel() == EDITORIAL_STAFF );
-            DrawEditorialElement( dc , app, staff, measure );
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, staff, measure );
         }
         else {
             assert(false);
@@ -876,7 +873,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 	assert( dc ); // DC cannot be NULL
 
 	LayerElement *element = NULL;
-    App *app = NULL;
+    EditorialElement *editorialElement = NULL;
     
     dc->StartGraphic( layer, "", layer->GetUuid());
     
@@ -900,13 +897,12 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     for (current = layer->GetFirst( ); current; current = layer->GetNext( ) )
     {
         element = dynamic_cast<LayerElement*>(current);
-        app = dynamic_cast<App*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
         if (element) {
             DrawElement( dc, element, layer, staff, measure );
         }
-        else if (app) {
-            assert( app->GetLevel() == EDITORIAL_LAYER );
-            DrawEditorialElement( dc , app, layer, staff, measure );
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, layer, staff, measure );
         }
         else {
             assert(false);
@@ -970,8 +966,12 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
 // View - Editorial
 //----------------------------------------------------------------------------
 
-void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *system )
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system )
 {
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_SYSTEM );
+    }
+    
     dc->StartGraphic( element, "", element->GetUuid());
     
     Measure *measure = NULL;
@@ -1002,8 +1002,12 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *
     dc->EndGraphic( element, this );
 }
 
-void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure *measure, System *system )
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system )
 {
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_MEASURE );
+    }
+    
     dc->StartGraphic( element, "", element->GetUuid());
     
     Staff *staff = NULL;
@@ -1028,8 +1032,12 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure 
     dc->EndGraphic( element, this );
 }
     
-void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *staff,  Measure *measure )
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure )
 {
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_STAFF );
+    }
+    
     dc->StartGraphic( element, "", element->GetUuid());
     
     Layer *layer = NULL;
@@ -1054,8 +1062,12 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *s
     dc->EndGraphic( element, this );
 }
 
-void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *layer, Staff *staff, Measure *measure )
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_LAYER );
+    }
+    
     dc->StartGraphic( element, "", element->GetUuid());
     
     LayerElement *layerElement = NULL;

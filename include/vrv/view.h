@@ -22,6 +22,7 @@ namespace vrv {
 class Beam;
 class Barline;
 class Doc;
+class EditorialElement;
 class Layer;
 class LayerElement;
 class Measure;
@@ -148,13 +149,13 @@ protected:
      */
     ///@{
     /** System level **/
-    void DrawEditorialElement( DeviceContext *dc, DocObject *element, System *system );
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system );
     /** Measure level **/
-    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Measure *measure, System *system );
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
     /** Staff level **/
-    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Staff *staff,  Measure *measure );
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
     /** Layer level **/
-    void DrawEditorialElement( DeviceContext *dc, DocObject *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**

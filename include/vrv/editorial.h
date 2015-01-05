@@ -75,8 +75,7 @@ private:
 // App
 //----------------------------------------------------------------------------
 
-class App: public DocObject,
-    public AttCommon
+class App: public EditorialElement
 {
 public:
     /**
