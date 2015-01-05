@@ -859,10 +859,15 @@ bool MeiInput::ReadMeiSystemChildren( Object *parent, pugi::xml_node parentNode 
         else if ( parentNode.child( "measure" ) ) {
             // we should not mix measured and unmeasured within a system...
             assert(!unmeasured);
-            if ( dynamic_cast<EditorialElement*>( parent ) && !m_ignoreLayoutInformation ) {
-                LogError( "Cannot have <measure> within editorial markup unless layout information \
-                         is ignored (try with --ignore-layout)" );
-                return false;
+            if ( dynamic_cast<EditorialElement*>( parent ) ) {
+                if ( !m_ignoreLayoutInformation ) {
+                    LogError( "Cannot have <measure> within editorial markup unless layout information \
+                             is ignored and continous layout is chosen (try with --no-layout)" );
+                    return false;
+                }
+                else {
+                    m_hasMeasureWithinEditMarkup = true;
+                }
                 
             }
             success = ReadMeiMeasure(parent, current);
@@ -1508,6 +1513,11 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
     
 bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level )
 {
+    if (!m_hasScoreDef) {
+        LogError("<app> before any <scoreDef> is not supported");
+        return false;
+    }
+    
     // Special case where we select the child either by looking at the m_rdgXPathQuery or by
     // selecting the <lem> or the first child
     pugi::xml_node selectedLemOrRdg;
@@ -1526,7 +1536,7 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
         selectedLemOrRdg = app.first_child( );
     }
     if ( !selectedLemOrRdg ) {
-        LogWarning("Could not find a <lem> or <rdg> in the <app>");
+        LogError("Could not find a <lem> or <rdg> in the <app>");
         return false;
     }
     
@@ -1535,9 +1545,7 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
     vrvApp->ReadCommon(app);
     parent->AddApp(vrvApp);
     
-    ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level );
-    
-    return true;   
+    return ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level );
 }
     
     
@@ -1680,17 +1688,13 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
 
 bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
 {
+    bool success = true;
     if ( (std::string( element.name() ) == "app") ) {
-        /*element = GetSelectedReading( element );
-        pugi::xml_node current;
-        for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( current );
-        }*/
-        ReadMeiApp( m_system, element, EDITORIAL_SYSTEM );
+        success = ReadMeiApp( m_system, element, EDITORIAL_SYSTEM );
     }
     else if ( std::string( element.name() ) == "measure" ) {
         // This is the call that will put us back on the page-based reading loop
-        ReadMeiMeasure( m_system, element );
+        success = ReadMeiMeasure( m_system, element );
     }
     else if (std::string( element.name() ) == "pb") {
         if ( (m_system->GetChildCount() > 0) && !m_ignoreLayoutInformation) {
@@ -1713,22 +1717,24 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
     else if ( std::string( element.name() ) == "score" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( current );
+            if (!success) break;
+            success = ReadScoreBasedMei( current );
         }
     }
     else if ( (std::string( element.name() ) == "scoreDef") ) {
-        ReadMeiScoreDef( m_system, element );
+        success = ReadMeiScoreDef( m_system, element );
     }
     else if ( std::string( element.name() ) == "section" ) {
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
-            ReadScoreBasedMei( current );
+            if (!success) break;
+            success = ReadScoreBasedMei( current );
         }
     }
     else {
         LogWarning( "Elements <%s> ignored", element.name() );
     }
-    return true;
+    return success;
 }
     
 bool MeiInput::ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur)
