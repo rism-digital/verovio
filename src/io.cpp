@@ -66,6 +66,7 @@ FileInputStream::FileInputStream( Doc *doc ) :
 void FileInputStream::Init( )
 {
     m_hasLayoutInformation = false;
+    m_hasMeasureWithinEditMarkup = false;
     m_ignoreLayoutInformation = false;
 }
     
