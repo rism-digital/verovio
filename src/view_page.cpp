@@ -120,7 +120,10 @@ void View::DrawSystem( DeviceContext *dc, System *system )
             DrawEditorialElement( dc , app, system );
         }
         // scoreDef are not drawn directly, but anything else should not be possible
-        else if (!scoreDef) {
+        else if (scoreDef) {
+            m_drawingScoreDef.Replace(scoreDef);
+        }
+        else {
             assert(false);
         }
 	}
@@ -255,7 +258,7 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         
         AttCommonNComparison comparison( &typeid(Staff), staffDef->GetN() );
         Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison));
-        System *system = dynamic_cast<System*>(measure->m_parent);
+        System *system = dynamic_cast<System*>(measure->GetFirstParent( &typeid(System) ) );
         
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
@@ -972,12 +975,14 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *
     dc->StartGraphic( element, "", element->GetUuid());
     
     Measure *measure = NULL;
+    ScoreDef *scoreDef = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
     for (current = element->GetFirst( ); current; current = element->GetNext( ) )
     {
         measure = dynamic_cast<Measure*>(current);
+        scoreDef = dynamic_cast<ScoreDef*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
         if (measure) {
             DrawMeasure( dc , measure, system );
@@ -985,8 +990,12 @@ void View::DrawEditorialElement( DeviceContext *dc, DocObject *element, System *
         else if (editorialElement) {
             DrawEditorialElement( dc , editorialElement, system );
         }
+        // scoreDef are not drawn directly, but anything else should not be possible
+        else if (scoreDef) {
+            m_drawingScoreDef.Replace( scoreDef );
+        }
         else {
-            //assert(false);
+            assert(false);
         }
     }
     
