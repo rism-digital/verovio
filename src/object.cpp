@@ -288,7 +288,7 @@ void Object::SetParent( Object *parent )
     m_parent = parent;
 }
     
-void Object::AddApp( App *child )
+void Object::AddEditorialElement( EditorialElement *child )
 {
     assert(
            dynamic_cast<System*>(this)

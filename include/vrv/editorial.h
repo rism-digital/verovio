@@ -61,6 +61,18 @@ public:
     void AddStaff( Staff *child );
     ///@}
     
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Fill a page by adding systems with the appropriate length
+     * For EditorialElement, this means only moving them since their width is not
+     * taken into account. Only system children EditorialElement are processed.
+     */
+    virtual int CastOffSystems( ArrayPtrVoid params );
+    
 protected:
     
 private:

@@ -192,7 +192,7 @@ void Doc::CastOff( )
     contentSystem->Process( &castOffSystems, params );
     delete contentSystem;
     
-    LogDebug("Layout: %d systems", contentPage->GetSystemCount());
+    //LogDebug("Layout: %d systems", contentPage->GetSystemCount());
     
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDef( true );
@@ -216,7 +216,7 @@ void Doc::CastOff( )
     contentPage->Process( &castOffPages, params );
     delete contentPage;
     
-    LogDebug("Layout: %d pages", this->GetChildCount());
+    //LogDebug("Layout: %d pages", this->GetChildCount());
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
@@ -240,7 +240,7 @@ void Doc::UnCastOff( )
     
     this->AddPage(contentPage);
     
-    LogDebug("ContinousLayout: %d pages", this->GetChildCount());
+    //LogDebug("ContinousLayout: %d pages", this->GetChildCount());
     
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
@@ -257,6 +257,7 @@ int Doc::GetPageCount( )
 {
     return GetChildCount() ;
 }
+    
 /*
 short Doc::GetLeftMargin( const std::type_info *elementType )
 {
@@ -266,18 +267,15 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
 }
 */
     
-    short Doc::GetLeftMargin( const Object *object )
-    {
-        const std::type_info *elementType = &typeid(*object);
-        //if (typeid(Note) == *elementType) return 10;
-        if (typeid(Barline) == *elementType) return 5;
-        else if (typeid(Clef) == *elementType) return -20;
-        return 0;
+short Doc::GetLeftMargin( const Object *object )
+{
+    const std::type_info *elementType = &typeid(*object);
+    //if (typeid(Note) == *elementType) return 10;
+    if (typeid(Barline) == *elementType) return 5;
+    else if (typeid(Clef) == *elementType) return -20;
+    return 0;
 
-    }
-    
-
-    
+}
     
 short Doc::GetRightMargin( const std::type_info *elementType )
 {

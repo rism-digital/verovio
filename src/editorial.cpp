@@ -18,6 +18,7 @@
 #include "measure.h"
 #include "scoredef.h"
 #include "staff.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -179,6 +180,33 @@ Rdg::~Rdg()
 void Rdg::Reset()
 {
     EditorialElement::Reset();
+}
+    
+//----------------------------------------------------------------------------
+// EditorialElement functor methods
+//----------------------------------------------------------------------------
+
+int EditorialElement::CastOffSystems( ArrayPtrVoid params )
+{
+    // param 0: a pointer to the system we are taking the content from
+    // param 1: a pointer the page we are adding system to (unused)
+    // param 2: a pointer to the current system
+    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
+    // param 4: the system width (unused)
+    System *contentSystem = static_cast<System*>(params[0]);
+    System **currentSystem = static_cast<System**>(params[2]);
+    
+    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
+    assert( dynamic_cast<System*>(this->m_parent));
+    
+    // Special case where we use the Relinquish method.
+    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
+    // from the content System because this screws up the iterator. Relinquish gives up
+    // the ownership of the Measure - the contentSystem will be deleted afterwards.
+    EditorialElement *editorialElement = dynamic_cast<EditorialElement*>( contentSystem->Relinquish( this->GetIdx()) );
+    (*currentSystem)->AddEditorialElement( editorialElement );
+    
+    return FUNCTOR_SIBLINGS;
 }
 
 

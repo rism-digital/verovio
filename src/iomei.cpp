@@ -1543,7 +1543,7 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
     App *vrvApp = new App( level );
     SetMeiUuid(app, vrvApp);
     vrvApp->ReadCommon(app);
-    parent->AddApp(vrvApp);
+    parent->AddEditorialElement(vrvApp);
     
     return ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level );
 }
