@@ -510,12 +510,13 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         return;
     }
 
+    else if (dynamic_cast<EditorialElement*>(this)) {
+        deepness++;
+    }
     if (deepness == 0) {
         return;
     }
-    else if (!dynamic_cast<EditorialElement*>(this)) {
-        deepness--;
-    }
+    deepness--;
     
     ArrayOfObjects::iterator iter;
     for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
