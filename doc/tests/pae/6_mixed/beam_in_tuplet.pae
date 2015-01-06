@@ -1,0 +1,7 @@
+@start:base_tuplet
+@clef:G-2
+@keysig:none
+@key: 
+@timesig:c/
+@data:=5/''4E'B''C/ED+8(6D{C'B};3)/''4DC'8BA/4.G
+@end:base_tuplet

@@ -1,0 +1,7 @@
+@start:base_tuplet
+@clef:G-2
+@keysig:none
+@key: 
+@timesig:c/
+@data:4({8''DF'F};3)4({8''DG'G};3)4({8''CF'F};3)4({8''EA'A};3)/4({8''CF'F};3)4({8''DG'G};3)
+@end:base_tuplet
