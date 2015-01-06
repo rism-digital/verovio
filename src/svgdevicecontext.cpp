@@ -160,7 +160,11 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     
 void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
 {
-    m_currentNode = m_currentNode.find_child_by_attribute("id", gId.c_str());
+    std::string xpath = "//g[@id=\"" + gId + "\"]";
+    pugi::xpath_node selection = m_currentNode.select_single_node( xpath.c_str() );
+    if ( selection ) {
+        m_currentNode = selection.node();
+    }
     m_svgNodeStack.push_back(m_currentNode);
 }
   
