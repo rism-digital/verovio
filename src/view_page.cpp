@@ -313,9 +313,15 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
     dc->ResetPen();
     dc->ResetBrush();
     
-    xg = x - (m_doc->m_drawingBeamWhiteWidth[0]);
+    dc->SetPen( m_currentColour , 0, AxSOLID );
+    dc->SetBrush( m_currentColour , AxSOLID );
+    
+    xg = x - m_doc->m_drawingBeamWidth[0];
     // determine le blanc entre barres grosse et mince
     DrawFullRectangle(dc, xg -  m_doc->m_drawingBeamWidth[0] , y1, xg, y2 );
+    
+    dc->ResetPen();
+    dc->ResetBrush();
 
 	return;
 }
