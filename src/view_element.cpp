@@ -1694,8 +1694,9 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;
     int emb_offset = 0; // if there is and embellishment, offset the note up
     
-    // We position the fermata in the same horizontal pos. of th eobject
-    x = element->GetDrawingX();
+    // We position the fermata in the same horizontal pos. of th object
+    // but it shoud be moved according to half of the fermata size
+    x = element->GetDrawingX() - m_doc->m_drawingInterl[staff->staffSize];
     
     // First case, notes
     if (dynamic_cast<Note*>(element)) {
@@ -1706,44 +1707,40 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         if (!element->m_drawingStemDir && (note->m_dur != DUR_1 || note->m_dur != DUR_BR)) {
         */
             // only for up-fermatas, if there is a trill on the same note
-            // add a 35 pixel space so they do not collide
-            // HARDCODED
             if (note->m_embellishment)
-                emb_offset = 35;
+                emb_offset = m_doc->m_drawingInterl[staff->staffSize];
             
             // check that the notehead is in the staff.
-            // HARDCODED
             if ((element->GetDrawingY()) < staff->GetDrawingY())
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
-                y = staff->GetDrawingY() + 20 + emb_offset;
+                y = staff->GetDrawingY() + m_doc->m_drawingHalfInterl[staff->staffSize] + emb_offset;
             else
-                // out of the staff, place the trill 20 px above the notehead
-                y = (element->GetDrawingY()) + 20 + emb_offset;
+                // out of the staff, place the trill above the notehead
+                y = (element->GetDrawingY()) + m_doc->m_drawingHalfInterl[staff->staffSize] + emb_offset;
             
             // draw the up-fermata
-            DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C0_fermataAbove, staff->staffSize, false );
+            DrawSmuflCode ( dc, x, y, SMUFL_E4C0_fermataAbove, staff->staffSize, false );
         /*
         } else { // stem up fermata down
             
             // This works as above, only we check that the note head is not
             // UNDER the staff
             if ((element->GetDrawingY()) > (staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize]))
-                // notehead in staff, set at 20 px under
-                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize] - 20;
+                // notehead in staff, set  under
+                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize] - m_doc->m_drawingInterl[staff->staffSize];
             else
-                // notehead under staff, set 20 px under notehead
-                y = (element->GetDrawingY()) - 20;
+                // notehead under staff, set under notehead
+                y = (element->GetDrawingY()) - m_doc->m_drawingInterl[staff->staffSize];
             
-            DrawSmuflCode ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_DOWN, staff, false );
+            DrawSmuflCode ( dc, x, y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
         */
     } else if (dynamic_cast<Rest*>(element)) {
         // this is a rest
         // rests for the moment are always in the staff
-        // so just place the fermata above the staff + 20 px
-        // HARDCODED
-        y = staff->GetDrawingY() + 20;
-        DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C1_fermataBelow, staff->staffSize, false );
+        // so just place the fermata above the staff
+        y = staff->GetDrawingY() + m_doc->m_drawingInterl[staff->staffSize];
+        DrawSmuflCode ( dc, x, y, SMUFL_E4C1_fermataBelow, staff->staffSize, false );
     }
 }
 
@@ -1752,15 +1749,17 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
 // if there are many symbols to draw we could make a generalized function
 void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;    
-    x = element->GetDrawingX();
+
+    // It shoud be moved according to half of the trill size
+    x = element->GetDrawingX() - m_doc->m_drawingAccidWidth[staff->staffSize][element->m_cueSize];
 
     // HARDCODED
     if ((element->GetDrawingY()) < staff->GetDrawingY())
-        y = staff->GetDrawingY() + 30;
+        y = staff->GetDrawingY() + m_doc->m_drawingInterl[staff->staffSize];
     else
-        y = (element->GetDrawingY()) + 30;
+        y = (element->GetDrawingY()) + m_doc->m_drawingInterl[staff->staffSize];
     
-    DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E566_ornamentTrill, staff->staffSize, false );
+    DrawSmuflCode ( dc, x, y, SMUFL_E566_ornamentTrill, staff->staffSize, false );
 }
 
 } // namespace vrv    
