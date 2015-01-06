@@ -53,7 +53,7 @@ void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 
 
 	SwapY( &y1, &y2 );
 
-    dc->SetPen( m_currentColour, 1, AxSOLID  );
+    dc->SetPen( m_currentColour, 0, AxSOLID  );
     dc->SetBrush( m_currentColour, AxSOLID );
 
 	dc->DrawRectangle( ToDeviceContextX( x1 ), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1) , ToDeviceContextX( y1 - y2 ));
