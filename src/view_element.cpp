@@ -1477,7 +1477,7 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff )
 {
     // to be updated
-    int x = element->GetDrawingX() - 1 * m_doc->m_drawingUnit * 2;
+    int x = element->GetDrawingX() - m_doc->m_drawingUnit * 2;
     int y = element->GetDrawingY();
     if (staff->GetAlignment() ) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * m_doc->m_drawingUnit * 4;
