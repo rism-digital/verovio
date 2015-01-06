@@ -13,6 +13,7 @@
 #include <assert.h>
 #include <cstring>
 #include <stdio.h>
+#include <string>
 #include <typeinfo>
 
 //----------------------------------------------------------------------------
@@ -20,18 +21,19 @@
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
+#include "doc.h"
 #include "keysig.h"
 #include "layerelement.h"
 #include "mensur.h"
 #include "note.h"
 #include "rest.h"
+#include "staff.h"
 #include "tie.h"
 #include "tuplet.h"
 
 namespace vrv {
     
-#define TUPLET_OFFSET 20
-#define OBLIQUE_OFFSET 0x52 //move to oblique figures
+#define TUPLET_OFFSET (25 * DEFINITON_FACTOR)
 
 /**
  * Analyze a tuplet object and figure out if all the notes are in the same beam
@@ -209,7 +211,8 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             }
             
             
-        } else { // two directional beams
+        } else {
+            // two directional beams
             // this case is similar to the above, but the bracket is only orizontal
             // y is 0 because the final y pos is above the tallest stem
             y = 0;
@@ -243,7 +246,6 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         }
     }
         
-    
     center->x = x;
     center->y = y;
     return direction;
@@ -257,11 +259,11 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     
     tuplet->ResetList(tuplet);
     
-    int txt_lenght, txt_height;
+    int txt_length, txt_height;
     
     std::wstring notes = IntToTupletFigures((short int)tuplet->GetNum());
     
-    dc->GetSmuflTextExtent(notes, &txt_lenght, &txt_height);
+    dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
     
     MusPoint start, end, center;
     bool direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
@@ -269,13 +271,15 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
     // Calculate position for number 0x82
     // since the number is slanted, move the center left
     // by 4 pixels so it seems more centered to the eye
-    int txt_x = center.x - (txt_lenght / 2) - 4;
-    //DrawSmuflCode ( dc, txt_x,  center.y, notes + 0x82, staff, false);
+    int txt_x = center.x - (txt_length / 2);
+    // we need to move down the figure of half of it height, which is about an accid width
+    int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][tuplet->m_cueSize];
     
-    DrawSmuflString(dc, txt_x, center.y, notes, 0);
+    DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
     
-    //dc->SetPen(AxBLACK);
-    dc->SetPen(AxBLACK, 2, AxSOLID);
+    int verticalLine = m_doc->m_drawingUnit;
+    
+    dc->SetPen(m_currentColour, m_doc->m_env.m_stemWidth, AxSOLID);
     
     // Start is 0 when no line is necessary (i.e. beamed notes)
     if (start.x > 0) {
@@ -285,9 +289,9 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
         double m = (double)(start.y - end.y) / (double)(start.x - end.x);
         
         // x = 10 pixels before the number
-        double x = txt_x - 4;
+        double x = txt_x - 40;
         // xa = just after, the number is abundant so I do not add anything
-        double xa = txt_x + txt_lenght + 2;
+        double xa = txt_x + txt_length + 20;
         
         // calculate the y coords in the slope
         double y1 = (double)start.y + m * (x - (double)start.x);
@@ -300,16 +304,16 @@ void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *s
         
         // vertical bracket lines
         if (direction) {
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - 10));
-            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - 10));
+            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
+            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
         } else {
-            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + 10));
-            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + 10));
+            dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
+            dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
         }
                 
     }
     
-    //rz dc->EndGraphic(element, this );
+    dc->ResetPen();
 }
 
 } // namespace vrv

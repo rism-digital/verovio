@@ -859,12 +859,13 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 
 void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
 {
-	DrawSmuflCode( dc, x, y, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->staffSize, smaller );
-
+    int y2 = y + m_doc->m_drawingInterl[staff->staffSize];
+	DrawSmuflCode( dc, x, y2, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->staffSize, smaller );
+    
 	if (dots)
 	{	if (valeur < DUR_16)
 			y += m_doc->m_drawingInterl[staff->staffSize];
-		DrawDots ( dc, (x + m_doc->m_drawingInterl[staff->staffSize]), y, dots, staff);
+		DrawDots ( dc, (x + 2 * m_doc->m_drawingInterl[staff->staffSize]), y, dots, staff);
 	}
 	return;
 }
@@ -1345,7 +1346,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
+    int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*4);
     int x = element->GetDrawingX();
     
     if ( meterSig->GetSym() == METERSIGN_common ) {
