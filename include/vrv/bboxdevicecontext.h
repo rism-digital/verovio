@@ -30,78 +30,79 @@ namespace vrv {
 class BBoxDeviceContext: public DeviceContext
 {
 public:
-
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
     BBoxDeviceContext ( View *view, int width, int height );
     virtual ~BBoxDeviceContext();
+    ///@}
     
-    // Setters
-    
-    virtual void SetBrush( int colour, int style = AxSOLID );
-    
+    /**
+     * @name Setters
+     */
+    ///@{
     virtual void SetBackground( int colour, int style = AxSOLID );
-    
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) {};
-    
     virtual void SetBackgroundMode( int mode );
-    
-    virtual void SetPen( int colour, int width = 1, int style = AxSOLID );
-    
     virtual void SetFont( FontMetricsInfo *font_info );
-        
     virtual void SetTextForeground( int colour );
-    
     virtual void SetTextBackground( int colour );
-    
-    virtual void ResetBrush( );
-    
-    virtual void ResetPen( );
-    
     virtual void SetLogicalOrigin( int x, int y );
-    
     virtual void SetUserScale( double xScale, double yScale );
+    ///@}
     
-    // Getters
-    
+    /**
+     * @name Getters
+     */
+    ///@{
     virtual void GetTextExtent( const std::string& string, int *w, int *h );
-    
+    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
     virtual MusPoint GetLogicalOrigin( );
+    ///@}
 
-    // Drawing methods
-        
+    /**
+     * @name Drawing methods
+     */
+    ///@{
     virtual void DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6]);
-    
     virtual void DrawCircle(int x, int y, int radius);
-    
     virtual void DrawEllipse(int x, int y, int width, int height);
-    
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
-    
     virtual void DrawLine(int x1, int y1, int x2, int y2);
-    
     virtual void DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
-    
     virtual void DrawRectangle(int x, int y, int width, int height);
-    
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle);
-    
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    
     virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT );
-    
-    virtual void DrawMusicText(const std::string& text, int x, int y);
-    
+    virtual void DrawMusicText(const std::wstring& text, int x, int y);
     virtual void DrawSpline(int n, MusPoint points[]);
-    
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) {};
+    ///@}
     
-    // 
+    /**
+     * @name Method for starting and ending a graphic
+     */
+    ///@{
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId );
-    
     virtual void EndGraphic(DocObject *object, View *view );
+    ///@}
     
+    /**
+     * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
+     */
+    ///@{
+    virtual void ResumeGraphic( DocObject *object, std::string gId ) {};
+    virtual void EndResumedGraphic( DocObject *object, View *view  ) {};
+    ///@}
+    
+    /**
+     * @name Method for starting and ending page
+     */
+    ///@{
     virtual void StartPage();
-    
     virtual void EndPage();
+    ///@}
     
     
 private:
@@ -119,9 +120,6 @@ private:
      * The view are calling from - used to flip back the Y coordinates
      */
     View *m_view;
-   
-    //
-    int m_penWidth;
     
     void UpdateBB(int x1, int y1, int x2, int y2);
     

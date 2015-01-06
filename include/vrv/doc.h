@@ -74,11 +74,11 @@ public:
      * @name Setters for the page dimensions and margins
      */
     ///@{
-    void SetPageHeight( int pageHeight ) { m_pageHeight = pageHeight; };
-    void SetPageWidth( int pageWidth ) { m_pageWidth = pageWidth; };
-    void SetPageLeftMar( short pageLeftMar ) { m_pageLeftMar = pageLeftMar; };
-    void SetPageRightMar( short pageRightMar ) { m_pageRightMar = pageRightMar; };
-    void SetPageTopMar( short pageTopMar ) { m_pageTopMar = pageTopMar; };
+    void SetPageHeight( int pageHeight ) { m_pageHeight = pageHeight * DEFINITON_FACTOR; };
+    void SetPageWidth( int pageWidth ) { m_pageWidth = pageWidth * DEFINITON_FACTOR; };
+    void SetPageLeftMar( short pageLeftMar ) { m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR; };
+    void SetPageRightMar( short pageRightMar ) { m_pageRightMar = pageRightMar * DEFINITON_FACTOR; };
+    void SetPageTopMar( short pageTopMar ) { m_pageTopMar = pageTopMar * DEFINITON_FACTOR; };
     void SetSpacingStaff( short spacingStaff ) { m_spacingStaff = spacingStaff; };
     void SetSpacingSystem( short spacingSystem ) { m_spacingSystem = spacingSystem; };
     ///@}
@@ -92,6 +92,15 @@ public:
     ///@}
     
     /**
+     * @name Getters for the object margins (left and right)
+     * These should eventually be set at parameters.
+     */
+    ///@{
+    short GetLeftMargin( const Object *object );
+    short GetRightMargin( const std::type_info *elementType );
+    ///@}
+
+    /*
      * @name Setter and getter for the justification (x-axis) flag.
      * Justification is enabled by default. It need to be disable
      * for drawing all the document on one single system.
@@ -123,15 +132,16 @@ public:
     void PrepareDrawing( );
     
     /**
-     * Performs the layout of the entire document.
+     * Casts off the entire document.
+     * Starting from a single system, create and fill pages and systems.
      */
-    void LayOut( );
+    void CastOff( );
     
     /**
-     * Undo the layout of the entire document.
+     * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void LayOutContinuously( );
+    void UnCastOff( );
     
     /**
      * To be implemented.
@@ -172,12 +182,6 @@ public:
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
     int GetAdjustedDrawingPageHeight( );
-    
-    /**
-     * Initializes fonts from the resources (music and lyrics)
-     * The method is called when the doc is reset.
-     */
-	virtual void UpdateFontValues();
         
     //----------//
     // Functors //
@@ -185,11 +189,9 @@ public:
 
 private:
     /**
-     * Calculates the Leipzig font size according to the m_interlDefin reference value.
-     * The size is calculated using  LEIPZIG_UNITS_PER_EM and LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT.
-     * See vrvdef.h for more information about these values.
+     * Calculates the music font size according to the m_interlDefin reference value.
      */
-    int CalcLeipzigFontSize( );
+    int CalcMusicFontSize( );
     
 public:
     
@@ -227,12 +229,8 @@ public:
   
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** Editor step (10 by default) */
-    int m_drawingStep1;
-    /** Editor medium step (3 * m_drawingStep1) */
-    int m_drawingStep2;
-    /** Editor large step (6 * m_drawingStep1) */
-    int m_drawingStep3;
+    /** The page drawing unit */
+    int m_drawingUnit;
     /** Half a the space between to staff lines for normal and small staff (10 and 8 by default) */
     int m_drawingHalfInterl[2];
     /** Space between to staff lines for normal and small staff (20 and 16 by default) */
@@ -267,10 +265,10 @@ public:
     float m_drawingVerticalUnit1[2];
     /** A vertical unit corresponding to the 1/8 of an interline */
     float m_drawingVerticalUnit2[2];
-    /** Current Leipzig font for normal and small staff and normal and grace size */
+    /** Current music font for normal and small staff and normal and grace size */
     FontMetricsInfo m_drawingFonts[2][2];				
-    /** Leipzig font */
-    FontMetricsInfo m_drawingLeipzigFont;
+    /** music font */
+    FontMetricsInfo m_drawingMusicFont;
     /** Current lyric font for normal and small staff and normal and grace size */
     FontMetricsInfo m_drawingLyricFonts[2];
     /** Lyric font by default */

@@ -163,6 +163,7 @@ void Page::LayOutHorizontally( )
     int measure_width = 0;
     params.push_back( &min_pos );
     params.push_back( &measure_width );
+    params.push_back( doc );
     Functor setBoundingBoxXShift( &Object::SetBoundingBoxXShift );
     Functor setBoundingBoxXShiftEnd( &Object::SetBoundingBoxXShiftEnd );
     this->Process( &setBoundingBoxXShift, params, &setBoundingBoxXShiftEnd );

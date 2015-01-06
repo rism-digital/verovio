@@ -77,11 +77,6 @@ public:
     void AddVerse(Verse *child);
     
     /**
-     * Return the default horizontal spacing of notes.
-     */
-    virtual int GetHorizontalSpacing( );
-    
-    /**
      * @name Setters and getters for tie attributes
      */
     ///@{

@@ -18,10 +18,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "aligner.h"
 #include "beam.h"
 #include "clef.h"
 #include "doc.h"
+#include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -233,12 +235,18 @@ Object *Object::FindChildByUuid( std::string uuid )
 
 Object *Object::FindChildByType(const std::type_info *elementType)
 {
-    Functor findByType( &Object::FindByType );
+    AttComparison attComparison( elementType );
+    return FindChildByAttComparison( &attComparison );
+}
+    
+Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deepness )
+{
+    Functor findByAttComparison( &Object::FindByAttComparison );
     Object *element = NULL;
     ArrayPtrVoid params;
-    params.push_back( &elementType );
+    params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByType, params );
+    this->Process( &findByAttComparison, params, NULL, NULL, deepness );
     return element;
 }
     
@@ -279,7 +287,21 @@ void Object::SetParent( Object *parent )
     assert( !m_parent );
     m_parent = parent;
 }
-
+    
+void Object::AddEditorialElement( EditorialElement *child )
+{
+    assert(
+           dynamic_cast<System*>(this)
+        || dynamic_cast<Measure*>(this)
+        || dynamic_cast<Staff*>(this)
+        || dynamic_cast<Layer*>(this)
+        || dynamic_cast<LayerElement*>(this)
+        || dynamic_cast<Note*>(this)
+           );
+    child->SetParent( this );
+    m_children.push_back( child );
+    Modify();
+}
 
 bool Object::operator==( Object& other )
 {
@@ -342,14 +364,6 @@ void Object::AddSameAs( std::string id, std::string filename )
         m_sameAs += " ";
     }
     m_sameAs += sameAs;
-}
-    
-void Object::SetDocParent()
-{
-    if (!m_doc) {
-        m_doc = dynamic_cast<Doc*>( this->GetFirstParent( &typeid(Doc) ) );
-        assert( m_doc );
-    }
 }
 
 Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps )
@@ -482,7 +496,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, MapOfTypeN *mapOfTypeN )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, MapOfTypeN *mapOfTypeN, int deepness )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -496,6 +510,14 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         return;
     }
 
+    else if (dynamic_cast<EditorialElement*>(this)) {
+        deepness++;
+    }
+    if (deepness == 0) {
+        return;
+    }
+    deepness--;
+    
     ArrayOfObjects::iterator iter;
     for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
     {
@@ -513,12 +535,12 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
                 }
                 else {
                     // process this one and quit
-                    (*iter)->Process( functor, params, endFunctor, mapOfTypeN );
+                    (*iter)->Process( functor, params, endFunctor, mapOfTypeN, deepness );
                     break;
                 }
             }
         }
-        (*iter)->Process( functor, params, endFunctor, mapOfTypeN );
+        (*iter)->Process( functor, params, endFunctor, mapOfTypeN, deepness );
     }
     
     if ( endFunctor ) {
@@ -634,6 +656,10 @@ bool DocObject::HasSelfBB()
     return ( (m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF) );
 }
 
+void DocObject::AddRdgClass( std::string newClass )
+{
+    m_rdgClasses.push_back(newClass);
+}
 
 //----------------------------------------------------------------------------
 // ObjectListInterface
@@ -785,12 +811,12 @@ int Object::FindByUuid( ArrayPtrVoid params )
     //LogDebug("Still looking for uuid...");
     return FUNCTOR_CONTINUE;
 }
-    
-int Object::FindByType( ArrayPtrVoid params )
+
+int Object::FindByAttComparison( ArrayPtrVoid params )
 {
     // param 0: the type we are looking for
     // param 1: the pointer to pointer to the Object
-    const std::type_info **elementType = static_cast<const std::type_info**>(params[0]);
+    AttComparison *test = static_cast<AttComparison*>(params[0]);
     Object **element = static_cast<Object**>(params[1]);
     
     if ( (*element) ) {
@@ -798,14 +824,16 @@ int Object::FindByType( ArrayPtrVoid params )
         return FUNCTOR_STOP;
     }
     
-    if ( typeid(*this) == **elementType ) {
+    // evaluate by applying the AttComparison operator()
+    if ((*test)(this)) {
         (*element) = this;
         //LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
-    //LogDebug("Still looking for uuid...");
+    //LogDebug("Still looking for the object matching the AttComparison...");
     return FUNCTOR_CONTINUE;
 }
+
     
 int Object::SetCurrentScoreDef( ArrayPtrVoid params )
 {
@@ -817,9 +845,9 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     assert( currentScoreDef );
     
     // starting a new page
-    Page *current_page = dynamic_cast<Page*>(this);
-    if ( current_page  ) {
-        if ( current_page->m_parent->GetChildIndex( current_page ) == 0 ) {
+    Page *page = dynamic_cast<Page*>(this);
+    if ( page  ) {
+        if ( page->m_parent->GetChildIndex( page ) == 0 ) {
             currentScoreDef->SetRedrawFlags( true, true, true, true );
             currentScoreDef->SetDrawLabels( true );
         }
@@ -827,82 +855,105 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
             currentScoreDef->SetRedrawFlags( true, true, false, false );
             currentScoreDef->SetDrawLabels( false );
         }
-        current_page->m_drawingScoreDef = *currentScoreDef;
+        page->m_drawingScoreDef = *currentScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
-    System *current_system = dynamic_cast<System*>(this);
-    if ( current_system  ) {
+    System *system = dynamic_cast<System*>(this);
+    if ( system  ) {
         currentScoreDef->SetRedrawFlags( true, true, false, false );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new scoreDef
-    ScoreDef *current_scoreDef= dynamic_cast<ScoreDef*>(this);
-    if ( current_scoreDef  ) {
+    ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
+    if ( scoreDef  ) {
         bool drawClef = false;
         bool drawKeySig = false;
         bool drawMensur = false;
         bool drawMeterSig = false;
-        if (current_scoreDef->GetClef()) {
-            currentScoreDef->ReplaceClef(current_scoreDef->GetClef());
+        if (scoreDef->GetClef()) {
+            currentScoreDef->ReplaceClef(scoreDef->GetClef());
             drawClef = true;
         }
-        if (current_scoreDef->GetKeySig()) {
-            currentScoreDef->ReplaceKeySig(current_scoreDef->GetKeySig());
+        if (scoreDef->GetKeySig()) {
+            currentScoreDef->ReplaceKeySig(scoreDef->GetKeySig());
             drawKeySig = true;
         }
-        if (current_scoreDef->GetMensur()) {
-            currentScoreDef->ReplaceMensur(current_scoreDef->GetMensur());
+        if (scoreDef->GetMensur()) {
+            currentScoreDef->ReplaceMensur(scoreDef->GetMensur());
             drawMensur = true;
         }
-        if (current_scoreDef->GetMeterSig()) {
-            currentScoreDef->ReplaceMeterSig(current_scoreDef->GetMeterSig());
+        if (scoreDef->GetMeterSig()) {
+            currentScoreDef->ReplaceMeterSig(scoreDef->GetMeterSig());
             drawMeterSig = true;
         }
+        // Replace the current scoreDef with the new one, including its content (staffDef)
+        currentScoreDef->Replace(scoreDef);
         currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig );
         return FUNCTOR_CONTINUE;
     }
 
+
+    // starting a new staffDef
+    // Because staffDef have to be included in a scoreDef, a new staffDef was already
+    // replaced by the new scoreDef (see above). Here we only need to reset the drawing flags
+    StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
+    if ( staffDef  ) {
+        StaffDef *tmpStaffDef = currentScoreDef->GetStaffDef( staffDef->GetN() );
+        if (staffDef->GetClef()) {
+            tmpStaffDef->SetDrawClef( true );
+        }
+        if (staffDef->GetKeySig()) {
+            tmpStaffDef->SetDrawKeySig( true );
+        }
+        if (staffDef->GetMensur()) {
+            tmpStaffDef->SetDrawMensur( true );
+        }
+        if (staffDef->GetMeterSig()) {
+            tmpStaffDef->SetDrawMeterSig( true );
+        }
+    }
+    
     // starting a new staff
-    Staff *current_staff = dynamic_cast<Staff*>(this);
-    if ( current_staff  ) {
-        (*currentStaffDef) = currentScoreDef->GetStaffDef( current_staff->GetN() );
+    Staff *staff = dynamic_cast<Staff*>(this);
+    if ( staff  ) {
+        (*currentStaffDef) = currentScoreDef->GetStaffDef( staff->GetN() );
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new layer
-    Layer *current_layer = dynamic_cast<Layer*>(this);
-    if ( current_layer  ) {
+    Layer *layer = dynamic_cast<Layer*>(this);
+    if ( layer  ) {
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something more
         // generic (PrepareDrawing?) might be a good idea...
-        if (current_layer->m_parent->GetChildCount() > 1) {
-            if (current_layer->m_parent->GetChildIndex(current_layer)==0) {
-                current_layer->SetDrawingStemDir(STEMDIRECTION_up);
+        if (layer->m_parent->GetChildCount() > 1) {
+            if (layer->m_parent->GetChildIndex(layer)==0) {
+                layer->SetDrawingStemDir(STEMDIRECTION_up);
             }
             else {
-                current_layer->SetDrawingStemDir(STEMDIRECTION_down);
+                layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        current_layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
+        layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new clef
-    Clef *current_clef = dynamic_cast<Clef*>(this);
-    if ( current_clef  ) {
+    Clef *clef = dynamic_cast<Clef*>(this);
+    if ( clef  ) {
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceClef( current_clef );
+        (*currentStaffDef)->ReplaceClef( clef );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new keysig
-    KeySig *current_keysig = dynamic_cast<KeySig*>(this);
-    if ( current_keysig  ) {
+    KeySig *keysig = dynamic_cast<KeySig*>(this);
+    if ( keysig  ) {
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceKeySig( current_keysig );
+        (*currentStaffDef)->ReplaceKeySig( keysig );
         return FUNCTOR_CONTINUE;
     }
     
@@ -938,8 +989,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
+    // param 2: the Doc
     int *min_pos = static_cast<int*>(params[0]);
     int *measure_width = static_cast<int*>(params[1]);
+    Doc *doc = static_cast<Doc*>(params[2]);
 
     // starting a new measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -956,10 +1009,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // starting an new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
-        // reset it as the minimum position to the step (if doc found)
-        (*min_pos) = 0;
-        Doc *doc = dynamic_cast<Doc*>( current_layer->GetFirstParent( &typeid(Doc) ) );
-        if (doc) (*min_pos) = doc->m_drawingStep1;
+        // reset it as the minimum position to the step (HARDCODED)
+        (*min_pos) = 30 * doc->m_drawingUnit / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1006,14 +1057,17 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         // We need to reconsider this: if the mrest is on the top staff, the aligner will be before any other note
         // aligner. This means that it will not be shifted. We need to shift it but not take into account its own width.
         //current->GetAlignment()->SetXShift( current->GetAlignment()->GetXRel() );
+        (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
     }
+    
+    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / 10;
     
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
-    int negative_offset = - current->m_contentBB_x1;
+    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(current) * doc->m_drawingUnit / 10);
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
@@ -1033,10 +1087,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    //(*min_pos) = current->m_contentBB_x2 + current->GetHorizontalSpacing();
-    //current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 - current->GetAlignment()->GetXRel() + current->GetHorizontalSpacing() );
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + current->GetHorizontalSpacing();
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + current->GetHorizontalSpacing() );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / DEFINITON_FACTOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / DEFINITON_FACTOR );
     
     return FUNCTOR_CONTINUE;
 }

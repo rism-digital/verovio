@@ -53,7 +53,7 @@ void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 
 
 	SwapY( &y1, &y2 );
 
-    dc->SetPen( m_currentColour, 1, AxSOLID  );
+    dc->SetPen( m_currentColour, 0, AxSOLID  );
     dc->SetBrush( m_currentColour, AxSOLID );
 
 	dc->DrawRectangle( ToDeviceContextX( x1 ), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1) , ToDeviceContextX( y1 - y2 ));
@@ -91,7 +91,7 @@ void View::DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, 
 
 void View::DrawDot ( DeviceContext *dc, int x, int y )
 {
-	int r = std::max( ToDeviceContextX(3), 2 );
+	int r = std::max( ToDeviceContextX( m_doc->m_drawingInterl[0] / 5 ), 2 );
 	
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -102,50 +102,30 @@ void View::DrawDot ( DeviceContext *dc, int x, int y )
     dc->ResetBrush();
 }
 
-void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, 
-						 Staff *staff, bool dimin )
+void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
+						 int staffSize, bool dimin )
 {  
-	int staffSize = staff->staffSize;
 	int fontCorr = 0;
+    
     if (dc->CorrectMusicAscent()) {
         fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][dimin];
     }
 
 	assert( dc ); // DC cannot be NULL
-
-    // Font offset management for clef in mensural mode - needs improvement (font modification?)
-	if (staff->notAnc && (unsigned char)c >= LEIPZIG_OFFSET_IN_FONT)
-	{	
-		c+= LEIPZIG_OFFSET_MENSURAL;
-		if (dimin && is_in (c, 227, 229))	// les trois clefs
-		{	
-			c+= 14;	// les cles d===e tablature
-            if (dc->CorrectMusicAscent()) {
-                fontCorr = m_doc->m_drawingFontHeightAscent[ staffSize][0];
-            }
-		}
-	}
-	if (!staff->notAnc || !is_in (c, 241, 243))	// tout sauf clefs de tablature
-	{
-        dc->SetFont( &m_doc->m_drawingFonts[ staffSize ][ dimin ] );
-	}
+    
+    dc->SetFont( &m_doc->m_drawingFonts[staffSize][dimin] );
 
 	if ( dc)
 	{	
 		dc->SetBackground( AxBLUE );
 		dc->SetBackgroundMode( AxTRANSPARENT );
         
-        char str_c[2];
-        str_c[0] = c;
-        str_c[1] = 0;
-        std::string str = str_c;
+        std::wstring str;
+        str.push_back(code);
 		dc->SetTextForeground( m_currentColour );
         dc->SetPen( m_currentColour, 1, AxSOLID );
         dc->SetBrush( m_currentColour, AxSOLID );
 
-		//LogDebug("Drawing text here, x: %d, y: %d, y (zoomed): %d, y + fontcorr: %d"
-		//	   , ToDeviceContextX(x), y, ToDeviceContextY(y), ToDeviceContextY(y + fontCorr));
-        // DrawMusicText is the same with AxWxDc but different with SvgDeviceContext
 		dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y + fontCorr) );
 
         dc->ResetPen();
@@ -155,7 +135,7 @@ void View::DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c,
 	return;
 }
 
-void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize)
+void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize)
 { 
 	assert( dc ); // DC cannot be NULL
 
@@ -173,7 +153,7 @@ void View::DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, i
         LogDebug("Centering string not implemented with DeviceContext");
 		
         int w, h;
-		dc->GetTextExtent( s, &w, &h );
+		dc->GetSmuflTextExtent( s, &w, &h );
 		x -= w / 2;
         
 	}
@@ -193,9 +173,9 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT, std::min( 2 * m_doc->m_drawingInterl[0] / 2, abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 2 * m_doc->m_drawingInterl[0] / 2, abs( x1 - x ) / 4 ) );
     
-    int thickness = std::max( m_doc->m_drawingInterl[0] / 3, MIN_TIE_THICKNESS );
+    int thickness = std::max( m_doc->m_drawingInterl[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
     
     int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point
@@ -228,7 +208,9 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_env.m_stemWidth / 2 ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
+    dc->ResetPen();
 }
 
 } // namespace vrv

@@ -189,6 +189,17 @@ public:
     void SetDrawLabels( bool drawLabels ) { m_drawLabels = drawLabels; };
     ///@}
     
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Fill a page by adding systems with the appropriate length
+     * For ScoreDef, this means only moving them since their width is not taken into
+     * account
+     */
+    virtual int CastOffSystems( ArrayPtrVoid params );
+    
 protected:
     /**
      * Filter the list for a specific class.

@@ -23,7 +23,7 @@ class Alignment;
 
 /** 
  * This class is a base class for the Layer (<layer>) content.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class LayerElement: public DocObject
 {
@@ -46,12 +46,6 @@ public:
      * By default, a new uuid is generated
      */
     LayerElement *GetChildCopy( bool newUuid = true );
-    
-    /**
-     * Return the default horizontal spacing of elements.
-     * This method should be redefined whenever necessary in the child classes.
-     */
-    virtual int GetHorizontalSpacing( );
     
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)

@@ -51,10 +51,15 @@ enum EditorMode {
 	EDITOR_INSERT
 };
     
-// Default values
+//----------------------------------------------------------------------------
+// Default layout values
+//----------------------------------------------------------------------------
+    
+#define DEFINITON_FACTOR 10
+
 #define DEFAULT_UNIT 9
-#define MIN_UNIT 7
-#define MAX_UNIT 11
+#define MIN_UNIT 6
+#define MAX_UNIT 18
     
 #define DEFAULT_PAGE_RIGHT_MAR 50
 #define MIN_PAGE_RIGHT_MAR 0
@@ -68,10 +73,6 @@ enum EditorMode {
 #define MIN_PAGE_TOP_MAR 0
 #define MAX_PAGE_TOP_MAR 500
     
-#define DEFAULT_SCALE 100
-#define MIN_SCALE 10
-#define MAX_SCALE 1000
-    
 #define DEFAULT_PAGE_HEIGHT 2970
 #define MIN_PAGE_HEIGHT 100
 #define MAX_PAGE_HEIGHT 60000
@@ -79,6 +80,17 @@ enum EditorMode {
 #define DEFAULT_PAGE_WIDTH 2100
 #define MIN_PAGE_WIDTH 100
 #define MAX_PAGE_WIDTH 60000
+    
+#define MIN_TIE_HEIGHT 12
+#define MIN_TIE_THICKNESS 6
+    
+//----------------------------------------------------------------------------
+// Default scaling (%) and spacing (units) values
+//----------------------------------------------------------------------------
+    
+#define DEFAULT_SCALE 100
+#define MIN_SCALE 1
+#define MAX_SCALE 1000
     
 #define DEFAULT_SPACING_STAFF 6
 #define MIN_SPACING_STAFF 0
@@ -88,11 +100,10 @@ enum EditorMode {
 #define MIN_SPACING_SYSTEM 0
 #define MAX_SPACING_SYSTEM 12
 
-// SPACING
-#define MIN_TIE_HEIGHT 12
-#define MIN_TIE_THICKNESS 6
-
-// DURATION
+//----------------------------------------------------------------------------
+// Durations
+//----------------------------------------------------------------------------
+    
 #define DUR_LG 0  // longa
 #define DUR_BR 1  // brevis
 #define DUR_1 2   // whole note
@@ -107,6 +118,10 @@ enum EditorMode {
 // used for alignement
 #define DUR_MAX 1024
 
+//----------------------------------------------------------------------------
+// Legacy Wolfgang defines
+//----------------------------------------------------------------------------
+    
 // ACCID
 #define ACCID_SHARP 1
 #define ACCID_FLAT 2
@@ -142,6 +157,19 @@ enum EditorMode {
 #define ACCENT_OBL_PNT 6
 #define ACCENT_VERT_PNT 7
 
+    
+// the maximum is 255 (unsigned char)
+enum EditorialLevel {
+    EDITORIAL_UNDEFINED = 0,
+    EDITORIAL_SYSTEM,
+    EDITORIAL_SCOREDEF,
+    EDITORIAL_STAFFGRP,    
+    EDITORIAL_MEASURE,
+    EDITORIAL_STAFF,
+    EDITORIAL_LAYER,
+    EDITORIAL_NOTE
+};
+    
 // the maximum is 255 (unsigned char)
 enum StaffGrpSymbol {
     STAFFGRP_NONE = 0,
@@ -172,73 +200,6 @@ enum ClefId {
     C5 = CLEFSHAPE_C << 8 | 5,
     perc = CLEFSHAPE_perc << 8 | 1
 };
-
-//----------------------------------------------------------------------------
-// Music - Leipzig font
-//----------------------------------------------------------------------------
-
-#define LEIPZIG_OFFSET_IN_FONT 200
-#define LEIPZIG_OFFSET_MENSURAL 20
-#define LEIPZIG_OFFSET_NOTE_HEAD 249
-//
-#define LEIPZIG_FERMATA_UP 63
-#define LEIPZIG_FERMATA_DOWN 64
-//
-#define LEIPZIG_EMB_TRILL 116
-//
-#define LEIPZIG_HEAD_WHOLE 201
-#define LEIPZIG_HEAD_WHOLE_FILLED 202
-#define LEIPZIG_HEAD_HALF 203
-#define LEIPZIG_HEAD_QUARTER 204
-#define LEIPZIG_STEM_FLAG_UP 205
-#define LEIPZIG_STEM_FLAG_DOWN 206
-//
-#define LEIPZIG_CLEF_PERC 152
-#define LEIPZIG_CLEF_G 207
-#define LEIPZIG_CLEF_F 208
-#define LEIPZIG_CLEF_C 209
-#define LEIPZIG_CLEF_8va 210
-//
-#define LEIPZIG_ACCID_SHARP 211
-#define LEIPZIG_ACCID_NATURAL 212
-#define LEIPZIG_ACCID_FLAT 213
-#define LEIPZIG_ACCID_DOUBLE_SHARP 214
-#define LEIPZIG_ACCID_QUARTER_FLAT 246
-#define LEIPZIG_ACCID_QUARTER_SHARP 244
-//
-#define LEIPZIG_REST_QUARTER 215
-//
-#define LEIPZIG_METER_SYMB_COMMON 140
-#define LEIPZIG_METER_SYMB_CUT 183 // was 129, works only with font 4.8
-#define LEIPZIG_METER_SYMB_2_CUT 127
-#define LEIPZIG_METER_SYMB_3_CUT 249    // was 128
-#define LEIPZIG_METER_SYMB_2 '2'
-#define LEIPZIG_METER_SYMB_3 '3'
-// TODO
-#define sSTACC 0
-#define sLOURE 'k'
-#define sACCENT_OBL '>'
-#define sACCENT_VERT_SUP '<'
-#define sACCENT_VERT_INF ','
-#define sBEBUNG 'k'
-#define sSTAC_AIGU_SUP ':'
-#define sSTAC_AIGU_INF ';'
-
-/*
- The following values have been obtain using FreeType2
- See ./varia/glyph_info.c
- For now, hardcoded values are ok because we do not change the music/neumes fonts
- 
- If we want to enable this (changing font at runtime) we would need to
- add a method similar to glyph_info.c to get the glyph size for the note head (and others)
- */
-
-#define LEIPZIG_UNITS_PER_EM 2048.0
-#define LEIPZIG_ASCENT 1183.0
-#define LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT 266.0
-#define LEIPZIG_WHOLE_NOTE_HEAD_WIDTH 405.0
-#define LEIPZIG_HALF_NOTE_HEAD_WIDTH 314.0
-#define LEIPZIG_SHARP_WIDTH 197.0
 
 } // namespace vrv
 

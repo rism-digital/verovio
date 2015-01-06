@@ -35,26 +35,6 @@ System::System() :
     Reset();
 }
 
-System::System( const System& system )
-{
-    int i;
-
-	m_systemLeftMar = system.m_systemLeftMar;
-	m_systemRightMar = system.m_systemRightMar;
-	m_xAbs = system.m_xAbs;
-	m_drawingXRel = system.m_drawingXRel;
-	m_drawingX = system.m_drawingX;
-	m_yAbs = system.m_yAbs;
-	m_drawingYRel = system.m_drawingYRel;
-	m_drawingY = system.m_drawingY;
-    
-	for (i = 0; i < this->GetMeasureCount(); i++)
-	{
-        Measure *nmeasure = new Measure( *dynamic_cast<Measure*>( system.m_children[i] ) );
-        this->AddMeasure( nmeasure );
-	}
-}
-
 System::~System()
 {
 }

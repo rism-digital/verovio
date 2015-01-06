@@ -15,9 +15,17 @@
 
 //----------------------------------------------------------------------------
 
+#include "glyph.h"
+#include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
+#include "mensur.h"
+#include "metersig.h"
+#include "mrest.h"
+#include "multirest.h"
+#include "note.h"
 #include "page.h"
+#include "smufl.h"
 #include "staff.h"
 #include "system.h"
 #include "verse.h"
@@ -44,9 +52,7 @@ void Doc::Reset( DocType type )
 {
     Object::Reset();
     
-    UpdateFontValues();
-    
-    m_type = type;    
+    m_type = type;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
@@ -57,6 +63,7 @@ void Doc::Reset( DocType type )
     m_spacingSystem = m_env.m_spacingSystem;
     
     m_drawingPage = NULL;
+    m_drawingUnit = 0;
     m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     
@@ -80,6 +87,9 @@ void Doc::PrepareDrawing()
     ArrayPtrVoid params;
     IntTree tree;
     params.push_back( &tree );
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    //StaffN_LayerN_VerseN_t staffLayerVerseTree;
+    //params.push_back( &staffLayerVerseTree );
     
     // We first fill a tree of int with the staff/layer/verse numbers to be process
     
@@ -91,9 +101,9 @@ void Doc::PrepareDrawing()
     // For this, we use a MapOfTypeN that looks for each object if it is of the type
     // and with @n specified
     
-    std::map<int,IntTree>::iterator staves;
-    std::map<int,IntTree>::iterator layers;
-    std::map<int,IntTree>::iterator verses;
+    IntTree_t::iterator staves;
+    IntTree_t::iterator layers;
+    IntTree_t::iterator verses;
     for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
@@ -109,6 +119,29 @@ void Doc::PrepareDrawing()
             }
         }
     }
+    
+    /*
+    // Alternate solution with StaffN_LayerN_VerseN_t
+    StaffN_LayerN_VerseN_t::iterator staves;
+    LayerN_VerserN_t::iterator layers;
+    VerseN_t::iterator verses;
+    for (staves = staffLayerVerseTree.begin(); staves != staffLayerVerseTree.end(); ++staves) {
+        for (layers = staves->second.begin(); layers != staves->second.end(); ++layers) {
+            for (verses= layers->second.begin(); verses != layers->second.end(); ++verses) {
+                std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
+                MapOfTypeN map;
+                map[ &typeid(Staff) ] = staves->first;
+                map[ &typeid(Layer) ] = layers->first;
+                map[ &typeid(Verse) ] = verses->first;
+                
+                ArrayPtrVoid paramsLyrics;
+                Functor prepareLyrics( &Object::PrepareLyrics );
+                this->Process( &prepareLyrics, paramsLyrics, NULL, &map );
+            }
+        }
+    }
+    */
+    
     //LogElapsedTimeEnd ( "Preparing drawing" );
 }
     
@@ -133,7 +166,7 @@ void Doc::SetCurrentScoreDef( bool force )
     m_currentScoreDefDone = true;
 }
 
-void Doc::LayOut( )
+void Doc::CastOff( )
 {
     this->SetCurrentScoreDef();
     
@@ -159,7 +192,7 @@ void Doc::LayOut( )
     contentSystem->Process( &castOffSystems, params );
     delete contentSystem;
     
-    LogDebug("Layout: %d systems", contentPage->GetSystemCount());
+    //LogDebug("Layout: %d systems", contentPage->GetSystemCount());
     
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDef( true );
@@ -183,7 +216,7 @@ void Doc::LayOut( )
     contentPage->Process( &castOffPages, params );
     delete contentPage;
     
-    LogDebug("Layout: %d pages", this->GetChildCount());
+    //LogDebug("Layout: %d pages", this->GetChildCount());
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
@@ -191,7 +224,7 @@ void Doc::LayOut( )
     this->SetCurrentScoreDef( true );
 }
     
-void Doc::LayOutContinuously( )
+void Doc::UnCastOff( )
 {  
     Page *contentPage = new Page();
     System *contentSystem = new System();
@@ -207,7 +240,7 @@ void Doc::LayOutContinuously( )
     
     this->AddPage(contentPage);
     
-    LogDebug("ContinousLayout: %d pages", this->GetChildCount());
+    //LogDebug("ContinousLayout: %d pages", this->GetChildCount());
     
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
@@ -224,6 +257,39 @@ int Doc::GetPageCount( )
 {
     return GetChildCount() ;
 }
+    
+/*
+short Doc::GetLeftMargin( const std::type_info *elementType )
+{
+    if (&typeid(Note) == elementType)
+        return 5;
+    return 0;
+}
+*/
+    
+short Doc::GetLeftMargin( const Object *object )
+{
+    const std::type_info *elementType = &typeid(*object);
+    //if (typeid(Note) == *elementType) return 10;
+    if (typeid(Barline) == *elementType) return 5;
+    else if (typeid(Clef) == *elementType) return -20;
+    return 0;
+
+}
+    
+short Doc::GetRightMargin( const std::type_info *elementType )
+{
+    if (typeid(Clef) == *elementType) return 20;
+    else if (typeid(KeySig) == *elementType)  return 30;
+    else if (typeid(Mensur) == *elementType) return 30;
+    else if (typeid(MeterSig) == *elementType) return 30;
+    else if (typeid(Barline) == *elementType) return 0;
+    else if (typeid(MRest) == *elementType) return 0;
+    else if (typeid(MultiRest) == *elementType) return 0;
+    //else if (typeid(Note) == *elementType) return 10;
+    return 15;
+}
+
 
 Page *Doc::SetDrawingPage( int pageIdx )
 {
@@ -279,6 +345,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     // Since  m_env.m_interlDefin stays the same, it useless to do it
     // every time for now.
     
+    m_drawingUnit = this->m_env.m_unit;
+    
 	m_drawingBeamMaxSlope = this->m_env.m_beamMaxSlope;
 	m_drawingBeamMinSlope = this->m_env.m_beamMinSlope;
 	m_drawingBeamMaxSlope /= 100;
@@ -290,7 +358,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingGraceRatio[1] = this->m_env.m_graceDen;
     
     // half of the space between two lines
-    m_drawingHalfInterl[0] = m_env.m_interlDefin/2;
+    m_drawingHalfInterl[0] = m_env.m_unit;
     // same for small staves
     m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
@@ -304,21 +372,19 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
     m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
     
-    m_drawingStep1 = m_drawingHalfInterl[0];
-    m_drawingStep2 = m_drawingStep1 * 3;
-    m_drawingStep3 = m_drawingStep1 * 6;
-    
     // values for beams
-    m_drawingBeamWidth[0] = this->m_env.m_interlDefin / 2;
-    m_drawingBeamWhiteWidth[0] = this->m_env.m_interlDefin / 4;
+    m_drawingBeamWidth[0] = this->m_env.m_unit;
+    m_drawingBeamWhiteWidth[0] = this->m_env.m_unit / 2;
     m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
-    m_drawingFontHeight = CalcLeipzigFontSize();
+    m_drawingFontHeight = CalcMusicFontSize();
+    /*
     m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
 	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
     m_drawingFontHeightAscent[1][0] = (m_drawingFontHeightAscent[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
 	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
+    */
     
     m_drawingFontSize[0][0] = m_drawingFontHeight;
     m_drawingFontSize[0][1] = (m_drawingFontSize[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
@@ -339,7 +405,13 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingVerticalUnit2[1] = (float)m_drawingInterl[1]/8;
     
     float glyph_size;
-    glyph_size = (LEIPZIG_HALF_NOTE_HEAD_WIDTH * (float)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    Glyph *glyph;
+    int x, y, w, h;
+    glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+
+    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
     m_drawingNoteRadius[0][0] = ceil(glyph_size / 2);
     m_drawingNoteRadius[0][1] = (m_drawingNoteRadius[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingNoteRadius[1][0] = (m_drawingNoteRadius[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
@@ -350,14 +422,20 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingLedgerLine[1][0] = (m_drawingLedgerLine[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
     m_drawingLedgerLine[1][1] = (m_drawingLedgerLine[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     
-    glyph_size = round(LEIPZIG_WHOLE_NOTE_HEAD_WIDTH * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+    glyph = Resources::GetGlyph(SMUFL_E0A2_noteheadWhole);
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
     m_drawingLedgerLine[0][2] = (int)(glyph_size * .66);
     m_drawingLedgerLine[1][2] = (m_drawingLedgerLine[0][2] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     
     m_drawingBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
     m_drawingBrevisWidth[1] = (m_drawingBrevisWidth[0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    
-    glyph_size = round(LEIPZIG_SHARP_WIDTH * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
+ 
+    glyph = Resources::GetGlyph(SMUFL_E262_accidentalSharp);
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
     m_drawingAccidWidth[0][0] = glyph_size;
     m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
@@ -366,44 +444,16 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	return m_drawingPage;
 }
 
-int Doc::CalcLeipzigFontSize( )
+int Doc::CalcMusicFontSize( )
 {
-    // We just have the Leipzig font for now
-    return round((double)m_env.m_interlDefin * LEIPZIG_UNITS_PER_EM / LEIPZIG_WHOLE_NOTE_HEAD_HEIGHT);
-}
-
-void Doc::UpdateFontValues() 
-{	
-	if ( !m_drawingLeipzigFont.FromString( Resources::GetMusicFontDescStr() ) )
-        LogWarning( "Impossible to load font 'Leipzig'" );
-	
-	//LogMessage( "Size %d, Family %d, Style %d, Weight %d, Underline %d, Face %s, Desc %s",
-	//	m_drawingLeipzigFont.GetPointSize(),
-	//	m_drawingLeipzigFont.GetFamily(),
-	//	m_drawingLeipzigFont.GetStyle(),
-	//	m_drawingLeipzigFont.GetWeight(),
-	//	m_drawingLeipzigFont.GetUnderlined(),
-	//	m_drawingLeipzigFont.GetFaceName().c_str(),
-	//	m_drawingLeipzigFont.GetNativeFontInfoDesc().c_str());
-    
-	m_drawingFonts[0][0] = m_drawingLeipzigFont;
-    m_drawingFonts[0][1] = m_drawingLeipzigFont;
-    m_drawingFonts[1][0] = m_drawingLeipzigFont;
-    m_drawingFonts[1][1] = m_drawingLeipzigFont;
-	
-	// Lyrics
-	if ( !m_drawingLyricFont.FromString( Resources::GetLyricFontDescStr() ) )
-		LogWarning( "Impossible to load font for the lyrics" );
-    
-	m_drawingLyricFonts[0] = m_drawingLyricFont;
-    m_drawingLyricFonts[1] = m_drawingLyricFont;
+    return m_env.m_unit * 8;
 }
     
 int Doc::GetAdjustedDrawingPageHeight()
 {
     assert( m_drawingPage );
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageTopMar * 2);
+    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
 }
 
     
@@ -411,7 +461,7 @@ int Doc::GetAdjustedDrawingPageWidth()
 {
     assert( m_drawingPage );
     int contentWidth = m_drawingPage->GetContentWidth();
-    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar);
+    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;;
 }
 
 int Doc::Save( FileOutputStream *output )

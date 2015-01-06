@@ -10,6 +10,8 @@
 #define __VRV_DC_H__
 
 #include <string>
+#include <stack>
+#include <assert.h>
 
 namespace vrv {
 
@@ -53,6 +55,59 @@ class MusRect;
 class FontMetricsInfo;
 class DocObject;
 class View;
+    
+// ---------------------------------------------------------------------------
+// Pen/Brush
+// ---------------------------------------------------------------------------
+
+/**
+ * These classes are used for storing drawing style parameters during SVG and 
+ * bounding box engraving.
+ */
+
+class Pen{
+    
+public:
+    Pen()
+    : m_penColour(0), m_penWidth(0), m_penOpacity(0.0)
+    { }
+    Pen(int colour, int width, float opacity)
+    : m_penColour(colour), m_penWidth(width), m_penOpacity(opacity)
+    { }
+    
+    int GetColour() const { return m_penColour; }
+    void SetColour(int colour) { m_penColour = colour; }
+    int GetWidth() const { return m_penWidth; }
+    void SetWidth (int width) { m_penWidth = width; }
+    float GetOpacity() const { return m_penOpacity; }
+    void SetOpacity (float opacity) { m_penOpacity = opacity; }
+    
+public:
+    int m_penColour, m_penWidth;
+    float m_penOpacity;
+    
+};
+
+class Brush{
+    
+public:
+    Brush()
+    : m_brushColour(0), m_brushOpacity(0.0)
+    { }
+    Brush(int colour, float opacity)
+    : m_brushColour(colour), m_brushOpacity(opacity)
+    { }
+    
+    int GetColour() const { return m_brushColour; }
+    void SetColour(int colour) { m_brushColour = colour; }
+    float GetOpacity() const { return m_brushOpacity; }
+    void SetOpacity(float opacity) { m_brushOpacity = opacity; }
+    
+public:
+    int m_brushColour;
+    float m_brushOpacity;
+};
+
 
 // ---------------------------------------------------------------------------
 // DeviceContext
@@ -72,93 +127,105 @@ class View;
 class DeviceContext
 {
 public:
-
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
     DeviceContext () { m_correctMusicAscent = true; m_drawingBoundingBoxes = false;};
     virtual ~DeviceContext() {};
+    ///@}
     
-    // Setters
-    
-    virtual void SetBrush( int colour, int style = AxSOLID ) = 0;
-    
+    /**
+     * @name Setters
+     * Non virtual methods cannot be overriden and manage the Pen and Brush stacks
+     */
+    ///@{
+    void SetBrush( int colour, int opacity );
+    void SetPen( int colour, int width, int opacity );
+    void ResetBrush( );
+    void ResetPen( );
     virtual void SetBackground( int colour, int style = AxSOLID ) = 0;
-    
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) = 0;
-    
     virtual void SetBackgroundMode( int mode ) = 0;
-    
-    virtual void SetPen( int colour, int width = 1, int style = AxSOLID ) = 0;
-    
     virtual void SetFont( FontMetricsInfo *font_info ) = 0;
-
     virtual void SetTextForeground( int colour ) = 0;
-    
     virtual void SetTextBackground( int colour ) = 0;
-    
-    virtual void ResetBrush( ) = 0;
-    
-    virtual void ResetPen( ) = 0;
-    
     virtual void SetLogicalOrigin( int x, int y ) = 0;
+    ///}
     
-    // Getters 
-    
+    /**
+     * @name Getters
+     */
+    ///@{
     virtual void GetTextExtent( const std::string& string, int *w, int *h ) = 0;
-    
+    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h ) = 0;
     virtual MusPoint GetLogicalOrigin( ) = 0;
-    
     virtual bool CorrectMusicAscent( ) { return m_correctMusicAscent; };
+    ///@}
 
-    // Drawing methods
-    
+    /**
+     * @name Drawing methods
+     */
+    ///@{
     virtual void DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6]) = 0;
-    
     virtual void DrawCircle(int x, int y, int radius) = 0;
-    
     virtual void DrawEllipse(int x, int y, int width, int height) = 0;
-    
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end) = 0;
-    
     virtual void DrawLine(int x1, int y1, int x2, int y2) = 0;
-    
     virtual void DrawPolygon(int n, MusPoint points[], int xoffset = 0, int yoffset = 0, int fill_style = AxODDEVEN_RULE) = 0;
-    
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
-    
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle) = 0;
-    
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
-    
     virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT ) = 0;
-    
-    virtual void DrawMusicText(const std::string& text, int x, int y) = 0;
-    
+    virtual void DrawMusicText(const std::wstring& text, int x, int y) = 0;
     virtual void DrawSpline(int n, MusPoint points[]) = 0;
-    
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) = 0;
+    ///@}
     
-    // Method for starting and ending a graphic - for example for grouping shapes in <g></g> in SVG
-    
+    /**
+     * @name Method for starting and ending a graphic
+     * For example, the method can be used for grouping shapes in <g></g> in SVG
+     */
+    ///@{
     virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId ) = 0;
-    
     virtual void EndGraphic( DocObject *object, View *view  ) = 0;
+    ///@}
     
+    /**
+     * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
+     * The methods can be used to the output together, for example for a Beam
+     */
+    ///@{
+    virtual void ResumeGraphic( DocObject *object, std::string gId ) = 0;
+    virtual void EndResumedGraphic( DocObject *object, View *view  ) = 0;
+    ///@}
+ 
+    /**
+     * @name Method for starting and ending page
+     */
+    ///@{
     virtual void StartPage( ) = 0;
-    
     virtual void EndPage( ) = 0;
+    ///@}
     
-    // Colour conversion method
-    
+    /** Colour conversion method **/
     static int RGB2Int( char red, char green, char blue ) { return (red << 16 | green << 8 | blue); };
 
-    
-    // debug bounding boxes?
+    /**
+     * @name Getter and setter for drawing bounding box option (debug)
+     */
+    ///@{
     virtual void SetDrawBoundingBoxes(bool b) {m_drawingBoundingBoxes = b;};
     virtual bool GetDrawBoundingBoxes() {return m_drawingBoundingBoxes;};
+    ///@}
     
 protected:
     
-    bool m_correctMusicAscent; // specify if the ascent has to be correct when view the Leipzig font (true wxDC, false SVG)
+    bool m_correctMusicAscent; // specify if the ascent has to be correct when view the music font (true wxDC, false SVG)
     bool m_drawingBoundingBoxes;
+    
+    std::stack<Pen> m_penStack;
+    std::stack<Brush> m_brushStack;
 };
 
 // ---------------------------------------------------------------------------
@@ -185,7 +252,7 @@ public:
     }
     virtual ~FontMetricsInfo() {};
     
-        // accessors and modifiers for the font elements
+    // accessors and modifiers for the font elements
     int GetPointSize() { return pointSize; }
     int GetStyle() { return style; };
     int GetWeight() { return weight; }
@@ -343,7 +410,7 @@ public:
 public:
     int x, y, width, height;
 };
-
+    
 } // namespace vrv
 
 #endif // __AX_DC_H__

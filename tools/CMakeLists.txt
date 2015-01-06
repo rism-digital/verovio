@@ -9,51 +9,52 @@ add_definitions(-g)
 include_directories(/usr/local/include ../include/vrv ../tinyxml ../libmei)
 
 add_executable (verovio 
-	main.cpp 
-	../src/accid.cpp 
+	main.cpp
+	../src/accid.cpp
 	../src/aligner.cpp
 	../src/att.cpp
-	../src/barline.cpp 
-	../src/bboxdevicecontext.cpp 
+	../src/barline.cpp
+	../src/bboxdevicecontext.cpp
 	../src/beam.cpp
-	../src/clef.cpp 
+	../src/clef.cpp
 	../src/custos.cpp
-	../src/devicecontext.cpp 
-	../src/doc.cpp 	
-	../src/dot.cpp 
-	../src/durationinterface.cpp 
-	../src/io.cpp 
+	../src/devicecontext.cpp
+	../src/doc.cpp	
+	../src/dot.cpp
+	../src/durationinterface.cpp
+	../src/editorial.cpp
+	../src/glyph.cpp
+	../src/io.cpp
 	../src/iodarms.cpp
-	../src/iomei.cpp 
-	../src/iopae.cpp 
+	../src/iomei.cpp
+	../src/iopae.cpp
 	../src/iomusxml.cpp
 	../src/keysig.cpp
 	../src/layer.cpp
-	../src/layerelement.cpp 
-	../src/leipzigbbox.cpp
-	../src/mensur.cpp 
-	../src/metersig.cpp 
+	../src/layerelement.cpp
+	../src/mensur.cpp
+	../src/metersig.cpp
 	../src/measure.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
-	../src/note.cpp 
-	../src/object.cpp 
-	../src/page.cpp 
-	../src/pitchinterface.cpp 
-	../src/positioninterface.cpp 
-	../src/view.cpp 
-	../src/view_beam.cpp  
-	../src/view_element.cpp 
-	../src/view_graph.cpp 
+	../src/note.cpp
+	../src/object.cpp
+	../src/page.cpp
+	../src/pitchinterface.cpp
+	../src/positioninterface.cpp
+	../src/view.cpp
+	../src/view_beam.cpp
+	../src/view_element.cpp
+	../src/view_graph.cpp
 	../src/view_page.cpp
 	../src/view_tuplet.cpp
-	../src/rest.cpp 
+	../src/rest.cpp
 	../src/scoredef.cpp
 	../src/slur.cpp
-	../src/staff.cpp 
-	../src/svgdevicecontext.cpp 
+	../src/staff.cpp
+	../src/svgdevicecontext.cpp
 	../src/syl.cpp
-	../src/system.cpp 
+	../src/system.cpp
 	../src/tie.cpp
 	../src/toolkit.cpp
 	../src/tuplet.cpp
@@ -80,4 +81,4 @@ add_executable (verovio
 	)
 
 install (TARGETS verovio DESTINATION /usr/local/bin)
-INSTALL(DIRECTORY ../data/svg/ DESTINATION share/verovio/svg FILES_MATCHING PATTERN "*.xml")
+INSTALL(DIRECTORY ../data/ DESTINATION share/verovio FILES_MATCHING PATTERN "*.xml")

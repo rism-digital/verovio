@@ -10,6 +10,7 @@
 #define __VRV_H__
 
 #include <cstring>
+#include <map>
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>
@@ -17,6 +18,7 @@
 
 namespace vrv {
     
+class Glyph;
 class Object;
     
 bool IsNote( Object *object );
@@ -119,20 +121,20 @@ public:
     ///@{
     static std::string GetPath( ) { return m_path; };
     static void SetPath( std::string path ) { m_path = path; };
-    static std::string GetMusicFontDescStr( ) { return m_musicFontDesc; };
-    static void SetMusicFontDescStr( std::string lyricFontDesc ) { m_musicFontDesc = lyricFontDesc; };
-    static std::string GetLyricFontDescStr( ) { return m_lyricFontDesc; };
-    static void SetLyricFontDescStr( std::string lyricFontDesc ) { m_lyricFontDesc = lyricFontDesc; };
+    static bool InitFont( );
+    static bool SetFont( std::string fontName );
+    static Glyph* GetGlyph( wchar_t smuflCode );
     ///@}
+    
+private:
+    static bool LoadFont(std::string fontName);
     
     
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static std::string m_path;
-    /** The FontInfo string for the music font */
-    static std::string m_musicFontDesc;
-    /** The FontInfo string for the default lyric font */
-    static std::string m_lyricFontDesc;
+    /** */
+    static std::map<wchar_t, Glyph> m_font;
 };
 
 
@@ -153,8 +155,8 @@ public:
     
     
 public:
-    /** The reference interline definition  */
-    int m_interlDefin;
+    /** The unit (1⁄2 of the distance between staff lines) **/
+    int m_unit;
     /** The landscape paper orientation flag */
     char m_landscape;
     /** The staff line width */

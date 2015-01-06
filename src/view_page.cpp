@@ -16,10 +16,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "beam.h"
 #include "barline.h"
 #include "clef.h"
 #include "doc.h"
+#include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -30,6 +32,7 @@
 #include "staff.h"
 #include "system.h"
 #include "slur.h"
+#include "smufl.h"
 #include "tie.h"
 #include "tuplet.h"
 
@@ -85,9 +88,11 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 {
 	assert( system ); // other asserted before
     
-    Measure *measure;
+    Measure *measure = NULL;
+    ScoreDef *scoreDef = NULL;
+    EditorialElement *editorialElement = NULL;
     
-    dc->StartGraphic( system, "system", system->GetUuid() );
+    dc->StartGraphic( system, "", system->GetUuid() );
     
     
     if ( system->m_yAbs == VRV_UNSET ) {
@@ -101,23 +106,25 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         system->SetDrawingX( system->m_xAbs );
         system->SetDrawingY( system->m_yAbs );
     }
-    
-    
-    /*for (i = 0; i < (int)system->GetMeasureCount(); i++)
-	{
-		measure = dynamic_cast<Measure*>(system->m_children[i]);
-        if (!measure) {
-            continue;
-        }
-        DrawMeasure( dc , measure, system );
-	}*/
 
     Object* current;
     for (current = system->GetFirst( ); current; current = system->GetNext( ) )
 	{
 		measure = dynamic_cast<Measure*>(current);
+        scoreDef = dynamic_cast<ScoreDef*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
         if (measure) {
             DrawMeasure( dc , measure, system );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, system );
+        }
+        // scoreDef are not drawn directly, but anything else should not be possible
+        else if (scoreDef) {
+            m_drawingScoreDef.Replace(scoreDef);
+        }
+        else {
+            assert(false);
         }
 	}
 
@@ -126,7 +133,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
     // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
-    measure  = dynamic_cast<Measure*>(system->GetFirstChild( &typeid(Measure) ) );
+    measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
         // NULL for the Barline parameters indicates that we are drawing the scoreDef
         DrawScoreDef( dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL );
@@ -134,7 +141,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
         if ( (measure->GetN() != VRV_UNSET) && (measure->GetN() > 1) ) {
-            dc->DrawMusicText( IntToObliqueFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->m_drawingStaffSize[0]  * 2 / 3) );
+            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->m_drawingStaffSize[0]  * 2 / 3) );
         }
     }
     
@@ -149,7 +156,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     // we need at least one measure to be able to draw the groups - we need access to the staff elements,
     assert( measure );
     
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp*>(scoreDef->GetFirstChild( &typeid(StaffGrp) ) );
+    StaffGrp *staffGrp = dynamic_cast<StaffGrp*>(scoreDef->FindChildByType( &typeid(StaffGrp) ) );
     if ( !staffGrp ) {
         return;
     }
@@ -164,7 +171,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     }
     else{
         barLine->SetDrawingX( x );
-        dc->StartGraphic( barLine, "barLine", barLine->GetUuid() );
+        dc->StartGraphic( barLine, "", barLine->GetUuid() );
         DrawBarlines( dc, measure, staffGrp, barLine );
         dc->EndGraphic( barLine, this );
     }
@@ -192,8 +199,10 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     }
     
     // Get the corresponding staff looking at the previous (or first) measure
-    Staff *first = measure->GetStaffWithNo( firstDef->GetN() );
-    Staff *last = measure->GetStaffWithNo( lastDef->GetN() );
+    AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
+    Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
+    AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
+    Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, 1));
     
     if (!first || !last ) {
         LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN() );
@@ -243,15 +252,18 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         
         if (!staffDef) {
             LogDebug("Should be staffDef in View::DrawStaffDefLabels");
-            return;
+            ++iter;
+            continue;
         }
         
-        Staff *staff = measure->GetStaffWithNo( staffDef->GetN() );
-        System *system = dynamic_cast<System*>(measure->m_parent);
+        AttCommonNComparison comparison( &typeid(Staff), staffDef->GetN() );
+        Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ));
+        System *system = dynamic_cast<System*>(measure->GetFirstParent( &typeid(System) ) );
         
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
-            return;
+            ++iter;
+            continue;
         }
         
         std::string label = staffDef->GetLabel();
@@ -278,33 +290,19 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
 
 void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
-	int xg, xd, yg, yd, ecart, centre;
-
-    dc->SetPen( m_currentColour , 2, AxSOLID );
-    dc->SetBrush( m_currentColour , AxTRANSPARENT );
+    int x1, x2;
     
-    ecart = m_doc->m_drawingBeamWidth[0] + m_doc->m_drawingBeamWhiteWidth[0];
-    centre = x - ecart;
+    x2 = x - m_doc->m_drawingBeamWidth[0];
+    x1 = x2 - m_doc->m_drawingBeamWidth[0];
     
-    xg = centre - ecart*2;
-    xd = centre + ecart*2;
+    DrawSmuflCode( dc, x1, y1,SMUFL_E003_bracketTop, staffSize, false );
+    DrawSmuflCode( dc, x1, y2,SMUFL_E004_bracketBottom, staffSize, false );
     
-    yg = y1 + m_doc->m_drawingInterl[ staffSize ] * 2;
-    yd = y1;
-    SwapY( &yg, &yd );
-    dc->DrawEllipticArc( ToDeviceContextX(xg), ToDeviceContextY(yg), ToDeviceContextX(xd-xg), ToDeviceContextX(yg-yd), 90, 40 );
-    
-    yg = y2;
-    yd = y2 - m_doc->m_drawingInterl[ staffSize ] * 2;
-    SwapY( &yg, &yd );
-    dc->DrawEllipticArc( ToDeviceContextX(xg), ToDeviceContextY(yg), ToDeviceContextX(xd-xg), ToDeviceContextX(yg-yd), 320, 271 );
-    
-    dc->ResetPen();
-    dc->ResetBrush();
-    
-    xg = x - (m_doc->m_drawingBeamWhiteWidth[0]);
-    // determine le blanc entre barres grosse et mince
-    DrawFullRectangle(dc, xg -  m_doc->m_drawingBeamWidth[0] , y1, xg, y2 );
+    // adjust to top and bottom position so we make sure the is not white space between
+    // the glyphs and the line
+    y1 += m_doc->m_env.m_stemWidth;
+    y2 -= m_doc->m_env.m_stemWidth;
+    DrawFullRectangle(dc, x1 , y1, x2, y2 );
 
 	return;
 }
@@ -317,26 +315,26 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     
 	assert( dc ); // DC cannot be NULL
 
+    int penWidth = m_doc->m_env.m_stemWidth;
+    y1 -= penWidth;
+    y2 += penWidth;
 	SwapY( &y1, &y2 );
 	
 	int ymed, xdec, fact;
     
-    dc->SetPen( m_currentColour , 1, AxSOLID );
-    dc->SetBrush( m_currentColour , AxSOLID );
-    
 	x -= m_doc->m_drawingBeamWhiteWidth[ staffSize ];  // distance entre barre et debut accolade
     
 	ymed = (y1 + y2) / 2;
-	fact = m_doc->m_drawingBeamWidth[ staffSize ]-1 + m_doc->m_env.m_barlineWidth;
+	fact = m_doc->m_drawingBeamWidth[ staffSize ] + m_doc->m_env.m_stemWidth;
 	xdec = ToDeviceContextX(fact);
     
 	points[0].x = ToDeviceContextX(x);
 	points[0].y = ToDeviceContextY(y1);
-	points[1].x = ToDeviceContextX(x - m_doc->m_drawingStep2);
+	points[1].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ]*2);
 	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*3);
-	points[3].x = ToDeviceContextX(x - m_doc->m_drawingStep1*2);
+	points[3].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ] );
 	points[3].y = ToDeviceContextY(ymed);
-	points[2].x = ToDeviceContextX(x + m_doc->m_drawingStep1);
+	points[2].x = ToDeviceContextX(x + m_doc->m_drawingUnit);
 	points[2].y = points[3].y + ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]);
     
     new_coords[0][0] = points[1].x;
@@ -359,6 +357,9 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     new_coords[1][3] = points[2].y;
     new_coords[1][4] = points[3].x;
     new_coords[1][5] = points[3].y;
+    
+    dc->SetPen( m_currentColour, std::max( 1, penWidth ), AxSOLID );
+    dc->SetBrush( m_currentColour , AxSOLID );
     
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y1), new_coords[0], new_coords[1]);
     
@@ -414,7 +415,8 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 DrawBarlines( dc, measure, childStaffGrp, barLine );
             }
             else if ( childStaffDef ) {
-                Staff *staff = measure->GetStaffWithNo( childStaffDef->GetN() );
+                AttCommonNComparison comparison( &typeid(Staff), childStaffDef->GetN() );
+                Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ) );
                 if (!staff ) {
                     LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
                     continue;
@@ -446,8 +448,10 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         }
         
         // Get the corresponding staff looking at the previous (or first) measure
-        Staff *first = measure->GetStaffWithNo( firstDef->GetN() );
-        Staff *last = measure->GetStaffWithNo( lastDef->GetN() );
+        AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
+        Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
+        AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
+        Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, 1));
         
         if (!first || !last ) {
             LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN() );
@@ -467,7 +471,8 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             for (i = 0; i < staffGrp->GetChildCount(); i++) {
                 childStaffDef = dynamic_cast<StaffDef*>(staffGrp->GetChild( i ));
                 if ( childStaffDef ) {
-                    Staff *staff = measure->GetStaffWithNo( childStaffDef->GetN() );
+                    AttCommonNComparison comparison( &typeid(Staff), childStaffDef->GetN() );
+                    Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff ) {
                         LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
                         continue;
@@ -587,9 +592,12 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 {
 	assert( dc ); // DC cannot be NULL
     
+    Staff *staff = NULL;
+    EditorialElement *editorialElement = NULL;
+    
     // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure if un-measured music
     if ( measure->IsMeasuredMusic()) {
-        dc->StartGraphic( measure, "measure", measure->GetUuid() );
+        dc->StartGraphic( measure, "", measure->GetUuid() );
     }
     
     // Here we set the appropriate y value to be used for drawing
@@ -605,13 +613,20 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
         measure->SetDrawingX( measure->m_xAbs );
     }
     
-	Staff *staff = NULL;
-	int j;
-    
-	for(j = 0; j < measure->GetStaffCount(); j++)
-	{       
-		staff = static_cast<Staff*>(measure->m_children[j]);
-		DrawStaff( dc, staff, measure, system );
+    Object* current;
+    for (current = measure->GetFirst( ); current; current = measure->GetNext( ) )
+    {
+        staff = dynamic_cast<Staff*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (staff) {
+            DrawStaff( dc, staff, measure, system );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, measure, system );
+        }
+        else {
+            assert(false);
+        }
     }
 
     if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
@@ -685,7 +700,10 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 {
 	assert( dc ); // DC cannot be NULL
     
-    dc->StartGraphic( staff, "staff", staff->GetUuid());
+    Layer *layer = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    dc->StartGraphic( staff, "", staff->GetUuid());
     
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
@@ -704,16 +722,23 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     }
     
     DrawStaffLines( dc, staff, measure, system );
-        
-	Layer *layer = NULL;
-	int j;
     
-	for(j = 0; j < staff->GetLayerCount(); j++)
-	{
-		layer = dynamic_cast<Layer*>(staff->m_children[j]);
-		DrawLayer( dc, layer, staff, measure );
-	}
-    
+    Object* current;
+    for (current = staff->GetFirst( ); current; current = staff->GetNext( ) )
+    {
+        layer = dynamic_cast<Layer*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (layer) {
+            DrawLayer( dc, layer, staff, measure );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, staff, measure );
+        }
+        else {
+            assert(false);
+        }
+    }
+
     dc->EndGraphic( staff, this );
 }
     
@@ -838,35 +863,41 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 	assert( dc ); // DC cannot be NULL
 
 	LayerElement *element = NULL;
-	int j;
+    EditorialElement *editorialElement = NULL;
     
-    
-    dc->StartGraphic( layer, "layer", layer->GetUuid());
+    dc->StartGraphic( layer, "", layer->GetUuid());
     
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
     
     if (layer->GetDrawingClef()) {
-        DrawElement(dc, layer->GetDrawingClef(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingClef(), layer, staff, measure);
     }
     if (layer->GetDrawingKeySig()) {
-        DrawElement(dc, layer->GetDrawingKeySig(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
     }
     if (layer->GetDrawingMensur()) {
-        DrawElement(dc, layer->GetDrawingMensur(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
     }
     if (layer->GetDrawingMeterSig()) {
-        DrawElement(dc, layer->GetDrawingMeterSig(), layer, measure, staff);
+        DrawElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
     }
-    
-	for(j = 0; j < layer->GetElementCount(); j++)
-	{
-		element = dynamic_cast<LayerElement*>(layer->m_children[j]);
-        
-        if ( element ) {
-            DrawElement( dc, element, layer, measure, staff );
+
+    Object* current;
+    for (current = layer->GetFirst( ); current; current = layer->GetNext( ) )
+    {
+        element = dynamic_cast<LayerElement*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (element) {
+            DrawElement( dc, element, layer, staff, measure );
         }
-	}
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, layer, staff, measure );
+        }
+        else {
+            assert(false);
+        }
+    }
     
     // first draw the beams
     DrawLayerList(dc, layer, staff, measure, &typeid(Beam) );
@@ -899,21 +930,158 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
             Beam *beam = dynamic_cast<Beam*>(element);
+            dc->ResumeGraphic(beam, beam->GetUuid());
             DrawBeam( dc, layer, beam, staff );
+            dc->EndResumedGraphic(beam, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
+            dc->ResumeGraphic(tuplet, tuplet->GetUuid());
             DrawTuplet( dc, tuplet, layer, staff );
+            dc->EndResumedGraphic(tuplet, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
+            // Not sure about ReStart and ReEnd Tie and Slur
             DrawTie( dc, element, layer, staff, measure );
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
+            // Not sure about ReStart and ReEnd Tie and Slur
             DrawTie( dc, element, layer, staff, measure );
         }
     }
 }
+    
 
+//----------------------------------------------------------------------------
+// View - Editorial
+//----------------------------------------------------------------------------
+
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_SYSTEM );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    
+    Measure *measure = NULL;
+    ScoreDef *scoreDef = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        measure = dynamic_cast<Measure*>(current);
+        scoreDef = dynamic_cast<ScoreDef*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (measure) {
+            DrawMeasure( dc , measure, system );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, system );
+        }
+        // scoreDef are not drawn directly, but anything else should not be possible
+        else if (scoreDef) {
+            m_drawingScoreDef.Replace( scoreDef );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_MEASURE );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    
+    Staff *staff = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        staff = dynamic_cast<Staff*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (staff) {
+            DrawStaff( dc , staff, measure, system );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, measure, system );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+    
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_STAFF );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    
+    Layer *layer = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        layer = dynamic_cast<Layer*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (layer) {
+            DrawLayer( dc , layer, staff, measure );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, staff, measure );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+
+void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_LAYER );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    
+    LayerElement *layerElement = NULL;
+    EditorialElement *editorialElement = NULL;
+    
+    Object* current;
+    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    {
+        layerElement = dynamic_cast<LayerElement*>(current);
+        editorialElement = dynamic_cast<EditorialElement*>(current);
+        if (layerElement) {
+            DrawElement( dc, layerElement, layer, staff, measure );
+        }
+        else if (editorialElement) {
+            DrawEditorialElement( dc , editorialElement, layer, staff, measure );
+        }
+        else {
+            assert(false);
+        }
+    }
+    
+    dc->EndGraphic( element, this );
+}
+    
 } // namespace vrv
 
 

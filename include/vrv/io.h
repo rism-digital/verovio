@@ -86,10 +86,16 @@ public:
     void IgnoreLayoutInformation() { m_ignoreLayoutInformation = true; };
     
     /**
-     * Getter for layoutInformation flag the is set to true during import
+     * Getter for layoutInformation flag that is set to true during import
      * if layout information is found (and not to be ignored).
      */
     bool HasLayoutInformation() { return m_hasLayoutInformation; };
+    
+    /**
+     * Getter for <app> level flag that is set to true during import
+     * if <measure> within editorial markup are found
+     */
+    bool HasMeasureWithinEditoMarkup() { return m_hasMeasureWithinEditMarkup; };
     
     /**
      * Set XPath query for <rdg> (MEI only)
@@ -113,6 +119,12 @@ protected:
      * file contains <pb> and <sb>. This will stay wrong with PAE import
      */
     bool m_hasLayoutInformation;
+    
+    /**
+     * Becomes true if <measure> are included within editorial markup.
+     * If this is true, the only continuous layout will be available.
+     */
+    bool m_hasMeasureWithinEditMarkup;
     
     /**
      * If set to true, the layout information found during the import

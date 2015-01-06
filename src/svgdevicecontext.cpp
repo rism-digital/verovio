@@ -11,24 +11,21 @@
 //----------------------------------------------------------------------------
 
 #include <fstream>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "leipzigbbox.h"
+#include "glyph.h"
 #include "view.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
-#include <math.h>
-
 namespace vrv {
 
 #define space " "
 #define semicolon ";"
- 
-//#include "app/axapp.h"
 
 extern "C" {
 static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
@@ -44,7 +41,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     DeviceContext()
 {	
 	
-    m_correctMusicAscent = false; // do not correct the ascent in the Leipzig font
+    m_correctMusicAscent = false; // do not correct the ascent in the music font
 
     m_width = width;
     m_height = height;
@@ -56,16 +53,22 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
-
-    m_graphics = 0;
-    m_indents = 1;
     
-    m_leipzig_glyphs.clear();
+    m_smufl_glyphs.clear();
     
     m_committed = false;
     
-    m_svg.str("");
-    m_svg.clear();
+    //create the initial SVG element
+    //width and height need to be set later; these are taken care of in "commit"
+    m_svgNode = m_svgDoc.append_child("svg");
+    m_svgNode.append_attribute( "version" ) = "1.1";
+    m_svgNode.append_attribute( "xmlns" ) = "http://www.w3.org/2000/svg";
+    m_svgNode.append_attribute( "xmlns:xlink" ) = "http://www.w3.org/1999/xlink";
+    m_svgNode.append_attribute( "overflow" ) = "visible";
+    
+    //start the stack
+    m_svgNodeStack.push_back(m_svgNode);
+    m_currentNode = m_svgNode;
     
     m_outdata.clear();
 }
@@ -87,66 +90,82 @@ bool SvgDeviceContext::CopyFileToStream(const std::string& filename, std::ostrea
 
 
 
-void SvgDeviceContext::Commit( bool xml_tag ) {
-
+void SvgDeviceContext::Commit( bool xml_declaration ) {
+    
     if (m_committed) {
         return;
     }
     
-    int i;
-    // close unclosed graphics, just in case
-    for (i = m_graphics; i < 0; m_graphics-- ) {
-        WriteLine("/*- SvgDeviceContext::Flush - Unclosed graphic */");
-        WriteLine("</g>");
-        m_indents--;
-    }
-    m_indents = 0;
-    WriteLine("</svg>\n") ;
-
+    //take care of width/height once userScale is updated
+    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
+    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
+    
     // header
-    std::string s;
-    if ( xml_tag ) {
-        s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n";
-    }
-    
-    s += StringFormat ( "<svg width=\"%dpx\" height=\"%dpx\"", (int)((double)m_width * m_userScaleX), (int)((double)m_height * m_userScaleY));
-    s += " version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\"  xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
-    
-    m_outdata << s;
-    
-    if (m_leipzig_glyphs.size() > 0)
+    if (m_smufl_glyphs.size() > 0)
     {
-        m_outdata << "\t<defs>\n";
         
+        pugi::xml_node defs = m_svgNode.prepend_child( "defs" );
+        pugi::xml_document sourceDoc;
+        
+        //for each needed glyph
         std::vector<std::string>::const_iterator it;
-        for(it = m_leipzig_glyphs.begin(); it != m_leipzig_glyphs.end(); ++it)
+        for(it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it)
         {
-            m_outdata << "\t\t";
-            CopyFileToStream( Resources::GetPath() + "/svg/" + (*it) + ".xml", m_outdata );
+            //load the XML file that contains it as a pugi::xml_document
+            std::ifstream source( (*it).c_str() );
+            sourceDoc.load(source);
+            
+            //copy all the nodes inside into the master document
+            for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling())
+            {
+                defs.append_copy(child);
+            }
         }
-        m_outdata << "\t</defs>\n";
     }
-    // finally concatenate the svg
-    m_outdata << m_svg.str();
+    
+    unsigned int output_flags = pugi::format_default | pugi::format_no_declaration;
+    if (xml_declaration) {
+        //edit the xml declaration
+        output_flags = pugi::format_default;
+        pugi::xml_node decl = m_svgDoc.prepend_child(pugi::node_declaration);
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
+        decl.append_attribute("standalone") = "no";
+    }
+    
+    // save the glyph data to m_outdata
+    m_svgDoc.save(m_outdata, "\t", output_flags);
+    
     m_committed = true;
-}
-
-
-void SvgDeviceContext::WriteLine( std::string string )
-{
-    std::string output;
-    output.append( m_indents, '\t' );
-    output += string + "\n"; 
-    m_svg << output;
 }
 
 
 void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std::string gId )
 {
-    WriteLine(StringFormat("<g class=\"%s\" id=\"%s\" style=\"%s %s %s %s\">", gClass.c_str(), gId.c_str(), m_penColour.c_str(), m_penStyle.c_str(),
-        m_brushColour.c_str(), m_brushStyle.c_str() ) );
-    m_graphics++;
-    m_indents++;
+    Pen currentPen = m_penStack.top();
+    Brush currentBrush = m_brushStack.top();
+    
+    std::string baseClass = object->GetClassName();
+    std::transform( baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower );
+    if (gClass.length() > 0) {
+        baseClass.append(" " + gClass);
+    }
+    
+    m_currentNode = m_currentNode.append_child("g");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute( "class" ) = baseClass.c_str();
+    m_currentNode.append_attribute( "id" ) = gId.c_str();
+    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
+}
+    
+void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
+{
+    std::string xpath = "//g[@id=\"" + gId + "\"]";
+    pugi::xpath_node selection = m_currentNode.select_single_node( xpath.c_str() );
+    if ( selection ) {
+        m_currentNode = selection.node();
+    }
+    m_svgNodeStack.push_back(m_currentNode);
 }
   
       
@@ -181,57 +200,57 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         }
         EndGraphic( object, NULL );
         
-        SetPen( AxBLACK, 1 );
+        SetPen( AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);
    
     }
-    
-    m_graphics--;
-    m_indents--;
-    WriteLine("</g>");
-}
 
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
+    
+void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
+{
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
 
 void SvgDeviceContext::StartPage( )
 {
-    // a graphic for scaling
-    WriteLine(StringFormat("<g class=\"page-scale\" transform=\"scale(%f, %f)\">", m_userScaleX, m_userScaleY ) );
-    m_graphics++;
-    m_indents++;
+    // a graphic for page (user) scaling
+    /*m_currentNode = m_currentNode.append_child("g");
+    m_currentNode.append_attribute("class") = "page-scale";
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute("transform") = StringFormat("scale(%f, %f)", m_userScaleX, m_userScaleY).c_str();*/
+    // a graphic for definition scaling
+    /*m_currentNode = m_currentNode.append_child("g");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute("class") = "definition-scale";
+    m_currentNode.append_attribute("transform") = "scale(0.1, 0.1)".c_str();*/
+    // a graphic for definition scaling
+    m_currentNode = m_currentNode.append_child("svg");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute("id") = "definition-scale";
+    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
+        m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
+
     // a graphic for the origin
-    WriteLine(StringFormat("<g class=\"page-margin\" transform=\"translate(%d, %d)\">", (int)((double)m_originX), (int)((double)m_originY) ) );
-    m_graphics++;
-    m_indents++;
+    m_currentNode = m_currentNode.append_child("g");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute("class") = "page-margin";
+    m_currentNode.append_attribute("transform") = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 }
  
        
 void SvgDeviceContext::EndPage() 
 {
     // end page-margin
-    m_graphics--;
-    m_indents--;
-    WriteLine("</g>");
+    m_svgNodeStack.pop_back();
+    // end definition-scale
+    m_svgNodeStack.pop_back();
     // end page-scale
-    m_graphics--;
-    m_indents--;
-    WriteLine("</g>");
-}
-
-        
-void SvgDeviceContext::SetBrush( int colour, int style )
-{
-    m_brushColour = "fill:#" + GetColour(colour) + semicolon;
-    switch ( style )
-    {
-        case AxSOLID :
-            m_brushStyle = "fill-opacity:1.0; ";
-            break ;
-        case AxTRANSPARENT:
-            m_brushStyle = "fill-opacity:0.0; ";
-            break ;
-        default :
-            m_brushStyle = "fill-opacity:1.0; "; // solid brush as default
-    }
+    //m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
 }
         
 void SvgDeviceContext::SetBackground( int colour, int style )
@@ -248,24 +267,7 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-        
-void SvgDeviceContext::SetPen( int colour, int width, int style )
-{
-    m_penColour = "stroke:#" + GetColour(colour)  + semicolon;
-    m_penWidth = "stroke-width:" + StringFormat("%d", width) + semicolon;
-    switch ( style )
-    {
-        case AxSOLID :
-            m_penStyle = "stroke-opacity:1.0; ";
-            break ;
-        case AxTRANSPARENT:
-            m_penStyle = "stroke-opacity:0.0; ";
-            break ;
-        default :
-            m_penStyle = "stroke-opacity:1.0; "; // solid brush as default
-    }
-}
-        
+    
 void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 {
     m_font = *font_info;
@@ -278,23 +280,13 @@ void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
 
 void SvgDeviceContext::SetTextForeground( int colour )
 {
-    m_brushColour = "fill:#" + GetColour(colour); // we use the brush colour for text
+    m_brushStack.top().SetColour(colour); // we use the brush colour for text
 }
         
 void SvgDeviceContext::SetTextBackground( int colour )
 {
     // nothing to do, we do not handle Text Background Mode
 }
-       
-void SvgDeviceContext::ResetBrush( )
-{
-    SetBrush( AxBLACK, AxSOLID );
-}
-        
-void SvgDeviceContext::ResetPen( )
-{
-    SetPen( AxBLACK, 1, AxSOLID );
-} 
 
 void SvgDeviceContext::SetLogicalOrigin( int x, int y ) 
 {
@@ -308,20 +300,31 @@ void SvgDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleY = yScale;
 }       
 
-// Copied from bBoxDc, TODO find another more generic solution
 void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
 {
-    int x, y, partial_w, partial_h;
+    LogDebug("SvgDeviceContext::GetTextExtent not implemented");
+}
     
+// Copied from bBoxDc, TODO find another more generic solution
+void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+{
+    int x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
     
-    for (unsigned int i = 0; i < string.length(); i++) {
-        
-        LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
-        
-        partial_w *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
-        partial_h *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+    
+        partial_w *= m_font.GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_font.GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
         
         *w += partial_w;
         *h += partial_h;
@@ -339,11 +342,12 @@ MusPoint SvgDeviceContext::GetLogicalOrigin( )
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
-    WriteLine( StringFormat("<path d=\"M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d\" style=\"fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width:1\" />", 
-                                x, y, // M command
-                                bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
-                                bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
-                                ) );
+    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
+       bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
+       bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
+       ).c_str();
+    pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth() ).c_str();
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
@@ -356,8 +360,12 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
 {
     int rh = height / 2;
     int rw = width  / 2;
-
-    WriteLine(StringFormat("<ellipse cx=\"%d\" cy=\"%d\" rx=\"%d\" ry=\"%d\" />", x+rw,y+rh, rw, rh ));
+    
+    pugi::xml_node ellipseChild = m_currentNode.append_child("ellipse");
+    ellipseChild.append_attribute("cx") = x+rw;
+    ellipseChild.append_attribute("cy") = y+rh;
+    ellipseChild.append_attribute("rx") = rw;
+    ellipseChild.append_attribute("ry") = rh;
 }
 
         
@@ -411,38 +419,33 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     //s.Printf ( "<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d L %d %d z ",
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye), int(xc), int(yc)  );
-
-    WriteLine( StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />",
-        int(xs), int(ys), abs(int(rx)), abs(int(ry)),
-        fArc, fSweep, int(xe), int(ye) ) );
+    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d",int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
 }
   
               
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    WriteLine( StringFormat("<path d=\"M%d %d L%d %d\" style=\"%s\" />", x1,y1,x2,y2, m_penWidth.c_str()) );
+    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1,y1,x2,y2).c_str();
+    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
  
                
 void SvgDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style)
 {
-
-    std::string s ;
-    s = "<polygon style=\"";
+    pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
     //if ( fillStyle == wxODDEVEN_RULE )
-    //    s = s + "fill-rule:evenodd; ";
+    //    polygonChild.append_attribute("style") = "fill-rule:evenodd;";
     //else
-    s += "fill-rule:nonzero; ";
-
-    s += "\" points=\"" ;
-
+    polygonChild.append_attribute("style") = "fill-rule:nonzero;";
+    
+    std::string pointsString;
     for (int i = 0; i < n;  i++)
     {
-        s += StringFormat("%d,%d ", points [i].x+xoffset, points[i].y+yoffset );
-        //CalcBoundingBox ( points [i].x+xoffset, points[i].y+yoffset);
+        pointsString += StringFormat("%d,%d ", points [i].x+xoffset, points[i].y+yoffset );
     }
-    s += "\" /> " ;
-    WriteLine(s);
+    polygonChild.append_attribute("points") = pointsString.c_str();
 }
     
             
@@ -454,7 +457,6 @@ void SvgDeviceContext::DrawRectangle(int x, int y, int width, int height)
 
 void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height, double radius)
 {
-
     std::string s ;
     
     // negative heights or widths are not allowed in SVG
@@ -467,8 +469,13 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }   
 
-    WriteLine ( StringFormat(" <rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\" rx=\"%.2g\" />", x, y, width, height, radius ) );
-
+    pugi::xml_node rectChild = m_currentNode.append_child( "rect" );
+    rectChild.append_attribute( "x" ) = x;
+    rectChild.append_attribute( "y" ) = y;
+    rectChild.append_attribute( "width" ) = width;
+    rectChild.append_attribute( "height" ) = height;
+    rectChild.append_attribute( "rx" ) = radius;
+    rectChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
 
         
@@ -479,15 +486,22 @@ void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alig
     std::string anchor;
     
     if ( alignement == RIGHT ) {
-        anchor = " text-anchor=\"end\"";
+        anchor = "end";
     }
     if ( alignement == CENTER ) {
-        anchor = " text-anchor=\"middle\"";
+        anchor = "middle";
     }
     
-    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 36px;\" %s>", x, y, 0, 0, anchor.c_str()) ;
-    s = s + text + "</text> " ;
-    WriteLine(s);
+    pugi::xml_node textChild = m_currentNode.append_child( "text" );
+    textChild.append_attribute( "x" ) = x;
+    textChild.append_attribute( "y" ) = y;
+    textChild.append_attribute( "dx" ) = 0;
+    textChild.append_attribute( "dy" ) = 0;
+    // HARDCODED
+    textChild.append_attribute( "style" ) = "font-family: Garamond, Georgia, serif; font-size: 360px;";
+    textChild.append_attribute( "text-anchor" ) = anchor.c_str();
+    
+    textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 
 
@@ -511,7 +525,6 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
     //    WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
     //    WriteLine( text ) ;
     //}
-    s = StringFormat(" <text x=\"%d\" y=\"%d\" dx=\"%d\" dy=\"%d\" style=\"font-family: Garamond, Georgia, serif; font-size: 36px;\">", x, y, 0, 0) ;
 
     // For some reason, some browsers (e.g., Chrome) do not like spaces or dots in font names...
     /*
@@ -532,125 +545,59 @@ void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, do
     //s = s + "fill:#" + wxColStr (m_textForegroundColour) + "; stroke:#" + wxColStr (m_textForegroundColour) + "; " ;
     sTmp.Printf ( "stroke-width:0;\"  transform=\"rotate( %.2g %d %d )  \" >",  -angle, x,y ) ;
     */
-    s = s + text + "</text> " ;
-    WriteLine(s);
+    pugi::xml_node textChild = m_currentNode.append_child( "text" );
+    textChild.append_attribute( "x" ) = x;
+    textChild.append_attribute( "y" ) = y;
+    textChild.append_attribute( "dx" ) = 0;
+    textChild.append_attribute( "dy" ) = 0;
+    // HARDCODED
+    textChild.append_attribute( "style" ) = "font-family: Garamond, Georgia, serif; font-size: 36px;";
+    //textChild.append_attribute( "text-anchor" ) = anchor.c_str();
+    
+    textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 
 std::string FilenameLookup(unsigned char c) {
     std::string glyph;
-    switch (c) {
-            /* figures */
-        case 48: glyph = "figure_0"; break;
-        case 49: glyph = "figure_1"; break;
-        case 50: glyph = "figure_2"; break;
-        case 51: glyph = "figure_3"; break;
-        case 52: glyph = "figure_4"; break;
-        case 53: glyph = "figure_5"; break;
-        case 54: glyph = "figure_6"; break;
-        case 55: glyph = "figure_7"; break;
-        case 56: glyph = "figure_8"; break;
-        case 57: glyph = "figure_9"; break;
-            /* oblique figures */
-        case 0x82: glyph = "oblique_figure_0"; break;
-        case 0x83: glyph = "oblique_figure_1"; break;
-        case 0x84: glyph = "oblique_figure_2"; break;
-        case 0x85: glyph = "oblique_figure_3"; break;
-        case 0x86: glyph = "oblique_figure_4"; break;
-        case 0x87: glyph = "oblique_figure_5"; break;
-        case 0x88: glyph = "oblique_figure_6"; break;
-        case 0x89: glyph = "oblique_figure_7"; break;
-        case 0x8A: glyph = "oblique_figure_8"; break;
-        case 0x8B: glyph = "oblique_figure_9"; break;
-            /* fermatas */
-        case LEIPZIG_FERMATA_UP: glyph = "fermata_up"; break;
-        case LEIPZIG_FERMATA_DOWN: glyph = "fermata_down"; break;          
-            /* clef */
-        case LEIPZIG_CLEF_G: glyph = "clef_G"; break;
-        case LEIPZIG_CLEF_F: glyph = "clef_F"; break;
-        case LEIPZIG_CLEF_C: glyph = "clef_C"; break;
-        case LEIPZIG_CLEF_8va: glyph = "clef_G8"; break;
-        case LEIPZIG_CLEF_G + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_G_mensural"; break;
-        case LEIPZIG_CLEF_F + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_F_mensural"; break;
-        case LEIPZIG_CLEF_C + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_C_mensural"; break;
-        case LEIPZIG_CLEF_8va + LEIPZIG_OFFSET_MENSURAL: glyph = "clef_G_chiavette"; break;
-            /* meter */
-        case LEIPZIG_METER_SYMB_COMMON: glyph = "meter_symb_common"; break;
-        case LEIPZIG_METER_SYMB_CUT: glyph = "meter_symb_cut"; break;
-        case LEIPZIG_METER_SYMB_2_CUT: glyph = "meter_symb_2_cut"; break;
-        case LEIPZIG_METER_SYMB_3_CUT: glyph = "meter_symb_3_cut"; break;
-            /* alterations */
-        case LEIPZIG_ACCID_SHARP: glyph = "alt_sharp"; break;
-        case LEIPZIG_ACCID_NATURAL: glyph = "alt_natural"; break;
-        case LEIPZIG_ACCID_FLAT: glyph = "alt_flat"; break;
-        case LEIPZIG_ACCID_DOUBLE_SHARP: glyph = "alt_double_sharp"; break;
-        case LEIPZIG_ACCID_SHARP + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_sharp_mensural"; break;
-        case LEIPZIG_ACCID_NATURAL + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_natural_mensural"; break;
-        case LEIPZIG_ACCID_FLAT + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_flat_mensural"; break;
-        case LEIPZIG_ACCID_DOUBLE_SHARP + LEIPZIG_OFFSET_MENSURAL: glyph = "alt_double_sharp_mensural"; break;
-            /* rests */
-        case LEIPZIG_REST_QUARTER: glyph = "rest_4"; break;
-        case LEIPZIG_REST_QUARTER + 1: glyph = "rest_8"; break;
-        case LEIPZIG_REST_QUARTER + 2: glyph = "rest_16"; break;
-        case LEIPZIG_REST_QUARTER + 3: glyph = "rest_32"; break;
-        case LEIPZIG_REST_QUARTER + 4: glyph = "rest_64"; break;
-        case LEIPZIG_REST_QUARTER + 5: glyph = "rest_128"; break;
-        case LEIPZIG_REST_QUARTER + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_4_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 1 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_8_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 2 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_16_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 3 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_32_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 4 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_64_mensural"; break;
-        case LEIPZIG_REST_QUARTER + 5 + LEIPZIG_OFFSET_MENSURAL: glyph = "rest_128_mensural"; break;
-            /* note heads */
-        case LEIPZIG_HEAD_WHOLE: glyph = "head_whole"; break;
-        case LEIPZIG_HEAD_WHOLE_FILLED: glyph = "head_whole_fill"; break;
-        case LEIPZIG_HEAD_HALF: glyph = "head_half"; break;
-        case LEIPZIG_HEAD_QUARTER: glyph = "head_quarter"; break;
-        case LEIPZIG_HEAD_WHOLE + LEIPZIG_OFFSET_MENSURAL: glyph = "head_whole_diamond"; break;
-        case LEIPZIG_HEAD_WHOLE_FILLED + LEIPZIG_OFFSET_MENSURAL: glyph = "head_whole_filldiamond"; break;
-        case LEIPZIG_HEAD_HALF + LEIPZIG_OFFSET_MENSURAL: glyph = "head_half_diamond"; break;
-        case LEIPZIG_HEAD_QUARTER + LEIPZIG_OFFSET_MENSURAL: glyph = "head_quarter_filldiamond"; break;
-            /* slashes */
-        case LEIPZIG_STEM_FLAG_UP: glyph = "slash_up"; break;
-        case LEIPZIG_STEM_FLAG_DOWN: glyph = "slash_down"; break;
-        case LEIPZIG_STEM_FLAG_UP + LEIPZIG_OFFSET_MENSURAL: glyph = "slash_up_mensural"; break;
-        case LEIPZIG_STEM_FLAG_DOWN + LEIPZIG_OFFSET_MENSURAL: glyph = "slash_down_mensural"; break;
-            /* ornaments */
-        case 35: glyph = "orn_mordent"; break;
-        case LEIPZIG_EMB_TRILL: glyph = "orn_trill"; break;
-            /* todo */
-        default: glyph = "clef_G_chiavette";
-    }
-
     return glyph;
 }
 
-void SvgDeviceContext::DrawMusicText(const std::string& text, int x, int y)
+void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {
 
     int w, h, gx, gy;
         
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); i++) {
-        unsigned char c = (unsigned char)text[i];
-        
-        std::string glyph = FilenameLookup(c);
-        
-        // Add the glyph to the array for the <defs>
-        std::vector<std::string>::const_iterator it = std::find(m_leipzig_glyphs.begin(), m_leipzig_glyphs.end(), glyph);
-        if (it == m_leipzig_glyphs.end())
+    for (unsigned int i = 0; i < text.length(); i++)
+    {
+        wchar_t c = text[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph)
         {
-            m_leipzig_glyphs.push_back( glyph );
+            continue;
         }
         
+        std::string path = glyph->GetPath();
+        
+        // Add the glyph to the array for the <defs>
+        std::vector<std::string>::const_iterator it = std::find(m_smufl_glyphs.begin(), m_smufl_glyphs.end(), path);
+        if (it == m_smufl_glyphs.end())
+        {
+            m_smufl_glyphs.push_back( path );
+        }
+        
+        
         // Write the char in the SVG
-        WriteLine ( StringFormat("<use xlink:href=\"#%s\" transform=\"translate(%d, %d) scale(%f, %f)\"/>",
-                                     glyph.c_str(), x, y, ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)),
-                                     ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ) );
+        pugi::xml_node useChild = m_currentNode.append_child( "use" );
+        useChild.append_attribute( "xlink:href" ) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
+        useChild.append_attribute( "x" ) = x;
+        useChild.append_attribute( "y" ) = y;
+        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
+        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
         
         // Get the bounds of the char
-        LeipzigBBox::GetCharBounds(c, &gx, &gy, &w, &h);
-        // Sum it to x so we move it to the start of the next char
-        x += (w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
+        glyph->GetBoundingBox(&gx, &gy, &w, &h);
+        x += w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
     }
 }
 
@@ -690,10 +637,10 @@ std::string SvgDeviceContext::GetColour( int colour )
     }
 }
 
-std::string SvgDeviceContext::GetStringSVG( bool xml_tag )
+std::string SvgDeviceContext::GetStringSVG( bool xml_declaration )
 {
     if (!m_committed)
-        Commit( xml_tag );
+        Commit( xml_declaration );
     
     return m_outdata.str();
 }

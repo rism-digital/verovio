@@ -15,8 +15,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "leipzigbbox.h"
+#include "glyph.h"
 #include "view.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -33,7 +34,7 @@ static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
 BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     DeviceContext()
 {	
-    m_correctMusicAscent = false; // do not correct the ascent in the Leipzig font    
+    m_correctMusicAscent = false; // do not correct the ascent in the music font    
     
     m_view = view;
     m_width = width;
@@ -72,10 +73,6 @@ void BBoxDeviceContext::StartPage( )
 void BBoxDeviceContext::EndPage() 
 {
 }
-
-void BBoxDeviceContext::SetBrush( int colour, int style )
-{
-}
         
 void BBoxDeviceContext::SetBackground( int colour, int style )
 {
@@ -87,16 +84,10 @@ void BBoxDeviceContext::SetBackgroundMode( int mode )
     // nothing to do, we do not handle Background Mode
 }
         
-void BBoxDeviceContext::SetPen( int colour, int width, int style )
-{
-    m_penWidth = width;
-}
-        
 void BBoxDeviceContext::SetFont( FontMetricsInfo *font_info )
 {
     m_font = *font_info;
 }
-            
 
 void BBoxDeviceContext::SetTextForeground( int colour )
 {
@@ -106,15 +97,6 @@ void BBoxDeviceContext::SetTextBackground( int colour )
 {
     // nothing to do, we do not handle Text Background Mode
 }
-       
-void BBoxDeviceContext::ResetBrush( )
-{
-}
-        
-void BBoxDeviceContext::ResetPen( )
-{
-    SetPen( AxBLACK, 1, AxSOLID );
-} 
 
 void BBoxDeviceContext::SetLogicalOrigin( int x, int y ) 
 {
@@ -125,26 +107,36 @@ void BBoxDeviceContext::SetUserScale( double xScale, double yScale )
     //// no idea how to handle this with the BB
     m_userScaleX = xScale;
     m_userScaleY = yScale;
-}       
-
+}
+    
 void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
 {
+    LogDebug("BBoxDeviceContext::GetTextExtent not implemented");
+}
+
+void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+{
     int x, y, partial_w, partial_h;
-    
     *w = 0;
     *h = 0;
     
-    for (unsigned int i = 0; i < string.length(); i++) {
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
         
-        LeipzigBBox::GetCharBounds(string.c_str()[i], &x, &y, &partial_w, &partial_h);
-        
-        partial_w *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
-        partial_h *= ((m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM));
+        partial_w *= m_font.GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_font.GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
         
         *w += partial_w;
         *h += partial_h;
     }
-    
 }
        
 
@@ -228,7 +220,7 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     //    int(xs), int(ys), int(rx), int(ry),
     //    fArc, fSweep, int(xe), int(ye) ) );
     
-    int penWidth = m_penWidth;
+    int penWidth = m_penStack.top().GetWidth();
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
@@ -249,12 +241,14 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
         y1 = y2;
         y2 = tmp;
     }
-    int p1 = m_penWidth / 2;
+    
+    int penWidth = m_penStack.top().GetWidth();
+    int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
     // however, we expect the actualy with to be shifted on the left/top
     // e.g. with 7, 4 on the left and 3 on the right
-    if ( m_penWidth % 2 ) {
+    if ( penWidth % 2 ) {
         p1++;
     }
     
@@ -301,19 +295,20 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         width = -width;
         x -= width;
     }
-    int penWidth = m_penWidth;
+    int penWidth = m_penStack.top().GetWidth();;
     if ( penWidth % 2 ) {
         penWidth += 1;
     }
     
-    UpdateBB( x - penWidth / 2, y - m_penWidth / 2, x + width + m_penWidth / 2, y + height + m_penWidth / 2);
+    UpdateBB( x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
 
         
 void BBoxDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
 {
     // alignment not taken into account!
-    DrawMusicText( text, x, y);
+    //std::wstring wtext = std::wstring(text.begin(), text.end());
+    //DrawMusicText( wtext, x, y);
 }
 
 
@@ -339,44 +334,35 @@ void BBoxDeviceContext::DrawRotatedText(const std::string& text, int x, int y, d
 }
 
 
-void BBoxDeviceContext::DrawMusicText(const std::string& text, int x, int y)
+void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {  
     
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
     
-    for (unsigned int i = 0; i < text.length(); i++) {
-        unsigned char c = (unsigned char)text[i];
-        
-        LeipzigBBox::GetCharBounds(c, &g_x, &g_y, &g_w, &g_h);
+    for (unsigned int i = 0; i < text.length(); i++)
+    {
+        wchar_t c = text[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + (g_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
+        int x_off = x + g_x * m_font.GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position are already flipped
-        int y_off = y - (g_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
-        // the +/- 2 is to compesate a couple pixels down the figure (rounding error?)
+        int y_off = y - g_y * m_font.GetPointSize() / glyph->GetUnitsPerEm();
          
         UpdateBB(x_off, y_off, 
-                  x_off + (g_w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ),
+                  x_off + g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm(),
         // idem, y position are flipped
-                  y_off - (g_h * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ));
+                  y_off - g_h * m_font.GetPointSize() / glyph->GetUnitsPerEm());
         
-        lastCharWidth = (g_w * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)));
+        lastCharWidth = g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
      
     }
-    
-    /*
-    int x_off = x + (bbox->m_bBox[glyph].m_x * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
-    // because we are in the drawing context, y position are already flipped
-    int y_off = y - (bbox->m_bBox[glyph].m_y * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) );
-    
-    UpdateBB(x_off, y_off, 
-        x_off + (bbox->m_bBox[glyph].m_width * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ),
-        // idem, y position are flipped
-        y_off - (bbox->m_bBox[glyph].m_height * ((double)(m_font.GetPointSize() / LEIPZIG_UNITS_PER_EM)) ));
-    */
 }
-
 
 void BBoxDeviceContext::DrawSpline(int n, MusPoint points[])
 {

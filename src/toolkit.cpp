@@ -33,7 +33,7 @@ namespace vrv {
 // Toolkit
 //----------------------------------------------------------------------------
 
-Toolkit::Toolkit()
+Toolkit::Toolkit( bool initFont )
 {
 
     m_scale = DEFAULT_SCALE;
@@ -53,6 +53,10 @@ Toolkit::Toolkit()
     m_showBoundingBoxes = false;
 	
 	m_cString = NULL;
+    
+    if ( initFont ) {
+        Resources::InitFont();
+    }
 }
 
 
@@ -210,6 +214,11 @@ bool Toolkit::LoadString( const std::string &data )
     
     m_doc.PrepareDrawing();
     
+    if (input->HasMeasureWithinEditoMarkup() && !m_noLayout) {
+        LogWarning( "Only continous layout is possible with <measure> within editorial markup, switching to --no-layout" );
+        this->SetNoLayout( true );
+    }
+    
     // do the layout? this depends on the options and of the
     // file. PAE and DARMS of no layout information. MEI files
     // can have, but this might have been ignored because of the
@@ -217,7 +226,7 @@ bool Toolkit::LoadString( const std::string &data )
     // was set, though.
     if (!input->HasLayoutInformation() && !m_noLayout) {
         //LogElapsedTimeStart();
-        m_doc.LayOut();
+        m_doc.CastOff();
         //LogElapsedTimeEnd("layout");
     }
     
@@ -334,7 +343,7 @@ void  Toolkit::ResetLogBuffer() {
 #endif
 }
 
-std::string Toolkit::RenderToSvg( int pageNo, bool xml_tag )
+std::string Toolkit::RenderToSvg( int pageNo, bool xml_declaration )
 {
     // Page number is one-based - correction to 0-based first
     pageNo--;
@@ -366,7 +375,7 @@ std::string Toolkit::RenderToSvg( int pageNo, bool xml_tag )
     // render the page
     m_view.DrawCurrentPage( &svg, false );
     
-    std::string out_str = svg.GetStringSVG( xml_tag );
+    std::string out_str = svg.GetStringSVG( xml_declaration );
     return out_str;
 }
     
@@ -380,8 +389,8 @@ void Toolkit::RedoLayout()
     m_doc.SetSpacingStaff( this->GetSpacingStaff() );
     m_doc.SetSpacingSystem( this->GetSpacingSystem() );
     
-    m_doc.LayOutContinuously();
-    m_doc.LayOut();
+    m_doc.UnCastOff();
+    m_doc.CastOff();
 }
 
 bool Toolkit::RenderToSvgFile( const std::string &filename, int pageNo )

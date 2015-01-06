@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
 #include "vrv.h"
 #include "vrvdef.h"
 
@@ -715,6 +716,18 @@ data_WORDPOS Att::StrToWordPos(std::string value)
         LogWarning("Unsupported pitch name '%s'", value.c_str() );
     }
     return WORDPOS_NONE;
+}
+    
+//----------------------------------------------------------------------------
+// AttComparison
+//----------------------------------------------------------------------------
+
+bool AttComparison::operator() (Object *object)
+{
+    if  (typeid(*object) == *m_elementType) {
+        return true;
+    }
+    return false;
 }
     
 } // namespace vrv

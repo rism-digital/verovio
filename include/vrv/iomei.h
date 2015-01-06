@@ -17,6 +17,7 @@
 
 namespace vrv {
 
+class App;
 class Accid;
 class Barline;
 class Beam;
@@ -26,6 +27,7 @@ class Dot;
 class DurationInterface;
 class Layer;
 class LayerElement;
+class Lem;
 class Measure;
 class Mensur;
 class MeterSig;
@@ -34,6 +36,7 @@ class MultiRest;
 class Note;
 class PitchInterface;
 class PositionInterface;
+class Rdg;
 class Rest;
 class ScoreDef;
 class Staff;
@@ -86,7 +89,7 @@ private:
     bool WriteMeiDoc( Doc *doc );
     
     /**
-     * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
+     * @name Methods for wrinting MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     bool WriteMeiPage( pugi::xml_node currentNode, Page *page );
@@ -100,7 +103,7 @@ private:
     ///@}
     
     /**
-     * Write an LayerElement child. 
+     * @name Methods for wrinting LayerElement children.
      * Called from WriteLayerElement.
      */
     ///@{
@@ -120,7 +123,16 @@ private:
     ///@}
     
     /**
-     * Write other mei elements
+     * @name Methods for writing editorial markup
+     */
+    ///@{
+    bool WriteMeiApp( pugi::xml_node currentNode, App *app ) { return true; };
+    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem ) { return true; };
+    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg ) { return true; };
+    ///@}
+    
+    /**
+     * @name Methods for wrinting other mei elements
      */
     ///@{
     void WriteMeiVerse( pugi::xml_node currentNode, Verse *verse );
@@ -128,25 +140,26 @@ private:
     ///@}
     
     /**
-     * Write a sameAs attribute
+     * @name Methods for wrinting a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      * To be changed to Att
      */
     void WriteSameAsAttr( pugi::xml_node currentNode, Object *object );
     
     /**
-     * Write a LayerElement and interfaces.
+     * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
     void WriteLayerElement( pugi::xml_node currentNode, LayerElement *element );
+    void WriteEditorialElement( pugi::xml_node currentNode, EditorialElement *element ) {};
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
     ///@}
     
     /**
-     * Write the XML text content
+     * @name Methods for wrinting the XML text content
      */
     void WriteText( pugi::xml_node currentNode, Object *object );
 	
@@ -206,23 +219,33 @@ private:
     
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related. 
+     * For each container (page, system, measure, staff and layer) there is one method for 
+     * reading the element and one method for reading it children. The method for reading
+     * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
+     * for example.
      */
     ///@{
     bool ReadMeiPage( pugi::xml_node page );
-    bool ReadMeiSystem( Page* page, pugi::xml_node system );
+    bool ReadMeiPageChildren( Object* parent, pugi::xml_node parentNode );
+    bool ReadMeiSystem( Object* parent, pugi::xml_node system );
+    bool ReadMeiSystemChildren( Object* parent, pugi::xml_node parentNode );
     bool ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef );
-    bool ReadMeiStaffGrp( Object *parent, pugi::xml_node system );
-    bool ReadMeiStaffDef( StaffGrp *staffGrp, pugi::xml_node system );
-    bool ReadMeiMeasure( System *system, pugi::xml_node measure );
-    bool ReadMeiStaff( Measure *measure, pugi::xml_node staff );
-    bool ReadMeiLayer( Staff *staff, pugi::xml_node layer );
+    bool ReadMeiScoreDefChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp );
+    bool ReadMeiStaffGrpChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef );
+    bool ReadMeiMeasure( Object *parent, pugi::xml_node measure );
+    bool ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiStaff( Object *parent, pugi::xml_node staff );
+    bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
+    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode );
     ///@}
 
     /**
      * @name Methods for reading MEI layer elements
      */
     ///@{
-    bool ReadMeiLayerElement( Object *parent, pugi::xml_node xmlElement );
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
@@ -243,15 +266,16 @@ private:
      * Only one child of <app> is loaded
      */
     ///@{
-    bool ReadMeiApp( Object *parent, pugi::xml_node app );
-    bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg );
+    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level );
+    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level );
     ///@}
     
     /**
-     * @name Methods for reading MEI LayerElement and interfaces
+     * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
      */
     ///@{
     bool ReadLayerElement( pugi::xml_node element, LayerElement *object );
+    bool ReadEditorialElement( pugi::xml_node element, EditorialElement *object );
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );

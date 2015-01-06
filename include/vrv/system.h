@@ -37,7 +37,6 @@ public:
      */
     ///@{
     System();
-	System( const System& system ); // copy contructor
     virtual ~System();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "System"; };
@@ -75,9 +74,6 @@ public:
      * Return the default horizontal spacing of system.
      */
     int GetVerticalSpacing();
-
-	
-	int GetMeasureCount() const { return (int)m_children.size(); };
     
     /**
      * Return the index position of the system in its page parent

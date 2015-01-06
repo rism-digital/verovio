@@ -20,6 +20,7 @@
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "system.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -310,6 +311,9 @@ void ScoreDef::Replace( StaffDef *newStaffDef )
         staffDef->ReplaceKeySig( newStaffDef->GetKeySig() );
         staffDef->ReplaceMensur( newStaffDef->GetMensur() );
         staffDef->ReplaceMeterSig( newStaffDef->GetMeterSig() );
+        // copy other attributes if present
+        if ( newStaffDef->HasLabel() ) staffDef->SetLabel( newStaffDef->GetLabel() );
+        if ( newStaffDef->HasLabelAbbr() ) staffDef->SetLabelAbbr( newStaffDef->GetLabelAbbr() );
     }
 }
 
@@ -437,6 +441,34 @@ void StaffDef::Reset()
     m_drawMensur = false;
     m_drawMeterSig = false;
     m_lines = 5;
+}
+    
+    
+//----------------------------------------------------------------------------
+// ScoreDef functor methods
+//----------------------------------------------------------------------------
+
+int ScoreDef::CastOffSystems( ArrayPtrVoid params )
+{
+    // param 0: a pointer to the system we are taking the content from
+    // param 1: a pointer the page we are adding system to (unused)
+    // param 2: a pointer to the current system
+    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
+    // param 4: the system width (unused)
+    System *contentSystem = static_cast<System*>(params[0]);
+    System **currentSystem = static_cast<System**>(params[2]);
+    
+    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
+    assert( dynamic_cast<System*>(this->m_parent));
+    
+    // Special case where we use the Relinquish method.
+    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
+    // from the content System because this screws up the iterator. Relinquish gives up
+    // the ownership of the Measure - the contentSystem will be deleted afterwards.
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef*>( contentSystem->Relinquish( this->GetIdx()) );
+    (*currentSystem)->AddScoreDef( scoreDef );
+    
+    return FUNCTOR_SIBLINGS;
 }
 
 //----------------------------------------------------------------------------

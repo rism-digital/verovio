@@ -266,12 +266,13 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid params )
     // param 0: the previous staff height
     // param 1: the staff margin
     // param 2: the staff interline sizes (int[2])
-    // param 2: the functor to be redirected to SystemAligner (unused)
+    // param 3: the functor to be redirected to SystemAligner (unused)
     int *previousStaffHeight = static_cast<int*>(params[0]);
     int *staffMargin = static_cast<int*>(params[1]);
     int **interlineSizes = static_cast<int**>(params[2]);
     
-    m_yShift -= this->GetVerseCount() * 2 * 18 + 24; //m_doc->m_env.m_interlDefin;
+    // take into account the number of lyrics
+    m_yShift -= this->GetVerseCount() * 2 * (*interlineSizes[0]) + (*interlineSizes[0]);
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
     
@@ -371,7 +372,7 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid params )
         intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an abritrary value
     }
     
-    m_xRel = (*previousXRel) + (intervalXRel);
+    m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
     (*previousXRel) = m_xRel;
     

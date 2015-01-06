@@ -11,6 +11,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <sstream>
 #include <typeinfo>
 
 //----------------------------------------------------------------------------
@@ -151,5 +152,32 @@ void View::SwapPoints (MusPoint *x1, MusPoint *x2)
     *x1 = *x2;
     *x2 = a;
 }
+
+std::wstring View::IntToTupletFigures(unsigned short number)
+{
+    return IntToSmuflFigures(number, 0xE880);
+}
+
+std::wstring View::IntToTimeSigFigures(unsigned short number)
+{
+    return IntToSmuflFigures(number, 0xE080);
+}
+
+std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
+{
+    // We do not convert more that FF values
+    if (number > 0xFFFF) number = 0xFFFF;
+    
+    std::wstringstream stream;
+    stream << number;
+    std::wstring str = stream.str();
+    
+    int i;
+    for (i = 0; i < str.size(); i++) {
+        str[i] += offset - 48;
+    }
+    return str;
+}
+    
 
 } // namespace vrv

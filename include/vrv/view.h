@@ -22,6 +22,7 @@ namespace vrv {
 class Beam;
 class Barline;
 class Doc;
+class EditorialElement;
 class Layer;
 class LayerElement;
 class Measure;
@@ -143,6 +144,21 @@ protected:
     ///@}
     
     /**
+     * @name Methods for drawing App and EditorialElement
+     * Defined in view_page.cpp
+     */
+    ///@{
+    /** System level **/
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system );
+    /** Measure level **/
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
+    /** Staff level **/
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
+    /** Layer level **/
+    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
+    ///@}
+    
+    /**
      * @name Methods for calculating drawing positions
      * Defined in view_element.cpp
      */
@@ -158,9 +174,9 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
-    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff);
-    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff );
+    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**
@@ -220,9 +236,9 @@ protected:
     ///@{
 	void DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
-	void DrawLeipzigFont ( DeviceContext *dc, int x, int y, unsigned char c, Staff *staff, bool dimin );
+	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
-	void DrawLeipzigString ( DeviceContext *dc, int x, int y, std::string s, int centrer, int staffSize = 0);
+	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
@@ -235,7 +251,9 @@ private:
      */
     ///@{
     bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center);
-    std::string IntToObliqueFigures(unsigned short number);
+    std::wstring IntToTupletFigures(unsigned short number);
+    std::wstring IntToTimeSigFigures(unsigned short number);
+    std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet* tuplet);
     ///@}
     

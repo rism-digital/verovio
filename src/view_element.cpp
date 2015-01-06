@@ -25,7 +25,6 @@
 #include "dot.h"
 #include "keysig.h"
 #include "layerelement.h"
-#include "leipzigbbox.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -37,6 +36,7 @@
 #include "syl.h"
 #include "system.h"
 #include "slur.h"
+#include "smufl.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -51,7 +51,7 @@ namespace vrv {
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures    
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
-void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff )
+void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -87,7 +87,7 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
         DrawBarline(dc, element, layer, staff);
     }
     else if (dynamic_cast<Beam*>(element)) {
-        DrawBeamElement(dc, element, layer, measure, staff);
+        DrawBeamElement(dc, element, layer, staff,  measure);
     }
     else if (dynamic_cast<Clef*>(element)) {
         DrawClef(dc, element, layer, staff);
@@ -126,7 +126,7 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
         DrawTie(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Tuplet*>(element)) {
-        DrawTupletElement(dc, element, layer, measure, staff);
+        DrawTupletElement(dc, element, layer, staff, measure);
     }
     
     m_currentColour = previousColor;
@@ -148,7 +148,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         int oct = note->GetOct() - 4;
         
         element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
-        dc->StartGraphic( element, "note", element->GetUuid() );
+        dc->StartGraphic( element, "", element->GetUuid() );
         DrawNote(dc, element, layer, staff);
         dc->EndGraphic(element, this );
 	}
@@ -162,7 +162,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         else
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
 		
-        dc->StartGraphic( element, "rest", element->GetUuid() );
+        dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff );
         dc->EndGraphic(element, this );
 	}
@@ -170,19 +170,19 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
 	return;
 }
 
-void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff) {
+void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
     
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
     
     Beam *beam = dynamic_cast<Beam*>(element);
 
-    dc->StartGraphic( element, "beam", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     for (unsigned int i = 0; i < beam->m_children.size(); i++) {
         if ( dynamic_cast<LayerElement*>(beam->m_children[i]) ) {
             LayerElement *element = dynamic_cast<LayerElement*>(beam->m_children[i]);
-            DrawElement(dc, element, layer, measure, staff);
+            DrawElement(dc, element, layer, staff, measure);
         }
     }
     
@@ -192,20 +192,20 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
     dc->EndGraphic(element, this );
 }
 
-void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *layer, Measure *measure, Staff *staff) {
+void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
     
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
     
     Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
     
-    dc->StartGraphic( element, "tuplet", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     // Draw the inner elements
     for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
         if ( dynamic_cast<LayerElement*>(tuplet->m_children[i]) ) {
             LayerElement *element = dynamic_cast<LayerElement*>(tuplet->m_children[i]);
-            DrawElement(dc, element, layer, measure, staff);
+            DrawElement(dc, element, layer, staff, measure);
         }
     }
     
@@ -257,7 +257,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	//	int horphyspoint=h_pnt;
 	//int b = element->m_drawingY;
-	int i, valdec, fontNo, ledge, queueCentre;
+    wchar_t fontNo;
+	int i, valdec, ledge, queueCentre;
 	int x1, x2, y2, espac7, decval, vertical;
 	int formval = 0;	// pour permettre dessiner colorations avec dÇcalage de val
 	int rayon, milieu = 0;
@@ -297,8 +298,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		}
 	}*/ // ax2 - not support of lat
 
-	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);	// dessin lignes additionnelles
-
 	if (note->GetDur() == DUR_LG || note->GetDur() == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->GetDur() == DUR_1))	// dessin carrees
 	{
 		DrawLigature ( dc, ynn, element, layer, staff);
@@ -306,21 +305,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	else if (note->GetDur()==DUR_1)
 	{	
         if (note->GetColored()==BOOLEAN_true) // && !note->m_ligObliqua) // in WG, use of obliq for coloration?
-			fontNo = LEIPZIG_HEAD_WHOLE_FILLED;
+			fontNo = SMUFL_E0FA_noteheadWholeFilled;
 		else
-			fontNo = LEIPZIG_HEAD_WHOLE;
+			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawLeipzigFont( dc, x1, ynn, fontNo, staff, note->m_cueSize );
+		DrawSmuflCode( dc, x1, ynn, fontNo, staff->staffSize, note->m_cueSize );
 		decval = ynn;
 	}
 	else
 	{	
         if ((note->GetColored()==BOOLEAN_true) || formval == DUR_2)
-			fontNo = LEIPZIG_HEAD_HALF;
+			fontNo = SMUFL_E0A3_noteheadHalf;
 		else
-			fontNo = LEIPZIG_HEAD_QUARTER;
+			fontNo = SMUFL_E0A4_noteheadBlack;
 
-		DrawLeipzigFont( dc,x1, ynn, fontNo, staff, note->m_cueSize );
+		DrawSmuflCode( dc,x1, ynn, fontNo,  staff->staffSize, note->m_cueSize );
 
 		milieu = bby - m_doc->m_drawingInterl[staffSize]*2;
 
@@ -408,9 +407,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				if (formval > DUR_4)
 				{
                     y2 += m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawLeipzigFont( dc,x2,y2,LEIPZIG_STEM_FLAG_UP, staff, note->m_cueSize );
+					DrawSmuflCode( dc,x2,y2,SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
 					for (i=0; i < valdec; i++)
-						DrawLeipzigFont( dc,x2,y2-=vertical,LEIPZIG_STEM_FLAG_UP, staff, note->m_cueSize );
+						DrawSmuflCode( dc,x2,y2-=vertical,SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
 				}
 			}
 			else
@@ -431,18 +430,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 element->m_drawingStemEnd.y = y2;
                 element->m_drawingStemDir = false;
                 
-				// ENZ
-				// decalage du crochet vers la gauche
-				// changement dans la fonte Leipzig 4.3 ‡ cause de problemes d'affichage
-				// en deÁ‡ de 0 avec la notation ancienne
-				// dans la fonte les crochets ont ete decales de 164 vers la droite
-				int cr_offset = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize]  + (m_doc->m_env.m_stemWidth / 2);
 				if (formval > DUR_4)
 				{
                     y2 -= m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawLeipzigFont( dc,x2 - cr_offset,y2,LEIPZIG_STEM_FLAG_DOWN , staff, note->m_cueSize );
+					DrawSmuflCode( dc,x2,y2,SMUFL_E241_flag8thDown ,  staff->staffSize, note->m_cueSize );
 					for (i=0; i < valdec; i++)
-						DrawLeipzigFont( dc,x2  - cr_offset,y2+=vertical,LEIPZIG_STEM_FLAG_DOWN, staff, 
+						DrawSmuflCode( dc,x2,y2+=vertical,SMUFL_E241_flag8thDown,  staff->staffSize,
 									 note->m_cueSize );
 				}
 			}
@@ -483,9 +476,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
 	else
 	{	if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
-			x2 = xn + m_doc->m_drawingStep1*7/2;
+			x2 = xn + m_doc->m_drawingUnit*7/2;
 		else
-			x2 = xn + m_doc->m_drawingStep1*5/2;
+			x2 = xn + m_doc->m_drawingUnit*5/2;
 
 		//if (this->lat) // ax2 - no support of note head flip
         //    x2 += rayon*2;
@@ -694,7 +687,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     //MRest *mrest = dynamic_cast<MRest*>(element);
     
-    dc->StartGraphic( element, "mrest", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     //LogMessage("Measure %d - X %d - RightX %d;", measure->GetIdx(), element->m_drawingX, measure->GetRightBarlineX() );
     
@@ -725,7 +718,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     MultiRest *multirest = dynamic_cast<MultiRest*>(element);
     
-    dc->StartGraphic( element, "multirest", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int x = element->GetDrawingX();
     
@@ -734,7 +727,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         multirest->SetNum(999);
     
     // This is 1/2 the length of th black rectangle
-	length = (m_doc->m_drawingStep1 * 5);
+	length = (m_doc->m_drawingUnit * 5);
     
     // Position centered in third line
     // it would be m_drawingInterl * 6.5, or m_drawingInterl / 2 * 13
@@ -752,21 +745,21 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     //Draw the to lines at beginning and end
     // make it 8 pixesl longers, and 4 pixels width
-    DrawVerticalLine(dc, y1 - 4, y2 + 4, x1, 4);
-    DrawVerticalLine(dc, y1 - 4, y2 + 4, x2, 4);
+    int border = m_doc->m_drawingHalfInterl[staff->staffSize] / 2;
+    DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->m_env.m_stemWidth * 2);
+    DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->m_env.m_stemWidth * 2);
     
     // Draw the text above
     int w, h;
-    unsigned int start_offset = 0; // offset from x to center text
+    int start_offset = 0; // offset from x to center text
     
     // convert to string
-    std::stringstream text;
-    text << multirest->GetNum();
+    std::wstring wtext = IntToTimeSigFigures(multirest->GetNum());
     
-    dc->GetTextExtent( text.str(), &w, &h);
-    start_offset = (x2 - x1 - w) / 2; // calculate offset to center text
+    dc->GetSmuflTextExtent( wtext, &w, &h);
+    start_offset = (x2 - x1 - w) /  2; // calculate offset to center text
     
-    DrawLeipzigString(dc, x1 + start_offset, staff->GetDrawingY() + 5, text.str(), false);
+    DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 5, wtext, false);
     
     dc->EndGraphic(element, this);
     
@@ -780,7 +773,7 @@ void View::DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff)
     
     y1 = y;
 	x1 = x;
-	x2 = x + (m_doc->m_drawingStep1 * 2 / 3);
+	x2 = x + (m_doc->m_drawingUnit * 2 / 3);
     
     // look if on line or between line
 	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
@@ -797,7 +790,7 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
     int x1, x2, y1, y2;
     y1 = y;
 	x1 = x;
-	x2 = x + (m_doc->m_drawingStep1 * 2 / 3);
+	x2 = x + (m_doc->m_drawingUnit * 2 / 3);
     
     // look if one line or between line
 	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingInterl[staff->staffSize])
@@ -807,8 +800,8 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
 	DrawFullRectangle( dc, x1, y2, x2, y1);
 	
     // lines
-    x1 = x - m_doc->m_drawingStep1;
-    x2 = x + m_doc->m_drawingStep1;
+    x1 = x - m_doc->m_drawingUnit;
+    x2 = x + m_doc->m_drawingUnit;
 
 	DrawHorizontalLine ( dc, x1, x2, y2, 1);
 	DrawHorizontalLine ( dc, x1, x2, y1, 1);
@@ -825,7 +818,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 	float foff;
 
 	if (staff->notAnc)
-		foff = (m_doc->m_drawingStep1 *1 / 3);
+		foff = (m_doc->m_drawingUnit *1 / 3);
 	else
 		foff = (m_doc->m_drawingLedgerLine[staff->staffSize][2] * 2) / 3; // i.e., la moitie de la ronde
 
@@ -860,18 +853,19 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_env.m_staffLineWidth);
 
 	if (dots)
-		DrawDots ( dc, (x2 + m_doc->m_drawingStep1), y2, dots, staff);
+		DrawDots ( dc, (x2 + m_doc->m_drawingUnit), y2, dots, staff);
 }
 
 
 void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
 {
-	DrawLeipzigFont( dc, x, y, LEIPZIG_REST_QUARTER + (valeur-DUR_4), staff, smaller );
-
+    int y2 = y + m_doc->m_drawingInterl[staff->staffSize];
+	DrawSmuflCode( dc, x, y2, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->staffSize, smaller );
+    
 	if (dots)
 	{	if (valeur < DUR_16)
 			y += m_doc->m_drawingInterl[staff->staffSize];
-		DrawDots ( dc, (x + m_doc->m_drawingStep2), y, dots, staff);
+		DrawDots ( dc, (x + 2 * m_doc->m_drawingInterl[staff->staffSize]), y, dots, staff);
 	}
 	return;
 }
@@ -887,7 +881,7 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
 	int i;
 	for (i = 0; i < dots; i++) {
 		DrawDot ( dc, x, y );
-		x += std::max (6, 2 * m_doc->m_drawingStep1);
+		x += std::max (6, 2 * m_doc->m_drawingUnit);
 	}
 	return;
 }
@@ -1069,7 +1063,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     Barline *barLine = dynamic_cast<Barline*>(element);
     int x = element->GetDrawingX();
     
-    dc->StartGraphic( element, "barLine", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     if (barLine->m_partialBarline)
     {
@@ -1093,11 +1087,11 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     Clef *clef = dynamic_cast<Clef*>(element);
 
-    dc->StartGraphic( element, "clef", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
 	
 	int b = staff->GetDrawingY();
 	int a = element->GetDrawingX();
-    int sym = LEIPZIG_CLEF_G;	//sSOL, position d'ordre des cles sol fa ut in fonts
+    int sym = SMUFL_E050_gClef;	//sSOL, position d'ordre des cles sol fa ut in fonts
 
     /*  poser sym=no de position sSOL dans la fonte
      *	au depart; ne faire operation sur b qu'une fois pour cas semblables,
@@ -1106,48 +1100,63 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	switch(clef->GetClefId())
 	{
 		case C1 :
-            sym += 2;
+            sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingStaffSize[ staff->staffSize ];
+            break;
 		case G1 :
             b -= m_doc->m_drawingStaffSize[ staff->staffSize ]; 
             break;
 		case G2_8va :
-            sym += 1;
+            sym = SMUFL_E053_gClef8va;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*3;
+            break;
         case G2_8vb :
-            sym += 1;
+            sym = SMUFL_E052_gClef8vb;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*3;
+            break;
 		case C2 :
-            sym += 2;
+            sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*3;
+            break;
 		case G2 :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*3; 
             break;
 		case F3 :
-            sym--;
+            sym = SMUFL_E062_fClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
+            break;
 		case C3 :
-            b -= m_doc->m_drawingInterl[ staff->staffSize ]*2; 
-            sym += 2; 
+            sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
             break;
 		case F5 :
-            sym++; 
+            sym =SMUFL_E062_fClef;
             break;
 		case F4 :
-            sym--;
-		case C4 :
+            sym = SMUFL_E062_fClef;
             b -= m_doc->m_drawingInterl[ staff->staffSize ];
+            break;
+		case C4 :
+            sym = SMUFL_E05C_cClef;
+            b -= m_doc->m_drawingInterl[ staff->staffSize ];
+            break;
 		case C5 :
-            sym += 2; 
+            sym = SMUFL_E05C_cClef;
             break;
 		case perc :
             b -= m_doc->m_drawingInterl[ staff->staffSize ]*2;
-            sym = LEIPZIG_CLEF_PERC; 
+            // FIXME
+            sym = SMUFL_E05C_cClef;
             break;
 		default: 
             break;
 	}
 
-	a -= m_doc->m_drawingStep1*2;
+	a -= m_doc->m_drawingUnit*2;
 	if (clef->m_cueSize)
-		a+= m_doc->m_drawingStep1;
+		a+= m_doc->m_drawingUnit;
 
-	DrawLeipzigFont ( dc, a, b, sym, staff, clef->m_cueSize  );
+	DrawSmuflCode ( dc, a, b, sym, staff->staffSize, clef->m_cueSize  );
    
     dc->EndGraphic(element, this ); //RZ
 }
@@ -1160,7 +1169,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     Mensur *mensur = dynamic_cast<Mensur*>(element);
  
-    dc->StartGraphic( element, "mensur", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
 	
 	int x;
 
@@ -1190,7 +1199,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
         x = element->GetDrawingX();
 		if (mensur->GetSign())
         {
-			x += m_doc->m_drawingStep1*5; // step forward because we have a sign or a meter symbol
+			x += m_doc->m_drawingUnit*5; // step forward because we have a sign or a meter symbol
         }
 		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), mensur->GetNumbase(), staff);
 	}
@@ -1300,6 +1309,7 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
     	
 	int ynum, yden;
 	std::string s;
+    std::wstring wtext;
 
 	if (numBase)
 	{	
@@ -1310,15 +1320,17 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
 		ynum = y - (m_doc->m_drawingHalfInterl[staff->staffSize]*6);
 
 	if (numBase > 9 || num > 9)	// avancer
-		x += m_doc->m_drawingStep1*2;
+		x += m_doc->m_drawingUnit*2;
 
 	s = StringFormat("%u",num);
-	DrawLeipzigString ( dc, x, ynum, s, 1, staff->staffSize);	// '1' = centrer
+    // FIXME (wtext instead of w)
+	DrawSmuflString ( dc, x, ynum, wtext, 1, staff->staffSize);	// '1' = centrer
 
 	if (numBase)
 	{
         s = StringFormat("%u",numBase);
-		DrawLeipzigString ( dc, x, yden, s, 1, staff->staffSize);	// '1' = centrer
+            // FIXME (wtext instead of w)
+		DrawSmuflString ( dc, x, yden, wtext, 1, staff->staffSize);	// '1' = centrer
 	}
 	return;
 }
@@ -1332,18 +1344,18 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
     MeterSig *meterSig = dynamic_cast<MeterSig*>(element);
     
-    dc->StartGraphic( element, "meterSig", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
-    int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*6);
+    int y = staff->GetDrawingY() - (m_doc->m_drawingHalfInterl[ staff->staffSize ]*4);
     int x = element->GetDrawingX();
     
     if ( meterSig->GetSym() == METERSIGN_common ) {
-        DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_COMMON, staff, staff->staffSize);
-        x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
+        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->staffSize, false);
+        x += m_doc->m_drawingUnit*5; // step forward because we have a symbol
     }
     else if ( meterSig->GetSym() == METERSIGN_cut ) {
-        DrawLeipzigFont( dc, element->GetDrawingX(), y, LEIPZIG_METER_SYMB_CUT, staff, staff->staffSize);
-        x += m_doc->m_drawingStep1*5; // step forward because we have a symbol
+        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->staffSize, false);
+        x += m_doc->m_drawingUnit*5; // step forward because we have a symbol
     }
 
     if (meterSig->GetCount())
@@ -1362,7 +1374,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Accid*>(element)); // Element must be a Symbol"
     
     Accid *accid = dynamic_cast<Accid*>(element);
-    dc->StartGraphic( element, "accid", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     // This is used when we add dynamically an element (eg. accidentals before notes)
     // So we can get the clef without adding the new elem in the list
@@ -1375,10 +1387,10 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
-    int symc = LEIPZIG_ACCID_NATURAL;
+    int symc = SMUFL_E261_accidentalNatural;
     switch (accid->GetAccid())
     {
-        case ACCIDENTAL_EXPLICIT_n :  symc = LEIPZIG_ACCID_NATURAL; break;
+        case ACCIDENTAL_EXPLICIT_n :  symc = SMUFL_E261_accidentalNatural; break;
         
         /* The ACCID_DOUBLE_SHARP definition is used in two ways:
          * 1) Antique notation (notAnc == true): it displays the two
@@ -1393,24 +1405,24 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
          * glyph).
          */
         case ACCIDENTAL_EXPLICIT_ss :
+            // This needs to be fixed because it is the old Wolfgang way to handle
+            // mensural notation
             if (staff->notAnc) {
-                    symc = LEIPZIG_ACCID_SHARP;
-                    DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );    
+                    symc = SMUFL_E262_accidentalSharp;
+                    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_cueSize );
                     y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
             } else {
-                symc = LEIPZIG_ACCID_DOUBLE_SHARP;
+                symc = SMUFL_E263_accidentalDoubleSharp;
                 break;
             }
-        case ACCIDENTAL_EXPLICIT_s : symc = LEIPZIG_ACCID_SHARP; break;
-        case ACCIDENTAL_EXPLICIT_ff :
-            symc = LEIPZIG_ACCID_FLAT; DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
-            y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
-        case ACCIDENTAL_EXPLICIT_f :  symc = LEIPZIG_ACCID_FLAT; break;
-        case ACCIDENTAL_EXPLICIT_su : symc = LEIPZIG_ACCID_QUARTER_SHARP; break; // Not sure this is correct...
-        case ACCIDENTAL_EXPLICIT_fu :  symc= LEIPZIG_ACCID_QUARTER_FLAT; break; // Same
+        case ACCIDENTAL_EXPLICIT_s : symc = SMUFL_E262_accidentalSharp; break;
+        case ACCIDENTAL_EXPLICIT_ff : symc = SMUFL_E264_accidentalDoubleFlat;
+        case ACCIDENTAL_EXPLICIT_f : symc = SMUFL_E260_accidentalFlat; break;
+        case ACCIDENTAL_EXPLICIT_su : symc = SMUFL_E268_accidentalNaturalSharp; break; // Not sure this is correct...
+        case ACCIDENTAL_EXPLICIT_fu : symc= SMUFL_E267_accidentalNaturalFlat; break; // Same
         default : break;
     }
-    DrawLeipzigFont ( dc, x, y, symc, staff, accid->m_cueSize );
+    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_cueSize );
 
     
     dc->EndGraphic(element, this );
@@ -1425,7 +1437,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(dynamic_cast<Custos*>(element)); // Element must be a Symbol"
     
     Custos *custos = dynamic_cast<Custos*>(element);
-    dc->StartGraphic( element, "custos", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int oct = custos->GetOloc() - 4;
     element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), oct) );
@@ -1435,7 +1447,8 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
-    DrawLeipzigFont( dc, x, y, 35, staff, custos->m_cueSize );
+    // HARDCODED (smufl code wrong)
+    DrawSmuflCode( dc, x, y, 35,  staff->staffSize, custos->m_cueSize );
     
     dc->EndGraphic(element, this ); //RZ
 
@@ -1448,7 +1461,7 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(dynamic_cast<Dot*>(element)); // Element must be a Symbol"
     
     Dot *dot = dynamic_cast<Dot*>(element);
-    dc->StartGraphic( element, "dot", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     int oct = dot->GetOloc() - 4;
     element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), oct) );
@@ -1465,12 +1478,12 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff )
 {
     // to be updated
-    int x = element->GetDrawingX() - 1 * m_doc->m_env.m_interlDefin;
+    int x = element->GetDrawingX() - m_doc->m_drawingUnit * 2;
     int y = element->GetDrawingY();
     if (staff->GetAlignment() ) {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * 2 * m_doc->m_env.m_interlDefin;
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * m_doc->m_drawingUnit * 4;
     }
-    dc->StartGraphic( syl, "syl", syl->GetUuid() );
+    dc->StartGraphic( syl, "", syl->GetUuid() );
     DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
     dc->EndGraphic(syl, this );
 
@@ -1503,19 +1516,20 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
         return;
     }
     
-    dc->StartGraphic( element, "keysig", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     
     for (int i = 0; i < ks->GetAlterationNumber(); i++) {
         
-        x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] + 5) * i;
+        // HARDCODED
+        x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.2) * i;
         y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->GetClefId()));;
         
         if (ks->GetAlteration() == ACCID_FLAT)
-            symb = LEIPZIG_ACCID_FLAT;
+            symb = SMUFL_E260_accidentalFlat;
         else
-            symb = LEIPZIG_ACCID_SHARP;
+            symb = SMUFL_E262_accidentalSharp;
         
-        DrawLeipzigFont ( dc, x, y, symb, staff, false );
+        DrawSmuflCode ( dc, x, y, symb,  staff->staffSize, false );
     }
     
     dc->EndGraphic(element, this ); //RZ
@@ -1595,7 +1609,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         y1 = y2 = note2->GetDrawingY();
         x2 = note2->GetDrawingX();
-        x1 = x2 - m_doc->m_drawingStep2;
+        x1 = x2 - m_doc->m_drawingInterl[ staff->staffSize ];
         assert(dynamic_cast<Note*>(note2));
         noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
         //DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);
@@ -1634,17 +1648,17 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     // FIXME, take in account elements that can be netween notes, eg keys time etc
     // 20 height nice with 70, not nice with 50
-    // Also remove hard-coded values!
+    // Also remove HARDCODED values!
     if (up) {
-        y1 += 14;
-        y2 += 14;
+        y1 += m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
+        y2 += m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
     }
     else {
-        y1 -= 14;
-        y2 -= 14;
+        y1 -= m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
+        y2 -= m_doc->m_drawingHalfInterl[staff->staffSize] * 1.6;
     }
     
-    dc->StartGraphic( element, "tie", element->GetUuid() );
+    dc->StartGraphic( element, "", element->GetUuid() );
     DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
     dc->EndGraphic(element, this );
 
@@ -1661,6 +1675,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     dc->SetPen(AxBLACK, 2, AxSOLID);
     dc->SetBrush( AxBLACK, AxSOLID );
     
+    // HARDCODED
     if (element->m_drawingStemDir)
         dc->DrawLine(element->m_drawingStemStart.x - 10, ToDeviceContextY(element->m_drawingStemStart.y + 10), element->m_drawingStemStart.x + 20, ToDeviceContextY(element->m_drawingStemStart.y + 40));
     else
@@ -1679,8 +1694,9 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;
     int emb_offset = 0; // if there is and embellishment, offset the note up
     
-    // We position the fermata in the same horizontal pos. of th eobject
-    x = element->GetDrawingX();
+    // We position the fermata in the same horizontal pos. of th object
+    // but it shoud be moved according to half of the fermata size
+    x = element->GetDrawingX() - m_doc->m_drawingInterl[staff->staffSize];
     
     // First case, notes
     if (dynamic_cast<Note*>(element)) {
@@ -1691,41 +1707,40 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         if (!element->m_drawingStemDir && (note->m_dur != DUR_1 || note->m_dur != DUR_BR)) {
         */
             // only for up-fermatas, if there is a trill on the same note
-            // add a 35 pixel space so they do not collide
             if (note->m_embellishment)
-                emb_offset = 35;
+                emb_offset = m_doc->m_drawingInterl[staff->staffSize];
             
             // check that the notehead is in the staff.
             if ((element->GetDrawingY()) < staff->GetDrawingY())
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
-                y = staff->GetDrawingY() + 20 + emb_offset;
+                y = staff->GetDrawingY() + m_doc->m_drawingHalfInterl[staff->staffSize] + emb_offset;
             else
-                // out of the staff, place the trill 20 px above the notehead
-                y = (element->GetDrawingY()) + 20 + emb_offset;
+                // out of the staff, place the trill above the notehead
+                y = (element->GetDrawingY()) + m_doc->m_drawingHalfInterl[staff->staffSize] + emb_offset;
             
             // draw the up-fermata
-            DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
+            DrawSmuflCode ( dc, x, y, SMUFL_E4C0_fermataAbove, staff->staffSize, false );
         /*
         } else { // stem up fermata down
             
             // This works as above, only we check that the note head is not
             // UNDER the staff
             if ((element->GetDrawingY()) > (staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize]))
-                // notehead in staff, set at 20 px under
-                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize] - 20;
+                // notehead in staff, set  under
+                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize] - m_doc->m_drawingInterl[staff->staffSize];
             else
-                // notehead under staff, set 20 px under notehead
-                y = (element->GetDrawingY()) - 20;
+                // notehead under staff, set under notehead
+                y = (element->GetDrawingY()) - m_doc->m_drawingInterl[staff->staffSize];
             
-            DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_DOWN, staff, false );
+            DrawSmuflCode ( dc, x, y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
         */
     } else if (dynamic_cast<Rest*>(element)) {
         // this is a rest
         // rests for the moment are always in the staff
-        // so just place the fermata above the staff + 20 px
-        y = staff->GetDrawingY() + 20;
-        DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_FERMATA_UP, staff, false );
+        // so just place the fermata above the staff
+        y = staff->GetDrawingY() + m_doc->m_drawingInterl[staff->staffSize];
+        DrawSmuflCode ( dc, x, y, SMUFL_E4C1_fermataBelow, staff->staffSize, false );
     }
 }
 
@@ -1734,14 +1749,17 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
 // if there are many symbols to draw we could make a generalized function
 void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;    
-    x = element->GetDrawingX();
 
+    // It shoud be moved according to half of the trill size
+    x = element->GetDrawingX() - m_doc->m_drawingAccidWidth[staff->staffSize][element->m_cueSize];
+
+    // HARDCODED
     if ((element->GetDrawingY()) < staff->GetDrawingY())
-        y = staff->GetDrawingY() + 30;
+        y = staff->GetDrawingY() + m_doc->m_drawingInterl[staff->staffSize];
     else
-        y = (element->GetDrawingY()) + 30;
+        y = (element->GetDrawingY()) + m_doc->m_drawingInterl[staff->staffSize];
     
-    DrawLeipzigFont ( dc, element->GetDrawingX(), y, LEIPZIG_EMB_TRILL, staff, false );
+    DrawSmuflCode ( dc, x, y, SMUFL_E566_ornamentTrill, staff->staffSize, false );
 }
 
 } // namespace vrv    

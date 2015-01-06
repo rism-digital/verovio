@@ -197,13 +197,4 @@ void Note::ResetSlurAttrInitial( )
     }
 }
 
-int Note::GetHorizontalSpacing()
-{
-    SetDocParent();
-    if (this->m_cueSize) {
-        return 5;
-    }
-    return 5; // arbitrary generic value
-}
-
 } // namespace vrv
