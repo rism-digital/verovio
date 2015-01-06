@@ -27,6 +27,7 @@ class Dot;
 class DurationInterface;
 class Layer;
 class LayerElement;
+class Lem;
 class Measure;
 class Mensur;
 class MeterSig;
@@ -35,6 +36,7 @@ class MultiRest;
 class Note;
 class PitchInterface;
 class PositionInterface;
+class Rdg;
 class Rest;
 class ScoreDef;
 class Staff;
@@ -87,7 +89,7 @@ private:
     bool WriteMeiDoc( Doc *doc );
     
     /**
-     * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
+     * @name Methods for wrinting MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     bool WriteMeiPage( pugi::xml_node currentNode, Page *page );
@@ -101,7 +103,7 @@ private:
     ///@}
     
     /**
-     * Write an LayerElement child. 
+     * @name Methods for wrinting LayerElement children.
      * Called from WriteLayerElement.
      */
     ///@{
@@ -121,7 +123,16 @@ private:
     ///@}
     
     /**
-     * Write other mei elements
+     * @name Methods for writing editorial markup
+     */
+    ///@{
+    bool WriteMeiApp( pugi::xml_node currentNode, App *app ) { return true; };
+    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem ) { return true; };
+    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg ) { return true; };
+    ///@}
+    
+    /**
+     * @name Methods for wrinting other mei elements
      */
     ///@{
     void WriteMeiVerse( pugi::xml_node currentNode, Verse *verse );
@@ -129,25 +140,26 @@ private:
     ///@}
     
     /**
-     * Write a sameAs attribute
+     * @name Methods for wrinting a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      * To be changed to Att
      */
     void WriteSameAsAttr( pugi::xml_node currentNode, Object *object );
     
     /**
-     * Write a LayerElement and interfaces.
+     * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
     void WriteLayerElement( pugi::xml_node currentNode, LayerElement *element );
+    void WriteEditorialElement( pugi::xml_node currentNode, EditorialElement *element ) {};
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
     ///@}
     
     /**
-     * Write the XML text content
+     * @name Methods for wrinting the XML text content
      */
     void WriteText( pugi::xml_node currentNode, Object *object );
 	
