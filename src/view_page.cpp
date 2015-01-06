@@ -328,22 +328,22 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     
 	assert( dc ); // DC cannot be NULL
 
+    int penWidth = m_doc->m_env.m_stemWidth;
+    y1 -= penWidth;
+    y2 += penWidth;
 	SwapY( &y1, &y2 );
 	
 	int ymed, xdec, fact;
     
-    dc->SetPen( m_currentColour , 1, AxSOLID );
-    dc->SetBrush( m_currentColour , AxSOLID );
-    
 	x -= m_doc->m_drawingBeamWhiteWidth[ staffSize ];  // distance entre barre et debut accolade
     
 	ymed = (y1 + y2) / 2;
-	fact = m_doc->m_drawingBeamWidth[ staffSize ]-1 + m_doc->m_env.m_barlineWidth;
+	fact = m_doc->m_drawingBeamWidth[ staffSize ] + m_doc->m_env.m_stemWidth;
 	xdec = ToDeviceContextX(fact);
     
 	points[0].x = ToDeviceContextX(x);
 	points[0].y = ToDeviceContextY(y1);
-	points[1].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ] );
+	points[1].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ]*2);
 	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*3);
 	points[3].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ] );
 	points[3].y = ToDeviceContextY(ymed);
@@ -370,6 +370,9 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     new_coords[1][3] = points[2].y;
     new_coords[1][4] = points[3].x;
     new_coords[1][5] = points[3].y;
+    
+    dc->SetPen( m_currentColour, std::max( 1, penWidth ), AxSOLID );
+    dc->SetBrush( m_currentColour , AxSOLID );
     
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y1), new_coords[0], new_coords[1]);
     
