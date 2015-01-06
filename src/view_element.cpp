@@ -309,7 +309,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		else
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawSmuflCode( dc, x1, ynn, fontNo, staff, note->m_cueSize );
+		DrawSmuflCode( dc, x1, ynn, fontNo, staff->staffSize, note->m_cueSize );
 		decval = ynn;
 	}
 	else
@@ -319,7 +319,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		else
 			fontNo = SMUFL_E0A4_noteheadBlack;
 
-		DrawSmuflCode( dc,x1, ynn, fontNo, staff, note->m_cueSize );
+		DrawSmuflCode( dc,x1, ynn, fontNo,  staff->staffSize, note->m_cueSize );
 
 		milieu = bby - m_doc->m_drawingInterl[staffSize]*2;
 
@@ -407,9 +407,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				if (formval > DUR_4)
 				{
                     y2 += m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawSmuflCode( dc,x2,y2,SMUFL_E240_flag8thUp, staff, note->m_cueSize );
+					DrawSmuflCode( dc,x2,y2,SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
 					for (i=0; i < valdec; i++)
-						DrawSmuflCode( dc,x2,y2-=vertical,SMUFL_E240_flag8thUp, staff, note->m_cueSize );
+						DrawSmuflCode( dc,x2,y2-=vertical,SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
 				}
 			}
 			else
@@ -433,9 +433,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				if (formval > DUR_4)
 				{
                     y2 -= m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawSmuflCode( dc,x2,y2,SMUFL_E241_flag8thDown , staff, note->m_cueSize );
+					DrawSmuflCode( dc,x2,y2,SMUFL_E241_flag8thDown ,  staff->staffSize, note->m_cueSize );
 					for (i=0; i < valdec; i++)
-						DrawSmuflCode( dc,x2,y2+=vertical,SMUFL_E241_flag8thDown, staff,
+						DrawSmuflCode( dc,x2,y2+=vertical,SMUFL_E241_flag8thDown,  staff->staffSize,
 									 note->m_cueSize );
 				}
 			}
@@ -859,7 +859,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 
 void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
 {
-	DrawSmuflCode( dc, x, y, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff, smaller );
+	DrawSmuflCode( dc, x, y, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->staffSize, smaller );
 
 	if (dots)
 	{	if (valeur < DUR_16)
@@ -1155,7 +1155,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	if (clef->m_cueSize)
 		a+= m_doc->m_drawingUnit;
 
-	DrawSmuflCode ( dc, a, b, sym, staff, clef->m_cueSize  );
+	DrawSmuflCode ( dc, a, b, sym, staff->staffSize, clef->m_cueSize  );
    
     dc->EndGraphic(element, this ); //RZ
 }
@@ -1349,11 +1349,11 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     int x = element->GetDrawingX();
     
     if ( meterSig->GetSym() == METERSIGN_common ) {
-        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff, staff->staffSize);
+        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08A_timeSigCommon, staff->staffSize, false);
         x += m_doc->m_drawingUnit*5; // step forward because we have a symbol
     }
     else if ( meterSig->GetSym() == METERSIGN_cut ) {
-        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff, staff->staffSize);
+        DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->staffSize, false);
         x += m_doc->m_drawingUnit*5; // step forward because we have a symbol
     }
 
@@ -1408,7 +1408,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
             // mensural notation
             if (staff->notAnc) {
                     symc = SMUFL_E262_accidentalSharp;
-                    DrawSmuflCode ( dc, x, y, symc, staff, accid->m_cueSize );    
+                    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_cueSize );
                     y += 7*m_doc->m_drawingHalfInterl[staff->staffSize]; // LP
             } else {
                 symc = SMUFL_E263_accidentalDoubleSharp;
@@ -1421,7 +1421,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         case ACCIDENTAL_EXPLICIT_fu : symc= SMUFL_E267_accidentalNaturalFlat; break; // Same
         default : break;
     }
-    DrawSmuflCode ( dc, x, y, symc, staff, accid->m_cueSize );
+    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_cueSize );
 
     
     dc->EndGraphic(element, this );
@@ -1447,7 +1447,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
     
     // HARDCODED (smufl code wrong)
-    DrawSmuflCode( dc, x, y, 35, staff, custos->m_cueSize );
+    DrawSmuflCode( dc, x, y, 35,  staff->staffSize, custos->m_cueSize );
     
     dc->EndGraphic(element, this ); //RZ
 
@@ -1528,7 +1528,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
         else
             symb = SMUFL_E262_accidentalSharp;
         
-        DrawSmuflCode ( dc, x, y, symb, staff, false );
+        DrawSmuflCode ( dc, x, y, symb,  staff->staffSize, false );
     }
     
     dc->EndGraphic(element, this ); //RZ
@@ -1720,7 +1720,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
                 y = (element->GetDrawingY()) + 20 + emb_offset;
             
             // draw the up-fermata
-            DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C0_fermataAbove, staff, false );
+            DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C0_fermataAbove, staff->staffSize, false );
         /*
         } else { // stem up fermata down
             
@@ -1742,7 +1742,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         // so just place the fermata above the staff + 20 px
         // HARDCODED
         y = staff->GetDrawingY() + 20;
-        DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C1_fermataBelow, staff, false );
+        DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E4C1_fermataBelow, staff->staffSize, false );
     }
 }
 
@@ -1759,7 +1759,7 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     else
         y = (element->GetDrawingY()) + 30;
     
-    DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E566_ornamentTrill, staff, false );
+    DrawSmuflCode ( dc, element->GetDrawingX(), y, SMUFL_E566_ornamentTrill, staff->staffSize, false );
 }
 
 } // namespace vrv    

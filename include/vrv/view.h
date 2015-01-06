@@ -236,7 +236,7 @@ protected:
     ///@{
 	void DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
-	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, Staff *staff, bool dimin );
+	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
 	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0);

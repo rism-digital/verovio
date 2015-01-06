@@ -103,9 +103,8 @@ void View::DrawDot ( DeviceContext *dc, int x, int y )
 }
 
 void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
-						 Staff *staff, bool dimin )
+						 int staffSize, bool dimin )
 {  
-	int staffSize = staff->staffSize;
 	int fontCorr = 0;
     
     if (dc->CorrectMusicAscent()) {
