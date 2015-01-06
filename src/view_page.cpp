@@ -32,6 +32,7 @@
 #include "staff.h"
 #include "system.h"
 #include "slur.h"
+#include "smufl.h"
 #include "tie.h"
 #include "tuplet.h"
 
@@ -289,39 +290,19 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
 
 void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
-	int xg, xd, yg, yd, ecart, centre;
-
-    dc->SetPen( m_currentColour , 2, AxSOLID );
-    dc->SetBrush( m_currentColour , AxTRANSPARENT );
+    int x1, x2;
     
-    ecart = m_doc->m_drawingBeamWidth[0] + m_doc->m_drawingBeamWhiteWidth[0];
-    centre = x - ecart;
+    x2 = x - m_doc->m_drawingBeamWidth[0];
+    x1 = x2 - m_doc->m_drawingBeamWidth[0];
     
-    xg = centre - ecart*2;
-    xd = centre + ecart*2;
+    DrawSmuflCode( dc, x1, y1,SMUFL_E003_bracketTop, staffSize, false );
+    DrawSmuflCode( dc, x1, y2,SMUFL_E004_bracketBottom, staffSize, false );
     
-    yg = y1 + m_doc->m_drawingInterl[ staffSize ] * 2;
-    yd = y1;
-    SwapY( &yg, &yd );
-    dc->DrawEllipticArc( ToDeviceContextX(xg), ToDeviceContextY(yg), ToDeviceContextX(xd-xg), ToDeviceContextX(yg-yd), 90, 40 );
-    
-    yg = y2;
-    yd = y2 - m_doc->m_drawingInterl[ staffSize ] * 2;
-    SwapY( &yg, &yd );
-    dc->DrawEllipticArc( ToDeviceContextX(xg), ToDeviceContextY(yg), ToDeviceContextX(xd-xg), ToDeviceContextX(yg-yd), 320, 271 );
-    
-    dc->ResetPen();
-    dc->ResetBrush();
-    
-    dc->SetPen( m_currentColour , 0, AxSOLID );
-    dc->SetBrush( m_currentColour , AxSOLID );
-    
-    xg = x - m_doc->m_drawingBeamWidth[0];
-    // determine le blanc entre barres grosse et mince
-    DrawFullRectangle(dc, xg -  m_doc->m_drawingBeamWidth[0] , y1, xg, y2 );
-    
-    dc->ResetPen();
-    dc->ResetBrush();
+    // adjust to top and bottom position so we make sure the is not white space between
+    // the glyphs and the line
+    y1 += m_doc->m_env.m_stemWidth;
+    y2 -= m_doc->m_env.m_stemWidth;
+    DrawFullRectangle(dc, x1 , y1, x2, y2 );
 
 	return;
 }
