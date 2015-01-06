@@ -1511,6 +1511,16 @@ void MeiInput::ReadText( pugi::xml_node element, Object *object )
     }
 }
     
+bool MeiInput::ReadEditorialElement( pugi::xml_node element, EditorialElement *object )
+{
+
+    object->ReadCommon( element );
+    ReadSameAsAttr( element, object );
+    SetMeiUuid( element, object );
+    
+    return true;
+}
+
 bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level )
 {
     if (!m_hasScoreDef) {
@@ -1541,8 +1551,7 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
     }
     
     App *vrvApp = new App( level );
-    SetMeiUuid(app, vrvApp);
-    vrvApp->ReadCommon(app);
+    ReadEditorialElement( app, vrvApp );
     parent->AddEditorialElement(vrvApp);
     
     return ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level );
@@ -1559,8 +1568,7 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
         vrvLemOrRdg = new Rdg();
     }
     
-    SetMeiUuid(lemOrRdg, vrvLemOrRdg);
-    vrvLemOrRdg->ReadCommon(lemOrRdg);
+    ReadEditorialElement( lemOrRdg, vrvLemOrRdg );
     app->AddLemOrRdg(vrvLemOrRdg);
     
     if (level == EDITORIAL_SYSTEM) {

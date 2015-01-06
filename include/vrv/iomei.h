@@ -259,10 +259,11 @@ private:
     ///@}
     
     /**
-     * @name Methods for reading MEI LayerElement and interfaces
+     * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
      */
     ///@{
     bool ReadLayerElement( pugi::xml_node element, LayerElement *object );
+    bool ReadEditorialElement( pugi::xml_node element, EditorialElement *object );
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
