@@ -144,18 +144,29 @@ protected:
     ///@}
     
     /**
-     * @name Methods for drawing App and EditorialElement
+     * @name Methods for drawing children
+     * Defined in view_page.cpp
+     * For each method, we have a parent Object, that can be either the same as the next paremeter,
+     * or an intermediate node in the hierarchy. For example, we can draw the system children from the 
+     * system itself (in that case, parent will be the same as system) or from an editorial element
+     * occuring in between.
+     */
+    ///@{
+    void DrawSystemChildren( DeviceContext *dc, Object *parent, System *system );
+    void DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system );
+    void DrawStaffChildren( DeviceContext *dc, Object *parent, Staff *staff,  Measure *measure );
+    void DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure );
+    ///@}
+    
+    /**
+     * @name Methods for drawing EditorialElement object at different levels
      * Defined in view_page.cpp
      */
     ///@{
-    /** System level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system );
-    /** Measure level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
-    /** Staff level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
-    /** Layer level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawSystemEditorialElement( DeviceContext *dc, EditorialElement *element, System *system );
+    void DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
+    void DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
+    void DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**

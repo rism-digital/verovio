@@ -88,10 +88,6 @@ void View::DrawSystem( DeviceContext *dc, System *system )
 {
 	assert( system ); // other asserted before
     
-    Measure *measure = NULL;
-    ScoreDef *scoreDef = NULL;
-    EditorialElement *editorialElement = NULL;
-    
     dc->StartGraphic( system, "", system->GetUuid() );
     
     
@@ -107,33 +103,14 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         system->SetDrawingY( system->m_yAbs );
     }
 
-    Object* current;
-    for (current = system->GetFirst( ); current; current = system->GetNext( ) )
-	{
-		measure = dynamic_cast<Measure*>(current);
-        scoreDef = dynamic_cast<ScoreDef*>(current);
-        editorialElement = dynamic_cast<EditorialElement*>(current);
-        if (measure) {
-            DrawMeasure( dc , measure, system );
-        }
-        else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, system );
-        }
-        // scoreDef are not drawn directly, but anything else should not be possible
-        else if (scoreDef) {
-            m_drawingScoreDef.Replace(scoreDef);
-        }
-        else {
-            assert(false);
-        }
-	}
+    DrawSystemChildren(dc, system, system);
 
     // We draw the groups after the staves because we use the m_drawingY member of the staves
     // that needs to be intialized.
     // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
     // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
-    measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
+    Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
         // NULL for the Barline parameters indicates that we are drawing the scoreDef
         DrawScoreDef( dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL );
@@ -592,9 +569,6 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 {
 	assert( dc ); // DC cannot be NULL
     
-    Staff *staff = NULL;
-    EditorialElement *editorialElement = NULL;
-    
     // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure if un-measured music
     if ( measure->IsMeasuredMusic()) {
         dc->StartGraphic( measure, "", measure->GetUuid() );
@@ -613,21 +587,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
         measure->SetDrawingX( measure->m_xAbs );
     }
     
-    Object* current;
-    for (current = measure->GetFirst( ); current; current = measure->GetNext( ) )
-    {
-        staff = dynamic_cast<Staff*>(current);
-        editorialElement = dynamic_cast<EditorialElement*>(current);
-        if (staff) {
-            DrawStaff( dc, staff, measure, system );
-        }
-        else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, measure, system );
-        }
-        else {
-            assert(false);
-        }
-    }
+    DrawMeasureChildren(dc, measure, measure, system);
 
     if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
         DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarline() );
@@ -700,9 +660,6 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 {
 	assert( dc ); // DC cannot be NULL
     
-    Layer *layer = NULL;
-    EditorialElement *editorialElement = NULL;
-    
     dc->StartGraphic( staff, "", staff->GetUuid());
     
     // Here we set the appropriate y value to be used for drawing
@@ -723,22 +680,8 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     DrawStaffLines( dc, staff, measure, system );
     
-    Object* current;
-    for (current = staff->GetFirst( ); current; current = staff->GetNext( ) )
-    {
-        layer = dynamic_cast<Layer*>(current);
-        editorialElement = dynamic_cast<EditorialElement*>(current);
-        if (layer) {
-            DrawLayer( dc, layer, staff, measure );
-        }
-        else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, staff, measure );
-        }
-        else {
-            assert(false);
-        }
-    }
-
+    DrawStaffChildren(dc, staff, staff, measure);
+    
     dc->EndGraphic( staff, this );
 }
     
@@ -861,15 +804,13 @@ MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint c
 void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure)
 {
 	assert( dc ); // DC cannot be NULL
-
-	LayerElement *element = NULL;
-    EditorialElement *editorialElement = NULL;
     
     dc->StartGraphic( layer, "", layer->GetUuid());
     
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
     
+    // the draw the scoreDef when required
     if (layer->GetDrawingClef()) {
         DrawElement(dc, layer->GetDrawingClef(), layer, staff, measure);
     }
@@ -883,21 +824,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
         DrawElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
     }
 
-    Object* current;
-    for (current = layer->GetFirst( ); current; current = layer->GetNext( ) )
-    {
-        element = dynamic_cast<LayerElement*>(current);
-        editorialElement = dynamic_cast<EditorialElement*>(current);
-        if (element) {
-            DrawElement( dc, element, layer, staff, measure );
-        }
-        else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, layer, staff, measure );
-        }
-        else {
-            assert(false);
-        }
-    }
+    DrawLayerChildren(dc, layer, layer, staff, measure);
     
     // first draw the beams
     DrawLayerList(dc, layer, staff, measure, &typeid(Beam) );
@@ -908,9 +835,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     // then slurs
     DrawLayerList(dc, layer, staff, measure, &typeid(Slur) );
     
-    
     dc->EndGraphic( layer, this );
-    
 }
 
 
@@ -951,25 +876,18 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
     }
 }
     
-
 //----------------------------------------------------------------------------
-// View - Editorial
+// View - Children
 //----------------------------------------------------------------------------
 
-void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system )
+void View::DrawSystemChildren( DeviceContext *dc, Object *parent, System *system )
 {
-    if ( dynamic_cast<App*>(element) ) {
-        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_SYSTEM );
-    }
-    
-    dc->StartGraphic( element, "", element->GetUuid());
-    
     Measure *measure = NULL;
     ScoreDef *scoreDef = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
-    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
         measure = dynamic_cast<Measure*>(current);
         scoreDef = dynamic_cast<ScoreDef*>(current);
@@ -978,7 +896,7 @@ void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, S
             DrawMeasure( dc , measure, system );
         }
         else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, system );
+            DrawSystemEditorialElement( dc , editorialElement, system );
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (scoreDef) {
@@ -988,23 +906,15 @@ void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, S
             assert(false);
         }
     }
-    
-    dc->EndGraphic( element, this );
 }
 
-void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system )
+void View::DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system )
 {
-    if ( dynamic_cast<App*>(element) ) {
-        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_MEASURE );
-    }
-    
-    dc->StartGraphic( element, "", element->GetUuid());
-    
     Staff *staff = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
-    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
         staff = dynamic_cast<Staff*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
@@ -1012,29 +922,21 @@ void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, M
             DrawStaff( dc , staff, measure, system );
         }
         else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, measure, system );
+            DrawMeasureEditorialElement( dc , editorialElement, measure, system );
         }
         else {
             assert(false);
         }
     }
-    
-    dc->EndGraphic( element, this );
 }
-    
-void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure )
+
+void View::DrawStaffChildren( DeviceContext *dc, Object *parent, Staff *staff,  Measure *measure )
 {
-    if ( dynamic_cast<App*>(element) ) {
-        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_STAFF );
-    }
-    
-    dc->StartGraphic( element, "", element->GetUuid());
-    
     Layer *layer = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
-    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
         layer = dynamic_cast<Layer*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
@@ -1042,29 +944,21 @@ void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, S
             DrawLayer( dc , layer, staff, measure );
         }
         else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, staff, measure );
+            DrawStaffEditorialElement( dc , editorialElement, staff, measure );
         }
         else {
             assert(false);
         }
     }
-    
-    dc->EndGraphic( element, this );
 }
 
-void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure )
+void View::DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure )
 {
-    if ( dynamic_cast<App*>(element) ) {
-        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_LAYER );
-    }
-    
-    dc->StartGraphic( element, "", element->GetUuid());
-    
     LayerElement *layerElement = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
-    for (current = element->GetFirst( ); current; current = element->GetNext( ) )
+    for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
         layerElement = dynamic_cast<LayerElement*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
@@ -1072,13 +966,60 @@ void View::DrawEditorialElement( DeviceContext *dc, EditorialElement *element, L
             DrawElement( dc, layerElement, layer, staff, measure );
         }
         else if (editorialElement) {
-            DrawEditorialElement( dc , editorialElement, layer, staff, measure );
+            DrawLayerEditorialElement( dc , editorialElement, layer, staff, measure );
         }
         else {
             assert(false);
         }
     }
+}
     
+
+//----------------------------------------------------------------------------
+// View - Editorial
+//----------------------------------------------------------------------------
+
+void View::DrawSystemEditorialElement( DeviceContext *dc, EditorialElement *element, System *system )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_SYSTEM );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    DrawSystemChildren( dc, element, system);
+    dc->EndGraphic( element, this );
+}
+
+void View::DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_MEASURE );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    DrawMeasureChildren(dc, element, measure, system);
+    dc->EndGraphic( element, this );
+}
+    
+void View::DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_STAFF );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    DrawStaffChildren(dc, element, staff, measure);
+    dc->EndGraphic( element, this );
+}
+
+void View::DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
+    if ( dynamic_cast<App*>(element) ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_LAYER );
+    }
+    
+    dc->StartGraphic( element, "", element->GetUuid());
+    DrawLayerChildren(dc, element, layer, staff, measure);
     dc->EndGraphic( element, this );
 }
     
