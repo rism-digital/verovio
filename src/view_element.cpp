@@ -179,12 +179,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
 
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    for (unsigned int i = 0; i < beam->m_children.size(); i++) {
-        if ( dynamic_cast<LayerElement*>(beam->m_children[i]) ) {
-            LayerElement *element = dynamic_cast<LayerElement*>(beam->m_children[i]);
-            DrawElement(dc, element, layer, staff, measure);
-        }
-    }
+    DrawLayerChildren(dc, beam, layer, staff, measure);
     
     // Add to the list of postponed element 
     layer->AddToDrawingList( beam );
@@ -202,12 +197,7 @@ void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *la
     dc->StartGraphic( element, "", element->GetUuid() );
     
     // Draw the inner elements
-    for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
-        if ( dynamic_cast<LayerElement*>(tuplet->m_children[i]) ) {
-            LayerElement *element = dynamic_cast<LayerElement*>(tuplet->m_children[i]);
-            DrawElement(dc, element, layer, staff, measure);
-        }
-    }
+    DrawLayerChildren(dc, tuplet, layer, staff, measure);
     
     // Add to the list of postponed element
     layer->AddToDrawingList( tuplet );
