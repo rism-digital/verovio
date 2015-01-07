@@ -525,30 +525,31 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     {
         if ( filters && !filters->empty() ) {
             bool hasAttComparison = false;
-            // first we look if the is a comparison object for the object type (e.g., a Staff)
+            // first we look if there is a comparison object for the object type (e.g., a Staff)
             ArrayOfAttComparisons::iterator attComparisonIter;
             for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
-                // if yet, we will use it (*attComparisonIter) for evaluating if the object matches
-                // the attribute (below)
+                // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
+                // the attribute (see below)
                 if ((*attComparisonIter)->GetType() == &typeid(**iter)) {
                     hasAttComparison = true;
                     break;
                 }
             }
             if (hasAttComparison) {
-                // use the operator of the AttCommon to evaluate the attribute
+                // use the operator of the AttComparison object to evaluate the attribute
                 if ((**attComparisonIter)(*iter)) {
+                    // the attribute value matches, process the object
                     //LogDebug("%s ", (*iter)->GetClassName().c_str() );
                     (*iter)->Process( functor, params, endFunctor, filters, deepness);
                     break;
                 }
                 else {
-                    // the attribute value does not match, skip this object
+                    // the attribute value does not match, skip this child
                     continue;
                 }
             }
         }
-        // we will end here if there is no filter at all or for the current child object
+        // we will end here if there is no filter at all or for the current child type
         (*iter)->Process( functor, params, endFunctor, filters, deepness );
     }
     
