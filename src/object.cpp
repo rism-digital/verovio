@@ -1061,13 +1061,13 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / 10;
+    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / MARGIN_DENOMINATOR;
     
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
-    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(current) * doc->m_drawingUnit / 10);
+    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR);
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
@@ -1087,8 +1087,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / DEFINITON_FACTOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / DEFINITON_FACTOR );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR );
     
     return FUNCTOR_CONTINUE;
 }

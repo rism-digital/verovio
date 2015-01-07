@@ -258,21 +258,13 @@ int Doc::GetPageCount( )
     return GetChildCount() ;
 }
     
-/*
+
 short Doc::GetLeftMargin( const std::type_info *elementType )
 {
-    if (&typeid(Note) == elementType)
-        return 5;
-    return 0;
-}
-*/
-    
-short Doc::GetLeftMargin( const Object *object )
-{
-    const std::type_info *elementType = &typeid(*object);
-    //if (typeid(Note) == *elementType) return 10;
+
     if (typeid(Barline) == *elementType) return 5;
     else if (typeid(Clef) == *elementType) return -20;
+    //else if (typeid(Note) == *elementType) return 10;
     return 0;
 
 }
