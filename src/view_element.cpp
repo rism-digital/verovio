@@ -397,11 +397,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				if (staff->notAnc)
 					DrawVerticalLine ( dc,y2,(int)(ynn + m_doc->m_drawingHalfInterl[staffSize]),x2, m_doc->m_env.m_stemWidth );//queue en descendant
 				else
-					DrawVerticalLine ( dc,y2,(int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );//queue en descendant
+					DrawVerticalLine ( dc,y2,(int)(ynn+ m_doc->m_drawingHalfInterl[staffSize]/4),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );//queue en descendant
                 
                 element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
                 element->m_drawingStemEnd.y = y2;
-                element->m_drawingStemStart.y = (int)(ynn+ m_doc->m_drawingVerticalUnit2[staffSize]);
+                element->m_drawingStemStart.y = (int)(ynn+ m_doc->m_drawingHalfInterl[staffSize]/4);
                 element->m_drawingStemDir = true;
                 
 				if (formval > DUR_4)
@@ -423,10 +423,10 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 				if (staff->notAnc)
 					DrawVerticalLine ( dc,y2,ynn- m_doc->m_drawingHalfInterl[staffSize],x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );//queue en descendant
 				else
-					DrawVerticalLine ( dc,y2,(int)(ynn- m_doc->m_drawingVerticalUnit2[staffSize]),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );	// queue en montant
+					DrawVerticalLine ( dc,y2,(int)(ynn- m_doc->m_drawingHalfInterl[staffSize]/4),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );	// queue en montant
 
                 element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
-                element->m_drawingStemStart.y = (int)(ynn- m_doc->m_drawingVerticalUnit2[staffSize]);
+                element->m_drawingStemStart.y = (int)(ynn- m_doc->m_drawingHalfInterl[staffSize]/4);
                 element->m_drawingStemEnd.y = y2;
                 element->m_drawingStemDir = false;
                 
@@ -943,8 +943,8 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	x1 = xn - m_doc->m_drawingBrevisWidth[staff->staffSize]; x2 = xn +  m_doc->m_drawingBrevisWidth[staff->staffSize];
 	y1 = y + m_doc->m_drawingHalfInterl[staff->staffSize]; 
 	y2 = y - m_doc->m_drawingHalfInterl[staff->staffSize]; 
-	y3 = (int)(y1 + m_doc->m_drawingVerticalUnit1[staff->staffSize]);	// partie d'encadrement qui depasse
-	y4 = (int)(y2 - m_doc->m_drawingVerticalUnit1[staff->staffSize]);	
+	y3 = (int)(y1 + m_doc->m_drawingHalfInterl[staff->staffSize]/2);	// partie d'encadrement qui depasse
+	y4 = (int)(y2 - m_doc->m_drawingHalfInterl[staff->staffSize]/2);
 
     
 	//if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
@@ -1445,7 +1445,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
-    y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingVerticalUnit2[staff->staffSize];  // LP - correction in 2.0.0
+    y -= m_doc->m_drawingHalfInterl[staff->staffSize] - m_doc->m_drawingHalfInterl[staff->staffSize]/4;  // LP - correction in 2.0.0
     
     // HARDCODED (smufl code wrong)
     DrawSmuflCode( dc, x, y, 35,  staff->staffSize, custos->m_cueSize );

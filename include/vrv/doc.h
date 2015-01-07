@@ -261,10 +261,6 @@ public:
     int m_drawingBrevisWidth[2];
     /** Accident width for normal and small staff and normal and grace size */
     int m_drawingAccidWidth[2][2];
-    /** A vertical unit corresponding to the 1/4 of an interline */
-    float m_drawingVerticalUnit1[2];
-    /** A vertical unit corresponding to the 1/8 of an interline */
-    float m_drawingVerticalUnit2[2];
     /** Current music font for normal and small staff and normal and grace size */
     FontMetricsInfo m_drawingFonts[2][2];				
     /** music font */

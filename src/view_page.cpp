@@ -801,7 +801,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
     Staff *parentStaff = dynamic_cast<Staff*>(layer->m_parent);
     int staffSize = parentStaff->staffSize;
 	// calculer position du do central en fonction clef
-	y_n += (int) m_doc->m_drawingVerticalUnit2[staffSize];
+	y_n += (int) m_doc->m_drawingHalfInterl[staffSize]/4;
 	yb = parentStaff->GetDrawingY() -  m_doc->m_drawingStaffSize[staffSize]*2; // UT1 default
 	
 

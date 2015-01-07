@@ -477,17 +477,17 @@ if (fPente)
 		if (fb.fl_cond)	/* esth: eviter que queues depassent barres */
 		{	if (crd[i].prov)	/* venant du haut, m_stemDir en bas */
 			{	/***fy1 = *(_ybeam+i)+v_pnt;***/	/* on raccourcit m_stemDir */
-				fy2 = crd[i].b-m_doc->m_drawingVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
 			}
 			else
 			{	/***fy1 = *(_ybeam+i)-e_t->v_pnt;***/	/* on allonge m_stemDir */
-				fy2 = crd[i].b+m_doc->m_drawingVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
 			}
 		}
 		else	// on tient compte de l'‚paisseur qui fait des "bosses"
 		{	if (fb.dir == STEMDIRECTION_up)	// m_stemDir en haut
 			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b+m_doc->m_drawingVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
                 crd[i].chk->m_drawingStemStart.y = fy2;
                 crd[i].chk->m_drawingStemEnd.y = fy1;
@@ -495,7 +495,7 @@ if (fPente)
 			}
 			else
 			{	fy1 = *(_ybeam+i) + m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b-m_doc->m_drawingVerticalUnit2[staff->staffSize];
+				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
                 crd[i].chk->m_drawingStemStart.y = fy2;
                 crd[i].chk->m_drawingStemEnd.y = fy1;

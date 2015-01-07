@@ -399,11 +399,6 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingLyricFonts[0].SetPointSize( m_drawingLyricFont.GetPointSize() );
     m_drawingLyricFonts[1].SetPointSize( m_drawingLyricFont.GetPointSize() );
     
-    m_drawingVerticalUnit1[0] = (float)m_drawingInterl[0]/4;
-    m_drawingVerticalUnit2[0] = (float)m_drawingInterl[0]/8;
-    m_drawingVerticalUnit1[1] = (float)m_drawingInterl[1]/4;
-    m_drawingVerticalUnit2[1] = (float)m_drawingInterl[1]/8;
-    
     float glyph_size;
     Glyph *glyph;
     int x, y, w, h;
