@@ -26,6 +26,8 @@ public:
         m_n = n;
     };
     
+    void SetN( int n ) { m_n = n; }
+    
     virtual bool operator() (Object *object)
     {
         if  (typeid(*object) != *m_elementType) {

@@ -129,6 +129,8 @@ public:
     
     virtual bool operator() (Object *object);
     
+    const std::type_info *GetType() { return m_elementType; };
+    
 protected:
     const std::type_info *m_elementType;
 };

@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
@@ -98,24 +99,29 @@ void Doc::PrepareDrawing()
     this->Process( &prepareDrawing, params );
     
     // The tree is used to process each staff/layer/verse separatly
-    // For this, we use a MapOfTypeN that looks for each object if it is of the type
+    // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
     // and with @n specified
     
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
+    std::vector<AttComparison*> filters;
     for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                MapOfTypeN map;
-                map[ &typeid(Staff) ] = staves->first;
-                map[ &typeid(Layer) ] = layers->first;
-                map[ &typeid(Verse) ] = verses->first;
+                filters.clear();
+                // Create ad comparison object for each type / @n
+                AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+                AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+                AttCommonNComparison matchVerse( &typeid(Verse), verses->first );
+                filters.push_back( &matchStaff );
+                filters.push_back( &matchLayer );
+                filters.push_back( &matchVerse );
                 
                 ArrayPtrVoid paramsLyrics;
                 Functor prepareLyrics( &Object::PrepareLyrics );
-                this->Process( &prepareLyrics, paramsLyrics, NULL, &map );
+                this->Process( &prepareLyrics, paramsLyrics, NULL, &filters );
             }
         }
     }
@@ -125,18 +131,22 @@ void Doc::PrepareDrawing()
     StaffN_LayerN_VerseN_t::iterator staves;
     LayerN_VerserN_t::iterator layers;
     VerseN_t::iterator verses;
+    std::vector<AttComparison*> filters;
     for (staves = staffLayerVerseTree.begin(); staves != staffLayerVerseTree.end(); ++staves) {
         for (layers = staves->second.begin(); layers != staves->second.end(); ++layers) {
             for (verses= layers->second.begin(); verses != layers->second.end(); ++verses) {
                 std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
-                MapOfTypeN map;
-                map[ &typeid(Staff) ] = staves->first;
-                map[ &typeid(Layer) ] = layers->first;
-                map[ &typeid(Verse) ] = verses->first;
-                
+                filters.clear();
+                AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+                AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+                AttCommonNComparison matchVerse( &typeid(Verse), verses->first );
+                filters.push_back( &matchStaff );
+                filters.push_back( &matchLayer );
+                filters.push_back( &matchVerse );
+
                 ArrayPtrVoid paramsLyrics;
                 Functor prepareLyrics( &Object::PrepareLyrics );
-                this->Process( &prepareLyrics, paramsLyrics, NULL, &map );
+                this->Process( &prepareLyrics, paramsLyrics, NULL, &filters );
             }
         }
     }

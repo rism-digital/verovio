@@ -58,7 +58,7 @@ public:
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using a MapOfTypeN
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
      * See PrepareDarwing
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );

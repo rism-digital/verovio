@@ -496,7 +496,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, MapOfTypeN *mapOfTypeN, int deepness )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -511,9 +511,11 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     }
 
     else if (dynamic_cast<EditorialElement*>(this)) {
+        // since editorial object do not count, we re-increase the deepness limit
         deepness++;
     }
     if (deepness == 0) {
+        // any need to change the functor m_returnCode?
         return;
     }
     deepness--;
@@ -521,26 +523,33 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     ArrayOfObjects::iterator iter;
     for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
     {
-        // The MapOfTypeN is used to filter according to a type and an @n
-        // For example, to process only staff @n="x" and @layer="y"
-        if ( mapOfTypeN ) {
-            MapOfTypeN::iterator typeN = mapOfTypeN->find( &typeid(**iter) );
-            if(typeN != mapOfTypeN->end()) {
-                AttCommon *child = dynamic_cast<AttCommon*>(*iter);
-                // The filtered type must be of AttCommon because GetN called
-                assert( child );
-                if (child->GetN() != typeN->second) {
-                    // skip it
-                    continue;
-                }
-                else {
-                    // process this one and quit
-                    (*iter)->Process( functor, params, endFunctor, mapOfTypeN, deepness );
+        if ( filters && !filters->empty() ) {
+            bool hasAttComparison = false;
+            // first we look if the is a comparison object for the object type (e.g., a Staff)
+            ArrayOfAttComparisons::iterator attComparisonIter;
+            for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
+                // if yet, we will use it (*attComparisonIter) for evaluating if the object matches
+                // the attribute (below)
+                if ((*attComparisonIter)->GetType() == &typeid(**iter)) {
+                    hasAttComparison = true;
                     break;
                 }
             }
+            if (hasAttComparison) {
+                // use the operator of the AttCommon to evaluate the attribute
+                if ((**attComparisonIter)(*iter)) {
+                    //LogDebug("%s ", (*iter)->GetClassName().c_str() );
+                    (*iter)->Process( functor, params, endFunctor, filters, deepness);
+                    break;
+                }
+                else {
+                    // the attribute value does not match, skip this object
+                    continue;
+                }
+            }
         }
-        (*iter)->Process( functor, params, endFunctor, mapOfTypeN, deepness );
+        // we will end here if there is no filter at all or for the current child object
+        (*iter)->Process( functor, params, endFunctor, filters, deepness );
     }
     
     if ( endFunctor ) {
