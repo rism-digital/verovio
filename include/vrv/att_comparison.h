@@ -30,9 +30,7 @@ public:
     
     virtual bool operator() (Object *object)
     {
-        if  (typeid(*object) != *m_elementType) {
-            return false;
-        }
+        if (!MatchesType(object)) return false;
         AttCommon *element = dynamic_cast<AttCommon*>(object);
         if (!element) {
             return false;
