@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "aligner.h"
+#include "editorial.h"
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
@@ -28,7 +29,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Verse::Verse():
-    DocObject("verse-"),
+    LayerElement("verse-"),
     AttCommon()
 {
     Reset();
@@ -40,14 +41,15 @@ Verse::~Verse()
 
 void Verse::Reset()
 {
-    DocObject::Reset();
+    LayerElement::Reset();
     ResetCommon();
 }
 
-void Verse::AddSyl(Syl *syl) {
-    
-    syl->SetParent( this );
-    m_children.push_back(syl);
+void Verse::AddElement(vrv::LayerElement *element)
+{
+    assert( dynamic_cast<Syl*>(element) || dynamic_cast<EditorialElement*>(element) );
+    element->SetParent( this );
+    m_children.push_back(element);
     Modify();
 }
 
@@ -97,7 +99,7 @@ int Verse::PrepareLyrics( ArrayPtrVoid params )
     
     Syl *syl = dynamic_cast<Syl*>( this->GetFirst( &typeid(Syl) ) );
     if (syl) {
-        //std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
+        std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
     }
     return FUNCTOR_CONTINUE;
 }

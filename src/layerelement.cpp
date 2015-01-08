@@ -31,8 +31,10 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
+#include "syl.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "verse.h"
 #include "vrv.h"
 #include "vrvdef.h"
 
@@ -235,6 +237,11 @@ bool LayerElement::IsRest()
     return (dynamic_cast<Rest*>(this));
 }
     
+bool LayerElement::IsSyl()
+{
+    return (dynamic_cast<Syl*>(this));
+}
+
 bool LayerElement::IsTie()
 {
     return (dynamic_cast<Tie*>(this));
@@ -243,6 +250,11 @@ bool LayerElement::IsTie()
 bool LayerElement::IsTuplet()
 {
     return (dynamic_cast<Tuplet*>(this));
+}
+    
+bool LayerElement::IsVerse()
+{
+    return (dynamic_cast<Verse*>(this));
 }
 
 void LayerElement::AdjustPname( int *pname, int *oct )
@@ -345,7 +357,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     else if ( this->IsGraceNote() ) {
         type = ALIGNMENT_GRACENOTE;
     }
-    else if ( this->IsBeam() || this->IsTuplet() ) {
+    else if ( this->IsBeam() || this->IsTuplet() || this->IsVerse() || this->IsSyl() ) {
         type = ALIGNMENT_CONTAINER;
     }
     

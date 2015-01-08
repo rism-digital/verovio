@@ -96,6 +96,8 @@ public:
     bool IsRest();
     bool IsTie();
     bool IsTuplet();
+    bool IsSyl();
+    bool IsVerse();
     bool IsGraceNote();
     ///@}
 

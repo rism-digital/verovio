@@ -10,7 +10,7 @@
 #define __VRV_SYL_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "layerelement.h"
 
 namespace vrv {
 
@@ -18,7 +18,7 @@ namespace vrv {
 // Syl
 //----------------------------------------------------------------------------
 
-class Syl: public DocObject,
+class Syl: public LayerElement,
     public AttSylLog
 {
 public:

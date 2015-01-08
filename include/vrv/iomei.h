@@ -259,7 +259,9 @@ private:
     bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
     bool ReadMeiNote( Object *parent, pugi::xml_node note );
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
+    bool ReadMeiSyl( Object *parent, pugi::xml_node syl );
     bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
+    bool ReadMeiVerse( Object *parent, pugi::xml_node verse );
     ///@}
   
     /**
@@ -288,8 +290,6 @@ private:
      */
     ///@{
     bool ReadAccidAsAttr( Note *note, pugi::xml_node verse );
-    bool ReadVerse( Note *note, pugi::xml_node verse );
-    bool ReadSyl( Verse *verse, pugi::xml_node syl );
     bool ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan );
     bool ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur );
     ///@}

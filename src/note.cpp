@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "editorial.h"
 #include "slur.h"
 #include "tie.h"
 #include "verse.h"
@@ -106,10 +107,11 @@ bool Note::operator==( Object& other )
     return true;
 }
     
-void Note::AddVerse(Verse *child)
-{    
-    child->SetParent( this );
-    m_children.push_back(child);
+void Note::AddElement(vrv::LayerElement *element)
+{
+    assert( dynamic_cast<Verse*>(element) || dynamic_cast<EditorialElement*>(element) );
+    element->SetParent( this );
+    m_children.push_back(element);
     Modify();
 }
 

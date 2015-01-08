@@ -671,10 +671,19 @@ bool MeiInput::IsAllowed(std::string element, vrv::Object *filterParent)
     }
     
     const std::type_info *elementType = &typeid(*filterParent);
-    if (*elementType  == typeid(Note))
+    if ( element == "app" ) {
+        return true;
+    }
+    else if (*elementType  == typeid(Note))
     {
-        if ( element == "accid" ) return true;
-        else if ( element == "verse" ) return true;
+        //if ( element == "accid" ) return true;
+        //else 
+        if ( element == "verse" ) return true;
+        else return false;
+    }
+    else if (*elementType  == typeid(Verse))
+    {
+        if ( element == "syl" ) return true;
         else return false;
     }
     else
@@ -1225,8 +1234,14 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "multiRest" ) {
             success = ReadMeiMultiRest( parent, xmlElement );
         }
+        else if ( elementName == "syl" ) {
+            success = ReadMeiSyl( parent, xmlElement );
+        }
         else if ( elementName == "tuplet" ) {
             success = ReadMeiTuplet( parent, xmlElement );
+        }
+        else if ( elementName == "verse" ) {
+            success = ReadMeiVerse( parent, xmlElement );
         }
         else if ( elementName == "chord" ) {
             // We just read the first note for now
@@ -1414,17 +1429,15 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
         }
     }
     
+    // We can drop this once we allow <accid> and <note> child
     pugi::xml_node current;
     for( current = note.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "accid" ) {
             ReadAccidAsAttr(  vrvNote, current );
         }
-        if ( std::string( current.name() ) == "verse" ) {
-            ReadVerse(  vrvNote, current );
-        }
     }
-	
-	return true;
+    
+	return ReadMeiLayerChildren(vrvNote, note, vrvNote);
 }
 
 
@@ -1440,6 +1453,17 @@ bool MeiInput::ReadMeiRest( Object *parent, pugi::xml_node rest )
     return true;
 }
 
+bool MeiInput::ReadMeiSyl( Object *parent, pugi::xml_node syl)
+{
+    Syl *vrvSyl = new Syl();
+    ReadLayerElement(syl, vrvSyl);
+    
+    vrvSyl->ReadSylLog( syl );
+    ReadText( syl, vrvSyl );
+    
+    AddLayerElement(parent, vrvSyl);
+    return true;
+}
 
 bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
 {
@@ -1451,43 +1475,25 @@ bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
     
     AddLayerElement(parent, vrvTuplet);
     
-    ReadMeiLayerChildren( vrvTuplet, tuplet);
+    bool success = ReadMeiLayerChildren(vrvTuplet, tuplet);
     
     if ( vrvTuplet->GetNoteCount() == 1 ) {
         LogWarning("<tuplet> with only one note");
     }
     
-    return true;
+    return success;
 }
-    
-bool MeiInput::ReadVerse( Note *vrvNote, pugi::xml_node verse)
+
+bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
 {
     Verse *vrvVerse = new Verse();
-    SetMeiUuid( verse , vrvVerse );
+    ReadLayerElement(verse, vrvVerse);
     
     vrvVerse->ReadCommon(verse);
     
-    pugi::xml_node current;
-    for( current = verse.first_child( ); current; current = current.next_sibling( ) ) {
-        if ( std::string( current.name() ) == "syl" ) {
-            ReadSyl( vrvVerse, current );
-        }
-    }
-
-    vrvNote->AddVerse( vrvVerse );
-    return true;
-}
-
-bool MeiInput::ReadSyl( Verse *vrvVerse, pugi::xml_node syl)
-{
-    Syl *vrvSyl = new Syl();
-    SetMeiUuid( syl , vrvSyl );
+    AddLayerElement(parent, vrvVerse);
     
-    vrvSyl->ReadSylLog( syl );
-    ReadText( syl, vrvSyl );
-    
-    vrvVerse->AddSyl( vrvSyl );
-    return true;
+    return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
@@ -1710,11 +1716,17 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     else if ( dynamic_cast<Layer*>( parent ) ) {
         dynamic_cast<Layer*>( parent )->AddElement( element );
     }
+    else if ( dynamic_cast<Note*>( parent ) ) {
+        dynamic_cast<Note*>( parent )->AddElement( element );
+    }
     else if ( dynamic_cast<Beam*>( parent ) ) {
         dynamic_cast<Beam*>( parent )->AddElement( element );
     }
     else if ( dynamic_cast<Tuplet*>( parent ) ) {
         dynamic_cast<Tuplet*>( parent )->AddElement( element );
+    }
+    else if ( dynamic_cast<Verse*>( parent ) ) {
+        dynamic_cast<Verse*>( parent )->AddElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
