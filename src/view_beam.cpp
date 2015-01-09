@@ -181,7 +181,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 				fb.mrq_port = chk->_shport;
             }***/
 
-			(crd+ct)->a = chk->GetDrawingX() - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
+            (crd+ct)->a = chk->GetDrawingX(); // - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
 			if (chk->IsNote() && ((Note*)chk)->GetBreaksec() && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
