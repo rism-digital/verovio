@@ -678,7 +678,8 @@ bool MeiInput::IsAllowed(std::string element, vrv::Object *filterParent)
     {
         //if ( element == "accid" ) return true;
         //else 
-        if ( element == "verse" ) return true;
+        if ( element == "syl" ) return true;
+        else if ( element == "verse" ) return true;
         else return false;
     }
     else if (*elementType  == typeid(Verse))
