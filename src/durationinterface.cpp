@@ -22,11 +22,6 @@
 
 namespace vrv {
 
-/**
- * Define the maximum levels between a beam and its notes
- */
-#define MAX_BEAM_DEPTH 5 
-
 
 //----------------------------------------------------------------------------
 // DurationInterface

@@ -40,12 +40,6 @@
 
 namespace vrv {
 
-/**
- * Define the maximum levels between a tuplet and its notes
- */
-#define MAX_TUPLET_DEPTH 3
-
-
 //----------------------------------------------------------------------------
 // LayerElement
 //----------------------------------------------------------------------------

@@ -856,13 +856,13 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
             Beam *beam = dynamic_cast<Beam*>(element);
             dc->ResumeGraphic(beam, beam->GetUuid());
-            DrawBeam( dc, layer, beam, staff );
+            DrawBeamPostponed( dc, layer, beam, staff );
             dc->EndResumedGraphic(beam, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
             dc->ResumeGraphic(tuplet, tuplet->GetUuid());
-            DrawTuplet( dc, tuplet, layer, staff );
+            DrawTupletPostponed( dc, tuplet, layer, staff );
             dc->EndResumedGraphic(tuplet, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {

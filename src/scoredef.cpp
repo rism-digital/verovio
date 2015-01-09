@@ -25,11 +25,6 @@
 
 namespace vrv {
 
-/**
- * Define the maximum levels of staffGrp within a scoreDef
- */
-#define MAX_STAFFGRP_DEPTH 5
-
 //----------------------------------------------------------------------------
 // ScoreOrStaffDefAttrInterface
 //----------------------------------------------------------------------------

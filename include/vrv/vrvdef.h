@@ -103,6 +103,22 @@ enum EditorMode {
 #define MAX_SPACING_SYSTEM 12
 
 //----------------------------------------------------------------------------
+// Maximum number of levels between parent and children for optimizing search
+//----------------------------------------------------------------------------
+    
+/** Define the maximum levels between a beam and its notes */
+#define MAX_BEAM_DEPTH 5
+    
+/** Define the maximum levels between a tuplet and its notes */
+#define MAX_TUPLET_DEPTH 5
+    
+/** Define the maximum levels of staffGrp within a scoreDef */
+#define MAX_STAFFGRP_DEPTH 5
+
+/** Define the maximum levels between a note and its syls */
+#define MAX_NOTE_DEPTH 5
+    
+//----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------
     

@@ -252,7 +252,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
 }
 
 
-void View::DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff)
+void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff)
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"

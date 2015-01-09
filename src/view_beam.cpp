@@ -74,7 +74,7 @@ double dA, dB;
 
 /* This need to be put into a beam class */
 
-void View::DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff )
+void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff )
 {
     LayerElement *chk;
 	static struct fb {
