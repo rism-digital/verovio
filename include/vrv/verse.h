@@ -10,7 +10,7 @@
 #define __VRV_VERSE_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "layerelement.h"
 
 namespace vrv {
     
@@ -20,7 +20,7 @@ class Syl;
 // Verse
 //----------------------------------------------------------------------------
 
-class Verse: public DocObject,
+class Verse: public LayerElement,
     public AttCommon
 {
 public:
@@ -36,9 +36,10 @@ public:
     ///@}
     
     /**
-     * Add syl to a verse.
+     * Add an element (a syl) to a verse.
+     * Only Syl elements will be actually added to the verse.
      */
-    void AddSyl(Syl *syl);
+    void AddElement(LayerElement *element);
     
     //----------//
     // Functors //
@@ -58,7 +59,7 @@ public:
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using a MapOfTypeN
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
      * See PrepareDarwing
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );

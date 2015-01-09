@@ -93,10 +93,12 @@ public:
     
     /**
      * @name Getters for the object margins (left and right)
+     * The margin are given in x / MARGIN_DENOMINATOR * UNIT
+     * With MARGIN_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT
      * These should eventually be set at parameters.
      */
     ///@{
-    short GetLeftMargin( const Object *object );
+    short GetLeftMargin( const std::type_info *elementType  );
     short GetRightMargin( const std::type_info *elementType );
     ///@}
 

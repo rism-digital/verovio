@@ -33,7 +33,7 @@ typedef std::list<Object*> ListOfObjects;
 
 typedef std::vector<void*> ArrayPtrVoid;
     
-typedef std::map<const std::type_info*, int> MapOfTypeN;
+typedef std::vector<AttComparison*> ArrayOfAttComparisons;
 
 /**
  * Generic int map recursive sturcutre for storing hierachy of values
@@ -288,12 +288,15 @@ public:
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
-     * The last parameter MapOfTypeN makes is possible to process object of a type given a key in the map
-     * with value @n. They must be of type AttCommon. This is very powerfull for operation on parts, e.g.,
-     * for extracting one single staff, or layer.
-     * Deepness allow to specify how many child levels should be processed. -1 means no limit; EditorialLevel objects do not count.
+     * The ArrayOfAttComparisons filter parameter makes is possible to process only objects of a
+     * type that match the attribute value given in the AttComparison object.
+     * This is a generic way for parsing the tree, e.g., for extracting one single staff, or layer.
+     * Deepness allow to specify how many child levels should be processed -10000 means no 
+     * limit (EditorialElement objects do not count).
      */
-    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL, MapOfTypeN *map = NULL, int deepness = -1 );
+    virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL,
+                         ArrayOfAttComparisons * filters = NULL, int deepness = -10000 );
+
     
     //----------//
     // Functors //
@@ -471,7 +474,7 @@ public:
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using a MapOfTypeN.
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      * not param
      */
     virtual int PrepareLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };

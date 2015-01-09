@@ -81,31 +81,31 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     
     if (dynamic_cast<Accid*>(element)) {
-        DrawAccid(dc, element, layer, staff);
+        DrawAccid(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Barline*>(element)) {
-        DrawBarline(dc, element, layer, staff);
+        DrawBarline(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Beam*>(element)) {
-        DrawBeamElement(dc, element, layer, staff,  measure);
+        DrawBeam(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Clef*>(element)) {
-        DrawClef(dc, element, layer, staff);
+        DrawClef(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Custos*>(element)) {
-        DrawCustos(dc, element, layer, staff);
+        DrawCustos(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Dot*>(element)) {
-        DrawDot(dc, element, layer, staff);
+        DrawDot(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<KeySig*>(element)) {
-        DrawKeySig(dc, element, layer, staff);
+        DrawKeySig(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Mensur*>(element)) {
-        DrawMensur(dc, element, layer, staff);
+        DrawMensur(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<MeterSig*>(element)) {
-        DrawMeterSig(dc, element, layer, staff);
+        DrawMeterSig(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<MRest*>(element)) {
         DrawMRest(dc, element, layer, staff, measure);
@@ -114,25 +114,31 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
         DrawMultiRest(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Note*>(element)) {
-        DrawDurationElement(dc, element, layer, staff);
+        DrawDurationElement(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Rest*>(element)) {
-        DrawDurationElement(dc, element, layer, staff);
-    }
-    else if (dynamic_cast<Tie*>(element)) {
-        DrawTie(dc, element, layer, staff, measure);
+        DrawDurationElement(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Slur*>(element)) {
         DrawTie(dc, element, layer, staff, measure);
     }
+    else if (dynamic_cast<Syl*>(element)) {
+        DrawSyl(dc, element, layer, staff, measure);
+    }
+    else if (dynamic_cast<Tie*>(element)) {
+        DrawTie(dc, element, layer, staff, measure);
+    }
     else if (dynamic_cast<Tuplet*>(element)) {
-        DrawTupletElement(dc, element, layer, staff, measure);
+        DrawTuplet(dc, element, layer, staff, measure);
+    }
+    else if (dynamic_cast<Verse*>(element)) {
+        DrawVerse(dc, element, layer, staff, measure);
     }
     
     m_currentColour = previousColor;
 }
 
-void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -149,7 +155,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         
         element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
         dc->StartGraphic( element, "", element->GetUuid() );
-        DrawNote(dc, element, layer, staff);
+        DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
@@ -163,14 +169,14 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
 		
         dc->StartGraphic( element, "", element->GetUuid() );
-        DrawRest( dc, element, layer, staff );
+        DrawRest( dc, element, layer, staff, measure );
         dc->EndGraphic(element, this );
 	}
 	
 	return;
 }
 
-void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
+void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
     
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -179,12 +185,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
 
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    for (unsigned int i = 0; i < beam->m_children.size(); i++) {
-        if ( dynamic_cast<LayerElement*>(beam->m_children[i]) ) {
-            LayerElement *element = dynamic_cast<LayerElement*>(beam->m_children[i]);
-            DrawElement(dc, element, layer, staff, measure);
-        }
-    }
+    DrawLayerChildren(dc, beam, layer, staff, measure);
     
     // Add to the list of postponed element 
     layer->AddToDrawingList( beam );
@@ -192,7 +193,7 @@ void View::DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *laye
     dc->EndGraphic(element, this );
 }
 
-void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
+void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
     
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -202,12 +203,7 @@ void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *la
     dc->StartGraphic( element, "", element->GetUuid() );
     
     // Draw the inner elements
-    for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
-        if ( dynamic_cast<LayerElement*>(tuplet->m_children[i]) ) {
-            LayerElement *element = dynamic_cast<LayerElement*>(tuplet->m_children[i]);
-            DrawElement(dc, element, layer, staff, measure);
-        }
-    }
+    DrawLayerChildren(dc, tuplet, layer, staff, measure);
     
     // Add to the list of postponed element
     layer->AddToDrawingList( tuplet );
@@ -222,7 +218,7 @@ void View::DrawTupletElement(DeviceContext *dc, LayerElement *element, Layer *la
 // queue: le ptr *testchord extern peut garder le x et l'y.
 
 
-void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
+void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -234,114 +230,90 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     // Get the immadiate parent of the note
     // to see if beamed or not
-    Object *note_parent = note->GetFirstParent(&typeid(Beam));
+    Beam *beam_parent = dynamic_cast<Beam*>(note->GetFirstParent(&typeid(Beam)));
     
     // This note is beamed and cue sized
-    if (note_parent != NULL) {
+    if (beam_parent != NULL) {
         if (note->m_cueSize == true) {
             // Get the Parent of the parent
             // we want to see if we are in a group of
             // beamed cue notes
-            Beam *b = dynamic_cast<Beam*>(note_parent);
-            if (b->GetListIndex(note) > -1) {
+            if (beam_parent->GetListIndex(note) > -1) {
                 inBeam = true;
             }
                         
-        } else {
+        }
+        else {
             // the note is just in a beam
             inBeam = true;
         }
     }
     
 	int staffSize = staff->staffSize;
-
-	//	int horphyspoint=h_pnt;
-	//int b = element->m_drawingY;
+    int y1 = element->GetDrawingY();
+    int x1, x2, y2;
+    int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
+    int drawingDur;
+    int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-	int i, valdec, ledge, queueCentre;
-	int x1, x2, y2, espac7, decval, vertical;
-	int formval = 0;	// pour permettre dessiner colorations avec dÇcalage de val
-	int rayon, milieu = 0;
+	int i, ledge;
+	int verticalCenter = 0;
 
 	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
-	int bby = staff->GetDrawingY();  // bby= y sommet portee
-	int ynn = element->GetDrawingY();
 	//static int ynn_chrd;
 
 	//val=note->m_dur;
-	formval = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
-	queueCentre = 0;
+	drawingDur = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
 
+	int radius = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
 
-	rayon = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
-
-	if (note->GetDur() > DUR_1 || (note->GetDur() == DUR_1 && staff->notAnc))	// annuler provisoirement la modif. des lignes addit.
+    if (note->GetDur() > DUR_1 || (note->GetDur() == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
 		ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
-	else
-	{	
-        ledge= m_doc->m_drawingLedgerLine[staffSize][2];
-		rayon += rayon/3;
+	
+    }
+    else {
+        ledge= m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
+		radius += radius/3;
 	}
 
-	x1 = xn-rayon;	// position d'appel du caractäre et de la queue gauche
+	x1 = xn-radius;	// position d'appel du caractäre et de la queue gauche
     xl = xn;
 
-	// permettre d'inverser le cotÇ de la tete de note avec flag lat
-	/*if (this->lat && !this->chord)
-	{	if (this->queue)
-		{	x1 = xn + rayon;
-			xl = xn + rayon * 2;
-		}
-		else
-		{	x1 = xn - rayon * 3;
-			xl = xn - rayon * 2;
-		}
-	}*/ // ax2 - not support of lat
-
-	if (note->GetDur() == DUR_LG || note->GetDur() == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->GetDur() == DUR_1))	// dessin carrees
-	{
-		DrawLigature ( dc, ynn, element, layer, staff);
+    // Long, breve and ligatures
+	if (note->GetDur() == DUR_LG || note->GetDur() == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->GetDur() == DUR_1)) {
+		DrawLigature ( dc, y1, element, layer, staff);
  	}
-	else if (note->GetDur()==DUR_1)
-	{	
-        if (note->GetColored()==BOOLEAN_true) // && !note->m_ligObliqua) // in WG, use of obliq for coloration?
+    // Whole notes
+	else if (note->GetDur()==DUR_1) {
+        if (note->GetColored()==BOOLEAN_true)
 			fontNo = SMUFL_E0FA_noteheadWholeFilled;
 		else
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawSmuflCode( dc, x1, ynn, fontNo, staff->staffSize, note->m_cueSize );
-		decval = ynn;
+		DrawSmuflCode( dc, x1, y1, fontNo, staff->staffSize, note->m_cueSize );
+		totalFlagStemHeight = y1;
 	}
-	else
-	{	
-        if ((note->GetColored()==BOOLEAN_true) || formval == DUR_2)
+    // Other values
+	else {
+        if ((note->GetColored()==BOOLEAN_true) || drawingDur == DUR_2) {
 			fontNo = SMUFL_E0A3_noteheadHalf;
-		else
+        }
+        else {
 			fontNo = SMUFL_E0A4_noteheadBlack;
+        }
 
-		DrawSmuflCode( dc,x1, ynn, fontNo,  staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, x1, y1, fontNo,  staff->staffSize, note->m_cueSize );
 
-		milieu = bby - m_doc->m_drawingInterl[staffSize]*2;
-
-// test ligne mediane pour direction queues: notation mesuree, milieu queue haut
-		if (staff->notAnc)
-			milieu +=  m_doc->m_drawingHalfInterl[staffSize];
+		verticalCenter = staffY - m_doc->m_drawingInterl[staffSize]*2;
 
 		//if (note->m_chord) { /*** && this == testchord)***/
 		//	ynn_chrd = ynn;
         //}
-		if (inBeam && formval > DUR_4)
-        {
+		if (inBeam && drawingDur > DUR_4) {
             // no stem
 		}
-		//else if (note->m_headshape != SANSQUEUE && (!note->m_chord || (note->m_chord==CHORD_TERMINAL))) {
-        else {
-            /*if (note->m_chord==CHORD_TERMINAL) {
-				up = testchord->obj.not.haste;
-				xn = testchord->m_drawingX;
-			}
-			else */
-            
+        else  {
+            // Set the drawing stem direction
 			if ( note->HasStemDir() ) {
                 note->m_drawingStemDir = note->GetStemDir();
             }
@@ -349,195 +321,104 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 note->m_drawingStemDir = layer->GetDrawingStemDir();
             }
             else {
-                note->m_drawingStemDir = (ynn >= milieu) ? STEMDIRECTION_down : STEMDIRECTION_up;
+                note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
             }
 			
-			espac7 = note->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
-			vertical = note->m_cueSize ?  m_doc->m_drawingHalfInterl[staffSize] :  m_doc->m_drawingInterl[staffSize];
-			decval = vertical * (valdec = formval-DUR_8);
+			baseStem = note->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
+			flagStemHeight = note->m_cueSize ?  m_doc->m_drawingHalfInterl[staffSize] :  m_doc->m_drawingInterl[staffSize];
+            nbFlags = drawingDur - DUR_8;
+			totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
 			
-			/***if (this->existDebord)	// queue longueur manuelle
-				traiteQueue (&espac7, this);***/
-
-			// diminuer le rayon de la moitie de l'epaisseur du trait de queue
-			rayon -= (m_doc->m_env.m_stemWidth) / 2;
-
-			if (note->m_drawingStemDir == STEMDIRECTION_down) {	// si queue vers le bas (a gauche)
-				espac7 = -espac7;
-				decval = -decval;
-				rayon = -rayon;
+			if (note->m_drawingStemDir == STEMDIRECTION_down) {
+                // flip all lengths
+				baseStem = -baseStem;
+				totalFlagStemHeight = -totalFlagStemHeight;
+				radius = -radius;
 			}
 
-			y2 = ((formval>DUR_8) ? (ynn + espac7 + decval) : (ynn + espac7));
+            // If we have flags, add them to the height
+			y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem));
+			x2 = xn + radius;
+            
+            if ((note->m_drawingStemDir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
+                y2 = verticalCenter;
+            }
+            else if ((note->m_drawingStemDir == STEMDIRECTION_down) && (y2 > verticalCenter) ) {
+                y2 = verticalCenter;
+            }
+            
+            // shorten the stem at its connection with the note head
+            int stemY1 = (note->m_drawingStemDir == STEMDIRECTION_up) ? y1 + m_doc->m_drawingHalfInterl[staffSize] / 4 : y1 - m_doc->m_drawingHalfInterl[staffSize] / 4;
+            int stemY2 = y2;
+            if (drawingDur > DUR_4) {
+                // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
+                stemY2 = (note->m_drawingStemDir == STEMDIRECTION_up) ? y2 - m_doc->m_drawingHalfInterl[staffSize] : y2 + m_doc->m_drawingHalfInterl[staffSize];
+            }
 
-			/*if ((note->m_chord==CHORD_INITIAL) || (note->m_chord==CHORD_MEDIAL)) {
-				ynn = ynn_chrd;
-            }*/
-
-			/***if (this->q_auto)
-			{	this->queue = (up > 0);
-				if ( (y2 >= milieu && ynn > milieu) || (y2 <= milieu && ynn < milieu) )
-				// note et queue du meme cote par rapport au centre de la portee
-				{	y2 = milieu;
-					queueCentre = 1;
-				}
-			}***/
-
-			if (staff->notAnc)
-				rayon = 0;
-			x2 = xn + rayon;
-
-			if (note->m_drawingStemDir == STEMDIRECTION_up)
-			{
-				if (formval > DUR_8 && !queueCentre)
-				// Le 24 Septembre 1993. Correction esthetique pour rapprocher tailles 
-				//   des DUR_8 et DUR_16 (longeur de queues trop inegales).
-					y2 -= m_doc->m_drawingHalfInterl[staffSize];
-				decval = y2;
-				if (staff->notAnc)
-					DrawVerticalLine ( dc,y2,(int)(ynn + m_doc->m_drawingHalfInterl[staffSize]),x2, m_doc->m_env.m_stemWidth );//queue en descendant
-				else
-					DrawVerticalLine ( dc,y2,(int)(ynn+ m_doc->m_drawingHalfInterl[staffSize]/4),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );//queue en descendant
+            // draw the stems and the flags
+			if (note->m_drawingStemDir == STEMDIRECTION_up) {
+                DrawFullRectangle( dc, x2 - m_doc->m_env.m_stemWidth, stemY1, x2, stemY2);
                 
                 element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+                element->m_drawingStemStart.y = y1;
                 element->m_drawingStemEnd.y = y2;
-                element->m_drawingStemStart.y = (int)(ynn+ m_doc->m_drawingHalfInterl[staffSize]/4);
                 element->m_drawingStemDir = true;
                 
-				if (formval > DUR_4)
-				{
-                    y2 += m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawSmuflCode( dc,x2,y2,SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
-					for (i=0; i < valdec; i++)
-						DrawSmuflCode( dc,x2,y2-=vertical,SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
+				if (drawingDur > DUR_4) {
+					DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, note->m_cueSize );
+					for (i=0; i < nbFlags; i++)
+						DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
 				}
 			}
-			else
-			{                
-				if (formval > DUR_8 && !queueCentre)
-				// Le 24 Septembre 1993. Correction esthetique pour rapprocher tailles 
-				//   des DUR_8 et DUR_16 (longeur de queues trop inegales).
-					y2 += m_doc->m_drawingHalfInterl[staffSize];
-				decval = y2;
-
-				if (staff->notAnc)
-					DrawVerticalLine ( dc,y2,ynn- m_doc->m_drawingHalfInterl[staffSize],x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );//queue en descendant
-				else
-					DrawVerticalLine ( dc,y2,(int)(ynn- m_doc->m_drawingHalfInterl[staffSize]/4),x2 - (m_doc->m_env.m_stemWidth / 2), m_doc->m_env.m_stemWidth );	// queue en montant
+			else {
+                DrawFullRectangle( dc, x2, stemY1, x2 + m_doc->m_env.m_stemWidth, stemY2);
 
                 element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
-                element->m_drawingStemStart.y = (int)(ynn- m_doc->m_drawingHalfInterl[staffSize]/4);
+                element->m_drawingStemStart.y = y1;
                 element->m_drawingStemEnd.y = y2;
                 element->m_drawingStemDir = false;
                 
-				if (formval > DUR_4)
-				{
-                    y2 -= m_doc->m_env.m_stemWidth / 2; // ENZO correction empirique...
-					DrawSmuflCode( dc,x2,y2,SMUFL_E241_flag8thDown ,  staff->staffSize, note->m_cueSize );
-					for (i=0; i < valdec; i++)
-						DrawSmuflCode( dc,x2,y2+=vertical,SMUFL_E241_flag8thDown,  staff->staffSize,
+				if (drawingDur > DUR_4) {
+					DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->staffSize, note->m_cueSize );
+					for (i=0; i < nbFlags; i++)
+						DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->staffSize,
 									 note->m_cueSize );
 				}
 			}
-            if (note->m_cueSize && note->m_acciaccatura)
+            if (note->m_cueSize && note->m_acciaccatura) {
                 DrawAcciaccaturaSlash(dc, element);
-		}	// fin de dessin queues et crochets
+            }
+		}
 
 	}
     
-	DrawLedgerLines( dc, ynn, bby, xl, ledge, staffSize);
+	DrawLedgerLines( dc, y1, staffY, xl, ledge, staffSize );
     
-	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) // && !this->accInvis) // ax2 no support invisible accidental yet
-	{
-		//if (note->m_chord)
-        //    {}/***x1 = x_acc_chrd (this,0);***/
-		//else
-			x1 -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
+	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
+		x1 -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
 		
         Accid accid;
         accid.SetOloc(note->GetOct());
         accid.SetPloc(note->GetPname());
 		accid.SetAccid(note->GetAccid());
+        accid.m_cueSize = note->m_cueSize;
         accid.SetDrawingX( x1 );
-        accid.SetDrawingY( staff->GetDrawingY() );
-        DrawAccid( dc, &accid, layer, staff, element ); // ax2
+        accid.SetDrawingY( y1 );
+        DrawAccid( dc, &accid, layer, staff, measure ); // ax2
 	}
-	if (0) //if (note->m_chord)
-	{	
-        /***x2 = testchord->m_drawingX + m_doc->m_drawingStep2;
-		if (this->haste)
-		{	if (this->lat || (this->ptr_fe && this->ptr_fe->type==NOTE && this->ptr_fe->obj.not.lat)
-				|| (this->ptr_pe && element->m_drawingX==this->ptr_pe->m_drawingX && this->ptr_pe->type==NOTE && this->ptr_pe->obj.not.lat
-					&& this->dec_y - this->ptr_pe->dec_y < m_doc->m_drawingInterl[staffSize]
-					&& 0 != ((int)b % (int)m_doc->m_drawingInterl[staffSize]))
-				)
-				x2 += m_doc->m_drawingNoteRadius[staffSize][dimin] * 2;
-		}*///
+	
+    if (0) {
 	}
-	else
-	{	if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+	else {
+        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
 			x2 = xn + m_doc->m_drawingUnit*7/2;
 		else
 			x2 = xn + m_doc->m_drawingUnit*5/2;
-
-		//if (this->lat) // ax2 - no support of note head flip
-        //    x2 += rayon*2;
 	}
 
-	if (note->GetDots()) // && (!this->pointInvisible)) // ax2 - no support of invisible dots yet
-	{
-		DrawDots( dc, x2, ynn, note->GetDots(), staff );
+	if (note->GetDots()) {
+		DrawDots( dc, x2, y1, note->GetDots(), staff );
 	}
-/*
-	if (this->stacc && (!this->rel || !this->queue_lig))
-	{
-		if (!this->chord || ((!this->queue_lig && this == testchord) || (this->queue_lig && this->fchord )))
-		{
-			if (val > DUR_BR)
-			{	if  (!this->queue_lig)
-				{	if ((this->queue && !this->chord) || (this->chord && this->haste))
-					{	b -= m_doc->m_drawingInterl[staffSize];
-						decval = -m_doc->m_drawingInterl[staffSize];
-					}
-					else
-					{	b += m_doc->m_drawingInterl[staffSize];
-						decval = 0;
-					}
-
-				}
-				else	// tous les cas inversÇs par queue_lig
-				{	b = decval-staff->m_drawingY;
-	
-					if ((!this->queue && !this->chord) || (this->chord && !this->haste))
-					{	b -= m_doc->m_drawingInterl[staffSize];
-						decval = -1;
-						if (val <= DUR_1)
-							decval = -m_doc->m_drawingInterl[staffSize];
-
-					}
-					else
-					{	b += m_doc->m_drawingHalfInterl[staffSize];
-						decval = 0;
-						if (val <= DUR_1)
-							b += m_doc->m_drawingHalfInterl[staffSize];
-					}
-				}
-
-			}
-			else
-				return;
-			putStacc (hdc,xn,b,decval,this->typStac);
-		}
-	}
-*/
-	
-	//temp debug code
-//	m_currentColour = wxCYAN;
-//	DrawFullRectangle(dc, element->m_drawingX - 3, ynn - 3, element->m_drawingX + 3, ynn + 3);
-//	LogDebug("xrel: %d, ynn: %d", element->m_drawingX, ynn);
-//	m_currentColour = wxBLACK;
-	//temp debug code
-    
     
     // Add the ties to the postponed drawing list
     if ( note->GetTieAttrInitial() ) {
@@ -574,10 +455,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         layer->AddToDrawingList( note->GetSlurAttrTerminal() );
     }
 
-    Verse *verse = NULL;
-    for ( verse = dynamic_cast<Verse*>( note->GetFirst( &typeid(Verse) ) ); verse; verse = dynamic_cast<Verse*> (note->GetNext() ) ) {
-        DrawVerse(dc, verse, note, layer, staff );
-    }
+    // This will draw lyrics, accid, etc.
+    DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->GetFermata() != PLACE_NONE) {
         DrawFermata(dc, element, staff);
@@ -591,7 +470,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 }
 
 
-void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {	
     assert(layer); // Pointer to layer cannot be NULL
     assert(staff); // Pointer to staff cannot be NULL
@@ -599,7 +478,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
     Rest *rest = dynamic_cast<Rest*>(element);
 
-	int formval = rest->GetDur();
+	int drawingDur = rest->GetDur();
 	int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
@@ -608,18 +487,18 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     element->m_drawingStemEnd.y = element->GetDrawingY();
     element->m_drawingStemStart.y = element->GetDrawingY();
 
-    if (formval > DUR_2)
+    if (drawingDur > DUR_2)
     {
 		x -= m_doc->m_drawingNoteRadius[staff->staffSize][rest->m_cueSize];
     }
 
-    switch (formval)
+    switch (drawingDur)
     {	
         case DUR_LG: DrawLongRest ( dc, x, y, staff); break;
         case DUR_BR: DrawBreveRest( dc, x, y, staff); break;
         case DUR_1:
-        case DUR_2: DrawWholeRest ( dc, x, y, formval, rest->GetDots(), rest->m_cueSize, staff); break;
-        default: DrawQuarterRest( dc, x, y, formval, rest->GetDots(), rest->m_cueSize, staff);
+        case DUR_2: DrawWholeRest ( dc, x, y, drawingDur, rest->GetDots(), rest->m_cueSize, staff); break;
+        default: DrawQuarterRest( dc, x, y, drawingDur, rest->GetDots(), rest->m_cueSize, staff);
     }
     
     if(rest->GetFermata() != PLACE_NONE) {
@@ -924,7 +803,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 
 	int xn, x1, x2, y1, y2, y3, y4;
     // int yy2, y5; // unused
-	int milieu, up, epaisseur;
+	int verticalCenter, up, epaisseur;
 
 	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
 	xn = element->GetDrawingX();
@@ -963,7 +842,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	/*
     else			// traitement des obliques
     {
-		if (!View::s_drawingLigObliqua)	// 1e passage: ligne verticale initiale
+		if (!View::s_drawingLigObliqua)	// 1e passage: ligne flagStemHeighte initiale
 		{
 			DrawVerticalLine (dc,y3,y4,x1, m_doc->m_env.m_stemWidth );
 			View::s_drawingLigObliqua = true;
@@ -971,7 +850,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 //			if (val == DUR_1)	// queue gauche haut si DUR_1
 //				queue_lig = ON;
 		}
-		else	// 2e passage: lignes obl. et verticale finale
+		else	// 2e passage: lignes obl. et flagStemHeighte finale
 		{
 			x1 -=  m_doc->m_drawingBrevisWidth[staff->staffSize]*2;	// avance auto
 
@@ -985,7 +864,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 			{	DrawObliqueLine ( dc,  x1,  y1,  x2,  yy2, 5);
 				DrawObliqueLine ( dc,  x1,  y5,  x2,  y2, -5);
 			}
-			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_env.m_stemWidth);	//cloture verticale
+			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_env.m_stemWidth);	//cloture flagStemHeighte
 
 			View::s_drawingLigObliqua = false;
 //			queue_lig = OFF;	//desamorce alg.queue DUR_BR
@@ -995,10 +874,10 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 
 	if (note->m_lig)	// memoriser positions d'une note a l'autre; relier notes par barres
 	{	
-        *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres verticales
+        *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres flagStemHeightes
 		//if (in(x1,(*View::s_drawingLigX)-2,(*View::s_drawingLigX)+2) || (this->fligat && this->lat && !Note1::marq_obl))
-			// les dernieres conditions pour permettre ligature verticale ancienne
-		//	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); // ax2 - drawing vertical lines missing
+			// les dernieres conditions pour permettre ligature flagStemHeighte ancienne
+		//	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); // ax2 - drawing flagStemHeight lines missing
 		*View::s_drawingLigX = *(View::s_drawingLigX + 1);
 		*View::s_drawingLigY = *(View::s_drawingLigY + 1);
 	}
@@ -1025,9 +904,9 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
 	*/
     {
-		milieu = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize]*2;
+		verticalCenter = staff->GetDrawingY() - m_doc->m_drawingInterl[staff->staffSize]*2;
 		// ENZ
-		up = (y < milieu) ? ON : OFF;
+		up = (y < verticalCenter) ? ON : OFF;
 		// ENZ
 		if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
             if ( note->m_drawingStemDir == STEMDIRECTION_up) {
@@ -1053,7 +932,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	return;
 }
 
-void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1079,7 +958,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->EndGraphic(element, this ); //RZ
 }
 
-void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1161,7 +1040,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this ); //RZ
 }
 
-void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1336,7 +1215,7 @@ void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numB
 }
     
     
-void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1367,7 +1246,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
 }
 
-void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent )
+void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1375,14 +1254,12 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     Accid *accid = dynamic_cast<Accid*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
-    
-    // This is used when we add dynamically an element (eg. accidentals before notes)
-    // So we can get the clef without adding the new elem in the list
-    LayerElement *list_elem = element;
-    if (parent) list_elem = parent;
 
-    int oct = accid->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( list_elem ), oct) );
+    // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
+    if ( accid->m_parent ) {
+        int oct = accid->GetOloc() - 4;
+        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
+    }
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1422,15 +1299,13 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         case ACCIDENTAL_EXPLICIT_fu : symc= SMUFL_E267_accidentalNaturalFlat; break; // Same
         default : break;
     }
-    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_cueSize );
+    DrawSmuflCode ( dc, x, y, symc, staff->staffSize, accid->m_cueSize );
 
-    
     dc->EndGraphic(element, this );
-
 }
 
 
-void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1454,7 +1329,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
 
 }
 
-void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1475,11 +1350,25 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
 }
     
-void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    Syl *syl = dynamic_cast<Syl*>(element);
+    
+    int verseNb = 1;
+    Verse *verse = dynamic_cast<Verse*>( element->GetFirstParent( &typeid(Verse), MAX_NOTE_DEPTH ) );
+    if ( verse ) {
+        verseNb = std::max(verse->GetN(), 1);
+    }
+    
+    Note *note = dynamic_cast<Note*>( element->GetFirstParent( &typeid(Note), MAX_NOTE_DEPTH ) );
+    if ( !note ) {
+        LogDebug("Syl parent note could not be found");
+        return;
+    }
+    
     // to be updated
-    int x = element->GetDrawingX() - m_doc->m_drawingUnit * 2;
-    int y = element->GetDrawingY();
+    int x = note->GetDrawingX() - m_doc->m_drawingUnit * 2;
+    int y = note->GetDrawingY();
     if (staff->GetAlignment() ) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * m_doc->m_drawingUnit * 4;
     }
@@ -1489,15 +1378,15 @@ void View::DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *elem
 
 }
     
-void View::DrawVerse( DeviceContext *dc, Verse *verse, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    if (verse->GetChildCount( &typeid(Syl) ) ) {
-        DrawSyl(dc, dynamic_cast<Syl*>( verse->GetFirst( &typeid(Syl) ) ), std::max(verse->GetN(), 1), element, layer, staff );
-    }
+    Verse *verse = dynamic_cast<Verse*>(element);
+    
+    DrawLayerChildren(dc, verse, layer, staff, measure);
 }
 
     
-void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff )
+void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -1764,44 +1653,3 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
 
 } // namespace vrv    
     
-/*
- * Lyric code not refactored in ax2
-    
-void Note1::DeleteLyricFromNote( Symbol1 *lyric )
-{
-	for ( int i = 0; i < (int)this->m_lyrics.GetCount(); i++ ){
-		Symbol1 *tmp = &this->m_lyrics[i];
-		if ( lyric == tmp ){
-			this->m_lyrics.RemoveAt( i );
-			break;
-		}
-	}
-}
-
-Symbol1 *Note1::GetFirstLyric( )
-{
-	if ( this->m_lyrics.GetCount() == 0 ) 
-		return NULL;
-	else
-		return &this->m_lyrics[0];
-}
-
-Symbol1 *Note1::GetLastLyric( )
-{
-	int num = this->m_lyrics.GetCount(); 
-	if ( num == 0 ) 
-		return NULL;
-	else 
-		return &this->m_lyrics[num-1];
-}
-
-Symbol1 *Note1::GetLyricNo( int no )
-{
-	int num = this->m_lyrics.GetCount(); 
-	if ( (no < 0) || (num <= no) ) 
-		return NULL;
-	else 
-		return &this->m_lyrics[no];
-}
-
-*/

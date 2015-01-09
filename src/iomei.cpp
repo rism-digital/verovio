@@ -663,6 +663,36 @@ bool MeiInput::ImportString( const std::string mei )
         return false;
     }
 }
+    
+bool MeiInput::IsAllowed(std::string element, vrv::Object *filterParent)
+{
+    if (!filterParent) {
+        return true;
+    }
+    
+    const std::type_info *elementType = &typeid(*filterParent);
+    if ( element == "app" ) {
+        return true;
+    }
+    else if (*elementType  == typeid(Note))
+    {
+        //if ( element == "accid" ) return true;
+        //else 
+        if ( element == "syl" ) return true;
+        else if ( element == "verse" ) return true;
+        else return false;
+    }
+    else if (*elementType  == typeid(Verse))
+    {
+        if ( element == "syl" ) return true;
+        else return false;
+    }
+    else
+    {
+        LogDebug("Unknow filter for '%s'", filterParent->GetClassName().c_str());
+        return true;
+    }
+}
 
 
 
@@ -1152,55 +1182,69 @@ bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
     return ReadMeiLayerChildren( vrvLayer, layer );
 }
 
-bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode )
+bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter )
 {
     bool success = true;
     pugi::xml_node xmlElement;
-    for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ){
-        if (!success) break;
-        if ( std::string( xmlElement.name() ) == "accid" ) {
+    std::string elementName;
+    for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string( xmlElement.name() );
+        if ( !IsAllowed( elementName, filter ) ) {
+            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str() );
+            continue;
+        }
+        else if ( elementName == "accid" ) {
             success = ReadMeiAccid( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "app" ) {
-            success = ReadMeiApp( parent, xmlElement, EDITORIAL_LAYER);
+        else if ( elementName == "app" ) {
+            success = ReadMeiApp( parent, xmlElement, EDITORIAL_LAYER, filter);
         }
-        else if ( std::string( xmlElement.name() )  == "barLine" ) {
+        else if ( elementName  == "barLine" ) {
             success = ReadMeiBarline( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "beam" ) {
+        else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
         }
-        else if ( std::string( xmlElement.name() ) == "clef" ) {
+        else if ( elementName == "clef" ) {
             success = ReadMeiClef( parent, xmlElement);
         }
-        else if ( std::string( xmlElement.name() ) == "custos" ) {
+        else if ( elementName == "custos" ) {
             success = ReadMeiCustos( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "dot" ) {
+        else if ( elementName == "dot" ) {
             success = ReadMeiDot( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "mensur" ) {
+        else if ( elementName == "mensur" ) {
             success = ReadMeiMensur( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "meterSig" ) {
+        else if ( elementName == "meterSig" ) {
             success = ReadMeiMeterSig( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "note" ) {
+        else if ( elementName == "note" ) {
             success = ReadMeiNote( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "rest" ) {
+        else if ( elementName == "rest" ) {
             success = ReadMeiRest( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "mRest" ) {
+        else if ( elementName == "mRest" ) {
             success = ReadMeiMRest( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "multiRest" ) {
+        else if ( elementName == "multiRest" ) {
             success = ReadMeiMultiRest( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "tuplet" ) {
+        else if ( elementName == "syl" ) {
+            success = ReadMeiSyl( parent, xmlElement );
+        }
+        else if ( elementName == "tuplet" ) {
             success = ReadMeiTuplet( parent, xmlElement );
         }
-        else if ( std::string( xmlElement.name() ) == "chord" ) {
+        else if ( elementName == "verse" ) {
+            success = ReadMeiVerse( parent, xmlElement );
+        }
+        else if ( elementName == "chord" ) {
             // We just read the first note for now
             pugi::xml_node note = xmlElement.child("note");
             if ( note ) {
@@ -1386,17 +1430,15 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
         }
     }
     
+    // We can drop this once we allow <accid> and <note> child
     pugi::xml_node current;
     for( current = note.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "accid" ) {
             ReadAccidAsAttr(  vrvNote, current );
         }
-        if ( std::string( current.name() ) == "verse" ) {
-            ReadVerse(  vrvNote, current );
-        }
     }
-	
-	return true;
+    
+	return ReadMeiLayerChildren(vrvNote, note, vrvNote);
 }
 
 
@@ -1412,6 +1454,17 @@ bool MeiInput::ReadMeiRest( Object *parent, pugi::xml_node rest )
     return true;
 }
 
+bool MeiInput::ReadMeiSyl( Object *parent, pugi::xml_node syl)
+{
+    Syl *vrvSyl = new Syl();
+    ReadLayerElement(syl, vrvSyl);
+    
+    vrvSyl->ReadSylLog( syl );
+    ReadText( syl, vrvSyl );
+    
+    AddLayerElement(parent, vrvSyl);
+    return true;
+}
 
 bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
 {
@@ -1423,43 +1476,25 @@ bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
     
     AddLayerElement(parent, vrvTuplet);
     
-    ReadMeiLayerChildren( vrvTuplet, tuplet);
+    bool success = ReadMeiLayerChildren(vrvTuplet, tuplet);
     
     if ( vrvTuplet->GetNoteCount() == 1 ) {
         LogWarning("<tuplet> with only one note");
     }
     
-    return true;
+    return success;
 }
-    
-bool MeiInput::ReadVerse( Note *vrvNote, pugi::xml_node verse)
+
+bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
 {
     Verse *vrvVerse = new Verse();
-    SetMeiUuid( verse , vrvVerse );
+    ReadLayerElement(verse, vrvVerse);
     
     vrvVerse->ReadCommon(verse);
     
-    pugi::xml_node current;
-    for( current = verse.first_child( ); current; current = current.next_sibling( ) ) {
-        if ( std::string( current.name() ) == "syl" ) {
-            ReadSyl( vrvVerse, current );
-        }
-    }
-
-    vrvNote->AddVerse( vrvVerse );
-    return true;
-}
-
-bool MeiInput::ReadSyl( Verse *vrvVerse, pugi::xml_node syl)
-{
-    Syl *vrvSyl = new Syl();
-    SetMeiUuid( syl , vrvSyl );
+    AddLayerElement(parent, vrvVerse);
     
-    vrvSyl->ReadSylLog( syl );
-    ReadText( syl, vrvSyl );
-    
-    vrvVerse->AddSyl( vrvSyl );
-    return true;
+    return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
@@ -1521,7 +1556,7 @@ bool MeiInput::ReadEditorialElement( pugi::xml_node element, EditorialElement *o
     return true;
 }
 
-bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level )
+bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter )
 {
     if (!m_hasScoreDef) {
         LogError("<app> before any <scoreDef> is not supported");
@@ -1554,11 +1589,11 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
     ReadEditorialElement( app, vrvApp );
     parent->AddEditorialElement(vrvApp);
     
-    return ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level );
+    return ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level, filter );
 }
     
     
-bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level )
+bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter )
 {
     EditorialElement *vrvLemOrRdg;
     if ( std::string( lemOrRdg.name() ) == "lem" ) {
@@ -1587,7 +1622,7 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
         return ReadMeiStaffChildren(vrvLemOrRdg, lemOrRdg);
     }
     else if (level == EDITORIAL_LAYER) {
-        return ReadMeiLayerChildren(vrvLemOrRdg, lemOrRdg);
+        return ReadMeiLayerChildren(vrvLemOrRdg, lemOrRdg, filter);
     }
     else {
         return false;
@@ -1682,11 +1717,17 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     else if ( dynamic_cast<Layer*>( parent ) ) {
         dynamic_cast<Layer*>( parent )->AddElement( element );
     }
+    else if ( dynamic_cast<Note*>( parent ) ) {
+        dynamic_cast<Note*>( parent )->AddElement( element );
+    }
     else if ( dynamic_cast<Beam*>( parent ) ) {
         dynamic_cast<Beam*>( parent )->AddElement( element );
     }
     else if ( dynamic_cast<Tuplet*>( parent ) ) {
         dynamic_cast<Tuplet*>( parent )->AddElement( element );
+    }
+    else if ( dynamic_cast<Verse*>( parent ) ) {
+        dynamic_cast<Verse*>( parent )->AddElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );

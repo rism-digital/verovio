@@ -222,7 +222,8 @@ private:
      * For each container (page, system, measure, staff and layer) there is one method for 
      * reading the element and one method for reading it children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
-     * for example.
+     * for example. The filter object is optionnal and can be set for filtering the allowed 
+     * children (see MeiInput::IsAllowed)
      */
     ///@{
     bool ReadMeiPage( pugi::xml_node page );
@@ -239,7 +240,7 @@ private:
     bool ReadMeiStaff( Object *parent, pugi::xml_node staff );
     bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
-    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode );
+    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
     ///@}
 
     /**
@@ -258,16 +259,19 @@ private:
     bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
     bool ReadMeiNote( Object *parent, pugi::xml_node note );
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
+    bool ReadMeiSyl( Object *parent, pugi::xml_node syl );
     bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
+    bool ReadMeiVerse( Object *parent, pugi::xml_node verse );
     ///@}
   
     /**
      * @name Methods for reading critical apparatus.
      * Only one child of <app> is loaded
+     * The filter is propagated (if any)
      */
     ///@{
-    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level );
-    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level );
+    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
     ///@}
     
     /**
@@ -286,8 +290,6 @@ private:
      */
     ///@{
     bool ReadAccidAsAttr( Note *note, pugi::xml_node verse );
-    bool ReadVerse( Note *note, pugi::xml_node verse );
-    bool ReadSyl( Verse *verse, pugi::xml_node syl );
     bool ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan );
     bool ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur );
     ///@}
@@ -366,6 +368,11 @@ private:
      * This should be moved to the Object::PrepareDrawing functor
      */
     std::vector<Note*> m_openTies;
+    
+    /**
+     * Check if an element is allowed within a given parent
+     */
+    bool IsAllowed( std::string element, Object *filterParent );
 };
 
 } // namespace vrv

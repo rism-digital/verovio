@@ -23,7 +23,7 @@ namespace vrv {
     
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 4
+#define VERSION_REVISION 5
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
@@ -84,6 +84,8 @@ enum EditorMode {
 #define MIN_TIE_HEIGHT 12
 #define MIN_TIE_THICKNESS 6
     
+#define MARGIN_DENOMINATOR 10
+    
 //----------------------------------------------------------------------------
 // Default scaling (%) and spacing (units) values
 //----------------------------------------------------------------------------
@@ -100,6 +102,24 @@ enum EditorMode {
 #define MIN_SPACING_SYSTEM 0
 #define MAX_SPACING_SYSTEM 12
 
+//----------------------------------------------------------------------------
+// Maximum number of levels between parent and children for optimizing search
+//----------------------------------------------------------------------------
+    
+/** All values set to -1 (no limit) since this has not major incidence **/
+    
+/** Define the maximum levels between a beam and its notes **/
+#define MAX_BEAM_DEPTH -1
+    
+/** Define the maximum levels between a tuplet and its notes **/
+#define MAX_TUPLET_DEPTH -1
+    
+/** Define the maximum levels of staffGrp within a scoreDef **/
+#define MAX_STAFFGRP_DEPTH -1
+
+/** Define the maximum levels between a note and its syls **/
+#define MAX_NOTE_DEPTH -1
+    
 //----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------

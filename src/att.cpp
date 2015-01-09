@@ -722,7 +722,15 @@ data_WORDPOS Att::StrToWordPos(std::string value)
 // AttComparison
 //----------------------------------------------------------------------------
 
-bool AttComparison::operator() (Object *object)
+bool AttComparison::operator()(Object *object)
+{
+    if  (typeid(*object) == *m_elementType) {
+        return true;
+    }
+    return false;
+}
+    
+bool AttComparison::MatchesType(Object *object)
 {
     if  (typeid(*object) == *m_elementType) {
         return true;

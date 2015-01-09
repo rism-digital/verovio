@@ -144,18 +144,29 @@ protected:
     ///@}
     
     /**
-     * @name Methods for drawing App and EditorialElement
+     * @name Methods for drawing children
+     * Defined in view_page.cpp
+     * For each method, we have a parent Object, that can be either the same as the next paremeter,
+     * or an intermediate node in the hierarchy. For example, we can draw the system children from the 
+     * system itself (in that case, parent will be the same as system) or from an editorial element
+     * occuring in between.
+     */
+    ///@{
+    void DrawSystemChildren( DeviceContext *dc, Object *parent, System *system );
+    void DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system );
+    void DrawStaffChildren( DeviceContext *dc, Object *parent, Staff *staff,  Measure *measure );
+    void DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure );
+    ///@}
+    
+    /**
+     * @name Methods for drawing EditorialElement object at different levels
      * Defined in view_page.cpp
      */
     ///@{
-    /** System level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, System *system );
-    /** Measure level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
-    /** Staff level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
-    /** Layer level **/
-    void DrawEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawSystemEditorialElement( DeviceContext *dc, EditorialElement *element, System *system );
+    void DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
+    void DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
+    void DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**
@@ -169,65 +180,86 @@ protected:
     ///@}
     
     /** 
-     * @name Methods for drawing LayerElement containing other elements.
-     * This is the case of Beam, Tuplet, Chords, etc.
+     * @name Top level method for drawing LayerElement.
+     * This can be called recursively for elements containing other elements.
+     * This the case for Note, Beam, Tuplet, Chords, etc.
      * Defined in view_element.cpp
      */
     ///@{
     void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawBeamElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawTupletElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**
      * @name Methods for drawing LayerElement child classes.
+     * They are base drawing methods that are called directly from DrawElement
+     * Because some elements draw their children recursively (e.g., Note) they must all
+     * have the same parameters
+     * Defined in view_element.cpp
+     */
+    ///@{
+    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTuplet( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    ///@}
+    
+    /**
+     * @name Methods for drawing parts of LayerElement child classes.
+     * They are sub-drawing methods that are called from the base drawing methods above.
+     * The parameter set can be different from a base drawing method since no recursive call is expected
      * Defined in view_element.cpp
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
-    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, LayerElement *parent = NULL );
-    void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff);
-    void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
-    void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
-    void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
-    void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
     void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff); 
+    void DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff ); 
+    void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );  
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawSyl( DeviceContext *dc, Syl *syl, int verseNb, LayerElement *element, Layer *layer, Staff *staff);
-    void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
-    void DrawTuplet( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff);
-    void DrawVerse( DeviceContext *dc, Verse *verse, LayerElement *element, Layer *layer, Staff *staff);
+    void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
     void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     ///@}
     
     /**
      * @name Method for drawing Beam.
+     * Called from the the layer postponed drawing list.
      * Wolfgang legacy code to be redesigned.
      * Defined in view_beam.cpp
      */
     ///@{
-    void DrawBeam(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff );
+    void DrawBeamPostponed(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff );
     ///@}
+    
+    /**
+     * @name Method for drawing Beam.
+     * Called from the the layer postponed drawing list.
+     * Defined in view_tuplet.cpp
+     */
+    ///@{
+    void DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff );
 
     /**
      * @name Low level drawing methods

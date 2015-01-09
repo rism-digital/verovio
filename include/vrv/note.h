@@ -72,9 +72,10 @@ public:
     virtual bool operator==(Object& other);
     
     /**
-     * Add verse to a note.
+     * Add an element (a verse or an accid) to a note.
+     * Only Verse and Accid elements will be actually added to the note.
      */
-    void AddVerse(Verse *child);
+    void AddElement(LayerElement *element);
     
     /**
      * @name Setters and getters for tie attributes
