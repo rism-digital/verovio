@@ -105,6 +105,9 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
+    Syl *currentSyl;
+    Note *lastNote;
+    Note *lastButOneNote;
     std::vector<AttComparison*> filters;
     for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -119,7 +122,13 @@ void Doc::PrepareDrawing()
                 filters.push_back( &matchLayer );
                 filters.push_back( &matchVerse );
                 
+                currentSyl = NULL;
+                lastNote = NULL;
+                lastButOneNote = NULL;
                 ArrayPtrVoid paramsLyrics;
+                paramsLyrics.push_back( &currentSyl );
+                paramsLyrics.push_back( &lastNote );
+                paramsLyrics.push_back( &lastButOneNote );
                 Functor prepareLyrics( &Object::PrepareLyrics );
                 this->Process( &prepareLyrics, paramsLyrics, NULL, &filters );
             }

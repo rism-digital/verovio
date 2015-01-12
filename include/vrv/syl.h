@@ -13,6 +13,8 @@
 #include "layerelement.h"
 
 namespace vrv {
+    
+class Note;
 
 //----------------------------------------------------------------------------
 // Syl
@@ -38,11 +40,30 @@ public:
      */
     void AddSyl(Syl *syl);
     
-protected:
-
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
+     * See PrepareDarwing
+     */
+    virtual int PrepareLyrics( ArrayPtrVoid params );
+    
 private:
     
 public:
+    /** 
+     * The first and last note of the syl to be used when we have @wordpos and @con 
+     * The first note is usually the parent.
+     */
+    Note *m_drawingFirstNote, *m_drawingLastNote;
+    /**
+     * The verse number with multiple verses
+     * Value is 1 by default, set in PrepareLyrics
+     */
+    int m_drawingVerse;
     
 private:
 

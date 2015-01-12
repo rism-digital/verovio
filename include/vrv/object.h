@@ -477,7 +477,7 @@ public:
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      * not param
      */
-    virtual int PrepareLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareLyrics( ArrayPtrVoid params );
     
     ///@}
     

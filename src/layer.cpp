@@ -34,7 +34,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer( ):
-	DocObject("layer-"), ObjectListInterface(),
+	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(),
     AttCommon()
 {
     Reset();
@@ -59,6 +59,7 @@ Layer::~Layer()
 void Layer::Reset()
 {
     DocObject::Reset();
+    DrawingListInterface::Reset();
     ResetCommon();
     
     m_drawingClef = NULL;
@@ -66,7 +67,6 @@ void Layer::Reset()
     m_drawingMensur = NULL;
     m_drawingMeterSig = NULL;
     m_drawingStemDir = STEMDIRECTION_NONE;
-    m_drawingList.clear();
 }
     
 void Layer::AddElement( LayerElement *element, int idx )
@@ -108,21 +108,6 @@ LayerElement *Layer::GetAtPos( int x )
 	}
 	
 	return element;
-}
-
-void Layer::AddToDrawingList( LayerElement *element )
-{
-    m_drawingList.push_back( element );
-}
-
-ListOfObjects *Layer::GetDrawingList( )
-{
-    return &m_drawingList;
-}
-
-void Layer::ResetDrawingList( )
-{
-    m_drawingList.clear();
 }
     
 void Layer::SetDrawingClef( Clef *clef )

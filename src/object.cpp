@@ -34,6 +34,7 @@
 #include "page.h"
 #include "scoredef.h"
 #include "staff.h"
+#include "syl.h"
 #include "system.h"
 #include "tie.h"
 #include "tuplet.h"
@@ -1230,6 +1231,34 @@ int Object::SaveEnd( ArrayPtrVoid params )
     if (!output->WriteObjectEnd( this )) {
         return FUNCTOR_STOP;
     }
+    return FUNCTOR_CONTINUE;
+}
+    
+
+int Object::PrepareLyrics( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    // param 1: the last Note
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+    Note **lastNote = static_cast<Note**>(params[1]);
+    Note **lastButOneNote = static_cast<Note**>(params[2]);
+    
+    // processing a note
+    Note *note = dynamic_cast<Note*>(this);
+    if ( note ) {
+        (*lastButOneNote) = (*lastNote);
+        (*lastNote) = note;
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // starting an new layer
+    Staff *staff = dynamic_cast<Staff*>(this);
+    if ( staff  ) {
+        if ((*currentSyl)) {
+            staff->m_drawingCurrentSyl.push_back((*currentSyl));
+        }   
+    }
+    
     return FUNCTOR_CONTINUE;
 }
 

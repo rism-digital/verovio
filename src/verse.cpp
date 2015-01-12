@@ -11,7 +11,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -52,6 +51,10 @@ void Verse::AddElement(vrv::LayerElement *element)
     m_children.push_back(element);
     Modify();
 }
+    
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
 
 int Verse::AlignVertically( ArrayPtrVoid params )
 {
@@ -74,7 +77,6 @@ int Verse::AlignVertically( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-    
 int Verse::PrepareDrawing( ArrayPtrVoid params )
 {
     // param 0: the IntTree
@@ -93,15 +95,5 @@ int Verse::PrepareDrawing( ArrayPtrVoid params )
     
     return FUNCTOR_SIBLINGS;
 }
-    
-int Verse::PrepareLyrics( ArrayPtrVoid params )
-{
-    
-    Syl *syl = dynamic_cast<Syl*>( this->GetFirst( &typeid(Syl) ) );
-    if (syl) {
-        std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
-    }
-    return FUNCTOR_CONTINUE;
-}
-    
+  
 } // namespace vrv
