@@ -18,7 +18,10 @@
 		  /* Create the Vevorio toolkit instance */
 		  var vrvToolkit = new verovio.toolkit();
 		  /* Render the data and insert it as content of the #output div */
-		  document.getElementById("output").innerHTML = vrvToolkit.renderData( data, "" );
+		  document.getElementById("output").innerHTML = vrvToolkit.renderData( 
+              data, 
+              JSON.stringify({ inputFormat: 'pae', font: 'Leipzig' }) 
+          );
 		</script>
 	</body>
 </html>

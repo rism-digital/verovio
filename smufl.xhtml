@@ -1,0 +1,89 @@
+---
+layout: verovio
+verovio-light: true
+title: Verovio – SMuFL
+active: smufl
+---
+
+<div class="row">
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include smufl-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>
+                    Verovio follows the <a href="http://www.smufl.org" target="_blank">Standard Music Font Layout (SMuFL)</a> specification. It means that it is easily possible to change the music font used in Verovio and to have a personalised output.
+Verovio includes its own SMuFL-compliant music font, Leipzig. It also supports and includes the <a href="http://www.smufl.org/font" target="_blank">Bravura</a> designed by Daniel Spreadbury at Steinberg.
+                </p>
+                
+                <p>
+                    The font can be selected using the <code>--font</code> option in the command-line tool or by adding <code>{ font: "Bravura" }</code> in the JavaScript toolkit options.
+                </p>
+            </div>
+        </div>
+        
+        <div class="panel panel-default">
+            <div class="panel-body">
+        
+                <h3 id="font_header"></h3>
+        
+                <div id="svg_output" style="overflow:auto;" ></div>
+
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    var zoom = 55;
+    var pageHeight = 100;
+    var adjustPageHeight = 1;
+    var border = 25;
+    var spacingStaff = 2;
+    //var vrvToolkit = new verovio.toolkit();
+
+    function load_data(data, options, output_div) {
+        var vrvToolkit = new verovio.toolkit();
+        console.log( options );
+        vrvToolkit.setOptions( options );
+        var svg = vrvToolkit.renderData( data + "\n", "" );
+        output_div.html(svg);
+    }
+    
+	function getParameterByName(name) {
+	    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+	    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+	}
+
+	$( document ).ready(function() {
+		
+		var font = getParameterByName("font");
+		if (!font) {
+			font = "Leipzig";
+		}
+        $('#font_header').html(font);
+        $( "#link-" + font ).addClass( "active" );
+        
+        options = JSON.stringify({
+                    pageHeight: pageHeight,
+                    adjustPageHeight: adjustPageHeight,
+                    noLayout: 1,
+                    border: border,
+                    spacingStaff: spacingStaff,
+                    font: font,
+                    scale: zoom
+                });
+
+        $.get( "{{ site.baseurl }}/examples/fonts/font-1.mei" , function( data ) {
+            
+            load_data( data, options, $('#svg_output') );
+        });
+    });
+//]]>
+</script>

@@ -1,6 +1,6 @@
 ---
 layout: verovio
-verovio-light: false
+verovio-light: true
 title: Verovio PAE Editor
 active: plain-and-easy
 pae-active: pae-editor
@@ -402,7 +402,7 @@ pae-active: pae-editor
 	{	
 		// The trailing newline is needed so we can read the file lines
 		// correctly if the file does not end with a newline
-		var svg = vrvToolkit.renderData(music + "\n", JSON.stringify({scale: 50, adjustPageHeight: 1, pageWidth: 1048, border: 0, spacingStaff: 2}));
+		var svg = vrvToolkit.renderData(music + "\n", JSON.stringify({inputFormat: 'pae', scale: 50, adjustPageHeight: 1, pageWidth: 1048, border: 0, spacingStaff: 2}));
 		document.getElementById('render_01').innerHTML = svg;
         
 		var mei = vrvToolkit.getMEI();

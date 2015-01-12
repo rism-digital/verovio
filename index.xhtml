@@ -13,7 +13,11 @@ active: home
 				<p>
 					Verovio is a fast, portable and lightweight library for engraving <a href="http://www.music-encoding.org" target="_blank">Music Encoding Initiative</a> (MEI) music scores into SVG. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++ with no dependencies on third-party frameworks and libraries. Verovio implements its own rendering engine, which can render SVG with all the musical symbols embedded in it and without dependency on external fonts. In addition to MEI, Verovio can also render Plain and Easy (PAE) code and DARMS code. 
 				</p> 
-				
+
+				<p>
+                    Verovio follows the <a href="{{ site.baseurl }}/smufl.xhtml">Standard Music Font Layout</a> specification and the font can be changed for personalizing the output.
+				</p> 
+
 				<p>
 					Since the rendering engine is defined as an abstract component, Verovio is highly modular and can be used in different contexts, including as a <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> compiled with <a href="http://www.emscripten.org" target="_blank">Emscripten</a> or as a <a href="{{ site.baseurl }}/python.xhtml">Python extension</a> using <a href="http://www.swig.org" target="_blank">SWIG</a>. It is possible to implement easily a rendering output different from SVG if needed.
 				</p>
@@ -69,8 +73,8 @@ active: home
 	<div class="col-md-5">
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<div id="hummel-p5" style="display: none;" class="text-center">
-					{% include svg/hummel-p5.svg %}
+				<div id="hummel-p6" style="display: none;" class="text-center">
+					{% include svg/hummel-p6.svg %}
 				</div>
 			</div>
 		</div>
@@ -99,18 +103,18 @@ active: home
 		if ( width < zoom * pageWidth / 100 ) {
 			zoom = width * 100 / pageWidth;
 		}
-		$( div + ' svg g.page-scale').attr("transform", "scale(" + zoom / 100 + ", "+ zoom / 100 +")") ;
-		$( div + ' svg').height(pageHeight * zoom / 100 );
-		$( div + ' svg').width(pageWidth * zoom / 100 );		
+		//$( div + ' svg g.page-scale').attr("transform", "scale(" + zoom / 100 + ", "+ zoom / 100 +")") ;
+		//$( div + ' svg').height(pageHeight * zoom / 100 );
+		//$( div + ' svg').width(pageWidth * zoom / 100 );		
 		
 		if ( $( div + ' svg') ) {
-			$( div + ' svg').height(pageHeight * zoom / 100 );
-			$( div + ' svg').width(pageWidth * zoom / 100 );	
+			$( div + ' svg').attr("height", pageHeight * zoom / 100 + "px" );
+			$( div + ' svg').attr("width", pageWidth * zoom / 100 + "px" );	
 		}
 	}
 
 	$( document ).ready(function() {
-		adjust_svg_size( "#hummel-p5", 2100, 2800, 20 );
+		adjust_svg_size( "#hummel-p6", 2100, 2800, 20 );
 	});
 //]]>
 </script>

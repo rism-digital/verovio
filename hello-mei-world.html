@@ -15,7 +15,7 @@
 		  var vrvToolkit = new verovio.toolkit();
 		  /* Load the file using a HTTP GET */
 		  $.get( "examples/hello-world/Haydn_StringQuartet_Op1_No1-p1.mei", function( data ) {
-		    var svg = vrvToolkit.renderData( data + "\n", JSON.stringify({ inputFormat: 'mei' }) );
+		    var svg = vrvToolkit.renderData( data + "\n", "" );
 		    $("#output").html(svg);
 		  });
 		</script>
