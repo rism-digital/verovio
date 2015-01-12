@@ -72,7 +72,7 @@ public:
      * Looks FORWARD of BACKWARD depending on the direction parameter.
      * Returns the retrieved element if *succ == true or the original element if not.
      */
-    LayerElement *GetFirstOld( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ );
+    LayerElement *GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ );
     
     /** 
      * Get the current clef for the test element.

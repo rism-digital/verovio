@@ -223,31 +223,31 @@ Object *Object::Relinquish( int idx )
     return child;
 }
     
-Object *Object::FindChildByUuid( std::string uuid )
+Object *Object::FindChildByUuid( std::string uuid, int deepness, bool direction )
 {
     Functor findByUuid( &Object::FindByUuid );
     Object *element = NULL;
     ArrayPtrVoid params;
     params.push_back( &uuid );
     params.push_back( &element );
-    this->Process( &findByUuid, params );
+    this->Process( &findByUuid, params, NULL, NULL, deepness, direction );
     return element;
 }
 
-Object *Object::FindChildByType(const std::type_info *elementType)
+Object *Object::FindChildByType(const std::type_info *elementType, int deepness, bool direction )
 {
     AttComparison attComparison( elementType );
-    return FindChildByAttComparison( &attComparison );
+    return FindChildByAttComparison( &attComparison, deepness, direction );
 }
     
-Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deepness )
+Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deepness, bool direction )
 {
     Functor findByAttComparison( &Object::FindByAttComparison );
     Object *element = NULL;
     ArrayPtrVoid params;
     params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByAttComparison, params, NULL, NULL, deepness );
+    this->Process( &findByAttComparison, params, NULL, NULL, deepness, direction );
     return element;
 }
     
@@ -497,7 +497,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool backwards )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -525,9 +525,9 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     // We need a pointer to the array for the option to work on a reversed copy
     ArrayOfObjects *children = &this->m_children;
     ArrayOfObjects reversed;
-    // For processing backwards, we operated on a copied reversed version
+    // For processing backward, we operated on a copied reversed version
     // Since we hold pointers, only addresses are copied
-    if ( backwards ) {
+    if ( direction == BACKWARD ) {
         reversed = (*children);
         std::reverse( reversed.begin(), reversed.end() );
         children = &reversed;

@@ -278,7 +278,7 @@ void Layer::Delete( LayerElement *element )
 // symbol, de la nature indiquee (flg). Retourne le ptr si succes, ou 
 // l'element de depart; le ptr succ est vrai si symb trouve.
 
-LayerElement *Layer::GetFirstOld( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ)
+LayerElement *Layer::GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ)
 {	
     LayerElement *original = element;
 

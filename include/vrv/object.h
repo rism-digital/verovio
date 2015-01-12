@@ -59,6 +59,10 @@ typedef std::map<int, IntTree> IntTree_t;
 typedef std::map<int, bool> VerseN_t;
 typedef std::map<int, VerseN_t> LayerN_VerserN_t;
 typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
+    
+#define UNLIMITED_DEPTH -10000
+#define FORWARD true
+#define BACKWARD false
 
 //----------------------------------------------------------------------------
 // Object
@@ -186,18 +190,22 @@ public:
      * Look for a child with the specified uuid (returns NULL if not found)
      * This method is a wrapper to a Object::FindByUuid functor.
      */
-    Object *FindChildByUuid( std::string uuid );
+    Object *FindChildByUuid( std::string uuid,
+                            int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
      * Look for a child with the specified type (returns NULL if not found)
      * This method is a wrapper to a Object::FindByType functor.
      */
-    Object *FindChildByType( const std::type_info *elementType );
+    Object *FindChildByType( const std::type_info *elementType,
+                            int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
      * Return the first element matching the AttComparison functor
+     * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByAttComparison( AttComparison *attComparison, int deepness = -1 );
+    Object *FindChildByAttComparison( AttComparison *attComparison,
+                                     int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -295,8 +303,8 @@ public:
      * limit (EditorialElement objects do not count).
      */
     virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL,
-            ArrayOfAttComparisons * filters = NULL, int deepness = -10000, bool backwards = false );
-
+                         ArrayOfAttComparisons * filters = NULL, int deepness = UNLIMITED_DEPTH,
+                         bool direction = FORWARD );
     
     //----------//
     // Functors //

@@ -151,9 +151,6 @@ enum EditorMode {
 #define ACCID_QUARTER_SHARP 6
 #define ACCID_QUARTER_FLAT 7
 
-// DIRECTIONS
-#define FORWARD 1
-#define BACKWARD 0
 #define ON 1
 #define OFF 0
 
