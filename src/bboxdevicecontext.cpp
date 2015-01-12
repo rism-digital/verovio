@@ -371,6 +371,10 @@ void BBoxDeviceContext::DrawSpline(int n, MusPoint points[])
 
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2) 
 {
+    if (m_isDeactivated) {
+        return;
+    }
+    
     /*
     DocObject *first = &m_objects[m_objects.Count() - 1];
     

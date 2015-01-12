@@ -131,7 +131,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    DeviceContext () { m_correctMusicAscent = true; m_drawingBoundingBoxes = false;};
+    DeviceContext () { m_correctMusicAscent = true; m_drawingBoundingBoxes = false; m_isDeactivated = false; };
     virtual ~DeviceContext() {};
     ///@}
     
@@ -183,6 +183,18 @@ public:
     ///@}
     
     /**
+     * @name Temporarily deactivate a graphic
+     * This can be used for example for not taking into account the bounding box of parts of the graphic.
+     * One example is the connectors in lyrics.
+     * This is not a virtual method and cannot be overriden. In only changes a flag. The effect of the flag
+     * has to be defined in the child class. It should not be call twice in a row.
+     */
+    ///@{
+    void DeactivateGraphic( );
+    void ReactivateGraphic( );
+    ///@}
+    
+    /**
      * @name Method for starting and ending a graphic
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
@@ -226,6 +238,10 @@ protected:
     
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;
+    
+    /** flag for indicating if the graphic is deactivated */
+    bool m_isDeactivated;
+    
 };
 
 // ---------------------------------------------------------------------------

@@ -73,6 +73,18 @@ void DeviceContext::ResetBrush( )
 {
     m_brushStack.pop();
 }
+    
+void DeviceContext::DeactivateGraphic()
+{
+    assert( !m_isDeactivated );
+    m_isDeactivated = true;
+}
+    
+void DeviceContext::ReactivateGraphic( )
+{
+    assert( m_isDeactivated );
+    m_isDeactivated = false;
+}
 
 //----------------------------------------------------------------------------
 // FontMetricsInfo
