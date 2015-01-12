@@ -295,7 +295,7 @@ public:
      * limit (EditorialElement objects do not count).
      */
     virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL,
-                         ArrayOfAttComparisons * filters = NULL, int deepness = -10000 );
+            ArrayOfAttComparisons * filters = NULL, int deepness = -10000, bool backwards = false );
 
     
     //----------//

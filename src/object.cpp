@@ -497,7 +497,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool backwards )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -522,7 +522,17 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     deepness--;
     
     ArrayOfObjects::iterator iter;
-    for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
+    // We need a pointer to the array for the option to work on a reversed copy
+    ArrayOfObjects *children = &this->m_children;
+    ArrayOfObjects reversed;
+    // For processing backwards, we operated on a copied reversed version
+    // Since we hold pointers, only addresses are copied
+    if ( backwards ) {
+        reversed = (*children);
+        std::reverse( reversed.begin(), reversed.end() );
+        children = &reversed;
+    }
+    for (iter = children->begin(); iter != children->end(); ++iter)
     {
         if ( filters && !filters->empty() ) {
             bool hasAttComparison = false;
@@ -1255,7 +1265,7 @@ int Object::PrepareLyrics( ArrayPtrVoid params )
     Staff *staff = dynamic_cast<Staff*>(this);
     if ( staff  ) {
         if ((*currentSyl)) {
-            staff->m_drawingCurrentSyl.push_back((*currentSyl));
+            staff->m_currentSyls.push_back((*currentSyl));
         }   
     }
     
