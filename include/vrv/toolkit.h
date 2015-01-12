@@ -218,7 +218,14 @@ public:
     void SetRdgXPathQuery( std::string const &rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
     std::string GetRdgXPathQuery() { return m_rdgXPathQuery; };
     ///@}
-	
+
+    /**
+     * @name Set a specific font
+     */
+    ///@{
+    bool SetFont( std::string const &font );
+    ///@}
+    
     /**
      * @name Get the pages for a loaded file
      * The SetFormat with ConvertFileFormat does not perform any validation

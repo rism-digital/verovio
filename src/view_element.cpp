@@ -1184,34 +1184,32 @@ void View::DrawMensurSlash ( DeviceContext *dc, int a, int yy, Staff *staff )
 
 void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
 {
-	assert( dc ); // DC cannot be NULL	
-    	
-	int ynum, yden;
-	std::string s;
+    assert( dc ); // DC cannot be NULL
+    
+    int ynum, yden;
     std::wstring wtext;
-
-	if (numBase)
-	{	
-		ynum = y - (m_doc->m_drawingHalfInterl[staff->staffSize]*4);
-		yden = ynum - (m_doc->m_drawingInterl[staff->staffSize]*2);
-	}
-	else
-		ynum = y - (m_doc->m_drawingHalfInterl[staff->staffSize]*6);
-
-	if (numBase > 9 || num > 9)	// avancer
-		x += m_doc->m_drawingUnit*2;
-
-	s = StringFormat("%u",num);
-    // FIXME (wtext instead of w)
-	DrawSmuflString ( dc, x, ynum, wtext, 1, staff->staffSize);	// '1' = centrer
-
-	if (numBase)
-	{
-        s = StringFormat("%u",numBase);
-            // FIXME (wtext instead of w)
-		DrawSmuflString ( dc, x, yden, wtext, 1, staff->staffSize);	// '1' = centrer
-	}
-	return;
+    
+    if (numBase)
+    {
+        ynum = y - (m_doc->m_drawingHalfInterl[staff->staffSize]*2);
+        yden = ynum - (m_doc->m_drawingInterl[staff->staffSize]*2);
+    }
+    else
+        ynum = y - (m_doc->m_drawingHalfInterl[staff->staffSize]*4);
+    
+    if (numBase > 9 || num > 9)	{
+        x += m_doc->m_drawingUnit*2;
+    }
+    
+    wtext = IntToTimeSigFigures(num);
+    DrawSmuflString ( dc, x, ynum, wtext, 1, staff->staffSize);	// '1' = centrer
+    
+    if (numBase)
+    {
+        wtext = IntToTimeSigFigures(numBase);
+        DrawSmuflString ( dc, x, yden, wtext, 1, staff->staffSize);	// '1' = centrer
+    }
+    return;
 }
     
     

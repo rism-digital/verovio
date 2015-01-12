@@ -99,7 +99,7 @@ int Verse::PrepareLyrics( ArrayPtrVoid params )
     
     Syl *syl = dynamic_cast<Syl*>( this->GetFirst( &typeid(Syl) ) );
     if (syl) {
-        std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
+        //std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
     }
     return FUNCTOR_CONTINUE;
 }
