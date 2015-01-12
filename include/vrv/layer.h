@@ -15,6 +15,7 @@
 
 #include "atts_shared.h"
 #include "clef.h"
+#include "drawinglistinterface.h"
 #include "object.h"
 #include "scoredef.h"
 
@@ -33,7 +34,7 @@ class Note;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public ObjectListInterface,
+class Layer: public DocObject, public DrawingListInterface, public ObjectListInterface,
     public AttCommon
 {
 public:
@@ -86,26 +87,6 @@ public:
      * The method uses Layer::GetClef first to find the clef before test.
      */
     int GetClefOffset( LayerElement *test  );
-    
-    /**
-     * Add an element to the drawing list.
-     * The drawing list is used to postponed the drawing of elements
-     * that need to be drawn in a particular order.
-     * For example, we need to draw beams before tuplets
-     */
-    void AddToDrawingList( LayerElement *element );
-
-    /**
-     * Return the drawing list.
-     * This is used when actually drawing the list (see View::DrawLayerList)
-     */
-    ListOfObjects *GetDrawingList( );
-
-    /**
-     * Reset the drawing list.
-     * Clears the list - called when the layer starts to be drawn
-     */
-    void ResetDrawingList( );
     
     /**
      * Basic method that remove intermediate clefs and custos.
@@ -169,9 +150,10 @@ private:
 public:
     
 protected:
-    // drawing variables
-    //LayerElement *beamListPremier; // we need to replace this with a proper beam class that handles a list of notes/rests
-    ListOfObjects m_drawingList;
+    /**
+     * @name Drawing variables
+     */
+    ///@{
     /** The clef attribute */
     Clef *m_drawingClef;
     /** The key signature */
@@ -180,6 +162,7 @@ protected:
     Mensur *m_drawingMensur;
     /** The meter signature (time signature) */
     MeterSig *m_drawingMeterSig;
+    ///@}
     
 private:
     /**

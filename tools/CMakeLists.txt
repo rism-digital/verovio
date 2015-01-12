@@ -21,6 +21,7 @@ add_executable (verovio
 	../src/devicecontext.cpp
 	../src/doc.cpp	
 	../src/dot.cpp
+	../src/drawinglistinterface.cpp
 	../src/durationinterface.cpp
 	../src/editorial.cpp
 	../src/glyph.cpp

@@ -99,6 +99,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
+	$VEROVIO_ROOT/src/drawinglistinterface.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
