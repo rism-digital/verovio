@@ -101,11 +101,6 @@ public:
     void SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
     
     /**
-     * Align horizontally the content of a layer.
-     */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
-    
-    /**
      * @name Set the clef, keySig, mensur and meterSig to be drawn.
      */
     ///@{
@@ -140,10 +135,9 @@ public:
     //----------//
     
     /**
-     * Copy the elements to a Layer passed in parameters.
-     * Also take into account a start and end uuid for the page (if any)
+     * Align horizontally the content of a layer.
      */
-    virtual int CopyToLayer( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid params );
     
 private:
     

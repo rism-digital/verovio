@@ -297,6 +297,10 @@ int LayerElement::GetXRel()
     }
     return 0;
 }
+    
+//----------------------------------------------------------------------------
+// LayerElement functors methods
+//----------------------------------------------------------------------------
 
 int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 {

@@ -415,62 +415,6 @@ void Layer::RemoveClefAndCustos()
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-int Layer::CopyToLayer( ArrayPtrVoid params )
-{  
-    // Things we might want to add: 
-    // - checking that the parent is a staff to avoid copying MusApp
-    // - adding a parent nbLogStaff and a nbLogLayer parameter for copying a specific staff / layer
-    
-    
-    // param 0: the Layer we need to copy to
-	Layer *destinationLayer = static_cast<Layer*>(params[0]);
-    // param 1: the uuid of the start element (if any)
-    std::string *start = static_cast<std::string*>(params[1]);
-    // param 2: the uuid of the end element (if any)
-    std::string *end = static_cast<std::string*>(params[2]);
-    // param 3: we have a start element and have started
-    bool *has_started = static_cast<bool*>(params[3]);
-    // param 4: we have an end element and have ended
-    bool *has_ended = static_cast<bool*>(params[4]);
-    // param 5: we want a new uuid for the copied elements
-    bool *new_uuid = static_cast<bool*>(params[5]);
-    
-    if ( (*has_ended) ) {
-        return FUNCTOR_STOP;
-    }
-    
-    int i;
-    for ( i = 0; i < this->GetElementCount(); i++ ) 
-    {
-        // check if we have a start uuid or if we already passed it
-        if ( !start->empty() && !(*has_started) ) {
-            if ( *start == m_children[i]->GetUuid() ) {
-                (*has_started) = true;
-            } 
-            else {
-                continue;
-            }
-        }
-        
-        // copy and add it
-        LayerElement *element = dynamic_cast<LayerElement*>(m_children[i]);
-        assert( element );
-        LayerElement *copy = element->GetChildCopy( (*new_uuid) );
-        destinationLayer->AddElement( copy );
-        
-        // check if we have a end uuid and if we have reached it. 
-        if ( !end->empty() ) {
-            if ( *end == m_children[i]->GetUuid() ) {
-                (*has_ended) = true;
-                return FUNCTOR_STOP;
-            }
-        }
-
-        
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)

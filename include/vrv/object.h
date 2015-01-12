@@ -308,11 +308,6 @@ public:
     virtual int AddLayerElementToList( ArrayPtrVoid params );
     
     /**
-     * See Layer::CopyToLayer
-     */ 
-    virtual int CopyToLayer( ArrayPtrVoid params ) { return false; };
-    
-    /**
      * Find a Object with a specified uuid.
      * param 0: the uuid we are looking for.
      * param 1: the pointer to pointer to the Object retrieved (if found).
