@@ -17,7 +17,11 @@ active: smufl
             <div class="panel-body">
                 <p>
                     Verovio follows the <a href="http://www.smufl.org" target="_blank">Standard Music Font Layout (SMuFL)</a> specification. It means that it is easily possible to change the music font used in Verovio and to have a personalised output.
-Verovio includes its own SMuFL-compliant music font, Leipzig. It also supports and includes the <a href="http://www.smufl.org/font" target="_blank">Bravura</a> designed by Daniel Spreadbury at Steinberg.
+Verovio includes the Leipzig font, its own SMuFL-compliant music font. 
+                </p>
+
+                <p>
+                    It also supports and includes the <a href="http://www.smufl.org/font" target="_blank">Bravura</a> designed by Daniel Spreadbury at Steinberg. The Gootville font is a <a href="http://www.musescore.org" target="_blank">MuseScore</a> font is not yet included by default in Verovio.
                 </p>
                 
                 <p>
@@ -80,9 +84,18 @@ Verovio includes its own SMuFL-compliant music font, Leipzig. It also supports a
                     scale: zoom
                 });
 
-        $.get( "{{ site.baseurl }}/examples/fonts/font-1.mei" , function( data ) {
-            
+        /*
+        $.get( "{{ site.baseurl }}/examples/fonts/font-1.mei" , function( data ) { 
             load_data( data, options, $('#svg_output') );
+        });
+        */
+        $.ajax({
+            url: "{{ site.baseurl }}/examples/fonts/" + font + ".svg"
+            , dataType: "text"
+            , success: function(data) {
+                console.log(data);
+                $('#svg_output').html(data);
+            }
         });
     });
 //]]>

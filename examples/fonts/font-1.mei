@@ -22,7 +22,7 @@
                 <score>
                     <scoreDef meter.count="4" meter.unit="4" key.sig="3f" key.mode="major">
                         <staffGrp symbol="line">
-                            <staffGrp symbol="brace" barthru="true">
+                            <staffGrp symbol="bracket" barthru="true">
                                 <staffDef n="1" xml:id="P1" label="upper" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
                                 <staffDef n="2" xml:id="P2" label="lower" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
                             </staffGrp>
