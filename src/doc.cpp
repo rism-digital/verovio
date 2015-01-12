@@ -70,6 +70,8 @@ void Doc::Reset( DocType type )
     m_currentScoreDefDone = false;
     
     m_scoreDef.Reset();
+    
+    m_drawingLyricFont.SetFaceName("Garamond");
 }
 
 void Doc::AddPage( Page *page )
@@ -392,6 +394,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
     m_drawingFontHeight = CalcMusicFontSize();
+    
     /*
     m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
 	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
@@ -399,18 +402,15 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
     */
     
-    m_drawingFontSize[0][0] = m_drawingFontHeight;
-    m_drawingFontSize[0][1] = (m_drawingFontSize[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
-    m_drawingFontSize[1][0] = (m_drawingFontSize[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-    m_drawingFontSize[1][1]= (m_drawingFontSize[1][0] * m_drawingGraceRatio[0])/ m_drawingGraceRatio[1];
+	m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
+    m_drawingSmuflFonts[0][1].SetPointSize( (m_drawingFontHeight * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
+    m_drawingSmuflFonts[1][0].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] );
+    m_drawingSmuflFonts[1][1].SetPointSize( ( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
     
-	m_drawingFonts[0][0].SetPointSize( m_drawingFontSize[0][0] ); //160
-    m_drawingFonts[0][1].SetPointSize( m_drawingFontSize[0][1] ); //120
-    m_drawingFonts[1][0].SetPointSize( m_drawingFontSize[1][0] ); //128
-    m_drawingFonts[1][1].SetPointSize( m_drawingFontSize[1][1] ); //100
-    
-	m_drawingLyricFonts[0].SetPointSize( m_drawingLyricFont.GetPointSize() );
-    m_drawingLyricFonts[1].SetPointSize( m_drawingLyricFont.GetPointSize() );
+    m_drawingLyricFonts[0] = m_drawingLyricFont;
+    m_drawingLyricFonts[1] = m_drawingLyricFont;
+	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight / 2 );
+    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] / 2 );
     
     float glyph_size;
     Glyph *glyph;

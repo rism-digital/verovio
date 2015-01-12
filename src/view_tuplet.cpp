@@ -262,6 +262,8 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     std::wstring notes = IntToTupletFigures((short int)tuplet->GetNum());
     
+    dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
+    
     dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
     
     MusPoint start, end, center;
@@ -275,6 +277,8 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][tuplet->m_cueSize];
     
     DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
+    
+    dc->ResetFont();
     
     int verticalLine = m_doc->m_drawingUnit;
     
@@ -313,6 +317,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     }
     
     dc->ResetPen();
+    
 }
 
 } // namespace vrv

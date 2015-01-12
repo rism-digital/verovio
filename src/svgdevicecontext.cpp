@@ -273,16 +273,6 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-    
-void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
-{
-    m_font = *font_info;
-    //wxFont font( font_info->pointSize, (wxFontFamily)font_info->family, font_info->style,
-    //    (wxFontWeight)font_info->weight, font_info->underlined, font_info->faceName,
-    //    (wxFontEncoding)font_info->encoding );
-    //m_dc->SetFont( font );
-}
-            
 
 void SvgDeviceContext::SetTextForeground( int colour )
 {
@@ -327,9 +317,9 @@ void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, i
         }
         glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
     
-        partial_w *= m_font.GetPointSize();
+        partial_w *= m_fontStack.top()->GetPointSize();
         partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_font.GetPointSize();
+        partial_h *= m_fontStack.top()->GetPointSize();
         partial_h /= glyph->GetUnitsPerEm();
         
         *w += partial_w;
@@ -484,10 +474,8 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
 
-        
-void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
+void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
-    
     std::string s;
     std::string anchor;
     
@@ -498,15 +486,33 @@ void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alig
         anchor = "middle";
     }
     
-    pugi::xml_node textChild = m_currentNode.append_child( "text" );
-    textChild.append_attribute( "x" ) = x;
-    textChild.append_attribute( "y" ) = y;
-    textChild.append_attribute( "dx" ) = 0;
-    textChild.append_attribute( "dy" ) = 0;
-    // HARDCODED
-    textChild.append_attribute( "style" ) = "font-family: Garamond, Georgia, serif; font-size: 360px;";
-    textChild.append_attribute( "text-anchor" ) = anchor.c_str();
+    m_currentNode = m_currentNode.append_child( "text" );
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute( "x" ) = x;
+    m_currentNode.append_attribute( "y" ) = y;
+    m_currentNode.append_attribute( "dx" ) = 0;
+    m_currentNode.append_attribute( "dy" ) = 0;
+    if ( !anchor.empty() ) {
+        m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
+    }
     
+}
+    
+void SvgDeviceContext::EndText()
+{
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
+        
+void SvgDeviceContext::DrawText(const std::string& text)
+{
+    pugi::xml_node textChild = m_currentNode.append_child( "tspan" );
+    if ( !m_fontStack.top()->GetFaceName().empty() ) {
+        textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
+    }
+    if ( m_fontStack.top()->GetPointSize() != 0 ) {
+        textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
+    }
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 
@@ -598,12 +604,12 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         useChild.append_attribute( "xlink:href" ) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute( "x" ) = x;
         useChild.append_attribute( "y" ) = y;
-        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
-        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
+        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         
         // Get the bounds of the char
         glyph->GetBoundingBox(&gx, &gy, &w, &h);
-        x += w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
     }
 }
 

@@ -274,7 +274,7 @@ protected:
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
 	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
-	void DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize = 0);
+	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 0);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
 	void DrawDot ( DeviceContext *dc, int x, int y );

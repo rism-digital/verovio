@@ -636,10 +636,11 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     // convert to string
     std::wstring wtext = IntToTimeSigFigures(multirest->GetNum());
     
+    dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
     dc->GetSmuflTextExtent( wtext, &w, &h);
     start_offset = (x2 - x1 - w) /  2; // calculate offset to center text
-    
     DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 5, wtext, false);
+    dc->ResetFont();
     
     dc->EndGraphic(element, this);
     
@@ -1377,7 +1378,7 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     dc->StartGraphic( syl, "", syl->GetUuid() );
     
-    DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
+    DrawLyricString(dc, x, y, syl->GetText().c_str() );
     
     if (syl->m_drawingFirstNote && syl->m_drawingLastNote) {
         System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );

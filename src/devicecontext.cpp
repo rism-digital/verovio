@@ -39,8 +39,7 @@ void DeviceContext::SetPen( int colour, int width, int opacity )
             opacityValue = 1.0; // solid brush as default
     }
     
-    Pen currentPen = Pen(colour, width, opacityValue);
-    m_penStack.push(currentPen);
+    m_penStack.push(Pen(colour, width, opacityValue));
 }
 
 void DeviceContext::SetBrush( int colour, int opacity )
@@ -59,11 +58,14 @@ void DeviceContext::SetBrush( int colour, int opacity )
             opacityValue = 1.0; // solid brush as default
     }
     
-    Brush currentBrush = Brush(colour, opacityValue);
-    m_brushStack.push(currentBrush);
-
+    m_brushStack.push(Brush(colour, opacityValue));
 }
 
+void DeviceContext::SetFont( FontInfo *font )
+{
+    m_fontStack.push( font );
+}
+    
 void DeviceContext::ResetPen( )
 {
     m_penStack.pop();
@@ -74,6 +76,11 @@ void DeviceContext::ResetBrush( )
     m_brushStack.pop();
 }
     
+void DeviceContext::ResetFont( )
+{
+    m_fontStack.pop();
+}
+
 void DeviceContext::DeactivateGraphic()
 {
     assert( !m_isDeactivated );
@@ -84,63 +91,6 @@ void DeviceContext::ReactivateGraphic( )
 {
     assert( m_isDeactivated );
     m_isDeactivated = false;
-}
-
-//----------------------------------------------------------------------------
-// FontMetricsInfo
-//----------------------------------------------------------------------------
-
-bool FontMetricsInfo::FromString(const std::string& ss)
-{
-    std::istringstream iss( ss );
-    std::string token;
-
-    getline( iss, token, ';');
-    //
-    //  Ignore the version for now
-    //
-
-    getline( iss, token, ';');
-    pointSize = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    family = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    style = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    weight = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    underlined = (atoi( token.c_str() ) != 0);
-
-    getline( iss, token, ';');
-    faceName = token;
-#ifndef __WXMAC__
-    if( faceName.empty() )
-        return false;
-#endif
-
-    getline( iss, token, ';');
-    encoding = atoi( token.c_str() );;
-
-    return true;
-}
-
-std::string FontMetricsInfo::ToString() const
-{
-    std::string s = StringFormat( "%d;%d;%d;%d;%d;%d;%s;%d",
-             0,                                 // version
-             pointSize,
-             family,
-             style,
-             weight,
-             underlined,
-             faceName.c_str(),
-             encoding);
-
-    return s;
 }
 
 } // namespace vrv

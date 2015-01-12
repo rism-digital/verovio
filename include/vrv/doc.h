@@ -259,8 +259,6 @@ public:
     int m_drawingBeamWidth[2];
     /** Height of a beam spacing (white) for normal and small staff (10 and 6 by default) */
     int m_drawingBeamWhiteWidth[2];
-    /** Current font height with ascent for normal and small staff and normal and grace size */
-    int m_drawingFontSize[2][2];
     /** Note radius for normal and small staff and normal and grace size */
     int m_drawingNoteRadius[2][2];
     /** Ledger line length for normal and small staff and normal and grace size */
@@ -270,13 +268,11 @@ public:
     /** Accident width for normal and small staff and normal and grace size */
     int m_drawingAccidWidth[2][2];
     /** Current music font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_drawingFonts[2][2];				
-    /** music font */
-    FontMetricsInfo m_drawingMusicFont;
+    FontInfo m_drawingSmuflFonts[2][2];
     /** Current lyric font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_drawingLyricFonts[2];
+    FontInfo m_drawingLyricFonts[2];
     /** Lyric font by default */
-    FontMetricsInfo m_drawingLyricFont;
+    FontInfo m_drawingLyricFont;
     /** The current page height */
     int m_drawingPageHeight;
     /** The current page height */

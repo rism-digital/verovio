@@ -83,11 +83,6 @@ void BBoxDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-        
-void BBoxDeviceContext::SetFont( FontMetricsInfo *font_info )
-{
-    m_font = *font_info;
-}
 
 void BBoxDeviceContext::SetTextForeground( int colour )
 {
@@ -129,9 +124,9 @@ void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, 
         }
         glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
         
-        partial_w *= m_font.GetPointSize();
+        partial_w *= m_fontStack.top()->GetPointSize();
         partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_font.GetPointSize();
+        partial_h *= m_fontStack.top()->GetPointSize();
         partial_h /= glyph->GetUnitsPerEm();
         
         *w += partial_w;
@@ -302,10 +297,21 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
     
     UpdateBB( x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
-
-        
-void BBoxDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
+    
+void BBoxDeviceContext::StartText(int x, int y, char alignement)
 {
+    // TODO
+    
+}
+
+void BBoxDeviceContext::EndText()
+{
+    // TODO
+}
+        
+void BBoxDeviceContext::DrawText(const std::string& text)
+{
+    // TODO
     // alignment not taken into account!
     //std::wstring wtext = std::wstring(text.begin(), text.end());
     //DrawMusicText( wtext, x, y);
@@ -349,16 +355,16 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         }
         glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + g_x * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position are already flipped
-        int y_off = y - g_y * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        int y_off = y - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
          
         UpdateBB(x_off, y_off, 
-                  x_off + g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm(),
+                  x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
         // idem, y position are flipped
-                  y_off - g_h * m_font.GetPointSize() / glyph->GetUnitsPerEm());
+                  y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm());
         
-        lastCharWidth = g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        lastCharWidth = g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
      
     }

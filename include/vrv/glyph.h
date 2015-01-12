@@ -13,9 +13,9 @@
 
 namespace vrv {
     
-#define VRV_TEXT_E550 "&xE550"
-#define VRV_TEXT_E551 "&xE551"
-#define VRV_TEXT_E552 "&xE552"
+#define VRV_TEXT_E550 0xE550
+#define VRV_TEXT_E551 0xE551
+#define VRV_TEXT_E552 0xE552
 
 /**
  * This class is used for storing a music font glyph.

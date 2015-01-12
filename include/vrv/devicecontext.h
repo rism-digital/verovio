@@ -52,7 +52,7 @@ enum
 
 class MusPoint;
 class MusRect;
-class FontMetricsInfo;
+class FontInfo;
 class DocObject;
 class View;
     
@@ -65,15 +65,13 @@ class View;
  * bounding box engraving.
  */
 
-class Pen{
-    
+class Pen
+{
 public:
     Pen()
-    : m_penColour(0), m_penWidth(0), m_penOpacity(0.0)
-    { }
+        : m_penColour(0), m_penWidth(0), m_penOpacity(0.0)  { }
     Pen(int colour, int width, float opacity)
-    : m_penColour(colour), m_penWidth(width), m_penOpacity(opacity)
-    { }
+        : m_penColour(colour), m_penWidth(width), m_penOpacity(opacity) { }
     
     int GetColour() const { return m_penColour; }
     void SetColour(int colour) { m_penColour = colour; }
@@ -88,15 +86,13 @@ public:
     
 };
 
-class Brush{
-    
+class Brush
+{
 public:
     Brush()
-    : m_brushColour(0), m_brushOpacity(0.0)
-    { }
+        : m_brushColour(0), m_brushOpacity(0.0) { }
     Brush(int colour, float opacity)
-    : m_brushColour(colour), m_brushOpacity(opacity)
-    { }
+        : m_brushColour(colour), m_brushOpacity(opacity) { }
     
     int GetColour() const { return m_brushColour; }
     void SetColour(int colour) { m_brushColour = colour; }
@@ -121,7 +117,7 @@ public:
  *  SvgDeviceContext - a non-gui file DC;
  *  MusCairoDC - a wrapper to a Cairo surface;
  * The class uses int-based colour encoding (instead of wxColour in wxDC).
- * It uses FontMetricsInfo (instead of wxFont in wxDC).
+ * It uses FontInfo (instead of wxFont in wxDC).
 */
 
 class DeviceContext
@@ -137,17 +133,18 @@ public:
     
     /**
      * @name Setters
-     * Non virtual methods cannot be overriden and manage the Pen and Brush stacks
+     * Non virtual methods cannot be overriden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
     void SetBrush( int colour, int opacity );
     void SetPen( int colour, int width, int opacity );
+    void SetFont( FontInfo *font );
     void ResetBrush( );
     void ResetPen( );
+    void ResetFont( );
     virtual void SetBackground( int colour, int style = AxSOLID ) = 0;
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) = 0;
     virtual void SetBackgroundMode( int mode ) = 0;
-    virtual void SetFont( FontMetricsInfo *font_info ) = 0;
     virtual void SetTextForeground( int colour ) = 0;
     virtual void SetTextBackground( int colour ) = 0;
     virtual void SetLogicalOrigin( int x, int y ) = 0;
@@ -176,11 +173,20 @@ public:
     virtual void DrawRectangle(int x, int y, int width, int height) = 0;
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle) = 0;
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius) = 0;
-    virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT ) = 0;
+    virtual void DrawText(const std::string& text) = 0;
     virtual void DrawMusicText(const std::wstring& text, int x, int y) = 0;
     virtual void DrawSpline(int n, MusPoint points[]) = 0;
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) = 0;
     ///@}
+
+    /**
+     * @name Method for starting and ending a text
+     * Once started, DrawText should be called for actually drawing the text.
+     * Font can be changed between called for DrawText
+     */
+    ///@{
+    virtual void StartText(int x, int y, char alignement = LEFT ) = 0;
+    virtual void EndText() = 0;
     
     /**
      * @name Temporarily deactivate a graphic
@@ -238,6 +244,7 @@ protected:
     
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;
+    std::stack<FontInfo*> m_fontStack;
     
     /** flag for indicating if the graphic is deactivated */
     bool m_isDeactivated;
@@ -245,7 +252,7 @@ protected:
 };
 
 // ---------------------------------------------------------------------------
-// FontMetricsInfo
+// FontInfo
 // ---------------------------------------------------------------------------
 
 /**
@@ -253,10 +260,10 @@ protected:
  * It is very similar to wxNativeFontInfo, but we need it for non-gui AxDCs 
 */
 
-class FontMetricsInfo
+class FontInfo
 {
 public:
-    FontMetricsInfo () 
+    FontInfo () 
     {
         pointSize = 0;
         family = 0; //was wxFONTFAMILY_DEFAULT;
@@ -266,7 +273,7 @@ public:
         faceName.clear();
         encoding = 0; //was wxFONTENCODING_DEFAULT;
     }
-    virtual ~FontMetricsInfo() {};
+    virtual ~FontInfo() {};
     
     // accessors and modifiers for the font elements
     int GetPointSize() { return pointSize; }
@@ -281,13 +288,9 @@ public:
     void SetStyle(int style_) { style = style_; }
     void SetWeight(int weight_) { weight = weight_; }
     void SetUnderlined(bool underlined_) { underlined = underlined_; }
-    void SetFaceName(std::string& faceName_) { faceName = faceName_; }
+    void SetFaceName(const char *faceName_) { faceName = faceName_; }
     void SetFamily(int family_) { family = family_; }
     void SetEncoding(int encoding_) { encoding = encoding_; }
-    
-    // in axdc.cpp
-    bool FromString(const std::string& s);
-    std::string ToString() const;
     
     int           pointSize;
     int           family;

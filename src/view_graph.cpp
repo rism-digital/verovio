@@ -11,11 +11,14 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "glyph.h"
 #include "staff.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -113,7 +116,6 @@ void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
 
 	assert( dc ); // DC cannot be NULL
     
-    dc->SetFont( &m_doc->m_drawingFonts[staffSize][dimin] );
 
 	if ( dc)
 	{	
@@ -122,14 +124,15 @@ void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
         
         std::wstring str;
         str.push_back(code);
-		dc->SetTextForeground( m_currentColour );
-        dc->SetPen( m_currentColour, 1, AxSOLID );
+        
         dc->SetBrush( m_currentColour, AxSOLID );
+        dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][dimin] );
 
 		dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y + fontCorr) );
 
-        dc->ResetPen();
+        dc->ResetFont();
         dc->ResetBrush();
+
 	}
 
 	return;
@@ -141,12 +144,10 @@ void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, in
 
     int fontCorr = 0;
     
-    dc->SetFont( &m_doc->m_drawingFonts[ staffSize ][0] );
-    x = ToDeviceContextX(x);
+    int xDC = ToDeviceContextX(x);
     if (dc->CorrectMusicAscent()) {
         fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][0];
     }
-    
     
 	if ( centrer )
 	{
@@ -154,21 +155,50 @@ void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, in
 		
         int w, h;
 		dc->GetSmuflTextExtent( s, &w, &h );
-		x -= w / 2;
+		xDC -= w / 2;
         
 	}
-	dc->SetTextForeground( m_currentColour );
-	dc->DrawMusicText( s, x, ToDeviceContextY(y + fontCorr ));
+    dc->SetBrush( m_currentColour, AxSOLID );
+    dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][0] );
+    
+	dc->DrawMusicText( s, xDC, ToDeviceContextY(y + fontCorr ));
+    
+    dc->ResetFont();
+    dc->ResetBrush();
 }
 
-void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::string s, int staffSize)
+void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize)
 {
 	assert( dc ); // DC cannot be NULL
+
+    dc->SetBrush( m_currentColour, AxSOLID );
+    dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
+    dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
-    //dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
-	x = ToDeviceContextX(x);
-	dc->SetTextForeground( m_currentColour );
-	dc->DrawText( s, x, ToDeviceContextY( y ) );
+    std::wistringstream iss( s  );
+    std::wstring token;
+    while( std::getline( iss, token, L'_' ))
+    {
+        dc->DrawText( UTF16to8( token.c_str() ) );
+        // no _
+        if (iss.eof())
+            break;
+        
+        FontInfo vrvTxt;
+        vrvTxt.SetFaceName("VerovioText");
+        vrvTxt.SetPointSize( m_doc->m_drawingLyricFonts[staffSize].GetPointSize());
+        
+        dc->SetFont( &vrvTxt );
+        std::wstring str;
+        str.push_back(VRV_TEXT_E551);
+        dc->DrawText( UTF16to8( str.c_str() ) );
+        dc->ResetFont();
+    }
+    //std::wcout << std::endl;
+	
+    dc->EndText( );
+    dc->ResetFont();
+    dc->ResetBrush();
 }
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
