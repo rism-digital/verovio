@@ -110,7 +110,7 @@ void display_usage() {
     
     cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
     
-    cerr << " --rdg-xpath-query          Set the xPath query for selecting <rdg> elements," << endl;
+    cerr << " --rdg-xpath-query=QUERY    Set the xPath query for selecting <rdg> elements," << endl;
     cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
 
     // Debugging options
@@ -304,7 +304,7 @@ int main(int argc, char** argv)
     }
     
     // Load a specified font
-    if (!font.empty() && !Resources::SetFont(font)) {
+    if (!font.empty() && !toolkit.SetFont(font)) {
         cerr << "Font '" << font << "' could not be loaded." << endl;
         exit(1);
     }

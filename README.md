@@ -12,6 +12,6 @@ The code for the attribute classes of Verovio are generated from the MEI schema 
 Example output
 --------------
 
-This page was generated with version 0.9.0
+This page was generated with version 0.9.5
 
 ![Example page](/images/page.png)

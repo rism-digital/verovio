@@ -144,8 +144,13 @@ bool Toolkit::SetFormat( std::string const &informat )
     }
     return true;
 };
+ 
     
-
+bool Toolkit::SetFont( std::string const &font )
+{
+    return Resources::SetFont(font);
+};
+ 
     
 bool Toolkit::LoadFile( const std::string &filename )
 {
@@ -278,6 +283,9 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     
     if (json.has<jsonxx::Number>("border"))
         SetBorder( json.get<jsonxx::Number>("border") );
+    
+    if (json.has<jsonxx::String>("font"))
+        SetFont(json.get<jsonxx::String>("font"));
 
     if (json.has<jsonxx::Number>("pageWidth"))
         SetPageWidth( json.get<jsonxx::Number>("pageWidth") );
