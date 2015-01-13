@@ -6,6 +6,10 @@ body {
 	margin-top: 65px;
 }
 
+svg:not(:root){
+	overflow:inherit
+}
+
 .navbar-brand {
 	padding: 0px 0px;
 	padding-left: 8px;
