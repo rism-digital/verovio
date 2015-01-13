@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <dirent.h>
 #include <cmath>
 #include <stdarg.h>
@@ -271,6 +272,11 @@ void AppendLogBuffer(bool checkDuplicate, std::string message)
     }
 }
 #endif
+    
+bool Check( Object *object ) {
+    assert( object );
+    return ( object != NULL );
+}
     
 //----------------------------------------------------------------------------
 // Various helpers
