@@ -45,6 +45,7 @@ bool Resources::InitFont()
     // We will need to rethink this for adding the option to add custom fonts
     if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded");
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded");
+    if (!LoadFont("Gootville")) LogError("Gootville font could not be loaded");
     
     if ( m_font.size() < SMUFL_COUNT ) {
         LogError("All default SMUFL glyphs could not be loaded");

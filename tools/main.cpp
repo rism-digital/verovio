@@ -98,7 +98,7 @@ void display_usage() {
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura is also available)" << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura and Gootville are also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
     

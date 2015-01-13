@@ -33,4 +33,8 @@ echo "Generating Leipzig files ..."
 saxon9ee Leipzig.svg extract-glyphs.xsl > tmp/Leipzig-bounding-boxes.svg
 phantomjs generate-bbox.js tmp/Leipzig-bounding-boxes.svg ../data/Leipzig.xml
 
+echo "Generating Gootville files ..."
+saxon9ee Gootville.svg extract-glyphs.xsl > tmp/Gootville-bounding-boxes.svg
+phantomjs generate-bbox.js tmp/Gootville-bounding-boxes.svg ../data/Gootville.xml
+
 echo "Done!"
