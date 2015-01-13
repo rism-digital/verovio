@@ -20,6 +20,7 @@ namespace vrv {
 class DeviceContext;
 class Layer;
 class StaffAlignment;
+class Syl;
 
 //----------------------------------------------------------------------------
 // Staff
@@ -90,8 +91,10 @@ public:
      * Number of lines copied from the staffDef for fast access when drawing
      */
 	int m_drawingLines;
+    
+    std::vector<Syl*>m_currentSyls;
 
-	/** 
+	/**
      * The Y absolute position of the staff for facsimile (transcription) encodings.
      * This is the top left corner of the staff (the X position is the position of the system).
      */

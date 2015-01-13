@@ -53,6 +53,7 @@ void Staff::Reset()
     m_yAbs = VRV_UNSET;
     m_drawingY = 0;
     m_staffAlignment = NULL;
+    m_currentSyls.clear();
 }
 
 void Staff::AddLayer( Layer *layer )

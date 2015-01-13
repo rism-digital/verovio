@@ -126,6 +126,7 @@ protected:
      */
     ///@{
     void DrawSystem( DeviceContext *dc, System *system );
+    void DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
 	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
     void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
@@ -238,6 +239,8 @@ protected:
     void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawSylConnector( DeviceContext *dc, Syl *syl, System *system );
+    void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
     void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
@@ -287,6 +290,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet* tuplet);
+    int GetSylY( Syl* syl, Staff *staff );
     ///@}
     
     /**

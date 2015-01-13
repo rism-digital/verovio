@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "accid.h"
 #include "barline.h"
 #include "beam.h"
@@ -1350,32 +1351,176 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
 }
     
+int View::GetSylY( Syl *syl, Staff *staff )
+{
+    assert( syl && staff );
+    
+    int y = syl->m_drawingFirstNote->GetDrawingY();
+    if (staff->GetAlignment() ) {
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - syl->m_drawingVerse * m_doc->m_drawingUnit * 4;
+    }
+    return y;
+}
+    
 void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     Syl *syl = dynamic_cast<Syl*>(element);
     
-    int verseNb = 1;
-    Verse *verse = dynamic_cast<Verse*>( element->GetFirstParent( &typeid(Verse), MAX_NOTE_DEPTH ) );
-    if ( verse ) {
-        verseNb = std::max(verse->GetN(), 1);
-    }
-    
-    Note *note = dynamic_cast<Note*>( element->GetFirstParent( &typeid(Note), MAX_NOTE_DEPTH ) );
-    if ( !note ) {
-        LogDebug("Syl parent note could not be found");
+    if ( !syl->m_drawingFirstNote ) {
+        LogDebug("Syl parent note was not found");
         return;
     }
     
     // to be updated
-    int x = note->GetDrawingX() - m_doc->m_drawingUnit * 2;
-    int y = note->GetDrawingY();
-    if (staff->GetAlignment() ) {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - verseNb * m_doc->m_drawingUnit * 4;
-    }
+    int x = syl->m_drawingFirstNote->GetDrawingX() - m_doc->m_drawingUnit * 2;
+    int y = GetSylY(syl, staff);
+    
     dc->StartGraphic( syl, "", syl->GetUuid() );
+    
     DrawLyricString(dc, x, y, UTF16to8( syl->GetText().c_str() ) );
+    
+    if (syl->m_drawingFirstNote && syl->m_drawingLastNote) {
+        System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );
+        // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
+        // that will look if the last note is in the same system (or not) and draw the connectors accordingly
+        if (currentSystem) {
+            currentSystem->AddToDrawingList(syl);
+        }
+    }
+    
     dc->EndGraphic(syl, this );
 
+}
+
+void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
+{
+    assert( syl->m_drawingFirstNote && syl->m_drawingLastNote);
+    if ( !syl->m_drawingFirstNote || !syl->m_drawingLastNote) return;
+    
+    // Get the parent system of the first and last note
+    System *parentSystem1 = dynamic_cast<System*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(System) )  );
+    System *parentSystem2 = dynamic_cast<System*>( syl->m_drawingLastNote->GetFirstParent( &typeid(System) )  );
+    
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (( system == parentSystem1 ) && ( system == parentSystem2 )) {
+        // Get the parent staff for calculating the y position
+        Staff *staff = dynamic_cast<Staff*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
+        
+        int y = GetSylY(syl, staff);
+        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length() - 1) * (int)m_doc->m_drawingInterl[staff->staffSize];
+        int x2 = syl->m_drawingLastNote->GetDrawingX();
+        
+        // In this case we can resume the Syl because is was drawn previouly in the system
+        dc->ResumeGraphic(syl, syl->GetUuid());
+        DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->EndResumedGraphic(syl, this);
+    }
+    // Only the first parent is the same, this means that the syl is "open" at the end of the system
+    else if ( system == parentSystem1 ) {
+        // We need the last measure of the system for x2
+        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        if ( !Check( last ) ) return;
+        Staff *staff = dynamic_cast<Staff*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
+        
+        int y = GetSylY(syl, staff);
+        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length() - 1) * (int)m_doc->m_drawingInterl[staff->staffSize];
+        int x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        
+        // In this case too we can resume the Syl because is was drawn previouly in the system
+        dc->ResumeGraphic(syl, syl->GetUuid());
+        DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->EndResumedGraphic(syl, this);
+        
+    }
+    // We are in the system of the last note - draw the connector from the beginning of the system
+    else if ( system == parentSystem2 ) {
+        // We need the first measure of the system for x1
+        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        if ( !Check( first ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
+        Staff *staff = dynamic_cast<Staff*>( syl->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
+        
+        int y = GetSylY(syl, staff);
+        int x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingInterl[staff->staffSize] : first->GetDrawingX();
+        int x2 = syl->m_drawingLastNote->GetDrawingX();
+        
+        // In this case we can resume the last note because the Syl itself was _not_ drawn previouly in the system
+        dc->ResumeGraphic(syl->m_drawingLastNote, syl->m_drawingLastNote->GetUuid());
+        DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->EndResumedGraphic(syl->m_drawingLastNote, this);
+    }
+    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    else {
+        // We need the first measure of the system for x1
+        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        if ( !Check( first ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
+        // We need the last measure of the system for x2
+        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        if ( !Check( last ) ) return;
+        // Get the staff of the first note - however, not the staff we need
+        Staff *firstStaff = dynamic_cast<Staff*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( firstStaff ) ) return;
+        
+        // We need the staff from the current system, i.e., the first measure.
+        AttCommonNComparison comparison( &typeid(Staff), firstStaff->GetN() );
+        Staff *staff = dynamic_cast<Staff*>(first->FindChildByAttComparison(&comparison, 1));
+        if (!staff ) {
+            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", firstStaff->GetN() );
+            return;
+        }
+        
+        int y = GetSylY(syl, staff);
+        int x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingInterl[staff->staffSize] : first->GetDrawingX();
+        int x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        
+        // In this case we cannot resume anything
+        DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+    }
+    
+}
+
+void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff )
+{
+    if (syl->GetCon() == CON_d) {
+        
+        y += m_doc->m_drawingHalfInterl[staff->staffSize] * 2 / 3;
+        x2 -= 3 * (int)m_doc->m_drawingHalfInterl[staff->staffSize];
+        
+        // the length of the dash and the space between them - can be made a parameter
+        int dashLength = m_doc->m_drawingHalfInterl[staff->staffSize] * 4 / 3;
+        int dashSpace = m_doc->m_drawingStaffSize[staff->staffSize] * 5 / 3;
+        
+        int dist = x2 - x1;
+        int nbDashes = dist / dashSpace;
+        
+        int margin = dist / 2;
+        // at least one dash
+        if (nbDashes < 2) {
+            nbDashes = 1;
+        }
+        else {
+            margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
+        }
+        margin -= dashLength / 2;
+        int i, x;
+        for (i = 0; i < nbDashes; i++) {
+            x = x1 + margin + (i *  dashSpace);
+            DrawFullRectangle(dc, x, y, x + dashLength, y + m_doc->m_env.m_barlineWidth);
+        }
+        
+    }
+    else if (syl->GetCon() == CON_u) {
+        DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_env.m_barlineWidth);
+    }
+    
 }
     
 void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

@@ -33,6 +33,7 @@
 #include "system.h"
 #include "slur.h"
 #include "smufl.h"
+#include "syl.h"
 #include "tie.h"
 #include "tuplet.h"
 
@@ -90,6 +91,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     dc->StartGraphic( system, "", system->GetUuid() );
     
+    // first we need to clear the drawing list of postponed elements
+    system->ResetDrawingList();
     
     if ( system->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
@@ -122,8 +125,32 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         }
     }
     
+    // first draw the beams
+    DrawSystemList(dc, system, &typeid(Syl) );
+    
     dc->EndGraphic(system, this );
 
+}
+
+void View::DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType )
+{
+    assert( dc ); // DC cannot be NULL
+    
+    ListOfObjects *drawingList = system->GetDrawingList();
+    LayerElement *element = NULL;
+    
+    ListOfObjects::iterator iter;
+    
+    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
+    {
+        element = dynamic_cast<LayerElement*>(*iter);
+        if (!element) continue;
+        
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Syl) ) ) {
+            Syl *syl = dynamic_cast<Syl*>(element);
+            DrawSylConnector( dc, syl, system );
+        }
+    }
 }
 
 void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine  )
@@ -681,6 +708,11 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     DrawStaffLines( dc, staff, measure, system );
     
     DrawStaffChildren(dc, staff, staff, measure);
+    
+    std::vector<Syl*>::iterator iter;
+    for (iter = staff->m_currentSyls.begin(); iter != staff->m_currentSyls.end(); ++iter) {
+        system->AddToDrawingList(*iter);
+    }
     
     dc->EndGraphic( staff, this );
 }

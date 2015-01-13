@@ -53,7 +53,7 @@ void Verse::AddElement(vrv::LayerElement *element)
 }
     
 //----------------------------------------------------------------------------
-// Functors methods
+// Verse functor methods
 //----------------------------------------------------------------------------
 
 int Verse::AlignVertically( ArrayPtrVoid params )
