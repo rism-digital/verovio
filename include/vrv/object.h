@@ -466,7 +466,8 @@ public:
      * param 3: bool the metersig flag.
      */
     virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
+   
+    ///@}
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
@@ -478,11 +479,15 @@ public:
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
-     * not param
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );
     
-    ///@}
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by doc at the end of a document of closing opened syl.
+     */
+    virtual int PrepareLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+
     
     /**
      * @name Functors for justification

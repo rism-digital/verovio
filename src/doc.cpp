@@ -28,6 +28,7 @@
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
+#include "syl.h"
 #include "system.h"
 #include "verse.h"
 #include "vrv.h"
@@ -130,7 +131,8 @@ void Doc::PrepareDrawing()
                 paramsLyrics.push_back( &lastNote );
                 paramsLyrics.push_back( &lastButOneNote );
                 Functor prepareLyrics( &Object::PrepareLyrics );
-                this->Process( &prepareLyrics, paramsLyrics, NULL, &filters );
+                Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
+                this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
             }
         }
     }
@@ -480,6 +482,24 @@ int Doc::Save( FileOutputStream *output )
     this->Process( &save, params, &saveEnd );
     
     return true;
+}
+    
+//----------------------------------------------------------------------------
+// Doc functors methods
+//----------------------------------------------------------------------------
+
+int Doc::PrepareLyricsEnd( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    // param 1: the last Note
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+    Note **lastNote = static_cast<Note**>(params[1]);
+    
+    if ( (*currentSyl) && (*lastNote) ) {
+        (*currentSyl)->m_drawingLastNote = (*lastNote);
+    }
+    
+    return FUNCTOR_STOP;
 }
 
 } // namespace vrv
