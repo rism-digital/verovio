@@ -43,9 +43,10 @@ std::map<wchar_t, Glyph> Resources::m_font;
 bool Resources::InitFont()
 {
     // We will need to rethink this for adding the option to add custom fonts
+    // Font Bravura first since it is expected to have always all symbols
     if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded");
+    // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded");
-    if (!LoadFont("Gootville")) LogError("Gootville font could not be loaded");
     
     if ( m_font.size() < SMUFL_COUNT ) {
         LogError("All default SMUFL glyphs could not be loaded");
