@@ -1092,7 +1092,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
-        LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
+        //LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
         negative_offset = 0;
     }
     

@@ -96,10 +96,16 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
         return;
     }
     
-    //take care of width/height once userScale is updated
+    // take care of width/height once userScale is updated
     m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
     m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
     
+    // add the woff VerovioText font
+    std::string woff = Resources::GetPath() + "/woff.xml";
+    pugi::xml_document woffDoc;
+    woffDoc.load_file(woff.c_str());
+    m_svgNode.prepend_copy( woffDoc.first_child() );
+
     // header
     if (m_smufl_glyphs.size() > 0)
     {
