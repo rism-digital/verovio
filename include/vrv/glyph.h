@@ -12,7 +12,10 @@
 #include "object.h"
 
 namespace vrv {
-
+    
+#define VRV_TEXT_E550 "&xE550"
+#define VRV_TEXT_E551 "&xE551"
+#define VRV_TEXT_E552 "&xE552"
 
 /**
  * This class is used for storing a music font glyph.

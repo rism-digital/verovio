@@ -20,7 +20,7 @@ OS2Version: 3
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1413579002
-ModificationTime: 1421225450
+ModificationTime: 1421248418
 PfmFamily: 81
 TTFWeight: 400
 TTFWidth: 5
@@ -1422,55 +1422,55 @@ EndChar
 
 StartChar: uniE550
 Encoding: 58704 58704 24
-Width: 529
-GlyphClass: 2
-Flags: HWO
-LayerCount: 2
-Fore
-SplineSet
-630 -100 m 1
- 577 -256 433 -333 257 -333 c 0
- 77 -333 -53 -258 -100 -100 c 1
- -77 -100 l 1
- -28 -200 140 -252 259 -252 c 0
- 380 -252 550 -200 607 -100 c 1
- 630 -100 l 1
-EndSplineSet
-EndChar
-
-StartChar: uniE551
-Encoding: 58705 58705 25
-Width: 892
-GlyphClass: 2
-Flags: HWO
-LayerCount: 2
-Fore
-SplineSet
-893 0 m 1
- 840 -156 582 -233 373 -233 c 0
- 170 -233 -84 -158 -131 0 c 1
- -109 0 l 1
- -60 -100 225 -152 375 -152 c 0
- 541 -152 813 -100 870 0 c 1
- 893 0 l 1
-EndSplineSet
-EndChar
-
-StartChar: uniE552
-Encoding: 58706 58706 26
-Width: 1220
+Width: 480
 GlyphClass: 2
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-1221 0 m 1
- 1168 -156 852 -233 537 -233 c 0
- 242 -233 -84 -158 -131 0 c 1
- -109 0 l 1
- -60 -100 310 -152 539 -152 c 0
- 764 -152 1141 -100 1198 0 c 1
- 1221 0 l 1
+605 -100 m 1
+ 552 -256 406 -350 230 -350 c 0
+ 50 -350 -78 -258 -125 -100 c 1
+ -102 -100 l 1
+ -53 -200 115 -252 234 -252 c 0
+ 355 -252 525 -200 582 -100 c 1
+ 605 -100 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE551
+Encoding: 58705 58705 25
+Width: 774
+GlyphClass: 2
+Flags: HWO
+LayerCount: 2
+Fore
+SplineSet
+899 -100 m 1
+ 846 -256 588 -350 379 -350 c 0
+ 176 -350 -78 -258 -125 -100 c 1
+ -103 -100 l 1
+ -54 -200 231 -252 381 -252 c 0
+ 547 -252 819 -200 876 -100 c 1
+ 899 -100 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE552
+Encoding: 58706 58706 26
+Width: 1102
+GlyphClass: 2
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+1227 -100 m 1
+ 1174 -256 858 -350 543 -350 c 0
+ 248 -350 -78 -258 -125 -100 c 1
+ -103 -100 l 1
+ -54 -200 316 -252 545 -252 c 0
+ 770 -252 1147 -200 1204 -100 c 1
+ 1227 -100 l 1
 EndSplineSet
 EndChar
 EndChars

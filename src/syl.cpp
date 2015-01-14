@@ -87,7 +87,7 @@ int Syl::PrepareLyrics( ArrayPtrVoid params )
         (*currentSyl) = NULL;
     }
     
-    std::cout << UTF16to8( this->GetText().c_str() ) << std::endl;
+    //std::cout << UTF16to8( this->GetText().c_str() ) << std::endl;
     return FUNCTOR_CONTINUE;
 }
 
