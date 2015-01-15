@@ -11,22 +11,17 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <sstream>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
 #include "accid.h"
-#include "barline.h"
 #include "beam.h"
-#include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "dot.h"
 #include "keysig.h"
-#include "layerelement.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
@@ -43,7 +38,6 @@
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
-#include "vrv.h"
 
 namespace vrv {
 

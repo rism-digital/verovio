@@ -10,18 +10,14 @@
 
 //----------------------------------------------------------------------------
 
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
-#include "doc.h"
 #include "iodarms.h"
 #include "iomei.h"
-#include "iomusxml.h"
 #include "iopae.h"
 #include "page.h"
 #include "svgdevicecontext.h"
-#include "view.h"
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"

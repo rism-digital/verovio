@@ -9,24 +9,16 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "clef.h"
 #include "custos.h"
 #include "doc.h"
-#include "dot.h"
 #include "keysig.h"
-#include "io.h"
-#include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
-#include "scoredef.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

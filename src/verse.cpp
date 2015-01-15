@@ -19,7 +19,6 @@
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
-#include "vrv.h"
 
 namespace vrv {
 

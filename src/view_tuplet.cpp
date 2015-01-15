@@ -11,25 +11,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <cstring>
-#include <stdio.h>
-#include <string>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
-#include "barline.h"
 #include "beam.h"
-#include "clef.h"
 #include "devicecontext.h"
 #include "doc.h"
-#include "keysig.h"
-#include "layerelement.h"
-#include "mensur.h"
-#include "note.h"
-#include "rest.h"
 #include "staff.h"
-#include "tie.h"
 #include "tuplet.h"
 
 namespace vrv {

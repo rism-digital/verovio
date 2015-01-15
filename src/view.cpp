@@ -12,13 +12,10 @@
 
 #include <assert.h>
 #include <sstream>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "layerelement.h"
-#include "note.h"
 #include "page.h"
 
 namespace vrv {

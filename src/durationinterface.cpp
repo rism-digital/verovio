@@ -15,8 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
-#include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

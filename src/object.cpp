@@ -5,43 +5,25 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "object.h"
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
 #include <assert.h>
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
-#include "aligner.h"
-#include "beam.h"
-#include "clef.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
-#include "multirest.h"
 #include "note.h"
 #include "page.h"
-#include "scoredef.h"
 #include "staff.h"
-#include "syl.h"
 #include "system.h"
-#include "tie.h"
-#include "tuplet.h"
-#include "verse.h"
-#include "view.h"
-#include "vrv.h"
 
 namespace vrv {
 

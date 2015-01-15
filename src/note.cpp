@@ -11,12 +11,9 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <cstring>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
-#include "doc.h"
 #include "editorial.h"
 #include "slur.h"
 #include "tie.h"

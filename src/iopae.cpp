@@ -10,19 +10,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
-#include <cstring>
-#include <iostream>
-#include <fstream>
 #include <sstream>
-#include <vector>
 
 //----------------------------------------------------------------------------
 
-#include "accid.h"
-#include "barline.h"
 #include "beam.h"
-#include "clef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"
@@ -34,7 +26,6 @@
 #include "rest.h"
 #include "system.h"
 #include "staff.h"
-#include "tie.h"
 #include "tuplet.h"
 
 //----------------------------------------------------------------------------

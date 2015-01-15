@@ -15,10 +15,8 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "io.h"
 #include "measure.h"
 #include "page.h"
-#include "vrv.h"
 
 namespace vrv {
 

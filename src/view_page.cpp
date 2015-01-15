@@ -12,20 +12,16 @@
 
 #include <assert.h>
 #include <math.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
 #include "beam.h"
-#include "barline.h"
-#include "clef.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
