@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "glyph.h"
 #include "staff.h"
 #include "vrv.h"
 

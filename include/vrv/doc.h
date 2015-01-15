@@ -11,10 +11,8 @@
 
 #include "devicecontext.h"
 #include "io.h"
-#include "object.h"
 #include "scoredef.h"
 #include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
