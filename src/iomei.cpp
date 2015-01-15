@@ -1628,52 +1628,6 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
         return false;
     }
 }
-
-/*
-void MeiInput::GetRdgClass( pugi::xml_node node, DocObject *object )
-{
-    std::string sourceVal = node.attribute("source").value();
-    if(!sourceVal.empty()){
-       object->AddRdgClass(sourceVal.substr(1));
-    }
-}
-*/
- 
-/*
-pugi::xml_node MeiInput::GetSelectedReading( pugi::xml_node app )
-{
-    pugi::xml_node current;
-    if ( m_rdgXPathQuery.length() > 0 ) {
-        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
-        if ( selection ) {
-            current = selection.node();
-            if (strcmp(current.name(), "rdg") == 0)
-            {
-                pugi::char_t const *sourceName;
-                
-                if ( current.attribute("resp") ) {
-                    sourceName = current.attribute("resp").value();
-                }
-                else if ( current.attribute("source") ) {
-                    sourceName = current.attribute("source").value();
-                }
-                else {
-                    LogWarning("Could not find a source attribute for a <rdg> element that matched the xPath query.");
-                }
-                
-                for( pugi::xml_node currentChild = current.first_child(); currentChild == current.last_child(); currentChild = currentChild.next_sibling( ) ) {
-                    currentChild.append_attribute("source") = sourceName;
-                }
-            }
-        }
-    }
-    if ( !current ) {
-        current = app.first_child( );
-    }
-
-    return current;
-}
-*/
     
 void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
 {

@@ -677,10 +677,6 @@ bool DocObject::HasSelfBB()
     return ( (m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF) );
 }
 
-void DocObject::AddRdgClass( std::string newClass )
-{
-    m_rdgClasses.push_back(newClass);
-}
 
 //----------------------------------------------------------------------------
 // ObjectListInterface

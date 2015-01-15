@@ -223,16 +223,6 @@ void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 
 void SvgDeviceContext::StartPage( )
 {
-    // a graphic for page (user) scaling
-    /*m_currentNode = m_currentNode.append_child("g");
-    m_currentNode.append_attribute("class") = "page-scale";
-    m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("transform") = StringFormat("scale(%f, %f)", m_userScaleX, m_userScaleY).c_str();*/
-    // a graphic for definition scaling
-    /*m_currentNode = m_currentNode.append_child("g");
-    m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("class") = "definition-scale";
-    m_currentNode.append_attribute("transform") = "scale(0.1, 0.1)".c_str();*/
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
@@ -304,6 +294,8 @@ void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h 
 // Copied from bBoxDc, TODO find another more generic solution
 void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
 {
+    assert( m_fontStack.top() );
+    
     int x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
@@ -401,20 +393,16 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     ye = yc - ry * sin (DegToRad(end)) ;
 
     ///now same as circle arc...
-
     double theta1 = atan2(ys-yc, xs-xc);
     double theta2 = atan2(ye-yc, xe-xc);
 
-    int fArc  ;                  // flag for large or small arc 0 means less than 180 degrees
+    int fArc  ;
+    // flag for large or small arc 0 means less than 180 degrees
     if ( (theta2 - theta1) > 0 ) fArc = 1; else fArc = 0 ;
 
     int fSweep ;
     if ( fabs(theta2 - theta1) > M_PI) fSweep = 1; else fSweep = 0 ;
 
-    // this version closes the arc
-    //s.Printf ( "<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d L %d %d z ",
-    //    int(xs), int(ys), int(rx), int(ry),
-    //    fArc, fSweep, int(xe), int(ye), int(xc), int(yc)  );
     pugi::xml_node pathChild = m_currentNode.append_child("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d",int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
 }
@@ -506,6 +494,8 @@ void SvgDeviceContext::EndText()
         
 void SvgDeviceContext::DrawText(const std::string& text)
 {
+    assert( m_fontStack.top() );
+    
     pugi::xml_node textChild = m_currentNode.append_child( "tspan" );
     if ( !m_fontStack.top()->GetFaceName().empty() ) {
         textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
@@ -520,53 +510,7 @@ void SvgDeviceContext::DrawText(const std::string& text)
 
 void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, double angle)
 {
-    //known bug; if the font is drawn in a scaled DC, it will not behave exactly as wxMSW
-
-    std::string s;
-
-    // calculate bounding box
-    int w, h, desc;
-    //DoGetTextExtent(sText, &w, &h, &desc);
-    w = h = desc = 0;
-
-    //double rad = DegToRad(angle);
-
-    
-    //if (m_backgroundMode == AxSOLID)
-    //{
-    //    WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
-    //    WriteLine( text ) ;
-    //}
-
-    // For some reason, some browsers (e.g., Chrome) do not like spaces or dots in font names...
-    /*
-    sTmp.Replace(" ", "");
-    sTmp.Replace(".", "");
-    if (sTmp.Len () > 0)  s = s + "style=\"font-family: '" + sTmp + "'; ";
-    else s = s + "style=\" " ;
-
-    std::string fontweights [3] = { "normal", "lighter", "bold" };
-    s = s + "font-weight:" + fontweights[m_font.GetWeight() - wxNORMAL] + semicolon + space;
-
-    std::string fontstyles [5] = { "normal", "style error", "style error", "italic", "oblique" };
-    s = s + "font-style:" + fontstyles[m_font.GetStyle() - wxNORMAL] + semicolon  + space;
-
-    sTmp.Printf ("font-size:%dpt; ", (int)((double)m_font.GetPointSize() * 1) );
-    s = s + sTmp ;
-    // remove the color information because normaly already in the graphic element
-    //s = s + "fill:#" + wxColStr (m_textForegroundColour) + "; stroke:#" + wxColStr (m_textForegroundColour) + "; " ;
-    sTmp.Printf ( "stroke-width:0;\"  transform=\"rotate( %.2g %d %d )  \" >",  -angle, x,y ) ;
-    */
-    pugi::xml_node textChild = m_currentNode.append_child( "text" );
-    textChild.append_attribute( "x" ) = x;
-    textChild.append_attribute( "y" ) = y;
-    textChild.append_attribute( "dx" ) = 0;
-    textChild.append_attribute( "dy" ) = 0;
-    // HARDCODED
-    textChild.append_attribute( "style" ) = "font-family: Garamond, Georgia, serif; font-size: 36px;";
-    //textChild.append_attribute( "text-anchor" ) = anchor.c_str();
-    
-    textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
+    // TODO
 }
 
 std::string FilenameLookup(unsigned char c) {
@@ -576,6 +520,7 @@ std::string FilenameLookup(unsigned char c) {
 
 void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {
+    assert( m_fontStack.top() );
 
     int w, h, gx, gy;
         

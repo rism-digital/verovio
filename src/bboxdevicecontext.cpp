@@ -111,6 +111,8 @@ void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h
 
 void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
 {
+    assert( m_fontStack.top() );
+    
     int x, y, partial_w, partial_h;
     *w = 0;
     *h = 0;
@@ -301,7 +303,6 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
 void BBoxDeviceContext::StartText(int x, int y, char alignement)
 {
     // TODO
-    
 }
 
 void BBoxDeviceContext::EndText()
@@ -312,36 +313,17 @@ void BBoxDeviceContext::EndText()
 void BBoxDeviceContext::DrawText(const std::string& text)
 {
     // TODO
-    // alignment not taken into account!
-    //std::wstring wtext = std::wstring(text.begin(), text.end());
-    //DrawMusicText( wtext, x, y);
 }
-
-
 
 void BBoxDeviceContext::DrawRotatedText(const std::string& text, int x, int y, double angle)
 {
-    //known bug; if the font is drawn in a scaled DC, it will not behave exactly as wxMSW
-
-    std::string s;
-
-    // calculate bounding box
-    int w, h, desc;
-    //DoGetTextExtent(sText, &w, &h, &desc);
-    w = h = desc = 0;
-
-    //double rad = DegToRad(angle);
-
-    
-    //if (m_backgroundMode == AxSOLID)
-    {
-        //WriteLine("/*- MusSVGFileDC::DrawRotatedText - Backgound not implemented */") ;
-    }
+    // TODO
 }
 
 
 void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {  
+    assert( m_fontStack.top() );
     
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
@@ -381,28 +363,6 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
         return;
     }
     
-    /*
-    DocObject *first = &m_objects[m_objects.Count() - 1];
-    
-    first->UpdateOwnBB(x1, y1, x2, y2);
-    
-    // Stretch the content BB of the other objects
-    // Check that we are not the only elem in the list
-    if (m_objects.Count() > 1) {
-        
-        // The second element in the list stretches in base of the new BBox of the first
-        m_objects[m_objects.Count() - 2].UpdateContentBB(first->m_selfBB_x1, first->m_selfBB_y1, first->m_selfBB_x2, first->m_selfBB_y2);
-        
-        // All the next ones, stretch using contentBB
-        for (int i = m_objects.Count() - 3; i >= 0; i--) {
-            DocObject *precedent = &m_objects[i + 1];
-            m_objects[i].UpdateContentBB(precedent->m_contentBB_x1, precedent->m_contentBB_y1, precedent->m_contentBB_x2, precedent->m_contentBB_y2);
-        }
-    }
-    */
-    
-    // simpler version 
-    
     // the array should not be empty
     assert( !m_objects.empty() ); // Array cannot be empty
     
@@ -411,6 +371,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     (m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     
     int i;
+    // Stretch the content BB of the other objects
     for (i = 0; i < (int)m_objects.size(); i++) {
         (m_objects[i])->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     }
