@@ -88,8 +88,8 @@ bool View::OneBeamInTuplet(Tuplet* tuplet) {
  
  */
 
-bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center) {
-    MusPoint first, last;
+bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center) {
+    Point first, last;
     int x, y;
     bool direction = true; //true = up, false = down
     
@@ -266,7 +266,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
     
-    MusPoint start, end, center;
+    Point start, end, center;
     bool direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
         
     // Calculate position for number 0x82

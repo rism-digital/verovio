@@ -10,7 +10,6 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -137,19 +136,19 @@ void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, 
 }
        
 
-MusPoint BBoxDeviceContext::GetLogicalOrigin( ) 
+Point BBoxDeviceContext::GetLogicalOrigin( ) 
 {
-    return MusPoint( 0, 0 );
+    return Point( 0, 0 );
 }
 
 // claculated better
 void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
     int vals[4];
-    FindPointsForBounds( MusPoint(x, y), 
-                        MusPoint(bezier1_coord[0], bezier1_coord[1]), 
-                        MusPoint(bezier1_coord[2], bezier1_coord[3]),
-                        MusPoint(bezier1_coord[4], bezier1_coord[5]),
+    FindPointsForBounds( Point(x, y), 
+                        Point(bezier1_coord[0], bezier1_coord[1]), 
+                        Point(bezier1_coord[2], bezier1_coord[3]),
+                        Point(bezier1_coord[4], bezier1_coord[5]),
                         vals);
     
     UpdateBB(vals[0], vals[1], vals[2], vals[3]);
@@ -253,7 +252,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 }
  
                
-void BBoxDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style)
+void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
     if ( n == 0 ) {
         return;
@@ -352,7 +351,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
     }
 }
 
-void BBoxDeviceContext::DrawSpline(int n, MusPoint points[])
+void BBoxDeviceContext::DrawSpline(int n, Point points[])
 {
 
 }
@@ -378,7 +377,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
 }
 
 // Ok, shame on me, found off the internet and modified, but for now it works
-void BBoxDeviceContext::FindPointsForBounds(MusPoint P0, MusPoint P1, MusPoint P2, MusPoint P3, int *ret)
+void BBoxDeviceContext::FindPointsForBounds(Point P0, Point P1, Point P2, Point P3, int *ret)
 {
     
     int A = P3.x - 3 * P2.x + 3 * P1.x - P0.x;

@@ -68,7 +68,7 @@ void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 
 
 void View::DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal)
 {	
-	MusPoint p[4];
+	Point p[4];
   
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );

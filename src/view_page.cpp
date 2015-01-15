@@ -62,7 +62,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     dc->DrawBackgroundImage( );
     
-    MusPoint origin = dc->GetLogicalOrigin();
+    Point origin = dc->GetLogicalOrigin();
     dc->SetLogicalOrigin( origin.x - m_doc->m_drawingPageLeftMar, origin.y - m_doc->m_drawingPageTopMar );
 
     dc->StartPage();
@@ -326,7 +326,7 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
 void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {	
     int new_coords[2][6];
-    MusPoint points[4];
+    Point points[4];
     
 	assert( dc ); // DC cannot be NULL
 
@@ -822,7 +822,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	return (code);
 }
 
-MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint center)
+Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
 {
     int distCenterX = (point.x - center.x);
     int distCenterY = (point.y - center.y);
@@ -832,7 +832,7 @@ MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint c
 	// angle d'origine entre l'axe x et la droite passant par le point et le centre
     float alpha = atan ( (float)distCenterX / (float)(distCenterY) );
     
-    MusPoint new_p = center;
+    Point new_p = center;
     int new_distCenterX, new_distCenterY;
 
     new_distCenterX = ( (int)( sin( alpha - rot_alpha ) * distCenter ) );

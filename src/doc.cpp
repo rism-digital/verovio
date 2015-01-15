@@ -10,7 +10,6 @@
 
 //----------------------------------------------------------------------------
 
-#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -19,19 +18,16 @@
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
-#include "note.h"
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
 #include "verse.h"
-#include "vrv.h"
 
 namespace vrv {
 

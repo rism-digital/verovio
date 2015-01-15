@@ -57,7 +57,7 @@ public:
     ///@{
     virtual void GetTextExtent( const std::string& string, int *w, int *h );
     virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
-    virtual MusPoint GetLogicalOrigin( );
+    virtual Point GetLogicalOrigin( );
     ///@}
 
     /**
@@ -69,13 +69,13 @@ public:
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
     virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
+    virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
     virtual void DrawText(const std::string& text);
     virtual void DrawMusicText(const std::wstring& text, int x, int y);
-    virtual void DrawSpline(int n, MusPoint points[]);
+    virtual void DrawSpline(int n, Point points[]);
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) {};
     ///@}
     
@@ -127,7 +127,7 @@ private:
     
     void UpdateBB(int x1, int y1, int x2, int y2);
     
-    void FindPointsForBounds(MusPoint P0, MusPoint P1, MusPoint P2, MusPoint P3, int *ret);
+    void FindPointsForBounds(Point P0, Point P1, Point P2, Point P3, int *ret);
 };
 
 } // namespace vrv

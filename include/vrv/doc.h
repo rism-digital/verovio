@@ -9,13 +9,14 @@
 #ifndef __VRV_DOC_H__
 #define __VRV_DOC_H__
 
-#include "devicecontext.h"
+#include "devicecontextbase.h"
 #include "io.h"
 #include "scoredef.h"
 #include "vrv.h"
 
 namespace vrv {
 
+class FontInfo;
 class Page;    
     
 enum DocType {

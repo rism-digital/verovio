@@ -320,9 +320,9 @@ void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, i
 }
        
 
-MusPoint SvgDeviceContext::GetLogicalOrigin( ) 
+Point SvgDeviceContext::GetLogicalOrigin( ) 
 {
-    return MusPoint( m_originX, m_originY );
+    return Point( m_originX, m_originY );
 }
 
 
@@ -416,7 +416,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 }
  
                
-void SvgDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style)
+void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
     pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
     //if ( fillStyle == wxODDEVEN_RULE )
@@ -559,7 +559,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 }
 
 
-void SvgDeviceContext::DrawSpline(int n, MusPoint points[])
+void SvgDeviceContext::DrawSpline(int n, Point points[])
 {
 
 }

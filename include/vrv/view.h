@@ -285,7 +285,7 @@ private:
      * @name Internal methods used for calculating tuplets
      */
     ///@{
-    bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center);
+    bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center);
     std::wstring IntToTupletFigures(unsigned short number);
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
@@ -297,7 +297,7 @@ private:
      * Swap the to points passed as reference.
      * This is useful for example when calculating bezier positions.
      */
-    static void SwapPoints (MusPoint *x1, MusPoint *x2);
+    static void SwapPoints (Point *x1, Point *x2);
     
     /**
      * Swap values passed as reference.
