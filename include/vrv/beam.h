@@ -10,7 +10,6 @@
 #define __VRV_BEAM_H__
 
 #include "layerelement.h"
-#include "note.h"
 
 namespace vrv {
 

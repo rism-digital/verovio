@@ -21,9 +21,11 @@
 
 #include "accid.h"
 #include "barline.h"
+#include "beam.h"
 #include "clef.h"
 #include "doc.h"
 #include "keysig.h"
+#include "layer.h"
 #include "measure.h"
 #include "metersig.h"
 #include "multirest.h"

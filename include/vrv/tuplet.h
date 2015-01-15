@@ -10,11 +10,11 @@
 #define __VRV_TUPLET_H__
 
 #include "atts_shared.h"
-#include "layer.h"
-#include "note.h"
-#include "object.h"
+#include "layerelement.h"
 
 namespace vrv {
+    
+class Note;
 
 //----------------------------------------------------------------------------
 // Tuplet

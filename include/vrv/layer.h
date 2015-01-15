@@ -17,13 +17,17 @@
 #include "clef.h"
 #include "drawinglistinterface.h"
 #include "object.h"
-#include "scoredef.h"
 
 namespace vrv {
 
 class DeviceContext;
+class KeySig;
 class LayerElement;
 class Note;
+class ScoreDef;
+class StaffDef;
+class Mensur;
+class MeterSig;
 
 //----------------------------------------------------------------------------
 // Layer

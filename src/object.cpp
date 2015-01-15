@@ -31,6 +31,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "multirest.h"
+#include "note.h"
 #include "page.h"
 #include "scoredef.h"
 #include "staff.h"

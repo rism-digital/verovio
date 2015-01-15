@@ -13,7 +13,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "devicecontext.h"
+#include "devicecontextbase.h"
 #include "scoredef.h"
 #include "vrvdef.h"
 
@@ -21,6 +21,7 @@ namespace vrv {
 
 class Beam;
 class Barline;
+class DeviceContext;
 class Doc;
 class EditorialElement;
 class Layer;

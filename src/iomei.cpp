@@ -12,37 +12,29 @@
 
 #include <algorithm>
 #include <assert.h>
-#include <ctime>
-#include <sstream>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "barline.h"
 #include "beam.h"
-#include "clef.h"
 #include "custos.h"
 #include "dot.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
-#include "object.h"
 #include "page.h"
 #include "rest.h"
-#include "scoredef.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
 #include "tuplet.h"
 #include "verse.h"
-#include "vrv.h"
 
 namespace vrv {
 

@@ -21,6 +21,7 @@
 #include "barline.h"
 #include "beam.h"
 #include "clef.h"
+#include "devicecontext.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layerelement.h"

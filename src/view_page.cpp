@@ -20,6 +20,7 @@
 #include "beam.h"
 #include "barline.h"
 #include "clef.h"
+#include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"

@@ -9,10 +9,15 @@
 #ifndef __VRV_BBOX_DC_H__
 #define __VRV_BBOX_DC_H__
 
+#include <vector>
+
+//----------------------------------------------------------------------------
+
 #include "devicecontext.h"
-#include "object.h"
 
 namespace vrv {
+    
+class Object;
 
 //----------------------------------------------------------------------------
 // BBoxDeviceContext

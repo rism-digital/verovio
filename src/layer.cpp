@@ -25,6 +25,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "scoredef.h"
 #include "vrvdef.h"
 
 namespace vrv {

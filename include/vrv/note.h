@@ -10,15 +10,9 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
-#include "beam.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
-
-// To be removed
-#define CHORD_INITIAL  (1<<1)
-#define CHORD_MEDIAL  (1<<2) 
-#define CHORD_TERMINAL  (1<<3) 
 
 namespace vrv {
 

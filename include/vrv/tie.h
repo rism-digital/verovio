@@ -9,11 +9,11 @@
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
-#include "layer.h"
-#include "note.h"
-#include "object.h"
+#include "layerelement.h"
 
 namespace vrv {
+    
+class Note;
 
 //----------------------------------------------------------------------------
 // Tie

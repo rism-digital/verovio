@@ -9,9 +9,8 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
-#include "devicecontextbase.h" // for Point
+#include "devicecontextbase.h"
 #include "object.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

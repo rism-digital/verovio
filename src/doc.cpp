@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
+#include "barline.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"

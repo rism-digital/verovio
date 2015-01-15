@@ -90,7 +90,6 @@ void System::ResetVerticalAlignment()
 
 Measure *System::GetAtPos( int x )
 {
-	//y += ( STAFF_OFFSET / 2 );
 	Measure *measure = dynamic_cast<Measure*>( this->GetFirst( &typeid(Measure) ) );
 	if ( !measure )
 		return NULL;
