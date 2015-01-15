@@ -14,11 +14,9 @@
 //----------------------------------------------------------------------------
 
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
-#include "scoredef.h"
-#include "staff.h"
 #include "system.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
