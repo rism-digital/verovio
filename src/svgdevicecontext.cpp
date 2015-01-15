@@ -178,7 +178,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
 {
  
     bool drawBoundingBox = false;
-    if (drawBoundingBox) //(view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
+    if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
         SetPen( AxRED, 1, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
@@ -491,7 +491,7 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
         
-void SvgDeviceContext::DrawText(const std::string& text)
+void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtext)
 {
     assert( m_fontStack.top() );
     

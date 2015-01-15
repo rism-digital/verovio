@@ -119,7 +119,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         // We should also have a better way to specify if the number has to be displayed or not
         if ( (measure->GetN() != VRV_UNSET) && (measure->GetN() > 1) ) {
             dc->SetFont( &m_doc->m_drawingSmuflFonts[0][0] );
-            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->m_drawingStaffSize[0]  * 2 / 3) );
+            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->m_drawingUnit) );
             dc->ResetFont();
         }
     }

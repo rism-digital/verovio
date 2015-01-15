@@ -1372,12 +1372,12 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
     
     // to be updated
-    int x = syl->m_drawingFirstNote->GetDrawingX() - m_doc->m_drawingUnit * 2;
-    int y = GetSylY(syl, staff);
+    syl->SetDrawingX( syl->m_drawingFirstNote->GetDrawingX() - m_doc->m_drawingUnit * 2 );
+    syl->SetDrawingY( GetSylY(syl, staff) );
     
     dc->StartGraphic( syl, "", syl->GetUuid() );
     
-    DrawLyricString(dc, x, y, syl->GetText().c_str() );
+    DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str() );
     
     if (syl->m_drawingFirstNote && syl->m_drawingLastNote) {
         System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );
@@ -1408,12 +1408,15 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         if ( !Check( staff ) ) return;
         
         int y = GetSylY(syl, staff);
-        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length() - 1) * (int)m_doc->m_drawingInterl[staff->staffSize];
+        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
+        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
         int x2 = syl->m_drawingLastNote->GetDrawingX();
         
         // In this case we can resume the Syl because is was drawn previouly in the system
         dc->ResumeGraphic(syl, syl->GetUuid());
+        dc->DeactivateGraphic();
         DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->ReactivateGraphic();
         dc->EndResumedGraphic(syl, this);
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
@@ -1425,12 +1428,15 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         if ( !Check( staff ) ) return;
         
         int y = GetSylY(syl, staff);
-        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length() - 1) * (int)m_doc->m_drawingInterl[staff->staffSize];
+        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
+        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
         int x2 = last->GetDrawingX() + last->GetRightBarlineX();
         
         // In this case too we can resume the Syl because is was drawn previouly in the system
         dc->ResumeGraphic(syl, syl->GetUuid());
+        dc->DeactivateGraphic();
         DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->ReactivateGraphic();
         dc->EndResumedGraphic(syl, this);
         
     }
@@ -1451,7 +1457,9 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         
         // In this case we can resume the last note because the Syl itself was _not_ drawn previouly in the system
         dc->ResumeGraphic(syl->m_drawingLastNote, syl->m_drawingLastNote->GetUuid());
+        dc->DeactivateGraphic();
         DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->ReactivateGraphic();
         dc->EndResumedGraphic(syl->m_drawingLastNote, this);
     }
     // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
@@ -1482,7 +1490,9 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         int x2 = last->GetDrawingX() + last->GetRightBarlineX();
         
         // In this case we cannot resume anything
+        dc->DeactivateGraphic();
         DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
+        dc->ReactivateGraphic();
     }
     
 }
@@ -1693,7 +1703,9 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
     
     dc->StartGraphic( element, "", element->GetUuid() );
+    dc->DeactivateGraphic();
     DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
+    dc->ReactivateGraphic();
     dc->EndGraphic(element, this );
 
     

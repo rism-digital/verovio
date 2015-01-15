@@ -23,7 +23,7 @@ namespace vrv {
     
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 5
+#define VERSION_REVISION 6
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
@@ -94,7 +94,7 @@ enum EditorMode {
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
     
-#define DEFAULT_SPACING_STAFF 6
+#define DEFAULT_SPACING_STAFF 8
 #define MIN_SPACING_STAFF 0
 #define MAX_SPACING_STAFF 12
     

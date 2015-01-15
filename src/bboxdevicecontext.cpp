@@ -43,6 +43,8 @@ BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     m_userScaleX = 1.0;
     m_userScaleY = 1.0;
     
+    m_drawingText = false;
+    
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
 }
@@ -302,17 +304,31 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
     
 void BBoxDeviceContext::StartText(int x, int y, char alignement)
 {
-    // TODO
+    assert( !m_drawingText );
+    m_drawingText = true;
+    m_textX = x;
+    m_textY = y;
+    m_textWidth = 0;
+    m_textHeight = 0;
 }
 
 void BBoxDeviceContext::EndText()
 {
-    // TODO
+    m_drawingText = false;
 }
         
-void BBoxDeviceContext::DrawText(const std::string& text)
+void BBoxDeviceContext::DrawText(const std::string& text, const std::wstring wtext)
 {
-    // TODO
+    assert( m_fontStack.top() );
+    
+    unsigned long length = wtext.length();
+    // very approximative, we should use GetTextExtend once implemented
+    m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
+    // ignore y bounding boxes for text
+    //m_textHeight = m_fontStack.top()->GetPointSize();
+    UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
+    
+    
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string& text, int x, int y, double angle)

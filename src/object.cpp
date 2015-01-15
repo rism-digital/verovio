@@ -606,7 +606,7 @@ void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
     
     m_updatedBB = true;
-    //LogDebug("CB Is:  %i %i %i %i", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+    //LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2, GetClassName().c_str());
 }
 
 void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 ) 
@@ -636,14 +636,14 @@ void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 )
 
 void DocObject::ResetBB() 
 {
-    m_contentBB_x1 = 0xFFFF;
-    m_contentBB_y1 = 0xFFFF;
-    m_contentBB_x2 = -0xFFFF;
-    m_contentBB_y2 = -0xFFFF;
-    m_selfBB_x1 = 0xFFFF;
-    m_selfBB_y1 = 0xFFFF; 
-    m_selfBB_x2 = -0xFFFF;
-    m_selfBB_y2 = -0xFFFF;
+    m_contentBB_x1 = 0xFFFFFFF;
+    m_contentBB_y1 = 0xFFFFFFF;
+    m_contentBB_x2 = -0xFFFFFFF;
+    m_contentBB_y2 = -0xFFFFFFF;
+    m_selfBB_x1 = 0xFFFFFFF;
+    m_selfBB_y1 = 0xFFFFFFF;
+    m_selfBB_x2 = -0xFFFFFFF;
+    m_selfBB_y2 = -0xFFFFFFF;
     //m_drawingX = 0;
     //m_drawingY = 0;
     

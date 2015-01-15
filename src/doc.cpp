@@ -407,8 +407,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     
     m_drawingLyricFonts[0] = m_drawingLyricFont;
     m_drawingLyricFonts[1] = m_drawingLyricFont;
-	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight / 2 );
-    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] / 2 );
+	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight * 3 / 5 );
+    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * 3 / 5 );
     
     float glyph_size;
     Glyph *glyph;

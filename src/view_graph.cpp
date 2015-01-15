@@ -177,7 +177,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     std::wstring token;
     while( std::getline( iss, token, L'_' ))
     {
-        dc->DrawText( UTF16to8( token.c_str() ) );
+        dc->DrawText( UTF16to8( token.c_str() ), token );
         // no _
         if (iss.eof())
             break;
@@ -189,7 +189,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         dc->SetFont( &vrvTxt );
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText( UTF16to8( str.c_str() ) );
+        dc->DrawText( UTF16to8( str.c_str() ), str );
         dc->ResetFont();
     }
     //std::wcout << std::endl;
