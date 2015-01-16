@@ -56,6 +56,7 @@ enum EditorMode {
 //----------------------------------------------------------------------------
     
 #define DEFINITON_FACTOR 10
+#define MARGIN_DENOMINATOR 10
 
 #define DEFAULT_UNIT 9
 #define MIN_UNIT 6
@@ -83,8 +84,6 @@ enum EditorMode {
     
 #define MIN_TIE_HEIGHT 12
 #define MIN_TIE_THICKNESS 6
-    
-#define MARGIN_DENOMINATOR 10
     
 //----------------------------------------------------------------------------
 // Default scaling (%) and spacing (units) values

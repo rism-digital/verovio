@@ -463,6 +463,8 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
+    assert( m_fontStack.top() );
+    
     std::string s;
     std::string anchor;
     
@@ -481,6 +483,10 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     m_currentNode.append_attribute( "dy" ) = 0;
     if ( !anchor.empty() ) {
         m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
+    }
+    // font-size seems to be required in <text> in FireFox
+    if ( m_fontStack.top()->GetPointSize() != 0 ) {
+        m_currentNode.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
     }
     
 }
