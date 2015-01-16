@@ -10,12 +10,10 @@
 
 //----------------------------------------------------------------------------
 
-#include <cstring>
-#include <typeinfo>
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
-#include "doc.h"
 #include "editorial.h"
 #include "slur.h"
 #include "tie.h"

@@ -12,13 +12,10 @@
 
 #include <assert.h>
 #include <sstream>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "layerelement.h"
-#include "note.h"
 #include "page.h"
 
 namespace vrv {
@@ -145,9 +142,9 @@ int View::ToLogicalY( int i )
     }
 }
     
-void View::SwapPoints (MusPoint *x1, MusPoint *x2)
+void View::SwapPoints (Point *x1, Point *x2)
 {
-    MusPoint a;
+    Point a;
     a = *x1;
     *x1 = *x2;
     *x2 = a;

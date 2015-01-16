@@ -14,13 +14,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
-#include "io.h"
 #include "layer.h"
 #include "system.h"
-#include "verse.h"
-#include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

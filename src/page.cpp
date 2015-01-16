@@ -14,13 +14,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
 #include "bboxdevicecontext.h"
 #include "doc.h"
-#include "staff.h"
 #include "system.h"
 #include "view.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

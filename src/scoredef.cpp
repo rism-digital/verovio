@@ -11,17 +11,14 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "clef.h"
-#include "io.h"
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "system.h"
-#include "vrv.h"
 
 namespace vrv {
 

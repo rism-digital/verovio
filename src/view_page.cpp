@@ -12,19 +12,16 @@
 
 #include <assert.h>
 #include <math.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
 #include "beam.h"
-#include "barline.h"
-#include "clef.h"
+#include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -62,7 +59,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     dc->DrawBackgroundImage( );
     
-    MusPoint origin = dc->GetLogicalOrigin();
+    Point origin = dc->GetLogicalOrigin();
     dc->SetLogicalOrigin( origin.x - m_doc->m_drawingPageLeftMar, origin.y - m_doc->m_drawingPageTopMar );
 
     dc->StartPage();
@@ -122,7 +119,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         // We should also have a better way to specify if the number has to be displayed or not
         if ( (measure->GetN() != VRV_UNSET) && (measure->GetN() > 1) ) {
             dc->SetFont( &m_doc->m_drawingSmuflFonts[0][0] );
-            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->m_drawingStaffSize[0]  * 2 / 3) );
+            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->m_drawingUnit) );
             dc->ResetFont();
         }
     }
@@ -326,7 +323,7 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
 void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {	
     int new_coords[2][6];
-    MusPoint points[4];
+    Point points[4];
     
 	assert( dc ); // DC cannot be NULL
 
@@ -822,7 +819,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	return (code);
 }
 
-MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint center)
+Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
 {
     int distCenterX = (point.x - center.x);
     int distCenterY = (point.y - center.y);
@@ -832,7 +829,7 @@ MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint c
 	// angle d'origine entre l'axe x et la droite passant par le point et le centre
     float alpha = atan ( (float)distCenterX / (float)(distCenterY) );
     
-    MusPoint new_p = center;
+    Point new_p = center;
     int new_distCenterX, new_distCenterY;
 
     new_distCenterX = ( (int)( sin( alpha - rot_alpha ) * distCenter ) );

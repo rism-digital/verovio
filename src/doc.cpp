@@ -16,22 +16,20 @@
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
+#include "barline.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
-#include "note.h"
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
 #include "verse.h"
-#include "vrv.h"
 
 namespace vrv {
 
@@ -409,8 +407,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     
     m_drawingLyricFonts[0] = m_drawingLyricFont;
     m_drawingLyricFonts[1] = m_drawingLyricFont;
-	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight / 2 );
-    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] / 2 );
+	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight * 3 / 5 );
+    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * 3 / 5 );
     
     float glyph_size;
     Glyph *glyph;

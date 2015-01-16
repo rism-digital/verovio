@@ -10,7 +10,6 @@
 #define __VRV_SYSTEM_H__
 
 #include "aligner.h"
-#include "barline.h"
 #include "drawinglistinterface.h"
 #include "object.h"
 

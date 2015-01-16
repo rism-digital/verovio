@@ -6,12 +6,10 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "layerelement.h"
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
@@ -21,10 +19,8 @@
 #include "beam.h"
 #include "clef.h"
 #include "custos.h"
-#include "doc.h"
 #include "dot.h"
 #include "keysig.h"
-#include "io.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
@@ -36,7 +32,6 @@
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

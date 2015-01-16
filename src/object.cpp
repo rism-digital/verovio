@@ -5,42 +5,25 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "object.h"
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
 #include <assert.h>
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
-#include "aligner.h"
-#include "beam.h"
-#include "clef.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
-#include "multirest.h"
+#include "note.h"
 #include "page.h"
-#include "scoredef.h"
 #include "staff.h"
-#include "syl.h"
 #include "system.h"
-#include "tie.h"
-#include "tuplet.h"
-#include "verse.h"
-#include "view.h"
-#include "vrv.h"
 
 namespace vrv {
 
@@ -623,7 +606,7 @@ void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
     
     m_updatedBB = true;
-    //LogDebug("CB Is:  %i %i %i %i", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+    //LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2, GetClassName().c_str());
 }
 
 void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 ) 
@@ -653,14 +636,14 @@ void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 )
 
 void DocObject::ResetBB() 
 {
-    m_contentBB_x1 = 0xFFFF;
-    m_contentBB_y1 = 0xFFFF;
-    m_contentBB_x2 = -0xFFFF;
-    m_contentBB_y2 = -0xFFFF;
-    m_selfBB_x1 = 0xFFFF;
-    m_selfBB_y1 = 0xFFFF; 
-    m_selfBB_x2 = -0xFFFF;
-    m_selfBB_y2 = -0xFFFF;
+    m_contentBB_x1 = 0xFFFFFFF;
+    m_contentBB_y1 = 0xFFFFFFF;
+    m_contentBB_x2 = -0xFFFFFFF;
+    m_contentBB_y2 = -0xFFFFFFF;
+    m_selfBB_x1 = 0xFFFFFFF;
+    m_selfBB_y1 = 0xFFFFFFF;
+    m_selfBB_x2 = -0xFFFFFFF;
+    m_selfBB_y2 = -0xFFFFFFF;
     //m_drawingX = 0;
     //m_drawingY = 0;
     

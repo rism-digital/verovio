@@ -15,12 +15,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "io.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
-#include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

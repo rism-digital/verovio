@@ -10,7 +10,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <fstream>
+#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -18,7 +18,6 @@
 #include "doc.h"
 #include "glyph.h"
 #include "view.h"
-#include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
@@ -179,7 +178,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
 {
  
     bool drawBoundingBox = false;
-    if (drawBoundingBox) //(view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
+    if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
         SetPen( AxRED, 1, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
@@ -320,9 +319,9 @@ void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, i
 }
        
 
-MusPoint SvgDeviceContext::GetLogicalOrigin( ) 
+Point SvgDeviceContext::GetLogicalOrigin( ) 
 {
-    return MusPoint( m_originX, m_originY );
+    return Point( m_originX, m_originY );
 }
 
 
@@ -416,7 +415,7 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 }
  
                
-void SvgDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style)
+void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
     pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
     //if ( fillStyle == wxODDEVEN_RULE )
@@ -464,6 +463,8 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
+    assert( m_fontStack.top() );
+    
     std::string s;
     std::string anchor;
     
@@ -483,6 +484,10 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     if ( !anchor.empty() ) {
         m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
     }
+    // font-size seems to be required in <text> in FireFox
+    if ( m_fontStack.top()->GetPointSize() != 0 ) {
+        m_currentNode.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
+    }
     
 }
     
@@ -492,7 +497,7 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
         
-void SvgDeviceContext::DrawText(const std::string& text)
+void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtext)
 {
     assert( m_fontStack.top() );
     
@@ -559,7 +564,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 }
 
 
-void SvgDeviceContext::DrawSpline(int n, MusPoint points[])
+void SvgDeviceContext::DrawSpline(int n, Point points[])
 {
 
 }

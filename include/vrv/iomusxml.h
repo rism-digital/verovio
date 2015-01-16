@@ -9,21 +9,22 @@
 #ifndef __VRV_IOMUSXML_H__
 #define __VRV_IOMUSXML_H__
 
-#include "doc.h"
-#include "layer.h"
+#include "io.h"
 #include "pugixml.hpp"
-#include "tie.h"
 
 namespace vrv {
 
 class Barline;
 class Beam;
 class Clef;
+class Doc;
 class Layer;
+class LayerElement;
 class MeterSig;
 class MRest;
 class MultiRest;
 class Note;
+class Page;
 class Rest;
 class Staff;
 class System;

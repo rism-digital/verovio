@@ -16,7 +16,6 @@
 //----------------------------------------------------------------------------
 
 #include "pugixml.hpp"
-#include "smufl.h"
 #include "vrv.h"
 
 namespace vrv {

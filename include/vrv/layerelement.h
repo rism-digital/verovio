@@ -9,9 +9,8 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
-#include "devicecontext.h" // for MusPoint
+#include "devicecontextbase.h"
 #include "object.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
@@ -129,8 +128,8 @@ public:
     bool m_cueSize;
 
     /** If this is a note, store here the stem coordinates (useful for ex. tuplets) */
-    MusPoint m_drawingStemStart; // beginning point, the one near the note
-    MusPoint m_drawingStemEnd; // end point (!), near beam or stem
+    Point m_drawingStemStart; // beginning point, the one near the note
+    Point m_drawingStemEnd; // end point (!), near beam or stem
     /** stem direction as drawn, true = up, false = down */
     bool m_drawingStemDir;
     

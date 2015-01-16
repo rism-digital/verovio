@@ -10,26 +10,19 @@
 
 //----------------------------------------------------------------------------
 
-#include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-
 //----------------------------------------------------------------------------
 
-#include "accid.h"
-#include "clef.h"
 #include "doc.h"
 #include "keysig.h"
+#include "layer.h"
 #include "measure.h"
 #include "mensur.h"
-#include "note.h"
 #include "page.h"
+#include "note.h"
 #include "rest.h"
 #include "system.h"
 #include "staff.h"
 #include "tie.h"
-#include "tuplet.h"
 
 namespace vrv {
 

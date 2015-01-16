@@ -16,7 +16,6 @@
 
 #include "object.h"
 #include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

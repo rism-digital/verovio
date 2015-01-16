@@ -15,9 +15,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "devicecontext.h"
 #include "doc.h"
-#include "staff.h"
-#include "vrv.h"
 
 namespace vrv {
 
@@ -68,7 +67,7 @@ void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 
 
 void View::DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal)
 {	
-	MusPoint p[4];
+	Point p[4];
   
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -178,7 +177,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     std::wstring token;
     while( std::getline( iss, token, L'_' ))
     {
-        dc->DrawText( UTF16to8( token.c_str() ) );
+        dc->DrawText( UTF16to8( token.c_str() ), token );
         // no _
         if (iss.eof())
             break;
@@ -190,7 +189,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         dc->SetFont( &vrvTxt );
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText( UTF16to8( str.c_str() ) );
+        dc->DrawText( UTF16to8( str.c_str() ), str );
         dc->ResetFont();
     }
     //std::wcout << std::endl;
