@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733B1A1D0390001E08F6 /* smufl.h */; };
 		4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733D1A1D08CD001E08F6 /* glyph.h */; };
 		4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
@@ -185,6 +186,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
+		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
@@ -505,6 +508,8 @@
 		8F086F38188539F00037FD8E /* containers */ = {
 			isa = PBXGroup;
 			children = (
+				2D2A79991A69812C000A441B /* chord.cpp */,
+				2D2A799B1A698137000A441B /* chord.h */,
 				4DCA95D71A515D0E008AD7E9 /* editorial.cpp */,
 				4DCA95DA1A515D33008AD7E9 /* editorial.h */,
 				8F086EC6188539540037FD8E /* layer.cpp */,
@@ -753,6 +758,7 @@
 				8F086F09188539540037FD8E /* view_graph.cpp in Sources */,
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
+				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,

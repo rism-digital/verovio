@@ -1159,7 +1159,27 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
     
     return success;
 }
-
+    
+bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
+{
+    pugi::xml_node note = chord.child("note");
+    bool success = true;
+    if ( note ) {
+        note.append_attribute( "dur" ) =  chord.attribute("dur").value();
+        success = ReadMeiNote( parent, note );
+        LogDebug("Only first note of chords is read" );
+    }
+    
+    return success;
+}
+    
+bool MeiInput::ReadMeiChordChildren( Object* parent, pugi::xml_node parentNode, Object *filter )
+{
+    bool success = true;
+    
+    return success;
+}
+    
 bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
 {
     Layer *vrvLayer = new Layer();
@@ -1208,6 +1228,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
         }
+        else if ( elementName == "chord" ) {
+            success = ReadMeiChord( parent, xmlElement);
+        }
         else if ( elementName == "clef" ) {
             success = ReadMeiClef( parent, xmlElement);
         }
@@ -1243,15 +1266,6 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "verse" ) {
             success = ReadMeiVerse( parent, xmlElement );
-        }
-        else if ( elementName == "chord" ) {
-            // We just read the first note for now
-            pugi::xml_node note = xmlElement.child("note");
-            if ( note ) {
-                note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
-                success = ReadMeiNote( parent, note );
-                LogDebug("Only first note of chords is read" );
-            }
         }
         // unknown
         else {
