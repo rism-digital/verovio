@@ -30,14 +30,16 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
-#include "staff.h"
-#include "syl.h"
-#include "system.h"
 #include "slur.h"
 #include "smufl.h"
+#include "staff.h"
+#include "style.h"
+#include "syl.h"
+#include "system.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -354,23 +356,23 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
             // draw the stems and the flags
 			if (note->m_drawingStemDir == STEMDIRECTION_up) {
-                DrawFullRectangle( dc, x2 - m_doc->m_env.m_stemWidth, stemY1, x2, stemY2);
+                DrawFullRectangle( dc, x2 - m_doc->m_style->m_stemWidth, stemY1, x2, stemY2);
                 
-                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_style->m_stemWidth / 2);
                 element->m_drawingStemStart.y = y1;
                 element->m_drawingStemEnd.y = y2;
                 element->m_drawingStemDir = true;
                 
 				if (drawingDur > DUR_4) {
-					DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, note->m_cueSize );
+					DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, note->m_cueSize );
 					for (i=0; i < nbFlags; i++)
-						DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
+						DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
 				}
 			}
 			else {
-                DrawFullRectangle( dc, x2, stemY1, x2 + m_doc->m_env.m_stemWidth, stemY2);
+                DrawFullRectangle( dc, x2, stemY1, x2 + m_doc->m_style->m_stemWidth, stemY2);
 
-                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_style->m_stemWidth / 2);
                 element->m_drawingStemStart.y = y1;
                 element->m_drawingStemEnd.y = y2;
                 element->m_drawingStemDir = false;
@@ -480,7 +482,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int y = element->GetDrawingY();
     
     // Temporary fix for rest within tuplet because drawing tuplet requires m_drawingStemXXX to be set
-    element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->GetDrawingX() - (m_doc->m_env.m_stemWidth / 2);
+    element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->GetDrawingX() - (m_doc->m_style->m_stemWidth / 2);
     element->m_drawingStemEnd.y = element->GetDrawingY();
     element->m_drawingStemStart.y = element->GetDrawingY();
 
@@ -535,7 +537,7 @@ void View::DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigne
 		//xng = toZoom(xng);
 		//xnd = toZoom(xnd);
 
-        dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
+        dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
         dc->SetBrush(m_currentColour , AxTRANSPARENT );
 
 		for (i = 0; i < test; i++)
@@ -622,8 +624,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     //Draw the to lines at beginning and end
     // make it 8 pixesl longers, and 4 pixels width
     int border = m_doc->m_drawingHalfInterl[staff->staffSize] / 2;
-    DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->m_env.m_stemWidth * 2);
-    DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->m_env.m_stemWidth * 2);
+    DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->m_style->m_stemWidth * 2);
+    DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->m_style->m_stemWidth * 2);
     
     // Draw the text above
     int w, h;
@@ -727,7 +729,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 
     // legder line
 	if (y > (int)staff->GetDrawingY()  || y < staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize])
-		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_env.m_staffLineWidth);
+		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_style->m_staffLineWidth);
 
 	if (dots)
 		DrawDots ( dc, (x2 + m_doc->m_drawingUnit), y2, dots, staff);
@@ -834,15 +836,15 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 		else
 			DrawFullRectangle( dc,x1,y1,x2,y2);	// dessine val carree pleine // ENZ correction de x2
 
-		DrawVerticalLine ( dc, y3, y4, x1, m_doc->m_env.m_stemWidth );	// corset lateral
-		DrawVerticalLine ( dc, y3, y4, x2, m_doc->m_env.m_stemWidth );
+		DrawVerticalLine ( dc, y3, y4, x1, m_doc->m_style->m_stemWidth );	// corset lateral
+		DrawVerticalLine ( dc, y3, y4, x2, m_doc->m_style->m_stemWidth );
 	}
 	/*
     else			// traitement des obliques
     {
 		if (!View::s_drawingLigObliqua)	// 1e passage: ligne flagStemHeighte initiale
 		{
-			DrawVerticalLine (dc,y3,y4,x1, m_doc->m_env.m_stemWidth );
+			DrawVerticalLine (dc,y3,y4,x1, m_doc->m_style->m_stemWidth );
 			View::s_drawingLigObliqua = true;
 			//oblique = OFF;
 //			if (val == DUR_1)	// queue gauche haut si DUR_1
@@ -862,7 +864,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 			{	DrawObliqueLine ( dc,  x1,  y1,  x2,  yy2, 5);
 				DrawObliqueLine ( dc,  x1,  y5,  x2,  y2, -5);
 			}
-			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_env.m_stemWidth);	//cloture flagStemHeighte
+			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_style->m_stemWidth);	//cloture flagStemHeighte
 
 			View::s_drawingLigObliqua = false;
 //			queue_lig = OFF;	//desamorce alg.queue DUR_BR
@@ -887,16 +889,16 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	{	
         if (note->m_dur == DUR_BR) //  && this->queue_lig)	// queue gauche bas: DUR_BR initiale descendante // ax2 - no support of queue_lig (see WG corrigeLigature)
 		{
-            DrawVerticalLine ( dc, y2, y3, x1, m_doc->m_env.m_stemWidth );
+            DrawVerticalLine ( dc, y2, y3, x1, m_doc->m_style->m_stemWidth );
         }
 		else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG en ligature, queue droite bas // ax2 - no support of queue_lig
 		{
-            DrawVerticalLine (dc, y2, y3, x2, m_doc->m_env.m_stemWidth );
+            DrawVerticalLine (dc, y2, y3, x2, m_doc->m_style->m_stemWidth );
         }
 		else if (note->m_dur == DUR_1) // && this->queue_lig )	// queue gauche haut // ax2 - no support of queue_lig
 		{	
             y2 = y1 + m_doc->m_drawingHalfInterl[staff->staffSize]*6;
-			DrawVerticalLine ( dc, y1, y2, x1, m_doc->m_env.m_stemWidth );
+			DrawVerticalLine ( dc, y1, y2, x1, m_doc->m_style->m_stemWidth );
 		} 
 	}
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
@@ -924,7 +926,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
             y3 = y1 + m_doc->m_drawingHalfInterl[staff->staffSize]*6;
 			y2 = y1;
         }
-		DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_env.m_stemWidth );
+		DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_style->m_stemWidth );
 	}
 
 	return;
@@ -948,7 +950,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else
     {
-        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_env.m_barlineWidth, barLine->m_onStaffOnly, staff);
+        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_style->m_barlineWidth, barLine->m_onStaffOnly, staff);
     }
     
 
@@ -1523,12 +1525,12 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i *  dashSpace);
-            DrawFullRectangle(dc, x, y, x + dashLength, y + m_doc->m_env.m_barlineWidth);
+            DrawFullRectangle(dc, x, y, x + dashLength, y + m_doc->m_style->m_barlineWidth);
         }
         
     }
     else if (syl->GetCon() == CON_u) {
-        DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_env.m_barlineWidth);
+        DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_style->m_barlineWidth);
     }
     
 }

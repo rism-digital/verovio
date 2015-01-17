@@ -26,13 +26,15 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "page.h"
-#include "staff.h"
-#include "system.h"
 #include "slur.h"
 #include "smufl.h"
+#include "staff.h"
+#include "style.h"
+#include "system.h"
 #include "syl.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -217,12 +219,12 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
     
     // ajdust the top and bottom according to staffline width
-    y_top += m_doc->m_env.m_staffLineWidth / 2;
-    y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
+    y_top += m_doc->m_style->m_staffLineWidth / 2;
+    y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth );
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
     }
     else if ( staffGrp->GetSymbol() == STAFFGRP_BRACE ) {
         DrawBrace ( dc, x, y_top, y_bottom, last->staffSize );
@@ -312,8 +314,8 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
     
     // adjust to top and bottom position so we make sure the is not white space between
     // the glyphs and the line
-    y1 += m_doc->m_env.m_stemWidth;
-    y2 -= m_doc->m_env.m_stemWidth;
+    y1 += m_doc->m_style->m_stemWidth;
+    y2 -= m_doc->m_style->m_stemWidth;
     DrawFullRectangle(dc, x1 , y1, x2, y2 );
 
 	return;
@@ -327,7 +329,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     
 	assert( dc ); // DC cannot be NULL
 
-    int penWidth = m_doc->m_env.m_stemWidth;
+    int penWidth = m_doc->m_style->m_stemWidth;
     y1 -= penWidth;
     y2 += penWidth;
 	SwapY( &y1, &y2 );
@@ -337,7 +339,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 	x -= m_doc->m_drawingBeamWhiteWidth[ staffSize ];  // distance entre barre et debut accolade
     
 	ymed = (y1 + y2) / 2;
-	fact = m_doc->m_drawingBeamWidth[ staffSize ] + m_doc->m_env.m_stemWidth;
+	fact = m_doc->m_drawingBeamWidth[ staffSize ] + m_doc->m_style->m_stemWidth;
 	xdec = ToDeviceContextX(fact);
     
 	points[0].x = ToDeviceContextX(x);
@@ -501,43 +503,43 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
     assert( dc );
     
     // adjust the top and bottom
-    y_top += m_doc->m_env.m_staffLineWidth / 2;
-    y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
+    y_top += m_doc->m_style->m_staffLineWidth / 2;
+    y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
 
     int x = barLine->GetDrawingX();
-	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
-	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
+	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_style->m_barlineWidth;
+	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_style->m_barlineWidth;
     
 	if (barLine->GetRend() == BARRENDITION_single)
     {
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth);
     }
     else if (barLine->GetRend() == BARRENDITION_rptboth)
     {
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
-        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_style->m_barlineWidth);
     }
     else if (barLine->GetRend()  == BARRENDITION_rptstart)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
-        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_style->m_barlineWidth);
     }
     else if (barLine->GetRend() == BARRENDITION_rptend)
 	{
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
 	}
 	else if (barLine->GetRend()  == BARRENDITION_dbl)
 	{
         // Narrow the bars a little bit - should be centered?
-        x1 += m_doc->m_env.m_barlineWidth;
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        x1 += m_doc->m_style->m_barlineWidth;
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
 	}
 	else if (barLine->GetRend()  == BARRENDITION_end)
     {
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
     }
 }
@@ -548,8 +550,8 @@ void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff
 	assert( dc ); // DC cannot be NULL
     
     int x = barLine->GetDrawingX();
-	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
-	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
+	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_style->m_barlineWidth;
+	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_style->m_barlineWidth;
     
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
     int y_top = y_bottom + m_doc->m_drawingInterl[staff->staffSize];
@@ -587,7 +589,7 @@ void View::DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff 
 		b = pportee->m_drawingY - m_doc->m_drawingStaffSize[ pportee->staffSize ]*2;
 		bb = next->m_drawingY - m_doc->m_drawingStaffSize[ next->staffSize];
 
-		DrawVerticalLine ( dc, b, bb, x,  m_doc->m_env.m_barlineWidth);
+		DrawVerticalLine ( dc, b, bb, x,  m_doc->m_style->m_barlineWidth);
 		
 	}
     */
@@ -741,9 +743,9 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     //x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
     
     x1 = measure->GetDrawingX();
-    x2 = x1 + measure->GetWidth(); // - m_doc->m_env.m_barlineWidth / 2;
+    x2 = x1 + measure->GetWidth(); // - m_doc->m_style->m_barlineWidth / 2;
     
-    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
+    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
     
     x1 = ToDeviceContextX (x1);

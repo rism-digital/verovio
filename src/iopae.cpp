@@ -27,6 +27,7 @@
 #include "system.h"
 #include "staff.h"
 #include "tuplet.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 

@@ -324,12 +324,7 @@ public:
 	Staff *m_currentStaff;
     System *m_currentSystem;
     Page *m_currentPage;
-    ///@}
-    
-    /** The notation mode (CMN, Mensural) */
-	int m_notationMode;
-    /** The editor mode, which can be Edit or Insert */
-	EditorMode m_editorMode;
+    ///@}m
     
 protected:
     /** 

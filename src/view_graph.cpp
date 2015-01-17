@@ -17,6 +17,8 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "style.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -236,7 +238,7 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
-    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_env.m_stemWidth / 2 ), AxSOLID );
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_style->m_stemWidth / 2 ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
     dc->ResetPen();
 }

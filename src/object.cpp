@@ -23,7 +23,9 @@
 #include "note.h"
 #include "page.h"
 #include "staff.h"
+#include "style.h"
 #include "system.h"
+#include "vrv.h"
 
 namespace vrv {
 

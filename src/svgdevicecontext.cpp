@@ -17,7 +17,9 @@
 
 #include "doc.h"
 #include "glyph.h"
+#include "style.h"
 #include "view.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 

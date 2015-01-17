@@ -12,12 +12,12 @@
 #include "devicecontextbase.h"
 #include "io.h"
 #include "scoredef.h"
-#include "vrv.h"
 
 namespace vrv {
 
 class FontInfo;
-class Page;    
+class Page;
+class Style;
     
 enum DocType {
     Raw = 0,
@@ -73,13 +73,13 @@ public:
      * @name Setters for the page dimensions and margins
      */
     ///@{
-    void SetPageHeight( int pageHeight ) { m_pageHeight = pageHeight * DEFINITON_FACTOR; };
-    void SetPageWidth( int pageWidth ) { m_pageWidth = pageWidth * DEFINITON_FACTOR; };
-    void SetPageLeftMar( short pageLeftMar ) { m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR; };
-    void SetPageRightMar( short pageRightMar ) { m_pageRightMar = pageRightMar * DEFINITON_FACTOR; };
-    void SetPageTopMar( short pageTopMar ) { m_pageTopMar = pageTopMar * DEFINITON_FACTOR; };
-    void SetSpacingStaff( short spacingStaff ) { m_spacingStaff = spacingStaff; };
-    void SetSpacingSystem( short spacingSystem ) { m_spacingSystem = spacingSystem; };
+    void SetPageHeight( int pageHeight );
+    void SetPageWidth( int pageWidth );
+    void SetPageLeftMar( short pageLeftMar );
+    void SetPageRightMar( short pageRightMar );
+    void SetPageTopMar( short pageTopMar );
+    void SetSpacingStaff( short spacingStaff );
+    void SetSpacingSystem( short spacingSystem );
     ///@}
 
     /**
@@ -212,7 +212,7 @@ public:
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */
-    DefaultEnv m_env;
+    Style *m_style;
     
     /** 
      * The source id. Exact use to be clarified.

@@ -20,8 +20,6 @@ namespace vrv {
     
 class Glyph;
 class Object;
-    
-bool IsNote( Object *object );
 
 /**
  * The following functions are helpers for formating, conversion, or loging
@@ -141,67 +139,6 @@ private:
     static std::string m_path;
     /** */
     static std::map<wchar_t, Glyph> m_font;
-};
-
-
-//----------------------------------------------------------------------------
-// DefaultEnv
-//----------------------------------------------------------------------------
-
-/** 
- * This class contains the document default environment variables.
- * Some of them are not available as is in MEI - to be solved
- */
-class DefaultEnv 
-{
-public:
-    // constructors and destructors
-    DefaultEnv();
-    virtual ~DefaultEnv();
-    
-    
-public:
-    /** The unit (1⁄2 of the distance between staff lines) **/
-    int m_unit;
-    /** The landscape paper orientation flag */
-    char m_landscape;
-    /** The staff line width */
-    unsigned char m_staffLineWidth;
-    /** The stem width */
-    unsigned char m_stemWidth;
-    /** The barLine width */
-    unsigned char m_barlineWidth;
-    /** The maximum beam slope */
-    unsigned char m_beamMaxSlope;
-    /** The minimum beam slope */
-    unsigned char m_beamMinSlope;     
-    /** The small staff size ratio numerator */
-    unsigned char m_smallStaffNum;
-    /** The small staff size ratio denominator */
-    unsigned char m_smallStaffDen;
-    /** The grace size ratio numerator */
-    unsigned char m_graceNum;
-    /** The grace size ratio denominator */
-    unsigned char m_graceDen;
-    /** The header and footer type */
-    unsigned int m_headerType;
-    /** The notation mode (cmn or mensural) */
-    int m_notationMode;
-    /** The page height */
-    int m_pageHeight;
-    /** The page width */
-    int m_pageWidth;
-    /** The page left margin */
-    short m_pageLeftMar;
-    /** The page right margin */
-    short m_pageRightMar;
-    /** The page top margin */
-    short m_pageTopMar;
-    /** The staff minimal spacing */
-    short m_spacingStaff;
-    /** The system minimal spacing */
-    short m_spacingSystem;
-    
 };
 
 } // namespace vrv

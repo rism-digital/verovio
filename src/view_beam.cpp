@@ -21,6 +21,7 @@
 #include "layerelement.h"
 #include "note.h"
 #include "staff.h"
+#include "style.h"
 
 namespace vrv {
 
@@ -155,8 +156,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     {	
         dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0];
         dx[1] =  m_doc->m_drawingNoteRadius[staff->staffSize][1];
-        dx[0] -= (m_doc->m_env.m_stemWidth)/2;
-        dx[1] -= (m_doc->m_env.m_stemWidth)/2;
+        dx[0] -= (m_doc->m_style->m_stemWidth)/2;
+        dx[1] -= (m_doc->m_style->m_stemWidth)/2;
     }
 	_yy[0] = staff->GetDrawingY();
 
@@ -181,7 +182,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 				fb.mrq_port = chk->_shport;
             }***/
 
-            (crd+ct)->a = chk->GetDrawingX(); // - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
+            (crd+ct)->a = chk->GetDrawingX(); // - m_doc->m_style->m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
 			if (chk->IsNote() && ((Note*)chk)->GetBreaksec() && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
@@ -486,7 +487,7 @@ if (fPente)
 		}
 		else	// on tient compte de l'‚paisseur qui fait des "bosses"
 		{	if (fb.dir == STEMDIRECTION_up)	// m_stemDir en haut
-			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
+			{	fy1 = *(_ybeam+i) - m_doc->m_style->m_stemWidth;
 				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
                 crd[i].chk->m_drawingStemStart.y = fy2;
@@ -494,7 +495,7 @@ if (fPente)
                 crd[i].chk->m_drawingStemDir = true;
 			}
 			else
-			{	fy1 = *(_ybeam+i) + m_doc->m_env.m_stemWidth;
+			{	fy1 = *(_ybeam+i) + m_doc->m_style->m_stemWidth;
 				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
                 crd[i].chk->m_drawingStemStart.y = fy2;
@@ -504,7 +505,7 @@ if (fPente)
 		}
 		if ((crd+i)->chk->IsNote())
 		{	
-            DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
+            DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_style->m_stemWidth);
             
 // ICI, bon endroit pour enfiler les STACCATOS - ne sont traités ici que ceux qui sont opposés à la tête (les autres, in wgnote.cpp)
 			//if (((Note*)(crd+i)->chk)->m_artic
@@ -536,8 +537,8 @@ if (fPente)
 
     // NOUVEAU
     // Correction des positions x extremes en fonction de l'‚paisseur des queues
-	(*crd).a -= (m_doc->m_env.m_stemWidth-1) / 3;
-	(crd+_ct)->a += (m_doc->m_env.m_stemWidth-1) / 3;
+	(*crd).a -= (m_doc->m_style->m_stemWidth-1) / 3;
+	(crd+_ct)->a += (m_doc->m_style->m_stemWidth-1) / 3;
 
 	delt_y = (fb.dir == STEMDIRECTION_down || fb.fl_cond ) ? 1.0 : -1.0;
 	/* on choisit une direction pour faire le premier paquet horizontal */

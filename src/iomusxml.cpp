@@ -23,6 +23,7 @@
 #include "note.h"
 #include "rest.h"
 #include "tie.h"
+#include "vrv.h"
 
 namespace vrv {
 

@@ -15,8 +15,11 @@
 #include <string>
 #include <sys/stat.h>
 
-#include "vrv.h"
+//----------------------------------------------------------------------------
+
+#include "style.h"
 #include "toolkit.h"
+#include "vrv.h"
 
 using namespace std;
 using namespace vrv;

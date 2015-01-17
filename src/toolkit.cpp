@@ -18,6 +18,8 @@
 #include "iopae.h"
 #include "page.h"
 #include "svgdevicecontext.h"
+#include "style.h"
+#include "vrv.h"
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"
