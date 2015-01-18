@@ -14,9 +14,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Default layout values
 //----------------------------------------------------------------------------
-    
-#define DEFINITON_FACTOR 10
-#define MARGIN_DENOMINATOR 10
 
 #define DEFAULT_UNIT 9
 #define MIN_UNIT 6
@@ -42,6 +39,20 @@ namespace vrv {
 #define MIN_PAGE_WIDTH 100
 #define MAX_PAGE_WIDTH 60000
     
+    
+#define DEFAULT_BARLINE_WITDH 3.0
+#define MIN_BARLINE_WIDTH 1.0
+#define MAX_BARLINE_WIDTH 8.0
+    
+
+#define DEFAULT_STAFFLINE_WITDH 3.0
+#define MIN_STAFFLINE_WIDTH 1.0
+#define MAX_STAFFLINE_WIDTH 8.0
+    
+#define DEFAULT_STEM_WITDH 2.0
+#define MIN_STEM_WIDTH 1.0
+#define MAX_STEM_WIDTH 5.0
+    
 #define MIN_TIE_HEIGHT 12
 #define MIN_TIE_THICKNESS 6
     
@@ -60,6 +71,10 @@ namespace vrv {
 #define DEFAULT_SPACING_SYSTEM 0
 #define MIN_SPACING_SYSTEM 0
 #define MAX_SPACING_SYSTEM 12
+    
+#define DEFAULT_LYRIC_SIZE 4.5
+#define MIN_LYRIC_SIZE 2.0
+#define MAX_LYRIC_SIZE 8.0
     
 //----------------------------------------------------------------------------
 // Style
@@ -83,11 +98,11 @@ public:
     /** The landscape paper orientation flag */
     char m_landscape;
     /** The staff line width */
-    unsigned char m_staffLineWidth;
+    unsigned short m_staffLineWidth;
     /** The stem width */
-    unsigned char m_stemWidth;
+    unsigned short m_stemWidth;
     /** The barLine width */
-    unsigned char m_barlineWidth;
+    unsigned short m_barlineWidth;
     /** The maximum beam slope */
     unsigned char m_beamMaxSlope;
     /** The minimum beam slope */
@@ -114,6 +129,9 @@ public:
     short m_spacingStaff;
     /** The system minimal spacing */
     short m_spacingSystem;
+    
+    /** The lyrics size (in units / PARAM_DENOMINATOR) */
+    int m_lyricSize;
     
 };
 

@@ -270,7 +270,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     dc->ResetFont();
     
-    int verticalLine = m_doc->m_drawingUnit;
+    int verticalLine = m_doc->m_drawingUnit[0];
     
     dc->SetPen(m_currentColour, m_doc->m_style->m_stemWidth, AxSOLID);
     

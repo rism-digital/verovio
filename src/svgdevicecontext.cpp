@@ -17,7 +17,6 @@
 
 #include "doc.h"
 #include "glyph.h"
-#include "style.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -460,13 +459,11 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "width" ) = width;
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
-    rectChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
-    assert( m_fontStack.top() );
-    
     std::string s;
     std::string anchor;
     
@@ -486,11 +483,9 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     if ( !anchor.empty() ) {
         m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
     }
-    // font-size seems to be required in <text> in FireFox
-    if ( m_fontStack.top()->GetPointSize() != 0 ) {
-        m_currentNode.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
-    }
-    
+    // font-size seems to be required in <text> in FireFox - however, we set it to 0px because otherwise we
+    // end up with spaces between tspan because of the linebreaks in the SVG. Needs to be investigated
+    m_currentNode.append_attribute("font-size") = StringFormat("0px").c_str();
 }
     
 void SvgDeviceContext::EndText()

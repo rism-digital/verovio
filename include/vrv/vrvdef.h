@@ -21,6 +21,9 @@ namespace vrv {
 // Global defines
 //----------------------------------------------------------------------------
     
+#define DEFINITON_FACTOR 10
+#define PARAM_DENOMINATOR 10
+    
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
 #define VERSION_REVISION 6

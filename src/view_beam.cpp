@@ -293,7 +293,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	fb.dir = layer->GetDrawingStemDir();
 	if (!fb.mrq_port)
 	{	
-        milieu = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
+        milieu = _yy[0] - (m_doc->m_drawingDoubleUnit[staff->staffSize] * 2);
 		y_moy /= ct;
         if (fb.dir == STEMDIRECTION_NONE) {
             if ( y_moy <  milieu ) fb.dir = STEMDIRECTION_up;
@@ -337,7 +337,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     /***
 	if (fb.mrq_port && extern_q_auto)
 	// deux portees concernees (partage), en mode automatique 
-	{	ecart = e_t->m_doc->m_drawingInterl[staff->staffSize]*6;
+	{	ecart = e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]*6;
 		for (i=0; i<ct; i++)
 		{	if ((crd+i)->prov)
 			{	(crd+i)->a -= dx[crd[i].chk->dimin];
@@ -362,10 +362,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         ecart = ((shortest-DUR_8)*(deltabar));
 
 		if (crd[_ct].chk->m_cueSize)
-			ecart += m_doc->m_drawingHalfInterl[staff->staffSize]*5;
+			ecart += m_doc->m_drawingUnit[staff->staffSize]*5;
 		else
         //   Le 24 Septembre 1993: obtenir des DUR_8 reliees a la hauteur des separees 
-			ecart += (shortest > DUR_8) ? m_doc->m_drawingInterl[staff->staffSize]*hauteurBarreMoyenne : m_doc->m_drawingInterl[staff->staffSize]*(hauteurBarreMoyenne+0.5);
+			ecart += (shortest > DUR_8) ? m_doc->m_drawingDoubleUnit[staff->staffSize]*hauteurBarreMoyenne : m_doc->m_drawingDoubleUnit[staff->staffSize]*(hauteurBarreMoyenne+0.5);
 
 		if (fb.dir == STEMDIRECTION_down)
 		{
@@ -374,7 +374,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 		}
         /***
         if (crd[_ct].chk->existDebord) {
-        ecart = m_doc->m_drawingInterl[0]*2;
+        ecart = m_doc->m_drawingDoubleUnit[0]*2;
             if (!fb.mrq_port) extern_q_auto= 0;
         }
         ***/
@@ -478,17 +478,17 @@ if (fPente)
 		if (fb.fl_cond)	/* esth: eviter que queues depassent barres */
 		{	if (crd[i].prov)	/* venant du haut, m_stemDir en bas */
 			{	/***fy1 = *(_ybeam+i)+v_pnt;***/	/* on raccourcit m_stemDir */
-				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+				fy2 = crd[i].b-m_doc->m_drawingUnit[staff->staffSize]/4;
 			}
 			else
 			{	/***fy1 = *(_ybeam+i)-e_t->v_pnt;***/	/* on allonge m_stemDir */
-				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+				fy2 = crd[i].b+m_doc->m_drawingUnit[staff->staffSize]/4;
 			}
 		}
 		else	// on tient compte de l'‚paisseur qui fait des "bosses"
 		{	if (fb.dir == STEMDIRECTION_up)	// m_stemDir en haut
 			{	fy1 = *(_ybeam+i) - m_doc->m_style->m_stemWidth;
-				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+				fy2 = crd[i].b+m_doc->m_drawingUnit[staff->staffSize]/4;
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
                 crd[i].chk->m_drawingStemStart.y = fy2;
                 crd[i].chk->m_drawingStemEnd.y = fy1;
@@ -496,7 +496,7 @@ if (fPente)
 			}
 			else
 			{	fy1 = *(_ybeam+i) + m_doc->m_style->m_stemWidth;
-				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+				fy2 = crd[i].b-m_doc->m_drawingUnit[staff->staffSize]/4;
                 crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
                 crd[i].chk->m_drawingStemStart.y = fy2;
                 crd[i].chk->m_drawingStemEnd.y = fy1;
@@ -512,22 +512,22 @@ if (fPente)
 			//	 && (!((Note*)(crd+i)->chk)->m_chord || (((Note*)(crd+i)->chk)->m_chord & CHORD_TERMINAL)))
 			// les cas non traités par note()
 /*			{	if (fb.dir == STEMDIRECTION_up || (fb.mrq_port && m_stemLen && !crd[i].prov))
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				else
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
 			}
 */
 			{	
                 /***if (fb.mrq_port && extern_q_auto)
 				{	if (crd[i].prov)
-						putStacc (dc,crd[i].a+dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
+						putStacc (dc,crd[i].a+dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
 					else
-						putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
+						putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				}
 				else if (fb.dir == STEMDIRECTION_up)
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
 				else
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
+					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingDoubleUnit[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
                 ***/
 			}
 

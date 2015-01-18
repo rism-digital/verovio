@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "vrvdef.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -20,15 +22,23 @@ Style::Style()
     
     m_unit = DEFAULT_UNIT * DEFINITON_FACTOR;
     m_landscape = false;
-    m_staffLineWidth = (unsigned char)(2.0 * DEFINITON_FACTOR);
-    m_stemWidth = (unsigned char)(2.0 * DEFINITON_FACTOR);
-    m_barlineWidth = (unsigned char)(3.0 * DEFINITON_FACTOR);
+    m_barlineWidth = (unsigned short)(DEFAULT_BARLINE_WITDH * DEFINITON_FACTOR);
+    m_staffLineWidth = (unsigned short)(DEFAULT_STAFFLINE_WITDH * DEFINITON_FACTOR);
+    m_stemWidth = (unsigned short)(DEFAULT_STEM_WITDH * DEFINITON_FACTOR);
+    
+    /**
+     * Wolfgang legacy code used for initialiazing Doc::m_drawingBeamMin/MaxSlope
+     * and used in View::DrawBeamPostponed
+     */
     m_beamMaxSlope = 30;
     m_beamMinSlope = 10;
     
-    // originally in WG Parameters2
-    m_smallStaffNum = 3;
-    m_smallStaffDen = 4;
+    /**
+     * We should probably keep graceNum and Den for cue sized notes.
+     * smallStaffNum and Den should be replaced for a more MEI way (percentage?)
+     */
+    m_smallStaffNum = 4;
+    m_smallStaffDen = 5;
     m_graceNum = 3;
     m_graceDen = 4;
     
@@ -39,6 +49,8 @@ Style::Style()
     m_pageTopMar = DEFAULT_PAGE_TOP_MAR * DEFINITON_FACTOR;
     m_spacingStaff = DEFAULT_SPACING_STAFF;
     m_spacingSystem = DEFAULT_SPACING_SYSTEM;
+    
+    m_lyricSize = DEFAULT_LYRIC_SIZE * PARAM_DENOMINATOR;
 }
 
 Style::~Style()

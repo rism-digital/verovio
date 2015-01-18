@@ -67,7 +67,6 @@ void Doc::Reset( DocType type )
     m_spacingSystem = m_style->m_spacingSystem;
     
     m_drawingPage = NULL;
-    m_drawingUnit = 0;
     m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     
@@ -398,8 +397,6 @@ Page *Doc::SetDrawingPage( int pageIdx )
     // Since  m_style->m_interlDefin stays the same, it useless to do it
     // every time for now.
     
-    m_drawingUnit = this->m_style->m_unit;
-    
 	m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
 	m_drawingBeamMinSlope = this->m_style->m_beamMinSlope;
 	m_drawingBeamMaxSlope /= 100;
@@ -411,19 +408,19 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingGraceRatio[1] = this->m_style->m_graceDen;
     
     // half of the space between two lines
-    m_drawingHalfInterl[0] = m_style->m_unit;
+    m_drawingUnit[0] = m_style->m_unit;
     // same for small staves
-    m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingUnit[1] = (m_drawingUnit[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
-    m_drawingInterl[0] = m_drawingHalfInterl[0] * 2;
+    m_drawingDoubleUnit[0] = m_drawingUnit[0] * 2;
     // same for small staves
-    m_drawingInterl[1] = m_drawingHalfInterl[1] * 2;
+    m_drawingDoubleUnit[1] = m_drawingUnit[1] * 2;
     // staff (with five lines)
-    m_drawingStaffSize[0] = m_drawingInterl[0] * 4;
-    m_drawingStaffSize[1] = m_drawingInterl[1] * 4;
+    m_drawingStaffSize[0] = m_drawingDoubleUnit[0] * 4;
+    m_drawingStaffSize[1] = m_drawingDoubleUnit[1] * 4;
     //
-    m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
-    m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
+    m_drawingOctaveSize[0] = m_drawingUnit[0] * 7;
+    m_drawingOctaveSize[1] = m_drawingUnit[1] * 7;
     
     // values for beams
     m_drawingBeamWidth[0] = this->m_style->m_unit;
@@ -447,8 +444,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     
     m_drawingLyricFonts[0] = m_drawingLyricFont;
     m_drawingLyricFonts[1] = m_drawingLyricFont;
-	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight * 3 / 5 );
-    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * 3 / 5 );
+	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
+    m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
     
     float glyph_size;
     Glyph *glyph;
