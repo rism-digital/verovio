@@ -469,6 +469,17 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
     if ( m_fontStack.top()->GetPointSize() != 0 ) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
     }
+    if ( m_fontStack.top()->GetStyle() != FONTWEIGHT_NONE ) {
+        if ( m_fontStack.top()->GetStyle() == FONTSTYLE_italic ) {
+            textChild.append_attribute("font-style") = "italic";
+        }
+        else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_normal ) {
+            textChild.append_attribute("font-style") = "normal";
+        }
+        else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_oblique ) {
+            textChild.append_attribute("font-style") = "oblique";
+        }
+    }
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 

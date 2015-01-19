@@ -24,6 +24,7 @@ namespace vrv {
 
 Syl::Syl():
     LayerElement("syl-"),
+    AttTypography(),
     AttSylLog()
 {
     Reset();
@@ -36,6 +37,7 @@ Syl::~Syl()
 void Syl::Reset()
 {
     LayerElement::Reset();
+    ResetTypography();
     ResetSylLog();
     
     m_drawingFirstNote = NULL;

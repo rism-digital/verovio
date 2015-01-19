@@ -353,6 +353,58 @@ int Att::StrToDur(std::string value)
     return dur;
 }
     
+std::string Att::FontstyleToStr(data_FONTSTYLE data)
+{
+    std::string value;
+    switch(data)
+    {
+        case FONTSTYLE_italic : value = "italic"; break;
+        case FONTSTYLE_normal : value = "normal"; break;
+        case FONTSTYLE_oblique : value = "oblique"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FONTSTYLE Att::StrToFontstyle(std::string value)
+{
+    if (value == "italic") return FONTSTYLE_italic;
+    else if (value == "normal") return FONTSTYLE_normal;
+    else if (value == "oblique") return FONTSTYLE_oblique;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return FONTSTYLE_NONE;
+}
+
+std::string Att::FontweightToStr(data_FONTWEIGHT data)
+{
+    std::string value;
+    switch(data)
+    {
+        case FONTWEIGHT_bold : value = "bold"; break;
+        case FONTWEIGHT_normal : value = "normal"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FONTWEIGHT Att::StrToFontweight(std::string value)
+{
+    if (value == "bold") return FONTWEIGHT_bold;
+    else if (value == "normal") return FONTWEIGHT_normal;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return FONTWEIGHT_NONE;
+}
+    
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
 {
     std::string value;

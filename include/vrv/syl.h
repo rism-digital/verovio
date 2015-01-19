@@ -21,6 +21,7 @@ class Note;
 //----------------------------------------------------------------------------
 
 class Syl: public LayerElement,
+    public AttTypography,
     public AttSylLog
 {
 public:

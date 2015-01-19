@@ -1379,7 +1379,22 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     dc->StartGraphic( syl, "", syl->GetUuid() );
     
-    DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str() );
+    dc->SetBrush( m_currentColour, AxSOLID );
+    
+    FontInfo currentFont;
+    if (syl->HasFontstyle()) {
+        currentFont = m_doc->m_drawingLyricFonts[ staff->staffSize ];
+        currentFont.SetStyle(syl->GetFontstyle());
+        dc->SetFont(&currentFont);
+    }
+    else {
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+    }
+    
+    DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str(), staff->staffSize );
+    
+    dc->ResetFont();
+    dc->ResetBrush();
     
     if (syl->m_drawingFirstNote && syl->m_drawingLastNote) {
         System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );

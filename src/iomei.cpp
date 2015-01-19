@@ -511,6 +511,8 @@ void MeiOutput::WriteMeiVerse( pugi::xml_node currentNode, Verse *verse )
 void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
 {
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( syl ).c_str();
+    syl->WriteTypography( currentNode );
+    syl->WriteSylLog( currentNode );
     WriteText( currentNode, syl );
     return;
 }
@@ -1451,6 +1453,7 @@ bool MeiInput::ReadMeiSyl( Object *parent, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
     
+    vrvSyl->ReadTypography( syl );
     vrvSyl->ReadSylLog( syl );
     ReadText( syl, vrvSyl );
     

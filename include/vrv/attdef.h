@@ -113,6 +113,25 @@ enum data_CON {
 };
     
 /**
+ * MEI data.FONTSTYLE
+ */
+enum data_FONTSTYLE {
+    FONTSTYLE_NONE = 0,
+    FONTSTYLE_italic,
+    FONTSTYLE_normal,
+    FONTSTYLE_oblique
+};
+    
+/**
+ * MEI data.FONTWEIGHT
+ */
+enum data_FONTWEIGHT {
+    FONTWEIGHT_NONE = 0,
+    FONTWEIGHT_bold,
+    FONTWEIGHT_normal
+};
+    
+/**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)
  * Order for 7f to 7s should not be changes. This is a special case since we use abs()
