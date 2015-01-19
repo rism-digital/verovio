@@ -10,7 +10,13 @@
 
 //----------------------------------------------------------------------------
 
+#include <algorithm>
 #include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "glyph.h"
+#include "vrv.h"
 
 namespace vrv {
     
@@ -86,6 +92,68 @@ void DeviceContext::ReactivateGraphic( )
 {
     assert( m_isDeactivated );
     m_isDeactivated = false;
+}
+
+void DeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
+{
+    std::wstring wtext(string.begin(), string.end());
+    GetTextExtent(wtext, w, h);
+}
+    
+void DeviceContext::GetTextExtent( const std::wstring& string, int *w, int *h )
+{
+    assert( m_fontStack.top() );
+    
+    int x, y, partial_w, partial_h;
+    (*w) = 0;
+    (*h) = 0;
+    
+    Glyph *unkown = Resources::GetTextGlyph(L'-');
+    
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetTextGlyph(c);
+        if (!glyph) {
+            glyph = unkown;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+        
+        partial_w *= m_fontStack.top()->GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_fontStack.top()->GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
+        
+        (*w) += partial_w;
+        (*h) = std::max(partial_h, (*h));
+    }
+}
+
+void DeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+{
+    assert( m_fontStack.top() );
+    
+    int x, y, partial_w, partial_h;
+    (*w) = 0;
+    (*h) = 0;
+    
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+        
+        partial_w *= m_fontStack.top()->GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_fontStack.top()->GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
+        
+        (*w) += partial_w;
+        (*h) = std::max(partial_h, (*h));
+    }
 }
 
 } // namespace vrv

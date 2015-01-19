@@ -35,6 +35,7 @@ namespace vrv {
     
 std::string Resources::m_path = "/usr/local/share/verovio";
 std::map<wchar_t, Glyph> Resources::m_font;
+std::map<wchar_t, Glyph> Resources::m_textFont;
   
 //----------------------------------------------------------------------------
 // Font related methods
@@ -52,6 +53,12 @@ bool Resources::InitFont()
         LogError("All default SMUFL glyphs could not be loaded");
         return false;
     }
+    
+    if ( !InitTextFont() ) {
+        LogError("Text font could not be initialized");
+        return false;
+    }
+    
     return true;
 }
     
@@ -62,7 +69,14 @@ bool Resources::SetFont(std::string fontName)
 
 Glyph *Resources::GetGlyph(wchar_t smuflCode)
 {
+    if (!m_font.count(smuflCode)) return NULL;
     return &m_font[smuflCode];
+}
+
+Glyph *Resources::GetTextGlyph(wchar_t code)
+{
+    if (!m_textFont.count(code)) return NULL;
+    return &m_textFont[code];
 }
     
 bool Resources::LoadFont(std::string fontName)
@@ -131,6 +145,44 @@ bool Resources::LoadFont(std::string fontName)
             if ( current.attribute( "width" ) ) width = atof( current.attribute( "width" ).value() );
             if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
             glyph->SetBoundingBox(x, y, width, height);
+        }
+    }                  
+    return true;
+}
+
+    
+bool Resources::InitTextFont()
+{
+    // Load the bounding boxes
+    pugi::xml_document doc;
+    std::string filename = Resources::GetPath() + "/text/Georgia.xml";
+    pugi::xml_parse_result result = doc.load_file( filename.c_str() );
+    if (!result)
+    {
+        // File not found, default bounding boxes will be used
+        LogMessage("Cannot load bounding boxes for txt font '%s'", filename.c_str());
+        return false;
+    }
+    pugi::xml_node root = doc.first_child();
+    if (!root.attribute("units-per-em")) {
+        LogWarning("No units-per-em attribute in bouding box file");
+        return false;
+    }
+    int unitsPerEm = atoi(root.attribute("units-per-em").value());
+    pugi::xml_node current;
+    for( current = root.child("glyph"); current; current = current.next_sibling("glyph") ) {
+        if ( current.attribute( "glyph-code" ) ) {
+            
+            wchar_t code = (wchar_t)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
+            Glyph glyph( unitsPerEm );
+            double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
+            // Not check for missing values...
+            if ( current.attribute( "x" ) ) x = atof( current.attribute( "x" ).value() );
+            if ( current.attribute( "y" ) ) y = atof( current.attribute( "y" ).value() );
+            if ( current.attribute( "width" ) ) width = atof( current.attribute( "width" ).value() );
+            if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
+            glyph.SetBoundingBox(x, y, width, height);
+            m_textFont[code] = glyph;
         }
     }                  
     return true;

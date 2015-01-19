@@ -126,8 +126,10 @@ public:
     static std::string GetPath( ) { return m_path; };
     static void SetPath( std::string path ) { m_path = path; };
     static bool InitFont( );
+    static bool InitTextFont( );
     static bool SetFont( std::string fontName );
     static Glyph* GetGlyph( wchar_t smuflCode );
+    static Glyph* GetTextGlyph( wchar_t code );
     ///@}
     
 private:
@@ -137,8 +139,10 @@ private:
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static std::string m_path;
-    /** */
+    /** The loaded SMuFL font */
     static std::map<wchar_t, Glyph> m_font;
+    /** A text font used for bounding box calculations */
+    static std::map<wchar_t, Glyph> m_textFont;
 };
 
 } // namespace vrv

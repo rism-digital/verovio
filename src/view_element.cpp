@@ -1403,6 +1403,8 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
     System *parentSystem1 = dynamic_cast<System*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(System) )  );
     System *parentSystem2 = dynamic_cast<System*>( syl->m_drawingLastNote->GetFirstParent( &typeid(System) )  );
     
+    int w, h;
+    
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (( system == parentSystem1 ) && ( system == parentSystem2 )) {
         // Get the parent staff for calculating the y position
@@ -1410,8 +1412,10 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         if ( !Check( staff ) ) return;
         
         int y = GetSylY(syl, staff);
-        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->ResetFont();
+        int x1 = syl->GetDrawingX() + w + m_doc->m_drawingUnit[ staff->staffSize ];
         int x2 = syl->m_drawingLastNote->GetDrawingX();
         
         // In this case we can resume the Syl because is was drawn previouly in the system
@@ -1430,8 +1434,10 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         if ( !Check( staff ) ) return;
         
         int y = GetSylY(syl, staff);
-        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->ResetFont();
+        int x1 = syl->GetDrawingX() + w + m_doc->m_drawingUnit[ staff->staffSize ];
         int x2 = last->GetDrawingX() + last->GetRightBarlineX();
         
         // In this case too we can resume the Syl because is was drawn previouly in the system

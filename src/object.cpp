@@ -1055,6 +1055,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
+    if ( current->IsVerse() || current->IsSyl() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
     if ( current->IsMRest() ) {
         // We need to reconsider this: if the mrest is on the top staff, the aligner will be before any other note
         // aligner. This means that it will not be shifted. We need to shift it but not take into account its own width.

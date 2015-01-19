@@ -251,6 +251,8 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
     assert( measure );
     assert( scoreDef );
     
+    int w, h;
+    
     ListOfObjects::iterator iter = scoreDef->m_list.begin();
     while (iter != scoreDef->m_list.end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef*>(*iter);
@@ -281,14 +283,15 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
             continue;
         }
         
-        // keep the widest width for the system; the 1.1 is an arbitrary avg value of each letter with
-        system->SetDrawingLabelsWidth( label.length() * m_doc->m_drawingDoubleUnit[staff->staffSize] * 1.1 );
-        
         int x = system->GetDrawingX() - 3 * m_doc->m_drawingBeamWidth[0];
         int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->m_drawingDoubleUnit[staff->staffSize] / 2);
         
         dc->SetBrush( m_currentColour, AxSOLID );
         dc->SetFont( &m_doc->m_drawingLyricFonts[ 0 ] );
+        
+        // keep the widest width for the system
+        dc->GetTextExtent( label, &w, &h);
+        system->SetDrawingLabelsWidth( w );
         
         dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
         dc->DrawText( label );

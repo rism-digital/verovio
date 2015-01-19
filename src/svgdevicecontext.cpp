@@ -181,7 +181,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
     bool drawBoundingBox = false;
     if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
-        SetPen( AxRED, 1, AxDOT_DASH );
+        SetPen( AxRED, 10, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasSelfBB() ) {
@@ -194,7 +194,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         }
         EndGraphic( object, NULL );
         
-        SetPen( AxBLUE, 1, AxDOT_DASH );
+        SetPen( AxBLUE, 10, AxDOT_DASH );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasContentBB() ) {
             this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
@@ -286,46 +286,10 @@ void SvgDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleY = yScale;
 }       
 
-void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
-{
-    LogDebug("SvgDeviceContext::GetTextExtent not implemented");
-}
-    
-// Copied from bBoxDc, TODO find another more generic solution
-void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
-{
-    assert( m_fontStack.top() );
-    
-    int x, y, partial_w, partial_h;
-    *w = 0;
-    *h = 0;
-    
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
-        wchar_t c = string[i];
-        Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph) {
-            continue;
-        }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-    
-        partial_w *= m_fontStack.top()->GetPointSize();
-        partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_fontStack.top()->GetPointSize();
-        partial_h /= glyph->GetUnitsPerEm();
-        
-        *w += partial_w;
-        *h += partial_h;
-    }
-}
-       
-
 Point SvgDeviceContext::GetLogicalOrigin( ) 
 {
     return Point( m_originX, m_originY );
 }
-
-
 
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])

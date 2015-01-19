@@ -60,8 +60,6 @@ public:
      * @name Getters
      */
     ///@{
-    virtual void GetTextExtent( const std::string& string, int *w, int *h );
-    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
     virtual Point GetLogicalOrigin( );
     ///}
 

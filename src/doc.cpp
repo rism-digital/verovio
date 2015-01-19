@@ -303,7 +303,7 @@ short Doc::GetRightMargin( const std::type_info *elementType )
     else if (typeid(MRest) == *elementType) return 0;
     else if (typeid(MultiRest) == *elementType) return 0;
     //else if (typeid(Note) == *elementType) return 10;
-    return 15;
+    return 10;
 }
     
 void Doc:: SetPageHeight( int pageHeight )
