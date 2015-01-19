@@ -53,7 +53,7 @@ Toolkit::Toolkit( bool initFont )
 	m_cString = NULL;
     
     if ( initFont ) {
-        Resources::InitFont();
+        Resources::InitFonts();
     }
 }
 

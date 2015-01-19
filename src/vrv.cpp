@@ -41,7 +41,7 @@ std::map<wchar_t, Glyph> Resources::m_textFont;
 // Font related methods
 //----------------------------------------------------------------------------
     
-bool Resources::InitFont()
+bool Resources::InitFonts()
 {
     // We will need to rethink this for adding the option to add custom fonts
     // Font Bravura first since it is expected to have always all symbols
@@ -153,14 +153,16 @@ bool Resources::LoadFont(std::string fontName)
     
 bool Resources::InitTextFont()
 {
-    // Load the bounding boxes
+    // For the text font, we load the bounding boxes only
     pugi::xml_document doc;
+    // For now, we have only Georgia.xml bounding boxes for ASCII chars
+    // For any other char, we currently use '-' bounding box
     std::string filename = Resources::GetPath() + "/text/Georgia.xml";
     pugi::xml_parse_result result = doc.load_file( filename.c_str() );
     if (!result)
     {
         // File not found, default bounding boxes will be used
-        LogMessage("Cannot load bounding boxes for txt font '%s'", filename.c_str());
+        LogMessage("Cannot load bounding boxes for text font '%s'", filename.c_str());
         return false;
     }
     pugi::xml_node root = doc.first_child();
@@ -172,8 +174,9 @@ bool Resources::InitTextFont()
     pugi::xml_node current;
     for( current = root.child("glyph"); current; current = current.next_sibling("glyph") ) {
         if ( current.attribute( "glyph-code" ) ) {
-            
             wchar_t code = (wchar_t)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
+            // We create a glyph with only the units per em which is the only info we need for
+            // the bounding boxes; path and codeStr will remain [unset]
             Glyph glyph( unitsPerEm );
             double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...

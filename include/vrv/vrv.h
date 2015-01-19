@@ -123,18 +123,23 @@ public:
      * @name Setters and getters for static environment variables
      */
     ///@{
+    /** Resource path */
     static std::string GetPath( ) { return m_path; };
     static void SetPath( std::string path ) { m_path = path; };
-    static bool InitFont( );
+    /** Init the SMufL music and text fonts */
+    static bool InitFonts( );
+    /** Init the text font (bounding boxes and ASCII only) */
     static bool InitTextFont( );
+    /** Select a particular font */
     static bool SetFont( std::string fontName );
+    /** Returns the glyph (if exists) for the current SMuFL font */
     static Glyph* GetGlyph( wchar_t smuflCode );
+    /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
     static Glyph* GetTextGlyph( wchar_t code );
     ///@}
     
 private:
     static bool LoadFont(std::string fontName);
-    
     
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
