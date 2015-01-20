@@ -1676,7 +1676,7 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         y1 = y2 = note2->GetDrawingY();
         x2 = note2->GetDrawingX();
-        x1 = x2 - m_doc->m_drawingDoubleUnit[ staff->staffSize ];
+        x1 = x2 - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2;
         assert(dynamic_cast<Note*>(note2));
         noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
         //DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);

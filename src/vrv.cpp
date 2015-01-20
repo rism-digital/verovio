@@ -156,7 +156,7 @@ bool Resources::InitTextFont()
     // For the text font, we load the bounding boxes only
     pugi::xml_document doc;
     // For now, we have only Georgia.xml bounding boxes for ASCII chars
-    // For any other char, we currently use '-' bounding box
+    // For any other char, we currently use 'o' bounding box
     std::string filename = Resources::GetPath() + "/text/Georgia.xml";
     pugi::xml_parse_result result = doc.load_file( filename.c_str() );
     if (!result)

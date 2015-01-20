@@ -108,7 +108,7 @@ void DeviceContext::GetTextExtent( const std::wstring& string, int *w, int *h )
     (*w) = 0;
     (*h) = 0;
     
-    Glyph *unkown = Resources::GetTextGlyph(L'-');
+    Glyph *unkown = Resources::GetTextGlyph(L'o');
     
     for (unsigned int i = 0; i < string.length(); i++)
     {
