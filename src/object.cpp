@@ -10,9 +10,11 @@
 
 #include <assert.h>
 #include <sstream>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
@@ -1042,6 +1044,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     }
     
     if ( current->IsBeam() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( current->IsChord() ) {
         return FUNCTOR_CONTINUE;
     }
     

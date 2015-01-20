@@ -510,8 +510,6 @@
 		8F086F38188539F00037FD8E /* containers */ = {
 			isa = PBXGroup;
 			children = (
-				2D2A79991A69812C000A441B /* chord.cpp */,
-				2D2A799B1A698137000A441B /* chord.h */,
 				4DCA95D71A515D0E008AD7E9 /* editorial.cpp */,
 				4DCA95DA1A515D33008AD7E9 /* editorial.h */,
 				8F086EC6188539540037FD8E /* layer.cpp */,
@@ -555,6 +553,8 @@
 				8F59290F18854BF800FE51AD /* barline.h */,
 				8F086EBA188539540037FD8E /* beam.cpp */,
 				8F59291118854BF800FE51AD /* beam.h */,
+				2D2A79991A69812C000A441B /* chord.cpp */,
+				2D2A799B1A698137000A441B /* chord.h */,
 				8F086EBB188539540037FD8E /* clef.cpp */,
 				8F59291218854BF800FE51AD /* clef.h */,
 				4DC34BA619BC4A83006175CD /* custos.cpp */,

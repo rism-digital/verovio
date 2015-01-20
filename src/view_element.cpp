@@ -11,12 +11,14 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
 #include "accid.h"
 #include "beam.h"
+#include "chord.h"
 #include "custos.h"
 #include "devicecontext.h"
 #include "doc.h"
@@ -67,8 +69,15 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     // With Transcription documents, we use the m_xAbs
     if ( element->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
-        element->SetDrawingY( staff->GetDrawingY() );
+        Chord* chordParent = dynamic_cast<Chord*>(element->GetFirstParent( &typeid( Chord ), 1));
+        if ( chordParent) {
+            element->SetDrawingX( chordParent->GetXRel() + measure->GetDrawingX() );
+            element->SetDrawingY( staff->GetDrawingY() );
+        }
+        else {
+            element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
+            element->SetDrawingY( staff->GetDrawingY() );
+        }
     }
     else
     {
@@ -85,6 +94,9 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else if (dynamic_cast<Beam*>(element)) {
         DrawBeam(dc, element, layer, staff, measure);
+    }
+    else if (dynamic_cast<Chord*>(element)) {
+        DrawDurationElement(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Clef*>(element)) {
         DrawClef(dc, element, layer, staff, measure);
@@ -144,8 +156,13 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
 	if ( !durElement )
 		return;
         
-	
-    if (dynamic_cast<Note*>(element)) 
+	if (dynamic_cast<Chord*>(element))
+    {
+        dc->StartGraphic( element, "", element->GetUuid() );
+        DrawChord(dc, element, layer, staff, measure);
+        dc->EndGraphic(element, this );
+    }
+    else if (dynamic_cast<Note*>(element))
     {
         Note *note = dynamic_cast<Note*>(element);
         int oct = note->GetOct() - 4;
@@ -273,7 +290,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		radius += radius/3;
 	}
 
-	x1 = xn-radius;	// position d'appel du caractäre et de la queue gauche
+	x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
     xl = xn;
 
     // Long, breve and ligatures
@@ -954,6 +971,18 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     
     dc->EndGraphic(element, this ); //RZ
+}
+    
+void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
+    std::cout << std::endl << "NOTES FOLLOW" << std::endl;
+    Chord* chord = dynamic_cast<Chord*>(element);
+    
+    std::cout << "Chord has " << (int)chord->m_list.size() << " or " << (int)chord->m_children.size() << " children." << std::endl;
+    
+    DrawLayerChildren(dc, chord, layer, staff, measure);
+
+    std::cout << "NOTES END." << std::endl << std::endl;
 }
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

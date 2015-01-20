@@ -14,8 +14,9 @@
 //----------------------------------------------------------------------------
 
 #include "atts_shared.h"
-#include "clef.h"
 #include "drawinglistinterface.h"
+#include "durationinterface.h"
+#include "layerelement.h"
 #include "object.h"
 
 namespace vrv {
@@ -31,15 +32,28 @@ namespace vrv {
  * A chord is contained in a layer.
  * It contains notes.
  */
-class Chord: public DocObject, public DrawingListInterface, public ObjectListInterface,
-public AttCommon
+class Chord: public LayerElement, public DrawingListInterface, public ObjectListInterface, public DurationInterface,
+    public AttCommon,
+    public AttStemmed
 {
 public:
-    
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Chord( );
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
+    
+    /**
+     * Add an element (only note supported) to a chord.
+     */
+    void AddElement(LayerElement *element);
+    
+    void FilterList();
+    ///@}
 };
 
 } // namespace vrv

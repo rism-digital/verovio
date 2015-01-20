@@ -17,6 +17,7 @@
 #include "aligner.h"
 #include "barline.h"
 #include "beam.h"
+#include "chord.h"
 #include "clef.h"
 #include "custos.h"
 #include "dot.h"
@@ -154,6 +155,11 @@ bool LayerElement::IsBeam()
     return (dynamic_cast<Beam*>(this));
 }
 
+bool LayerElement::IsChord()
+{
+    return (dynamic_cast<Chord*>(this));
+}
+    
 bool LayerElement::IsClef() 
 {  
     return (dynamic_cast<Clef*>(this));

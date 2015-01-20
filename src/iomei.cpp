@@ -11,11 +11,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
 #include "beam.h"
+#include "chord.h"
 #include "custos.h"
 #include "dot.h"
 #include "editorial.h"
@@ -40,7 +42,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
-
+    
 MeiOutput::MeiOutput( Doc *doc, std::string filename ) :
 	FileOutputStream( doc )
 {
@@ -1151,26 +1153,6 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
     return success;
 }
     
-bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
-{
-    pugi::xml_node note = chord.child("note");
-    bool success = true;
-    if ( note ) {
-        note.append_attribute( "dur" ) =  chord.attribute("dur").value();
-        success = ReadMeiNote( parent, note );
-        LogDebug("Only first note of chords is read" );
-    }
-    
-    return success;
-}
-    
-bool MeiInput::ReadMeiChordChildren( Object* parent, pugi::xml_node parentNode, Object *filter )
-{
-    bool success = true;
-    
-    return success;
-}
-    
 bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
 {
     Layer *vrvLayer = new Layer();
@@ -1402,6 +1384,33 @@ bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
     
     AddLayerElement(parent, vrvMultiRest);
 	return true;
+}
+    
+bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
+{
+    Chord *vrvChord = new Chord();
+    SetMeiUuid(chord, vrvChord);
+    
+    ReadDurationInterface(chord, vrvChord);
+    vrvChord->ReadCommon(chord);
+    vrvChord->ReadStemmed(chord);
+    
+    AddLayerElement(parent, vrvChord);
+    bool success = ReadMeiLayerChildren(vrvChord, chord);
+
+    std::cout << "Chord has " << (int)vrvChord->m_list.size() << " or " << (int)vrvChord->m_children.size() << " children." << std::endl;
+    
+    int dur = dynamic_cast<DurationInterface*>(vrvChord)->GetDur();
+    std::cout << "dur in " << dur << std::endl;
+    int len = (int)vrvChord->m_children.size();
+    for(int x = 0; x < len; x++)
+    {
+        dynamic_cast<DurationInterface*>(vrvChord->m_children.at(x))->SetDur(dur);
+        std::cout << dynamic_cast<PitchInterface*>(vrvChord->m_children.at(x))->GetPname() << " (" << dynamic_cast<DurationInterface*>(vrvChord->m_children.at(x))->GetDur() << ")";
+    }
+    std::cout << std::endl;
+    
+    return success;
 }
 
 bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
@@ -1687,6 +1696,9 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     }
     else if ( dynamic_cast<Verse*>( parent ) ) {
         dynamic_cast<Verse*>( parent )->AddElement( element );
+    }
+    else if ( dynamic_cast<Chord*>( parent ) ) {
+        dynamic_cast<Chord*>( parent )->AddElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );

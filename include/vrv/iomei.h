@@ -21,6 +21,7 @@ class App;
 class Accid;
 class Barline;
 class Beam;
+class Chord;
 class Clef;
 class Custos;
 class Dot;

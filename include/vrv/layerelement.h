@@ -80,6 +80,7 @@ public:
     bool IsAccid();
     bool IsBarline();
     bool IsBeam();
+    bool IsChord();
     bool IsClef();
     bool IsCustos();
     bool IsDot();
