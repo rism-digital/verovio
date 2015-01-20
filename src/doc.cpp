@@ -126,6 +126,8 @@ void Doc::PrepareDrawing()
                 filters.push_back( &matchLayer );
                 filters.push_back( &matchVerse );
                 
+                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+                // m_drawingLastNote is set only if the syl has a forward connector
                 currentSyl = NULL;
                 lastNote = NULL;
                 lastButOneNote = NULL;
@@ -136,6 +138,15 @@ void Doc::PrepareDrawing()
                 Functor prepareLyrics( &Object::PrepareLyrics );
                 Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
                 this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
+                
+                // The second pass set the current lyric for all staves that have a lyric
+                // started in a previous measure and that will need to be drawing from the
+                // Staff Object. This fills the Staff::m_currentSyls list
+                currentSyl = NULL;
+                paramsLyrics.clear();
+                paramsLyrics.push_back( &currentSyl );
+                Functor fillStaffCurrentLyrics( &Object::FillStaffCurrentLyrics );
+                this->Process( &fillStaffCurrentLyrics, paramsLyrics, NULL, &filters );
             }
         }
     }

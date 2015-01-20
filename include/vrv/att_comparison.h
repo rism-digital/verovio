@@ -18,7 +18,7 @@ namespace vrv {
 
 class AttCommonNComparison: public AttComparison
 {
-    
+
 public:
     AttCommonNComparison( const std::type_info *elementType, const int n ):
     AttComparison( elementType )
@@ -32,9 +32,7 @@ public:
     {
         if (!MatchesType(object)) return false;
         AttCommon *element = dynamic_cast<AttCommon*>(object);
-        if (!element) {
-            return false;
-        }
+        if (!element) return false;
         return (element->GetN() == m_n);
     }
     

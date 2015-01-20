@@ -96,6 +96,16 @@ public:
     void ResetSlurAttrTerminal() { m_slurAttrTerminal = NULL; };
     ///@}
     
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     */
+    virtual int PrepareLyrics( ArrayPtrVoid params );
+    
 private:
     
 protected:
