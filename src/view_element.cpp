@@ -69,9 +69,8 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     // With Transcription documents, we use the m_xAbs
     if ( element->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        Chord* chordParent = dynamic_cast<Chord*>(element->GetFirstParent( &typeid( Chord ), 1));
-        if ( chordParent) {
-            element->SetDrawingX( chordParent->GetXRel() + measure->GetDrawingX() );
+        if ( element->IsNote() && dynamic_cast<Note*>(element)->IsChordTone() ) {
+            element->SetDrawingX( dynamic_cast<Note*>(element)->IsChordTone()->GetXRel() + measure->GetDrawingX() );
             element->SetDrawingY( staff->GetDrawingY() );
         }
         else {
@@ -979,7 +978,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
 {
     Chord* chord = dynamic_cast<Chord*>(element);
     
-    //TODO: code here to set chord stem direction, note will automatically pick it up
+    chord->CalculateStemDirection();
+    
     DrawLayerChildren(dc, chord, layer, staff, measure);
 }
 

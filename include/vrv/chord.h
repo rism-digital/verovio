@@ -51,8 +51,11 @@ public:
      * Add an element (only note supported) to a chord.
      */
     void AddElement(LayerElement *element);
-    
+
     void FilterList();
+    
+    void CalculateStemDirection();
+
     ///@}
 };
 

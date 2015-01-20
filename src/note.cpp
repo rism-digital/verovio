@@ -219,8 +219,13 @@ bool Note::HasDrawingStemDir()
     }
     else
     {
-        return AttStemmed::HasStemDir();
+        return this->HasStemDir();
     }
+}
+
+Chord* Note::IsChordTone()
+{
+    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
 }
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
@@ -232,7 +237,7 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
     }
     else
     {
-        return AttStemmed::GetStemDir();
+        return this->GetStemDir();
     }
     
 }
