@@ -277,10 +277,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	//static int ynn_chrd;
 
 	//val=note->m_dur;
-    Chord* chordParent = note->IsChordTone();
-    if ( chordParent ) {
-        note->SetDur(chordParent->GetDur());
-    }
     
     drawingDur = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
     

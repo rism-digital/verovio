@@ -98,9 +98,11 @@ public:
     ///@}
     
     /**
-     * Returns chord parent if it's a chord tone.
+     * Overriding functions to return information from chord parent if 
+     * note is direct child of a chord.
      */
-    Chord* IsChordTone( );
+    int GetDur( );
+    int AlignHorizontally( ArrayPtrVoid params );
     
 private:
     

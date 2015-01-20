@@ -197,9 +197,32 @@ void Note::ResetSlurAttrInitial( )
     }
 }
     
-Chord* Note::IsChordTone( )
+int Note::GetDur( )
 {
-    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    if( chordParent )
+    {
+        return chordParent->GetDur();
+    }
+    else
+    {
+        return m_dur;
+    }
+}
+    
+int Note::AlignHorizontally( ArrayPtrVoid params )
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    if( chordParent )
+    {
+        this->ResetHorizontalAlignment();
+        m_alignment = chordParent->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
+    else
+    {
+        return LayerElement::AlignHorizontally(params);
+    }
 }
 
 } // namespace vrv

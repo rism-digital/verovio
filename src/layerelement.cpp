@@ -359,10 +359,6 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     else if ( this->IsBeam() || this->IsTuplet() || this->IsVerse() || this->IsSyl() ) {
         type = ALIGNMENT_CONTAINER;
     }
-    else if ( this->IsNote() && dynamic_cast<Note*>(this)->IsChordTone() ) {
-        m_alignment = dynamic_cast<Note*>(this)->IsChordTone()->m_alignment;
-        return FUNCTOR_CONTINUE;
-    }
     
     // get the duration of the event
     double duration = this->GetAlignementDuration();
