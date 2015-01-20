@@ -94,6 +94,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
+	$VEROVIO_ROOT/src/chord.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
