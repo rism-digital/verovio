@@ -238,11 +238,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
     Note *note = dynamic_cast<Note*>(element);
-    Chord *chord = note->IsChordTone();
+    Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;
     
-    // Get the immadiate parent of the note
+    // Get the immediate parent of the note
     // to see if beamed or not
     Beam *beam_parent = dynamic_cast<Beam*>(note->GetFirstParent(&typeid(Beam)));
     
@@ -265,12 +265,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	int staffSize = staff->staffSize;
     int y1 = element->GetDrawingY();
-    int x1, x2, y2;
-    int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
+    int x1, x2;//, y2;
+    //int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-	int i, ledge;
+	int ledge;//i, ledge;
 	int verticalCenter = 0;
 
 	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
@@ -307,7 +307,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
 		DrawSmuflCode( dc, x1, y1, fontNo, staff->staffSize, note->m_cueSize );
-		totalFlagStemHeight = y1;
+		//totalFlagStemHeight = y1;
 	}
     // Other values
 	else {
@@ -325,13 +325,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		//if (note->m_chord) { /*** && this == testchord)***/
 		//	ynn_chrd = ynn;
         //}
-		if ((inBeam && drawingDur > DUR_4) || chord) {
+		if ((inBeam && drawingDur > DUR_4) || inChord) {
             // no stem
 		}
         else  {
-            // Set the drawing stem direction
-			if ( note->HasDrawingStemDir() ) {
-                note->m_drawingStemDir = note->GetDrawingStemDir();
+			if ( note->HasStemDir() ) {
+                note->m_drawingStemDir = note->GetStemDir();
             }
             else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
                 note->m_drawingStemDir = layer->GetDrawingStemDir();
@@ -339,72 +338,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             else {
                 note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
             }
-			
-			baseStem = note->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
-			flagStemHeight = note->m_cueSize ?  m_doc->m_drawingHalfInterl[staffSize] :  m_doc->m_drawingInterl[staffSize];
-            nbFlags = drawingDur - DUR_8;
-			totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
-			
-			if (note->m_drawingStemDir == STEMDIRECTION_down) {
-                // flip all lengths
-				baseStem = -baseStem;
-				totalFlagStemHeight = -totalFlagStemHeight;
-				radius = -radius;
-			}
-
-            // If we have flags, add them to the height
-			y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem));
-			x2 = xn + radius;
-            
-            if ((note->m_drawingStemDir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
-                y2 = verticalCenter;
-            }
-            else if ((note->m_drawingStemDir == STEMDIRECTION_down) && (y2 > verticalCenter) ) {
-                y2 = verticalCenter;
-            }
-            
-            // shorten the stem at its connection with the note head
-            int stemY1 = (note->m_drawingStemDir == STEMDIRECTION_up) ? y1 + m_doc->m_drawingHalfInterl[staffSize] / 4 : y1 - m_doc->m_drawingHalfInterl[staffSize] / 4;
-            int stemY2 = y2;
-            if (drawingDur > DUR_4) {
-                // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
-                stemY2 = (note->m_drawingStemDir == STEMDIRECTION_up) ? y2 - m_doc->m_drawingHalfInterl[staffSize] : y2 + m_doc->m_drawingHalfInterl[staffSize];
-            }
-
-            // draw the stems and the flags
-			if (note->m_drawingStemDir == STEMDIRECTION_up) {
-                DrawFullRectangle( dc, x2 - m_doc->m_env.m_stemWidth, stemY1, x2, stemY2);
-                
-                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
-                element->m_drawingStemStart.y = y1;
-                element->m_drawingStemEnd.y = y2;
-                element->m_drawingStemDir = true;
-                
-				if (drawingDur > DUR_4) {
-					DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, note->m_cueSize );
-					for (i=0; i < nbFlags; i++)
-						DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, note->m_cueSize );
-				}
-			}
-			else {
-                DrawFullRectangle( dc, x2, stemY1, x2 + m_doc->m_env.m_stemWidth, stemY2);
-
-                element->m_drawingStemStart.x = element->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
-                element->m_drawingStemStart.y = y1;
-                element->m_drawingStemEnd.y = y2;
-                element->m_drawingStemDir = false;
-                
-				if (drawingDur > DUR_4) {
-					DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->staffSize, note->m_cueSize );
-					for (i=0; i < nbFlags; i++)
-						DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->staffSize,
-									 note->m_cueSize );
-				}
-			}
-            if (note->m_cueSize && note->m_acciaccatura) {
-                DrawAcciaccaturaSlash(dc, element);
-            }
-		}
+            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, y1, xn);
+        }
 
 	}
     
@@ -484,6 +419,84 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	return;
 }
+    
+void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int oppY, int x)
+{
+    int staffSize = staff->staffSize;
+    int staffY = staff->GetDrawingY();
+    int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
+    int drawingDur = dynamic_cast<DurationInterface*>(object)->GetDur();
+    int verticalCenter = staffY - m_doc->m_drawingInterl[staffSize]*2;
+    
+    baseStem = object->m_cueSize ? ( m_doc->m_drawingHalfInterl[staffSize]*5) : ( m_doc->m_drawingHalfInterl[staffSize]*7);
+    flagStemHeight = object->m_cueSize ?  m_doc->m_drawingHalfInterl[staffSize] :  m_doc->m_drawingInterl[staffSize];
+    nbFlags = drawingDur - DUR_8;
+    totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
+    
+    if (dir == STEMDIRECTION_down) {
+        // flip all lengths
+        baseStem = -baseStem;
+        totalFlagStemHeight = -totalFlagStemHeight;
+        radius = -radius;
+    }
+    
+    // If we have flags, add them to the height
+    int y1 = oppY;
+    int y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem));
+    //int x2 = xn + radius;
+    int x2 = x + radius;
+    
+    if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
+        y2 = verticalCenter;
+    }
+    else if ((dir == STEMDIRECTION_down) && (y2 > verticalCenter) ) {
+        y2 = verticalCenter;
+    }
+    
+    // shorten the stem at its connection with the note head
+    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + m_doc->m_drawingHalfInterl[staffSize] / 4 : y1 - m_doc->m_drawingHalfInterl[staffSize] / 4;
+    int stemY2 = y2;
+    if (drawingDur > DUR_4) {
+        // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
+        stemY2 = (dir == STEMDIRECTION_up) ? y2 - m_doc->m_drawingHalfInterl[staffSize] : y2 + m_doc->m_drawingHalfInterl[staffSize];
+    }
+    
+    // draw the stems and the flags
+    if (dir == STEMDIRECTION_up) {
+        DrawFullRectangle( dc, x2 - m_doc->m_env.m_stemWidth, stemY1, x2, stemY2);
+        
+        object->m_drawingStemStart.x = object->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+        object->m_drawingStemStart.y = y1;
+        object->m_drawingStemEnd.y = y2;
+        object->m_drawingStemDir = true;
+        
+        if (drawingDur > DUR_4) {
+            DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, object->m_cueSize );
+            for (int i=0; i < nbFlags; i++)
+                DrawSmuflCode( dc, x2 - m_doc->m_env.m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, object->m_cueSize );
+        }
+    }
+    else {
+        DrawFullRectangle( dc, x2, stemY1, x2 + m_doc->m_env.m_stemWidth, stemY2);
+        
+        object->m_drawingStemStart.x = object->m_drawingStemEnd.x = x2 - (m_doc->m_env.m_stemWidth / 2);
+        object->m_drawingStemStart.y = y1;
+        object->m_drawingStemEnd.y = y2;
+        object->m_drawingStemDir = false;
+        
+        if (drawingDur > DUR_4) {
+            DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->staffSize, object->m_cueSize );
+            for (int i=0; i < nbFlags; i++)
+                DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->staffSize,
+                              object->m_cueSize );
+        }
+    }
+    if (object->m_cueSize && dynamic_cast<Note*>(object)->m_acciaccatura) {
+        DrawAcciaccaturaSlash(dc, object);
+    }
+    
+}
+
 
 
 void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
@@ -977,13 +990,34 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-	int staffSize = staff->staffSize;
+    int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
 	int verticalCenter = staffY - m_doc->m_drawingInterl[staffSize]*2;
     int maxY = verticalCenter;
     int minY = verticalCenter;
     
     Chord* chord = dynamic_cast<Chord*>(element);
+    bool inBeam = false;
+    // Get the immadiate parent of the note
+    // to see if beamed or not
+    Beam *beam_parent = dynamic_cast<Beam*>(chord->GetFirstParent(&typeid(Beam)));
+    
+    // This note is beamed and cue sized
+    if (beam_parent != NULL) {
+        if (chord->m_cueSize == true) {
+            // Get the Parent of the parent
+            // we want to see if we are in a group of
+            // beamed cue notes
+            if (beam_parent->GetListIndex(chord) > -1) {
+                inBeam = true;
+            }
+            
+        }
+        else {
+            // the note is just in a beam
+            inBeam = true;
+        }
+    }
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
@@ -996,6 +1030,13 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     chord->SetStemDir( (maxY - verticalCenter >= verticalCenter - minY) ? STEMDIRECTION_down : STEMDIRECTION_up );
+    if(inBeam && chord->GetDur() > DUR_4)
+    {
+        //no stem
+    }
+    int oppY = chord->GetStemDir() ? maxY : minY;
+    int radius = maxY - minY;
+    //DrawStem(dc, chord, staff, chord->GetStemDir(), radius, oppY, chord->GetDrawingX() - radius);
 }
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

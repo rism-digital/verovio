@@ -1395,6 +1395,11 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     vrvChord->ReadCommon(chord);
     vrvChord->ReadStemmed(chord);
     
+    
+    if ( chord.attribute( "grace" ) ) {
+		vrvChord->m_cueSize = true;
+	}
+    
     AddLayerElement(parent, vrvChord);
     bool success = ReadMeiLayerChildren(vrvChord, chord);
     
