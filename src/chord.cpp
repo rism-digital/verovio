@@ -65,14 +65,12 @@ void Chord::FilterList()
             // remove anything that has not a DurationInterface
             iter = m_list.erase( iter );
         } else {
-            // Drop notes that are signaled as grace notes
             Note *n = dynamic_cast<Note*>(currentElement);
             
             if (n) {
                 iter++;
-                
             } else {
-                // if it is a Rest, do not drop
+                // if it is not a note, drop it
                 iter = m_list.erase( iter );
             }
         }

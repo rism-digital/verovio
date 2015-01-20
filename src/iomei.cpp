@@ -1397,18 +1397,6 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     
     AddLayerElement(parent, vrvChord);
     bool success = ReadMeiLayerChildren(vrvChord, chord);
-
-    std::cout << "Chord has " << (int)vrvChord->m_list.size() << " or " << (int)vrvChord->m_children.size() << " children." << std::endl;
-    
-    int dur = dynamic_cast<DurationInterface*>(vrvChord)->GetDur();
-    std::cout << "dur in " << dur << std::endl;
-    int len = (int)vrvChord->m_children.size();
-    for(int x = 0; x < len; x++)
-    {
-        dynamic_cast<DurationInterface*>(vrvChord->m_children.at(x))->SetDur(dur);
-        std::cout << dynamic_cast<PitchInterface*>(vrvChord->m_children.at(x))->GetPname() << " (" << dynamic_cast<DurationInterface*>(vrvChord->m_children.at(x))->GetDur() << ")";
-    }
-    std::cout << std::endl;
     
     return success;
 }

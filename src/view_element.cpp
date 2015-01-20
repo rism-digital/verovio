@@ -277,8 +277,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	//static int ynn_chrd;
 
 	//val=note->m_dur;
-	drawingDur = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
-
+    Chord* chordParent = note->IsChordTone();
+    if ( chordParent ) {
+        note->SetDur(chordParent->GetDur());
+    }
+    
+    drawingDur = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
+    
 	int radius = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
 
     if (note->GetDur() > DUR_1 || (note->GetDur() == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.

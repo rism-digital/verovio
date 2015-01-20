@@ -1047,8 +1047,11 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsChord() ) {
-        return FUNCTOR_CONTINUE;
+    if ( current->IsNote() ) {
+        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), 1));
+        if( chordParent ) {
+            return FUNCTOR_CONTINUE;
+        }
     }
     
     if ( current->IsTie() ) {

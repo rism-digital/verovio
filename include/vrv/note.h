@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
@@ -95,6 +96,11 @@ public:
     void ResetSlurAttrInitial();
     void ResetSlurAttrTerminal() { m_slurAttrTerminal = NULL; };
     ///@}
+    
+    /**
+     * Returns chord parent if it's a chord tone.
+     */
+    Chord* IsChordTone( );
     
 private:
     

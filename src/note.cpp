@@ -196,5 +196,10 @@ void Note::ResetSlurAttrInitial( )
         m_tieAttrInitial = NULL;
     }
 }
+    
+Chord* Note::IsChordTone( )
+{
+    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+}
 
 } // namespace vrv
