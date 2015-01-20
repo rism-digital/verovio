@@ -980,14 +980,8 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    std::cout << std::endl << "NOTES FOLLOW" << std::endl;
     Chord* chord = dynamic_cast<Chord*>(element);
-    
-    std::cout << "Chord has " << (int)chord->m_list.size() << " or " << (int)chord->m_children.size() << " children." << std::endl;
-    
     DrawLayerChildren(dc, chord, layer, staff, measure);
-
-    std::cout << "NOTES END." << std::endl << std::endl;
 }
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

@@ -25,7 +25,7 @@ namespace vrv {
 Chord::Chord( ):
 LayerElement("chord-"), DrawingListInterface(), ObjectListInterface(),    DurationInterface(),
     AttCommon(),
-    AttStemmed(),
+    AttStemmed()
 {
     Reset();
 }
