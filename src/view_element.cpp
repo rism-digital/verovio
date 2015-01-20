@@ -69,14 +69,8 @@ void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, 
     // With Transcription documents, we use the m_xAbs
     if ( element->m_xAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
-        if ( element->IsNote() && dynamic_cast<Note*>(element)->IsChordTone() ) {
-            element->SetDrawingX( dynamic_cast<Note*>(element)->IsChordTone()->GetXRel() + measure->GetDrawingX() );
-            element->SetDrawingY( staff->GetDrawingY() );
-        }
-        else {
-            element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
-            element->SetDrawingY( staff->GetDrawingY() );
-        }
+        element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
+        element->SetDrawingY( staff->GetDrawingY() );
     }
     else
     {
@@ -338,7 +332,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             else {
                 note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
             }
-            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, y1, xn);
+            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xn, y1);
         }
 
 	}
@@ -420,7 +414,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	return;
 }
     
-void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int oppY, int x)
+void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
@@ -438,13 +432,14 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
         baseStem = -baseStem;
         totalFlagStemHeight = -totalFlagStemHeight;
         radius = -radius;
+        heightY = -heightY;
     }
     
     // If we have flags, add them to the height
-    int y1 = oppY;
-    int y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem));
+    int y1 = originY;
+    int y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
     //int x2 = xn + radius;
-    int x2 = x + radius;
+    int x2 = xn + radius;
     
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
         y2 = verticalCenter;
@@ -1034,9 +1029,23 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     {
         //no stem
     }
-    int oppY = chord->GetStemDir() ? maxY : minY;
-    int radius = maxY - minY;
-    //DrawStem(dc, chord, staff, chord->GetStemDir(), radius, oppY, chord->GetDrawingX() - radius);
+    else {
+        int originY;
+        if (maxY - verticalCenter >= verticalCenter - minY) {
+            chord->SetStemDir( STEMDIRECTION_down );
+            originY = maxY;
+        }
+        else {
+            chord->SetStemDir( STEMDIRECTION_up );
+            originY = minY;
+        }
+        
+        int heightY = maxY - minY;
+        int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
+        int beamX = chord->GetDrawingX();
+        
+        DrawStem(dc, chord, staff, chord->GetStemDir(), radius, beamX, originY, heightY);
+    }
 }
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

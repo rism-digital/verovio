@@ -241,7 +241,7 @@ protected:
     void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int oppY, int x);
+    void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
     void DrawSylConnector( DeviceContext *dc, Syl *syl, System *system );
     void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
