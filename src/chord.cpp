@@ -80,9 +80,4 @@ void Chord::FilterList()
     }
 }
     
-void Chord::CalculateStemDirection()
-{
-    
-}
-    
 }

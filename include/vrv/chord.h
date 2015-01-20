@@ -53,8 +53,6 @@ public:
     void AddElement(LayerElement *element);
 
     void FilterList();
-    
-    void CalculateStemDirection();
 
     ///@}
 };

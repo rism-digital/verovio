@@ -238,6 +238,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
     Note *note = dynamic_cast<Note*>(element);
+    Chord *chord = note->IsChordTone();
     
     bool inBeam = false;
     
@@ -324,7 +325,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		//if (note->m_chord) { /*** && this == testchord)***/
 		//	ynn_chrd = ynn;
         //}
-		if (inBeam && drawingDur > DUR_4) {
+		if ((inBeam && drawingDur > DUR_4) || chord) {
             // no stem
 		}
         else  {
@@ -976,11 +977,25 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+	int staffSize = staff->staffSize;
+    int staffY = staff->GetDrawingY();
+	int verticalCenter = staffY - m_doc->m_drawingInterl[staffSize]*2;
+    int maxY = verticalCenter;
+    int minY = verticalCenter;
+    
     Chord* chord = dynamic_cast<Chord*>(element);
     
-    chord->CalculateStemDirection();
-    
     DrawLayerChildren(dc, chord, layer, staff, measure);
+    
+    for (int i = 0; i < (int)chord->m_children.size(); i++)
+    {
+        Note *note = dynamic_cast<Note*>(chord->m_children[i]);
+        int y1 = note->GetDrawingY();
+        if (y1 > maxY) maxY = y1;
+        else if (y1 < minY) minY = y1;
+    }
+    
+    chord->SetStemDir( (maxY - verticalCenter >= verticalCenter - minY) ? STEMDIRECTION_down : STEMDIRECTION_up );
 }
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
