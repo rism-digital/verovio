@@ -197,9 +197,9 @@ void Note::ResetSlurAttrInitial( )
     }
 }
     
-int Note::GetDur( )
+int Note::GetDrawingDur( )
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
     if( chordParent )
     {
         return chordParent->GetDur();
@@ -210,19 +210,31 @@ int Note::GetDur( )
     }
 }
     
-int Note::AlignHorizontally( ArrayPtrVoid params )
+bool Note::HasDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
     if( chordParent )
     {
-        this->ResetHorizontalAlignment();
-        m_alignment = chordParent->GetAlignment();
-        return FUNCTOR_CONTINUE;
+        return chordParent->HasStemDir();
     }
     else
     {
-        return LayerElement::AlignHorizontally(params);
+        return AttStemmed::HasStemDir();
     }
+}
+    
+data_STEMDIRECTION Note::GetDrawingStemDir()
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    if( chordParent )
+    {
+        return chordParent->GetStemDir();
+    }
+    else
+    {
+        return AttStemmed::GetStemDir();
+    }
+    
 }
 
 } // namespace vrv

@@ -314,6 +314,14 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
     
+    
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    if( chordParent )
+    {
+        m_alignment = chordParent->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
+    
     AlignmentType type = ALIGNMENT_DEFAULT;
     if ( this->IsBarline() ) {
         type = ALIGNMENT_BARLINE;

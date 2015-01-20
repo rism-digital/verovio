@@ -278,11 +278,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 	//val=note->m_dur;
     
-    drawingDur = ((note->GetColored()==BOOLEAN_true) && note->GetDur() > DUR_1) ? (note->GetDur()+1) : note->GetDur();
+    drawingDur = note->GetDrawingDur();
+    drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
     
 	int radius = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
 
-    if (note->GetDur() > DUR_1 || (note->GetDur() == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
+    if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
 		ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 	
     }
@@ -295,11 +296,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     xl = xn;
 
     // Long, breve and ligatures
-	if (note->GetDur() == DUR_LG || note->GetDur() == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && note->GetDur() == DUR_1)) {
+	if (drawingDur == DUR_LG || drawingDur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && drawingDur == DUR_1)) {
 		DrawLigature ( dc, y1, element, layer, staff);
  	}
     // Whole notes
-	else if (note->GetDur()==DUR_1) {
+	else if (drawingDur == DUR_1) {
         if (note->GetColored()==BOOLEAN_true)
 			fontNo = SMUFL_E0FA_noteheadWholeFilled;
 		else
@@ -329,8 +330,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		}
         else  {
             // Set the drawing stem direction
-			if ( note->HasStemDir() ) {
-                note->m_drawingStemDir = note->GetStemDir();
+			if ( note->HasDrawingStemDir() ) {
+                note->m_drawingStemDir = note->GetDrawingStemDir();
             }
             else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
                 note->m_drawingStemDir = layer->GetDrawingStemDir();
@@ -977,6 +978,8 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     Chord* chord = dynamic_cast<Chord*>(element);
+    
+    //TODO: code here to set chord stem direction, note will automatically pick it up
     DrawLayerChildren(dc, chord, layer, staff, measure);
 }
 

@@ -110,6 +110,9 @@ enum EditorMode {
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
     
+/** Define the maximum levels between a beam and its notes **/
+#define MAX_CHORD_DEPTH -1
+    
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1
     
