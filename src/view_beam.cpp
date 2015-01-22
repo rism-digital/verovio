@@ -52,13 +52,15 @@ void traiteQueue (int *hautqueue, Element *chk)
 #define MAX_MIF 20	/* nombre max de sous-groupes de beams */
 
 
-static struct coord {  float x;
-			float y;
-    float yHeight;
-			unsigned vlr: 8;	/* valeur */
-			unsigned prov: 8;	/* ON si portee sup. */
-            LayerElement *chk;
-	     } 	crd[NbREL]; /* garde les coord.d'entree*/
+static struct coord {
+    float x;
+    float y; //used if representing a note
+    float yMax; //used if representing a chord
+    float yMin; //used if representing a chord
+    unsigned vlr: 8;	/* valeur */
+    unsigned prov: 8;	/* ON si portee sup. */
+    LayerElement *chk;
+ } 	crd[NbREL]; /* garde les coord.d'entree*/
 
 /**
  * This structure is used for calculating the beam internally.
@@ -105,7 +107,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	int cpte_stop;	/* compteur de st_rl */
 	unsigned st_rl[NbFRACTURES];	/* garde les ruptures de beams */
 	int _yy[2];		/* garde dernier yy pour test mrq_port*/
-	static int _ybeam[NbREL];	/* garde les sommets de queues  */
+	static int _ybeam[NbREL];	/* garde les sommets de queues  */ //height of tails
 	int shortest, valref;	/* garde valeur la plus breve
 				* m_dur. de reference */
 	double high;
@@ -257,6 +259,9 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	}
     ***/
     
+    
+    //Determine flag direction:
+    
     yExtremes yVals;
     int curY;
     
@@ -295,10 +300,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         if (dynamic_cast<Chord*>((crd+i)->chk))
         {
             yVals = dynamic_cast<Chord*>((crd+i)->chk)->GetYExtremes(milieuPortee);
-            (crd+ct)->yHeight = yVals.yMax - yVals.yMin;
+            (crd+i)->yMax = yVals.yMax;
+            (crd+i)->yMin = yVals.yMin;
             
-            (crd+i)->y = yVals.yMin;
-            y_moy += (crd+i)->y + ((crd+i)->yHeight / 2);
+            y_moy += (crd+i)->y + ((yVals.yMax - yVals.yMin) / 2);
             
             if (abs(yVals.yMax - milieuPortee) > abs(yExtreme - milieuPortee)) yExtreme = yVals.yMax;
             if (abs(yVals.yMin - milieuPortee) > abs(yExtreme - milieuPortee)) yExtreme = yVals.yMin;
@@ -420,25 +425,30 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 		ecart = (fb.dir == STEMDIRECTION_up ? ecart : -ecart);
 
 		y_moy += ecart;
-        if ((fb.dir == STEMDIRECTION_up && y_moy <  milieuPortee) || (fb.dir == STEMDIRECTION_down && y_moy > milieuPortee)) {
-			ecart += milieuPortee-y_moy;
+        if ((fb.dir == STEMDIRECTION_up && y_moy < milieuPortee) || (fb.dir == STEMDIRECTION_down && y_moy > milieuPortee)) {
+			ecart += milieuPortee - y_moy;
         }
 
 		for (i=0; i<ct; i++)
 		{
-            *(_ybeam+i) = crd[i].y + ecart;
-			(crd+i)->x +=  dx[crd[i].chk->m_cueSize];
+            //change the stem dir for all objects
+            if ( crd[i].chk->IsNote() ) {
+                ((Note*)crd[i].chk)->m_drawingStemDir = fb.dir;
+                *(_ybeam+i) = crd[i].y + ecart;
+            }
+            
+            else if ( crd[i].chk->IsChord() ) {
+                ((Chord*)crd[i].chk)->m_drawingStemDir = fb.dir;
+                *(_ybeam+i) = (fb.dir == STEMDIRECTION_down ? crd[i].yMin : crd[i].yMax) + ecart;
+            }
+            
+            (crd+i)->x +=  dx[crd[i].chk->m_cueSize];
+            
 			s_y += _ybeam[i];
  			s_y2 += _ybeam[i] * _ybeam[i];
 			s_x += crd[i].x;
 			s_x2 += crd[i].x * crd[i].x;
 			s_xy += crd[i].x * _ybeam[i];
-            if ( crd[i].chk->IsNote() ) {
-                ((Note*)crd[i].chk)->m_drawingStemDir = fb.dir;
-            }
-            else if ( crd[i].chk->IsChord() ) {
-                ((Chord*)crd[i].chk)->m_drawingStemDir = fb.dir;
-            }
 		}
 
 	}
@@ -455,8 +465,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	if (fabs(dB) > m_doc->m_drawingBeamMaxSlope ) dB = (dB>0) ? m_doc->m_drawingBeamMaxSlope : - m_doc->m_drawingBeamMaxSlope;
 	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
 
-if (fPente)
-	dB += fPente;
+    if (fPente)
+        dB += fPente;
 
 	dA = (s_y - dB * s_x) / ct;
 
