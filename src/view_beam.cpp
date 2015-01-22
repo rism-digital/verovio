@@ -54,7 +54,7 @@ void traiteQueue (int *hautqueue, Element *chk)
 
 static struct coord {
     float x;
-    float y; //used if representing a note
+    float y; //represents the point farthest from the beam
     float yMax; //used if representing a chord
     float yMin; //used if representing a chord
     unsigned vlr: 8;	/* valeur */
@@ -333,7 +333,20 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	{
         if (fb.hasChord)
         {
-            fb.dir = (yExtreme > milieuPortee) ? STEMDIRECTION_down : STEMDIRECTION_up;
+            if (yExtreme > milieuPortee) {
+                fb.dir = STEMDIRECTION_down;
+                for (i = 0; i < ct; i++)
+                {
+                    crd[i].y = crd[i].yMax;
+                }
+            }
+            else {
+                fb.dir = STEMDIRECTION_up;
+                for (i = 0; i < ct; i++)
+                {
+                    crd[i].y = crd[i].yMin;
+                }
+            }
         }
         
 		y_moy /= ct;
