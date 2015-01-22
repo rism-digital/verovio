@@ -146,7 +146,8 @@ void Doc::PrepareDrawing()
                 paramsLyrics.clear();
                 paramsLyrics.push_back( &currentSyl );
                 Functor fillStaffCurrentLyrics( &Object::FillStaffCurrentLyrics );
-                this->Process( &fillStaffCurrentLyrics, paramsLyrics, NULL, &filters );
+                Functor fillStaffCurrentLyricsEnd( &Object::FillStaffCurrentLyricsEnd );
+                this->Process( &fillStaffCurrentLyrics, paramsLyrics, &fillStaffCurrentLyricsEnd, &filters );
             }
         }
     }

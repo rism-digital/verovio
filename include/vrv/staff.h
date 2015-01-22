@@ -90,6 +90,13 @@ public:
      */
     virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
     
+    /**
+     * Functor for setting running lyrics in staves
+     * This is necessary for <syl> that starts in one measure and ends in another one
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     */
+    virtual int FillStaffCurrentLyricsEnd( ArrayPtrVoid params );
+    
 public:
 	/**
      * Number of lines copied from the staffDef for fast access when drawing
