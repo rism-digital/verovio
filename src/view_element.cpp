@@ -988,8 +988,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
 	int verticalCenter = staffY - m_doc->m_drawingInterl[staffSize]*2;
-    int maxY = verticalCenter;
-    int minY = verticalCenter;
     
     Chord* chord = dynamic_cast<Chord*>(element);
     bool inBeam = false;
@@ -1016,16 +1014,14 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
-    for (int i = 0; i < (int)chord->m_children.size(); i++)
-    {
-        Note *note = dynamic_cast<Note*>(chord->m_children[i]);
-        int y1 = note->GetDrawingY();
-        if (y1 > maxY) maxY = y1;
-        else if (y1 < minY) minY = y1;
-    }
+    yExtremes yVals = chord->GetYExtremes(verticalCenter);
+    int maxY = yVals.yMax, minY = yVals.yMin;
     
+    int drawingDur = chord->GetDur();
+    drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     chord->SetStemDir( (maxY - verticalCenter >= verticalCenter - minY) ? STEMDIRECTION_down : STEMDIRECTION_up );
-    if(inBeam && chord->GetDur() > DUR_4)
+    
+    if(inBeam && drawingDur > DUR_4)
     {
         //no stem
     }
@@ -1039,6 +1035,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             chord->SetStemDir( STEMDIRECTION_up );
             originY = minY;
         }
+        
+        chord->m_drawingStemDir = chord->GetStemDir();
         
         int heightY = maxY - minY;
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];

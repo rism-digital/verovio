@@ -32,9 +32,15 @@ namespace vrv {
  * A chord is contained in a layer.
  * It contains notes.
  */
+struct yExtremes {
+    float yMin;
+    float yMax;
+};
+    
 class Chord: public LayerElement, public DrawingListInterface, public ObjectListInterface, public DurationInterface,
     public AttCommon,
-    public AttStemmed
+    public AttStemmed,
+    public AttColoration
 {
 public:
     /**
@@ -53,6 +59,8 @@ public:
     void AddElement(LayerElement *element);
 
     void FilterList();
+    
+    yExtremes GetYExtremes(float initial);
 
     ///@}
 };
