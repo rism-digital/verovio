@@ -52,8 +52,9 @@ void traiteQueue (int *hautqueue, Element *chk)
 #define MAX_MIF 20	/* nombre max de sous-groupes de beams */
 
 
-static struct coord {  float a;
-			float b;
+static struct coord {  float x;
+			float y;
+    float yHeight;
 			unsigned vlr: 8;	/* valeur */
 			unsigned prov: 8;	/* ON si portee sup. */
             LayerElement *chk;
@@ -191,7 +192,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 				fb.mrq_port = chk->_shport;
             }***/
 
-            (crd+ct)->a = chk->GetDrawingX(); // - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
+            (crd+ct)->x = chk->GetDrawingX(); // - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
 			(crd+ct)->vlr = k;
 			if (chk->IsNote() && ((Note*)chk)->GetBreaksec() && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
@@ -256,11 +257,14 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	}
     ***/
     
+    yExtremes yVals;
+    int curY;
+    
 	for (i = 0; i < ct; i++)
 	{	switch (fb.mrq_port)
 		{
             case 0: crd[i].prov = OFF;
-					(crd+i)->b = crd[i].chk->GetDrawingY();
+					(crd+i)->y = crd[i].chk->GetDrawingY();
 					break;
             /**
 			case 1: if (crd[i].chk->m_staffShift)
@@ -282,13 +286,31 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 					}
              **/
 		}
-		high= std::max((double)(crd+i)->b,high);		/* enregistrement des extremes */
-		low = std::min((double)(crd+i)->b,low);
+		high= std::max((double)(crd+i)->y,high);		/* enregistrement des extremes */
+		low = std::min((double)(crd+i)->y,low);
         /* lie au choix, plus bas, d'introduire l'accelerateur pour sy_up...
         if ((crd+i)->b==high) highIndice = i;
         if ((crd+i)->b==low) lowIndice = i;
         */
-		y_moy += crd[i].b;
+        if (dynamic_cast<Chord*>((crd+i)->chk))
+        {
+            yVals = dynamic_cast<Chord*>((crd+i)->chk)->GetYExtremes(milieuPortee);
+            (crd+ct)->yHeight = yVals.yMax - yVals.yMin;
+            
+            (crd+i)->y = yVals.yMin;
+            y_moy += (crd+i)->y + ((crd+i)->yHeight / 2);
+            
+            if (abs(yVals.yMax - milieuPortee) > abs(yExtreme - milieuPortee)) yExtreme = yVals.yMax;
+            if (abs(yVals.yMin - milieuPortee) > abs(yExtreme - milieuPortee)) yExtreme = yVals.yMin;
+        }
+        else
+        {
+            (crd+i)->y = crd[i].chk->GetDrawingY();
+            curY = (crd+i)->y;
+            if (yExtreme >= milieuPortee && curY > yExtreme) yExtreme = curY;
+            if (yExtreme <= milieuPortee && curY < yExtreme) yExtreme = curY;
+            y_moy += (crd+i)->y;
+        }
 	}
     /***
 	if (provshp)
@@ -303,9 +325,14 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
 	fb.dir = layer->GetDrawingStemDir();
 	if (!fb.mrq_port)
-	{	
-        milieuPortee = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
+	{
+        if (fb.hasChord)
+        {
+            fb.dir = (yExtreme > milieuPortee) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        }
+        
 		y_moy /= ct;
+        
         if (fb.dir == STEMDIRECTION_NONE) {
             if ( y_moy <  milieuPortee ) fb.dir = STEMDIRECTION_up;
             else fb.dir = STEMDIRECTION_down;
@@ -399,13 +426,13 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
 		for (i=0; i<ct; i++)
 		{
-            *(_ybeam+i) = crd[i].b + ecart;
-			(crd+i)->a +=  dx[crd[i].chk->m_cueSize];
+            *(_ybeam+i) = crd[i].y + ecart;
+			(crd+i)->x +=  dx[crd[i].chk->m_cueSize];
 			s_y += _ybeam[i];
  			s_y2 += _ybeam[i] * _ybeam[i];
-			s_x += crd[i].a;
-			s_x2 += crd[i].a * crd[i].a;
-			s_xy += crd[i].a * _ybeam[i];
+			s_x += crd[i].x;
+			s_x2 += crd[i].x * crd[i].x;
+			s_xy += crd[i].x * _ybeam[i];
             if ( crd[i].chk->IsNote() ) {
                 ((Note*)crd[i].chk)->m_drawingStemDir = fb.dir;
             }
@@ -468,7 +495,7 @@ if (fPente)
 	/* calcul du ybeam des queues */
 	for ( i=0; i<ct; i++ )
 	{	xr = *(_ybeam+i);	/* xr, variable de travail */
-		*(_ybeam+i)= dA + sy_up + dB * crd[i].a;
+		*(_ybeam+i)= dA + sy_up + dB * crd[i].x;
 		if (fb.fl_cond)
 			*(_ybeam+i) += sy_dec [crd[i].prov];
 		
@@ -492,26 +519,26 @@ if (fPente)
 		if (fb.fl_cond)	/* esth: eviter que queues depassent barres */
 		{	if (crd[i].prov)	/* venant du haut, m_stemDir en bas */
 			{	/***fy1 = *(_ybeam+i)+v_pnt;***/	/* on raccourcit m_stemDir */
-				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+				fy2 = crd[i].y-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
 			}
 			else
 			{	/***fy1 = *(_ybeam+i)-e_t->v_pnt;***/	/* on allonge m_stemDir */
-				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+				fy2 = crd[i].y+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
 			}
 		}
 		else	// on tient compte de l'‚paisseur qui fait des "bosses"
 		{	if (fb.dir == STEMDIRECTION_up)	// m_stemDir en haut
 			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
-                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
+				fy2 = crd[i].y+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].x;
                 crd[i].chk->m_drawingStemStart.y = fy2;
                 crd[i].chk->m_drawingStemEnd.y = fy1;
                 crd[i].chk->m_drawingStemDir = true;
 			}
 			else
 			{	fy1 = *(_ybeam+i) + m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
-                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
+				fy2 = crd[i].y-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].x;
                 crd[i].chk->m_drawingStemStart.y = fy2;
                 crd[i].chk->m_drawingStemEnd.y = fy1;
                 crd[i].chk->m_drawingStemDir = false;
@@ -519,7 +546,7 @@ if (fPente)
 		}
 		if ((crd+i)->chk->IsNote() || (crd+i)->chk->IsChord())
 		{	
-            DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
+            DrawVerticalLine (dc,fy2, fy1, crd[i].x, m_doc->m_env.m_stemWidth);
             
 // ICI, bon endroit pour enfiler les STACCATOS - ne sont traités ici que ceux qui sont opposés à la tête (les autres, in wgnote.cpp)
 			//if (((Note*)(crd+i)->chk)->m_artic
@@ -551,8 +578,8 @@ if (fPente)
 
     // NOUVEAU
     // Correction des positions x extremes en fonction de l'‚paisseur des queues
-	(*crd).a -= (m_doc->m_env.m_stemWidth-1) / 3;
-	(crd+_ct)->a += (m_doc->m_env.m_stemWidth-1) / 3;
+	(*crd).x -= (m_doc->m_env.m_stemWidth-1) / 3;
+	(crd+_ct)->x += (m_doc->m_env.m_stemWidth-1) / 3;
 
 	delt_y = (fb.dir == STEMDIRECTION_down || fb.fl_cond ) ? 1.0 : -1.0;
 	/* on choisit une direction pour faire le premier paquet horizontal */
@@ -569,7 +596,8 @@ if (fPente)
 		if (!crd[_ct].prov) fy2 -= sy_dec_moy;
 	}
 
-	fx1 = (*crd).a; fx2 = (crd+_ct)->a;
+	fx1 = (*crd).x;
+    fx2 = (crd+_ct)->x;
 
 
 	/* dessin des barres supplementaires jusqu'a concurrence de la valeur
@@ -652,10 +680,10 @@ if (fPente)
                     {
                         /*place marqueurs pour m_dur.egales/superieures
                          * a valtest en cours */
-                        mx_f[_mif] = crd[j].a; 
+                        mx_f[_mif] = crd[j].x;
                         my_f[_mif] = *(_ybeam+j);
                         if(!mx_i[_mif])
-                        {	mx_i[_mif] = crd[j].a;
+                        {	mx_i[_mif] = crd[j].x;
                             my_i[_mif] = *(_ybeam+j);
                             if (!_mif) apax = j;
                             if (!crd[j].prov)
@@ -697,7 +725,7 @@ if (fPente)
                      * max MAX_MIF n'est pas depasse */
                     if (mx_i[k] == mx_f[k])		/* une seule position concernee */
                     {
-                        if (apax == t && k==0 && mx_i[k] != crd[_ct].a)	/* au debut du paquet */
+                        if (apax == t && k==0 && mx_i[k] != crd[_ct].x)	/* au debut du paquet */
                         {	fy1 = my_i[k] + barre_y;
                             mx_f[k] = mx_i[k] + m_doc->m_drawingLedgerLine[staff->staffSize][0];
                             fy2 = dA + sy_up + barre_y + dB * mx_f[k];
