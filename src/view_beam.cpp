@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <math.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -88,7 +89,14 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 		unsigned flsht    : 3;	/* garde le pnt->_shport */
 		unsigned _grp	  : 1;	/* marqueur de groupes rythmiques */ // unused in Verovio
         data_STEMDIRECTION dir	  : 3;	/* marqueur direction queues */
+        bool hasChord;
 	}	fb;
+	fb.mq_val = OFF;
+    fb.hasChord = OFF;
+    
+    float milieuPortee = staff->GetDrawingY() - (m_doc->m_drawingInterl[staff->staffSize] * 2); //center point of the staff
+    float yExtreme = milieuPortee; //value of farthest y point on the staff from milieuPortee minus milieuPortee; used if fb.hasChord = ON
+    
 	int iHauteur=0;
 	float fPente = 0.0;
 	int ct;			/* compteur d'entree */
@@ -111,7 +119,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	int mx_i[MAX_MIF], mx_f[MAX_MIF], my_i[MAX_MIF], my_f[MAX_MIF];
 	char m_i[MAX_MIF];	/* pour stocker les prov des marqueurs */
 	int fx1,fx2,fy1,fy2;		/* coord. */
-	float milieu;
 
 	int i, j, t, h, k, si;		/* compteurs de boucles */
 	int _mif, decalage;
@@ -132,7 +139,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     //	bch.markchrd = shortest = fb.mq_val = valref = ct = cpte_stop = fb.mrq_port = OFF;
 	bch.markchrd = 0;
 	shortest = 0;
-	fb.mq_val = 0;
 	valref = ct = cpte_stop = 0;
 	fb.mrq_port = OFF;
 	high = y_moy = sy_up = sy_dec_moy = 0.0;
@@ -170,6 +176,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         if ( chk->IsNote() ) {
             k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->GetDur()+1 : ((Note*)chk)->GetDur();
         }
+        else if ( chk->IsChord() ) {
+            fb.hasChord = true;
+            k = ((Chord*)chk)->GetColored()==BOOLEAN_true ? ((Chord*)chk)->GetDur()+1 : ((Chord*)chk)->GetDur();
+        }
 
         // if (chk->type == NOTE && /*chk->sil == _NOT &&*/ k > DUR_4)
 		if (k > DUR_4)
@@ -186,12 +196,14 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 			if (chk->IsNote() && ((Note*)chk)->GetBreaksec() && ct)
                 /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
 				*(st_rl + (cpte_stop++)) = ct;
-
+            else if (chk->IsChord() && ((Chord*)chk)->GetBreaksec() && ct)
+				*(st_rl + (cpte_stop++)) = ct;
+            
 			/***if (extern_q_auto && chk->chord)
 			{	bch.markchrd=ON;
 				fb.flsht = fb.flsht ? fb.flsht : chk->_shport;
 			}***/
-            if (chk->IsNote())	// Žviter de prendre en compte silences
+            if (chk->IsNote() || chk->IsChord())	// Žviter de prendre en compte silences
             {
                 shortest = std::max(k,shortest);
                 if (!fb.mq_val && k != valref) fb.mq_val = ON; /* plus d'une valeur est presente*/
@@ -292,10 +304,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	fb.dir = layer->GetDrawingStemDir();
 	if (!fb.mrq_port)
 	{	
-        milieu = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
+        milieuPortee = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
 		y_moy /= ct;
         if (fb.dir == STEMDIRECTION_NONE) {
-            if ( y_moy <  milieu ) fb.dir = STEMDIRECTION_up;
+            if ( y_moy <  milieuPortee ) fb.dir = STEMDIRECTION_up;
             else fb.dir = STEMDIRECTION_down;
         }
 	}
@@ -381,8 +393,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 		ecart = (fb.dir == STEMDIRECTION_up ? ecart : -ecart);
 
 		y_moy += ecart;
-        if ((fb.dir == STEMDIRECTION_up && y_moy <  milieu) || (fb.dir == STEMDIRECTION_down && y_moy > milieu)) {
-			ecart += milieu-y_moy;
+        if ((fb.dir == STEMDIRECTION_up && y_moy <  milieuPortee) || (fb.dir == STEMDIRECTION_down && y_moy > milieuPortee)) {
+			ecart += milieuPortee-y_moy;
         }
 
 		for (i=0; i<ct; i++)
@@ -396,6 +408,9 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 			s_xy += crd[i].a * _ybeam[i];
             if ( crd[i].chk->IsNote() ) {
                 ((Note*)crd[i].chk)->m_drawingStemDir = fb.dir;
+            }
+            else if ( crd[i].chk->IsChord() ) {
+                ((Chord*)crd[i].chk)->m_drawingStemDir = fb.dir;
             }
 		}
 
@@ -502,7 +517,7 @@ if (fPente)
                 crd[i].chk->m_drawingStemDir = false;
 			}
 		}
-		if ((crd+i)->chk->IsNote())
+		if ((crd+i)->chk->IsNote() || (crd+i)->chk->IsChord())
 		{	
             DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
             
