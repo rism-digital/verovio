@@ -150,9 +150,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 			beamElementCoord[elementCount].dur = currentDur;
             
             // Look at beam breaks
-            beamElementCoord[elementCount].breaksec = -1;
+            beamElementCoord[elementCount].breaksec = 0;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary*>(current);
             if ( elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
+                if (!changingDur) changingDur = ON;
                 beamElementCoord[elementCount].breaksec = beamsecondary->GetBreaksec();
             }
             
@@ -435,18 +436,20 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
         // loop
         while (testDur <= shortestDur) {
+            // true at the beginning of a beam or after a breakSec
             bool start = true;
             
             // all but the last one
             for (i = 0; i < elementCount - 1; i++) {
+                bool breakSec = ((beamElementCoord[i].breaksec) && (testDur - DUR_8 >= beamElementCoord[i].breaksec));
                 beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
                 // partial is needed
                 if (beamElementCoord[i].dur >= (char)testDur) {
-                    // and for the next one too - through
-                    if (beamElementCoord[i+1].dur >= (char)testDur) {
+                    // and for the next one too, but no break - through
+                    if ((beamElementCoord[i+1].dur >= (char)testDur) && !breakSec) {
                         beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_THROUGH;
                     }
-                    // not for the next one
+                    // not needed for the next one or break
                     else {
                         // we are starting a beam or after a beam break - put it right
                         if (start) {
@@ -459,7 +462,12 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
                     }
                 }
                 // not we are in a group
-                start = false;
+                if (breakSec) {
+                    start = true;
+                }
+                else {
+                    start = false;
+                }
             }
             // last one
             beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
