@@ -419,8 +419,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	pilotee par l'indice de l'array; elle dessine horizontalement les barres 
 	de chaque sous-groupe en suivant les marqueurs */
 
-    if (changingDur)
-    {
+    if (changingDur) {
         testDur = DUR_8 + fullBars;
         barY = beamWidth;
 
