@@ -855,8 +855,8 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	{
 		if (note->GetColored()!=BOOLEAN_true)
 		{				//	double base des carrees
-			DrawObliqueLine ( dc, x1,  y1,  x2,  y1, -epaisseur );
-			DrawObliqueLine ( dc, x1,  y2,  x2,  y2, epaisseur );
+			DrawObliquePolygon ( dc, x1,  y1,  x2,  y1, -epaisseur );
+			DrawObliquePolygon ( dc, x1,  y2,  x2,  y2, epaisseur );
 		}
 		else
 			DrawFullRectangle( dc,x1,y1,x2,y2);	// dessine val carree pleine // ENZ correction de x2
@@ -884,10 +884,10 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 			y5 = y1+ m_doc->m_drawingInterl[staff->staffSize]; y2 += m_doc->m_drawingInterl[staff->staffSize];	// on monte d'un INTERL
 
 			if (note->GetColored()==BOOLEAN_true)
-				DrawObliqueLine ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingInterl[staff->staffSize]);
+				DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingInterl[staff->staffSize]);
 			else
-			{	DrawObliqueLine ( dc,  x1,  y1,  x2,  yy2, 5);
-				DrawObliqueLine ( dc,  x1,  y5,  x2,  y2, -5);
+			{	DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, 5);
+				DrawObliquePolygon ( dc,  x1,  y5,  x2,  y2, -5);
 			}
 			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_env.m_stemWidth);	//cloture flagStemHeighte
 

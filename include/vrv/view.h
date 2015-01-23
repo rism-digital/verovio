@@ -279,7 +279,7 @@ protected:
 	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 0);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
-	void DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal);
+	void DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
 	void DrawDot ( DeviceContext *dc, int x, int y );
     ///@}
     
