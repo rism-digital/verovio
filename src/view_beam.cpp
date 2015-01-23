@@ -26,8 +26,17 @@
 
 namespace vrv {
 
-#define MAX_ELEMENTS_IN_BEAM 80		/* nombre de valeurs reliees possibles */
-#define MAX_MIF 20	/* nombre max de sous-groupes de beams */
+// maximum number of elements allowed in a beam
+#define MAX_ELEMENTS_IN_BEAM 80
+// maximum number of partials allow
+#define MAX_DURATION_PARTIALS 10
+    
+enum  {
+    PARTIAL_NONE = 0,
+    PARTIAL_THROUGH,
+    PARTIAL_RIGHT,
+    PARTIAL_LEFT
+};
 
 struct BeamElementCoord {
     int x;
@@ -37,6 +46,7 @@ struct BeamElementCoord {
     int yBeam; // height of stems
     int dur; // drawing duration
     int breaksec;
+    char partialFlags[MAX_DURATION_PARTIALS];
     LayerElement *element;
 };
 
@@ -66,7 +76,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     double xr;
     
     // position in the beam element list
-	int currentPos, previousPos;
+	int elementCount, last;
     
     // duration variables
 	int shortestDur, lastDur, currentDur, testDur;
@@ -78,15 +88,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     int fx1,fx2,fy1,fy2;
     
     // temporary variables
-	int avgY, shiftY, barY, verticalShift, y1, fbarre_y, fullBars, polygonHeight;
-    
-	int mx_i[MAX_MIF], mx_f[MAX_MIF], my_i[MAX_MIF], my_f[MAX_MIF];
-	char m_i[MAX_MIF];	/* pour stocker les prov des marqueurs */
+	int avgY, shiftY, barY, verticalShift, y1, fullBars, polygonHeight;
 
     // loops
-	int i, j, k, t, si;		/* compteurs de boucles */
-	int _mif;
-	int apax;
+	int i, j;
     
     // beam bar sizes
 	int beamWidth, beamWidthBlack, beamWidthWhite;
@@ -96,7 +101,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // initialization
     
     shortestDur = 0;
-    lastDur = currentPos = 0;
+    lastDur = elementCount = 0;
     high = avgY = sy_up = 0.0;
     
     verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingInterl[staff->staffSize] * 2); //center point of the staff
@@ -140,15 +145,15 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
         // Can it happen? With rests?
 		if (currentDur > DUR_4) {
-			beamElementCoord[currentPos].element = current;
-            beamElementCoord[currentPos].x = current->GetDrawingX();
-			beamElementCoord[currentPos].dur = currentDur;
+			beamElementCoord[elementCount].element = current;
+            beamElementCoord[elementCount].x = current->GetDrawingX();
+			beamElementCoord[elementCount].dur = currentDur;
             
             // Look at beam breaks
-            beamElementCoord[currentPos].breaksec = -1;
+            beamElementCoord[elementCount].breaksec = -1;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary*>(current);
-            if ( currentPos && beamsecondary && beamsecondary->HasBreaksec()) {
-                beamElementCoord[currentPos].breaksec = beamsecondary->GetBreaksec();
+            if ( elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
+                beamElementCoord[elementCount].breaksec = beamsecondary->GetBreaksec();
             }
             
             // Skip rests
@@ -159,7 +164,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
                 if (!changingDur && currentDur != lastDur) changingDur = ON;
                 lastDur = currentDur;
             }
-			currentPos++;
+			elementCount++;
 		}
         
         iter++;
@@ -175,15 +180,15 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	}	while (1);
 
 
-	previousPos = currentPos - 1;
+	last = elementCount - 1;
     
     /******************************************************************/
     // Calculate the extrem values
     
     yExtremes yVals;
     int curY;
-    // currentPos holds the last one
-	for (i = 0; i < currentPos; i++) {
+    // elementCount holds the last one
+	for (i = 0; i < elementCount; i++) {
         beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
 
         // highest and lowest value;
@@ -216,26 +221,26 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     if (hasChord) {
         if (yExtreme > verticalCenter) {
             stemDir = STEMDIRECTION_down;
-            for (i = 0; i < currentPos; i++) {
+            for (i = 0; i < elementCount; i++) {
                 beamElementCoord[i].y = beamElementCoord[i].yMax;
             }
         }
         else {
             stemDir = STEMDIRECTION_up;
-            for (i = 0; i < currentPos; i++) {
+            for (i = 0; i < elementCount; i++) {
                 beamElementCoord[i].y = beamElementCoord[i].yMin;
             }
         }
     }
     
-    avgY /= currentPos;
+    avgY /= elementCount;
     
     if (stemDir == STEMDIRECTION_NONE) {
         if ( avgY <  verticalCenter ) stemDir = STEMDIRECTION_up;
         else stemDir = STEMDIRECTION_down;
     }
 
-    if (beamElementCoord[previousPos].element->m_cueSize == false)  {
+    if (beamElementCoord[last].element->m_cueSize == false)  {
         beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
         beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
     }
@@ -254,7 +259,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // The vertical shift depends on the shortestDur value we have in the beam
     verticalShift = ((shortestDur-DUR_8)*(beamWidth));
 
-    if (beamElementCoord[previousPos].element->m_cueSize) {
+    if (beamElementCoord[last].element->m_cueSize) {
         verticalShift += m_doc->m_drawingHalfInterl[staff->staffSize]*5;
     }
     else {
@@ -275,7 +280,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         verticalShift += verticalCenter - avgY;
     }
 
-    for (i=0; i<currentPos; i++)
+    for (i=0; i<elementCount; i++)
     {
         //change the stem dir for all objects
         if ( beamElementCoord[i].element->IsNote() ) {
@@ -298,8 +303,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     }
 
 
-	y1 = currentPos * s_xy - s_x * s_y;
-	xr = currentPos * s_x2 - s_x * s_x;
+	y1 = elementCount * s_xy - s_x * s_y;
+	xr = elementCount * s_x2 - s_x * s_x;
 
     // Prevent division by 0
     if (y1 && xr) {
@@ -318,7 +323,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         dB += slope;
     }
     
-	dA = (s_y - dB * s_x) / currentPos;
+	dA = (s_y - dB * s_x) / elementCount;
     
     if (height) {
         dA += height;
@@ -327,7 +332,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     /******************************************************************/
     // Calculate the stem lengths and draw them
     
-	for ( i=0; i<currentPos; i++ ) {
+	for ( i=0; i<elementCount; i++ ) {
         xr = beamElementCoord[i].yBeam;	/* xr, variable de travail */
 		beamElementCoord[i].yBeam = dA + sy_up + dB * beamElementCoord[i].x;
 		
@@ -340,7 +345,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             }
 	}
     
-	for (i=0; i<currentPos; i++)
+	for (i=0; i<elementCount; i++)
 	{
         if (stemDir == STEMDIRECTION_up) {
             fy1 = beamElementCoord[i].yBeam - m_doc->m_env.m_stemWidth;
@@ -361,7 +366,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         if (beamElementCoord[i].element->IsNote() || beamElementCoord[i].element->IsChord()) {
             DrawVerticalLine (dc,fy2, fy1, beamElementCoord[i].x, m_doc->m_env.m_stemWidth);
 		}
-
 	}
 
     /******************************************************************/
@@ -374,16 +378,16 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     
     // Adjust the x position of the first and last element for taking into account the stem width
 	beamElementCoord[0].x -= (m_doc->m_env.m_stemWidth) / 2;
-	beamElementCoord[previousPos].x += (m_doc->m_env.m_stemWidth) / 2;
+	beamElementCoord[last].x += (m_doc->m_env.m_stemWidth) / 2;
 
     // Shift direction
 	shiftY = (stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
 
 	fy1 = beamElementCoord[0].yBeam;
-    fy2 = beamElementCoord[previousPos].yBeam;
+    fy2 = beamElementCoord[last].yBeam;
 
 	fx1 = (*beamElementCoord).x;
-    fx2 = (beamElementCoord+previousPos)->x;
+    fx2 = (beamElementCoord+last)->x;
 
 	s_y = shiftY;
 	s_y2 = shiftY;
@@ -418,6 +422,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	marqueurs partitionnant les sous-groupes; la troisieme boucle for est
 	pilotee par l'indice de l'array; elle dessine horizontalement les barres 
 	de chaque sous-groupe en suivant les marqueurs */
+    
+    //return;
 
     if (changingDur) {
         testDur = DUR_8 + fullBars;
@@ -429,93 +435,68 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
         // loop
         while (testDur <= shortestDur) {
-            t = 0; si = 0;
-            i = 0;
-            //for (i=0; i<=cpte_stop; i++)	/* 1e boucle for */
-            {
-                //fullBars = (*(st_rl+si) ? *(st_rl+si) : currentPos);
-                fullBars = currentPos;
-                
-                /* var. test controlant 2e boucle for suivante
-                 * en fonction du compteur de "+" */
-    /*ici, t=j, i.e. increment des pos. de notes. On s'occupe maintenant de
-    l'ensemble des valeurs contenues dans un groupe marque par cpte_stop. C'est
-    la qu'il faut changer les signes des valeurs delta d'increment vertical.*/
-
-                for(k=0; k<MAX_MIF; k++)	/* initialisation*/
-                {	mx_i[k]=my_i[k]=mx_f[k]=my_f[k]=0;}
-
-                for (j=t,_mif=0,m_i[_mif]=0; j < fullBars; j++)	/* 2e boucle. */
-                {	/* j<fullBars : st_rl est trop loin de un cran */
-
-                /* Ici, d‚cision si SILENCE doit ou non avoir des barres; si oui, ligne
-                    suivante (condition: il doit etre pris aussi dans les beamElementCoord plus haut):*/
-                    if (((beamElementCoord+j)->dur) >= (unsigned int)testDur)	
-                /*	si NON, alors: */
-                    // if (((beamElementCoord+j)->dur) >= testDur && (beamElementCoord+j)->element->sil == _NOT)	
-                    {
-                        /*place marqueurs pour m_dur.egales/superieures
-                         * a testDur en cours */
-                        mx_f[_mif] = beamElementCoord[j].x;
-                        my_f[_mif] = beamElementCoord[j].yBeam;
-                        if(!mx_i[_mif])
-                        {	mx_i[_mif] = beamElementCoord[j].x;
-                            my_i[_mif] = beamElementCoord[j].yBeam;
-                            if (!_mif) apax = j;
-                            //if (!beamElementCoord[j].prov)
-                            /* enregistre les cas ou delta y est neg.*/
-                                m_i[_mif] = 1;
-                        }
+            bool start = true;
+            
+            // all but the last one
+            for (i = 0; i < elementCount - 1; i++) {
+                beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
+                // partial is needed
+                if (beamElementCoord[i].dur >= (char)testDur) {
+                    // and for the next one too - through
+                    if (beamElementCoord[i+1].dur >= (char)testDur) {
+                        beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_THROUGH;
                     }
-                    /* rupture de chaine: on passe a un 2e groupe
-                     * de marqueurs */
-                    else if(mx_i[_mif])
-                    {	_mif++;	/*incr. s'il y a un marq.*/
-                        m_i[_mif] = 0;
+                    // not for the next one
+                    else {
+                        // we are starting a beam or after a beam break - put it right
+                        if (start) {
+                            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_RIGHT;
+                        }
+                        // or the previous one had no partial - put it left
+                        else if (beamElementCoord[i-1].dur < (char)testDur) {
+                            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
+                        }
                     }
                 }
-
-                fbarre_y = barY;	/* stockage */
-                for (k=0; k<=std::min((mx_f[_mif]?_mif:(_mif-1)),MAX_MIF); k++)
-                {
-
-                    /* on passe en revue, horizontalement, les marqueurs
-                     * enregistres pour ce  groupe, en s'assurant que le
-                     * max MAX_MIF n'est pas depasse */
-                    if (mx_i[k] == mx_f[k])		/* une seule position concernee */
-                    {
-                        if (apax == t && k==0 && mx_i[k] != beamElementCoord[previousPos].x)	/* au debut du paquet */
-                        {	fy1 = my_i[k] + barY;
-                            mx_f[k] = mx_i[k] + m_doc->m_drawingLedgerLine[staff->staffSize][0];
-                            fy2 = dA + sy_up + barY + dB * mx_f[k];
-
-                            polygonHeight= beamWidthBlack*shiftY;
-                            DrawObliquePolygon (dc,mx_i[k],fy1,mx_f[k],fy2, polygonHeight);
-                            fy1 += polygonHeight; fy2 += polygonHeight;
-
-                        }
-                        else		/* corps ou fin de paquet */
-                        {	fy2 = my_i[k] + barY;
-                            mx_i[k] -= m_doc->m_drawingLedgerLine[staff->staffSize][0];
-                            fy1 = dA + sy_up + barY + dB * mx_i[k];
-                            polygonHeight = beamWidthBlack*shiftY;
-                            DrawObliquePolygon (dc,mx_i[k],fy1,mx_f[k],fy2, polygonHeight);
-                            fy1 += polygonHeight; fy2 += polygonHeight;
-
-                        }
-                    }
-                    else if (mx_i[k])		/* s'il y a un marqueur */
-                    {	fy1 = my_i[k] + barY;
-                        fy2 = my_f[k] + barY;
-                        polygonHeight = beamWidthBlack*shiftY;
-                        DrawObliquePolygon (dc,mx_i[k],fy1,mx_f[k],fy2, polygonHeight);
-                        fy1 += polygonHeight; fy2 += polygonHeight;
-
-                    }				
-                }	/* fin de boucle testant sous-ensembles marques _mif*/
-
-                t = 0;
-            }			/* fin de premiere boucle for */
+                // not we are in a group
+                start = false;
+            }
+            // last one
+            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
+            // partial is needed
+            if (beamElementCoord[i].dur >= (char)testDur) {
+                // and the previous one had no partial - put it left
+                if (beamElementCoord[i-1].dur < (char)testDur) {
+                    beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
+                }
+            }
+            
+            // draw them
+            for (i=0; i<elementCount; i++) {
+                if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_THROUGH) {
+                    // through should never be set on the last one
+                    assert( i < elementCount - 1);
+                    if (i >= elementCount - 1) continue; // assert for debug and skip otherwise
+                    fy1 = beamElementCoord[i].yBeam + barY;
+                    fy2 = beamElementCoord[i+1].yBeam + barY;
+                    polygonHeight = beamWidthBlack * shiftY;
+                    DrawObliquePolygon (dc, beamElementCoord[i].x, fy1,beamElementCoord[i+1].x, fy2, polygonHeight);
+                }
+                else if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_RIGHT) {
+                    fy1 = beamElementCoord[i].yBeam + barY;
+                    int x2 = beamElementCoord[i].x + m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                    fy2 = dA + sy_up + barY + dB * x2;
+                    polygonHeight= beamWidthBlack*shiftY;
+                    DrawObliquePolygon (dc, beamElementCoord[i].x, fy1, x2, fy2, polygonHeight);
+                }
+                else if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_LEFT) {
+                    fy2 = beamElementCoord[i].yBeam + barY;
+                    int x1 = beamElementCoord[i].x - m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                    fy1 = dA + sy_up + barY + dB * x1;
+                    polygonHeight = beamWidthBlack*shiftY;
+                    DrawObliquePolygon (dc, x1, fy1, beamElementCoord[i].x, fy2, polygonHeight);
+                }
+            }
 
             testDur += 1;
             barY += shiftY * beamWidth;
