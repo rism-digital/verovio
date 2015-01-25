@@ -751,12 +751,11 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
     
-    x1 = ToDeviceContextX (x1);
-    x2 = ToDeviceContextX (x2);
-    
     for(j = 0;j < staff->m_drawingLines; j++)
     {
-        dc->DrawLine( x1 , ToDeviceContextY ( yy ) , x2 , ToDeviceContextY ( yy ) );
+        dc->DrawLine( ToDeviceContextX (x1) , ToDeviceContextY ( yy ) , ToDeviceContextX (x2) , ToDeviceContextY ( yy ) );
+        // For drawing rectangles insteam of line
+        //DrawFullRectangle(dc, x1, yy - m_doc->m_style->m_barlineWidth / 2, x2, yy + m_doc->m_style->m_barlineWidth / 2 );
         yy -= m_doc->m_drawingDoubleUnit[staff->staffSize];
     }
     
