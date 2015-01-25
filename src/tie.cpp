@@ -46,13 +46,13 @@ void Tie::Reset()
     m_second = NULL;
 }
 
-void Tie::SetFirstNote( Note *note )
+void Tie::SetStart( Note *note )
 {
     assert( !m_first );
     m_first = note;
 }
 
-void Tie::SetSecondNote( Note *note )
+void Tie::SetEnd( Note *note )
 {
     assert( !m_second );
     m_second = note;

@@ -354,7 +354,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         m_layer->SetN( 1 );
         
         m_staff->AddLayer(m_layer);
-        m_measure->AddStaff( m_staff );
+        m_measure->AddMeasureElement( m_staff );
         system->AddMeasure( m_measure );
         
         MeasureObject obj = *it;
@@ -1063,21 +1063,21 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
 void PaeInput::convertMeasure(MeasureObject *measure ) {
     
     if ( measure->clef != NULL ) {
-        m_layer->AddElement(measure->clef);
+        m_layer->AddLayerElement(measure->clef);
     }
     
     if ( measure->key != NULL) {
-        m_layer->AddElement(measure->key);
+        m_layer->AddLayerElement(measure->key);
     }
     
     if ( measure->meter != NULL ) {
-        m_layer->AddElement(measure->meter);
+        m_layer->AddLayerElement(measure->meter);
     }
     
     if ( measure->wholerest > 0 ) { 
         MultiRest *mr = new MultiRest();
         mr->SetNum(measure->wholerest);
-        m_layer->AddElement(mr);
+        m_layer->AddLayerElement(mr);
     }
     
     m_nested_objects.clear();
@@ -1207,14 +1207,14 @@ void PaeInput::addLayerElement(LayerElement *element) {
         LayerElement *bottom = m_nested_objects.back();
         
         if ( dynamic_cast<Beam*>( bottom ) ) {
-            ((Beam*)bottom)->AddElement( element );
+            ((Beam*)bottom)->AddLayerElement( element );
         }
         else if ( dynamic_cast<Tuplet*>( bottom ) ) {
-            ((Tuplet*)bottom)->AddElement( element );
+            ((Tuplet*)bottom)->AddLayerElement( element );
         }
         
     } else {
-        m_layer->AddElement(element);
+        m_layer->AddLayerElement(element);
     }
 }
 

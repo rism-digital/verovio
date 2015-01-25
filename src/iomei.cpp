@@ -29,6 +29,7 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
@@ -537,6 +538,12 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface 
 void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInterface *interface)
 {
 
+}
+    
+void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, vrv::TimeSpanningInterface *interface)
+{
+    interface->WriteStartendid(element);
+    interface->WriteStartid(element);
 }
 
 void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
@@ -1081,7 +1088,7 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
             success = ReadMeiApp( parent, current, EDITORIAL_MEASURE);
         }
         else if ( std::string( current.name() ) == "staff" ) {
-            success = ReadMeiStaff( parent, current);
+            success = ReadMeiStaff( parent, current );
         }
         else if ( std::string( current.name() ) == "tupletSpan" ) {
             if (!ReadTupletSpanAsTuplet( dynamic_cast<Measure*>( parent ), current )) {
@@ -1089,9 +1096,7 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
             }
         }
         else if ( std::string( current.name() ) == "slur" ) {
-            if (!ReadSlurAsSlurAttr( dynamic_cast<Measure*>( parent ), current )) {
-                LogWarning( "<slur> not readable as @slur and ignored" );
-            }
+            success = ReadMeiSlur( parent, current );
         }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name() );
@@ -1099,6 +1104,18 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
     }
     
     return success;
+}
+    
+bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
+{
+    Slur *vrvSlur = new Slur();
+    SetMeiUuid(slur, vrvSlur);
+    
+    ReadTimeSpanningInterface(slur, vrvSlur);
+    
+    AddMeasureElement(parent, vrvSlur);
+    
+    return true;
 }
 
 bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
@@ -1120,13 +1137,7 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
         LogWarning("No @n on <staff> might yield unpredictable results");
     }
     
-    // This could me moved to an AddStaff method for consistency with AddLayerElement
-    if ( dynamic_cast<Measure*>( parent ) ) {
-        dynamic_cast<Measure*>( parent )->AddStaff( vrvStaff );
-    }
-    else if ( dynamic_cast<EditorialElement*>( parent ) ) {
-        dynamic_cast<EditorialElement*>( parent )->AddStaff( vrvStaff );
-    }
+    AddMeasureElement(parent, vrvStaff);
 
     return ReadMeiStaffChildren( vrvStaff, staff );
 }
@@ -1517,6 +1528,13 @@ bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
     return true;
 }
     
+bool MeiInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
+{
+    interface->ReadStartendid(element);
+    interface->ReadStartid(element);
+    return true;
+}
+
 bool MeiInput::ReadAccidAsAttr( Note *note, pugi::xml_node accid )
 {
     Accid vrvAccid;
@@ -1661,22 +1679,36 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
 void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
 {
     if ( dynamic_cast<EditorialElement*>( parent ) ) {
-        dynamic_cast<EditorialElement*>( parent )->AddElement( element );
+        dynamic_cast<EditorialElement*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Layer*>( parent ) ) {
-        dynamic_cast<Layer*>( parent )->AddElement( element );
+        dynamic_cast<Layer*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Note*>( parent ) ) {
-        dynamic_cast<Note*>( parent )->AddElement( element );
+        dynamic_cast<Note*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Beam*>( parent ) ) {
-        dynamic_cast<Beam*>( parent )->AddElement( element );
+        dynamic_cast<Beam*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Tuplet*>( parent ) ) {
-        dynamic_cast<Tuplet*>( parent )->AddElement( element );
+        dynamic_cast<Tuplet*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Verse*>( parent ) ) {
-        dynamic_cast<Verse*>( parent )->AddElement( element );
+        dynamic_cast<Verse*>( parent )->AddLayerElement( element );
+    }
+    else {
+        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
+        delete element;
+    }
+}
+    
+void MeiInput::AddMeasureElement(Object *parent, MeasureElement *element)
+{
+    if ( dynamic_cast<EditorialElement*>( parent ) ) {
+        dynamic_cast<EditorialElement*>( parent )->AddMeasureElement( element );
+    }
+    else if ( dynamic_cast<Measure*>( parent ) ) {
+        dynamic_cast<Measure*>( parent )->AddMeasureElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
@@ -1733,47 +1765,6 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
         LogWarning( "Elements <%s> ignored", element.name() );
     }
     return success;
-}
-    
-bool MeiInput::ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur)
-{
-    if (!measure) {
-        LogWarning( "Cannot read <slur> within editorial markup" );
-        return false;
-    }
-    
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-    
-	// position (pitch)
-	if ( slur.attribute( "startid" ) ) {
-        std::string refId = ExtractUuidFragment( slur.attribute( "startid" ).value() );
-        start = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
-
-        if (!start || !start->IsNote()) {
-            LogWarning( "Note with @startid '%s' not found when trying to read the <slur>", refId.c_str() );
-        }    
-        
-	}
-	if ( slur.attribute( "endid" ) ) {
-        std::string refId = ExtractUuidFragment( slur.attribute( "endid" ).value() );
-        end = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
-        
-        if (!end || !end->IsNote()) {
-            LogWarning( "Note with @endid '%s' not found when trying to read the <slur>", refId.c_str() );
-        }
-	}
-    Note *startNote = dynamic_cast<Note*>(start);
-    Note *endNote = dynamic_cast<Note*>(end);
-    
-    if (!start || !end || !startNote || !endNote) {
-        return false;
-    }
-    
-    startNote->SetSlurAttrInitial();
-    endNote->SetSlurAttrTerminal( startNote );
-    
-    return true;
 }
     
 bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan)
@@ -1836,7 +1827,7 @@ bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSp
     //LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
     int i;
     for (i = endIdx; i >= startIdx; i--) {
-        tuplet->AddElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
+        tuplet->AddLayerElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
     }
     tuplet->SetParent( parentLayer );
     parentLayer->InsertChild( tuplet, startIdx );

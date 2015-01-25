@@ -535,7 +535,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
                 if ((**attComparisonIter)(*iter)) {
                     // the attribute value matches, process the object
                     //LogDebug("%s ", (*iter)->GetClassName().c_str() );
-                    (*iter)->Process( functor, params, endFunctor, filters, deepness);
+                    (*iter)->Process( functor, params, endFunctor, filters, deepness, direction );
                     break;
                 }
                 else {
@@ -545,7 +545,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
             }
         }
         // we will end here if there is no filter at all or for the current child type
-        (*iter)->Process( functor, params, endFunctor, filters, deepness );
+        (*iter)->Process( functor, params, endFunctor, filters, deepness, direction );
     }
     
     if ( endFunctor ) {

@@ -40,7 +40,6 @@ Note::~Note()
 {
     // This deletes the Tie and Slur objects if necessary
     ResetTieAttrInitial();
-    ResetSlurAttrInitial();
 }
     
 void Note::Reset()
@@ -59,9 +58,6 @@ void Note::Reset()
     // tie pointers
     m_tieAttrInitial = NULL;
     m_tieAttrTerminal = NULL;
-    // slur pointers
-    m_slurAttrInitial = NULL;
-    m_slurAttrTerminal = NULL;
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -105,7 +101,7 @@ bool Note::operator==( Object& other )
     return true;
 }
     
-void Note::AddElement(vrv::LayerElement *element)
+void Note::AddLayerElement(vrv::LayerElement *element)
 {
     assert( dynamic_cast<Verse*>(element) || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
@@ -138,7 +134,7 @@ void Note::SetTieAttrInitial()
         return;
     }
     m_tieAttrInitial = new Tie();
-    m_tieAttrInitial->SetFirstNote( this );
+    m_tieAttrInitial->SetStart( this );
 }
 
 void Note::SetTieAttrTerminal( Note *previousNote )
@@ -152,46 +148,13 @@ void Note::SetTieAttrTerminal( Note *previousNote )
         return;
     }
     m_tieAttrTerminal = previousNote->GetTieAttrInitial();
-    m_tieAttrTerminal->SetSecondNote( this );
+    m_tieAttrTerminal->SetEnd( this );
 }
 
 void Note::ResetTieAttrInitial( )
 {
     if ( m_tieAttrInitial ) {
         // Deleting the Tie object will also reset the m_tieAttrTerminal of the second note
-        delete m_tieAttrInitial;
-        m_tieAttrInitial = NULL;
-    }
-}
-    
-void Note::SetSlurAttrInitial()
-{
-    if ( m_slurAttrInitial ) {
-        LogWarning("Initial slur attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_slurAttrInitial = new Slur();
-    m_slurAttrInitial->SetFirstNote( this );
-}
-
-void Note::SetSlurAttrTerminal( Note *previousNote )
-{
-    if ( m_slurAttrTerminal ) {
-        LogWarning("Terminal slur attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    if ( !previousNote || !previousNote->GetSlurAttrInitial() ) {
-        LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_slurAttrTerminal = previousNote->GetSlurAttrInitial();
-    m_slurAttrTerminal->SetSecondNote( this );
-}
-
-void Note::ResetSlurAttrInitial( )
-{
-    if ( m_slurAttrInitial ) {
-        // Deleting the Slur object will also reset the m_slurAttrTerminal of the second note
         delete m_tieAttrInitial;
         m_tieAttrInitial = NULL;
     }

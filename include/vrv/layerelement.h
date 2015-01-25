@@ -113,6 +113,11 @@ public:
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
     
+    /**
+     *
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
+    
 protected:
     /**
      * Returns the duration if the child element has a DurationInterface

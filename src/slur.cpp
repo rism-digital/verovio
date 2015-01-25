@@ -23,7 +23,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Slur::Slur():
-    LayerElement("slur-")
+    MeasureElement("slur-"), TimeSpanningInterface()
 {
     Reset();
 }
@@ -31,31 +31,32 @@ Slur::Slur():
 
 Slur::~Slur()
 {
-    if (m_first && m_first->GetSlurAttrTerminal() == this) {
-        m_first->ResetSlurAttrInitial();
-    }
-    if (m_second && m_second->GetSlurAttrTerminal() == this) {
-        m_second->ResetSlurAttrTerminal();
-    }
 }
         
 void Slur::Reset()
 {
-    LayerElement::Reset();
-    m_first = NULL;
-    m_second = NULL;
+    MeasureElement::Reset();
+    TimeSpanningInterface::Reset();
 }
 
-void Slur::SetFirstNote( Note *note )
+//----------------------------------------------------------------------------
+// Slur functor methods
+//----------------------------------------------------------------------------
+
+int Slur::PrepareTimeSpanning( ArrayPtrVoid params )
 {
-    assert( !m_first );
-    m_first = note;
+    // param 0: the IntTree
+    std::vector<TimeSpanningInterface*> *slurs = static_cast<std::vector<TimeSpanningInterface*>*>(params[0]);
+    bool *fillList = static_cast<bool*>(params[1]);
+    
+    if ((*fillList)==false) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    this->SetUuidStr();
+    slurs->push_back(this);
+    
+    return FUNCTOR_CONTINUE;
 }
-
-void Slur::SetSecondNote( Note *note )
-{
-    assert( !m_second );
-    m_second = note;
-}
-
+    
 } // namespace vrv

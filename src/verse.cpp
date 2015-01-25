@@ -43,7 +43,7 @@ void Verse::Reset()
     ResetCommon();
 }
 
-void Verse::AddElement(vrv::LayerElement *element)
+void Verse::AddLayerElement(vrv::LayerElement *element)
 {
     assert( dynamic_cast<Syl*>(element) || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
@@ -76,7 +76,7 @@ int Verse::AlignVertically( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Verse::PrepareDrawing( ArrayPtrVoid params )
+int Verse::PrepareProcessingLists( ArrayPtrVoid params )
 {
     // param 0: the IntTree
     IntTree *tree = static_cast<IntTree*>(params[0]);

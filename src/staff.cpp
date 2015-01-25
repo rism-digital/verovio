@@ -26,7 +26,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Staff::Staff( int n ):
-	DocObject("staff-"),
+	MeasureElement("staff-"),
     AttCommon()
 {
     Reset();
@@ -40,7 +40,7 @@ Staff::~Staff()
 
 void Staff::Reset()
 {
-    DocObject::Reset();
+    MeasureElement::Reset();
     ResetCommon();
     notAnc = false; // LP we want modern notation :))
     grise = false;

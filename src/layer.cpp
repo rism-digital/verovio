@@ -63,7 +63,7 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
     
-void Layer::AddElement( LayerElement *element, int idx )
+void Layer::AddLayerElement( LayerElement *element, int idx )
 {
 	element->SetParent( this );
     if ( idx == -1 ) {
@@ -161,7 +161,7 @@ LayerElement *Layer::Insert( LayerElement *element, int x )
     
     // Insert in the logical tree - this works only for facsimile (transcription) encoding
     insertElement->m_xAbs = x;
-    AddElement( insertElement, idx );
+    AddLayerElement( insertElement, idx );
     
 	Refresh();
     //
@@ -175,7 +175,7 @@ void Layer::Insert( LayerElement *layerElement, LayerElement *before )
     if ( before ) {
         idx = this->GetChildIndex( before );
     }
-    AddElement( layerElement , idx );
+    AddLayerElement( layerElement , idx );
 }
 
 void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )

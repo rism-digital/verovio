@@ -10,7 +10,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "measureelement.h"
 
 namespace vrv {
 
@@ -29,7 +29,7 @@ class Syl;
  * It contains Measure objects.
  * For unmeasured music, on single Measure is added for simplifying internal processing
 */
-class Staff: public DocObject,
+class Staff: public MeasureElement,
     public AttCommon
 {
     

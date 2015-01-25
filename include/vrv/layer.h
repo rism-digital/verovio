@@ -53,7 +53,7 @@ public:
     virtual std::string GetClassName( ) { return "Layer"; };
     ///@}
 	
-	void AddElement( LayerElement *element, int idx = -1 );
+	void AddLayerElement( LayerElement *element, int idx = -1 );
     	
 	int GetElementCount() const { return (int)m_children.size(); };
     

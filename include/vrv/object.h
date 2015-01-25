@@ -474,7 +474,11 @@ public:
      * to be processed.
      * param 0: IntTree *
      */
-    virtual int PrepareDrawing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareProcessingLists( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends

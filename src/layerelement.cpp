@@ -29,6 +29,7 @@
 #include "rest.h"
 #include "syl.h"
 #include "tie.h"
+#include "timeinterface.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -365,6 +366,25 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     
     // increase the time position
     (*time) += duration;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+
+int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
+{
+    // param 0: the IntTree
+    std::vector<TimeSpanningInterface*> *timeSpanningElements = static_cast<std::vector<TimeSpanningInterface*>*>(params[0]);
+    
+    std::vector<TimeSpanningInterface*>::iterator iter = timeSpanningElements->begin();
+    while ( iter != timeSpanningElements->end()) {
+        if ((*iter)->SetStartAndEnd( this ) ) {
+            iter = timeSpanningElements->erase( iter );
+        }
+        else {
+            iter++;
+        }
+    }
     
     return FUNCTOR_CONTINUE;
 }

@@ -39,7 +39,7 @@ public:
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
     
     //----------//
     // Functors //
@@ -55,7 +55,7 @@ public:
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
      * to be processed.
      */
-    virtual int PrepareDrawing( ArrayPtrVoid params );
+    virtual int PrepareProcessingLists( ArrayPtrVoid params );
     
 protected:
 

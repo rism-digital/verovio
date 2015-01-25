@@ -641,9 +641,21 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     }
 }
 
-
+void View::DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measure *measure, System *system)
+{
+    assert(system); // Pointer to layer cannot be NULL"
+    assert(measure); // Pointer to staff cannot be NULL"
+    
+    if (dynamic_cast<Slur*>(element)) {
+        DrawSlur(dc,  dynamic_cast<Slur*>(element), measure, system);
+    }
+    else if (dynamic_cast<Staff*>(element)) {
+        DrawStaff(dc,  dynamic_cast<Staff*>(element), measure, system);
+    }
+}
+    
 //----------------------------------------------------------------------------
-// View - Staff
+// View - MeasureElement
 //----------------------------------------------------------------------------
 
 int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
@@ -765,6 +777,11 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     return;
 }
 
+    
+void View::DrawSlur( DeviceContext *dc, Slur *slur, Measure *measure, System *system )
+{
+        
+}
 
 //----------------------------------------------------------------------------
 // View - Layer
@@ -856,16 +873,16 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     
     // the draw the scoreDef when required
     if (layer->GetDrawingClef()) {
-        DrawElement(dc, layer->GetDrawingClef(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingClef(), layer, staff, measure);
     }
     if (layer->GetDrawingKeySig()) {
-        DrawElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
     }
     if (layer->GetDrawingMensur()) {
-        DrawElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
     }
     if (layer->GetDrawingMeterSig()) {
-        DrawElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
     }
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
@@ -954,16 +971,16 @@ void View::DrawSystemChildren( DeviceContext *dc, Object *parent, System *system
 
 void View::DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system )
 {
-    Staff *staff = NULL;
+    MeasureElement *measureElement = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
     for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
-        staff = dynamic_cast<Staff*>(current);
+        measureElement = dynamic_cast<MeasureElement*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
-        if (staff) {
-            DrawStaff( dc , staff, measure, system );
+        if (measureElement) {
+            DrawMeasureElement( dc , measureElement, measure, system );
         }
         else if (editorialElement) {
             DrawMeasureEditorialElement( dc , editorialElement, measure, system );
@@ -1007,7 +1024,7 @@ void View::DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, S
         layerElement = dynamic_cast<LayerElement*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
         if (layerElement) {
-            DrawElement( dc, layerElement, layer, staff, measure );
+            DrawLayerElement( dc, layerElement, layer, staff, measure );
         }
         else if (editorialElement) {
             DrawLayerEditorialElement( dc , editorialElement, layer, staff, measure );

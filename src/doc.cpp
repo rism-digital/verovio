@@ -25,6 +25,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "page.h"
+#include "slur.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -90,6 +91,20 @@ void Doc::Refresh()
 void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
+    
+    std::vector<TimeSpanningInterface*> timeSpanningElements;
+    bool fillList = true;
+    params.push_back( &timeSpanningElements );
+    params.push_back( &fillList );
+    Functor prepareTimeSpanning( &Object::PrepareTimeSpanning );
+    this->Process( &prepareTimeSpanning, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD );
+    
+    if ( !timeSpanningElements.empty() ) {
+        fillList = false;
+        this->Process( &prepareTimeSpanning, params );
+    }
+    
+    params.clear();
     IntTree tree;
     params.push_back( &tree );
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
@@ -97,10 +112,9 @@ void Doc::PrepareDrawing()
     //params.push_back( &staffLayerVerseTree );
     
     // We first fill a tree of int with the staff/layer/verse numbers to be process
-    
     //LogElapsedTimeStart( );
-    Functor prepareDrawing( &Object::PrepareDrawing );
-    this->Process( &prepareDrawing, params );
+    Functor prepareProcessingLists( &Object::PrepareProcessingLists );
+    this->Process( &prepareProcessingLists, params );
     
     // The tree is used to process each staff/layer/verse separatly
     // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type

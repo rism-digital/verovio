@@ -1,11 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        element.cpp
+// Name:        measureelement.cpp
 // Author:      Laurent Pugin
-// Created:     2014
+// Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "element.h"
+
+#include "measureelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,36 +14,33 @@
 
 //----------------------------------------------------------------------------
 
-#include "childElement.h"
-
 namespace vrv {
 
+
 //----------------------------------------------------------------------------
-// Element
+// MeasureElement
 //----------------------------------------------------------------------------
 
-Element::Element():
-    DocObject("element-"),
-    AttCommon()
+MeasureElement::MeasureElement():
+    DocObject("me")
 {
     Reset();
 }
 
-Element::~Element()
+MeasureElement::MeasureElement(std::string classid):
+    DocObject(classid)
 {
+    Reset();
 }
 
-void Element::AddChildElement(ChildElement *child)
-{    
-    child->SetParent( this );
-    m_children.push_back(child);
-    Modify();
+MeasureElement::~MeasureElement()
+{
+
 }
     
-void Element::Reset()
+void MeasureElement::Reset()
 {
-    LayerElement::Reset()
-    ResetCommon();
-}    
-
+    DocObject::Reset();
+}
+    
 } // namespace vrv

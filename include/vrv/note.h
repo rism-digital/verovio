@@ -69,7 +69,7 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
     
     /**
      * @name Setters and getters for tie attributes
@@ -81,19 +81,6 @@ public:
     Tie *GetTieAttrTerminal( ) { return m_tieAttrTerminal; };
     void ResetTieAttrInitial();
     void ResetTieAttrTerminal() { m_tieAttrTerminal = NULL; };
-    ///@}
-    
-    /**
-     * @name Setters and getters for slur attributes.
-     * Only one attribute is currently supported.
-     */
-    ///@{
-    void SetSlurAttrInitial( );
-    void SetSlurAttrTerminal( Note *previousNote );
-    Slur *GetSlurAttrInitial( ) { return m_slurAttrInitial; };
-    Slur *GetSlurAttrTerminal( ) { return m_slurAttrTerminal; };
-    void ResetSlurAttrInitial();
-    void ResetSlurAttrTerminal() { m_slurAttrTerminal = NULL; };
     ///@}
     
     //----------//
@@ -119,19 +106,6 @@ protected:
     ///@{
     Tie *m_tieAttrInitial;
     Tie *m_tieAttrTerminal;
-    ///@}
-    
-    /**
-     * @name Slur attributes are represented by pointers to Slur objects.
-     * There is one pointer for the initial attribute and one pointer for the end attribute.
-     * The Slur objects points back to the notes as it is the case with a MEI slur element.
-     * With attributes, the note with the initial attribute own the Slur object and take care of deleting it.
-     * Currenly only one single slub attribute (@slur="i1") is supported.
-     */
-     /* Note: we would need to change this to a Slur vector to support 1-6 slur attributes */
-    ///@{
-    Slur *m_slurAttrInitial;
-    Slur *m_slurAttrTerminal;
     ///@}
     
 public:

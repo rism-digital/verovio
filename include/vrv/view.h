@@ -27,7 +27,9 @@ class EditorialElement;
 class Layer;
 class LayerElement;
 class Measure;
+class MeasureElement;
 class Page;
+class Slur;
 class Staff;
 class Syl;
 class System;
@@ -181,6 +183,24 @@ protected:
     int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
     ///@}
     
+    /**
+     * @name Top level method for drawing MeasureElement.
+     * Call appropriate method of child classes (Staff, Slur, etc).
+     * Defined in page_element.cpp
+     */
+    ///@{
+    void DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measure *measure, System *system );
+    ///@}
+    
+    /**
+     * @name Methods for drawing MeasureElement child classes.
+     * They are base drawing methods that are called directly from DrawMeasureElement
+     * Defined in view_page.cpp
+     */
+    ///@{
+    void DrawSlur( DeviceContext *dc, Slur *slur, Measure *measure, System *system );
+    ///@}
+    
     /** 
      * @name Top level method for drawing LayerElement.
      * This can be called recursively for elements containing other elements.
@@ -188,12 +208,12 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
     /**
      * @name Methods for drawing LayerElement child classes.
-     * They are base drawing methods that are called directly from DrawElement
+     * They are base drawing methods that are called directly from DrawLayerElement
      * Because some elements draw their children recursively (e.g., Note) they must all
      * have the same parameters
      * Defined in view_element.cpp

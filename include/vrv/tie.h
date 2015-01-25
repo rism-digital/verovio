@@ -40,10 +40,10 @@ public:
      * The setter asserts that no note was previously set.
      */
     ///@{
-    void SetFirstNote( Note *note );
-    void SetSecondNote( Note *note );
-    Note *GetFirstNote() { return m_first; };
-    Note *GetSecondNote() { return m_second; };
+    void SetStart( Note *note );
+    void SetEnd( Note *note );
+    Note *GetStart() { return m_first; };
+    Note *GetEnd() { return m_second; };
     ///@}
     
 private:

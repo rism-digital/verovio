@@ -34,7 +34,7 @@ void Beam::Reset()
     LayerElement::Reset();
 }
 
-void Beam::AddElement(LayerElement *element)
+void Beam::AddLayerElement(LayerElement *element)
 {
    
     element->SetParent( this );
