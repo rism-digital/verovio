@@ -18,6 +18,8 @@
 #include "iopae.h"
 #include "page.h"
 #include "svgdevicecontext.h"
+#include "style.h"
+#include "vrv.h"
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"
@@ -51,7 +53,7 @@ Toolkit::Toolkit( bool initFont )
 	m_cString = NULL;
     
     if ( initFont ) {
-        Resources::InitFont();
+        Resources::InitFonts();
     }
 }
 

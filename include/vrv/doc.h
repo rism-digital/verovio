@@ -12,12 +12,12 @@
 #include "devicecontextbase.h"
 #include "io.h"
 #include "scoredef.h"
-#include "vrv.h"
 
 namespace vrv {
 
 class FontInfo;
-class Page;    
+class Page;
+class Style;
     
 enum DocType {
     Raw = 0,
@@ -73,13 +73,13 @@ public:
      * @name Setters for the page dimensions and margins
      */
     ///@{
-    void SetPageHeight( int pageHeight ) { m_pageHeight = pageHeight * DEFINITON_FACTOR; };
-    void SetPageWidth( int pageWidth ) { m_pageWidth = pageWidth * DEFINITON_FACTOR; };
-    void SetPageLeftMar( short pageLeftMar ) { m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR; };
-    void SetPageRightMar( short pageRightMar ) { m_pageRightMar = pageRightMar * DEFINITON_FACTOR; };
-    void SetPageTopMar( short pageTopMar ) { m_pageTopMar = pageTopMar * DEFINITON_FACTOR; };
-    void SetSpacingStaff( short spacingStaff ) { m_spacingStaff = spacingStaff; };
-    void SetSpacingSystem( short spacingSystem ) { m_spacingSystem = spacingSystem; };
+    void SetPageHeight( int pageHeight );
+    void SetPageWidth( int pageWidth );
+    void SetPageLeftMar( short pageLeftMar );
+    void SetPageRightMar( short pageRightMar );
+    void SetPageTopMar( short pageTopMar );
+    void SetSpacingStaff( short spacingStaff );
+    void SetSpacingSystem( short spacingSystem );
     ///@}
 
     /**
@@ -92,8 +92,8 @@ public:
     
     /**
      * @name Getters for the object margins (left and right)
-     * The margin are given in x / MARGIN_DENOMINATOR * UNIT
-     * With MARGIN_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT
+     * The margin are given in x / PARAM_DENOMINATOR * UNIT
+     * With PARAM_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT
      * These should eventually be set at parameters.
      */
     ///@{
@@ -212,7 +212,7 @@ public:
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */
-    DefaultEnv m_env;
+    Style *m_style;
     
     /** 
      * The source id. Exact use to be clarified.
@@ -236,21 +236,19 @@ public:
   
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** The page drawing unit */
-    int m_drawingUnit;
-    /** Half a the space between to staff lines for normal and small staff (10 and 8 by default) */
-    int m_drawingHalfInterl[2];
-    /** Space between to staff lines for normal and small staff (20 and 16 by default) */
-    int m_drawingInterl[2];
-    /** Height of a five line staff for normal and small staff (80 and 64 by default) */
+    /** Half a the space between to staff lines for normal and small staff */
+    int m_drawingUnit[2];
+    /** Space between to staff lines for normal and small staff */
+    int m_drawingDoubleUnit[2];
+    /** Height of a five line staff for normal and small staff */
     int m_drawingStaffSize[2];
-    /** Height of an octave for normal and small staff (70 and 56 by default) */
+    /** Height of an octave for normal and small staff */
     int m_drawingOctaveSize[2];
     /** Font height (100 par defaut) */
     int m_drawingFontHeight;
     /** Font height with ascent for normal and small staff and normal and grace size */
 	int m_drawingFontHeightAscent[2][2];
-    /** Normal and small staff ration (16 / 20 by default) */
+    /** Normal and small staff ration (4 / 5 by default) */
     int m_drawingSmallStaffRatio[2];
     /** Normal and grace size (3 / 4 by default) */
     int m_drawingGraceRatio[2];

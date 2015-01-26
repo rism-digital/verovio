@@ -74,6 +74,12 @@ protected:
     
     std::string DurToStr(int data);
     int StrToDur(std::string value);
+    
+    std::string FontstyleToStr(data_FONTSTYLE data);
+    data_FONTSTYLE StrToFontstyle(std::string value);
+    
+    std::string FontweightToStr(data_FONTWEIGHT data);
+    data_FONTWEIGHT StrToFontweight(std::string value);
         
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);

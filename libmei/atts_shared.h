@@ -5365,13 +5365,13 @@ public:
     bool HasFontsize( );
     
     //
-    void SetFontstyle(std::string fontstyle_) { m_fontstyle = fontstyle_; };
-    std::string GetFontstyle() const { return m_fontstyle; };    
+    void SetFontstyle(data_FONTSTYLE fontstyle_) { m_fontstyle = fontstyle_; };
+    data_FONTSTYLE GetFontstyle() const { return m_fontstyle; };    
     bool HasFontstyle( );
     
     //
-    void SetFontweight(std::string fontweight_) { m_fontweight = fontweight_; };
-    std::string GetFontweight() const { return m_fontweight; };    
+    void SetFontweight(data_FONTWEIGHT fontweight_) { m_fontweight = fontweight_; };
+    data_FONTWEIGHT GetFontweight() const { return m_fontweight; };    
     bool HasFontweight( );
     
     ///@}
@@ -5384,9 +5384,9 @@ protected:
     /** Indicates the size of a font in printers' points, i.e., 1/72nd of an inch. **/
     double m_fontsizeDbl;
     /** Records the style of a font, i.e, italic, oblique, or normal. **/
-    std::string m_fontstyle;
+    data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/
-    std::string m_fontweight;
+    data_FONTWEIGHT m_fontweight;
 
 /* include <attfontweight> */
 };

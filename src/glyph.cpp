@@ -24,6 +24,17 @@ namespace vrv {
 // Glyph
 //----------------------------------------------------------------------------
 
+Glyph::Glyph()
+{
+    m_x = 0.0;
+    m_y = 0.0;
+    m_width = 0.0;
+    m_height = 0.0;
+    m_unitsPerEm = 20480;
+    m_path = "[unset]";
+    m_codeStr = "[unset]";
+}
+    
 Glyph::Glyph(std::string path, std::string codeStr)
 {
     m_x = 0.0;
@@ -61,17 +72,20 @@ Glyph::Glyph(std::string path, std::string codeStr)
     
     m_unitsPerEm = atoi( viewBox.substr( viewBox.find_last_of(' ') ).c_str() ) * 10;
 }
-
-Glyph::~Glyph()
+    
+Glyph::Glyph(int unitsPerEm)
 {
     m_x = 0.0;
     m_y = 0.0;
     m_width = 0.0;
     m_height = 0.0;
-    m_unitsPerEm = 20480;
+    m_unitsPerEm = unitsPerEm * 10;
     m_path = "[unset]";
     m_codeStr = "[unset]";
+}    
 
+Glyph::~Glyph()
+{
 }
     
 void Glyph::SetBoundingBox(double x, double y, double w, double h)

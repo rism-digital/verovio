@@ -66,13 +66,19 @@ public:
     virtual void SetTextBackground( int colour ) = 0;
     virtual void SetLogicalOrigin( int x, int y ) = 0;
     ///}
+
+    /**
+     * @name Getters for text extend (non virtual)
+     */
+    ///@{
+    virtual void GetTextExtent( const std::string& string, int *w, int *h );
+    virtual void GetTextExtent( const std::wstring& string, int *w, int *h );
+    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
     
     /**
      * @name Getters
      */
     ///@{
-    virtual void GetTextExtent( const std::string& string, int *w, int *h ) = 0;
-    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h ) = 0;
     virtual Point GetLogicalOrigin( ) = 0;
     virtual bool CorrectMusicAscent( ) { return m_correctMusicAscent; };
     ///@}

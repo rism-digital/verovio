@@ -30,8 +30,9 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    Glyph() {};
+    Glyph();
     Glyph(std::string path, std::string codeStr);
+    Glyph(int unitsPerEm);
     virtual ~Glyph();
     ///@}
     

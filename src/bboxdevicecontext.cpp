@@ -105,39 +105,6 @@ void BBoxDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleX = xScale;
     m_userScaleY = yScale;
 }
-    
-void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
-{
-    LogDebug("BBoxDeviceContext::GetTextExtent not implemented");
-}
-
-void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
-{
-    assert( m_fontStack.top() );
-    
-    int x, y, partial_w, partial_h;
-    *w = 0;
-    *h = 0;
-    
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
-        wchar_t c = string[i];
-        Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph) {
-            continue;
-        }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-        
-        partial_w *= m_fontStack.top()->GetPointSize();
-        partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_fontStack.top()->GetPointSize();
-        partial_h /= glyph->GetUnitsPerEm();
-        
-        *w += partial_w;
-        *h += partial_h;
-    }
-}
-       
 
 Point BBoxDeviceContext::GetLogicalOrigin( ) 
 {
@@ -321,12 +288,15 @@ void BBoxDeviceContext::DrawText(const std::string& text, const std::wstring wte
 {
     assert( m_fontStack.top() );
     
-    unsigned long length = wtext.length();
+    //unsigned long length = wtext.length();
+    int w, h;
+    GetTextExtent(wtext, &w, &h);
+    m_textWidth += w;
     // very approximative, we should use GetTextExtend once implemented
-    m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
+    //m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
     // ignore y bounding boxes for text
     //m_textHeight = m_fontStack.top()->GetPointSize();
-    UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
+        UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
     
     
 }

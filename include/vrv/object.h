@@ -480,13 +480,27 @@ public:
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareLyrics( ArrayPtrVoid params );
+    virtual int PrepareLyrics( ArrayPtrVoid params )  { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by doc at the end of a document of closing opened syl.
      */
     virtual int PrepareLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Functor for setting running lyrics in staves
+     * This is necessary for <syl> that starts in one measure and ends in another one
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     */
+    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Functor for setting running lyrics in staves
+     * This is necessary for <syl> that starts in one measure and ends in another one
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     */
+    virtual int FillStaffCurrentLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
 
     
     /**

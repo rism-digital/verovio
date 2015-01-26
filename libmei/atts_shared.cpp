@@ -6098,8 +6098,8 @@ void AttTypography::ResetTypography() {
     m_fontfam = "";
     m_fontname = "";
     m_fontsizeDbl = 0.0;
-    m_fontstyle = "";
-    m_fontweight = "";
+    m_fontstyle = FONTSTYLE_NONE;
+    m_fontweight = FONTWEIGHT_NONE;
 }
 
 bool AttTypography::ReadTypography(  pugi::xml_node element ) {
@@ -6117,11 +6117,11 @@ bool AttTypography::ReadTypography(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("fontstyle")) {
-        this->SetFontstyle(StrToStr(element.attribute("fontstyle").value()));
+        this->SetFontstyle(StrToFontstyle(element.attribute("fontstyle").value()));
         hasAttribute = true;
     }
     if (element.attribute("fontweight")) {
-        this->SetFontweight(StrToStr(element.attribute("fontweight").value()));
+        this->SetFontweight(StrToFontweight(element.attribute("fontweight").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -6142,11 +6142,11 @@ bool AttTypography::WriteTypography(  pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasFontstyle()) {
-        element.append_attribute("fontstyle") = StrToStr(this->GetFontstyle()).c_str();
+        element.append_attribute("fontstyle") = FontstyleToStr(this->GetFontstyle()).c_str();
         wroteAttribute = true;
     }
     if (this->HasFontweight()) {
-        element.append_attribute("fontweight") = StrToStr(this->GetFontweight()).c_str();
+        element.append_attribute("fontweight") = FontweightToStr(this->GetFontweight()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6169,12 +6169,12 @@ bool AttTypography::HasFontsize( )
 
 bool AttTypography::HasFontstyle( )
 {
-    return (m_fontstyle != "");
+    return (m_fontstyle != FONTSTYLE_NONE);
 }
 
 bool AttTypography::HasFontweight( )
 {
-    return (m_fontweight != "");
+    return (m_fontweight != FONTWEIGHT_NONE);
 }
 
 

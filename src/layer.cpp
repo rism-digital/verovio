@@ -19,6 +19,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "vrv.h"
 
 namespace vrv {
 

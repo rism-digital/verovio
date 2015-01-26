@@ -24,6 +24,7 @@ namespace vrv {
 
 Syl::Syl():
     LayerElement("syl-"),
+    AttTypography(),
     AttSylLog()
 {
     Reset();
@@ -36,6 +37,7 @@ Syl::~Syl()
 void Syl::Reset()
 {
     LayerElement::Reset();
+    ResetTypography();
     ResetSylLog();
     
     m_drawingFirstNote = NULL;
@@ -63,15 +65,19 @@ int Syl::PrepareLyrics( ArrayPtrVoid params )
     
     m_drawingFirstNote = dynamic_cast<Note*>( this->GetFirstParent( &typeid(Note), MAX_NOTE_DEPTH ) );
     
+    // At this stage currentSyl is actually the previous one that is ending here
     if ((*currentSyl)) {
+        // The previous syl was an initial or median -> The note we just parsed is the end
         if (((*currentSyl)->GetWordpos() == WORDPOS_i) || ((*currentSyl)->GetWordpos() == WORDPOS_m)) {
             (*currentSyl)->m_drawingLastNote = (*lastNote);
         }
+        // The previous syl was a underscore -> the previous but one was the end
         else if ((*currentSyl)->GetCon() == CON_u) {
             (*currentSyl)->m_drawingLastNote = (*lastButOneNote);
         }
     }
     
+    // Now decide what to do with the starting syl and check if it has a forward connector
     if ((this->GetWordpos() == WORDPOS_i) || (this->GetWordpos() == WORDPOS_m)) {
         (*currentSyl) = this;
         return FUNCTOR_CONTINUE;
@@ -84,9 +90,24 @@ int Syl::PrepareLyrics( ArrayPtrVoid params )
         (*currentSyl) = NULL;
     }
     
-    //std::cout << UTF16to8( this->GetText().c_str() ) << std::endl;
     return FUNCTOR_CONTINUE;
 }
-
+    
+int Syl::FillStaffCurrentLyrics( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+    
+    // Since the lastNote was set in Syl::PrepareLyircs previously
+    // we can rely on it to check if the syl has a forward connector
+    if (this->m_drawingLastNote) {
+        (*currentSyl) = this;
+    }
+    else {
+        (*currentSyl) = NULL;
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

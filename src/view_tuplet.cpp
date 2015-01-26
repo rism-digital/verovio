@@ -18,6 +18,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "staff.h"
+#include "style.h"
 #include "tuplet.h"
 
 namespace vrv {
@@ -269,9 +270,9 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     dc->ResetFont();
     
-    int verticalLine = m_doc->m_drawingUnit;
+    int verticalLine = m_doc->m_drawingUnit[0];
     
-    dc->SetPen(m_currentColour, m_doc->m_env.m_stemWidth, AxSOLID);
+    dc->SetPen(m_currentColour, m_doc->m_style->m_stemWidth, AxSOLID);
     
     // Start is 0 when no line is necessary (i.e. beamed notes)
     if (start.x > 0) {

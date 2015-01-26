@@ -26,6 +26,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -1012,7 +1013,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
         // reset it as the minimum position to the step (HARDCODED)
-        (*min_pos) = 30 * doc->m_drawingUnit / 10;
+        (*min_pos) = 30 * doc->m_drawingUnit[0] / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1062,6 +1063,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
+    if ( current->IsVerse() || current->IsSyl() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
     if ( current->IsMRest() ) {
         // We need to reconsider this: if the mrest is on the top staff, the aligner will be before any other note
         // aligner. This means that it will not be shifted. We need to shift it but not take into account its own width.
@@ -1070,13 +1075,13 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / MARGIN_DENOMINATOR;
+    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / PARAM_DENOMINATOR;
     
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
-    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR);
+    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
@@ -1096,8 +1101,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
     
     return FUNCTOR_CONTINUE;
 }
@@ -1229,34 +1234,6 @@ int Object::SaveEnd( ArrayPtrVoid params )
     if (!output->WriteObjectEnd( this )) {
         return FUNCTOR_STOP;
     }
-    return FUNCTOR_CONTINUE;
-}
-    
-
-int Object::PrepareLyrics( ArrayPtrVoid params )
-{
-    // param 0: the current Syl
-    // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl**>(params[0]);
-    Note **lastNote = static_cast<Note**>(params[1]);
-    Note **lastButOneNote = static_cast<Note**>(params[2]);
-    
-    // processing a note
-    Note *note = dynamic_cast<Note*>(this);
-    if ( note ) {
-        (*lastButOneNote) = (*lastNote);
-        (*lastNote) = note;
-        return FUNCTOR_CONTINUE;
-    }
-    
-    // starting an new layer
-    Staff *staff = dynamic_cast<Staff*>(this);
-    if ( staff  ) {
-        if ((*currentSyl)) {
-            staff->m_currentSyls.push_back((*currentSyl));
-        }   
-    }
-    
     return FUNCTOR_CONTINUE;
 }
 

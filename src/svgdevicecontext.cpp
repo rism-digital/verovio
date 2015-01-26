@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "glyph.h"
 #include "view.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
@@ -180,7 +181,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
     bool drawBoundingBox = false;
     if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
-        SetPen( AxRED, 1, AxDOT_DASH );
+        SetPen( AxRED, 10, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasSelfBB() ) {
@@ -193,7 +194,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         }
         EndGraphic( object, NULL );
         
-        SetPen( AxBLUE, 1, AxDOT_DASH );
+        SetPen( AxBLUE, 10, AxDOT_DASH );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasContentBB() ) {
             this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
@@ -285,46 +286,10 @@ void SvgDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleY = yScale;
 }       
 
-void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
-{
-    LogDebug("SvgDeviceContext::GetTextExtent not implemented");
-}
-    
-// Copied from bBoxDc, TODO find another more generic solution
-void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
-{
-    assert( m_fontStack.top() );
-    
-    int x, y, partial_w, partial_h;
-    *w = 0;
-    *h = 0;
-    
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
-        wchar_t c = string[i];
-        Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph) {
-            continue;
-        }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-    
-        partial_w *= m_fontStack.top()->GetPointSize();
-        partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_fontStack.top()->GetPointSize();
-        partial_h /= glyph->GetUnitsPerEm();
-        
-        *w += partial_w;
-        *h += partial_h;
-    }
-}
-       
-
 Point SvgDeviceContext::GetLogicalOrigin( ) 
 {
     return Point( m_originX, m_originY );
 }
-
-
 
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
@@ -461,13 +426,11 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "width" ) = width;
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
-    rectChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
-    assert( m_fontStack.top() );
-    
     std::string s;
     std::string anchor;
     
@@ -487,11 +450,9 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     if ( !anchor.empty() ) {
         m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
     }
-    // font-size seems to be required in <text> in FireFox
-    if ( m_fontStack.top()->GetPointSize() != 0 ) {
-        m_currentNode.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
-    }
-    
+    // font-size seems to be required in <text> in FireFox - however, we set it to 0px because otherwise we
+    // end up with spaces between tspan because of the linebreaks in the SVG. Needs to be investigated
+    m_currentNode.append_attribute("font-size") = StringFormat("0px").c_str();
 }
     
 void SvgDeviceContext::EndText()
@@ -510,6 +471,17 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
     }
     if ( m_fontStack.top()->GetPointSize() != 0 ) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
+    }
+    if ( m_fontStack.top()->GetStyle() != FONTWEIGHT_NONE ) {
+        if ( m_fontStack.top()->GetStyle() == FONTSTYLE_italic ) {
+            textChild.append_attribute("font-style") = "italic";
+        }
+        else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_normal ) {
+            textChild.append_attribute("font-style") = "normal";
+        }
+        else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_oblique ) {
+            textChild.append_attribute("font-style") = "oblique";
+        }
     }
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
