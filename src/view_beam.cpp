@@ -104,7 +104,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     lastDur = elementCount = 0;
     high = avgY = sy_up = 0.0;
     
-    verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingInterl[staff->staffSize] * 2); //center point of the staff
+    verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingDoubleUnit[staff->staffSize] * 2); //center point of the staff
     yExtreme = verticalCenter; //value of farthest y point on the staff from verticalCenter minus verticalCenter; used if hasChord = ON
 
     beam->ResetList( beam );
@@ -126,8 +126,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
     dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0];
     dx[1] =  m_doc->m_drawingNoteRadius[staff->staffSize][1];
-    dx[0] -= (m_doc->m_env.m_stemWidth)/2;
-    dx[1] -= (m_doc->m_env.m_stemWidth)/2;
+    dx[0] -= (m_doc->m_style->m_stemWidth)/2;
+    dx[1] -= (m_doc->m_style->m_stemWidth)/2;
     
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -246,8 +246,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
     }
     else {
-        beamWidthBlack = std::max(2, (m_doc->m_drawingBeamWidth[staff->staffSize] * m_doc->m_env.m_graceNum / m_doc->m_env.m_graceDen));
-        beamWidthWhite = std::max(2, (m_doc->m_drawingBeamWhiteWidth[staff->staffSize] * m_doc->m_env.m_graceNum / m_doc->m_env.m_graceDen));
+        beamWidthBlack = std::max(2, (m_doc->m_drawingBeamWidth[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen));
+        beamWidthWhite = std::max(2, (m_doc->m_drawingBeamWhiteWidth[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen));
     }
 	beamWidth = beamWidthBlack + beamWidthWhite;
 
@@ -261,12 +261,12 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     verticalShift = ((shortestDur-DUR_8)*(beamWidth));
 
     if (beamElementCoord[last].element->m_cueSize) {
-        verticalShift += m_doc->m_drawingHalfInterl[staff->staffSize]*5;
+        verticalShift += m_doc->m_drawingUnit[staff->staffSize]*5;
     }
     else {
         verticalShift += (shortestDur > DUR_8) ?
-            m_doc->m_drawingInterl[staff->staffSize] * verticalShiftFactor :
-            m_doc->m_drawingInterl[staff->staffSize] * (verticalShiftFactor + 0.5);
+            m_doc->m_drawingDoubleUnit[staff->staffSize] * verticalShiftFactor :
+            m_doc->m_drawingDoubleUnit[staff->staffSize] * (verticalShiftFactor + 0.5);
     }
 
     // swap x position and verticalShift direction with stem down
@@ -349,23 +349,23 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	for (i=0; i<elementCount; i++)
 	{
         if (stemDir == STEMDIRECTION_up) {
-            fy1 = beamElementCoord[i].yBeam - m_doc->m_env.m_stemWidth;
-            fy2 = beamElementCoord[i].y + m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+            fy1 = beamElementCoord[i].yBeam - m_doc->m_style->m_stemWidth;
+            fy2 = beamElementCoord[i].y + m_doc->m_drawingUnit[staff->staffSize]/4;
             beamElementCoord[i].element->m_drawingStemStart.x = beamElementCoord[i].element->m_drawingStemEnd.x = beamElementCoord[i].x;
             beamElementCoord[i].element->m_drawingStemStart.y = fy2;
             beamElementCoord[i].element->m_drawingStemEnd.y = fy1;
             beamElementCoord[i].element->m_drawingStemDir = true;
         }
         else {
-            fy1 = beamElementCoord[i].yBeam + m_doc->m_env.m_stemWidth;
-            fy2 = beamElementCoord[i].y - m_doc->m_drawingHalfInterl[staff->staffSize]/4;
+            fy1 = beamElementCoord[i].yBeam + m_doc->m_style->m_stemWidth;
+            fy2 = beamElementCoord[i].y - m_doc->m_drawingUnit[staff->staffSize]/4;
             beamElementCoord[i].element->m_drawingStemStart.x = beamElementCoord[i].element->m_drawingStemEnd.x = beamElementCoord[i].x;
             beamElementCoord[i].element->m_drawingStemStart.y = fy2;
             beamElementCoord[i].element->m_drawingStemEnd.y = fy1;
             beamElementCoord[i].element->m_drawingStemDir = false;
         }
         if (beamElementCoord[i].element->IsNote() || beamElementCoord[i].element->IsChord()) {
-            DrawVerticalLine (dc,fy2, fy1, beamElementCoord[i].x, m_doc->m_env.m_stemWidth);
+            DrawVerticalLine (dc,fy2, fy1, beamElementCoord[i].x, m_doc->m_style->m_stemWidth);
 		}
 	}
 
@@ -378,8 +378,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     fullBars =  !changingDur ? (shortestDur - DUR_4) : 1;
     
     // Adjust the x position of the first and last element for taking into account the stem width
-	beamElementCoord[0].x -= (m_doc->m_env.m_stemWidth) / 2;
-	beamElementCoord[last].x += (m_doc->m_env.m_stemWidth) / 2;
+	beamElementCoord[0].x -= (m_doc->m_style->m_stemWidth) / 2;
+	beamElementCoord[last].x += (m_doc->m_style->m_stemWidth) / 2;
 
     // Shift direction
 	shiftY = (stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;

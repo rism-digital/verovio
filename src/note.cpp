@@ -239,7 +239,7 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
     {
         return this->GetStemDir();
     }
-
+}
     
 //----------------------------------------------------------------------------
 // Functors methods

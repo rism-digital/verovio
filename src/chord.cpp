@@ -88,10 +88,12 @@ yExtremes Chord::GetYExtremes(float initial)
     yVals.yMax = initial;
     yVals.yMin = initial;
     
+    int y1;
     for (int i = 0; i < (int)this->m_children.size(); i++)
     {
         Note *note = dynamic_cast<Note*>(this->m_children[i]);
-        int y1 = note->GetDrawingY();
+        y1 = note->GetDrawingY();
+        //std::cout << "Looking at " << y1 << std::endl;
         if (y1 > yVals.yMax) yVals.yMax = y1;
         else if (y1 < yVals.yMin) yVals.yMin = y1;
     }

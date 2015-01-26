@@ -16,6 +16,8 @@
 #include "devicecontextbase.h"
 #include "scoredef.h"
 #include "vrvdef.h"
+#include "vrv.h"
+#include "style.h"
 
 namespace vrv {
 
