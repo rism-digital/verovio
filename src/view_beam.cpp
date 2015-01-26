@@ -23,6 +23,8 @@
 #include "layerelement.h"
 #include "note.h"
 #include "staff.h"
+#include "style.h"
+#include "vrv.h"
 
 namespace vrv {
 

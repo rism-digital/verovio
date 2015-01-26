@@ -32,14 +32,16 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
-#include "staff.h"
-#include "syl.h"
-#include "system.h"
 #include "slur.h"
 #include "smufl.h"
+#include "staff.h"
+#include "style.h"
+#include "syl.h"
+#include "system.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
