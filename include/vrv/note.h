@@ -107,6 +107,17 @@ public:
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
     
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     */
+    virtual int PrepareLyrics( ArrayPtrVoid params );
+    
 private:
     
 protected:

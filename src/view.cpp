@@ -35,10 +35,6 @@ View::View( )
     m_currentMeasure = NULL;
 	m_currentStaff = NULL;
     m_currentSystem = NULL;
-
-    m_editorMode = EDITOR_EDIT;
-	
-	m_notationMode = MENSURAL_MODE;
 }
 
 
@@ -127,7 +123,7 @@ int View::ToDeviceContextY( int i )
         return 0;
     }
     
-    return m_doc->m_drawingPageHeight - i; // flipped
+    return (m_doc->m_drawingPageHeight - i); // flipped
 }
 
 /** y value in the Logical world  */

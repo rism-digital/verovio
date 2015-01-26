@@ -23,6 +23,7 @@
 #include "system.h"
 #include "staff.h"
 #include "tie.h"
+#include "vrv.h"
 
 namespace vrv {
 

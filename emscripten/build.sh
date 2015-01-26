@@ -131,6 +131,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/scoredef.cpp \
 	$VEROVIO_ROOT/src/slur.cpp \
 	$VEROVIO_ROOT/src/staff.cpp \
+	$VEROVIO_ROOT/src/style.cpp \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
 	$VEROVIO_ROOT/src/system.cpp \

@@ -36,7 +36,7 @@ public:
      * @name Constructors and destructors
      */
     ///@{
-    /** If initFont is set to false, Resources::InitFont will have to be called explicitely */
+    /** If initFont is set to false, Resources::InitFonts will have to be called explicitely */
     Toolkit( bool initFont = true );
     virtual ~Toolkit();
     ///@}

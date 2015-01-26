@@ -35,12 +35,13 @@ namespace vrv {
     
 std::string Resources::m_path = "/usr/local/share/verovio";
 std::map<wchar_t, Glyph> Resources::m_font;
+std::map<wchar_t, Glyph> Resources::m_textFont;
   
 //----------------------------------------------------------------------------
 // Font related methods
 //----------------------------------------------------------------------------
     
-bool Resources::InitFont()
+bool Resources::InitFonts()
 {
     // We will need to rethink this for adding the option to add custom fonts
     // Font Bravura first since it is expected to have always all symbols
@@ -52,6 +53,12 @@ bool Resources::InitFont()
         LogError("All default SMUFL glyphs could not be loaded");
         return false;
     }
+    
+    if ( !InitTextFont() ) {
+        LogError("Text font could not be initialized");
+        return false;
+    }
+    
     return true;
 }
     
@@ -62,7 +69,14 @@ bool Resources::SetFont(std::string fontName)
 
 Glyph *Resources::GetGlyph(wchar_t smuflCode)
 {
+    if (!m_font.count(smuflCode)) return NULL;
     return &m_font[smuflCode];
+}
+
+Glyph *Resources::GetTextGlyph(wchar_t code)
+{
+    if (!m_textFont.count(code)) return NULL;
+    return &m_textFont[code];
 }
     
 bool Resources::LoadFont(std::string fontName)
@@ -131,6 +145,47 @@ bool Resources::LoadFont(std::string fontName)
             if ( current.attribute( "width" ) ) width = atof( current.attribute( "width" ).value() );
             if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
             glyph->SetBoundingBox(x, y, width, height);
+        }
+    }                  
+    return true;
+}
+
+    
+bool Resources::InitTextFont()
+{
+    // For the text font, we load the bounding boxes only
+    pugi::xml_document doc;
+    // For now, we have only Georgia.xml bounding boxes for ASCII chars
+    // For any other char, we currently use 'o' bounding box
+    std::string filename = Resources::GetPath() + "/text/Georgia.xml";
+    pugi::xml_parse_result result = doc.load_file( filename.c_str() );
+    if (!result)
+    {
+        // File not found, default bounding boxes will be used
+        LogMessage("Cannot load bounding boxes for text font '%s'", filename.c_str());
+        return false;
+    }
+    pugi::xml_node root = doc.first_child();
+    if (!root.attribute("units-per-em")) {
+        LogWarning("No units-per-em attribute in bouding box file");
+        return false;
+    }
+    int unitsPerEm = atoi(root.attribute("units-per-em").value());
+    pugi::xml_node current;
+    for( current = root.child("glyph"); current; current = current.next_sibling("glyph") ) {
+        if ( current.attribute( "glyph-code" ) ) {
+            wchar_t code = (wchar_t)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
+            // We create a glyph with only the units per em which is the only info we need for
+            // the bounding boxes; path and codeStr will remain [unset]
+            Glyph glyph( unitsPerEm );
+            double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
+            // Not check for missing values...
+            if ( current.attribute( "x" ) ) x = atof( current.attribute( "x" ).value() );
+            if ( current.attribute( "y" ) ) y = atof( current.attribute( "y" ).value() );
+            if ( current.attribute( "width" ) ) width = atof( current.attribute( "width" ).value() );
+            if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
+            glyph.SetBoundingBox(x, y, width, height);
+            m_textFont[code] = glyph;
         }
     }                  
     return true;
@@ -407,45 +462,6 @@ std::string GetFilename( std::string fullpath )
     
 std::string GetVersion() {
     return StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION );
-}
-
-//----------------------------------------------------------------------------
-// DefaultEnv
-//----------------------------------------------------------------------------
-
-DefaultEnv::DefaultEnv()
-{
-    
-    m_unit = DEFAULT_UNIT * DEFINITON_FACTOR;
-    m_landscape = false;
-    m_staffLineWidth = (unsigned char)(2.0 * DEFINITON_FACTOR);
-    m_stemWidth = (unsigned char)(2.0 * DEFINITON_FACTOR);
-    m_barlineWidth = (unsigned char)(3.0 * DEFINITON_FACTOR);
-    m_beamMaxSlope = 30;
-    m_beamMinSlope = 10;
-    
-    // originally in WG Parameters2
-    m_smallStaffNum = 3;
-    m_smallStaffDen = 4;
-    m_graceNum = 3;
-    m_graceDen = 4;
-    m_headerType = 0;
-    
-    m_pageHeight = DEFAULT_PAGE_HEIGHT * DEFINITON_FACTOR;
-    m_pageWidth = DEFAULT_PAGE_WIDTH * DEFINITON_FACTOR;
-    m_pageRightMar = DEFAULT_PAGE_RIGHT_MAR * DEFINITON_FACTOR;;
-    m_pageLeftMar = DEFAULT_PAGE_LEFT_MAR * DEFINITON_FACTOR;
-    m_pageTopMar = DEFAULT_PAGE_TOP_MAR * DEFINITON_FACTOR;
-    m_spacingStaff = DEFAULT_SPACING_STAFF;
-    m_spacingSystem = DEFAULT_SPACING_SYSTEM;
-    
-    // additional parameters
-    m_notationMode = MENSURAL_MODE;
-    //m_notationMode = CMN_MODE;
-}
-
-DefaultEnv::~DefaultEnv()
-{
 }
 
 } // namespace vrv

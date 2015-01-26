@@ -239,7 +239,24 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
     {
         return this->GetStemDir();
     }
+
     
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Note::PrepareLyrics( ArrayPtrVoid params )
+{
+    // param 0: the current Syl (unused)
+    // param 1: the last Note
+    // param 2: the last but one Note
+    Note **lastNote = static_cast<Note**>(params[1]);
+    Note **lastButOneNote = static_cast<Note**>(params[2]);
+    
+    (*lastButOneNote) = (*lastNote);
+    (*lastNote) = this;
+    
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

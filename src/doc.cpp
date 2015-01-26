@@ -1,4 +1,4 @@
-    /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Name:        doc.cpp
 // Author:      Laurent Pugin
 // Created:     2005
@@ -27,9 +27,11 @@
 #include "page.h"
 #include "smufl.h"
 #include "staff.h"
+#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -40,11 +42,13 @@ namespace vrv {
 Doc::Doc() :
     Object("doc-")
 {
+    m_style = new Style();
     Reset( Raw );
 }
 
 Doc::~Doc()
 {
+    delete m_style;
     
 }
 
@@ -59,11 +63,10 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
-    m_spacingStaff = m_env.m_spacingStaff;
-    m_spacingSystem = m_env.m_spacingSystem;
+    m_spacingStaff = m_style->m_spacingStaff;
+    m_spacingSystem = m_style->m_spacingSystem;
     
     m_drawingPage = NULL;
-    m_drawingUnit = 0;
     m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     
@@ -123,6 +126,8 @@ void Doc::PrepareDrawing()
                 filters.push_back( &matchLayer );
                 filters.push_back( &matchVerse );
                 
+                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+                // m_drawingLastNote is set only if the syl has a forward connector
                 currentSyl = NULL;
                 lastNote = NULL;
                 lastButOneNote = NULL;
@@ -133,6 +138,16 @@ void Doc::PrepareDrawing()
                 Functor prepareLyrics( &Object::PrepareLyrics );
                 Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
                 this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
+                
+                // The second pass set the current lyric for all staves that have a lyric
+                // started in a previous measure and that will need to be drawing from the
+                // Staff Object. This fills the Staff::m_currentSyls list
+                currentSyl = NULL;
+                paramsLyrics.clear();
+                paramsLyrics.push_back( &currentSyl );
+                Functor fillStaffCurrentLyrics( &Object::FillStaffCurrentLyrics );
+                Functor fillStaffCurrentLyricsEnd( &Object::FillStaffCurrentLyricsEnd );
+                this->Process( &fillStaffCurrentLyrics, paramsLyrics, &fillStaffCurrentLyricsEnd, &filters );
             }
         }
     }
@@ -300,8 +315,44 @@ short Doc::GetRightMargin( const std::type_info *elementType )
     else if (typeid(MRest) == *elementType) return 0;
     else if (typeid(MultiRest) == *elementType) return 0;
     //else if (typeid(Note) == *elementType) return 10;
-    return 15;
+    return 10;
 }
+    
+void Doc:: SetPageHeight( int pageHeight )
+{
+    m_pageHeight = pageHeight * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageWidth( int pageWidth )
+{
+    m_pageWidth = pageWidth * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageLeftMar( short pageLeftMar )
+{
+    m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageRightMar( short pageRightMar )
+{
+    m_pageRightMar = pageRightMar * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageTopMar( short pageTopMar )
+{
+    m_pageTopMar = pageTopMar * DEFINITON_FACTOR;
+};
+
+void Doc::SetSpacingStaff( short spacingStaff )
+{
+    m_spacingStaff = spacingStaff;
+};
+
+void Doc::SetSpacingSystem( short spacingSystem )
+{
+    m_spacingSystem = spacingSystem;
+};
+
 
 
 Page *Doc::SetDrawingPage( int pageIdx )
@@ -337,14 +388,14 @@ Page *Doc::SetDrawingPage( int pageIdx )
     }
     else
     {
-        m_drawingPageHeight = m_env.m_pageHeight;
-        m_drawingPageWidth = m_env.m_pageWidth;
-        m_drawingPageLeftMar = m_env.m_pageLeftMar;
-        m_drawingPageRightMar = m_env.m_pageRightMar;
-        m_drawingPageTopMar = m_env.m_pageTopMar;
+        m_drawingPageHeight = m_style->m_pageHeight;
+        m_drawingPageWidth = m_style->m_pageWidth;
+        m_drawingPageLeftMar = m_style->m_pageLeftMar;
+        m_drawingPageRightMar = m_style->m_pageRightMar;
+        m_drawingPageTopMar = m_style->m_pageTopMar;
     }
     
-    if (this->m_env.m_landscape)
+    if (this->m_style->m_landscape)
     {	
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
@@ -355,39 +406,37 @@ Page *Doc::SetDrawingPage( int pageIdx )
     }
     
     // From here we could check if values have changed
-    // Since  m_env.m_interlDefin stays the same, it useless to do it
+    // Since  m_style->m_interlDefin stays the same, it useless to do it
     // every time for now.
     
-    m_drawingUnit = this->m_env.m_unit;
-    
-	m_drawingBeamMaxSlope = this->m_env.m_beamMaxSlope;
-	m_drawingBeamMinSlope = this->m_env.m_beamMinSlope;
+	m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
+	m_drawingBeamMinSlope = this->m_style->m_beamMinSlope;
 	m_drawingBeamMaxSlope /= 100;
 	m_drawingBeamMinSlope /= 100;
     
-    m_drawingSmallStaffRatio[0] = this->m_env.m_smallStaffNum;
-    m_drawingSmallStaffRatio[1] = this->m_env.m_smallStaffDen;
-    m_drawingGraceRatio[0] = this->m_env.m_graceNum;
-    m_drawingGraceRatio[1] = this->m_env.m_graceDen;
+    m_drawingSmallStaffRatio[0] = this->m_style->m_smallStaffNum;
+    m_drawingSmallStaffRatio[1] = this->m_style->m_smallStaffDen;
+    m_drawingGraceRatio[0] = this->m_style->m_graceNum;
+    m_drawingGraceRatio[1] = this->m_style->m_graceDen;
     
     // half of the space between two lines
-    m_drawingHalfInterl[0] = m_env.m_unit;
+    m_drawingUnit[0] = m_style->m_unit;
     // same for small staves
-    m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingUnit[1] = (m_drawingUnit[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
-    m_drawingInterl[0] = m_drawingHalfInterl[0] * 2;
+    m_drawingDoubleUnit[0] = m_drawingUnit[0] * 2;
     // same for small staves
-    m_drawingInterl[1] = m_drawingHalfInterl[1] * 2;
+    m_drawingDoubleUnit[1] = m_drawingUnit[1] * 2;
     // staff (with five lines)
-    m_drawingStaffSize[0] = m_drawingInterl[0] * 4;
-    m_drawingStaffSize[1] = m_drawingInterl[1] * 4;
+    m_drawingStaffSize[0] = m_drawingDoubleUnit[0] * 4;
+    m_drawingStaffSize[1] = m_drawingDoubleUnit[1] * 4;
     //
-    m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
-    m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
+    m_drawingOctaveSize[0] = m_drawingUnit[0] * 7;
+    m_drawingOctaveSize[1] = m_drawingUnit[1] * 7;
     
     // values for beams
-    m_drawingBeamWidth[0] = this->m_env.m_unit;
-    m_drawingBeamWhiteWidth[0] = this->m_env.m_unit / 2;
+    m_drawingBeamWidth[0] = this->m_style->m_unit;
+    m_drawingBeamWhiteWidth[0] = this->m_style->m_unit / 2;
     m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
@@ -407,8 +456,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     
     m_drawingLyricFonts[0] = m_drawingLyricFont;
     m_drawingLyricFonts[1] = m_drawingLyricFont;
-	m_drawingLyricFonts[0].SetPointSize( m_drawingFontHeight * 3 / 5 );
-    m_drawingLyricFonts[1].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * 3 / 5 );
+	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
+    m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
     
     float glyph_size;
     Glyph *glyph;
@@ -452,7 +501,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
 
 int Doc::CalcMusicFontSize( )
 {
-    return m_env.m_unit * 8;
+    return m_style->m_unit * 8;
 }
     
 int Doc::GetAdjustedDrawingPageHeight()

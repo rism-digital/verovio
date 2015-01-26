@@ -27,6 +27,7 @@ public:
     ///@{
     Beam();
     virtual ~Beam();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Beam"; };
     ///@}
     

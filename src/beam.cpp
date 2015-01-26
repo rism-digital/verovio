@@ -21,14 +21,21 @@ namespace vrv {
 Beam::Beam():
     LayerElement("beam-"), ObjectListInterface()
 {
+    Reset();
 }
 
 
 Beam::~Beam()
 {
 }
+    
+void Beam::Reset()
+{
+    LayerElement::Reset();
+}
 
-void Beam::AddElement(LayerElement *element) {
+void Beam::AddElement(LayerElement *element)
+{
    
     element->SetParent( this );
     m_children.push_back(element);

@@ -20,8 +20,6 @@ namespace vrv {
     
 class Glyph;
 class Object;
-    
-bool IsNote( Object *object );
 
 /**
  * The following functions are helpers for formating, conversion, or loging
@@ -125,83 +123,31 @@ public:
      * @name Setters and getters for static environment variables
      */
     ///@{
+    /** Resource path */
     static std::string GetPath( ) { return m_path; };
     static void SetPath( std::string path ) { m_path = path; };
-    static bool InitFont( );
+    /** Init the SMufL music and text fonts */
+    static bool InitFonts( );
+    /** Init the text font (bounding boxes and ASCII only) */
+    static bool InitTextFont( );
+    /** Select a particular font */
     static bool SetFont( std::string fontName );
+    /** Returns the glyph (if exists) for the current SMuFL font */
     static Glyph* GetGlyph( wchar_t smuflCode );
+    /** Returns the glyph (if exists) for the text font (bounding box and ASCII only) */
+    static Glyph* GetTextGlyph( wchar_t code );
     ///@}
     
 private:
     static bool LoadFont(std::string fontName);
     
-    
 private:
     /** The path to the resources directory (e.g., for the svg/ subdirectory with fonts as XML */
     static std::string m_path;
-    /** */
+    /** The loaded SMuFL font */
     static std::map<wchar_t, Glyph> m_font;
-};
-
-
-//----------------------------------------------------------------------------
-// DefaultEnv
-//----------------------------------------------------------------------------
-
-/** 
- * This class contains the document default environment variables.
- * Some of them are not available as is in MEI - to be solved
- */
-class DefaultEnv 
-{
-public:
-    // constructors and destructors
-    DefaultEnv();
-    virtual ~DefaultEnv();
-    
-    
-public:
-    /** The unit (1⁄2 of the distance between staff lines) **/
-    int m_unit;
-    /** The landscape paper orientation flag */
-    char m_landscape;
-    /** The staff line width */
-    unsigned char m_staffLineWidth;
-    /** The stem width */
-    unsigned char m_stemWidth;
-    /** The barLine width */
-    unsigned char m_barlineWidth;
-    /** The maximum beam slope */
-    unsigned char m_beamMaxSlope;
-    /** The minimum beam slope */
-    unsigned char m_beamMinSlope;     
-    /** The small staff size ratio numerator */
-    unsigned char m_smallStaffNum;
-    /** The small staff size ratio denominator */
-    unsigned char m_smallStaffDen;
-    /** The grace size ratio numerator */
-    unsigned char m_graceNum;
-    /** The grace size ratio denominator */
-    unsigned char m_graceDen;
-    /** The header and footer type */
-    unsigned int m_headerType;
-    /** The notation mode (cmn or mensural) */
-    int m_notationMode;
-    /** The page height */
-    int m_pageHeight;
-    /** The page width */
-    int m_pageWidth;
-    /** The page left margin */
-    short m_pageLeftMar;
-    /** The page right margin */
-    short m_pageRightMar;
-    /** The page top margin */
-    short m_pageTopMar;
-    /** The staff minimal spacing */
-    short m_spacingStaff;
-    /** The system minimal spacing */
-    short m_spacingSystem;
-    
+    /** A text font used for bounding box calculations */
+    static std::map<wchar_t, Glyph> m_textFont;
 };
 
 } // namespace vrv

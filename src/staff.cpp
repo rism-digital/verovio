@@ -15,6 +15,8 @@
 //----------------------------------------------------------------------------
 
 #include "layer.h"
+#include "note.h"
+#include "syl.h"
 #include "system.h"
 
 namespace vrv {
@@ -126,6 +128,44 @@ int Staff::AlignVertically( ArrayPtrVoid params )
     
     // for next staff
     (*staffNb)++;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Staff::FillStaffCurrentLyrics( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    // param 1: the last Note
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+
+    if ((*currentSyl)) {
+        // We have a running syl started in a previous measure
+        this->m_currentSyls.push_back((*currentSyl));
+        if ((*currentSyl)->m_drawingLastNote) {
+            // Look if the syl ends in this measure - if yes, set it to NULL for the next measure
+            if ((*currentSyl)->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) == this ) {
+                (*currentSyl) = NULL;
+            }
+        }
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::FillStaffCurrentLyricsEnd( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    // param 1: the last Note
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+    
+    // Here we have a running syl started and ended in this measure but still running (happens with @con="u"
+    // At the end of a word (not next syl for detecting the end of the syl)
+    if ((*currentSyl) && (*currentSyl)->m_drawingLastNote) {
+        // Look if the syl ends in this measure - if yes, set it to NULL for the next measure
+        if ((*currentSyl)->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) == this ) {
+            (*currentSyl) = NULL;
+        }
+    }
     
     return FUNCTOR_CONTINUE;
 }
