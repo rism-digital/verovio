@@ -93,7 +93,6 @@ void Chord::GetYExtremes(int initial, int *yMax, int *yMin)
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
         y1 = note->GetDrawingY();
-        //std::cout << "Looking at " << y1 << std::endl;
         if (y1 > *yMax) *yMax = y1;
         else if (y1 < *yMin) *yMin = y1;
     }

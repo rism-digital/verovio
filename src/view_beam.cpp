@@ -43,8 +43,8 @@ enum  {
 struct BeamElementCoord {
     int x;
     int y; // represents the point farthest from the beam
-    int yTop; // y value of topmost note at any onset time
-    int yBottom; // y value of bottom-most note at any onset time
+    int yTop; // y value of topmost note
+    int yBottom; // y value of bottom-most note
     int yBeam; // height of stems
     int dur; // drawing duration
     int breaksec;
@@ -63,9 +63,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     
     // position variables
-    int high, low;
+    int high, low, yExtreme;
     int verticalCenter;
-    int yExtreme;
     
     double verticalShiftFactor = 3.0;
     
@@ -193,11 +192,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     int curY;
     // elementCount holds the last one
 	for (i = 0; i < elementCount; i++) {
-        beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
-
-        // highest and lowest value;
-		high= std::max(beamElementCoord[i].y, high);
-		low = std::min(beamElementCoord[i].y, low);
 
         if (dynamic_cast<Chord*>(beamElementCoord[i].element)) {
             dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(verticalCenter, &yMax, &yMin);
@@ -206,19 +200,25 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             
             avgY += beamElementCoord[i].y + ((yMax - yMin) / 2);
             
-            if (abs(yMax - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yMax;
-            if (abs(yMin - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yMin;
+            // highest and lowest value;
+            high= std::max(yMax, high);
+            low = std::min(yMin, low);
         }
         else {
+            beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
+            
+            // highest and lowest value;
+            high= std::max(beamElementCoord[i].y, high);
+            low = std::min(beamElementCoord[i].y, low);
+            
             curY = beamElementCoord[i].element->GetDrawingY();
             beamElementCoord[i].y = curY;
             beamElementCoord[i].yTop = curY;
             beamElementCoord[i].yBottom = curY;
-            if (yExtreme >= verticalCenter && curY > yExtreme) yExtreme = curY;
-            if (yExtreme <= verticalCenter && curY < yExtreme) yExtreme = curY;
             avgY += beamElementCoord[i].y;
         }
 	}
+    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
     
     avgY /= elementCount;
 
@@ -260,7 +260,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // The vertical shift depends on the shortestDur value we have in the beam
     verticalShift = ((shortestDur-DUR_8)*(beamWidth));
 
-    //if an element is a smaller size
+    //if the beam has smaller-size notes
     if (beamElementCoord[last].element->m_cueSize) {
         verticalShift += m_doc->m_drawingUnit[staff->staffSize]*5;
     }
@@ -292,12 +292,15 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         
         else if ( beamElementCoord[i].element->IsChord() ) {
             ((Chord*)beamElementCoord[i].element)->m_drawingStemDir = stemDir;
-            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
         }
         
         else {
             beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
         }
+        
+        if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY())
+            beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY();
         
         beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
         
@@ -335,7 +338,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         prevYPos = beamElementCoord[i].yBeam;	/* curCoord, variable de travail */
 		beamElementCoord[i].yBeam = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
 		
-        //if the stem is not long enough, adds the extra stem length needed to all members of the beam
+        //if the stem is not long enough, add extra stem length needed to all members of the beam
         if ((stemDir == STEMDIRECTION_up && prevYPos > beamElementCoord[i].yBeam) || (stemDir == STEMDIRECTION_down && prevYPos < beamElementCoord[i].yBeam)) {
             verticalBoost += prevYPos - beamElementCoord[i].yBeam;
             i = -1;
