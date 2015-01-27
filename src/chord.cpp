@@ -24,9 +24,9 @@ namespace vrv {
 
 Chord::Chord( ):
 LayerElement("chord-"), DrawingListInterface(), ObjectListInterface(),    DurationInterface(),
+    AttColoration(),
     AttCommon(),
-    AttStemmed(),
-    AttColoration()
+    AttStemmed()
 {
     Reset();
 }
@@ -82,23 +82,19 @@ void Chord::FilterList()
     }
 }
     
-yExtremes Chord::GetYExtremes(float initial)
+void Chord::GetYExtremes(int initial, int *yMax, int *yMin)
 {
-    yExtremes yVals;
-    yVals.yMax = initial;
-    yVals.yMin = initial;
-    
+    *yMax = initial;
+    *yMin = initial;
     int y1;
     for (int i = 0; i < (int)this->m_children.size(); i++)
     {
         Note *note = dynamic_cast<Note*>(this->m_children[i]);
         y1 = note->GetDrawingY();
         //std::cout << "Looking at " << y1 << std::endl;
-        if (y1 > yVals.yMax) yVals.yMax = y1;
-        else if (y1 < yVals.yMin) yVals.yMin = y1;
+        if (y1 > *yMax) *yMax = y1;
+        else if (y1 < *yMin) *yMin = y1;
     }
-    
-    return yVals;
 }
     
 }

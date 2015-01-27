@@ -188,7 +188,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     /******************************************************************/
     // Calculate the extrem values
     
-    yExtremes yVals;
+    int yMax = 0, yMin = 0;
     int curY;
     // elementCount holds the last one
 	for (i = 0; i < elementCount; i++) {
@@ -199,14 +199,14 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 		low = std::min(beamElementCoord[i].y, low);
 
         if (dynamic_cast<Chord*>(beamElementCoord[i].element)) {
-            yVals = dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(verticalCenter);
-            beamElementCoord[i].yMax = yVals.yMax;
-            beamElementCoord[i].yMin = yVals.yMin;
+            dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(verticalCenter, &yMax, &yMin);
+            beamElementCoord[i].yMax = yMax;
+            beamElementCoord[i].yMin = yMin;
             
-            avgY += beamElementCoord[i].y + ((yVals.yMax - yVals.yMin) / 2);
+            avgY += beamElementCoord[i].y + ((yMax - yMin) / 2);
             
-            if (abs(yVals.yMax - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yVals.yMax;
-            if (abs(yVals.yMin - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yVals.yMin;
+            if (abs(yMax - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yMax;
+            if (abs(yMin - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yMin;
         }
         else {
             beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
