@@ -276,11 +276,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         dx[1] = -dx[1];
         verticalShift = -verticalShift;
     }
-
-    avgY += verticalShift;
-    if ((stemDir == STEMDIRECTION_up && avgY < verticalCenter) || (stemDir == STEMDIRECTION_down && avgY > verticalCenter)) {
-        verticalShift += verticalCenter - avgY;
-    }
     
     for (i=0; i<elementCount; i++)
     {
@@ -292,7 +287,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         
         else if ( beamElementCoord[i].element->IsChord() ) {
             ((Chord*)beamElementCoord[i].element)->m_drawingStemDir = stemDir;
-            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
+            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
         }
         
         else {
@@ -300,7 +295,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         }
         
         if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY())
-            beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY();
+            beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY() + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
         
         beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
         
