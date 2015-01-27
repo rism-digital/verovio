@@ -1016,12 +1016,12 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
-    yExtremes yVals = chord->GetYExtremes(verticalCenter);
-    int maxY = yVals.yMax, minY = yVals.yMin;
-    
+    int yMax, yMin;
+    chord->GetYExtremes(verticalCenter, &yMax, &yMin);
+        
     int drawingDur = chord->GetDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-    chord->SetStemDir( (maxY - verticalCenter >= verticalCenter - minY) ? STEMDIRECTION_down : STEMDIRECTION_up );
+    chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up );
     
     if(inBeam && drawingDur > DUR_4)
     {
@@ -1029,18 +1029,18 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else {
         int originY;
-        if (maxY - verticalCenter >= verticalCenter - minY) {
+        if (yMax - verticalCenter >= verticalCenter - yMin) {
             chord->SetStemDir( STEMDIRECTION_down );
-            originY = maxY;
+            originY = yMax;
         }
         else {
             chord->SetStemDir( STEMDIRECTION_up );
-            originY = minY;
+            originY = yMin;
         }
         
         chord->m_drawingStemDir = chord->GetStemDir();
         
-        int heightY = maxY - minY;
+        int heightY = yMax - yMin;
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
         int beamX = chord->GetDrawingX();
         
