@@ -59,7 +59,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     BeamElementCoord beamElementCoord[MAX_ELEMENTS_IN_BEAM]; /* garde les coord.d'entree*/
 
 	bool changingDur = OFF;
-    bool hasChord = OFF;
+    bool beamHasChord = OFF;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     
     // position variables
@@ -107,7 +107,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     high = avgY = sy_up = 0.0;
     
     verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingDoubleUnit[staff->staffSize] * 2); //center point of the staff
-    yExtreme = verticalCenter; //value of farthest y point on the staff from verticalCenter minus verticalCenter; used if hasChord = ON
+    yExtreme = verticalCenter; //value of farthest y point on the staff from verticalCenter minus verticalCenter; used if beamHasChord = ON
 
     ListOfObjects* beamChildren = beam->GetList(beam);
     
@@ -142,7 +142,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         currentDur = dynamic_cast<DurationInterface*>(current)->GetDur();
         
         if ( current->IsChord() ) {
-            hasChord = true;
+            beamHasChord = true;
         }
 
         // Can it happen? With rests?
@@ -186,7 +186,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	last = elementCount - 1;
     
     /******************************************************************/
-    // Calculate the extrem values
+    // Calculate the extreme values
     
     int yMax = 0, yMin = 0;
     int curY;
@@ -209,19 +209,24 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             if (abs(yMin - verticalCenter) > abs(yExtreme - verticalCenter)) yExtreme = yMin;
         }
         else {
-            beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
-            curY = beamElementCoord[i].y;
+            curY = beamElementCoord[i].element->GetDrawingY();
+            beamElementCoord[i].y = curY;
+            beamElementCoord[i].yMax = curY;
+            beamElementCoord[i].yMin = curY;
             if (yExtreme >= verticalCenter && curY > yExtreme) yExtreme = curY;
             if (yExtreme <= verticalCenter && curY < yExtreme) yExtreme = curY;
             avgY += beamElementCoord[i].y;
         }
 	}
+    
+    avgY /= elementCount;
 
     /******************************************************************/
     // Set the stem direction
     
+    
     stemDir = layer->GetDrawingStemDir();
-    if (hasChord) {
+    if (stemDir == STEMDIRECTION_NONE && beamHasChord) {
         if (yExtreme > verticalCenter) {
             stemDir = STEMDIRECTION_down;
             for (i = 0; i < elementCount; i++) {
@@ -235,8 +240,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             }
         }
     }
-    
-    avgY /= elementCount;
     
     if (stemDir == STEMDIRECTION_NONE) {
         if ( avgY <  verticalCenter ) stemDir = STEMDIRECTION_up;
