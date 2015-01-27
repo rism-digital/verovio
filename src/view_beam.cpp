@@ -109,17 +109,17 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingDoubleUnit[staff->staffSize] * 2); //center point of the staff
     yExtreme = verticalCenter; //value of farthest y point on the staff from verticalCenter minus verticalCenter; used if hasChord = ON
 
-    beam->ResetList( beam );
+    ListOfObjects* beamChildren = beam->GetList(beam);
     
     // Should we assert this at the beginning?
-    if (beam->m_list.empty()) {
+    if (beamChildren->empty()) {
         return;
     }
     
-    assert( beam->m_list.size() < MAX_ELEMENTS_IN_BEAM );
+    assert( beamChildren->size() < MAX_ELEMENTS_IN_BEAM );
     
     // current point to the first Note in the layed out layer
-    current = dynamic_cast<LayerElement*>(beam->m_list.front());
+    current = dynamic_cast<LayerElement*>(beamChildren->front());
     // Beam list should contain only DurationInterface objects
     assert( dynamic_cast<DurationInterface*>(current) );
     
@@ -134,7 +134,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
     
-    ListOfObjects::iterator iter = beam->m_list.begin();
+    ListOfObjects::iterator iter = beamChildren->begin();
 	do {
         // Beam list should contain only DurationInterface objects
         assert( dynamic_cast<DurationInterface*>(current) );
@@ -171,7 +171,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 		}
         
         iter++;
-        if (iter == beam->m_list.end()) {
+        if (iter == beamChildren->end()) {
             break;
         }
         current = dynamic_cast<LayerElement*>(*iter);

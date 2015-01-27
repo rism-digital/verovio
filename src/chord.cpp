@@ -57,18 +57,19 @@ void Chord::FilterList()
 {
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = m_list.begin();
+    ListOfObjects* childList = this->GetList(this);
+    ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != m_list.end()) {
+    while ( iter != childList->end()) {
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( !currentElement ) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = m_list.erase( iter );
+            iter = childList->erase( iter );
         }
         else if ( !currentElement->HasDurationInterface() )
         {
             // remove anything that has not a DurationInterface
-            iter = m_list.erase( iter );
+            iter = childList->erase( iter );
         } else {
             Note *n = dynamic_cast<Note*>(currentElement);
             
@@ -76,7 +77,7 @@ void Chord::FilterList()
                 iter++;
             } else {
                 // if it is not a note, drop it
-                iter = m_list.erase( iter );
+                iter = childList->erase( iter );
             }
         }
     }
@@ -88,8 +89,8 @@ void Chord::GetYExtremes(int initial, int *yMax, int *yMin)
     *yMin = initial;
     int y1;
     
-    this->GetList(this); //make sure it's initialized
-    for (ListOfObjects::iterator it = this->m_list.begin(); it != this->m_list.end(); it++) {
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
         y1 = note->GetDrawingY();
         //std::cout << "Looking at " << y1 << std::endl;

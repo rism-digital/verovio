@@ -253,8 +253,9 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
     
     int w, h;
     
-    ListOfObjects::iterator iter = scoreDef->m_list.begin();
-    while (iter != scoreDef->m_list.end()) {
+    ListOfObjects* scoreDefChildren = scoreDef->GetList(scoreDef);
+    ListOfObjects::iterator iter = scoreDefChildren->begin();
+    while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef*>(*iter);
         
         if (!staffDef) {
