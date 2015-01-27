@@ -137,10 +137,10 @@ void View::DrawSystemList( DeviceContext *dc, System *system, const std::type_in
 {
     assert( dc ); // DC cannot be NULL
     
-    std::list<DocObject*> *drawingList = system->GetDrawingList();
+    ListOfObjects *drawingList = system->GetDrawingList();
     LayerElement *element = NULL;
     
-    std::list<DocObject*>::iterator iter;
+    ListOfObjects::iterator iter;
     
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
     {
@@ -904,10 +904,10 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
 {
 	assert( dc ); // DC cannot be NULL
     
-    std::list<DocObject*> *drawingList = layer->GetDrawingList();
+    ListOfObjects *drawingList = layer->GetDrawingList();
 	LayerElement *element = NULL;
     
-    std::list<DocObject*>::iterator iter;
+    ListOfObjects::iterator iter;
     
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
     {

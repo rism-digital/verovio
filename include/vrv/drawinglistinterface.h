@@ -9,7 +9,7 @@
 #ifndef __VRV_DRAWING_LIST_INTERFACE_H__
 #define __VRV_DRAWING_LIST_INTERFACE_H__
 
-#include <list>
+#include "vrvdef.h"
 
 namespace vrv {
     
@@ -48,7 +48,7 @@ public:
      * Return the drawing list.
      * This is used when actually drawing the list (see View::DrawLayerList)
      */
-    std::list<DocObject*> *GetDrawingList( );
+    ListOfObjects *GetDrawingList( );
     
     /**
      * Reset the drawing list.
@@ -62,7 +62,7 @@ public:
 
 private:
     /** The list of object for which drawing is postponed */
-    std::list<DocObject*> m_drawingList;
+    ListOfObjects m_drawingList;
 };
     
 } // namespace vrv 

@@ -9,34 +9,22 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
-#include <list>
 #include <map>
 #include <string>
 #include <typeinfo>
-#include <vector>
 
 //----------------------------------------------------------------------------
 
 #include "vrvdef.h"
 
 namespace vrv {
-
+    
 class Doc;
 class EditorialElement;
 class Functor;
-class Object;
-class AttComparison;
-
-typedef std::vector<Object*> ArrayOfObjects;
-
-typedef std::list<Object*> ListOfObjects;
-
-typedef std::vector<void*> ArrayPtrVoid;
-    
-typedef std::vector<AttComparison*> ArrayOfAttComparisons;
 
 /**
- * Generic int map recursive sturcutre for storing hierachy of values
+ * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store 
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)

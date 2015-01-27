@@ -43,7 +43,7 @@ void DrawingListInterface::AddToDrawingList( DocObject *object )
     m_drawingList.unique();
 }
 
-std::list<DocObject*> *DrawingListInterface::GetDrawingList( )
+ListOfObjects *DrawingListInterface::GetDrawingList( )
 {
     return &m_drawingList;
 }

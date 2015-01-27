@@ -10,12 +10,25 @@
 #define __VRV_DEF_H__
 
 #include <algorithm>
+#include <list>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
 
 namespace vrv {
+    
+    class Object;
+    class AttComparison;
+    
+    typedef std::vector<Object*> ArrayOfObjects;
+    
+    typedef std::list<Object*> ListOfObjects;
+    
+    typedef std::vector<void*> ArrayPtrVoid;
+    
+    typedef std::vector<AttComparison*> ArrayOfAttComparisons;
     
 //----------------------------------------------------------------------------
 // Global defines
