@@ -36,14 +36,14 @@ void DrawingListInterface::Reset()
     
     
     
-void DrawingListInterface::AddToDrawingList( LayerElement *element )
+void DrawingListInterface::AddToDrawingList( DocObject *object )
 {
-    m_drawingList.push_back( element );
+    m_drawingList.push_back( object );
     m_drawingList.sort();
     m_drawingList.unique();
 }
 
-ListOfObjects *DrawingListInterface::GetDrawingList( )
+std::list<DocObject*> *DrawingListInterface::GetDrawingList( )
 {
     return &m_drawingList;
 }

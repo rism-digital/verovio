@@ -9,11 +9,11 @@
 #ifndef __VRV_DRAWING_LIST_INTERFACE_H__
 #define __VRV_DRAWING_LIST_INTERFACE_H__
 
-#include "object.h"
+#include <list>
 
 namespace vrv {
     
-class LayerElement;
+class DocObject;
 
 //----------------------------------------------------------------------------
 // DrawingListInterface
@@ -42,13 +42,13 @@ public:
      * that need to be drawn in a particular order.
      * For example, we need to draw beams before tuplets
      */
-    void AddToDrawingList( LayerElement *element );
+    void AddToDrawingList( DocObject *element );
     
     /**
      * Return the drawing list.
      * This is used when actually drawing the list (see View::DrawLayerList)
      */
-    ListOfObjects *GetDrawingList( );
+    std::list<DocObject*> *GetDrawingList( );
     
     /**
      * Reset the drawing list.
@@ -62,7 +62,7 @@ public:
 
 private:
     /** The list of object for which drawing is postponed */
-    ListOfObjects m_drawingList;
+    std::list<DocObject*> m_drawingList;
 };
     
 } // namespace vrv 
