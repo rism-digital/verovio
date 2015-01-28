@@ -47,10 +47,12 @@ int Tie::PrepareTimeSpanning( ArrayPtrVoid params )
     return TimeSpanningInterface::PrepareTimeSpanning(params, this);
 }
 
+
 int Tie::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
 {
     // Pass it to the pseudo functor of the interface
     return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
+
 
 } // namespace vrv

@@ -742,6 +742,33 @@ data_STEMPOSITION Att::StrToStemPosition(std::string value)
         LogWarning("Unsupported pitch name '%s'", value.c_str() );
     }
     return STEMPOSITION_NONE;
+}    
+
+std::string Att::TieToStr(data_TIE data)
+{
+    std::string value;
+    switch(data)
+    {
+        case TIE_i : value = "i"; break;
+        case TIE_m : value = "m"; break;
+        case TIE_t : value = "t"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_TIE Att::StrToTie(std::string value)
+{
+    if (value == "i") return TIE_i;
+    else if (value == "m") return TIE_m;
+    else if (value == "t") return TIE_t;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return TIE_NONE;
 }
 
 std::string Att::WordPosToStr(data_WORDPOS data)

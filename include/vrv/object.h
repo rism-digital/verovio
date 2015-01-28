@@ -466,7 +466,11 @@ public:
     
     /**
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };    
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      */

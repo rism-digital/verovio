@@ -5759,13 +5759,13 @@ AttTiepresent::~AttTiepresent() {
 }
 
 void AttTiepresent::ResetTiepresent() {
-    m_tie = "";
+    m_tie = TIE_NONE;
 }
 
 bool AttTiepresent::ReadTiepresent(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tie")) {
-        this->SetTie(StrToStr(element.attribute("tie").value()));
+        this->SetTie(StrToTie(element.attribute("tie").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5774,7 +5774,7 @@ bool AttTiepresent::ReadTiepresent(  pugi::xml_node element ) {
 bool AttTiepresent::WriteTiepresent(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTie()) {
-        element.append_attribute("tie") = StrToStr(this->GetTie()).c_str();
+        element.append_attribute("tie") = TieToStr(this->GetTie()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5782,7 +5782,7 @@ bool AttTiepresent::WriteTiepresent(  pugi::xml_node element ) {
 
 bool AttTiepresent::HasTie( )
 {
-    return (m_tie != "");
+    return (m_tie != TIE_NONE);
 }
 
 

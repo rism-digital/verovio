@@ -1127,12 +1127,13 @@ void PaeInput::parseNote(NoteObject note) {
             mnote->m_embellishment = EMB_TRILL;
         
         if (m_last_tied_note != NULL) {
-            mnote->SetTieAttrTerminal(m_last_tied_note);
+            mnote->SetTie(TIE_t);
             m_last_tied_note = NULL;
         }
         
         if (note.tie) {
-            mnote->SetTieAttrInitial();
+            if (mnote->GetTie()==TIE_t) mnote->SetTie(TIE_m);
+            else mnote->SetTie(TIE_i);
             m_last_tied_note = mnote;
         }
         

@@ -30,8 +30,10 @@ Note::Note():
 	LayerElement("note-"), DurationInterface(), PitchInterface(),
     AttColoration(),
     AttNoteLogMensural(),
-    AttStemmed()
+    AttStemmed(),
+    AttTiepresent()
 {
+    m_drawingTieAttr = NULL;
     Reset();
 }
 
@@ -39,7 +41,9 @@ Note::Note():
 Note::~Note()
 {
     // This deletes the Tie and Slur objects if necessary
-    ResetTieAttrInitial();
+    if (m_drawingTieAttr) {
+        delete m_drawingTieAttr;
+    }
 }
     
 void Note::Reset()
@@ -51,13 +55,16 @@ void Note::Reset()
     ResetColoration();
     ResetNoteLogMensural();
     ResetStemmed();
+    ResetTiepresent();
     
     // TO BE REMOVED
     m_acciaccatura = false;
     m_embellishment = EMB_NONE;
     // tie pointers
-    m_tieAttrInitial = NULL;
-    m_tieAttrTerminal = NULL;
+    if (m_drawingTieAttr) {
+        delete m_drawingTieAttr;
+    }
+    m_drawingTieAttr = NULL;
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -127,6 +134,7 @@ void Note::SetValue( int value, int flag )
     }    
 }
 
+/*
 void Note::SetTieAttrInitial()
 {
     if ( m_tieAttrInitial ) {
@@ -159,6 +167,7 @@ void Note::ResetTieAttrInitial( )
         m_tieAttrInitial = NULL;
     }
 }
+*/
   
 int Note::GetDrawingDur( )
 {
@@ -208,6 +217,41 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Note::PrepareTieAttr( ArrayPtrVoid params )
+{
+    // param 0: the last Note with an open tie
+    Note **lastNote = static_cast<Note**>(params[0]);
+    
+    if ((*lastNote)) {
+        if ((this->GetTie()!=TIE_m) || (this->GetTie()!=TIE_t)) {
+            LogWarning("Expected @tie median or terminal in note '%s'", this->GetUuid().c_str());
+        }
+        (*lastNote)->m_drawingTieAttr->SetEnd(this);
+    }
+
+    if ((this->GetTie()==TIE_m) || (this->GetTie()==TIE_i)) {
+        assert(!this->m_drawingTieAttr);
+        this->m_drawingTieAttr = new Tie();
+        this->m_drawingTieAttr->SetStart(this);
+        (*lastNote) = this;
+    }
+    else {
+        (*lastNote) = NULL;
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+
+int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->m_drawingTieAttr) {
+        return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(params);
+    }
+    return FUNCTOR_CONTINUE;
+}
+    
 int Note::PrepareLyrics( ArrayPtrVoid params )
 {
     // param 0: the current Syl (unused)

@@ -114,6 +114,9 @@ protected:
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
     
+    std::string TieToStr(data_TIE data);
+    data_TIE StrToTie(std::string value);
+    
     std::string WordPosToStr(data_WORDPOS data);
     data_WORDPOS StrToWordPos(std::string value);
   

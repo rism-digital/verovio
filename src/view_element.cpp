@@ -367,6 +367,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		DrawDots( dc, x2, y1, note->GetDots(), staff );
 	}
     
+    if (note->GetDrawingTieAttr()) {
+        System *system = dynamic_cast<System*>(measure->GetFirstParent(&typeid(System)));
+        if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
+    }
+    
     // Add the ties to the postponed drawing list
     /*
     if ( note->GetTieAttrInitial() ) {

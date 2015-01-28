@@ -39,7 +39,8 @@ class Verse;
 class Note: public LayerElement, public DurationInterface, public PitchInterface,
     public AttColoration,
     public AttNoteLogMensural,
-    public AttStemmed
+    public AttStemmed,
+    public AttTiepresent
 {
 public:
     /**
@@ -76,12 +77,15 @@ public:
      * @name Setters and getters for tie attributes
      */
     ///@{
+    /*
     void SetTieAttrInitial( );
     void SetTieAttrTerminal( Note *previousNote );
     Tie *GetTieAttrInitial( ) { return m_tieAttrInitial; };
     Tie *GetTieAttrTerminal( ) { return m_tieAttrTerminal; };
     void ResetTieAttrInitial();
     void ResetTieAttrTerminal() { m_tieAttrTerminal = NULL; };
+    */
+    Tie *GetDrawingTieAttr( ) { return m_drawingTieAttr; };
     ///@}
     
     /**
@@ -99,25 +103,32 @@ public:
     // Functors //
     //----------//
     
+    
+    /**
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );
     
+    /**
+     */
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    
 private:
     
 protected:
     
     /**
-     * @name Tie attributes are represented by pointers to Tie objects.
-     * There is one pointer for the initial attribute and one pointer for the end attribute.
-     * The Tie objects points back to the notes as it is the case with a MEI tie element.
-     * With attributes, the note with the initial attribute own the Tie object and take care of deleting it
+     * @name Tie attributes are represented a pointers to Tie objects.
+     * There is one pointer for the initial attribute (TIE_i or TIE_m).
+     * The note with the initial attribute owns the Tie object and take care of deleting it
      */
     ///@{
-    Tie *m_tieAttrInitial;
-    Tie *m_tieAttrTerminal;
+    Tie *m_drawingTieAttr;
     ///@}
     
 public:

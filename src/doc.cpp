@@ -115,16 +115,6 @@ void Doc::PrepareDrawing()
     }
     
     params.clear();
-    timeSpanningElements.clear();
-    params.push_back( &timeSpanningElements );
-    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
-    this->Process( &fillStaffCurrentTimeSpanning, params );
-    
-    if ( !timeSpanningElements.empty() ) {
-        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
-    }
-    
-    params.clear();
     IntTree verseTree;
     IntTree layerTree;
     params.push_back( &verseTree );
@@ -145,10 +135,41 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
-    Syl *currentSyl;
+    
     Note *lastNote;
-    Note *lastButOneNote;
     std::vector<AttComparison*> filters;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+                filters.clear();
+                // Create ad comparison object for each type / @n
+                AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+                AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+                filters.push_back( &matchStaff );
+                filters.push_back( &matchLayer );
+                
+                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+                // m_drawingLastNote is set only if the syl has a forward connector
+                lastNote = NULL;
+                ArrayPtrVoid paramsTieAttr;
+                paramsTieAttr.push_back( &lastNote );
+                Functor prepareTieAttr( &Object::PrepareTieAttr );
+                this->Process( &prepareTieAttr, paramsTieAttr, NULL, &filters );
+        }
+    }
+    
+    
+    params.clear();
+    timeSpanningElements.clear();
+    params.push_back( &timeSpanningElements );
+    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
+    this->Process( &fillStaffCurrentTimeSpanning, params );
+    
+    if ( !timeSpanningElements.empty() ) {
+        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
+    }
+    
+    Syl *currentSyl;
+    Note *lastButOneNote;
     for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {

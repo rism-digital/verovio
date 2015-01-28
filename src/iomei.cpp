@@ -482,6 +482,7 @@ void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
     note->WriteColoration(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStemmed(currentNode);
+    note->WriteTiepresent(currentNode);
     
     if ( note->m_cueSize ) {
         currentNode.append_attribute( "grace" ) = "unknown";
@@ -1446,6 +1447,7 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     vrvNote->ReadColoration(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStemmed(note);
+    vrvNote->ReadTiepresent(note);
     
     // grace
     if ( note.attribute( "grace" ) ) {
@@ -1453,19 +1455,6 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
 	}
     
     AddLayerElement(parent, vrvNote);
-    
-    // Ties - this should be moved to the Object::PrepareDrawing functor
-    if ( note.attribute( "tie" ) ) {
-        if ( (strcmp ( note.attribute( "tie" ).value(), "i" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
-            vrvNote->SetTieAttrInitial();
-            m_openTies.push_back( vrvNote );
-        }
-        if ( (strcmp ( note.attribute( "tie" ).value(), "t" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
-            if (!FindOpenTie( vrvNote ) ) {
-                LogWarning("Initial @tie not found" );
-            }
-        }
-    }
     
     // We can drop this once we allow <accid> and <note> child
     pugi::xml_node current;
@@ -1896,7 +1885,7 @@ bool MeiInput::FindOpenTie( Note *terminalNote )
         }
         // we only compare oct and pname because alteration is not relevant for ties
         if ( (terminalNote->GetOct() == (*iter)->GetOct()) && (terminalNote->GetPname() == (*iter)->GetPname()) ) {
-            terminalNote->SetTieAttrTerminal( *iter );
+            //terminalNote->SetTieAttrTerminal( *iter );
             m_openTies.erase(iter);
             return true;
         }
