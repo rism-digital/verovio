@@ -30,8 +30,8 @@ Style::Style()
      * Wolfgang legacy code used for initialiazing Doc::m_drawingBeamMin/MaxSlope
      * and used in View::DrawBeamPostponed
      */
-    m_beamMaxSlope = 30;
-    m_beamMinSlope = 10;
+    m_beamMaxSlope = 10;
+    m_beamMinSlope = 0;
     
     /**
      * We should probably keep graceNum and Den for cue sized notes.
