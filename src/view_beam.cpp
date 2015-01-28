@@ -45,7 +45,7 @@ struct BeamElementCoord {
     int y; // represents the point farthest from the beam
     int yTop; // y value of topmost note
     int yBottom; // y value of bottom-most note
-    int yBeam; // height of stems
+    int yBeam; // y value of stem top position
     int dur; // drawing duration
     int breaksec;
     char partialFlags[MAX_DURATION_PARTIALS];
@@ -296,6 +296,9 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         
         if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY()) {
             beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY() + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
+        }
+        else if (stemDir == STEMDIRECTION_down && beamElementCoord[i].yBottom < (staff->GetDrawingY() - staff->m_drawingHeight)) {
+            beamElementCoord[i].yBeam -= (staff->GetDrawingY() - staff->m_drawingHeight) - beamElementCoord[i].yBottom + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
         }
         
         beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
