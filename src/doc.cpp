@@ -92,21 +92,43 @@ void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
     
-    std::vector<TimeSpanningInterface*> timeSpanningElements;
+    std::vector<DocObject*> timeSpanningElements;
     bool fillList = true;
     params.push_back( &timeSpanningElements );
     params.push_back( &fillList );
     Functor prepareTimeSpanning( &Object::PrepareTimeSpanning );
     this->Process( &prepareTimeSpanning, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD );
     
+    // First we tried backward because nomrally the spanning elements are at the end of
+    // the measure. However, in some case, one (or both) end points will appear afterwards
+    // in the encoding. For these, the previous iteration will not have resolved the link and
+    // the spanning elements will remain in the timeSpanningElements array. We try again forward
+    // but this time without filling the list (that is only will the remaining elements)
     if ( !timeSpanningElements.empty() ) {
         fillList = false;
         this->Process( &prepareTimeSpanning, params );
     }
     
+    // If some are still there, then it is probably an issue in the encoding
+    if ( !timeSpanningElements.empty() ) {
+        LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size() );
+    }
+    
     params.clear();
-    IntTree tree;
-    params.push_back( &tree );
+    timeSpanningElements.clear();
+    params.push_back( &timeSpanningElements );
+    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
+    this->Process( &fillStaffCurrentTimeSpanning, params );
+    
+    if ( !timeSpanningElements.empty() ) {
+        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
+    }
+    
+    params.clear();
+    IntTree verseTree;
+    IntTree layerTree;
+    params.push_back( &verseTree );
+    params.push_back( &layerTree );
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
     //StaffN_LayerN_VerseN_t staffLayerVerseTree;
     //params.push_back( &staffLayerVerseTree );
@@ -127,7 +149,7 @@ void Doc::PrepareDrawing()
     Note *lastNote;
     Note *lastButOneNote;
     std::vector<AttComparison*> filters;
-    for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
+    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
@@ -160,8 +182,7 @@ void Doc::PrepareDrawing()
                 paramsLyrics.clear();
                 paramsLyrics.push_back( &currentSyl );
                 Functor fillStaffCurrentLyrics( &Object::FillStaffCurrentLyrics );
-                Functor fillStaffCurrentLyricsEnd( &Object::FillStaffCurrentLyricsEnd );
-                this->Process( &fillStaffCurrentLyrics, paramsLyrics, &fillStaffCurrentLyricsEnd, &filters );
+                this->Process( &fillStaffCurrentLyrics, paramsLyrics, NULL, &filters );
             }
         }
     }

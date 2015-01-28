@@ -38,6 +38,13 @@ class Tuplet;
 class Verse;
 
 
+enum  {
+    SPANNING_START_END = 0,
+    SPANNING_START,
+    SPANNING_END,
+    SPANNING_MIDDLE
+};
+
 //----------------------------------------------------------------------------
 // View
 //----------------------------------------------------------------------------
@@ -198,7 +205,9 @@ protected:
      * Defined in view_page.cpp
      */
     ///@{
-    void DrawSlur( DeviceContext *dc, Slur *slur, Measure *measure, System *system );
+    void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
+    void DrawSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
+                  Staff *staff, char spanningType, DocObject *graphic = NULL );
     ///@}
     
     /** 

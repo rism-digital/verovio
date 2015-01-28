@@ -1453,11 +1453,11 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         // We need the first measure of the system for x1
         Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
         if ( !Check( first ) ) return;
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
         Staff *staff = dynamic_cast<Staff*>( syl->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( staff ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( &typeid(Note) ) );
         
         int y = GetSylY(syl, staff);
         int x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();

@@ -13,8 +13,6 @@
 #include "timeinterface.h"
 
 namespace vrv {
-    
-class Note;
 
 //----------------------------------------------------------------------------
 // Slur
@@ -37,6 +35,10 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     */
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
     
     /**
      *

@@ -466,7 +466,11 @@ public:
     
     /**
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };    
+    
+    /**
+     */
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends
@@ -486,14 +490,6 @@ public:
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int FillStaffCurrentLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
-    /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
-     */
-    virtual int FillStaffCurrentLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-
     
     /**
      * @name Functors for justification

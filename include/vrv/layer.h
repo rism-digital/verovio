@@ -143,6 +143,12 @@ public:
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
     
+    /**
+     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * to be processed.
+     */
+    virtual int PrepareProcessingLists( ArrayPtrVoid params );
+    
 private:
     
 public:

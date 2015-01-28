@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "layerelement.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -87,6 +88,36 @@ std::string TimeSpanningInterface::ExtractUuidFragment(std::string refUuid)
         refUuid = refUuid.substr( pos + 1 );
     }
     return refUuid;
+}
+    
+int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object )
+{
+    // param 0: the IntTree
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    bool *fillList = static_cast<bool*>(params[1]);
+    
+    if ((*fillList)==false) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    this->SetUuidStr();
+    elements->push_back(object);
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid params, DocObject *object  )
+{
+    // param 0: the current Syl
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    
+    if (this->HasStartAndEnd()) {
+        if ( GetStart()->GetFirstParent( &typeid(Staff) ) != GetEnd()->GetFirstParent( &typeid(Staff) ) ) {
+            // We have a running syl started in a previous measure
+            elements->push_back(object);
+        }
+    }
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

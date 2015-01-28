@@ -14,8 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "note.h"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -45,18 +43,14 @@ void Slur::Reset()
 
 int Slur::PrepareTimeSpanning( ArrayPtrVoid params )
 {
-    // param 0: the IntTree
-    std::vector<TimeSpanningInterface*> *slurs = static_cast<std::vector<TimeSpanningInterface*>*>(params[0]);
-    bool *fillList = static_cast<bool*>(params[1]);
+    // Pass it to the pseudo functor of the interface
+    return TimeSpanningInterface::PrepareTimeSpanning(params, this);
+}
     
-    if ((*fillList)==false) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    this->SetUuidStr();
-    slurs->push_back(this);
-    
-    return FUNCTOR_CONTINUE;
+int Slur::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+{
+    // Pass it to the pseudo functor of the interface
+    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
     
 } // namespace vrv

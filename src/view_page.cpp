@@ -25,6 +25,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "note.h"
 #include "page.h"
 #include "slur.h"
 #include "smufl.h"
@@ -128,6 +129,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     // first draw the beams
     DrawSystemList(dc, system, &typeid(Syl) );
+    DrawSystemList(dc, system, &typeid(Slur) );
     
     dc->EndGraphic(system, this );
 
@@ -138,18 +140,21 @@ void View::DrawSystemList( DeviceContext *dc, System *system, const std::type_in
     assert( dc ); // DC cannot be NULL
     
     ListOfObjects *drawingList = system->GetDrawingList();
-    LayerElement *element = NULL;
+    DocObject *element = NULL;
     
     ListOfObjects::iterator iter;
     
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
     {
-        element = dynamic_cast<LayerElement*>(*iter);
+        element = dynamic_cast<DocObject*>(*iter);
         if (!element) continue;
         
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Syl) ) ) {
             Syl *syl = dynamic_cast<Syl*>(element);
             DrawSylConnector( dc, syl, system );
+        }
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
+            DrawTimeSpanningElement(dc, element, system );
         }
     }
 }
@@ -646,8 +651,10 @@ void View::DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measu
     assert(system); // Pointer to layer cannot be NULL"
     assert(measure); // Pointer to staff cannot be NULL"
     
-    if (dynamic_cast<Slur*>(element)) {
-        DrawSlur(dc,  dynamic_cast<Slur*>(element), measure, system);
+    if (dynamic_cast<TimeSpanningInterface*>(element)) {
+        dc->StartGraphic( element, "", element->GetUuid() );
+        dc->EndGraphic( element, this);
+        system->AddToDrawingList(element);
     }
     else if (dynamic_cast<Staff*>(element)) {
         DrawStaff(dc,  dynamic_cast<Staff*>(element), measure, system);
@@ -734,8 +741,13 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     DrawStaffChildren(dc, staff, staff, measure);
     
-    std::vector<Syl*>::iterator iter;
-    for (iter = staff->m_currentSyls.begin(); iter != staff->m_currentSyls.end(); ++iter) {
+    std::vector<Syl*>::iterator iter1;
+    for (iter1 = staff->m_currentSyls.begin(); iter1 != staff->m_currentSyls.end(); ++iter1) {
+        system->AddToDrawingList(*iter1);
+    }
+    
+    std::vector<DocObject*>::iterator iter;
+    for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
         system->AddToDrawingList(*iter);
     }
     
@@ -777,10 +789,188 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     return;
 }
 
-    
-void View::DrawSlur( DeviceContext *dc, Slur *slur, Measure *measure, System *system )
+void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, System *system )
 {
+    assert(dynamic_cast<TimeSpanningInterface*>(element)); // Element must be a TimeSpanningInterface
+    TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
+    
+    if ( !Check( interface->GetStart() ) ) return;
+    if ( !Check( interface->GetEnd() ) ) return;
+    
+    // Get the parent system of the first and last note
+    System *parentSystem1 = dynamic_cast<System*>( interface->GetStart()->GetFirstParent( &typeid(System) )  );
+    System *parentSystem2 = dynamic_cast<System*>( interface->GetEnd()->GetFirstParent( &typeid(System) )  );
+    
+    int x1, x2;
+    Staff *staff = NULL;
+    DocObject *graphic = NULL;
+    char spanningType = SPANNING_START_END;
+    
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (( system == parentSystem1 ) && ( system == parentSystem2 )) {
+        // Get the parent staff for calculating the y position
+        staff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
         
+        x1 = interface->GetStart()->GetDrawingX();
+        x2 = interface->GetEnd()->GetDrawingX();
+        graphic = element;
+    }
+    // Only the first parent is the same, this means that the element is "open" at the end of the system
+    else if ( system == parentSystem1 ) {
+        // We need the last measure of the system for x2
+        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        if ( !Check( last ) ) return;
+        staff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
+        
+        x1 = interface->GetStart()->GetDrawingX();
+        x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        graphic = element;
+        spanningType = SPANNING_START;
+    }
+    // We are in the system of the last note - draw the element from the beginning of the system
+    else if ( system == parentSystem2 ) {
+        // We need the first measure of the system for x1
+        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        if ( !Check( first ) ) return;
+        // Get the staff of the first note - however, not the staff we need
+        Staff *lastStaff = dynamic_cast<Staff*>( interface->GetEnd()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( lastStaff ) ) return;
+        // We need the first staff from the current system, i.e., the first measure.
+        AttCommonNComparison comparison( &typeid(Staff), lastStaff->GetN() );
+        staff = dynamic_cast<Staff*>(system->FindChildByAttComparison(&comparison, 2));
+        if (!staff ) {
+            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", lastStaff->GetN() );
+            return;
+        }
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( &typeid(Note) ) );
+        
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
+        x2 = interface->GetEnd()->GetDrawingX();
+        spanningType = SPANNING_END;
+    }
+    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    else {
+        // We need the first measure of the system for x1
+        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        if ( !Check( first ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
+        // We need the last measure of the system for x2
+        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        if ( !Check( last ) ) return;
+        // Get the staff of the first note - however, not the staff we need
+        Staff *firstStaff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( firstStaff ) ) return;
+        
+        // We need the staff from the current system, i.e., the first measure.
+        AttCommonNComparison comparison( &typeid(Staff), firstStaff->GetN() );
+        staff = dynamic_cast<Staff*>(first->FindChildByAttComparison(&comparison, 1));
+        if (!staff ) {
+            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", firstStaff->GetN() );
+            return;
+        }
+        
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
+        x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        spanningType = SPANNING_MIDDLE;
+    }
+    
+    if (dynamic_cast<Slur*>(element)) {
+        DrawSlur(dc, dynamic_cast<Slur*>(element), x1, x2, staff, spanningType, graphic);
+    }
+}
+    
+void View::DrawSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
+                    char spanningType, DocObject *graphic )
+{
+    assert(dynamic_cast<Slur*>(element)); // Element must be a Slur
+    Slur *slur = dynamic_cast<Slur*>(element);
+    
+    LayerElement *note1 = NULL;
+    LayerElement *note2 = NULL;
+    
+    bool up = true;
+    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
+    int y1, y2;
+    
+    note1 = slur->GetStart();
+    note2 = slur->GetEnd();
+    
+    if ( !note1 && !note2 ) {
+        // no note, obviously nothing to do...
+        return;
+    }
+    
+    //the normal case
+    if ( spanningType ==  SPANNING_START_END ) {
+        assert( note1 && note2 );
+        // Copied from DrawNote
+        // We could use the stamDir information
+        // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
+        y1 = note1->GetDrawingY();
+        y2 = note2->GetDrawingY();
+        assert(dynamic_cast<Note*>(note1));
+        // for now we only look at the first note - needs to be improved
+        // m_drawingStemDir it not set properly in beam - needs to be fixed.
+        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+    }
+    // This is the case when the tie is split over two system of two pages.
+    // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
+    else if ( spanningType ==  SPANNING_START ) {
+        y1 = y2 = note1->GetDrawingY();
+        assert(dynamic_cast<Note*>(note1));
+        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+    }
+    // Now this is the case when the tie is split but we are drawing the end of it
+    else if ( spanningType ==  SPANNING_END ) {
+        y1 = y2 = note2->GetDrawingY();
+        x2 = note2->GetDrawingX();
+        assert(dynamic_cast<Note*>(note2));
+        noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
+    }
+    // Finally
+    else {
+        LogDebug("Slur accross an entire system is not supported");
+    }
+    
+    assert( dynamic_cast<Note*>(note1));
+    if (noteStemDir == STEMDIRECTION_up) {
+        up = false;
+    }
+    else if (noteStemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        int center = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize] * 2;
+        up = (y1 > center) ? true : false;
+    }
+    
+    // FIXME, take in account elements that can be netween notes, eg keys time etc
+    // 20 height nice with 70, not nice with 50
+    // Also remove HARDCODED values!
+    if (up) {
+        y1 += m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+        y2 += m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+    }
+    else {
+        y1 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+        y2 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+    }
+    
+    if ( graphic ) {
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
+    dc->DeactivateGraphic();
+    DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
+    dc->ReactivateGraphic();
+    if ( graphic ) {
+        dc->EndResumedGraphic(graphic, this);
+    }
+
+    
 }
 
 //----------------------------------------------------------------------------

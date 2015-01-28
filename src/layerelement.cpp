@@ -374,12 +374,14 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
 {
     // param 0: the IntTree
-    std::vector<TimeSpanningInterface*> *timeSpanningElements = static_cast<std::vector<TimeSpanningInterface*>*>(params[0]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
     
-    std::vector<TimeSpanningInterface*>::iterator iter = timeSpanningElements->begin();
-    while ( iter != timeSpanningElements->end()) {
-        if ((*iter)->SetStartAndEnd( this ) ) {
-            iter = timeSpanningElements->erase( iter );
+    std::vector<DocObject*>::iterator iter = elements->begin();
+    while ( iter != elements->end()) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(*iter);
+        assert(interface);
+        if (interface->SetStartAndEnd( this ) ) {
+            iter = elements->erase( iter );
         }
         else {
             iter++;
