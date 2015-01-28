@@ -67,22 +67,22 @@ void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 
 	return;
 }
 
-void View::DrawObliqueLine ( DeviceContext *dc, int x1, int y1, int x2, int y2, int decal)
+void View::DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y2, int height)
 {	
 	Point p[4];
   
-    dc->SetPen( m_currentColour, 1, AxSOLID );
+    dc->SetPen( m_currentColour, 0, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
 
-	decal = ToDeviceContextX(decal);
+	height = ToDeviceContextX(height);
 	p[0].x = ToDeviceContextX(x1);
 	p[0].y =  ToDeviceContextY(y1);
 	p[1].x = ToDeviceContextX(x2);
 	p[1].y =  ToDeviceContextY(y2);
 	p[2].x = p[1].x;
-	p[2].y = p[1].y - decal;
+	p[2].y = p[1].y - height;
 	p[3].x = p[0].x;
-	p[3].y = p[0].y - decal;
+	p[3].y = p[0].y - height;
 
 	dc->DrawPolygon ( 4, p );
 

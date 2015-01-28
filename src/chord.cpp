@@ -1,50 +1,59 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        beam.cpp
-// Author:      Rodolfo Zitellini
-// Created:     26/06/2012
+// Name:        chord.cpp
+// Author:      Andrew Horwitz
+// Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "chord.h"
 
-#include "beam.h"
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include "note.h"
 
 namespace vrv {
-
+    
 //----------------------------------------------------------------------------
-// Beam
+// Chord
 //----------------------------------------------------------------------------
 
-Beam::Beam():
-    LayerElement("beam-"), ObjectListInterface()
+Chord::Chord( ):
+LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
+    AttColoration(),
+    AttCommon(),
+    AttStemmed()
 {
     Reset();
 }
 
-
-Beam::~Beam()
+Chord::~Chord()
 {
+}
+
+void Chord::Reset()
+{
+    DocObject::Reset();
+    DurationInterface::Reset();
+    ResetCommon();
+    ResetStemmed();
+    ResetColoration();
 }
     
-void Beam::Reset()
+void Chord::AddLayerElement(vrv::LayerElement *element)
 {
-    LayerElement::Reset();
-}
-
-void Beam::AddLayerElement(LayerElement *element)
-{
-   
+    assert( dynamic_cast<Note*>(element) );
     element->SetParent( this );
     m_children.push_back(element);
     Modify();
 }
 
-void Beam::FilterList()
+void Chord::FilterList()
 {
-    bool firstNoteGrace = false;
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ListOfObjects* childList = this->GetList(this);
@@ -54,41 +63,38 @@ void Beam::FilterList()
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( !currentElement ) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase( iter );           
+            iter = childList->erase( iter );
         }
         else if ( !currentElement->HasDurationInterface() )
         {
             // remove anything that has not a DurationInterface
             iter = childList->erase( iter );
         } else {
-            // Drop notes that are signaled as grace notes
             Note *n = dynamic_cast<Note*>(currentElement);
             
             if (n) {
-                // if we are at the beginning of the beam
-                // and the note is cueSize
-                // assume all the beam is of grace notes
-                if (childList->begin() == iter) {
-                  if (n->m_cueSize)
-                      firstNoteGrace = true;
-                }
-                
-                // if the first note in beam was NOT a grace
-                // we have grace notes embedded in a beam
-                // drop them
-                if ( !firstNoteGrace && n->m_cueSize == true)
-                    iter = childList->erase( iter );
-                else
-                    iter++;
-                
-            } else {
-                // if it is a Rest, do not drop
                 iter++;
+            } else {
+                // if it is not a note, drop it
+                iter = childList->erase( iter );
             }
         }
     }
+}
+    
+void Chord::GetYExtremes(int initial, int *yMax, int *yMin)
+{
+    *yMax = initial;
+    *yMin = initial;
+    int y1;
+    
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Note *note = dynamic_cast<Note*>(*it);
+        y1 = note->GetDrawingY();
+        if (y1 > *yMax) *yMax = y1;
+        else if (y1 < *yMin) *yMin = y1;
+    }
+}
     
 }
-
-} // namespace vrv
-

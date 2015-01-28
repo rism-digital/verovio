@@ -10,9 +10,11 @@
 
 #include <assert.h>
 #include <sstream>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
@@ -689,10 +691,10 @@ void ObjectListInterface::ResetList( Object *node )
         return;
     }
     
+    node->Modify( false );
     m_list.clear();
     node->FillList( &m_list );
     this->FilterList();
-    node->Modify( false );
 }
 
 ListOfObjects *ObjectListInterface::GetList( Object *node )
@@ -1044,6 +1046,13 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     
     if ( current->IsBeam() ) {
         return FUNCTOR_CONTINUE;
+    }
+    
+    if ( current->IsNote() ) {
+        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), 1));
+        if( chordParent ) {
+            return FUNCTOR_CONTINUE;
+        }
     }
     
     if ( current->IsTie() ) {

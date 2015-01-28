@@ -159,6 +159,50 @@ void Note::ResetTieAttrInitial( )
         m_tieAttrInitial = NULL;
     }
 }
+  
+int Note::GetDrawingDur( )
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    if( chordParent )
+    {
+        return chordParent->GetDur();
+    }
+    else
+    {
+        return m_dur;
+    }
+}
+    
+bool Note::HasDrawingStemDir()
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    if( chordParent )
+    {
+        return chordParent->HasStemDir();
+    }
+    else
+    {
+        return this->HasStemDir();
+    }
+}
+
+Chord* Note::IsChordTone()
+{
+    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+}
+    
+data_STEMDIRECTION Note::GetDrawingStemDir()
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    if( chordParent )
+    {
+        return chordParent->GetStemDir();
+    }
+    else
+    {
+        return this->GetStemDir();
+    }
+}
     
 //----------------------------------------------------------------------------
 // Functors methods

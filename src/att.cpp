@@ -314,6 +314,7 @@ std::string Att::DurToStr(int data)
     else if (data == DUR_32) value = "32";
     else if (data == DUR_64) value = "64";
     else if (data == DUR_128) value = "128";
+    else if (data == DUR_256) value = "256";
     else {
         LogWarning("Unknown duration '%d'", data);
         value = "4";
@@ -341,6 +342,7 @@ int Att::StrToDur(std::string value)
     else if (value == "32") dur = DUR_32;
     else if (value == "64") dur = DUR_64;
     else if (value == "128") dur = DUR_128;
+    else if (value == "256") dur = DUR_256;
     else {
         if ((value.length() > 0) && (value[value.length()-1] == 'p')) {
             LogWarning("PPQ duration dur_s are not supported");

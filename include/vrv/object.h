@@ -680,6 +680,9 @@ public:
      */
     ListOfObjects *GetList( Object *node );
     
+private:
+    ListOfObjects m_list;
+    
 protected:
     /**
      * Filter the list for a specific class.
@@ -693,9 +696,6 @@ public:
      * As for GetList, we need to pass the object.
      */
     void ResetList( Object *node );
-        
-    ListOfObjects m_list;
-    
 };
 
 //----------------------------------------------------------------------------

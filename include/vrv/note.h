@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "pitchinterface.h"
@@ -82,6 +83,17 @@ public:
     void ResetTieAttrInitial();
     void ResetTieAttrTerminal() { m_tieAttrTerminal = NULL; };
     ///@}
+    
+    /**
+     * Overriding functions to return information from chord parent if 
+     * note is direct child of a chord.
+     */
+    
+    Chord* IsChordTone( );
+    int GetDrawingDur( );
+    bool HasDrawingStemDir( );
+    data_STEMDIRECTION GetDrawingStemDir( );
+    
     
     //----------//
     // Functors //

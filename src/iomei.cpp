@@ -11,11 +11,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
 #include "beam.h"
+#include "chord.h"
 #include "custos.h"
 #include "dot.h"
 #include "editorial.h"
@@ -42,7 +44,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
-
+    
 MeiOutput::MeiOutput( Doc *doc, std::string filename ) :
 	FileOutputStream( doc )
 {
@@ -1164,7 +1166,7 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
     
     return success;
 }
-
+    
 bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
 {
     Layer *vrvLayer = new Layer();
@@ -1213,6 +1215,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
         }
+        else if ( elementName == "chord" ) {
+            success = ReadMeiChord( parent, xmlElement);
+        }
         else if ( elementName == "clef" ) {
             success = ReadMeiClef( parent, xmlElement);
         }
@@ -1248,15 +1253,6 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "verse" ) {
             success = ReadMeiVerse( parent, xmlElement );
-        }
-        else if ( elementName == "chord" ) {
-            // We just read the first note for now
-            pugi::xml_node note = xmlElement.child("note");
-            if ( note ) {
-                note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
-                success = ReadMeiNote( parent, note );
-                LogDebug("Only first note of chords is read" );
-            }
         }
         // unknown
         else {
@@ -1402,6 +1398,26 @@ bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
     
     AddLayerElement(parent, vrvMultiRest);
 	return true;
+}
+    
+bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
+{
+    Chord *vrvChord = new Chord();
+    SetMeiUuid(chord, vrvChord);
+    
+    ReadDurationInterface(chord, vrvChord);
+    vrvChord->ReadCommon(chord);
+    vrvChord->ReadStemmed(chord);
+    
+    
+    if ( chord.attribute( "grace" ) ) {
+		vrvChord->m_cueSize = true;
+	}
+    
+    AddLayerElement(parent, vrvChord);
+    bool success = ReadMeiLayerChildren(vrvChord, chord);
+    
+    return success;
 }
 
 bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
@@ -1683,6 +1699,9 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     }
     else if ( dynamic_cast<Layer*>( parent ) ) {
         dynamic_cast<Layer*>( parent )->AddLayerElement( element );
+    }
+    else if ( dynamic_cast<Chord*>( parent ) ) {
+        dynamic_cast<Chord*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Note*>( parent ) ) {
         dynamic_cast<Note*>( parent )->AddLayerElement( element );

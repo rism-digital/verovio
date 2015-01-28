@@ -80,8 +80,7 @@ void Layer::AddLayerElement( LayerElement *element, int idx )
 LayerElement *Layer::GetPrevious( LayerElement *element )
 {
     this->ResetList( this );
-    
-    if ( !element || m_list.empty() )
+    if ( !element || this->GetList(this)->empty() )
         return NULL;
     
     return dynamic_cast<LayerElement*>( GetListPrevious( element ) );

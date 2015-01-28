@@ -312,13 +312,15 @@ void ScoreDef::Replace( StaffDef *newStaffDef )
 void ScoreDef::FilterList()
 {
     // We want to keep only staffDef
-    ListOfObjects::iterator iter = m_list.begin();
-    
-    while ( iter != m_list.end()) {
+    ListOfObjects* childList = this->GetList(this);
+    ListOfObjects::iterator iter;
+        
+    for (iter = childList->begin(); iter != childList->end(); ++iter)
+    {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
         if ( !currentStaffDef )
         {
-            iter = m_list.erase( iter );
+            iter = childList->erase( iter );
         } else {
             iter++;
         }
@@ -331,9 +333,10 @@ StaffDef *ScoreDef::GetStaffDef( int n )
     StaffDef *staffDef = NULL;
     
     this->ResetList( this );
+    ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter;
-    int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++)
+
+    for (iter = childList->begin(); iter != childList->end(); ++iter)
     {
         staffDef = dynamic_cast<StaffDef*>(*iter);
         if (staffDef && (staffDef->GetN() == n) ) {
@@ -394,13 +397,14 @@ void StaffGrp::AddStaffGrp( StaffGrp *staffGrp )
 void StaffGrp::FilterList()
 {
     // We want to keep only staffDef
-    ListOfObjects::iterator iter = m_list.begin();
+    ListOfObjects* childList = this->GetList(this);
+    ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != m_list.end()) {
+    while ( iter != childList->end()) {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
         if ( !currentStaffDef )
         {
-            iter = m_list.erase( iter );
+            iter = childList->erase( iter );
         } else {
             iter++;
         }

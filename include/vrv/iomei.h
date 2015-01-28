@@ -21,6 +21,7 @@ class App;
 class Accid;
 class Barline;
 class Beam;
+class Chord;
 class Clef;
 class Custos;
 class Dot;
@@ -253,6 +254,8 @@ private:
     bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
     bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
+    bool ReadMeiChord( Object* parent, pugi::xml_node chord );
+    bool ReadMeiChordChildren( Object* parent, pugi::xml_node parentNode, Object *filter = NULL );
     ///@}
 
     /**

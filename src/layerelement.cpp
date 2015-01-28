@@ -17,6 +17,7 @@
 #include "aligner.h"
 #include "barline.h"
 #include "beam.h"
+#include "chord.h"
 #include "clef.h"
 #include "custos.h"
 #include "dot.h"
@@ -155,6 +156,11 @@ bool LayerElement::IsBeam()
     return (dynamic_cast<Beam*>(this));
 }
 
+bool LayerElement::IsChord()
+{
+    return (dynamic_cast<Chord*>(this));
+}
+    
 bool LayerElement::IsClef() 
 {  
     return (dynamic_cast<Clef*>(this));
@@ -308,6 +314,14 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
+    
+    
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    if( chordParent )
+    {
+        m_alignment = chordParent->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
     
     AlignmentType type = ALIGNMENT_DEFAULT;
     if ( this->IsBarline() ) {

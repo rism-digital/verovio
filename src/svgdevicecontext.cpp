@@ -382,11 +382,14 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
                
 void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
+    assert( m_penStack.size() );
+    
     pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
     //if ( fillStyle == wxODDEVEN_RULE )
     //    polygonChild.append_attribute("style") = "fill-rule:evenodd;";
     //else
     polygonChild.append_attribute("style") = "fill-rule:nonzero;";
+    polygonChild.append_attribute("stroke-width") = StringFormat("%d", m_penStack.top().GetWidth()).c_str();
     
     std::string pointsString;
     for (int i = 0; i < n;  i++)
