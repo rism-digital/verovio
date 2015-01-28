@@ -103,6 +103,11 @@ public:
      */
 	int m_drawingLines;
     
+    /**
+     * Total drawing height from top of top line to bottom of bottom line
+     */
+    int m_drawingHeight;
+    
     std::vector<Syl*>m_currentSyls;
 
 	/**

@@ -253,8 +253,9 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
     
     int w, h;
     
-    ListOfObjects::iterator iter = scoreDef->m_list.begin();
-    while (iter != scoreDef->m_list.end()) {
+    ListOfObjects* scoreDefChildren = scoreDef->GetList(scoreDef);
+    ListOfObjects::iterator iter = scoreDefChildren->begin();
+    while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef*>(*iter);
         
         if (!staffDef) {
@@ -758,6 +759,8 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
         //DrawFullRectangle(dc, x1, yy - m_doc->m_style->m_barlineWidth / 2, x2, yy + m_doc->m_style->m_barlineWidth / 2 );
         yy -= m_doc->m_drawingDoubleUnit[staff->staffSize];
     }
+    
+    staff->m_drawingHeight = staff->GetDrawingY() - yy;
     
     dc->ResetPen( );
     dc->ResetBrush( );

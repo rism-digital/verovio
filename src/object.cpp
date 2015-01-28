@@ -691,10 +691,10 @@ void ObjectListInterface::ResetList( Object *node )
         return;
     }
     
+    node->Modify( false );
     m_list.clear();
     node->FillList( &m_list );
     this->FilterList();
-    node->Modify( false );
 }
 
 ListOfObjects *ObjectListInterface::GetList( Object *node )
