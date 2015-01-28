@@ -1017,7 +1017,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
     int yMax, yMin;
-    chord->GetYExtremes(verticalCenter, &yMax, &yMin);
+    chord->GetYExtremes(&yMax, &yMin);
         
     int drawingDur = chord->GetDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;

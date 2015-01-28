@@ -56,7 +56,7 @@ public:
 
     void FilterList();
     
-    void GetYExtremes(int initial, int *yMax, int *yMin);
+    void GetYExtremes(int *yMax, int *yMin);
 
     ///@}
 };

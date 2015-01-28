@@ -83,18 +83,24 @@ void Chord::FilterList()
     }
 }
     
-void Chord::GetYExtremes(int initial, int *yMax, int *yMin)
+void Chord::GetYExtremes(int *yMax, int *yMin)
 {
-    *yMax = initial;
-    *yMin = initial;
+    bool passed = false;
     int y1;
-    
     ListOfObjects* childList = this->GetList(this); //make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
+        if (!note) continue;
         y1 = note->GetDrawingY();
-        if (y1 > *yMax) *yMax = y1;
-        else if (y1 < *yMin) *yMin = y1;
+        if (!passed) {
+            *yMax = y1;
+            *yMin = y1;
+            passed = true;
+        }
+        else {
+            if (y1 > *yMax) *yMax = y1;
+            else if (y1 < *yMin) *yMin = y1;
+        }
     }
 }
     

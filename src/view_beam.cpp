@@ -69,7 +69,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     double verticalShiftFactor = 3.0;
     
     // For slope calculation and linear regression
-    double verticalBoost = 0.0;
+    double verticalBoost = 0.0; //extra height to ensure the beam clears all the noteheads
     double s_x=0.0; //sum of all x(n) for n in beamElementCoord
     double s_y=0.0; //sum of all y(n)
     double s_xy=0.0; //sum of (x(n) * y(n))
@@ -194,7 +194,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	for (i = 0; i < elementCount; i++) {
 
         if (dynamic_cast<Chord*>(beamElementCoord[i].element)) {
-            dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(verticalCenter, &yMax, &yMin);
+            dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(&yMax, &yMin);
             beamElementCoord[i].yTop = yMax;
             beamElementCoord[i].yBottom = yMin;
             
@@ -232,7 +232,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         else stemDir = STEMDIRECTION_down;
     }
     
-    if (stemDir == STEMDIRECTION_down) { //set stem direction for all the notes
+    if (stemDir == STEMDIRECTION_up) { //set stem direction for all the notes
         for (i = 0; i < elementCount; i++) {
             beamElementCoord[i].y = beamElementCoord[i].yTop;
         }
@@ -294,13 +294,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
         }
         
-        if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY()) {
-            beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY() + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
-        }
-        else if (stemDir == STEMDIRECTION_down && beamElementCoord[i].yBottom < (staff->GetDrawingY() - staff->m_drawingHeight)) {
-            beamElementCoord[i].yBeam -= (staff->GetDrawingY() - staff->m_drawingHeight) - beamElementCoord[i].yBottom + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
-        }
-        
         beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
         
         s_y += beamElementCoord[i].yBeam;
@@ -337,9 +330,9 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	for ( i=0; i<elementCount; i++ ) {
         oldYPos = beamElementCoord[i].yBeam;
 		expectedY = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
-		
+        
         //if the stem is not long enough, add extra stem length needed to all members of the beam
-        if ((stemDir == STEMDIRECTION_up && oldYPos > expectedY) || (stemDir == STEMDIRECTION_down && oldYPos < expectedY)) {
+        if ((stemDir == STEMDIRECTION_up && (oldYPos > expectedY)) || (stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
             verticalBoost += oldYPos - expectedY;
         }
 	}
@@ -353,11 +346,11 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	{
         if (stemDir == STEMDIRECTION_up) {
             fy1 = beamElementCoord[i].yBeam - m_doc->m_style->m_stemWidth;
-            fy2 = beamElementCoord[i].y + m_doc->m_drawingUnit[staff->staffSize]/4;
+            fy2 = beamElementCoord[i].yBottom + m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         else {
             fy1 = beamElementCoord[i].yBeam + m_doc->m_style->m_stemWidth;
-            fy2 = beamElementCoord[i].y - m_doc->m_drawingUnit[staff->staffSize]/4;
+            fy2 = beamElementCoord[i].yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         
         beamElementCoord[i].element->m_drawingStemStart.x = beamElementCoord[i].element->m_drawingStemEnd.x = beamElementCoord[i].x;
