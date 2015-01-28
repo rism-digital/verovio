@@ -368,6 +368,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
     
     // Add the ties to the postponed drawing list
+    /*
     if ( note->GetTieAttrInitial() ) {
         // normally, we add the tie from the terminal note,
         // however, when the notes are not on the same system (or page),
@@ -386,6 +387,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if ( note->GetTieAttrTerminal() ) {
         layer->AddToDrawingList( note->GetTieAttrTerminal() );
     }
+    */
 
     // This will draw lyrics, accid, etc.
     DrawLayerChildren(dc, note, layer, staff, measure);

@@ -450,6 +450,8 @@
 				4DF28A021A754DE400BA9F7D /* measureelement.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
+				8F086ED8188539540037FD8E /* tie.cpp */,
+				8F59292F18854BF800FE51AD /* tie.h */,
 			);
 			name = measureelements;
 			sourceTree = "<group>";
@@ -609,8 +611,6 @@
 				8F59292818854BF800FE51AD /* rest.h */,
 				4D9A9C1D19A1DE2000028D93 /* syl.cpp */,
 				4D9A9C1B199F576100028D93 /* syl.h */,
-				8F086ED8188539540037FD8E /* tie.cpp */,
-				8F59292F18854BF800FE51AD /* tie.h */,
 				8F086ED9188539540037FD8E /* tuplet.cpp */,
 				8F59293018854BF800FE51AD /* tuplet.h */,
 				4D9A9C18199F561200028D93 /* verse.cpp */,

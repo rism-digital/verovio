@@ -357,7 +357,6 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
             // create a new mus tie with this note
             m_current_tie = new Tie;
             m_current_tie->SetStart( note );
-            m_layer->AddLayerElement(m_current_tie);
         } else {
             // no tie (L or J) specified for not
             // but if cur tie !NULL we need to close the tie

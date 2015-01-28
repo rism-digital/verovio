@@ -9,11 +9,10 @@
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
-#include "layerelement.h"
+#include "measureelement.h"
+#include "timeinterface.h"
 
 namespace vrv {
-    
-class Note;
 
 //----------------------------------------------------------------------------
 // Tie
@@ -21,7 +20,7 @@ class Note;
 // NOTE tie NOTE tie etc
 //----------------------------------------------------------------------------
 
-class Tie: public LayerElement
+class Tie: public MeasureElement, public TimeSpanningInterface
 {
 public:
     /**
@@ -34,25 +33,26 @@ public:
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tie"; };
     ///@}
+    ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
     
     /**
-     * @name Set and get the first and second note of the tie
-     * The setter asserts that no note was previously set.
      */
-    ///@{
-    void SetStart( Note *note );
-    void SetEnd( Note *note );
-    Note *GetStart() { return m_first; };
-    Note *GetEnd() { return m_second; };
-    ///@}
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    
+    /**
+     *
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
     
 private:
     
 public:
     
 private:
-    Note *m_first;
-    Note *m_second;
     
 };
 
