@@ -35,6 +35,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -1097,6 +1098,9 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
                 LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
             }
         }
+        else if ( std::string( current.name() ) == "tie" ) {
+            success = ReadMeiTie( parent, current );
+        }
         else if ( std::string( current.name() ) == "slur" ) {
             success = ReadMeiSlur( parent, current );
         }
@@ -1108,6 +1112,18 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
     return success;
 }
     
+bool MeiInput::ReadMeiTie( Object *parent, pugi::xml_node tie )
+{
+    Tie *vrvTie = new Tie();
+    SetMeiUuid(tie, vrvTie);
+    
+    ReadTimeSpanningInterface(tie, vrvTie);
+    
+    AddMeasureElement(parent, vrvTie);
+    
+    return true;
+}
+
 bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
 {
     Slur *vrvSlur = new Slur();

@@ -45,6 +45,7 @@ class Slur;
 class Staff;
 class Syl;
 class System;
+class Tie;
 class TimeSpanningInterface;
 class Tuplet;
 class Verse;
@@ -131,7 +132,8 @@ private:
      * Called from WriteLayerElement.
      */
     ///@{
-    void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
+    void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur ) { return; };
+    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie ) { return; };
     ///@}
     
     /**
@@ -284,6 +286,7 @@ private:
      */
     ///@{
     bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
+    bool ReadMeiTie( Object *parent, pugi::xml_node tie );
     ///@}
   
     /**

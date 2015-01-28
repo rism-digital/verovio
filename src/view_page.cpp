@@ -129,6 +129,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     // first draw the beams
     DrawSystemList(dc, system, &typeid(Syl) );
+    DrawSystemList(dc, system, &typeid(Tie) );
     DrawSystemList(dc, system, &typeid(Slur) );
     
     dc->EndGraphic(system, this );
@@ -152,6 +153,9 @@ void View::DrawSystemList( DeviceContext *dc, System *system, const std::type_in
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Syl) ) ) {
             Syl *syl = dynamic_cast<Syl*>(element);
             DrawSylConnector( dc, syl, system );
+        }
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
+            DrawTimeSpanningElement(dc, element, system );
         }
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
             DrawTimeSpanningElement(dc, element, system );
@@ -883,16 +887,19 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         spanningType = SPANNING_MIDDLE;
     }
     
-    if (dynamic_cast<Slur*>(element)) {
-        DrawSlur(dc, dynamic_cast<Slur*>(element), x1, x2, staff, spanningType, graphic);
+    if (dynamic_cast<Tie*>(element)) {
+        DrawTieOrSlur(dc, dynamic_cast<Tie*>(element), x1, x2, staff, spanningType, graphic);
+    }
+    else if (dynamic_cast<Slur*>(element)) {
+        DrawTieOrSlur(dc, dynamic_cast<Slur*>(element), x1, x2, staff, spanningType, graphic);
     }
 }
     
-void View::DrawSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
+void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
                     char spanningType, DocObject *graphic )
 {
-    assert(dynamic_cast<Slur*>(element)); // Element must be a Slur
-    Slur *slur = dynamic_cast<Slur*>(element);
+    assert(dynamic_cast<Slur*>(element) || dynamic_cast<Tie*>(element)); // Element must be a Tie or a Slur
+    TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
     
     LayerElement *note1 = NULL;
     LayerElement *note2 = NULL;
@@ -901,8 +908,8 @@ void View::DrawSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
     
-    note1 = slur->GetStart();
-    note2 = slur->GetEnd();
+    note1 = interface->GetStart();
+    note2 = interface->GetEnd();
     
     if ( !note1 && !note2 ) {
         // no note, obviously nothing to do...

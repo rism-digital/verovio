@@ -206,7 +206,7 @@ protected:
      */
     ///@{
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
-    void DrawSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
+    void DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
                   Staff *staff, char spanningType, DocObject *graphic = NULL );
     ///@}
     
