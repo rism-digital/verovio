@@ -571,20 +571,6 @@ std::string MeiOutput::BoolToStr(bool value)
     return "false";
 }
 
-/*
-std::string MeiOutput::OctToStr(int oct)
-{
-	char buf[3];
-	snprintf(buf, 2, "%d", oct);
-	return std::string(buf);
-	
-	// For some reason, #include <sstream> does not work with xcode 3.2
-	//std::ostringstream oss;
-	//oss << oct;
-	//return oss.str();    
-}
-*/
-
 std::string MeiOutput::DocTypeToStr(DocType type)
 {
  	std::string value; 
@@ -755,14 +741,6 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         for( current = mdiv.first_child( ); current; current = current.next_sibling( ) ) {
             if (!success) break;
             success = ReadScoreBasedMei( current );
-        }
-    }
-    
-    if ( !m_openTies.empty()) {
-        std::vector<Note*>::iterator iter;
-        for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
-        {
-            LogWarning("Terminal @tie for <note> '%s' could not be matched", (*iter)->GetUuid().c_str() );
         }
     }
     
@@ -1859,42 +1837,6 @@ bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSp
     return true;    
 }
 
-bool MeiInput::FindOpenTie( Note *terminalNote )
-{
-    Layer *currentLayer = dynamic_cast<Layer*>( terminalNote->GetFirstParent( &typeid(Layer) ) );
-    Staff *currentStaff = dynamic_cast<Staff*>( terminalNote->GetFirstParent( &typeid(Staff) ) );
-    assert( currentLayer );
-    assert( currentStaff );
-    
-    std::vector<Note*>::iterator iter;
-    for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
-    {
-        // we need to get the parent layer and the parent staff for comparing their number
-        Layer *parentLayer = dynamic_cast<Layer*>( (*iter)->GetFirstParent( &typeid(Layer) ) );
-        Staff *parentStaff = dynamic_cast<Staff*>( (*iter)->GetFirstParent( &typeid(Staff) ) );
-        // We assume that if the note has no parent layer or no parent staff it,
-        // is because we are in the same staff or layer (e.g., beam) and they have not been added
-        //to their parent (staff or layer) yet.
-        // If we have one, compare the number
-        if ( (parentStaff) && (currentStaff->GetN() != parentStaff->GetN()) ) {
-            continue;
-        }
-        // same layer?
-        if ( (parentLayer) && (currentLayer->GetN() != parentLayer->GetN()) ) {
-            continue;
-        }
-        // we only compare oct and pname because alteration is not relevant for ties
-        if ( (terminalNote->GetOct() == (*iter)->GetOct()) && (terminalNote->GetPname() == (*iter)->GetPname()) ) {
-            //terminalNote->SetTieAttrTerminal( *iter );
-            m_openTies.erase(iter);
-            return true;
-        }
-        
-    }
-
-    return false;
-}
-
 void MeiInput::SetMeiUuid( pugi::xml_node element, Object *object )
 {
     if ( !element.attribute( "xml:id" ) ) {
@@ -1909,13 +1851,6 @@ bool MeiInput::StrToBool(std::string value)
     if (value == "false") return false;
 	return true;
 }
-
-    /*
-int MeiInput::StrToOct(std::string oct)
-{
-	return atoi(oct.c_str());
-}
-     */
    
 DocType MeiInput::StrToDocType(std::string type)
 {

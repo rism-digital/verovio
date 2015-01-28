@@ -350,14 +350,6 @@ private:
     bool ReadScoreBasedMei( pugi::xml_node element );    
     
     /**
-     * Look through the list of notes with open tie stored in MeiInput::m_openTies.
-     * The note has to be on the same staff (@n) and the same layer (@n) and
-     * have the same pitch. If found, the terminal attribute is the and the note
-     * is removed from the list
-     */
-    bool FindOpenTie( Note *terminalNote );
-    
-    /**
      * @name Various methods for reading / converting values.
      */
     ///@{
@@ -388,12 +380,6 @@ private:
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.
      */
     bool m_hasScoreDef;
-    
-    /**
-     * A vector of keeping the notes with open ties.
-     * This should be moved to the Object::PrepareDrawing functor
-     */
-    std::vector<Note*> m_openTies;
     
     /**
      * Check if an element is allowed within a given parent
