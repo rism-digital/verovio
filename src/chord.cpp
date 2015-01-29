@@ -26,7 +26,8 @@ Chord::Chord( ):
 LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     AttColoration(),
     AttCommon(),
-    AttStemmed()
+    AttStemmed(),
+    AttTiepresent()
 {
     Reset();
 }

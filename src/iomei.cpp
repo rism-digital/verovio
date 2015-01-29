@@ -1403,7 +1403,7 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadCommon(chord);
     vrvChord->ReadStemmed(chord);
-    
+    vrvChord->ReadTiepresent(chord);
     
     if ( chord.attribute( "grace" ) ) {
 		vrvChord->m_cueSize = true;
