@@ -28,7 +28,6 @@ if [ ! -d data ]; then mkdir data; fi
 ASM="\
 	-O2 --memory-init-file 0 \
 	-s ASM_JS=1 \
-	-s OUTLINING_LIMIT=160000 \
 	-s TOTAL_MEMORY=256*1024*1024 \
 	-s TOTAL_STACK=16*1024*1024"
 ASM_NAME=""

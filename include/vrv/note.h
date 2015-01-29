@@ -86,17 +86,16 @@ public:
      * Overriding functions to return information from chord parent if 
      * note is direct child of a chord.
      */
-    
+    ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
-    
+    ///@}
     
     //----------//
     // Functors //
     //----------//
-    
     
     /**
      */

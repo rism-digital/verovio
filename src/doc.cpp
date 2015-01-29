@@ -17,6 +17,7 @@
 
 #include "att_comparison.h"
 #include "barline.h"
+#include "chord.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
@@ -136,7 +137,8 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
     
-    Note *lastNote;
+    Chord *currentChord;
+    std::vector<Note*>currentNotes;
     std::vector<AttComparison*> filters;
     for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -149,9 +151,11 @@ void Doc::PrepareDrawing()
                 
                 // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
-                lastNote = NULL;
+                currentChord = NULL;
+                currentNotes.clear();
                 ArrayPtrVoid paramsTieAttr;
-                paramsTieAttr.push_back( &lastNote );
+                paramsTieAttr.push_back( &currentNotes );
+                paramsTieAttr.push_back( &currentChord );
                 Functor prepareTieAttr( &Object::PrepareTieAttr );
                 this->Process( &prepareTieAttr, paramsTieAttr, NULL, &filters );
         }
@@ -169,6 +173,7 @@ void Doc::PrepareDrawing()
     }
     
     Syl *currentSyl;
+    Note *lastNote;
     Note *lastButOneNote;
     for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {

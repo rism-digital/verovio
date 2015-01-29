@@ -198,24 +198,26 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 int Note::PrepareTieAttr( ArrayPtrVoid params )
 {
     // param 0: the last Note with an open tie
-    Note **lastNote = static_cast<Note**>(params[0]);
+    std::vector<Note*> *lastNotes = static_cast<std::vector<Note*>*>(params[0]);
+    Chord *lastChord = static_cast<Chord*>(params[1]);
+    
+    /*
     
     if ((*lastNote)) {
-        if ((this->GetTie()!=TIE_m) || (this->GetTie()!=TIE_t)) {
+        if ((this->GetTie()!=TIE_m) && (this->GetTie()!=TIE_t)) {
             LogWarning("Expected @tie median or terminal in note '%s'", this->GetUuid().c_str());
         }
         (*lastNote)->m_drawingTieAttr->SetEnd(this);
     }
 
     if ((this->GetTie()==TIE_m) || (this->GetTie()==TIE_i)) {
-        assert(!this->m_drawingTieAttr);
-        this->m_drawingTieAttr = new Tie();
-        this->m_drawingTieAttr->SetStart(this);
+        this->SetDrawingTieAttr();
         (*lastNote) = this;
     }
     else {
         (*lastNote) = NULL;
     }
+    */
     
     return FUNCTOR_CONTINUE;
 }
