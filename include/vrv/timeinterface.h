@@ -45,8 +45,8 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetStart( LayerElement *note );
-    void SetEnd( LayerElement *note );
+    void SetStart( LayerElement *start );
+    void SetEnd( LayerElement *end );
     LayerElement *GetStart() { return m_start; };
     LayerElement *GetEnd() { return m_end; };
     ///@}

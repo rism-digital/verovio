@@ -74,17 +74,11 @@ public:
     void AddLayerElement(LayerElement *element);
     
     /**
-     * @name Setters and getters for tie attributes
+     * @name Setter and getter for tie attribute
      */
     ///@{
-    /*
-    void SetTieAttrInitial( );
-    void SetTieAttrTerminal( Note *previousNote );
-    Tie *GetTieAttrInitial( ) { return m_tieAttrInitial; };
-    Tie *GetTieAttrTerminal( ) { return m_tieAttrTerminal; };
-    void ResetTieAttrInitial();
-    void ResetTieAttrTerminal() { m_tieAttrTerminal = NULL; };
-    */
+    void ResetDrawingTieAttr( );
+    void SetDrawingTieAttr( );
     Tie *GetDrawingTieAttr( ) { return m_drawingTieAttr; };
     ///@}
     

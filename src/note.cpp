@@ -61,10 +61,7 @@ void Note::Reset()
     m_acciaccatura = false;
     m_embellishment = EMB_NONE;
     // tie pointers
-    if (m_drawingTieAttr) {
-        delete m_drawingTieAttr;
-    }
-    m_drawingTieAttr = NULL;
+    ResetDrawingTieAttr();
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -134,40 +131,21 @@ void Note::SetValue( int value, int flag )
     }    
 }
 
-/*
-void Note::SetTieAttrInitial()
+void Note::SetDrawingTieAttr(  )
 {
-    if ( m_tieAttrInitial ) {
-        LogWarning("Initial tie attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_tieAttrInitial = new Tie();
-    m_tieAttrInitial->SetStart( this );
+    assert(!this->m_drawingTieAttr);
+    if ( m_drawingTieAttr ) return;
+    m_drawingTieAttr = new Tie();
+    m_drawingTieAttr->SetStart( this );
 }
 
-void Note::SetTieAttrTerminal( Note *previousNote )
+void Note::ResetDrawingTieAttr( )
 {
-    if ( m_tieAttrTerminal ) {
-        LogWarning("Terminal tie attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    if ( !previousNote || !previousNote->GetTieAttrInitial() ) {
-        LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_tieAttrTerminal = previousNote->GetTieAttrInitial();
-    m_tieAttrTerminal->SetEnd( this );
-}
-
-void Note::ResetTieAttrInitial( )
-{
-    if ( m_tieAttrInitial ) {
-        // Deleting the Tie object will also reset the m_tieAttrTerminal of the second note
-        delete m_tieAttrInitial;
-        m_tieAttrInitial = NULL;
+    if ( m_drawingTieAttr ) {
+        delete m_drawingTieAttr;
+        m_drawingTieAttr = NULL;
     }
 }
-*/
   
 int Note::GetDrawingDur( )
 {
