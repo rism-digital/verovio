@@ -369,30 +369,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     if (note->GetDrawingTieAttr()) {
         System *system = dynamic_cast<System*>(measure->GetFirstParent(&typeid(System)));
+        // create a placeholder for the tie attribute that will be drawn from the system
+        dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
+        dc->EndGraphic(note->GetDrawingTieAttr(), this);
         if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
-    
-    // Add the ties to the postponed drawing list
-    /*
-    if ( note->GetTieAttrInitial() ) {
-        // normally, we add the tie from the terminal note,
-        // however, when the notes are not on the same system (or page),
-        // we need to draw them twice. For this reason, we look if the
-        // parent system is the same or not. If not, we also add to the list
-        // the tie from the inital note
-        Note *noteTerminal = note->GetTieAttrInitial()->GetEnd();
-        if ( noteTerminal ) {
-            System *parentSystem1 = dynamic_cast<System*>( note->GetFirstParent( &typeid(System) ) );
-            System *parentSystem2 = dynamic_cast<System*>( noteTerminal->GetFirstParent( &typeid(System) ) );
-            if ( (parentSystem1 != parentSystem2) && parentSystem1 ) {
-                layer->AddToDrawingList( note->GetTieAttrInitial() );
-            }
-        }
-    }
-    if ( note->GetTieAttrTerminal() ) {
-        layer->AddToDrawingList( note->GetTieAttrTerminal() );
-    }
-    */
 
     // This will draw lyrics, accid, etc.
     DrawLayerChildren(dc, note, layer, staff, measure);

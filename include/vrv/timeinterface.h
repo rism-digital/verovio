@@ -81,11 +81,12 @@ protected:
      */
     
     /**
+     * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params, DocObject *object );
     
     /**
-     *
+     * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object );
     

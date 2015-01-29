@@ -25,6 +25,7 @@
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
+#include "note.h"
 #include "page.h"
 #include "slur.h"
 #include "smufl.h"
@@ -93,6 +94,7 @@ void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
     
+    // Try to match all spanning elements (slur, tie, etc) by processing backward
     std::vector<DocObject*> timeSpanningElements;
     bool fillList = true;
     params.push_back( &timeSpanningElements );
@@ -115,6 +117,8 @@ void Doc::PrepareDrawing()
         LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size() );
     }
     
+    // We need to populate processing lists for processing the document by Layer (for matching @tie) and
+    // by Verse (for matching syllable connectors)
     params.clear();
     IntTree verseTree;
     IntTree layerTree;
@@ -124,7 +128,7 @@ void Doc::PrepareDrawing()
     //StaffN_LayerN_VerseN_t staffLayerVerseTree;
     //params.push_back( &staffLayerVerseTree );
     
-    // We first fill a tree of int with the staff/layer/verse numbers to be process
+    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
     //LogElapsedTimeStart( );
     Functor prepareProcessingLists( &Object::PrepareProcessingLists );
     this->Process( &prepareProcessingLists, params );
@@ -137,41 +141,58 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
     
+    // Process by layer for matching @tie attribute - we process notes and chords, looking at
+    // GetTie values and pitch and oct for matching notes
     Chord *currentChord;
-    std::vector<Note*>currentNotes;
+    std::vector<Note*> currentNotes;
     std::vector<AttComparison*> filters;
     for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-                filters.clear();
-                // Create ad comparison object for each type / @n
-                AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
-                AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
-                filters.push_back( &matchStaff );
-                filters.push_back( &matchLayer );
-                
-                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
-                // m_drawingLastNote is set only if the syl has a forward connector
-                currentChord = NULL;
-                currentNotes.clear();
-                ArrayPtrVoid paramsTieAttr;
-                paramsTieAttr.push_back( &currentNotes );
-                paramsTieAttr.push_back( &currentChord );
-                Functor prepareTieAttr( &Object::PrepareTieAttr );
-                this->Process( &prepareTieAttr, paramsTieAttr, NULL, &filters );
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+            
+            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // m_drawingLastNote is set only if the syl has a forward connector
+            currentChord = NULL;
+            currentNotes.clear();
+            ArrayPtrVoid paramsTieAttr;
+            paramsTieAttr.push_back( &currentNotes );
+            paramsTieAttr.push_back( &currentChord );
+            Functor prepareTieAttr( &Object::PrepareTieAttr );
+            Functor prepareTieAttrEnd( &Object::PrepareTieAttrEnd );
+            this->Process( &prepareTieAttr, paramsTieAttr, &prepareTieAttrEnd, &filters );
+        
+            // After having processed one layer, we check if we have open ties - if yes, we
+            // must reset them and they will be ignored.
+            if ( !currentNotes.empty() ) {
+                std::vector<Note*>::iterator iter;
+                for (iter = currentNotes.begin(); iter != currentNotes.end(); iter++) {
+                    LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                    (*iter)->ResetDrawingTieAttr();
+                }
+            }
         }
     }
     
-    
+    // Once <slur> , <ties> and @ties are matched, we need to set them as running TimeSpanningInterface to each
+    // staff they are extended. This does not need to be done staff by staff because we can just check the
+    // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
     params.clear();
     timeSpanningElements.clear();
     params.push_back( &timeSpanningElements );
     Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
     this->Process( &fillStaffCurrentTimeSpanning, params );
     
+    // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if ( !timeSpanningElements.empty() ) {
         LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
     }
     
+    // Same for the lyrics, but Verse by Verse - Syl should be made TimeSpanningInterfade elements
     Syl *currentSyl;
     Note *lastNote;
     Note *lastButOneNote;
@@ -204,6 +225,8 @@ void Doc::PrepareDrawing()
                 // The second pass set the current lyric for all staves that have a lyric
                 // started in a previous measure and that will need to be drawing from the
                 // Staff Object. This fills the Staff::m_currentSyls list
+                // This could actually be move to FillStaffCurrentTimeSpanning which should be done at
+                // the very end once we have made Syl TimeSpanningInterface elements
                 currentSyl = NULL;
                 paramsLyrics.clear();
                 paramsLyrics.push_back( &currentSyl );

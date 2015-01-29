@@ -53,7 +53,7 @@ public:
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
-     * to be processed.
+     * and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists( ArrayPtrVoid params );
     

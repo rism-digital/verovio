@@ -43,6 +43,7 @@ void Chord::Reset()
     ResetCommon();
     ResetStemmed();
     ResetColoration();
+    ResetTiepresent();
 }
     
 void Chord::AddLayerElement(vrv::LayerElement *element)
@@ -96,6 +97,34 @@ void Chord::GetYExtremes(int initial, int *yMax, int *yMin)
         if (y1 > *yMax) *yMax = y1;
         else if (y1 < *yMin) *yMin = y1;
     }
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Chord::PrepareTieAttr( ArrayPtrVoid params )
+{
+    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
+    // param 1: Chord** currentChord for the current chord if in a chord
+    Chord **currentChord = static_cast<Chord**>(params[1]);
+    
+    assert(!(*currentChord));
+    (*currentChord) = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::PrepareTieAttrEnd( ArrayPtrVoid params )
+{
+    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
+    // param 1: Chord** currentChord for the current chord if in a chord
+    Chord **currentChord = static_cast<Chord**>(params[1]);
+    
+    assert((*currentChord));
+    (*currentChord) = NULL;
+    
+    return FUNCTOR_CONTINUE;
 }
     
 }

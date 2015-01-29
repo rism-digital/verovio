@@ -60,6 +60,21 @@ public:
     void GetYExtremes(int initial, int *yMax, int *yMin);
 
     ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    
+    
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
 };
 
 } // namespace vrv

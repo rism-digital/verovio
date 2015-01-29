@@ -37,11 +37,12 @@ public:
     //----------//
     
     /**
+     * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
     
     /**
-     *
+     * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid params );
     

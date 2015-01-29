@@ -439,23 +439,19 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
+int Layer::PrepareProcessingLists( ArrayPtrVoid params )
+{
+    // param 0: the IntTree* for staff/layer/verse (unused)
+    // param 1: the IntTree* for staff/layer
+    IntTree *tree = static_cast<IntTree*>(params[1]);
+    // Alternate solution with StaffN_LayerN_VerseN_t
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
     
-    int Layer::PrepareProcessingLists( ArrayPtrVoid params )
-    {
-        // param 0: the IntTree
-        IntTree *tree = static_cast<IntTree*>(params[1]);
-        // Alternate solution with StaffN_LayerN_VerseN_t
-        //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
-        
-        Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
-        
-        assert( staff );
-        
-        tree->child[ staff->GetN() ].child[ this->GetN() ];
-        // Alternate solution with StaffN_LayerN_VerseN_t
-        //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
-        
-        return FUNCTOR_CONTINUE;
-    }
+    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
+    assert( staff );
+    tree->child[ staff->GetN() ].child[ this->GetN() ];
+    
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

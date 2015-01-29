@@ -387,7 +387,8 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 
 int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
 {
-    // param 0: the IntTree
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
     std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
     
     std::vector<DocObject*>::iterator iter = elements->begin();

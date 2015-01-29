@@ -98,6 +98,7 @@ public:
     //----------//
     
     /**
+     * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr( ArrayPtrVoid params );
     

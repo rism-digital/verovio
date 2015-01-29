@@ -92,7 +92,8 @@ std::string TimeSpanningInterface::ExtractUuidFragment(std::string refUuid)
     
 int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object )
 {
-    // param 0: the IntTree
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stack or not
     std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
     bool *fillList = static_cast<bool*>(params[1]);
     
@@ -108,7 +109,7 @@ int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid params, DocObject *
     
 int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid params, DocObject *object  )
 {
-    // param 0: the current Syl
+    // param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
     std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
     
     if (this->HasStartAndEnd()) {

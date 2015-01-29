@@ -197,27 +197,41 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 
 int Note::PrepareTieAttr( ArrayPtrVoid params )
 {
-    // param 0: the last Note with an open tie
-    std::vector<Note*> *lastNotes = static_cast<std::vector<Note*>*>(params[0]);
-    Chord *lastChord = static_cast<Chord*>(params[1]);
+    // param 0: std::vector<Note*>* that holds the current notes with open ties
+    // param 1: Chord** currentChord for the current chord if in a chord
+    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>(params[0]);
+    Chord **currentChord = static_cast<Chord**>(params[1]);
     
-    /*
+    AttTiepresent *check = this;
+    if ((*currentChord)) {
+        check = (*currentChord);
+    }
+    assert(check);
     
-    if ((*lastNote)) {
-        if ((this->GetTie()!=TIE_m) && (this->GetTie()!=TIE_t)) {
-            LogWarning("Expected @tie median or terminal in note '%s'", this->GetUuid().c_str());
+    std::vector<Note*>::iterator iter = currentNotes->begin();
+    while ( iter != currentNotes->end()) {
+        // same octave and same pitch - this is the one!
+        if ((this->GetOct()==(*iter)->GetOct()) && (this->GetPname()==(*iter)->GetPname())) {
+            // right flag
+            if ((check->GetTie()==TIE_m) || (check->GetTie()==TIE_t)) {
+                assert( (*iter)->GetDrawingTieAttr() );
+                (*iter)->GetDrawingTieAttr()->SetEnd(this);
+            }
+            else {
+                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
+                (*iter)->ResetDrawingTieAttr();
+            }
+            iter = currentNotes->erase( iter );
+            // we are done for this note
+            break;
         }
-        (*lastNote)->m_drawingTieAttr->SetEnd(this);
+        iter++;
     }
 
-    if ((this->GetTie()==TIE_m) || (this->GetTie()==TIE_i)) {
+    if ((check->GetTie()==TIE_m) || (check->GetTie()==TIE_i)) {
         this->SetDrawingTieAttr();
-        (*lastNote) = this;
+        currentNotes->push_back(this);
     }
-    else {
-        (*lastNote) = NULL;
-    }
-    */
     
     return FUNCTOR_CONTINUE;
 }
