@@ -760,6 +760,8 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
         yy -= m_doc->m_drawingDoubleUnit[staff->staffSize];
     }
     
+    staff->m_drawingHeight = staff->GetDrawingY() - yy;
+    
     dc->ResetPen( );
     dc->ResetBrush( );
     

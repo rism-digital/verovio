@@ -45,7 +45,7 @@ struct BeamElementCoord {
     int y; // represents the point farthest from the beam
     int yTop; // y value of topmost note
     int yBottom; // y value of bottom-most note
-    int yBeam; // height of stems
+    int yBeam; // y value of stem top position
     int dur; // drawing duration
     int breaksec;
     char partialFlags[MAX_DURATION_PARTIALS];
@@ -294,8 +294,12 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
         }
         
-        if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY())
+        if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY()) {
             beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY() + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
+        }
+        else if (stemDir == STEMDIRECTION_down && beamElementCoord[i].yBottom < (staff->GetDrawingY() - staff->m_drawingHeight)) {
+            beamElementCoord[i].yBeam -= (staff->GetDrawingY() - staff->m_drawingHeight) - beamElementCoord[i].yBottom + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
+        }
         
         beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
         
@@ -327,19 +331,24 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
     /******************************************************************/
     // Calculate the stem lengths and draw them
-    
-    double prevYPos; //holds y position before calculation to determine if beam needs extra height
+
+    double oldYPos; //holds y position before calculation to determine if beam needs extra height
+    double expectedY;
 	for ( i=0; i<elementCount; i++ ) {
-        prevYPos = beamElementCoord[i].yBeam;	/* curCoord, variable de travail */
-		beamElementCoord[i].yBeam = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
+        oldYPos = beamElementCoord[i].yBeam;
+		expectedY = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
 		
         //if the stem is not long enough, add extra stem length needed to all members of the beam
-        if ((stemDir == STEMDIRECTION_up && prevYPos > beamElementCoord[i].yBeam) || (stemDir == STEMDIRECTION_down && prevYPos < beamElementCoord[i].yBeam)) {
-            verticalBoost += prevYPos - beamElementCoord[i].yBeam;
-            i = -1;
+        if ((stemDir == STEMDIRECTION_up && oldYPos > expectedY) || (stemDir == STEMDIRECTION_down && oldYPos < expectedY)) {
+            verticalBoost += oldYPos - expectedY;
         }
 	}
     
+    for (i=0; i<elementCount; i++)
+    {
+		beamElementCoord[i].yBeam = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
+    }
+        
 	for (i=0; i<elementCount; i++)
 	{
         if (stemDir == STEMDIRECTION_up) {
