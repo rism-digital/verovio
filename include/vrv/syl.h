@@ -21,6 +21,12 @@ class Note;
 // Syl
 //----------------------------------------------------------------------------
 
+/**
+ * Syl is a TimeSpanningInterface for managing syllable connectors. This means
+ * that TimeSpanningInterface attributes will not be read from the MEI but
+ * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
+ */
+    
 class Syl: public LayerElement, public TimeSpanningInterface,
     public AttTypography,
     public AttSylLog
@@ -37,11 +43,6 @@ public:
     virtual std::string GetClassName( ) { return "Syl"; };
     ///@}
     
-    /**
-     * Add syl to a syl.
-     */
-    void AddSyl(Syl *syl);
-    
     //----------//
     // Functors //
     //----------//
@@ -54,11 +55,9 @@ public:
     virtual int PrepareLyrics( ArrayPtrVoid params );
     
     /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
     
 private:
     

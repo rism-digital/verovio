@@ -178,21 +178,7 @@ void Doc::PrepareDrawing()
         }
     }
     
-    // Once <slur> , <ties> and @ties are matched, we need to set them as running TimeSpanningInterface to each
-    // staff they are extended. This does not need to be done staff by staff because we can just check the
-    // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
-    params.clear();
-    timeSpanningElements.clear();
-    params.push_back( &timeSpanningElements );
-    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
-    this->Process( &fillStaffCurrentTimeSpanning, params );
-    
-    // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if ( !timeSpanningElements.empty() ) {
-        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
-    }
-    
-    // Same for the lyrics, but Verse by Verse - Syl should be made TimeSpanningInterfade elements
+    // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     Syl *currentSyl;
     Note *lastNote;
     Note *lastButOneNote;
@@ -221,19 +207,22 @@ void Doc::PrepareDrawing()
                 Functor prepareLyrics( &Object::PrepareLyrics );
                 Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
                 this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
-                
-                // The second pass set the current lyric for all staves that have a lyric
-                // started in a previous measure and that will need to be drawing from the
-                // Staff Object. This fills the Staff::m_currentSyls list
-                // This could actually be move to FillStaffCurrentTimeSpanning which should be done at
-                // the very end once we have made Syl TimeSpanningInterface elements
-                currentSyl = NULL;
-                paramsLyrics.clear();
-                paramsLyrics.push_back( &currentSyl );
-                Functor fillStaffCurrentLyrics( &Object::FillStaffCurrentLyrics );
-                this->Process( &fillStaffCurrentLyrics, paramsLyrics, NULL, &filters );
             }
         }
+    }
+    
+    // Once <slur> , <ties> and @ties are matched but also syl connectors, we need to set them as running TimeSpanningInterface
+    // to each staff they are extended. This does not need to be done staff by staff because we can just check the
+    // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
+    params.clear();
+    timeSpanningElements.clear();
+    params.push_back( &timeSpanningElements );
+    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
+    this->Process( &fillStaffCurrentTimeSpanning, params );
+    
+    // Something must be wrong in the encoding because a TimeSpanningInterface was left open
+    if ( !timeSpanningElements.empty() ) {
+        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
     }
     
     /*

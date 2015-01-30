@@ -93,23 +93,10 @@ int Syl::PrepareLyrics( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Syl::FillStaffCurrentLyrics( ArrayPtrVoid params )
+int Syl::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
 {
-    // param 0: the current Syl
-    Syl **currentSyl = static_cast<Syl**>(params[0]);
-    
-    // Since the lastNote was set in Syl::PrepareLyircs previously
-    // we can rely on it to check if the syl has a forward connector
-    if (this->GetEnd() ) {
-        if ( this->GetStart()->GetFirstParent( &typeid(Staff) ) != this->GetEnd()->GetFirstParent( &typeid(Staff) ) ) {
-            (*currentSyl) = this;
-        }
-    }
-    else {
-        (*currentSyl) = NULL;
-    }
-    
-    return FUNCTOR_CONTINUE;
+    // Pass it to the pseudo functor of the interface
+    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
 
 } // namespace vrv

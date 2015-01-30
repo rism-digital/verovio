@@ -208,6 +208,8 @@ protected:
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
     void DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
                   Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
+                          Staff *staff, char spanningType, DocObject *graphic = NULL );
     ///@}
     
     /** 

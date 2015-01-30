@@ -151,8 +151,7 @@ void View::DrawSystemList( DeviceContext *dc, System *system, const std::type_in
         if (!element) continue;
         
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Syl) ) ) {
-            Syl *syl = dynamic_cast<Syl*>(element);
-            DrawSylConnector( dc, syl, system );
+            DrawTimeSpanningElement( dc, element, system );
         }
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
             DrawTimeSpanningElement(dc, element, system );
@@ -887,12 +886,16 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         spanningType = SPANNING_MIDDLE;
     }
     
-    if (dynamic_cast<Tie*>(element)) {
-        DrawTieOrSlur(dc, dynamic_cast<Tie*>(element), x1, x2, staff, spanningType, graphic);
-    }
-    else if (dynamic_cast<Slur*>(element)) {
+    if (dynamic_cast<Slur*>(element)) {
         DrawTieOrSlur(dc, dynamic_cast<Slur*>(element), x1, x2, staff, spanningType, graphic);
     }
+    else if (dynamic_cast<Syl*>(element)) {
+        DrawSylConnector(dc, dynamic_cast<Syl*>(element), x1, x2, staff, spanningType, graphic);
+    }
+    else if (dynamic_cast<Tie*>(element)) {
+        DrawTieOrSlur(dc, dynamic_cast<Tie*>(element), x1, x2, staff, spanningType, graphic);
+    }
+
 }
     
 void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
@@ -970,17 +973,13 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
         y2 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
     }
     
-    if ( graphic ) {
-        dc->ResumeGraphic(graphic, graphic->GetUuid());
-    }
+    if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else dc->StartGraphic(element, "spanning-tie-or-slur", "");
     dc->DeactivateGraphic();
     DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
     dc->ReactivateGraphic();
-    if ( graphic ) {
-        dc->EndResumedGraphic(graphic, this);
-    }
-
-    
+    if ( graphic ) dc->EndResumedGraphic(graphic, this);
+    else dc->EndGraphic(element, this);
 }
 
 //----------------------------------------------------------------------------
