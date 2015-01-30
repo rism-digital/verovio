@@ -27,7 +27,9 @@ namespace vrv {
 
 TimeSpanningInterface::TimeSpanningInterface():
     AttStartendid(),
-    AttStartid()
+    AttStartid(),
+    AttTimestampMusical(),
+    AttTimestamp2Musical()
 {
     Reset();
 }
@@ -41,6 +43,9 @@ void TimeSpanningInterface::Reset()
 {
     ResetStartendid();
     ResetStartid();
+    ResetTimestampMusical();
+    ResetTimestamp2Musical();
+    
     m_start = NULL;
     m_end = NULL;
     m_startUuid = "";

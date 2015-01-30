@@ -9,6 +9,10 @@
 #ifndef __ATT_DEF_H__
 #define __ATT_DEF_H__
 
+#include <utility>
+
+//----------------------------------------------------------------------------
+
 namespace vrv {
     
 #define VRV_UNSET -0x7FFFFFFF
@@ -280,6 +284,8 @@ enum data_WORDPOS {
     WORDPOS_m,
     WORDPOS_t
 };
+    
+typedef std::pair<int, double> typedef_TSTAMP2;
     
 } // namespace vrv
 

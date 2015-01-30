@@ -117,6 +117,9 @@ protected:
     std::string TieToStr(data_TIE data);
     data_TIE StrToTie(std::string value);
     
+    std::string Tstamp2ToStr(typedef_TSTAMP2 data);
+    typedef_TSTAMP2 StrToTstamp2(std::string value);
+    
     std::string WordPosToStr(data_WORDPOS data);
     data_WORDPOS StrToWordPos(std::string value);
   

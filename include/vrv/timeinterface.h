@@ -27,7 +27,9 @@ class LayerElement;
  */
 class TimeSpanningInterface:
     public AttStartendid,
-    public AttStartid
+    public AttStartid,
+    public AttTimestampMusical,
+    public AttTimestamp2Musical
 {
 public:
     /**

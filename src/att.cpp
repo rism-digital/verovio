@@ -770,6 +770,16 @@ data_TIE Att::StrToTie(std::string value)
     }
     return TIE_NONE;
 }
+    
+std::string Att::Tstamp2ToStr(typedef_TSTAMP2 data)
+{
+    return "0m0.0";
+}
+    
+typedef_TSTAMP2 Att::StrToTstamp2(std::string value)
+{
+    return std::make_pair(0, 1.0);
+}
 
 std::string Att::WordPosToStr(data_WORDPOS data)
 {
