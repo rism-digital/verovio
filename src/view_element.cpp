@@ -994,28 +994,27 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
     int drawingDur = chord->GetDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-    chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up );
     
     if(inBeam && drawingDur > DUR_4)
     {
         //no stem
     }
     else {
-        int originY;
-        if (yMax - verticalCenter >= verticalCenter - yMin) {
-            chord->SetStemDir( STEMDIRECTION_down );
-            originY = yMax;
+        if ( chord->HasStemDir() ) {
+            chord->m_drawingStemDir = chord->GetStemDir();
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            chord->m_drawingStemDir = layer->GetDrawingStemDir();
         }
         else {
-            chord->SetStemDir( STEMDIRECTION_up );
-            originY = yMin;
+            chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up) );
+            chord->m_drawingStemDir = chord->GetStemDir();
         }
         
-        chord->m_drawingStemDir = chord->GetStemDir();
-        
-        int heightY = yMax - yMin;
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
         int beamX = chord->GetDrawingX();
+        int originY = ( chord->GetStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int heightY = yMax - yMin;
         
         DrawStem(dc, chord, staff, chord->GetStemDir(), radius, beamX, originY, heightY);
     }

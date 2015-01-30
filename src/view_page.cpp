@@ -916,6 +916,13 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
         return;
     }
     
+    Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent(&typeid(Layer)));
+    Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent(&typeid(Layer)));
+    
+    if ( layer1->GetN() != layer2->GetN() ) {
+        LogWarning("Ties between different layers may not be fully supported.");
+    }
+    
     //the normal case
     if ( spanningType ==  SPANNING_START_END ) {
         assert( note1 && note2 );
@@ -949,7 +956,11 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     
     assert( dynamic_cast<Note*>(note1));
-    if (noteStemDir == STEMDIRECTION_up) {
+    //layer direction trumps note direction
+    if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
+        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+    }
+    else if (noteStemDir == STEMDIRECTION_up) {
         up = false;
     }
     else if (noteStemDir == STEMDIRECTION_NONE) {
@@ -979,8 +990,6 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     if ( graphic ) {
         dc->EndResumedGraphic(graphic, this);
     }
-
-    
 }
 
 //----------------------------------------------------------------------------
