@@ -24,7 +24,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Syl::Syl():
-    LayerElement("syl-"),
+    LayerElement("syl-"), TimeSpanningInterface(),
     AttTypography(),
     AttSylLog()
 {
@@ -38,11 +38,10 @@ Syl::~Syl()
 void Syl::Reset()
 {
     LayerElement::Reset();
+    TimeSpanningInterface::Reset();
     ResetTypography();
     ResetSylLog();
     
-    m_drawingFirstNote = NULL;
-    m_drawingLastNote = NULL;
     m_drawingVerse = 1;
 }
 
@@ -64,17 +63,17 @@ int Syl::PrepareLyrics( ArrayPtrVoid params )
         m_drawingVerse = std::max(verse->GetN(), 1);
     }
     
-    m_drawingFirstNote = dynamic_cast<Note*>( this->GetFirstParent( &typeid(Note), MAX_NOTE_DEPTH ) );
+    this->SetStart( dynamic_cast<LayerElement*>( this->GetFirstParent( &typeid(Note), MAX_NOTE_DEPTH ) ) );
     
     // At this stage currentSyl is actually the previous one that is ending here
     if ((*currentSyl)) {
         // The previous syl was an initial or median -> The note we just parsed is the end
         if (((*currentSyl)->GetWordpos() == WORDPOS_i) || ((*currentSyl)->GetWordpos() == WORDPOS_m)) {
-            (*currentSyl)->m_drawingLastNote = (*lastNote);
+            (*currentSyl)->SetEnd(*lastNote);
         }
         // The previous syl was a underscore -> the previous but one was the end
         else if ((*currentSyl)->GetCon() == CON_u) {
-            (*currentSyl)->m_drawingLastNote = (*lastButOneNote);
+            (*currentSyl)->SetEnd(*lastButOneNote);
         }
     }
     
@@ -101,8 +100,8 @@ int Syl::FillStaffCurrentLyrics( ArrayPtrVoid params )
     
     // Since the lastNote was set in Syl::PrepareLyircs previously
     // we can rely on it to check if the syl has a forward connector
-    if (this->m_drawingLastNote ) {
-        if ( this->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) != this->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) ) {
+    if (this->GetEnd() ) {
+        if ( this->GetStart()->GetFirstParent( &typeid(Staff) ) != this->GetEnd()->GetFirstParent( &typeid(Staff) ) ) {
             (*currentSyl) = this;
         }
     }

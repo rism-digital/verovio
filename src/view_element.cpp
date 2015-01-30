@@ -1420,7 +1420,7 @@ int View::GetSylY( Syl *syl, Staff *staff )
 {
     assert( syl && staff );
     
-    int y = syl->m_drawingFirstNote->GetDrawingY();
+    int y = syl->GetStart()->GetDrawingY();
     if (staff->GetAlignment() ) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - syl->m_drawingVerse * m_doc->m_drawingUnit[staff->staffSize] * 4;
     }
@@ -1431,20 +1431,20 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 {
     Syl *syl = dynamic_cast<Syl*>(element);
     
-    if ( !syl->m_drawingFirstNote ) {
+    if ( !syl->GetStart() ) {
         LogDebug("Syl parent note was not found");
         return;
     }
     
     // to be updated
-    syl->SetDrawingX( syl->m_drawingFirstNote->GetDrawingX() - m_doc->m_drawingUnit[staff->staffSize] * 2 );
+    syl->SetDrawingX( syl->GetStart()->GetDrawingX() - m_doc->m_drawingUnit[staff->staffSize] * 2 );
     syl->SetDrawingY( GetSylY(syl, staff) );
     
     dc->StartGraphic( syl, "", syl->GetUuid() );
     
     DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str() );
     
-    if (syl->m_drawingFirstNote && syl->m_drawingLastNote) {
+    if (syl->GetStart() && syl->GetEnd()) {
         System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
@@ -1459,23 +1459,23 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
 void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
 {
-    assert( syl->m_drawingFirstNote && syl->m_drawingLastNote);
-    if ( !syl->m_drawingFirstNote || !syl->m_drawingLastNote) return;
+    assert( syl->GetStart() && syl->GetEnd());
+    if ( !syl->GetStart() || !syl->GetEnd()) return;
     
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(System) )  );
-    System *parentSystem2 = dynamic_cast<System*>( syl->m_drawingLastNote->GetFirstParent( &typeid(System) )  );
+    System *parentSystem1 = dynamic_cast<System*>( syl->GetStart()->GetFirstParent( &typeid(System) )  );
+    System *parentSystem2 = dynamic_cast<System*>( syl->GetEnd()->GetFirstParent( &typeid(System) )  );
     
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (( system == parentSystem1 ) && ( system == parentSystem2 )) {
         // Get the parent staff for calculating the y position
-        Staff *staff = dynamic_cast<Staff*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) );
+        Staff *staff = dynamic_cast<Staff*>( syl->GetStart()->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( staff ) ) return;
         
         int y = GetSylY(syl, staff);
         // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
-        int x2 = syl->m_drawingLastNote->GetDrawingX();
+        int x1 = syl->GetStart()->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        int x2 = syl->GetEnd()->GetDrawingX();
         
         // In this case we can resume the Syl because is was drawn previouly in the system
         dc->ResumeGraphic(syl, syl->GetUuid());
@@ -1489,12 +1489,12 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         // We need the last measure of the system for x2
         Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
         if ( !Check( last ) ) return;
-        Staff *staff = dynamic_cast<Staff*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) );
+        Staff *staff = dynamic_cast<Staff*>( syl->GetStart()->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( staff ) ) return;
         
         int y = GetSylY(syl, staff);
         // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        int x1 = syl->m_drawingFirstNote->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        int x1 = syl->GetStart()->GetDrawingX() + ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
         int x2 = last->GetDrawingX() + last->GetRightBarlineX();
         
         // In this case too we can resume the Syl because is was drawn previouly in the system
@@ -1510,7 +1510,7 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         // We need the first measure of the system for x1
         Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
         if ( !Check( first ) ) return;
-        Staff *staff = dynamic_cast<Staff*>( syl->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) );
+        Staff *staff = dynamic_cast<Staff*>( syl->GetEnd()->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( staff ) ) return;
         // Also try to get a first note - we should change this once we have a x position in measure that
         // takes into account the scoreDef
@@ -1518,14 +1518,14 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         
         int y = GetSylY(syl, staff);
         int x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
-        int x2 = syl->m_drawingLastNote->GetDrawingX();
+        int x2 = syl->GetEnd()->GetDrawingX();
         
         // In this case we can resume the last note because the Syl itself was _not_ drawn previouly in the system
-        dc->ResumeGraphic(syl->m_drawingLastNote, syl->m_drawingLastNote->GetUuid());
+        dc->ResumeGraphic(syl->GetEnd(), syl->GetEnd()->GetUuid());
         dc->DeactivateGraphic();
         DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
         dc->ReactivateGraphic();
-        dc->EndResumedGraphic(syl->m_drawingLastNote, this);
+        dc->EndResumedGraphic(syl->GetEnd(), this);
     }
     // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
     else {
@@ -1539,7 +1539,7 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
         if ( !Check( last ) ) return;
         // Get the staff of the first note - however, not the staff we need
-        Staff *firstStaff = dynamic_cast<Staff*>( syl->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) );
+        Staff *firstStaff = dynamic_cast<Staff*>( syl->GetStart()->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( firstStaff ) ) return;
         
         // We need the staff from the current system, i.e., the first measure.

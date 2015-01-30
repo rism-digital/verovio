@@ -11,6 +11,7 @@
 
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "timeinterface.h"
 
 namespace vrv {
     
@@ -20,7 +21,7 @@ class Note;
 // Syl
 //----------------------------------------------------------------------------
 
-class Syl: public LayerElement,
+class Syl: public LayerElement, public TimeSpanningInterface,
     public AttTypography,
     public AttSylLog
 {
@@ -62,11 +63,6 @@ public:
 private:
     
 public:
-    /** 
-     * The first and last note of the syl to be used when we have @wordpos and @con 
-     * The first note is usually the parent.
-     */
-    Note *m_drawingFirstNote, *m_drawingLastNote;
     /**
      * The verse number with multiple verses
      * Value is 1 by default, set in PrepareLyrics

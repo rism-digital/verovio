@@ -171,9 +171,9 @@ int Staff::FillStaffCurrentLyrics( ArrayPtrVoid params )
     if ((*currentSyl)) {
         // We have a running syl started in a previous measure
         this->m_currentSyls.push_back((*currentSyl));
-        if ((*currentSyl)->m_drawingLastNote) {
+        if ((*currentSyl)->GetEnd()) {
             // Look if the syl ends in this measure - if not, add it
-            if ((*currentSyl)->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) == this ) {
+            if ((*currentSyl)->GetEnd()->GetFirstParent( &typeid(Staff) ) == this ) {
                 (*currentSyl) = NULL;
             }
         }

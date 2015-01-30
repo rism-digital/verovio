@@ -627,7 +627,7 @@ int Doc::PrepareLyricsEnd( ArrayPtrVoid params )
     Note **lastNote = static_cast<Note**>(params[1]);
     
     if ( (*currentSyl) && (*lastNote) ) {
-        (*currentSyl)->m_drawingLastNote = (*lastNote);
+        (*currentSyl)->SetEnd(*lastNote);
     }
     
     return FUNCTOR_STOP;
