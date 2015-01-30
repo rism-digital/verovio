@@ -1783,7 +1783,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
         // rests for the moment are always in the staff
         // so just place the fermata above the staff
         y = staff->GetDrawingY() + m_doc->m_drawingDoubleUnit[staff->staffSize];
-        DrawSmuflCode ( dc, x, y, SMUFL_E4C1_fermataBelow, staff->staffSize, false );
+        DrawSmuflCode ( dc, x, y, SMUFL_E4C0_fermataAbove, staff->staffSize, false );
     }
 }
 
