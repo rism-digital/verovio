@@ -5034,8 +5034,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTie(std::string tie_) { m_tie = tie_; };
-    std::string GetTie() const { return m_tie; };    
+    void SetTie(data_TIE tie_) { m_tie = tie_; };
+    data_TIE GetTie() const { return m_tie; };    
     bool HasTie( );
     
     ///@}
@@ -5046,7 +5046,7 @@ protected:
      * If visual information about the tie needs to be recorded, then a <tie> element
      * should be employed.
      **/
-    std::string m_tie;
+    data_TIE m_tie;
 
 /* include <atttie> */
 };

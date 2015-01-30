@@ -110,9 +110,14 @@ public:
     //----------//
     
     /**
-     * Align horizontally the LayerElement.
+     * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
+    
+    /**
+     * See Object::PrepareTimeSpanning
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
     
 protected:
     /**

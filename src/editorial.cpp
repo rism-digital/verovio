@@ -59,7 +59,7 @@ void EditorialElement::AddLayer( Layer *child )
     }
 }
 
-void EditorialElement::AddElement( LayerElement *child )
+void EditorialElement::AddLayerElement( LayerElement *child )
 {
     child->SetParent( this );
     m_children.push_back( child );
@@ -80,12 +80,12 @@ void EditorialElement::AddScoreDef( ScoreDef *child )
     Modify();
 }
     
-void EditorialElement::AddStaff( Staff *child )
+void EditorialElement::AddMeasureElement( MeasureElement *child )
 {
     child->SetParent( this );
     m_children.push_back( child );
     Modify();
-    if ( child->GetN() < 1 ) {
+    if ( dynamic_cast<Staff*>(child) &&  dynamic_cast<Staff*>(child)->GetN() < 1 ) {
         LogError("Staff without @n is not supported within editorial markup element");
     }
 }

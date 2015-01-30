@@ -53,7 +53,7 @@ public:
     virtual std::string GetClassName( ) { return "Layer"; };
     ///@}
 	
-	void AddElement( LayerElement *element, int idx = -1 );
+	void AddLayerElement( LayerElement *element, int idx = -1 );
     	
 	int GetElementCount() const { return (int)m_children.size(); };
     
@@ -142,6 +142,12 @@ public:
      * Align horizontally the content of a layer.
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
+    
+    /**
+     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * and for staff/layer to be then processed.
+     */
+    virtual int PrepareProcessingLists( ArrayPtrVoid params );
     
 private:
     

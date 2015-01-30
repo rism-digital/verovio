@@ -52,7 +52,7 @@ namespace vrv {
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures    
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
-void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -367,39 +367,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		DrawDots( dc, x2, y1, note->GetDots(), staff );
 	}
     
-    // Add the ties to the postponed drawing list
-    if ( note->GetTieAttrInitial() ) {
-        // normally, we add the tie from the terminal note,
-        // however, when the notes are not on the same system (or page),
-        // we need to draw them twice. For this reason, we look if the
-        // parent system is the same or not. If not, we also add to the list
-        // the tie from the inital note
-        Note *noteTerminal = note->GetTieAttrInitial()->GetSecondNote();
-        if ( noteTerminal ) {
-            System *parentSystem1 = dynamic_cast<System*>( note->GetFirstParent( &typeid(System) ) );
-            System *parentSystem2 = dynamic_cast<System*>( noteTerminal->GetFirstParent( &typeid(System) ) );
-            if ( (parentSystem1 != parentSystem2) && parentSystem1 ) {
-                layer->AddToDrawingList( note->GetTieAttrInitial() );
-            }
-        }
-    }
-    if ( note->GetTieAttrTerminal() ) {
-        layer->AddToDrawingList( note->GetTieAttrTerminal() );
-    }
-    
-    // same for slurs
-    if ( note->GetSlurAttrInitial() ) {
-        Note *noteTerminal = note->GetSlurAttrInitial()->GetSecondNote();
-        if ( noteTerminal ) {
-            System *parentSystem1 = dynamic_cast<System*>( note->GetFirstParent( &typeid(System) ) );
-            System *parentSystem2 = dynamic_cast<System*>( noteTerminal->GetFirstParent( &typeid(System) ) );
-            if ( (parentSystem1 != parentSystem2) && parentSystem1 ) {
-                layer->AddToDrawingList( note->GetSlurAttrInitial() );
-            }
-        }
-    }
-    if ( note->GetSlurAttrTerminal() ) {
-        layer->AddToDrawingList( note->GetSlurAttrTerminal() );
+    if (note->GetDrawingTieAttr()) {
+        System *system = dynamic_cast<System*>(measure->GetFirstParent(&typeid(System)));
+        // create a placeholder for the tie attribute that will be drawn from the system
+        dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
+        dc->EndGraphic(note->GetDrawingTieAttr(), this);
+        if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
 
     // This will draw lyrics, accid, etc.
@@ -1537,11 +1510,11 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         // We need the first measure of the system for x1
         Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
         if ( !Check( first ) ) return;
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
         Staff *staff = dynamic_cast<Staff*>( syl->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( staff ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( &typeid(Note) ) );
         
         int y = GetSylY(syl, staff);
         int x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
@@ -1690,11 +1663,11 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Tie *tie = dynamic_cast<Tie*>(element);
     Slur *slur = dynamic_cast<Slur*>(element);
     if ( tie ) {
-        note1 = tie->GetFirstNote();
-        note2 = tie->GetSecondNote();
+        note1 = tie->GetStart();
+        note2 = tie->GetEnd();
     } else if ( slur ) {
-        note1 = slur->GetFirstNote();
-        note2 = slur->GetSecondNote();
+        note1 = slur->GetStart();
+        note2 = slur->GetEnd();
     }
     
     if ( !note1 && !note2 ) {

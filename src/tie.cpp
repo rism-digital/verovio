@@ -14,8 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "note.h"
-
 namespace vrv {
     
 //----------------------------------------------------------------------------
@@ -23,7 +21,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Tie::Tie():
-LayerElement("tie-")
+    MeasureElement("tie-"), TimeSpanningInterface()
 {
     Reset();
 }
@@ -31,31 +29,30 @@ LayerElement("tie-")
 
 Tie::~Tie()
 {
-    if (m_first && m_first->GetTieAttrTerminal() == this) {
-        m_first->ResetTieAttrInitial();
-    }
-    if (m_second && m_second->GetTieAttrTerminal() == this) {
-        m_second->ResetTieAttrTerminal();
-    }
 }
     
 void Tie::Reset()
 {
-    LayerElement::Reset();
-    m_first = NULL;
-    m_second = NULL;
+    MeasureElement::Reset();
+    TimeSpanningInterface::Reset();
 }
 
-void Tie::SetFirstNote( Note *note )
+//----------------------------------------------------------------------------
+// Tie functor methods
+//----------------------------------------------------------------------------
+
+int Tie::PrepareTimeSpanning( ArrayPtrVoid params )
 {
-    assert( !m_first );
-    m_first = note;
+    // Pass it to the pseudo functor of the interface
+    return TimeSpanningInterface::PrepareTimeSpanning(params, this);
 }
 
-void Tie::SetSecondNote( Note *note )
+
+int Tie::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
 {
-    assert( !m_second );
-    m_second = note;
+    // Pass it to the pseudo functor of the interface
+    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
+
 
 } // namespace vrv

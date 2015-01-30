@@ -10,7 +10,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
-#include "object.h"
+#include "measureelement.h"
 
 namespace vrv {
 
@@ -18,6 +18,7 @@ class DeviceContext;
 class Layer;
 class StaffAlignment;
 class Syl;
+class TimeSpanningInterface;
 
 //----------------------------------------------------------------------------
 // Staff
@@ -29,7 +30,7 @@ class Syl;
  * It contains Measure objects.
  * For unmeasured music, on single Measure is added for simplifying internal processing
 */
-class Staff: public DocObject,
+class Staff: public MeasureElement,
     public AttCommon
 {
     
@@ -84,18 +85,15 @@ public:
     virtual int AlignVertically( ArrayPtrVoid params );
     
     /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
-    
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+
     /**
      * Functor for setting running lyrics in staves
      * This is necessary for <syl> that starts in one measure and ends in another one
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int FillStaffCurrentLyricsEnd( ArrayPtrVoid params );
+    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
     
 public:
 	/**
@@ -109,6 +107,7 @@ public:
     int m_drawingHeight;
     
     std::vector<Syl*>m_currentSyls;
+    std::vector<DocObject*>m_timeSpanningElements;
 
 	/**
      * The Y absolute position of the staff for facsimile (transcription) encodings.

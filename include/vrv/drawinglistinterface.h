@@ -9,11 +9,11 @@
 #ifndef __VRV_DRAWING_LIST_INTERFACE_H__
 #define __VRV_DRAWING_LIST_INTERFACE_H__
 
-#include "object.h"
+#include "vrvdef.h"
 
 namespace vrv {
     
-class LayerElement;
+class DocObject;
 
 //----------------------------------------------------------------------------
 // DrawingListInterface
@@ -42,7 +42,7 @@ public:
      * that need to be drawn in a particular order.
      * For example, we need to draw beams before tuplets
      */
-    void AddToDrawingList( LayerElement *element );
+    void AddToDrawingList( DocObject *element );
     
     /**
      * Return the drawing list.

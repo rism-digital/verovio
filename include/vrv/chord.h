@@ -33,10 +33,11 @@ namespace vrv {
  * It contains notes.
  */
     
-class Chord: public LayerElement, public DrawingListInterface, public ObjectListInterface, public DurationInterface,
+class Chord: public LayerElement, public ObjectListInterface, public DurationInterface,
     public AttColoration,
     public AttCommon,
-    public AttStemmed
+    public AttStemmed,
+    public AttTiepresent
 {
 public:
     /**
@@ -52,13 +53,28 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
 
     void FilterList();
     
     void GetYExtremes(int *yMax, int *yMin);
 
     ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    
+    
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
 };
 
 } // namespace vrv

@@ -23,10 +23,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Chord::Chord( ):
-LayerElement("chord-"), DrawingListInterface(), ObjectListInterface(),    DurationInterface(),
+LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     AttColoration(),
     AttCommon(),
-    AttStemmed()
+    AttStemmed(),
+    AttTiepresent()
 {
     Reset();
 }
@@ -39,13 +40,13 @@ void Chord::Reset()
 {
     DocObject::Reset();
     DurationInterface::Reset();
-    DrawingListInterface::Reset();
     ResetCommon();
     ResetStemmed();
     ResetColoration();
+    ResetTiepresent();
 }
     
-void Chord::AddElement(vrv::LayerElement *element)
+void Chord::AddLayerElement(vrv::LayerElement *element)
 {
     assert( dynamic_cast<Note*>(element) );
     element->SetParent( this );
@@ -102,6 +103,34 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
             else if (y1 < *yMin) *yMin = y1;
         }
     }
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Chord::PrepareTieAttr( ArrayPtrVoid params )
+{
+    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
+    // param 1: Chord** currentChord for the current chord if in a chord
+    Chord **currentChord = static_cast<Chord**>(params[1]);
+    
+    assert(!(*currentChord));
+    (*currentChord) = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Chord::PrepareTieAttrEnd( ArrayPtrVoid params )
+{
+    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
+    // param 1: Chord** currentChord for the current chord if in a chord
+    Chord **currentChord = static_cast<Chord**>(params[1]);
+    
+    assert((*currentChord));
+    (*currentChord) = NULL;
+    
+    return FUNCTOR_CONTINUE;
 }
     
 }

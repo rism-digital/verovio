@@ -30,6 +30,7 @@
 #include "rest.h"
 #include "syl.h"
 #include "tie.h"
+#include "timeinterface.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -379,6 +380,28 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     
     // increase the time position
     (*time) += duration;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+
+int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    
+    std::vector<DocObject*>::iterator iter = elements->begin();
+    while ( iter != elements->end()) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(*iter);
+        assert(interface);
+        if (interface->SetStartAndEnd( this ) ) {
+            iter = elements->erase( iter );
+        }
+        else {
+            iter++;
+        }
+    }
     
     return FUNCTOR_CONTINUE;
 }

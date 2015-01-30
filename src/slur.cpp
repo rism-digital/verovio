@@ -14,8 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "note.h"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -23,7 +21,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Slur::Slur():
-    LayerElement("slur-")
+    MeasureElement("slur-"), TimeSpanningInterface()
 {
     Reset();
 }
@@ -31,31 +29,28 @@ Slur::Slur():
 
 Slur::~Slur()
 {
-    if (m_first && m_first->GetSlurAttrTerminal() == this) {
-        m_first->ResetSlurAttrInitial();
-    }
-    if (m_second && m_second->GetSlurAttrTerminal() == this) {
-        m_second->ResetSlurAttrTerminal();
-    }
 }
         
 void Slur::Reset()
 {
-    LayerElement::Reset();
-    m_first = NULL;
-    m_second = NULL;
+    MeasureElement::Reset();
+    TimeSpanningInterface::Reset();
 }
 
-void Slur::SetFirstNote( Note *note )
+//----------------------------------------------------------------------------
+// Slur functor methods
+//----------------------------------------------------------------------------
+
+int Slur::PrepareTimeSpanning( ArrayPtrVoid params )
 {
-    assert( !m_first );
-    m_first = note;
+    // Pass it to the pseudo functor of the interface
+    return TimeSpanningInterface::PrepareTimeSpanning(params, this);
 }
-
-void Slur::SetSecondNote( Note *note )
+    
+int Slur::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
 {
-    assert( !m_second );
-    m_second = note;
+    // Pass it to the pseudo functor of the interface
+    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
-
+    
 } // namespace vrv

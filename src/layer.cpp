@@ -9,6 +9,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
@@ -19,6 +20,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -63,7 +65,7 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
     
-void Layer::AddElement( LayerElement *element, int idx )
+void Layer::AddLayerElement( LayerElement *element, int idx )
 {
 	element->SetParent( this );
     if ( idx == -1 ) {
@@ -160,7 +162,7 @@ LayerElement *Layer::Insert( LayerElement *element, int x )
     
     // Insert in the logical tree - this works only for facsimile (transcription) encoding
     insertElement->m_xAbs = x;
-    AddElement( insertElement, idx );
+    AddLayerElement( insertElement, idx );
     
 	Refresh();
     //
@@ -174,7 +176,7 @@ void Layer::Insert( LayerElement *layerElement, LayerElement *before )
     if ( before ) {
         idx = this->GetChildIndex( before );
     }
-    AddElement( layerElement , idx );
+    AddLayerElement( layerElement , idx );
 }
 
 void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )
@@ -434,6 +436,21 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
         m_drawingMeterSig->AlignHorizontally( params );
     }
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::PrepareProcessingLists( ArrayPtrVoid params )
+{
+    // param 0: the IntTree* for staff/layer/verse (unused)
+    // param 1: the IntTree* for staff/layer
+    IntTree *tree = static_cast<IntTree*>(params[1]);
+    // Alternate solution with StaffN_LayerN_VerseN_t
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
+    
+    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
+    assert( staff );
+    tree->child[ staff->GetN() ].child[ this->GetN() ];
+    
     return FUNCTOR_CONTINUE;
 }
 

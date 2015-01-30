@@ -30,6 +30,7 @@ class Layer;
 class LayerElement;
 class Lem;
 class Measure;
+class MeasureElement;
 class Mensur;
 class MeterSig;
 class MRest;
@@ -40,9 +41,12 @@ class PositionInterface;
 class Rdg;
 class Rest;
 class ScoreDef;
+class Slur;
 class Staff;
 class Syl;
 class System;
+class Tie;
+class TimeSpanningInterface;
 class Tuplet;
 class Verse;
 
@@ -124,6 +128,15 @@ private:
     ///@}
     
     /**
+     * @name Methods for wrinting MeasureElement children.
+     * Called from WriteLayerElement.
+     */
+    ///@{
+    void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur ) { return; };
+    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie ) { return; };
+    ///@}
+    
+    /**
      * @name Methods for writing editorial markup
      */
     ///@{
@@ -157,6 +170,7 @@ private:
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
+    void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
     ///@}
     
     /**
@@ -266,6 +280,14 @@ private:
     bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
     bool ReadMeiVerse( Object *parent, pugi::xml_node verse );
     ///@}
+    
+    /**
+     * @name Methods for reading MEI measure elements
+     */
+    ///@{
+    bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
+    bool ReadMeiTie( Object *parent, pugi::xml_node tie );
+    ///@}
   
     /**
      * @name Methods for reading critical apparatus.
@@ -286,6 +308,7 @@ private:
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
+    bool ReadTimeSpanningInterface( pugi::xml_node element, TimeSpanningInterface *interface );
     ///@}
 
     /**
@@ -294,7 +317,6 @@ private:
     ///@{
     bool ReadAccidAsAttr( Note *note, pugi::xml_node verse );
     bool ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan );
-    bool ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur );
     ///@}
     
     /**
@@ -317,6 +339,7 @@ private:
      */
     ///@{
     void AddLayerElement( Object *parent, LayerElement *element );
+    void AddMeasureElement( Object *parent, MeasureElement *element );
     void AddScoreDef( Object *parent, ScoreDef *element );
     void AddStaffGrp( Object *parent, StaffGrp *element );
     ///@}
@@ -325,14 +348,6 @@ private:
      * Read score-based MEI
      */
     bool ReadScoreBasedMei( pugi::xml_node element );    
-    
-    /**
-     * Look through the list of notes with open tie stored in MeiInput::m_openTies.
-     * The note has to be on the same staff (@n) and the same layer (@n) and
-     * have the same pitch. If found, the terminal attribute is the and the note
-     * is removed from the list
-     */
-    bool FindOpenTie( Note *terminalNote );
     
     /**
      * @name Various methods for reading / converting values.
@@ -365,12 +380,6 @@ private:
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.
      */
     bool m_hasScoreDef;
-    
-    /**
-     * A vector of keeping the notes with open ties.
-     * This should be moved to the Object::PrepareDrawing functor
-     */
-    std::vector<Note*> m_openTies;
     
     /**
      * Check if an element is allowed within a given parent

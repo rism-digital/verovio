@@ -70,7 +70,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
     }
     
     KeySig *k = new KeySig(quantity, accid);
-    m_layer->AddElement(k);
+    m_layer->AddLayerElement(k);
     return;
     //////
     /*
@@ -79,7 +79,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
         alter->SetOloc(4);
         alter->SetPloc(alteration_set[i]);
         alter->SetAccid(accid);
-        m_layer->AddElement(alter);
+        m_layer->AddLayerElement(alter);
     }
     */
 }
@@ -138,7 +138,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
         LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
     }
     
-    m_layer->AddElement(meter);
+    m_layer->AddLayerElement(meter);
     return pos;
 }
 
@@ -242,7 +242,7 @@ int DarmsInput::do_Clef(int pos, const char* data) {
         return 0; // fail
     }
     
-    m_layer->AddElement(mclef);
+    m_layer->AddLayerElement(mclef);
     return pos;
 }
 
@@ -328,7 +328,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         rest->SetDur(duration);
         rest->SetDurGes(DUR_8);
         rest->SetDots( dot );
-        m_layer->AddElement(rest);
+        m_layer->AddLayerElement(rest);
     } else {
         
         if ((position + m_clef_offset) > sizeof(PitchMap))
@@ -341,7 +341,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         note->SetOct( PitchMap[position + m_clef_offset].oct );
         note->SetPname( PitchMap[position + m_clef_offset].pitch );
         note->SetDots( dot );
-        m_layer->AddElement(note);
+        m_layer->AddLayerElement(note);
         
         // Ties are between two notes and have a reference to the two notes
         // if more than two notes are ties, the m_second note of the first
@@ -352,18 +352,17 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         if (tie) {
             // cur tie !NULL, so we add this note as second note there
             if (m_current_tie) {
-                m_current_tie->SetSecondNote( note );
+                m_current_tie->SetEnd( note );
             }
             // create a new mus tie with this note
             m_current_tie = new Tie;
-            m_current_tie->SetFirstNote( note );
-            m_layer->AddElement(m_current_tie);
+            m_current_tie->SetStart( note );
         } else {
             // no tie (L or J) specified for not
             // but if cur tie !NULL we need to close the tie
             // and set cur tie to NULL
             if (m_current_tie) {
-                m_current_tie->SetSecondNote( note );
+                m_current_tie->SetEnd( note );
                 m_current_tie = NULL;
             }
         }
@@ -410,7 +409,7 @@ bool DarmsInput::ImportString(std::string data_str) {
     
     m_current_tie = NULL;
     m_staff->AddLayer(m_layer);
-    m_measure->AddStaff( m_staff );
+    m_measure->AddMeasureElement( m_staff );
     system->AddMeasure( m_measure );
     
     // do this the C style, char by char
