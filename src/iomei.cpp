@@ -10,36 +10,32 @@
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
 #include <assert.h>
-#include <ctime>
-#include <sstream>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "barline.h"
 #include "beam.h"
-#include "clef.h"
+#include "chord.h"
 #include "custos.h"
 #include "dot.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
-#include "object.h"
 #include "page.h"
 #include "rest.h"
-#include "scoredef.h"
+#include "slur.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -49,7 +45,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
-
+    
 MeiOutput::MeiOutput( Doc *doc, std::string filename ) :
 	FileOutputStream( doc )
 {
@@ -486,6 +482,7 @@ void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
     note->WriteColoration(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStemmed(currentNode);
+    note->WriteTiepresent(currentNode);
     
     if ( note->m_cueSize ) {
         currentNode.append_attribute( "grace" ) = "unknown";
@@ -519,6 +516,8 @@ void MeiOutput::WriteMeiVerse( pugi::xml_node currentNode, Verse *verse )
 void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
 {
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( syl ).c_str();
+    syl->WriteTypography( currentNode );
+    syl->WriteSylLog( currentNode );
     WriteText( currentNode, syl );
     return;
 }
@@ -544,6 +543,12 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInte
 {
 
 }
+    
+void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, vrv::TimeSpanningInterface *interface)
+{
+    interface->WriteStartendid(element);
+    interface->WriteStartid(element);
+}
 
 void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
 {
@@ -565,20 +570,6 @@ std::string MeiOutput::BoolToStr(bool value)
     if (value) return "true";
     return "false";
 }
-
-/*
-std::string MeiOutput::OctToStr(int oct)
-{
-	char buf[3];
-	snprintf(buf, 2, "%d", oct);
-	return std::string(buf);
-	
-	// For some reason, #include <sstream> does not work with xcode 3.2
-	//std::ostringstream oss;
-	//oss << oct;
-	//return oss.str();    
-}
-*/
 
 std::string MeiOutput::DocTypeToStr(DocType type)
 {
@@ -750,14 +741,6 @@ bool MeiInput::ReadMei( pugi::xml_node root )
         for( current = mdiv.first_child( ); current; current = current.next_sibling( ) ) {
             if (!success) break;
             success = ReadScoreBasedMei( current );
-        }
-    }
-    
-    if ( !m_openTies.empty()) {
-        std::vector<Note*>::iterator iter;
-        for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
-        {
-            LogWarning("Terminal @tie for <note> '%s' could not be matched", (*iter)->GetUuid().c_str() );
         }
     }
     
@@ -1087,17 +1070,18 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
             success = ReadMeiApp( parent, current, EDITORIAL_MEASURE);
         }
         else if ( std::string( current.name() ) == "staff" ) {
-            success = ReadMeiStaff( parent, current);
+            success = ReadMeiStaff( parent, current );
         }
         else if ( std::string( current.name() ) == "tupletSpan" ) {
             if (!ReadTupletSpanAsTuplet( dynamic_cast<Measure*>( parent ), current )) {
                 LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
             }
         }
+        else if ( std::string( current.name() ) == "tie" ) {
+            success = ReadMeiTie( parent, current );
+        }
         else if ( std::string( current.name() ) == "slur" ) {
-            if (!ReadSlurAsSlurAttr( dynamic_cast<Measure*>( parent ), current )) {
-                LogWarning( "<slur> not readable as @slur and ignored" );
-            }
+            success = ReadMeiSlur( parent, current );
         }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name() );
@@ -1105,6 +1089,30 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
     }
     
     return success;
+}
+    
+bool MeiInput::ReadMeiTie( Object *parent, pugi::xml_node tie )
+{
+    Tie *vrvTie = new Tie();
+    SetMeiUuid(tie, vrvTie);
+    
+    ReadTimeSpanningInterface(tie, vrvTie);
+    
+    AddMeasureElement(parent, vrvTie);
+    
+    return true;
+}
+
+bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
+{
+    Slur *vrvSlur = new Slur();
+    SetMeiUuid(slur, vrvSlur);
+    
+    ReadTimeSpanningInterface(slur, vrvSlur);
+    
+    AddMeasureElement(parent, vrvSlur);
+    
+    return true;
 }
 
 bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
@@ -1126,13 +1134,7 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
         LogWarning("No @n on <staff> might yield unpredictable results");
     }
     
-    // This could me moved to an AddStaff method for consistency with AddLayerElement
-    if ( dynamic_cast<Measure*>( parent ) ) {
-        dynamic_cast<Measure*>( parent )->AddStaff( vrvStaff );
-    }
-    else if ( dynamic_cast<EditorialElement*>( parent ) ) {
-        dynamic_cast<EditorialElement*>( parent )->AddStaff( vrvStaff );
-    }
+    AddMeasureElement(parent, vrvStaff);
 
     return ReadMeiStaffChildren( vrvStaff, staff );
 }
@@ -1159,7 +1161,7 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
     
     return success;
 }
-
+    
 bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
 {
     Layer *vrvLayer = new Layer();
@@ -1208,6 +1210,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
         }
+        else if ( elementName == "chord" ) {
+            success = ReadMeiChord( parent, xmlElement);
+        }
         else if ( elementName == "clef" ) {
             success = ReadMeiClef( parent, xmlElement);
         }
@@ -1243,15 +1248,6 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "verse" ) {
             success = ReadMeiVerse( parent, xmlElement );
-        }
-        else if ( elementName == "chord" ) {
-            // We just read the first note for now
-            pugi::xml_node note = xmlElement.child("note");
-            if ( note ) {
-                note.append_attribute( "dur" ) =  xmlElement.attribute("dur").value();
-                success = ReadMeiNote( parent, note );
-                LogDebug("Only first note of chords is read" );
-            }
         }
         // unknown
         else {
@@ -1398,6 +1394,26 @@ bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
     AddLayerElement(parent, vrvMultiRest);
 	return true;
 }
+    
+bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
+{
+    Chord *vrvChord = new Chord();
+    SetMeiUuid(chord, vrvChord);
+    
+    ReadDurationInterface(chord, vrvChord);
+    vrvChord->ReadCommon(chord);
+    vrvChord->ReadStemmed(chord);
+    vrvChord->ReadTiepresent(chord);
+    
+    if ( chord.attribute( "grace" ) ) {
+		vrvChord->m_cueSize = true;
+	}
+    
+    AddLayerElement(parent, vrvChord);
+    bool success = ReadMeiLayerChildren(vrvChord, chord);
+    
+    return success;
+}
 
 bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
 {
@@ -1409,6 +1425,7 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     vrvNote->ReadColoration(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStemmed(note);
+    vrvNote->ReadTiepresent(note);
     
     // grace
     if ( note.attribute( "grace" ) ) {
@@ -1416,19 +1433,6 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
 	}
     
     AddLayerElement(parent, vrvNote);
-    
-    // Ties - this should be moved to the Object::PrepareDrawing functor
-    if ( note.attribute( "tie" ) ) {
-        if ( (strcmp ( note.attribute( "tie" ).value(), "i" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
-            vrvNote->SetTieAttrInitial();
-            m_openTies.push_back( vrvNote );
-        }
-        if ( (strcmp ( note.attribute( "tie" ).value(), "t" ) == 0) || (strcmp ( note.attribute( "tie" ).value(), "m" ) == 0) ) {
-            if (!FindOpenTie( vrvNote ) ) {
-                LogWarning("Initial @tie not found" );
-            }
-        }
-    }
     
     // We can drop this once we allow <accid> and <note> child
     pugi::xml_node current;
@@ -1459,6 +1463,7 @@ bool MeiInput::ReadMeiSyl( Object *parent, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
     
+    vrvSyl->ReadTypography( syl );
     vrvSyl->ReadSylLog( syl );
     ReadText( syl, vrvSyl );
     
@@ -1522,6 +1527,13 @@ bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *
     return true;
 }
     
+bool MeiInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
+{
+    interface->ReadStartendid(element);
+    interface->ReadStartid(element);
+    return true;
+}
+
 bool MeiInput::ReadAccidAsAttr( Note *note, pugi::xml_node accid )
 {
     Accid vrvAccid;
@@ -1628,52 +1640,6 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
         return false;
     }
 }
-
-/*
-void MeiInput::GetRdgClass( pugi::xml_node node, DocObject *object )
-{
-    std::string sourceVal = node.attribute("source").value();
-    if(!sourceVal.empty()){
-       object->AddRdgClass(sourceVal.substr(1));
-    }
-}
-*/
- 
-/*
-pugi::xml_node MeiInput::GetSelectedReading( pugi::xml_node app )
-{
-    pugi::xml_node current;
-    if ( m_rdgXPathQuery.length() > 0 ) {
-        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
-        if ( selection ) {
-            current = selection.node();
-            if (strcmp(current.name(), "rdg") == 0)
-            {
-                pugi::char_t const *sourceName;
-                
-                if ( current.attribute("resp") ) {
-                    sourceName = current.attribute("resp").value();
-                }
-                else if ( current.attribute("source") ) {
-                    sourceName = current.attribute("source").value();
-                }
-                else {
-                    LogWarning("Could not find a source attribute for a <rdg> element that matched the xPath query.");
-                }
-                
-                for( pugi::xml_node currentChild = current.first_child(); currentChild == current.last_child(); currentChild = currentChild.next_sibling( ) ) {
-                    currentChild.append_attribute("source") = sourceName;
-                }
-            }
-        }
-    }
-    if ( !current ) {
-        current = app.first_child( );
-    }
-
-    return current;
-}
-*/
     
 void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
 {
@@ -1712,22 +1678,39 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
 void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
 {
     if ( dynamic_cast<EditorialElement*>( parent ) ) {
-        dynamic_cast<EditorialElement*>( parent )->AddElement( element );
+        dynamic_cast<EditorialElement*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Layer*>( parent ) ) {
-        dynamic_cast<Layer*>( parent )->AddElement( element );
+        dynamic_cast<Layer*>( parent )->AddLayerElement( element );
+    }
+    else if ( dynamic_cast<Chord*>( parent ) ) {
+        dynamic_cast<Chord*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Note*>( parent ) ) {
-        dynamic_cast<Note*>( parent )->AddElement( element );
+        dynamic_cast<Note*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Beam*>( parent ) ) {
-        dynamic_cast<Beam*>( parent )->AddElement( element );
+        dynamic_cast<Beam*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Tuplet*>( parent ) ) {
-        dynamic_cast<Tuplet*>( parent )->AddElement( element );
+        dynamic_cast<Tuplet*>( parent )->AddLayerElement( element );
     }
     else if ( dynamic_cast<Verse*>( parent ) ) {
-        dynamic_cast<Verse*>( parent )->AddElement( element );
+        dynamic_cast<Verse*>( parent )->AddLayerElement( element );
+    }
+    else {
+        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
+        delete element;
+    }
+}
+    
+void MeiInput::AddMeasureElement(Object *parent, MeasureElement *element)
+{
+    if ( dynamic_cast<EditorialElement*>( parent ) ) {
+        dynamic_cast<EditorialElement*>( parent )->AddMeasureElement( element );
+    }
+    else if ( dynamic_cast<Measure*>( parent ) ) {
+        dynamic_cast<Measure*>( parent )->AddMeasureElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
@@ -1784,47 +1767,6 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
         LogWarning( "Elements <%s> ignored", element.name() );
     }
     return success;
-}
-    
-bool MeiInput::ReadSlurAsSlurAttr( Measure *measure, pugi::xml_node slur)
-{
-    if (!measure) {
-        LogWarning( "Cannot read <slur> within editorial markup" );
-        return false;
-    }
-    
-    LayerElement *start = NULL;
-    LayerElement *end = NULL;
-    
-	// position (pitch)
-	if ( slur.attribute( "startid" ) ) {
-        std::string refId = ExtractUuidFragment( slur.attribute( "startid" ).value() );
-        start = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
-
-        if (!start || !start->IsNote()) {
-            LogWarning( "Note with @startid '%s' not found when trying to read the <slur>", refId.c_str() );
-        }    
-        
-	}
-	if ( slur.attribute( "endid" ) ) {
-        std::string refId = ExtractUuidFragment( slur.attribute( "endid" ).value() );
-        end = dynamic_cast<LayerElement*>( measure->FindChildByUuid( refId ) );
-        
-        if (!end || !end->IsNote()) {
-            LogWarning( "Note with @endid '%s' not found when trying to read the <slur>", refId.c_str() );
-        }
-	}
-    Note *startNote = dynamic_cast<Note*>(start);
-    Note *endNote = dynamic_cast<Note*>(end);
-    
-    if (!start || !end || !startNote || !endNote) {
-        return false;
-    }
-    
-    startNote->SetSlurAttrInitial();
-    endNote->SetSlurAttrTerminal( startNote );
-    
-    return true;
 }
     
 bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan)
@@ -1887,48 +1829,12 @@ bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSp
     //LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
     int i;
     for (i = endIdx; i >= startIdx; i--) {
-        tuplet->AddElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
+        tuplet->AddLayerElement( dynamic_cast<LayerElement*>( parentLayer->DetachChild(i) ) );
     }
     tuplet->SetParent( parentLayer );
     parentLayer->InsertChild( tuplet, startIdx );
 
     return true;    
-}
-
-bool MeiInput::FindOpenTie( Note *terminalNote )
-{
-    Layer *currentLayer = dynamic_cast<Layer*>( terminalNote->GetFirstParent( &typeid(Layer) ) );
-    Staff *currentStaff = dynamic_cast<Staff*>( terminalNote->GetFirstParent( &typeid(Staff) ) );
-    assert( currentLayer );
-    assert( currentStaff );
-    
-    std::vector<Note*>::iterator iter;
-    for (iter = m_openTies.begin(); iter != m_openTies.end(); ++iter)
-    {
-        // we need to get the parent layer and the parent staff for comparing their number
-        Layer *parentLayer = dynamic_cast<Layer*>( (*iter)->GetFirstParent( &typeid(Layer) ) );
-        Staff *parentStaff = dynamic_cast<Staff*>( (*iter)->GetFirstParent( &typeid(Staff) ) );
-        // We assume that if the note has no parent layer or no parent staff it,
-        // is because we are in the same staff or layer (e.g., beam) and they have not been added
-        //to their parent (staff or layer) yet.
-        // If we have one, compare the number
-        if ( (parentStaff) && (currentStaff->GetN() != parentStaff->GetN()) ) {
-            continue;
-        }
-        // same layer?
-        if ( (parentLayer) && (currentLayer->GetN() != parentLayer->GetN()) ) {
-            continue;
-        }
-        // we only compare oct and pname because alteration is not relevant for ties
-        if ( (terminalNote->GetOct() == (*iter)->GetOct()) && (terminalNote->GetPname() == (*iter)->GetPname()) ) {
-            terminalNote->SetTieAttrTerminal( *iter );
-            m_openTies.erase(iter);
-            return true;
-        }
-        
-    }
-
-    return false;
 }
 
 void MeiInput::SetMeiUuid( pugi::xml_node element, Object *object )
@@ -1945,13 +1851,6 @@ bool MeiInput::StrToBool(std::string value)
     if (value == "false") return false;
 	return true;
 }
-
-    /*
-int MeiInput::StrToOct(std::string oct)
-{
-	return atoi(oct.c_str());
-}
-     */
    
 DocType MeiInput::StrToDocType(std::string type)
 {

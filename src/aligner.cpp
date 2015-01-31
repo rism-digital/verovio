@@ -258,7 +258,7 @@ void Alignment::SetMaxWidth( int max_width )
 }
 
 //----------------------------------------------------------------------------
-// Functors
+// Functors methods
 //----------------------------------------------------------------------------
 
 int StaffAlignment::SetAligmentYPos( ArrayPtrVoid params )

@@ -11,24 +11,14 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <cstring>
-#include <stdio.h>
-#include <string>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
-#include "barline.h"
 #include "beam.h"
-#include "clef.h"
+#include "devicecontext.h"
 #include "doc.h"
-#include "keysig.h"
-#include "layerelement.h"
-#include "mensur.h"
-#include "note.h"
-#include "rest.h"
 #include "staff.h"
-#include "tie.h"
+#include "style.h"
 #include "tuplet.h"
 
 namespace vrv {
@@ -88,18 +78,17 @@ bool View::OneBeamInTuplet(Tuplet* tuplet) {
  
  */
 
-bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, MusPoint* end, MusPoint *center) {
-    MusPoint first, last;
+bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center) {
+    Point first, last;
     int x, y;
     bool direction = true; //true = up, false = down
     
-    LayerElement *firstNote, *lastNote;
+    ListOfObjects* tupletChildren = tuplet->GetList(tuplet);
+    LayerElement *firstNote = dynamic_cast<LayerElement*>(tupletChildren->front());
+    LayerElement *lastNote = dynamic_cast<LayerElement*>(tupletChildren->back());
     
     // AllNotesBeamed tries to figure out if all the notes are in the same beam
     if (OneBeamInTuplet(tuplet)) {
-        
-        firstNote = dynamic_cast<LayerElement*>(tuplet->m_list.front());
-        lastNote = dynamic_cast<LayerElement*>(tuplet->m_list.back());
 
         // yes they are in a beam
         // get the x position centered from the STEM so it looks better
@@ -133,9 +122,6 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             }
         }*/
         
-        firstNote = dynamic_cast<LayerElement*>(tuplet->m_list.front());
-        lastNote = dynamic_cast<LayerElement*>(tuplet->m_list.back());
-        
         // There are unbeamed notes of two different beams
         // treat all the notes as unbeames
         int ups = 0, downs = 0; // quantity of up- and down-stems
@@ -151,8 +137,8 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
         
         // THe first step is to calculate all the stem directions
         // cycle into the elements and count the up and down dirs
-        ListOfObjects::iterator iter = tuplet->m_list.begin();
-        while (iter != tuplet->m_list.end()) {
+        ListOfObjects::iterator iter = tupletChildren->begin();
+        while (iter != tupletChildren->end()) {
             LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
             
             if (currentNote->m_drawingStemDir == true)
@@ -184,8 +170,8 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             // and stop at last -1)
             // We will see if the position of the note is more (or less for down stems) of the calculated
             // average. In this case we offset down or up all the points
-            iter = tuplet->m_list.begin();
-            while (iter != tuplet->m_list.end()) {
+            iter = tupletChildren->begin();
+            while (iter != tupletChildren->end()) {
                  LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
                 
                 if (direction) {
@@ -217,8 +203,8 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, MusPoint* start, M
             y = 0;
             
             // Find the tallest stem and set y to it (with the offset distance)
-            iter = tuplet->m_list.begin();
-            while (iter != tuplet->m_list.end()) {
+            iter = tupletChildren->begin();
+            while (iter != tupletChildren->end()) {
                 LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
                 
                 if (currentNote->m_drawingStemDir == direction) {
@@ -262,9 +248,11 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     std::wstring notes = IntToTupletFigures((short int)tuplet->GetNum());
     
+    dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
+    
     dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
     
-    MusPoint start, end, center;
+    Point start, end, center;
     bool direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
         
     // Calculate position for number 0x82
@@ -276,9 +264,11 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
     
-    int verticalLine = m_doc->m_drawingUnit;
+    dc->ResetFont();
     
-    dc->SetPen(m_currentColour, m_doc->m_env.m_stemWidth, AxSOLID);
+    int verticalLine = m_doc->m_drawingUnit[0];
+    
+    dc->SetPen(m_currentColour, m_doc->m_style->m_stemWidth, AxSOLID);
     
     // Start is 0 when no line is necessary (i.e. beamed notes)
     if (start.x > 0) {
@@ -313,6 +303,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     }
     
     dc->ResetPen();
+    
 }
 
 } // namespace vrv

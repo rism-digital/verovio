@@ -6,12 +6,10 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "layerelement.h"
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
@@ -19,12 +17,11 @@
 #include "aligner.h"
 #include "barline.h"
 #include "beam.h"
+#include "chord.h"
 #include "clef.h"
 #include "custos.h"
-#include "doc.h"
 #include "dot.h"
 #include "keysig.h"
-#include "io.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
@@ -33,10 +30,10 @@
 #include "rest.h"
 #include "syl.h"
 #include "tie.h"
+#include "timeinterface.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
@@ -159,6 +156,11 @@ bool LayerElement::IsBeam()
     return (dynamic_cast<Beam*>(this));
 }
 
+bool LayerElement::IsChord()
+{
+    return (dynamic_cast<Chord*>(this));
+}
+    
 bool LayerElement::IsClef() 
 {  
     return (dynamic_cast<Clef*>(this));
@@ -297,6 +299,10 @@ int LayerElement::GetXRel()
     }
     return 0;
 }
+    
+//----------------------------------------------------------------------------
+// LayerElement functors methods
+//----------------------------------------------------------------------------
 
 int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 {
@@ -308,6 +314,14 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
+    
+    
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    if( chordParent )
+    {
+        m_alignment = chordParent->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
     
     AlignmentType type = ALIGNMENT_DEFAULT;
     if ( this->IsBarline() ) {
@@ -366,6 +380,28 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     
     // increase the time position
     (*time) += duration;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+
+int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    
+    std::vector<DocObject*>::iterator iter = elements->begin();
+    while ( iter != elements->end()) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(*iter);
+        assert(interface);
+        if (interface->SetStartAndEnd( this ) ) {
+            iter = elements->erase( iter );
+        }
+        else {
+            iter++;
+        }
+    }
     
     return FUNCTOR_CONTINUE;
 }

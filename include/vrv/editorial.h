@@ -18,9 +18,9 @@ class Layer;
 class LayerElement;
 class Lem;
 class Measure;
+class MeasureElement;
 class Rdg;
 class ScoreDef;
-class Staff;
 class StaffDef;
 class StaffGrp;
     
@@ -52,13 +52,13 @@ public:
      * @name Add children to an editorial element.
      */
     ///@{
-    void AddElement( LayerElement *child );
+    void AddLayerElement( LayerElement *child );
     void AddLayer( Layer *child );
     void AddMeasure( Measure *child );
+    void AddMeasureElement( MeasureElement *child );
     void AddScoreDef( ScoreDef *child );
     void AddStaffDef( StaffDef *child );
     void AddStaffGrp( StaffGrp *child );
-    void AddStaff( Staff *child );
     ///@}
     
     

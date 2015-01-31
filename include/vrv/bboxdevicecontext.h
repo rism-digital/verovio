@@ -9,10 +9,15 @@
 #ifndef __VRV_BBOX_DC_H__
 #define __VRV_BBOX_DC_H__
 
+#include <vector>
+
+//----------------------------------------------------------------------------
+
 #include "devicecontext.h"
-#include "object.h"
 
 namespace vrv {
+    
+class Object;
 
 //----------------------------------------------------------------------------
 // BBoxDeviceContext
@@ -45,7 +50,6 @@ public:
     virtual void SetBackground( int colour, int style = AxSOLID );
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) {};
     virtual void SetBackgroundMode( int mode );
-    virtual void SetFont( FontMetricsInfo *font_info );
     virtual void SetTextForeground( int colour );
     virtual void SetTextBackground( int colour );
     virtual void SetLogicalOrigin( int x, int y );
@@ -56,9 +60,7 @@ public:
      * @name Getters
      */
     ///@{
-    virtual void GetTextExtent( const std::string& string, int *w, int *h );
-    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
-    virtual MusPoint GetLogicalOrigin( );
+    virtual Point GetLogicalOrigin( );
     ///@}
 
     /**
@@ -70,15 +72,22 @@ public:
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
     virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
+    virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT );
+    virtual void DrawText(const std::string& text, const std::wstring wtext = L"");
     virtual void DrawMusicText(const std::wstring& text, int x, int y);
-    virtual void DrawSpline(int n, MusPoint points[]);
+    virtual void DrawSpline(int n, Point points[]);
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) {};
     ///@}
+    
+    /**
+     * @name Method for starting and ending a text
+     */
+    ///@{
+    virtual void StartText(int x, int y, char alignement = LEFT );
+    virtual void EndText();
     
     /**
      * @name Method for starting and ending a graphic
@@ -110,11 +119,16 @@ private:
     double m_userScaleX, m_userScaleY;
     
     /**
+     * members for keeping track of the text bounding box.
+     * Set values are reset in StartText
+     */
+    int m_textX, m_textY, m_textWidth, m_textHeight;
+    bool m_drawingText;
+    
+    /**
      * The array containing the object for which the bounding box needs to be updated
      */ 
     std::vector<DocObject*> m_objects;
-    
-    FontMetricsInfo m_font;
     
     /**
      * The view are calling from - used to flip back the Y coordinates
@@ -123,7 +137,7 @@ private:
     
     void UpdateBB(int x1, int y1, int x2, int y2);
     
-    void FindPointsForBounds(MusPoint P0, MusPoint P1, MusPoint P2, MusPoint P3, int *ret);
+    void FindPointsForBounds(Point P0, Point P1, Point P2, Point P3, int *ret);
 };
 
 } // namespace vrv

@@ -10,15 +10,11 @@
 
 //----------------------------------------------------------------------------
 
-#include <cstring>
 #include <math.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "beam.h"
-#include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 

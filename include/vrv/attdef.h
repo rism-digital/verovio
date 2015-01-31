@@ -9,6 +9,10 @@
 #ifndef __ATT_DEF_H__
 #define __ATT_DEF_H__
 
+#include <utility>
+
+//----------------------------------------------------------------------------
+
 namespace vrv {
     
 #define VRV_UNSET -0x7FFFFFFF
@@ -110,6 +114,25 @@ enum data_CON {
     CON_v,
     CON_i,
     CON_b
+};
+    
+/**
+ * MEI data.FONTSTYLE
+ */
+enum data_FONTSTYLE {
+    FONTSTYLE_NONE = 0,
+    FONTSTYLE_italic,
+    FONTSTYLE_normal,
+    FONTSTYLE_oblique
+};
+    
+/**
+ * MEI data.FONTWEIGHT
+ */
+enum data_FONTWEIGHT {
+    FONTWEIGHT_NONE = 0,
+    FONTWEIGHT_bold,
+    FONTWEIGHT_normal
 };
     
 /**
@@ -241,6 +264,16 @@ enum data_STEMPOSITION {
     STEMPOSITION_right,
     STEMPOSITION_center
 };
+    
+/**
+ * MEI data.TIE
+ */
+enum data_TIE {
+    TIE_NONE = 0,
+    TIE_i,
+    TIE_m,
+    TIE_t
+};
         
 /**
  * MEI values for @wordpos (no datatype in MEI)
@@ -251,6 +284,8 @@ enum data_WORDPOS {
     WORDPOS_m,
     WORDPOS_t
 };
+    
+typedef std::pair<int, double> typedef_TSTAMP2;
     
 } // namespace vrv
 

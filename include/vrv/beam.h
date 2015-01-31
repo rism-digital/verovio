@@ -10,7 +10,6 @@
 #define __VRV_BEAM_H__
 
 #include "layerelement.h"
-#include "note.h"
 
 namespace vrv {
 
@@ -28,6 +27,7 @@ public:
     ///@{
     Beam();
     virtual ~Beam();
+    virtual void Reset();
     virtual std::string GetClassName( ) { return "Beam"; };
     ///@}
     
@@ -37,7 +37,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
     
 protected:
     /**

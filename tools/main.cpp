@@ -15,8 +15,11 @@
 #include <string>
 #include <sys/stat.h>
 
-#include "vrv.h"
+//----------------------------------------------------------------------------
+
+#include "style.h"
 #include "toolkit.h"
+#include "vrv.h"
 
 using namespace std;
 using namespace vrv;
@@ -98,7 +101,7 @@ void display_usage() {
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura is also available)" << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura and Gootville are also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
     
@@ -148,7 +151,7 @@ int main(int argc, char** argv)
     
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
-    // The fonts will be loaded later with Resources::InitFont()
+    // The fonts will be loaded later with Resources::InitFonts()
     Toolkit toolkit( false );
     
     // read pae by default
@@ -298,7 +301,7 @@ int main(int argc, char** argv)
     }
 
     // Loaded the music font from the resource diretory
-    if (!Resources::InitFont()) {
+    if (!Resources::InitFonts()) {
         cerr << "The music font could not be loaded, please verify the content of the directory." << endl;
         exit(1);
     }

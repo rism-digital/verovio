@@ -12,13 +12,10 @@
 
 #include <assert.h>
 #include <sstream>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "layerelement.h"
-#include "note.h"
 #include "page.h"
 
 namespace vrv {
@@ -38,10 +35,6 @@ View::View( )
     m_currentMeasure = NULL;
 	m_currentStaff = NULL;
     m_currentSystem = NULL;
-
-    m_editorMode = EDITOR_EDIT;
-	
-	m_notationMode = MENSURAL_MODE;
 }
 
 
@@ -130,7 +123,7 @@ int View::ToDeviceContextY( int i )
         return 0;
     }
     
-    return m_doc->m_drawingPageHeight - i; // flipped
+    return (m_doc->m_drawingPageHeight - i); // flipped
 }
 
 /** y value in the Logical world  */
@@ -145,9 +138,9 @@ int View::ToLogicalY( int i )
     }
 }
     
-void View::SwapPoints (MusPoint *x1, MusPoint *x2)
+void View::SwapPoints (Point *x1, Point *x2)
 {
-    MusPoint a;
+    Point a;
     a = *x1;
     *x1 = *x2;
     *x2 = a;

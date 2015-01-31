@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "io.h"
 #include "measure.h"
 #include "page.h"
 #include "vrv.h"
@@ -27,7 +26,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 System::System() :
-	DocObject("system-")
+	DocObject("system-"), DrawingListInterface()
 {
     // We set parent to it because we want to access the parent doc from the aligners
     // See Object::SetParentDoc()
@@ -42,6 +41,8 @@ System::~System()
 void System::Reset()
 {
     DocObject::Reset();
+    DrawingListInterface::Reset();
+    
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
     m_xAbs = VRV_UNSET;
@@ -88,7 +89,6 @@ void System::ResetVerticalAlignment()
 
 Measure *System::GetAtPos( int x )
 {
-	//y += ( STAFF_OFFSET / 2 );
 	Measure *measure = dynamic_cast<Measure*>( this->GetFirst( &typeid(Measure) ) );
 	if ( !measure )
 		return NULL;

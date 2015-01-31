@@ -9,16 +9,15 @@
 #ifndef __VRV_DOC_H__
 #define __VRV_DOC_H__
 
-#include "devicecontext.h"
+#include "devicecontextbase.h"
 #include "io.h"
-#include "object.h"
 #include "scoredef.h"
-#include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
-class Page;    
+class FontInfo;
+class Page;
+class Style;
     
 enum DocType {
     Raw = 0,
@@ -74,13 +73,13 @@ public:
      * @name Setters for the page dimensions and margins
      */
     ///@{
-    void SetPageHeight( int pageHeight ) { m_pageHeight = pageHeight * DEFINITON_FACTOR; };
-    void SetPageWidth( int pageWidth ) { m_pageWidth = pageWidth * DEFINITON_FACTOR; };
-    void SetPageLeftMar( short pageLeftMar ) { m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR; };
-    void SetPageRightMar( short pageRightMar ) { m_pageRightMar = pageRightMar * DEFINITON_FACTOR; };
-    void SetPageTopMar( short pageTopMar ) { m_pageTopMar = pageTopMar * DEFINITON_FACTOR; };
-    void SetSpacingStaff( short spacingStaff ) { m_spacingStaff = spacingStaff; };
-    void SetSpacingSystem( short spacingSystem ) { m_spacingSystem = spacingSystem; };
+    void SetPageHeight( int pageHeight );
+    void SetPageWidth( int pageWidth );
+    void SetPageLeftMar( short pageLeftMar );
+    void SetPageRightMar( short pageRightMar );
+    void SetPageTopMar( short pageTopMar );
+    void SetSpacingStaff( short spacingStaff );
+    void SetSpacingSystem( short spacingSystem );
     ///@}
 
     /**
@@ -93,8 +92,8 @@ public:
     
     /**
      * @name Getters for the object margins (left and right)
-     * The margin are given in x / MARGIN_DENOMINATOR * UNIT
-     * With MARGIN_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT
+     * The margin are given in x / PARAM_DENOMINATOR * UNIT
+     * With PARAM_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT
      * These should eventually be set at parameters.
      */
     ///@{
@@ -188,6 +187,12 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by doc at the end of a document of closing opened syl.
+     */
+    virtual int PrepareLyricsEnd( ArrayPtrVoid params );
 
 private:
     /**
@@ -207,7 +212,7 @@ public:
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */
-    DefaultEnv m_env;
+    Style *m_style;
     
     /** 
      * The source id. Exact use to be clarified.
@@ -231,21 +236,19 @@ public:
   
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** The page drawing unit */
-    int m_drawingUnit;
-    /** Half a the space between to staff lines for normal and small staff (10 and 8 by default) */
-    int m_drawingHalfInterl[2];
-    /** Space between to staff lines for normal and small staff (20 and 16 by default) */
-    int m_drawingInterl[2];
-    /** Height of a five line staff for normal and small staff (80 and 64 by default) */
+    /** Half a the space between to staff lines for normal and small staff */
+    int m_drawingUnit[2];
+    /** Space between to staff lines for normal and small staff */
+    int m_drawingDoubleUnit[2];
+    /** Height of a five line staff for normal and small staff */
     int m_drawingStaffSize[2];
-    /** Height of an octave for normal and small staff (70 and 56 by default) */
+    /** Height of an octave for normal and small staff */
     int m_drawingOctaveSize[2];
     /** Font height (100 par defaut) */
     int m_drawingFontHeight;
     /** Font height with ascent for normal and small staff and normal and grace size */
 	int m_drawingFontHeightAscent[2][2];
-    /** Normal and small staff ration (16 / 20 by default) */
+    /** Normal and small staff ration (4 / 5 by default) */
     int m_drawingSmallStaffRatio[2];
     /** Normal and grace size (3 / 4 by default) */
     int m_drawingGraceRatio[2];
@@ -253,8 +256,6 @@ public:
     int m_drawingBeamWidth[2];
     /** Height of a beam spacing (white) for normal and small staff (10 and 6 by default) */
     int m_drawingBeamWhiteWidth[2];
-    /** Current font height with ascent for normal and small staff and normal and grace size */
-    int m_drawingFontSize[2][2];
     /** Note radius for normal and small staff and normal and grace size */
     int m_drawingNoteRadius[2][2];
     /** Ledger line length for normal and small staff and normal and grace size */
@@ -264,13 +265,11 @@ public:
     /** Accident width for normal and small staff and normal and grace size */
     int m_drawingAccidWidth[2][2];
     /** Current music font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_drawingFonts[2][2];				
-    /** music font */
-    FontMetricsInfo m_drawingMusicFont;
+    FontInfo m_drawingSmuflFonts[2][2];
     /** Current lyric font for normal and small staff and normal and grace size */
-    FontMetricsInfo m_drawingLyricFonts[2];
+    FontInfo m_drawingLyricFonts[2];
     /** Lyric font by default */
-    FontMetricsInfo m_drawingLyricFont;
+    FontInfo m_drawingLyricFont;
     /** The current page height */
     int m_drawingPageHeight;
     /** The current page height */

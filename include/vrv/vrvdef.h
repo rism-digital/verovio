@@ -10,6 +10,8 @@
 #define __VRV_DEF_H__
 
 #include <algorithm>
+#include <list>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
@@ -17,13 +19,27 @@
 
 namespace vrv {
     
+    class Object;
+    class AttComparison;
+    
+    typedef std::vector<Object*> ArrayOfObjects;
+    
+    typedef std::list<Object*> ListOfObjects;
+    
+    typedef std::vector<void*> ArrayPtrVoid;
+    
+    typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+    
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------
     
+#define DEFINITON_FACTOR 10
+#define PARAM_DENOMINATOR 10
+    
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 5
+#define VERSION_REVISION 6
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
@@ -39,69 +55,6 @@ enum FunctorCode {
     FUNCTOR_STOP
 };
 
-// Is this score for Mensural, neumes, or CMN
-enum NotationMode {
-    MENSURAL_MODE = 0,
-    CMN_MODE
-};
-
-// Is the app in insert mode or edit (drag) mode
-enum EditorMode {
-	EDITOR_EDIT,
-	EDITOR_INSERT
-};
-    
-//----------------------------------------------------------------------------
-// Default layout values
-//----------------------------------------------------------------------------
-    
-#define DEFINITON_FACTOR 10
-
-#define DEFAULT_UNIT 9
-#define MIN_UNIT 6
-#define MAX_UNIT 18
-    
-#define DEFAULT_PAGE_RIGHT_MAR 50
-#define MIN_PAGE_RIGHT_MAR 0
-#define MAX_PAGE_RIGHT_MAR 500
-    
-#define DEFAULT_PAGE_LEFT_MAR 50
-#define MIN_PAGE_LEFT_MAR 0
-#define MAX_PAGE_LEFT_MAR 500
-    
-#define DEFAULT_PAGE_TOP_MAR 50
-#define MIN_PAGE_TOP_MAR 0
-#define MAX_PAGE_TOP_MAR 500
-    
-#define DEFAULT_PAGE_HEIGHT 2970
-#define MIN_PAGE_HEIGHT 100
-#define MAX_PAGE_HEIGHT 60000
-    
-#define DEFAULT_PAGE_WIDTH 2100
-#define MIN_PAGE_WIDTH 100
-#define MAX_PAGE_WIDTH 60000
-    
-#define MIN_TIE_HEIGHT 12
-#define MIN_TIE_THICKNESS 6
-    
-#define MARGIN_DENOMINATOR 10
-    
-//----------------------------------------------------------------------------
-// Default scaling (%) and spacing (units) values
-//----------------------------------------------------------------------------
-    
-#define DEFAULT_SCALE 100
-#define MIN_SCALE 1
-#define MAX_SCALE 1000
-    
-#define DEFAULT_SPACING_STAFF 6
-#define MIN_SPACING_STAFF 0
-#define MAX_SPACING_STAFF 12
-    
-#define DEFAULT_SPACING_SYSTEM 0
-#define MIN_SPACING_SYSTEM 0
-#define MAX_SPACING_SYSTEM 12
-
 //----------------------------------------------------------------------------
 // Maximum number of levels between parent and children for optimizing search
 //----------------------------------------------------------------------------
@@ -110,6 +63,9 @@ enum EditorMode {
     
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
+    
+/** Define the maximum levels between a beam and its notes **/
+#define MAX_CHORD_DEPTH -1
     
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1
@@ -137,6 +93,20 @@ enum EditorMode {
 #define DUR_256 10
 // used for alignement
 #define DUR_MAX 1024
+    
+//----------------------------------------------------------------------------
+// VerovioText codpoints
+//----------------------------------------------------------------------------
+   
+/**
+ * These are SMuFL codepoints for the VerovioText font used for embedding 
+ * SMuFL text glyph within text, as for example with <annot> or <syl>
+ * Verovio uses a very small subset of glyph defined below (for now)
+ */
+    
+#define VRV_TEXT_E550 0xE550
+#define VRV_TEXT_E551 0xE551
+#define VRV_TEXT_E552 0xE552
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
@@ -151,9 +121,6 @@ enum EditorMode {
 #define ACCID_QUARTER_SHARP 6
 #define ACCID_QUARTER_FLAT 7
 
-// DIRECTIONS
-#define FORWARD 1
-#define BACKWARD 0
 #define ON 1
 #define OFF 0
 

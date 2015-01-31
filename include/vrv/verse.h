@@ -39,7 +39,7 @@ public:
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
     
     //----------//
     // Functors //
@@ -53,16 +53,9 @@ public:
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
-     * to be processed.
+     * and for staff/layer to be then processed.
      */
-    virtual int PrepareDrawing( ArrayPtrVoid params );
-    
-    /**
-     * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
-     * See PrepareDarwing
-     */
-    virtual int PrepareLyrics( ArrayPtrVoid params );
+    virtual int PrepareProcessingLists( ArrayPtrVoid params );
     
 protected:
 

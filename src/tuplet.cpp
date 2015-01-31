@@ -38,7 +38,7 @@ void Tuplet::Reset()
     LayerElement::Reset();
 }
 
-void Tuplet::AddElement(LayerElement *element) {
+void Tuplet::AddLayerElement(LayerElement *element) {
     
     //if (!element->HasDurationInterface()) {
     //    return;
@@ -53,13 +53,14 @@ void Tuplet::FilterList()
 {
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = m_list.begin();
+    ListOfObjects* childList = this->GetList(this);
+    ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != m_list.end()) {
+    while ( iter != childList->end()) {
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( currentElement && !currentElement->HasDurationInterface() )
         {
-            iter = m_list.erase( iter );
+            iter = childList->erase( iter );
         } else {
             iter++;
         }

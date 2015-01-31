@@ -10,12 +10,13 @@
 
 //----------------------------------------------------------------------------
 
-#include <sstream>
-#include <string>
+#include <algorithm>
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
-#include "doc.h"
+#include "glyph.h"
+#include "vrv.h"
 
 namespace vrv {
     
@@ -39,8 +40,7 @@ void DeviceContext::SetPen( int colour, int width, int opacity )
             opacityValue = 1.0; // solid brush as default
     }
     
-    Pen currentPen = Pen(colour, width, opacityValue);
-    m_penStack.push(currentPen);
+    m_penStack.push(Pen(colour, width, opacityValue));
 }
 
 void DeviceContext::SetBrush( int colour, int opacity )
@@ -59,11 +59,14 @@ void DeviceContext::SetBrush( int colour, int opacity )
             opacityValue = 1.0; // solid brush as default
     }
     
-    Brush currentBrush = Brush(colour, opacityValue);
-    m_brushStack.push(currentBrush);
-
+    m_brushStack.push(Brush(colour, opacityValue));
 }
 
+void DeviceContext::SetFont( FontInfo *font )
+{
+    m_fontStack.push( font );
+}
+    
 void DeviceContext::ResetPen( )
 {
     m_penStack.pop();
@@ -73,62 +76,84 @@ void DeviceContext::ResetBrush( )
 {
     m_brushStack.pop();
 }
-
-//----------------------------------------------------------------------------
-// FontMetricsInfo
-//----------------------------------------------------------------------------
-
-bool FontMetricsInfo::FromString(const std::string& ss)
+    
+void DeviceContext::ResetFont( )
 {
-    std::istringstream iss( ss );
-    std::string token;
-
-    getline( iss, token, ';');
-    //
-    //  Ignore the version for now
-    //
-
-    getline( iss, token, ';');
-    pointSize = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    family = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    style = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    weight = atoi( token.c_str() );
-
-    getline( iss, token, ';');
-    underlined = (atoi( token.c_str() ) != 0);
-
-    getline( iss, token, ';');
-    faceName = token;
-#ifndef __WXMAC__
-    if( faceName.empty() )
-        return false;
-#endif
-
-    getline( iss, token, ';');
-    encoding = atoi( token.c_str() );;
-
-    return true;
+    m_fontStack.pop();
 }
 
-std::string FontMetricsInfo::ToString() const
+void DeviceContext::DeactivateGraphic()
 {
-    std::string s = StringFormat( "%d;%d;%d;%d;%d;%d;%s;%d",
-             0,                                 // version
-             pointSize,
-             family,
-             style,
-             weight,
-             underlined,
-             faceName.c_str(),
-             encoding);
+    assert( !m_isDeactivated );
+    m_isDeactivated = true;
+}
+    
+void DeviceContext::ReactivateGraphic( )
+{
+    assert( m_isDeactivated );
+    m_isDeactivated = false;
+}
 
-    return s;
+void DeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
+{
+    std::wstring wtext(string.begin(), string.end());
+    GetTextExtent(wtext, w, h);
+}
+    
+void DeviceContext::GetTextExtent( const std::wstring& string, int *w, int *h )
+{
+    assert( m_fontStack.top() );
+    
+    int x, y, partial_w, partial_h;
+    (*w) = 0;
+    (*h) = 0;
+    
+    Glyph *unkown = Resources::GetTextGlyph(L'o');
+    
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetTextGlyph(c);
+        if (!glyph) {
+            glyph = unkown;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+        
+        partial_w *= m_fontStack.top()->GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_fontStack.top()->GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
+        
+        (*w) += partial_w;
+        (*h) = std::max(partial_h, (*h));
+    }
+}
+
+void DeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+{
+    assert( m_fontStack.top() );
+    
+    int x, y, partial_w, partial_h;
+    (*w) = 0;
+    (*h) = 0;
+    
+    for (unsigned int i = 0; i < string.length(); i++)
+    {
+        wchar_t c = string[i];
+        Glyph *glyph = Resources::GetGlyph(c);
+        if (!glyph) {
+            continue;
+        }
+        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+        
+        partial_w *= m_fontStack.top()->GetPointSize();
+        partial_w /= glyph->GetUnitsPerEm();
+        partial_h *= m_fontStack.top()->GetPointSize();
+        partial_h /= glyph->GetUnitsPerEm();
+        
+        (*w) += partial_w;
+        (*h) = std::max(partial_h, (*h));
+    }
 }
 
 } // namespace vrv

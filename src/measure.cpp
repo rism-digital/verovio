@@ -15,12 +15,9 @@
 
 //----------------------------------------------------------------------------
 
-#include "io.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
-#include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
@@ -65,12 +62,13 @@ void Measure::Reset()
     }
 }
 
-void Measure::AddStaff( Staff *staff )
+void Measure::AddMeasureElement( MeasureElement *element )
 {    
-	staff->SetParent( this );
-	m_children.push_back( staff );
+	element->SetParent( this );
+	m_children.push_back( element );
     
-    if ( staff->GetN() < 1 ) {
+    Staff *staff = dynamic_cast<Staff*>(element);
+    if ( staff && (staff->GetN() < 1) ) {
         // This is not 100% safe if we have a <app> and <rdg> with more than
         // one staff as a previous child.
         staff->SetN( this->GetChildCount() );

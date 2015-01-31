@@ -5,40 +5,27 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "object.h"
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
 #include <assert.h>
-#include <iostream>
 #include <sstream>
-#include <string>
-#include <typeinfo>
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
-#include "aligner.h"
-#include "beam.h"
-#include "clef.h"
+#include "chord.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
-#include "multirest.h"
+#include "note.h"
 #include "page.h"
-#include "scoredef.h"
 #include "staff.h"
 #include "system.h"
-#include "tie.h"
-#include "tuplet.h"
-#include "verse.h"
-#include "view.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -222,31 +209,31 @@ Object *Object::Relinquish( int idx )
     return child;
 }
     
-Object *Object::FindChildByUuid( std::string uuid )
+Object *Object::FindChildByUuid( std::string uuid, int deepness, bool direction )
 {
     Functor findByUuid( &Object::FindByUuid );
     Object *element = NULL;
     ArrayPtrVoid params;
     params.push_back( &uuid );
     params.push_back( &element );
-    this->Process( &findByUuid, params );
+    this->Process( &findByUuid, params, NULL, NULL, deepness, direction );
     return element;
 }
 
-Object *Object::FindChildByType(const std::type_info *elementType)
+Object *Object::FindChildByType(const std::type_info *elementType, int deepness, bool direction )
 {
     AttComparison attComparison( elementType );
-    return FindChildByAttComparison( &attComparison );
+    return FindChildByAttComparison( &attComparison, deepness, direction );
 }
     
-Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deepness )
+Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deepness, bool direction )
 {
     Functor findByAttComparison( &Object::FindByAttComparison );
     Object *element = NULL;
     ArrayPtrVoid params;
     params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByAttComparison, params, NULL, NULL, deepness );
+    this->Process( &findByAttComparison, params, NULL, NULL, deepness, direction );
     return element;
 }
     
@@ -496,7 +483,7 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness )
+void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -521,7 +508,17 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     deepness--;
     
     ArrayOfObjects::iterator iter;
-    for (iter = this->m_children.begin(); iter != m_children.end(); ++iter)
+    // We need a pointer to the array for the option to work on a reversed copy
+    ArrayOfObjects *children = &this->m_children;
+    ArrayOfObjects reversed;
+    // For processing backward, we operated on a copied reversed version
+    // Since we hold pointers, only addresses are copied
+    if ( direction == BACKWARD ) {
+        reversed = (*children);
+        std::reverse( reversed.begin(), reversed.end() );
+        children = &reversed;
+    }
+    for (iter = children->begin(); iter != children->end(); ++iter)
     {
         if ( filters && !filters->empty() ) {
             bool hasAttComparison = false;
@@ -540,7 +537,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
                 if ((**attComparisonIter)(*iter)) {
                     // the attribute value matches, process the object
                     //LogDebug("%s ", (*iter)->GetClassName().c_str() );
-                    (*iter)->Process( functor, params, endFunctor, filters, deepness);
+                    (*iter)->Process( functor, params, endFunctor, filters, deepness, direction );
                     break;
                 }
                 else {
@@ -550,7 +547,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
             }
         }
         // we will end here if there is no filter at all or for the current child type
-        (*iter)->Process( functor, params, endFunctor, filters, deepness );
+        (*iter)->Process( functor, params, endFunctor, filters, deepness, direction );
     }
     
     if ( endFunctor ) {
@@ -612,7 +609,7 @@ void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
     
     m_updatedBB = true;
-    //LogDebug("CB Is:  %i %i %i %i", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+    //LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2, GetClassName().c_str());
 }
 
 void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 ) 
@@ -642,14 +639,14 @@ void DocObject::UpdateSelfBB( int x1, int y1, int x2, int y2 )
 
 void DocObject::ResetBB() 
 {
-    m_contentBB_x1 = 0xFFFF;
-    m_contentBB_y1 = 0xFFFF;
-    m_contentBB_x2 = -0xFFFF;
-    m_contentBB_y2 = -0xFFFF;
-    m_selfBB_x1 = 0xFFFF;
-    m_selfBB_y1 = 0xFFFF; 
-    m_selfBB_x2 = -0xFFFF;
-    m_selfBB_y2 = -0xFFFF;
+    m_contentBB_x1 = 0xFFFFFFF;
+    m_contentBB_y1 = 0xFFFFFFF;
+    m_contentBB_x2 = -0xFFFFFFF;
+    m_contentBB_y2 = -0xFFFFFFF;
+    m_selfBB_x1 = 0xFFFFFFF;
+    m_selfBB_y1 = 0xFFFFFFF;
+    m_selfBB_x2 = -0xFFFFFFF;
+    m_selfBB_y2 = -0xFFFFFFF;
     //m_drawingX = 0;
     //m_drawingY = 0;
     
@@ -666,10 +663,6 @@ bool DocObject::HasSelfBB()
     return ( (m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF) );
 }
 
-void DocObject::AddRdgClass( std::string newClass )
-{
-    m_rdgClasses.push_back(newClass);
-}
 
 //----------------------------------------------------------------------------
 // ObjectListInterface
@@ -698,10 +691,10 @@ void ObjectListInterface::ResetList( Object *node )
         return;
     }
     
+    node->Modify( false );
     m_list.clear();
     node->FillList( &m_list );
     this->FilterList();
-    node->Modify( false );
 }
 
 ListOfObjects *ObjectListInterface::GetList( Object *node )
@@ -1020,7 +1013,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     Layer *current_layer = dynamic_cast<Layer*>(this);
     if ( current_layer  ) {
         // reset it as the minimum position to the step (HARDCODED)
-        (*min_pos) = 30 * doc->m_drawingUnit / 10;
+        (*min_pos) = 30 * doc->m_drawingUnit[0] / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1055,11 +1048,22 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
+    if ( current->IsNote() ) {
+        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), 1));
+        if( chordParent ) {
+            return FUNCTOR_CONTINUE;
+        }
+    }
+    
     if ( current->IsTie() ) {
         return FUNCTOR_CONTINUE;
     }
     
     if ( current->IsTuplet() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( current->IsVerse() || current->IsSyl() ) {
         return FUNCTOR_CONTINUE;
     }
     
@@ -1071,17 +1075,17 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / MARGIN_DENOMINATOR;
+    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / PARAM_DENOMINATOR;
     
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
-    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR);
+    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
     
     // this will probably never happen
     if ( negative_offset < 0 ) {
-        LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
+        //LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
         negative_offset = 0;
     }
     
@@ -1097,8 +1101,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit / MARGIN_DENOMINATOR );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
     
     return FUNCTOR_CONTINUE;
 }

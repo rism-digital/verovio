@@ -16,7 +16,7 @@
 
 namespace vrv {
 
-class Staff;
+class MeasureElement;
 
 //----------------------------------------------------------------------------
 // Measure
@@ -50,7 +50,7 @@ public:
      */
     bool IsMeasuredMusic() { return m_measuredMusic; };
     
-	void AddStaff( Staff *staff );
+	void AddMeasureElement( MeasureElement *element );
 	
 	int GetStaffCount() const { return (int)m_children.size(); };
     

@@ -1,4 +1,4 @@
-    /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Name:        doc.cpp
 // Author:      Laurent Pugin
 // Created:     2005
@@ -16,18 +16,22 @@
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
+#include "barline.h"
+#include "chord.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
+#include "slur.h"
 #include "smufl.h"
 #include "staff.h"
+#include "style.h"
+#include "syl.h"
 #include "system.h"
 #include "verse.h"
 #include "vrv.h"
@@ -41,11 +45,13 @@ namespace vrv {
 Doc::Doc() :
     Object("doc-")
 {
+    m_style = new Style();
     Reset( Raw );
 }
 
 Doc::~Doc()
 {
+    delete m_style;
     
 }
 
@@ -60,15 +66,16 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
-    m_spacingStaff = m_env.m_spacingStaff;
-    m_spacingSystem = m_env.m_spacingSystem;
+    m_spacingStaff = m_style->m_spacingStaff;
+    m_spacingSystem = m_style->m_spacingSystem;
     
     m_drawingPage = NULL;
-    m_drawingUnit = 0;
     m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
     
     m_scoreDef.Reset();
+    
+    m_drawingLyricFont.SetFaceName("Garamond");
 }
 
 void Doc::AddPage( Page *page )
@@ -86,17 +93,45 @@ void Doc::Refresh()
 void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
-    IntTree tree;
-    params.push_back( &tree );
+    
+    // Try to match all spanning elements (slur, tie, etc) by processing backward
+    std::vector<DocObject*> timeSpanningElements;
+    bool fillList = true;
+    params.push_back( &timeSpanningElements );
+    params.push_back( &fillList );
+    Functor prepareTimeSpanning( &Object::PrepareTimeSpanning );
+    this->Process( &prepareTimeSpanning, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD );
+    
+    // First we tried backward because nomrally the spanning elements are at the end of
+    // the measure. However, in some case, one (or both) end points will appear afterwards
+    // in the encoding. For these, the previous iteration will not have resolved the link and
+    // the spanning elements will remain in the timeSpanningElements array. We try again forward
+    // but this time without filling the list (that is only will the remaining elements)
+    if ( !timeSpanningElements.empty() ) {
+        fillList = false;
+        this->Process( &prepareTimeSpanning, params );
+    }
+    
+    // If some are still there, then it is probably an issue in the encoding
+    if ( !timeSpanningElements.empty() ) {
+        LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size() );
+    }
+    
+    // We need to populate processing lists for processing the document by Layer (for matching @tie) and
+    // by Verse (for matching syllable connectors)
+    params.clear();
+    IntTree verseTree;
+    IntTree layerTree;
+    params.push_back( &verseTree );
+    params.push_back( &layerTree );
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
     //StaffN_LayerN_VerseN_t staffLayerVerseTree;
     //params.push_back( &staffLayerVerseTree );
     
-    // We first fill a tree of int with the staff/layer/verse numbers to be process
-    
+    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
     //LogElapsedTimeStart( );
-    Functor prepareDrawing( &Object::PrepareDrawing );
-    this->Process( &prepareDrawing, params );
+    Functor prepareProcessingLists( &Object::PrepareProcessingLists );
+    this->Process( &prepareProcessingLists, params );
     
     // The tree is used to process each staff/layer/verse separatly
     // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
@@ -105,8 +140,49 @@ void Doc::PrepareDrawing()
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
+    
+    // Process by layer for matching @tie attribute - we process notes and chords, looking at
+    // GetTie values and pitch and oct for matching notes
+    Chord *currentChord;
+    std::vector<Note*> currentNotes;
     std::vector<AttComparison*> filters;
-    for (staves = tree.child.begin(); staves != tree.child.end(); ++staves) {
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+            
+            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // m_drawingLastNote is set only if the syl has a forward connector
+            currentChord = NULL;
+            currentNotes.clear();
+            ArrayPtrVoid paramsTieAttr;
+            paramsTieAttr.push_back( &currentNotes );
+            paramsTieAttr.push_back( &currentChord );
+            Functor prepareTieAttr( &Object::PrepareTieAttr );
+            Functor prepareTieAttrEnd( &Object::PrepareTieAttrEnd );
+            this->Process( &prepareTieAttr, paramsTieAttr, &prepareTieAttrEnd, &filters );
+        
+            // After having processed one layer, we check if we have open ties - if yes, we
+            // must reset them and they will be ignored.
+            if ( !currentNotes.empty() ) {
+                std::vector<Note*>::iterator iter;
+                for (iter = currentNotes.begin(); iter != currentNotes.end(); iter++) {
+                    LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
+                    (*iter)->ResetDrawingTieAttr();
+                }
+            }
+        }
+    }
+    
+    // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
+    Syl *currentSyl;
+    Note *lastNote;
+    Note *lastButOneNote;
+    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
@@ -119,11 +195,34 @@ void Doc::PrepareDrawing()
                 filters.push_back( &matchLayer );
                 filters.push_back( &matchVerse );
                 
+                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+                // m_drawingLastNote is set only if the syl has a forward connector
+                currentSyl = NULL;
+                lastNote = NULL;
+                lastButOneNote = NULL;
                 ArrayPtrVoid paramsLyrics;
+                paramsLyrics.push_back( &currentSyl );
+                paramsLyrics.push_back( &lastNote );
+                paramsLyrics.push_back( &lastButOneNote );
                 Functor prepareLyrics( &Object::PrepareLyrics );
-                this->Process( &prepareLyrics, paramsLyrics, NULL, &filters );
+                Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
+                this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
             }
         }
+    }
+    
+    // Once <slur> , <ties> and @ties are matched but also syl connectors, we need to set them as running TimeSpanningInterface
+    // to each staff they are extended. This does not need to be done staff by staff because we can just check the
+    // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
+    params.clear();
+    timeSpanningElements.clear();
+    params.push_back( &timeSpanningElements );
+    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
+    this->Process( &fillStaffCurrentTimeSpanning, params );
+    
+    // Something must be wrong in the encoding because a TimeSpanningInterface was left open
+    if ( !timeSpanningElements.empty() ) {
+        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
     }
     
     /*
@@ -289,8 +388,44 @@ short Doc::GetRightMargin( const std::type_info *elementType )
     else if (typeid(MRest) == *elementType) return 0;
     else if (typeid(MultiRest) == *elementType) return 0;
     //else if (typeid(Note) == *elementType) return 10;
-    return 15;
+    return 10;
 }
+    
+void Doc:: SetPageHeight( int pageHeight )
+{
+    m_pageHeight = pageHeight * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageWidth( int pageWidth )
+{
+    m_pageWidth = pageWidth * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageLeftMar( short pageLeftMar )
+{
+    m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageRightMar( short pageRightMar )
+{
+    m_pageRightMar = pageRightMar * DEFINITON_FACTOR;
+};
+
+void Doc::SetPageTopMar( short pageTopMar )
+{
+    m_pageTopMar = pageTopMar * DEFINITON_FACTOR;
+};
+
+void Doc::SetSpacingStaff( short spacingStaff )
+{
+    m_spacingStaff = spacingStaff;
+};
+
+void Doc::SetSpacingSystem( short spacingSystem )
+{
+    m_spacingSystem = spacingSystem;
+};
+
 
 
 Page *Doc::SetDrawingPage( int pageIdx )
@@ -326,14 +461,14 @@ Page *Doc::SetDrawingPage( int pageIdx )
     }
     else
     {
-        m_drawingPageHeight = m_env.m_pageHeight;
-        m_drawingPageWidth = m_env.m_pageWidth;
-        m_drawingPageLeftMar = m_env.m_pageLeftMar;
-        m_drawingPageRightMar = m_env.m_pageRightMar;
-        m_drawingPageTopMar = m_env.m_pageTopMar;
+        m_drawingPageHeight = m_style->m_pageHeight;
+        m_drawingPageWidth = m_style->m_pageWidth;
+        m_drawingPageLeftMar = m_style->m_pageLeftMar;
+        m_drawingPageRightMar = m_style->m_pageRightMar;
+        m_drawingPageTopMar = m_style->m_pageTopMar;
     }
     
-    if (this->m_env.m_landscape)
+    if (this->m_style->m_landscape)
     {	
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
@@ -344,43 +479,42 @@ Page *Doc::SetDrawingPage( int pageIdx )
     }
     
     // From here we could check if values have changed
-    // Since  m_env.m_interlDefin stays the same, it useless to do it
+    // Since  m_style->m_interlDefin stays the same, it useless to do it
     // every time for now.
     
-    m_drawingUnit = this->m_env.m_unit;
-    
-	m_drawingBeamMaxSlope = this->m_env.m_beamMaxSlope;
-	m_drawingBeamMinSlope = this->m_env.m_beamMinSlope;
+	m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
+	m_drawingBeamMinSlope = this->m_style->m_beamMinSlope;
 	m_drawingBeamMaxSlope /= 100;
 	m_drawingBeamMinSlope /= 100;
     
-    m_drawingSmallStaffRatio[0] = this->m_env.m_smallStaffNum;
-    m_drawingSmallStaffRatio[1] = this->m_env.m_smallStaffDen;
-    m_drawingGraceRatio[0] = this->m_env.m_graceNum;
-    m_drawingGraceRatio[1] = this->m_env.m_graceDen;
+    m_drawingSmallStaffRatio[0] = this->m_style->m_smallStaffNum;
+    m_drawingSmallStaffRatio[1] = this->m_style->m_smallStaffDen;
+    m_drawingGraceRatio[0] = this->m_style->m_graceNum;
+    m_drawingGraceRatio[1] = this->m_style->m_graceDen;
     
     // half of the space between two lines
-    m_drawingHalfInterl[0] = m_env.m_unit;
+    m_drawingUnit[0] = m_style->m_unit;
     // same for small staves
-    m_drawingHalfInterl[1] = (m_drawingHalfInterl[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingUnit[1] = (m_drawingUnit[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     // space between two lines
-    m_drawingInterl[0] = m_drawingHalfInterl[0] * 2;
+    m_drawingDoubleUnit[0] = m_drawingUnit[0] * 2;
     // same for small staves
-    m_drawingInterl[1] = m_drawingHalfInterl[1] * 2;
+    m_drawingDoubleUnit[1] = m_drawingUnit[1] * 2;
     // staff (with five lines)
-    m_drawingStaffSize[0] = m_drawingInterl[0] * 4;
-    m_drawingStaffSize[1] = m_drawingInterl[1] * 4;
+    m_drawingStaffSize[0] = m_drawingDoubleUnit[0] * 4;
+    m_drawingStaffSize[1] = m_drawingDoubleUnit[1] * 4;
     //
-    m_drawingOctaveSize[0] = m_drawingHalfInterl[0] * 7;
-    m_drawingOctaveSize[1] = m_drawingHalfInterl[1] * 7;
+    m_drawingOctaveSize[0] = m_drawingUnit[0] * 7;
+    m_drawingOctaveSize[1] = m_drawingUnit[1] * 7;
     
     // values for beams
-    m_drawingBeamWidth[0] = this->m_env.m_unit;
-    m_drawingBeamWhiteWidth[0] = this->m_env.m_unit / 2;
+    m_drawingBeamWidth[0] = this->m_style->m_unit;
+    m_drawingBeamWhiteWidth[0] = this->m_style->m_unit / 2;
     m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
     
     m_drawingFontHeight = CalcMusicFontSize();
+    
     /*
     m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
 	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
@@ -388,18 +522,15 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
     */
     
-    m_drawingFontSize[0][0] = m_drawingFontHeight;
-    m_drawingFontSize[0][1] = (m_drawingFontSize[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
-    m_drawingFontSize[1][0] = (m_drawingFontSize[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-    m_drawingFontSize[1][1]= (m_drawingFontSize[1][0] * m_drawingGraceRatio[0])/ m_drawingGraceRatio[1];
+	m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
+    m_drawingSmuflFonts[0][1].SetPointSize( (m_drawingFontHeight * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
+    m_drawingSmuflFonts[1][0].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] );
+    m_drawingSmuflFonts[1][1].SetPointSize( ( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
     
-	m_drawingFonts[0][0].SetPointSize( m_drawingFontSize[0][0] ); //160
-    m_drawingFonts[0][1].SetPointSize( m_drawingFontSize[0][1] ); //120
-    m_drawingFonts[1][0].SetPointSize( m_drawingFontSize[1][0] ); //128
-    m_drawingFonts[1][1].SetPointSize( m_drawingFontSize[1][1] ); //100
-    
-	m_drawingLyricFonts[0].SetPointSize( m_drawingLyricFont.GetPointSize() );
-    m_drawingLyricFonts[1].SetPointSize( m_drawingLyricFont.GetPointSize() );
+    m_drawingLyricFonts[0] = m_drawingLyricFont;
+    m_drawingLyricFonts[1] = m_drawingLyricFont;
+	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
+    m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
     
     float glyph_size;
     Glyph *glyph;
@@ -443,7 +574,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
 
 int Doc::CalcMusicFontSize( )
 {
-    return m_env.m_unit * 8;
+    return m_style->m_unit * 8;
 }
     
 int Doc::GetAdjustedDrawingPageHeight()
@@ -471,6 +602,24 @@ int Doc::Save( FileOutputStream *output )
     this->Process( &save, params, &saveEnd );
     
     return true;
+}
+    
+//----------------------------------------------------------------------------
+// Doc functors methods
+//----------------------------------------------------------------------------
+
+int Doc::PrepareLyricsEnd( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    // param 1: the last Note
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+    Note **lastNote = static_cast<Note**>(params[1]);
+    
+    if ( (*currentSyl) && (*lastNote) ) {
+        (*currentSyl)->SetEnd(*lastNote);
+    }
+    
+    return FUNCTOR_STOP;
 }
 
 } // namespace vrv

@@ -10,22 +10,18 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "accid.h"
-#include "clef.h"
 #include "custos.h"
 #include "doc.h"
-#include "dot.h"
 #include "keysig.h"
-#include "io.h"
-#include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
-#include "vrvdef.h"
+#include "staff.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -34,7 +30,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer( ):
-	DocObject("layer-"), ObjectListInterface(),
+	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(),
     AttCommon()
 {
     Reset();
@@ -59,6 +55,7 @@ Layer::~Layer()
 void Layer::Reset()
 {
     DocObject::Reset();
+    DrawingListInterface::Reset();
     ResetCommon();
     
     m_drawingClef = NULL;
@@ -66,10 +63,9 @@ void Layer::Reset()
     m_drawingMensur = NULL;
     m_drawingMeterSig = NULL;
     m_drawingStemDir = STEMDIRECTION_NONE;
-    m_drawingList.clear();
 }
     
-void Layer::AddElement( LayerElement *element, int idx )
+void Layer::AddLayerElement( LayerElement *element, int idx )
 {
 	element->SetParent( this );
     if ( idx == -1 ) {
@@ -84,8 +80,7 @@ void Layer::AddElement( LayerElement *element, int idx )
 LayerElement *Layer::GetPrevious( LayerElement *element )
 {
     this->ResetList( this );
-    
-    if ( !element || m_list.empty() )
+    if ( !element || this->GetList(this)->empty() )
         return NULL;
     
     return dynamic_cast<LayerElement*>( GetListPrevious( element ) );
@@ -108,21 +103,6 @@ LayerElement *Layer::GetAtPos( int x )
 	}
 	
 	return element;
-}
-
-void Layer::AddToDrawingList( LayerElement *element )
-{
-    m_drawingList.push_back( element );
-}
-
-ListOfObjects *Layer::GetDrawingList( )
-{
-    return &m_drawingList;
-}
-
-void Layer::ResetDrawingList( )
-{
-    m_drawingList.clear();
 }
     
 void Layer::SetDrawingClef( Clef *clef )
@@ -182,7 +162,7 @@ LayerElement *Layer::Insert( LayerElement *element, int x )
     
     // Insert in the logical tree - this works only for facsimile (transcription) encoding
     insertElement->m_xAbs = x;
-    AddElement( insertElement, idx );
+    AddLayerElement( insertElement, idx );
     
 	Refresh();
     //
@@ -196,7 +176,7 @@ void Layer::Insert( LayerElement *layerElement, LayerElement *before )
     if ( before ) {
         idx = this->GetChildIndex( before );
     }
-    AddElement( layerElement , idx );
+    AddLayerElement( layerElement , idx );
 }
 
 void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )
@@ -293,7 +273,7 @@ void Layer::Delete( LayerElement *element )
 // symbol, de la nature indiquee (flg). Retourne le ptr si succes, ou 
 // l'element de depart; le ptr succ est vrai si symb trouve.
 
-LayerElement *Layer::GetFirstOld( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ)
+LayerElement *Layer::GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ)
 {	
     LayerElement *original = element;
 
@@ -430,62 +410,6 @@ void Layer::RemoveClefAndCustos()
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-int Layer::CopyToLayer( ArrayPtrVoid params )
-{  
-    // Things we might want to add: 
-    // - checking that the parent is a staff to avoid copying MusApp
-    // - adding a parent nbLogStaff and a nbLogLayer parameter for copying a specific staff / layer
-    
-    
-    // param 0: the Layer we need to copy to
-	Layer *destinationLayer = static_cast<Layer*>(params[0]);
-    // param 1: the uuid of the start element (if any)
-    std::string *start = static_cast<std::string*>(params[1]);
-    // param 2: the uuid of the end element (if any)
-    std::string *end = static_cast<std::string*>(params[2]);
-    // param 3: we have a start element and have started
-    bool *has_started = static_cast<bool*>(params[3]);
-    // param 4: we have an end element and have ended
-    bool *has_ended = static_cast<bool*>(params[4]);
-    // param 5: we want a new uuid for the copied elements
-    bool *new_uuid = static_cast<bool*>(params[5]);
-    
-    if ( (*has_ended) ) {
-        return FUNCTOR_STOP;
-    }
-    
-    int i;
-    for ( i = 0; i < this->GetElementCount(); i++ ) 
-    {
-        // check if we have a start uuid or if we already passed it
-        if ( !start->empty() && !(*has_started) ) {
-            if ( *start == m_children[i]->GetUuid() ) {
-                (*has_started) = true;
-            } 
-            else {
-                continue;
-            }
-        }
-        
-        // copy and add it
-        LayerElement *element = dynamic_cast<LayerElement*>(m_children[i]);
-        assert( element );
-        LayerElement *copy = element->GetChildCopy( (*new_uuid) );
-        destinationLayer->AddElement( copy );
-        
-        // check if we have a end uuid and if we have reached it. 
-        if ( !end->empty() ) {
-            if ( *end == m_children[i]->GetUuid() ) {
-                (*has_ended) = true;
-                return FUNCTOR_STOP;
-            }
-        }
-
-        
-    }
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
@@ -512,6 +436,21 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
         m_drawingMeterSig->AlignHorizontally( params );
     }
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::PrepareProcessingLists( ArrayPtrVoid params )
+{
+    // param 0: the IntTree* for staff/layer/verse (unused)
+    // param 1: the IntTree* for staff/layer
+    IntTree *tree = static_cast<IntTree*>(params[1]);
+    // Alternate solution with StaffN_LayerN_VerseN_t
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
+    
+    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
+    assert( staff );
+    tree->child[ staff->GetN() ].child[ this->GetN() ];
+    
     return FUNCTOR_CONTINUE;
 }
 

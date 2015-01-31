@@ -11,7 +11,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -20,7 +19,6 @@
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
-#include "vrv.h"
 
 namespace vrv {
 
@@ -45,13 +43,17 @@ void Verse::Reset()
     ResetCommon();
 }
 
-void Verse::AddElement(vrv::LayerElement *element)
+void Verse::AddLayerElement(vrv::LayerElement *element)
 {
     assert( dynamic_cast<Syl*>(element) || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
     m_children.push_back(element);
     Modify();
 }
+    
+//----------------------------------------------------------------------------
+// Verse functor methods
+//----------------------------------------------------------------------------
 
 int Verse::AlignVertically( ArrayPtrVoid params )
 {
@@ -74,17 +76,16 @@ int Verse::AlignVertically( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-    
-int Verse::PrepareDrawing( ArrayPtrVoid params )
+int Verse::PrepareProcessingLists( ArrayPtrVoid params )
 {
-    // param 0: the IntTree
+    // param 0: the IntTree* for staff/layer/verse
+    // param 1: the IntTree* for staff/layer (unused)
     IntTree *tree = static_cast<IntTree*>(params[0]);
     // Alternate solution with StaffN_LayerN_VerseN_t
     //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
     
     Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
     Layer *layer = dynamic_cast<Layer*>( this->GetFirstParent( &typeid( Layer ) ) );
-    
     assert( staff && layer );
     
     tree->child[ staff->GetN() ].child[ layer->GetN() ].child[ this->GetN() ];
@@ -93,15 +94,5 @@ int Verse::PrepareDrawing( ArrayPtrVoid params )
     
     return FUNCTOR_SIBLINGS;
 }
-    
-int Verse::PrepareLyrics( ArrayPtrVoid params )
-{
-    
-    Syl *syl = dynamic_cast<Syl*>( this->GetFirst( &typeid(Syl) ) );
-    if (syl) {
-        //std::cout << UTF16to8( syl->GetText().c_str() ) << std::endl;
-    }
-    return FUNCTOR_CONTINUE;
-}
-    
+  
 } // namespace vrv

@@ -5759,13 +5759,13 @@ AttTiepresent::~AttTiepresent() {
 }
 
 void AttTiepresent::ResetTiepresent() {
-    m_tie = "";
+    m_tie = TIE_NONE;
 }
 
 bool AttTiepresent::ReadTiepresent(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tie")) {
-        this->SetTie(StrToStr(element.attribute("tie").value()));
+        this->SetTie(StrToTie(element.attribute("tie").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5774,7 +5774,7 @@ bool AttTiepresent::ReadTiepresent(  pugi::xml_node element ) {
 bool AttTiepresent::WriteTiepresent(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTie()) {
-        element.append_attribute("tie") = StrToStr(this->GetTie()).c_str();
+        element.append_attribute("tie") = TieToStr(this->GetTie()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5782,7 +5782,7 @@ bool AttTiepresent::WriteTiepresent(  pugi::xml_node element ) {
 
 bool AttTiepresent::HasTie( )
 {
-    return (m_tie != "");
+    return (m_tie != TIE_NONE);
 }
 
 
@@ -5801,13 +5801,13 @@ AttTimestampMusical::~AttTimestampMusical() {
 }
 
 void AttTimestampMusical::ResetTimestampMusical() {
-    m_tstamp = "";
+    m_tstamp = -1.0;
 }
 
 bool AttTimestampMusical::ReadTimestampMusical(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tstamp")) {
-        this->SetTstamp(StrToStr(element.attribute("tstamp").value()));
+        this->SetTstamp(StrToDbl(element.attribute("tstamp").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5816,7 +5816,7 @@ bool AttTimestampMusical::ReadTimestampMusical(  pugi::xml_node element ) {
 bool AttTimestampMusical::WriteTimestampMusical(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTstamp()) {
-        element.append_attribute("tstamp") = StrToStr(this->GetTstamp()).c_str();
+        element.append_attribute("tstamp") = DblToStr(this->GetTstamp()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5824,7 +5824,7 @@ bool AttTimestampMusical::WriteTimestampMusical(  pugi::xml_node element ) {
 
 bool AttTimestampMusical::HasTstamp( )
 {
-    return (m_tstamp != "");
+    return (m_tstamp != -1.0);
 }
 
 
@@ -5899,13 +5899,13 @@ AttTimestamp2Musical::~AttTimestamp2Musical() {
 }
 
 void AttTimestamp2Musical::ResetTimestamp2Musical() {
-    m_tstamp2 = "";
+    m_tstamp2 = std::make_pair(-1,-1.0);
 }
 
 bool AttTimestamp2Musical::ReadTimestamp2Musical(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tstamp2")) {
-        this->SetTstamp2(StrToStr(element.attribute("tstamp2").value()));
+        this->SetTstamp2(StrToTstamp2(element.attribute("tstamp2").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5914,7 +5914,7 @@ bool AttTimestamp2Musical::ReadTimestamp2Musical(  pugi::xml_node element ) {
 bool AttTimestamp2Musical::WriteTimestamp2Musical(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTstamp2()) {
-        element.append_attribute("tstamp2") = StrToStr(this->GetTstamp2()).c_str();
+        element.append_attribute("tstamp2") = Tstamp2ToStr(this->GetTstamp2()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5922,7 +5922,7 @@ bool AttTimestamp2Musical::WriteTimestamp2Musical(  pugi::xml_node element ) {
 
 bool AttTimestamp2Musical::HasTstamp2( )
 {
-    return (m_tstamp2 != "");
+    return (m_tstamp2 != std::make_pair(-1,-1.0));
 }
 
 
@@ -6098,8 +6098,8 @@ void AttTypography::ResetTypography() {
     m_fontfam = "";
     m_fontname = "";
     m_fontsizeDbl = 0.0;
-    m_fontstyle = "";
-    m_fontweight = "";
+    m_fontstyle = FONTSTYLE_NONE;
+    m_fontweight = FONTWEIGHT_NONE;
 }
 
 bool AttTypography::ReadTypography(  pugi::xml_node element ) {
@@ -6117,11 +6117,11 @@ bool AttTypography::ReadTypography(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("fontstyle")) {
-        this->SetFontstyle(StrToStr(element.attribute("fontstyle").value()));
+        this->SetFontstyle(StrToFontstyle(element.attribute("fontstyle").value()));
         hasAttribute = true;
     }
     if (element.attribute("fontweight")) {
-        this->SetFontweight(StrToStr(element.attribute("fontweight").value()));
+        this->SetFontweight(StrToFontweight(element.attribute("fontweight").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -6142,11 +6142,11 @@ bool AttTypography::WriteTypography(  pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasFontstyle()) {
-        element.append_attribute("fontstyle") = StrToStr(this->GetFontstyle()).c_str();
+        element.append_attribute("fontstyle") = FontstyleToStr(this->GetFontstyle()).c_str();
         wroteAttribute = true;
     }
     if (this->HasFontweight()) {
-        element.append_attribute("fontweight") = StrToStr(this->GetFontweight()).c_str();
+        element.append_attribute("fontweight") = FontweightToStr(this->GetFontweight()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6169,12 +6169,12 @@ bool AttTypography::HasFontsize( )
 
 bool AttTypography::HasFontstyle( )
 {
-    return (m_fontstyle != "");
+    return (m_fontstyle != FONTSTYLE_NONE);
 }
 
 bool AttTypography::HasFontweight( )
 {
-    return (m_fontweight != "");
+    return (m_fontweight != FONTWEIGHT_NONE);
 }
 
 

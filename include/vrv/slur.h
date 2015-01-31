@@ -9,9 +9,8 @@
 #ifndef __VRV_SLUR_H__
 #define __VRV_SLUR_H__
 
-#include "layer.h"
-#include "note.h"
-#include "object.h"
+#include "measureelement.h"
+#include "timeinterface.h"
 
 namespace vrv {
 
@@ -19,7 +18,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur: public LayerElement
+class Slur: public MeasureElement, public TimeSpanningInterface
 {
 public:
     /**
@@ -33,24 +32,25 @@ public:
     virtual std::string GetClassName( ) { return "Slur"; };
     ///@}
     
+    //----------//
+    // Functors //
+    //----------//
+    
     /**
-     * @name Set and get the first and second note of the tie
-     * The setter asserts that no note was previously set.
+     * See Object::FillStaffCurrentTimeSpanning
      */
-    ///@{
-    void SetFirstNote( Note *note );
-    void SetSecondNote( Note *note );
-    Note *GetFirstNote() { return m_first; };
-    Note *GetSecondNote() { return m_second; };
-    ///@}
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    
+    /**
+     * See Object::PrepareTimeSpanning
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
     
 private:
     
 public:
     
 private:
-    Note *m_first;
-    Note *m_second;
     
 };
 

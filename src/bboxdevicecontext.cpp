@@ -43,6 +43,8 @@ BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     m_userScaleX = 1.0;
     m_userScaleY = 1.0;
     
+    m_drawingText = false;
+    
     SetBrush( AxBLACK, AxSOLID );
     SetPen( AxBLACK, 1, AxSOLID );
 }
@@ -83,11 +85,6 @@ void BBoxDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-        
-void BBoxDeviceContext::SetFont( FontMetricsInfo *font_info )
-{
-    m_font = *font_info;
-}
 
 void BBoxDeviceContext::SetTextForeground( int colour )
 {
@@ -108,51 +105,20 @@ void BBoxDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleX = xScale;
     m_userScaleY = yScale;
 }
-    
-void BBoxDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
-{
-    LogDebug("BBoxDeviceContext::GetTextExtent not implemented");
-}
 
-void BBoxDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+Point BBoxDeviceContext::GetLogicalOrigin( ) 
 {
-    int x, y, partial_w, partial_h;
-    *w = 0;
-    *h = 0;
-    
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
-        wchar_t c = string[i];
-        Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph) {
-            continue;
-        }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-        
-        partial_w *= m_font.GetPointSize();
-        partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_font.GetPointSize();
-        partial_h /= glyph->GetUnitsPerEm();
-        
-        *w += partial_w;
-        *h += partial_h;
-    }
-}
-       
-
-MusPoint BBoxDeviceContext::GetLogicalOrigin( ) 
-{
-    return MusPoint( 0, 0 );
+    return Point( 0, 0 );
 }
 
 // claculated better
 void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
     int vals[4];
-    FindPointsForBounds( MusPoint(x, y), 
-                        MusPoint(bezier1_coord[0], bezier1_coord[1]), 
-                        MusPoint(bezier1_coord[2], bezier1_coord[3]),
-                        MusPoint(bezier1_coord[4], bezier1_coord[5]),
+    FindPointsForBounds( Point(x, y), 
+                        Point(bezier1_coord[0], bezier1_coord[1]), 
+                        Point(bezier1_coord[2], bezier1_coord[3]),
+                        Point(bezier1_coord[4], bezier1_coord[5]),
                         vals);
     
     UpdateBB(vals[0], vals[1], vals[2], vals[3]);
@@ -256,7 +222,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 }
  
                
-void BBoxDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style)
+void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
     if ( n == 0 ) {
         return;
@@ -302,40 +268,48 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
     
     UpdateBB( x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
-
-        
-void BBoxDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
+    
+void BBoxDeviceContext::StartText(int x, int y, char alignement)
 {
-    // alignment not taken into account!
-    //std::wstring wtext = std::wstring(text.begin(), text.end());
-    //DrawMusicText( wtext, x, y);
+    assert( !m_drawingText );
+    m_drawingText = true;
+    m_textX = x;
+    m_textY = y;
+    m_textWidth = 0;
+    m_textHeight = 0;
 }
 
-
+void BBoxDeviceContext::EndText()
+{
+    m_drawingText = false;
+}
+        
+void BBoxDeviceContext::DrawText(const std::string& text, const std::wstring wtext)
+{
+    assert( m_fontStack.top() );
+    
+    //unsigned long length = wtext.length();
+    int w, h;
+    GetTextExtent(wtext, &w, &h);
+    m_textWidth += w;
+    // very approximative, we should use GetTextExtend once implemented
+    //m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
+    // ignore y bounding boxes for text
+    //m_textHeight = m_fontStack.top()->GetPointSize();
+        UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
+    
+    
+}
 
 void BBoxDeviceContext::DrawRotatedText(const std::string& text, int x, int y, double angle)
 {
-    //known bug; if the font is drawn in a scaled DC, it will not behave exactly as wxMSW
-
-    std::string s;
-
-    // calculate bounding box
-    int w, h, desc;
-    //DoGetTextExtent(sText, &w, &h, &desc);
-    w = h = desc = 0;
-
-    //double rad = DegToRad(angle);
-
-    
-    //if (m_backgroundMode == AxSOLID)
-    {
-        //WriteLine("/*- MusSVGFileDC::DrawRotatedText - Backgound not implemented */") ;
-    }
+    // TODO
 }
 
 
 void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {  
+    assert( m_fontStack.top() );
     
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
@@ -349,49 +323,31 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         }
         glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
     
-        int x_off = x + g_x * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         // because we are in the drawing context, y position are already flipped
-        int y_off = y - g_y * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        int y_off = y - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
          
         UpdateBB(x_off, y_off, 
-                  x_off + g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm(),
+                  x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
         // idem, y position are flipped
-                  y_off - g_h * m_font.GetPointSize() / glyph->GetUnitsPerEm());
+                  y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm());
         
-        lastCharWidth = g_w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        lastCharWidth = g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         x += lastCharWidth; // move x to next char
      
     }
 }
 
-void BBoxDeviceContext::DrawSpline(int n, MusPoint points[])
+void BBoxDeviceContext::DrawSpline(int n, Point points[])
 {
 
 }
 
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2) 
 {
-    /*
-    DocObject *first = &m_objects[m_objects.Count() - 1];
-    
-    first->UpdateOwnBB(x1, y1, x2, y2);
-    
-    // Stretch the content BB of the other objects
-    // Check that we are not the only elem in the list
-    if (m_objects.Count() > 1) {
-        
-        // The second element in the list stretches in base of the new BBox of the first
-        m_objects[m_objects.Count() - 2].UpdateContentBB(first->m_selfBB_x1, first->m_selfBB_y1, first->m_selfBB_x2, first->m_selfBB_y2);
-        
-        // All the next ones, stretch using contentBB
-        for (int i = m_objects.Count() - 3; i >= 0; i--) {
-            DocObject *precedent = &m_objects[i + 1];
-            m_objects[i].UpdateContentBB(precedent->m_contentBB_x1, precedent->m_contentBB_y1, precedent->m_contentBB_x2, precedent->m_contentBB_y2);
-        }
+    if (m_isDeactivated) {
+        return;
     }
-    */
-    
-    // simpler version 
     
     // the array should not be empty
     assert( !m_objects.empty() ); // Array cannot be empty
@@ -401,13 +357,14 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     (m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     
     int i;
+    // Stretch the content BB of the other objects
     for (i = 0; i < (int)m_objects.size(); i++) {
         (m_objects[i])->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     }
 }
 
 // Ok, shame on me, found off the internet and modified, but for now it works
-void BBoxDeviceContext::FindPointsForBounds(MusPoint P0, MusPoint P1, MusPoint P2, MusPoint P3, int *ret)
+void BBoxDeviceContext::FindPointsForBounds(Point P0, Point P1, Point P2, Point P3, int *ret)
 {
     
     int A = P3.x - 3 * P2.x + 3 * P1.x - P0.x;

@@ -6,7 +6,7 @@ SET(CMAKE_BUILD_TYPE Release)
 
 add_definitions(-g)
 
-include_directories(/usr/local/include ../include/vrv ../tinyxml ../libmei)
+include_directories(/usr/local/include ../include/vrv ../libmei)
 
 add_executable (verovio 
 	main.cpp
@@ -16,11 +16,13 @@ add_executable (verovio
 	../src/barline.cpp
 	../src/bboxdevicecontext.cpp
 	../src/beam.cpp
+	../src/chord.cpp
 	../src/clef.cpp
 	../src/custos.cpp
 	../src/devicecontext.cpp
 	../src/doc.cpp	
 	../src/dot.cpp
+	../src/drawinglistinterface.cpp
 	../src/durationinterface.cpp
 	../src/editorial.cpp
 	../src/glyph.cpp
@@ -35,6 +37,7 @@ add_executable (verovio
 	../src/mensur.cpp
 	../src/metersig.cpp
 	../src/measure.cpp
+	../src/measureelement.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
 	../src/note.cpp
@@ -52,10 +55,12 @@ add_executable (verovio
 	../src/scoredef.cpp
 	../src/slur.cpp
 	../src/staff.cpp
+	../src/style.cpp
 	../src/svgdevicecontext.cpp
 	../src/syl.cpp
 	../src/system.cpp
 	../src/tie.cpp
+	../src/timeinterface.cpp
 	../src/toolkit.cpp
 	../src/tuplet.cpp
 	../src/verse.cpp

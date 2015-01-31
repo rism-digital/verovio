@@ -9,10 +9,9 @@
 #ifndef __VRV_GLYPH_H__
 #define __VRV_GLYPH_H__
 
-#include "object.h"
+#include <string>
 
 namespace vrv {
-
 
 /**
  * This class is used for storing a music font glyph.
@@ -31,8 +30,9 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    Glyph() {};
+    Glyph();
     Glyph(std::string path, std::string codeStr);
+    Glyph(int unitsPerEm);
     virtual ~Glyph();
     ///@}
     

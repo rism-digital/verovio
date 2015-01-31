@@ -50,7 +50,6 @@ public:
     virtual void SetBackground( int colour, int style = AxSOLID );
     virtual void SetBackgroundImage( void *image, double opacity = 1.0 );
     virtual void SetBackgroundMode( int mode );
-    virtual void SetFont( FontMetricsInfo *font_info );
     virtual void SetTextForeground( int colour );
     virtual void SetTextBackground( int colour );
     virtual void SetLogicalOrigin( int x, int y );
@@ -61,9 +60,7 @@ public:
      * @name Getters
      */
     ///@{
-    virtual void GetTextExtent( const std::string& string, int *w, int *h );
-    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
-    virtual MusPoint GetLogicalOrigin( );
+    virtual Point GetLogicalOrigin( );
     ///}
 
     /**
@@ -81,15 +78,22 @@ public:
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
     virtual void DrawLine(int x1, int y1, int x2, int y2);
-    virtual void DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
+    virtual void DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style = AxODDEVEN_RULE);
     virtual void DrawRectangle(int x, int y, int width, int height);
     virtual void DrawRotatedText(const std::string& text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
-    virtual void DrawText(const std::string& text, int x, int y, char alignement = LEFT );
+    virtual void DrawText(const std::string& text, const std::wstring wtext = L"");
     virtual void DrawMusicText(const std::wstring& text, int x, int y);
-    virtual void DrawSpline(int n, MusPoint points[]);
+    virtual void DrawSpline(int n, Point points[]);
     virtual void DrawBackgroundImage( int x = 0, int y = 0 );
     ///@}
+    
+    /**
+     * @name Method for starting and ending a text
+     */
+    ///@{
+    virtual void StartText(int x, int y, char alignement = LEFT );
+    virtual void EndText();
     
     /**
      * @name Method for starting and ending a graphic
@@ -132,7 +136,6 @@ private:
     int m_width, m_height;
     int m_originX, m_originY;
     double m_userScaleX, m_userScaleY;
-    FontMetricsInfo m_font;
       
     // holds the list of glyphs from the smufl font used so far
     // they will be added at the end of the file as <defs>

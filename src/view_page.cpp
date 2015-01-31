@@ -12,29 +12,30 @@
 
 #include <assert.h>
 #include <math.h>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
 #include "att_comparison.h"
 #include "beam.h"
-#include "barline.h"
-#include "clef.h"
+#include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
 #include "keysig.h"
 #include "layer.h"
-#include "layerelement.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "note.h"
 #include "page.h"
-#include "staff.h"
-#include "system.h"
 #include "slur.h"
 #include "smufl.h"
+#include "staff.h"
+#include "style.h"
+#include "system.h"
+#include "syl.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -61,7 +62,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     dc->DrawBackgroundImage( );
     
-    MusPoint origin = dc->GetLogicalOrigin();
+    Point origin = dc->GetLogicalOrigin();
     dc->SetLogicalOrigin( origin.x - m_doc->m_drawingPageLeftMar, origin.y - m_doc->m_drawingPageTopMar );
 
     dc->StartPage();
@@ -90,6 +91,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     dc->StartGraphic( system, "", system->GetUuid() );
     
+    // first we need to clear the drawing list of postponed elements
+    system->ResetDrawingList();
     
     if ( system->m_yAbs == VRV_UNSET ) {
         assert( m_doc->GetType() == Raw );
@@ -118,12 +121,45 @@ void View::DrawSystem( DeviceContext *dc, System *system )
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
         if ( (measure->GetN() != VRV_UNSET) && (measure->GetN() > 1) ) {
-            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->m_drawingStaffSize[0]  * 2 / 3) );
+            dc->SetFont( &m_doc->m_drawingSmuflFonts[0][0] );
+            dc->DrawMusicText( IntToTupletFigures( measure->GetN() ) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->m_drawingUnit[0]) );
+            dc->ResetFont();
         }
     }
     
+    // first draw the beams
+    DrawSystemList(dc, system, &typeid(Syl) );
+    DrawSystemList(dc, system, &typeid(Tie) );
+    DrawSystemList(dc, system, &typeid(Slur) );
+    
     dc->EndGraphic(system, this );
 
+}
+
+void View::DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType )
+{
+    assert( dc ); // DC cannot be NULL
+    
+    ListOfObjects *drawingList = system->GetDrawingList();
+    DocObject *element = NULL;
+    
+    ListOfObjects::iterator iter;
+    
+    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
+    {
+        element = dynamic_cast<DocObject*>(*iter);
+        if (!element) continue;
+        
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Syl) ) ) {
+            DrawTimeSpanningElement( dc, element, system );
+        }
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
+            DrawTimeSpanningElement(dc, element, system );
+        }
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
+            DrawTimeSpanningElement(dc, element, system );
+        }
+    }
 }
 
 void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine  )
@@ -188,15 +224,15 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     
     int y_top = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
-    int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
+    int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingDoubleUnit[last->staffSize];
     
     // ajdust the top and bottom according to staffline width
-    y_top += m_doc->m_env.m_staffLineWidth / 2;
-    y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
+    y_top += m_doc->m_style->m_staffLineWidth / 2;
+    y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth );
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
     }
     else if ( staffGrp->GetSymbol() == STAFFGRP_BRACE ) {
         DrawBrace ( dc, x, y_top, y_bottom, last->staffSize );
@@ -223,8 +259,11 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
     assert( measure );
     assert( scoreDef );
     
-    ListOfObjects::iterator iter = scoreDef->m_list.begin();
-    while (iter != scoreDef->m_list.end()) {
+    int w, h;
+    
+    ListOfObjects* scoreDefChildren = scoreDef->GetList(scoreDef);
+    ListOfObjects::iterator iter = scoreDefChildren->begin();
+    while (iter != scoreDefChildren->end()) {
         StaffDef *staffDef = dynamic_cast<StaffDef*>(*iter);
         
         if (!staffDef) {
@@ -253,12 +292,22 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
             continue;
         }
         
-        // keep the widest width for the system; the 1.1 is an arbitrary avg value of each letter with
-        system->SetDrawingLabelsWidth( label.length() * m_doc->m_drawingInterl[staff->staffSize] * 1.1 );
-        
         int x = system->GetDrawingX() - 3 * m_doc->m_drawingBeamWidth[0];
-        int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->m_drawingInterl[staff->staffSize] / 2);
-        dc->DrawText( label, ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
+        int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->m_drawingDoubleUnit[staff->staffSize] / 2);
+        
+        dc->SetBrush( m_currentColour, AxSOLID );
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ 0 ] );
+        
+        // keep the widest width for the system
+        dc->GetTextExtent( label, &w, &h);
+        system->SetDrawingLabelsWidth( w );
+        
+        dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
+        dc->DrawText( label );
+        dc->EndText( );
+        
+        dc->ResetFont();
+        dc->ResetBrush();
         
         ++iter;
     }
@@ -277,8 +326,8 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
     
     // adjust to top and bottom position so we make sure the is not white space between
     // the glyphs and the line
-    y1 += m_doc->m_env.m_stemWidth;
-    y2 -= m_doc->m_env.m_stemWidth;
+    y1 += m_doc->m_style->m_stemWidth;
+    y2 -= m_doc->m_style->m_stemWidth;
     DrawFullRectangle(dc, x1 , y1, x2, y2 );
 
 	return;
@@ -288,11 +337,11 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
 void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {	
     int new_coords[2][6];
-    MusPoint points[4];
+    Point points[4];
     
 	assert( dc ); // DC cannot be NULL
 
-    int penWidth = m_doc->m_env.m_stemWidth;
+    int penWidth = m_doc->m_style->m_stemWidth;
     y1 -= penWidth;
     y2 += penWidth;
 	SwapY( &y1, &y2 );
@@ -302,17 +351,17 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 	x -= m_doc->m_drawingBeamWhiteWidth[ staffSize ];  // distance entre barre et debut accolade
     
 	ymed = (y1 + y2) / 2;
-	fact = m_doc->m_drawingBeamWidth[ staffSize ] + m_doc->m_env.m_stemWidth;
+	fact = m_doc->m_drawingBeamWidth[ staffSize ] + m_doc->m_style->m_stemWidth;
 	xdec = ToDeviceContextX(fact);
     
 	points[0].x = ToDeviceContextX(x);
 	points[0].y = ToDeviceContextY(y1);
-	points[1].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ]*2);
-	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*3);
-	points[3].x = ToDeviceContextX(x - m_doc->m_drawingInterl[ staffSize ] );
+	points[1].x = ToDeviceContextX(x - m_doc->m_drawingDoubleUnit[ staffSize ]*2);
+	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staffSize ]*3);
+	points[3].x = ToDeviceContextX(x - m_doc->m_drawingDoubleUnit[ staffSize ] );
 	points[3].y = ToDeviceContextY(ymed);
-	points[2].x = ToDeviceContextX(x + m_doc->m_drawingUnit);
-	points[2].y = points[3].y + ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]);
+	points[2].x = ToDeviceContextX(x + m_doc->m_drawingUnit[staffSize]);
+	points[2].y = points[3].y + ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staffSize ]);
     
     new_coords[0][0] = points[1].x;
     new_coords[0][1] = points[1].y;
@@ -326,7 +375,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 	
 	points[1].x += xdec;
 	points[2].x += xdec;
-	points[1].y = points[0].y + ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*2);
+	points[1].y = points[0].y + ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staffSize ]*2);
     
     new_coords[1][0] = points[1].x;
     new_coords[1][1] = points[1].y;
@@ -341,9 +390,9 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y1), new_coords[0], new_coords[1]);
     
 	// on produit l'image reflet vers le bas: 0 est identique 
-	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*2);
+	points[1].y = points[0].y - ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staffSize ]*2);
 	points[3].y = ToDeviceContextY(y2);
-	points[2].y = points[3].y + ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]*3);
+	points[2].y = points[3].y + ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staffSize ]*3);
     
     new_coords[0][0] = points[1].x;
     new_coords[0][1] = points[1].y;
@@ -357,7 +406,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 	
 	points[1].x -= xdec;
 	points[2].x -= xdec;
-	points[2].y = points[3].y - ToDeviceContextX( m_doc->m_drawingInterl[ staffSize ]);
+	points[2].y = points[3].y - ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staffSize ]);
     
     new_coords[1][0] = points[1].x;
     new_coords[1][1] = points[1].y;
@@ -400,7 +449,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 }
                 int y_top = staff->GetDrawingY();
                 // for the bottom position we need to take into account the number of lines and the staff size
-                int y_bottom = staff->GetDrawingY() - (childStaffDef->GetLines() - 1) * m_doc->m_drawingInterl[staff->staffSize];
+                int y_bottom = staff->GetDrawingY() - (childStaffDef->GetLines() - 1) * m_doc->m_drawingDoubleUnit[staff->staffSize];
                 DrawBarline( dc, y_top, y_bottom, barLine );
                 if ( barLine->HasRepetitionDots() ) {
                     DrawBarlineDots( dc, childStaffDef, staff, barLine );
@@ -437,7 +486,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         
         int y_top = first->GetDrawingY();
         // for the bottom position we need to take into account the number of lines and the staff size
-        int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingInterl[last->staffSize];
+        int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->m_drawingDoubleUnit[last->staffSize];
         
         DrawBarline( dc, y_top, y_bottom, barLine );
         
@@ -466,43 +515,43 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
     assert( dc );
     
     // adjust the top and bottom
-    y_top += m_doc->m_env.m_staffLineWidth / 2;
-    y_bottom -= m_doc->m_env.m_staffLineWidth / 2;
+    y_top += m_doc->m_style->m_staffLineWidth / 2;
+    y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
 
     int x = barLine->GetDrawingX();
-	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
-	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
+	int x1 = x - m_doc->m_drawingBeamWidth[0] - m_doc->m_style->m_barlineWidth;
+	int x2 = x + m_doc->m_drawingBeamWidth[0] + m_doc->m_style->m_barlineWidth;
     
 	if (barLine->GetRend() == BARRENDITION_single)
     {
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth);
     }
     else if (barLine->GetRend() == BARRENDITION_rptboth)
     {
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
-        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_style->m_barlineWidth);
     }
     else if (barLine->GetRend()  == BARRENDITION_rptstart)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
-        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x2, m_doc->m_style->m_barlineWidth);
     }
     else if (barLine->GetRend() == BARRENDITION_rptend)
 	{
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
 	}
 	else if (barLine->GetRend()  == BARRENDITION_dbl)
 	{
         // Narrow the bars a little bit - should be centered?
-        x1 += m_doc->m_env.m_barlineWidth;
-        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_env.m_barlineWidth);
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        x1 += m_doc->m_style->m_barlineWidth;
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
 	}
 	else if (barLine->GetRend()  == BARRENDITION_end)
     {
-        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_env.m_barlineWidth);
+        DrawVerticalLine( dc , y_top, y_bottom, x1, m_doc->m_style->m_barlineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_drawingBeamWidth[0]);
     }
 }
@@ -513,11 +562,11 @@ void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff
 	assert( dc ); // DC cannot be NULL
     
     int x = barLine->GetDrawingX();
-	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_env.m_barlineWidth;
-	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_env.m_barlineWidth;
+	int x1 = x - 2 * m_doc->m_drawingBeamWidth[0] - m_doc->m_style->m_barlineWidth;
+	int x2 = x + 2 * m_doc->m_drawingBeamWidth[0] + m_doc->m_style->m_barlineWidth;
     
-    int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->m_drawingHalfInterl[staff->staffSize];
-    int y_top = y_bottom + m_doc->m_drawingInterl[staff->staffSize];
+    int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->m_drawingUnit[staff->staffSize];
+    int y_top = y_bottom + m_doc->m_drawingDoubleUnit[staff->staffSize];
  
     if ((barLine->GetRend()  == BARRENDITION_rptstart) || (barLine->GetRend() == BARRENDITION_rptboth))
     {
@@ -552,7 +601,7 @@ void View::DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff 
 		b = pportee->m_drawingY - m_doc->m_drawingStaffSize[ pportee->staffSize ]*2;
 		bb = next->m_drawingY - m_doc->m_drawingStaffSize[ next->staffSize];
 
-		DrawVerticalLine ( dc, b, bb, x,  m_doc->m_env.m_barlineWidth);
+		DrawVerticalLine ( dc, b, bb, x,  m_doc->m_style->m_barlineWidth);
 		
 	}
     */
@@ -601,9 +650,23 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     }
 }
 
-
+void View::DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measure *measure, System *system)
+{
+    assert(system); // Pointer to layer cannot be NULL"
+    assert(measure); // Pointer to staff cannot be NULL"
+    
+    if (dynamic_cast<TimeSpanningInterface*>(element)) {
+        dc->StartGraphic( element, "", element->GetUuid() );
+        dc->EndGraphic( element, this);
+        system->AddToDrawingList(element);
+    }
+    else if (dynamic_cast<Staff*>(element)) {
+        DrawStaff(dc,  dynamic_cast<Staff*>(element), measure, system);
+    }
+}
+    
 //----------------------------------------------------------------------------
-// View - Staff
+// View - MeasureElement
 //----------------------------------------------------------------------------
 
 int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
@@ -615,16 +678,16 @@ int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
 	char *ptouche, i;
 	ptouche=&touches[0];
 
-	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_drawingHalfInterl[staff->staffSize];
+	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_drawingUnit[staff->staffSize];
 	if (staff->m_drawingLines > 5)
-		y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->m_drawingHalfInterl[staff->staffSize];
+		y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->m_drawingUnit[staff->staffSize];
 
 	/* exprime distance separant m_drawingY de
 	position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
 	ensuite, donc elle doit etre NEGATIVE si plus bas que m_drawingY */
 	for (i=0; i<(signed)sizeof(touches); i++)
 		if (*(ptouche+i) == pname)
-			return(y_int += ((i+1)*m_doc->m_drawingHalfInterl[staff->staffSize]));
+			return(y_int += ((i+1)*m_doc->m_drawingUnit[staff->staffSize]));
 	return 0;
 }
 
@@ -632,7 +695,7 @@ int View::CalculateRestPosY ( Staff *staff, char duration)
 {
     assert(staff); // Pointer to staff cannot be NULL"
 
-	int staff_space = m_doc->m_drawingHalfInterl[staff->staffSize];
+	int staff_space = m_doc->m_drawingUnit[staff->staffSize];
     int base = -17 * staff_space; // -17 is a magic number copied from above
     int offset;
     
@@ -682,6 +745,16 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     DrawStaffChildren(dc, staff, staff, measure);
     
+    std::vector<Syl*>::iterator iter1;
+    for (iter1 = staff->m_currentSyls.begin(); iter1 != staff->m_currentSyls.end(); ++iter1) {
+        system->AddToDrawingList(*iter1);
+    }
+    
+    std::vector<DocObject*>::iterator iter;
+    for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
+        system->AddToDrawingList(*iter);
+    }
+    
     dc->EndGraphic( staff, this );
 }
     
@@ -701,19 +774,20 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     //x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
     
     x1 = measure->GetDrawingX();
-    x2 = x1 + measure->GetWidth(); // - m_doc->m_env.m_barlineWidth / 2;
+    x2 = x1 + measure->GetWidth(); // - m_doc->m_style->m_barlineWidth / 2;
     
-    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_env.m_staffLineWidth ), AxSOLID );
+    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
-    
-    x1 = ToDeviceContextX (x1);
-    x2 = ToDeviceContextX (x2);
     
     for(j = 0;j < staff->m_drawingLines; j++)
     {
-        dc->DrawLine( x1 , ToDeviceContextY ( yy ) , x2 , ToDeviceContextY ( yy ) );
-        yy -= m_doc->m_drawingInterl[staff->staffSize];
+        dc->DrawLine( ToDeviceContextX (x1) , ToDeviceContextY ( yy ) , ToDeviceContextX (x2) , ToDeviceContextY ( yy ) );
+        // For drawing rectangles insteam of line
+        //DrawFullRectangle(dc, x1, yy - m_doc->m_style->m_barlineWidth / 2, x2, yy + m_doc->m_style->m_barlineWidth / 2 );
+        yy -= m_doc->m_drawingDoubleUnit[staff->staffSize];
     }
+    
+    staff->m_drawingHeight = staff->GetDrawingY() - yy;
     
     dc->ResetPen( );
     dc->ResetBrush( );
@@ -721,6 +795,192 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     return;
 }
 
+void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, System *system )
+{
+    assert(dynamic_cast<TimeSpanningInterface*>(element)); // Element must be a TimeSpanningInterface
+    TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
+    
+    if ( !Check( interface->GetStart() ) ) return;
+    if ( !Check( interface->GetEnd() ) ) return;
+    
+    // Get the parent system of the first and last note
+    System *parentSystem1 = dynamic_cast<System*>( interface->GetStart()->GetFirstParent( &typeid(System) )  );
+    System *parentSystem2 = dynamic_cast<System*>( interface->GetEnd()->GetFirstParent( &typeid(System) )  );
+    
+    int x1, x2;
+    Staff *staff = NULL;
+    DocObject *graphic = NULL;
+    char spanningType = SPANNING_START_END;
+    
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if (( system == parentSystem1 ) && ( system == parentSystem2 )) {
+        // Get the parent staff for calculating the y position
+        staff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
+        
+        x1 = interface->GetStart()->GetDrawingX();
+        x2 = interface->GetEnd()->GetDrawingX();
+        graphic = element;
+    }
+    // Only the first parent is the same, this means that the element is "open" at the end of the system
+    else if ( system == parentSystem1 ) {
+        // We need the last measure of the system for x2
+        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        if ( !Check( last ) ) return;
+        staff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( staff ) ) return;
+        
+        x1 = interface->GetStart()->GetDrawingX();
+        x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        graphic = element;
+        spanningType = SPANNING_START;
+    }
+    // We are in the system of the last note - draw the element from the beginning of the system
+    else if ( system == parentSystem2 ) {
+        // We need the first measure of the system for x1
+        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        if ( !Check( first ) ) return;
+        // Get the staff of the first note - however, not the staff we need
+        Staff *lastStaff = dynamic_cast<Staff*>( interface->GetEnd()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( lastStaff ) ) return;
+        // We need the first staff from the current system, i.e., the first measure.
+        AttCommonNComparison comparison( &typeid(Staff), lastStaff->GetN() );
+        staff = dynamic_cast<Staff*>(system->FindChildByAttComparison(&comparison, 2));
+        if (!staff ) {
+            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", lastStaff->GetN() );
+            return;
+        }
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( &typeid(Note) ) );
+        
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
+        x2 = interface->GetEnd()->GetDrawingX();
+        spanningType = SPANNING_END;
+    }
+    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    else {
+        // We need the first measure of the system for x1
+        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        if ( !Check( first ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
+        // We need the last measure of the system for x2
+        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        if ( !Check( last ) ) return;
+        // Get the staff of the first note - however, not the staff we need
+        Staff *firstStaff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        if ( !Check( firstStaff ) ) return;
+        
+        // We need the staff from the current system, i.e., the first measure.
+        AttCommonNComparison comparison( &typeid(Staff), firstStaff->GetN() );
+        staff = dynamic_cast<Staff*>(first->FindChildByAttComparison(&comparison, 1));
+        if (!staff ) {
+            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", firstStaff->GetN() );
+            return;
+        }
+        
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
+        x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        spanningType = SPANNING_MIDDLE;
+    }
+    
+    if (dynamic_cast<Slur*>(element)) {
+        DrawTieOrSlur(dc, dynamic_cast<Slur*>(element), x1, x2, staff, spanningType, graphic);
+    }
+    else if (dynamic_cast<Syl*>(element)) {
+        DrawSylConnector(dc, dynamic_cast<Syl*>(element), x1, x2, staff, spanningType, graphic);
+    }
+    else if (dynamic_cast<Tie*>(element)) {
+        DrawTieOrSlur(dc, dynamic_cast<Tie*>(element), x1, x2, staff, spanningType, graphic);
+    }
+
+}
+    
+void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
+                    char spanningType, DocObject *graphic )
+{
+    assert(dynamic_cast<Slur*>(element) || dynamic_cast<Tie*>(element)); // Element must be a Tie or a Slur
+    TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
+    
+    LayerElement *note1 = NULL;
+    LayerElement *note2 = NULL;
+    
+    bool up = true;
+    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
+    int y1, y2;
+    
+    note1 = interface->GetStart();
+    note2 = interface->GetEnd();
+    
+    if ( !note1 && !note2 ) {
+        // no note, obviously nothing to do...
+        return;
+    }
+    
+    //the normal case
+    if ( spanningType ==  SPANNING_START_END ) {
+        assert( note1 && note2 );
+        // Copied from DrawNote
+        // We could use the stamDir information
+        // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
+        y1 = note1->GetDrawingY();
+        y2 = note2->GetDrawingY();
+        assert(dynamic_cast<Note*>(note1));
+        // for now we only look at the first note - needs to be improved
+        // m_drawingStemDir it not set properly in beam - needs to be fixed.
+        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+    }
+    // This is the case when the tie is split over two system of two pages.
+    // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
+    else if ( spanningType ==  SPANNING_START ) {
+        y1 = y2 = note1->GetDrawingY();
+        assert(dynamic_cast<Note*>(note1));
+        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+    }
+    // Now this is the case when the tie is split but we are drawing the end of it
+    else if ( spanningType ==  SPANNING_END ) {
+        y1 = y2 = note2->GetDrawingY();
+        x2 = note2->GetDrawingX();
+        assert(dynamic_cast<Note*>(note2));
+        noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
+    }
+    // Finally
+    else {
+        LogDebug("Slur accross an entire system is not supported");
+    }
+    
+    assert( dynamic_cast<Note*>(note1));
+    if (noteStemDir == STEMDIRECTION_up) {
+        up = false;
+    }
+    else if (noteStemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        int center = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize] * 2;
+        up = (y1 > center) ? true : false;
+    }
+    
+    // FIXME, take in account elements that can be netween notes, eg keys time etc
+    // 20 height nice with 70, not nice with 50
+    // Also remove HARDCODED values!
+    if (up) {
+        y1 += m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+        y2 += m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+    }
+    else {
+        y1 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+        y2 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
+    }
+    
+    if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else dc->StartGraphic(element, "spanning-tie-or-slur", "");
+    dc->DeactivateGraphic();
+    DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
+    dc->ReactivateGraphic();
+    if ( graphic ) dc->EndResumedGraphic(graphic, this);
+    else dc->EndGraphic(element, this);
+}
 
 //----------------------------------------------------------------------------
 // View - Layer
@@ -744,7 +1004,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
     Staff *parentStaff = dynamic_cast<Staff*>(layer->m_parent);
     int staffSize = parentStaff->staffSize;
 	// calculer position du do central en fonction clef
-	y_n += (int) m_doc->m_drawingHalfInterl[staffSize]/4;
+	y_n += (int) m_doc->m_drawingUnit[staffSize]/4;
 	yb = parentStaff->GetDrawingY() -  m_doc->m_drawingStaffSize[staffSize]*2; // UT1 default
 	
 
@@ -760,7 +1020,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	Clef *clef = layer->GetClef (pelement);
     if (clef) {
         clefId = clef->GetClefId();
-        yb += (clef->GetClefOffset()) * m_doc->m_drawingHalfInterl[staffSize];	// UT1 reel
+        yb += (clef->GetClefOffset()) * m_doc->m_drawingUnit[staffSize];	// UT1 reel
     }
 	yb -= 4 *  m_doc->m_drawingOctaveSize[staffSize];	// UT, note la plus grave
 
@@ -769,7 +1029,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	if (y_dec< 0)
 		y_dec = 0;
 
-	degres = y_dec /  m_doc->m_drawingHalfInterl[staffSize];	// ecart en degres (PITCHNAME_c..PITCHNAME_b) par rapport a UT1
+	degres = y_dec /  m_doc->m_drawingUnit[staffSize];	// ecart en degres (PITCHNAME_c..PITCHNAME_b) par rapport a UT1
 	octaves = degres / 7;
 	position = degres % 7;
 
@@ -779,7 +1039,7 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	return (code);
 }
 
-MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint center)
+Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
 {
     int distCenterX = (point.x - center.x);
     int distCenterY = (point.y - center.y);
@@ -789,7 +1049,7 @@ MusPoint CalcPositionAfterRotation( MusPoint point , float rot_alpha, MusPoint c
 	// angle d'origine entre l'axe x et la droite passant par le point et le centre
     float alpha = atan ( (float)distCenterX / (float)(distCenterY) );
     
-    MusPoint new_p = center;
+    Point new_p = center;
     int new_distCenterX, new_distCenterY;
 
     new_distCenterX = ( (int)( sin( alpha - rot_alpha ) * distCenter ) );
@@ -812,16 +1072,16 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     
     // the draw the scoreDef when required
     if (layer->GetDrawingClef()) {
-        DrawElement(dc, layer->GetDrawingClef(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingClef(), layer, staff, measure);
     }
     if (layer->GetDrawingKeySig()) {
-        DrawElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
     }
     if (layer->GetDrawingMensur()) {
-        DrawElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
     }
     if (layer->GetDrawingMeterSig()) {
-        DrawElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
+        DrawLayerElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
     }
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
@@ -910,16 +1170,16 @@ void View::DrawSystemChildren( DeviceContext *dc, Object *parent, System *system
 
 void View::DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system )
 {
-    Staff *staff = NULL;
+    MeasureElement *measureElement = NULL;
     EditorialElement *editorialElement = NULL;
     
     Object* current;
     for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
-        staff = dynamic_cast<Staff*>(current);
+        measureElement = dynamic_cast<MeasureElement*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
-        if (staff) {
-            DrawStaff( dc , staff, measure, system );
+        if (measureElement) {
+            DrawMeasureElement( dc , measureElement, measure, system );
         }
         else if (editorialElement) {
             DrawMeasureEditorialElement( dc , editorialElement, measure, system );
@@ -963,7 +1223,7 @@ void View::DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, S
         layerElement = dynamic_cast<LayerElement*>(current);
         editorialElement = dynamic_cast<EditorialElement*>(current);
         if (layerElement) {
-            DrawElement( dc, layerElement, layer, staff, measure );
+            DrawLayerElement( dc, layerElement, layer, staff, measure );
         }
         else if (editorialElement) {
             DrawLayerEditorialElement( dc , editorialElement, layer, staff, measure );

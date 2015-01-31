@@ -9,9 +9,6 @@
 #ifndef __VRV_IODARMS_H__
 #define __VRV_IODARMS_H__
 
-#include <string>
-#include <vector>
-
 //----------------------------------------------------------------------------
 
 #include "attdef.h"

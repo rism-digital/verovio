@@ -10,7 +10,7 @@
 
 //----------------------------------------------------------------------------
 
-#include <fstream>
+#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -18,7 +18,7 @@
 #include "doc.h"
 #include "glyph.h"
 #include "view.h"
-#include "vrvdef.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
@@ -96,10 +96,16 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
         return;
     }
     
-    //take care of width/height once userScale is updated
+    // take care of width/height once userScale is updated
     m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
     m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
     
+    // add the woff VerovioText font
+    std::string woff = Resources::GetPath() + "/woff.xml";
+    pugi::xml_document woffDoc;
+    woffDoc.load_file(woff.c_str());
+    m_svgNode.prepend_copy( woffDoc.first_child() );
+
     // header
     if (m_smufl_glyphs.size() > 0)
     {
@@ -173,9 +179,9 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
 {
  
     bool drawBoundingBox = false;
-    if (drawBoundingBox) //(view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
+    if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
-        SetPen( AxRED, 1, AxDOT_DASH );
+        SetPen( AxRED, 10, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasSelfBB() ) {
@@ -188,7 +194,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         }
         EndGraphic( object, NULL );
         
-        SetPen( AxBLUE, 1, AxDOT_DASH );
+        SetPen( AxBLUE, 10, AxDOT_DASH );
         StartGraphic( object, "bounding-box", "0");
         if ( object->HasContentBB() ) {
             this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
@@ -217,16 +223,6 @@ void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 
 void SvgDeviceContext::StartPage( )
 {
-    // a graphic for page (user) scaling
-    /*m_currentNode = m_currentNode.append_child("g");
-    m_currentNode.append_attribute("class") = "page-scale";
-    m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("transform") = StringFormat("scale(%f, %f)", m_userScaleX, m_userScaleY).c_str();*/
-    // a graphic for definition scaling
-    /*m_currentNode = m_currentNode.append_child("g");
-    m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute("class") = "definition-scale";
-    m_currentNode.append_attribute("transform") = "scale(0.1, 0.1)".c_str();*/
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
@@ -267,16 +263,6 @@ void SvgDeviceContext::SetBackgroundMode( int mode )
 {
     // nothing to do, we do not handle Background Mode
 }
-    
-void SvgDeviceContext::SetFont( FontMetricsInfo *font_info )
-{
-    m_font = *font_info;
-    //wxFont font( font_info->pointSize, (wxFontFamily)font_info->family, font_info->style,
-    //    (wxFontWeight)font_info->weight, font_info->underlined, font_info->faceName,
-    //    (wxFontEncoding)font_info->encoding );
-    //m_dc->SetFont( font );
-}
-            
 
 void SvgDeviceContext::SetTextForeground( int colour )
 {
@@ -300,44 +286,10 @@ void SvgDeviceContext::SetUserScale( double xScale, double yScale )
     m_userScaleY = yScale;
 }       
 
-void SvgDeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
+Point SvgDeviceContext::GetLogicalOrigin( ) 
 {
-    LogDebug("SvgDeviceContext::GetTextExtent not implemented");
+    return Point( m_originX, m_originY );
 }
-    
-// Copied from bBoxDc, TODO find another more generic solution
-void SvgDeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
-{
-    int x, y, partial_w, partial_h;
-    *w = 0;
-    *h = 0;
-    
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
-        wchar_t c = string[i];
-        Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph) {
-            continue;
-        }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-    
-        partial_w *= m_font.GetPointSize();
-        partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_font.GetPointSize();
-        partial_h /= glyph->GetUnitsPerEm();
-        
-        *w += partial_w;
-        *h += partial_h;
-    }
-}
-       
-
-MusPoint SvgDeviceContext::GetLogicalOrigin( ) 
-{
-    return MusPoint( m_originX, m_originY );
-}
-
-
 
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
@@ -405,20 +357,16 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     ye = yc - ry * sin (DegToRad(end)) ;
 
     ///now same as circle arc...
-
     double theta1 = atan2(ys-yc, xs-xc);
     double theta2 = atan2(ye-yc, xe-xc);
 
-    int fArc  ;                  // flag for large or small arc 0 means less than 180 degrees
+    int fArc  ;
+    // flag for large or small arc 0 means less than 180 degrees
     if ( (theta2 - theta1) > 0 ) fArc = 1; else fArc = 0 ;
 
     int fSweep ;
     if ( fabs(theta2 - theta1) > M_PI) fSweep = 1; else fSweep = 0 ;
 
-    // this version closes the arc
-    //s.Printf ( "<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d L %d %d z ",
-    //    int(xs), int(ys), int(rx), int(ry),
-    //    fArc, fSweep, int(xe), int(ye), int(xc), int(yc)  );
     pugi::xml_node pathChild = m_currentNode.append_child("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d",int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
 }
@@ -432,13 +380,16 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 }
  
                
-void SvgDeviceContext::DrawPolygon(int n, MusPoint points[], int xoffset, int yoffset, int fill_style)
+void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
+    assert( m_penStack.size() );
+    
     pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
     //if ( fillStyle == wxODDEVEN_RULE )
     //    polygonChild.append_attribute("style") = "fill-rule:evenodd;";
     //else
     polygonChild.append_attribute("style") = "fill-rule:nonzero;";
+    polygonChild.append_attribute("stroke-width") = StringFormat("%d", m_penStack.top().GetWidth()).c_str();
     
     std::string pointsString;
     for (int i = 0; i < n;  i++)
@@ -475,13 +426,11 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "width" ) = width;
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
-    rectChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
 
-        
-void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alignement)
+void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
-    
     std::string s;
     std::string anchor;
     
@@ -492,15 +441,48 @@ void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alig
         anchor = "middle";
     }
     
-    pugi::xml_node textChild = m_currentNode.append_child( "text" );
-    textChild.append_attribute( "x" ) = x;
-    textChild.append_attribute( "y" ) = y;
-    textChild.append_attribute( "dx" ) = 0;
-    textChild.append_attribute( "dy" ) = 0;
-    // HARDCODED
-    textChild.append_attribute( "style" ) = "font-family: Garamond, Georgia, serif; font-size: 360px;";
-    textChild.append_attribute( "text-anchor" ) = anchor.c_str();
+    m_currentNode = m_currentNode.append_child( "text" );
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute( "x" ) = x;
+    m_currentNode.append_attribute( "y" ) = y;
+    m_currentNode.append_attribute( "dx" ) = 0;
+    m_currentNode.append_attribute( "dy" ) = 0;
+    if ( !anchor.empty() ) {
+        m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
+    }
+    // font-size seems to be required in <text> in FireFox - however, we set it to 0px because otherwise we
+    // end up with spaces between tspan because of the linebreaks in the SVG. Needs to be investigated
+    m_currentNode.append_attribute("font-size") = StringFormat("0px").c_str();
+}
     
+void SvgDeviceContext::EndText()
+{
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
+        
+void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtext)
+{
+    assert( m_fontStack.top() );
+    
+    pugi::xml_node textChild = m_currentNode.append_child( "tspan" );
+    if ( !m_fontStack.top()->GetFaceName().empty() ) {
+        textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
+    }
+    if ( m_fontStack.top()->GetPointSize() != 0 ) {
+        textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
+    }
+    if ( m_fontStack.top()->GetStyle() != FONTWEIGHT_NONE ) {
+        if ( m_fontStack.top()->GetStyle() == FONTSTYLE_italic ) {
+            textChild.append_attribute("font-style") = "italic";
+        }
+        else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_normal ) {
+            textChild.append_attribute("font-style") = "normal";
+        }
+        else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_oblique ) {
+            textChild.append_attribute("font-style") = "oblique";
+        }
+    }
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 
@@ -508,53 +490,7 @@ void SvgDeviceContext::DrawText(const std::string& text, int x, int y, char alig
 
 void SvgDeviceContext::DrawRotatedText(const std::string& text, int x, int y, double angle)
 {
-    //known bug; if the font is drawn in a scaled DC, it will not behave exactly as wxMSW
-
-    std::string s;
-
-    // calculate bounding box
-    int w, h, desc;
-    //DoGetTextExtent(sText, &w, &h, &desc);
-    w = h = desc = 0;
-
-    //double rad = DegToRad(angle);
-
-    
-    //if (m_backgroundMode == AxSOLID)
-    //{
-    //    WriteLine("/*- SvgDeviceContext::DrawRotatedText - Backgound not implemented */") ;
-    //    WriteLine( text ) ;
-    //}
-
-    // For some reason, some browsers (e.g., Chrome) do not like spaces or dots in font names...
-    /*
-    sTmp.Replace(" ", "");
-    sTmp.Replace(".", "");
-    if (sTmp.Len () > 0)  s = s + "style=\"font-family: '" + sTmp + "'; ";
-    else s = s + "style=\" " ;
-
-    std::string fontweights [3] = { "normal", "lighter", "bold" };
-    s = s + "font-weight:" + fontweights[m_font.GetWeight() - wxNORMAL] + semicolon + space;
-
-    std::string fontstyles [5] = { "normal", "style error", "style error", "italic", "oblique" };
-    s = s + "font-style:" + fontstyles[m_font.GetStyle() - wxNORMAL] + semicolon  + space;
-
-    sTmp.Printf ("font-size:%dpt; ", (int)((double)m_font.GetPointSize() * 1) );
-    s = s + sTmp ;
-    // remove the color information because normaly already in the graphic element
-    //s = s + "fill:#" + wxColStr (m_textForegroundColour) + "; stroke:#" + wxColStr (m_textForegroundColour) + "; " ;
-    sTmp.Printf ( "stroke-width:0;\"  transform=\"rotate( %.2g %d %d )  \" >",  -angle, x,y ) ;
-    */
-    pugi::xml_node textChild = m_currentNode.append_child( "text" );
-    textChild.append_attribute( "x" ) = x;
-    textChild.append_attribute( "y" ) = y;
-    textChild.append_attribute( "dx" ) = 0;
-    textChild.append_attribute( "dy" ) = 0;
-    // HARDCODED
-    textChild.append_attribute( "style" ) = "font-family: Garamond, Georgia, serif; font-size: 36px;";
-    //textChild.append_attribute( "text-anchor" ) = anchor.c_str();
-    
-    textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
+    // TODO
 }
 
 std::string FilenameLookup(unsigned char c) {
@@ -564,6 +500,7 @@ std::string FilenameLookup(unsigned char c) {
 
 void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
 {
+    assert( m_fontStack.top() );
 
     int w, h, gx, gy;
         
@@ -592,17 +529,17 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         useChild.append_attribute( "xlink:href" ) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute( "x" ) = x;
         useChild.append_attribute( "y" ) = y;
-        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
-        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_font.GetPointSize()).c_str();
+        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         
         // Get the bounds of the char
         glyph->GetBoundingBox(&gx, &gy, &w, &h);
-        x += w * m_font.GetPointSize() / glyph->GetUnitsPerEm();
+        x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
     }
 }
 
 
-void SvgDeviceContext::DrawSpline(int n, MusPoint points[])
+void SvgDeviceContext::DrawSpline(int n, Point points[])
 {
 
 }

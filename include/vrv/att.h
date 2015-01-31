@@ -74,6 +74,12 @@ protected:
     
     std::string DurToStr(int data);
     int StrToDur(std::string value);
+    
+    std::string FontstyleToStr(data_FONTSTYLE data);
+    data_FONTSTYLE StrToFontstyle(std::string value);
+    
+    std::string FontweightToStr(data_FONTWEIGHT data);
+    data_FONTWEIGHT StrToFontweight(std::string value);
         
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);
@@ -107,6 +113,12 @@ protected:
     
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
+    
+    std::string TieToStr(data_TIE data);
+    data_TIE StrToTie(std::string value);
+    
+    std::string Tstamp2ToStr(typedef_TSTAMP2 data);
+    typedef_TSTAMP2 StrToTstamp2(std::string value);
     
     std::string WordPosToStr(data_WORDPOS data);
     data_WORDPOS StrToWordPos(std::string value);

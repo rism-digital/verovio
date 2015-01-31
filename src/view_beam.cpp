@@ -11,6 +11,8 @@
 //----------------------------------------------------------------------------
 
 #include <algorithm>
+#include <assert.h>
+#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -21,738 +23,496 @@
 #include "layerelement.h"
 #include "note.h"
 #include "staff.h"
+#include "style.h"
+#include "vrv.h"
 
 namespace vrv {
 
-/*
-#define BEAMEDIT 50	// code arbitraire identifiant la structure de debordement pour beams
-typedef struct BeamEdit {	
-    short iHauteur;
-    float fPente;
-} BeamEdit;
-*/
-//static BeamEdit BeamEd, *ptBeamEd;
-
-/*
-void traiteQueue (int *hautqueue, Element *chk)
-{	ptdebord = (Debord *)chk->pdebord;
-	ptdebord ++;	// pointe sur valeurs
-	ptBeamEd = (BeamEdit *)ptdebord;
-	*hautqueue += ptBeamEd->iHauteur;
-	return;
-}
-*/
-
-/* position x, pos. curseur yy, decalage y sous curseur, rayon de note;
-   collecte et calcule les donnees */
-
-#define NbFRACTURES 20		/* nombre de '+' possibles */
-#define NbREL 80		/* nombre de valeurs reliees possibles */
-#define MAX_MIF 20	/* nombre max de sous-groupes de beams */
-
-
-static struct coord {  float a;
-			float b;
-			unsigned vlr: 8;	/* valeur */
-			unsigned prov: 8;	/* ON si portee sup. */
-            LayerElement *chk;
-	     } 	crd[NbREL]; /* garde les coord.d'entree*/
-
-/**
- * This structure is used for calculating the beam internally.
-*/
-struct BeamFlag {	unsigned beam_chrd:3;	/* retournee par beam() a input() */
-		unsigned beamchrd:3;	/* accord() et note() */
-		unsigned inpt:1;	/* usage in input(),beam(),accord() */
-		unsigned markchrd:1;	/* in beam() */
-        unsigned niaf:8;
+// maximum number of elements allowed in a beam
+#define MAX_ELEMENTS_IN_BEAM 80
+// maximum number of partials allow
+#define MAX_DURATION_PARTIALS 10
+    
+enum  {
+    PARTIAL_NONE = 0,
+    PARTIAL_THROUGH,
+    PARTIAL_RIGHT,
+    PARTIAL_LEFT
 };
-struct BeamFlag bch;
-double sy_up = 0.0;
-float hauteurBarreMoyenne = 3.0;
-double dA, dB;
 
-/* This need to be put into a beam class */
+struct BeamElementCoord {
+    int x;
+    int y; // represents the point farthest from the beam
+    int yTop; // y value of topmost note
+    int yBottom; // y value of bottom-most note
+    int yBeam; // y value of stem top position
+    int dur; // drawing duration
+    int breaksec;
+    char partialFlags[MAX_DURATION_PARTIALS];
+    LayerElement *element;
+};
 
 void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff )
 {
-    LayerElement *chk;
-	static struct fb {
-		unsigned _liaison : 1;	/* temoin pour liaison: si ON, il y a
-							   de la liaison dans l'air et beam doit
-							   doit appeler liaison_note. Cfr.liais_note()*/
-		unsigned mrq_port : 2;	/* ON si changement in yy; necessaire
-								pour decider beams lorsque 2 portees */
-		unsigned mq_val   : 1;	/* marqueur de changement de valeur*/
-		unsigned fl_cond : 1;	/* flags concernant partage portees */
-		unsigned flsht    : 3;	/* garde le pnt->_shport */
-		unsigned _grp	  : 1;	/* marqueur de groupes rythmiques */ // unused in Verovio
-        data_STEMDIRECTION dir	  : 3;	/* marqueur direction queues */
-	}	fb;
-	int iHauteur=0;
-	float fPente = 0.0;
-	int ct;			/* compteur d'entree */
-	int _ct;		/* compte d'entree moins 1 */
-	int cpte_stop;	/* compteur de st_rl */
-	unsigned st_rl[NbFRACTURES];	/* garde les ruptures de beams */
-	int _yy[2];		/* garde dernier yy pour test mrq_port*/
-	static int _ybeam[NbREL];	/* garde les sommets de queues  */
-	int shortest, valref;	/* garde valeur la plus breve
-				* m_dur. de reference */
-	double high;
-	double low;		/* gardent les y extremes */
-	double dx[2];			/* rayon / 2 */
-	double y_moy;		/* calcul de moyenne y pour dir */
-	double s_x=0.0, s_y=0.0, s_xy=0.0, s_x2=0.0, s_y2=0.0;	/* sommes pour la regress. */
-	double xr;				/* variables de travail */
-	double delt_y, barre_y, ecart, y1;
-	double sy_dec_moy, sy_dec[2];
-	double fbarre_y;
-	int mx_i[MAX_MIF], mx_f[MAX_MIF], my_i[MAX_MIF], my_f[MAX_MIF];
-	char m_i[MAX_MIF];	/* pour stocker les prov des marqueurs */
-	int fx1,fx2,fy1,fy2;		/* coord. */
-	float milieu;
+    LayerElement *current;
+    
+    BeamElementCoord beamElementCoord[MAX_ELEMENTS_IN_BEAM]; /* garde les coord.d'entree*/
 
-	int i, j, t, h, k, si;		/* compteurs de boucles */
-	int _mif, decalage;
-	int valtest;			/* travail */
-	int apax;	 	/* test pour valeur breve isolee en debut  de groupes */
-	//int provshp=0;
-	int deltabar, deltanbbar, deltablanc;
-	
-    beam->ResetList( beam );
+	bool changingDur = OFF;
+    bool beamHasChord = OFF;
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    
+    // position variables
+    int high, low, yExtreme;
+    int verticalCenter;
+    
+    double verticalShiftFactor = 3.0;
+    
+    // For slope calculation and linear regression
+    double verticalBoost = 0.0;
+    double s_x=0.0; //sum of all x(n) for n in beamElementCoord
+    double s_y=0.0; //sum of all y(n)
+    double s_xy=0.0; //sum of (x(n) * y(n))
+    double s_x2=0.0; //sum of all x(n)^2
+    double s_y2=0.0; //sum of all y(n)^2
+    double startingY, beamSlope; //startingY is the initial position of the beam, beamSlope is the slope
+    
+    // position in the beam element list
+	int elementCount, last;
+    
+    // duration variables
+	int shortestDur, lastDur, currentDur, testDur;
+
+    // position x for the stem (normal and cue size)
+	int dx[2];
+    
+    // temporary coordinates
+    int fx1,fx2,fy1,fy2;
+    
+    // temporary variables
+	int avgY, shiftY, barY, verticalShift, y1, fullBars, polygonHeight;
+    double xr;
+
+    // loops
+	int i, j;
+    
+    // beam bar sizes
+	int beamWidth, beamWidthBlack, beamWidthWhite;
+
+    
+    /******************************************************************/
+    // initialization
+    
+    shortestDur = 0;
+    lastDur = elementCount = 0;
+    high = avgY = verticalBoost = 0.0;
+    
+    verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingDoubleUnit[staff->staffSize] * 2); //center point of the staff
+    yExtreme = verticalCenter; //value of farthest y point on the staff from verticalCenter minus verticalCenter; used if beamHasChord = ON
+
+    ListOfObjects* beamChildren = beam->GetList(beam);
     
     // Should we assert this at the beginning?
-    if (beam->m_list.empty())
+    if (beamChildren->empty()) {
         return;
-    
-    // chk point to the first Note in the layed out layer
-    chk = dynamic_cast<LayerElement*>(beam->m_list.front());
-    
-    //	bch.markchrd = shortest = fb.mq_val = valref = ct = cpte_stop = fb.mrq_port = OFF;
-	bch.markchrd = 0;
-	shortest = 0;
-	fb.mq_val = 0;
-	valref = ct = cpte_stop = 0;
-	fb.mrq_port = OFF;
-	high = y_moy = sy_up = sy_dec_moy = 0.0;
-	for (i=0; i<NbFRACTURES; i++)
-		st_rl[i] = 0;
-	/***if (e_t->_shport) { provshp = e_t->_shport; shportee (0);}***/
-		/* retablir a la fin si provshp existe */
-
-	low = chk->GetDrawingY();	/* initialiser */
-    k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->GetDur()+1 : ((Note*)chk)->GetDur();
-    
-	valref = k;		/* m_dur test conservee */
-    //	valref = chk->m_dur;		/* m_dur test conservee */
-	fb.flsht = 0;
-
-	if (staff->notAnc) {
-		dx[0] = dx[1] = 0.0;
-    } 
-    else
-    {	
-        dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0];
-        dx[1] =  m_doc->m_drawingNoteRadius[staff->staffSize][1];
-        dx[0] -= (m_doc->m_env.m_stemWidth)/2;
-        dx[1] -= (m_doc->m_env.m_stemWidth)/2;
     }
-	_yy[0] = staff->GetDrawingY();
-
-    ListOfObjects::iterator iter = beam->m_list.begin();
     
-	do
-	{
+    assert( beamChildren->size() < MAX_ELEMENTS_IN_BEAM );
+    
+    // current point to the first Note in the layed out layer
+    current = dynamic_cast<LayerElement*>(beamChildren->front());
+    // Beam list should contain only DurationInterface objects
+    assert( dynamic_cast<DurationInterface*>(current) );
+    
+	low = current->GetDrawingY();
+    lastDur = dynamic_cast<DurationInterface*>(current)->GetDur();
+    
+    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+    dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0] - (m_doc->m_style->m_stemWidth)/2;
+    dx[1] =  m_doc->m_drawingNoteRadius[staff->staffSize][1] - (m_doc->m_style->m_stemWidth)/2;
+    
+    /******************************************************************/
+    // Populate BeamElementCoord for each element in the beam
+    
+    ListOfObjects::iterator iter = beamChildren->begin();
+	do {
+        // Beam list should contain only DurationInterface objects
+        assert( dynamic_cast<DurationInterface*>(current) );
         
-        //LogDebug("-> %s", chk->GetClassName().c_str() );
+        currentDur = dynamic_cast<DurationInterface*>(current)->GetDur();
         
-        if ( chk->IsNote() ) {
-            k = ((Note*)chk)->GetColored()==BOOLEAN_true ? ((Note*)chk)->GetDur()+1 : ((Note*)chk)->GetDur();
+        if ( current->IsChord() ) {
+            beamHasChord = true;
         }
 
-        // if (chk->type == NOTE && /*chk->sil == _NOT &&*/ k > DUR_4)
-		if (k > DUR_4)
-        {
-			(crd+ct)->chk = chk;
-			/* garantir uniformite des flags */
-
-			/***if (!fb.mrq_port && chk->_shport) {
-				fb.mrq_port = chk->_shport;
-            }***/
-
-            (crd+ct)->a = chk->GetDrawingX(); // - m_doc->m_env.m_stemWidth / 2;		/* enregistrement des coord. */
-			(crd+ct)->vlr = k;
-			if (chk->IsNote() && ((Note*)chk)->GetBreaksec() && ct)
-                /* enregistr. des ruptures de beaming; des la 2e note;(autrement idiot)*/
-				*(st_rl + (cpte_stop++)) = ct;
-
-			/***if (extern_q_auto && chk->chord)
-			{	bch.markchrd=ON;
-				fb.flsht = fb.flsht ? fb.flsht : chk->_shport;
-			}***/
-            if (chk->IsNote())	// Žviter de prendre en compte silences
-            {
-                shortest = std::max(k,shortest);
-                if (!fb.mq_val && k != valref) fb.mq_val = ON; /* plus d'une valeur est presente*/
-                valref = std::min(k,valref);
+        // Can it happen? With rests?
+		if (currentDur > DUR_4) {
+			beamElementCoord[elementCount].element = current;
+            beamElementCoord[elementCount].x = current->GetDrawingX();
+			beamElementCoord[elementCount].dur = currentDur;
+            
+            // Look at beam breaks
+            beamElementCoord[elementCount].breaksec = 0;
+            AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary*>(current);
+            if ( elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
+                if (!changingDur) changingDur = ON;
+                beamElementCoord[elementCount].breaksec = beamsecondary->GetBreaksec();
             }
-			ct++;
+            
+            // Skip rests
+            if (current->IsNote() || current->IsChord()) {
+                // keep the shortest dur in the beam
+                shortestDur = std::max(currentDur,shortestDur);
+                // check if we have more than duration in the beam
+                if (!changingDur && currentDur != lastDur) changingDur = ON;
+                lastDur = currentDur;
+            }
+			elementCount++;
 		}
         
         iter++;
-        if (iter == beam->m_list.end()) {
+        if (iter == beamChildren->end()) {
             break;
         }
-        
-        chk = dynamic_cast<LayerElement*>(*iter);
-		if (chk == NULL) { 
+        current = dynamic_cast<LayerElement*>(*iter);
+		if (current == NULL) {
+            LogDebug("Error accessing element in Beam list");
             return;
         }
         
 	}	while (1);
 
-    // SECURITE : EVITER DE BARRER UN ACCORD ISOLE...
-/*	if (chk->IsNote() && (((Note*)chk)->m_chord & CHORD_TERMINAL)  && (chk->m_drawingX == layer->beamListPremier->m_drawingX))
-	{	chk = layer->beamListPremier;
-		do {	
-                ((Note*)chk)->m_beam[0] = 0;
-				chk = layer->GetNext(chk);
-			}	while (chk && chk->IsNote() && !((Note*)chk)->m_chord & CHORD_TERMINAL);
-		layer->beamListPremier = NULL;
-		return;
-	}
-*/
+
+	last = elementCount - 1;
     
-    //LogDebug("ct %d", ct );
-
-	_ct = ct - 1;		/* compte d'entree moins 1 */
-
-	/* ici, verifier la provenance (haut/bas) des queues en cas de
-		partage entre portees, et repasser la liste */
-    /***
-	if (fb.mrq_port)
-	// le y le plus haut est dans _yy[0] 
-	{	if (fb.mrq_port==1)
-		{	_yy[0] = (this != phead) ? staff->ptr_pp->m_drawingY : staff->m_drawingY; 
-			_yy[1] = staff->m_drawingY;
-		}
-		else
-		{	_yy[1] = (this != ptail) ? staff->ptr_fp->m_drawingY : staff->m_drawingY; 
-			_yy[0] = staff->m_drawingY;
-		}
-	}
-    ***/
+    /******************************************************************/
+    // Calculate the extreme values
     
-	for (i = 0; i < ct; i++)
-	{	switch (fb.mrq_port)
-		{
-            case 0: crd[i].prov = OFF;
-					(crd+i)->b = crd[i].chk->GetDrawingY();
-					break;
-            /**
-			case 1: if (crd[i].chk->m_staffShift)
-					{	crd[i].prov = ON;
-						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[0];
-					}
-					else
-					{	crd[i].prov = OFF;
-						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[1];
-					}
-					break;
-			case 2: if (crd[i].chk->m_staffShift)
-					{	crd[i].prov = OFF;
-						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[1];
-					}
-					else
-					{	crd[i].prov = ON;
-						(crd+i)->b = crd[i].chk->m_drawingYRel + _yy[0];
-					}
-             **/
-		}
-		high= std::max((double)(crd+i)->b,high);		/* enregistrement des extremes */
-		low = std::min((double)(crd+i)->b,low);
-        /* lie au choix, plus bas, d'introduire l'accelerateur pour sy_up...
-        if ((crd+i)->b==high) highIndice = i;
-        if ((crd+i)->b==low) lowIndice = i;
-        */
-		y_moy += crd[i].b;
-	}
-    /***
-	if (provshp)
-		shportee (provshp);
-    ***/
-    
-	if (ct<2) {
-        //layer->beamListPremier = NULL;
-		return;		/* test erreur input */
-    }
+    int yMax = 0, yMin = 0;
+    int curY;
+    // elementCount holds the last one
+	for (i = 0; i < elementCount; i++) {
 
-
-	fb.dir = layer->GetDrawingStemDir();
-	if (!fb.mrq_port)
-	{	
-        milieu = _yy[0] - (m_doc->m_drawingInterl[staff->staffSize] * 2);
-		y_moy /= ct;
-        if (fb.dir == STEMDIRECTION_NONE) {
-            if ( y_moy <  milieu ) fb.dir = STEMDIRECTION_up;
-            else fb.dir = STEMDIRECTION_down;
-        }
-	}
-
-    if (crd[_ct].chk->m_cueSize == false)
-    {
-        deltanbbar = m_doc->m_drawingBeamWidth[staff->staffSize];
-        deltablanc = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
-    }
-    else
-    {	deltanbbar = std::max(2, (m_doc->m_drawingBeamWidth[staff->staffSize]/2));
-        deltablanc = std::max(2, (m_doc->m_drawingBeamWhiteWidth[staff->staffSize]-1));
-    }
-	deltabar = deltanbbar + deltablanc;
-
-
-    /* Calcul des sommes et facteurs s_y, s_xy necessaires a la regression.
-    La regression se base sur les sommets des queues, calcul‚s en ajoutant un
-    ‚cart standard fonction de la valeur la plus breve enregistree. Direction
-    connue, donc ajout ou retrait de l'ecart, et correction du x d'origine en
-    fonction de la direction.*/
-
-    /***
-    if (crd[_ct].chk->existDebord)
-    {	ptdebord = (Debord *)chk->pdebord;
-        ptdebord ++;	// pointe sur valeurs
-        ptBeamEd = (BeamEdit *)ptdebord;
-        iHauteur = ptBeamEd->iHauteur;
-        fPente = ptBeamEd->fPente;
-        BeamEd = *ptBeamEd;
-    }
-    else ***/
-    {	
-        iHauteur = 0;
-        fPente = 0.0;
-    }
-
-    /***
-	if (fb.mrq_port && extern_q_auto)
-	// deux portees concernees (partage), en mode automatique 
-	{	ecart = e_t->m_doc->m_drawingInterl[staff->staffSize]*6;
-		for (i=0; i<ct; i++)
-		{	if ((crd+i)->prov)
-			{	(crd+i)->a -= dx[crd[i].chk->dimin];
-				*(_ybeam+i) = crd[i].b - ecart;
-				crd[i].chk->m_stemDir = 0;
-			}
-			else
-			{	(crd+i)->a += dx[crd[i].chk->dimin];
-				*(_ybeam+i) = crd[i].b + ecart;
-				crd[i].chk->m_stemDir = 1;
-			}
-			s_y += _ybeam[i];
- 			s_x += crd[i].a;
-			s_x2 += crd[i].a * crd[i].a;
-			s_xy += crd[i].a * _ybeam[i];
-		}
-	}
-	else ***/
-    
-	// une seule portee; on tient compte de la direction precedemment calculee*/
-	{	
-        ecart = ((shortest-DUR_8)*(deltabar));
-
-		if (crd[_ct].chk->m_cueSize)
-			ecart += m_doc->m_drawingHalfInterl[staff->staffSize]*5;
-		else
-        //   Le 24 Septembre 1993: obtenir des DUR_8 reliees a la hauteur des separees 
-			ecart += (shortest > DUR_8) ? m_doc->m_drawingInterl[staff->staffSize]*hauteurBarreMoyenne : m_doc->m_drawingInterl[staff->staffSize]*(hauteurBarreMoyenne+0.5);
-
-		if (fb.dir == STEMDIRECTION_down)
-		{
-            dx[0] = - dx[0];
-			dx[1] = - dx[1];
-		}
-        /***
-        if (crd[_ct].chk->existDebord) {
-        ecart = m_doc->m_drawingInterl[0]*2;
-            if (!fb.mrq_port) extern_q_auto= 0;
-        }
-        ***/
-
-		ecart = (fb.dir == STEMDIRECTION_up ? ecart : -ecart);
-
-		y_moy += ecart;
-        if ((fb.dir == STEMDIRECTION_up && y_moy <  milieu) || (fb.dir == STEMDIRECTION_down && y_moy > milieu)) {
-			ecart += milieu-y_moy;
-        }
-
-		for (i=0; i<ct; i++)
-		{
-            *(_ybeam+i) = crd[i].b + ecart;
-			(crd+i)->a +=  dx[crd[i].chk->m_cueSize];
-			s_y += _ybeam[i];
- 			s_y2 += _ybeam[i] * _ybeam[i];
-			s_x += crd[i].a;
-			s_x2 += crd[i].a * crd[i].a;
-			s_xy += crd[i].a * _ybeam[i];
-            if ( crd[i].chk->IsNote() ) {
-                ((Note*)crd[i].chk)->m_drawingStemDir = fb.dir;
-            }
-		}
-
-	}
-
-	y1 = ct * s_xy - s_x * s_y;
-	xr = ct * s_x2 - s_x * s_x;
-
-	if (y1 && xr)	// securite: eviter division par 0 si deux x identiques
-		dB = y1 / xr;
-	else
-		dB = 0.0;
-	/* Correction esthetique : */
-	if (fabs(dB) < m_doc->m_drawingBeamMinSlope ) dB = 0.0;
-	if (fabs(dB) > m_doc->m_drawingBeamMaxSlope ) dB = (dB>0) ? m_doc->m_drawingBeamMaxSlope : - m_doc->m_drawingBeamMaxSlope;
-	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
-
-if (fPente)
-	dB += fPente;
-
-	dA = (s_y - dB * s_x) / ct;
-
-
-	h = cpte_stop ? 1 : (!fb.mq_val ? (shortest - DUR_4) : 1); /***((fb.mrq_port && extern_q_auto)?(valref-DUR_4):1));***/
-		/* nombre de barres a dessiner */
-
-
-	/* flag condition: pour eviter tests complexes repetes in boucles;
-	 * concerne les cas de partages entre portees. Vrai si pas de stop-rel
-	 * (i.e. possibilite de plusieurs barres communes traversantes) */
-
-	fb.fl_cond = OFF;
-
-    /***
-	if (fb.mrq_port && extern_q_auto)
-		fb.fl_cond = ON;	// independamment de mq_val
-    ***/
-
-	if (fb.fl_cond)
-	/*valeur pour allonger queues si partage entre portees et mode autom.*/
-	{
-		i = deltabar * h - deltablanc;	/* nombre de points de dec */
-		j = i / 2;
-		sy_dec[0] = j;
-		sy_dec[1] = -sy_dec[0];
-
-		if ( i % 2)
-			sy_dec[1] -= 1;
-		sy_dec_moy = sy_dec[0] + abs (sy_dec[1]);
-	}
-
-    if (iHauteur)
-        dA += iHauteur;
-
-	/* calcul du ybeam des queues */
-	for ( i=0; i<ct; i++ )
-	{	xr = *(_ybeam+i);	/* xr, variable de travail */
-		*(_ybeam+i)= dA + sy_up + dB * crd[i].a;
-		if (fb.fl_cond)
-			*(_ybeam+i) += sy_dec [crd[i].prov];
-		
-		/* test pour garantir l'absence de recoupement */
-        if (!iHauteur)
-            if (!fb.mrq_port)
-            {	if ((fb.dir == STEMDIRECTION_up && xr > *(_ybeam+i)) || (fb.dir == STEMDIRECTION_down && xr < *(_ybeam+i)))
-                {
-                    sy_up += xr - *(_ybeam+i);
-                    i = -1;	/* on refait la boucle avec un sy_up */
-                }
-            }	
-
-
-	}
-
-	/* dessin de la barre pilote et des queues */
-
-	for (i=0; i<ct; i++)
-	{
-		if (fb.fl_cond)	/* esth: eviter que queues depassent barres */
-		{	if (crd[i].prov)	/* venant du haut, m_stemDir en bas */
-			{	/***fy1 = *(_ybeam+i)+v_pnt;***/	/* on raccourcit m_stemDir */
-				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
-			}
-			else
-			{	/***fy1 = *(_ybeam+i)-e_t->v_pnt;***/	/* on allonge m_stemDir */
-				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
-			}
-		}
-		else	// on tient compte de l'‚paisseur qui fait des "bosses"
-		{	if (fb.dir == STEMDIRECTION_up)	// m_stemDir en haut
-			{	fy1 = *(_ybeam+i) - m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b+m_doc->m_drawingHalfInterl[staff->staffSize]/4;
-                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
-                crd[i].chk->m_drawingStemStart.y = fy2;
-                crd[i].chk->m_drawingStemEnd.y = fy1;
-                crd[i].chk->m_drawingStemDir = true;
-			}
-			else
-			{	fy1 = *(_ybeam+i) + m_doc->m_env.m_stemWidth;
-				fy2 = crd[i].b-m_doc->m_drawingHalfInterl[staff->staffSize]/4;
-                crd[i].chk->m_drawingStemStart.x = crd[i].chk->m_drawingStemEnd.x = crd[i].a;
-                crd[i].chk->m_drawingStemStart.y = fy2;
-                crd[i].chk->m_drawingStemEnd.y = fy1;
-                crd[i].chk->m_drawingStemDir = false;
-			}
-		}
-		if ((crd+i)->chk->IsNote())
-		{	
-            DrawVerticalLine (dc,fy2, fy1, crd[i].a, m_doc->m_env.m_stemWidth);
+        if (dynamic_cast<Chord*>(beamElementCoord[i].element)) {
+            dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(verticalCenter, &yMax, &yMin);
+            beamElementCoord[i].yTop = yMax;
+            beamElementCoord[i].yBottom = yMin;
             
-// ICI, bon endroit pour enfiler les STACCATOS - ne sont traités ici que ceux qui sont opposés à la tête (les autres, in wgnote.cpp)
-			//if (((Note*)(crd+i)->chk)->m_artic
-			//	 && (!((Note*)(crd+i)->chk)->m_chord || (((Note*)(crd+i)->chk)->m_chord & CHORD_TERMINAL)))
-			// les cas non traités par note()
-/*			{	if (fb.dir == STEMDIRECTION_up || (fb.mrq_port && m_stemLen && !crd[i].prov))
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
-				else
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
-			}
-*/
-			{	
-                /***if (fb.mrq_port && extern_q_auto)
-				{	if (crd[i].prov)
-						putStacc (dc,crd[i].a+dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
-					else
-						putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
-				}
-				else if (fb.dir == STEMDIRECTION_up)
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1+e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, 0,crd[i].chk->typStac);
-				else
-					putStacc (dc,crd[i].a-dx[crd[i].chk->dimin],fy1-e_t->m_doc->m_drawingInterl[staff->staffSize]-staff->m_drawingY, -1,crd[i].chk->typStac);
-                ***/
-			}
-
-		}
-
+            avgY += beamElementCoord[i].y + ((yMax - yMin) / 2);
+            
+            // highest and lowest value;
+            high= std::max(yMax, high);
+            low = std::min(yMin, low);
+        }
+        else {
+            beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
+            
+            // highest and lowest value;
+            high= std::max(beamElementCoord[i].y, high);
+            low = std::min(beamElementCoord[i].y, low);
+            
+            curY = beamElementCoord[i].element->GetDrawingY();
+            beamElementCoord[i].y = curY;
+            beamElementCoord[i].yTop = curY;
+            beamElementCoord[i].yBottom = curY;
+            avgY += beamElementCoord[i].y;
+        }
 	}
+    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
+    
+    avgY /= elementCount;
 
-    // NOUVEAU
-    // Correction des positions x extremes en fonction de l'‚paisseur des queues
-	(*crd).a -= (m_doc->m_env.m_stemWidth-1) / 3;
-	(crd+_ct)->a += (m_doc->m_env.m_stemWidth-1) / 3;
+    /******************************************************************/
+    // Set the stem direction
+    
+    stemDir = layer->GetDrawingStemDir(); //force layer direction if it exists
+    if (stemDir == STEMDIRECTION_NONE) {
+        if (beamHasChord) stemDir = (yExtreme > verticalCenter ? STEMDIRECTION_down : STEMDIRECTION_up); //if it has a chord, go by the most extreme position
+        else if ( avgY <  verticalCenter ) stemDir = STEMDIRECTION_up; //otherwise go by average
+        else stemDir = STEMDIRECTION_down;
+    }
+    
+    if (stemDir == STEMDIRECTION_down) { //set stem direction for all the notes
+        for (i = 0; i < elementCount; i++) {
+            beamElementCoord[i].y = beamElementCoord[i].yTop;
+        }
+    }
+    else {
+        for (i = 0; i < elementCount; i++) {
+            beamElementCoord[i].y = beamElementCoord[i].yBottom;
+        }
+    }
 
-	delt_y = (fb.dir == STEMDIRECTION_down || fb.fl_cond ) ? 1.0 : -1.0;
-	/* on choisit une direction pour faire le premier paquet horizontal */
+    if (beamElementCoord[last].element->m_cueSize == false)  {
+        beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
+        beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
+    }
+    else {
+        beamWidthBlack = std::max(2, (m_doc->m_drawingBeamWidth[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen));
+        beamWidthWhite = std::max(2, (m_doc->m_drawingBeamWhiteWidth[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen));
+    }
+    
+	beamWidth = beamWidthBlack + beamWidthWhite;
 
-	fy1 = *_ybeam; fy2 = *(_ybeam+_ct);
+    /******************************************************************/
+    // Calculate the slope doing a linear regression
+    
+    // The vertical shift depends on the shortestDur value we have in the beam
+    verticalShift = ((shortestDur-DUR_8)*(beamWidth));
+
+    //if the beam has smaller-size notes
+    if (beamElementCoord[last].element->m_cueSize) {
+        verticalShift += m_doc->m_drawingUnit[staff->staffSize]*5;
+    }
+    else {
+        verticalShift += (shortestDur > DUR_8) ?
+            m_doc->m_drawingDoubleUnit[staff->staffSize] * verticalShiftFactor :
+            m_doc->m_drawingDoubleUnit[staff->staffSize] * (verticalShiftFactor + 0.5);
+    }
+    
+    // swap x position and verticalShift direction with stem down
+    if (stemDir == STEMDIRECTION_down) {
+        dx[0] = -dx[0];
+        dx[1] = -dx[1];
+        verticalShift = -verticalShift;
+    }
+    
+    for (i=0; i<elementCount; i++)
+    {
+        //change the stem dir for all objects
+        if ( beamElementCoord[i].element->IsNote() ) {
+            ((Note*)beamElementCoord[i].element)->m_drawingStemDir = stemDir;
+            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+        }
+        
+        else if ( beamElementCoord[i].element->IsChord() ) {
+            ((Chord*)beamElementCoord[i].element)->m_drawingStemDir = stemDir;
+            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+        }
+        
+        else {
+            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+        }
+        
+        if (stemDir == STEMDIRECTION_up && beamElementCoord[i].yTop > staff->GetDrawingY()) {
+            beamElementCoord[i].yBeam += beamElementCoord[i].yTop - staff->GetDrawingY() + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
+        }
+        else if (stemDir == STEMDIRECTION_down && beamElementCoord[i].yBottom < (staff->GetDrawingY() - staff->m_drawingHeight)) {
+            beamElementCoord[i].yBeam -= (staff->GetDrawingY() - staff->m_drawingHeight) - beamElementCoord[i].yBottom + (beamElementCoord[i].yTop - beamElementCoord[i].yBottom) / 2;
+        }
+        
+        beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
+        
+        s_y += beamElementCoord[i].yBeam;
+        s_y2 += beamElementCoord[i].yBeam * beamElementCoord[i].yBeam;
+        s_x += beamElementCoord[i].x;
+        s_x2 += beamElementCoord[i].x * beamElementCoord[i].x;
+        s_xy += beamElementCoord[i].x * beamElementCoord[i].yBeam;
+    }
 
 
-	if (fb.fl_cond)
-    /* reequilibrage du tir horizontal: on aligne les beams sur les queues
-        qui ont ete allongees selon leur direction pour couvrir l'epaisseur */
+	y1 = elementCount * s_xy - s_x * s_y;
+	xr = elementCount * s_x2 - s_x * s_x;
 
+    // Prevent division by 0
+    if (y1 && xr) {
+		beamSlope = y1 / xr;
+    }
+    else {
+		beamSlope = 0.0;
+    }
+    
+	/* Correction esthetique : */
+	if (fabs(beamSlope) < m_doc->m_drawingBeamMinSlope ) beamSlope = 0.0;
+	if (fabs(beamSlope) > m_doc->m_drawingBeamMaxSlope ) beamSlope = (beamSlope > 0) ? m_doc->m_drawingBeamMaxSlope : - m_doc->m_drawingBeamMaxSlope;
+	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
+    
+	startingY = (s_y - beamSlope * s_x) / elementCount;
+
+    /******************************************************************/
+    // Calculate the stem lengths and draw them
+
+    double oldYPos; //holds y position before calculation to determine if beam needs extra height
+    double expectedY;
+	for ( i=0; i<elementCount; i++ ) {
+        oldYPos = beamElementCoord[i].yBeam;
+		expectedY = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
+		
+        //if the stem is not long enough, add extra stem length needed to all members of the beam
+        if ((stemDir == STEMDIRECTION_up && oldYPos > expectedY) || (stemDir == STEMDIRECTION_down && oldYPos < expectedY)) {
+            verticalBoost += oldYPos - expectedY;
+        }
+	}
+    
+    for (i=0; i<elementCount; i++)
+    {
+		beamElementCoord[i].yBeam = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
+    }
+        
+	for (i=0; i<elementCount; i++)
 	{
-		if (!crd[0].prov) fy1 -=  sy_dec_moy;
-		if (!crd[_ct].prov) fy2 -= sy_dec_moy;
+        if (stemDir == STEMDIRECTION_up) {
+            fy1 = beamElementCoord[i].yBeam - m_doc->m_style->m_stemWidth;
+            fy2 = beamElementCoord[i].y + m_doc->m_drawingUnit[staff->staffSize]/4;
+        }
+        else {
+            fy1 = beamElementCoord[i].yBeam + m_doc->m_style->m_stemWidth;
+            fy2 = beamElementCoord[i].y - m_doc->m_drawingUnit[staff->staffSize]/4;
+        }
+        
+        beamElementCoord[i].element->m_drawingStemStart.x = beamElementCoord[i].element->m_drawingStemEnd.x = beamElementCoord[i].x;
+        beamElementCoord[i].element->m_drawingStemStart.y = fy2;
+        beamElementCoord[i].element->m_drawingStemEnd.y = fy1;
+        beamElementCoord[i].element->m_drawingStemDir = false;
+        
+        if(beamElementCoord[i].element->IsNote() || beamElementCoord[i].element->IsChord())
+            DrawVerticalLine (dc,fy2, fy1, beamElementCoord[i].x, m_doc->m_style->m_stemWidth);
 	}
 
-	fx1 = (*crd).a; fx2 = (crd+_ct)->a;
+    /******************************************************************/
+    // Draw the beam full bars
+    
+    // Number of bars to draw - if we do not have changing values, draw
+    // the number of bars according to the shortestDur value. Otherwise draw
+    // only one bar and the others will be drawn separately.
+    fullBars =  !changingDur ? (shortestDur - DUR_4) : 1;
+    
+    // Adjust the x position of the first and last element for taking into account the stem width
+	beamElementCoord[0].x -= (m_doc->m_style->m_stemWidth) / 2;
+	beamElementCoord[last].x += (m_doc->m_style->m_stemWidth) / 2;
 
+    // Shift direction
+	shiftY = (stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
 
-	/* dessin des barres supplementaires jusqu'a concurrence de la valeur
-	 *  minimum commune a tout le groupe: i.e. une seule s'il y a des "stoprel"
-	 *  (fragmentation de beaming), ou sinon valref (ou h).
-	*/
-	/* chk->cone est le flag des cones d'acc. et ralent. */
-	//s_y = crd[0].chk->cone ? 0.0 : delt_y; // removed in ax2
-	//s_y2 = (crd+_ct)->chk->cone ? 0.0 : delt_y; // removed in ax2
-	s_y = delt_y; // removed in ax2
-	s_y2 = delt_y; // removed in ax2
+	fy1 = beamElementCoord[0].yBeam;
+    fy2 = beamElementCoord[last].yBeam;
 
-	for (j=0; j<h ; j++)
+	fx1 = (*beamElementCoord).x;
+    fx2 = (beamElementCoord+last)->x;
+
+	s_y = shiftY;
+	s_y2 = shiftY;
+    
+    // For acc and rit beam (see AttBeamingVis set
+    // s_y = 0 and s_y2 = 0 respectively
+
+	for (j=0; j<fullBars ; j++)
 	{
-		decalage = deltanbbar*delt_y;
-        DrawObliqueLine (dc,fx1,fy1,fx2,fy2, decalage /***, workColor2***/);
-		fy1 += decalage; fy2 += decalage;
+		polygonHeight = beamWidthBlack*shiftY;
+        DrawObliquePolygon (dc,fx1,fy1,fx2,fy2, polygonHeight);
+		fy1 += polygonHeight; fy2 += polygonHeight;
 
-/* ici, redescendre  de l'epaisseur de la barre s'il y a accele */
-		if (!s_y)
-			fy1 += (deltanbbar * delt_y) * -1;
-		else
-			fy1 += s_y*deltablanc;
-		if (!s_y2)
-			fy2 += (deltanbbar * delt_y) * -1;
-		else
-			fy2 += s_y2*deltablanc;
+        // s_y must == 0 for accelerando beams
+		if (!s_y) fy1 += (beamWidthBlack * shiftY) * -1;
+		else fy1 += s_y*beamWidthWhite;
+        
+        // reverse for retardendo beam
+		if (!s_y2) fy2 += (beamWidthBlack * shiftY) * -1;
+		else fy2 += s_y2*beamWidthWhite;
 	}
+    
+    /******************************************************************/
+    // Draw the beam partial bars (if any)
 
 	/* calcul des x en cas de beaming multiple */
 	/* parcours horizontal ajoutant barres en fonction de m_dur la plus 
-	breve (shortest), controle par boucle while; la premiere boucle for
+	breve (shortestDur), controle par boucle while; la premiere boucle for
 	controle le nombre d'etapes horizontales du parcours (par le nombre
 	de commandes '+' enregistrees); la deuxieme boucle for teste pour
 	chaque paquet entre deux '+' les valeurs; elle construit une array de 
 	marqueurs partitionnant les sous-groupes; la troisieme boucle for est
 	pilotee par l'indice de l'array; elle dessine horizontalement les barres 
-	de chaque sous-groupe en suivant les marqueurs */ 
+	de chaque sous-groupe en suivant les marqueurs */
+    
+    //return;
 
- 
-	/* cpte_stop=0 ? pas de rupture de beaming*/
+    if (changingDur) {
+        testDur = DUR_8 + fullBars;
+        barY = beamWidth;
 
-    if (fb.mq_val || cpte_stop)	/* deuxieme partie du test */
-    {
-        valtest = DUR_8 + h;
-
-        if ( fb.fl_cond )
-        {	barre_y = deltablanc + sy_dec_moy;
-            /* = decalage entre bout de m_stemDir et position acquise des barres */
+        if (stemDir == STEMDIRECTION_up) {
+            barY = -barY;
         }
-        else	/* pas de partage entre portees */
 
-            barre_y = deltabar;
-
-        /* h contient nombre de barres communes deja dessinees */
-        if (fb.dir == STEMDIRECTION_up)	/* queues ascendantes: on descend */
-            barre_y = -barre_y;
-
-        while (valtest <= shortest)
-        {	t = 0; si = 0;
-            for (i=0; i<=cpte_stop; i++)	/* 1e boucle for */
-            {	h = (*(st_rl+si) ? *(st_rl+si) : ct);
-                /* var. test controlant 2e boucle for suivante
-                 * en fonction du compteur de "+" */
-    /*ici, t=j, i.e. increment des pos. de notes. On s'occupe maintenant de
-    l'ensemble des valeurs contenues dans un groupe marque par cpte_stop. C'est
-    la qu'il faut changer les signes des valeurs delta d'increment vertical.*/
-
-                for(k=0; k<MAX_MIF; k++)	/* initialisation*/
-                {	mx_i[k]=my_i[k]=mx_f[k]=my_f[k]=0;}
-
-                for (j=t,_mif=0,m_i[_mif]=0; j < h; j++)	/* 2e boucle. */
-                {	/* j<h : st_rl est trop loin de un cran */
-
-                /* Ici, d‚cision si SILENCE doit ou non avoir des barres; si oui, ligne
-                    suivante (condition: il doit etre pris aussi dans les crd plus haut):*/
-                    if (((crd+j)->vlr) >= (unsigned int)valtest)	
-                /*	si NON, alors: */
-                    // if (((crd+j)->vlr) >= valtest && (crd+j)->chk->sil == _NOT)	
-                    {
-                        /*place marqueurs pour m_dur.egales/superieures
-                         * a valtest en cours */
-                        mx_f[_mif] = crd[j].a; 
-                        my_f[_mif] = *(_ybeam+j);
-                        if(!mx_i[_mif])
-                        {	mx_i[_mif] = crd[j].a;
-                            my_i[_mif] = *(_ybeam+j);
-                            if (!_mif) apax = j;
-                            if (!crd[j].prov)
-                            /* enregistre les cas ou delta y est neg.*/
-                                m_i[_mif] = 1;
-                        }
+        // loop
+        while (testDur <= shortestDur) {
+            // true at the beginning of a beam or after a breakSec
+            bool start = true;
+            
+            // all but the last one
+            for (i = 0; i < elementCount - 1; i++) {
+                bool breakSec = ((beamElementCoord[i].breaksec) && (testDur - DUR_8 >= beamElementCoord[i].breaksec));
+                beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
+                // partial is needed
+                if (beamElementCoord[i].dur >= (char)testDur) {
+                    // and for the next one too, but no break - through
+                    if ((beamElementCoord[i+1].dur >= (char)testDur) && !breakSec) {
+                        beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_THROUGH;
                     }
-                    /* rupture de chaine: on passe a un 2e groupe
-                     * de marqueurs */
-                    else if(mx_i[_mif])
-                    {	_mif++;	/*incr. s'il y a un marq.*/
-                        m_i[_mif] = 0;
+                    // not needed for the next one or break
+                    else {
+                        // we are starting a beam or after a beam break - put it right
+                        if (start) {
+                            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_RIGHT;
+                        }
+                        // or the previous one had no partial - put it left
+                        else if (beamElementCoord[i-1].dur < (char)testDur) {
+                            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
+                        }
                     }
                 }
-
-                fbarre_y = barre_y;	/* stockage */
-                for (k=0; k<=std::min((mx_f[_mif]?_mif:(_mif-1)),MAX_MIF); k++)
-                {
-                    /* "constantes" de corr. definissant origine du calcul des
-                     * y, dans les cas de partage entre portees automatiques;
-                     * (construction anterieure en montant si fl_cond) */
-                    if ( fb.fl_cond)
-                    {	barre_y = abs(fbarre_y); delt_y = abs (delt_y);
-
-                        if (m_i[k])		/* i.e. portee inf. (!crd[j].prov) */
-                        {	barre_y = -barre_y;
-                            delt_y = -delt_y;
-                            sy_up = sy_dec[0];	/* valeur positive */
-                        }
-
-                        else
-                            sy_up = sy_dec[1];	/* valeur negative */
-
-                    }
-
-
-                    /* on passe en revue, horizontalement, les marqueurs
-                     * enregistres pour ce  groupe, en s'assurant que le
-                     * max MAX_MIF n'est pas depasse */
-                    if (mx_i[k] == mx_f[k])		/* une seule position concernee */
-                    {
-                        if (apax == t && k==0 && mx_i[k] != crd[_ct].a)	/* au debut du paquet */
-                        {	fy1 = my_i[k] + barre_y;
-                            mx_f[k] = mx_i[k] + m_doc->m_drawingLedgerLine[staff->staffSize][0];
-                            fy2 = dA + sy_up + barre_y + dB * mx_f[k];
-
-                            decalage= deltanbbar*delt_y;
-                            DrawObliqueLine (dc,mx_i[k],fy1,mx_f[k],fy2, decalage /***, workColor2***/ );
-                            fy1 += decalage; fy2 += decalage;
-
-                        }
-                        else		/* corps ou fin de paquet */
-                        {	fy2 = my_i[k] + barre_y;
-                            mx_i[k] -= m_doc->m_drawingLedgerLine[staff->staffSize][0];
-                            fy1 = dA + sy_up + barre_y + dB * mx_i[k];
-                            decalage = deltanbbar*delt_y;
-                            DrawObliqueLine (dc,mx_i[k],fy1,mx_f[k],fy2, decalage  /***,workColor2***/);
-                            fy1 += decalage; fy2 += decalage;
-
-                        }
-                    }
-                    else if (mx_i[k])		/* s'il y a un marqueur */
-                    {	fy1 = my_i[k] + barre_y;
-                        fy2 = my_f[k] + barre_y;
-                        decalage = deltanbbar*delt_y;
-                        DrawObliqueLine (dc,mx_i[k],fy1,mx_f[k],fy2, decalage /***,workColor2***/);
-                        fy1 += decalage; fy2 += decalage;
-
-                    }				
-                }	/* fin de boucle testant sous-ensembles marques _mif*/
-
-                if ( fb.fl_cond)	/* retablissement des valeurs positives */
-                {	barre_y = abs(fbarre_y);
-                    delt_y =  abs(delt_y);
+                // not we are in a group
+                if (breakSec) {
+                    start = true;
                 }
+                else {
+                    start = false;
+                }
+            }
+            // last one
+            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
+            // partial is needed
+            if (beamElementCoord[i].dur >= (char)testDur) {
+                // and the previous one had no partial - put it left
+                if (beamElementCoord[i-1].dur < (char)testDur) {
+                    beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
+                }
+            }
+            
+            // draw them
+            for (i=0; i<elementCount; i++) {
+                if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_THROUGH) {
+                    // through should never be set on the last one
+                    assert( i < elementCount - 1);
+                    if (i >= elementCount - 1) continue; // assert for debug and skip otherwise
+                    fy1 = beamElementCoord[i].yBeam + barY;
+                    fy2 = beamElementCoord[i+1].yBeam + barY;
+                    polygonHeight = beamWidthBlack * shiftY;
+                    DrawObliquePolygon (dc, beamElementCoord[i].x, fy1,beamElementCoord[i+1].x, fy2, polygonHeight);
+                }
+                else if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_RIGHT) {
+                    fy1 = beamElementCoord[i].yBeam + barY;
+                    int x2 = beamElementCoord[i].x + m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                    fy2 = startingY + verticalBoost + barY + beamSlope * x2;
+                    polygonHeight= beamWidthBlack*shiftY;
+                    DrawObliquePolygon (dc, beamElementCoord[i].x, fy1, x2, fy2, polygonHeight);
+                }
+                else if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_LEFT) {
+                    fy2 = beamElementCoord[i].yBeam + barY;
+                    int x1 = beamElementCoord[i].x - m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                    fy1 = startingY + verticalBoost + barY + beamSlope * x1;
+                    polygonHeight = beamWidthBlack*shiftY;
+                    DrawObliquePolygon (dc, x1, fy1, beamElementCoord[i].x, fy2, polygonHeight);
+                }
+            }
 
-                if (*st_rl)
-                {	si++; t = j;} 
-                else t = 0;
-            }			/* fin de premiere boucle for */
-
-            valtest += 1;	/* increments de valeur et d'espace */
-            barre_y += delt_y*deltabar;
-        }			/* fin de boucle while */
-    }				/*fermeture de la deuxieme partie du test */
-
-	/***beamPremier = layer->beamListPremier;***/
-	//layer->beamListPremier = NULL; RZ COMMENTED
-
-    /***
-	if (fb._grp)	// group.fin)
-	{	e_t->rel = OFF; 
-		rythmeInf(dc);
-	}
-    ***/
-
-
-	if (fb._liaison)
-		return;	
-
-/*	1111, code retourne pour appeler liais_note (NULL) apres beam(): on
-    evite ainsi le risque d'appel recursif de beam. C'est le code de la
-	 liaison "retardee": la direction des
-	queues n'etait pas encore connue de liais_note lorsque la liaison a
-	ete demandee, puisqu' elle est calculee (en mode automatique) par
-	la presente fonction (et placee dans le bit m_stemDir); le code NULL
-	permet un test d'association avec variable "attente" in
-	liais_note (attente est engendree par coincidence rel && m_stemLen inter-
-	disant le choix de la direction de liaison); ainsi NULL && attente 
-	permettent d'entrer dans l'algoritme */ 
+            testDur += 1;
+            barY += shiftY * beamWidth;
+        } // end of while
+    } // end of drawing partial bars
 
 	return;	
-}				/* fermeture de la fonction */
 
+}
+    
 } // namespace vrv

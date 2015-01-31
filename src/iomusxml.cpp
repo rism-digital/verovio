@@ -10,22 +10,20 @@
 
 //----------------------------------------------------------------------------
 
-#include <algorithm>
-#include <iostream>
 #include <sstream>
 
 //----------------------------------------------------------------------------
 
-#include "barline.h"
 #include "beam.h"
 #include "clef.h"
+#include "doc.h"
 #include "keysig.h"
-#include "layerelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
 #include "rest.h"
 #include "tie.h"
+#include "vrv.h"
 
 namespace vrv {
 

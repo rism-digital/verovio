@@ -10,7 +10,7 @@
 #define __VRV_SYSTEM_H__
 
 #include "aligner.h"
-#include "barline.h"
+#include "drawinglistinterface.h"
 #include "object.h"
 
 namespace vrv {
@@ -28,7 +28,7 @@ class ScoreDef;
  * A System is contained in a Page.
  * It contains Staff objects.
 */
-class System: public DocObject
+class System: public DocObject, public DrawingListInterface
 {
 public:
     /**

@@ -10,11 +10,11 @@
 #define __VRV_TUPLET_H__
 
 #include "atts_shared.h"
-#include "layer.h"
-#include "note.h"
-#include "object.h"
+#include "layerelement.h"
 
 namespace vrv {
+    
+class Note;
 
 //----------------------------------------------------------------------------
 // Tuplet
@@ -42,7 +42,7 @@ public:
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
     
 protected:
     /**

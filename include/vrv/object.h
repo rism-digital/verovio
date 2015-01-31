@@ -9,34 +9,22 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
-#include <list>
 #include <map>
 #include <string>
 #include <typeinfo>
-#include <vector>
 
 //----------------------------------------------------------------------------
 
 #include "vrvdef.h"
 
 namespace vrv {
-
+    
 class Doc;
 class EditorialElement;
 class Functor;
-class Object;
-class AttComparison;
-
-typedef std::vector<Object*> ArrayOfObjects;
-
-typedef std::list<Object*> ListOfObjects;
-
-typedef std::vector<void*> ArrayPtrVoid;
-    
-typedef std::vector<AttComparison*> ArrayOfAttComparisons;
 
 /**
- * Generic int map recursive sturcutre for storing hierachy of values
+ * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store 
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
@@ -59,6 +47,10 @@ typedef std::map<int, IntTree> IntTree_t;
 typedef std::map<int, bool> VerseN_t;
 typedef std::map<int, VerseN_t> LayerN_VerserN_t;
 typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
+    
+#define UNLIMITED_DEPTH -10000
+#define FORWARD true
+#define BACKWARD false
 
 //----------------------------------------------------------------------------
 // Object
@@ -186,18 +178,22 @@ public:
      * Look for a child with the specified uuid (returns NULL if not found)
      * This method is a wrapper to a Object::FindByUuid functor.
      */
-    Object *FindChildByUuid( std::string uuid );
+    Object *FindChildByUuid( std::string uuid,
+                            int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
      * Look for a child with the specified type (returns NULL if not found)
      * This method is a wrapper to a Object::FindByType functor.
      */
-    Object *FindChildByType( const std::type_info *elementType );
+    Object *FindChildByType( const std::type_info *elementType,
+                            int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
      * Return the first element matching the AttComparison functor
+     * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByAttComparison( AttComparison *attComparison, int deepness = -1 );
+    Object *FindChildByAttComparison( AttComparison *attComparison,
+                                     int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -291,12 +287,12 @@ public:
      * The ArrayOfAttComparisons filter parameter makes is possible to process only objects of a
      * type that match the attribute value given in the AttComparison object.
      * This is a generic way for parsing the tree, e.g., for extracting one single staff, or layer.
-     * Deepness allow to specify how many child levels should be processed -10000 means no 
+     * Deepness allow to specify how many child levels should be processed UNLIMITED_DEPTH means no 
      * limit (EditorialElement objects do not count).
      */
     virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL,
-                         ArrayOfAttComparisons * filters = NULL, int deepness = -10000 );
-
+                         ArrayOfAttComparisons * filters = NULL, int deepness = UNLIMITED_DEPTH,
+                         bool direction = FORWARD );
     
     //----------//
     // Functors //
@@ -306,11 +302,6 @@ public:
      * Add each LayerElements and its children to a list
      */
     virtual int AddLayerElementToList( ArrayPtrVoid params );
-    
-    /**
-     * See Layer::CopyToLayer
-     */ 
-    virtual int CopyToLayer( ArrayPtrVoid params ) { return false; };
     
     /**
      * Find a Object with a specified uuid.
@@ -463,23 +454,60 @@ public:
      * param 3: bool the metersig flag.
      */
     virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
+   
+    ///@}
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
-     * to be processed.
-     * param 0: IntTree *
+     * and for staff/layer to be then processed.
+     * param 0: IntTree*
+     * param 1: IntTree*
      */
-    virtual int PrepareDrawing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareProcessingLists( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Matches start and end for TimeSpanningInterface elements (such as tie or slur)
+     * If fillList is set to false, the only the remaining elements will be matched.
+     * This is used when processing a second time in the other direction
+     * param 0: std::vector<DocObject*>* that holds the current elements to match
+     * param 1: bool* fillList for indicating whether the elements have to be stack or not
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Processes Chord and Note for matching @tie by processing by Layer and by looking
+     * at the Pname and Oct
+     * param 0: std::vector<Note*>* that holds the current notes with open ties
+     * param 1: Chord** currentChord for the current chord if in a chord
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Processes Chord and Note for matching @tie by processing by Layer; resets the
+     * Chord pointer to NULL at the end of a chord
+     * param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
+     * param 1: Chord** currentChord for the current chord if in a chord
+     */
+    virtual int PrepareTieAttrEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
-     * not param
      */
-    virtual int PrepareLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareLyrics( ArrayPtrVoid params )  { return FUNCTOR_CONTINUE; };
     
-    ///@}
+    /**
+     * Functor for setting wordpos and connector ends
+     * The functor is process by doc at the end of a document of closing opened syl.
+     */
+    virtual int PrepareLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Goes through all the TimeSpanningInterface element and set them a current to each staff
+     * where require. For Note with DrawingTieAttr, the functor is redireted to the tie object
+     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
+     */
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * @name Functors for justification
@@ -606,11 +634,6 @@ public:
      * We need this to avoid not updating bounding boxes to screw up the layout with their intial values.
      */
     bool HasUpdatedBB( ) { return m_updatedBB; };
-    
-    /**
-     *
-     */
-    void AddRdgClass( std::string newClass );
 
 private:
     bool m_updatedBB;
@@ -630,7 +653,6 @@ protected:
 public:
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
-    std::vector<std::string> m_rdgClasses;
 };
 
 
@@ -676,6 +698,9 @@ public:
      */
     ListOfObjects *GetList( Object *node );
     
+private:
+    ListOfObjects m_list;
+    
 protected:
     /**
      * Filter the list for a specific class.
@@ -689,9 +714,6 @@ public:
      * As for GetList, we need to pass the object.
      */
     void ResetList( Object *node );
-        
-    ListOfObjects m_list;
-    
 };
 
 //----------------------------------------------------------------------------

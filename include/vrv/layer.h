@@ -15,14 +15,19 @@
 
 #include "atts_shared.h"
 #include "clef.h"
+#include "drawinglistinterface.h"
 #include "object.h"
-#include "scoredef.h"
 
 namespace vrv {
 
 class DeviceContext;
+class KeySig;
 class LayerElement;
 class Note;
+class ScoreDef;
+class StaffDef;
+class Mensur;
+class MeterSig;
 
 //----------------------------------------------------------------------------
 // Layer
@@ -33,7 +38,7 @@ class Note;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public ObjectListInterface,
+class Layer: public DocObject, public DrawingListInterface, public ObjectListInterface,
     public AttCommon
 {
 public:
@@ -48,7 +53,7 @@ public:
     virtual std::string GetClassName( ) { return "Layer"; };
     ///@}
 	
-	void AddElement( LayerElement *element, int idx = -1 );
+	void AddLayerElement( LayerElement *element, int idx = -1 );
     	
 	int GetElementCount() const { return (int)m_children.size(); };
     
@@ -71,7 +76,7 @@ public:
      * Looks FORWARD of BACKWARD depending on the direction parameter.
      * Returns the retrieved element if *succ == true or the original element if not.
      */
-    LayerElement *GetFirstOld( LayerElement *element, unsigned int direction, const std::type_info *elementType, bool *succ );
+    LayerElement *GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ );
     
     /** 
      * Get the current clef for the test element.
@@ -88,26 +93,6 @@ public:
     int GetClefOffset( LayerElement *test  );
     
     /**
-     * Add an element to the drawing list.
-     * The drawing list is used to postponed the drawing of elements
-     * that need to be drawn in a particular order.
-     * For example, we need to draw beams before tuplets
-     */
-    void AddToDrawingList( LayerElement *element );
-
-    /**
-     * Return the drawing list.
-     * This is used when actually drawing the list (see View::DrawLayerList)
-     */
-    ListOfObjects *GetDrawingList( );
-
-    /**
-     * Reset the drawing list.
-     * Clears the list - called when the layer starts to be drawn
-     */
-    void ResetDrawingList( );
-    
-    /**
      * Basic method that remove intermediate clefs and custos.
      * Used for building collations (See CmpFile::Collate).
      */
@@ -118,11 +103,6 @@ public:
      * Also set the current clef.
      */
     void SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
-    
-    /**
-     * Align horizontally the content of a layer.
-     */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
     
     /**
      * @name Set the clef, keySig, mensur and meterSig to be drawn.
@@ -159,19 +139,25 @@ public:
     //----------//
     
     /**
-     * Copy the elements to a Layer passed in parameters.
-     * Also take into account a start and end uuid for the page (if any)
+     * Align horizontally the content of a layer.
      */
-    virtual int CopyToLayer( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid params );
+    
+    /**
+     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * and for staff/layer to be then processed.
+     */
+    virtual int PrepareProcessingLists( ArrayPtrVoid params );
     
 private:
     
 public:
     
 protected:
-    // drawing variables
-    //LayerElement *beamListPremier; // we need to replace this with a proper beam class that handles a list of notes/rests
-    ListOfObjects m_drawingList;
+    /**
+     * @name Drawing variables
+     */
+    ///@{
     /** The clef attribute */
     Clef *m_drawingClef;
     /** The key signature */
@@ -180,6 +166,7 @@ protected:
     Mensur *m_drawingMensur;
     /** The meter signature (time signature) */
     MeterSig *m_drawingMeterSig;
+    ///@}
     
 private:
     /**

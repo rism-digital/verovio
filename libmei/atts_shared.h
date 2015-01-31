@@ -5034,8 +5034,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTie(std::string tie_) { m_tie = tie_; };
-    std::string GetTie() const { return m_tie; };    
+    void SetTie(data_TIE tie_) { m_tie = tie_; };
+    data_TIE GetTie() const { return m_tie; };    
     bool HasTie( );
     
     ///@}
@@ -5046,7 +5046,7 @@ protected:
      * If visual information about the tie needs to be recorded, then a <tie> element
      * should be employed.
      **/
-    std::string m_tie;
+    data_TIE m_tie;
 
 /* include <atttie> */
 };
@@ -5076,8 +5076,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstamp(std::string tstamp_) { m_tstamp = tstamp_; };
-    std::string GetTstamp() const { return m_tstamp; };    
+    void SetTstamp(double tstamp_) { m_tstamp = tstamp_; };
+    double GetTstamp() const { return m_tstamp; };    
     bool HasTstamp( );
     
     ///@}
@@ -5087,7 +5087,7 @@ protected:
      * Encodes the onset time in terms of musical time, i.e.,
      * beats[.fractional_beat_part].
      **/
-    std::string m_tstamp;
+    double m_tstamp;
 
 /* include <atttstamp> */
 };
@@ -5165,8 +5165,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstamp2(std::string tstamp2_) { m_tstamp2 = tstamp2_; };
-    std::string GetTstamp2() const { return m_tstamp2; };    
+    void SetTstamp2(typedef_TSTAMP2 tstamp2_) { m_tstamp2 = tstamp2_; };
+    typedef_TSTAMP2 GetTstamp2() const { return m_tstamp2; };    
     bool HasTstamp2( );
     
     ///@}
@@ -5176,7 +5176,7 @@ protected:
      * Encodes the ending point of an event in terms of musical time, i.e., a count of
      * measures plus a beat location.
      **/
-    std::string m_tstamp2;
+    typedef_TSTAMP2 m_tstamp2;
 
 /* include <atttstamp2> */
 };
@@ -5365,13 +5365,13 @@ public:
     bool HasFontsize( );
     
     //
-    void SetFontstyle(std::string fontstyle_) { m_fontstyle = fontstyle_; };
-    std::string GetFontstyle() const { return m_fontstyle; };    
+    void SetFontstyle(data_FONTSTYLE fontstyle_) { m_fontstyle = fontstyle_; };
+    data_FONTSTYLE GetFontstyle() const { return m_fontstyle; };    
     bool HasFontstyle( );
     
     //
-    void SetFontweight(std::string fontweight_) { m_fontweight = fontweight_; };
-    std::string GetFontweight() const { return m_fontweight; };    
+    void SetFontweight(data_FONTWEIGHT fontweight_) { m_fontweight = fontweight_; };
+    data_FONTWEIGHT GetFontweight() const { return m_fontweight; };    
     bool HasFontweight( );
     
     ///@}
@@ -5384,9 +5384,9 @@ protected:
     /** Indicates the size of a font in printers' points, i.e., 1/72nd of an inch. **/
     double m_fontsizeDbl;
     /** Records the style of a font, i.e, italic, oblique, or normal. **/
-    std::string m_fontstyle;
+    data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/
-    std::string m_fontweight;
+    data_FONTWEIGHT m_fontweight;
 
 /* include <attfontweight> */
 };

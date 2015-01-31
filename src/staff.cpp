@@ -14,13 +14,11 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
-#include "io.h"
 #include "layer.h"
+#include "note.h"
+#include "syl.h"
 #include "system.h"
-#include "verse.h"
-#include "vrv.h"
-#include "vrvdef.h"
+#include "timeinterface.h"
 
 namespace vrv {
 
@@ -29,7 +27,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Staff::Staff( int n ):
-	DocObject("staff-"),
+	MeasureElement("staff-"),
     AttCommon()
 {
     Reset();
@@ -43,7 +41,7 @@ Staff::~Staff()
 
 void Staff::Reset()
 {
-    DocObject::Reset();
+    MeasureElement::Reset();
     ResetCommon();
     notAnc = false; // LP we want modern notation :))
     grise = false;
@@ -53,6 +51,7 @@ void Staff::Reset()
     m_yAbs = VRV_UNSET;
     m_drawingY = 0;
     m_staffAlignment = NULL;
+    m_currentSyls.clear();
 }
 
 void Staff::AddLayer( Layer *layer )
@@ -130,6 +129,55 @@ int Staff::AlignVertically( ArrayPtrVoid params )
     
     // for next staff
     (*staffNb)++;
+    
+    return FUNCTOR_CONTINUE;
+}
+        
+int Staff::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    
+    std::vector<DocObject*>::iterator iter = elements->begin();
+    while ( iter != elements->end()) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(*iter);
+        assert(interface);
+        Staff *endParent = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent( &typeid(Staff) ) );
+        assert( endParent );
+        // Because we are not processing following staff @n, we need to check it here.
+        // this might cause problem with cross-staves slurs if the end is on a lower staff than the start:
+        // this will be true for the staff below the start in the same measure - a fix would be to check if
+        // we are still in the same measure (compare this->m_parent and start->m_parent)
+        if ( endParent->GetN() == this->GetN() ) {
+            m_timeSpanningElements.push_back(*iter);
+        }
+        // We have reached the end of the spanning - remove it from the list of running elements
+        if ( endParent == this ) {
+            iter = elements->erase( iter );
+        }
+        else {
+            iter++;
+        }
+    }
+    return FUNCTOR_CONTINUE;
+}
+    
+int Staff::FillStaffCurrentLyrics( ArrayPtrVoid params )
+{
+    // param 0: the current Syl
+    // param 1: the last Note
+    Syl **currentSyl = static_cast<Syl**>(params[0]);
+    
+    if ((*currentSyl)) {
+        // We have a running syl started in a previous measure
+        this->m_currentSyls.push_back((*currentSyl));
+        if ((*currentSyl)->GetEnd()) {
+            // Look if the syl ends in this measure - if not, add it
+            if ((*currentSyl)->GetEnd()->GetFirstParent( &typeid(Staff) ) == this ) {
+                (*currentSyl) = NULL;
+            }
+        }
+    }
     
     return FUNCTOR_CONTINUE;
 }

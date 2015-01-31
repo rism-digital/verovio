@@ -10,18 +10,16 @@
 
 //----------------------------------------------------------------------------
 
-#include <iostream>
 
 //----------------------------------------------------------------------------
 
-#include "doc.h"
 #include "iodarms.h"
 #include "iomei.h"
-#include "iomusxml.h"
 #include "iopae.h"
 #include "page.h"
 #include "svgdevicecontext.h"
-#include "view.h"
+#include "style.h"
+#include "vrv.h"
 
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"
@@ -55,7 +53,7 @@ Toolkit::Toolkit( bool initFont )
 	m_cString = NULL;
     
     if ( initFont ) {
-        Resources::InitFont();
+        Resources::InitFonts();
     }
 }
 

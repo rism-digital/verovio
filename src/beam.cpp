@@ -10,7 +10,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
+#include "note.h"
 
 namespace vrv {
 
@@ -21,14 +21,21 @@ namespace vrv {
 Beam::Beam():
     LayerElement("beam-"), ObjectListInterface()
 {
+    Reset();
 }
 
 
 Beam::~Beam()
 {
 }
+    
+void Beam::Reset()
+{
+    LayerElement::Reset();
+}
 
-void Beam::AddElement(LayerElement *element) {
+void Beam::AddLayerElement(LayerElement *element)
+{
    
     element->SetParent( this );
     m_children.push_back(element);
@@ -40,18 +47,19 @@ void Beam::FilterList()
     bool firstNoteGrace = false;
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects::iterator iter = m_list.begin();
+    ListOfObjects* childList = this->GetList(this);
+    ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != m_list.end()) {
+    while ( iter != childList->end()) {
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         if ( !currentElement ) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = m_list.erase( iter );           
+            iter = childList->erase( iter );           
         }
         else if ( !currentElement->HasDurationInterface() )
         {
             // remove anything that has not a DurationInterface
-            iter = m_list.erase( iter );
+            iter = childList->erase( iter );
         } else {
             // Drop notes that are signaled as grace notes
             Note *n = dynamic_cast<Note*>(currentElement);
@@ -60,7 +68,7 @@ void Beam::FilterList()
                 // if we are at the beginning of the beam
                 // and the note is cueSize
                 // assume all the beam is of grace notes
-                if (m_list.begin() == iter) {
+                if (childList->begin() == iter) {
                   if (n->m_cueSize)
                       firstNoteGrace = true;
                 }
@@ -69,7 +77,7 @@ void Beam::FilterList()
                 // we have grace notes embedded in a beam
                 // drop them
                 if ( !firstNoteGrace && n->m_cueSize == true)
-                    iter = m_list.erase( iter );
+                    iter = childList->erase( iter );
                 else
                     iter++;
                 

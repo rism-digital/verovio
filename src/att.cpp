@@ -16,7 +16,6 @@
 
 #include "object.h"
 #include "vrv.h"
-#include "vrvdef.h"
 
 namespace vrv {
 
@@ -315,6 +314,7 @@ std::string Att::DurToStr(int data)
     else if (data == DUR_32) value = "32";
     else if (data == DUR_64) value = "64";
     else if (data == DUR_128) value = "128";
+    else if (data == DUR_256) value = "256";
     else {
         LogWarning("Unknown duration '%d'", data);
         value = "4";
@@ -342,6 +342,7 @@ int Att::StrToDur(std::string value)
     else if (value == "32") dur = DUR_32;
     else if (value == "64") dur = DUR_64;
     else if (value == "128") dur = DUR_128;
+    else if (value == "256") dur = DUR_256;
     else {
         if ((value.length() > 0) && (value[value.length()-1] == 'p')) {
             LogWarning("PPQ duration dur_s are not supported");
@@ -352,6 +353,58 @@ int Att::StrToDur(std::string value)
         dur = VRV_UNSET;
     }
     return dur;
+}
+    
+std::string Att::FontstyleToStr(data_FONTSTYLE data)
+{
+    std::string value;
+    switch(data)
+    {
+        case FONTSTYLE_italic : value = "italic"; break;
+        case FONTSTYLE_normal : value = "normal"; break;
+        case FONTSTYLE_oblique : value = "oblique"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FONTSTYLE Att::StrToFontstyle(std::string value)
+{
+    if (value == "italic") return FONTSTYLE_italic;
+    else if (value == "normal") return FONTSTYLE_normal;
+    else if (value == "oblique") return FONTSTYLE_oblique;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return FONTSTYLE_NONE;
+}
+
+std::string Att::FontweightToStr(data_FONTWEIGHT data)
+{
+    std::string value;
+    switch(data)
+    {
+        case FONTWEIGHT_bold : value = "bold"; break;
+        case FONTWEIGHT_normal : value = "normal"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FONTWEIGHT Att::StrToFontweight(std::string value)
+{
+    if (value == "bold") return FONTWEIGHT_bold;
+    else if (value == "normal") return FONTWEIGHT_normal;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return FONTWEIGHT_NONE;
 }
     
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
@@ -689,6 +742,43 @@ data_STEMPOSITION Att::StrToStemPosition(std::string value)
         LogWarning("Unsupported pitch name '%s'", value.c_str() );
     }
     return STEMPOSITION_NONE;
+}    
+
+std::string Att::TieToStr(data_TIE data)
+{
+    std::string value;
+    switch(data)
+    {
+        case TIE_i : value = "i"; break;
+        case TIE_m : value = "m"; break;
+        case TIE_t : value = "t"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_TIE Att::StrToTie(std::string value)
+{
+    if (value == "i") return TIE_i;
+    else if (value == "m") return TIE_m;
+    else if (value == "t") return TIE_t;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return TIE_NONE;
+}
+    
+std::string Att::Tstamp2ToStr(typedef_TSTAMP2 data)
+{
+    return "0m0.0";
+}
+    
+typedef_TSTAMP2 Att::StrToTstamp2(std::string value)
+{
+    return std::make_pair(0, 1.0);
 }
 
 std::string Att::WordPosToStr(data_WORDPOS data)
