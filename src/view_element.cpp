@@ -675,7 +675,7 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
 	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingDoubleUnit[staff->staffSize])
 		y1 -= m_doc->m_drawingUnit[staff->staffSize];
     
-	y2 = y1 + m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
+	y2 = y1 + m_doc->m_drawingDoubleUnit[staff->staffSize];
 	DrawFullRectangle( dc, x1, y2, x2, y1);
 	
     // lines
@@ -903,6 +903,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	}
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
 	*/
+    if (note->GetDur() == DUR_LG)
     {
 		verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
 		// ENZ
