@@ -287,8 +287,22 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         ledge= m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 		radius += radius/3;
 	}
-
-	x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
+    
+    if (!note->m_flippedNotehead) {
+        x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
+    }
+    else {
+        if (note->m_drawingStemDir == STEMDIRECTION_up) {
+            x1 = xn + radius;
+        }
+        else if (note->m_drawingStemDir == STEMDIRECTION_down) {
+            x1 = xn - radius * 3;
+        }
+        else {
+            x1 = xn - radius;
+        }
+    }
+    
     xl = xn;
 
     // Long, breve and ligatures
@@ -1007,8 +1021,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             chord->m_drawingStemDir = layer->GetDrawingStemDir();
         }
         else {
-            chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up) );
-            chord->m_drawingStemDir = chord->GetStemDir();
+            chord->m_drawingStemDir = (yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
         }
         
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];

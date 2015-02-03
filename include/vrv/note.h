@@ -93,6 +93,11 @@ public:
     data_STEMDIRECTION GetDrawingStemDir( );
     ///@}
     
+    /**
+     * Returns a single integer representing pitch and octave.
+     */
+    int GetDiatonicPitch( ) { return this->GetPname() + (int)this->GetOct() * 7; };
+    
     //----------//
     // Functors //
     //----------//
@@ -136,6 +141,9 @@ public:
     data_STEMDIRECTION m_drawingStemDir;
     /** drawing stem length */
     int d_stemLen;
+    
+    /** flags for determining clusters in chord **/
+    bool m_flippedNotehead;
     
 private:
     
