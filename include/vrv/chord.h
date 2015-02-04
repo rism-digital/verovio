@@ -33,7 +33,7 @@ namespace vrv {
  * It contains notes.
  */
     
-class Chord: public LayerElement, public ObjectListInterface, public DurationInterface,
+class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, public DrawingListInterface,
     public AttColoration,
     public AttCommon,
     public AttStemmed,

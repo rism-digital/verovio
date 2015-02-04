@@ -229,6 +229,29 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    Chord *chordParent = dynamic_cast<Chord*>(element->m_parent);
+    Beam *beamParent = dynamic_cast<Beam*>(element->m_parent);
+    
+    //if note is a direct child of layer, we can draw it immediately
+    if (element->m_parent == layer) {
+        std::cout << "found a single note" << std::endl;
+        DrawNotehead(dc, element, layer, staff, measure);
+    }
+    //but if it's a parent of chord or beam, we need to know the stem direction and placement first
+    else if (chordParent) {
+        std::cout << "found a chord parent - postponing" << std::endl;
+        chordParent->AddToDrawingList(element);
+        //DrawNotehead(dc, element, layer, staff, measure);
+    }
+    else if (beamParent) {
+        std::cout << "found a beam parent - postponing" << std::endl;
+        beamParent->AddToDrawingList(element);
+        //DrawNotehead(dc, element, layer, staff, measure);
+    }
+}
+    
+void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
@@ -288,6 +311,17 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		radius += radius/3;
 	}
     
+    verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
+    if ( note->HasDrawingStemDir() ) {
+        note->m_drawingStemDir = note->GetDrawingStemDir();
+    }
+    else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        note->m_drawingStemDir = layer->GetDrawingStemDir();
+    }
+    else {
+        note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    }
+    
     if (!note->m_flippedNotehead) {
         x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
     }
@@ -327,10 +361,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         else {
 			fontNo = SMUFL_E0A4_noteheadBlack;
         }
-
+        
+        std::cout << "\twith x at " << x1 << std::endl;
 		DrawSmuflCode( dc, x1, y1, fontNo,  staff->staffSize, note->m_cueSize );
-
-		verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
 
 		//if (note->m_chord) { /*** && this == testchord)***/
 		//	ynn_chrd = ynn;
@@ -339,15 +372,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             // no stem
 		}
         else  {
-			if ( note->HasStemDir() ) {
-                note->m_drawingStemDir = note->GetStemDir();
-            }
-            else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-                note->m_drawingStemDir = layer->GetDrawingStemDir();
-            }
-            else {
-                note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
-            }
             DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xn, y1);
         }
 
@@ -1011,6 +1035,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     if(inBeam && drawingDur > DUR_4)
     {
+        
         //no stem
     }
     else {
@@ -1030,6 +1055,17 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         int heightY = yMax - yMin;
         
         DrawStem(dc, chord, staff, chord->GetStemDir(), radius, beamX, originY, heightY);
+    }
+    
+    if (!inBeam)
+    {
+        ListOfObjects *noteList = chord->GetDrawingList();
+        ListOfObjects::iterator iter = noteList->begin();
+        
+        while ( iter != noteList->end()) {
+            DrawNotehead(dc, dynamic_cast<Note*>(*iter), layer, staff, measure);
+            iter++;
+        }
     }
 }
 

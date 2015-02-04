@@ -1126,7 +1126,7 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
             Beam *beam = dynamic_cast<Beam*>(element);
             dc->ResumeGraphic(beam, beam->GetUuid());
-            DrawBeamPostponed( dc, layer, beam, staff );
+            DrawBeamPostponed( dc, layer, beam, staff, measure );
             dc->EndResumedGraphic(beam, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {

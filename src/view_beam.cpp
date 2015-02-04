@@ -52,7 +52,7 @@ struct BeamElementCoord {
     LayerElement *element;
 };
 
-void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff )
+void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure )
 {
     LayerElement *current;
     
@@ -182,6 +182,11 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         
 	}	while (1);
 
+    //elementCount must be greater than 0 here
+    if (elementCount == 0){
+        LogDebug("Beam with no notes of duration > 8 detected. Exiting DrawBeamPostponed gracefully.");
+        return;
+    }
 
 	last = elementCount - 1;
     
@@ -231,6 +236,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         else if ( avgY <  verticalCenter ) stemDir = STEMDIRECTION_up; //otherwise go by average
         else stemDir = STEMDIRECTION_down;
     }
+    
+    beam->SetDrawingStemDir(stemDir);
     
     if (stemDir == STEMDIRECTION_up) { //set stem direction for all the notes
         for (i = 0; i < elementCount; i++) {
@@ -321,6 +328,25 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
     
 	startingY = (s_y - beamSlope * s_x) / elementCount;
+    
+    /******************************************************************/
+    // Draw noteheads for all objects in the beam
+    
+    for (i = 0; i < elementCount; i++) {
+        if (beamElementCoord[i].element->IsChord()) {
+            Chord *chord = dynamic_cast<Chord*>(beamElementCoord[i].element);
+            ListOfObjects *noteList = chord->GetDrawingList();
+            ListOfObjects::iterator iter = noteList->begin();
+            
+            while ( iter != noteList->end()) {
+                DrawNotehead(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure);
+                iter++;
+            }
+        }
+        else if (beamElementCoord[i].element->IsNote()) {
+            DrawNotehead(dc, dynamic_cast<LayerElement*>(beamElementCoord[i].element), layer, staff, measure);
+        }
+    }
 
     /******************************************************************/
     // Calculate the stem lengths and draw them

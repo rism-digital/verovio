@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"

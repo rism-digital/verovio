@@ -163,9 +163,14 @@ int Note::GetDrawingDur( )
 bool Note::HasDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
     if( chordParent )
     {
         return chordParent->HasStemDir();
+    }
+    else if( beamParent )
+    {
+        return beamParent->GetDrawingStemDir();
     }
     else
     {
@@ -181,9 +186,14 @@ Chord* Note::IsChordTone()
 data_STEMDIRECTION Note::GetDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
     if( chordParent )
     {
         return chordParent->GetStemDir();
+    }
+    else if( beamParent )
+    {
+        return beamParent->GetDrawingStemDir();
     }
     else
     {
