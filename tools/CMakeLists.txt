@@ -37,6 +37,7 @@ add_executable (verovio
 	../src/mensur.cpp
 	../src/metersig.cpp
 	../src/measure.cpp
+	../src/measureelement.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
 	../src/note.cpp
@@ -59,6 +60,7 @@ add_executable (verovio
 	../src/syl.cpp
 	../src/system.cpp
 	../src/tie.cpp
+	../src/timeinterface.cpp
 	../src/toolkit.cpp
 	../src/tuplet.cpp
 	../src/verse.cpp

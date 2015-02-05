@@ -10,6 +10,7 @@
 #define __VRV_BEAM_H__
 
 #include "layerelement.h"
+#include "drawinglistinterface.h"
 
 namespace vrv {
 
@@ -17,7 +18,7 @@ namespace vrv {
 // Beam
 //----------------------------------------------------------------------------
 
-class Beam: public LayerElement, public ObjectListInterface
+class Beam: public LayerElement, public ObjectListInterface, public DrawingListInterface
 {
 public:
     /**
@@ -37,7 +38,14 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
+    
+    /**
+     * @name Set and get the stem direction of the beam.
+     */
+    ///@{
+    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
     
 protected:
     /**
@@ -47,6 +55,7 @@ protected:
     virtual void FilterList();
     
 private:
+    data_STEMDIRECTION m_drawingStemDir;
 
 public:
     

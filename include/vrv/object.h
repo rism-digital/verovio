@@ -9,34 +9,22 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
-#include <list>
 #include <map>
 #include <string>
 #include <typeinfo>
-#include <vector>
 
 //----------------------------------------------------------------------------
 
 #include "vrvdef.h"
 
 namespace vrv {
-
+    
 class Doc;
 class EditorialElement;
 class Functor;
-class Object;
-class AttComparison;
-
-typedef std::vector<Object*> ArrayOfObjects;
-
-typedef std::list<Object*> ListOfObjects;
-
-typedef std::vector<void*> ArrayPtrVoid;
-    
-typedef std::vector<AttComparison*> ArrayOfAttComparisons;
 
 /**
- * Generic int map recursive sturcutre for storing hierachy of values
+ * Generic int map recursive structure for storing hierachy of values
  * For example, we want to process all staves one by one, and within each staff
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store 
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
@@ -471,10 +459,43 @@ public:
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
-     * to be processed.
-     * param 0: IntTree *
+     * and for staff/layer to be then processed.
+     * param 0: IntTree*
+     * param 1: IntTree*
      */
-    virtual int PrepareDrawing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareProcessingLists( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Matches start and end for TimeSpanningInterface elements (such as tie or slur)
+     * If fillList is set to false, the only the remaining elements will be matched.
+     * This is used when processing a second time in the other direction
+     * param 0: std::vector<DocObject*>* that holds the current elements to match
+     * param 1: bool* fillList for indicating whether the elements have to be stack or not
+     */
+    virtual int PrepareTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Processes Chord and Note for matching @tie by processing by Layer and by looking
+     * at the Pname and Oct
+     * param 0: std::vector<Note*>* that holds the current notes with open ties
+     * param 1: Chord** currentChord for the current chord if in a chord
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Processes Chord and Note for matching @tie by processing by Layer; resets the
+     * Chord pointer to NULL at the end of a chord
+     * param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
+     * param 1: Chord** currentChord for the current chord if in a chord
+     */
+    virtual int PrepareTieAttrEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Goes through all the TimeSpanningInterface element and set them a current to each staff 
+     * where require. For Note with DrawingTieAttr, the functor is redireted to the tie object
+     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
+     */
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends
@@ -494,14 +515,6 @@ public:
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int FillStaffCurrentLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
-    /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
-     */
-    virtual int FillStaffCurrentLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-
     
     /**
      * @name Functors for justification

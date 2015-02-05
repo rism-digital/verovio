@@ -15,6 +15,7 @@
 
 #include "note.h"
 #include "verse.h"
+#include "staff.h"
 
 namespace vrv {
 
@@ -100,8 +101,10 @@ int Syl::FillStaffCurrentLyrics( ArrayPtrVoid params )
     
     // Since the lastNote was set in Syl::PrepareLyircs previously
     // we can rely on it to check if the syl has a forward connector
-    if (this->m_drawingLastNote) {
-        (*currentSyl) = this;
+    if (this->m_drawingLastNote ) {
+        if ( this->m_drawingFirstNote->GetFirstParent( &typeid(Staff) ) != this->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) ) {
+            (*currentSyl) = this;
+        }
     }
     else {
         (*currentSyl) = NULL;

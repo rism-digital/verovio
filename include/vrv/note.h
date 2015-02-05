@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
@@ -39,7 +40,8 @@ class Verse;
 class Note: public LayerElement, public DurationInterface, public PitchInterface,
     public AttColoration,
     public AttNoteLogMensural,
-    public AttStemmed
+    public AttStemmed,
+    public AttTiepresent
 {
 public:
     /**
@@ -70,47 +72,41 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    void AddElement(LayerElement *element);
+    void AddLayerElement(LayerElement *element);
     
     /**
-     * @name Setters and getters for tie attributes
+     * @name Setter and getter for tie attribute
      */
     ///@{
-    void SetTieAttrInitial( );
-    void SetTieAttrTerminal( Note *previousNote );
-    Tie *GetTieAttrInitial( ) { return m_tieAttrInitial; };
-    Tie *GetTieAttrTerminal( ) { return m_tieAttrTerminal; };
-    void ResetTieAttrInitial();
-    void ResetTieAttrTerminal() { m_tieAttrTerminal = NULL; };
-    ///@}
-    
-    /**
-     * @name Setters and getters for slur attributes.
-     * Only one attribute is currently supported.
-     */
-    ///@{
-    void SetSlurAttrInitial( );
-    void SetSlurAttrTerminal( Note *previousNote );
-    Slur *GetSlurAttrInitial( ) { return m_slurAttrInitial; };
-    Slur *GetSlurAttrTerminal( ) { return m_slurAttrTerminal; };
-    void ResetSlurAttrInitial();
-    void ResetSlurAttrTerminal() { m_slurAttrTerminal = NULL; };
+    void ResetDrawingTieAttr( );
+    void SetDrawingTieAttr( );
+    Tie *GetDrawingTieAttr( ) { return m_drawingTieAttr; };
     ///@}
     
     /**
      * Overriding functions to return information from chord parent if 
      * note is direct child of a chord.
      */
-    
+    ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
+    ///@}
     
+    /**
+     * Returns a single integer representing pitch and octave.
+     */
+    int GetDiatonicPitch( ) { return this->GetPname() + (int)this->GetOct() * 7; };
     
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttr( ArrayPtrVoid params );
     
     /**
      * Functor for setting wordpos and connector ends
@@ -118,32 +114,21 @@ public:
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );
     
+    /**
+     */
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    
 private:
     
 protected:
     
     /**
-     * @name Tie attributes are represented by pointers to Tie objects.
-     * There is one pointer for the initial attribute and one pointer for the end attribute.
-     * The Tie objects points back to the notes as it is the case with a MEI tie element.
-     * With attributes, the note with the initial attribute own the Tie object and take care of deleting it
+     * @name Tie attributes are represented a pointers to Tie objects.
+     * There is one pointer for the initial attribute (TIE_i or TIE_m).
+     * The note with the initial attribute owns the Tie object and take care of deleting it
      */
     ///@{
-    Tie *m_tieAttrInitial;
-    Tie *m_tieAttrTerminal;
-    ///@}
-    
-    /**
-     * @name Slur attributes are represented by pointers to Slur objects.
-     * There is one pointer for the initial attribute and one pointer for the end attribute.
-     * The Slur objects points back to the notes as it is the case with a MEI slur element.
-     * With attributes, the note with the initial attribute own the Slur object and take care of deleting it.
-     * Currenly only one single slub attribute (@slur="i1") is supported.
-     */
-     /* Note: we would need to change this to a Slur vector to support 1-6 slur attributes */
-    ///@{
-    Slur *m_slurAttrInitial;
-    Slur *m_slurAttrTerminal;
+    Tie *m_drawingTieAttr;
     ///@}
     
 public:
@@ -157,6 +142,9 @@ public:
     data_STEMDIRECTION m_drawingStemDir;
     /** drawing stem length */
     int d_stemLen;
+    
+    /** flags for determining clusters in chord **/
+    bool m_flippedNotehead;
     
 private:
     

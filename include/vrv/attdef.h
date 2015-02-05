@@ -260,6 +260,16 @@ enum data_STEMPOSITION {
     STEMPOSITION_right,
     STEMPOSITION_center
 };
+    
+/**
+ * MEI data.TIE
+ */
+enum data_TIE {
+    TIE_NONE = 0,
+    TIE_i,
+    TIE_m,
+    TIE_t
+};
         
 /**
  * MEI values for @wordpos (no datatype in MEI)

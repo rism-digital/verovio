@@ -30,8 +30,10 @@ Note::Note():
 	LayerElement("note-"), DurationInterface(), PitchInterface(),
     AttColoration(),
     AttNoteLogMensural(),
-    AttStemmed()
+    AttStemmed(),
+    AttTiepresent()
 {
+    m_drawingTieAttr = NULL;
     Reset();
 }
 
@@ -39,8 +41,9 @@ Note::Note():
 Note::~Note()
 {
     // This deletes the Tie and Slur objects if necessary
-    ResetTieAttrInitial();
-    ResetSlurAttrInitial();
+    if (m_drawingTieAttr) {
+        delete m_drawingTieAttr;
+    }
 }
     
 void Note::Reset()
@@ -52,16 +55,13 @@ void Note::Reset()
     ResetColoration();
     ResetNoteLogMensural();
     ResetStemmed();
+    ResetTiepresent();
     
     // TO BE REMOVED
     m_acciaccatura = false;
     m_embellishment = EMB_NONE;
     // tie pointers
-    m_tieAttrInitial = NULL;
-    m_tieAttrTerminal = NULL;
-    // slur pointers
-    m_slurAttrInitial = NULL;
-    m_slurAttrTerminal = NULL;
+    ResetDrawingTieAttr();
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -105,7 +105,7 @@ bool Note::operator==( Object& other )
     return true;
 }
     
-void Note::AddElement(vrv::LayerElement *element)
+void Note::AddLayerElement(vrv::LayerElement *element)
 {
     assert( dynamic_cast<Verse*>(element) || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
@@ -131,72 +131,22 @@ void Note::SetValue( int value, int flag )
     }    
 }
 
-void Note::SetTieAttrInitial()
+void Note::SetDrawingTieAttr(  )
 {
-    if ( m_tieAttrInitial ) {
-        LogWarning("Initial tie attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_tieAttrInitial = new Tie();
-    m_tieAttrInitial->SetFirstNote( this );
+    assert(!this->m_drawingTieAttr);
+    if ( m_drawingTieAttr ) return;
+    m_drawingTieAttr = new Tie();
+    m_drawingTieAttr->SetStart( this );
 }
 
-void Note::SetTieAttrTerminal( Note *previousNote )
+void Note::ResetDrawingTieAttr( )
 {
-    if ( m_tieAttrTerminal ) {
-        LogWarning("Terminal tie attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    if ( !previousNote || !previousNote->GetTieAttrInitial() ) {
-        LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_tieAttrTerminal = previousNote->GetTieAttrInitial();
-    m_tieAttrTerminal->SetSecondNote( this );
-}
-
-void Note::ResetTieAttrInitial( )
-{
-    if ( m_tieAttrInitial ) {
-        // Deleting the Tie object will also reset the m_tieAttrTerminal of the second note
-        delete m_tieAttrInitial;
-        m_tieAttrInitial = NULL;
+    if ( m_drawingTieAttr ) {
+        delete m_drawingTieAttr;
+        m_drawingTieAttr = NULL;
     }
 }
-    
-void Note::SetSlurAttrInitial()
-{
-    if ( m_slurAttrInitial ) {
-        LogWarning("Initial slur attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_slurAttrInitial = new Slur();
-    m_slurAttrInitial->SetFirstNote( this );
-}
-
-void Note::SetSlurAttrTerminal( Note *previousNote )
-{
-    if ( m_slurAttrTerminal ) {
-        LogWarning("Terminal slur attribute already set for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    if ( !previousNote || !previousNote->GetSlurAttrInitial() ) {
-        LogWarning("No previous note or previous note without intial or median attribute for note '%s", this->GetUuid().c_str() );
-        return;
-    }
-    m_slurAttrTerminal = previousNote->GetSlurAttrInitial();
-    m_slurAttrTerminal->SetSecondNote( this );
-}
-
-void Note::ResetSlurAttrInitial( )
-{
-    if ( m_slurAttrInitial ) {
-        // Deleting the Slur object will also reset the m_slurAttrTerminal of the second note
-        delete m_tieAttrInitial;
-        m_tieAttrInitial = NULL;
-    }
-}
-    
+  
 int Note::GetDrawingDur( )
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
@@ -213,9 +163,14 @@ int Note::GetDrawingDur( )
 bool Note::HasDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
     if( chordParent )
     {
         return chordParent->HasStemDir();
+    }
+    else if( beamParent )
+    {
+        return beamParent->GetDrawingStemDir();
     }
     else
     {
@@ -231,9 +186,14 @@ Chord* Note::IsChordTone()
 data_STEMDIRECTION Note::GetDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
     if( chordParent )
     {
         return chordParent->GetStemDir();
+    }
+    else if( beamParent )
+    {
+        return beamParent->GetDrawingStemDir();
     }
     else
     {
@@ -245,6 +205,57 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Note::PrepareTieAttr( ArrayPtrVoid params )
+{
+    // param 0: std::vector<Note*>* that holds the current notes with open ties
+    // param 1: Chord** currentChord for the current chord if in a chord
+    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>(params[0]);
+    Chord **currentChord = static_cast<Chord**>(params[1]);
+    
+    AttTiepresent *check = this;
+    if ((*currentChord)) {
+        check = (*currentChord);
+    }
+    assert(check);
+    
+    std::vector<Note*>::iterator iter = currentNotes->begin();
+    while ( iter != currentNotes->end()) {
+        // same octave and same pitch - this is the one!
+        if ((this->GetOct()==(*iter)->GetOct()) && (this->GetPname()==(*iter)->GetPname())) {
+            // right flag
+            if ((check->GetTie()==TIE_m) || (check->GetTie()==TIE_t)) {
+                assert( (*iter)->GetDrawingTieAttr() );
+                (*iter)->GetDrawingTieAttr()->SetEnd(this);
+            }
+            else {
+                LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
+                (*iter)->ResetDrawingTieAttr();
+            }
+            iter = currentNotes->erase( iter );
+            // we are done for this note
+            break;
+        }
+        iter++;
+    }
+
+    if ((check->GetTie()==TIE_m) || (check->GetTie()==TIE_i)) {
+        this->SetDrawingTieAttr();
+        currentNotes->push_back(this);
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+
+int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->m_drawingTieAttr) {
+        return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(params);
+    }
+    return FUNCTOR_CONTINUE;
+}
+    
 int Note::PrepareLyrics( ArrayPtrVoid params )
 {
     // param 0: the current Syl (unused)

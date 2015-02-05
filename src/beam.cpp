@@ -22,6 +22,8 @@ Beam::Beam():
     LayerElement("beam-"), ObjectListInterface()
 {
     Reset();
+    
+    m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
 
@@ -34,7 +36,7 @@ void Beam::Reset()
     LayerElement::Reset();
 }
 
-void Beam::AddElement(LayerElement *element)
+void Beam::AddLayerElement(LayerElement *element)
 {
    
     element->SetParent( this );

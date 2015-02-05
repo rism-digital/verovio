@@ -52,7 +52,7 @@ namespace vrv {
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures    
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
-void View::DrawElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -229,6 +229,29 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    Chord *chordParent = dynamic_cast<Chord*>(element->m_parent);
+    Beam *beamParent = dynamic_cast<Beam*>(element->m_parent);
+    
+    //if note is a direct child of layer, we can draw it immediately
+    if (element->m_parent == layer) {
+        std::cout << "found a single note" << std::endl;
+        DrawNotehead(dc, element, layer, staff, measure);
+    }
+    //but if it's a parent of chord or beam, we need to know the stem direction and placement first
+    else if (chordParent) {
+        std::cout << "found a chord parent - postponing" << std::endl;
+        chordParent->AddToDrawingList(element);
+        //DrawNotehead(dc, element, layer, staff, measure);
+    }
+    else if (beamParent) {
+        std::cout << "found a beam parent - postponing" << std::endl;
+        beamParent->AddToDrawingList(element);
+        //DrawNotehead(dc, element, layer, staff, measure);
+    }
+}
+    
+void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
@@ -287,8 +310,33 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         ledge= m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 		radius += radius/3;
 	}
-
-	x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
+    
+    verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
+    if ( note->HasDrawingStemDir() ) {
+        note->m_drawingStemDir = note->GetDrawingStemDir();
+    }
+    else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        note->m_drawingStemDir = layer->GetDrawingStemDir();
+    }
+    else {
+        note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    }
+    
+    if (!note->m_flippedNotehead) {
+        x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
+    }
+    else {
+        if (note->m_drawingStemDir == STEMDIRECTION_up) {
+            x1 = xn + radius;
+        }
+        else if (note->m_drawingStemDir == STEMDIRECTION_down) {
+            x1 = xn - radius * 3;
+        }
+        else {
+            x1 = xn - radius;
+        }
+    }
+    
     xl = xn;
 
     // Long, breve and ligatures
@@ -313,10 +361,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         else {
 			fontNo = SMUFL_E0A4_noteheadBlack;
         }
-
+        
+        std::cout << "\twith x at " << x1 << std::endl;
 		DrawSmuflCode( dc, x1, y1, fontNo,  staff->staffSize, note->m_cueSize );
-
-		verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
 
 		//if (note->m_chord) { /*** && this == testchord)***/
 		//	ynn_chrd = ynn;
@@ -325,15 +372,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             // no stem
 		}
         else  {
-			if ( note->HasStemDir() ) {
-                note->m_drawingStemDir = note->GetStemDir();
-            }
-            else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-                note->m_drawingStemDir = layer->GetDrawingStemDir();
-            }
-            else {
-                note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
-            }
             DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xn, y1);
         }
 
@@ -367,39 +405,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		DrawDots( dc, x2, y1, note->GetDots(), staff );
 	}
     
-    // Add the ties to the postponed drawing list
-    if ( note->GetTieAttrInitial() ) {
-        // normally, we add the tie from the terminal note,
-        // however, when the notes are not on the same system (or page),
-        // we need to draw them twice. For this reason, we look if the
-        // parent system is the same or not. If not, we also add to the list
-        // the tie from the inital note
-        Note *noteTerminal = note->GetTieAttrInitial()->GetSecondNote();
-        if ( noteTerminal ) {
-            System *parentSystem1 = dynamic_cast<System*>( note->GetFirstParent( &typeid(System) ) );
-            System *parentSystem2 = dynamic_cast<System*>( noteTerminal->GetFirstParent( &typeid(System) ) );
-            if ( (parentSystem1 != parentSystem2) && parentSystem1 ) {
-                layer->AddToDrawingList( note->GetTieAttrInitial() );
-            }
-        }
-    }
-    if ( note->GetTieAttrTerminal() ) {
-        layer->AddToDrawingList( note->GetTieAttrTerminal() );
-    }
-    
-    // same for slurs
-    if ( note->GetSlurAttrInitial() ) {
-        Note *noteTerminal = note->GetSlurAttrInitial()->GetSecondNote();
-        if ( noteTerminal ) {
-            System *parentSystem1 = dynamic_cast<System*>( note->GetFirstParent( &typeid(System) ) );
-            System *parentSystem2 = dynamic_cast<System*>( noteTerminal->GetFirstParent( &typeid(System) ) );
-            if ( (parentSystem1 != parentSystem2) && parentSystem1 ) {
-                layer->AddToDrawingList( note->GetSlurAttrInitial() );
-            }
-        }
-    }
-    if ( note->GetSlurAttrTerminal() ) {
-        layer->AddToDrawingList( note->GetSlurAttrTerminal() );
+    if (note->GetDrawingTieAttr()) {
+        System *system = dynamic_cast<System*>(measure->GetFirstParent(&typeid(System)));
+        // create a placeholder for the tie attribute that will be drawn from the system
+        dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
+        dc->EndGraphic(note->GetDrawingTieAttr(), this);
+        if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
 
     // This will draw lyrics, accid, etc.
@@ -1017,34 +1028,44 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
     int yMax, yMin;
-    chord->GetYExtremes(verticalCenter, &yMax, &yMin);
+    chord->GetYExtremes(&yMax, &yMin);
         
     int drawingDur = chord->GetDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-    chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up );
     
     if(inBeam && drawingDur > DUR_4)
     {
+        
         //no stem
     }
     else {
-        int originY;
-        if (yMax - verticalCenter >= verticalCenter - yMin) {
-            chord->SetStemDir( STEMDIRECTION_down );
-            originY = yMax;
+        if ( chord->HasStemDir() ) {
+            chord->m_drawingStemDir = chord->GetStemDir();
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            chord->m_drawingStemDir = layer->GetDrawingStemDir();
         }
         else {
-            chord->SetStemDir( STEMDIRECTION_up );
-            originY = yMin;
+            chord->m_drawingStemDir = (yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
         }
         
-        chord->m_drawingStemDir = chord->GetStemDir();
-        
-        int heightY = yMax - yMin;
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
         int beamX = chord->GetDrawingX();
+        int originY = ( chord->GetStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int heightY = yMax - yMin;
         
         DrawStem(dc, chord, staff, chord->GetStemDir(), radius, beamX, originY, heightY);
+    }
+    
+    if (!inBeam)
+    {
+        ListOfObjects *noteList = chord->GetDrawingList();
+        ListOfObjects::iterator iter = noteList->begin();
+        
+        while ( iter != noteList->end()) {
+            DrawNotehead(dc, dynamic_cast<Note*>(*iter), layer, staff, measure);
+            iter++;
+        }
     }
 }
 
@@ -1537,11 +1558,11 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, System *system )
         // We need the first measure of the system for x1
         Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
         if ( !Check( first ) ) return;
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
         Staff *staff = dynamic_cast<Staff*>( syl->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) );
         if ( !Check( staff ) ) return;
+        // Also try to get a first note - we should change this once we have a x position in measure that
+        // takes into account the scoreDef
+        Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( &typeid(Note) ) );
         
         int y = GetSylY(syl, staff);
         int x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
@@ -1690,11 +1711,11 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Tie *tie = dynamic_cast<Tie*>(element);
     Slur *slur = dynamic_cast<Slur*>(element);
     if ( tie ) {
-        note1 = tie->GetFirstNote();
-        note2 = tie->GetSecondNote();
+        note1 = tie->GetStart();
+        note2 = tie->GetEnd();
     } else if ( slur ) {
-        note1 = slur->GetFirstNote();
-        note2 = slur->GetSecondNote();
+        note1 = slur->GetStart();
+        note2 = slur->GetEnd();
     }
     
     if ( !note1 && !note2 ) {
