@@ -1063,7 +1063,9 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         ListOfObjects::iterator iter = noteList->begin();
         
         while ( iter != noteList->end()) {
+            dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
             DrawNotehead(dc, dynamic_cast<Note*>(*iter), layer, staff, measure);
+            dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
             iter++;
         }
     }

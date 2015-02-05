@@ -18,6 +18,7 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "devicecontext.h"
 #include "doc.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -339,12 +340,16 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             ListOfObjects::iterator iter = noteList->begin();
             
             while ( iter != noteList->end()) {
+                dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
                 DrawNotehead(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure);
+                dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
                 iter++;
             }
         }
         else if (beamElementCoord[i].element->IsNote()) {
+            dc->ResumeGraphic( dynamic_cast<DocObject*>(beamElementCoord[i].element), beamElementCoord[i].element->GetUuid() );
             DrawNotehead(dc, dynamic_cast<LayerElement*>(beamElementCoord[i].element), layer, staff, measure);
+            dc->EndResumedGraphic( dynamic_cast<DocObject*>(beamElementCoord[i].element), this );
         }
     }
 
