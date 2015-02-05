@@ -21,6 +21,7 @@ namespace vrv {
     
 class Doc;
 class EditorialElement;
+class FileOutputStream;
 class Functor;
 
 /**
@@ -279,6 +280,12 @@ public:
      * Mark the object and its parent (if any) as modified
      */
     void Modify( bool modified = true );
+    
+    /**
+     * Saves the object (and its children) using the specified output stream.
+     * Creates a functors that will parse the tree.
+     */
+    virtual int Save( FileOutputStream *output );
     
     /**
      * Main method that processes functors.

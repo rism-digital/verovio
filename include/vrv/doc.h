@@ -10,7 +10,6 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
-#include "io.h"
 #include "scoredef.h"
 
 namespace vrv {
@@ -110,12 +109,6 @@ public:
     void SetJustificationX( bool drawingJustifyX ) { m_drawingJustifyX = drawingJustifyX; };
     bool GetJustificationX( ) { return m_drawingJustifyX; };
     ///@}
-    
-    /**
-     * Saves the document using the specified output stream.
-     * Creates a functors that will parse the full tree.
-     */
-    virtual int Save( FileOutputStream *output );
 
     /**
      * Set the initial scoreDef of each page

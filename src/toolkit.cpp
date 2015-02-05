@@ -248,8 +248,11 @@ bool Toolkit::LoadString( const std::string &data )
 
 std::string Toolkit::GetMEI( int pageNo )
 {
+    // Page number is one-based - correction to 0-based first
+    pageNo--;
+    
     MeiOutput meioutput( &m_doc, "" );
-    return meioutput.GetOutput();
+    return meioutput.GetOutput( pageNo );
 }
 
 

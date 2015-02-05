@@ -599,18 +599,6 @@ int Doc::GetAdjustedDrawingPageWidth()
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;;
 }
-
-int Doc::Save( FileOutputStream *output )
-{
-    ArrayPtrVoid params;
-	params.push_back( output );
-
-    Functor save( &Object::Save );
-    Functor saveEnd( &Object::SaveEnd );
-    this->Process( &save, params, &saveEnd );
-    
-    return true;
-}
     
 //----------------------------------------------------------------------------
 // Doc functors methods
