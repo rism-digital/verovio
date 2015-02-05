@@ -98,5 +98,11 @@ int Syl::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
     // Pass it to the pseudo functor of the interface
     return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
+    
+int Syl::ResetDarwing( ArrayPtrVoid params )
+{
+    // Pass it to the pseudo functor of the interface
+    return  TimeSpanningInterface::ResetDrawing(params, this);
+};
 
 } // namespace vrv

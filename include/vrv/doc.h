@@ -302,6 +302,12 @@ private:
      */
     bool m_currentScoreDefDone;
     
+    /**
+     * A flag for indicating if the drawing preparation has been done. If yes,
+     * drawing preparation will be reset before being done again.
+     */
+    bool m_drawingPreparationDone;
+    
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;
     /** Page height (MEI scoredef@page.height) - currently not saved */

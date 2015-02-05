@@ -72,6 +72,7 @@ void Doc::Reset( DocType type )
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
+    m_drawingPreparationDone = false;
     
     m_scoreDef.Reset();
     
@@ -93,6 +94,11 @@ void Doc::Refresh()
 void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
+    
+    if (m_drawingPreparationDone) {
+        Functor resetDrawing( &Object::ResetDarwing );
+        this->Process( &resetDrawing, params );
+    }
     
     // Try to match all spanning elements (slur, tie, etc) by processing backward
     std::vector<DocObject*> timeSpanningElements;
@@ -252,6 +258,8 @@ void Doc::PrepareDrawing()
     */
     
     //LogElapsedTimeEnd ( "Preparing drawing" );
+    
+    m_drawingPreparationDone = true;
 }
     
 void Doc::SetCurrentScoreDef( bool force )

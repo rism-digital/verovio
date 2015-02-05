@@ -510,6 +510,11 @@ public:
     virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
      * @name Functors for justification
      */
     ///@{

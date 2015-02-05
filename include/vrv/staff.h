@@ -95,6 +95,11 @@ public:
      */
     virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
     
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params );
+    
 public:
 	/**
      * Number of lines copied from the staffDef for fast access when drawing
@@ -106,7 +111,6 @@ public:
      */
     int m_drawingHeight;
     
-    std::vector<Syl*>m_currentSyls;
     std::vector<DocObject*>m_timeSpanningElements;
 
 	/**
