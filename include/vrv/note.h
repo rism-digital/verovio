@@ -90,8 +90,12 @@ public:
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
+    bool IsInCluster( ) { return m_clusterPosition > 0; };
+    
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
+    
+    
     ///@}
     
     /**

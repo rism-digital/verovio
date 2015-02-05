@@ -282,8 +282,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
 		ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
-	
-    }
+	}
     else {
         ledge= m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 		radius += radius/3;
@@ -302,16 +301,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     //determine if note should be flipped; x1 determines where the note is in relation to the tail
-    if (inChord) {
+    if (note->IsInCluster()) {
         bool flippedNotehead = false;
-        if (note->m_clusterPosition > 0) {
-            //the note will be flipped on odd indices when the stem goes down, otherwise flipped on even indices
-            if (note->m_evenCluster && note->m_drawingStemDir == STEMDIRECTION_down) {
-                flippedNotehead = (note->m_clusterPosition % 2 == 0);
-            }
-            else {
-                flippedNotehead = (note->m_clusterPosition % 2 != 0);
-            }
+        if (note->m_evenCluster && note->m_drawingStemDir == STEMDIRECTION_down) {
+            flippedNotehead = (note->m_clusterPosition % 2 == 0);
+        }
+        else {
+            flippedNotehead = (note->m_clusterPosition % 2 != 0);
         }
         
         //positions notehead
@@ -348,7 +344,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
 		DrawSmuflCode( dc, x1, y1, fontNo, staff->staffSize, note->m_cueSize );
-		//totalFlagStemHeight = y1;
 	}
     // Other values
 	else {
@@ -361,13 +356,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
 		DrawSmuflCode( dc, x1, y1, fontNo,  staff->staffSize, note->m_cueSize );
 
-		//if (note->m_chord) { /*** && this == testchord)***/
-		//	ynn_chrd = ynn;
-        //}
-		if ((inBeam && drawingDur > DUR_4) || inChord) {
-            // no stem
-		}
-        else  {
+		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
             DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xn, y1);
         }
 
@@ -388,15 +377,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         DrawAccid( dc, &accid, layer, staff, measure ); // ax2
 	}
 	
-    if (0) {
-	}
-	else {
-        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
-			x2 = xn + m_doc->m_drawingUnit[staffSize]*7/2;
-		else
-			x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
-	}
-
+    if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+        x2 = xn + m_doc->m_drawingUnit[staffSize]*7/2;
+    else
+        x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
+	
 	if (note->GetDots()) {
 		DrawDots( dc, x2, y1, note->GetDots(), staff );
 	}
@@ -1031,7 +1016,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     if(inBeam && drawingDur > DUR_4)
     {
-        
         //no stem
     }
     else {
@@ -1047,10 +1031,10 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
         int beamX = chord->GetDrawingX();
-        int originY = ( chord->GetStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
         int heightY = yMax - yMin;
         
-        DrawStem(dc, chord, staff, chord->GetStemDir(), radius, beamX, originY, heightY);
+        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
     }
     
     if (!inBeam)
