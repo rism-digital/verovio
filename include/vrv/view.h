@@ -127,6 +127,15 @@ public:
      */
 	void DrawCurrentPage( DeviceContext *dc, bool background = true );
     
+    /**
+     * @name Methods for calculating drawing positions
+     * Defined in view_element.cpp
+     */
+    ///@{
+    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
+    int CalculateRestPosY ( Staff *staff, char duration);
+    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
+    ///@}
     
 protected:
     /** 
@@ -178,16 +187,6 @@ protected:
     void DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
     void DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
     void DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
-    ///@}
-    
-    /**
-     * @name Methods for calculating drawing positions
-     * Defined in view_element.cpp
-     */
-    ///@{
-    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
-    int CalculateRestPosY ( Staff *staff, char duration);
-    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
     ///@}
     
     /**
