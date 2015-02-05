@@ -91,6 +91,12 @@ extern "C" {
 		
 		return vrvToolkit_renderPage(tk, 1, options);
 	}
-
-
+    
+    bool vrvToolkit_edit(Toolkit *tk, const char *editorAction) {
+        if (!tk->Edit( editorAction )) {
+            vrv::LogError( "Could not perform editor action." );
+            return false;
+        }
+        return true;
+    }
 }

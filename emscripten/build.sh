@@ -158,7 +158,8 @@ python $EMCC $CHATTY \
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\
 		'_vrvToolkit_renderPage',\
-		'_vrvToolkit_setOptions']" \
+		'_vrvToolkit_setOptions',\
+		'_vrvToolkit_edit']" \
 	-o build/verovio.js
 
 if [ $? -eq 0 ]; then 

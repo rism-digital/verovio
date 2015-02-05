@@ -40,6 +40,9 @@ verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number
 // void setOptions(Toolkit *ic, const char *options) 
 verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['number', 'string']);
 
+// bool edit(Toolkit *ic, const char *editorAction) 
+verovio.vrvToolkit.edit = Module.cwrap('vrvToolkit_edit', 'number', ['number', 'string']);
+
 // A pointer to the object - only one instance can be created for now
 verovio.ptr = 0;
 
@@ -96,6 +99,10 @@ verovio.toolkit.prototype.getMEI = function (page_no) {
 
 verovio.toolkit.prototype.setOptions = function (options) {
 	verovio.vrvToolkit.setOptions(this.ptr, options);
+};
+
+verovio.toolkit.prototype.edit = function (editorAction) {
+	return verovio.vrvToolkit.edit(this.ptr, editorAction);
 };
 
 /***************************************************************************************************************************/
