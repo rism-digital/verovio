@@ -37,7 +37,33 @@ public:
     virtual ~Att();
     ///@}
     
-protected:
+    /** 
+     * @name static method for blind attribute modification
+     * The implementation is implemented by LibMEI in each module corresponding file
+     * Use in the toolkit for applying attribute modification to unspecified elements
+     * See Toolkit::Set method
+     * Files to be uncommented according to the inclusion of the corresponding LibMEI files
+     */
+    ///@{
+    //static bool SetAnalysis( Object *element, std::string attrType, std::string attrValue );
+    static bool SetCmn( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetCmnornaments( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetEdittrans( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetFacsimile( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetFigtable( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetHarmony( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetHeader( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetLinkalign( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetLyrics( Object *element, std::string attrType, std::string attrValue );
+    static bool SetMensural( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetMidi( Object *element, std::string attrType, std::string attrValue );
+    static bool SetPagebased( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetNeumes( Object *element, std::string attrType, std::string attrValue );
+    static bool SetShared( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetTablature( Object *element, std::string attrType, std::string attrValue );
+    
+public:
     /** Dummy string converter */
     std::string StrToStr(std::string str);
     

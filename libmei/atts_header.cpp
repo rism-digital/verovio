@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -62,5 +64,17 @@ bool AttRegularmethod::HasMethod( )
 
 /* include <attmethod> */
 
-} // vrv namespace
+bool Att::SetHeader( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "method") && dynamic_cast<AttRegularmethod*>(element) ) {
+        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+        att->SetMethod(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

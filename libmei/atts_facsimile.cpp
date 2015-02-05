@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -64,5 +66,17 @@ void AttFacsimile::getCoords() {
     return;
 }
 
-} // vrv namespace
+bool Att::SetFacsimile( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "facs") && dynamic_cast<AttFacsimile*>(element) ) {
+        AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
+        att->SetFacs(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

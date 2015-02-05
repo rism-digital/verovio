@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -104,5 +106,22 @@ bool AttSource::HasSource( )
 
 /* include <attsource> */
 
-} // vrv namespace
+bool Att::SetCritapp( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "cause") && dynamic_cast<AttCrit*>(element) ) {
+        AttCrit *att = dynamic_cast<AttCrit*>(element);
+        att->SetCause(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "source") && dynamic_cast<AttSource*>(element) ) {
+        AttSource *att = dynamic_cast<AttSource*>(element);
+        att->SetSource(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

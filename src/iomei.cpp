@@ -1276,7 +1276,7 @@ bool MeiInput::ReadMeiAccid( Object *parent, pugi::xml_node accid )
     ReadLayerElement(accid, vrvAccid);
     
     ReadPositionInterface(accid, vrvAccid);
-    vrvAccid->ResetAccidental();
+    vrvAccid->ReadAccidental(accid);
     
     AddLayerElement(parent, vrvAccid);
     return true;

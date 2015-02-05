@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -62,5 +64,17 @@ bool AttAlignment::HasWhen( )
 
 /* include <attwhen> */
 
-} // vrv namespace
+bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "when") && dynamic_cast<AttAlignment*>(element) ) {
+        AttAlignment *att = dynamic_cast<AttAlignment*>(element);
+        att->SetWhen(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

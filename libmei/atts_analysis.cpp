@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -384,5 +386,72 @@ bool AttSolfa::HasPsolfa( )
 
 /* include <attpsolfa> */
 
-} // vrv namespace
+bool Att::SetAnalysis( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "copyof") && dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        att->SetCopyof(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "corresp") && dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        att->SetCorresp(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "next") && dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        att->SetNext(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "prev") && dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        att->SetPrev(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "sameas") && dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        att->SetSameas(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "synch") && dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        att->SetSynch(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "deg") && dynamic_cast<AttHarmonicfunction*>(element) ) {
+        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction*>(element);
+        att->SetDeg(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "inth") && dynamic_cast<AttIntervalharmonic*>(element) ) {
+        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic*>(element);
+        att->SetInth(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "intm") && dynamic_cast<AttIntervallicdesc*>(element) ) {
+        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc*>(element);
+        att->SetIntm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "mfunc") && dynamic_cast<AttMelodicfunction*>(element) ) {
+        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction*>(element);
+        att->SetMfunc(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "pclass") && dynamic_cast<AttPitchclass*>(element) ) {
+        AttPitchclass *att = dynamic_cast<AttPitchclass*>(element);
+        att->SetPclass(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "psolfa") && dynamic_cast<AttSolfa*>(element) ) {
+        AttSolfa *att = dynamic_cast<AttSolfa*>(element);
+        att->SetPsolfa(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

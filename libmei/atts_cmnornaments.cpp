@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -230,5 +232,47 @@ bool AttTurnLog::HasForm( )
 
 /* include <attform> */
 
-} // vrv namespace
+bool Att::SetCmnornaments( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "form") && dynamic_cast<AttMordentLog*>(element) ) {
+        AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "long") && dynamic_cast<AttMordentLog*>(element) ) {
+        AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
+        att->SetLong(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "ornam") && dynamic_cast<AttOrnam*>(element) ) {
+        AttOrnam *att = dynamic_cast<AttOrnam*>(element);
+        att->SetOrnam(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "accidupper") && dynamic_cast<AttOrnamentaccid*>(element) ) {
+        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
+        att->SetAccidupper(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "accidlower") && dynamic_cast<AttOrnamentaccid*>(element) ) {
+        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
+        att->SetAccidlower(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "delayed") && dynamic_cast<AttTurnLog*>(element) ) {
+        AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
+        att->SetDelayed(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "form") && dynamic_cast<AttTurnLog*>(element) ) {
+        AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

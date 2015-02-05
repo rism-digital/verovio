@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -76,5 +78,22 @@ bool AttVerseLog::HasRhythm( )
 
 /* include <attrhythm> */
 
-} // vrv namespace
+bool Att::SetLyrics( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "refrain") && dynamic_cast<AttVerseLog*>(element) ) {
+        AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
+        att->SetRefrain(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "rhythm") && dynamic_cast<AttVerseLog*>(element) ) {
+        AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
+        att->SetRhythm(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

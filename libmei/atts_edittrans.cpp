@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -202,5 +204,37 @@ bool AttReasonident::HasReason( )
 
 /* include <attreason> */
 
-} // vrv namespace
+bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "agent") && dynamic_cast<AttAgentident*>(element) ) {
+        AttAgentident *att = dynamic_cast<AttAgentident*>(element);
+        att->SetAgent(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "cert") && dynamic_cast<AttEdit*>(element) ) {
+        AttEdit *att = dynamic_cast<AttEdit*>(element);
+        att->SetCert(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "evidence") && dynamic_cast<AttEdit*>(element) ) {
+        AttEdit *att = dynamic_cast<AttEdit*>(element);
+        att->SetEvidence(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "extent") && dynamic_cast<AttExtent*>(element) ) {
+        AttExtent *att = dynamic_cast<AttExtent*>(element);
+        att->SetExtent(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "reason") && dynamic_cast<AttReasonident*>(element) ) {
+        AttReasonident *att = dynamic_cast<AttReasonident*>(element);
+        att->SetReason(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

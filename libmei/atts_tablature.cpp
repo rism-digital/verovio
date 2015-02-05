@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -118,5 +120,27 @@ bool AttStaffDefGesTablature::HasTabStrings( )
 
 /* include <atttab.strings> */
 
-} // vrv namespace
+bool Att::SetTablature( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "tabFret") && dynamic_cast<AttNoteGesTablature*>(element) ) {
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
+        att->SetTabFret(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "tabString") && dynamic_cast<AttNoteGesTablature*>(element) ) {
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
+        att->SetTabString(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "tabStrings") && dynamic_cast<AttStaffDefGesTablature*>(element) ) {
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
+        att->SetTabStrings(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

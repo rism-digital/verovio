@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -76,5 +78,22 @@ bool AttTabular::HasRowspan( )
 
 /* include <attrowspan> */
 
-} // vrv namespace
+bool Att::SetFigtable( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "colspanInt") && dynamic_cast<AttTabular*>(element) ) {
+        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        att->SetColspan(att->StrToInt(attrValue));
+    return true;
+    }
+    if ( (attrType == "rowspanInt") && dynamic_cast<AttTabular*>(element) ) {
+        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        att->SetRowspan(att->StrToInt(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

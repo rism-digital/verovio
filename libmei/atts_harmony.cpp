@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -160,5 +162,32 @@ bool AttHarmVis::HasRendgrid( )
 
 /* include <attrendgrid> */
 
-} // vrv namespace
+bool Att::SetHarmony( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "fret") && dynamic_cast<AttFretlocation*>(element) ) {
+        AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
+        att->SetFret(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "chordref") && dynamic_cast<AttHarmLog*>(element) ) {
+        AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
+        att->SetChordref(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "extender") && dynamic_cast<AttHarmVis*>(element) ) {
+        AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        att->SetExtender(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "rendgrid") && dynamic_cast<AttHarmVis*>(element) ) {
+        AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        att->SetRendgrid(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

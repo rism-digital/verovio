@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -132,5 +134,32 @@ bool AttUneumeLog::HasName( )
 
 /* include <attname> */
 
-} // vrv namespace
+bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "form") && dynamic_cast<AttIneumeLog*>(element) ) {
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "name") && dynamic_cast<AttIneumeLog*>(element) ) {
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        att->SetName(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "form") && dynamic_cast<AttUneumeLog*>(element) ) {
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "name") && dynamic_cast<AttUneumeLog*>(element) ) {
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        att->SetName(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

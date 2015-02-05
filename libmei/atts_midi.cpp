@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -356,5 +358,72 @@ bool AttTimebase::HasPpq( )
 
 /* include <attppq> */
 
-} // vrv namespace
+bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "midiChannel") && dynamic_cast<AttChannelized*>(element) ) {
+        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        att->SetMidiChannel(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiDuty") && dynamic_cast<AttChannelized*>(element) ) {
+        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        att->SetMidiDuty(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiPort") && dynamic_cast<AttChannelized*>(element) ) {
+        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        att->SetMidiPort(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiTrackInt") && dynamic_cast<AttChannelized*>(element) ) {
+        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        att->SetMidiTrack(att->StrToInt(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiInstrnum") && dynamic_cast<AttMidiinstrument*>(element) ) {
+        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        att->SetMidiInstrnum(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiInstrname") && dynamic_cast<AttMidiinstrument*>(element) ) {
+        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        att->SetMidiInstrname(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiPan") && dynamic_cast<AttMidiinstrument*>(element) ) {
+        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        att->SetMidiPan(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiVolume") && dynamic_cast<AttMidiinstrument*>(element) ) {
+        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        att->SetMidiVolume(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "numInt") && dynamic_cast<AttMidinumber*>(element) ) {
+        AttMidinumber *att = dynamic_cast<AttMidinumber*>(element);
+        att->SetNum(att->StrToInt(attrValue));
+    return true;
+    }
+    if ( (attrType == "midiTempo") && dynamic_cast<AttMiditempo*>(element) ) {
+        AttMiditempo *att = dynamic_cast<AttMiditempo*>(element);
+        att->SetMidiTempo(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "val") && dynamic_cast<AttMidivalue*>(element) ) {
+        AttMidivalue *att = dynamic_cast<AttMidivalue*>(element);
+        att->SetVal(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "ppqInt") && dynamic_cast<AttTimebase*>(element) ) {
+        AttTimebase *att = dynamic_cast<AttTimebase*>(element);
+        att->SetPpq(att->StrToInt(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

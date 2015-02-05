@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -62,5 +64,17 @@ bool AttSurface::HasSurface( )
 
 /* include <attsurface> */
 
-} // vrv namespace
+bool Att::SetPagebased( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "surface") && dynamic_cast<AttSurface*>(element) ) {
+        AttSurface *att = dynamic_cast<AttSurface*>(element);
+        att->SetSurface(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    

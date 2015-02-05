@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -1700,5 +1702,262 @@ bool AttTupletVis::HasNumFormat( )
 
 /* include <attnum.format> */
 
-} // vrv namespace
+bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
+{
+    if ( (attrType == "order") && dynamic_cast<AttArpegLog*>(element) ) {
+        AttArpegLog *att = dynamic_cast<AttArpegLog*>(element);
+        att->SetOrder(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "arrow") && dynamic_cast<AttArpegVis*>(element) ) {
+        AttArpegVis *att = dynamic_cast<AttArpegVis*>(element);
+        att->SetArrow(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "form") && dynamic_cast<AttBTremLog*>(element) ) {
+        AttBTremLog *att = dynamic_cast<AttBTremLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "beam") && dynamic_cast<AttBeamed*>(element) ) {
+        AttBeamed *att = dynamic_cast<AttBeamed*>(element);
+        att->SetBeam(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "beamWith") && dynamic_cast<AttBeamedwith*>(element) ) {
+        AttBeamedwith *att = dynamic_cast<AttBeamedwith*>(element);
+        att->SetBeamWith(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "beamGroup") && dynamic_cast<AttBeamingLog*>(element) ) {
+        AttBeamingLog *att = dynamic_cast<AttBeamingLog*>(element);
+        att->SetBeamGroup(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "beamRests") && dynamic_cast<AttBeamingLog*>(element) ) {
+        AttBeamingLog *att = dynamic_cast<AttBeamingLog*>(element);
+        att->SetBeamRests(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "rend") && dynamic_cast<AttBeamrend*>(element) ) {
+        AttBeamrend *att = dynamic_cast<AttBeamrend*>(element);
+        att->SetRend(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "slopeDbl") && dynamic_cast<AttBeamrend*>(element) ) {
+        AttBeamrend *att = dynamic_cast<AttBeamrend*>(element);
+        att->SetSlope(att->StrToDbl(attrValue));
+    return true;
+    }
+    if ( (attrType == "breaksecInt") && dynamic_cast<AttBeamsecondary*>(element) ) {
+        AttBeamsecondary *att = dynamic_cast<AttBeamsecondary*>(element);
+        att->SetBreaksec(att->StrToInt(attrValue));
+    return true;
+    }
+    if ( (attrType == "rend") && dynamic_cast<AttBeatRptVis*>(element) ) {
+        AttBeatRptVis *att = dynamic_cast<AttBeatRptVis*>(element);
+        att->SetRend(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "amount") && dynamic_cast<AttBendGes*>(element) ) {
+        AttBendGes *att = dynamic_cast<AttBendGes*>(element);
+        att->SetAmount(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "cutout") && dynamic_cast<AttCutout*>(element) ) {
+        AttCutout *att = dynamic_cast<AttCutout*>(element);
+        att->SetCutout(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "expand") && dynamic_cast<AttExpandable*>(element) ) {
+        AttExpandable *att = dynamic_cast<AttExpandable*>(element);
+        att->SetExpand(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "form") && dynamic_cast<AttFTremLog*>(element) ) {
+        AttFTremLog *att = dynamic_cast<AttFTremLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "form") && dynamic_cast<AttFermataVis*>(element) ) {
+        AttFermataVis *att = dynamic_cast<AttFermataVis*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "shape") && dynamic_cast<AttFermataVis*>(element) ) {
+        AttFermataVis *att = dynamic_cast<AttFermataVis*>(element);
+        att->SetShape(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "text") && dynamic_cast<AttGlissVis*>(element) ) {
+        AttGlissVis *att = dynamic_cast<AttGlissVis*>(element);
+        att->SetText(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "grace") && dynamic_cast<AttGraced*>(element) ) {
+        AttGraced *att = dynamic_cast<AttGraced*>(element);
+        att->SetGrace(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "graceTime") && dynamic_cast<AttGraced*>(element) ) {
+        AttGraced *att = dynamic_cast<AttGraced*>(element);
+        att->SetGraceTime(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "form") && dynamic_cast<AttHairpinLog*>(element) ) {
+        AttHairpinLog *att = dynamic_cast<AttHairpinLog*>(element);
+        att->SetForm(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "opening") && dynamic_cast<AttHairpinVis*>(element) ) {
+        AttHairpinVis *att = dynamic_cast<AttHairpinVis*>(element);
+        att->SetOpening(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "c") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetC(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "d") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetD(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "e") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetE(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "f") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetF(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "g") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetG(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "a") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetA(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "b") && dynamic_cast<AttHarpPedalLog*>(element) ) {
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog*>(element);
+        att->SetB(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "lv") && dynamic_cast<AttLvpresent*>(element) ) {
+        AttLvpresent *att = dynamic_cast<AttLvpresent*>(element);
+        att->SetLv(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "block") && dynamic_cast<AttMultiRestVis*>(element) ) {
+        AttMultiRestVis *att = dynamic_cast<AttMultiRestVis*>(element);
+        att->SetBlock(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "gliss") && dynamic_cast<AttNoteGesCmn*>(element) ) {
+        AttNoteGesCmn *att = dynamic_cast<AttNoteGesCmn*>(element);
+        att->SetGliss(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "numInt") && dynamic_cast<AttNumbered*>(element) ) {
+        AttNumbered *att = dynamic_cast<AttNumbered*>(element);
+        att->SetNum(att->StrToInt(attrValue));
+    return true;
+    }
+    if ( (attrType == "numPlace") && dynamic_cast<AttNumberplacement*>(element) ) {
+        AttNumberplacement *att = dynamic_cast<AttNumberplacement*>(element);
+        att->SetNumPlace(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "numVisible") && dynamic_cast<AttNumberplacement*>(element) ) {
+        AttNumberplacement *att = dynamic_cast<AttNumberplacement*>(element);
+        att->SetNumVisible(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "coll") && dynamic_cast<AttOctaveLog*>(element) ) {
+        AttOctaveLog *att = dynamic_cast<AttOctaveLog*>(element);
+        att->SetColl(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "dir") && dynamic_cast<AttPedalLog*>(element) ) {
+        AttPedalLog *att = dynamic_cast<AttPedalLog*>(element);
+        att->SetDir(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "style") && dynamic_cast<AttPedalVis*>(element) ) {
+        AttPedalVis *att = dynamic_cast<AttPedalVis*>(element);
+        att->SetStyle(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "pedalStyle") && dynamic_cast<AttPianopedals*>(element) ) {
+        AttPianopedals *att = dynamic_cast<AttPianopedals*>(element);
+        att->SetPedalStyle(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "rehEnclose") && dynamic_cast<AttRehearsal*>(element) ) {
+        AttRehearsal *att = dynamic_cast<AttRehearsal*>(element);
+        att->SetRehEnclose(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "gridShow") && dynamic_cast<AttScoreDefVisCmn*>(element) ) {
+        AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn*>(element);
+        att->SetGridShow(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "slurRend") && dynamic_cast<AttSlurrend*>(element) ) {
+        AttSlurrend *att = dynamic_cast<AttSlurrend*>(element);
+        att->SetSlurRend(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "stemMod") && dynamic_cast<AttStemmedCmn*>(element) ) {
+        AttStemmedCmn *att = dynamic_cast<AttStemmedCmn*>(element);
+        att->SetStemMod(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "stemWith") && dynamic_cast<AttStemmedCmn*>(element) ) {
+        AttStemmedCmn *att = dynamic_cast<AttStemmedCmn*>(element);
+        att->SetStemWith(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "tieRend") && dynamic_cast<AttTierend*>(element) ) {
+        AttTierend *att = dynamic_cast<AttTierend*>(element);
+        att->SetTieRend(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "measperf") && dynamic_cast<AttTremmeasured*>(element) ) {
+        AttTremmeasured *att = dynamic_cast<AttTremmeasured*>(element);
+        att->SetMeasperf(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "bracketPlace") && dynamic_cast<AttTupletVis*>(element) ) {
+        AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
+        att->SetBracketPlace(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "bracketVisible") && dynamic_cast<AttTupletVis*>(element) ) {
+        AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
+        att->SetBracketVisible(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "durVisible") && dynamic_cast<AttTupletVis*>(element) ) {
+        AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
+        att->SetDurVisible(att->StrToStr(attrValue));
+    return true;
+    }
+    if ( (attrType == "numFormat") && dynamic_cast<AttTupletVis*>(element) ) {
+        AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
+        att->SetNumFormat(att->StrToStr(attrValue));
+    return true;
+    }
 
+    return false;
+}
+
+
+} // vrv namespace
+    
