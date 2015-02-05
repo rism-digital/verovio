@@ -35,6 +35,7 @@ Note::Note():
 {
     m_drawingTieAttr = NULL;
     Reset();
+    m_clusterPosition = 0;
 }
 
 
@@ -164,11 +165,11 @@ bool Note::HasDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
-    if( chordParent )
+    if( chordParent && chordParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
     {
-        return chordParent->HasStemDir();
+        return chordParent->GetDrawingStemDir();
     }
-    else if( beamParent )
+    else if( beamParent && beamParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
     {
         return beamParent->GetDrawingStemDir();
     }
@@ -189,7 +190,7 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
     if( chordParent )
     {
-        return chordParent->GetStemDir();
+        return chordParent->GetDrawingStemDir();
     }
     else if( beamParent )
     {

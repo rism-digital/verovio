@@ -30,6 +30,7 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     AttTiepresent()
 {
     Reset();
+    m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
 Chord::~Chord()
@@ -59,6 +60,19 @@ bool compare_pitch (Object *first, Object *second)
     Note *n1 = dynamic_cast<Note*>(first);
     Note *n2 = dynamic_cast<Note*>(second);
     return ( n1->GetDiatonicPitch() < n2->GetDiatonicPitch() );
+}
+    
+void updateClusterSizes (std::list<Note*> *unsetNotes)
+{
+    std::list<Note*>::iterator unsetIter;
+    bool evenSize = (unsetNotes->size() % 2 == 0);
+    
+    unsetIter = unsetNotes->begin();
+    while (unsetIter != unsetNotes->end()) {
+        dynamic_cast<Note*>(*unsetIter)->m_evenCluster = evenSize;
+        unsetIter++;
+    }
+    unsetNotes->clear();
 }
 
 void Chord::FilterList()
@@ -93,8 +107,9 @@ void Chord::FilterList()
     iter = childList->begin();
     
     Note *curNote, *lastNote = dynamic_cast<Note*>(*iter);
-    lastNote->m_flippedNotehead = false;
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
+    int clusterPosition = 0;
+    std::list<Note*> unsetNotes;
     
     iter++;
     
@@ -103,10 +118,19 @@ void Chord::FilterList()
         curPitch = curNote->GetDiatonicPitch();
         
         if (curPitch - lastPitch == 1) {
-            curNote->m_flippedNotehead = !lastNote->m_flippedNotehead;
+            if(clusterPosition == 0)
+            {
+                unsetNotes.push_back(lastNote);
+                lastNote->m_clusterPosition = 1;
+                clusterPosition = 1;
+            }
+            clusterPosition++;
+            unsetNotes.push_back(curNote);
+            curNote->m_clusterPosition = clusterPosition;
         }
-        else {
-            curNote->m_flippedNotehead = false;
+        else if (clusterPosition > 0) {
+            updateClusterSizes(&unsetNotes);
+            clusterPosition = 0;
         }
         
         lastNote = curNote;
@@ -114,6 +138,7 @@ void Chord::FilterList()
         
         iter++;
     }
+    updateClusterSizes(&unsetNotes);
 }
     
 void Chord::GetYExtremes(int *yMax, int *yMin)

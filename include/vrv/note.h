@@ -144,7 +144,8 @@ public:
     int d_stemLen;
     
     /** flags for determining clusters in chord **/
-    bool m_flippedNotehead;
+    int m_clusterPosition; //1-indexed position in a cluster of notes in a chord
+    bool m_evenCluster; //whether the cluster is even
     
 private:
     

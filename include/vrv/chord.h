@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "atts_shared.h"
-#include "drawinglistinterface.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "object.h"
@@ -33,7 +32,7 @@ namespace vrv {
  * It contains notes.
  */
     
-class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, public DrawingListInterface,
+class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, 
     public AttColoration,
     public AttCommon,
     public AttStemmed,
@@ -58,6 +57,13 @@ public:
     void FilterList();
     
     void GetYExtremes(int *yMax, int *yMin);
+    
+    /**
+     * @name Set and get the stem direction of the beam.
+     */
+    ///@{
+    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
 
     ///@}
     
@@ -75,6 +81,9 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
+    
+private:
+    data_STEMDIRECTION m_drawingStemDir;
 };
 
 } // namespace vrv

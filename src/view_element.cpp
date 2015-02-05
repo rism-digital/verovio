@@ -164,7 +164,13 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         
         element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
         dc->StartGraphic( element, "", element->GetUuid() );
-        DrawNote(dc, element, layer, staff, measure);
+        
+        //if note is a direct child of layer, we can draw it immediately
+        if (element->m_parent == layer) {
+            DrawNote(dc, element, layer, staff, measure);
+        }
+        //but if it's a child of chord or beam, we need to know the stem direction and placement first, so this will be resumed later
+        
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
@@ -225,32 +231,8 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 // Accords: note doit connaitre le x non modifie par accord(), la fin de 
 // l'accord (ptr_n->fchord), la valeur y extreme opposee au sommet de la
 // queue: le ptr *testchord extern peut garder le x et l'y.
-
-
+    
 void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
-{
-    Chord *chordParent = dynamic_cast<Chord*>(element->m_parent);
-    Beam *beamParent = dynamic_cast<Beam*>(element->m_parent);
-    
-    //if note is a direct child of layer, we can draw it immediately
-    if (element->m_parent == layer) {
-        std::cout << "found a single note" << std::endl;
-        DrawNotehead(dc, element, layer, staff, measure);
-    }
-    //but if it's a parent of chord or beam, we need to know the stem direction and placement first
-    else if (chordParent) {
-        std::cout << "found a chord parent - postponing" << std::endl;
-        chordParent->AddToDrawingList(element);
-        //DrawNotehead(dc, element, layer, staff, measure);
-    }
-    else if (beamParent) {
-        std::cout << "found a beam parent - postponing" << std::endl;
-        beamParent->AddToDrawingList(element);
-        //DrawNotehead(dc, element, layer, staff, measure);
-    }
-}
-    
-void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -284,18 +266,14 @@ void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer
     
 	int staffSize = staff->staffSize;
     int y1 = element->GetDrawingY();
-    int x1, x2;//, y2;
-    //int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
+    int x1, x2;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-	int ledge;//i, ledge;
+	int ledge;
 	int verticalCenter = 0;
 
 	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
-	//static int ynn_chrd;
-
-	//val=note->m_dur;
     
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
@@ -311,6 +289,7 @@ void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer
 		radius += radius/3;
 	}
     
+    //set stem direction
     verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     if ( note->HasDrawingStemDir() ) {
         note->m_drawingStemDir = note->GetDrawingStemDir();
@@ -322,21 +301,39 @@ void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer
         note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
     
-    if (!note->m_flippedNotehead) {
-        x1 = xn - radius;	// position d'appel du caractäre et de la queue gauche
-    }
-    else {
-        if (note->m_drawingStemDir == STEMDIRECTION_up) {
-            x1 = xn + radius;
+    //determine if note should be flipped; x1 determines where the note is in relation to the tail
+    if (inChord) {
+        bool flippedNotehead = false;
+        if (note->m_clusterPosition > 0) {
+            //the note will be flipped on odd indices when the stem goes down, otherwise flipped on even indices
+            if (note->m_evenCluster && note->m_drawingStemDir == STEMDIRECTION_down) {
+                flippedNotehead = (note->m_clusterPosition % 2 == 0);
+            }
+            else {
+                flippedNotehead = (note->m_clusterPosition % 2 != 0);
+            }
         }
-        else if (note->m_drawingStemDir == STEMDIRECTION_down) {
-            x1 = xn - radius * 3;
-        }
-        else {
+        
+        //positions notehead
+        if (flippedNotehead) {
             x1 = xn - radius;
         }
+        else {
+            if (note->m_drawingStemDir == STEMDIRECTION_up) {
+                x1 = xn + radius;
+            }
+            else if (note->m_drawingStemDir == STEMDIRECTION_down) {
+                x1 = xn - radius * 3;
+            }
+            else {
+                x1 = xn - radius;
+            }
+        }
     }
-    
+    else
+    {
+        x1 = xn - radius;
+    }
     xl = xn;
 
     // Long, breve and ligatures
@@ -362,7 +359,6 @@ void View::DrawNotehead ( DeviceContext *dc, LayerElement *element, Layer *layer
 			fontNo = SMUFL_E0A4_noteheadBlack;
         }
         
-        std::cout << "\twith x at " << x1 << std::endl;
 		DrawSmuflCode( dc, x1, y1, fontNo,  staff->staffSize, note->m_cueSize );
 
 		//if (note->m_chord) { /*** && this == testchord)***/
@@ -1040,13 +1036,13 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     else {
         if ( chord->HasStemDir() ) {
-            chord->m_drawingStemDir = chord->GetStemDir();
+            chord->SetDrawingStemDir(chord->GetStemDir());
         }
         else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            chord->m_drawingStemDir = layer->GetDrawingStemDir();
+            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
         }
         else {
-            chord->m_drawingStemDir = (yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
+            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
         }
         
         int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
@@ -1059,12 +1055,14 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     if (!inBeam)
     {
-        ListOfObjects *noteList = chord->GetDrawingList();
+        ListOfObjects *noteList = chord->GetList(chord);
         ListOfObjects::iterator iter = noteList->begin();
         
         while ( iter != noteList->end()) {
+            Note *note = dynamic_cast<Note*>(*iter);
+            if (!note) continue;
             dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
-            DrawNotehead(dc, dynamic_cast<Note*>(*iter), layer, staff, measure);
+            DrawNote(dc, note, layer, staff, measure);
             dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
             iter++;
         }
