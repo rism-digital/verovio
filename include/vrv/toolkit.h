@@ -104,6 +104,11 @@ public:
     std::string GetMEI( int pageNo =  0 );
     
     /**
+     * Return element attributes as a JSON string
+     */
+    std::string GetElementAttr( const std::string &xmlId );
+    
+    /**
      * Redo the layout of the loaded data
      * This can be called once the rendering option were changed,
      * For example with a new page (sceen) height or a new zoom level.

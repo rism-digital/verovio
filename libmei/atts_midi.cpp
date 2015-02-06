@@ -358,72 +358,134 @@ bool AttTimebase::HasPpq( )
 
 /* include <attppq> */
 
-bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "midiChannel") && dynamic_cast<AttChannelized*>(element) ) {
+bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttChannelized*>(element) ) {
         AttChannelized *att = dynamic_cast<AttChannelized*>(element);
-        att->SetMidiChannel(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "midiChannel") {
+            att->SetMidiChannel(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "midiDuty") {
+            att->SetMidiDuty(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "midiPort") {
+            att->SetMidiPort(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "midiTrackInt") {
+            att->SetMidiTrack(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "midiDuty") && dynamic_cast<AttChannelized*>(element) ) {
-        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
-        att->SetMidiDuty(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "midiPort") && dynamic_cast<AttChannelized*>(element) ) {
-        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
-        att->SetMidiPort(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "midiTrackInt") && dynamic_cast<AttChannelized*>(element) ) {
-        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
-        att->SetMidiTrack(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "midiInstrnum") && dynamic_cast<AttMidiinstrument*>(element) ) {
+    if (dynamic_cast<AttMidiinstrument*>(element) ) {
         AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
-        att->SetMidiInstrnum(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "midiInstrnum") {
+            att->SetMidiInstrnum(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "midiInstrname") {
+            att->SetMidiInstrname(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "midiPan") {
+            att->SetMidiPan(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "midiVolume") {
+            att->SetMidiVolume(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "midiInstrname") && dynamic_cast<AttMidiinstrument*>(element) ) {
-        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
-        att->SetMidiInstrname(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "midiPan") && dynamic_cast<AttMidiinstrument*>(element) ) {
-        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
-        att->SetMidiPan(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "midiVolume") && dynamic_cast<AttMidiinstrument*>(element) ) {
-        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
-        att->SetMidiVolume(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "numInt") && dynamic_cast<AttMidinumber*>(element) ) {
+    if (dynamic_cast<AttMidinumber*>(element) ) {
         AttMidinumber *att = dynamic_cast<AttMidinumber*>(element);
-        att->SetNum(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "numInt") {
+            att->SetNum(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "midiTempo") && dynamic_cast<AttMiditempo*>(element) ) {
+    if (dynamic_cast<AttMiditempo*>(element) ) {
         AttMiditempo *att = dynamic_cast<AttMiditempo*>(element);
-        att->SetMidiTempo(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "midiTempo") {
+            att->SetMidiTempo(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "val") && dynamic_cast<AttMidivalue*>(element) ) {
+    if (dynamic_cast<AttMidivalue*>(element) ) {
         AttMidivalue *att = dynamic_cast<AttMidivalue*>(element);
-        att->SetVal(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "val") {
+            att->SetVal(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "ppqInt") && dynamic_cast<AttTimebase*>(element) ) {
+    if (dynamic_cast<AttTimebase*>(element) ) {
         AttTimebase *att = dynamic_cast<AttTimebase*>(element);
-        att->SetPpq(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "ppqInt") {
+            att->SetPpq(att->StrToInt(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetMidi( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttChannelized*>(element) ) {
+        AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        if (att->HasMidiChannel()) {
+            attributes->push_back(std::make_pair("midiChannel", att->StrToStr(att->GetMidiChannel())));
+        }
+        if (att->HasMidiDuty()) {
+            attributes->push_back(std::make_pair("midiDuty", att->StrToStr(att->GetMidiDuty())));
+        }
+        if (att->HasMidiPort()) {
+            attributes->push_back(std::make_pair("midiPort", att->StrToStr(att->GetMidiPort())));
+        }
+        if (att->HasMidiTrack()) {
+            attributes->push_back(std::make_pair("midiTrackInt", att->IntToStr(att->GetMidiTrack())));
+        }
+    }
+    if (dynamic_cast<AttMidiinstrument*>(element) ) {
+        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        if (att->HasMidiInstrnum()) {
+            attributes->push_back(std::make_pair("midiInstrnum", att->StrToStr(att->GetMidiInstrnum())));
+        }
+        if (att->HasMidiInstrname()) {
+            attributes->push_back(std::make_pair("midiInstrname", att->StrToStr(att->GetMidiInstrname())));
+        }
+        if (att->HasMidiPan()) {
+            attributes->push_back(std::make_pair("midiPan", att->StrToStr(att->GetMidiPan())));
+        }
+        if (att->HasMidiVolume()) {
+            attributes->push_back(std::make_pair("midiVolume", att->StrToStr(att->GetMidiVolume())));
+        }
+    }
+    if (dynamic_cast<AttMidinumber*>(element) ) {
+        AttMidinumber *att = dynamic_cast<AttMidinumber*>(element);
+        if (att->HasNum()) {
+            attributes->push_back(std::make_pair("numInt", att->IntToStr(att->GetNum())));
+        }
+    }
+    if (dynamic_cast<AttMiditempo*>(element) ) {
+        AttMiditempo *att = dynamic_cast<AttMiditempo*>(element);
+        if (att->HasMidiTempo()) {
+            attributes->push_back(std::make_pair("midiTempo", att->StrToStr(att->GetMidiTempo())));
+        }
+    }
+    if (dynamic_cast<AttMidivalue*>(element) ) {
+        AttMidivalue *att = dynamic_cast<AttMidivalue*>(element);
+        if (att->HasVal()) {
+            attributes->push_back(std::make_pair("val", att->StrToStr(att->GetVal())));
+        }
+    }
+    if (dynamic_cast<AttTimebase*>(element) ) {
+        AttTimebase *att = dynamic_cast<AttTimebase*>(element);
+        if (att->HasPpq()) {
+            attributes->push_back(std::make_pair("ppqInt", att->IntToStr(att->GetPpq())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     

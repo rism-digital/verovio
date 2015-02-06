@@ -64,17 +64,27 @@ bool AttSurface::HasSurface( )
 
 /* include <attsurface> */
 
-bool Att::SetPagebased( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "surface") && dynamic_cast<AttSurface*>(element) ) {
+bool Att::SetPagebased( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttSurface*>(element) ) {
         AttSurface *att = dynamic_cast<AttSurface*>(element);
-        att->SetSurface(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "surface") {
+            att->SetSurface(att->StrToStr(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetPagebased( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttSurface*>(element) ) {
+        AttSurface *att = dynamic_cast<AttSurface*>(element);
+        if (att->HasSurface()) {
+            attributes->push_back(std::make_pair("surface", att->StrToStr(att->GetSurface())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     

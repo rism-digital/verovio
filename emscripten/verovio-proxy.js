@@ -43,6 +43,9 @@ verovio.vrvToolkit.setOptions = Module.cwrap('vrvToolkit_setOptions', null, ['nu
 // bool edit(Toolkit *ic, const char *editorAction) 
 verovio.vrvToolkit.edit = Module.cwrap('vrvToolkit_edit', 'number', ['number', 'string']);
 
+// char *getElementAttr(Toolkit *ic, const char *xmlId )
+verovio.vrvToolkit.getElementAttr = Module.cwrap('vrvToolkit_getElementAttr', 'string', ['number', 'string']);
+
 // A pointer to the object - only one instance can be created for now
 verovio.ptr = 0;
 
@@ -103,6 +106,10 @@ verovio.toolkit.prototype.setOptions = function (options) {
 
 verovio.toolkit.prototype.edit = function (editorAction) {
 	return verovio.vrvToolkit.edit(this.ptr, editorAction);
+};
+
+verovio.toolkit.prototype.getElementAttr = function (xmlId) {
+  	return verovio.vrvToolkit.getElementAttr(this.ptr, xmlId);
 };
 
 /***************************************************************************************************************************/

@@ -64,17 +64,27 @@ bool AttAlignment::HasWhen( )
 
 /* include <attwhen> */
 
-bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "when") && dynamic_cast<AttAlignment*>(element) ) {
+bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttAlignment*>(element) ) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
-        att->SetWhen(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "when") {
+            att->SetWhen(att->StrToStr(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetLinkalign( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttAlignment*>(element) ) {
+        AttAlignment *att = dynamic_cast<AttAlignment*>(element);
+        if (att->HasWhen()) {
+            attributes->push_back(std::make_pair("when", att->StrToStr(att->GetWhen())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     

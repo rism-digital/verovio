@@ -99,4 +99,9 @@ extern "C" {
         }
         return true;
     }
+    
+    const char* vrvToolkit_getElementAttr(Toolkit *tk, const char *xmlId) {
+        tk->SetCString(tk->GetElementAttr( xmlId ));
+        return tk->GetCString();
+    }
 }

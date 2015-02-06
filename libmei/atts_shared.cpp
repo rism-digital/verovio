@@ -6714,1162 +6714,2368 @@ bool AttXy2::HasY2( )
 
 /* include <atty2> */
 
-bool Att::SetShared( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "func") && dynamic_cast<AttAccidLog*>(element) ) {
+bool Att::SetShared( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttAccidLog*>(element) ) {
         AttAccidLog *att = dynamic_cast<AttAccidLog*>(element);
-        att->SetFunc(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "accid") && dynamic_cast<AttAccidental*>(element) ) {
+    if (dynamic_cast<AttAccidental*>(element) ) {
         AttAccidental *att = dynamic_cast<AttAccidental*>(element);
-        att->SetAccid(att->StrToAccidentalExplicit(attrValue));
-    return true;
+        if (attrType == "accid") {
+            att->SetAccid(att->StrToAccidentalExplicit(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "accidGes") && dynamic_cast<AttAccidentalPerformed*>(element) ) {
+    if (dynamic_cast<AttAccidentalPerformed*>(element) ) {
         AttAccidentalPerformed *att = dynamic_cast<AttAccidentalPerformed*>(element);
-        att->SetAccidGes(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "accidGes") {
+            att->SetAccidGes(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "altsym") && dynamic_cast<AttAltsym*>(element) ) {
+    if (dynamic_cast<AttAltsym*>(element) ) {
         AttAltsym *att = dynamic_cast<AttAltsym*>(element);
-        att->SetAltsym(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "altsym") {
+            att->SetAltsym(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "artic") && dynamic_cast<AttArticulation*>(element) ) {
+    if (dynamic_cast<AttArticulation*>(element) ) {
         AttArticulation *att = dynamic_cast<AttArticulation*>(element);
-        att->SetArtic(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "artic") {
+            att->SetArtic(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "articGes") && dynamic_cast<AttArticulationPerformed*>(element) ) {
+    if (dynamic_cast<AttArticulationPerformed*>(element) ) {
         AttArticulationPerformed *att = dynamic_cast<AttArticulationPerformed*>(element);
-        att->SetArticGes(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "articGes") {
+            att->SetArticGes(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "dots") && dynamic_cast<AttAugmentdots*>(element) ) {
+    if (dynamic_cast<AttAugmentdots*>(element) ) {
         AttAugmentdots *att = dynamic_cast<AttAugmentdots*>(element);
-        att->SetDots(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "dots") {
+            att->SetDots(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "authority") && dynamic_cast<AttAuthorized*>(element) ) {
+    if (dynamic_cast<AttAuthorized*>(element) ) {
         AttAuthorized *att = dynamic_cast<AttAuthorized*>(element);
-        att->SetAuthority(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "authority") {
+            att->SetAuthority(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "authURI") {
+            att->SetAuthURI(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "authURI") && dynamic_cast<AttAuthorized*>(element) ) {
-        AttAuthorized *att = dynamic_cast<AttAuthorized*>(element);
-        att->SetAuthURI(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "rend") && dynamic_cast<AttBarLineLog*>(element) ) {
+    if (dynamic_cast<AttBarLineLog*>(element) ) {
         AttBarLineLog *att = dynamic_cast<AttBarLineLog*>(element);
-        att->SetRend(att->StrToBarRendition(attrValue));
-    return true;
+        if (attrType == "rend") {
+            att->SetRend(att->StrToBarRendition(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "barplace") && dynamic_cast<AttBarplacement*>(element) ) {
+    if (dynamic_cast<AttBarplacement*>(element) ) {
         AttBarplacement *att = dynamic_cast<AttBarplacement*>(element);
-        att->SetBarplace(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "barplace") {
+            att->SetBarplace(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "taktplace") {
+            att->SetTaktplace(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "taktplace") && dynamic_cast<AttBarplacement*>(element) ) {
-        AttBarplacement *att = dynamic_cast<AttBarplacement*>(element);
-        att->SetTaktplace(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "beamColor") && dynamic_cast<AttBeamingVis*>(element) ) {
+    if (dynamic_cast<AttBeamingVis*>(element) ) {
         AttBeamingVis *att = dynamic_cast<AttBeamingVis*>(element);
-        att->SetBeamColor(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "beamColor") {
+            att->SetBeamColor(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "beamRend") {
+            att->SetBeamRend(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "beamSlopeDbl") {
+            att->SetBeamSlope(att->StrToDbl(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "beamRend") && dynamic_cast<AttBeamingVis*>(element) ) {
-        AttBeamingVis *att = dynamic_cast<AttBeamingVis*>(element);
-        att->SetBeamRend(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "beamSlopeDbl") && dynamic_cast<AttBeamingVis*>(element) ) {
-        AttBeamingVis *att = dynamic_cast<AttBeamingVis*>(element);
-        att->SetBeamSlope(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "analog") && dynamic_cast<AttBibl*>(element) ) {
+    if (dynamic_cast<AttBibl*>(element) ) {
         AttBibl *att = dynamic_cast<AttBibl*>(element);
-        att->SetAnalog(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "analog") {
+            att->SetAnalog(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "calendar") && dynamic_cast<AttCalendared*>(element) ) {
+    if (dynamic_cast<AttCalendared*>(element) ) {
         AttCalendared *att = dynamic_cast<AttCalendared*>(element);
-        att->SetCalendar(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "calendar") {
+            att->SetCalendar(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "dbkey") && dynamic_cast<AttCanonical*>(element) ) {
+    if (dynamic_cast<AttCanonical*>(element) ) {
         AttCanonical *att = dynamic_cast<AttCanonical*>(element);
-        att->SetDbkey(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "dbkey") {
+            att->SetDbkey(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "cluster") && dynamic_cast<AttChordVis*>(element) ) {
+    if (dynamic_cast<AttChordVis*>(element) ) {
         AttChordVis *att = dynamic_cast<AttChordVis*>(element);
-        att->SetCluster(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "cluster") {
+            att->SetCluster(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "cautionary") && dynamic_cast<AttClefLog*>(element) ) {
+    if (dynamic_cast<AttClefLog*>(element) ) {
         AttClefLog *att = dynamic_cast<AttClefLog*>(element);
-        att->SetCautionary(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "cautionary") {
+            att->SetCautionary(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "clefShape") && dynamic_cast<AttCleffingLog*>(element) ) {
+    if (dynamic_cast<AttCleffingLog*>(element) ) {
         AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
-        att->SetClefShape(att->StrToClefShape(attrValue));
-    return true;
+        if (attrType == "clefShape") {
+            att->SetClefShape(att->StrToClefShape(attrValue));
+            return true;
+        }
+        if (attrType == "clefLine") {
+            att->SetClefLine(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "clefDis") {
+            att->SetClefDis(att->StrToOctaveDis(attrValue));
+            return true;
+        }
+        if (attrType == "clefDisPlace") {
+            att->SetClefDisPlace(att->StrToPlace(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "clefLine") && dynamic_cast<AttCleffingLog*>(element) ) {
-        AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
-        att->SetClefLine(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "clefDis") && dynamic_cast<AttCleffingLog*>(element) ) {
-        AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
-        att->SetClefDis(att->StrToOctaveDis(attrValue));
-    return true;
-    }
-    if ( (attrType == "clefDisPlace") && dynamic_cast<AttCleffingLog*>(element) ) {
-        AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
-        att->SetClefDisPlace(att->StrToPlace(attrValue));
-    return true;
-    }
-    if ( (attrType == "clefColor") && dynamic_cast<AttCleffingVis*>(element) ) {
+    if (dynamic_cast<AttCleffingVis*>(element) ) {
         AttCleffingVis *att = dynamic_cast<AttCleffingVis*>(element);
-        att->SetClefColor(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "clefColor") {
+            att->SetClefColor(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "clefVisible") {
+            att->SetClefVisible(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "clefVisible") && dynamic_cast<AttCleffingVis*>(element) ) {
-        AttCleffingVis *att = dynamic_cast<AttCleffingVis*>(element);
-        att->SetClefVisible(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "shape") && dynamic_cast<AttClefshape*>(element) ) {
+    if (dynamic_cast<AttClefshape*>(element) ) {
         AttClefshape *att = dynamic_cast<AttClefshape*>(element);
-        att->SetShape(att->StrToClefShape(attrValue));
-    return true;
+        if (attrType == "shape") {
+            att->SetShape(att->StrToClefShape(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "code") && dynamic_cast<AttCoded*>(element) ) {
+    if (dynamic_cast<AttCoded*>(element) ) {
         AttCoded *att = dynamic_cast<AttCoded*>(element);
-        att->SetCode(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "code") {
+            att->SetCode(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "color") && dynamic_cast<AttColor*>(element) ) {
+    if (dynamic_cast<AttColor*>(element) ) {
         AttColor *att = dynamic_cast<AttColor*>(element);
-        att->SetColor(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "color") {
+            att->SetColor(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "colored") && dynamic_cast<AttColoration*>(element) ) {
+    if (dynamic_cast<AttColoration*>(element) ) {
         AttColoration *att = dynamic_cast<AttColoration*>(element);
-        att->SetColored(att->StrToBool(attrValue));
-    return true;
+        if (attrType == "colored") {
+            att->SetColored(att->StrToBool(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "label") && dynamic_cast<AttCommon*>(element) ) {
+    if (dynamic_cast<AttCommon*>(element) ) {
         AttCommon *att = dynamic_cast<AttCommon*>(element);
-        att->SetLabel(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "label") {
+            att->SetLabel(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "n") {
+            att->SetN(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "base") {
+            att->SetBase(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "n") && dynamic_cast<AttCommon*>(element) ) {
-        AttCommon *att = dynamic_cast<AttCommon*>(element);
-        att->SetN(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "base") && dynamic_cast<AttCommon*>(element) ) {
-        AttCommon *att = dynamic_cast<AttCommon*>(element);
-        att->SetBase(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "ulxInt") && dynamic_cast<AttCoordinated*>(element) ) {
+    if (dynamic_cast<AttCoordinated*>(element) ) {
         AttCoordinated *att = dynamic_cast<AttCoordinated*>(element);
-        att->SetUlx(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "ulxInt") {
+            att->SetUlx(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "ulyInt") {
+            att->SetUly(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "lrxInt") {
+            att->SetLrx(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "lryInt") {
+            att->SetLry(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "ulyInt") && dynamic_cast<AttCoordinated*>(element) ) {
-        AttCoordinated *att = dynamic_cast<AttCoordinated*>(element);
-        att->SetUly(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "lrxInt") && dynamic_cast<AttCoordinated*>(element) ) {
-        AttCoordinated *att = dynamic_cast<AttCoordinated*>(element);
-        att->SetLrx(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "lryInt") && dynamic_cast<AttCoordinated*>(element) ) {
-        AttCoordinated *att = dynamic_cast<AttCoordinated*>(element);
-        att->SetLry(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "bezier") && dynamic_cast<AttCurvature*>(element) ) {
+    if (dynamic_cast<AttCurvature*>(element) ) {
         AttCurvature *att = dynamic_cast<AttCurvature*>(element);
-        att->SetBezier(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "bezier") {
+            att->SetBezier(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "bulge") {
+            att->SetBulge(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "curvedir") {
+            att->SetCurvedir(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "bulge") && dynamic_cast<AttCurvature*>(element) ) {
-        AttCurvature *att = dynamic_cast<AttCurvature*>(element);
-        att->SetBulge(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "curvedir") && dynamic_cast<AttCurvature*>(element) ) {
-        AttCurvature *att = dynamic_cast<AttCurvature*>(element);
-        att->SetCurvedir(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "rend") && dynamic_cast<AttCurverend*>(element) ) {
+    if (dynamic_cast<AttCurverend*>(element) ) {
         AttCurverend *att = dynamic_cast<AttCurverend*>(element);
-        att->SetRend(att->StrToBarRendition(attrValue));
-    return true;
+        if (attrType == "rend") {
+            att->SetRend(att->StrToBarRendition(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "target") && dynamic_cast<AttCustosLog*>(element) ) {
+    if (dynamic_cast<AttCustosLog*>(element) ) {
         AttCustosLog *att = dynamic_cast<AttCustosLog*>(element);
-        att->SetTarget(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "target") {
+            att->SetTarget(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "enddate") && dynamic_cast<AttDatable*>(element) ) {
+    if (dynamic_cast<AttDatable*>(element) ) {
         AttDatable *att = dynamic_cast<AttDatable*>(element);
-        att->SetEnddate(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "enddate") {
+            att->SetEnddate(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "isodate") {
+            att->SetIsodate(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "notafter") {
+            att->SetNotafter(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "notbefore") {
+            att->SetNotbefore(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "startdate") {
+            att->SetStartdate(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "isodate") && dynamic_cast<AttDatable*>(element) ) {
-        AttDatable *att = dynamic_cast<AttDatable*>(element);
-        att->SetIsodate(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "notafter") && dynamic_cast<AttDatable*>(element) ) {
-        AttDatable *att = dynamic_cast<AttDatable*>(element);
-        att->SetNotafter(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "notbefore") && dynamic_cast<AttDatable*>(element) ) {
-        AttDatable *att = dynamic_cast<AttDatable*>(element);
-        att->SetNotbefore(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "startdate") && dynamic_cast<AttDatable*>(element) ) {
-        AttDatable *att = dynamic_cast<AttDatable*>(element);
-        att->SetStartdate(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "data") && dynamic_cast<AttDatapointing*>(element) ) {
+    if (dynamic_cast<AttDatapointing*>(element) ) {
         AttDatapointing *att = dynamic_cast<AttDatapointing*>(element);
-        att->SetData(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "data") {
+            att->SetData(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "decls") && dynamic_cast<AttDeclaring*>(element) ) {
+    if (dynamic_cast<AttDeclaring*>(element) ) {
         AttDeclaring *att = dynamic_cast<AttDeclaring*>(element);
-        att->SetDecls(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "decls") {
+            att->SetDecls(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "dynamDist") && dynamic_cast<AttDistances*>(element) ) {
+    if (dynamic_cast<AttDistances*>(element) ) {
         AttDistances *att = dynamic_cast<AttDistances*>(element);
-        att->SetDynamDist(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "dynamDist") {
+            att->SetDynamDist(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "harmDist") {
+            att->SetHarmDist(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "textDist") {
+            att->SetTextDist(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "harmDist") && dynamic_cast<AttDistances*>(element) ) {
-        AttDistances *att = dynamic_cast<AttDistances*>(element);
-        att->SetHarmDist(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "textDist") && dynamic_cast<AttDistances*>(element) ) {
-        AttDistances *att = dynamic_cast<AttDistances*>(element);
-        att->SetTextDist(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "form") && dynamic_cast<AttDotLog*>(element) ) {
+    if (dynamic_cast<AttDotLog*>(element) ) {
         AttDotLog *att = dynamic_cast<AttDotLog*>(element);
-        att->SetForm(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "form") {
+            att->SetForm(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "dur") && dynamic_cast<AttDurationAdditive*>(element) ) {
+    if (dynamic_cast<AttDurationAdditive*>(element) ) {
         AttDurationAdditive *att = dynamic_cast<AttDurationAdditive*>(element);
-        att->SetDur(att->StrToDur(attrValue));
-    return true;
+        if (attrType == "dur") {
+            att->SetDur(att->StrToDur(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "durDefault") && dynamic_cast<AttDurationDefault*>(element) ) {
+    if (dynamic_cast<AttDurationDefault*>(element) ) {
         AttDurationDefault *att = dynamic_cast<AttDurationDefault*>(element);
-        att->SetDurDefault(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "durDefault") {
+            att->SetDurDefault(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "numDefaultInt") {
+            att->SetNumDefault(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "numbaseDefaultInt") {
+            att->SetNumbaseDefault(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "numDefaultInt") && dynamic_cast<AttDurationDefault*>(element) ) {
-        AttDurationDefault *att = dynamic_cast<AttDurationDefault*>(element);
-        att->SetNumDefault(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "numbaseDefaultInt") && dynamic_cast<AttDurationDefault*>(element) ) {
-        AttDurationDefault *att = dynamic_cast<AttDurationDefault*>(element);
-        att->SetNumbaseDefault(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "dur") && dynamic_cast<AttDurationMusical*>(element) ) {
+    if (dynamic_cast<AttDurationMusical*>(element) ) {
         AttDurationMusical *att = dynamic_cast<AttDurationMusical*>(element);
-        att->SetDur(att->StrToDur(attrValue));
-    return true;
+        if (attrType == "dur") {
+            att->SetDur(att->StrToDur(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "durGes") && dynamic_cast<AttDurationPerformed*>(element) ) {
+    if (dynamic_cast<AttDurationPerformed*>(element) ) {
         AttDurationPerformed *att = dynamic_cast<AttDurationPerformed*>(element);
-        att->SetDurGes(att->StrToDur(attrValue));
-    return true;
+        if (attrType == "durGes") {
+            att->SetDurGes(att->StrToDur(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "num") && dynamic_cast<AttDurationRatio*>(element) ) {
+    if (dynamic_cast<AttDurationRatio*>(element) ) {
         AttDurationRatio *att = dynamic_cast<AttDurationRatio*>(element);
-        att->SetNum(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "num") {
+            att->SetNum(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "numbase") {
+            att->SetNumbase(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "numbase") && dynamic_cast<AttDurationRatio*>(element) ) {
-        AttDurationRatio *att = dynamic_cast<AttDurationRatio*>(element);
-        att->SetNumbase(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "enclose") && dynamic_cast<AttEnclosingchars*>(element) ) {
+    if (dynamic_cast<AttEnclosingchars*>(element) ) {
         AttEnclosingchars *att = dynamic_cast<AttEnclosingchars*>(element);
-        att->SetEnclose(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "enclose") {
+            att->SetEnclose(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "fermata") && dynamic_cast<AttFermatapresent*>(element) ) {
+    if (dynamic_cast<AttFermatapresent*>(element) ) {
         AttFermatapresent *att = dynamic_cast<AttFermatapresent*>(element);
-        att->SetFermata(att->StrToPlace(attrValue));
-    return true;
+        if (attrType == "fermata") {
+            att->SetFermata(att->StrToPlace(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "hand") && dynamic_cast<AttHandident*>(element) ) {
+    if (dynamic_cast<AttHandident*>(element) ) {
         AttHandident *att = dynamic_cast<AttHandident*>(element);
-        att->SetHand(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "hand") {
+            att->SetHand(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "halign") && dynamic_cast<AttHorizontalalign*>(element) ) {
+    if (dynamic_cast<AttHorizontalalign*>(element) ) {
         AttHorizontalalign *att = dynamic_cast<AttHorizontalalign*>(element);
-        att->SetHalign(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "halign") {
+            att->SetHalign(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "instr") && dynamic_cast<AttInstrumentident*>(element) ) {
+    if (dynamic_cast<AttInstrumentident*>(element) ) {
         AttInstrumentident *att = dynamic_cast<AttInstrumentident*>(element);
-        att->SetInstr(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "instr") {
+            att->SetInstr(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "mimetype") && dynamic_cast<AttInternetmedia*>(element) ) {
+    if (dynamic_cast<AttInternetmedia*>(element) ) {
         AttInternetmedia *att = dynamic_cast<AttInternetmedia*>(element);
-        att->SetMimetype(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "mimetype") {
+            att->SetMimetype(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "join") && dynamic_cast<AttJoined*>(element) ) {
+    if (dynamic_cast<AttJoined*>(element) ) {
         AttJoined *att = dynamic_cast<AttJoined*>(element);
-        att->SetJoin(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "join") {
+            att->SetJoin(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "mode") && dynamic_cast<AttKeySigLog*>(element) ) {
+    if (dynamic_cast<AttKeySigLog*>(element) ) {
         AttKeySigLog *att = dynamic_cast<AttKeySigLog*>(element);
-        att->SetMode(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "mode") {
+            att->SetMode(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "keyAccid") && dynamic_cast<AttKeySigDefaultLog*>(element) ) {
+    if (dynamic_cast<AttKeySigDefaultLog*>(element) ) {
         AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
-        att->SetKeyAccid(att->StrToAccidentalImplicit(attrValue));
-    return true;
+        if (attrType == "keyAccid") {
+            att->SetKeyAccid(att->StrToAccidentalImplicit(attrValue));
+            return true;
+        }
+        if (attrType == "keyMode") {
+            att->SetKeyMode(att->StrToMode(attrValue));
+            return true;
+        }
+        if (attrType == "keyPname") {
+            att->SetKeyPname(att->StrToPitchName(attrValue));
+            return true;
+        }
+        if (attrType == "keySig") {
+            att->SetKeySig(att->StrToKeySignature(attrValue));
+            return true;
+        }
+        if (attrType == "keySigMixed") {
+            att->SetKeySigMixed(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "keyMode") && dynamic_cast<AttKeySigDefaultLog*>(element) ) {
-        AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
-        att->SetKeyMode(att->StrToMode(attrValue));
-    return true;
-    }
-    if ( (attrType == "keyPname") && dynamic_cast<AttKeySigDefaultLog*>(element) ) {
-        AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
-        att->SetKeyPname(att->StrToPitchName(attrValue));
-    return true;
-    }
-    if ( (attrType == "keySig") && dynamic_cast<AttKeySigDefaultLog*>(element) ) {
-        AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
-        att->SetKeySig(att->StrToKeySignature(attrValue));
-    return true;
-    }
-    if ( (attrType == "keySigMixed") && dynamic_cast<AttKeySigDefaultLog*>(element) ) {
-        AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
-        att->SetKeySigMixed(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "keySigShow") && dynamic_cast<AttKeySigDefaultVis*>(element) ) {
+    if (dynamic_cast<AttKeySigDefaultVis*>(element) ) {
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
-        att->SetKeySigShow(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "keySigShow") {
+            att->SetKeySigShow(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "keySigShowchange") {
+            att->SetKeySigShowchange(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "keySigShowchange") && dynamic_cast<AttKeySigDefaultVis*>(element) ) {
-        AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
-        att->SetKeySigShowchange(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "labelAbbr") && dynamic_cast<AttLabelsAddl*>(element) ) {
+    if (dynamic_cast<AttLabelsAddl*>(element) ) {
         AttLabelsAddl *att = dynamic_cast<AttLabelsAddl*>(element);
-        att->SetLabelAbbr(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "labelAbbr") {
+            att->SetLabelAbbr(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "lang") && dynamic_cast<AttLang*>(element) ) {
+    if (dynamic_cast<AttLang*>(element) ) {
         AttLang *att = dynamic_cast<AttLang*>(element);
-        att->SetLang(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "lang") {
+            att->SetLang(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "def") && dynamic_cast<AttLayerLog*>(element) ) {
+    if (dynamic_cast<AttLayerLog*>(element) ) {
         AttLayerLog *att = dynamic_cast<AttLayerLog*>(element);
-        att->SetDef(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "def") {
+            att->SetDef(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "layer") && dynamic_cast<AttLayerident*>(element) ) {
+    if (dynamic_cast<AttLayerident*>(element) ) {
         AttLayerident *att = dynamic_cast<AttLayerident*>(element);
-        att->SetLayer(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "layer") {
+            att->SetLayer(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "line") && dynamic_cast<AttLineloc*>(element) ) {
+    if (dynamic_cast<AttLineloc*>(element) ) {
         AttLineloc *att = dynamic_cast<AttLineloc*>(element);
-        att->SetLine(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "line") {
+            att->SetLine(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "rend") && dynamic_cast<AttLinerend*>(element) ) {
+    if (dynamic_cast<AttLinerend*>(element) ) {
         AttLinerend *att = dynamic_cast<AttLinerend*>(element);
-        att->SetRend(att->StrToBarRendition(attrValue));
-    return true;
+        if (attrType == "rend") {
+            att->SetRend(att->StrToBarRendition(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "lyricAlign") && dynamic_cast<AttLyricstyle*>(element) ) {
+    if (dynamic_cast<AttLyricstyle*>(element) ) {
         AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
-        att->SetLyricAlign(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "lyricAlign") {
+            att->SetLyricAlign(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lyricFam") {
+            att->SetLyricFam(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lyricName") {
+            att->SetLyricName(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lyricSize") {
+            att->SetLyricSize(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lyricStyle") {
+            att->SetLyricStyle(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lyricWeight") {
+            att->SetLyricWeight(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "lyricFam") && dynamic_cast<AttLyricstyle*>(element) ) {
-        AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
-        att->SetLyricFam(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "lyricName") && dynamic_cast<AttLyricstyle*>(element) ) {
-        AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
-        att->SetLyricName(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "lyricSize") && dynamic_cast<AttLyricstyle*>(element) ) {
-        AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
-        att->SetLyricSize(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "lyricStyle") && dynamic_cast<AttLyricstyle*>(element) ) {
-        AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
-        att->SetLyricStyle(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "lyricWeight") && dynamic_cast<AttLyricstyle*>(element) ) {
-        AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
-        att->SetLyricWeight(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "left") && dynamic_cast<AttMeasureLog*>(element) ) {
+    if (dynamic_cast<AttMeasureLog*>(element) ) {
         AttMeasureLog *att = dynamic_cast<AttMeasureLog*>(element);
-        att->SetLeft(att->StrToBarRendition(attrValue));
-    return true;
+        if (attrType == "left") {
+            att->SetLeft(att->StrToBarRendition(attrValue));
+            return true;
+        }
+        if (attrType == "right") {
+            att->SetRight(att->StrToBarRendition(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "right") && dynamic_cast<AttMeasureLog*>(element) ) {
-        AttMeasureLog *att = dynamic_cast<AttMeasureLog*>(element);
-        att->SetRight(att->StrToBarRendition(attrValue));
-    return true;
-    }
-    if ( (attrType == "unit") && dynamic_cast<AttMeasurement*>(element) ) {
+    if (dynamic_cast<AttMeasurement*>(element) ) {
         AttMeasurement *att = dynamic_cast<AttMeasurement*>(element);
-        att->SetUnit(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "unit") {
+            att->SetUnit(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "begin") && dynamic_cast<AttMediabounds*>(element) ) {
+    if (dynamic_cast<AttMediabounds*>(element) ) {
         AttMediabounds *att = dynamic_cast<AttMediabounds*>(element);
-        att->SetBegin(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "begin") {
+            att->SetBegin(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "end") {
+            att->SetEnd(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "betype") {
+            att->SetBetype(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "end") && dynamic_cast<AttMediabounds*>(element) ) {
-        AttMediabounds *att = dynamic_cast<AttMediabounds*>(element);
-        att->SetEnd(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "betype") && dynamic_cast<AttMediabounds*>(element) ) {
-        AttMediabounds *att = dynamic_cast<AttMediabounds*>(element);
-        att->SetBetype(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "medium") && dynamic_cast<AttMedium*>(element) ) {
+    if (dynamic_cast<AttMedium*>(element) ) {
         AttMedium *att = dynamic_cast<AttMedium*>(element);
-        att->SetMedium(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "medium") {
+            att->SetMedium(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "meiversion") && dynamic_cast<AttMeiversion*>(element) ) {
+    if (dynamic_cast<AttMeiversion*>(element) ) {
         AttMeiversion *att = dynamic_cast<AttMeiversion*>(element);
-        att->SetMeiversion(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "meiversion") {
+            att->SetMeiversion(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "meiversionNum") {
+            att->SetMeiversionNum(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "meiversionNum") && dynamic_cast<AttMeiversion*>(element) ) {
-        AttMeiversion *att = dynamic_cast<AttMeiversion*>(element);
-        att->SetMeiversionNum(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "dot") && dynamic_cast<AttMensurLog*>(element) ) {
+    if (dynamic_cast<AttMensurLog*>(element) ) {
         AttMensurLog *att = dynamic_cast<AttMensurLog*>(element);
-        att->SetDot(att->StrToBool(attrValue));
-    return true;
+        if (attrType == "dot") {
+            att->SetDot(att->StrToBool(attrValue));
+            return true;
+        }
+        if (attrType == "sign") {
+            att->SetSign(att->StrToMensurationSign(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "sign") && dynamic_cast<AttMensurLog*>(element) ) {
-        AttMensurLog *att = dynamic_cast<AttMensurLog*>(element);
-        att->SetSign(att->StrToMensurationSign(attrValue));
-    return true;
-    }
-    if ( (attrType == "count") && dynamic_cast<AttMeterSigLog*>(element) ) {
+    if (dynamic_cast<AttMeterSigLog*>(element) ) {
         AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>(element);
-        att->SetCount(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "count") {
+            att->SetCount(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "sym") {
+            att->SetSym(att->StrToMeterSign(attrValue));
+            return true;
+        }
+        if (attrType == "unit") {
+            att->SetUnit(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "sym") && dynamic_cast<AttMeterSigLog*>(element) ) {
-        AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>(element);
-        att->SetSym(att->StrToMeterSign(attrValue));
-    return true;
-    }
-    if ( (attrType == "unit") && dynamic_cast<AttMeterSigLog*>(element) ) {
-        AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>(element);
-        att->SetUnit(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "rend") && dynamic_cast<AttMeterSigVis*>(element) ) {
+    if (dynamic_cast<AttMeterSigVis*>(element) ) {
         AttMeterSigVis *att = dynamic_cast<AttMeterSigVis*>(element);
-        att->SetRend(att->StrToBarRendition(attrValue));
-    return true;
+        if (attrType == "rend") {
+            att->SetRend(att->StrToBarRendition(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "meterCount") && dynamic_cast<AttMeterSigDefaultLog*>(element) ) {
+    if (dynamic_cast<AttMeterSigDefaultLog*>(element) ) {
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog*>(element);
-        att->SetMeterCount(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "meterCount") {
+            att->SetMeterCount(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "meterUnit") {
+            att->SetMeterUnit(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "meterUnit") && dynamic_cast<AttMeterSigDefaultLog*>(element) ) {
-        AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog*>(element);
-        att->SetMeterUnit(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "meterRend") && dynamic_cast<AttMeterSigDefaultVis*>(element) ) {
+    if (dynamic_cast<AttMeterSigDefaultVis*>(element) ) {
         AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis*>(element);
-        att->SetMeterRend(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "meterRend") {
+            att->SetMeterRend(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "meterShowchange") {
+            att->SetMeterShowchange(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "meterSym") {
+            att->SetMeterSym(att->StrToMeterSign(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "meterShowchange") && dynamic_cast<AttMeterSigDefaultVis*>(element) ) {
-        AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis*>(element);
-        att->SetMeterShowchange(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "meterSym") && dynamic_cast<AttMeterSigDefaultVis*>(element) ) {
-        AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis*>(element);
-        att->SetMeterSym(att->StrToMeterSign(attrValue));
-    return true;
-    }
-    if ( (attrType == "metcon") && dynamic_cast<AttMeterconformance*>(element) ) {
+    if (dynamic_cast<AttMeterconformance*>(element) ) {
         AttMeterconformance *att = dynamic_cast<AttMeterconformance*>(element);
-        att->SetMetcon(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "metcon") {
+            att->SetMetcon(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "metcon") && dynamic_cast<AttMeterconformanceBar*>(element) ) {
+    if (dynamic_cast<AttMeterconformanceBar*>(element) ) {
         AttMeterconformanceBar *att = dynamic_cast<AttMeterconformanceBar*>(element);
-        att->SetMetcon(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "metcon") {
+            att->SetMetcon(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "control") {
+            att->SetControl(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "control") && dynamic_cast<AttMeterconformanceBar*>(element) ) {
-        AttMeterconformanceBar *att = dynamic_cast<AttMeterconformanceBar*>(element);
-        att->SetControl(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "mm") && dynamic_cast<AttMmtempo*>(element) ) {
+    if (dynamic_cast<AttMmtempo*>(element) ) {
         AttMmtempo *att = dynamic_cast<AttMmtempo*>(element);
-        att->SetMm(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "mm") {
+            att->SetMm(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "mmUnit") {
+            att->SetMmUnit(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "mmDots") {
+            att->SetMmDots(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "mmUnit") && dynamic_cast<AttMmtempo*>(element) ) {
-        AttMmtempo *att = dynamic_cast<AttMmtempo*>(element);
-        att->SetMmUnit(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "mmDots") && dynamic_cast<AttMmtempo*>(element) ) {
-        AttMmtempo *att = dynamic_cast<AttMmtempo*>(element);
-        att->SetMmDots(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "multiNumber") && dynamic_cast<AttMultinummeasures*>(element) ) {
+    if (dynamic_cast<AttMultinummeasures*>(element) ) {
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
-        att->SetMultiNumber(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "multiNumber") {
+            att->SetMultiNumber(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "nymref") && dynamic_cast<AttName*>(element) ) {
+    if (dynamic_cast<AttName*>(element) ) {
         AttName *att = dynamic_cast<AttName*>(element);
-        att->SetNymref(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "nymref") {
+            att->SetNymref(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "role") {
+            att->SetRole(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "role") && dynamic_cast<AttName*>(element) ) {
-        AttName *att = dynamic_cast<AttName*>(element);
-        att->SetRole(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "octGes") && dynamic_cast<AttNoteGes*>(element) ) {
+    if (dynamic_cast<AttNoteGes*>(element) ) {
         AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
-        att->SetOctGes(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "octGes") {
+            att->SetOctGes(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pnameGes") {
+            att->SetPnameGes(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pnum") {
+            att->SetPnum(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "pnameGes") && dynamic_cast<AttNoteGes*>(element) ) {
-        AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
-        att->SetPnameGes(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pnum") && dynamic_cast<AttNoteGes*>(element) ) {
-        AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
-        att->SetPnum(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "headshape") && dynamic_cast<AttNoteVis*>(element) ) {
+    if (dynamic_cast<AttNoteVis*>(element) ) {
         AttNoteVis *att = dynamic_cast<AttNoteVis*>(element);
-        att->SetHeadshape(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "headshape") {
+            att->SetHeadshape(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "oct") && dynamic_cast<AttOctave*>(element) ) {
+    if (dynamic_cast<AttOctave*>(element) ) {
         AttOctave *att = dynamic_cast<AttOctave*>(element);
-        att->SetOct(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "oct") {
+            att->SetOct(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "octaveDefault") && dynamic_cast<AttOctavedefault*>(element) ) {
+    if (dynamic_cast<AttOctavedefault*>(element) ) {
         AttOctavedefault *att = dynamic_cast<AttOctavedefault*>(element);
-        att->SetOctaveDefault(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "octaveDefault") {
+            att->SetOctaveDefault(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "dis") && dynamic_cast<AttOctavedisplacement*>(element) ) {
+    if (dynamic_cast<AttOctavedisplacement*>(element) ) {
         AttOctavedisplacement *att = dynamic_cast<AttOctavedisplacement*>(element);
-        att->SetDis(att->StrToOctaveDis(attrValue));
-    return true;
+        if (attrType == "dis") {
+            att->SetDis(att->StrToOctaveDis(attrValue));
+            return true;
+        }
+        if (attrType == "disPlace") {
+            att->SetDisPlace(att->StrToPlace(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "disPlace") && dynamic_cast<AttOctavedisplacement*>(element) ) {
-        AttOctavedisplacement *att = dynamic_cast<AttOctavedisplacement*>(element);
-        att->SetDisPlace(att->StrToPlace(attrValue));
-    return true;
-    }
-    if ( (attrType == "ontheline") && dynamic_cast<AttOnelinestaff*>(element) ) {
+    if (dynamic_cast<AttOnelinestaff*>(element) ) {
         AttOnelinestaff *att = dynamic_cast<AttOnelinestaff*>(element);
-        att->SetOntheline(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "ontheline") {
+            att->SetOntheline(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "num") && dynamic_cast<AttPadLog*>(element) ) {
+    if (dynamic_cast<AttPadLog*>(element) ) {
         AttPadLog *att = dynamic_cast<AttPadLog*>(element);
-        att->SetNum(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "num") {
+            att->SetNum(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "func") && dynamic_cast<AttPbVis*>(element) ) {
+    if (dynamic_cast<AttPbVis*>(element) ) {
         AttPbVis *att = dynamic_cast<AttPbVis*>(element);
-        att->SetFunc(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "func") {
+            att->SetFunc(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "pname") && dynamic_cast<AttPitch*>(element) ) {
+    if (dynamic_cast<AttPitch*>(element) ) {
         AttPitch *att = dynamic_cast<AttPitch*>(element);
-        att->SetPname(att->StrToPitchName(attrValue));
-    return true;
+        if (attrType == "pname") {
+            att->SetPname(att->StrToPitchName(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "place") && dynamic_cast<AttPlacement*>(element) ) {
+    if (dynamic_cast<AttPlacement*>(element) ) {
         AttPlacement *att = dynamic_cast<AttPlacement*>(element);
-        att->SetPlace(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "place") {
+            att->SetPlace(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "plist") && dynamic_cast<AttPlist*>(element) ) {
+    if (dynamic_cast<AttPlist*>(element) ) {
         AttPlist *att = dynamic_cast<AttPlist*>(element);
-        att->SetPlist(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "plist") {
+            att->SetPlist(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "evaluate") {
+            att->SetEvaluate(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "evaluate") && dynamic_cast<AttPlist*>(element) ) {
-        AttPlist *att = dynamic_cast<AttPlist*>(element);
-        att->SetEvaluate(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "actuate") && dynamic_cast<AttPointing*>(element) ) {
+    if (dynamic_cast<AttPointing*>(element) ) {
         AttPointing *att = dynamic_cast<AttPointing*>(element);
-        att->SetActuate(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "actuate") {
+            att->SetActuate(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "role") {
+            att->SetRole(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "show") {
+            att->SetShow(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "target") {
+            att->SetTarget(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "targettype") {
+            att->SetTargettype(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "title") {
+            att->SetTitle(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "role") && dynamic_cast<AttPointing*>(element) ) {
-        AttPointing *att = dynamic_cast<AttPointing*>(element);
-        att->SetRole(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "show") && dynamic_cast<AttPointing*>(element) ) {
-        AttPointing *att = dynamic_cast<AttPointing*>(element);
-        att->SetShow(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "target") && dynamic_cast<AttPointing*>(element) ) {
-        AttPointing *att = dynamic_cast<AttPointing*>(element);
-        att->SetTarget(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "targettype") && dynamic_cast<AttPointing*>(element) ) {
-        AttPointing *att = dynamic_cast<AttPointing*>(element);
-        att->SetTargettype(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "title") && dynamic_cast<AttPointing*>(element) ) {
-        AttPointing *att = dynamic_cast<AttPointing*>(element);
-        att->SetTitle(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "size") && dynamic_cast<AttRelativesize*>(element) ) {
+    if (dynamic_cast<AttRelativesize*>(element) ) {
         AttRelativesize *att = dynamic_cast<AttRelativesize*>(element);
-        att->SetSize(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "size") {
+            att->SetSize(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "resp") && dynamic_cast<AttResponsibility*>(element) ) {
+    if (dynamic_cast<AttResponsibility*>(element) ) {
         AttResponsibility *att = dynamic_cast<AttResponsibility*>(element);
-        att->SetResp(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "resp") {
+            att->SetResp(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "rend") && dynamic_cast<AttSbVis*>(element) ) {
+    if (dynamic_cast<AttSbVis*>(element) ) {
         AttSbVis *att = dynamic_cast<AttSbVis*>(element);
-        att->SetRend(att->StrToBarRendition(attrValue));
-    return true;
+        if (attrType == "rend") {
+            att->SetRend(att->StrToBarRendition(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "scale") && dynamic_cast<AttScalable*>(element) ) {
+    if (dynamic_cast<AttScalable*>(element) ) {
         AttScalable *att = dynamic_cast<AttScalable*>(element);
-        att->SetScale(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "scale") {
+            att->SetScale(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "tunePname") && dynamic_cast<AttScoreDefGes*>(element) ) {
+    if (dynamic_cast<AttScoreDefGes*>(element) ) {
         AttScoreDefGes *att = dynamic_cast<AttScoreDefGes*>(element);
-        att->SetTunePname(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "tunePname") {
+            att->SetTunePname(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "tuneHzDbl") {
+            att->SetTuneHz(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "tuneTemper") {
+            att->SetTuneTemper(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "tuneHzDbl") && dynamic_cast<AttScoreDefGes*>(element) ) {
-        AttScoreDefGes *att = dynamic_cast<AttScoreDefGes*>(element);
-        att->SetTuneHz(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "tuneTemper") && dynamic_cast<AttScoreDefGes*>(element) ) {
-        AttScoreDefGes *att = dynamic_cast<AttScoreDefGes*>(element);
-        att->SetTuneTemper(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "endingRend") && dynamic_cast<AttScoreDefVis*>(element) ) {
+    if (dynamic_cast<AttScoreDefVis*>(element) ) {
         AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetEndingRend(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "endingRend") {
+            att->SetEndingRend(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "mnumVisible") {
+            att->SetMnumVisible(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "musicName") {
+            att->SetMusicName(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "musicSize") {
+            att->SetMusicSize(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "optimize") {
+            att->SetOptimize(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageHeight") {
+            att->SetPageHeight(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageWidth") {
+            att->SetPageWidth(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageTopmar") {
+            att->SetPageTopmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageBotmar") {
+            att->SetPageBotmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageLeftmar") {
+            att->SetPageLeftmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageRightmar") {
+            att->SetPageRightmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pagePanels") {
+            att->SetPagePanels(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageScale") {
+            att->SetPageScale(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "spacingPackexpDbl") {
+            att->SetSpacingPackexp(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "spacingPackfactDbl") {
+            att->SetSpacingPackfact(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "spacingStaff") {
+            att->SetSpacingStaff(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "spacingSystem") {
+            att->SetSpacingSystem(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "systemLeftmar") {
+            att->SetSystemLeftmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "systemRightmar") {
+            att->SetSystemRightmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "systemTopmar") {
+            att->SetSystemTopmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "vuHeight") {
+            att->SetVuHeight(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "mnumVisible") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetMnumVisible(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "musicName") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetMusicName(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "musicSize") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetMusicSize(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "optimize") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetOptimize(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageHeight") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageHeight(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageWidth") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageWidth(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageTopmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageTopmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageBotmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageBotmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageLeftmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageLeftmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageRightmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageRightmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pagePanels") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPagePanels(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "pageScale") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetPageScale(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "spacingPackexpDbl") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSpacingPackexp(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "spacingPackfactDbl") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSpacingPackfact(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "spacingStaff") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSpacingStaff(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "spacingSystem") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSpacingSystem(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "systemLeftmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSystemLeftmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "systemRightmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSystemRightmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "systemTopmar") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetSystemTopmar(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "vuHeight") && dynamic_cast<AttScoreDefVis*>(element) ) {
-        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
-        att->SetVuHeight(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "restart") && dynamic_cast<AttSectionVis*>(element) ) {
+    if (dynamic_cast<AttSectionVis*>(element) ) {
         AttSectionVis *att = dynamic_cast<AttSectionVis*>(element);
-        att->SetRestart(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "restart") {
+            att->SetRestart(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "seqInt") && dynamic_cast<AttSequence*>(element) ) {
+    if (dynamic_cast<AttSequence*>(element) ) {
         AttSequence *att = dynamic_cast<AttSequence*>(element);
-        att->SetSeq(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "seqInt") {
+            att->SetSeq(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "slash") && dynamic_cast<AttSlashcount*>(element) ) {
+    if (dynamic_cast<AttSlashcount*>(element) ) {
         AttSlashcount *att = dynamic_cast<AttSlashcount*>(element);
-        att->SetSlash(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "slash") {
+            att->SetSlash(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "slur") && dynamic_cast<AttSlurpresent*>(element) ) {
+    if (dynamic_cast<AttSlurpresent*>(element) ) {
         AttSlurpresent *att = dynamic_cast<AttSlurpresent*>(element);
-        att->SetSlur(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "slur") {
+            att->SetSlur(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "compressable") && dynamic_cast<AttSpaceVis*>(element) ) {
+    if (dynamic_cast<AttSpaceVis*>(element) ) {
         AttSpaceVis *att = dynamic_cast<AttSpaceVis*>(element);
-        att->SetCompressable(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "compressable") {
+            att->SetCompressable(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "def") && dynamic_cast<AttStaffLog*>(element) ) {
+    if (dynamic_cast<AttStaffLog*>(element) ) {
         AttStaffLog *att = dynamic_cast<AttStaffLog*>(element);
-        att->SetDef(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "def") {
+            att->SetDef(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "gridShow") && dynamic_cast<AttStaffDefVis*>(element) ) {
+    if (dynamic_cast<AttStaffDefVis*>(element) ) {
         AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
-        att->SetGridShow(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "gridShow") {
+            att->SetGridShow(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "layerscheme") {
+            att->SetLayerscheme(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "linesInt") {
+            att->SetLines(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "linesColor") {
+            att->SetLinesColor(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "linesVisible") {
+            att->SetLinesVisible(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "spacing") {
+            att->SetSpacing(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "layerscheme") && dynamic_cast<AttStaffDefVis*>(element) ) {
-        AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
-        att->SetLayerscheme(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "linesInt") && dynamic_cast<AttStaffDefVis*>(element) ) {
-        AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
-        att->SetLines(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "linesColor") && dynamic_cast<AttStaffDefVis*>(element) ) {
-        AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
-        att->SetLinesColor(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "linesVisible") && dynamic_cast<AttStaffDefVis*>(element) ) {
-        AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
-        att->SetLinesVisible(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "spacing") && dynamic_cast<AttStaffDefVis*>(element) ) {
-        AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
-        att->SetSpacing(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "barthru") && dynamic_cast<AttStaffGrpVis*>(element) ) {
+    if (dynamic_cast<AttStaffGrpVis*>(element) ) {
         AttStaffGrpVis *att = dynamic_cast<AttStaffGrpVis*>(element);
-        att->SetBarthru(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "barthru") {
+            att->SetBarthru(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "symbol") && dynamic_cast<AttStaffgroupingsym*>(element) ) {
+    if (dynamic_cast<AttStaffgroupingsym*>(element) ) {
         AttStaffgroupingsym *att = dynamic_cast<AttStaffgroupingsym*>(element);
-        att->SetSymbol(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "symbol") {
+            att->SetSymbol(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "staff") && dynamic_cast<AttStaffident*>(element) ) {
+    if (dynamic_cast<AttStaffident*>(element) ) {
         AttStaffident *att = dynamic_cast<AttStaffident*>(element);
-        att->SetStaff(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "staff") {
+            att->SetStaff(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "loc") && dynamic_cast<AttStaffloc*>(element) ) {
+    if (dynamic_cast<AttStaffloc*>(element) ) {
         AttStaffloc *att = dynamic_cast<AttStaffloc*>(element);
-        att->SetLoc(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "loc") {
+            att->SetLoc(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "ploc") && dynamic_cast<AttStafflocPitched*>(element) ) {
+    if (dynamic_cast<AttStafflocPitched*>(element) ) {
         AttStafflocPitched *att = dynamic_cast<AttStafflocPitched*>(element);
-        att->SetPloc(att->StrToPitchName(attrValue));
-    return true;
+        if (attrType == "ploc") {
+            att->SetPloc(att->StrToPitchName(attrValue));
+            return true;
+        }
+        if (attrType == "oloc") {
+            att->SetOloc(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "oloc") && dynamic_cast<AttStafflocPitched*>(element) ) {
-        AttStafflocPitched *att = dynamic_cast<AttStafflocPitched*>(element);
-        att->SetOloc(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "endid") && dynamic_cast<AttStartendid*>(element) ) {
+    if (dynamic_cast<AttStartendid*>(element) ) {
         AttStartendid *att = dynamic_cast<AttStartendid*>(element);
-        att->SetEndid(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "endid") {
+            att->SetEndid(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "startid") && dynamic_cast<AttStartid*>(element) ) {
+    if (dynamic_cast<AttStartid*>(element) ) {
         AttStartid *att = dynamic_cast<AttStartid*>(element);
-        att->SetStartid(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "startid") {
+            att->SetStartid(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "stemDir") && dynamic_cast<AttStemmed*>(element) ) {
+    if (dynamic_cast<AttStemmed*>(element) ) {
         AttStemmed *att = dynamic_cast<AttStemmed*>(element);
-        att->SetStemDir(att->StrToStemDirection(attrValue));
-    return true;
+        if (attrType == "stemDir") {
+            att->SetStemDir(att->StrToStemDirection(attrValue));
+            return true;
+        }
+        if (attrType == "stemLen") {
+            att->SetStemLen(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "stemPos") {
+            att->SetStemPos(att->StrToStemPosition(attrValue));
+            return true;
+        }
+        if (attrType == "stemX") {
+            att->SetStemX(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "stemY") {
+            att->SetStemY(att->StrToInt(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "stemLen") && dynamic_cast<AttStemmed*>(element) ) {
-        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
-        att->SetStemLen(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "stemPos") && dynamic_cast<AttStemmed*>(element) ) {
-        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
-        att->SetStemPos(att->StrToStemPosition(attrValue));
-    return true;
-    }
-    if ( (attrType == "stemX") && dynamic_cast<AttStemmed*>(element) ) {
-        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
-        att->SetStemX(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "stemY") && dynamic_cast<AttStemmed*>(element) ) {
-        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
-        att->SetStemY(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "con") && dynamic_cast<AttSylLog*>(element) ) {
+    if (dynamic_cast<AttSylLog*>(element) ) {
         AttSylLog *att = dynamic_cast<AttSylLog*>(element);
-        att->SetCon(att->StrToCon(attrValue));
-    return true;
+        if (attrType == "con") {
+            att->SetCon(att->StrToCon(attrValue));
+            return true;
+        }
+        if (attrType == "wordpos") {
+            att->SetWordpos(att->StrToWordPos(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "wordpos") && dynamic_cast<AttSylLog*>(element) ) {
-        AttSylLog *att = dynamic_cast<AttSylLog*>(element);
-        att->SetWordpos(att->StrToWordPos(attrValue));
-    return true;
-    }
-    if ( (attrType == "syl") && dynamic_cast<AttSyltext*>(element) ) {
+    if (dynamic_cast<AttSyltext*>(element) ) {
         AttSyltext *att = dynamic_cast<AttSyltext*>(element);
-        att->SetSyl(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "syl") {
+            att->SetSyl(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "textFam") && dynamic_cast<AttTextstyle*>(element) ) {
+    if (dynamic_cast<AttTextstyle*>(element) ) {
         AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
-        att->SetTextFam(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "textFam") {
+            att->SetTextFam(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "textName") {
+            att->SetTextName(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "textSize") {
+            att->SetTextSize(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "textStyle") {
+            att->SetTextStyle(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "textWeight") {
+            att->SetTextWeight(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "textName") && dynamic_cast<AttTextstyle*>(element) ) {
-        AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
-        att->SetTextName(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "textSize") && dynamic_cast<AttTextstyle*>(element) ) {
-        AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
-        att->SetTextSize(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "textStyle") && dynamic_cast<AttTextstyle*>(element) ) {
-        AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
-        att->SetTextStyle(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "textWeight") && dynamic_cast<AttTextstyle*>(element) ) {
-        AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
-        att->SetTextWeight(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "tie") && dynamic_cast<AttTiepresent*>(element) ) {
+    if (dynamic_cast<AttTiepresent*>(element) ) {
         AttTiepresent *att = dynamic_cast<AttTiepresent*>(element);
-        att->SetTie(att->StrToTie(attrValue));
-    return true;
+        if (attrType == "tie") {
+            att->SetTie(att->StrToTie(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "tstamp") && dynamic_cast<AttTimestampMusical*>(element) ) {
+    if (dynamic_cast<AttTimestampMusical*>(element) ) {
         AttTimestampMusical *att = dynamic_cast<AttTimestampMusical*>(element);
-        att->SetTstamp(att->StrToDbl(attrValue));
-    return true;
+        if (attrType == "tstamp") {
+            att->SetTstamp(att->StrToDbl(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "tstampGesInt") && dynamic_cast<AttTimestampPerformed*>(element) ) {
+    if (dynamic_cast<AttTimestampPerformed*>(element) ) {
         AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
-        att->SetTstampGes(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "tstampGesInt") {
+            att->SetTstampGes(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "tstampReal") {
+            att->SetTstampReal(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "tstampReal") && dynamic_cast<AttTimestampPerformed*>(element) ) {
-        AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
-        att->SetTstampReal(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "tstamp2") && dynamic_cast<AttTimestamp2Musical*>(element) ) {
+    if (dynamic_cast<AttTimestamp2Musical*>(element) ) {
         AttTimestamp2Musical *att = dynamic_cast<AttTimestamp2Musical*>(element);
-        att->SetTstamp2(att->StrToTstamp2(attrValue));
-    return true;
+        if (attrType == "tstamp2") {
+            att->SetTstamp2(att->StrToTstamp2(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "transDiatDbl") && dynamic_cast<AttTransposition*>(element) ) {
+    if (dynamic_cast<AttTransposition*>(element) ) {
         AttTransposition *att = dynamic_cast<AttTransposition*>(element);
-        att->SetTransDiat(att->StrToDbl(attrValue));
-    return true;
+        if (attrType == "transDiatDbl") {
+            att->SetTransDiat(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "transSemiDbl") {
+            att->SetTransSemi(att->StrToDbl(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "transSemiDbl") && dynamic_cast<AttTransposition*>(element) ) {
-        AttTransposition *att = dynamic_cast<AttTransposition*>(element);
-        att->SetTransSemi(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "tuplet") && dynamic_cast<AttTupletpresent*>(element) ) {
+    if (dynamic_cast<AttTupletpresent*>(element) ) {
         AttTupletpresent *att = dynamic_cast<AttTupletpresent*>(element);
-        att->SetTuplet(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "tuplet") {
+            att->SetTuplet(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "type") && dynamic_cast<AttTyped*>(element) ) {
+    if (dynamic_cast<AttTyped*>(element) ) {
         AttTyped *att = dynamic_cast<AttTyped*>(element);
-        att->SetType(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "type") {
+            att->SetType(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "subtype") {
+            att->SetSubtype(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "subtype") && dynamic_cast<AttTyped*>(element) ) {
-        AttTyped *att = dynamic_cast<AttTyped*>(element);
-        att->SetSubtype(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "fontfam") && dynamic_cast<AttTypography*>(element) ) {
+    if (dynamic_cast<AttTypography*>(element) ) {
         AttTypography *att = dynamic_cast<AttTypography*>(element);
-        att->SetFontfam(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "fontfam") {
+            att->SetFontfam(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "fontname") {
+            att->SetFontname(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "fontsizeDbl") {
+            att->SetFontsize(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "fontstyle") {
+            att->SetFontstyle(att->StrToFontstyle(attrValue));
+            return true;
+        }
+        if (attrType == "fontweight") {
+            att->SetFontweight(att->StrToFontweight(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "fontname") && dynamic_cast<AttTypography*>(element) ) {
-        AttTypography *att = dynamic_cast<AttTypography*>(element);
-        att->SetFontname(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "fontsizeDbl") && dynamic_cast<AttTypography*>(element) ) {
-        AttTypography *att = dynamic_cast<AttTypography*>(element);
-        att->SetFontsize(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "fontstyle") && dynamic_cast<AttTypography*>(element) ) {
-        AttTypography *att = dynamic_cast<AttTypography*>(element);
-        att->SetFontstyle(att->StrToFontstyle(attrValue));
-    return true;
-    }
-    if ( (attrType == "fontweight") && dynamic_cast<AttTypography*>(element) ) {
-        AttTypography *att = dynamic_cast<AttTypography*>(element);
-        att->SetFontweight(att->StrToFontweight(attrValue));
-    return true;
-    }
-    if ( (attrType == "visible") && dynamic_cast<AttVisibility*>(element) ) {
+    if (dynamic_cast<AttVisibility*>(element) ) {
         AttVisibility *att = dynamic_cast<AttVisibility*>(element);
-        att->SetVisible(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "visible") {
+            att->SetVisible(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "ho") && dynamic_cast<AttVisualoffsetHo*>(element) ) {
+    if (dynamic_cast<AttVisualoffsetHo*>(element) ) {
         AttVisualoffsetHo *att = dynamic_cast<AttVisualoffsetHo*>(element);
-        att->SetHo(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "ho") {
+            att->SetHo(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "to") && dynamic_cast<AttVisualoffsetTo*>(element) ) {
+    if (dynamic_cast<AttVisualoffsetTo*>(element) ) {
         AttVisualoffsetTo *att = dynamic_cast<AttVisualoffsetTo*>(element);
-        att->SetTo(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "to") {
+            att->SetTo(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "vo") && dynamic_cast<AttVisualoffsetVo*>(element) ) {
+    if (dynamic_cast<AttVisualoffsetVo*>(element) ) {
         AttVisualoffsetVo *att = dynamic_cast<AttVisualoffsetVo*>(element);
-        att->SetVo(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "vo") {
+            att->SetVo(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "startho") && dynamic_cast<AttVisualoffset2Ho*>(element) ) {
+    if (dynamic_cast<AttVisualoffset2Ho*>(element) ) {
         AttVisualoffset2Ho *att = dynamic_cast<AttVisualoffset2Ho*>(element);
-        att->SetStartho(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "startho") {
+            att->SetStartho(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "endho") {
+            att->SetEndho(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "endho") && dynamic_cast<AttVisualoffset2Ho*>(element) ) {
-        AttVisualoffset2Ho *att = dynamic_cast<AttVisualoffset2Ho*>(element);
-        att->SetEndho(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "startto") && dynamic_cast<AttVisualoffset2To*>(element) ) {
+    if (dynamic_cast<AttVisualoffset2To*>(element) ) {
         AttVisualoffset2To *att = dynamic_cast<AttVisualoffset2To*>(element);
-        att->SetStartto(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "startto") {
+            att->SetStartto(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "endto") {
+            att->SetEndto(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "endto") && dynamic_cast<AttVisualoffset2To*>(element) ) {
-        AttVisualoffset2To *att = dynamic_cast<AttVisualoffset2To*>(element);
-        att->SetEndto(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "startvo") && dynamic_cast<AttVisualoffset2Vo*>(element) ) {
+    if (dynamic_cast<AttVisualoffset2Vo*>(element) ) {
         AttVisualoffset2Vo *att = dynamic_cast<AttVisualoffset2Vo*>(element);
-        att->SetStartvo(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "startvo") {
+            att->SetStartvo(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "endvo") {
+            att->SetEndvo(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "endvo") && dynamic_cast<AttVisualoffset2Vo*>(element) ) {
-        AttVisualoffset2Vo *att = dynamic_cast<AttVisualoffset2Vo*>(element);
-        att->SetEndvo(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "space") && dynamic_cast<AttWhitespace*>(element) ) {
+    if (dynamic_cast<AttWhitespace*>(element) ) {
         AttWhitespace *att = dynamic_cast<AttWhitespace*>(element);
-        att->SetSpace(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "space") {
+            att->SetSpace(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "width") && dynamic_cast<AttWidth*>(element) ) {
+    if (dynamic_cast<AttWidth*>(element) ) {
         AttWidth *att = dynamic_cast<AttWidth*>(element);
-        att->SetWidth(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "width") {
+            att->SetWidth(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "xDbl") && dynamic_cast<AttXy*>(element) ) {
+    if (dynamic_cast<AttXy*>(element) ) {
         AttXy *att = dynamic_cast<AttXy*>(element);
-        att->SetX(att->StrToDbl(attrValue));
-    return true;
+        if (attrType == "xDbl") {
+            att->SetX(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "yDbl") {
+            att->SetY(att->StrToDbl(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "yDbl") && dynamic_cast<AttXy*>(element) ) {
-        AttXy *att = dynamic_cast<AttXy*>(element);
-        att->SetY(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "x2Dbl") && dynamic_cast<AttXy2*>(element) ) {
+    if (dynamic_cast<AttXy2*>(element) ) {
         AttXy2 *att = dynamic_cast<AttXy2*>(element);
-        att->SetX2(att->StrToDbl(attrValue));
-    return true;
-    }
-    if ( (attrType == "y2Dbl") && dynamic_cast<AttXy2*>(element) ) {
-        AttXy2 *att = dynamic_cast<AttXy2*>(element);
-        att->SetY2(att->StrToDbl(attrValue));
-    return true;
+        if (attrType == "x2Dbl") {
+            att->SetX2(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "y2Dbl") {
+            att->SetY2(att->StrToDbl(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttAccidLog*>(element) ) {
+        AttAccidLog *att = dynamic_cast<AttAccidLog*>(element);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+        }
+    }
+    if (dynamic_cast<AttAccidental*>(element) ) {
+        AttAccidental *att = dynamic_cast<AttAccidental*>(element);
+        if (att->HasAccid()) {
+            attributes->push_back(std::make_pair("accid", att->AccidentalExplicitToStr(att->GetAccid())));
+        }
+    }
+    if (dynamic_cast<AttAccidentalPerformed*>(element) ) {
+        AttAccidentalPerformed *att = dynamic_cast<AttAccidentalPerformed*>(element);
+        if (att->HasAccidGes()) {
+            attributes->push_back(std::make_pair("accidGes", att->StrToStr(att->GetAccidGes())));
+        }
+    }
+    if (dynamic_cast<AttAltsym*>(element) ) {
+        AttAltsym *att = dynamic_cast<AttAltsym*>(element);
+        if (att->HasAltsym()) {
+            attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));
+        }
+    }
+    if (dynamic_cast<AttArticulation*>(element) ) {
+        AttArticulation *att = dynamic_cast<AttArticulation*>(element);
+        if (att->HasArtic()) {
+            attributes->push_back(std::make_pair("artic", att->StrToStr(att->GetArtic())));
+        }
+    }
+    if (dynamic_cast<AttArticulationPerformed*>(element) ) {
+        AttArticulationPerformed *att = dynamic_cast<AttArticulationPerformed*>(element);
+        if (att->HasArticGes()) {
+            attributes->push_back(std::make_pair("articGes", att->StrToStr(att->GetArticGes())));
+        }
+    }
+    if (dynamic_cast<AttAugmentdots*>(element) ) {
+        AttAugmentdots *att = dynamic_cast<AttAugmentdots*>(element);
+        if (att->HasDots()) {
+            attributes->push_back(std::make_pair("dots", att->IntToStr(att->GetDots())));
+        }
+    }
+    if (dynamic_cast<AttAuthorized*>(element) ) {
+        AttAuthorized *att = dynamic_cast<AttAuthorized*>(element);
+        if (att->HasAuthority()) {
+            attributes->push_back(std::make_pair("authority", att->StrToStr(att->GetAuthority())));
+        }
+        if (att->HasAuthURI()) {
+            attributes->push_back(std::make_pair("authURI", att->StrToStr(att->GetAuthURI())));
+        }
+    }
+    if (dynamic_cast<AttBarLineLog*>(element) ) {
+        AttBarLineLog *att = dynamic_cast<AttBarLineLog*>(element);
+        if (att->HasRend()) {
+            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        }
+    }
+    if (dynamic_cast<AttBarplacement*>(element) ) {
+        AttBarplacement *att = dynamic_cast<AttBarplacement*>(element);
+        if (att->HasBarplace()) {
+            attributes->push_back(std::make_pair("barplace", att->StrToStr(att->GetBarplace())));
+        }
+        if (att->HasTaktplace()) {
+            attributes->push_back(std::make_pair("taktplace", att->StrToStr(att->GetTaktplace())));
+        }
+    }
+    if (dynamic_cast<AttBeamingVis*>(element) ) {
+        AttBeamingVis *att = dynamic_cast<AttBeamingVis*>(element);
+        if (att->HasBeamColor()) {
+            attributes->push_back(std::make_pair("beamColor", att->StrToStr(att->GetBeamColor())));
+        }
+        if (att->HasBeamRend()) {
+            attributes->push_back(std::make_pair("beamRend", att->StrToStr(att->GetBeamRend())));
+        }
+        if (att->HasBeamSlope()) {
+            attributes->push_back(std::make_pair("beamSlopeDbl", att->DblToStr(att->GetBeamSlope())));
+        }
+    }
+    if (dynamic_cast<AttBibl*>(element) ) {
+        AttBibl *att = dynamic_cast<AttBibl*>(element);
+        if (att->HasAnalog()) {
+            attributes->push_back(std::make_pair("analog", att->StrToStr(att->GetAnalog())));
+        }
+    }
+    if (dynamic_cast<AttCalendared*>(element) ) {
+        AttCalendared *att = dynamic_cast<AttCalendared*>(element);
+        if (att->HasCalendar()) {
+            attributes->push_back(std::make_pair("calendar", att->StrToStr(att->GetCalendar())));
+        }
+    }
+    if (dynamic_cast<AttCanonical*>(element) ) {
+        AttCanonical *att = dynamic_cast<AttCanonical*>(element);
+        if (att->HasDbkey()) {
+            attributes->push_back(std::make_pair("dbkey", att->StrToStr(att->GetDbkey())));
+        }
+    }
+    if (dynamic_cast<AttChordVis*>(element) ) {
+        AttChordVis *att = dynamic_cast<AttChordVis*>(element);
+        if (att->HasCluster()) {
+            attributes->push_back(std::make_pair("cluster", att->StrToStr(att->GetCluster())));
+        }
+    }
+    if (dynamic_cast<AttClefLog*>(element) ) {
+        AttClefLog *att = dynamic_cast<AttClefLog*>(element);
+        if (att->HasCautionary()) {
+            attributes->push_back(std::make_pair("cautionary", att->StrToStr(att->GetCautionary())));
+        }
+    }
+    if (dynamic_cast<AttCleffingLog*>(element) ) {
+        AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
+        if (att->HasClefShape()) {
+            attributes->push_back(std::make_pair("clefShape", att->ClefShapeToStr(att->GetClefShape())));
+        }
+        if (att->HasClefLine()) {
+            attributes->push_back(std::make_pair("clefLine", att->IntToStr(att->GetClefLine())));
+        }
+        if (att->HasClefDis()) {
+            attributes->push_back(std::make_pair("clefDis", att->OctaveDisToStr(att->GetClefDis())));
+        }
+        if (att->HasClefDisPlace()) {
+            attributes->push_back(std::make_pair("clefDisPlace", att->PlaceToStr(att->GetClefDisPlace())));
+        }
+    }
+    if (dynamic_cast<AttCleffingVis*>(element) ) {
+        AttCleffingVis *att = dynamic_cast<AttCleffingVis*>(element);
+        if (att->HasClefColor()) {
+            attributes->push_back(std::make_pair("clefColor", att->StrToStr(att->GetClefColor())));
+        }
+        if (att->HasClefVisible()) {
+            attributes->push_back(std::make_pair("clefVisible", att->StrToStr(att->GetClefVisible())));
+        }
+    }
+    if (dynamic_cast<AttClefshape*>(element) ) {
+        AttClefshape *att = dynamic_cast<AttClefshape*>(element);
+        if (att->HasShape()) {
+            attributes->push_back(std::make_pair("shape", att->ClefShapeToStr(att->GetShape())));
+        }
+    }
+    if (dynamic_cast<AttCoded*>(element) ) {
+        AttCoded *att = dynamic_cast<AttCoded*>(element);
+        if (att->HasCode()) {
+            attributes->push_back(std::make_pair("code", att->StrToStr(att->GetCode())));
+        }
+    }
+    if (dynamic_cast<AttColor*>(element) ) {
+        AttColor *att = dynamic_cast<AttColor*>(element);
+        if (att->HasColor()) {
+            attributes->push_back(std::make_pair("color", att->StrToStr(att->GetColor())));
+        }
+    }
+    if (dynamic_cast<AttColoration*>(element) ) {
+        AttColoration *att = dynamic_cast<AttColoration*>(element);
+        if (att->HasColored()) {
+            attributes->push_back(std::make_pair("colored", att->BoolToStr(att->GetColored())));
+        }
+    }
+    if (dynamic_cast<AttCommon*>(element) ) {
+        AttCommon *att = dynamic_cast<AttCommon*>(element);
+        if (att->HasLabel()) {
+            attributes->push_back(std::make_pair("label", att->StrToStr(att->GetLabel())));
+        }
+        if (att->HasN()) {
+            attributes->push_back(std::make_pair("n", att->IntToStr(att->GetN())));
+        }
+        if (att->HasBase()) {
+            attributes->push_back(std::make_pair("base", att->StrToStr(att->GetBase())));
+        }
+    }
+    if (dynamic_cast<AttCoordinated*>(element) ) {
+        AttCoordinated *att = dynamic_cast<AttCoordinated*>(element);
+        if (att->HasUlx()) {
+            attributes->push_back(std::make_pair("ulxInt", att->IntToStr(att->GetUlx())));
+        }
+        if (att->HasUly()) {
+            attributes->push_back(std::make_pair("ulyInt", att->IntToStr(att->GetUly())));
+        }
+        if (att->HasLrx()) {
+            attributes->push_back(std::make_pair("lrxInt", att->IntToStr(att->GetLrx())));
+        }
+        if (att->HasLry()) {
+            attributes->push_back(std::make_pair("lryInt", att->IntToStr(att->GetLry())));
+        }
+    }
+    if (dynamic_cast<AttCurvature*>(element) ) {
+        AttCurvature *att = dynamic_cast<AttCurvature*>(element);
+        if (att->HasBezier()) {
+            attributes->push_back(std::make_pair("bezier", att->StrToStr(att->GetBezier())));
+        }
+        if (att->HasBulge()) {
+            attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
+        }
+        if (att->HasCurvedir()) {
+            attributes->push_back(std::make_pair("curvedir", att->StrToStr(att->GetCurvedir())));
+        }
+    }
+    if (dynamic_cast<AttCurverend*>(element) ) {
+        AttCurverend *att = dynamic_cast<AttCurverend*>(element);
+        if (att->HasRend()) {
+            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        }
+    }
+    if (dynamic_cast<AttCustosLog*>(element) ) {
+        AttCustosLog *att = dynamic_cast<AttCustosLog*>(element);
+        if (att->HasTarget()) {
+            attributes->push_back(std::make_pair("target", att->StrToStr(att->GetTarget())));
+        }
+    }
+    if (dynamic_cast<AttDatable*>(element) ) {
+        AttDatable *att = dynamic_cast<AttDatable*>(element);
+        if (att->HasEnddate()) {
+            attributes->push_back(std::make_pair("enddate", att->StrToStr(att->GetEnddate())));
+        }
+        if (att->HasIsodate()) {
+            attributes->push_back(std::make_pair("isodate", att->StrToStr(att->GetIsodate())));
+        }
+        if (att->HasNotafter()) {
+            attributes->push_back(std::make_pair("notafter", att->StrToStr(att->GetNotafter())));
+        }
+        if (att->HasNotbefore()) {
+            attributes->push_back(std::make_pair("notbefore", att->StrToStr(att->GetNotbefore())));
+        }
+        if (att->HasStartdate()) {
+            attributes->push_back(std::make_pair("startdate", att->StrToStr(att->GetStartdate())));
+        }
+    }
+    if (dynamic_cast<AttDatapointing*>(element) ) {
+        AttDatapointing *att = dynamic_cast<AttDatapointing*>(element);
+        if (att->HasData()) {
+            attributes->push_back(std::make_pair("data", att->StrToStr(att->GetData())));
+        }
+    }
+    if (dynamic_cast<AttDeclaring*>(element) ) {
+        AttDeclaring *att = dynamic_cast<AttDeclaring*>(element);
+        if (att->HasDecls()) {
+            attributes->push_back(std::make_pair("decls", att->StrToStr(att->GetDecls())));
+        }
+    }
+    if (dynamic_cast<AttDistances*>(element) ) {
+        AttDistances *att = dynamic_cast<AttDistances*>(element);
+        if (att->HasDynamDist()) {
+            attributes->push_back(std::make_pair("dynamDist", att->StrToStr(att->GetDynamDist())));
+        }
+        if (att->HasHarmDist()) {
+            attributes->push_back(std::make_pair("harmDist", att->StrToStr(att->GetHarmDist())));
+        }
+        if (att->HasTextDist()) {
+            attributes->push_back(std::make_pair("textDist", att->StrToStr(att->GetTextDist())));
+        }
+    }
+    if (dynamic_cast<AttDotLog*>(element) ) {
+        AttDotLog *att = dynamic_cast<AttDotLog*>(element);
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+        }
+    }
+    if (dynamic_cast<AttDurationAdditive*>(element) ) {
+        AttDurationAdditive *att = dynamic_cast<AttDurationAdditive*>(element);
+        if (att->HasDur()) {
+            attributes->push_back(std::make_pair("dur", att->DurToStr(att->GetDur())));
+        }
+    }
+    if (dynamic_cast<AttDurationDefault*>(element) ) {
+        AttDurationDefault *att = dynamic_cast<AttDurationDefault*>(element);
+        if (att->HasDurDefault()) {
+            attributes->push_back(std::make_pair("durDefault", att->StrToStr(att->GetDurDefault())));
+        }
+        if (att->HasNumDefault()) {
+            attributes->push_back(std::make_pair("numDefaultInt", att->IntToStr(att->GetNumDefault())));
+        }
+        if (att->HasNumbaseDefault()) {
+            attributes->push_back(std::make_pair("numbaseDefaultInt", att->IntToStr(att->GetNumbaseDefault())));
+        }
+    }
+    if (dynamic_cast<AttDurationMusical*>(element) ) {
+        AttDurationMusical *att = dynamic_cast<AttDurationMusical*>(element);
+        if (att->HasDur()) {
+            attributes->push_back(std::make_pair("dur", att->DurToStr(att->GetDur())));
+        }
+    }
+    if (dynamic_cast<AttDurationPerformed*>(element) ) {
+        AttDurationPerformed *att = dynamic_cast<AttDurationPerformed*>(element);
+        if (att->HasDurGes()) {
+            attributes->push_back(std::make_pair("durGes", att->DurToStr(att->GetDurGes())));
+        }
+    }
+    if (dynamic_cast<AttDurationRatio*>(element) ) {
+        AttDurationRatio *att = dynamic_cast<AttDurationRatio*>(element);
+        if (att->HasNum()) {
+            attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
+        }
+        if (att->HasNumbase()) {
+            attributes->push_back(std::make_pair("numbase", att->IntToStr(att->GetNumbase())));
+        }
+    }
+    if (dynamic_cast<AttEnclosingchars*>(element) ) {
+        AttEnclosingchars *att = dynamic_cast<AttEnclosingchars*>(element);
+        if (att->HasEnclose()) {
+            attributes->push_back(std::make_pair("enclose", att->StrToStr(att->GetEnclose())));
+        }
+    }
+    if (dynamic_cast<AttFermatapresent*>(element) ) {
+        AttFermatapresent *att = dynamic_cast<AttFermatapresent*>(element);
+        if (att->HasFermata()) {
+            attributes->push_back(std::make_pair("fermata", att->PlaceToStr(att->GetFermata())));
+        }
+    }
+    if (dynamic_cast<AttHandident*>(element) ) {
+        AttHandident *att = dynamic_cast<AttHandident*>(element);
+        if (att->HasHand()) {
+            attributes->push_back(std::make_pair("hand", att->StrToStr(att->GetHand())));
+        }
+    }
+    if (dynamic_cast<AttHorizontalalign*>(element) ) {
+        AttHorizontalalign *att = dynamic_cast<AttHorizontalalign*>(element);
+        if (att->HasHalign()) {
+            attributes->push_back(std::make_pair("halign", att->StrToStr(att->GetHalign())));
+        }
+    }
+    if (dynamic_cast<AttInstrumentident*>(element) ) {
+        AttInstrumentident *att = dynamic_cast<AttInstrumentident*>(element);
+        if (att->HasInstr()) {
+            attributes->push_back(std::make_pair("instr", att->StrToStr(att->GetInstr())));
+        }
+    }
+    if (dynamic_cast<AttInternetmedia*>(element) ) {
+        AttInternetmedia *att = dynamic_cast<AttInternetmedia*>(element);
+        if (att->HasMimetype()) {
+            attributes->push_back(std::make_pair("mimetype", att->StrToStr(att->GetMimetype())));
+        }
+    }
+    if (dynamic_cast<AttJoined*>(element) ) {
+        AttJoined *att = dynamic_cast<AttJoined*>(element);
+        if (att->HasJoin()) {
+            attributes->push_back(std::make_pair("join", att->StrToStr(att->GetJoin())));
+        }
+    }
+    if (dynamic_cast<AttKeySigLog*>(element) ) {
+        AttKeySigLog *att = dynamic_cast<AttKeySigLog*>(element);
+        if (att->HasMode()) {
+            attributes->push_back(std::make_pair("mode", att->StrToStr(att->GetMode())));
+        }
+    }
+    if (dynamic_cast<AttKeySigDefaultLog*>(element) ) {
+        AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
+        if (att->HasKeyAccid()) {
+            attributes->push_back(std::make_pair("keyAccid", att->AccidentalImplicitToStr(att->GetKeyAccid())));
+        }
+        if (att->HasKeyMode()) {
+            attributes->push_back(std::make_pair("keyMode", att->ModeToStr(att->GetKeyMode())));
+        }
+        if (att->HasKeyPname()) {
+            attributes->push_back(std::make_pair("keyPname", att->PitchNameToStr(att->GetKeyPname())));
+        }
+        if (att->HasKeySig()) {
+            attributes->push_back(std::make_pair("keySig", att->KeySignatureToStr(att->GetKeySig())));
+        }
+        if (att->HasKeySigMixed()) {
+            attributes->push_back(std::make_pair("keySigMixed", att->StrToStr(att->GetKeySigMixed())));
+        }
+    }
+    if (dynamic_cast<AttKeySigDefaultVis*>(element) ) {
+        AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
+        if (att->HasKeySigShow()) {
+            attributes->push_back(std::make_pair("keySigShow", att->StrToStr(att->GetKeySigShow())));
+        }
+        if (att->HasKeySigShowchange()) {
+            attributes->push_back(std::make_pair("keySigShowchange", att->StrToStr(att->GetKeySigShowchange())));
+        }
+    }
+    if (dynamic_cast<AttLabelsAddl*>(element) ) {
+        AttLabelsAddl *att = dynamic_cast<AttLabelsAddl*>(element);
+        if (att->HasLabelAbbr()) {
+            attributes->push_back(std::make_pair("labelAbbr", att->StrToStr(att->GetLabelAbbr())));
+        }
+    }
+    if (dynamic_cast<AttLang*>(element) ) {
+        AttLang *att = dynamic_cast<AttLang*>(element);
+        if (att->HasLang()) {
+            attributes->push_back(std::make_pair("lang", att->StrToStr(att->GetLang())));
+        }
+    }
+    if (dynamic_cast<AttLayerLog*>(element) ) {
+        AttLayerLog *att = dynamic_cast<AttLayerLog*>(element);
+        if (att->HasDef()) {
+            attributes->push_back(std::make_pair("def", att->StrToStr(att->GetDef())));
+        }
+    }
+    if (dynamic_cast<AttLayerident*>(element) ) {
+        AttLayerident *att = dynamic_cast<AttLayerident*>(element);
+        if (att->HasLayer()) {
+            attributes->push_back(std::make_pair("layer", att->StrToStr(att->GetLayer())));
+        }
+    }
+    if (dynamic_cast<AttLineloc*>(element) ) {
+        AttLineloc *att = dynamic_cast<AttLineloc*>(element);
+        if (att->HasLine()) {
+            attributes->push_back(std::make_pair("line", att->IntToStr(att->GetLine())));
+        }
+    }
+    if (dynamic_cast<AttLinerend*>(element) ) {
+        AttLinerend *att = dynamic_cast<AttLinerend*>(element);
+        if (att->HasRend()) {
+            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        }
+    }
+    if (dynamic_cast<AttLyricstyle*>(element) ) {
+        AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
+        if (att->HasLyricAlign()) {
+            attributes->push_back(std::make_pair("lyricAlign", att->StrToStr(att->GetLyricAlign())));
+        }
+        if (att->HasLyricFam()) {
+            attributes->push_back(std::make_pair("lyricFam", att->StrToStr(att->GetLyricFam())));
+        }
+        if (att->HasLyricName()) {
+            attributes->push_back(std::make_pair("lyricName", att->StrToStr(att->GetLyricName())));
+        }
+        if (att->HasLyricSize()) {
+            attributes->push_back(std::make_pair("lyricSize", att->StrToStr(att->GetLyricSize())));
+        }
+        if (att->HasLyricStyle()) {
+            attributes->push_back(std::make_pair("lyricStyle", att->StrToStr(att->GetLyricStyle())));
+        }
+        if (att->HasLyricWeight()) {
+            attributes->push_back(std::make_pair("lyricWeight", att->StrToStr(att->GetLyricWeight())));
+        }
+    }
+    if (dynamic_cast<AttMeasureLog*>(element) ) {
+        AttMeasureLog *att = dynamic_cast<AttMeasureLog*>(element);
+        if (att->HasLeft()) {
+            attributes->push_back(std::make_pair("left", att->BarRenditionToStr(att->GetLeft())));
+        }
+        if (att->HasRight()) {
+            attributes->push_back(std::make_pair("right", att->BarRenditionToStr(att->GetRight())));
+        }
+    }
+    if (dynamic_cast<AttMeasurement*>(element) ) {
+        AttMeasurement *att = dynamic_cast<AttMeasurement*>(element);
+        if (att->HasUnit()) {
+            attributes->push_back(std::make_pair("unit", att->IntToStr(att->GetUnit())));
+        }
+    }
+    if (dynamic_cast<AttMediabounds*>(element) ) {
+        AttMediabounds *att = dynamic_cast<AttMediabounds*>(element);
+        if (att->HasBegin()) {
+            attributes->push_back(std::make_pair("begin", att->StrToStr(att->GetBegin())));
+        }
+        if (att->HasEnd()) {
+            attributes->push_back(std::make_pair("end", att->StrToStr(att->GetEnd())));
+        }
+        if (att->HasBetype()) {
+            attributes->push_back(std::make_pair("betype", att->StrToStr(att->GetBetype())));
+        }
+    }
+    if (dynamic_cast<AttMedium*>(element) ) {
+        AttMedium *att = dynamic_cast<AttMedium*>(element);
+        if (att->HasMedium()) {
+            attributes->push_back(std::make_pair("medium", att->StrToStr(att->GetMedium())));
+        }
+    }
+    if (dynamic_cast<AttMeiversion*>(element) ) {
+        AttMeiversion *att = dynamic_cast<AttMeiversion*>(element);
+        if (att->HasMeiversion()) {
+            attributes->push_back(std::make_pair("meiversion", att->StrToStr(att->GetMeiversion())));
+        }
+        if (att->HasMeiversionNum()) {
+            attributes->push_back(std::make_pair("meiversionNum", att->StrToStr(att->GetMeiversionNum())));
+        }
+    }
+    if (dynamic_cast<AttMensurLog*>(element) ) {
+        AttMensurLog *att = dynamic_cast<AttMensurLog*>(element);
+        if (att->HasDot()) {
+            attributes->push_back(std::make_pair("dot", att->BoolToStr(att->GetDot())));
+        }
+        if (att->HasSign()) {
+            attributes->push_back(std::make_pair("sign", att->MensurationSignToStr(att->GetSign())));
+        }
+    }
+    if (dynamic_cast<AttMeterSigLog*>(element) ) {
+        AttMeterSigLog *att = dynamic_cast<AttMeterSigLog*>(element);
+        if (att->HasCount()) {
+            attributes->push_back(std::make_pair("count", att->IntToStr(att->GetCount())));
+        }
+        if (att->HasSym()) {
+            attributes->push_back(std::make_pair("sym", att->MeterSignToStr(att->GetSym())));
+        }
+        if (att->HasUnit()) {
+            attributes->push_back(std::make_pair("unit", att->IntToStr(att->GetUnit())));
+        }
+    }
+    if (dynamic_cast<AttMeterSigVis*>(element) ) {
+        AttMeterSigVis *att = dynamic_cast<AttMeterSigVis*>(element);
+        if (att->HasRend()) {
+            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        }
+    }
+    if (dynamic_cast<AttMeterSigDefaultLog*>(element) ) {
+        AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog*>(element);
+        if (att->HasMeterCount()) {
+            attributes->push_back(std::make_pair("meterCount", att->IntToStr(att->GetMeterCount())));
+        }
+        if (att->HasMeterUnit()) {
+            attributes->push_back(std::make_pair("meterUnit", att->IntToStr(att->GetMeterUnit())));
+        }
+    }
+    if (dynamic_cast<AttMeterSigDefaultVis*>(element) ) {
+        AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis*>(element);
+        if (att->HasMeterRend()) {
+            attributes->push_back(std::make_pair("meterRend", att->StrToStr(att->GetMeterRend())));
+        }
+        if (att->HasMeterShowchange()) {
+            attributes->push_back(std::make_pair("meterShowchange", att->StrToStr(att->GetMeterShowchange())));
+        }
+        if (att->HasMeterSym()) {
+            attributes->push_back(std::make_pair("meterSym", att->MeterSignToStr(att->GetMeterSym())));
+        }
+    }
+    if (dynamic_cast<AttMeterconformance*>(element) ) {
+        AttMeterconformance *att = dynamic_cast<AttMeterconformance*>(element);
+        if (att->HasMetcon()) {
+            attributes->push_back(std::make_pair("metcon", att->StrToStr(att->GetMetcon())));
+        }
+    }
+    if (dynamic_cast<AttMeterconformanceBar*>(element) ) {
+        AttMeterconformanceBar *att = dynamic_cast<AttMeterconformanceBar*>(element);
+        if (att->HasMetcon()) {
+            attributes->push_back(std::make_pair("metcon", att->StrToStr(att->GetMetcon())));
+        }
+        if (att->HasControl()) {
+            attributes->push_back(std::make_pair("control", att->StrToStr(att->GetControl())));
+        }
+    }
+    if (dynamic_cast<AttMmtempo*>(element) ) {
+        AttMmtempo *att = dynamic_cast<AttMmtempo*>(element);
+        if (att->HasMm()) {
+            attributes->push_back(std::make_pair("mm", att->StrToStr(att->GetMm())));
+        }
+        if (att->HasMmUnit()) {
+            attributes->push_back(std::make_pair("mmUnit", att->StrToStr(att->GetMmUnit())));
+        }
+        if (att->HasMmDots()) {
+            attributes->push_back(std::make_pair("mmDots", att->StrToStr(att->GetMmDots())));
+        }
+    }
+    if (dynamic_cast<AttMultinummeasures*>(element) ) {
+        AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
+        if (att->HasMultiNumber()) {
+            attributes->push_back(std::make_pair("multiNumber", att->StrToStr(att->GetMultiNumber())));
+        }
+    }
+    if (dynamic_cast<AttName*>(element) ) {
+        AttName *att = dynamic_cast<AttName*>(element);
+        if (att->HasNymref()) {
+            attributes->push_back(std::make_pair("nymref", att->StrToStr(att->GetNymref())));
+        }
+        if (att->HasRole()) {
+            attributes->push_back(std::make_pair("role", att->StrToStr(att->GetRole())));
+        }
+    }
+    if (dynamic_cast<AttNoteGes*>(element) ) {
+        AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
+        if (att->HasOctGes()) {
+            attributes->push_back(std::make_pair("octGes", att->StrToStr(att->GetOctGes())));
+        }
+        if (att->HasPnameGes()) {
+            attributes->push_back(std::make_pair("pnameGes", att->StrToStr(att->GetPnameGes())));
+        }
+        if (att->HasPnum()) {
+            attributes->push_back(std::make_pair("pnum", att->StrToStr(att->GetPnum())));
+        }
+    }
+    if (dynamic_cast<AttNoteVis*>(element) ) {
+        AttNoteVis *att = dynamic_cast<AttNoteVis*>(element);
+        if (att->HasHeadshape()) {
+            attributes->push_back(std::make_pair("headshape", att->StrToStr(att->GetHeadshape())));
+        }
+    }
+    if (dynamic_cast<AttOctave*>(element) ) {
+        AttOctave *att = dynamic_cast<AttOctave*>(element);
+        if (att->HasOct()) {
+            attributes->push_back(std::make_pair("oct", att->IntToStr(att->GetOct())));
+        }
+    }
+    if (dynamic_cast<AttOctavedefault*>(element) ) {
+        AttOctavedefault *att = dynamic_cast<AttOctavedefault*>(element);
+        if (att->HasOctaveDefault()) {
+            attributes->push_back(std::make_pair("octaveDefault", att->StrToStr(att->GetOctaveDefault())));
+        }
+    }
+    if (dynamic_cast<AttOctavedisplacement*>(element) ) {
+        AttOctavedisplacement *att = dynamic_cast<AttOctavedisplacement*>(element);
+        if (att->HasDis()) {
+            attributes->push_back(std::make_pair("dis", att->OctaveDisToStr(att->GetDis())));
+        }
+        if (att->HasDisPlace()) {
+            attributes->push_back(std::make_pair("disPlace", att->PlaceToStr(att->GetDisPlace())));
+        }
+    }
+    if (dynamic_cast<AttOnelinestaff*>(element) ) {
+        AttOnelinestaff *att = dynamic_cast<AttOnelinestaff*>(element);
+        if (att->HasOntheline()) {
+            attributes->push_back(std::make_pair("ontheline", att->StrToStr(att->GetOntheline())));
+        }
+    }
+    if (dynamic_cast<AttPadLog*>(element) ) {
+        AttPadLog *att = dynamic_cast<AttPadLog*>(element);
+        if (att->HasNum()) {
+            attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
+        }
+    }
+    if (dynamic_cast<AttPbVis*>(element) ) {
+        AttPbVis *att = dynamic_cast<AttPbVis*>(element);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+        }
+    }
+    if (dynamic_cast<AttPitch*>(element) ) {
+        AttPitch *att = dynamic_cast<AttPitch*>(element);
+        if (att->HasPname()) {
+            attributes->push_back(std::make_pair("pname", att->PitchNameToStr(att->GetPname())));
+        }
+    }
+    if (dynamic_cast<AttPlacement*>(element) ) {
+        AttPlacement *att = dynamic_cast<AttPlacement*>(element);
+        if (att->HasPlace()) {
+            attributes->push_back(std::make_pair("place", att->StrToStr(att->GetPlace())));
+        }
+    }
+    if (dynamic_cast<AttPlist*>(element) ) {
+        AttPlist *att = dynamic_cast<AttPlist*>(element);
+        if (att->HasPlist()) {
+            attributes->push_back(std::make_pair("plist", att->StrToStr(att->GetPlist())));
+        }
+        if (att->HasEvaluate()) {
+            attributes->push_back(std::make_pair("evaluate", att->StrToStr(att->GetEvaluate())));
+        }
+    }
+    if (dynamic_cast<AttPointing*>(element) ) {
+        AttPointing *att = dynamic_cast<AttPointing*>(element);
+        if (att->HasActuate()) {
+            attributes->push_back(std::make_pair("actuate", att->StrToStr(att->GetActuate())));
+        }
+        if (att->HasRole()) {
+            attributes->push_back(std::make_pair("role", att->StrToStr(att->GetRole())));
+        }
+        if (att->HasShow()) {
+            attributes->push_back(std::make_pair("show", att->StrToStr(att->GetShow())));
+        }
+        if (att->HasTarget()) {
+            attributes->push_back(std::make_pair("target", att->StrToStr(att->GetTarget())));
+        }
+        if (att->HasTargettype()) {
+            attributes->push_back(std::make_pair("targettype", att->StrToStr(att->GetTargettype())));
+        }
+        if (att->HasTitle()) {
+            attributes->push_back(std::make_pair("title", att->StrToStr(att->GetTitle())));
+        }
+    }
+    if (dynamic_cast<AttRelativesize*>(element) ) {
+        AttRelativesize *att = dynamic_cast<AttRelativesize*>(element);
+        if (att->HasSize()) {
+            attributes->push_back(std::make_pair("size", att->StrToStr(att->GetSize())));
+        }
+    }
+    if (dynamic_cast<AttResponsibility*>(element) ) {
+        AttResponsibility *att = dynamic_cast<AttResponsibility*>(element);
+        if (att->HasResp()) {
+            attributes->push_back(std::make_pair("resp", att->StrToStr(att->GetResp())));
+        }
+    }
+    if (dynamic_cast<AttSbVis*>(element) ) {
+        AttSbVis *att = dynamic_cast<AttSbVis*>(element);
+        if (att->HasRend()) {
+            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        }
+    }
+    if (dynamic_cast<AttScalable*>(element) ) {
+        AttScalable *att = dynamic_cast<AttScalable*>(element);
+        if (att->HasScale()) {
+            attributes->push_back(std::make_pair("scale", att->StrToStr(att->GetScale())));
+        }
+    }
+    if (dynamic_cast<AttScoreDefGes*>(element) ) {
+        AttScoreDefGes *att = dynamic_cast<AttScoreDefGes*>(element);
+        if (att->HasTunePname()) {
+            attributes->push_back(std::make_pair("tunePname", att->StrToStr(att->GetTunePname())));
+        }
+        if (att->HasTuneHz()) {
+            attributes->push_back(std::make_pair("tuneHzDbl", att->DblToStr(att->GetTuneHz())));
+        }
+        if (att->HasTuneTemper()) {
+            attributes->push_back(std::make_pair("tuneTemper", att->StrToStr(att->GetTuneTemper())));
+        }
+    }
+    if (dynamic_cast<AttScoreDefVis*>(element) ) {
+        AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
+        if (att->HasEndingRend()) {
+            attributes->push_back(std::make_pair("endingRend", att->StrToStr(att->GetEndingRend())));
+        }
+        if (att->HasMnumVisible()) {
+            attributes->push_back(std::make_pair("mnumVisible", att->StrToStr(att->GetMnumVisible())));
+        }
+        if (att->HasMusicName()) {
+            attributes->push_back(std::make_pair("musicName", att->StrToStr(att->GetMusicName())));
+        }
+        if (att->HasMusicSize()) {
+            attributes->push_back(std::make_pair("musicSize", att->StrToStr(att->GetMusicSize())));
+        }
+        if (att->HasOptimize()) {
+            attributes->push_back(std::make_pair("optimize", att->StrToStr(att->GetOptimize())));
+        }
+        if (att->HasPageHeight()) {
+            attributes->push_back(std::make_pair("pageHeight", att->StrToStr(att->GetPageHeight())));
+        }
+        if (att->HasPageWidth()) {
+            attributes->push_back(std::make_pair("pageWidth", att->StrToStr(att->GetPageWidth())));
+        }
+        if (att->HasPageTopmar()) {
+            attributes->push_back(std::make_pair("pageTopmar", att->StrToStr(att->GetPageTopmar())));
+        }
+        if (att->HasPageBotmar()) {
+            attributes->push_back(std::make_pair("pageBotmar", att->StrToStr(att->GetPageBotmar())));
+        }
+        if (att->HasPageLeftmar()) {
+            attributes->push_back(std::make_pair("pageLeftmar", att->StrToStr(att->GetPageLeftmar())));
+        }
+        if (att->HasPageRightmar()) {
+            attributes->push_back(std::make_pair("pageRightmar", att->StrToStr(att->GetPageRightmar())));
+        }
+        if (att->HasPagePanels()) {
+            attributes->push_back(std::make_pair("pagePanels", att->StrToStr(att->GetPagePanels())));
+        }
+        if (att->HasPageScale()) {
+            attributes->push_back(std::make_pair("pageScale", att->StrToStr(att->GetPageScale())));
+        }
+        if (att->HasSpacingPackexp()) {
+            attributes->push_back(std::make_pair("spacingPackexpDbl", att->DblToStr(att->GetSpacingPackexp())));
+        }
+        if (att->HasSpacingPackfact()) {
+            attributes->push_back(std::make_pair("spacingPackfactDbl", att->DblToStr(att->GetSpacingPackfact())));
+        }
+        if (att->HasSpacingStaff()) {
+            attributes->push_back(std::make_pair("spacingStaff", att->StrToStr(att->GetSpacingStaff())));
+        }
+        if (att->HasSpacingSystem()) {
+            attributes->push_back(std::make_pair("spacingSystem", att->StrToStr(att->GetSpacingSystem())));
+        }
+        if (att->HasSystemLeftmar()) {
+            attributes->push_back(std::make_pair("systemLeftmar", att->StrToStr(att->GetSystemLeftmar())));
+        }
+        if (att->HasSystemRightmar()) {
+            attributes->push_back(std::make_pair("systemRightmar", att->StrToStr(att->GetSystemRightmar())));
+        }
+        if (att->HasSystemTopmar()) {
+            attributes->push_back(std::make_pair("systemTopmar", att->StrToStr(att->GetSystemTopmar())));
+        }
+        if (att->HasVuHeight()) {
+            attributes->push_back(std::make_pair("vuHeight", att->StrToStr(att->GetVuHeight())));
+        }
+    }
+    if (dynamic_cast<AttSectionVis*>(element) ) {
+        AttSectionVis *att = dynamic_cast<AttSectionVis*>(element);
+        if (att->HasRestart()) {
+            attributes->push_back(std::make_pair("restart", att->StrToStr(att->GetRestart())));
+        }
+    }
+    if (dynamic_cast<AttSequence*>(element) ) {
+        AttSequence *att = dynamic_cast<AttSequence*>(element);
+        if (att->HasSeq()) {
+            attributes->push_back(std::make_pair("seqInt", att->IntToStr(att->GetSeq())));
+        }
+    }
+    if (dynamic_cast<AttSlashcount*>(element) ) {
+        AttSlashcount *att = dynamic_cast<AttSlashcount*>(element);
+        if (att->HasSlash()) {
+            attributes->push_back(std::make_pair("slash", att->IntToStr(att->GetSlash())));
+        }
+    }
+    if (dynamic_cast<AttSlurpresent*>(element) ) {
+        AttSlurpresent *att = dynamic_cast<AttSlurpresent*>(element);
+        if (att->HasSlur()) {
+            attributes->push_back(std::make_pair("slur", att->StrToStr(att->GetSlur())));
+        }
+    }
+    if (dynamic_cast<AttSpaceVis*>(element) ) {
+        AttSpaceVis *att = dynamic_cast<AttSpaceVis*>(element);
+        if (att->HasCompressable()) {
+            attributes->push_back(std::make_pair("compressable", att->StrToStr(att->GetCompressable())));
+        }
+    }
+    if (dynamic_cast<AttStaffLog*>(element) ) {
+        AttStaffLog *att = dynamic_cast<AttStaffLog*>(element);
+        if (att->HasDef()) {
+            attributes->push_back(std::make_pair("def", att->StrToStr(att->GetDef())));
+        }
+    }
+    if (dynamic_cast<AttStaffDefVis*>(element) ) {
+        AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
+        if (att->HasGridShow()) {
+            attributes->push_back(std::make_pair("gridShow", att->StrToStr(att->GetGridShow())));
+        }
+        if (att->HasLayerscheme()) {
+            attributes->push_back(std::make_pair("layerscheme", att->StrToStr(att->GetLayerscheme())));
+        }
+        if (att->HasLines()) {
+            attributes->push_back(std::make_pair("linesInt", att->IntToStr(att->GetLines())));
+        }
+        if (att->HasLinesColor()) {
+            attributes->push_back(std::make_pair("linesColor", att->StrToStr(att->GetLinesColor())));
+        }
+        if (att->HasLinesVisible()) {
+            attributes->push_back(std::make_pair("linesVisible", att->StrToStr(att->GetLinesVisible())));
+        }
+        if (att->HasSpacing()) {
+            attributes->push_back(std::make_pair("spacing", att->StrToStr(att->GetSpacing())));
+        }
+    }
+    if (dynamic_cast<AttStaffGrpVis*>(element) ) {
+        AttStaffGrpVis *att = dynamic_cast<AttStaffGrpVis*>(element);
+        if (att->HasBarthru()) {
+            attributes->push_back(std::make_pair("barthru", att->StrToStr(att->GetBarthru())));
+        }
+    }
+    if (dynamic_cast<AttStaffgroupingsym*>(element) ) {
+        AttStaffgroupingsym *att = dynamic_cast<AttStaffgroupingsym*>(element);
+        if (att->HasSymbol()) {
+            attributes->push_back(std::make_pair("symbol", att->StrToStr(att->GetSymbol())));
+        }
+    }
+    if (dynamic_cast<AttStaffident*>(element) ) {
+        AttStaffident *att = dynamic_cast<AttStaffident*>(element);
+        if (att->HasStaff()) {
+            attributes->push_back(std::make_pair("staff", att->StrToStr(att->GetStaff())));
+        }
+    }
+    if (dynamic_cast<AttStaffloc*>(element) ) {
+        AttStaffloc *att = dynamic_cast<AttStaffloc*>(element);
+        if (att->HasLoc()) {
+            attributes->push_back(std::make_pair("loc", att->StrToStr(att->GetLoc())));
+        }
+    }
+    if (dynamic_cast<AttStafflocPitched*>(element) ) {
+        AttStafflocPitched *att = dynamic_cast<AttStafflocPitched*>(element);
+        if (att->HasPloc()) {
+            attributes->push_back(std::make_pair("ploc", att->PitchNameToStr(att->GetPloc())));
+        }
+        if (att->HasOloc()) {
+            attributes->push_back(std::make_pair("oloc", att->IntToStr(att->GetOloc())));
+        }
+    }
+    if (dynamic_cast<AttStartendid*>(element) ) {
+        AttStartendid *att = dynamic_cast<AttStartendid*>(element);
+        if (att->HasEndid()) {
+            attributes->push_back(std::make_pair("endid", att->StrToStr(att->GetEndid())));
+        }
+    }
+    if (dynamic_cast<AttStartid*>(element) ) {
+        AttStartid *att = dynamic_cast<AttStartid*>(element);
+        if (att->HasStartid()) {
+            attributes->push_back(std::make_pair("startid", att->StrToStr(att->GetStartid())));
+        }
+    }
+    if (dynamic_cast<AttStemmed*>(element) ) {
+        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
+        if (att->HasStemDir()) {
+            attributes->push_back(std::make_pair("stemDir", att->StemDirectionToStr(att->GetStemDir())));
+        }
+        if (att->HasStemLen()) {
+            attributes->push_back(std::make_pair("stemLen", att->IntToStr(att->GetStemLen())));
+        }
+        if (att->HasStemPos()) {
+            attributes->push_back(std::make_pair("stemPos", att->StemPositionToStr(att->GetStemPos())));
+        }
+        if (att->HasStemX()) {
+            attributes->push_back(std::make_pair("stemX", att->IntToStr(att->GetStemX())));
+        }
+        if (att->HasStemY()) {
+            attributes->push_back(std::make_pair("stemY", att->IntToStr(att->GetStemY())));
+        }
+    }
+    if (dynamic_cast<AttSylLog*>(element) ) {
+        AttSylLog *att = dynamic_cast<AttSylLog*>(element);
+        if (att->HasCon()) {
+            attributes->push_back(std::make_pair("con", att->ConToStr(att->GetCon())));
+        }
+        if (att->HasWordpos()) {
+            attributes->push_back(std::make_pair("wordpos", att->WordPosToStr(att->GetWordpos())));
+        }
+    }
+    if (dynamic_cast<AttSyltext*>(element) ) {
+        AttSyltext *att = dynamic_cast<AttSyltext*>(element);
+        if (att->HasSyl()) {
+            attributes->push_back(std::make_pair("syl", att->StrToStr(att->GetSyl())));
+        }
+    }
+    if (dynamic_cast<AttTextstyle*>(element) ) {
+        AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
+        if (att->HasTextFam()) {
+            attributes->push_back(std::make_pair("textFam", att->StrToStr(att->GetTextFam())));
+        }
+        if (att->HasTextName()) {
+            attributes->push_back(std::make_pair("textName", att->StrToStr(att->GetTextName())));
+        }
+        if (att->HasTextSize()) {
+            attributes->push_back(std::make_pair("textSize", att->StrToStr(att->GetTextSize())));
+        }
+        if (att->HasTextStyle()) {
+            attributes->push_back(std::make_pair("textStyle", att->StrToStr(att->GetTextStyle())));
+        }
+        if (att->HasTextWeight()) {
+            attributes->push_back(std::make_pair("textWeight", att->StrToStr(att->GetTextWeight())));
+        }
+    }
+    if (dynamic_cast<AttTiepresent*>(element) ) {
+        AttTiepresent *att = dynamic_cast<AttTiepresent*>(element);
+        if (att->HasTie()) {
+            attributes->push_back(std::make_pair("tie", att->TieToStr(att->GetTie())));
+        }
+    }
+    if (dynamic_cast<AttTimestampMusical*>(element) ) {
+        AttTimestampMusical *att = dynamic_cast<AttTimestampMusical*>(element);
+        if (att->HasTstamp()) {
+            attributes->push_back(std::make_pair("tstamp", att->DblToStr(att->GetTstamp())));
+        }
+    }
+    if (dynamic_cast<AttTimestampPerformed*>(element) ) {
+        AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
+        if (att->HasTstampGes()) {
+            attributes->push_back(std::make_pair("tstampGesInt", att->IntToStr(att->GetTstampGes())));
+        }
+        if (att->HasTstampReal()) {
+            attributes->push_back(std::make_pair("tstampReal", att->StrToStr(att->GetTstampReal())));
+        }
+    }
+    if (dynamic_cast<AttTimestamp2Musical*>(element) ) {
+        AttTimestamp2Musical *att = dynamic_cast<AttTimestamp2Musical*>(element);
+        if (att->HasTstamp2()) {
+            attributes->push_back(std::make_pair("tstamp2", att->Tstamp2ToStr(att->GetTstamp2())));
+        }
+    }
+    if (dynamic_cast<AttTransposition*>(element) ) {
+        AttTransposition *att = dynamic_cast<AttTransposition*>(element);
+        if (att->HasTransDiat()) {
+            attributes->push_back(std::make_pair("transDiatDbl", att->DblToStr(att->GetTransDiat())));
+        }
+        if (att->HasTransSemi()) {
+            attributes->push_back(std::make_pair("transSemiDbl", att->DblToStr(att->GetTransSemi())));
+        }
+    }
+    if (dynamic_cast<AttTupletpresent*>(element) ) {
+        AttTupletpresent *att = dynamic_cast<AttTupletpresent*>(element);
+        if (att->HasTuplet()) {
+            attributes->push_back(std::make_pair("tuplet", att->StrToStr(att->GetTuplet())));
+        }
+    }
+    if (dynamic_cast<AttTyped*>(element) ) {
+        AttTyped *att = dynamic_cast<AttTyped*>(element);
+        if (att->HasType()) {
+            attributes->push_back(std::make_pair("type", att->StrToStr(att->GetType())));
+        }
+        if (att->HasSubtype()) {
+            attributes->push_back(std::make_pair("subtype", att->StrToStr(att->GetSubtype())));
+        }
+    }
+    if (dynamic_cast<AttTypography*>(element) ) {
+        AttTypography *att = dynamic_cast<AttTypography*>(element);
+        if (att->HasFontfam()) {
+            attributes->push_back(std::make_pair("fontfam", att->StrToStr(att->GetFontfam())));
+        }
+        if (att->HasFontname()) {
+            attributes->push_back(std::make_pair("fontname", att->StrToStr(att->GetFontname())));
+        }
+        if (att->HasFontsize()) {
+            attributes->push_back(std::make_pair("fontsizeDbl", att->DblToStr(att->GetFontsize())));
+        }
+        if (att->HasFontstyle()) {
+            attributes->push_back(std::make_pair("fontstyle", att->FontstyleToStr(att->GetFontstyle())));
+        }
+        if (att->HasFontweight()) {
+            attributes->push_back(std::make_pair("fontweight", att->FontweightToStr(att->GetFontweight())));
+        }
+    }
+    if (dynamic_cast<AttVisibility*>(element) ) {
+        AttVisibility *att = dynamic_cast<AttVisibility*>(element);
+        if (att->HasVisible()) {
+            attributes->push_back(std::make_pair("visible", att->StrToStr(att->GetVisible())));
+        }
+    }
+    if (dynamic_cast<AttVisualoffsetHo*>(element) ) {
+        AttVisualoffsetHo *att = dynamic_cast<AttVisualoffsetHo*>(element);
+        if (att->HasHo()) {
+            attributes->push_back(std::make_pair("ho", att->StrToStr(att->GetHo())));
+        }
+    }
+    if (dynamic_cast<AttVisualoffsetTo*>(element) ) {
+        AttVisualoffsetTo *att = dynamic_cast<AttVisualoffsetTo*>(element);
+        if (att->HasTo()) {
+            attributes->push_back(std::make_pair("to", att->StrToStr(att->GetTo())));
+        }
+    }
+    if (dynamic_cast<AttVisualoffsetVo*>(element) ) {
+        AttVisualoffsetVo *att = dynamic_cast<AttVisualoffsetVo*>(element);
+        if (att->HasVo()) {
+            attributes->push_back(std::make_pair("vo", att->StrToStr(att->GetVo())));
+        }
+    }
+    if (dynamic_cast<AttVisualoffset2Ho*>(element) ) {
+        AttVisualoffset2Ho *att = dynamic_cast<AttVisualoffset2Ho*>(element);
+        if (att->HasStartho()) {
+            attributes->push_back(std::make_pair("startho", att->StrToStr(att->GetStartho())));
+        }
+        if (att->HasEndho()) {
+            attributes->push_back(std::make_pair("endho", att->StrToStr(att->GetEndho())));
+        }
+    }
+    if (dynamic_cast<AttVisualoffset2To*>(element) ) {
+        AttVisualoffset2To *att = dynamic_cast<AttVisualoffset2To*>(element);
+        if (att->HasStartto()) {
+            attributes->push_back(std::make_pair("startto", att->StrToStr(att->GetStartto())));
+        }
+        if (att->HasEndto()) {
+            attributes->push_back(std::make_pair("endto", att->StrToStr(att->GetEndto())));
+        }
+    }
+    if (dynamic_cast<AttVisualoffset2Vo*>(element) ) {
+        AttVisualoffset2Vo *att = dynamic_cast<AttVisualoffset2Vo*>(element);
+        if (att->HasStartvo()) {
+            attributes->push_back(std::make_pair("startvo", att->StrToStr(att->GetStartvo())));
+        }
+        if (att->HasEndvo()) {
+            attributes->push_back(std::make_pair("endvo", att->StrToStr(att->GetEndvo())));
+        }
+    }
+    if (dynamic_cast<AttWhitespace*>(element) ) {
+        AttWhitespace *att = dynamic_cast<AttWhitespace*>(element);
+        if (att->HasSpace()) {
+            attributes->push_back(std::make_pair("space", att->StrToStr(att->GetSpace())));
+        }
+    }
+    if (dynamic_cast<AttWidth*>(element) ) {
+        AttWidth *att = dynamic_cast<AttWidth*>(element);
+        if (att->HasWidth()) {
+            attributes->push_back(std::make_pair("width", att->StrToStr(att->GetWidth())));
+        }
+    }
+    if (dynamic_cast<AttXy*>(element) ) {
+        AttXy *att = dynamic_cast<AttXy*>(element);
+        if (att->HasX()) {
+            attributes->push_back(std::make_pair("xDbl", att->DblToStr(att->GetX())));
+        }
+        if (att->HasY()) {
+            attributes->push_back(std::make_pair("yDbl", att->DblToStr(att->GetY())));
+        }
+    }
+    if (dynamic_cast<AttXy2*>(element) ) {
+        AttXy2 *att = dynamic_cast<AttXy2*>(element);
+        if (att->HasX2()) {
+            attributes->push_back(std::make_pair("x2Dbl", att->DblToStr(att->GetX2())));
+        }
+        if (att->HasY2()) {
+            attributes->push_back(std::make_pair("y2Dbl", att->DblToStr(att->GetY2())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     

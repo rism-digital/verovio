@@ -330,6 +330,40 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     return false;
 #endif
 }
+    
+    
+std::string Toolkit::GetElementAttr( const std::string &xmlId )
+{
+#ifdef USE_EMSCRIPTEN
+    jsonxx::Object o;
+    
+    if ( !m_doc.GetDrawingPage() ) return o.json();
+    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+    if (!element) {
+        LogMessage("Element with id '%s' could not be found", xmlId.c_str() );
+        return o.json();
+    }
+    
+    // Fill the attribute array (pair of string) by looking by attributes for all available MEI modules
+    ArrayOfStrAttr attributes;
+    Att::GetCmn(element, &attributes );
+    Att::GetMensural(element, &attributes );
+    Att::GetPagebased(element, &attributes );
+    Att::GetShared(element, &attributes );
+    
+    // Fill the JSON object
+    ArrayOfStrAttr::iterator iter;
+    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+        o << (*iter).first << (*iter).second;
+        //LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str() );
+    }
+    return o.json();
+    
+#else
+    // The non js version of the app should not use this function.
+    return "";
+#endif
+}
 
 bool Toolkit::Edit( const std::string &json_editorAction ) {
 #ifdef USE_EMSCRIPTEN

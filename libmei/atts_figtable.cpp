@@ -78,22 +78,34 @@ bool AttTabular::HasRowspan( )
 
 /* include <attrowspan> */
 
-bool Att::SetFigtable( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "colspanInt") && dynamic_cast<AttTabular*>(element) ) {
+bool Att::SetFigtable( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttTabular*>(element) ) {
         AttTabular *att = dynamic_cast<AttTabular*>(element);
-        att->SetColspan(att->StrToInt(attrValue));
-    return true;
-    }
-    if ( (attrType == "rowspanInt") && dynamic_cast<AttTabular*>(element) ) {
-        AttTabular *att = dynamic_cast<AttTabular*>(element);
-        att->SetRowspan(att->StrToInt(attrValue));
-    return true;
+        if (attrType == "colspanInt") {
+            att->SetColspan(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "rowspanInt") {
+            att->SetRowspan(att->StrToInt(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetFigtable( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttTabular*>(element) ) {
+        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        if (att->HasColspan()) {
+            attributes->push_back(std::make_pair("colspanInt", att->IntToStr(att->GetColspan())));
+        }
+        if (att->HasRowspan()) {
+            attributes->push_back(std::make_pair("rowspanInt", att->IntToStr(att->GetRowspan())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     

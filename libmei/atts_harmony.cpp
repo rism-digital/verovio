@@ -162,32 +162,60 @@ bool AttHarmVis::HasRendgrid( )
 
 /* include <attrendgrid> */
 
-bool Att::SetHarmony( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "fret") && dynamic_cast<AttFretlocation*>(element) ) {
+bool Att::SetHarmony( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttFretlocation*>(element) ) {
         AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
-        att->SetFret(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "fret") {
+            att->SetFret(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "chordref") && dynamic_cast<AttHarmLog*>(element) ) {
+    if (dynamic_cast<AttHarmLog*>(element) ) {
         AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
-        att->SetChordref(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "chordref") {
+            att->SetChordref(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "extender") && dynamic_cast<AttHarmVis*>(element) ) {
+    if (dynamic_cast<AttHarmVis*>(element) ) {
         AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
-        att->SetExtender(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "rendgrid") && dynamic_cast<AttHarmVis*>(element) ) {
-        AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
-        att->SetRendgrid(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "extender") {
+            att->SetExtender(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "rendgrid") {
+            att->SetRendgrid(att->StrToStr(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetHarmony( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttFretlocation*>(element) ) {
+        AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
+        if (att->HasFret()) {
+            attributes->push_back(std::make_pair("fret", att->StrToStr(att->GetFret())));
+        }
+    }
+    if (dynamic_cast<AttHarmLog*>(element) ) {
+        AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
+        if (att->HasChordref()) {
+            attributes->push_back(std::make_pair("chordref", att->StrToStr(att->GetChordref())));
+        }
+    }
+    if (dynamic_cast<AttHarmVis*>(element) ) {
+        AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        if (att->HasExtender()) {
+            attributes->push_back(std::make_pair("extender", att->StrToStr(att->GetExtender())));
+        }
+        if (att->HasRendgrid()) {
+            attributes->push_back(std::make_pair("rendgrid", att->StrToStr(att->GetRendgrid())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     

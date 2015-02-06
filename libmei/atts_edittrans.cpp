@@ -204,37 +204,73 @@ bool AttReasonident::HasReason( )
 
 /* include <attreason> */
 
-bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrValue )
-{
-    if ( (attrType == "agent") && dynamic_cast<AttAgentident*>(element) ) {
+bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttAgentident*>(element) ) {
         AttAgentident *att = dynamic_cast<AttAgentident*>(element);
-        att->SetAgent(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "agent") {
+            att->SetAgent(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "cert") && dynamic_cast<AttEdit*>(element) ) {
+    if (dynamic_cast<AttEdit*>(element) ) {
         AttEdit *att = dynamic_cast<AttEdit*>(element);
-        att->SetCert(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "cert") {
+            att->SetCert(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "evidence") {
+            att->SetEvidence(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "evidence") && dynamic_cast<AttEdit*>(element) ) {
-        AttEdit *att = dynamic_cast<AttEdit*>(element);
-        att->SetEvidence(att->StrToStr(attrValue));
-    return true;
-    }
-    if ( (attrType == "extent") && dynamic_cast<AttExtent*>(element) ) {
+    if (dynamic_cast<AttExtent*>(element) ) {
         AttExtent *att = dynamic_cast<AttExtent*>(element);
-        att->SetExtent(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "extent") {
+            att->SetExtent(att->StrToStr(attrValue));
+            return true;
+        }
     }
-    if ( (attrType == "reason") && dynamic_cast<AttReasonident*>(element) ) {
+    if (dynamic_cast<AttReasonident*>(element) ) {
         AttReasonident *att = dynamic_cast<AttReasonident*>(element);
-        att->SetReason(att->StrToStr(attrValue));
-    return true;
+        if (attrType == "reason") {
+            att->SetReason(att->StrToStr(attrValue));
+            return true;
+        }
     }
 
     return false;
 }
 
+void Att::GetEdittrans( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttAgentident*>(element) ) {
+        AttAgentident *att = dynamic_cast<AttAgentident*>(element);
+        if (att->HasAgent()) {
+            attributes->push_back(std::make_pair("agent", att->StrToStr(att->GetAgent())));
+        }
+    }
+    if (dynamic_cast<AttEdit*>(element) ) {
+        AttEdit *att = dynamic_cast<AttEdit*>(element);
+        if (att->HasCert()) {
+            attributes->push_back(std::make_pair("cert", att->StrToStr(att->GetCert())));
+        }
+        if (att->HasEvidence()) {
+            attributes->push_back(std::make_pair("evidence", att->StrToStr(att->GetEvidence())));
+        }
+    }
+    if (dynamic_cast<AttExtent*>(element) ) {
+        AttExtent *att = dynamic_cast<AttExtent*>(element);
+        if (att->HasExtent()) {
+            attributes->push_back(std::make_pair("extent", att->StrToStr(att->GetExtent())));
+        }
+    }
+    if (dynamic_cast<AttReasonident*>(element) ) {
+        AttReasonident *att = dynamic_cast<AttReasonident*>(element);
+        if (att->HasReason()) {
+            attributes->push_back(std::make_pair("reason", att->StrToStr(att->GetReason())));
+        }
+    }
 
+}
+    
 } // vrv namespace
     
