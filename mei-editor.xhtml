@@ -1,0 +1,513 @@
+---
+layout: viewer
+title: Verovio MEI Editor
+active: mei-editor
+downloads:
+    - name: "Guami Canzona 24"
+      description: "8 voices and b.c., 10 pages - 235Kb"
+      link: "Guami_Canzona_24.mei"
+    - name: "Marenzio Madrigal a 5"
+      description: "Lib. 6, S’io parto, 4 pages - 119Kb"
+      link: "Marenzio_Sesto_a_5_01.mei"
+    - name: "Krebs Trio in Eb"
+      description: "Organ score, 6 pages - 380Kb"
+      link: "Krebs_Trio_Eb_2.mei"
+    - name: "Ahle, Jesu, meines Herzens Freud"
+      description: "Choral, 1 page - 70Kb"
+      link: "Ahle_Jesu_meines_Herzens_Freud.mei"
+    - name: "Beethoven Op 18/1"
+      description: "String quartet, 18 pages - 1.1Mb"
+      link: "Beethoven_op.18_1.mei"
+    - name: "Brahms Op 51/1"
+      description: "String quartet, 7 pages - 640Kb"
+      link: "Brahms_StringQuartet_Op51_No1.mei"
+context-menus:
+    - { name: "Breve", icon: "keyboard-00", class: "note", action: "editSet('dur', 'breve')" }
+    - { name: "Whole", icon: "keyboard-01", class: "note", action: "editSet('dur', '1')" }
+    - { name: "Half", icon: "keyboard-02", class: "note", action: "editSet('dur', '2')" }
+    - { name: "Quarter", icon: "keyboard-04", class: "note", action: "editSet('dur', '4')" }
+    - { name: "8-th", icon: "keyboard-08", class: "note", action: "editSet('dur', '8')" }
+    - { name: "16-th", icon: "keyboard-16", class: "note", action: "editSet('dur', '16')" }
+    - { name: "32-th", icon: "keyboard-32", class: "note", action: "editSet('dur', '32')" }
+    - { divider: true }
+    - { name: "Sharp", class: "note", action: "editSet('accid', 's')" }
+    - { name: "Flat", class: "note", action: "editSet('accid', 'f')" }
+    - { name: "Remove accid.", class: "note", action: "editSet('accid', '')" }
+    - { divider: true }
+    - { name: "Slur", class: "note", action: "editInsert('slur')" }
+---
+
+<script type="text/javascript">
+//<![CDATA[
+    
+	var vrvToolkit = new verovio.toolkit();
+	var page = 1;
+	var zoom = 50;
+	var pageHeight = 2970;
+	var pageWidth = 2100;
+    var show_xml = false;
+    var font = 'Leipzig';
+    var drag_id = new Array();
+    var drag_start;
+    var dragging;
+    var piano = Synth.createInstrument('piano');
+    var last_note = ["", 0]
+    var mute = true;
+    
+    function set_options( ) {
+        pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
+        pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+		border = 50;
+		options = JSON.stringify({
+					inputFormat: 'mei',
+					pageHeight: pageHeight,
+					pageWidth: pageWidth,
+					border: border,
+					scale: zoom,
+                    adjustPageHeight: 1,
+					ignoreLayout: 1,
+                    font: font
+				});
+		vrvToolkit.setOptions( options );
+    }
+	
+	function load_data(data) {
+		set_options();
+		vrvToolkit.loadData(data);
+		page = 1;
+		load_page( true );
+	}
+
+	function load_page( init_overlay ) {
+        if (show_xml) {
+            $('#show_notation').trigger("click");
+        }
+		svg = vrvToolkit.renderPage(page, "");
+		$("#svg_output").html(svg);
+        //d3.select("#svg_output").select("svg").selectAll(".note").on("mousedown", drag_output);
+        //d3.select("#svg_output").selectAll("*").style("opacity", "0.0");
+		adjust_page_height();
+        if ( init_overlay ) {
+            create_overlay( 0 );   
+        }
+	};
+    
+    function reload_page( id ) {
+		vrvToolkit.redoLayout();
+	    var elementPage = vrvToolkit.getPageWithElement( id );
+        if (elementPage == 0) {
+            console.log( "ID not found" );
+            return;
+        }
+        if (elementPage != page) {
+            page = elementPage;
+        }
+        load_page( true );
+    }
+    
+    function reset_overlay( ) {
+        $("#svg_overlay").html("");
+    };
+    
+    function create_overlay( id ) {
+        
+        $("#svg_overlay").html( $("#svg_output").html() );
+        overlay_svg = d3.select("#svg_overlay").select("svg");
+        /*
+        var element = overlay_svg.select("#" + id );
+        element.selectAll("*:not(use)").remove()
+        var str = new XMLSerializer().serializeToString( element.node() );
+        d3.select("#svg_overlay").select(".page-margin").selectAll("*").remove();
+        $("#svg_overlay .page-margin").html(str);
+        */
+        d3.select("#svg_overlay").selectAll("g, path").style("stroke-opacity", "0.0").style("fill-opacity", "0.0");
+        d3.select("#svg_overlay").selectAll("text").remove();
+        d3.select("#svg_overlay").select("svg").selectAll(".note").call(drag_overlay);
+        d3.select("#svg_overlay").select("defs").append("filter").attr("id", "selector");
+        //    .append("feMorphology").attr("operator", "dilate").attr("in", "SourceGraphic").attr("radius", 3);
+        //.append("feGaussianBlur").attr("stdDeviation", 5);
+    };
+    
+    function play_note( id, update ) {
+        if ( mute ) {
+            return;
+        }
+        attrStr = vrvToolkit.getElementAttr( id );
+        var attr = JSON.parse(attrStr);
+        if (!attr.pname || !attr.oct ) {
+            return;
+        }
+        if (update && (last_note[0] == attr.pname) &&  (last_note[1] == attr.oct)) {
+            return;
+        }
+        last_note[0] = attr.pname;
+        last_note[1] = attr.oct;
+        // adjust duration and volume according to octave
+        dur = Math.max( 0.5, 3 / attr.oct );
+        volume = Math.max( 0.1, 2 / attr.oct );
+        Synth.setVolume(volume);
+        piano.play(attr.pname.toUpperCase(), attr.oct, dur); // plays C4 for 2s using the 'piano' sound profile
+        //Bleep.tone(attr.pname.toUpperCase(), 32, attr.oct); Bleep.start();
+    };
+    
+    function toggle_XML( show ) {
+        if (show_xml == show) {
+            return;
+        }
+        show_xml = show;
+        if (show_xml) { 
+        	var mei = vrvToolkit.getMEI( page );
+            $("#xml_output").text(mei);
+            //prettyPrint is just too slow...
+            //$("#xml_output").removeClass("prettyprinted");
+            //prettyPrint();
+            $("#svg_panel").hide();
+            $("#xml_panel").show();
+        }
+        else {
+            $("#svg_panel").show();
+            $("#xml_panel").hide();
+        }
+    };
+
+	function next_page() {
+		if (page >= vrvToolkit.getPageCount()) {
+			return;
+		}
+		page = page + 1;
+		load_page( true );
+	};
+
+	function prev_page() {
+		if (page <= 1) {
+			return;
+		}
+		page = page - 1;
+		load_page( true );
+	};
+
+	function first_page() {
+		page = 1;
+		load_page( true );
+	};
+	
+	function last_page() {
+		page = vrvToolkit.getPageCount();
+		load_page( true );
+	};
+
+	function apply_zoom() {
+		set_options();
+        reset_overlay();
+		vrvToolkit.redoLayout();
+		page = 1;
+		load_page( true );
+	}
+
+	function zoom_out() {
+		if (zoom < 20) {
+			return;
+		}
+		zoom = zoom / 2;
+		apply_zoom();
+	}
+
+	function zoom_in() {
+		if (zoom > 80) {
+			return;
+		}
+		zoom = zoom * 2;
+		apply_zoom();
+	}
+	
+	function adjust_page_height() {
+		// adjust the height of the panel
+		if ( $('#svg_panel svg') ) {
+            zoomed_height = pageHeight * zoom / 100;
+            if ( zoomed_height < $('#svg_panel svg').height() ) {
+                zoomed_height = $('#svg_panel svg').height();
+            }
+			$('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar	
+		}
+	}
+    
+    function highlight_id( div, id ) {
+        d3.select( "#" + div ).select( "#" + id ).style("fill", "#ff0000").style("stroke", "#ff0000").style("fill-opacity", "1.0")
+        .style("stroke-opacity", "1.0"); // .attr("filter", "url(#selector)");
+        
+    }
+    
+	function set_font( fontname ) {
+		font = fontname
+		apply_zoom();
+	}
+    
+    /*
+    function hide_id( div, id ) {
+        d3.select( "#" + div ).select( "#" + id ).selectAll("*:not(path):not(text)").style("fill-opacity", "0.0").style("stroke-opacity", "0.0");
+        
+    }
+    */
+    
+    function editSet( attr, value ) {
+        if (drag_id.length == 0) {
+            return;
+        }
+		editorAction = JSON.stringify({ action: 'set', param: { elementId: drag_id[0],
+            attrType: attr, attrValue: value }   
+	    });
+        var res = vrvToolkit.edit( editorAction );
+        reload_page( drag_id[0] );  
+    };
+
+    function editInsert( elementType ) {
+        if ((drag_id.length < 2) || (drag_id[0] == drag_id[1]) ) {
+            console.log("Select two (different) notes!")
+            return;
+        }
+		editorAction = JSON.stringify({ action: 'insert', param: { elementType: elementType,
+            startid: drag_id[1], endid: drag_id[0] }   
+	    });
+        var res = vrvToolkit.edit( editorAction );
+        reload_page( drag_id[0] );  
+    };
+
+    var drag_overlay = d3.behavior.drag().origin(function() { 
+            var t = d3.select(this);
+            id = d3.select(this).attr("id");
+            if (id != drag_id[0]) drag_id.unshift( id ); // make sure we don't add it twice
+            //hide_id( "svg_output", drag_id[0] );
+            highlight_id( "svg_overlay", drag_id[0] );
+            drag_start = d3.mouse(this);
+            // we haven't started to drag yet, this might be just a selection
+            dragging = false;
+            play_note( drag_id[0], false );
+            $('.ct-menu-n1').hide();
+            return { x: t.attr("x"), y: t.attr("y")};
+    })
+    .on("drag", function(d,i) {
+        d3.select(this).attr("transform", function(d,i) {
+            return "translate(" + [ 0 ,d3.event.y ] + ")"
+        }).style("fill-opacity", "0.0").style("stroke-opacity", "0.0");
+        this.__origin__ = [ d3.event.x,  d3.event.y];
+        // we use this to distinct from click (selection)
+        dragging = true;
+		editorAction = JSON.stringify({ action: 'drag', param: { elementId: drag_id[0], 
+                        x: parseInt(drag_start[0] + this.__origin__[0]),
+                        y: parseInt(drag_start[1] + this.__origin__[1]) }   
+	    });
+        play_note( drag_id[0], true );
+        // do something with the error...
+        var res = vrvToolkit.edit( editorAction );
+        //console.log( vrvToolkit.getLog() );
+        load_page( false );
+        highlight_id( "svg_output", drag_id[0] );    
+    })
+    .on("dragend", function(d,i) {
+        if (dragging) {
+            delete this.__origin__; 
+            reset_overlay();
+    		/*
+            editorAction = JSON.stringify({
+    					action: 'set',
+                        param: { 
+                            elementId: drag_id[0], 
+                            attrType: "accid",
+                            attrValue: "s" 
+                        }   
+    				});
+            // do something with the error...
+            var res = vrvToolkit.edit( editorAction );
+            */
+            console.log( drag_id[0] );
+            reload_page( drag_id[0] );
+            dragging = false; 
+            drag_id.length = 0;
+        }
+    });
+
+//]]>
+</script>
+
+    
+<!-- top navbar -->
+<div id="navbar" class="navbar navbar-default navbar-with-sidebar">
+    <button type="button" class="navbar-toggle sidebar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+         <span class="icon-bar"></span>
+         <span class="icon-bar"></span>
+         <span class="icon-bar"></span> 
+    </button>
+    <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.xhtml">
+        <img src="{{ site.baseurl }}/images/verovio-fadded-50.png" />
+    </a>
+    <div class="btn-group">
+        <button type="button" class="btn btn-default btn-sm">Font</button>
+        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+            <span class="caret"></span>
+            <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" onclick="set_font('Leipzig'); return false;">Leipzig</a></li>
+            <li><a href="#" onclick="set_font('Bravura'); return false;">Bravura</a></li>
+            <li><a href="#" onclick="set_font('Gootville'); return false;">Gootville</a></li>
+            <!--<li class="divider"></li>
+            <li><a href="#">Separated link</a></li>-->
+        </ul>
+    </div>
+    <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-default btn-sm active">
+            <input id="show_notation" type="radio" name="show" value="show_notation" checked="true"/>&#x266b;
+        </label>
+        <label class="btn btn-default btn-sm">
+            <input type="radio" name="show" value="show_xml"/>XML
+        </label>
+    </div>
+    <div class="btn-group" role="group">
+			<button onclick="zoom_out()" class="btn btn-sm btn-default" type="button">
+				<span class="glyphicon glyphicon-zoom-out"/>
+			</button>
+			<button onclick="zoom_in()" class="btn btn-sm  btn-default" type="button">
+				<span class="glyphicon glyphicon-zoom-in"/>
+			</button>
+	</div>
+    <div class="btn-group" role="group">
+		<button onclick="first_page()" class="btn btn-sm btn-default" type="button">
+			<span class="glyphicon glyphicon-fast-backward"/>
+		</button>
+		<button onclick="prev_page()" class="btn btn-sm btn-default" type="button">
+			<span class="glyphicon glyphicon-backward"/>
+		</button>
+		<button onclick="next_page()" class="btn btn-sm btn-default" type="button">
+			<span class="glyphicon glyphicon-forward"/>
+		</button>
+		<button onclick="last_page()" class="btn btn-sm btn-default" type="button">
+			<span class="glyphicon glyphicon-fast-forward"/>
+		</button>
+	</div>
+    <div class="btn-group" data-toggle="buttons">
+        <label class="btn btn-default btn-sm">
+            <input id="mute" type="checkbox" name="mute" value="mude" checked="false"/>
+            <span class="glyphicon glyphicon-volume-up"></span>
+        </label>
+    </div>
+</div>
+
+<div id="svg_panel" style="background-color: #fff;">
+	<div id="svg_output" style="overflow: hidden; z-index: 1; position:absolute;" />
+    <div id="svg_overlay" style="overflow: hidden; z-index: 2; position:absolute;" data-toggle="context" data-target="#context-menu"/>
+</div>
+<div id="xml_panel" style="background-color: #fff; display: none;">
+    <pre class="prettyprint" id="xml_output"  style="overflow: auto; width: auto; word-wrap: normal;">
+    </pre>
+</div>
+
+<!-- sidebar -->
+<div class="sidebar-offcanvas" id="sidebar" role="navigation">
+	<div class="sidebar-panel">
+		<div class="row">
+			<div class="col-xs-12">
+				<h4>Examples</h4>
+			</div>
+		</div>
+		<div id="downloads_panel_body">
+			<div class="row">
+				<div class="col-md-12">
+					{% for d in page.downloads %}
+					<p><a href="{{ site.baseurl }}/{{ page.name }}?examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+						 {{ d.description }}
+					 </p>
+					{% endfor %}
+				</div>
+				<!-- /.col-md-6 -->
+			</div>
+			<!-- /.row -->
+		</div>
+	</div>
+</div>
+
+<div id="context-menu">
+    <ul class="dropdown-menu" role="menu">
+	    {% for d in page.context-menus %}
+        {% if d.divider  %}<li class="divider"></li>
+        {% else %}
+	    <li><a class="ct-menu-{{ d.class }}" tabindex="-1" href="#" onclick="{{ d.action}}; return false;">{% if d.icon %}<span class="glyphicon {{ d.icon }}"/>  {% endif %}{{ d.name }}</a></li>
+        {% endif %}
+	    {% endfor %}
+    </ul>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	$( document ).ready(function() {
+		
+		$(window).keyup(function(event){
+			// We need to make sure not to capture event on text fields
+			if ( $(event.target).hasClass('form-control') ) {
+				return;
+			}
+			if ( event.ctrlKey && (event.keyCode == 37) ) {
+				first_page();
+			}
+			else if ( event.keyCode == 37 ) {
+				prev_page();
+			}
+			else if ( event.ctrlKey && (event.keyCode == 39) ) {
+				last_page();
+			}
+			else if ( event.keyCode == 39 ) {
+				next_page();
+			}
+			else if ( event.keyCode == 107 ) {
+				zoom_in();
+			}
+			else if ( event.keyCode == 109 ) {
+				zoom_out();
+			}
+		});
+        
+        $(window).resize(function(){
+            apply_zoom();
+        });
+        
+        $('input[type=radio][name=show]').change(function() {
+             if (this.value == 'show_notation') {
+                 toggle_XML( false );
+             }
+            else {
+                toggle_XML( true );
+             }
+        });
+        
+        $('input[type=checkbox][name=mute]').change(function() {
+            mute = !mute;
+        });
+        
+        $('#svg_overlay').contextmenu( {
+            before: function (e, element, target) {
+                e.preventDefault();
+                if (drag_id.length == 0) {
+                    e.preventDefault();
+                    this.closemenu();
+                    return false;
+                }
+                return true;
+            }
+          });
+		
+		// Adjust the size of the svg_output and the zoom according to the div (screen) size
+		width = $('#svg_panel').width();
+		zoom = Math.min( Math.floor( 100 * width / 2100 ), 40 );
+	
+		// Load the default file or the file passed in the URL
+		var file = location.search.substring(1);
+        console.log( file );
+		if (file.length == 0) {
+            file = "examples/downloads/Krebs_Trio_Eb_2.mei";
+        }
+		$( "#toggle_options" ).click();
+		$.get( file , function( data ) {
+			load_data( data );
+		});
+	});
+//]]>
+</script>

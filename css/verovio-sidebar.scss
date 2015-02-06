@@ -15,17 +15,23 @@ html {
 body {
 	margin-top: 0px;
     height: 100%;
-    background-color: $sidebar-background;
+    //background-color: $sidebar-background;
 }
 
 .navbar {
     margin-bottom: 0px;
+}
+.navbar-brand {
+    margin-right: 30px;
 }
 
 
 // forcing the toggle button to be always displayed
 .sidebar-toggle {
   display: inherit !important;
+}
+#navbar .btn-group {
+    margin-top: 10px;
 }
 
 .navbar-with-sidebar {
