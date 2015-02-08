@@ -50,9 +50,8 @@ context-menus:
     var drag_id = new Array();
     var drag_start;
     var dragging;
-    var piano = Synth.createInstrument('piano');
     var last_note = ["", 0]
-    var mute = true;
+    var mute = false;
     
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
@@ -142,12 +141,26 @@ context-menus:
         }
         last_note[0] = attr.pname;
         last_note[1] = attr.oct;
-        // adjust duration and volume according to octave
-        dur = Math.max( 0.5, 3 / attr.oct );
-        volume = Math.max( 0.1, 2 / attr.oct );
-        Synth.setVolume(volume);
-        piano.play(attr.pname.toUpperCase(), attr.oct, dur); // plays C4 for 2s using the 'piano' sound profile
-        //Bleep.tone(attr.pname.toUpperCase(), 32, attr.oct); Bleep.start();
+        
+        var midiBase = 0;
+        switch (attr.pname) {
+            case 'd': midiBase = 2; break;
+            case 'e': midiBase = 4; break;
+            case 'f': midiBase = 5; break;
+            case 'g': midiBase = 7; break;
+            case 'a': midiBase = 9; break;
+            case 'b': midiBase = 11; break;
+        }
+        if (attr.accid) {
+            if (attr.accid == 'f') midiBase--;
+            else if (attr.accid == 's') midiBase++;
+        }
+        var note = midiBase + parseInt(attr.oct) * 12;
+        //console.log( note );
+		var velocity = 127; // how hard the note hits
+		MIDI.setVolume(0, 127);
+		MIDI.noteOn(0, note, velocity, 0);
+		MIDI.noteOff(0, note, 0.5);
     };
     
     function toggle_XML( show ) {
@@ -385,8 +398,8 @@ context-menus:
 		</button>
 	</div>
     <div class="btn-group" data-toggle="buttons">
-        <label class="btn btn-default btn-sm">
-            <input id="mute" type="checkbox" name="mute" value="mude" checked="false"/>
+        <label class="btn btn-default btn-sm  active">
+            <input id="mute" type="checkbox" name="mute" value="mude" checked="true"/>
             <span class="glyphicon glyphicon-volume-up"></span>
         </label>
     </div>
@@ -494,6 +507,13 @@ context-menus:
             }
           });
 		
+      	MIDI.loadPlugin({
+      		soundfontUrl: "{{ site.baseurl }}/soundfont/",
+      		instrument: "acoustic_grand_piano",
+      		callback: function() {
+      		}
+      	});
+        
 		// Adjust the size of the svg_output and the zoom according to the div (screen) size
 		width = $('#svg_panel').width();
 		zoom = Math.min( Math.floor( 100 * width / 2100 ), 40 );
