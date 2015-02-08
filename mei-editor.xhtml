@@ -155,7 +155,7 @@ context-menus:
             if (attr.accid == 'f') midiBase--;
             else if (attr.accid == 's') midiBase++;
         }
-        var note = midiBase + parseInt(attr.oct) * 12;
+        var note = midiBase + (parseInt(attr.oct) + 1) * 12;
         //console.log( note );
 		var velocity = 127; // how hard the note hits
 		MIDI.setVolume(0, 127);
