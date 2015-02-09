@@ -260,7 +260,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	int staffSize = staff->staffSize;
     int y1 = element->GetDrawingY();
-    int x1, x2;
+    int xLedger, xNote, xAccid, xStem;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
@@ -268,7 +268,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int verticalCenter = 0;
     bool flippedNotehead = false;
 
-	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
+	xStem = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
     
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
@@ -279,7 +279,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 	}
     else {
-        ledge= m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
+        ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
 		radius += radius/3;
 	}
     
@@ -296,7 +296,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     //determine if note should be flipped; x1 determines where the note is in relation to the tail
-    if (note->IsInCluster()) {
+    if (note->m_cluster) {
         if ((note->m_cluster->size() % 2 == 0) && note->m_drawingStemDir == STEMDIRECTION_down) {
             flippedNotehead = (note->m_clusterPosition % 2 == 0);
         }
@@ -306,25 +306,25 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
         //positions notehead
         if (flippedNotehead) {
-            x1 = xn - radius;
+            xNote = xStem - radius;
         }
         else {
             if (note->m_drawingStemDir == STEMDIRECTION_up) {
-                x1 = xn + radius;
+                xNote = xStem + radius;
             }
             else if (note->m_drawingStemDir == STEMDIRECTION_down) {
-                x1 = xn - radius * 3;
+                xNote = xStem - radius * 3;
             }
             else {
-                x1 = xn - radius;
+                xNote = xStem - radius;
             }
         }
     }
     else
     {
-        x1 = xn - radius;
+        xNote = xStem - radius;
     }
-    xl = xn;
+    xLedger = xStem;
 
     // Long, breve and ligatures
 	if (drawingDur == DUR_LG || drawingDur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && drawingDur == DUR_1)) {
@@ -337,7 +337,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		else
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawSmuflCode( dc, x1, y1, fontNo, staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, xNote, y1, fontNo, staff->staffSize, note->m_cueSize );
 	}
     // Other values
 	else {
@@ -348,36 +348,37 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			fontNo = SMUFL_E0A4_noteheadBlack;
         }
         
-		DrawSmuflCode( dc, x1, y1, fontNo,  staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, xNote, y1, fontNo,  staff->staffSize, note->m_cueSize );
 
 		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
-            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xn, y1);
+            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, y1);
         }
 
 	}
     
-	DrawLedgerLines( dc, y1, staffY, xl, ledge, staffSize );
+	DrawLedgerLines( dc, y1, staffY, xLedger, ledge, staffSize );
     
 	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
-		x1 -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
+		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
 		
         Accid accid;
         accid.SetOloc(note->GetOct());
         accid.SetPloc(note->GetPname());
 		accid.SetAccid(note->GetAccid());
         accid.m_cueSize = note->m_cueSize;
-        accid.SetDrawingX( x1 );
+        accid.SetDrawingX( xAccid );
         accid.SetDrawingY( y1 );
         DrawAccid( dc, &accid, layer, staff, measure ); // ax2
 	}
 	
-    if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
-        x2 = xn + m_doc->m_drawingUnit[staffSize]*7/2;
-    else
-        x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
-	
-    if (note->GetDrawingDots()) {
-		DrawDots( dc, x2, y1, note->GetDrawingDots(), staff );
+    if (note->GetDrawingDots() && !inChord) {
+        int xDot;
+        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+            xDot = xStem + m_doc->m_drawingUnit[staffSize]*7/2;
+        else
+            xDot = xStem + m_doc->m_drawingUnit[staffSize]*5/2;
+        
+		PrepareDots( dc, xDot, y1, note->GetDrawingDots(), staff );
 	}
     
     if (note->GetDrawingTieAttr()) {
@@ -426,7 +427,6 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     // If we have flags, add them to the height
     int y1 = originY;
     int y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    //int x2 = xn + radius;
     int x2 = xn + radius;
     
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
@@ -745,7 +745,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_style->m_staffLineWidth);
 
 	if (dots)
-		DrawDots ( dc, (x2 + m_doc->m_drawingUnit[staff->staffSize]), y2, dots, staff);
+		PrepareDots( dc, (x2 + m_doc->m_drawingUnit[staff->staffSize]), y2, dots, staff);
 }
 
 
@@ -757,21 +757,29 @@ void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsign
 	if (dots)
 	{	if (valeur < DUR_16)
 			y += m_doc->m_drawingDoubleUnit[staff->staffSize];
-		DrawDots ( dc, (x + 2 * m_doc->m_drawingDoubleUnit[staff->staffSize]), y, dots, staff);
+		PrepareDots( dc, (x + 2 * m_doc->m_drawingDoubleUnit[staff->staffSize]), y, dots, staff);
 	}
 	return;
 }
 
-
-void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff )
+bool View::IsOnStaffLine ( int y, Staff *staff)
 {
-    if ( (y - staff->GetDrawingY()) % m_doc->m_drawingDoubleUnit[staff->staffSize] == 0 ) {
+    return ((y - staff->GetDrawingY()) % m_doc->m_drawingDoubleUnit[staff->staffSize] == 0 );
+}
+
+void View::PrepareDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff )
+{
+    if ( IsOnStaffLine(y, staff) ) {
         y += m_doc->m_drawingUnit[staff->staffSize];
     }
-    
+    DrawDots(dc, x, y, dots, staff);
+}
+
+void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
+{
 	int i;
 	for (i = 0; i < dots; i++) {
-		DrawDot ( dc, x, y );
+        DrawDot ( dc, x, y );
 		x += std::max (6, 2 * m_doc->m_drawingUnit[staff->staffSize]);
 	}
 	return;
@@ -1001,17 +1009,71 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
-    int yMax, yMin;
-    chord->GetYExtremes(&yMax, &yMin);
+    //Easier to draw dots for the chord at once to make sure we've got one standard X-position for all the dots.
+    if (chord->GetDots()) {
+        int dots = chord->GetDots();
+        int dotsX;
+        if (chord->GetDur() < DUR_2 || (chord->GetDur() > DUR_8 && !inBeam && (chord->GetDrawingStemDir() == STEMDIRECTION_up))) {
+            dotsX = chord->GetDrawingX() + m_doc->m_drawingUnit[staffSize]*7/2;
+        }
+        else {
+            dotsX = chord->GetDrawingX() + m_doc->m_drawingUnit[staffSize]*5/2;
+        }
         
+        //Draw dots for notes that are not in clusters...
+        for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
+        {
+            Note *note = dynamic_cast<Note*>(*it);
+            if (!note->m_cluster) PrepareDots(dc, dotsX, note->GetDrawingY(), dots, staff);
+        }
+        
+        for(std::list<ChordCluster*>::iterator cit = chord->m_clusters.begin(); cit != chord->m_clusters.end(); cit++)
+        {
+            ChordCluster* cluster = *cit;
+            switch (cluster->size())
+            {
+            case 0:
+                break;
+            case 1:
+                LogWarning("Found a note cluster of size 1.");
+                break;
+                
+            case 2: {
+                Note *first = cluster->at(0);
+                Note *second = cluster->at(1);
+                if (IsOnStaffLine(cluster->at(0)->GetDrawingY(), staff)) {
+                    DrawDots(dc, dotsX, first->GetDrawingY() - m_doc->m_drawingUnit[staff->staffSize], dots, staff);
+                    DrawDots(dc, dotsX, second->GetDrawingY(), dots, staff);
+                }
+                else {
+                    DrawDots(dc, dotsX, first->GetDrawingY(), dots, staff);
+                    DrawDots(dc, dotsX, second->GetDrawingY() + m_doc->m_drawingUnit[staff->staffSize], dots, staff);
+                }
+                break;
+            }
+            
+            case 3:
+            case 4:
+                
+            default:
+                break;
+                
+            }
+            for(std::vector<Note*>::iterator it = cluster->begin(); it != cluster->end(); ++it) {
+                
+            }
+            
+        }
+    }
+    
+    //if we're not in a beam, draw the stems
     int drawingDur = chord->GetDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     
-    if(inBeam && drawingDur > DUR_4)
-    {
-        //no stem
-    }
-    else {
+    if (!(inBeam && drawingDur > DUR_4)) {
+        int yMax, yMin;
+        chord->GetYExtremes(&yMax, &yMin);
+        
         if ( chord->HasStemDir() ) {
             chord->SetDrawingStemDir(chord->GetStemDir());
         }
@@ -1028,11 +1090,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         int heightY = yMax - yMin;
         
         DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
-    }
-    
-    if (!inBeam)
-    {        
-        DrawLayerChildren(dc, chord, layer, staff, measure);
     }
 }
 

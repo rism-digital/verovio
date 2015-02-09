@@ -258,6 +258,7 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
+    void PrepareDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
@@ -324,6 +325,11 @@ private:
     bool OneBeamInTuplet(Tuplet* tuplet);
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
+    
+    /**
+     * @name Used for calculating clustered information/dot position
+     */
+    bool IsOnStaffLine ( int y, Staff *staff );
     
     /**
      * Swap the to points passed as reference.

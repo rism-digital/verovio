@@ -93,7 +93,6 @@ public:
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
-    bool IsInCluster( ) { return m_cluster; };
     
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );

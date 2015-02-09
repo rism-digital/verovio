@@ -118,7 +118,7 @@ void Chord::FilterList()
             if(!lastNote->m_cluster)
             {
                 curCluster = new ChordCluster();
-                m_clusters.push_back(*curCluster);
+                m_clusters.push_back(curCluster);
                 curCluster->push_back(lastNote);
                 lastNote->m_cluster = curCluster;
                 lastNote->m_clusterPosition = (int)curCluster->size();

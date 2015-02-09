@@ -87,7 +87,9 @@ public:
     
 private:
     data_STEMDIRECTION m_drawingStemDir;
-    std::list<ChordCluster> m_clusters;
+    
+public:
+    std::list<ChordCluster*> m_clusters;
 };
 
 } // namespace vrv
