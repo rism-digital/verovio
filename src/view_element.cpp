@@ -269,6 +269,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     bool flippedNotehead = false;
 
 	xStem = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
+    xLedger = xStem;
     
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
@@ -295,13 +296,29 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
     
-    //determine if note should be flipped; x1 determines where the note is in relation to the tail
+    //if the note is clustered, calculations are different
     if (note->m_cluster) {
-        if ((note->m_cluster->size() % 2 == 0) && note->m_drawingStemDir == STEMDIRECTION_down) {
-            flippedNotehead = (note->m_clusterPosition % 2 == 0);
+        if (note->m_drawingStemDir == STEMDIRECTION_down) {
+            //stem down/even cluster = noteheads start on left (incorrect side)
+            if (note->m_cluster->size() % 2 == 0) {
+                flippedNotehead = (note->m_clusterPosition % 2 == 0);
+            }
+            //else they start on normal side
+            else {
+                flippedNotehead = (note->m_clusterPosition % 2 != 0);
+            }
+            
+            //if stem goes down, move ledger start to the left and expand it a full radius
+            xLedger -= radius;
+            ledge += radius;
         }
         else {
+            //flipped noteheads start on normal side no matter what
             flippedNotehead = (note->m_clusterPosition % 2 != 0);
+            
+            //if stem goes up, move ledger start to the right and expand it a full radius
+            xLedger += radius;
+            ledge += radius;
         }
         
         //positions notehead
@@ -324,7 +341,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     {
         xNote = xStem - radius;
     }
-    xLedger = xStem;
 
     // Long, breve and ligatures
 	if (drawingDur == DUR_LG || drawingDur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && drawingDur == DUR_1)) {
