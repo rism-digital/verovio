@@ -93,6 +93,7 @@ public:
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
+    bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
     
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );

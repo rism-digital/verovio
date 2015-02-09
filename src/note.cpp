@@ -168,6 +168,14 @@ int Note::GetDrawingDur( )
     }
 }
     
+bool Note::IsClusterExtreme()
+{
+    ChordCluster* cluster = this->m_cluster;
+    if (this == cluster->at(0)) return true;
+    if (this == cluster->at(cluster->size() - 1)) return true;
+    else return false;
+}
+    
 bool Note::HasDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
