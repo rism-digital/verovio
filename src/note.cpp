@@ -148,6 +148,12 @@ void Note::ResetDrawingTieAttr( )
     }
 }
   
+    
+Chord* Note::IsChordTone()
+{
+    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+}
+    
 int Note::GetDrawingDur( )
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
@@ -163,8 +169,8 @@ int Note::GetDrawingDur( )
     
 bool Note::HasDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
     if( chordParent && chordParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
     {
         return chordParent->GetDrawingStemDir();
@@ -178,16 +184,11 @@ bool Note::HasDrawingStemDir()
         return this->HasStemDir();
     }
 }
-
-Chord* Note::IsChordTone()
-{
-    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-}
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
     if( chordParent )
     {
         return chordParent->GetDrawingStemDir();
@@ -200,6 +201,20 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
     {
         return this->GetStemDir();
     }
+}
+    
+char Note::GetDrawingDots()
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    if( chordParent && chordParent->GetDots() )
+    {
+        return chordParent->GetDots();
+    }
+    else
+    {
+        return this->GetDots();
+    }
+    
 }
     
 //----------------------------------------------------------------------------

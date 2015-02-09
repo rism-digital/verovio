@@ -376,8 +376,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     else
         x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
 	
-	if (note->GetDots()) {
-		DrawDots( dc, x2, y1, note->GetDots(), staff );
+    if (note->GetDrawingDots()) {
+		DrawDots( dc, x2, y1, note->GetDrawingDots(), staff );
 	}
     
     if (note->GetDrawingTieAttr()) {
