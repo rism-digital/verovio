@@ -1028,7 +1028,9 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
         {
             Note *note = dynamic_cast<Note*>(*it);
-            if (!note->m_cluster) PrepareDots(dc, dotsX, note->GetDrawingY(), dots, staff);
+            if (!note->m_cluster) {
+                PrepareDots(dc, dotsX, note->GetDrawingY(), dots, staff);
+            }
         }
         
         // Notes in clusters: If the stem points up, we have a note on the (incorrect) right side of the stem; add a note diameter to the dot positioning to avoid overlapping.
@@ -1075,16 +1077,22 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 }
                 break;
             }
-            case 4:
+                    
+            default: {
+                Note* first = *(cluster->begin());
+                Note* last = cluster->at(cluster->size() - 1);
+                int curY = first->GetDrawingY();
+                if (IsOnStaffLine(curY, staff)) curY -= fullUnit;
+                int endY = last->GetDrawingY();
+                if (IsOnStaffLine(endY, staff)) endY += fullUnit;
                 
-            default:
+                do {
+                    DrawDots(dc, dotsX, curY, dots, staff);
+                    curY += doubleUnit;
+                } while (curY <= endY);
                 break;
-                
             }
-            for(std::vector<Note*>::iterator it = cluster->begin(); it != cluster->end(); ++it) {
-                
-            }
-            
+            }//switch
         }
     }
     
