@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "note.h"
+#include "editorial.h"
 
 namespace vrv {
     
@@ -90,7 +91,16 @@ void Chord::FilterList()
         else if ( !currentElement->HasDurationInterface() )
         {
             iter = childList->erase( iter );
-        } else {
+        }
+        else /*if ( dynamic_cast<EditorialElement*>(currentElement))
+        {
+            Object* object = currentElement->GetFirstChild(&typeid(Note));
+            if (dynamic_cast<Note*>(object))
+            {
+                iter++;
+            }
+        }
+        else */{
             Note *n = dynamic_cast<Note*>(currentElement);
             
             if (n) {

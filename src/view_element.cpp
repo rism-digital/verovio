@@ -164,13 +164,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         
         element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
         dc->StartGraphic( element, "", element->GetUuid() );
-        
-        //if note is a direct child of layer, we can draw it immediately
-        if (element->m_parent == layer) {
-            DrawNote(dc, element, layer, staff, measure);
-        }
-        //but if it's a child of chord or beam, we need to know the stem direction and placement first, so this will be resumed later
-        
+        DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
@@ -1042,14 +1036,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         ListOfObjects *noteList = chord->GetList(chord);
         ListOfObjects::iterator iter = noteList->begin();
         
-        while ( iter != noteList->end()) {
-            Note *note = dynamic_cast<Note*>(*iter);
-            if (!note) continue;
-            dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
-            DrawNote(dc, note, layer, staff, measure);
-            dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
-            iter++;
-        }
+        DrawLayerChildren(dc, chord, layer, staff, measure);
     }
 }
 
