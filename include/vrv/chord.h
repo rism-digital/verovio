@@ -16,10 +16,13 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
+#include "note.h"
 #include "object.h"
 
 namespace vrv {
     
+class Note;
+typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Chord
@@ -84,6 +87,7 @@ public:
     
 private:
     data_STEMDIRECTION m_drawingStemDir;
+    std::list<ChordCluster> m_clusters;
 };
 
 } // namespace vrv

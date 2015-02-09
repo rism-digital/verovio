@@ -36,6 +36,7 @@ Note::Note():
     m_drawingTieAttr = NULL;
     Reset();
     m_clusterPosition = 0;
+    m_cluster = 0;
 }
 
 

@@ -63,19 +63,6 @@ bool compare_pitch (Object *first, Object *second)
     return ( n1->GetDiatonicPitch() < n2->GetDiatonicPitch() );
 }
     
-void updateClusterSizes (std::list<Note*> *unsetNotes)
-{
-    std::list<Note*>::iterator unsetIter;
-    bool evenSize = (unsetNotes->size() % 2 == 0);
-    
-    unsetIter = unsetNotes->begin();
-    while (unsetIter != unsetNotes->end()) {
-        dynamic_cast<Note*>(*unsetIter)->m_evenCluster = evenSize;
-        unsetIter++;
-    }
-    unsetNotes->clear();
-}
-
 void Chord::FilterList()
 {
     // Retain only note children of chords
@@ -118,8 +105,8 @@ void Chord::FilterList()
     
     Note *curNote, *lastNote = dynamic_cast<Note*>(*iter);
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
-    int clusterPosition = 0;
     std::list<Note*> unsetNotes;
+    ChordCluster* curCluster = new ChordCluster();
     
     iter++;
     
@@ -128,19 +115,17 @@ void Chord::FilterList()
         curPitch = curNote->GetDiatonicPitch();
         
         if (curPitch - lastPitch == 1) {
-            if(clusterPosition == 0)
+            if(!lastNote->m_cluster)
             {
-                unsetNotes.push_back(lastNote);
-                lastNote->m_clusterPosition = 1;
-                clusterPosition = 1;
+                curCluster = new ChordCluster();
+                m_clusters.push_back(*curCluster);
+                curCluster->push_back(lastNote);
+                lastNote->m_cluster = curCluster;
+                lastNote->m_clusterPosition = (int)curCluster->size();
             }
-            clusterPosition++;
-            unsetNotes.push_back(curNote);
-            curNote->m_clusterPosition = clusterPosition;
-        }
-        else if (clusterPosition > 0) {
-            updateClusterSizes(&unsetNotes);
-            clusterPosition = 0;
+            curCluster->push_back(curNote);
+            curNote->m_cluster = curCluster;
+            curNote->m_clusterPosition = (int)curCluster->size();
         }
         
         lastNote = curNote;
@@ -148,7 +133,6 @@ void Chord::FilterList()
         
         iter++;
     }
-    updateClusterSizes(&unsetNotes);
 }
     
 void Chord::GetYExtremes(int *yMax, int *yMin)

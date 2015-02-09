@@ -18,9 +18,12 @@
 
 namespace vrv {
 
+class Chord;
 class Slur;
 class Tie;
 class Verse;
+class Note;
+typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Note
@@ -90,7 +93,7 @@ public:
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
-    bool IsInCluster( ) { return m_clusterPosition > 0; };
+    bool IsInCluster( ) { return m_cluster; };
     
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
@@ -149,8 +152,9 @@ public:
     int d_stemLen;
     
     /** flags for determining clusters in chord **/
-    int m_clusterPosition; //1-indexed position in a cluster of notes in a chord
-    bool m_evenCluster; //whether the cluster is even
+    ChordCluster* m_cluster; //cluster this belongs to
+    int m_clusterPosition; //1-indexed position in said cluster; 0 if does not have position
+
     
 private:
     

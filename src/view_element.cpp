@@ -266,6 +266,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     wchar_t fontNo;
 	int ledge;
 	int verticalCenter = 0;
+    bool flippedNotehead = false;
 
 	int xn = element->GetDrawingX(), xl = element->GetDrawingX();
     
@@ -296,8 +297,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     //determine if note should be flipped; x1 determines where the note is in relation to the tail
     if (note->IsInCluster()) {
-        bool flippedNotehead = false;
-        if (note->m_evenCluster && note->m_drawingStemDir == STEMDIRECTION_down) {
+        if ((note->m_cluster->size() % 2 == 0) && note->m_drawingStemDir == STEMDIRECTION_down) {
             flippedNotehead = (note->m_clusterPosition % 2 == 0);
         }
         else {
@@ -764,7 +764,6 @@ void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsign
 
 
 void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff )
-
 {
     if ( (y - staff->GetDrawingY()) % m_doc->m_drawingDoubleUnit[staff->staffSize] == 0 ) {
         y += m_doc->m_drawingUnit[staff->staffSize];
@@ -1032,10 +1031,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     if (!inBeam)
-    {
-        ListOfObjects *noteList = chord->GetList(chord);
-        ListOfObjects::iterator iter = noteList->begin();
-        
+    {        
         DrawLayerChildren(dc, chord, layer, staff, measure);
     }
 }
