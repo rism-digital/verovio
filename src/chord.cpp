@@ -15,7 +15,6 @@
 //----------------------------------------------------------------------------
 
 #include "note.h"
-#include "editorial.h"
 
 namespace vrv {
     
@@ -36,16 +35,28 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
 
 Chord::~Chord()
 {
+    ClearClusters();
 }
 
 void Chord::Reset()
 {
+    ClearClusters();
     DocObject::Reset();
     DurationInterface::Reset();
     ResetCommon();
     ResetStemmed();
     ResetColoration();
     ResetTiepresent();
+}
+    
+void Chord::ClearClusters()
+{
+    std::list<ChordCluster*>::iterator iter;
+    for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter)
+    {
+        delete *iter;
+    }
+    m_clusters.clear();
 }
     
 void Chord::AddLayerElement(vrv::LayerElement *element)

@@ -35,8 +35,6 @@ Note::Note():
 {
     m_drawingTieAttr = NULL;
     Reset();
-    m_clusterPosition = 0;
-    m_cluster = 0;
 }
 
 
@@ -67,6 +65,8 @@ void Note::Reset()
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
+    m_clusterPosition = 0;
+    m_cluster = NULL;
 }
 
 bool Note::operator==( Object& other )
@@ -210,20 +210,6 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
     {
         return this->GetStemDir();
     }
-}
-    
-char Note::GetDrawingDots()
-{
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    if( chordParent && chordParent->GetDots() )
-    {
-        return chordParent->GetDots();
-    }
-    else
-    {
-        return this->GetDots();
-    }
-    
 }
     
 //----------------------------------------------------------------------------

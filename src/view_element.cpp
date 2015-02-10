@@ -391,14 +391,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         DrawAccid( dc, &accid, layer, staff, measure ); // ax2
 	}
 	
-    if (note->GetDrawingDots() && !inChord) {
+    if (note->GetDots() && !inChord) {
         int xDot;
         if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
             xDot = xStem + m_doc->m_drawingUnit[staffSize]*7/2;
         else
             xDot = xStem + m_doc->m_drawingUnit[staffSize]*5/2;
         
-		PrepareDots( dc, xDot, y1, note->GetDrawingDots(), staff );
+		PrepareDots( dc, xDot, y1, note->GetDots(), staff );
 	}
     
     if (note->GetDrawingTieAttr()) {

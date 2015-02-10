@@ -97,7 +97,6 @@ public:
     
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
-    char GetDrawingDots( );
     
     
     ///@}

@@ -16,13 +16,9 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
-#include "note.h"
 #include "object.h"
 
 namespace vrv {
-    
-class Note;
-typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Chord
@@ -84,6 +80,12 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
+    
+protected:
+    /**
+     * Clear the m_clusters vector and delete all the objects.
+     */
+    void ClearClusters();
     
 private:
     data_STEMDIRECTION m_drawingStemDir;
