@@ -11,6 +11,10 @@
 
 #include <string>
 
+#ifdef USE_EMSCRIPTEN
+#include "jsonxx.h"
+#endif
+
 //----------------------------------------------------------------------------
 
 #include "doc.h"
@@ -63,6 +67,12 @@ public:
     bool ParseOptions( const std::string &json_options );
     
     /**
+     * Parse the editor actions passed as JSON string
+     * only available for Emscripten based compiles
+     **/
+    bool Edit( const std::string &json_editorAction );
+    
+    /**
      * Concatenates the vrv::logBuffer into a string an returns it.
      * This is used only for Emscripten based compilation.
      * The vrv::logBuffer is filled by the vrv::LogXXX functions.
@@ -92,6 +102,11 @@ public:
      * Get all the pages unless a page number (1-based) is specified
      */
     std::string GetMEI( int pageNo =  0 );
+    
+    /**
+     * Return element attributes as a JSON string
+     */
+    std::string GetElementAttr( const std::string &xmlId );
     
     /**
      * Redo the layout of the loaded data
@@ -233,8 +248,29 @@ public:
     ///@{
     int GetPageCount( );
     ///@}
+    
+    /**
+     * Experimental editor method
+     */
+    ///@{
+    bool Drag( std::string elementId, int x, int y );
+    bool Insert( std::string elementType, std::string startId, std::string endId );
+    bool Set( std::string elementId, std::string attrType, std::string attrValue );
+    ///@}
 
 private:
+    
+protected:
+#ifdef USE_EMSCRIPTEN
+    /**
+     * Experimental editor method
+     */
+    ///@{
+    bool ParseDragAction( jsonxx::Object param, std::string *elementId, int *x, int *y );
+    bool ParseInsertAction( jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid );
+    bool ParseSetAction( jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue );
+    ///@}
+#endif
     
 public:
     

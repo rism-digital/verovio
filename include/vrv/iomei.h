@@ -13,6 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "io.h"
 #include "pugixml.hpp"
 
 namespace vrv {
@@ -87,7 +88,12 @@ public:
     /**
      * Return the output as a string by writing it to the stringstream member.
      */
-    std::string GetOutput();
+    std::string GetOutput( int page = -1 );
+    
+    /**
+     * Setter for score-based MEI output (non implemented)
+     */
+    void SetScoreBasedMEI( bool scoreBasedMEI ) { m_scoreBasedMEI = scoreBasedMEI; };
 
 private:
     
@@ -115,6 +121,7 @@ private:
     void WriteMeiAccid( pugi::xml_node currentNode, Accid *accid );
     void WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine );
     void WriteMeiBeam( pugi::xml_node currentNode, Beam *beam );
+    void WriteMeiChord( pugi::xml_node currentNode, Chord *chord );
     void WriteMeiClef( pugi::xml_node currentNode, Clef *clef );
     void WriteMeiCustos( pugi::xml_node currentNode, Custos *custos );
     void WriteMeiDot( pugi::xml_node currentNode, Dot *dot );
@@ -128,21 +135,20 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting MeasureElement children.
-     * Called from WriteLayerElement.
+     * @name Methods for wrinting MeasureElement children (other the staff).
      */
     ///@{
-    void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur ) { return; };
-    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie ) { return; };
+    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
+    void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
     ///@}
     
     /**
      * @name Methods for writing editorial markup
      */
     ///@{
-    bool WriteMeiApp( pugi::xml_node currentNode, App *app ) { return true; };
-    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem ) { return true; };
-    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg ) { return true; };
+    bool WriteMeiApp( pugi::xml_node currentNode, App *app );
+    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
+    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
     ///@}
     
     /**
@@ -166,7 +172,7 @@ private:
      */
     ///@{
     void WriteLayerElement( pugi::xml_node currentNode, LayerElement *element );
-    void WriteEditorialElement( pugi::xml_node currentNode, EditorialElement *element ) {};
+    void WriteEditorialElement( pugi::xml_node currentNode, EditorialElement *element );
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
@@ -194,6 +200,8 @@ private:
     std::string m_filename;
     std::stringstream m_streamStringOutput;
     bool m_writeToStreamString;
+    int m_page;
+    bool m_scoreBasedMEI;
     pugi::xml_node m_mei;
     /** @name Current element */
     pugi::xml_node m_currentNode;

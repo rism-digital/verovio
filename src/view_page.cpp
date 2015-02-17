@@ -745,11 +745,6 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     DrawStaffChildren(dc, staff, staff, measure);
     
-    std::vector<Syl*>::iterator iter1;
-    for (iter1 = staff->m_currentSyls.begin(); iter1 != staff->m_currentSyls.end(); ++iter1) {
-        system->AddToDrawingList(*iter1);
-    }
-    
     std::vector<DocObject*>::iterator iter;
     for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
         system->AddToDrawingList(*iter);
@@ -1004,8 +999,8 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
     Staff *parentStaff = dynamic_cast<Staff*>(layer->m_parent);
     int staffSize = parentStaff->staffSize;
 	// calculer position du do central en fonction clef
-	y_n += (int) m_doc->m_drawingUnit[staffSize]/4;
-	yb = parentStaff->GetDrawingY() -  m_doc->m_drawingStaffSize[staffSize]*2; // UT1 default
+	//y_n += (int) m_doc->m_drawingUnit[staffSize]/4;
+	yb = parentStaff->GetDrawingY() -  m_doc->m_drawingStaffSize[staffSize]; // UT1 default
 	
 
 	plafond = yb + 8 *  m_doc->m_drawingOctaveSize[staffSize];

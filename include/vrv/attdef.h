@@ -10,10 +10,13 @@
 #define __ATT_DEF_H__
 
 #include <utility>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
 namespace vrv {
+    
+typedef std::vector<std::pair<std::string, std::string> >  ArrayOfStrAttr;
     
 #define VRV_UNSET -0x7FFFFFFF
     

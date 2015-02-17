@@ -297,6 +297,7 @@ data_CON Att::StrToCon(std::string value)
 std::string Att::DurToStr(int data)
 {
     std::string value;
+    /*
     if (data == DUR_LG) value = "longa";
     else if (data == DUR_BR) value = "brevis";
     else if (data == DUR_1) value = "semibrevis";
@@ -304,7 +305,8 @@ std::string Att::DurToStr(int data)
     else if (data == DUR_4) value = "semiminima";
     else if (data == DUR_8) value = "fusa";
     else if (data == DUR_16) value = "semifusa";
-    else if (data == DUR_LG) value = "long";
+    */
+    if (data == DUR_LG) value = "long";
     else if (data == DUR_BR) value = "breve";
     else if (data == DUR_1) value = "1";
     else if (data == DUR_2) value = "2";

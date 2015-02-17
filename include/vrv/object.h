@@ -21,6 +21,7 @@ namespace vrv {
     
 class Doc;
 class EditorialElement;
+class FileOutputStream;
 class Functor;
 
 /**
@@ -281,6 +282,12 @@ public:
     void Modify( bool modified = true );
     
     /**
+     * Saves the object (and its children) using the specified output stream.
+     * Creates a functors that will parse the tree.
+     */
+    virtual int Save( FileOutputStream *output );
+    
+    /**
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
@@ -508,6 +515,11 @@ public:
      * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
      */
     virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * @name Functors for justification
