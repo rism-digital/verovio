@@ -31,6 +31,10 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
 {
     Reset();
     m_drawingStemDir = STEMDIRECTION_NONE;
+    m_ledgerLines[0][0] = 0;
+    m_ledgerLines[0][1] = 0;
+    m_ledgerLines[1][0] = 0;
+    m_ledgerLines[1][1] = 0;
 }
 
 Chord::~Chord()
@@ -114,10 +118,11 @@ void Chord::FilterList()
     
     iter = childList->begin();
     
+    this->ClearClusters();
+    
     Note *curNote, *lastNote = dynamic_cast<Note*>(*iter);
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
-    std::list<Note*> unsetNotes;
-    ChordCluster* curCluster = new ChordCluster();
+    ChordCluster* curCluster = NULL;
     
     iter++;
     

@@ -261,8 +261,8 @@ protected:
     void PrepareDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff );

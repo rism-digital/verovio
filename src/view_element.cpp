@@ -259,7 +259,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
 	int staffSize = staff->staffSize;
-    int y1 = element->GetDrawingY();
+    int noteY = element->GetDrawingY();
     int xLedger, xNote, xAccid, xStem;
     int drawingDur;
     int staffY = staff->GetDrawingY();
@@ -267,6 +267,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int ledge;
 	int verticalCenter = 0;
     bool flippedNotehead = false;
+    bool doubleLengthLedger = false;
 
 	xStem = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
     xLedger = xStem;
@@ -284,7 +285,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		radius += radius/3;
 	}
     
-    //set stem direction
+    /************** Stem/notehead direction: **************/
+    
     verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     if ( note->HasDrawingStemDir() ) {
         note->m_drawingStemDir = note->GetDrawingStemDir();
@@ -293,7 +295,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         note->m_drawingStemDir = layer->GetDrawingStemDir();
     }
     else {
-        note->m_drawingStemDir = (y1 >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        note->m_drawingStemDir = (noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
     
     //if the note is clustered, calculations are different
@@ -309,9 +311,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
             
             //if stem goes down, move ledger start to the left and expand it a full radius
-            if(!(note->IsClusterExtreme() && IsOnStaffLine(y1, staff))) {
+            if(!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger -= radius;
-                ledge += radius;
+                doubleLengthLedger = true;
             }
         }
         else {
@@ -319,9 +321,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             flippedNotehead = (note->m_clusterPosition % 2 != 0);
             
             //if stem goes up, move ledger start to the right and expand it a full radius
-            if(!(note->IsClusterExtreme() && IsOnStaffLine(y1, staff))) {
+            if(!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger += radius;
-                ledge += radius;
+                doubleLengthLedger = true;
             }
         }
         
@@ -346,9 +348,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         xNote = xStem - radius;
     }
 
+    /************** Noteheads: **************/
+    
     // Long, breve and ligatures
 	if (drawingDur == DUR_LG || drawingDur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && drawingDur == DUR_1)) {
-		DrawLigature ( dc, y1, element, layer, staff);
+		DrawLigature ( dc, noteY, element, layer, staff);
  	}
     // Whole notes
 	else if (drawingDur == DUR_1) {
@@ -357,7 +361,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		else
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawSmuflCode( dc, xNote, y1, fontNo, staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
 	}
     // Other values
 	else {
@@ -368,15 +372,41 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			fontNo = SMUFL_E0A4_noteheadBlack;
         }
         
-		DrawSmuflCode( dc, xNote, y1, fontNo,  staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->staffSize, note->m_cueSize );
 
 		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
-            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, y1);
+            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, noteY);
         }
 
 	}
+
+    /************** Ledger lines: **************/
+
+    int staffTop = staffY + m_doc->m_drawingUnit[staffSize];
+    int staffBot = staffY - m_doc->m_drawingStaffSize[staffSize] - m_doc->m_drawingUnit[staffSize];
     
-	DrawLedgerLines( dc, y1, staffY, xLedger, ledge, staffSize );
+    //if the note is not in the staff
+    if (!is_in(noteY,staffTop,staffBot))
+    {
+        int distance, highestNewLine, numLines;
+        
+        bool aboveStaff = (noteY > staffTop);
+        
+        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->m_drawingStaffSize[staffSize] - noteY);
+        highestNewLine = ((distance % m_doc->m_drawingDoubleUnit[staffSize] > 0) ? (distance - m_doc->m_drawingUnit[staffSize]) : distance);
+        numLines = highestNewLine / m_doc->m_drawingDoubleUnit[staffSize];
+ 
+        //if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
+        if (inChord) {
+            inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = std::max(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
+        }
+        //we do want to go ahead and draw if it's not in a chord
+        else {
+            DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
+        }
+    }
+    
+    /************** Accidentals/dots/peripherals: **************/
     
 	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
 		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
@@ -387,7 +417,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		accid.SetAccid(note->GetAccid());
         accid.m_cueSize = note->m_cueSize;
         accid.SetDrawingX( xAccid );
-        accid.SetDrawingY( y1 );
+        accid.SetDrawingY( noteY );
         DrawAccid( dc, &accid, layer, staff, measure ); // ax2
 	}
 	
@@ -398,7 +428,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         else
             xDot = xStem + m_doc->m_drawingUnit[staffSize]*5/2;
         
-		PrepareDots( dc, xDot, y1, note->GetDots(), staff );
+		PrepareDots( dc, xDot, noteY, note->GetDots(), staff );
 	}
     
     if (note->GetDrawingTieAttr()) {
@@ -500,8 +530,60 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     
 }
 
-
-
+//skips "skip" lines before drawing "n" ledger lines
+void View::DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n)
+{
+    //various variables
+    int ledgerY;
+    int staffY = staff->GetDrawingY();
+    int staffSize = staff->staffSize;
+    int betweenLines = m_doc->m_drawingDoubleUnit[staffSize];
+    int ledge = m_doc->m_drawingLedgerLine[staffSize][element->m_cueSize];
+    int noteDiameter = m_doc->m_drawingNoteRadius[staffSize][element->m_cueSize] * 2;
+    
+    //prep start and end positions of ledger line depending on stem direction and doubleLength
+    int xLedgerStart, xLedgerEnd;
+    if (doubleLength) {
+        if (dynamic_cast<Chord*>(element)->GetDrawingStemDir() == STEMDIRECTION_down) {
+            xLedgerStart = element->GetDrawingX() - ledge - noteDiameter;
+            xLedgerEnd = element->GetDrawingX() + ledge;
+        }
+        else {
+            xLedgerStart = element->GetDrawingX() - ledge;
+            xLedgerEnd = element->GetDrawingX() + ledge + noteDiameter;
+        }
+    }
+    else {
+        xLedgerStart = element->GetDrawingX() - ledge;
+        xLedgerEnd = element->GetDrawingX() + ledge;
+    }
+    
+    //prep initial Y position
+    if (aboveStaff) {
+        ledgerY = (skip * betweenLines) + staffY;
+    }
+    else {
+        ledgerY = staffY - m_doc->m_drawingStaffSize[staffSize] - (skip * betweenLines);
+        betweenLines = -m_doc->m_drawingDoubleUnit[staffSize];
+    }
+    
+    //add one line's distance to get it off the edge of the staff
+    ledgerY += betweenLines;
+    
+    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
+    dc->SetBrush(m_currentColour , AxTRANSPARENT );
+    
+    //draw the lines
+    for (int i = 0; i < n; i++)
+    {
+        dc->DrawLine( ToDeviceContextX(xLedgerStart) , ToDeviceContextY ( ledgerY ) , ToDeviceContextX(xLedgerEnd) , ToDeviceContextY ( ledgerY ) );
+        ledgerY += betweenLines;
+    }
+    
+    dc->ResetPen();
+    dc->ResetBrush();
+}
+    
 void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {	
     assert(layer); // Pointer to layer cannot be NULL
@@ -537,56 +619,6 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         DrawFermata(dc, element, staff);
     }
     
-	return;
-}
-
-
-void View::DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize)
-{
-	int yn, ynt, yh, yb, test, v_decal = m_doc->m_drawingDoubleUnit[staffSize];
-	int dist, xng, xnd;
-	register int i;
-
-
-	yh = y_p + m_doc->m_drawingUnit[staffSize];
-    yb = y_p - m_doc->m_drawingStaffSize[staffSize]- m_doc->m_drawingUnit[staffSize];
-
-	if (!is_in(y_n,yh,yb))                           // note hors-portee?
-	{
-		xng = xn - smaller;
-		xnd = xn + smaller;
-
-		dist = ((y_n > yh) ? (y_n - y_p) : y_p - m_doc->m_drawingStaffSize[staffSize] - y_n);
-  		ynt = ((dist % m_doc->m_drawingDoubleUnit[staffSize] > 0) ? (dist - m_doc->m_drawingUnit[staffSize]) : dist);
-		test = ynt/ m_doc->m_drawingDoubleUnit[staffSize];
-		if (y_n > yh)
-		{	yn = ynt + y_p;
-			v_decal = - m_doc->m_drawingDoubleUnit[staffSize];
-		}
-		else
-			yn = y_p - m_doc->m_drawingStaffSize[staffSize] - ynt;
-
-		//hPen = (HPEN)SelectObject (hdc, CreatePen (PS_SOLID, _param.EpLignesPORTEE+1, workColor2));
-		//xng = toZoom(xng);
-		//xnd = toZoom(xnd);
-
-        dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
-        dc->SetBrush(m_currentColour , AxTRANSPARENT );
-
-		for (i = 0; i < test; i++)
-		{
-			dc->DrawLine( ToDeviceContextX(xng) , ToDeviceContextY ( yn ) , ToDeviceContextX(xnd) , ToDeviceContextY ( yn ) );
-			//h_line ( dc, xng, xnd, yn, _param.EpLignesPORTEE);
-			//yh =  toZoom(yn);
-			//MoveToEx (hdc, xng, yh, NULL);
-			//LineTo (hdc, xnd, yh);
-
-			yn += v_decal;
-		}
-
-        dc->ResetPen();
-        dc->ResetBrush();
-	}
 	return;
 }
     
@@ -1033,10 +1065,13 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
-    //Easier to draw dots for the chord at once to make sure we've got one standard X-position for all the dots.
+    /************ Dots ************/
+    
     if (chord->GetDots()) {
         int dots = chord->GetDots();
         int dotsX;
+        
+        //make sure all the dots are at the same X position
         if (chord->GetDur() < DUR_2 || (chord->GetDur() > DUR_8 && !inBeam && (chord->GetDrawingStemDir() == STEMDIRECTION_up))) {
             dotsX = chord->GetDrawingX() + (fullUnit * 7/2);
         }
@@ -1070,6 +1105,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             //if either is on a staff line, expand it to the next space
             if (IsOnStaffLine(curY, staff)) curY -= fullUnit;
             if (IsOnStaffLine(endY, staff)) endY += fullUnit;
+            
             //in the case of size = 3, we need one more dot on top for clarity
             else if (clusterSize == 3) endY += doubleUnit;
             
@@ -1081,10 +1117,12 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
-    //if we're not in a beam, draw the stems
+    /************ Stems ************/
+    
     int drawingDur = chord->GetDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     
+    //(unless we're in a beam)
     if (!(inBeam && drawingDur > DUR_4)) {
         int yMax, yMin;
         chord->GetYExtremes(&yMax, &yMin);
@@ -1105,6 +1143,30 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
         DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
     }
+    
+    /************ Ledger lines ************/
+    
+    //if there are double-length lines, we only need to draw single-length after they've been drawn
+    chord->m_ledgerLines[0][0] -= chord->m_ledgerLines[1][0];
+    chord->m_ledgerLines[0][1] -= chord->m_ledgerLines[1][1];
+    
+    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
+    dc->SetBrush(m_currentColour , AxTRANSPARENT );
+    
+    //double-length lines below the staff
+    DrawLedgerLines(dc, chord, staff, false, true, 0, chord->m_ledgerLines[1][0]);
+    
+    //remainder single-length lines below the staff
+    DrawLedgerLines(dc, chord, staff, false, false, chord->m_ledgerLines[1][0], chord->m_ledgerLines[0][0]);
+    
+    //double-length lines above the staff
+    DrawLedgerLines(dc, chord, staff, true, true, 0, chord->m_ledgerLines[1][1]);
+    
+    //remainder single-length lines above the staff
+    DrawLedgerLines(dc, chord, staff, true, false, chord->m_ledgerLines[1][1], chord->m_ledgerLines[0][1]);
+    
+    dc->ResetPen();
+    dc->ResetBrush();
 }
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

@@ -92,6 +92,12 @@ private:
     
 public:
     std::list<ChordCluster*> m_clusters;
+    
+    /** Number of ledger lines for the chord where:
+     * m_ledgerLines[0][x] is single-length, m_ledgerLines[1][x] is double-length
+     * m_ledgerLines[x][0] is below staff, m_ledgerLines[x][1] is above staff
+     */
+    int m_ledgerLines[2][2];
 };
 
 } // namespace vrv
