@@ -17,6 +17,7 @@
 #include "chord.h"
 #include "doc.h"
 #include "editorial.h"
+#include "io.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -553,6 +554,18 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     if ( endFunctor ) {
         endFunctor->Call( this, params );
     }
+}
+    
+int Object::Save( FileOutputStream *output )
+{
+    ArrayPtrVoid params;
+    params.push_back( output );
+    
+    Functor save( &Object::Save );
+    Functor saveEnd( &Object::SaveEnd );
+    this->Process( &save, params, &saveEnd );
+    
+    return true;
 }
     
 //----------------------------------------------------------------------------

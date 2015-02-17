@@ -92,6 +92,11 @@ protected:
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object );
     
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing( ArrayPtrVoid params, DocObject *object );
+    
 private:
     /**
      *

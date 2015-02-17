@@ -112,6 +112,11 @@ public:
      */
     virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
     
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params );
+    
 private:
     
 protected:

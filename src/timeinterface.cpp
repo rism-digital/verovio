@@ -126,4 +126,13 @@ int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid params, Do
     return FUNCTOR_CONTINUE;
 }
 
+int TimeSpanningInterface::ResetDrawing( ArrayPtrVoid params, DocObject *object  )
+{
+    m_start = NULL;
+    m_end = NULL;
+    m_startUuid = "";
+    m_endUuid = "";
+    return FUNCTOR_CONTINUE;
+}
+    
 } // namespace vrv

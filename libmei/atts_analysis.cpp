@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -384,5 +386,140 @@ bool AttSolfa::HasPsolfa( )
 
 /* include <attpsolfa> */
 
-} // vrv namespace
+bool Att::SetAnalysis( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        if (attrType == "copyof") {
+            att->SetCopyof(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "corresp") {
+            att->SetCorresp(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "next") {
+            att->SetNext(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "prev") {
+            att->SetPrev(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "sameas") {
+            att->SetSameas(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "synch") {
+            att->SetSynch(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttHarmonicfunction*>(element) ) {
+        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction*>(element);
+        if (attrType == "deg") {
+            att->SetDeg(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttIntervalharmonic*>(element) ) {
+        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic*>(element);
+        if (attrType == "inth") {
+            att->SetInth(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttIntervallicdesc*>(element) ) {
+        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc*>(element);
+        if (attrType == "intm") {
+            att->SetIntm(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttMelodicfunction*>(element) ) {
+        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction*>(element);
+        if (attrType == "mfunc") {
+            att->SetMfunc(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttPitchclass*>(element) ) {
+        AttPitchclass *att = dynamic_cast<AttPitchclass*>(element);
+        if (attrType == "pclass") {
+            att->SetPclass(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttSolfa*>(element) ) {
+        AttSolfa *att = dynamic_cast<AttSolfa*>(element);
+        if (attrType == "psolfa") {
+            att->SetPsolfa(att->StrToStr(attrValue));
+            return true;
+        }
+    }
 
+    return false;
+}
+
+void Att::GetAnalysis( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttCommonAnl*>(element) ) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
+        if (att->HasCopyof()) {
+            attributes->push_back(std::make_pair("copyof", att->StrToStr(att->GetCopyof())));
+        }
+        if (att->HasCorresp()) {
+            attributes->push_back(std::make_pair("corresp", att->StrToStr(att->GetCorresp())));
+        }
+        if (att->HasNext()) {
+            attributes->push_back(std::make_pair("next", att->StrToStr(att->GetNext())));
+        }
+        if (att->HasPrev()) {
+            attributes->push_back(std::make_pair("prev", att->StrToStr(att->GetPrev())));
+        }
+        if (att->HasSameas()) {
+            attributes->push_back(std::make_pair("sameas", att->StrToStr(att->GetSameas())));
+        }
+        if (att->HasSynch()) {
+            attributes->push_back(std::make_pair("synch", att->StrToStr(att->GetSynch())));
+        }
+    }
+    if (dynamic_cast<AttHarmonicfunction*>(element) ) {
+        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction*>(element);
+        if (att->HasDeg()) {
+            attributes->push_back(std::make_pair("deg", att->StrToStr(att->GetDeg())));
+        }
+    }
+    if (dynamic_cast<AttIntervalharmonic*>(element) ) {
+        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic*>(element);
+        if (att->HasInth()) {
+            attributes->push_back(std::make_pair("inth", att->StrToStr(att->GetInth())));
+        }
+    }
+    if (dynamic_cast<AttIntervallicdesc*>(element) ) {
+        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc*>(element);
+        if (att->HasIntm()) {
+            attributes->push_back(std::make_pair("intm", att->StrToStr(att->GetIntm())));
+        }
+    }
+    if (dynamic_cast<AttMelodicfunction*>(element) ) {
+        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction*>(element);
+        if (att->HasMfunc()) {
+            attributes->push_back(std::make_pair("mfunc", att->StrToStr(att->GetMfunc())));
+        }
+    }
+    if (dynamic_cast<AttPitchclass*>(element) ) {
+        AttPitchclass *att = dynamic_cast<AttPitchclass*>(element);
+        if (att->HasPclass()) {
+            attributes->push_back(std::make_pair("pclass", att->StrToStr(att->GetPclass())));
+        }
+    }
+    if (dynamic_cast<AttSolfa*>(element) ) {
+        AttSolfa *att = dynamic_cast<AttSolfa*>(element);
+        if (att->HasPsolfa()) {
+            attributes->push_back(std::make_pair("psolfa", att->StrToStr(att->GetPsolfa())));
+        }
+    }
+
+}
+    
+} // vrv namespace
+    

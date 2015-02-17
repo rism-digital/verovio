@@ -53,4 +53,10 @@ int Slur::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
     return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
     
+int Slur::ResetDarwing( ArrayPtrVoid params )
+{
+    // Pass it to the pseudo functor of the interface
+    return  TimeSpanningInterface::ResetDrawing(params, this);
+};
+    
 } // namespace vrv

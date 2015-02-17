@@ -259,5 +259,11 @@ int Note::PrepareLyrics( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int Note::ResetDarwing( ArrayPtrVoid params )
+{
+    this->ResetDrawingTieAttr();
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv

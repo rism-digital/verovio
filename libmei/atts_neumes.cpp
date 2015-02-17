@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -132,5 +134,54 @@ bool AttUneumeLog::HasName( )
 
 /* include <attname> */
 
-} // vrv namespace
+bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttIneumeLog*>(element) ) {
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        if (attrType == "form") {
+            att->SetForm(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "name") {
+            att->SetName(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttUneumeLog*>(element) ) {
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        if (attrType == "form") {
+            att->SetForm(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "name") {
+            att->SetName(att->StrToStr(attrValue));
+            return true;
+        }
+    }
 
+    return false;
+}
+
+void Att::GetNeumes( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttIneumeLog*>(element) ) {
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+        }
+        if (att->HasName()) {
+            attributes->push_back(std::make_pair("name", att->StrToStr(att->GetName())));
+        }
+    }
+    if (dynamic_cast<AttUneumeLog*>(element) ) {
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+        }
+        if (att->HasName()) {
+            attributes->push_back(std::make_pair("name", att->StrToStr(att->GetName())));
+        }
+    }
+
+}
+    
+} // vrv namespace
+    
