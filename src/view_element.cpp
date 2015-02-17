@@ -1535,7 +1535,11 @@ void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, St
 {
     Verse *verse = dynamic_cast<Verse*>(element);
     
+    dc->StartGraphic( verse, "", verse->GetUuid() );
+    
     DrawLayerChildren(dc, verse, layer, staff, measure);
+    
+    dc->EndGraphic( verse, this );
 }
 
     
