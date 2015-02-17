@@ -21,6 +21,7 @@ namespace vrv {
 
 class Beam;
 class Barline;
+class Chord;
 class DeviceContext;
 class Doc;
 class EditorialElement;
@@ -258,7 +259,7 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
-    void PrepareDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
+    void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);

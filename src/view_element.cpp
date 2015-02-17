@@ -428,7 +428,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         else
             xDot = xStem + m_doc->m_drawingUnit[staffSize]*5/2;
         
-		PrepareDots( dc, xDot, noteY, note->GetDots(), staff );
+		DrawDots( dc, xDot, noteY, note->GetDots(), staff );
 	}
     
     if (note->GetDrawingTieAttr()) {
@@ -797,7 +797,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_style->m_staffLineWidth);
 
 	if (dots)
-		PrepareDots( dc, (x2 + m_doc->m_drawingUnit[staff->staffSize]), y2, dots, staff);
+		DrawDots( dc, (x2 + m_doc->m_drawingUnit[staff->staffSize]), y2, dots, staff);
 }
 
 
@@ -809,7 +809,7 @@ void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsign
 	if (dots)
 	{	if (valeur < DUR_16)
 			y += m_doc->m_drawingDoubleUnit[staff->staffSize];
-		PrepareDots( dc, (x + 2 * m_doc->m_drawingDoubleUnit[staff->staffSize]), y, dots, staff);
+		DrawDots( dc, (x + 2 * m_doc->m_drawingDoubleUnit[staff->staffSize]), y, dots, staff);
 	}
 	return;
 }
@@ -819,17 +819,54 @@ bool View::IsOnStaffLine ( int y, Staff *staff)
     return ((y - staff->GetDrawingY()) % m_doc->m_drawingDoubleUnit[staff->staffSize] == 0 );
 }
 
-void View::PrepareDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff )
+void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff )
 {
-    if ( IsOnStaffLine(y, staff) ) {
-        y += m_doc->m_drawingUnit[staff->staffSize];
+    std::list<int> *dotsList = &chord->m_dots;
+    int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
+    int doubleUnit = fullUnit * 2;
+    
+    //if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
+    if (IsOnStaffLine(y, staff)) {
+        y += fullUnit;
+        
+        //if this position is not on the list, we're good to go
+        if(std::find(dotsList->begin(), dotsList->end(), y) == dotsList->end()) {}
+        //if it is on the list, we should try the spot a doubleUnit below
+        else if(std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end()) y -= doubleUnit;
+        //otherwise, any other space looks weird so let's not draw it
+        else return;
     }
+    //similar if it's not on a staff line
+    else {
+        //see if the optimal place exists already
+        if(std::find(dotsList->begin(), dotsList->end(), y) == dotsList->end()) {}
+        //if it does, then look up a space first
+        else if(std::find(dotsList->begin(), dotsList->end(), y + doubleUnit) == dotsList->end()) y += doubleUnit;
+        //then look down a space
+        else if(std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end()) y -= doubleUnit;
+        //otherwise let's not draw it
+        else return;
+    }
+    
+    //finally, make sure it's not outside the acceptable extremes of the chord
+    int yMax, yMin;
+    chord->GetYExtremes(&yMax, &yMin);
+    
+    if (y > (yMax + doubleUnit)) return;
+    if (y < (yMin - doubleUnit)) return;
+    
+    dotsList->push_back(y);
     DrawDots(dc, x, y, dots, staff);
+
+    return;
 }
 
 void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
 	int i;
+    if ( IsOnStaffLine(y, staff) ) {
+        y += m_doc->m_drawingUnit[staff->staffSize];
+    }
 	for (i = 0; i < dots; i++) {
         DrawDot ( dc, x, y );
 		x += std::max (6, 2 * m_doc->m_drawingUnit[staff->staffSize]);
@@ -842,7 +879,7 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
 void View::CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff)
 {
     /*
-	if (element == NULL) 
+	if (element == NULL)
     {
     	return;
     }
@@ -1079,18 +1116,10 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             dotsX = chord->GetDrawingX() + (fullUnit * 5/2);
         }
         
-        //Draw dots for notes that are not in clusters...
-        for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
-        {
-            Note *note = dynamic_cast<Note*>(*it);
-            if (!note->m_cluster) {
-                PrepareDots(dc, dotsX, note->GetDrawingY(), dots, staff);
-            }
-        }
+        // Notes in clusters: If the stem points up and we have a note on the (incorrect) right side of the stem, add a note diameter to the dot positioning to avoid overlapping.
+        if ((chord->GetDrawingStemDir() == STEMDIRECTION_up) && (chord->m_clusters.size() > 0)) dotsX += (radius * 2);
         
-        // Notes in clusters: If the stem points up, we have a note on the (incorrect) right side of the stem; add a note diameter to the dot positioning to avoid overlapping.
-        if (chord->GetDrawingStemDir() == STEMDIRECTION_up) dotsX += (radius * 2);
-        
+        // Draw dots for notes in clusters first...
         for(std::list<ChordCluster*>::iterator cit = chord->m_clusters.begin(); cit != chord->m_clusters.end(); cit++)
         {
             ChordCluster* cluster = *cit;
@@ -1104,16 +1133,24 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             
             //if either is on a staff line, expand it to the next space
             if (IsOnStaffLine(curY, staff)) curY -= fullUnit;
+            else if (clusterSize > 3) curY -= doubleUnit;
             if (IsOnStaffLine(endY, staff)) endY += fullUnit;
-            
-            //in the case of size = 3, we need one more dot on top for clarity
-            else if (clusterSize == 3) endY += doubleUnit;
+            else if (clusterSize == 3 || clusterSize == 5) endY += doubleUnit;
             
             //draw dots from one point to another
             do {
-                DrawDots(dc, dotsX, curY, dots, staff);
+                PrepareChordDots(dc, chord, dotsX, curY, dots, staff);
                 curY += doubleUnit;
             } while (curY <= endY);
+        }
+        
+        //Then fill in otherwise
+        for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
+        {
+            Note *note = dynamic_cast<Note*>(*it);
+            if (!note->m_cluster) {
+                PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), dots, staff);
+            }
         }
     }
     
