@@ -1179,17 +1179,19 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         noteFwd->m_accid.SetDrawingX(xAccid);
         noteBkwd->m_accid.SetDrawingX(xAccid);
         
-        //if the lower note has an accidental, draw it and update prevAccid
-        if (noteFwd->HasAccid())
-        {
-            DrawAccid(dc, &noteFwd->m_accid, layer, staff, measure, prevAccid);
-            prevAccid = &noteFwd->m_accid;
+        //resumeGraphic for each note here?
+        
+        //if the top note has an accidental, draw it and update prevAccid
+        if (noteBkwd->HasAccid()) {
+            DrawAccid(dc, &noteBkwd->m_accid, layer, staff, measure, prevAccid);
+            prevAccid = &noteBkwd->m_accid;
         }
         
         //same, except with an extra check that we're not doing the same note twice
-        if (noteFwd != noteBkwd && noteBkwd->HasAccid()) {
-            DrawAccid(dc, &noteBkwd->m_accid, layer, staff, measure, prevAccid);
-            prevAccid = &noteBkwd->m_accid;
+        if (noteFwd != noteBkwd && noteFwd->HasAccid())
+        {
+            DrawAccid(dc, &noteFwd->m_accid, layer, staff, measure, prevAccid);
+            prevAccid = &noteFwd->m_accid;
         }
         
         //adjust indices/iterators
@@ -1554,11 +1556,54 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
         int oct = accid->GetOloc() - 4;
-        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
+        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
     }
     
-    int x = element->GetDrawingX();
-    int y = element->GetDrawingY();
+    int x, y;
+    x = accid->GetDrawingX();
+    if (prevAccid != NULL) {
+        int curY = accid->GetDrawingY();
+        int prevY = prevAccid->GetDrawingY();
+        int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
+        int halfUnit = fullUnit / 2;
+        int oneAndAHalfUnit = halfUnit * 3;
+        int quarterUnit = fullUnit / 4; //only used to offset parallel lines when top is a flat
+        int threeQuarterUnit = quarterUnit * 2;
+        int doubleUnit = fullUnit * 2;
+        
+        //this gets the interval between the last two notes; it was a 6th if interval = 6
+        int interval = ((prevY - curY) / m_doc->m_drawingUnit[staff->staffSize]) + 1;
+        
+        //flats are unique because they don't go down as low
+        if (prevAccid->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
+            if (interval >= 6) x -= quarterUnit;
+            else if (interval == 5) {
+                //flat lines up with sharp at fullUnit, we want a bit more
+                if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x -= oneAndAHalfUnit;
+                else x -= fullUnit;
+            }
+            else {
+                //clearance on top right of a flat means it should be moved in a bit
+                if (interval == 4 && accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= oneAndAHalfUnit;
+                else x -= doubleUnit;
+            }
+        }
+        else {
+            if (interval >= 7) x -= quarterUnit;
+            else if (interval == 6) {
+                //sharp/nat on top of a sharp can never be a full unit, otherwise the opposite lines line up
+                if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x -= threeQuarterUnit;
+                else x -= fullUnit;
+            }
+            else if (interval == 5) {
+                //clearance on top right of a flat means it should be moved in a bit
+                if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= fullUnit;
+                else x -= oneAndAHalfUnit;
+            }
+            else x -= doubleUnit;
+        }
+    }
+    y = accid->GetDrawingY();
     
     int symc = SMUFL_E261_accidentalNatural;
     switch (accid->GetAccid())
@@ -1595,6 +1640,10 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         case ACCIDENTAL_EXPLICIT_fu : symc= SMUFL_E267_accidentalNaturalFlat; break; // Same
         default : break;
     }
+    
+    accid->SetDrawingX(x);
+    accid->SetDrawingY(y);
+    
     DrawSmuflCode ( dc, x, y, symc, staff->staffSize, accid->m_cueSize );
 
     dc->EndGraphic(element, this );
