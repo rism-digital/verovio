@@ -171,8 +171,6 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 {
     assert( dc ); // DC cannot be NULL
     
-    dc->SetBrush( m_currentColour, AxSOLID );
-    dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
     dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
     std::wistringstream iss( s  );
@@ -197,8 +195,6 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     //std::wcout << std::endl;
     
     dc->EndText( );
-    dc->ResetFont();
-    dc->ResetBrush();
 }
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
