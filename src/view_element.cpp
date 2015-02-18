@@ -1437,7 +1437,7 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
     
-    // to be updated
+    // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
     syl->SetDrawingX( syl->GetStart()->GetDrawingX() - m_doc->m_drawingUnit[staff->staffSize] * 2 );
     syl->SetDrawingY( GetSylY(syl, staff) );
     
@@ -1486,14 +1486,16 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
         dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
         dc->GetTextExtent(syl->GetText(), &w, &h);
         dc->ResetFont();
-        x1 += w;
+        // x position of the syl is two units back
+        x1 += w - m_doc->m_drawingUnit[staff->staffSize] * 2;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else  if ( spanningType ==  SPANNING_START) {
         dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
         dc->GetTextExtent(syl->GetText(), &w, &h);
         dc->ResetFont();
-        x1 += w;
+        // idem
+        x1 += w - m_doc->m_drawingUnit[staff->staffSize] * 2;
         
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
@@ -1520,11 +1522,18 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
     if (syl->GetCon() == CON_d) {
         
         y += m_doc->m_drawingUnit[staff->staffSize] * 2 / 3;
-        x2 -= 3 * (int)m_doc->m_drawingUnit[staff->staffSize];
+        // x position of the syl is two units back
+        x2 -= 2 * (int)m_doc->m_drawingUnit[staff->staffSize];
+        
+        //if ( x1 > x2 ) {
+        //    DrawFullRectangle(dc, x1, y + 2* m_doc->m_style->m_barlineWidth, x2, y + 3 * m_doc->m_style->m_barlineWidth);
+        //    LogDebug("x1 > x2 (%d %d)", x1, x2 );
+        //}
         
         // the length of the dash and the space between them - can be made a parameter
         int dashLength = m_doc->m_drawingUnit[staff->staffSize] * 4 / 3;
         int dashSpace = m_doc->m_drawingStaffSize[staff->staffSize] * 5 / 3;
+        int halfDashLength = dashLength / 2;
         
         int dist = x2 - x1;
         int nbDashes = dist / dashSpace;
@@ -1541,11 +1550,12 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i *  dashSpace);
-            DrawFullRectangle(dc, x, y, x + dashLength, y + m_doc->m_style->m_barlineWidth);
+            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + m_doc->m_style->m_barlineWidth);
         }
         
     }
     else if (syl->GetCon() == CON_u) {
+        x1 += (int)m_doc->m_drawingUnit[staff->staffSize] / 2;
         DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_style->m_barlineWidth);
     }
     
