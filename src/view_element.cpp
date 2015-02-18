@@ -1464,16 +1464,21 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
     if ( !syl->GetStart() || !syl->GetEnd()) return;
     
     int y = GetSylY(syl, staff);
+    int w, h;
     
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ( spanningType ==  SPANNING_START_END ) {
-        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        x1 += ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->ResetFont();
+        x1 += w;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else  if ( spanningType ==  SPANNING_START) {
-        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        x1 += ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->ResetFont();
+        x1 += w;
         
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
