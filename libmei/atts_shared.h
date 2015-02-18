@@ -5076,8 +5076,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstamp(std::string tstamp_) { m_tstamp = tstamp_; };
-    std::string GetTstamp() const { return m_tstamp; };    
+    void SetTstamp(double tstamp_) { m_tstamp = tstamp_; };
+    double GetTstamp() const { return m_tstamp; };    
     bool HasTstamp( );
     
     ///@}
@@ -5087,7 +5087,7 @@ protected:
      * Encodes the onset time in terms of musical time, i.e.,
      * beats[.fractional_beat_part].
      **/
-    std::string m_tstamp;
+    double m_tstamp;
 
 /* include <atttstamp> */
 };
@@ -5165,8 +5165,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstamp2(std::string tstamp2_) { m_tstamp2 = tstamp2_; };
-    std::string GetTstamp2() const { return m_tstamp2; };    
+    void SetTstamp2(typedef_TSTAMP2 tstamp2_) { m_tstamp2 = tstamp2_; };
+    typedef_TSTAMP2 GetTstamp2() const { return m_tstamp2; };    
     bool HasTstamp2( );
     
     ///@}
@@ -5176,7 +5176,7 @@ protected:
      * Encodes the ending point of an event in terms of musical time, i.e., a count of
      * measures plus a beat location.
      **/
-    std::string m_tstamp2;
+    typedef_TSTAMP2 m_tstamp2;
 
 /* include <atttstamp2> */
 };

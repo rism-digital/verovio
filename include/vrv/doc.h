@@ -10,7 +10,6 @@
 #define __VRV_DOC_H__
 
 #include "devicecontextbase.h"
-#include "io.h"
 #include "scoredef.h"
 
 namespace vrv {
@@ -110,12 +109,6 @@ public:
     void SetJustificationX( bool drawingJustifyX ) { m_drawingJustifyX = drawingJustifyX; };
     bool GetJustificationX( ) { return m_drawingJustifyX; };
     ///@}
-    
-    /**
-     * Saves the document using the specified output stream.
-     * Creates a functors that will parse the full tree.
-     */
-    virtual int Save( FileOutputStream *output );
 
     /**
      * Set the initial scoreDef of each page
@@ -301,6 +294,12 @@ private:
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;
+    
+    /**
+     * A flag for indicating if the drawing preparation has been done. If yes,
+     * drawing preparation will be reset before being done again.
+     */
+    bool m_drawingPreparationDone;
     
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

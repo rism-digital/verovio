@@ -128,6 +128,15 @@ public:
      */
 	void DrawCurrentPage( DeviceContext *dc, bool background = true );
     
+    /**
+     * @name Methods for calculating drawing positions
+     * Defined in view_element.cpp
+     */
+    ///@{
+    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
+    int CalculateRestPosY ( Staff *staff, char duration);
+    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
+    ///@}
     
 protected:
     /** 
@@ -182,16 +191,6 @@ protected:
     ///@}
     
     /**
-     * @name Methods for calculating drawing positions
-     * Defined in view_element.cpp
-     */
-    ///@{
-    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
-    int CalculateRestPosY ( Staff *staff, char duration);
-    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
-    ///@}
-    
-    /**
      * @name Top level method for drawing MeasureElement.
      * Call appropriate method of child classes (Staff, Slur, etc).
      * Defined in page_element.cpp
@@ -209,6 +208,8 @@ protected:
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
     void DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
                   Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
+                          Staff *staff, char spanningType, DocObject *graphic = NULL );
     ///@}
     
     /** 

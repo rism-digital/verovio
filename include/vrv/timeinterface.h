@@ -27,7 +27,9 @@ class LayerElement;
  */
 class TimeSpanningInterface:
     public AttStartendid,
-    public AttStartid
+    public AttStartid,
+    public AttTimestampMusical,
+    public AttTimestamp2Musical
 {
 public:
     /**
@@ -89,6 +91,11 @@ protected:
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object );
+    
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing( ArrayPtrVoid params, DocObject *object );
     
 private:
     /**
