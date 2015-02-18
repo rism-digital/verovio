@@ -1159,10 +1159,11 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Accidentals ************/
     
     //navigate through list of notes, starting with outside and working in
-    ListOfObjects *noteList = chord->GetList(chord);
-    int fwIdx = 0, bkwdIdx = (int)noteList->size();
-    ListOfObjects::iterator itFwd = noteList->begin();
-    ListOfObjects::iterator itBkwd = noteList->end();
+    chord->FilterList();
+    ListOfObjects noteList = chord->GenerateAccidList();
+    int fwIdx = 0, bkwdIdx = (int)noteList.size();
+    ListOfObjects::iterator itFwd = noteList.begin();
+    ListOfObjects::iterator itBkwd = noteList.end();
     itBkwd--; //so it's a valid pointer
     Accid *prevAccid = NULL;
     
@@ -1565,41 +1566,48 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         int curY = accid->GetDrawingY();
         int prevY = prevAccid->GetDrawingY();
         int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
+        int doubleUnit = fullUnit * 2;
         int halfUnit = fullUnit / 2;
         int oneAndAHalfUnit = halfUnit * 3;
-        int quarterUnit = fullUnit / 4; //only used to offset parallel lines when top is a flat
-        int threeQuarterUnit = quarterUnit * 2;
-        int doubleUnit = fullUnit * 2;
+        int nudge = fullUnit / 4; //for when we need just a little difference
         
         //this gets the interval between the last two notes; it was a 6th if interval = 6
         int interval = ((prevY - curY) / m_doc->m_drawingUnit[staff->staffSize]) + 1;
         
-        //flats are unique because they don't go down as low
-        if (prevAccid->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
-            if (interval >= 6) x -= quarterUnit;
-            else if (interval == 5) {
-                //flat lines up with sharp at fullUnit, we want a bit more
-                if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x -= oneAndAHalfUnit;
-                else x -= fullUnit;
+        if (interval > 0)
+        {
+            //flats are unique because they don't go down as low
+            if (prevAccid->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
+                if (interval >= 6) x -= nudge;
+                else if (interval == 5) {
+                    //flat lines up with sharp at fullUnit, we want a bit more
+                    if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x -= oneAndAHalfUnit;
+                    else x -= fullUnit;
+                }
+                else {
+                    //clearance on top right of a flat means it should be moved in a bit
+                    if (interval == 4 && accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= oneAndAHalfUnit;
+                    else x -= doubleUnit;
+                }
             }
             else {
-                //clearance on top right of a flat means it should be moved in a bit
-                if (interval == 4 && accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= oneAndAHalfUnit;
+                if (interval >= 7) x -= nudge;
+                else if (interval == 6) {
+                    //sharp/nat on top of a sharp can never be a full unit, otherwise the opposite lines line up
+                    if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x = x - fullUnit + nudge;
+                    else x -= fullUnit;
+                }
+                else if (interval == 5) {
+                    //clearance on top right of a flat means it should be moved in a bit
+                    if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= fullUnit;
+                    else x -= oneAndAHalfUnit;
+                }
                 else x -= doubleUnit;
             }
         }
         else {
-            if (interval >= 7) x -= quarterUnit;
-            else if (interval == 6) {
-                //sharp/nat on top of a sharp can never be a full unit, otherwise the opposite lines line up
-                if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x -= threeQuarterUnit;
-                else x -= fullUnit;
-            }
-            else if (interval == 5) {
-                //clearance on top right of a flat means it should be moved in a bit
-                if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= fullUnit;
-                else x -= oneAndAHalfUnit;
-            }
+            interval = -interval;
+            if (interval >= 7) x -= nudge;
             else x -= doubleUnit;
         }
     }

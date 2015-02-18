@@ -150,6 +150,19 @@ void Chord::FilterList()
         iter++;
     }
 }
+
+ListOfObjects Chord::GenerateAccidList()
+{
+    ListOfObjects accidList;
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Note *note = dynamic_cast<Note*>(*it);
+        if (note->HasAccid()) {
+            accidList.push_back(*it);
+        }
+    }
+    return accidList;
+}
     
 void Chord::GetYExtremes(int *yMax, int *yMin)
 {

@@ -58,6 +58,11 @@ public:
     void GetYExtremes(int *yMax, int *yMin);
     
     /**
+     * Returns list of notes that have accidentals
+     */
+    ListOfObjects GenerateAccidList();
+    
+    /**
      * @name Set and get the stem direction of the beam.
      */
     ///@{
