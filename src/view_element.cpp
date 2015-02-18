@@ -82,7 +82,7 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     }
     
     if (dynamic_cast<Accid*>(element)) {
-        DrawAccid(dc, element, layer, staff, measure);
+        DrawAccid(dc, element, layer, staff, measure, NULL);
     }
     else if (dynamic_cast<Barline*>(element)) {
         DrawBarline(dc, element, layer, staff, measure);
@@ -411,14 +411,16 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
 		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
 		
-        Accid accid;
-        accid.SetOloc(note->GetOct());
-        accid.SetPloc(note->GetPname());
-		accid.SetAccid(note->GetAccid());
-        accid.m_cueSize = note->m_cueSize;
-        accid.SetDrawingX( xAccid );
-        accid.SetDrawingY( noteY );
-        DrawAccid( dc, &accid, layer, staff, measure ); // ax2
+        Accid *accid = &note->m_accid;
+        accid->SetOloc(note->GetOct());
+        accid->SetPloc(note->GetPname());
+		accid->SetAccid(note->GetAccid());
+        accid->m_cueSize = note->m_cueSize;
+        accid->SetDrawingX( xAccid );
+        accid->SetDrawingY( noteY );
+        
+        //postpone drawing the accidental until later if it's in a chord
+        if (!inChord) DrawAccid( dc, accid, layer, staff, measure, NULL ); // ax2
 	}
 	
     if (note->GetDots() && !inChord) {
@@ -1154,6 +1156,49 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
+    /************ Accidentals ************/
+    
+    //navigate through list of notes, starting with outside and working in
+    ListOfObjects *noteList = chord->GetList(chord);
+    int fwIdx = 0, bkwdIdx = (int)noteList->size();
+    ListOfObjects::iterator itFwd = noteList->begin();
+    ListOfObjects::iterator itBkwd = noteList->end();
+    itBkwd--; //so it's a valid pointer
+    Accid *prevAccid = NULL;
+    
+    //set the x position: only non-default case is a down-stemmed non-cluster which needs one more note diameter of space
+    int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
+    if (chord->GetDrawingStemDir() == STEMDIRECTION_down && chord->m_clusters.size() > 0) xAccid -= (radius * 2);
+    
+    //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
+    while (fwIdx < bkwdIdx)
+    {
+        Note *noteFwd = dynamic_cast<Note*>(*itFwd);
+        Note *noteBkwd = dynamic_cast<Note*>(*itBkwd);
+        
+        noteFwd->m_accid.SetDrawingX(xAccid);
+        noteBkwd->m_accid.SetDrawingX(xAccid);
+        
+        //if the lower note has an accidental, draw it and update prevAccid
+        if (noteFwd->HasAccid())
+        {
+            DrawAccid(dc, &noteFwd->m_accid, layer, staff, measure, prevAccid);
+            prevAccid = &noteFwd->m_accid;
+        }
+        
+        //same, except with an extra check that we're not doing the same note twice
+        if (noteFwd != noteBkwd && noteBkwd->HasAccid()) {
+            DrawAccid(dc, &noteBkwd->m_accid, layer, staff, measure, prevAccid);
+            prevAccid = &noteBkwd->m_accid;
+        }
+        
+        //adjust indices/iterators
+        itFwd++;
+        fwIdx++;
+        itBkwd--;
+        bkwdIdx--;
+    }
+    
     /************ Stems ************/
     
     int drawingDur = chord->GetDur();
@@ -1497,7 +1542,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
 }
 
-void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"

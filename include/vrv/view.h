@@ -19,6 +19,7 @@
 
 namespace vrv {
 
+class Accid;
 class Beam;
 class Barline;
 class Chord;
@@ -230,7 +231,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid );
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );

@@ -8,6 +8,7 @@
 #ifndef __VRV_NOTE_H__
 #define __VRV_NOTE_H__
 
+#include "accid.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
 #include "beam.h"
@@ -18,6 +19,7 @@
 
 namespace vrv {
 
+class Accid;
 class Chord;
 class Slur;
 class Tie;
@@ -158,6 +160,9 @@ public:
     /** flags for determining clusters in chord **/
     ChordCluster* m_cluster; //cluster this belongs to
     int m_clusterPosition; //1-indexed position in said cluster; 0 if does not have position
+    
+    /** other information necessary for notes in chords **/
+    Accid m_accid;
 
     
 private:
