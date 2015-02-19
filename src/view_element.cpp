@@ -173,7 +173,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE)
-            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetDur()) );
+            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
         else
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
 		
@@ -357,7 +357,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (0) {
 	}
 	else {
-        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+        if (note->GetActualDur() < DUR_2 || (note->GetActualDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
 			x2 = xn + m_doc->m_drawingUnit[staffSize]*7/2;
 		else
 			x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
@@ -394,7 +394,7 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = dynamic_cast<DurationInterface*>(object)->GetDur();
+    int drawingDur = dynamic_cast<DurationInterface*>(object)->GetActualDur();
     int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     
     baseStem = object->m_cueSize ? ( m_doc->m_drawingUnit[staffSize]*5) : ( m_doc->m_drawingUnit[staffSize]*7);
@@ -477,7 +477,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
     Rest *rest = dynamic_cast<Rest*>(element);
 
-	int drawingDur = rest->GetDur();
+	int drawingDur = rest->GetActualDur();
 	int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
@@ -992,7 +992,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int yMax, yMin;
     chord->GetYExtremes(verticalCenter, &yMax, &yMin);
         
-    int drawingDur = chord->GetDur();
+    int drawingDur = chord->GetActualDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up );
     
@@ -1712,7 +1712,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     
     Note *note = dynamic_cast<Note*>(element);
     
-    if (note->GetDur() < DUR_8)
+    if (note->GetActualDur() < DUR_8)
         return;
     
     dc->SetPen(AxBLACK, 2, AxSOLID);

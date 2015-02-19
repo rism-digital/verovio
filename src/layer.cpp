@@ -359,7 +359,7 @@ void Layer::RemoveClefAndCustos()
                 if ( (i > 0) && previous && previous->IsNote() )
                 {
                     Note *note = dynamic_cast<Note*>(m_children[i - 1]);
-                    if ( note && (note->GetDur() == DUR_LG) )
+                    if ( note && (note->GetActualDur() == DUR_LG) )
                     {
                         bool removeLonga = false;
                         // we check only for the pitch, not the octave, but should be enough

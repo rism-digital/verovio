@@ -1673,7 +1673,7 @@ AttDurationAdditive::~AttDurationAdditive() {
 }
 
 void AttDurationAdditive::ResetDurationAdditive() {
-    m_dur = 0;
+    m_dur = DURATION_4;
 }
 
 bool AttDurationAdditive::ReadDurationAdditive(  pugi::xml_node element ) {
@@ -1696,7 +1696,7 @@ bool AttDurationAdditive::WriteDurationAdditive(  pugi::xml_node element ) {
 
 bool AttDurationAdditive::HasDur( )
 {
-    return (m_dur != 0);
+    return (m_dur != DURATION_4);
 }
 
 
@@ -1785,7 +1785,7 @@ AttDurationMusical::~AttDurationMusical() {
 }
 
 void AttDurationMusical::ResetDurationMusical() {
-    m_dur = 0;
+    m_dur = DURATION_4;
 }
 
 bool AttDurationMusical::ReadDurationMusical(  pugi::xml_node element ) {
@@ -1808,7 +1808,7 @@ bool AttDurationMusical::WriteDurationMusical(  pugi::xml_node element ) {
 
 bool AttDurationMusical::HasDur( )
 {
-    return (m_dur != 0);
+    return (m_dur != DURATION_4);
 }
 
 
@@ -1827,7 +1827,7 @@ AttDurationPerformed::~AttDurationPerformed() {
 }
 
 void AttDurationPerformed::ResetDurationPerformed() {
-    m_durGes = VRV_UNSET;
+    m_durGes = DURATION_NONE;
 }
 
 bool AttDurationPerformed::ReadDurationPerformed(  pugi::xml_node element ) {
@@ -1850,7 +1850,7 @@ bool AttDurationPerformed::WriteDurationPerformed(  pugi::xml_node element ) {
 
 bool AttDurationPerformed::HasDurGes( )
 {
-    return (m_durGes != VRV_UNSET);
+    return (m_durGes != DURATION_NONE);
 }
 
 

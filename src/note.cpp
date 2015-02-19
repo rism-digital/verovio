@@ -113,24 +113,6 @@ void Note::AddLayerElement(vrv::LayerElement *element)
     Modify();
 }
 
-void Note::SetValue( int value, int flag )
-{
-    DurationInterface::SetDur( value );
-    
-	// remove ligature flag for  inadequate values	
-	if ( ( value < DUR_BR ) || ( value > DUR_1 ) ) {
-        this->SetLig(LIGATURE_NONE);
-    }
-
-	this->SetColored(BOOLEAN_NONE);
-    
-	// remove qauto flag for silences and inadequate values	
-	if ( ( value > DUR_LG ) && ( value < DUR_2 ) ) {
-		this->SetStemDir(STEMDIRECTION_NONE);
-        this->SetStemLen(0);
-    }    
-}
-
 void Note::SetDrawingTieAttr(  )
 {
     assert(!this->m_drawingTieAttr);
@@ -152,11 +134,11 @@ int Note::GetDrawingDur( )
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
     if( chordParent )
     {
-        return chordParent->GetDur();
+        return chordParent->GetActualDur();
     }
     else
     {
-        return m_dur;
+        return GetActualDur();
     }
 }
     

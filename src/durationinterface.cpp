@@ -50,14 +50,9 @@ void DurationInterface::Reset()
     ResetFermatapresent();
 }
 
-void DurationInterface::SetDurationGes( int value )
-{
-    this->m_durGes = value;
-}
-
 double DurationInterface::GetAlignementDuration( int num, int numbase )
 {
-    int note_dur = m_durGes != VRV_UNSET ? m_durGes : m_dur;
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetDur();
     
     double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
     if ( GetDots() > 0 ) {
@@ -104,7 +99,20 @@ bool DurationInterface::IsLastInBeam( Object *noteOrRest )
     return false;    
     
 }
+    
+int DurationInterface::GetActualDur()
+{
+    // maxima (-1) is a mensural only value
+    if (this->GetDur() == DURATION_maxima) return DUR_MX;
+    return (this->GetDur() & DUR_MENSURAL_MASK);
+}
 
+bool DurationInterface::IsMensural()
+{
+    // maxima (-1) is a mensural only value
+    if (this->GetDur() == DURATION_maxima) return true;
+    return (this->GetDur() > DUR_MENSURAL_MASK);
+}
 
 bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherDurationInterface )
 {
@@ -118,10 +126,10 @@ bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherD
     //if ( this->m_breakSec != otherDurationInterface->m_breakSec ) {
     //    return false;
     //}
-    if ( this->m_dots != otherDurationInterface->m_dots ) {
+    if ( this->GetDots() != otherDurationInterface->GetDots() ) {
         return false;
     }
-    if ( this->m_dur != otherDurationInterface->m_dur ) {
+    if ( this->GetDur() != otherDurationInterface->GetDur() ) {
         return false;
     }
     if ( this->GetNum() != otherDurationInterface->GetNum() ) {

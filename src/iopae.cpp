@@ -409,22 +409,22 @@ int PaeInput::getOctave (const char* incipit, char *octave, int index ) {
 // getDuration --
 //
 
-int PaeInput::getDuration(const char* incipit, int *duration, int *dot, int index ) {
+int PaeInput::getDuration(const char* incipit, data_DURATION *duration, int *dot, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
     
     switch (incipit[i]) {
-        case '0': *duration = DUR_LG; break;
-        case '1': *duration = DUR_1; break;
-        case '2': *duration = DUR_2; break;
-        case '3': *duration = DUR_32; break;
-        case '4': *duration = DUR_4; break;
-        case '5': *duration = DUR_64; break;
-        case '6': *duration = DUR_16; break;
-        case '7': *duration = DUR_128; break;
-        case '8': *duration = DUR_8; break;
-        case '9': *duration = DUR_BR; break;
+        case '0': *duration = DURATION_long; break;
+        case '1': *duration = DURATION_1; break;
+        case '2': *duration = DURATION_2; break;
+        case '3': *duration = DURATION_32; break;
+        case '4': *duration = DURATION_4; break;
+        case '5': *duration = DURATION_64; break;
+        case '6': *duration = DURATION_16; break;
+        case '7': *duration = DURATION_128; break;
+        case '8': *duration = DURATION_8; break;
+        case '9': *duration = DURATION_breve; break;
     }
      
     
@@ -441,7 +441,7 @@ int PaeInput::getDuration(const char* incipit, int *duration, int *dot, int inde
     }
     if ((*dot == 1) && (*duration == 7)) {
         // neumatic notation
-        *duration = 1.0;
+        *duration = DURATION_breve;
         *dot = 0;
         LogWarning("Found a note in neumatic notation (7.), using quarter note instead");				
     }
@@ -467,7 +467,8 @@ int PaeInput::getDurations(const char* incipit, MeasureObject* measure, int inde
     
     //int j = 0;
     do {
-        int dur, dot;
+        int dot;
+        data_DURATION dur;
         //measure->dots.setSize(j+1);
         i += getDuration(incipit, &dur, &dot, i );
         measure->durations.push_back(dur);
@@ -980,10 +981,10 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     if (note->acciaccatura) {
         // acciaccaturas are always eights regardless
         // and have no dots
-        note->duration = DUR_8;
+        note->duration = DURATION_8;
     } else {
         if (measure->durations.size() == 0) {
-            note->duration = DUR_4;
+            note->duration = DURATION_4;
             note->dots = 0;
             LogWarning("Got a note before a duration was specified");
         } else {

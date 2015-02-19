@@ -41,10 +41,7 @@ public:
     DurationInterface();
     virtual ~DurationInterface();
     virtual void Reset();
-    ///@}
-    
-    /* Set the logic (gestural) duration */
-    virtual void SetDurationGes( int value );
+    ///@}SetDurationGes
     
     /**
      * Returns the duration (in double) for the element.
@@ -70,6 +67,20 @@ public:
      * Return true if the note or rest is the last of a beam.
      */
     bool IsLastInBeam( Object *noteOrRest );
+
+    
+    /**
+     * Return the actual duration of the note, for both CMN and mensural durations
+     * See data_DURATION
+     * For CMN, it is the same (DURATION_1 == DUR_1)
+     * For mensural, we need to apply the DUR_MENSURAL_MASK
+     */
+    int GetActualDur();
+    
+    /**
+     * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
+     */
+    bool IsMensural();
     
     /**
      * Inteface comparison operator. 

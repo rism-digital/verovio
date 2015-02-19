@@ -131,15 +131,6 @@ void LayerElement::ResetHorizontalAlignment()
 {
     m_drawingX = 0;
 }
-
-void LayerElement::SetValue( int value, int flag )
-{
-    if ( this->HasDurationInterface() ){
-        DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
-        duration->SetDur( value );
-    }
-}
-    
     
 bool LayerElement::IsAccid( )
 {
