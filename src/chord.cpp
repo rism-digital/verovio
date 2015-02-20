@@ -58,6 +58,13 @@ void Chord::ClearClusters()
     std::list<ChordCluster*>::iterator iter;
     for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter)
     {
+        ChordCluster *cluster = dynamic_cast<ChordCluster*>(*iter);
+        for (std::vector<Note*>::iterator clIter = cluster->begin(); clIter != cluster->end(); ++clIter)
+        {
+            Note *note = dynamic_cast<Note*>(*clIter);
+            note->m_cluster = NULL;
+            note->m_clusterPosition = 0;
+        }
         delete *iter;
     }
     m_clusters.clear();
