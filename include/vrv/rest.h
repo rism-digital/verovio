@@ -36,12 +36,6 @@ public:
     virtual std::string GetClassName( ) { return "Rest"; };
     ///@}
     
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Rest and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
 private:
     
 public:

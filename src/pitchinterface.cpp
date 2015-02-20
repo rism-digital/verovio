@@ -8,6 +8,14 @@
 
 #include "pitchinterface.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "vrv.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -37,19 +45,15 @@ void PitchInterface::Reset()
 
 bool PitchInterface::HasIdenticalPitchInterface( PitchInterface *otherPitchInterface )
 {
+    // This should never happen because it is fully implemented
+    LogError( "PitchInterface::HasIdenticalPitchInterface missing" );
+    assert( false );
+    return false;
+    /*
     if ( !otherPitchInterface ) {
         return false;
     }
-    if ( this->m_accid != otherPitchInterface->m_accid ) {
-        return false;
-    }
-    if ( this->m_oct != otherPitchInterface->m_oct ) {
-        return false;
-    }
-    if ( this->m_pname != otherPitchInterface->m_pname ) {
-        return false;
-    }
-    return true;
+    */
 }
     
 } // namespace vrv

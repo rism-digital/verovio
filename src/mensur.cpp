@@ -50,33 +50,6 @@ void Mensur::Reset()
     ResetMensurVis();
     ResetSlashcount();
 }
-
-bool Mensur::operator==( Object& other )
-{
-    Mensur *otherMensur = dynamic_cast<Mensur*>( &other );
-    if ( !otherMensur ) {
-        return false;
-    }
-    if ( this->GetDot() != otherMensur->GetDot() ) {
-        return false;
-    }
-    if ( this->GetNum() != otherMensur->GetNum() ) {
-        return false;
-    }
-    if ( this->GetNumbase() != otherMensur->GetNumbase() ) {
-        return false;
-    }
-    if ( this->GetOrient() != otherMensur->GetOrient() ) {
-        return false;
-    }
-    if ( this->GetSign() != otherMensur->GetSign() ) {
-        return false;
-    }
-    if ( this->GetSlash() != otherMensur->GetSlash() ) {
-        return false;
-    }
-    return true;
-}
     
 //----------------------------------------------------------------------------
 // MensurAttr
@@ -98,16 +71,6 @@ void MensurAttr::Reset()
 {
     Object::Reset();
     ResetMensuralLog();
-}
-
-bool MensurAttr::operator==( Object& other )
-{
-    MensurAttr *otherMensurAttr = dynamic_cast<MensurAttr*>( &other );
-    if ( !otherMensurAttr ) {
-        return false;
-    }
-    // we need member comparison here...
-    return true;
 }
     
 } // namespace vrv

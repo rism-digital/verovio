@@ -30,7 +30,6 @@ public:
      */
     ///@{
     Tuplet();
-    Tuplet(int num, int numbase);
     virtual ~Tuplet();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tuplet"; };

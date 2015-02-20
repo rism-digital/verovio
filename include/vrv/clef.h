@@ -43,12 +43,6 @@ public:
     ///@}
     
     /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Clef and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
-    /**
      * Return the offset of the clef
      */
     int GetClefOffset();
@@ -89,12 +83,6 @@ public:
     virtual std::string GetClassName( ) { return "ClefAttr"; };
     virtual Object* Clone() { return new ClefAttr(*this); };
     ///@}
-    
-    /**
-     * Comparison operator.
-     * Check if the LayerElement if a ClefAttr and compare attributes
-     */
-    virtual bool operator==(Object& other);
     
 private:
     

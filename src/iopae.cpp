@@ -1173,7 +1173,10 @@ void PaeInput::parseNote(NoteObject note) {
     // we have a tuplet, the tuplet_note is > 0
     // which means we are counting a tuplet
     if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) { // first elem in tuplet
-        pushContainer(new Tuplet(note.tuplet_notes, note.tuplet_notes));
+        Tuplet *newTuplet = new Tuplet();
+        newTuplet->SetNum(note.tuplet_notes);
+        newTuplet->SetNumbase(note.tuplet_notes);
+        pushContainer(newTuplet);
     }
     
     

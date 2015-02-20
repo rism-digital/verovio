@@ -33,15 +33,6 @@ void Barline::Reset()
     ResetBarLineLog();
 }
 
-bool Barline::operator==( Object& other )
-{
-    Barline *otherBarline = dynamic_cast<Barline*>( &other );
-    if ( !otherBarline ) {
-        return false;
-    }
-    return true;
-}
-
 bool Barline::HasRepetitionDots()
 {
     if (GetRend() == BARRENDITION_rptstart || GetRend() == BARRENDITION_rptend || GetRend() == BARRENDITION_rptboth) {

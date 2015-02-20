@@ -297,6 +297,7 @@ bool Object::operator==( Object& other )
     // The comparison is performed in the CmpFile::Align method.
     // We expect to compare only Note, Rest, etc object for which we have an overwritten method
     LogError( "Missing comparison operator for '%s'", this->GetClassName().c_str() );
+    assert( false );
     return false;
 }
 

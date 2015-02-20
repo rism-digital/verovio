@@ -35,14 +35,7 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new Barline(*this); };
     virtual std::string GetClassName( ) { return "Barline"; };
-    ///@}
-    
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Barline and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
+    ///@}  
     
     /**
      * Use to set the alignment for the Measure Barline members.

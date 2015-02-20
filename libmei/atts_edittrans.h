@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Signifies the causative agent of damage, illegibility, or other loss of original
      * text.
@@ -101,7 +101,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Signifies the degree of certainty or precision associated with a feature. **/
     std::string m_cert;
     /**
@@ -145,7 +145,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates the extent of damage or omission. **/
     std::string m_extent;
 
@@ -183,7 +183,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Holds a short phrase describing the reason for missing textual material (gap),
      * why material is supplied (supplied), or why transcription is difficult

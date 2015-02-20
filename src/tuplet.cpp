@@ -21,14 +21,6 @@ Tuplet::Tuplet():
 
 }
 
-Tuplet::Tuplet(int num, int numbase):
-    LayerElement("tuplet-"), ObjectListInterface()
-{
-    Reset();
-    m_num = num;
-    m_numbase = numbase;
-}
-
 Tuplet::~Tuplet()
 {
 }

@@ -10,11 +10,13 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -116,36 +118,15 @@ bool DurationInterface::IsMensural()
 
 bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherDurationInterface )
 {
+    // This should never happen because it is fully implemented
+    LogError( "DurationInterface::HasIdenticalDurationInterface missing" );
+    assert( false );
+    return false;
+    /*
     if ( !otherDurationInterface ) {
         return false;
     }
-    // beam requires value by value comparison
-    //if ( this->m_beam != otherDurationInterface->m_beam ) {
-    //    return false;
-    //}
-    //if ( this->m_breakSec != otherDurationInterface->m_breakSec ) {
-    //    return false;
-    //}
-    if ( this->GetDots() != otherDurationInterface->GetDots() ) {
-        return false;
-    }
-    if ( this->GetDur() != otherDurationInterface->GetDur() ) {
-        return false;
-    }
-    if ( this->GetNum() != otherDurationInterface->GetNum() ) {
-        return false;
-    }
-    if ( this->GetNumbase() != otherDurationInterface->GetNumbase() ) {
-        return false;
-    }
-    // tuplet requires value by value comparison
-    //if ( this->m_tuplet != otherDurationInterface->m_tuplet ) {
-    //    return false;
-    //}
-    if ( this->m_fermata != otherDurationInterface->m_fermata ) {
-        return false;
-    }
-    return true;
+    */
 }
 
 } // namespace vrv
