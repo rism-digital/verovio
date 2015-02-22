@@ -866,22 +866,22 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
     SetMeiUuid( page, vrvPage );
     
     if ( page.attribute( "page.height" ) ) {
-        m_page->m_pageHeight = atoi ( page.attribute( "page.height" ).value() );
+        vrvPage->m_pageHeight = atoi ( page.attribute( "page.height" ).value() );
     }
     if ( page.attribute( "page.width" ) ) {
-        m_page->m_pageWidth = atoi ( page.attribute( "page.width" ).value() );
+        vrvPage->m_pageWidth = atoi ( page.attribute( "page.width" ).value() );
     }
     if ( page.attribute( "page.leftmar" ) ) {
-        m_page->m_pageLeftMar = atoi ( page.attribute( "page.leftmar" ).value() );
+        vrvPage->m_pageLeftMar = atoi ( page.attribute( "page.leftmar" ).value() );
     }
     if ( page.attribute( "page.rightmar" ) ) {
-        m_page->m_pageRightMar = atoi ( page.attribute( "page.rightmar" ).value() );
+        vrvPage->m_pageRightMar = atoi ( page.attribute( "page.rightmar" ).value() );
     }
     if ( page.attribute( "page.topmar" ) ) {
-        m_page->m_pageTopMar = atoi ( page.attribute( "page.topmar" ).value() );
+        vrvPage->m_pageTopMar = atoi ( page.attribute( "page.topmar" ).value() );
     }
     if ( page.attribute( "surface" ) ) {
-        m_page->m_surface = page.attribute( "surface" ).value();
+        vrvPage->m_surface = page.attribute( "surface" ).value();
     }
 
     m_doc->AddPage( vrvPage );
@@ -935,7 +935,7 @@ bool MeiInput::ReadMeiSystem( Object *parent, pugi::xml_node system )
         vrvSystem->m_systemRightMar = atoi ( system.attribute( "system.rightmar" ).value() );
     }
     if ( system.attribute( "uly" ) ) {
-        vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() );
+        vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() ) * DEFINITON_FACTOR;
     }
     
     // This could me moved to an AddSystem method for consistency with AddLayerElement
@@ -1230,7 +1230,7 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
     vrvStaff->ReadCommon(staff);
     
     if ( staff.attribute( "uly" ) ) {
-        vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
+        vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() ) * DEFINITON_FACTOR;
     }
     if ( staff.attribute( "label" ) ) {
         // we use type only for typing mensural notation
@@ -1368,7 +1368,7 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
 bool MeiInput::ReadLayerElement( pugi::xml_node element, LayerElement *object )
 {
     if ( element.attribute( "ulx" ) ) {
-        object->m_xAbs = atoi ( element.attribute( "ulx" ).value() );
+        object->m_xAbs = atoi ( element.attribute( "ulx" ).value() ) * DEFINITON_FACTOR;
     }
 
     ReadSameAsAttr( element, object );
