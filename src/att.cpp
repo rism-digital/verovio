@@ -297,7 +297,8 @@ data_CON Att::StrToCon(std::string value)
 std::string Att::DurToStr(data_DURATION data)
 {
     std::string value;
-    if (data == DURATION_longa) value = "longa";
+    if (data == DURATION_maxima) value = "maxima";
+    else if (data == DURATION_longa) value = "longa";
     else if (data == DURATION_brevis) value = "brevis";
     else if (data == DURATION_semibrevis) value = "semibrevis";
     else if (data == DURATION_minima) value = "minima";
@@ -325,7 +326,8 @@ std::string Att::DurToStr(data_DURATION data)
 data_DURATION Att::StrToDur(std::string value)
 {
     data_DURATION dur;
-    if (value == "longa") dur = DURATION_longa;
+    if (value == "maxima") dur = DURATION_maxima;
+    else if (value == "longa") dur = DURATION_longa;
     else if (value == "brevis") dur = DURATION_brevis;
     else if (value == "semibrevis") dur = DURATION_semibrevis;
     else if (value == "minima") dur = DURATION_minima;
