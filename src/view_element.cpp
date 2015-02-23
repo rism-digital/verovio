@@ -234,6 +234,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
     Note *note = dynamic_cast<Note*>(element);
+    
+    if (note->IsMensural()){
+        DrawMensuralNote(dc, element, layer, staff, measure);
+        return;
+    }
+    
     Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;

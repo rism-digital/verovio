@@ -280,6 +280,16 @@ protected:
     ///@}
     
     /**
+     * @name Methods for drawing mensural LayerElement child classes.
+     * They are base drawing methods that are called directly from DrawLayerElement
+     * Because some elements draw their children recursively (e.g., Note) they must all
+     * have the same parameters
+     * Defined in view_element.cpp
+     */
+    ///@{
+    void DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    
+    /**
      * @name Method for drawing Beam.
      * Called from the the layer postponed drawing list.
      * Wolfgang legacy code to be redesigned.

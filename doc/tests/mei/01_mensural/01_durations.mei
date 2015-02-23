@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title/>
+                <respStmt>
+                    <persName>Laurent Pugin</persName>
+                </respStmt>
+            </titleStmt>
+            <pubStmt>
+                <unpub/>
+            </pubStmt>
+            
+        </fileDesc>
+        
+    </meiHead>
+<music>
+	<body>
+		<mdiv>
+			<score>
+				<scoreDef>
+					<staffGrp symbol="line">
+						<staffGrp n="1" symbol="bracket">
+							<staffDef clef.line="2" clef.shape="G" lines="5" n="1" xml:id="sd1"/>
+						</staffGrp>
+					</staffGrp>
+				</scoreDef>
+				<section>
+					<measure label="1" n="1">
+						<staff n="1">
+							<layer n="1">
+							    <note xml:id="note-000000083659672" dur="maxima" oct="4" pname="g" />
+							    <note xml:id="note-000000083659672" dur="longa" oct="4" pname="g" />
+							    <note xml:id="note-000000096892696" dur="brevis" oct="4" pname="g" />
+							    <note xml:id="note-000000125219393" dur="semibrevis" oct="4" pname="g" />
+							    <note xml:id="note-000000023477513" dur="minima" oct="4" pname="g" />
+							    <note xml:id="note-000000086811926" dur="semiminima" oct="4" pname="g" />
+							    <note xml:id="note-000000056033098" dur="fusa" oct="4" pname="g" />
+							    <note xml:id="note-000000090038598" dur="semifusa" oct="4" pname="g" />    
+							</layer>
+						</staff>
+					</measure>
+				</section>
+			</score>
+		</mdiv>
+	</body>
+</music>
+</mei>
