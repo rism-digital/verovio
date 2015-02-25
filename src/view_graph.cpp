@@ -203,7 +203,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 2 * m_doc->m_drawingDoubleUnit[0] / 2, abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 6 * m_doc->m_drawingDoubleUnit[0] / 2, abs( x1 - x ) / 4 ) );
     
     int thickness = std::max( m_doc->m_drawingDoubleUnit[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
     

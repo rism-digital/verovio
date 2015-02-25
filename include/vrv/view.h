@@ -19,8 +19,10 @@
 
 namespace vrv {
 
+class Accid;
 class Beam;
 class Barline;
+class Chord;
 class DeviceContext;
 class Doc;
 class EditorialElement;
@@ -127,6 +129,15 @@ public:
      */
 	void DrawCurrentPage( DeviceContext *dc, bool background = true );
     
+    /**
+     * @name Methods for calculating drawing positions
+     * Defined in view_element.cpp
+     */
+    ///@{
+    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
+    int CalculateRestPosY ( Staff *staff, char duration);
+    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
+    ///@}
     
 protected:
     /** 
@@ -181,16 +192,6 @@ protected:
     ///@}
     
     /**
-     * @name Methods for calculating drawing positions
-     * Defined in view_element.cpp
-     */
-    ///@{
-    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
-    int CalculateRestPosY ( Staff *staff, char duration);
-    int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
-    ///@}
-    
-    /**
      * @name Top level method for drawing MeasureElement.
      * Call appropriate method of child classes (Staff, Slur, etc).
      * Defined in page_element.cpp
@@ -208,6 +209,8 @@ protected:
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
     void DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
                   Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
+                          Staff *staff, char spanningType, DocObject *graphic = NULL );
     ///@}
     
     /** 
@@ -228,7 +231,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid );
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -242,7 +245,6 @@ protected:
     void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
-    void DrawNotehead( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -259,10 +261,11 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
+    void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff );
@@ -325,6 +328,11 @@ private:
     bool OneBeamInTuplet(Tuplet* tuplet);
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
+    
+    /**
+     * @name Used for calculating clustered information/dot position
+     */
+    bool IsOnStaffLine ( int y, Staff *staff );
     
     /**
      * Swap the to points passed as reference.

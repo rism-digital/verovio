@@ -294,7 +294,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         }
         
         else if ( beamElementCoord[i].element->IsChord() ) {
-            ((Chord*)beamElementCoord[i].element)->m_drawingStemDir = stemDir;
+            ((Chord*)beamElementCoord[i].element)->SetDrawingStemDir(stemDir);
             beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
         }
         
@@ -331,24 +331,28 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	startingY = (s_y - beamSlope * s_x) / elementCount;
     
     /******************************************************************/
-    // Draw noteheads for all objects in the beam
+    // Draw notes for all objects in the beam now that stem direction is calculated
     
     for (i = 0; i < elementCount; i++) {
         if (beamElementCoord[i].element->IsChord()) {
             Chord *chord = dynamic_cast<Chord*>(beamElementCoord[i].element);
-            ListOfObjects *noteList = chord->GetDrawingList();
+            ListOfObjects *noteList = chord->GetList(chord);
             ListOfObjects::iterator iter = noteList->begin();
             
+            dc->ResumeGraphic( dynamic_cast<DocObject*>(chord), (chord)->GetUuid() );
             while ( iter != noteList->end()) {
+                Note *note = dynamic_cast<Note*>(*iter);
+                if (!note) continue;
                 dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
-                DrawNotehead(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure);
+                DrawNote(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure);
                 dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
                 iter++;
             }
+            dc->EndResumedGraphic( dynamic_cast<DocObject*>(chord), this );
         }
         else if (beamElementCoord[i].element->IsNote()) {
             dc->ResumeGraphic( dynamic_cast<DocObject*>(beamElementCoord[i].element), beamElementCoord[i].element->GetUuid() );
-            DrawNotehead(dc, dynamic_cast<LayerElement*>(beamElementCoord[i].element), layer, staff, measure);
+            DrawNote(dc, dynamic_cast<LayerElement*>(beamElementCoord[i].element), layer, staff, measure);
             dc->EndResumedGraphic( dynamic_cast<DocObject*>(beamElementCoord[i].element), this );
         }
     }

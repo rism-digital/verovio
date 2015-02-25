@@ -17,6 +17,7 @@
 #include "chord.h"
 #include "doc.h"
 #include "editorial.h"
+#include "io.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -555,6 +556,18 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
     }
 }
     
+int Object::Save( FileOutputStream *output )
+{
+    ArrayPtrVoid params;
+    params.push_back( output );
+    
+    Functor save( &Object::Save );
+    Functor saveEnd( &Object::SaveEnd );
+    this->Process( &save, params, &saveEnd );
+    
+    return true;
+}
+    
 //----------------------------------------------------------------------------
 // DocObject
 //----------------------------------------------------------------------------
@@ -1049,7 +1062,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     }
     
     if ( current->IsNote() ) {
-        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), 1));
+        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
         if( chordParent ) {
             return FUNCTOR_CONTINUE;
         }

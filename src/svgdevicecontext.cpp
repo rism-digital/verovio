@@ -183,7 +183,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
     {
         SetPen( AxRED, 10, AxDOT_DASH );
         SetBrush( AxWHITE, AxTRANSPARENT );
-        StartGraphic( object, "bounding-box", "0");
+        StartGraphic( object, "self-bounding-box", "0");
         if ( object->HasSelfBB() ) {
             this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ),
@@ -195,7 +195,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
         EndGraphic( object, NULL );
         
         SetPen( AxBLUE, 10, AxDOT_DASH );
-        StartGraphic( object, "bounding-box", "0");
+        StartGraphic( object, "content-bounding-box", "0");
         if ( object->HasContentBB() ) {
             this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ),

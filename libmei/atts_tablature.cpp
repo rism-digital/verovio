@@ -16,6 +16,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "object.h"
+
 /* #include_block */
 
 namespace vrv {
@@ -118,5 +120,47 @@ bool AttStaffDefGesTablature::HasTabStrings( )
 
 /* include <atttab.strings> */
 
-} // vrv namespace
+bool Att::SetTablature( Object *element, std::string attrType, std::string attrValue ) {
+    if (dynamic_cast<AttNoteGesTablature*>(element) ) {
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
+        if (attrType == "tabFret") {
+            att->SetTabFret(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "tabString") {
+            att->SetTabString(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (dynamic_cast<AttStaffDefGesTablature*>(element) ) {
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
+        if (attrType == "tabStrings") {
+            att->SetTabStrings(att->StrToStr(attrValue));
+            return true;
+        }
+    }
 
+    return false;
+}
+
+void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
+    if (dynamic_cast<AttNoteGesTablature*>(element) ) {
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
+        if (att->HasTabFret()) {
+            attributes->push_back(std::make_pair("tabFret", att->StrToStr(att->GetTabFret())));
+        }
+        if (att->HasTabString()) {
+            attributes->push_back(std::make_pair("tabString", att->StrToStr(att->GetTabString())));
+        }
+    }
+    if (dynamic_cast<AttStaffDefGesTablature*>(element) ) {
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
+        if (att->HasTabStrings()) {
+            attributes->push_back(std::make_pair("tabStrings", att->StrToStr(att->GetTabStrings())));
+        }
+    }
+
+}
+    
+} // vrv namespace
+    

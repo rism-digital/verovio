@@ -21,6 +21,7 @@ namespace vrv {
     
 class Doc;
 class EditorialElement;
+class FileOutputStream;
 class Functor;
 
 /**
@@ -281,13 +282,19 @@ public:
     void Modify( bool modified = true );
     
     /**
+     * Saves the object (and its children) using the specified output stream.
+     * Creates a functors that will parse the tree.
+     */
+    virtual int Save( FileOutputStream *output );
+    
+    /**
      * Main method that processes functors.
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
      * The ArrayOfAttComparisons filter parameter makes is possible to process only objects of a
      * type that match the attribute value given in the AttComparison object.
      * This is a generic way for parsing the tree, e.g., for extracting one single staff, or layer.
-     * Deepness allow to specify how many child levels should be processed -10000 means no 
+     * Deepness allow to specify how many child levels should be processed UNLIMITED_DEPTH means no 
      * limit (EditorialElement objects do not count).
      */
     virtual void Process( Functor *functor, ArrayPtrVoid params, Functor *endFunctor = NULL,
@@ -491,13 +498,6 @@ public:
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Goes through all the TimeSpanningInterface element and set them a current to each staff 
-     * where require. For Note with DrawingTieAttr, the functor is redireted to the tie object
-     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
-     */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
-    
-    /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
@@ -510,11 +510,16 @@ public:
     virtual int PrepareLyricsEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * Goes through all the TimeSpanningInterface element and set them a current to each staff
+     * where require. For Note with DrawingTieAttr, the functor is redireted to the tie object
+     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * @name Functors for justification

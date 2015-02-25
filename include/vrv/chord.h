@@ -14,13 +14,11 @@
 //----------------------------------------------------------------------------
 
 #include "atts_shared.h"
-#include "drawinglistinterface.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 #include "object.h"
 
 namespace vrv {
-    
     
 //----------------------------------------------------------------------------
 // Chord
@@ -33,7 +31,7 @@ namespace vrv {
  * It contains notes.
  */
     
-class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, public DrawingListInterface,
+class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, 
     public AttColoration,
     public AttCommon,
     public AttStemmed,
@@ -58,6 +56,18 @@ public:
     void FilterList();
     
     void GetYExtremes(int *yMax, int *yMin);
+    
+    /**
+     * Returns list of notes that have accidentals
+     */
+    ListOfObjects GenerateAccidList();
+    
+    /**
+     * @name Set and get the stem direction of the beam.
+     */
+    ///@{
+    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
 
     ///@}
     
@@ -75,6 +85,30 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
+    
+protected:
+    /**
+     * Clear the m_clusters vector and delete all the objects.
+     */
+    void ClearClusters();
+    
+private:
+    data_STEMDIRECTION m_drawingStemDir;
+    
+public:
+    std::list<ChordCluster*> m_clusters;
+    
+    /** 
+     * Number of ledger lines for the chord where:
+     * m_ledgerLines[0][x] is single-length, m_ledgerLines[1][x] is double-length
+     * m_ledgerLines[x][0] is below staff, m_ledgerLines[x][1] is above staff
+     */
+    int m_ledgerLines[2][2];
+    
+    /**
+     * Positions of dots in the chord to avoid overlapping
+     */
+    std::list<int> m_dots;
 };
 
 } // namespace vrv

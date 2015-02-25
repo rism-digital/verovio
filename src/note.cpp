@@ -65,6 +65,8 @@ void Note::Reset()
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
+    m_clusterPosition = 0;
+    m_cluster = NULL;
 }
 
 bool Note::operator==( Object& other )
@@ -147,6 +149,12 @@ void Note::ResetDrawingTieAttr( )
     }
 }
   
+    
+Chord* Note::IsChordTone()
+{
+    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+}
+    
 int Note::GetDrawingDur( )
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
@@ -160,15 +168,23 @@ int Note::GetDrawingDur( )
     }
 }
     
+bool Note::IsClusterExtreme()
+{
+    ChordCluster* cluster = this->m_cluster;
+    if (this == cluster->at(0)) return true;
+    if (this == cluster->at(cluster->size() - 1)) return true;
+    else return false;
+}
+    
 bool Note::HasDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
-    if( chordParent )
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
+    if( chordParent && chordParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
     {
-        return chordParent->HasStemDir();
+        return chordParent->GetDrawingStemDir();
     }
-    else if( beamParent )
+    else if( beamParent && beamParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
     {
         return beamParent->GetDrawingStemDir();
     }
@@ -177,19 +193,14 @@ bool Note::HasDrawingStemDir()
         return this->HasStemDir();
     }
 }
-
-Chord* Note::IsChordTone()
-{
-    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-}
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), 1));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), 1));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
     if( chordParent )
     {
-        return chordParent->GetStemDir();
+        return chordParent->GetDrawingStemDir();
     }
     else if( beamParent )
     {
@@ -269,5 +280,11 @@ int Note::PrepareLyrics( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int Note::ResetDarwing( ArrayPtrVoid params )
+{
+    this->ResetDrawingTieAttr();
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv

@@ -51,6 +51,8 @@ MeiOutput::MeiOutput( Doc *doc, std::string filename ) :
 {
     m_filename = filename;
     m_writeToStreamString = false;
+    m_page = -1;
+    m_scoreBasedMEI = false;
 }
 
 MeiOutput::~MeiOutput()
@@ -62,25 +64,38 @@ bool MeiOutput::ExportFile( )
     try {
         pugi::xml_document meiDoc;
         
-        m_mei = meiDoc.append_child("mei");
-        m_mei.append_attribute( "xmlns" ) = "http://www.music-encoding.org/ns/mei";
-        m_mei.append_attribute( "meiversion" ) = "2013";
-        
-        // this starts the call of all the functors
-        m_doc->Save( this );
-        
-        /* To be change to pugixml
-        TiXmlUnknown *schema = new TiXmlUnknown();
-        schema->SetValue("?xml-model href=\"http://www.aruspix.net/mei-page-based-2013-08-29.rng\" type=\"application/xml\" schematypens=\"http://relaxng.org/ns/structure/1.0\"?");
-        
-        meiDoc->LinkEndChild( new TiXmlDeclaration( "1.0", "UTF-8", "" ) );
-        meiDoc->LinkEndChild(schema);
-        */
-        if ( m_writeToStreamString ) {
-            meiDoc.save(m_streamStringOutput);
+        if ( m_page < 0 ) {
+            m_mei = meiDoc.append_child("mei");
+            m_mei.append_attribute( "xmlns" ) = "http://www.music-encoding.org/ns/mei";
+            m_mei.append_attribute( "meiversion" ) = "2013";
+            
+            // this starts the call of all the functors
+            m_doc->Save( this );
+            
+            /* To be change to pugixml
+            TiXmlUnknown *schema = new TiXmlUnknown();
+            schema->SetValue("?xml-model href=\"http://www.aruspix.net/mei-page-based-2013-08-29.rng\" type=\"application/xml\" schematypens=\"http://relaxng.org/ns/structure/1.0\"?");
+            
+            meiDoc->LinkEndChild( new TiXmlDeclaration( "1.0", "UTF-8", "" ) );
+            meiDoc->LinkEndChild(schema);
+            */
+
         }
         else {
-            meiDoc.save_file( m_filename.c_str() );
+            if (m_page >= m_doc->GetPageCount()) {
+                LogError("Page %d does not exist", m_page );
+                return false;
+            }
+            Page *page = dynamic_cast<Page*>(m_doc->m_children[m_page]);
+            assert( page );
+            m_currentNode = meiDoc.append_child("pages");
+            page->Save( this );
+        }
+        if ( m_writeToStreamString ) {
+            meiDoc.save(m_streamStringOutput, "    ");
+        }
+        else {
+            meiDoc.save_file( m_filename.c_str(), "    " );
         }
     }
     catch( char * str ) {
@@ -90,11 +105,13 @@ bool MeiOutput::ExportFile( )
 	return true;    
 }
     
-std::string MeiOutput::GetOutput()
+std::string MeiOutput::GetOutput( int page )
 {
     m_writeToStreamString = true;
+    m_page = page;
     this->ExportFile();
     m_writeToStreamString = false;
+    m_page = -1;
     return m_streamStringOutput.str();
 }
     
@@ -140,6 +157,16 @@ bool MeiOutput::WriteObject( Object *object )
         WriteMeiLayer( m_currentNode, dynamic_cast<Layer*>(object) );
     }
     
+    // Measure elements
+    else if (dynamic_cast<Slur*>(object)) {
+        m_currentNode = m_currentNode.append_child("slur");
+        WriteMeiSlur( m_currentNode, dynamic_cast<Slur*>(object) );
+    }
+    else if (dynamic_cast<Tie*>(object)) {
+        m_currentNode = m_currentNode.append_child("tie");
+        WriteMeiTie( m_currentNode, dynamic_cast<Tie*>(object) );
+    }
+    
     // Layer elements
     else if (dynamic_cast<Accid*>(object)) {
         m_currentNode = m_currentNode.append_child("accid");
@@ -152,6 +179,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (dynamic_cast<Beam*>(object)) {
         m_currentNode = m_currentNode.append_child("beam");
         WriteMeiBeam( m_currentNode, dynamic_cast<Beam*>(object) );
+    }
+    else if (dynamic_cast<Chord*>(object)) {
+        m_currentNode = m_currentNode.append_child( "chord" );
+        WriteMeiChord( m_currentNode, dynamic_cast<Chord*>(object) );
     }
     else if (dynamic_cast<Clef*>(object)) {
         m_currentNode = m_currentNode.append_child("clef");
@@ -200,8 +231,23 @@ bool MeiOutput::WriteObject( Object *object )
         WriteMeiSyl( m_currentNode, dynamic_cast<Syl*>(object) );
     }
     
+    // Editorial markup
+    else if (dynamic_cast<App*>(object)) {
+        m_currentNode = m_currentNode.append_child("app");
+        WriteMeiApp( m_currentNode, dynamic_cast<App*>(object) );
+    }
+    else if (dynamic_cast<Lem*>(object)) {
+        m_currentNode = m_currentNode.append_child("lem");
+        WriteMeiLem( m_currentNode, dynamic_cast<Lem*>(object) );
+    }
+    else if (dynamic_cast<Rdg*>(object)) {
+        m_currentNode = m_currentNode.append_child("rdg");
+        WriteMeiRdg( m_currentNode, dynamic_cast<Rdg*>(object) );
+    }
+    
     else {
         // Missing output method for the class
+        LogError("Output method missing for '%s'", object->GetClassName().c_str() );
         assert( false ); // let's make it stop because this should not happen
     }
     
@@ -288,7 +334,9 @@ bool MeiOutput::WriteMeiSystem( pugi::xml_node currentNode, System *system )
     currentNode.append_attribute( "system.leftmar" ) = StringFormat( "%d", system->m_systemLeftMar ).c_str();
     currentNode.append_attribute( "system.rightmar") = StringFormat( "%d", system->m_systemRightMar ).c_str();
     // y positions
-    currentNode.append_attribute( "uly" ) = StringFormat( "%d", system->m_yAbs ).c_str();
+    if ( system->m_yAbs != VRV_UNSET) {
+        currentNode.append_attribute( "uly" ) = StringFormat( "%d", system->m_yAbs ).c_str();
+    }
     
     return true;
 }
@@ -363,7 +411,25 @@ bool MeiOutput::WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure )
     measure->WriteMeasureLog(currentNode);
     
     return true;
-}
+}    
+
+void MeiOutput::WriteMeiTie( pugi::xml_node currentNode, Tie *tie )
+{
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tie ).c_str();
+    
+    WriteTimeSpanningInterface(currentNode, tie);
+    
+    return;
+};
+
+void MeiOutput::WriteMeiSlur( pugi::xml_node currentNode, Slur *slur )
+{
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( slur ).c_str();
+    
+    WriteTimeSpanningInterface(currentNode, slur);
+    
+    return;
+};
 
 bool MeiOutput::WriteMeiStaff( pugi::xml_node currentNode, Staff *staff )
 {
@@ -375,11 +441,12 @@ bool MeiOutput::WriteMeiStaff( pugi::xml_node currentNode, Staff *staff )
     if ( staff->notAnc ) {
         currentNode.append_attribute( "label" ) = "mensural";
     }
-    currentNode.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
+    if ( staff->m_yAbs != VRV_UNSET) {
+        currentNode.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
+    }
 
     return true;
 }
-
 
 bool MeiOutput::WriteMeiLayer( pugi::xml_node currentNode, Layer *layer )
 {
@@ -422,6 +489,20 @@ void MeiOutput::WriteMeiBeam( pugi::xml_node currentNode, Beam *beam )
     return;
 }
 
+void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
+{
+    WriteLayerElement( currentNode, chord );
+    WriteDurationInterface( currentNode, chord);
+    chord->WriteCommon(currentNode);
+    chord->WriteStemmed(currentNode);
+    chord->WriteTiepresent(currentNode);
+    
+    if ( chord->m_cueSize ) {
+        currentNode.append_attribute( "grace" ) = "unknown";
+    }
+    
+    return;
+}
 
 void MeiOutput::WriteMeiClef( pugi::xml_node currentNode, Clef *clef )
 {
@@ -464,7 +545,8 @@ void MeiOutput::WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig
     
 void MeiOutput::WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest )
 {
-     return;
+    WriteLayerElement( currentNode, mRest );
+    return;
 }
 
 void MeiOutput::WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest )
@@ -541,7 +623,7 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface 
     
 void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInterface *interface)
 {
-
+    interface->WriteStafflocPitched(element);
 }
     
 void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, vrv::TimeSpanningInterface *interface)
@@ -564,6 +646,31 @@ void MeiOutput::WriteText( pugi::xml_node element, Object *object )
         element.text() =  UTF16to8(object->GetText().c_str() ).c_str();
     }
 }
+    
+void MeiOutput::WriteEditorialElement( pugi::xml_node currentNode, EditorialElement *element )
+{
+    this->WriteSameAsAttr( currentNode, element );    
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( element ).c_str();
+    element->WriteCommon( currentNode );
+}
+
+bool MeiOutput::WriteMeiApp( pugi::xml_node currentNode, App *app )
+{
+    WriteEditorialElement(currentNode, app);
+    return true;
+};
+
+bool MeiOutput::WriteMeiLem( pugi::xml_node currentNode, Lem *lem )
+{
+    WriteEditorialElement(currentNode, lem);
+    return true;
+};
+
+bool MeiOutput::WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg )
+{
+    WriteEditorialElement(currentNode, rdg);
+    return true;
+};
     
 std::string MeiOutput::BoolToStr(bool value)
 {
@@ -1276,7 +1383,7 @@ bool MeiInput::ReadMeiAccid( Object *parent, pugi::xml_node accid )
     ReadLayerElement(accid, vrvAccid);
     
     ReadPositionInterface(accid, vrvAccid);
-    vrvAccid->ResetAccidental();
+    vrvAccid->ReadAccidental(accid);
     
     AddLayerElement(parent, vrvAccid);
     return true;
@@ -1308,6 +1415,26 @@ bool MeiInput::ReadMeiBeam( Object *parent, pugi::xml_node beam )
     }
     
     return true;
+}
+    
+bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
+{
+    Chord *vrvChord = new Chord();
+    SetMeiUuid(chord, vrvChord);
+    
+    ReadDurationInterface(chord, vrvChord);
+    vrvChord->ReadCommon(chord);
+    vrvChord->ReadStemmed(chord);
+    vrvChord->ReadTiepresent(chord);
+    
+    if ( chord.attribute( "grace" ) ) {
+        vrvChord->m_cueSize = true;
+    }
+    
+    AddLayerElement(parent, vrvChord);
+    bool success = ReadMeiLayerChildren(vrvChord, chord);
+    
+    return success;
 }
 
 bool MeiInput::ReadMeiClef( Object *parent, pugi::xml_node clef )
@@ -1393,26 +1520,6 @@ bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
     
     AddLayerElement(parent, vrvMultiRest);
 	return true;
-}
-    
-bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
-{
-    Chord *vrvChord = new Chord();
-    SetMeiUuid(chord, vrvChord);
-    
-    ReadDurationInterface(chord, vrvChord);
-    vrvChord->ReadCommon(chord);
-    vrvChord->ReadStemmed(chord);
-    vrvChord->ReadTiepresent(chord);
-    
-    if ( chord.attribute( "grace" ) ) {
-		vrvChord->m_cueSize = true;
-	}
-    
-    AddLayerElement(parent, vrvChord);
-    bool success = ReadMeiLayerChildren(vrvChord, chord);
-    
-    return success;
 }
 
 bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )

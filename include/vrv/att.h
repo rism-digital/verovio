@@ -37,7 +37,55 @@ public:
     virtual ~Att();
     ///@}
     
-protected:
+    /** 
+     * @name static method for blind attribute modification
+     * The implementation is implemented by LibMEI in each module corresponding file
+     * Use in the toolkit for applying attribute modification to unspecified elements
+     * See Toolkit::Set method
+     * Files to be uncommented according to the inclusion of the corresponding LibMEI files
+     */
+    ///@{
+    //static bool SetAnalysis( Object *element, std::string attrType, std::string attrValue );
+    static bool SetCmn( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetCmnornaments( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetEdittrans( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetFacsimile( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetFigtable( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetHarmony( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetHeader( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetLinkalign( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetLyrics( Object *element, std::string attrType, std::string attrValue );
+    static bool SetMensural( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetMidi( Object *element, std::string attrType, std::string attrValue );
+    static bool SetPagebased( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetNeumes( Object *element, std::string attrType, std::string attrValue );
+    static bool SetShared( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetTablature( Object *element, std::string attrType, std::string attrValue );
+
+    /**
+     * Idem for getting attributes as strings
+     */
+    //static void GetAnalysis( Object *element, ArrayOfStrAttr *attributes );
+    static void GetCmn( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetCmnornaments( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetCritapp( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetEdittrans( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetFacsimile( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetFigtable( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetHarmony( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetHeader( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetLinkalign( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetLyrics( Object *element, ArrayOfStrAttr *attributes );
+    static void GetMensural( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetMidi( Object *element, ArrayOfStrAttr *attributes );
+    static void GetPagebased( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetNeumes( Object *element, ArrayOfStrAttr *attributes );
+    static void GetShared( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetTablature( Object *element, ArrayOfStrAttr *attributes );
+    ///@}
+    
+public:
     /** Dummy string converter */
     std::string StrToStr(std::string str);
     
@@ -116,6 +164,9 @@ protected:
     
     std::string TieToStr(data_TIE data);
     data_TIE StrToTie(std::string value);
+    
+    std::string Tstamp2ToStr(typedef_TSTAMP2 data);
+    typedef_TSTAMP2 StrToTstamp2(std::string value);
     
     std::string WordPosToStr(data_WORDPOS data);
     data_WORDPOS StrToWordPos(std::string value);

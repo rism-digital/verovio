@@ -10,30 +10,31 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
 #include "iodarms.h"
 #include "iomei.h"
 #include "iopae.h"
+#include "layer.h"
 #include "page.h"
+#include "measure.h"
+#include "note.h"
+#include "slur.h"
 #include "svgdevicecontext.h"
 #include "style.h"
 #include "vrv.h"
 
-#ifdef USE_EMSCRIPTEN
-#include "jsonxx.h"
-#endif
-
 namespace vrv {
-
+    
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
 
 Toolkit::Toolkit( bool initFont )
 {
-
+    
     m_scale = DEFAULT_SCALE;
     m_format = mei_file;
     
@@ -49,8 +50,8 @@ Toolkit::Toolkit( bool initFont )
     m_adjustPageHeight = false;
     m_noJustification = false;
     m_showBoundingBoxes = false;
-	
-	m_cString = NULL;
+    
+    m_cString = NULL;
     
     if ( initFont ) {
         Resources::InitFonts();
@@ -64,7 +65,7 @@ Toolkit::~Toolkit()
         free( m_cString );
     }
 }
-    
+
 bool Toolkit::SetBorder( int border )
 {
     // We use left margin values because for now we cannot specify different values for each margin
@@ -75,7 +76,7 @@ bool Toolkit::SetBorder( int border )
     m_border = border;
     return true;
 }
-    
+
 bool Toolkit::SetScale( int scale )
 {
     if (scale < MIN_SCALE || scale > MAX_SCALE) {
@@ -85,7 +86,7 @@ bool Toolkit::SetScale( int scale )
     m_scale = scale;
     return true;
 }
-    
+
 bool Toolkit::SetPageHeight( int h )
 {
     if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
@@ -95,7 +96,7 @@ bool Toolkit::SetPageHeight( int h )
     m_pageHeight = h;
     return true;
 }
-    
+
 bool Toolkit::SetPageWidth( int w )
 {
     if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
@@ -105,7 +106,7 @@ bool Toolkit::SetPageWidth( int w )
     m_pageWidth = w;
     return true;
 };
-    
+
 bool Toolkit::SetSpacingStaff( int spacingStaff )
 {
     if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
@@ -115,8 +116,8 @@ bool Toolkit::SetSpacingStaff( int spacingStaff )
     m_spacingStaff = spacingStaff;
     return true;
 }
-    
-    
+
+
 bool Toolkit::SetSpacingSystem( int spacingSystem )
 {
     if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
@@ -126,7 +127,7 @@ bool Toolkit::SetSpacingSystem( int spacingSystem )
     m_spacingSystem = spacingSystem;
     return true;
 }
-    
+
 
 bool Toolkit::SetFormat( std::string const &informat )
 {
@@ -142,14 +143,14 @@ bool Toolkit::SetFormat( std::string const &informat )
     }
     return true;
 };
- 
-    
+
+
 bool Toolkit::SetFont( std::string const &font )
 {
     return Resources::SetFont(font);
 };
- 
-    
+
+
 bool Toolkit::LoadFile( const std::string &filename )
 {
     std::ifstream in( filename.c_str() );
@@ -165,7 +166,7 @@ bool Toolkit::LoadFile( const std::string &filename )
     // read the file into the string:
     std::string content( fileSize, 0 );
     in.read(&content[0], fileSize);
-
+    
     return LoadString( content );
 }
 
@@ -199,7 +200,7 @@ bool Toolkit::LoadString( const std::string &data )
     if ( m_rdgXPathQuery.length() > 0 ) {
         input->SetRdgXPathQuery( m_rdgXPathQuery );
     }
-
+    
     // load the file
     if ( !input->ImportString( data )) {
         LogError( "Error importing data" );
@@ -243,15 +244,18 @@ bool Toolkit::LoadString( const std::string &data )
     
     return true;
 }
-    
+
 
 std::string Toolkit::GetMEI( int pageNo )
 {
+    // Page number is one-based - correction to 0-based first
+    pageNo--;
+    
     MeiOutput meioutput( &m_doc, "" );
-    return meioutput.GetOutput();
+    return meioutput.GetOutput( pageNo );
 }
 
-    
+
 bool Toolkit::SaveFile( const std::string &filename )
 {
     MeiOutput meioutput( &m_doc, filename.c_str());
@@ -266,7 +270,7 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
-        
+    
     // Read JSON options
     if (!json.parse(json_options)) {
         LogError( "Can not parse JSON string." );
@@ -284,7 +288,7 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     
     if (json.has<jsonxx::String>("font"))
         SetFont(json.get<jsonxx::String>("font"));
-
+    
     if (json.has<jsonxx::Number>("pageWidth"))
         SetPageWidth( json.get<jsonxx::Number>("pageWidth") );
     
@@ -309,16 +313,16 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     
     if (json.has<jsonxx::Number>("ignoreLayout"))
         SetIgnoreLayout(json.get<jsonxx::Number>("ignoreLayout"));
-
+    
     if (json.has<jsonxx::Number>("adjustPageHeight"))
         SetAdjustPageHeight(json.get<jsonxx::Number>("adjustPageHeight"));
-
+    
     if (json.has<jsonxx::Number>("noJustification"))
         SetNoJustification(json.get<jsonxx::Number>("noJustification"));
-
+    
     if (json.has<jsonxx::Number>("showBoundingBoxes"))
         SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));
-        
+    
     return true;
     
 #else
@@ -327,6 +331,85 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
 #endif
 }
     
+    
+std::string Toolkit::GetElementAttr( const std::string &xmlId )
+{
+#ifdef USE_EMSCRIPTEN
+    jsonxx::Object o;
+    
+    if ( !m_doc.GetDrawingPage() ) return o.json();
+    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
+    if (!element) {
+        LogMessage("Element with id '%s' could not be found", xmlId.c_str() );
+        return o.json();
+    }
+    
+    // Fill the attribute array (pair of string) by looking by attributes for all available MEI modules
+    ArrayOfStrAttr attributes;
+    Att::GetCmn(element, &attributes );
+    Att::GetMensural(element, &attributes );
+    Att::GetPagebased(element, &attributes );
+    Att::GetShared(element, &attributes );
+    
+    // Fill the JSON object
+    ArrayOfStrAttr::iterator iter;
+    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+        o << (*iter).first << (*iter).second;
+        //LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str() );
+    }
+    return o.json();
+    
+#else
+    // The non js version of the app should not use this function.
+    return "";
+#endif
+}
+
+bool Toolkit::Edit( const std::string &json_editorAction ) {
+#ifdef USE_EMSCRIPTEN
+    
+    jsonxx::Object json;
+    
+    // Read JSON actions
+    if (!json.parse(json_editorAction)) {
+        LogError( "Can not parse JSON string." );
+        return false;
+    }
+    
+    if (json.has<jsonxx::String>("action") && json.has<jsonxx::Object>("param")) {
+        if ( json.get<jsonxx::String>("action") == "drag" ) {
+            std::string elementId;
+            int x, y;
+            if (this->ParseDragAction( json.get<jsonxx::Object>("param"), &elementId, &x, &y )) {
+                return this->Drag( elementId, x, y );
+            }
+        }
+        else if ( json.get<jsonxx::String>("action") == "insert" ) {
+            LogMessage("insert...");
+            std::string elementType, startid, endid;
+            if (this->ParseInsertAction( json.get<jsonxx::Object>("param"), &elementType, &startid, &endid )) {
+                return this->Insert( elementType, startid, endid );
+            }
+            else {
+                LogMessage("Insert!!!! %s %s %s", elementType.c_str(), startid.c_str(), endid.c_str() );
+            }
+        }
+        else if ( json.get<jsonxx::String>("action") == "set" ) {
+            std::string elementId, attrType, attrValue;
+            if (this->ParseSetAction( json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue )) {
+                return this->Set( elementId, attrType, attrValue );
+            }
+        }
+    }
+    LogError( "Does not understand action." );
+    return false;
+    
+#else
+    // The non js version of the app should not use this function.
+    return false;
+#endif
+}
+
 
 std::string Toolkit::GetLogString() {
 #ifdef USE_EMSCRIPTEN
@@ -341,10 +424,10 @@ std::string Toolkit::GetLogString() {
     return "";
 #endif
 }
-  
+
 
 void  Toolkit::ResetLogBuffer() {
-#ifdef USE_EMSCRIPTEN 
+#ifdef USE_EMSCRIPTEN
     vrv::logBuffer.clear();
 #endif
 }
@@ -384,7 +467,7 @@ std::string Toolkit::RenderToSvg( int pageNo, bool xml_declaration )
     std::string out_str = svg.GetStringSVG( xml_declaration );
     return out_str;
 }
-    
+
 void Toolkit::RedoLayout()
 {
     m_doc.SetPageHeight( this->GetPageHeight() );
@@ -418,9 +501,9 @@ bool Toolkit::RenderToSvgFile( const std::string &filename, int pageNo )
 
 
 int Toolkit::GetPageCount() {
-	return m_doc.GetPageCount();
+    return m_doc.GetPageCount();
 }
-    
+
 int Toolkit::GetPageWithElement( const std::string &xmlId ) {
     Object *element = m_doc.FindChildByUuid(xmlId);
     if (!element) {
@@ -458,5 +541,103 @@ const char *Toolkit::GetCString( )
         return "[unspecified]";
     }
 }
+    
+bool Toolkit::Drag( std::string elementId, int x, int y )
+{
+    if ( !m_doc.GetDrawingPage() ) return false;
+    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
+    if ( dynamic_cast<Note*>(element) ) {
+        Note *note = dynamic_cast<Note*>(element);
+        Layer *layer = dynamic_cast<Layer*>(note->GetFirstParent(&typeid(Layer)));
+        if ( !layer ) return false;
+        int oct;
+        data_PITCHNAME pname = (data_PITCHNAME)m_view.CalculatePitchCode( layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct  );
+        note->SetPname(pname);
+        note->SetOct(oct);
+        return true;
+    }
+    return false;
+}
+    
+bool Toolkit::Insert( std::string elementType, std::string startid, std::string endid )
+{
+    LogMessage("Insert!");
+    if ( !m_doc.GetDrawingPage() ) return false;
+    Object *start = m_doc.GetDrawingPage()->FindChildByUuid(startid);
+    Object *end = m_doc.GetDrawingPage()->FindChildByUuid(endid);
+    // Check that start and end element exists
+    if ( !start || !end ) {
+        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str() );
+        return false;
+    }
+    // Check that it is a LayerElement
+    if ( !dynamic_cast<LayerElement*>(start) ) {
+        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str() );
+        return false;
+    }
+    if ( !dynamic_cast<LayerElement*>(end) ) {
+        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str() );
+        return false;
+    }
+    
+    Measure *measure = dynamic_cast<Measure*>(start->GetFirstParent(&typeid(Measure)));
+    assert( measure );
+    if (elementType == "slur" ) {
+        Slur *slur = new Slur();
+        slur->SetStartid( startid );
+        slur->SetEndid( endid );
+        measure->AddMeasureElement(slur);
+        m_doc.PrepareDrawing();
+        return true;
+    }
+    return false;
+}
 
+bool Toolkit::Set( std::string elementId, std::string attrType, std::string attrValue )
+{
+    if ( !m_doc.GetDrawingPage() ) return false;
+    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
+    if ( Att::SetCmn(element, attrType, attrValue )) return true;
+    if ( Att::SetMensural(element, attrType, attrValue )) return true;
+    if ( Att::SetPagebased(element, attrType, attrValue )) return true;
+    if ( Att::SetShared(element, attrType, attrValue )) return true;
+    return false;
+}
+    
+#ifdef USE_EMSCRIPTEN
+bool Toolkit::ParseDragAction( jsonxx::Object param, std::string *elementId, int *x, int *y )
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::Number>("x")) return false;
+    (*x) = param.get<jsonxx::Number>("x");
+    if (!param.has<jsonxx::Number>("y")) return false;
+    (*y) = param.get<jsonxx::Number>("y");
+    return true;
+}
+    
+bool Toolkit::ParseInsertAction( jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid )
+{
+    if (!param.has<jsonxx::String>("elementType")) return false;
+    (*elementType) = param.get<jsonxx::String>("elementType");
+    if (!param.has<jsonxx::String>("startid")) return false;
+    (*startid) = param.get<jsonxx::String>("startid");
+    if (!param.has<jsonxx::String>("endid")) return false;
+    (*endid) = param.get<jsonxx::String>("endid");
+    return true;
+}
+    
+bool Toolkit::ParseSetAction( jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue )
+{
+    if (!param.has<jsonxx::String>("elementId")) return false;
+    (*elementId) = param.get<jsonxx::String>("elementId");
+    if (!param.has<jsonxx::String>("attrType")) return false;
+    (*attrType) = param.get<jsonxx::String>("attrType");
+    if (!param.has<jsonxx::String>("attrValue")) return false;
+    (*attrValue) = param.get<jsonxx::String>("attrValue");
+    return true;
+}
+#endif
+
+    
 } //namespace vrv

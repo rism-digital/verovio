@@ -30,20 +30,44 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     AttTiepresent()
 {
     Reset();
+    m_drawingStemDir = STEMDIRECTION_NONE;
+    m_ledgerLines[0][0] = 0;
+    m_ledgerLines[0][1] = 0;
+    m_ledgerLines[1][0] = 0;
+    m_ledgerLines[1][1] = 0;
 }
 
 Chord::~Chord()
 {
+    ClearClusters();
 }
 
 void Chord::Reset()
 {
+    ClearClusters();
     DocObject::Reset();
     DurationInterface::Reset();
     ResetCommon();
     ResetStemmed();
     ResetColoration();
     ResetTiepresent();
+}
+    
+void Chord::ClearClusters()
+{
+    std::list<ChordCluster*>::iterator iter;
+    for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter)
+    {
+        ChordCluster *cluster = dynamic_cast<ChordCluster*>(*iter);
+        for (std::vector<Note*>::iterator clIter = cluster->begin(); clIter != cluster->end(); ++clIter)
+        {
+            Note *note = dynamic_cast<Note*>(*clIter);
+            note->m_cluster = NULL;
+            note->m_clusterPosition = 0;
+        }
+        delete *iter;
+    }
+    m_clusters.clear();
 }
     
 void Chord::AddLayerElement(vrv::LayerElement *element)
@@ -60,7 +84,7 @@ bool compare_pitch (Object *first, Object *second)
     Note *n2 = dynamic_cast<Note*>(second);
     return ( n1->GetDiatonicPitch() < n2->GetDiatonicPitch() );
 }
-
+    
 void Chord::FilterList()
 {
     // Retain only note children of chords
@@ -76,7 +100,16 @@ void Chord::FilterList()
         else if ( !currentElement->HasDurationInterface() )
         {
             iter = childList->erase( iter );
-        } else {
+        }
+        else /*if ( dynamic_cast<EditorialElement*>(currentElement))
+        {
+            Object* object = currentElement->GetFirstChild(&typeid(Note));
+            if (dynamic_cast<Note*>(object))
+            {
+                iter++;
+            }
+        }
+        else */{
             Note *n = dynamic_cast<Note*>(currentElement);
             
             if (n) {
@@ -92,9 +125,11 @@ void Chord::FilterList()
     
     iter = childList->begin();
     
+    this->ClearClusters();
+    
     Note *curNote, *lastNote = dynamic_cast<Note*>(*iter);
-    lastNote->m_flippedNotehead = false;
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
+    ChordCluster* curCluster = NULL;
     
     iter++;
     
@@ -103,10 +138,17 @@ void Chord::FilterList()
         curPitch = curNote->GetDiatonicPitch();
         
         if (curPitch - lastPitch == 1) {
-            curNote->m_flippedNotehead = !lastNote->m_flippedNotehead;
-        }
-        else {
-            curNote->m_flippedNotehead = false;
+            if(!lastNote->m_cluster)
+            {
+                curCluster = new ChordCluster();
+                m_clusters.push_back(curCluster);
+                curCluster->push_back(lastNote);
+                lastNote->m_cluster = curCluster;
+                lastNote->m_clusterPosition = (int)curCluster->size();
+            }
+            curCluster->push_back(curNote);
+            curNote->m_cluster = curCluster;
+            curNote->m_clusterPosition = (int)curCluster->size();
         }
         
         lastNote = curNote;
@@ -114,6 +156,19 @@ void Chord::FilterList()
         
         iter++;
     }
+}
+
+ListOfObjects Chord::GenerateAccidList()
+{
+    ListOfObjects accidList;
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Note *note = dynamic_cast<Note*>(*it);
+        if (note->HasAccid()) {
+            accidList.push_back(*it);
+        }
+    }
+    return accidList;
 }
     
 void Chord::GetYExtremes(int *yMax, int *yMin)

@@ -51,7 +51,7 @@ void Staff::Reset()
     m_yAbs = VRV_UNSET;
     m_drawingY = 0;
     m_staffAlignment = NULL;
-    m_currentSyls.clear();
+    m_timeSpanningElements.clear();
 }
 
 void Staff::AddLayer( Layer *layer )
@@ -170,10 +170,10 @@ int Staff::FillStaffCurrentLyrics( ArrayPtrVoid params )
     
     if ((*currentSyl)) {
         // We have a running syl started in a previous measure
-        this->m_currentSyls.push_back((*currentSyl));
-        if ((*currentSyl)->m_drawingLastNote) {
+        this->m_timeSpanningElements.push_back((*currentSyl));
+        if ((*currentSyl)->GetEnd()) {
             // Look if the syl ends in this measure - if not, add it
-            if ((*currentSyl)->m_drawingLastNote->GetFirstParent( &typeid(Staff) ) == this ) {
+            if ((*currentSyl)->GetEnd()->GetFirstParent( &typeid(Staff) ) == this ) {
                 (*currentSyl) = NULL;
             }
         }
@@ -181,5 +181,12 @@ int Staff::FillStaffCurrentLyrics( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int Staff::ResetDarwing( ArrayPtrVoid params )
+{
+    // Pass it to the pseudo functor of the interface
+    this->m_timeSpanningElements.clear();
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv

@@ -72,6 +72,7 @@ void Doc::Reset( DocType type )
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
     m_currentScoreDefDone = false;
+    m_drawingPreparationDone = false;
     
     m_scoreDef.Reset();
     
@@ -93,6 +94,11 @@ void Doc::Refresh()
 void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
+    
+    if (m_drawingPreparationDone) {
+        Functor resetDrawing( &Object::ResetDarwing );
+        this->Process( &resetDrawing, params );
+    }
     
     // Try to match all spanning elements (slur, tie, etc) by processing backward
     std::vector<DocObject*> timeSpanningElements;
@@ -178,21 +184,7 @@ void Doc::PrepareDrawing()
         }
     }
     
-    // Once <slur> , <ties> and @ties are matched, we need to set them as running TimeSpanningInterface to each
-    // staff they are extended. This does not need to be done staff by staff because we can just check the
-    // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
-    params.clear();
-    timeSpanningElements.clear();
-    params.push_back( &timeSpanningElements );
-    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
-    this->Process( &fillStaffCurrentTimeSpanning, params );
-    
-    // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if ( !timeSpanningElements.empty() ) {
-        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
-    }
-    
-    // Same for the lyrics, but Verse by Verse - Syl should be made TimeSpanningInterfade elements
+    // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     Syl *currentSyl;
     Note *lastNote;
     Note *lastButOneNote;
@@ -221,19 +213,22 @@ void Doc::PrepareDrawing()
                 Functor prepareLyrics( &Object::PrepareLyrics );
                 Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
                 this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
-                
-                // The second pass set the current lyric for all staves that have a lyric
-                // started in a previous measure and that will need to be drawing from the
-                // Staff Object. This fills the Staff::m_currentSyls list
-                // This could actually be move to FillStaffCurrentTimeSpanning which should be done at
-                // the very end once we have made Syl TimeSpanningInterface elements
-                currentSyl = NULL;
-                paramsLyrics.clear();
-                paramsLyrics.push_back( &currentSyl );
-                Functor fillStaffCurrentLyrics( &Object::FillStaffCurrentLyrics );
-                this->Process( &fillStaffCurrentLyrics, paramsLyrics, NULL, &filters );
             }
         }
+    }
+    
+    // Once <slur> , <ties> and @ties are matched but also syl connectors, we need to set them as running TimeSpanningInterface
+    // to each staff they are extended. This does not need to be done staff by staff because we can just check the
+    // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
+    params.clear();
+    timeSpanningElements.clear();
+    params.push_back( &timeSpanningElements );
+    Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
+    this->Process( &fillStaffCurrentTimeSpanning, params );
+    
+    // Something must be wrong in the encoding because a TimeSpanningInterface was left open
+    if ( !timeSpanningElements.empty() ) {
+        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
     }
     
     /*
@@ -263,6 +258,8 @@ void Doc::PrepareDrawing()
     */
     
     //LogElapsedTimeEnd ( "Preparing drawing" );
+    
+    m_drawingPreparationDone = true;
 }
     
 void Doc::SetCurrentScoreDef( bool force )
@@ -602,18 +599,6 @@ int Doc::GetAdjustedDrawingPageWidth()
     int contentWidth = m_drawingPage->GetContentWidth();
     return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;;
 }
-
-int Doc::Save( FileOutputStream *output )
-{
-    ArrayPtrVoid params;
-	params.push_back( output );
-
-    Functor save( &Object::Save );
-    Functor saveEnd( &Object::SaveEnd );
-    this->Process( &save, params, &saveEnd );
-    
-    return true;
-}
     
 //----------------------------------------------------------------------------
 // Doc functors methods
@@ -627,7 +612,7 @@ int Doc::PrepareLyricsEnd( ArrayPtrVoid params )
     Note **lastNote = static_cast<Note**>(params[1]);
     
     if ( (*currentSyl) && (*lastNote) ) {
-        (*currentSyl)->m_drawingLastNote = (*lastNote);
+        (*currentSyl)->SetEnd(*lastNote);
     }
     
     return FUNCTOR_STOP;

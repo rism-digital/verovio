@@ -11,6 +11,7 @@
 
 #include "atts_shared.h"
 #include "layerelement.h"
+#include "timeinterface.h"
 
 namespace vrv {
     
@@ -20,7 +21,13 @@ class Note;
 // Syl
 //----------------------------------------------------------------------------
 
-class Syl: public LayerElement,
+/**
+ * Syl is a TimeSpanningInterface for managing syllable connectors. This means
+ * that TimeSpanningInterface attributes will not be read from the MEI but
+ * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
+ */
+    
+class Syl: public LayerElement, public TimeSpanningInterface,
     public AttTypography,
     public AttSylLog
 {
@@ -36,11 +43,6 @@ public:
     virtual std::string GetClassName( ) { return "Syl"; };
     ///@}
     
-    /**
-     * Add syl to a syl.
-     */
-    void AddSyl(Syl *syl);
-    
     //----------//
     // Functors //
     //----------//
@@ -53,20 +55,18 @@ public:
     virtual int PrepareLyrics( ArrayPtrVoid params );
     
     /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params );
     
 private:
     
 public:
-    /** 
-     * The first and last note of the syl to be used when we have @wordpos and @con 
-     * The first note is usually the parent.
-     */
-    Note *m_drawingFirstNote, *m_drawingLastNote;
     /**
      * The verse number with multiple verses
      * Value is 1 by default, set in PrepareLyrics
