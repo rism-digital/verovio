@@ -255,8 +255,9 @@ public:
     int m_drawingLedgerLine[2][3];
     /** Brevis width for normal and small staff */
     int m_drawingBrevisWidth[2];
-    /** Accident width for normal and small staff and normal and grace size */
+    /** Accident width/height for normal and small staff and normal and grace size */
     int m_drawingAccidWidth[2][2];
+    int m_drawingAccidHeight[2][2];
     /** Current music font for normal and small staff and normal and grace size */
     FontInfo m_drawingSmuflFonts[2][2];
     /** Current lyric font for normal and small staff and normal and grace size */

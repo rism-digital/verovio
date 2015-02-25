@@ -82,7 +82,7 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     }
     
     if (dynamic_cast<Accid*>(element)) {
-        DrawAccid(dc, element, layer, staff, measure, NULL);
+        DrawAccid(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Barline*>(element)) {
         DrawBarline(dc, element, layer, staff, measure);
@@ -303,11 +303,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         if (note->m_drawingStemDir == STEMDIRECTION_down) {
             //stem down/even cluster = noteheads start on left (incorrect side)
             if (note->m_cluster->size() % 2 == 0) {
-                flippedNotehead = (note->m_clusterPosition % 2 == 0);
+                flippedNotehead = (note->m_clusterPosition % 2 != 0);
             }
             //else they start on normal side
             else {
-                flippedNotehead = (note->m_clusterPosition % 2 != 0);
+                flippedNotehead = (note->m_clusterPosition % 2 == 0);
             }
             
             //if stem goes down, move ledger start to the left and expand it a full radius
@@ -318,7 +318,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         else {
             //flipped noteheads start on normal side no matter what
-            flippedNotehead = (note->m_clusterPosition % 2 != 0);
+            flippedNotehead = (note->m_clusterPosition % 2 == 0);
             
             //if stem goes up, move ledger start to the right and expand it a full radius
             if(!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
@@ -328,15 +328,15 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         
         //positions notehead
-        if (flippedNotehead) {
+        if (!flippedNotehead) {
             xNote = xStem - radius;
         }
         else {
             if (note->m_drawingStemDir == STEMDIRECTION_up) {
-                xNote = xStem + radius;
+                xNote = xStem + radius - m_doc->m_style->m_stemWidth;
             }
             else if (note->m_drawingStemDir == STEMDIRECTION_down) {
-                xNote = xStem - radius * 3;
+                xNote = xStem - radius * 3 + m_doc->m_style->m_stemWidth;
             }
             else {
                 xNote = xStem - radius;
@@ -398,7 +398,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
  
         //if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
         if (inChord) {
-            inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = std::max(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
+            inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = ledgermax(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
         }
         //we do want to go ahead and draw if it's not in a chord
         else {
@@ -420,7 +420,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         accid->SetDrawingY( noteY );
         
         //postpone drawing the accidental until later if it's in a chord
-        if (!inChord) DrawAccid( dc, accid, layer, staff, measure, NULL ); // ax2
+        if (!inChord) DrawAccid( dc, accid, layer, staff, measure ); // ax2
 	}
 	
     if (note->GetDots() && !inChord) {
@@ -1106,6 +1106,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     /************ Dots ************/
     
+    chord->m_dots.clear();
+    
     if (chord->GetDots()) {
         int dots = chord->GetDots();
         int dotsX;
@@ -1189,8 +1191,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
         
         //same, except with an extra check that we're not doing the same note twice
-        if (noteFwd != noteBkwd && noteFwd->HasAccid())
-        {
+        if (noteFwd != noteBkwd && noteFwd->HasAccid()) {
             DrawAccid(dc, &noteFwd->m_accid, layer, staff, measure, prevAccid);
             prevAccid = &noteFwd->m_accid;
         }
