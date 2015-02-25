@@ -914,6 +914,13 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
         return;
     }
     
+    Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent(&typeid(Layer)));
+    Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent(&typeid(Layer)));
+    
+    if ( layer1->GetN() != layer2->GetN() ) {
+        LogWarning("Ties between different layers may not be fully supported.");
+    }
+    
     //the normal case
     if ( spanningType ==  SPANNING_START_END ) {
         assert( note1 && note2 );
@@ -947,7 +954,11 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     
     assert( dynamic_cast<Note*>(note1));
-    if (noteStemDir == STEMDIRECTION_up) {
+    //layer direction trumps note direction
+    if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
+        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+    }
+    else if (noteStemDir == STEMDIRECTION_up) {
         up = false;
     }
     else if (noteStemDir == STEMDIRECTION_NONE) {
@@ -973,6 +984,7 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     dc->DeactivateGraphic();
     DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
     dc->ReactivateGraphic();
+
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
     else dc->EndGraphic(element, this);
 }
@@ -1111,7 +1123,7 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
             Beam *beam = dynamic_cast<Beam*>(element);
             dc->ResumeGraphic(beam, beam->GetUuid());
-            DrawBeamPostponed( dc, layer, beam, staff );
+            DrawBeamPostponed( dc, layer, beam, staff, measure );
             dc->EndResumedGraphic(beam, this);
         }
         else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {

@@ -21,6 +21,7 @@ namespace vrv {
     
     class Object;
     class AttComparison;
+    class Note;
     
     typedef std::vector<Object*> ArrayOfObjects;
     
@@ -29,6 +30,8 @@ namespace vrv {
     typedef std::vector<void*> ArrayPtrVoid;
     
     typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+    
+    typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Global defines
