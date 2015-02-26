@@ -125,6 +125,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_beam.cpp \
 	$VEROVIO_ROOT/src/view_element.cpp \
 	$VEROVIO_ROOT/src/view_graph.cpp \
+	$VEROVIO_ROOT/src/view_mensural.cpp \
 	$VEROVIO_ROOT/src/view_page.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/rest.cpp \

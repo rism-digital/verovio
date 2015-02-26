@@ -233,6 +233,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
     Note *note = dynamic_cast<Note*>(element);
+    
+    if (note->IsMensural()){
+        DrawMensuralNote(dc, element, layer, staff, measure);
+        return;
+    }
+    
     Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;
@@ -423,16 +429,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         if (!inChord) DrawAccid( dc, accid, layer, staff, measure, NULL ); // ax2
 	}
 	
-    if (0) {
-	}
-	else {
-        if (note->GetActualDur() < DUR_2 || (note->GetActualDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
-			x2 = xn + m_doc->m_drawingUnit[staffSize]*7/2;
-		else
-			x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
     if (note->GetDots() && !inChord) {
         int xDot;
-        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+        if (note->GetActualDur() < DUR_2 || (note->GetActualDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
             xDot = xStem + m_doc->m_drawingUnit[staffSize]*7/2;
         else
             xDot = xStem + m_doc->m_drawingUnit[staffSize]*5/2;
