@@ -1545,6 +1545,72 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->EndGraphic(element, this );
     
 }
+    
+bool View::CalculateAccidX(Staff *staff, Accid *prevAccid, Accid *nextAccid)
+{
+    //keep the original X position to compare at the end
+    int origX = nextAccid->GetDrawingX();
+    int newX = nextAccid->GetDrawingX();
+
+    //this gets the interval between the last two notes; if interval = 6, there is a 6th between the notes
+    int interval = ((prevAccid->GetDrawingY() - nextAccid->GetDrawingY()) / m_doc->m_drawingUnit[staff->staffSize]) + 1;
+    
+    //what types of accidentals they are; as of now, only f/s/n are supported
+    int newType = nextAccid->GetAccid();
+    int prevType = prevAccid->GetAccid();
+    
+    //possible spacings
+    int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
+    int doubleUnit = fullUnit * 2;
+    int halfUnit = fullUnit / 2;
+    int oneAndAHalfUnit = halfUnit * 3;
+    int nudge = fullUnit / 4; //for when we need just a little difference
+    
+    if (interval > 0)
+    {
+        //flats are unique because they don't go down as low
+        if (prevType == ACCIDENTAL_EXPLICIT_f) {
+            if (interval >= 6) {}//newX -= nudge;
+            else if (interval == 5) {
+                //flat lines up with sharp at fullUnit, we want a bit more
+                if (newType == ACCIDENTAL_EXPLICIT_s) newX -= oneAndAHalfUnit;
+                else newX -= fullUnit;
+            }
+            else {
+                //clearance on top right of a flat means it should be moved in a bit
+                if (interval == 4 && newType == ACCIDENTAL_EXPLICIT_f) newX -= oneAndAHalfUnit;
+                else newX -= doubleUnit;
+            }
+        }
+        else {
+            if (interval >= 7) {}//newX -= nudge;
+            else if (interval == 6) {
+                //sharp/nat on top of a sharp can never be a full unit, otherwise the opposite lines line up
+                if (newType == ACCIDENTAL_EXPLICIT_s) newX = newX - fullUnit + nudge;
+                else newX -= fullUnit;
+            }
+            else if (interval == 5) {
+                //clearance on top right of a flat means it should be moved in a bit
+                if (newType == ACCIDENTAL_EXPLICIT_f) newX -= fullUnit;
+                else newX -= oneAndAHalfUnit;
+            }
+            else newX -= doubleUnit;
+        }
+    }
+    else {
+        interval = -interval;
+        if (interval >= 7) {}//newX -= nudge;
+        else newX -= doubleUnit;
+    }
+    
+    if (origX == newX) {
+        return false;
+    }
+    else {
+        nextAccid->SetDrawingX(newX);
+        return true;
+    }
+}
 
 void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )
 {
@@ -1561,58 +1627,10 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
     }
     
-    int x, y;
-    x = accid->GetDrawingX();
-    if (prevAccid != NULL) {
-        int curY = accid->GetDrawingY();
-        int prevY = prevAccid->GetDrawingY();
-        int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
-        int doubleUnit = fullUnit * 2;
-        int halfUnit = fullUnit / 2;
-        int oneAndAHalfUnit = halfUnit * 3;
-        int nudge = fullUnit / 4; //for when we need just a little difference
-        
-        //this gets the interval between the last two notes; it was a 6th if interval = 6
-        int interval = ((prevY - curY) / m_doc->m_drawingUnit[staff->staffSize]) + 1;
-        
-        if (interval > 0)
-        {
-            //flats are unique because they don't go down as low
-            if (prevAccid->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
-                if (interval >= 6) x -= nudge;
-                else if (interval == 5) {
-                    //flat lines up with sharp at fullUnit, we want a bit more
-                    if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x -= oneAndAHalfUnit;
-                    else x -= fullUnit;
-                }
-                else {
-                    //clearance on top right of a flat means it should be moved in a bit
-                    if (interval == 4 && accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= oneAndAHalfUnit;
-                    else x -= doubleUnit;
-                }
-            }
-            else {
-                if (interval >= 7) x -= nudge;
-                else if (interval == 6) {
-                    //sharp/nat on top of a sharp can never be a full unit, otherwise the opposite lines line up
-                    if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_s) x = x - fullUnit + nudge;
-                    else x -= fullUnit;
-                }
-                else if (interval == 5) {
-                    //clearance on top right of a flat means it should be moved in a bit
-                    if (accid->GetAccid() == ACCIDENTAL_EXPLICIT_f) x -= fullUnit;
-                    else x -= oneAndAHalfUnit;
-                }
-                else x -= doubleUnit;
-            }
-        }
-        else {
-            interval = -interval;
-            if (interval >= 7) x -= nudge;
-            else x -= doubleUnit;
-        }
-    }
-    y = accid->GetDrawingY();
+    //Calculate the offset
+    if (prevAccid != NULL) CalculateAccidX(staff, prevAccid, accid);
+    int x = accid->GetDrawingX();
+    int y = accid->GetDrawingY();
     
     int symc = SMUFL_E261_accidentalNatural;
     switch (accid->GetAccid())
@@ -1649,9 +1667,6 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         case ACCIDENTAL_EXPLICIT_fu : symc= SMUFL_E267_accidentalNaturalFlat; break; // Same
         default : break;
     }
-    
-    accid->SetDrawingX(x);
-    accid->SetDrawingY(y);
     
     DrawSmuflCode ( dc, x, y, symc, staff->staffSize, accid->m_cueSize );
 
