@@ -954,7 +954,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
+        layer->SetDrawingAndCurrentValues( currentScoreDef, (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
     

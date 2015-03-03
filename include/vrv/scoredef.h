@@ -326,7 +326,7 @@ public:
     bool DrawKeySig() const { return m_drawKeySig; };
     void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
     bool DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawClef = drawMensur; };
+    void SetDrawMensur( bool drawMensur ) { m_drawMensur = drawMensur; };
     bool DrawMeterSig() const { return m_drawMeterSig; };
     void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
     ///@}
