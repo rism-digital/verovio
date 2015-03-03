@@ -45,18 +45,22 @@ bool AttChannelized::ReadChannelized(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("midi.channel")) {
         this->SetMidiChannel(StrToStr(element.attribute("midi.channel").value()));
+        element.remove_attribute("midi.channel");
         hasAttribute = true;
     }
     if (element.attribute("midi.duty")) {
         this->SetMidiDuty(StrToStr(element.attribute("midi.duty").value()));
+        element.remove_attribute("midi.duty");
         hasAttribute = true;
     }
     if (element.attribute("midi.port")) {
         this->SetMidiPort(StrToStr(element.attribute("midi.port").value()));
+        element.remove_attribute("midi.port");
         hasAttribute = true;
     }
     if (element.attribute("midi.track")) {
         this->SetMidiTrack(StrToInt(element.attribute("midi.track").value()));
+        element.remove_attribute("midi.track");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -129,18 +133,22 @@ bool AttMidiinstrument::ReadMidiinstrument(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("midi.instrnum")) {
         this->SetMidiInstrnum(StrToStr(element.attribute("midi.instrnum").value()));
+        element.remove_attribute("midi.instrnum");
         hasAttribute = true;
     }
     if (element.attribute("midi.instrname")) {
         this->SetMidiInstrname(StrToStr(element.attribute("midi.instrname").value()));
+        element.remove_attribute("midi.instrname");
         hasAttribute = true;
     }
     if (element.attribute("midi.pan")) {
         this->SetMidiPan(StrToStr(element.attribute("midi.pan").value()));
+        element.remove_attribute("midi.pan");
         hasAttribute = true;
     }
     if (element.attribute("midi.volume")) {
         this->SetMidiVolume(StrToStr(element.attribute("midi.volume").value()));
+        element.remove_attribute("midi.volume");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -210,6 +218,7 @@ bool AttMidinumber::ReadMidinumber(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
+        element.remove_attribute("num");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -252,6 +261,7 @@ bool AttMiditempo::ReadMiditempo(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("midi.tempo")) {
         this->SetMidiTempo(StrToStr(element.attribute("midi.tempo").value()));
+        element.remove_attribute("midi.tempo");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -294,6 +304,7 @@ bool AttMidivalue::ReadMidivalue(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("val")) {
         this->SetVal(StrToStr(element.attribute("val").value()));
+        element.remove_attribute("val");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -336,6 +347,7 @@ bool AttTimebase::ReadTimebase(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("ppq")) {
         this->SetPpq(StrToInt(element.attribute("ppq").value()));
+        element.remove_attribute("ppq");
         hasAttribute = true;
     }
     return hasAttribute;

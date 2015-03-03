@@ -19,19 +19,19 @@
 
 namespace vrv {
     
-    class Object;
-    class AttComparison;
-    class Note;
-    
-    typedef std::vector<Object*> ArrayOfObjects;
-    
-    typedef std::list<Object*> ListOfObjects;
-    
-    typedef std::vector<void*> ArrayPtrVoid;
-    
-    typedef std::vector<AttComparison*> ArrayOfAttComparisons;
-    
-    typedef std::vector<Note*> ChordCluster;
+class Object;
+class AttComparison;
+class Note;
+
+typedef std::vector<Object*> ArrayOfObjects;
+
+typedef std::list<Object*> ListOfObjects;
+
+typedef std::vector<void*> ArrayPtrVoid;
+
+typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+
+typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Global defines

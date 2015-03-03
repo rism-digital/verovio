@@ -42,6 +42,7 @@ bool AttFacsimile::ReadFacsimile(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("facs")) {
         this->SetFacs(StrToStr(element.attribute("facs").value()));
+        element.remove_attribute("facs");
         hasAttribute = true;
     }
     return hasAttribute;

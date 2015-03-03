@@ -638,6 +638,14 @@ void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
         element.append_attribute( "sameas" ) = object->m_sameAs.c_str();
     }
 }
+
+void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, vrv::Object *object)
+{
+    ArrayOfStrAttr::iterator iter;
+    for (iter = object->m_unsupported.begin(); iter != object->m_unsupported.end(); iter++) {
+        element.append_attribute( (*iter).first.c_str() ) = (*iter).second.c_str();
+    }
+}
     
     
 void MeiOutput::WriteText( pugi::xml_node element, Object *object )
@@ -1658,6 +1666,15 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     object->m_sameAs = element.attribute( "sameas" ).value();
 }
 
+    
+void MeiInput::ReadUnsupportedAttr( pugi::xml_node element, Object *object )
+{
+    for (pugi::xml_attribute_iterator ait = element.attributes_begin(); ait != element.attributes_end(); ++ait)
+    {
+        object->m_unsupported.push_back(std::make_pair(ait->name(), ait->value()));
+    }
+}
+    
 void MeiInput::ReadText( pugi::xml_node element, Object *object )
 {
     if (element.text()) {
@@ -1951,6 +1968,7 @@ void MeiInput::SetMeiUuid( pugi::xml_node element, Object *object )
     }
     
     object->SetUuid( element.attribute( "xml:id" ).value() );
+    element.remove_attribute("xml:id");
 }
 
 bool MeiInput::StrToBool(std::string value)
