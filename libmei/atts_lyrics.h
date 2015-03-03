@@ -60,7 +60,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Used to indicate a common, usually centered, refrain (Mup User's Guide, p.
      * 44).

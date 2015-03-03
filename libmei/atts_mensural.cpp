@@ -231,28 +231,28 @@ AttMensuralShared::~AttMensuralShared() {
 }
 
 void AttMensuralShared::ResetMensuralShared() {
-    m_modusmaior = "";
-    m_modusminor = "";
-    m_prolatio = "";
-    m_tempus = "";
+    m_modusmaior = MODUSMAIOR_NONE;
+    m_modusminor = MODUSMINOR_NONE;
+    m_prolatio = PROLATIO_NONE;
+    m_tempus = TEMPUS_NONE;
 }
 
 bool AttMensuralShared::ReadMensuralShared(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("modusmaior")) {
-        this->SetModusmaior(StrToStr(element.attribute("modusmaior").value()));
+        this->SetModusmaior(StrToModusmaior(element.attribute("modusmaior").value()));
         hasAttribute = true;
     }
     if (element.attribute("modusminor")) {
-        this->SetModusminor(StrToStr(element.attribute("modusminor").value()));
+        this->SetModusminor(StrToModusminor(element.attribute("modusminor").value()));
         hasAttribute = true;
     }
     if (element.attribute("prolatio")) {
-        this->SetProlatio(StrToStr(element.attribute("prolatio").value()));
+        this->SetProlatio(StrToProlatio(element.attribute("prolatio").value()));
         hasAttribute = true;
     }
     if (element.attribute("tempus")) {
-        this->SetTempus(StrToStr(element.attribute("tempus").value()));
+        this->SetTempus(StrToTempus(element.attribute("tempus").value()));
         hasAttribute = true;
     }
     return hasAttribute;
@@ -261,19 +261,19 @@ bool AttMensuralShared::ReadMensuralShared(  pugi::xml_node element ) {
 bool AttMensuralShared::WriteMensuralShared(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasModusmaior()) {
-        element.append_attribute("modusmaior") = StrToStr(this->GetModusmaior()).c_str();
+        element.append_attribute("modusmaior") = ModusmaiorToStr(this->GetModusmaior()).c_str();
         wroteAttribute = true;
     }
     if (this->HasModusminor()) {
-        element.append_attribute("modusminor") = StrToStr(this->GetModusminor()).c_str();
+        element.append_attribute("modusminor") = ModusminorToStr(this->GetModusminor()).c_str();
         wroteAttribute = true;
     }
     if (this->HasProlatio()) {
-        element.append_attribute("prolatio") = StrToStr(this->GetProlatio()).c_str();
+        element.append_attribute("prolatio") = ProlatioToStr(this->GetProlatio()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTempus()) {
-        element.append_attribute("tempus") = StrToStr(this->GetTempus()).c_str();
+        element.append_attribute("tempus") = TempusToStr(this->GetTempus()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -281,22 +281,22 @@ bool AttMensuralShared::WriteMensuralShared(  pugi::xml_node element ) {
 
 bool AttMensuralShared::HasModusmaior( )
 {
-    return (m_modusmaior != "");
+    return (m_modusmaior != MODUSMAIOR_NONE);
 }
 
 bool AttMensuralShared::HasModusminor( )
 {
-    return (m_modusminor != "");
+    return (m_modusminor != MODUSMINOR_NONE);
 }
 
 bool AttMensuralShared::HasProlatio( )
 {
-    return (m_prolatio != "");
+    return (m_prolatio != PROLATIO_NONE);
 }
 
 bool AttMensuralShared::HasTempus( )
 {
-    return (m_tempus != "");
+    return (m_tempus != TEMPUS_NONE);
 }
 
 
@@ -529,19 +529,19 @@ bool Att::SetMensural( Object *element, std::string attrType, std::string attrVa
     if (dynamic_cast<AttMensuralShared*>(element) ) {
         AttMensuralShared *att = dynamic_cast<AttMensuralShared*>(element);
         if (attrType == "modusmaior") {
-            att->SetModusmaior(att->StrToStr(attrValue));
+            att->SetModusmaior(att->StrToModusmaior(attrValue));
             return true;
         }
         if (attrType == "modusminor") {
-            att->SetModusminor(att->StrToStr(attrValue));
+            att->SetModusminor(att->StrToModusminor(attrValue));
             return true;
         }
         if (attrType == "prolatio") {
-            att->SetProlatio(att->StrToStr(attrValue));
+            att->SetProlatio(att->StrToProlatio(attrValue));
             return true;
         }
         if (attrType == "tempus") {
-            att->SetTempus(att->StrToStr(attrValue));
+            att->SetTempus(att->StrToTempus(attrValue));
             return true;
         }
     }
@@ -623,16 +623,16 @@ void Att::GetMensural( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttMensuralShared*>(element) ) {
         AttMensuralShared *att = dynamic_cast<AttMensuralShared*>(element);
         if (att->HasModusmaior()) {
-            attributes->push_back(std::make_pair("modusmaior", att->StrToStr(att->GetModusmaior())));
+            attributes->push_back(std::make_pair("modusmaior", att->ModusmaiorToStr(att->GetModusmaior())));
         }
         if (att->HasModusminor()) {
-            attributes->push_back(std::make_pair("modusminor", att->StrToStr(att->GetModusminor())));
+            attributes->push_back(std::make_pair("modusminor", att->ModusminorToStr(att->GetModusminor())));
         }
         if (att->HasProlatio()) {
-            attributes->push_back(std::make_pair("prolatio", att->StrToStr(att->GetProlatio())));
+            attributes->push_back(std::make_pair("prolatio", att->ProlatioToStr(att->GetProlatio())));
         }
         if (att->HasTempus()) {
-            attributes->push_back(std::make_pair("tempus", att->StrToStr(att->GetTempus())));
+            attributes->push_back(std::make_pair("tempus", att->TempusToStr(att->GetTempus())));
         }
     }
     if (dynamic_cast<AttMensuralVis*>(element) ) {

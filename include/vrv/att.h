@@ -143,6 +143,12 @@ public:
     
     std::string ModeToStr(data_MODE data);
     data_MODE StrToMode(std::string value);
+
+    std::string ModusmaiorToStr(data_MODUSMAIOR data);
+    data_MODUSMAIOR StrToModusmaior(std::string value);
+    
+    std::string ModusminorToStr(data_MODUSMINOR data);
+    data_MODUSMINOR StrToModusminor(std::string value);
     
     std::string OctaveDisToStr(data_OCTAVE_DIS data);
     data_OCTAVE_DIS StrToOctaveDis(std::string value);
@@ -156,11 +162,17 @@ public:
     std::string PlaceToStr(data_PLACE data);
     data_PLACE StrToPlace(std::string value);
     
+    std::string ProlatioToStr(data_PROLATIO data);
+    data_PROLATIO StrToProlatio(std::string value);
+    
     std::string StemDirectionToStr(data_STEMDIRECTION data);
     data_STEMDIRECTION StrToStemDirection(std::string value);
     
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
+    
+    std::string TempusToStr(data_TEMPUS data);
+    data_TEMPUS StrToTempus(std::string value);
     
     std::string TieToStr(data_TIE data);
     data_TIE StrToTie(std::string value);

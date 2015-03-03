@@ -60,7 +60,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the fret at which a string should be stopped. **/
     std::string m_tabFret;
     /** Records which string is to be played. **/
@@ -100,7 +100,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Provides a *written* pitch and octave for each open string. **/
     std::string m_tabStrings;
 

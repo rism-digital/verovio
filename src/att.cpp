@@ -576,6 +576,58 @@ data_MODE Att::StrToMode(std::string value)
     // default
     return MODE_NONE;
 }
+
+std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
+{
+    std::string value;
+    switch(data)
+    {
+        case MODUSMAIOR_2 : value = "2"; break;
+        case MODUSMAIOR_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODUSMAIOR Att::StrToModusmaior(std::string value)
+{
+    if (value == "2") return MODUSMAIOR_2;
+    else if (value == "3") return MODUSMAIOR_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return MODUSMAIOR_NONE;
+}
+
+std::string Att::ModusminorToStr(data_MODUSMINOR data)
+{
+    std::string value;
+    switch(data)
+    {
+        case MODUSMINOR_2 : value = "2"; break;
+        case MODUSMINOR_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODUSMINOR Att::StrToModusminor(std::string value)
+{
+    if (value == "2") return MODUSMINOR_2;
+    else if (value == "3") return MODUSMINOR_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return MODUSMINOR_NONE;
+}
     
 std::string Att::OctaveDisToStr( data_OCTAVE_DIS data )
 {
@@ -692,7 +744,33 @@ data_PLACE Att::StrToPlace(std::string value)
     }
     // default
     return PLACE_NONE;
-}    
+}
+
+std::string Att::ProlatioToStr(data_PROLATIO data)
+{
+    std::string value;
+    switch(data)
+    {
+        case PROLATIO_2 : value = "2"; break;
+        case PROLATIO_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_PROLATIO Att::StrToProlatio(std::string value)
+{
+    if (value == "2") return PROLATIO_2;
+    else if (value == "3") return PROLATIO_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return PROLATIO_NONE;
+}
 
 std::string Att::StemDirectionToStr(data_STEMDIRECTION data)
 {
@@ -760,6 +838,32 @@ std::string Att::TieToStr(data_TIE data)
             break;
     }
     return value;
+}
+
+std::string Att::TempusToStr(data_TEMPUS data)
+{
+    std::string value;
+    switch(data)
+    {
+        case TEMPUS_2 : value = "2"; break;
+        case TEMPUS_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_TEMPUS Att::StrToTempus(std::string value)
+{
+    if (value == "2") return TEMPUS_2;
+    else if (value == "3") return TEMPUS_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return TEMPUS_NONE;
 }
 
 data_TIE Att::StrToTie(std::string value)

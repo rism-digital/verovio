@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the location at which a string should be stopped against a fret. **/
     std::string m_fret;
 
@@ -93,7 +93,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Contains a reference to a <chordDef> element elsewhere in the document. **/
     std::string m_chordref;
 
@@ -136,7 +136,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Indicates the presence of an extension symbol, typically a dash or underscore,
      * drawn from the end of the harmonic indication to the point indicated by the dur

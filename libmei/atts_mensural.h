@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the function of the dot. **/
     std::string m_form;
 
@@ -98,7 +98,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the function of the dot. **/
     std::string m_form;
     /** Describes the rotation or reflection of the base symbol. **/
@@ -158,7 +158,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Determines if a dot is to be added to the base symbol. **/
     data_BOOLEAN m_mensurDot;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
@@ -209,36 +209,36 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetModusmaior(std::string modusmaior_) { m_modusmaior = modusmaior_; };
-    std::string GetModusmaior() const { return m_modusmaior; };    
+    void SetModusmaior(data_MODUSMAIOR modusmaior_) { m_modusmaior = modusmaior_; };
+    data_MODUSMAIOR GetModusmaior() const { return m_modusmaior; };    
     bool HasModusmaior( );
     
     //
-    void SetModusminor(std::string modusminor_) { m_modusminor = modusminor_; };
-    std::string GetModusminor() const { return m_modusminor; };    
+    void SetModusminor(data_MODUSMINOR modusminor_) { m_modusminor = modusminor_; };
+    data_MODUSMINOR GetModusminor() const { return m_modusminor; };    
     bool HasModusminor( );
     
     //
-    void SetProlatio(std::string prolatio_) { m_prolatio = prolatio_; };
-    std::string GetProlatio() const { return m_prolatio; };    
+    void SetProlatio(data_PROLATIO prolatio_) { m_prolatio = prolatio_; };
+    data_PROLATIO GetProlatio() const { return m_prolatio; };    
     bool HasProlatio( );
     
     //
-    void SetTempus(std::string tempus_) { m_tempus = tempus_; };
-    std::string GetTempus() const { return m_tempus; };    
+    void SetTempus(data_TEMPUS tempus_) { m_tempus = tempus_; };
+    data_TEMPUS GetTempus() const { return m_tempus; };    
     bool HasTempus( );
     
     ///@}
 
-private:
+protected:
     /** Describes the maxima-long relationship. **/
-    std::string m_modusmaior;
+    data_MODUSMAIOR m_modusmaior;
     /** Describes the long-breve relationship. **/
-    std::string m_modusminor;
+    data_MODUSMINOR m_modusminor;
     /** Describes the semibreve-minim relationship. **/
-    std::string m_prolatio;
+    data_PROLATIO m_prolatio;
     /** Describes the breve-semibreve relationship. **/
-    std::string m_tempus;
+    data_TEMPUS m_tempus;
 
 /* include <atttempus> */
 };
@@ -294,7 +294,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Records the color of the mensuration sign.
      * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
@@ -343,7 +343,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Indicates this element's participation in a ligature. **/
     data_LIGATURE m_lig;
 
@@ -381,7 +381,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** States how many spaces are covered by the rest. **/
     int m_spacesInt;
 

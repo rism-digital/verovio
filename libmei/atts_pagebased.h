@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Contains a reference to a surface element **/
     std::string m_surface;
 

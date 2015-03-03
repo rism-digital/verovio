@@ -60,7 +60,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the function of the dot. **/
     std::string m_form;
     /**
@@ -103,7 +103,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Indicates that this element has an attached ornament.
      * If visual information about the ornament is needed, then one of the elements
@@ -150,7 +150,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the written accidental associated with an upper neighboring note. **/
     std::string m_accidupper;
     /** Records the written accidental associated with a lower neighboring note. **/
@@ -195,7 +195,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * When the delayed attribute is set to 'true', the turn begins on the second half
      * of the beat.

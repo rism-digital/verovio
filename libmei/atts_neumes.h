@@ -60,7 +60,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the function of the dot. **/
     std::string m_form;
     /** Records the name of the neume. **/
@@ -105,7 +105,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records the function of the dot. **/
     std::string m_form;
     /** Records the name of the neume. **/

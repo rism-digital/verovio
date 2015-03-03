@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Classifies the cause for the variant reading, according to any appropriate
      * typology of possible origins.
@@ -96,7 +96,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Contains a list of one or more pointers indicating the sources which attest to a
      * given reading.

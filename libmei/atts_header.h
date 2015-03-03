@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Indicates the method employed to mark corrections and normalizations. **/
     std::string m_method;
 

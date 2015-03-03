@@ -70,7 +70,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Records a MIDI channel value. **/
     std::string m_midiChannel;
     /** Specifies the 'on' part of the duty cycle as a percentage of a note's duration. **/
@@ -129,7 +129,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** Sets the MIDI instrument number. **/
     std::string m_midiInstrnum;
     /** Provides a General MIDI label for the MIDI instrument. **/
@@ -176,7 +176,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
@@ -217,7 +217,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Contains a MIDI value, that is, the number of quarter notes per minute in the
      * range from 10 to 1000.
@@ -258,7 +258,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /** MIDI number. **/
     std::string m_val;
 
@@ -296,7 +296,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Indicates the number of pulses (sometimes referred to as ticks or divisions) per
      * quarter note.

@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Indicates the point of occurrence of this feature along a time line.
      * Its value must be the ID of a <when> element.

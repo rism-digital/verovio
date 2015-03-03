@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-private:
+protected:
     /**
      * Permits the current element to reference a facsimile image or image zone which
      * corresponds to it.
