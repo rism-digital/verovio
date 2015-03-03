@@ -257,6 +257,26 @@ enum data_MODE {
     MODE_aeolian,
     MODE_locrian
 };
+
+/**
+ * MEI data.MODUSMAIOR
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_MODUSMAIOR {
+    MODUSMAIOR_NONE = -3,
+    MODUSMAIOR_2 = 2,
+    MODUSMAIOR_3
+};
+    
+/**
+ * MEI data.MODUSMINOR
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_MODUSMINOR {
+    MODUSMINOR_NONE = -3,
+    MODUSMINOR_2 = 2,
+    MODUSMINOR_3
+};
     
 /**
  * MEI data.OCTAVE.DIS
@@ -280,6 +300,16 @@ enum data_PITCHNAME {
     PITCHNAME_g,
     PITCHNAME_a,
     PITCHNAME_b,
+};
+    
+/**
+ * MEI data.PROLATIO
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_PROLATIO {
+    PROLATIO_NONE = -3,
+    PROLATIO_2 = 2,
+    PROLATIO_3
 };
 
 /**
@@ -318,6 +348,16 @@ enum data_STEMPOSITION {
     STEMPOSITION_left,
     STEMPOSITION_right,
     STEMPOSITION_center
+};
+    
+/**
+ * MEI data.TEMPUS
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_TEMPUS {
+    TEMPUS_NONE = -3,
+    TEMPUS_2 = 2,
+    TEMPUS_3
 };
     
 /**
