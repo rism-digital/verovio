@@ -357,6 +357,11 @@ bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
     }
+    if ( scoreDef->GetMensurAttr() ) {
+        scoreDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralShared(currentNode);
+    }
+    
     
     // this needs to be fixed
     return true;
@@ -394,6 +399,10 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     if ( staffDef->GetMeterSigAttr() ) {
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
+    }
+    if ( staffDef->GetMensurAttr() ) {
+        staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        staffDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     
     return true;
@@ -529,6 +538,7 @@ void MeiOutput::WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur )
 {
     WriteLayerElement( currentNode, mensur );
     mensur->WriteDurationRatio(currentNode);
+    mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashcount(currentNode);
@@ -1029,7 +1039,7 @@ bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
         vrvScoreDef->ReplaceMeterSig( &meterSig );
     }
     MensurAttr mensur;
-    if ( mensur.ReadMensuralLog( scoreDef ) ) {
+    if ( mensur.ReadMensuralLog( scoreDef ) || mensur.ReadMensuralShared( scoreDef ) ) {
         vrvScoreDef->ReplaceMensur( &mensur );
     }
     
@@ -1129,6 +1139,10 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
         vrvStaffDef->ReplaceMeterSig( &meterSig );
+    }
+    MensurAttr mensur;
+    if ( mensur.ReadMensuralLog( staffDef ) || mensur.ReadMensuralShared( staffDef ) ) {
+        vrvStaffDef->ReplaceMensur( &mensur );
     }
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
@@ -1482,6 +1496,7 @@ bool MeiInput::ReadMeiMensur( Object *parent, pugi::xml_node mensur )
     ReadLayerElement(mensur, vrvMensur);
     
     vrvMensur->ReadDurationRatio( mensur );
+    vrvMensur->ReadMensuralShared( mensur );
     vrvMensur->ReadMensurLog( mensur );
     vrvMensur->ReadMensurVis( mensur );
     vrvMensur->ReadSlashcount( mensur );
