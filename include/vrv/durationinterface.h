@@ -14,6 +14,7 @@
 
 namespace vrv {
 
+class Mensur;
 class Object;
 
 //----------------------------------------------------------------------------
@@ -50,6 +51,11 @@ public:
      * LayerElement and DurationInterface have no inheritance link.
      */
     virtual double GetAlignementDuration( int num, int numbase );
+    
+    /**
+     * Returns the duration (in double) for the element for mensural notation
+     */
+    virtual double GetAlignementMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
     /**
      * Look if the note or rest is in a beam.

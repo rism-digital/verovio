@@ -261,7 +261,7 @@ void LayerElement::AdjustPname( int *pname, int *oct )
 	}
 }
 
-double LayerElement::GetAlignementDuration()
+double LayerElement::GetAlignementDuration( Mensur *mensur, MeterSig *meterSig )
 {
     if ( this->IsGraceNote() ) {
         return 0.0;
@@ -276,7 +276,8 @@ double LayerElement::GetAlignementDuration()
             numbase = tuplet->GetNumbase();
         }
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
-        return duration->GetAlignementDuration( num, numbase );
+        if (duration->IsMensural()) return duration->GetAlignementMensuralDuration( num, numbase, mensur );
+        else return duration->GetAlignementDuration( num, numbase );
     }
     else {
         return 0.0;
@@ -299,9 +300,11 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner
     // param 1: the time
-    // param 2: the current scoreDef (unused)
+    // param 2: the current Mensur
+    // param 3: the current MeterSig (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
     double *time = static_cast<double*>(params[1]);
+    Mensur **currentMensur = static_cast<Mensur**>(params[2]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -361,7 +364,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     }
     
     // get the duration of the event
-    double duration = this->GetAlignementDuration();
+    double duration = this->GetAlignementDuration( *currentMensur );
     
     (*measureAligner)->SetMaxTime( (*time) + duration );
     

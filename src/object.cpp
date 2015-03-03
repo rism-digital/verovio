@@ -981,7 +981,8 @@ int Object::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time (unused)
-    // param 2: the current scoreDef (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
         
     // reset all the drawing values - this also need to be called
     // from any functor overriding this one!

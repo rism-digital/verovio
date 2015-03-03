@@ -56,12 +56,20 @@ double DurationInterface::GetAlignementDuration( int num, int numbase )
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
     
+    if (this->HasNum()) num *=this->GetNum();
+    if (this->HasNumbase()) numbase *=this->GetNumbase();
+    
     double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
     if ( GetDots() > 0 ) {
         duration = 2 * duration - (duration / pow(2, GetDots()));
     }
     //LogDebug("Duration %d; Dot %d; Alignement %f", note_dur, GetDots(), duration );
     return duration;
+}
+    
+double DurationInterface::GetAlignementMensuralDuration( int num, int numbase, Mensur *currentMensur )
+{
+    return 512;
 }
 
 bool DurationInterface::IsInBeam( Object *noteOrRest )
