@@ -35,10 +35,14 @@ Mensur::Mensur( MensurAttr *mensurAttr ):
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
+    //
     this->SetModusmaior(mensurAttr->GetModusmaior());
     this->SetModusminor(mensurAttr->GetModusminor());
     this->SetProlatio(mensurAttr->GetProlatio());
     this->SetTempus(mensurAttr->GetTempus());
+    //
+    this->SetNum(mensurAttr->GetProportNum());
+    this->SetNumbase(mensurAttr->GetProportNumbase());
     // It is unclear why we don't have mensur.num and mensur.numbase attributes
     // in att.mensura.default.log - ask Perry...
 }

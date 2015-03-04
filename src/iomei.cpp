@@ -351,15 +351,12 @@ bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef
         scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
     }
     if ( scoreDef->GetMensurAttr() ) {
-        dynamic_cast<AttMensuralLog*>(scoreDef)->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     if ( scoreDef->GetMeterSigAttr() ) {
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
-    }
-    if ( scoreDef->GetMensurAttr() ) {
-        scoreDef->GetMensurAttr()->WriteMensuralLog(currentNode);
-        scoreDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     
     
@@ -395,14 +392,11 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     }
     if ( staffDef->GetMensurAttr() ) {
         staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        staffDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     if ( staffDef->GetMeterSigAttr() ) {
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
-    }
-    if ( staffDef->GetMensurAttr() ) {
-        staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
-        staffDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     
     return true;
@@ -1036,10 +1030,12 @@ bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
+        meterSig.ReadMeterSigDefaultVis( scoreDef );  // not great, but we need to do it in case we have both and the first one succeeded
         vrvScoreDef->ReplaceMeterSig( &meterSig );
     }
     MensurAttr mensur;
     if ( mensur.ReadMensuralLog( scoreDef ) || mensur.ReadMensuralShared( scoreDef ) ) {
+        mensur.ReadMensuralShared( scoreDef ); // not great, but we need to do it in case we have both and the first one succeeded
         vrvScoreDef->ReplaceMensur( &mensur );
     }
     
@@ -1138,10 +1134,12 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
+        meterSig.ReadMeterSigDefaultVis( staffDef );  // not great, but we need to do it in case we have both and the first one succeeded
         vrvStaffDef->ReplaceMeterSig( &meterSig );
     }
     MensurAttr mensur;
     if ( mensur.ReadMensuralLog( staffDef ) || mensur.ReadMensuralShared( staffDef ) ) {
+        mensur.ReadMensuralShared( staffDef ); // not great, but we need to do it in case we have both and the first one succeeded
         vrvStaffDef->ReplaceMensur( &mensur );
     }
     

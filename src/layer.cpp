@@ -433,6 +433,8 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     (*currentMensur) = m_currentMensur;
     (*currentMeterSig) = m_currentMeterSig;
     
+    //LogDebug(" ----- " );
+    
     if ( m_drawClef && m_currentClef ) {
         m_currentClef->AlignHorizontally( params );
     }

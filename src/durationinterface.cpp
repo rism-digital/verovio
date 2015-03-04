@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "mensur.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -69,7 +70,28 @@ double DurationInterface::GetAlignmentDuration( int num, int numbase )
     
 double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur )
 {
-    return 512;
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    
+    if (this->HasNum()) num *=this->GetNum();
+    if (this->HasNumbase()) numbase *=this->GetNumbase();
+    if (currentMensur->HasNum()) num *=currentMensur->GetNum();
+    if (currentMensur->HasNumbase()) numbase *=currentMensur->GetNumbase();
+    
+    double ratio = 0.0;
+    double duration = (double)DUR_MENSURAL_REF;
+    switch (note_dur) {
+        case DUR_MX : duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior()); break;
+        case DUR_LG : duration *= (double)abs(currentMensur->GetModusminor()); break;
+        case DUR_BR : break;
+        case DUR_1 : duration /= (double)abs(currentMensur->GetTempus()); break;
+        default:
+            ratio = pow(2.0, (double)(note_dur - DUR_2));
+            duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
+            break;
+    }
+    duration *= (double)numbase / (double)num;
+    //LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio );
+    return duration;
 }
 
 bool DurationInterface::IsInBeam( Object *noteOrRest )

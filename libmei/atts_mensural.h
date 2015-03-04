@@ -147,13 +147,13 @@ public:
     bool HasMensurSlash( );
     
     //
-    void SetProportNum(int proportNumInt_) { m_proportNumInt = proportNumInt_; };
-    int GetProportNum() const { return m_proportNumInt; };    
+    void SetProportNum(int proportNum_) { m_proportNum = proportNum_; };
+    int GetProportNum() const { return m_proportNum; };    
     bool HasProportNum( );
     
     //
-    void SetProportNumbase(int proportNumbaseInt_) { m_proportNumbaseInt = proportNumbaseInt_; };
-    int GetProportNumbase() const { return m_proportNumbaseInt; };    
+    void SetProportNumbase(int proportNumbase_) { m_proportNumbase = proportNumbase_; };
+    int GetProportNumbase() const { return m_proportNumbase; };    
     bool HasProportNumbase( );
     
     ///@}
@@ -173,13 +173,13 @@ protected:
      * ratio, e.g., 1:3.
      * Proport.num is for the first value in the ratio.
      **/
-    int m_proportNumInt;
+    int m_proportNum;
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
      * ratio, e.g., 1:3.
      * Proport.numbase is for the second value in the ratio.
      **/
-    int m_proportNumbaseInt;
+    int m_proportNumbase;
 
 /* include <attproport.numbase> */
 };

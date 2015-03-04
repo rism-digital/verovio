@@ -42,6 +42,8 @@ typedef std::vector<std::pair<std::string, std::string> >  ArrayOfStrAttr;
 // mensural duration
 #define DUR_MENSURAL_OFFSET (2 * DUR_MAX)
 #define DUR_MENSURAL_MASK (2 * DUR_MAX -1)
+// used for mensural alignment
+#define DUR_MENSURAL_REF 1728
     
 //----------------------------------------------------------------------------
 // MEI data defines

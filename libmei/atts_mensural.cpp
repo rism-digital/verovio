@@ -136,8 +136,8 @@ void AttMensuralLog::ResetMensuralLog() {
     m_mensurDot = BOOLEAN_NONE;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSlash = 0;
-    m_proportNumInt = 0;
-    m_proportNumbaseInt = 0;
+    m_proportNum = 1;
+    m_proportNumbase = 1;
 }
 
 bool AttMensuralLog::ReadMensuralLog(  pugi::xml_node element ) {
@@ -207,12 +207,12 @@ bool AttMensuralLog::HasMensurSlash( )
 
 bool AttMensuralLog::HasProportNum( )
 {
-    return (m_proportNumInt != 0);
+    return (m_proportNum != 1);
 }
 
 bool AttMensuralLog::HasProportNumbase( )
 {
-    return (m_proportNumbaseInt != 0);
+    return (m_proportNumbase != 1);
 }
 
 
@@ -517,11 +517,11 @@ bool Att::SetMensural( Object *element, std::string attrType, std::string attrVa
             att->SetMensurSlash(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "proportNumInt") {
+        if (attrType == "proportNum") {
             att->SetProportNum(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "proportNumbaseInt") {
+        if (attrType == "proportNumbase") {
             att->SetProportNumbase(att->StrToInt(attrValue));
             return true;
         }
@@ -614,10 +614,10 @@ void Att::GetMensural( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("mensurSlash", att->IntToStr(att->GetMensurSlash())));
         }
         if (att->HasProportNum()) {
-            attributes->push_back(std::make_pair("proportNumInt", att->IntToStr(att->GetProportNum())));
+            attributes->push_back(std::make_pair("proportNum", att->IntToStr(att->GetProportNum())));
         }
         if (att->HasProportNumbase()) {
-            attributes->push_back(std::make_pair("proportNumbaseInt", att->IntToStr(att->GetProportNumbase())));
+            attributes->push_back(std::make_pair("proportNumbase", att->IntToStr(att->GetProportNumbase())));
         }
     }
     if (dynamic_cast<AttMensuralShared*>(element) ) {

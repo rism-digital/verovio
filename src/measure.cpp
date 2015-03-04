@@ -18,6 +18,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -140,6 +141,8 @@ int Measure::AlignHorizontally( ArrayPtrVoid params )
     if ( m_rightBarline.GetRend() != BARRENDITION_NONE ) {
         m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
+    
+    //LogDebug("\n ***** Align measure %d", this->GetN() );
     
     assert( *measureAligner );
         
