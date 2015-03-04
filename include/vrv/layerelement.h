@@ -119,7 +119,7 @@ protected:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    virtual double GetAlignementDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL );
+    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL );
     
 private:
     

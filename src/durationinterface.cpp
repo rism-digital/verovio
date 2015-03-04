@@ -52,7 +52,7 @@ void DurationInterface::Reset()
     ResetFermatapresent();
 }
 
-double DurationInterface::GetAlignementDuration( int num, int numbase )
+double DurationInterface::GetAlignmentDuration( int num, int numbase )
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
     
@@ -67,7 +67,7 @@ double DurationInterface::GetAlignementDuration( int num, int numbase )
     return duration;
 }
     
-double DurationInterface::GetAlignementMensuralDuration( int num, int numbase, Mensur *currentMensur )
+double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur )
 {
     return 512;
 }

@@ -47,15 +47,15 @@ public:
     /**
      * Returns the duration (in double) for the element.
      * It returns 0.0 for grace notes.
-     * Careful: this method is not overriding LayerElement::GetAlignementDuration since
+     * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    virtual double GetAlignementDuration( int num, int numbase );
+    virtual double GetAlignmentDuration( int num, int numbase );
     
     /**
      * Returns the duration (in double) for the element for mensural notation
      */
-    virtual double GetAlignementMensuralDuration( int num, int numbase, Mensur *currentMensur );
+    virtual double GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
     /**
      * Look if the note or rest is in a beam.
