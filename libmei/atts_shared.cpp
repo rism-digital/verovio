@@ -1869,8 +1869,8 @@ AttDurationRatio::~AttDurationRatio() {
 }
 
 void AttDurationRatio::ResetDurationRatio() {
-    m_num = 1;
-    m_numbase = 1;
+    m_num = -1;
+    m_numbase = -1;
 }
 
 bool AttDurationRatio::ReadDurationRatio(  pugi::xml_node element ) {
@@ -1901,12 +1901,12 @@ bool AttDurationRatio::WriteDurationRatio(  pugi::xml_node element ) {
 
 bool AttDurationRatio::HasNum( )
 {
-    return (m_num != 1);
+    return (m_num != -1);
 }
 
 bool AttDurationRatio::HasNumbase( )
 {
-    return (m_numbase != 1);
+    return (m_numbase != -1);
 }
 
 
@@ -3899,7 +3899,7 @@ AttPadLog::~AttPadLog() {
 }
 
 void AttPadLog::ResetPadLog() {
-    m_num = 1;
+    m_num = -1;
 }
 
 bool AttPadLog::ReadPadLog(  pugi::xml_node element ) {
@@ -3922,7 +3922,7 @@ bool AttPadLog::WritePadLog(  pugi::xml_node element ) {
 
 bool AttPadLog::HasNum( )
 {
-    return (m_num != 1);
+    return (m_num != -1);
 }
 
 

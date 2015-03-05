@@ -136,8 +136,8 @@ void AttMensuralLog::ResetMensuralLog() {
     m_mensurDot = BOOLEAN_NONE;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSlash = 0;
-    m_proportNum = 1;
-    m_proportNumbase = 1;
+    m_proportNum = -1;
+    m_proportNumbase = -1;
 }
 
 bool AttMensuralLog::ReadMensuralLog(  pugi::xml_node element ) {
@@ -207,12 +207,12 @@ bool AttMensuralLog::HasMensurSlash( )
 
 bool AttMensuralLog::HasProportNum( )
 {
-    return (m_proportNum != 1);
+    return (m_proportNum != -1);
 }
 
 bool AttMensuralLog::HasProportNumbase( )
 {
-    return (m_proportNumbase != 1);
+    return (m_proportNumbase != -1);
 }
 
 
