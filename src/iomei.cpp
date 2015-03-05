@@ -1880,6 +1880,12 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
             if (!success) break;
+            // This will happen with unmeasured music - ReadMeiSystemChildren will read take over the loop
+            // This means that <pb> and <sb> (for example) will not be read
+            else if ( (std::string( current.name() ) == "staff") ) {
+                success = ReadMeiSystemChildren( m_system, element );
+                break;
+            }
             success = ReadScoreBasedMei( current );
         }
     }
