@@ -956,12 +956,11 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else
     {
-        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_style->m_barlineWidth, barLine->m_onStaffOnly, staff);
+        int y = staff->GetDrawingY();
+        DrawBarline( dc, y, y - m_doc->m_drawingStaffSize[staff->staffSize], barLine );
     }
     
-
-    
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 }
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
