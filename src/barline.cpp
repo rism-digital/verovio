@@ -31,7 +31,6 @@ void Barline::Reset()
 {
     LayerElement::Reset();
     ResetBarLineLog();
-    this->SetRend(BARRENDITION_single);
 }
 
 bool Barline::HasRepetitionDots()

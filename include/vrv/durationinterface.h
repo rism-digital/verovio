@@ -54,6 +54,8 @@ public:
     
     /**
      * Returns the duration (in double) for the element for mensural notation
+     * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
+     * need to be modifiy for shorter equality in later repertoire.
      */
     virtual double GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
