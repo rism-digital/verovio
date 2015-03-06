@@ -31,6 +31,7 @@ void Barline::Reset()
 {
     LayerElement::Reset();
     ResetBarLineLog();
+    this->SetRend(BARRENDITION_single);
 }
 
 bool Barline::HasRepetitionDots()
@@ -39,6 +40,20 @@ bool Barline::HasRepetitionDots()
         return true;
     }
     return false;
+}
+    
+//----------------------------------------------------------------------------
+// Barline
+//----------------------------------------------------------------------------
+
+BarlineAttr::BarlineAttr():
+    Barline()
+{
+    
+}
+
+BarlineAttr::~BarlineAttr()
+{
 }
 
 } // namespace vrv
