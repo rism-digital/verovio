@@ -67,68 +67,12 @@ void Note::Reset()
     d_stemLen = 0;
 }
 
-bool Note::operator==( Object& other )
-{
-    Note *otherNote = dynamic_cast<Note*>( &other );
-    if ( !otherNote ) {
-        return false;
-    }
-    if ( this->m_colored != otherNote->m_colored ) {
-        return false;
-    }
-    if ( this->m_lig != otherNote->m_lig ) {
-        return false;
-    }
-    // slur need value by value comparison
-    //if ( this->m_slur != otherNote->m_slur ) {
-    //    return false;
-    //}
-    if ( this->m_stemDir != otherNote->m_stemDir ) {
-        return false;
-    }
-    if ( this->m_stemLen != otherNote->m_stemLen ) {
-        return false;
-    }
-    if ( this->m_acciaccatura != otherNote->m_acciaccatura ) {
-        return false;
-    }
-    if ( this->m_embellishment != otherNote->m_embellishment ) {
-        return false;
-    }
-    if ( !this->HasIdenticalPitchInterface( otherNote ) ) {
-        return false;
-    }
-    if ( !this->HasIdenticalDurationInterface( otherNote ) ) {
-        return false;
-    }
-    
-    return true;
-}
-    
 void Note::AddLayerElement(vrv::LayerElement *element)
 {
     assert( dynamic_cast<Verse*>(element) || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
     m_children.push_back(element);
     Modify();
-}
-
-void Note::SetValue( int value, int flag )
-{
-    DurationInterface::SetDur( value );
-    
-	// remove ligature flag for  inadequate values	
-	if ( ( value < DUR_BR ) || ( value > DUR_1 ) ) {
-        this->SetLig(LIGATURE_NONE);
-    }
-
-	this->SetColored(BOOLEAN_NONE);
-    
-	// remove qauto flag for silences and inadequate values	
-	if ( ( value > DUR_LG ) && ( value < DUR_2 ) ) {
-		this->SetStemDir(STEMDIRECTION_NONE);
-        this->SetStemLen(0);
-    }    
 }
 
 void Note::SetDrawingTieAttr(  )
@@ -152,11 +96,11 @@ int Note::GetDrawingDur( )
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
     if( chordParent )
     {
-        return chordParent->GetDur();
+        return chordParent->GetActualDur();
     }
     else
     {
-        return m_dur;
+        return GetActualDur();
     }
 }
     

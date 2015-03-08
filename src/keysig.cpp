@@ -160,19 +160,5 @@ void KeySigAttr::Reset()
     Object::Reset();
     ResetKeySigDefaultLog();
 }
-    
-bool KeySigAttr::operator==( Object& other )
-{
-    KeySigAttr *otherClefAttr = dynamic_cast<KeySigAttr*>( &other );
-    if ( !otherClefAttr ) {
-        return false;
-    }
-    /*
-     if ( this->m_clefId != otherClef->m_clefId ) {
-     return false;
-     }
-     */
-    return true;
-}
 
 } // namespace vrv

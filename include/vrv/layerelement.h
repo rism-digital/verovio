@@ -15,6 +15,8 @@
 namespace vrv {
 
 class Alignment;
+class Mensur;
+class MeterSig;
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -56,12 +58,6 @@ public:
      * Adjust the pname and the octave for values outside the range
      */
     static void AdjustPname( int *pname, int *oct );
-
-    /**
-     * Set the value for child element of LayerElement.
-     * For example, set the duration for DurationInterface elements (call explicitly) 
-     */
-	virtual void SetValue( int value, int flag = 0 );
     
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -123,7 +119,7 @@ protected:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    virtual double GetAlignementDuration();
+    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL );
     
 private:
     

@@ -109,6 +109,9 @@ bool Resources::LoadFont(std::string fontName)
         }
     }
     
+    closedir(dir);
+    
+    
     // Then load the bounding boxes (if bounding box file is provided)
     pugi::xml_document doc;
     std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
@@ -146,7 +149,8 @@ bool Resources::LoadFont(std::string fontName)
             if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
             glyph->SetBoundingBox(x, y, width, height);
         }
-    }                  
+    }
+    
     return true;
 }
 

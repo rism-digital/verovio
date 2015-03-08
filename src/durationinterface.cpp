@@ -10,11 +10,14 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "mensur.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -50,20 +53,44 @@ void DurationInterface::Reset()
     ResetFermatapresent();
 }
 
-void DurationInterface::SetDurationGes( int value )
+double DurationInterface::GetAlignmentDuration( int num, int numbase )
 {
-    this->m_durGes = value;
-}
-
-double DurationInterface::GetAlignementDuration( int num, int numbase )
-{
-    int note_dur = m_durGes != VRV_UNSET ? m_durGes : m_dur;
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    
+    if (this->HasNum()) num *=this->GetNum();
+    if (this->HasNumbase()) numbase *=this->GetNumbase();
     
     double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
     if ( GetDots() > 0 ) {
         duration = 2 * duration - (duration / pow(2, GetDots()));
     }
-    //LogDebug("Duration %d; Dot %d; Alignement %f", m_dur, m_dots, duration );
+    //LogDebug("Duration %d; Dot %d; Alignement %f", note_dur, GetDots(), duration );
+    return duration;
+}
+    
+double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur )
+{
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    
+    if (this->HasNum()) num *=this->GetNum();
+    if (this->HasNumbase()) numbase *=this->GetNumbase();
+    if (currentMensur->HasNum()) num *=currentMensur->GetNum();
+    if (currentMensur->HasNumbase()) numbase *=currentMensur->GetNumbase();
+    
+    double ratio = 0.0;
+    double duration = (double)DUR_MENSURAL_REF;
+    switch (note_dur) {
+        case DUR_MX : duration *= (double)fabs(currentMensur->GetModusminor()) * (double)fabs(currentMensur->GetModusmaior()); break;
+        case DUR_LG : duration *= (double)fabs(currentMensur->GetModusminor()); break;
+        case DUR_BR : break;
+        case DUR_1 : duration /= (double)fabs(currentMensur->GetTempus()); break;
+        default:
+            ratio = pow(2.0, (double)(note_dur - DUR_2));
+            duration /= (double)fabs(currentMensur->GetTempus()) * (double)fabs(currentMensur->GetProlatio()) * ratio;
+            break;
+    }
+    duration *= (double)numbase / (double)num;
+    //LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio );
     return duration;
 }
 
@@ -104,40 +131,32 @@ bool DurationInterface::IsLastInBeam( Object *noteOrRest )
     return false;    
     
 }
+    
+int DurationInterface::GetActualDur()
+{
+    // maxima (-1) is a mensural only value
+    if (this->GetDur() == DURATION_maxima) return DUR_MX;
+    return (this->GetDur() & DUR_MENSURAL_MASK);
+}
 
+bool DurationInterface::IsMensural()
+{
+    // maxima (-1) is a mensural only value
+    if (this->GetDur() == DURATION_maxima) return true;
+    return (this->GetDur() > DUR_MENSURAL_MASK);
+}
 
 bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherDurationInterface )
 {
+    // This should never happen because it is fully implemented
+    LogError( "DurationInterface::HasIdenticalDurationInterface missing" );
+    assert( false );
+    return false;
+    /*
     if ( !otherDurationInterface ) {
         return false;
     }
-    // beam requires value by value comparison
-    //if ( this->m_beam != otherDurationInterface->m_beam ) {
-    //    return false;
-    //}
-    //if ( this->m_breakSec != otherDurationInterface->m_breakSec ) {
-    //    return false;
-    //}
-    if ( this->m_dots != otherDurationInterface->m_dots ) {
-        return false;
-    }
-    if ( this->m_dur != otherDurationInterface->m_dur ) {
-        return false;
-    }
-    if ( this->GetNum() != otherDurationInterface->GetNum() ) {
-        return false;
-    }
-    if ( this->GetNumbase() != otherDurationInterface->GetNumbase() ) {
-        return false;
-    }
-    // tuplet requires value by value comparison
-    //if ( this->m_tuplet != otherDurationInterface->m_tuplet ) {
-    //    return false;
-    //}
-    if ( this->m_fermata != otherDurationInterface->m_fermata ) {
-        return false;
-    }
-    return true;
+    */
 }
 
 } // namespace vrv

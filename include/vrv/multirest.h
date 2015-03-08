@@ -37,12 +37,6 @@ public:
     virtual std::string GetClassName( ) { return "MultiRest"; };
     ///@}
     
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Clef and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
 private:
     
 public:

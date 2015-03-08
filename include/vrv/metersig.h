@@ -39,12 +39,6 @@ public:
     virtual std::string GetClassName( ) { return "MeterSig"; };
     virtual Object* Clone() { return new MeterSig(*this); };
     ///@}
-    
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a MeterSig and compare attributes
-     */
-    virtual bool operator==(Object& other);
 
 private:
     
@@ -78,12 +72,6 @@ public:
     virtual std::string GetClassName( ) { return "MeterSigAttr"; };
     virtual Object* Clone() { return new MeterSigAttr(*this); };
     ///@}
-    
-    /**
-     * Comparison operator.
-     * Check if the LayerElement if a MeterSigAttr and compare attributes
-     */
-    virtual bool operator==(Object& other);
     
 private:
     

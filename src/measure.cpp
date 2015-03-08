@@ -18,6 +18,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -120,7 +121,8 @@ int Measure::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner
     // param 1: the time (unused)
-    // param 2: the current scoreDef (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
@@ -139,6 +141,8 @@ int Measure::AlignHorizontally( ArrayPtrVoid params )
     if ( m_rightBarline.GetRend() != BARRENDITION_NONE ) {
         m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
+    
+    //LogDebug("\n ***** Align measure %d", this->GetN() );
     
     assert( *measureAligner );
         

@@ -42,12 +42,11 @@ void Beam::AddLayerElement(LayerElement *element)
     Modify();
 }
 
-void Beam::FilterList()
+void Beam::FilterList( ListOfObjects *childList )
 {
     bool firstNoteGrace = false;
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {

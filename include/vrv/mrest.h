@@ -33,13 +33,6 @@ public:
     virtual void Reset();
     virtual std::string GetClassName( ){ return "MRest"; }; ;
     ///@}
-    
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Clef and compare attributes
-     */
-    virtual bool operator==(Object& other);
-
 
 private:
     

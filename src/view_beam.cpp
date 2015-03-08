@@ -125,7 +125,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     assert( dynamic_cast<DurationInterface*>(current) );
     
 	low = current->GetDrawingY();
-    lastDur = dynamic_cast<DurationInterface*>(current)->GetDur();
+    lastDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
     
     // x-offset values for stem bases, dx[y] where y = element->m_cueSize
     dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0] - (m_doc->m_style->m_stemWidth)/2;
@@ -139,7 +139,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         // Beam list should contain only DurationInterface objects
         assert( dynamic_cast<DurationInterface*>(current) );
         
-        currentDur = dynamic_cast<DurationInterface*>(current)->GetDur();
+        currentDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
         
         if ( current->IsChord() ) {
             beamHasChord = true;

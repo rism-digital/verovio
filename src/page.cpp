@@ -126,10 +126,12 @@ void Page::LayOutHorizontally( )
     // - each LayerElement object will have its Alignment pointer initialized
     MeasureAligner *measureAlignerPtr = NULL;
     double time = 0.0;
-    ScoreDef *currentScoreDef = NULL;
+    Mensur *currentMensur = NULL;
+    MeterSig *currentMeterSig = NULL;
     params.push_back( &measureAlignerPtr );
     params.push_back( &time );
-    params.push_back( &currentScoreDef );
+    params.push_back( &currentMensur );
+    params.push_back( &currentMeterSig );
     Functor alignHorizontally( &Object::AlignHorizontally );
     this->Process( &alignHorizontally, params );
     

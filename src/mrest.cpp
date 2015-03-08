@@ -29,13 +29,4 @@ void MRest::Reset()
     LayerElement::Reset();
 }
 
-bool MRest::operator==( Object& other )
-{
-    MRest *otherMRest = dynamic_cast<MRest*>( &other );
-    if ( !otherMRest ) {
-        return false;
-    }
-    return true;
-}
-
 } // namespace vrv

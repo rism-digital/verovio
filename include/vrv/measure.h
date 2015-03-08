@@ -169,8 +169,8 @@ private:
      * @name The measure barlines (left and right) used when drawing
      */
     ///@{
-    Barline m_leftBarline;
-    Barline m_rightBarline;
+    BarlineAttr m_leftBarline;
+    BarlineAttr m_rightBarline;
     ///@}
 };
 

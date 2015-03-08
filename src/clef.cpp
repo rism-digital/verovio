@@ -44,21 +44,6 @@ void Clef::Reset()
     ResetLineloc();
     ResetOctavedisplacement();
 }
-
-bool Clef::operator==( Object& other )
-{
-    Clef *otherClef = dynamic_cast<Clef*>( &other );
-    if ( !otherClef ) {
-        return false;
-    }
-    /*
-    if ( this->m_clefId != otherClef->m_clefId ) {
-        return false;
-    }
-    */
-    return true;
-}
-    
     
 int Clef::GetClefId()
 {
@@ -109,20 +94,6 @@ void ClefAttr::Reset()
 {
     Object::Reset();
     ResetCleffingLog();
-}
-
-bool ClefAttr::operator==( Object& other )
-{
-    ClefAttr *otherClefAttr = dynamic_cast<ClefAttr*>( &other );
-    if ( !otherClefAttr ) {
-        return false;
-    }
-    /*
-    if ( this->m_clefId != otherClef->m_clefId ) {
-        return false;
-    }
-    */
-    return true;
 }
 
 } // namespace vrv

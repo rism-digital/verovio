@@ -173,7 +173,7 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE)
-            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetDur()) );
+            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
         else
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
 		
@@ -234,6 +234,12 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(dynamic_cast<Note*>(element)); // Element must be a Note"
     
     Note *note = dynamic_cast<Note*>(element);
+    
+    if (note->IsMensural()){
+        DrawMensuralNote(dc, element, layer, staff, measure);
+        return;
+    }
+    
     Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;
@@ -357,7 +363,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (0) {
 	}
 	else {
-        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+        if (note->GetActualDur() < DUR_2 || (note->GetActualDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
 			x2 = xn + m_doc->m_drawingUnit[staffSize]*7/2;
 		else
 			x2 = xn + m_doc->m_drawingUnit[staffSize]*5/2;
@@ -394,7 +400,7 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = dynamic_cast<DurationInterface*>(object)->GetDur();
+    int drawingDur = dynamic_cast<DurationInterface*>(object)->GetActualDur();
     int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     
     baseStem = object->m_cueSize ? ( m_doc->m_drawingUnit[staffSize]*5) : ( m_doc->m_drawingUnit[staffSize]*7);
@@ -477,7 +483,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
     Rest *rest = dynamic_cast<Rest*>(element);
 
-	int drawingDur = rest->GetDur();
+	int drawingDur = rest->GetActualDur();
 	int x = element->GetDrawingX();
     int y = element->GetDrawingY();
     
@@ -951,12 +957,11 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else
     {
-        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_style->m_barlineWidth, barLine->m_onStaffOnly, staff);
+        int y = staff->GetDrawingY();
+        DrawBarline( dc, y, y - m_doc->m_drawingStaffSize[staff->staffSize], barLine );
     }
     
-
-    
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 }
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
@@ -993,7 +998,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int yMax, yMin;
     chord->GetYExtremes(verticalCenter, &yMax, &yMin);
         
-    int drawingDur = chord->GetDur();
+    int drawingDur = chord->GetActualDur();
     drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     chord->SetStemDir( (yMax - verticalCenter >= verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up );
     
@@ -1104,149 +1109,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this ); //RZ
 }
 
-void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
-{
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Mensur*>(element)); // Element must be a Mensur"
-
-    Mensur *mensur = dynamic_cast<Mensur*>(element);
- 
-    dc->StartGraphic( element, "", element->GetUuid() );
-	
-	int x;
-
-    if (mensur->GetSign()==MENSURATIONSIGN_O)
-    {	
-        DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    else if ((mensur->GetSign()==MENSURATIONSIGN_C) && (mensur->GetOrient()!=ORIENTATION_reversed))
-    {	
-        DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    else if (mensur->GetSign()==MENSURATIONSIGN_C && mensur->GetOrient()==ORIENTATION_reversed)
-    {	
-        DrawMensurReversedHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    if (mensur->GetSlash()) // we handle only one single slash
-    {	
-        DrawMensurSlash ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    if (mensur->GetDot()) // we handle only one single dot
-    {	
-        DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-
-	if (mensur->GetNum())
-	{	
-        x = element->GetDrawingX();
-		if (mensur->GetSign())
-        {
-			x += m_doc->m_drawingUnit[staff->staffSize] * 5; // step forward because we have a sign or a meter symbol
-        }
-		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), mensur->GetNumbase(), staff);
-	}
-    
-    dc->EndGraphic(element, this ); //RZ
-
-}
-
-
-void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
-{
-	assert( dc ); // DC cannot be NULL
-	
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-	int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-
-	int w = std::max( ToDeviceContextX(4), 2 );
-
-    dc->SetPen( m_currentColour, w, AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
-
-	dc->DrawCircle( ToDeviceContextX(x), y, r );
-
-    dc->ResetPen();
-    dc->ResetBrush();
-}	
-
-void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff )
-{
-	assert( dc ); // DC cannot be NULL
-
-	int w = std::max( ToDeviceContextX(4), 2 );
-    dc->SetPen( m_currentColour, w, AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
-
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-	int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-
-	x = ToDeviceContextX (x);
-	x -= 3*r/3;
-
-	dc->DrawEllipticArc( x, y, 2*r, 2*r, 70, 290 );
-		
-    dc->ResetPen();
-    dc->ResetBrush();
-
-	return;
-}	
-
-void View::DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff )
-{	
-	assert( dc ); // DC cannot be NULL
-
-	int w = std::max( ToDeviceContextX(4), 2 );
-    dc->SetPen( m_currentColour, w, AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
-
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-	int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ] );
-
-    // needs to be fixed
-	x = ToDeviceContextX (x);
-	x -= 4*r/3;
-
-	dc->DrawEllipticArc( x, y, 2*r, 2*r, 250, 110 );
-    
-    dc->ResetPen();
-    dc->ResetBrush();
-
-	return;
-}	
-
-void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
-{
-	assert( dc ); // DC cannot be NULL
-
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-	int r = std::max( ToDeviceContextX(4), 2 );
-	
-    dc->SetPen( m_currentColour, 1, AxSOLID );
-    dc->SetBrush( m_currentColour, AxSOLID );
-
-	dc->DrawCircle( ToDeviceContextX(x) -r/2 , y, r );
-		
-    dc->ResetPen();
-    dc->ResetBrush();
-
-	return;
-}	
-
-
-void View::DrawMensurSlash ( DeviceContext *dc, int a, int yy, Staff *staff )
-{	
-	assert( dc ); // DC cannot be NULL
-	
-	int y1 = yy;
-	int y2 = y1 - m_doc->m_drawingStaffSize[ staff->staffSize ];
-	
-	DrawVerticalLine ( dc, y1, y2, a, 3);
-	return;
-}	
-
-
-void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
+void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
 {
     assert( dc ); // DC cannot be NULL
     
@@ -1306,7 +1169,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
 
     if (meterSig->GetCount())
     {	
-        DrawMensurFigures ( dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
+        DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
     
     dc->EndGraphic(element, this );
@@ -1747,7 +1610,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     
     Note *note = dynamic_cast<Note*>(element);
     
-    if (note->GetDur() < DUR_8)
+    if (note->GetActualDur() < DUR_8)
         return;
     
     dc->SetPen(AxBLACK, 2, AxSOLID);

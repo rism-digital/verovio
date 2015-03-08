@@ -294,29 +294,28 @@ data_CON Att::StrToCon(std::string value)
     return CON_NONE;
 }
     
-std::string Att::DurToStr(int data)
+std::string Att::DurToStr(data_DURATION data)
 {
     std::string value;
-    /*
-    if (data == DUR_LG) value = "longa";
-    else if (data == DUR_BR) value = "brevis";
-    else if (data == DUR_1) value = "semibrevis";
-    else if (data == DUR_2) value = "minima";
-    else if (data == DUR_4) value = "semiminima";
-    else if (data == DUR_8) value = "fusa";
-    else if (data == DUR_16) value = "semifusa";
-    */
-    if (data == DUR_LG) value = "long";
-    else if (data == DUR_BR) value = "breve";
-    else if (data == DUR_1) value = "1";
-    else if (data == DUR_2) value = "2";
-    else if (data == DUR_4) value = "4";
-    else if (data == DUR_8) value = "8";
-    else if (data == DUR_16) value = "16";
-    else if (data == DUR_32) value = "32";
-    else if (data == DUR_64) value = "64";
-    else if (data == DUR_128) value = "128";
-    else if (data == DUR_256) value = "256";
+    if (data == DURATION_maxima) value = "maxima";
+    else if (data == DURATION_longa) value = "longa";
+    else if (data == DURATION_brevis) value = "brevis";
+    else if (data == DURATION_semibrevis) value = "semibrevis";
+    else if (data == DURATION_minima) value = "minima";
+    else if (data == DURATION_semiminima) value = "semiminima";
+    else if (data == DURATION_fusa) value = "fusa";
+    else if (data == DURATION_semifusa) value = "semifusa";
+    else if (data == DURATION_long) value = "long";
+    else if (data == DURATION_breve) value = "breve";
+    else if (data == DURATION_1) value = "1";
+    else if (data == DURATION_2) value = "2";
+    else if (data == DURATION_4) value = "4";
+    else if (data == DURATION_8) value = "8";
+    else if (data == DURATION_16) value = "16";
+    else if (data == DURATION_32) value = "32";
+    else if (data == DURATION_64) value = "64";
+    else if (data == DURATION_128) value = "128";
+    else if (data == DURATION_256) value = "256";
     else {
         LogWarning("Unknown duration '%d'", data);
         value = "4";
@@ -324,27 +323,28 @@ std::string Att::DurToStr(int data)
     return value;
 }
 
-int Att::StrToDur(std::string value)
+data_DURATION Att::StrToDur(std::string value)
 {
-    int dur;
-    if (value == "longa") dur = DUR_LG;
-    else if (value == "brevis") dur = DUR_BR;
-    else if (value == "semibrevis") dur = DUR_1;
-    else if (value == "minima") dur = DUR_2;
-    else if (value == "semiminima") dur = DUR_4;
-    else if (value == "fusa") dur = DUR_8;
-    else if (value == "semifusa") dur = DUR_16;
-    else if (value == "long") dur = DUR_LG;
-    else if (value == "breve") dur = DUR_BR;
-    else if (value == "1") dur = DUR_1;
-    else if (value == "2") dur = DUR_2;
-    else if (value == "4") dur = DUR_4;
-    else if (value == "8") dur = DUR_8;
-    else if (value == "16") dur = DUR_16;
-    else if (value == "32") dur = DUR_32;
-    else if (value == "64") dur = DUR_64;
-    else if (value == "128") dur = DUR_128;
-    else if (value == "256") dur = DUR_256;
+    data_DURATION dur;
+    if (value == "maxima") dur = DURATION_maxima;
+    else if (value == "longa") dur = DURATION_longa;
+    else if (value == "brevis") dur = DURATION_brevis;
+    else if (value == "semibrevis") dur = DURATION_semibrevis;
+    else if (value == "minima") dur = DURATION_minima;
+    else if (value == "semiminima") dur = DURATION_semiminima;
+    else if (value == "fusa") dur = DURATION_fusa;
+    else if (value == "semifusa") dur = DURATION_semifusa;
+    else if (value == "long") dur = DURATION_long;
+    else if (value == "breve") dur = DURATION_breve;
+    else if (value == "1") dur = DURATION_1;
+    else if (value == "2") dur = DURATION_2;
+    else if (value == "4") dur = DURATION_4;
+    else if (value == "8") dur = DURATION_8;
+    else if (value == "16") dur = DURATION_16;
+    else if (value == "32") dur = DURATION_32;
+    else if (value == "64") dur = DURATION_64;
+    else if (value == "128") dur = DURATION_128;
+    else if (value == "256") dur = DURATION_256;
     else {
         if ((value.length() > 0) && (value[value.length()-1] == 'p')) {
             LogWarning("PPQ duration dur_s are not supported");
@@ -352,7 +352,7 @@ int Att::StrToDur(std::string value)
         else {
             LogWarning("Unknown @dur dur '%s'", value.c_str());
         }
-        dur = VRV_UNSET;
+        dur = DURATION_NONE;
     }
     return dur;
 }
@@ -576,6 +576,58 @@ data_MODE Att::StrToMode(std::string value)
     // default
     return MODE_NONE;
 }
+
+std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
+{
+    std::string value;
+    switch(data)
+    {
+        case MODUSMAIOR_2 : value = "2"; break;
+        case MODUSMAIOR_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODUSMAIOR Att::StrToModusmaior(std::string value)
+{
+    if (value == "2") return MODUSMAIOR_2;
+    else if (value == "3") return MODUSMAIOR_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return MODUSMAIOR_NONE;
+}
+
+std::string Att::ModusminorToStr(data_MODUSMINOR data)
+{
+    std::string value;
+    switch(data)
+    {
+        case MODUSMINOR_2 : value = "2"; break;
+        case MODUSMINOR_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_MODUSMINOR Att::StrToModusminor(std::string value)
+{
+    if (value == "2") return MODUSMINOR_2;
+    else if (value == "3") return MODUSMINOR_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return MODUSMINOR_NONE;
+}
     
 std::string Att::OctaveDisToStr( data_OCTAVE_DIS data )
 {
@@ -692,7 +744,33 @@ data_PLACE Att::StrToPlace(std::string value)
     }
     // default
     return PLACE_NONE;
-}    
+}
+
+std::string Att::ProlatioToStr(data_PROLATIO data)
+{
+    std::string value;
+    switch(data)
+    {
+        case PROLATIO_2 : value = "2"; break;
+        case PROLATIO_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_PROLATIO Att::StrToProlatio(std::string value)
+{
+    if (value == "2") return PROLATIO_2;
+    else if (value == "3") return PROLATIO_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return PROLATIO_NONE;
+}
 
 std::string Att::StemDirectionToStr(data_STEMDIRECTION data)
 {
@@ -760,6 +838,32 @@ std::string Att::TieToStr(data_TIE data)
             break;
     }
     return value;
+}
+
+std::string Att::TempusToStr(data_TEMPUS data)
+{
+    std::string value;
+    switch(data)
+    {
+        case TEMPUS_2 : value = "2"; break;
+        case TEMPUS_3 : value = "3"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_TEMPUS Att::StrToTempus(std::string value)
+{
+    if (value == "2") return TEMPUS_2;
+    else if (value == "3") return TEMPUS_3;
+    else {
+        LogWarning("Unsupported mode '%s'", value.c_str() );
+    }
+    // default
+    return TEMPUS_NONE;
 }
 
 data_TIE Att::StrToTie(std::string value)

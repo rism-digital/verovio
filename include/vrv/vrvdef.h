@@ -77,24 +77,6 @@ enum FunctorCode {
 #define MAX_NOTE_DEPTH -1
     
 //----------------------------------------------------------------------------
-// Durations
-//----------------------------------------------------------------------------
-    
-#define DUR_LG 0  // longa
-#define DUR_BR 1  // brevis
-#define DUR_1 2   // whole note
-#define DUR_2 3   // ...
-#define DUR_4 4
-#define DUR_8 5
-#define DUR_16 6
-#define DUR_32 7
-#define DUR_64 8
-#define DUR_128 9
-#define DUR_256 10
-// used for alignement
-#define DUR_MAX 1024
-    
-//----------------------------------------------------------------------------
 // VerovioText codpoints
 //----------------------------------------------------------------------------
    

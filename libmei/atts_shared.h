@@ -1489,8 +1489,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(int dur_) { m_dur = dur_; };
-    int GetDur() const { return m_dur; };    
+    void SetDur(data_DURATION dur_) { m_dur = dur_; };
+    data_DURATION GetDur() const { return m_dur; };    
     bool HasDur( );
     
     ///@}
@@ -1503,7 +1503,7 @@ protected:
      * multiple space-separated values that add up to the total duration may be used.
      * When dotted values are present, the dots attribute must be ignored.
      **/
-    int m_dur;
+    data_DURATION m_dur;
 
 /* include <attdur> */
 };
@@ -1595,8 +1595,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(int dur_) { m_dur = dur_; };
-    int GetDur() const { return m_dur; };    
+    void SetDur(data_DURATION dur_) { m_dur = dur_; };
+    data_DURATION GetDur() const { return m_dur; };    
     bool HasDur( );
     
     ///@}
@@ -1609,7 +1609,7 @@ protected:
      * multiple space-separated values that add up to the total duration may be used.
      * When dotted values are present, the dots attribute must be ignored.
      **/
-    int m_dur;
+    data_DURATION m_dur;
 
 /* include <attdur> */
 };
@@ -1639,8 +1639,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDurGes(int durGes_) { m_durGes = durGes_; };
-    int GetDurGes() const { return m_durGes; };    
+    void SetDurGes(data_DURATION durGes_) { m_durGes = durGes_; };
+    data_DURATION GetDurGes() const { return m_durGes; };    
     bool HasDurGes( );
     
     ///@}
@@ -1652,7 +1652,7 @@ protected:
      * MusicXML 'divisions'), Humdrum **recip values, beats, seconds, or mensural
      * duration values.
      **/
-    int m_durGes;
+    data_DURATION m_durGes;
 
 /* include <attdur.ges> */
 };

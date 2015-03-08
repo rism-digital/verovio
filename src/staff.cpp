@@ -31,7 +31,7 @@ Staff::Staff( int n ):
     AttCommon()
 {
     Reset();
-    m_n = n;
+    SetN(n);
 }
 
 Staff::~Staff()

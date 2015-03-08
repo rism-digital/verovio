@@ -102,26 +102,36 @@ public:
      * Set drawing clef, keysig and mensur if necessary and if available.
      * Also set the current clef.
      */
-    void SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
+    void SetDrawingAndCurrentValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
     
     /**
      * @name Set the clef, keySig, mensur and meterSig to be drawn.
      */
     ///@{
-    void SetDrawingClef( Clef *clef );
-    void SetDrawingKeySig( KeySig *keySig );
-    void SetDrawingMensur( Mensur *mensur );
-    void SetDrawingMeterSig( MeterSig *meterSig );
+    void SetDrawClef( bool draw ) { m_drawClef = draw; };
+    void SetDrawKeySig( bool draw ) { m_drawKeySig = draw; };
+    void SetDrawMensur( bool draw ) { m_drawMensur = draw; };
+    void SetDrawMeterSig( bool draw ) { m_drawMeterSig = draw; };
     ///@}
     
     /**
      * @name Get the clef, keySig, mensur and meterSig to be drawn.
      */
     ///@{
-    Clef *GetDrawingClef( ) { return m_drawingClef; };
-    KeySig *GetDrawingKeySig( ) { return m_drawingKeySig; };
-    Mensur *GetDrawingMensur( ) { return m_drawingMensur; };
-    MeterSig *GetDrawingMeterSig( ) { return m_drawingMeterSig; };
+    Clef *GetDrawingClef( ) { if (m_drawClef) return m_currentClef; return NULL; };
+    KeySig *GetDrawingKeySig( ) { if (m_drawKeySig) return m_currentKeySig; return NULL; };
+    Mensur *GetDrawingMensur( ) { if (m_drawMensur) return m_currentMensur; return NULL; };
+    MeterSig *GetDrawingMeterSig( ) { if (m_drawMeterSig) return m_currentMeterSig; return NULL; };
+    ///@}
+    
+    /**
+     * @name Set the current clef, keySig, mensur and meterSig.
+     */
+    ///@{
+    void SetCurrentClef( Clef *clef );
+    void SetCurrentKeySig( KeySig *keySig );
+    void SetCurrentMensur( Mensur *mensur );
+    void SetCurrentMeterSig( MeterSig *meterSig );
     ///@}
     
     /**
@@ -155,25 +165,33 @@ public:
     
 protected:
     /**
-     * @name Drawing variables
+     * @name Drawing flags
      */
     ///@{
     /** The clef attribute */
-    Clef *m_drawingClef;
+    bool m_drawClef;
     /** The key signature */
-    KeySig *m_drawingKeySig;
+    bool m_drawKeySig;
     /** The mensur */
-    Mensur *m_drawingMensur;
+    bool m_drawMensur;
     /** The meter signature (time signature) */
-    MeterSig *m_drawingMeterSig;
+    bool m_drawMeterSig;
     ///@}
     
 private:
     /**
-     * The current clef.
-     * This is used for getting the clef when interacting, for example by clicking in order to get the pitch from a position
+     * @name The current values
      */
-    Clef m_currentClef;
+    ///@{
+    /** The clef attribute */
+    Clef *m_currentClef;
+    /** The key signature */
+    KeySig *m_currentKeySig;
+    /** The mensur */
+    Mensur *m_currentMensur;
+    /** The meter signature (time signature) */
+    MeterSig *m_currentMeterSig;
+    ///@}
     /**
      *
      */
