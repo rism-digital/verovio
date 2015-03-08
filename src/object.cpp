@@ -708,7 +708,7 @@ void ObjectListInterface::ResetList( Object *node )
     node->Modify( false );
     m_list.clear();
     node->FillList( &m_list );
-    this->FilterList();
+    this->FilterList( &m_list );
 }
 
 ListOfObjects *ObjectListInterface::GetList( Object *node )

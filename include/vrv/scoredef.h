@@ -205,7 +205,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep staffGrp for fast access.
      */
-    virtual void FilterList();
+    virtual void FilterList( ListOfObjects *childList );
     
 private:
     
@@ -270,7 +270,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep staffDef for fast access.
      */
-    virtual void FilterList();
+    virtual void FilterList( ListOfObjects *childList );
     
 private:
     
