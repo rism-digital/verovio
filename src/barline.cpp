@@ -40,5 +40,19 @@ bool Barline::HasRepetitionDots()
     }
     return false;
 }
+    
+//----------------------------------------------------------------------------
+// Barline
+//----------------------------------------------------------------------------
+
+BarlineAttr::BarlineAttr():
+    Barline()
+{
+    
+}
+
+BarlineAttr::~BarlineAttr()
+{
+}
 
 } // namespace vrv

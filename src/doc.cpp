@@ -392,7 +392,8 @@ short Doc::GetRightMargin( const std::type_info *elementType )
     else if (typeid(KeySig) == *elementType)  return 30;
     else if (typeid(Mensur) == *elementType) return 30;
     else if (typeid(MeterSig) == *elementType) return 30;
-    else if (typeid(Barline) == *elementType) return 0;
+    else if (typeid(Barline) == *elementType) return 30;
+    else if (typeid(BarlineAttr) == *elementType) return 0;
     else if (typeid(MRest) == *elementType) return 0;
     else if (typeid(MultiRest) == *elementType) return 0;
     //else if (typeid(Note) == *elementType) return 10;

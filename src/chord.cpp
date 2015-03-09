@@ -84,11 +84,10 @@ bool compare_pitch (Object *first, Object *second)
     Note *n2 = dynamic_cast<Note*>(second);
     return ( n1->GetDiatonicPitch() < n2->GetDiatonicPitch() );
 }
-    
-void Chord::FilterList()
+
+void Chord::FilterList( ListOfObjects *childList )
 {
     // Retain only note children of chords
-    ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {

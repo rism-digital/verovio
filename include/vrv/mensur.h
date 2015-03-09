@@ -26,6 +26,7 @@ class MensurAttr;
  */
 class Mensur: public LayerElement,
     public AttDurationRatio,
+    public AttMensuralShared,
     public AttMensurLog,
     public AttMensurVis,
     public AttSlashcount
@@ -67,6 +68,7 @@ private:
  * This class models the MEI @mensur attributes in scoreDef or staffDef elements.
  */
 class MensurAttr: public Object,
+    public AttMensuralShared,
     public AttMensuralLog
 {
 public:

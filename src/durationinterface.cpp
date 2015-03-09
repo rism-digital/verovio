@@ -12,10 +12,12 @@
 
 #include <assert.h>
 #include <math.h>
+#include <stdlib.h>
 
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "mensur.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -52,15 +54,44 @@ void DurationInterface::Reset()
     ResetFermatapresent();
 }
 
-double DurationInterface::GetAlignementDuration( int num, int numbase )
+double DurationInterface::GetAlignmentDuration( int num, int numbase )
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    
+    if (this->HasNum()) num *=this->GetNum();
+    if (this->HasNumbase()) numbase *=this->GetNumbase();
     
     double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
     if ( GetDots() > 0 ) {
         duration = 2 * duration - (duration / pow(2, GetDots()));
     }
     //LogDebug("Duration %d; Dot %d; Alignement %f", note_dur, GetDots(), duration );
+    return duration;
+}
+    
+double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur )
+{
+    int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    
+    if (this->HasNum()) num *=this->GetNum();
+    if (this->HasNumbase()) numbase *=this->GetNumbase();
+    if (currentMensur->HasNum()) num *=currentMensur->GetNum();
+    if (currentMensur->HasNumbase()) numbase *=currentMensur->GetNumbase();
+    
+    double ratio = 0.0;
+    double duration = (double)DUR_MENSURAL_REF;
+    switch (note_dur) {
+        case DUR_MX : duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior()); break;
+        case DUR_LG : duration *= (double)abs(currentMensur->GetModusminor()); break;
+        case DUR_BR : break;
+        case DUR_1 : duration /= (double)abs(currentMensur->GetTempus()); break;
+        default:
+            ratio = pow(2.0, (double)(note_dur - DUR_2));
+            duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
+            break;
+    }
+    duration *= (double)numbase / (double)num;
+    //LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio );
     return duration;
 }
 

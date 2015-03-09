@@ -22,14 +22,14 @@ if [ ! -d build ]; then mkdir build; fi
 
 if [ ! -d data ]; then mkdir data; fi
 
-# default is with ASM an large file support
-# memory is increased (TOTAL_MEMORY and TOTAL_STACK) for processing large files (tested up to 7MB)
-# we can disable this for a light version 	
+# Default is with ASM an large file support.
+# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
+# Empirically, the memory amount required is approx. 5 times the file size (as an indication).
+# We can disable this for a light version that uses the default memory settings 	
 ASM="\
 	-O2 --memory-init-file 0 \
 	-s ASM_JS=1 \
-	-s TOTAL_MEMORY=256*1024*1024 \
-	-s TOTAL_STACK=16*1024*1024"
+	-s TOTAL_STACK=64*1024*1024"
 ASM_NAME=""
 
 # default is master (no version)

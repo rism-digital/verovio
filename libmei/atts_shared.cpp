@@ -394,7 +394,7 @@ AttBarLineLog::~AttBarLineLog() {
 }
 
 void AttBarLineLog::ResetBarLineLog() {
-    m_rend = BARRENDITION_NONE;
+    m_rend = BARRENDITION_single;
 }
 
 bool AttBarLineLog::ReadBarLineLog(  pugi::xml_node element ) {
@@ -418,7 +418,7 @@ bool AttBarLineLog::WriteBarLineLog(  pugi::xml_node element ) {
 
 bool AttBarLineLog::HasRend( )
 {
-    return (m_rend != BARRENDITION_NONE);
+    return (m_rend != BARRENDITION_single);
 }
 
 
@@ -1335,7 +1335,7 @@ AttCurverend::~AttCurverend() {
 }
 
 void AttCurverend::ResetCurverend() {
-    m_rend = BARRENDITION_NONE;
+    m_rend = BARRENDITION_single;
 }
 
 bool AttCurverend::ReadCurverend(  pugi::xml_node element ) {
@@ -1359,7 +1359,7 @@ bool AttCurverend::WriteCurverend(  pugi::xml_node element ) {
 
 bool AttCurverend::HasRend( )
 {
-    return (m_rend != BARRENDITION_NONE);
+    return (m_rend != BARRENDITION_single);
 }
 
 
@@ -1928,8 +1928,8 @@ AttDurationRatio::~AttDurationRatio() {
 }
 
 void AttDurationRatio::ResetDurationRatio() {
-    m_num = 1;
-    m_numbase = 1;
+    m_num = -1;
+    m_numbase = -1;
 }
 
 bool AttDurationRatio::ReadDurationRatio(  pugi::xml_node element ) {
@@ -1962,12 +1962,12 @@ bool AttDurationRatio::WriteDurationRatio(  pugi::xml_node element ) {
 
 bool AttDurationRatio::HasNum( )
 {
-    return (m_num != 1);
+    return (m_num != -1);
 }
 
 bool AttDurationRatio::HasNumbase( )
 {
-    return (m_numbase != 1);
+    return (m_numbase != -1);
 }
 
 
@@ -2706,7 +2706,7 @@ AttLinerend::~AttLinerend() {
 }
 
 void AttLinerend::ResetLinerend() {
-    m_rend = BARRENDITION_NONE;
+    m_rend = BARRENDITION_single;
 }
 
 bool AttLinerend::ReadLinerend(  pugi::xml_node element ) {
@@ -2730,7 +2730,7 @@ bool AttLinerend::WriteLinerend(  pugi::xml_node element ) {
 
 bool AttLinerend::HasRend( )
 {
-    return (m_rend != BARRENDITION_NONE);
+    return (m_rend != BARRENDITION_single);
 }
 
 
@@ -3273,7 +3273,7 @@ AttMeterSigVis::~AttMeterSigVis() {
 }
 
 void AttMeterSigVis::ResetMeterSigVis() {
-    m_rend = BARRENDITION_NONE;
+    m_rend = BARRENDITION_single;
 }
 
 bool AttMeterSigVis::ReadMeterSigVis(  pugi::xml_node element ) {
@@ -3297,7 +3297,7 @@ bool AttMeterSigVis::WriteMeterSigVis(  pugi::xml_node element ) {
 
 bool AttMeterSigVis::HasRend( )
 {
-    return (m_rend != BARRENDITION_NONE);
+    return (m_rend != BARRENDITION_single);
 }
 
 
@@ -4025,7 +4025,7 @@ AttPadLog::~AttPadLog() {
 }
 
 void AttPadLog::ResetPadLog() {
-    m_num = 1;
+    m_num = -1;
 }
 
 bool AttPadLog::ReadPadLog(  pugi::xml_node element ) {
@@ -4049,7 +4049,7 @@ bool AttPadLog::WritePadLog(  pugi::xml_node element ) {
 
 bool AttPadLog::HasNum( )
 {
-    return (m_num != 1);
+    return (m_num != -1);
 }
 
 
@@ -4459,7 +4459,7 @@ AttSbVis::~AttSbVis() {
 }
 
 void AttSbVis::ResetSbVis() {
-    m_rend = BARRENDITION_NONE;
+    m_rend = BARRENDITION_single;
 }
 
 bool AttSbVis::ReadSbVis(  pugi::xml_node element ) {
@@ -4483,7 +4483,7 @@ bool AttSbVis::WriteSbVis(  pugi::xml_node element ) {
 
 bool AttSbVis::HasRend( )
 {
-    return (m_rend != BARRENDITION_NONE);
+    return (m_rend != BARRENDITION_single);
 }
 
 

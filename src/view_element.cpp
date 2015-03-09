@@ -748,7 +748,7 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
 	if ( (y - staff->GetDrawingY()) % m_doc->m_drawingDoubleUnit[staff->staffSize])
 		y1 -= m_doc->m_drawingUnit[staff->staffSize];
     
-	y2 = y1 + m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
+	y2 = y1 + m_doc->m_drawingDoubleUnit[staff->staffSize];
 	DrawFullRectangle( dc, x1, y2, x2, y1);
 	
     // lines
@@ -1020,6 +1020,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	}
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
 	*/
+    if (note->GetDur() == DUR_LG)
     {
 		verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
 		// ENZ
@@ -1067,12 +1068,11 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     }
     else
     {
-        //DrawBarline( dc, (System*)staff->m_parent, x,  m_doc->m_style->m_barlineWidth, barLine->m_onStaffOnly, staff);
+        int y = staff->GetDrawingY();
+        DrawBarline( dc, y, y - m_doc->m_drawingStaffSize[staff->staffSize], barLine );
     }
     
-
-    
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 }
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
@@ -1165,7 +1165,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Accidentals ************/
     
     //navigate through list of notes, starting with outside and working in
-    chord->FilterList();
     ListOfObjects noteList = chord->GenerateAccidList();
     int fwIdx = 0, bkwdIdx = (int)noteList.size();
     ListOfObjects::iterator itFwd = noteList.begin();
@@ -1342,149 +1341,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this ); //RZ
 }
 
-void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
-{
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Mensur*>(element)); // Element must be a Mensur"
-
-    Mensur *mensur = dynamic_cast<Mensur*>(element);
- 
-    dc->StartGraphic( element, "", element->GetUuid() );
-	
-	int x;
-
-    if (mensur->GetSign()==MENSURATIONSIGN_O)
-    {	
-        DrawMensurCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    else if ((mensur->GetSign()==MENSURATIONSIGN_C) && (mensur->GetOrient()!=ORIENTATION_reversed))
-    {	
-        DrawMensurHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    else if (mensur->GetSign()==MENSURATIONSIGN_C && mensur->GetOrient()==ORIENTATION_reversed)
-    {	
-        DrawMensurReversedHalfCircle ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    if (mensur->GetSlash()) // we handle only one single slash
-    {	
-        DrawMensurSlash ( dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-    if (mensur->GetDot()) // we handle only one single dot
-    {	
-        DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
-    }
-
-	if (mensur->GetNum())
-	{	
-        x = element->GetDrawingX();
-		if (mensur->GetSign())
-        {
-			x += m_doc->m_drawingUnit[staff->staffSize] * 5; // step forward because we have a sign or a meter symbol
-        }
-		DrawMensurFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), mensur->GetNumbase(), staff);
-	}
-    
-    dc->EndGraphic(element, this ); //RZ
-
-}
-
-
-void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
-{
-	assert( dc ); // DC cannot be NULL
-	
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-	int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-
-	int w = std::max( ToDeviceContextX(4), 2 );
-
-    dc->SetPen( m_currentColour, w, AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
-
-	dc->DrawCircle( ToDeviceContextX(x), y, r );
-
-    dc->ResetPen();
-    dc->ResetBrush();
-}	
-
-void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff )
-{
-	assert( dc ); // DC cannot be NULL
-
-	int w = std::max( ToDeviceContextX(4), 2 );
-    dc->SetPen( m_currentColour, w, AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
-
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-	int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-
-	x = ToDeviceContextX (x);
-	x -= 3*r/3;
-
-	dc->DrawEllipticArc( x, y, 2*r, 2*r, 70, 290 );
-		
-    dc->ResetPen();
-    dc->ResetBrush();
-
-	return;
-}	
-
-void View::DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff )
-{	
-	assert( dc ); // DC cannot be NULL
-
-	int w = std::max( ToDeviceContextX(4), 2 );
-    dc->SetPen( m_currentColour, w, AxSOLID );
-    dc->SetBrush( m_currentColour, AxTRANSPARENT );
-
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-	int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ] );
-
-    // needs to be fixed
-	x = ToDeviceContextX (x);
-	x -= 4*r/3;
-
-	dc->DrawEllipticArc( x, y, 2*r, 2*r, 250, 110 );
-    
-    dc->ResetPen();
-    dc->ResetBrush();
-
-	return;
-}	
-
-void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
-{
-	assert( dc ); // DC cannot be NULL
-
-	int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-	int r = std::max( ToDeviceContextX(4), 2 );
-	
-    dc->SetPen( m_currentColour, 1, AxSOLID );
-    dc->SetBrush( m_currentColour, AxSOLID );
-
-	dc->DrawCircle( ToDeviceContextX(x) -r/2 , y, r );
-		
-    dc->ResetPen();
-    dc->ResetBrush();
-
-	return;
-}	
-
-
-void View::DrawMensurSlash ( DeviceContext *dc, int a, int yy, Staff *staff )
-{	
-	assert( dc ); // DC cannot be NULL
-	
-	int y1 = yy;
-	int y2 = y1 - m_doc->m_drawingStaffSize[ staff->staffSize ];
-	
-	DrawVerticalLine ( dc, y1, y2, a, 3);
-	return;
-}	
-
-
-void View::DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
+void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
 {
     assert( dc ); // DC cannot be NULL
     
@@ -1544,7 +1401,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
 
     if (meterSig->GetCount())
     {	
-        DrawMensurFigures ( dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
+        DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
     
     dc->EndGraphic(element, this );
@@ -1729,13 +1586,28 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
     
-    // to be updated
+    // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
     syl->SetDrawingX( syl->GetStart()->GetDrawingX() - m_doc->m_drawingUnit[staff->staffSize] * 2 );
     syl->SetDrawingY( GetSylY(syl, staff) );
     
     dc->StartGraphic( syl, "", syl->GetUuid() );
     
-    DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str() );
+    dc->SetBrush( m_currentColour, AxSOLID );
+    
+    FontInfo currentFont;
+    if (syl->HasFontstyle()) {
+        currentFont = m_doc->m_drawingLyricFonts[ staff->staffSize ];
+        currentFont.SetStyle(syl->GetFontstyle());
+        dc->SetFont(&currentFont);
+    }
+    else {
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+    }
+    
+    DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str(), staff->staffSize );
+    
+    dc->ResetFont();
+    dc->ResetBrush();
     
     if (syl->GetStart() && syl->GetEnd()) {
         System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );
@@ -1756,16 +1628,23 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
     if ( !syl->GetStart() || !syl->GetEnd()) return;
     
     int y = GetSylY(syl, staff);
+    int w, h;
     
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ( spanningType ==  SPANNING_START_END ) {
-        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        x1 += ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->ResetFont();
+        // x position of the syl is two units back
+        x1 += w - m_doc->m_drawingUnit[staff->staffSize] * 2;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else  if ( spanningType ==  SPANNING_START) {
-        // x1 is the end of the syl - very approximative, we should use GetTextExtend once implemented
-        x1 += ((int)syl->GetText().length()) * m_doc->m_drawingLyricFonts[staff->staffSize].GetPointSize() / 3;
+        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
+        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->ResetFont();
+        // idem
+        x1 += w - m_doc->m_drawingUnit[staff->staffSize] * 2;
         
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
@@ -1792,11 +1671,18 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
     if (syl->GetCon() == CON_d) {
         
         y += m_doc->m_drawingUnit[staff->staffSize] * 2 / 3;
-        x2 -= 3 * (int)m_doc->m_drawingUnit[staff->staffSize];
+        // x position of the syl is two units back
+        x2 -= 2 * (int)m_doc->m_drawingUnit[staff->staffSize];
+        
+        //if ( x1 > x2 ) {
+        //    DrawFullRectangle(dc, x1, y + 2* m_doc->m_style->m_barlineWidth, x2, y + 3 * m_doc->m_style->m_barlineWidth);
+        //    LogDebug("x1 > x2 (%d %d)", x1, x2 );
+        //}
         
         // the length of the dash and the space between them - can be made a parameter
         int dashLength = m_doc->m_drawingUnit[staff->staffSize] * 4 / 3;
         int dashSpace = m_doc->m_drawingStaffSize[staff->staffSize] * 5 / 3;
+        int halfDashLength = dashLength / 2;
         
         int dist = x2 - x1;
         int nbDashes = dist / dashSpace;
@@ -1813,11 +1699,12 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i *  dashSpace);
-            DrawFullRectangle(dc, x, y, x + dashLength, y + m_doc->m_style->m_barlineWidth);
+            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + m_doc->m_style->m_barlineWidth);
         }
         
     }
     else if (syl->GetCon() == CON_u) {
+        x1 += (int)m_doc->m_drawingUnit[staff->staffSize] / 2;
         DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_style->m_barlineWidth);
     }
     
@@ -1827,7 +1714,11 @@ void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, St
 {
     Verse *verse = dynamic_cast<Verse*>(element);
     
+    dc->StartGraphic( verse, "", verse->GetUuid() );
+    
     DrawLayerChildren(dc, verse, layer, staff, measure);
+    
+    dc->EndGraphic( verse, this );
 }
 
     

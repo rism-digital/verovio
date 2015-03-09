@@ -20,6 +20,7 @@ int Mensur::s_numBase = 2;
 Mensur::Mensur():
 	LayerElement("mensur-"),
     AttDurationRatio(),
+    AttMensuralShared(),
     AttMensurLog(),
     AttMensurVis(),
     AttSlashcount()
@@ -34,6 +35,14 @@ Mensur::Mensur( MensurAttr *mensurAttr ):
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
+    //
+    this->SetModusmaior(mensurAttr->GetModusmaior());
+    this->SetModusminor(mensurAttr->GetModusminor());
+    this->SetProlatio(mensurAttr->GetProlatio());
+    this->SetTempus(mensurAttr->GetTempus());
+    //
+    this->SetNum(mensurAttr->GetProportNum());
+    this->SetNumbase(mensurAttr->GetProportNumbase());
     // It is unclear why we don't have mensur.num and mensur.numbase attributes
     // in att.mensura.default.log - ask Perry...
 }
@@ -46,6 +55,7 @@ void Mensur::Reset()
 {
     LayerElement::Reset();
     ResetDurationRatio();
+    ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
     ResetSlashcount();
@@ -57,6 +67,7 @@ void Mensur::Reset()
 
 MensurAttr::MensurAttr():
     Object(),
+    AttMensuralShared(),
     AttMensuralLog()
 {
     Reset();
@@ -70,6 +81,7 @@ MensurAttr::~MensurAttr()
 void MensurAttr::Reset()
 {
     Object::Reset();
+    ResetMensuralShared();
     ResetMensuralLog();
 }
     

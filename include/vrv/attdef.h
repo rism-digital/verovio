@@ -24,7 +24,11 @@ typedef std::vector<std::pair<std::string, std::string> >  ArrayOfStrAttr;
 //----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------
-    
+ 
+/**
+ * These duration values are used for internal calculation and differ from the 
+ * MEI data.DURATION types (see below)
+ */
 #define DUR_MX -1  // maxima
 #define DUR_LG 0  // longa
 #define DUR_BR 1  // brevis
@@ -36,12 +40,14 @@ typedef std::vector<std::pair<std::string, std::string> >  ArrayOfStrAttr;
 #define DUR_32 7
 #define DUR_64 8
 #define DUR_128 9
-#define DUR_256 10
+#define DUR_256 10  // this is it for now
 // used for alignement
 #define DUR_MAX 1024
 // mensural duration
 #define DUR_MENSURAL_OFFSET (2 * DUR_MAX)
 #define DUR_MENSURAL_MASK (2 * DUR_MAX -1)
+// used for mensural alignment
+#define DUR_MENSURAL_REF 1728
     
 //----------------------------------------------------------------------------
 // MEI data defines
@@ -257,6 +263,26 @@ enum data_MODE {
     MODE_aeolian,
     MODE_locrian
 };
+
+/**
+ * MEI data.MODUSMAIOR
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_MODUSMAIOR {
+    MODUSMAIOR_NONE = -3,
+    MODUSMAIOR_2 = 2,
+    MODUSMAIOR_3
+};
+    
+/**
+ * MEI data.MODUSMINOR
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_MODUSMINOR {
+    MODUSMINOR_NONE = -3,
+    MODUSMINOR_2 = 2,
+    MODUSMINOR_3
+};
     
 /**
  * MEI data.OCTAVE.DIS
@@ -280,6 +306,16 @@ enum data_PITCHNAME {
     PITCHNAME_g,
     PITCHNAME_a,
     PITCHNAME_b,
+};
+    
+/**
+ * MEI data.PROLATIO
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_PROLATIO {
+    PROLATIO_NONE = -3,
+    PROLATIO_2 = 2,
+    PROLATIO_3
 };
 
 /**
@@ -318,6 +354,16 @@ enum data_STEMPOSITION {
     STEMPOSITION_left,
     STEMPOSITION_right,
     STEMPOSITION_center
+};
+    
+/**
+ * MEI data.TEMPUS
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_TEMPUS {
+    TEMPUS_NONE = -3,
+    TEMPUS_2 = 2,
+    TEMPUS_3
 };
     
 /**

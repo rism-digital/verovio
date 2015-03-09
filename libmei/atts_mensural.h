@@ -147,13 +147,13 @@ public:
     bool HasMensurSlash( );
     
     //
-    void SetProportNum(int proportNumInt_) { m_proportNumInt = proportNumInt_; };
-    int GetProportNum() const { return m_proportNumInt; };    
+    void SetProportNum(int proportNum_) { m_proportNum = proportNum_; };
+    int GetProportNum() const { return m_proportNum; };    
     bool HasProportNum( );
     
     //
-    void SetProportNumbase(int proportNumbaseInt_) { m_proportNumbaseInt = proportNumbaseInt_; };
-    int GetProportNumbase() const { return m_proportNumbaseInt; };    
+    void SetProportNumbase(int proportNumbase_) { m_proportNumbase = proportNumbase_; };
+    int GetProportNumbase() const { return m_proportNumbase; };    
     bool HasProportNumbase( );
     
     ///@}
@@ -173,13 +173,13 @@ private:
      * ratio, e.g., 1:3.
      * Proport.num is for the first value in the ratio.
      **/
-    int m_proportNumInt;
+    int m_proportNum;
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
      * ratio, e.g., 1:3.
      * Proport.numbase is for the second value in the ratio.
      **/
-    int m_proportNumbaseInt;
+    int m_proportNumbase;
 
 /* include <attproport.numbase> */
 };
@@ -209,36 +209,36 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetModusmaior(std::string modusmaior_) { m_modusmaior = modusmaior_; };
-    std::string GetModusmaior() const { return m_modusmaior; };    
+    void SetModusmaior(data_MODUSMAIOR modusmaior_) { m_modusmaior = modusmaior_; };
+    data_MODUSMAIOR GetModusmaior() const { return m_modusmaior; };    
     bool HasModusmaior( );
     
     //
-    void SetModusminor(std::string modusminor_) { m_modusminor = modusminor_; };
-    std::string GetModusminor() const { return m_modusminor; };    
+    void SetModusminor(data_MODUSMINOR modusminor_) { m_modusminor = modusminor_; };
+    data_MODUSMINOR GetModusminor() const { return m_modusminor; };    
     bool HasModusminor( );
     
     //
-    void SetProlatio(std::string prolatio_) { m_prolatio = prolatio_; };
-    std::string GetProlatio() const { return m_prolatio; };    
+    void SetProlatio(data_PROLATIO prolatio_) { m_prolatio = prolatio_; };
+    data_PROLATIO GetProlatio() const { return m_prolatio; };    
     bool HasProlatio( );
     
     //
-    void SetTempus(std::string tempus_) { m_tempus = tempus_; };
-    std::string GetTempus() const { return m_tempus; };    
+    void SetTempus(data_TEMPUS tempus_) { m_tempus = tempus_; };
+    data_TEMPUS GetTempus() const { return m_tempus; };    
     bool HasTempus( );
     
     ///@}
 
 private:
     /** Describes the maxima-long relationship. **/
-    std::string m_modusmaior;
+    data_MODUSMAIOR m_modusmaior;
     /** Describes the long-breve relationship. **/
-    std::string m_modusminor;
+    data_MODUSMINOR m_modusminor;
     /** Describes the semibreve-minim relationship. **/
-    std::string m_prolatio;
+    data_PROLATIO m_prolatio;
     /** Describes the breve-semibreve relationship. **/
-    std::string m_tempus;
+    data_TEMPUS m_tempus;
 
 /* include <atttempus> */
 };

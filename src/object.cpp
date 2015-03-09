@@ -708,7 +708,7 @@ void ObjectListInterface::ResetList( Object *node )
     node->Modify( false );
     m_list.clear();
     node->FillList( &m_list );
-    this->FilterList();
+    this->FilterList( &m_list );
 }
 
 ListOfObjects *ObjectListInterface::GetList( Object *node )
@@ -954,7 +954,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingValues( currentScoreDef, (*currentStaffDef) );
+        layer->SetDrawingAndCurrentValues( currentScoreDef, (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
     
@@ -981,7 +981,8 @@ int Object::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time (unused)
-    // param 2: the current scoreDef (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
         
     // reset all the drawing values - this also need to be called
     // from any functor overriding this one!

@@ -14,6 +14,7 @@
 
 namespace vrv {
 
+class Mensur;
 class Object;
 
 //----------------------------------------------------------------------------
@@ -46,10 +47,17 @@ public:
     /**
      * Returns the duration (in double) for the element.
      * It returns 0.0 for grace notes.
-     * Careful: this method is not overriding LayerElement::GetAlignementDuration since
+     * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    virtual double GetAlignementDuration( int num, int numbase );
+    virtual double GetAlignmentDuration( int num, int numbase );
+    
+    /**
+     * Returns the duration (in double) for the element for mensural notation
+     * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
+     * need to be modifiy for shorter equality in later repertoire.
+     */
+    virtual double GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
     /**
      * Look if the note or rest is in a beam.

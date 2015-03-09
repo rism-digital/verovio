@@ -351,12 +351,14 @@ bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef
         scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
     }
     if ( scoreDef->GetMensurAttr() ) {
-        dynamic_cast<AttMensuralLog*>(scoreDef)->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     if ( scoreDef->GetMeterSigAttr() ) {
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
     }
+    
     
     // this needs to be fixed
     return true;
@@ -390,6 +392,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     }
     if ( staffDef->GetMensurAttr() ) {
         staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        staffDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     if ( staffDef->GetMeterSigAttr() ) {
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
@@ -529,6 +532,7 @@ void MeiOutput::WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur )
 {
     WriteLayerElement( currentNode, mensur );
     mensur->WriteDurationRatio(currentNode);
+    mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashcount(currentNode);
@@ -1034,10 +1038,12 @@ bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
+        meterSig.ReadMeterSigDefaultVis( scoreDef );  // not great, but we need to do it in case we have both and the first one succeeded
         vrvScoreDef->ReplaceMeterSig( &meterSig );
     }
     MensurAttr mensur;
-    if ( mensur.ReadMensuralLog( scoreDef ) ) {
+    if ( mensur.ReadMensuralLog( scoreDef ) || mensur.ReadMensuralShared( scoreDef ) ) {
+        mensur.ReadMensuralShared( scoreDef ); // not great, but we need to do it in case we have both and the first one succeeded
         vrvScoreDef->ReplaceMensur( &mensur );
     }
     
@@ -1136,7 +1142,13 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
+        meterSig.ReadMeterSigDefaultVis( staffDef );  // not great, but we need to do it in case we have both and the first one succeeded
         vrvStaffDef->ReplaceMeterSig( &meterSig );
+    }
+    MensurAttr mensur;
+    if ( mensur.ReadMensuralLog( staffDef ) || mensur.ReadMensuralShared( staffDef ) ) {
+        mensur.ReadMensuralShared( staffDef ); // not great, but we need to do it in case we have both and the first one succeeded
+        vrvStaffDef->ReplaceMensur( &mensur );
     }
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
@@ -1490,6 +1502,7 @@ bool MeiInput::ReadMeiMensur( Object *parent, pugi::xml_node mensur )
     ReadLayerElement(mensur, vrvMensur);
     
     vrvMensur->ReadDurationRatio( mensur );
+    vrvMensur->ReadMensuralShared( mensur );
     vrvMensur->ReadMensurLog( mensur );
     vrvMensur->ReadMensurVis( mensur );
     vrvMensur->ReadSlashcount( mensur );
@@ -1884,6 +1897,12 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
             if (!success) break;
+            // This will happen with unmeasured music - ReadMeiSystemChildren will read take over the loop
+            // This means that <pb> and <sb> (for example) will not be read
+            else if ( (std::string( current.name() ) == "staff") ) {
+                success = ReadMeiSystemChildren( m_system, element );
+                break;
+            }
             success = ReadScoreBasedMei( current );
         }
     }

@@ -15,6 +15,8 @@
 namespace vrv {
 
 class Alignment;
+class Mensur;
+class MeterSig;
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -117,7 +119,7 @@ protected:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    virtual double GetAlignementDuration();
+    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL );
     
 private:
     
