@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <math.h>
+#include <stdlib.h>
 
 //----------------------------------------------------------------------------
 
@@ -80,13 +81,13 @@ double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Me
     double ratio = 0.0;
     double duration = (double)DUR_MENSURAL_REF;
     switch (note_dur) {
-        case DUR_MX : duration *= (double)fabs(currentMensur->GetModusminor()) * (double)fabs(currentMensur->GetModusmaior()); break;
-        case DUR_LG : duration *= (double)fabs(currentMensur->GetModusminor()); break;
+        case DUR_MX : duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior()); break;
+        case DUR_LG : duration *= (double)abs(currentMensur->GetModusminor()); break;
         case DUR_BR : break;
-        case DUR_1 : duration /= (double)fabs(currentMensur->GetTempus()); break;
+        case DUR_1 : duration /= (double)abs(currentMensur->GetTempus()); break;
         default:
             ratio = pow(2.0, (double)(note_dur - DUR_2));
-            duration /= (double)fabs(currentMensur->GetTempus()) * (double)fabs(currentMensur->GetProlatio()) * ratio;
+            duration /= (double)abs(currentMensur->GetTempus()) * (double)abs(currentMensur->GetProlatio()) * ratio;
             break;
     }
     duration *= (double)numbase / (double)num;
