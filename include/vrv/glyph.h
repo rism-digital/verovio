@@ -9,6 +9,7 @@
 #ifndef __VRV_GLYPH_H__
 #define __VRV_GLYPH_H__
 
+#include <algorithm>
 #include <string>
 
 namespace vrv {
