@@ -1078,6 +1078,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
     int fullUnit = m_doc->m_drawingUnit[staffSize];
+    int halfUnit = fullUnit / 2;
     int doubleUnit = fullUnit * 2;
     
     bool inBeam = false;
@@ -1162,45 +1163,57 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     //navigate through list of notes, starting with outside and working in
     chord->FilterList();
-    ListOfObjects noteList = chord->GenerateAccidList();
-    int fwIdx = 0, bkwdIdx = (int)noteList.size();
-    ListOfObjects::iterator itFwd = noteList.begin();
-    ListOfObjects::iterator itBkwd = noteList.end();
-    itBkwd--; //so it's a valid pointer
-    Accid *prevAccid = NULL;
+    std::vector<Note*> noteList = chord->GenerateAccidList();
+    int size = (int)noteList.size();
     
-    //set the x position: only non-default case is a down-stemmed non-cluster which needs one more note diameter of space
+    //set the default x position: only non-default case is a down-stemmed non-cluster which needs one more note diameter of space
     int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
     if (chord->GetDrawingStemDir() == STEMDIRECTION_down && chord->m_clusters.size() > 0) xAccid -= (radius * 2);
+
+    int fwIdx = 0;
+    int bwIdx = size - 1;
+    
+    //make m_accidSpace into a 2D vector of size (vertical half-units, most possible horizontal halfunits)
+    int idx, setIdx;
+    std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
+    std::vector<bool> *accidLine;
+    //top y position - bottom y position in half-units
+    accidSpace->resize((noteList[0]->GetDrawingY() - noteList[noteList.size() - 1]->GetDrawingY()) / halfUnit);
+    
+    //each line needs to be 4 times the number of notes in case every one overlaps fully
+    int lineLength = (doubleUnit*size) / halfUnit;
+    for(idx = 0; idx < accidSpace->size(); idx++)
+    {
+        accidLine = &accidSpace->at(idx);
+        //resize each line
+        accidLine->resize(lineLength);
+        //initialize all spaces to false
+        for(setIdx = 0; setIdx < lineLength; setIdx++) accidLine->at(setIdx) = false;
+    }
     
     //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
-    while (fwIdx < bkwdIdx)
+    while (fwIdx <= bwIdx)
     {
-        Note *noteFwd = dynamic_cast<Note*>(*itFwd);
-        Note *noteBkwd = dynamic_cast<Note*>(*itBkwd);
-        
-        noteFwd->m_accid.SetDrawingX(xAccid);
-        noteBkwd->m_accid.SetDrawingX(xAccid);
+        Accid *accidFwd = &noteList[fwIdx]->m_accid;
+        Accid *accidBwd = &noteList[bwIdx]->m_accid;
         
         //resumeGraphic for each note here?
         
         //if the top note has an accidental, draw it and update prevAccid
-        if (noteBkwd->HasAccid()) {
-            DrawAccid(dc, &noteBkwd->m_accid, layer, staff, measure, prevAccid);
-            prevAccid = &noteBkwd->m_accid;
-        }
+        accidFwd->SetDrawingX(xAccid);
+        CalculateAccidX(staff, accidFwd, chord, noteList);
+        DrawAccid(dc, accidFwd, layer, staff, measure);
         
         //same, except with an extra check that we're not doing the same note twice
-        if (noteFwd != noteBkwd && noteFwd->HasAccid()) {
-            DrawAccid(dc, &noteFwd->m_accid, layer, staff, measure, prevAccid);
-            prevAccid = &noteFwd->m_accid;
+        if (fwIdx != bwIdx) {
+            accidBwd->SetDrawingX(xAccid);
+            CalculateAccidX(staff, accidBwd, chord, noteList);
+            DrawAccid(dc, accidBwd, layer, staff, measure);
         }
         
         //adjust indices/iterators
-        itFwd++;
         fwIdx++;
-        itBkwd--;
-        bkwdIdx--;
+        bwIdx--;
     }
     
     /************ Stems ************/
@@ -1545,71 +1558,62 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->EndGraphic(element, this );
     
 }
-    
-bool View::CalculateAccidX(Staff *staff, Accid *prevAccid, Accid *nextAccid)
-{
-    //keep the original X position to compare at the end
-    int origX = nextAccid->GetDrawingX();
-    int newX = nextAccid->GetDrawingX();
 
-    //this gets the interval between the last two notes; if interval = 6, there is a 6th between the notes
-    int interval = ((prevAccid->GetDrawingY() - nextAccid->GetDrawingY()) / m_doc->m_drawingUnit[staff->staffSize]) + 1;
-    
-    //what types of accidentals they are; as of now, only f/s/n are supported
-    int newType = nextAccid->GetAccid();
-    int prevType = prevAccid->GetAccid();
-    
-    //possible spacings
+//returns false if no adjustment is necessary
+bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, std::vector<Note*> noteList)
+{
+    //size declarations
     int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
     int doubleUnit = fullUnit * 2;
     int halfUnit = fullUnit / 2;
-    int oneAndAHalfUnit = halfUnit * 3;
-    int nudge = fullUnit / 4; //for when we need just a little difference
     
-    if (interval > 0)
+    std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
+    int xLength = (int)accidSpace->at(0).size();
+    
+    //Y-position limits
+    int listTop = noteList[0]->GetDrawingY();
+    int listBot = noteList[noteList.size() - 1]->GetDrawingY();
+    int topY = accid->GetDrawingY() + (2 * fullUnit);
+    int topPos = std::max(0, listTop - topY) / halfUnit;
+    int bottomY = accid->GetDrawingY() - (2 * fullUnit);
+    int botPos = (int)accidSpace->size() - 1 - ((std::max(0, bottomY - listBot)) / halfUnit);
+    
+    //std::cout << topY << " " << bottomY << " " << topPos << " " << botPos << std::endl;
+    
+    int currentX = 0;
+    int width = doubleUnit / halfUnit; //always 4 for now, this avoids magic numbers
+    
+    //move to the left by half-units until all four corners are false
+    while (currentX < xLength)
     {
-        //flats are unique because they don't go down as low
-        if (prevType == ACCIDENTAL_EXPLICIT_f) {
-            if (interval >= 6) {}//newX -= nudge;
-            else if (interval == 5) {
-                //flat lines up with sharp at fullUnit, we want a bit more
-                if (newType == ACCIDENTAL_EXPLICIT_s) newX -= oneAndAHalfUnit;
-                else newX -= fullUnit;
-            }
-            else {
-                //clearance on top right of a flat means it should be moved in a bit
-                if (interval == 4 && newType == ACCIDENTAL_EXPLICIT_f) newX -= oneAndAHalfUnit;
-                else newX -= doubleUnit;
-            }
+        //std::cout << "(" << topPos << "/" << botPos << "," << currentX << ")" << accidSpace->at(topPos)[currentX] << accidSpace->at(botPos)[currentX] << " ";
+        if (accidSpace->at(topPos)[currentX]) currentX += 1;
+        else if (accidSpace->at(botPos)[currentX]) currentX += 1;
+        else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
+        else if (accidSpace->at(botPos)[currentX + width]) currentX += 1;
+        else break;
+    };
+    
+    //std::cout << std::endl;
+    
+    //move the accidental as needed
+    int xShift = currentX * halfUnit;
+    accid->SetDrawingX(accid->GetDrawingX() - xShift);
+    
+    //std::cout << "Setting true at " << currentX - 3 << " to " << currentX << ", " << topPos << " to " << botPos << std::endl;
+    
+    //mark the spaces as taken (true)
+    for(int xIdx = currentX; xIdx < currentX + width; xIdx++)
+    {
+        for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+        {
+            //std::cout << "(" << yIdx << "," << xIdx << ")" << accidSpace->at(yIdx)[xIdx];
+            accidSpace->at(yIdx).at(xIdx) = true;
+            //std::cout << accidSpace->at(yIdx)[xIdx] << " ";
         }
-        else {
-            if (interval >= 7) {}//newX -= nudge;
-            else if (interval == 6) {
-                //sharp/nat on top of a sharp can never be a full unit, otherwise the opposite lines line up
-                if (newType == ACCIDENTAL_EXPLICIT_s) newX = newX - fullUnit + nudge;
-                else newX -= fullUnit;
-            }
-            else if (interval == 5) {
-                //clearance on top right of a flat means it should be moved in a bit
-                if (newType == ACCIDENTAL_EXPLICIT_f) newX -= fullUnit;
-                else newX -= oneAndAHalfUnit;
-            }
-            else newX -= doubleUnit;
-        }
-    }
-    else {
-        interval = -interval;
-        if (interval >= 7) {}//newX -= nudge;
-        else newX -= doubleUnit;
     }
     
-    if (origX == newX) {
-        return false;
-    }
-    else {
-        nextAccid->SetDrawingX(newX);
-        return true;
-    }
+    return (currentX == 0);
 }
 
 void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )
@@ -1627,8 +1631,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
     }
     
-    //Calculate the offset
-    if (prevAccid != NULL) CalculateAccidX(staff, prevAccid, accid);
+    //Get the offset
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
     

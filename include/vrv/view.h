@@ -337,7 +337,7 @@ private:
      * Internal methods for calculating spacing chords
      */
     void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
-    bool CalculateAccidX (Staff *staff, Accid *prevAccid, Accid *nextAccid);
+    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, std::vector<Note*> noteList);
     
     /**
      * Swap the to points passed as reference.
