@@ -52,7 +52,6 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     xLedger = xStem;
     
     drawingDur = note->GetDrawingDur();
-    drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
     
     int radius = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
     
@@ -96,13 +95,15 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     }
     // Other values
     else {
-        if ((note->GetColored()==BOOLEAN_true) || drawingDur == DUR_2) {
-            fontNo = SMUFL_E0A3_noteheadHalf;
+        if (note->GetColored()==BOOLEAN_true) {
+            if (drawingDur == DUR_2) fontNo = SMUFL_E0A4_noteheadBlack;
+            else fontNo = SMUFL_E0A3_noteheadHalf;
         }
         else {
-            fontNo = SMUFL_E0A4_noteheadBlack;
+            if (drawingDur > DUR_2) fontNo = SMUFL_E0A4_noteheadBlack;
+            else fontNo = SMUFL_E0A3_noteheadHalf;
         }
-        
+
         DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->staffSize, note->m_cueSize );
         
         DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, noteY);
