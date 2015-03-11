@@ -172,6 +172,9 @@ void Chord::ResetAccidList()
 void Chord::ResetAccidSpace(int fullUnit)
 {
     m_accidSpace.clear();
+ 
+    if (m_accidList.size() == 0) return;
+    
     int halfUnit = fullUnit / 2;
     int doubleUnit = fullUnit * 2;
     
@@ -180,7 +183,8 @@ void Chord::ResetAccidSpace(int fullUnit)
     int size = (int)m_accidList.size();
     std::vector<bool> *accidLine;
     //top y position - bottom y position in half-units
-    m_accidSpace.resize((m_accidList[0]->GetDrawingY() - m_accidList[m_accidList.size() - 1]->GetDrawingY()) / halfUnit);
+    int rows = ((m_accidList[0]->GetDrawingY() - m_accidList[m_accidList.size() - 1]->GetDrawingY()) / halfUnit);
+    m_accidSpace.resize(std::max(rows, ACCID_WIDTH));
     
     //each line needs to be 4 times the number of notes in case every one overlaps fully
     int lineLength = (doubleUnit*size) / halfUnit;

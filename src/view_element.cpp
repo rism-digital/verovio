@@ -1178,53 +1178,56 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     chord->ResetAccidList();
     std::vector<Note*> noteList = chord->m_accidList;
     int size = (int)noteList.size();
-    chord->ResetAccidSpace(fullUnit);
-    
-    std::vector<int> accidClusters;
-    
-    for(idx = 0; idx < size; idx++)
+    if (size > 0)
     {
-        Accid *curAccid = &noteList[idx]->m_accid;
-        //false as the last parameter for CalcAccidX will see if there are any vertical conflicts without setting anything
-        if (CalculateAccidX(staff, curAccid, chord, false) > 0)
-        {
-            accidClusters.push_back(idx);
-        }
-    }
-    
-    chord->ResetAccidSpace(fullUnit);
-    int accidSize = (int)accidClusters.size();
-    
-    for(idx = 0; idx < accidSize; idx++)
-    {
-        fwIdx = accidClusters[idx];
-        if (idx == accidSize - 1) bwIdx = size - 1;
-        else bwIdx = accidClusters[idx + 1] - 1;
+        chord->ResetAccidSpace(fullUnit);
         
-        //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
-        while (fwIdx <= bwIdx)
+        std::vector<int> accidClusters;
+        
+        for(idx = 0; idx < size; idx++)
         {
-            Accid *accidFwd = &noteList[fwIdx]->m_accid;
-            Accid *accidBwd = &noteList[bwIdx]->m_accid;
-            
-            //if the top note has an accidental, draw it and update prevAccid
-            accidFwd->SetDrawingX(xAccid);
-            CalculateAccidX(staff, accidFwd, chord, true);
-            DrawAccid(dc, accidFwd, layer, staff, measure);
-            
-            //same, except with an extra check that we're not doing the same note twice
-            if (fwIdx != bwIdx) {
-                accidBwd->SetDrawingX(xAccid);
-                CalculateAccidX(staff, accidBwd, chord, true);
-                DrawAccid(dc, accidBwd, layer, staff, measure);
-                bwIdx--;
+            Accid *curAccid = &noteList[idx]->m_accid;
+            //false as the last parameter for CalcAccidX will see if there are any vertical conflicts without setting anything
+            if (CalculateAccidX(staff, curAccid, chord, false) > 0)
+            {
+                accidClusters.push_back(idx);
             }
-            
-            fwIdx++;
         }
-        fwIdx = idx;
-    }
         
+        chord->ResetAccidSpace(fullUnit);
+        int accidSize = (int)accidClusters.size();
+        
+        for(idx = 0; idx < accidSize; idx++)
+        {
+            fwIdx = accidClusters[idx];
+            if (idx == accidSize - 1) bwIdx = size - 1;
+            else bwIdx = accidClusters[idx + 1] - 1;
+            
+            //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
+            while (fwIdx <= bwIdx)
+            {
+                Accid *accidFwd = &noteList[fwIdx]->m_accid;
+                Accid *accidBwd = &noteList[bwIdx]->m_accid;
+                
+                //if the top note has an accidental, draw it and update prevAccid
+                accidFwd->SetDrawingX(xAccid);
+                CalculateAccidX(staff, accidFwd, chord, true);
+                DrawAccid(dc, accidFwd, layer, staff, measure);
+                
+                //same, except with an extra check that we're not doing the same note twice
+                if (fwIdx != bwIdx) {
+                    accidBwd->SetDrawingX(xAccid);
+                    CalculateAccidX(staff, accidBwd, chord, true);
+                    DrawAccid(dc, accidBwd, layer, staff, measure);
+                    bwIdx--;
+                }
+                
+                fwIdx++;
+            }
+            fwIdx = idx;
+        }
+    }
+    
     /************ Stems ************/
     
     int drawingDur = chord->GetDur();
@@ -1448,7 +1451,6 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
     int botPos = (int)accidSpace->size() - 1 - ((std::max(0, bottomY - listBot)) / halfUnit);
     
     int currentX = 0;
-    int width = doubleUnit / halfUnit; //always 4 for now, this avoids magic numbers
     
     //move to the left by half-units until all four corners are false
     if (type == ACCIDENTAL_EXPLICIT_f) {
@@ -1456,8 +1458,8 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
             if (accidSpace->at(topPos + 1)[currentX]) currentX += 1;
             if (accidSpace->at(topPos)[currentX + 1]) currentX += 1;
             else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX + width]) currentX += 1;
+            else if (accidSpace->at(topPos)[currentX + ACCID_WIDTH]) currentX += 1;
+            else if (accidSpace->at(botPos)[currentX + ACCID_WIDTH]) currentX += 1;
             else break;
         };
     }
@@ -1465,8 +1467,8 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
         while (currentX < xLength) {
             if (accidSpace->at(topPos)[currentX]) currentX += 1;
             else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX + width]) currentX += 1;
+            else if (accidSpace->at(topPos)[currentX + ACCID_WIDTH]) currentX += 1;
+            else if (accidSpace->at(botPos)[currentX + ACCID_WIDTH]) currentX += 1;
             else break;
         };
     }
@@ -1478,7 +1480,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
         accid->SetDrawingX(accid->GetDrawingX() - xShift);
         
         //mark the spaces as taken (true)
-        for(int xIdx = currentX; xIdx < currentX + width; xIdx++)
+        for(int xIdx = currentX; xIdx < currentX + ACCID_WIDTH; xIdx++)
         {
             for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
             {
@@ -1489,7 +1491,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
     //otherwise just mark the vertical position so we can see if there are any vertical conflicts
     else
     {
-        for(int xIdx = 0; xIdx < 4; xIdx++) //x from 0 to 4, base position
+        for(int xIdx = 0; xIdx < ACCID_WIDTH; xIdx++) //x from 0 to 4, base position
         {
             for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
             {
