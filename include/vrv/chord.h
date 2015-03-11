@@ -49,6 +49,7 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
+    ///@}
     
     /**
      * Add an element (only note supported) to a chord.
@@ -58,8 +59,6 @@ public:
     virtual void FilterList( ListOfObjects *childlist );
     
     void GetYExtremes(int initial, int *yMax, int *yMin);
-
-    ///@}
     
     //----------//
     // Functors //
@@ -69,7 +68,6 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr( ArrayPtrVoid params );
-    
     
     /**
      * See Object::PrepareTieAttr
