@@ -158,14 +158,14 @@ void Chord::FilterList()
     }
 }
 
-ListOfObjects Chord::GenerateAccidList()
+std::vector<Note*> Chord::GenerateAccidList()
 {
-    ListOfObjects accidList;
+    std::vector<Note*> accidList;
     ListOfObjects* childList = this->GetList(this); //make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+    for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
         if (note->HasAccid()) {
-            accidList.push_back(*it);
+            accidList.push_back(note);
         }
     }
     return accidList;

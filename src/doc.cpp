@@ -576,6 +576,11 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     m_drawingAccidWidth[1][1] = (m_drawingAccidWidth[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    glyph_size = round((double)h * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
+    m_drawingAccidHeight[0][0] = glyph_size;
+    m_drawingAccidHeight[0][1] = (m_drawingAccidHeight[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    m_drawingAccidHeight[1][0] = (m_drawingAccidHeight[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
+    m_drawingAccidHeight[1][1] = (m_drawingAccidHeight[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     
 	return m_drawingPage;
 }
