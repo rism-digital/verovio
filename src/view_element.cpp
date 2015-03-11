@@ -1078,7 +1078,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
     int fullUnit = m_doc->m_drawingUnit[staffSize];
-    int halfUnit = fullUnit / 2;
     int doubleUnit = fullUnit * 2;
     
     bool inBeam = false;
@@ -1162,60 +1161,65 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Accidentals ************/
     
     //navigate through list of notes, starting with outside and working in
-    chord->FilterList();
-    std::vector<Note*> noteList = chord->GenerateAccidList();
-    int size = (int)noteList.size();
     
     //set the default x position: only non-default case is a down-stemmed non-cluster which needs one more note diameter of space
     int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
     if (chord->GetDrawingStemDir() == STEMDIRECTION_down && chord->m_clusters.size() > 0) xAccid -= (radius * 2);
 
     int fwIdx = 0;
-    int bwIdx = size - 1;
+    int idx, bwIdx;
     
-    //make m_accidSpace into a 2D vector of size (vertical half-units, most possible horizontal halfunits)
-    int idx, setIdx;
-    std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
-    std::vector<bool> *accidLine;
-    //top y position - bottom y position in half-units
-    accidSpace->resize((noteList[0]->GetDrawingY() - noteList[noteList.size() - 1]->GetDrawingY()) / halfUnit);
+    chord->FilterList();
+    chord->ResetAccidList();
+    std::vector<Note*> noteList = chord->m_accidList;
+    int size = (int)noteList.size();
+    chord->ResetAccidSpace(fullUnit);
     
-    //each line needs to be 4 times the number of notes in case every one overlaps fully
-    int lineLength = (doubleUnit*size) / halfUnit;
-    for(idx = 0; idx < accidSpace->size(); idx++)
+    std::vector<int> accidClusters;
+    
+    for(idx = 0; idx < size; idx++)
     {
-        accidLine = &accidSpace->at(idx);
-        //resize each line
-        accidLine->resize(lineLength);
-        //initialize all spaces to false
-        for(setIdx = 0; setIdx < lineLength; setIdx++) accidLine->at(setIdx) = false;
-    }
-    
-    //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
-    while (fwIdx <= bwIdx)
-    {
-        Accid *accidFwd = &noteList[fwIdx]->m_accid;
-        Accid *accidBwd = &noteList[bwIdx]->m_accid;
-        
-        //resumeGraphic for each note here?
-        
-        //if the top note has an accidental, draw it and update prevAccid
-        accidFwd->SetDrawingX(xAccid);
-        CalculateAccidX(staff, accidFwd, chord, noteList);
-        DrawAccid(dc, accidFwd, layer, staff, measure);
-        
-        //same, except with an extra check that we're not doing the same note twice
-        if (fwIdx != bwIdx) {
-            accidBwd->SetDrawingX(xAccid);
-            CalculateAccidX(staff, accidBwd, chord, noteList);
-            DrawAccid(dc, accidBwd, layer, staff, measure);
+        Accid *curAccid = &noteList[idx]->m_accid;
+        //false as the last parameter for CalcAccidX will see if there are any vertical conflicts without setting anything
+        if (CalculateAccidX(staff, curAccid, chord, false) > 0)
+        {
+            accidClusters.push_back(idx);
         }
-        
-        //adjust indices/iterators
-        fwIdx++;
-        bwIdx--;
     }
     
+    chord->ResetAccidSpace(fullUnit);
+    int accidSize = (int)accidClusters.size();
+    
+    for(idx = 0; idx < accidSize; idx++)
+    {
+        fwIdx = accidClusters[idx];
+        if (idx == accidSize - 1) bwIdx = size - 1;
+        else bwIdx = accidClusters[idx + 1] - 1;
+        
+        //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
+        while (fwIdx <= bwIdx)
+        {
+            Accid *accidFwd = &noteList[fwIdx]->m_accid;
+            Accid *accidBwd = &noteList[bwIdx]->m_accid;
+            
+            //if the top note has an accidental, draw it and update prevAccid
+            accidFwd->SetDrawingX(xAccid);
+            CalculateAccidX(staff, accidFwd, chord, true);
+            DrawAccid(dc, accidFwd, layer, staff, measure);
+            
+            //same, except with an extra check that we're not doing the same note twice
+            if (fwIdx != bwIdx) {
+                accidBwd->SetDrawingX(xAccid);
+                CalculateAccidX(staff, accidBwd, chord, true);
+                DrawAccid(dc, accidBwd, layer, staff, measure);
+                bwIdx--;
+            }
+            
+            fwIdx++;
+        }
+        fwIdx = idx;
+    }
+        
     /************ Stems ************/
     
     int drawingDur = chord->GetDur();
@@ -1560,7 +1564,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
 }
 
 //returns false if no adjustment is necessary
-bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, std::vector<Note*> noteList)
+bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
 {
     //size declarations
     int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
@@ -1568,6 +1572,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, std::vector
     int halfUnit = fullUnit / 2;
     
     std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
+    std::vector<Note*> noteList = chord->m_accidList;
     int xLength = (int)accidSpace->at(0).size();
     
     //Y-position limits
@@ -1578,15 +1583,12 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, std::vector
     int bottomY = accid->GetDrawingY() - (2 * fullUnit);
     int botPos = (int)accidSpace->size() - 1 - ((std::max(0, bottomY - listBot)) / halfUnit);
     
-    //std::cout << topY << " " << bottomY << " " << topPos << " " << botPos << std::endl;
-    
     int currentX = 0;
     int width = doubleUnit / halfUnit; //always 4 for now, this avoids magic numbers
     
     //move to the left by half-units until all four corners are false
     while (currentX < xLength)
     {
-        //std::cout << "(" << topPos << "/" << botPos << "," << currentX << ")" << accidSpace->at(topPos)[currentX] << accidSpace->at(botPos)[currentX] << " ";
         if (accidSpace->at(topPos)[currentX]) currentX += 1;
         else if (accidSpace->at(botPos)[currentX]) currentX += 1;
         else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
@@ -1594,23 +1596,32 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, std::vector
         else break;
     };
     
-    //std::cout << std::endl;
-    
-    //move the accidental as needed
-    int xShift = currentX * halfUnit;
-    accid->SetDrawingX(accid->GetDrawingX() - xShift);
-    
-    //std::cout << "Setting true at " << currentX - 3 << " to " << currentX << ", " << topPos << " to " << botPos << std::endl;
-    
-    //mark the spaces as taken (true)
-    for(int xIdx = currentX; xIdx < currentX + width; xIdx++)
+    //move the accidental position if requested
+    if (save)
     {
-        for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+        int xShift = currentX * halfUnit;
+        accid->SetDrawingX(accid->GetDrawingX() - xShift);
+        
+        //mark the spaces as taken (true)
+        for(int xIdx = currentX; xIdx < currentX + width; xIdx++)
         {
-            //std::cout << "(" << yIdx << "," << xIdx << ")" << accidSpace->at(yIdx)[xIdx];
-            accidSpace->at(yIdx).at(xIdx) = true;
-            //std::cout << accidSpace->at(yIdx)[xIdx] << " ";
+            for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+            {
+                accidSpace->at(yIdx).at(xIdx) = true;
+            }
         }
+    }
+    //otherwise just mark the vertical position so we can see if there are any vertical conflicts
+    else
+    {
+        for(int xIdx = 0; xIdx < 4; xIdx++) //x from 0 to 4, base position
+        {
+            for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+            {
+                accidSpace->at(yIdx).at(xIdx) = true;
+            }
+        }
+        
     }
     
     return (currentX == 0);

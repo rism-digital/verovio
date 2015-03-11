@@ -63,7 +63,8 @@ public:
     /**
      * Returns list of notes that have accidentals
      */
-    std::vector<Note*> GenerateAccidList();
+    void ResetAccidList();
+    void ResetAccidSpace(int staffSize);
     
     /**
      * @name Set and get the stem direction of the beam.
@@ -112,6 +113,7 @@ public:
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
+    std::vector<Note*> m_accidList;
     std::vector< std::vector<bool> > m_accidSpace;
 };
 
