@@ -42,6 +42,7 @@ bool AttAlignment::ReadAlignment(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("when")) {
         this->SetWhen(StrToStr(element.attribute("when").value()));
+        element.remove_attribute("when");
         hasAttribute = true;
     }
     return hasAttribute;

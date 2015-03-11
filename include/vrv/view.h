@@ -240,7 +240,6 @@ protected:
     void DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
-    void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -266,12 +265,7 @@ protected:
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
-    void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
-    void DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
-    void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
+    void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
     void DrawSylConnector( DeviceContext *dc, Syl *syl, System *system );
@@ -280,6 +274,28 @@ protected:
     void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     ///@}
+    
+    /**
+     * @name Methods for drawing mensural LayerElement child classes.
+     * They are base drawing methods that are called directly from DrawLayerElement
+     * Because some elements draw their children recursively (e.g., Note) they must all
+     * have the same parameters
+     * Defined in view_mensural.cpp
+     */
+    ///@{
+    void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    
+    /**
+     * @name Methods for drawing parts of mensural LayerElement child classes.
+     * Defined in view_mensural.cpp
+     */
+    ///@{
+    void DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff );
+    void DrawMensurDot( DeviceContext *dc, int x, int yy, Staff *staff );
+    void DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
+    void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
+    void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
     
     /**
      * @name Method for drawing Beam.

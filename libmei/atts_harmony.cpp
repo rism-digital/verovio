@@ -42,6 +42,7 @@ bool AttFretlocation::ReadFretlocation(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("fret")) {
         this->SetFret(StrToStr(element.attribute("fret").value()));
+        element.remove_attribute("fret");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -84,6 +85,7 @@ bool AttHarmLog::ReadHarmLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("chordref")) {
         this->SetChordref(StrToStr(element.attribute("chordref").value()));
+        element.remove_attribute("chordref");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -127,10 +129,12 @@ bool AttHarmVis::ReadHarmVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("extender")) {
         this->SetExtender(StrToStr(element.attribute("extender").value()));
+        element.remove_attribute("extender");
         hasAttribute = true;
     }
     if (element.attribute("rendgrid")) {
         this->SetRendgrid(StrToStr(element.attribute("rendgrid").value()));
+        element.remove_attribute("rendgrid");
         hasAttribute = true;
     }
     return hasAttribute;

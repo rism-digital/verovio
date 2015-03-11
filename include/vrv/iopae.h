@@ -68,7 +68,7 @@ public:
         octave = 4;
         beam = 0;
         pitch = PITCHNAME_NONE;
-        duration = 0;
+        duration = DURATION_NONE;
         accidental = ACCIDENTAL_EXPLICIT_NONE;
         dots = 0;
         rest = false;
@@ -124,7 +124,7 @@ public:
     char octave;
     unsigned char beam;
     data_PITCHNAME pitch;
-    char duration;
+    data_DURATION duration;
     data_ACCIDENTAL_EXPLICIT accidental;
     unsigned int dots;
     bool rest;
@@ -175,7 +175,7 @@ public:
         durations.clear();
         dots.clear();
         notes.clear();
-        durations_offset = 0;
+        durations_offset = DURATION_long;
         reset();
     };
     void   reset(void) {
@@ -193,9 +193,9 @@ public:
     
     std::vector<NoteObject> notes;
     
-    std::vector<int> durations;
+    std::vector<data_DURATION> durations;
     std::vector<int> dots; // use the same offset as durations, they are used in parallel
-    unsigned int durations_offset;
+    char durations_offset;
     data_BARRENDITION    barLine;
     int    abbreviation_offset;  
     int    wholerest;   // number of whole rests to process
@@ -240,7 +240,7 @@ private:
      int       getAccidental       (const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
      int       getOctave           (const char* incipit, char *octave, int index = 0 );
      int       getDurations        (const char* incipit, MeasureObject *measure, int index = 0);
-     int       getDuration         (const char* incipit, int *duration, int *dot, int index );
+     int       getDuration         (const char* incipit, data_DURATION *duration, int *dot, int index );
      int       getTupletFermata    (const char* incipit, NoteObject *note, int index = 0);
      int       getTupletFermataEnd (const char* incipit, NoteObject *note, int index = 0);
      int       getGraceNote        (const char* incipit, NoteObject *note, int index = 0);

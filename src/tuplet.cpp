@@ -21,14 +21,6 @@ Tuplet::Tuplet():
 
 }
 
-Tuplet::Tuplet(int num, int numbase):
-    LayerElement("tuplet-"), ObjectListInterface()
-{
-    Reset();
-    m_num = num;
-    m_numbase = numbase;
-}
-
 Tuplet::~Tuplet()
 {
 }
@@ -49,11 +41,10 @@ void Tuplet::AddLayerElement(LayerElement *element) {
     Modify();
 }
 
-void Tuplet::FilterList()
+void Tuplet::FilterList( ListOfObjects *childList )
 {
     // We want to keep only notes and rest
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
-    ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {

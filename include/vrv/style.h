@@ -51,7 +51,7 @@ namespace vrv {
 #define MIN_STEM_WIDTH 1.0
 #define MAX_STEM_WIDTH 5.0
     
-#define MIN_TIE_HEIGHT 24
+#define MIN_TIE_HEIGHT 20
 #define MIN_TIE_THICKNESS 6
     
 //----------------------------------------------------------------------------

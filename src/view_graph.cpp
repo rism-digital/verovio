@@ -171,8 +171,6 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 {
     assert( dc ); // DC cannot be NULL
     
-    dc->SetBrush( m_currentColour, AxSOLID );
-    dc->SetFont( &m_doc->m_drawingLyricFonts[ staffSize ] );
     dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
     std::wistringstream iss( s  );
@@ -197,13 +195,11 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     //std::wcout << std::endl;
     
     dc->EndText( );
-    dc->ResetFont();
-    dc->ResetBrush();
 }
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 6 * m_doc->m_drawingDoubleUnit[0] / 2, abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->m_drawingDoubleUnit[0] / 3, abs( x1 - x ) / 4 ) );
     
     int thickness = std::max( m_doc->m_drawingDoubleUnit[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
     

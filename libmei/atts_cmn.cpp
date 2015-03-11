@@ -42,6 +42,7 @@ bool AttArpegLog::ReadArpegLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("order")) {
         this->SetOrder(StrToStr(element.attribute("order").value()));
+        element.remove_attribute("order");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -84,6 +85,7 @@ bool AttArpegVis::ReadArpegVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("arrow")) {
         this->SetArrow(StrToStr(element.attribute("arrow").value()));
+        element.remove_attribute("arrow");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -126,6 +128,7 @@ bool AttBTremLog::ReadBTremLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -168,6 +171,7 @@ bool AttBeamed::ReadBeamed(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("beam")) {
         this->SetBeam(StrToStr(element.attribute("beam").value()));
+        element.remove_attribute("beam");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -210,6 +214,7 @@ bool AttBeamedwith::ReadBeamedwith(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("beam.with")) {
         this->SetBeamWith(StrToStr(element.attribute("beam.with").value()));
+        element.remove_attribute("beam.with");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -253,10 +258,12 @@ bool AttBeamingLog::ReadBeamingLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("beam.group")) {
         this->SetBeamGroup(StrToStr(element.attribute("beam.group").value()));
+        element.remove_attribute("beam.group");
         hasAttribute = true;
     }
     if (element.attribute("beam.rests")) {
         this->SetBeamRests(StrToStr(element.attribute("beam.rests").value()));
+        element.remove_attribute("beam.rests");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -309,10 +316,12 @@ bool AttBeamrend::ReadBeamrend(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("rend")) {
         this->SetRend(StrToStr(element.attribute("rend").value()));
+        element.remove_attribute("rend");
         hasAttribute = true;
     }
     if (element.attribute("slope")) {
         this->SetSlope(StrToDbl(element.attribute("slope").value()));
+        element.remove_attribute("slope");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -364,6 +373,7 @@ bool AttBeamsecondary::ReadBeamsecondary(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("breaksec")) {
         this->SetBreaksec(StrToInt(element.attribute("breaksec").value()));
+        element.remove_attribute("breaksec");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -406,6 +416,7 @@ bool AttBeatRptVis::ReadBeatRptVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("rend")) {
         this->SetRend(StrToStr(element.attribute("rend").value()));
+        element.remove_attribute("rend");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -448,6 +459,7 @@ bool AttBendGes::ReadBendGes(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("amount")) {
         this->SetAmount(StrToStr(element.attribute("amount").value()));
+        element.remove_attribute("amount");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -490,6 +502,7 @@ bool AttCutout::ReadCutout(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("cutout")) {
         this->SetCutout(StrToStr(element.attribute("cutout").value()));
+        element.remove_attribute("cutout");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -532,6 +545,7 @@ bool AttExpandable::ReadExpandable(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("expand")) {
         this->SetExpand(StrToStr(element.attribute("expand").value()));
+        element.remove_attribute("expand");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -574,6 +588,7 @@ bool AttFTremLog::ReadFTremLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -617,10 +632,12 @@ bool AttFermataVis::ReadFermataVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("shape")) {
         this->SetShape(StrToStr(element.attribute("shape").value()));
+        element.remove_attribute("shape");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -672,6 +689,7 @@ bool AttGlissVis::ReadGlissVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("text")) {
         this->SetText(StrToStr(element.attribute("text").value()));
+        element.remove_attribute("text");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -715,10 +733,12 @@ bool AttGraced::ReadGraced(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("grace")) {
         this->SetGrace(StrToStr(element.attribute("grace").value()));
+        element.remove_attribute("grace");
         hasAttribute = true;
     }
     if (element.attribute("grace.time")) {
         this->SetGraceTime(StrToStr(element.attribute("grace.time").value()));
+        element.remove_attribute("grace.time");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -770,6 +790,7 @@ bool AttHairpinLog::ReadHairpinLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -812,6 +833,7 @@ bool AttHairpinVis::ReadHairpinVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("opening")) {
         this->SetOpening(StrToStr(element.attribute("opening").value()));
+        element.remove_attribute("opening");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -860,30 +882,37 @@ bool AttHarpPedalLog::ReadHarpPedalLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("c")) {
         this->SetC(StrToStr(element.attribute("c").value()));
+        element.remove_attribute("c");
         hasAttribute = true;
     }
     if (element.attribute("d")) {
         this->SetD(StrToStr(element.attribute("d").value()));
+        element.remove_attribute("d");
         hasAttribute = true;
     }
     if (element.attribute("e")) {
         this->SetE(StrToStr(element.attribute("e").value()));
+        element.remove_attribute("e");
         hasAttribute = true;
     }
     if (element.attribute("f")) {
         this->SetF(StrToStr(element.attribute("f").value()));
+        element.remove_attribute("f");
         hasAttribute = true;
     }
     if (element.attribute("g")) {
         this->SetG(StrToStr(element.attribute("g").value()));
+        element.remove_attribute("g");
         hasAttribute = true;
     }
     if (element.attribute("a")) {
         this->SetA(StrToStr(element.attribute("a").value()));
+        element.remove_attribute("a");
         hasAttribute = true;
     }
     if (element.attribute("b")) {
         this->SetB(StrToStr(element.attribute("b").value()));
+        element.remove_attribute("b");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -980,6 +1009,7 @@ bool AttLvpresent::ReadLvpresent(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("lv")) {
         this->SetLv(StrToStr(element.attribute("lv").value()));
+        element.remove_attribute("lv");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1022,6 +1052,7 @@ bool AttMultiRestVis::ReadMultiRestVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("block")) {
         this->SetBlock(StrToStr(element.attribute("block").value()));
+        element.remove_attribute("block");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1064,6 +1095,7 @@ bool AttNoteGesCmn::ReadNoteGesCmn(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("gliss")) {
         this->SetGliss(StrToStr(element.attribute("gliss").value()));
+        element.remove_attribute("gliss");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1106,6 +1138,7 @@ bool AttNumbered::ReadNumbered(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
+        element.remove_attribute("num");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1149,10 +1182,12 @@ bool AttNumberplacement::ReadNumberplacement(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("num.place")) {
         this->SetNumPlace(StrToStr(element.attribute("num.place").value()));
+        element.remove_attribute("num.place");
         hasAttribute = true;
     }
     if (element.attribute("num.visible")) {
         this->SetNumVisible(StrToStr(element.attribute("num.visible").value()));
+        element.remove_attribute("num.visible");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1204,6 +1239,7 @@ bool AttOctaveLog::ReadOctaveLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("coll")) {
         this->SetColl(StrToStr(element.attribute("coll").value()));
+        element.remove_attribute("coll");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1246,6 +1282,7 @@ bool AttPedalLog::ReadPedalLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("dir")) {
         this->SetDir(StrToStr(element.attribute("dir").value()));
+        element.remove_attribute("dir");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1288,6 +1325,7 @@ bool AttPedalVis::ReadPedalVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("style")) {
         this->SetStyle(StrToStr(element.attribute("style").value()));
+        element.remove_attribute("style");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1330,6 +1368,7 @@ bool AttPianopedals::ReadPianopedals(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("pedal.style")) {
         this->SetPedalStyle(StrToStr(element.attribute("pedal.style").value()));
+        element.remove_attribute("pedal.style");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1372,6 +1411,7 @@ bool AttRehearsal::ReadRehearsal(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("reh.enclose")) {
         this->SetRehEnclose(StrToStr(element.attribute("reh.enclose").value()));
+        element.remove_attribute("reh.enclose");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1414,6 +1454,7 @@ bool AttScoreDefVisCmn::ReadScoreDefVisCmn(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("grid.show")) {
         this->SetGridShow(StrToStr(element.attribute("grid.show").value()));
+        element.remove_attribute("grid.show");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1456,6 +1497,7 @@ bool AttSlurrend::ReadSlurrend(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("slur.rend")) {
         this->SetSlurRend(StrToStr(element.attribute("slur.rend").value()));
+        element.remove_attribute("slur.rend");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1499,10 +1541,12 @@ bool AttStemmedCmn::ReadStemmedCmn(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("stem.mod")) {
         this->SetStemMod(StrToStr(element.attribute("stem.mod").value()));
+        element.remove_attribute("stem.mod");
         hasAttribute = true;
     }
     if (element.attribute("stem.with")) {
         this->SetStemWith(StrToStr(element.attribute("stem.with").value()));
+        element.remove_attribute("stem.with");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1554,6 +1598,7 @@ bool AttTierend::ReadTierend(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tie.rend")) {
         this->SetTieRend(StrToStr(element.attribute("tie.rend").value()));
+        element.remove_attribute("tie.rend");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1596,6 +1641,7 @@ bool AttTremmeasured::ReadTremmeasured(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("measperf")) {
         this->SetMeasperf(StrToStr(element.attribute("measperf").value()));
+        element.remove_attribute("measperf");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1641,18 +1687,22 @@ bool AttTupletVis::ReadTupletVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("bracket.place")) {
         this->SetBracketPlace(StrToStr(element.attribute("bracket.place").value()));
+        element.remove_attribute("bracket.place");
         hasAttribute = true;
     }
     if (element.attribute("bracket.visible")) {
         this->SetBracketVisible(StrToStr(element.attribute("bracket.visible").value()));
+        element.remove_attribute("bracket.visible");
         hasAttribute = true;
     }
     if (element.attribute("dur.visible")) {
         this->SetDurVisible(StrToStr(element.attribute("dur.visible").value()));
+        element.remove_attribute("dur.visible");
         hasAttribute = true;
     }
     if (element.attribute("num.format")) {
         this->SetNumFormat(StrToStr(element.attribute("num.format").value()));
+        element.remove_attribute("num.format");
         hasAttribute = true;
     }
     return hasAttribute;

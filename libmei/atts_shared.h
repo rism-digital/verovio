@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of an accidental. **/
     std::string m_func;
 
@@ -93,7 +93,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Captures a written accidental. **/
     data_ACCIDENTAL_EXPLICIT m_accid;
 
@@ -131,7 +131,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the performed pitch inflection when it differs from the written
      * accidental.
@@ -172,7 +172,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Provides a way of pointing to a user-defined symbol.
      * It must contain an ID of a <symbolDef> element elsewhere in the document.
@@ -213,7 +213,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes the written articulation(s).
      * Articulations are normally encoded in order from the note head outward; that is,
@@ -257,7 +257,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records performed articulation that differs from the written value. **/
     std::string m_articGes;
 
@@ -295,7 +295,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the number of augmentation dots required by a dotted duration. **/
     char m_dots;
 
@@ -338,7 +338,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * A name or label associated with the controlled vocabulary from which the value
      * is taken.
@@ -384,7 +384,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
@@ -427,7 +427,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the location of a bar line. **/
     std::string m_barplace;
     /**
@@ -486,7 +486,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Color of beams, including those associated with tuplets. **/
     std::string m_beamColor;
     /** Encodes whether a beam is "feathered" and in which direction. **/
@@ -528,7 +528,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Contains a reference to a field or element in another descriptive encoding
      * system to which this MEI element is comparable.
@@ -569,7 +569,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the calendar system to which a date belongs, for example, Gregorian,
      * Julian, Roman, Mosaic, Revolutionary, Islamic, etc.
@@ -610,7 +610,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Used to record a value which serves as a primary key in an external database. **/
     std::string m_dbkey;
 
@@ -648,7 +648,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates a single alternative note head should be displayed instead of
      * individual note heads.
@@ -690,7 +690,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the function of the clef.
      * A "cautionary" clef does not change the following pitches.
@@ -746,7 +746,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Encodes a value for the clef symbol. **/
     data_CLEFSHAPE m_clefShape;
     /**
@@ -799,7 +799,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the color of the clef. **/
     std::string m_clefColor;
     /** Determines whether the clef is to be displayed. **/
@@ -839,7 +839,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes a clef's shape. **/
     data_CLEFSHAPE m_shape;
 
@@ -877,7 +877,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Captures one or more coded values for the textual content of this element. **/
     std::string m_code;
 
@@ -915,7 +915,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used to indicate visual appearance.
      * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
@@ -956,7 +956,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates this feature is 'colored'; that is, it is a participant in a change in
      * rhythmic values.
@@ -1011,7 +1011,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Provides a label for an element.
      * The value may be any string.
@@ -1074,7 +1074,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates the upper-left corner x coordinate. **/
     int m_ulxInt;
     /** Indicates the upper-left corner y coordinate. **/
@@ -1128,7 +1128,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the placement of Bezier control points as a series of space-separated xy
      * coordinates, e.g., 19 45 -32 118.
@@ -1178,7 +1178,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
@@ -1216,7 +1216,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes the target note when its pitch differs from the pitch at which the
      * custos appears.
@@ -1277,7 +1277,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Contains the end point of a date range in standard ISO form. **/
     std::string m_enddate;
     /** Provides the value of a textual date in standard ISO form. **/
@@ -1323,7 +1323,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Used to link metadata elements to one or more data-containing elements. **/
     std::string m_data;
 
@@ -1361,7 +1361,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Identifies one or more metadata elements within the header, which are understood
      * to apply to the element bearing this attribute and its content.
@@ -1412,7 +1412,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the default distance from the staff for dynamic marks. **/
     std::string m_dynamDist;
     /**
@@ -1457,7 +1457,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
 
@@ -1489,13 +1489,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(int dur_) { m_dur = dur_; };
-    int GetDur() const { return m_dur; };    
+    void SetDur(data_DURATION dur_) { m_dur = dur_; };
+    data_DURATION GetDur() const { return m_dur; };    
     bool HasDur( );
     
     ///@}
 
-protected:
+private:
     /**
      * Records duration using ident dotted, relative durational values provided by the
      * data.DURATION datatype.
@@ -1503,7 +1503,7 @@ protected:
      * multiple space-separated values that add up to the total duration may be used.
      * When dotted values are present, the dots attribute must be ignored.
      **/
-    int m_dur;
+    data_DURATION m_dur;
 
 /* include <attdur> */
 };
@@ -1549,7 +1549,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Contains a default duration in those situations when the first note, rest,
      * chord, etc.
@@ -1595,13 +1595,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDur(int dur_) { m_dur = dur_; };
-    int GetDur() const { return m_dur; };    
+    void SetDur(data_DURATION dur_) { m_dur = dur_; };
+    data_DURATION GetDur() const { return m_dur; };    
     bool HasDur( );
     
     ///@}
 
-protected:
+private:
     /**
      * Records duration using ident dotted, relative durational values provided by the
      * data.DURATION datatype.
@@ -1609,7 +1609,7 @@ protected:
      * multiple space-separated values that add up to the total duration may be used.
      * When dotted values are present, the dots attribute must be ignored.
      **/
-    int m_dur;
+    data_DURATION m_dur;
 
 /* include <attdur> */
 };
@@ -1639,20 +1639,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDurGes(int durGes_) { m_durGes = durGes_; };
-    int GetDurGes() const { return m_durGes; };    
+    void SetDurGes(data_DURATION durGes_) { m_durGes = durGes_; };
+    data_DURATION GetDurGes() const { return m_durGes; };    
     bool HasDurGes( );
     
     ///@}
 
-protected:
+private:
     /**
      * Records performed duration information that differs from the written duration.
      * Its value may be expressed in several forms; that is, ppq (MIDI clicks and
      * MusicXML 'divisions'), Humdrum **recip values, beats, seconds, or mensural
      * duration values.
      **/
-    int m_durGes;
+    data_DURATION m_durGes;
 
 /* include <attdur.ges> */
 };
@@ -1693,7 +1693,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
@@ -1739,7 +1739,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the characters often used to mark accidentals, articulations, and
      * sometimes notes as having a cautionary or editorial function.
@@ -1782,7 +1782,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the attachment of a fermata to this element.
      * If visual information about the fermata needs to be recorded, then a <fermata>
@@ -1824,7 +1824,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Signifies the hand responsible for an action.
      * The value must be the ID of a <hand> element declared in the header.
@@ -1865,7 +1865,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records horizontal alignment. **/
     std::string m_halign;
 
@@ -1903,7 +1903,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Provides a way of pointing to a MIDI instrument definition.
      * It must contain the ID of an <instrDef> element elsewhere in the document.
@@ -1944,7 +1944,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Specifies the applicable MIME (multimedia internet mail extension) type.
      * The value should be a valid MIME media type defined by the Internet Engineering
@@ -1986,7 +1986,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used for linking visually separate entities that form a single logical entity,
      * for example, multiple slurs broken across a system break that form a single
@@ -2031,7 +2031,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates major, minor, or other tonality. **/
     std::string m_mode;
 
@@ -2089,7 +2089,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Contains an accidental for the tonic key, if one is required, e.g., if key.pname
      * equals 'c' and key.accid equals 's', then a tonic of C# is indicated.
@@ -2156,7 +2156,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates whether the key signature should be displayed. **/
     std::string m_keySigShow;
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
@@ -2196,7 +2196,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Provides a label for a group of staves on pages after the first page.
      * Usually, this label takes an abbreviated form.
@@ -2237,7 +2237,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** --- **/
     std::string m_lang;
 
@@ -2275,7 +2275,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
 
@@ -2313,7 +2313,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Identifies the layer to which a feature applies. **/
     std::string m_layer;
 
@@ -2351,7 +2351,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the line upon which a feature stands.
      * The value must be in the range between 1 and the number of lines on the staff.
@@ -2393,7 +2393,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
@@ -2456,7 +2456,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the alignment of lyric syllables associated with a note or chord. **/
     std::string m_lyricAlign;
     /** Sets the font family default value for lyrics. **/
@@ -2509,7 +2509,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the visual rendition of the left bar line.
      * It is present here only for facilitation of translation from legacy encodings
@@ -2553,7 +2553,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates the unit used for a measurement of size. **/
     int m_unit;
 
@@ -2601,7 +2601,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Specifies a point where the relevant content begins.
      * A numerical value must be less and a time value must be earlier than that in the
@@ -2656,7 +2656,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the writing medium. **/
     std::string m_medium;
 
@@ -2699,7 +2699,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Specifies a generic MEI version label. **/
     std::string m_meiversion;
     /** Records a detailed MEI version number. **/
@@ -2744,7 +2744,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Specifies whether a dot is to be added to the base symbol. **/
     data_BOOLEAN m_dot;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
@@ -2794,7 +2794,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
@@ -2844,7 +2844,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
@@ -2887,7 +2887,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Captures the number of beats in a measure, that is, the top number of the meter
      * signature.
@@ -2945,7 +2945,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Contains an indication of how the meter signature should be rendered. **/
     std::string m_meterRend;
     /**
@@ -2993,7 +2993,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the relationship between the content of a staff or layer and the
      * prevailing meter.
@@ -3039,7 +3039,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the relationship between the content of a staff or layer and the
      * prevailing meter.
@@ -3098,7 +3098,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used to describe tempo in terms of beats (often the meter signature denominator)
      * per minute, ala M.M.
@@ -3144,7 +3144,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates whether programmatically calculated counts of multiple measures of
      * rest (mRest) and whole measure repeats (mRpt) in parts should be rendered.
@@ -3190,7 +3190,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used to record a pointer to the regularized form of the name elsewhere in the
      * document.
@@ -3246,7 +3246,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records performed octave information that differs from the written value. **/
     std::string m_octGes;
     /** Contains a performed pitch name that differs from the written value. **/
@@ -3288,7 +3288,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Used to override the head shape normally used for the given duration. **/
     std::string m_headshape;
 
@@ -3326,7 +3326,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Captures written octave information. **/
     char m_oct;
 
@@ -3364,7 +3364,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Contains a default octave specification for use when the first note, rest,
      * chord, etc.
@@ -3411,7 +3411,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the amount of octave displacement. **/
     data_OCTAVE_DIS m_dis;
     /** Records the direction of octave displacement. **/
@@ -3451,7 +3451,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Determines the placement of notes on a 1-line staff.
      * A value of 'true' places all notes on the line, while a value of 'false' places
@@ -3493,7 +3493,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
@@ -3534,7 +3534,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of an accidental. **/
     std::string m_func;
 
@@ -3572,7 +3572,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Contains a written pitch name. **/
     data_PITCHNAME m_pname;
 
@@ -3610,7 +3610,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Captures the placement of the item with respect to the staff with which it is
      * associated.
@@ -3656,7 +3656,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Contains a space separated list of references that identify logical events that
      * participate in a collection, such as notes under a phrase mark.
@@ -3724,7 +3724,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** --- **/
     std::string m_actuate;
     /**
@@ -3781,7 +3781,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the relative size of a feature. **/
     std::string m_size;
 
@@ -3819,7 +3819,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Captures information regarding responsibility for some aspect of the text's
      * creation, transcription, editing, or encoding.
@@ -3861,7 +3861,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_rend;
 
@@ -3899,7 +3899,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
     std::string m_scale;
 
@@ -3947,7 +3947,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Holds the pitch name of a tuning reference pitch. **/
     std::string m_tunePname;
     /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
@@ -4089,7 +4089,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes where ending marks should be displayed. **/
     std::string m_endingRend;
     /** Indicates whether measure numbers should be displayed. **/
@@ -4198,7 +4198,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates that staves begin again with this section. **/
     std::string m_restart;
 
@@ -4236,7 +4236,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used to assign a sequence number related to the order in which the encoded
      * features carrying this attribute are believed to have occurred.
@@ -4277,7 +4277,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates the number of slashes present. **/
     char m_slash;
 
@@ -4315,7 +4315,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates that this element participates in a slur.
      * If visual information about the slur needs to be recorded, then a <slur> element
@@ -4357,7 +4357,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates whether a space is 'compressible', i.e., if it may be removed at the
      * discretion of processing software.
@@ -4398,7 +4398,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
 
@@ -4461,7 +4461,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Determines whether to display guitar chord grids. **/
     std::string m_gridShow;
     /** Indicates the number of layers and their stem directions. **/
@@ -4521,7 +4521,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates whether bar lines go across the space between staves (true) or are
      * only drawn across the lines of each staff (false).
@@ -4562,7 +4562,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Specifies the symbol used to group a set of staves. **/
     std::string m_symbol;
 
@@ -4600,7 +4600,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Signifies the staff on which a notated event occurs or to which a control event
      * applies.
@@ -4642,7 +4642,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Holds the staff location of the feature. **/
     std::string m_loc;
 
@@ -4685,7 +4685,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Captures staff location in terms of written pitch name. **/
     data_PITCHNAME m_ploc;
     /** Records staff location in terms of written octave. **/
@@ -4725,7 +4725,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the final element in a sequence of events to which the feature
      * applies.
@@ -4766,7 +4766,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Holds a reference to the first element in a sequence of events to which the
      * feature applies.
@@ -4827,7 +4827,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the direction of a stem. **/
     data_STEMDIRECTION m_stemDir;
     /** Encodes the stem length. **/
@@ -4878,7 +4878,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Describes the symbols typically used to indicate breaks between syllables and
      * their functions.
@@ -4921,7 +4921,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Holds an associated sung text syllable. **/
     std::string m_syl;
 
@@ -4979,7 +4979,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Provides a default value for the font family name of text (other than lyrics)
      * when this information is not provided on the individual elements.
@@ -5040,7 +5040,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates that this element participates in a tie.
      * If visual information about the tie needs to be recorded, then a <tie> element
@@ -5082,7 +5082,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes the onset time in terms of musical time, i.e.,
      * beats[.fractional_beat_part].
@@ -5128,7 +5128,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used to record the onset time in pulses per quarter note (ppq, MusicXML
      * divisions, or MIDI clicks) since the start of the file.
@@ -5171,7 +5171,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes the ending point of an event in terms of musical time, i.e., a count of
      * measures plus a beat location.
@@ -5217,7 +5217,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the amount of diatonic pitch shift, e.g., C to C♯ = 0, C to D♭ = 1,
      * necessary to calculate the sounded pitch from the written one.
@@ -5263,7 +5263,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates that this feature participates in a tuplet.
      * If visual information about the tuplet needs to be recorded, then a <tuplet>
@@ -5310,7 +5310,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Characterizes the element in some sense, using any convenient classification
      * scheme or typology.
@@ -5376,7 +5376,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Contains the name of a font-family. **/
     std::string m_fontfam;
     /** Holds the name of a font. **/
@@ -5422,7 +5422,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates if a feature should be rendered when the notation is presented
      * graphically or sounded when it is presented in an aural form.
@@ -5463,7 +5463,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records a horizontal adjustment to a feature's programmatically-determined
      * location in terms of staff interline distance; that is, in units of 1/2 the
@@ -5505,7 +5505,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records a timestamp adjustment of a feature's programmatically-determined
      * location in terms of musical time; that is, beats.
@@ -5546,7 +5546,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the vertical adjustment of a feature's programmatically-determined
      * location in terms of staff interline distance; that is, in units of 1/2 the
@@ -5593,7 +5593,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the horizontal adjustment of a feature's programmatically-determined
      * start point.
@@ -5644,7 +5644,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records a timestamp adjustment of a feature's programmatically-determined start
      * point.
@@ -5695,7 +5695,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records a vertical adjustment of a feature's programmatically-determined start
      * point.
@@ -5741,7 +5741,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** --- **/
     std::string m_space;
 
@@ -5779,7 +5779,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Measurement of the horizontal dimension of an entity.
      * The width attribute may be used to capture measure width data for interchange
@@ -5827,7 +5827,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes an x coordinate for a feature in an output coordinate system.
      * When it is necessary to record the placement of a feature in a facsimile image,
@@ -5880,7 +5880,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Encodes the optional 2nd x coordinate. **/
     double m_x2Dbl;
     /** Encodes the optional 2nd y coordinate. **/

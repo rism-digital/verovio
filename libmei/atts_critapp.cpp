@@ -42,6 +42,7 @@ bool AttCrit::ReadCrit(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("cause")) {
         this->SetCause(StrToStr(element.attribute("cause").value()));
+        element.remove_attribute("cause");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -84,6 +85,7 @@ bool AttSource::ReadSource(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("source")) {
         this->SetSource(StrToStr(element.attribute("source").value()));
+        element.remove_attribute("source");
         hasAttribute = true;
     }
     return hasAttribute;

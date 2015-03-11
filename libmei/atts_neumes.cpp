@@ -43,10 +43,12 @@ bool AttIneumeLog::ReadIneumeLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("name")) {
         this->SetName(StrToStr(element.attribute("name").value()));
+        element.remove_attribute("name");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -99,10 +101,12 @@ bool AttUneumeLog::ReadUneumeLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("name")) {
         this->SetName(StrToStr(element.attribute("name").value()));
+        element.remove_attribute("name");
         hasAttribute = true;
     }
     return hasAttribute;

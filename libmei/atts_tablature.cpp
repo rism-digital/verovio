@@ -43,10 +43,12 @@ bool AttNoteGesTablature::ReadNoteGesTablature(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tab.fret")) {
         this->SetTabFret(StrToStr(element.attribute("tab.fret").value()));
+        element.remove_attribute("tab.fret");
         hasAttribute = true;
     }
     if (element.attribute("tab.string")) {
         this->SetTabString(StrToStr(element.attribute("tab.string").value()));
+        element.remove_attribute("tab.string");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -98,6 +100,7 @@ bool AttStaffDefGesTablature::ReadStaffDefGesTablature(  pugi::xml_node element 
     bool hasAttribute = false;
     if (element.attribute("tab.strings")) {
         this->SetTabStrings(StrToStr(element.attribute("tab.strings").value()));
+        element.remove_attribute("tab.strings");
         hasAttribute = true;
     }
     return hasAttribute;

@@ -23,21 +23,6 @@ Rest::Rest():
 Rest::~Rest()
 {
 }
-
-bool Rest::operator==( Object& other )
-{
-    Rest *otherRest = dynamic_cast<Rest*>( &other );
-    if ( !otherRest ) {
-        return false;
-    }
-    if ( !this->HasIdenticalPositionInterface( otherRest ) ) {
-        return false;
-    }
-    if ( !this->HasIdenticalDurationInterface( otherRest ) ) {
-        return false;
-    }
-    return true;
-}
     
 void Rest::Reset()
 {

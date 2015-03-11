@@ -43,10 +43,12 @@ bool AttVerseLog::ReadVerseLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("refrain")) {
         this->SetRefrain(StrToStr(element.attribute("refrain").value()));
+        element.remove_attribute("refrain");
         hasAttribute = true;
     }
     if (element.attribute("rhythm")) {
         this->SetRhythm(StrToStr(element.attribute("rhythm").value()));
+        element.remove_attribute("rhythm");
         hasAttribute = true;
     }
     return hasAttribute;

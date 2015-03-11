@@ -56,7 +56,7 @@ public:
      */
     void AddLayerElement(LayerElement *element);
 
-    void FilterList();
+    virtual void FilterList( ListOfObjects *childlist );
     
     void GetYExtremes(int *yMax, int *yMin);
     

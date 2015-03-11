@@ -10,6 +10,9 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+#include <stdlib.h>
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -83,7 +86,7 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
     else if (key < 0) {
         m_alteration = ACCID_FLAT;
     }
-    m_num_alter = key < 0 ? -key : key; // abs equivalent
+    m_num_alter = abs(key);
 }
 
 KeySig::~KeySig()
@@ -159,20 +162,6 @@ void KeySigAttr::Reset()
 {
     Object::Reset();
     ResetKeySigDefaultLog();
-}
-    
-bool KeySigAttr::operator==( Object& other )
-{
-    KeySigAttr *otherClefAttr = dynamic_cast<KeySigAttr*>( &other );
-    if ( !otherClefAttr ) {
-        return false;
-    }
-    /*
-     if ( this->m_clefId != otherClef->m_clefId ) {
-     return false;
-     }
-     */
-    return true;
 }
 
 } // namespace vrv
