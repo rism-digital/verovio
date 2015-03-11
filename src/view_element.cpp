@@ -1433,6 +1433,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
     int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
     int doubleUnit = fullUnit * 2;
     int halfUnit = fullUnit / 2;
+    int type = accid->GetAccid();
     
     std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
     std::vector<Note*> noteList = chord->m_accidList;
@@ -1450,14 +1451,25 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
     int width = doubleUnit / halfUnit; //always 4 for now, this avoids magic numbers
     
     //move to the left by half-units until all four corners are false
-    while (currentX < xLength)
-    {
-        if (accidSpace->at(topPos)[currentX]) currentX += 1;
-        else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-        else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
-        else if (accidSpace->at(botPos)[currentX + width]) currentX += 1;
-        else break;
-    };
+    if (type == ACCIDENTAL_EXPLICIT_f) {
+        while (currentX < xLength) {
+            if (accidSpace->at(topPos + 1)[currentX]) currentX += 1;
+            if (accidSpace->at(topPos)[currentX + 1]) currentX += 1;
+            else if (accidSpace->at(botPos)[currentX]) currentX += 1;
+            else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
+            else if (accidSpace->at(botPos)[currentX + width]) currentX += 1;
+            else break;
+        };
+    }
+    else {
+        while (currentX < xLength) {
+            if (accidSpace->at(topPos)[currentX]) currentX += 1;
+            else if (accidSpace->at(botPos)[currentX]) currentX += 1;
+            else if (accidSpace->at(topPos)[currentX + width]) currentX += 1;
+            else if (accidSpace->at(botPos)[currentX + width]) currentX += 1;
+            else break;
+        };
+    }
     
     //move the accidental position if requested
     if (save)
