@@ -172,6 +172,9 @@ enum ClefId {
     C5 = CLEFSHAPE_C << 8 | 5,
     perc = CLEFSHAPE_perc << 8 | 1
 };
+    
+//Used in spacing accidentals on complex chords
+#define ACCID_WIDTH 4
 
 } // namespace vrv
 

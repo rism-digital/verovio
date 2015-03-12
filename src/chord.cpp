@@ -157,17 +157,45 @@ void Chord::FilterList( ListOfObjects *childList )
     }
 }
 
-ListOfObjects Chord::GenerateAccidList()
+void Chord::ResetAccidList()
 {
-    ListOfObjects accidList;
+    m_accidList.clear();
     ListOfObjects* childList = this->GetList(this); //make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+    for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
         if (note->HasAccid()) {
-            accidList.push_back(*it);
+            m_accidList.push_back(note);
         }
     }
-    return accidList;
+}
+    
+void Chord::ResetAccidSpace(int fullUnit)
+{
+    m_accidSpace.clear();
+ 
+    if (m_accidList.size() == 0) return;
+    
+    int halfUnit = fullUnit / 2;
+    int doubleUnit = fullUnit * 2;
+    
+    //make m_accidSpace into a 2D vector of size (vertical half-units, most possible horizontal halfunits)
+    int idx, setIdx;
+    int size = (int)m_accidList.size();
+    std::vector<bool> *accidLine;
+    //top y position - bottom y position in half-units
+    int rows = ((m_accidList[0]->GetDrawingY() - m_accidList[m_accidList.size() - 1]->GetDrawingY()) / halfUnit);
+    m_accidSpace.resize(std::max(rows, ACCID_WIDTH));
+    
+    //each line needs to be 4 times the number of notes in case every one overlaps fully
+    int lineLength = (doubleUnit*size) / halfUnit;
+    for(idx = 0; idx < m_accidSpace.size(); idx++)
+    {
+        accidLine = &m_accidSpace.at(idx);
+        //resize each line
+        accidLine->resize(lineLength);
+        //initialize all spaces to false
+        for(setIdx = 0; setIdx < lineLength; setIdx++) accidLine->at(setIdx) = false;
+    }
 }
     
 void Chord::GetYExtremes(int *yMax, int *yMin)

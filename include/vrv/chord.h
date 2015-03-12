@@ -20,6 +20,9 @@
 
 namespace vrv {
     
+#define ledgermin(a,b) (((a)<(b))?(a):(b))
+#define ledgermax(a,b) (((a)>(b))?(a):(b))
+    
 //----------------------------------------------------------------------------
 // Chord
 //----------------------------------------------------------------------------
@@ -60,7 +63,8 @@ public:
     /**
      * Returns list of notes that have accidentals
      */
-    ListOfObjects GenerateAccidList();
+    void ResetAccidList();
+    void ResetAccidSpace(int staffSize);
     
     /**
      * @name Set and get the stem direction of the beam.
@@ -103,12 +107,14 @@ public:
      * m_ledgerLines[0][x] is single-length, m_ledgerLines[1][x] is double-length
      * m_ledgerLines[x][0] is below staff, m_ledgerLines[x][1] is above staff
      */
-    int m_ledgerLines[2][2];
+    char m_ledgerLines[2][2];
     
     /**
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
+    std::vector<Note*> m_accidList;
+    std::vector< std::vector<bool> > m_accidSpace;
 };
 
 } // namespace vrv

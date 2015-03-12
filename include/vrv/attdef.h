@@ -9,6 +9,7 @@
 #ifndef __ATT_DEF_H__
 #define __ATT_DEF_H__
 
+#include <string>
 #include <utility>
 #include <vector>
 

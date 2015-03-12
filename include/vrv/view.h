@@ -231,7 +231,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid );
+    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid = NULL );
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -260,7 +260,6 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
-    void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
@@ -349,6 +348,12 @@ private:
      * @name Used for calculating clustered information/dot position
      */
     bool IsOnStaffLine ( int y, Staff *staff );
+    
+    /**
+     * Internal methods for calculating spacing chords
+     */
+    void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
+    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save);
     
     /**
      * Swap the to points passed as reference.
