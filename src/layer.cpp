@@ -33,22 +33,27 @@ Layer::Layer( ):
 	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(),
     AttCommon()
 {
+    // own pointers need to be initialized before Reset()
+    m_currentClef = NULL;
+    m_currentKeySig = NULL;
+    m_currentMensur = NULL;
+    m_currentMeterSig = NULL;
     Reset();
 }
 
 Layer::~Layer()
 {
-    if (m_drawingClef) {
-        delete m_drawingClef;
+    if (m_currentClef) {
+        delete m_currentClef;
     }
-    if (m_drawingKeySig) {
-        delete m_drawingKeySig;
+    if (m_currentKeySig) {
+        delete m_currentKeySig;
     }
-    if (m_drawingMensur) {
-        delete m_drawingMensur;
+    if (m_currentMensur) {
+        delete m_currentMensur;
     }
-    if (m_drawingMeterSig) {
-        delete m_drawingMeterSig;
+    if (m_currentMeterSig) {
+        delete m_currentMeterSig;
     }    
 }
 
@@ -58,10 +63,27 @@ void Layer::Reset()
     DrawingListInterface::Reset();
     ResetCommon();
     
-    m_drawingClef = NULL;
-    m_drawingKeySig = NULL;
-    m_drawingMensur = NULL;
-    m_drawingMeterSig = NULL;
+    if (m_currentClef) {
+        delete m_currentClef;
+    }
+    if (m_currentKeySig) {
+        delete m_currentKeySig;
+    }
+    if (m_currentMensur) {
+        delete m_currentMensur;
+    }
+    if (m_currentMeterSig) {
+        delete m_currentMeterSig;
+    }
+    // Have at least a clef by default
+    m_currentClef = new Clef();
+    m_currentKeySig = NULL;
+    m_currentMensur = NULL;
+    m_currentMeterSig = NULL;
+    m_drawClef = false;
+    m_drawKeySig = false;
+    m_drawMensur = false;
+    m_drawMeterSig = false;
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
     
@@ -105,36 +127,36 @@ LayerElement *Layer::GetAtPos( int x )
 	return element;
 }
     
-void Layer::SetDrawingClef( Clef *clef )
+void Layer::SetCurrentClef( Clef *clef )
 {
-    if (m_drawingClef) {
-        delete m_drawingClef;
+    if (clef) {
+        if (m_currentClef) delete m_currentClef;
+        m_currentClef = clef;
     }
-    m_drawingClef = clef;
 }
 
-void Layer::SetDrawingKeySig( KeySig *keySig )
+void Layer::SetCurrentKeySig( KeySig *keySig )
 {
-    if (m_drawingKeySig) {
-        delete m_drawingKeySig;
+    if (keySig) {
+        if (m_currentKeySig) delete m_currentKeySig;
+        m_currentKeySig = keySig;
     }
-    m_drawingKeySig = keySig;
 }
 
-void Layer::SetDrawingMensur( Mensur *mensur )
+void Layer::SetCurrentMensur( Mensur *mensur )
 {
-    if (m_drawingMensur) {
-        delete m_drawingMensur;
+    if (mensur) {
+        if (m_currentMensur) delete m_currentMensur;
+        m_currentMensur = mensur;
     }
-    m_drawingMensur = mensur;
 }
 
-void Layer::SetDrawingMeterSig( MeterSig *meterSig )
+void Layer::SetCurrentMeterSig( MeterSig *meterSig )
 {
-    if (m_drawingMeterSig) {
-        delete m_drawingMeterSig;
+    if (meterSig) {
+        if (m_currentMeterSig) delete m_currentMeterSig;
+        m_currentMeterSig = meterSig;
     }
-    m_drawingMeterSig = meterSig;
 }
 
 LayerElement *Layer::Insert( LayerElement *element, int x )
@@ -179,66 +201,49 @@ void Layer::Insert( LayerElement *layerElement, LayerElement *before )
     AddLayerElement( layerElement , idx );
 }
 
-void Layer::SetDrawingValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )
+void Layer::SetDrawingAndCurrentValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )
 {
     if (!currentStaffDef || !currentScoreDef) {
         LogDebug("scoreDef and/or staffDef not found");
         return;
     }
     
-    this->SetDrawingClef( NULL );
-    this->SetDrawingKeySig( NULL );
-    this->SetDrawingMensur( NULL );
-    this->SetDrawingMeterSig( NULL );
-    
-    if ( currentStaffDef->DrawClef() ) {
-        if ( currentStaffDef->GetClef() ) {
-            this->SetDrawingClef( currentStaffDef->GetClefCopy() );
-        }
-        else {
-            this->SetDrawingClef( currentScoreDef->GetClefCopy() );
-        }
-        currentStaffDef->SetDrawClef( false );
-    }
-    if ( currentStaffDef->DrawKeySig() ) {
-        if ( currentStaffDef->GetKeySig() ) {
-            this->SetDrawingKeySig( currentStaffDef->GetKeySigCopy() );
-        }
-        else {
-            this->SetDrawingKeySig( currentScoreDef->GetKeySigCopy() );
-        }
-        currentStaffDef->SetDrawKeySig( false );
-    }
-    if ( currentStaffDef->DrawMensur() ) {
-        if ( currentStaffDef->GetMensur() ) {
-            this->SetDrawingMensur( currentStaffDef->GetMensurCopy() );
-        }
-        else {
-            this->SetDrawingMensur( currentScoreDef->GetMensurCopy() );
-        }
-        currentStaffDef->SetDrawMensur( false );
-    }
-    if ( currentStaffDef->DrawMeterSig() ) {
-        if ( currentStaffDef->GetMeterSig() ) {
-            this->SetDrawingMeterSig( currentStaffDef->GetMeterSigCopy() );
-        }
-        else {
-            this->SetDrawingMeterSig( currentScoreDef->GetMeterSigCopy() );
-        }
-        currentStaffDef->SetDrawMeterSig( false );
-    }
-    
-    // also put the current clef (if any if the staffDef or the scoreDef)
-    // not very efficient...
+    this->SetDrawClef( currentStaffDef->DrawClef() );
+    this->SetDrawKeySig( currentStaffDef->DrawKeySig() );
+    this->SetDrawMensur( currentStaffDef->DrawMensur() );
+    this->SetDrawMeterSig( currentStaffDef->DrawMeterSig() );
+    // Don't draw on the next one
+    currentStaffDef->SetDrawClef( false );
+    currentStaffDef->SetDrawKeySig( false );
+    currentStaffDef->SetDrawMensur( false );
+    currentStaffDef->SetDrawMeterSig( false );
+
     if ( currentStaffDef->GetClef() ) {
-        Clef *tmp = currentStaffDef->GetClefCopy();
-        this->m_currentClef = *tmp;
-        delete tmp;
+        this->SetCurrentClef( currentStaffDef->GetClefCopy() );
     }
-    else if ( currentScoreDef->GetClef() ) {
-        Clef *tmp = currentStaffDef->GetClefCopy();
-        this->m_currentClef = *tmp;
-        delete tmp;
+    else {
+        this->SetCurrentClef( currentScoreDef->GetClefCopy() );
+    }
+
+    if ( currentStaffDef->GetKeySig() ) {
+        this->SetCurrentKeySig( currentStaffDef->GetKeySigCopy() );
+    }
+    else {
+        this->SetCurrentKeySig( currentScoreDef->GetKeySigCopy() );
+    }
+
+    if ( currentStaffDef->GetMensur() ) {
+        this->SetCurrentMensur( currentStaffDef->GetMensurCopy() );
+    }
+    else {
+        this->SetCurrentMensur( currentScoreDef->GetMensurCopy() );
+    }
+
+    if ( currentStaffDef->GetMeterSig() ) {
+        this->SetCurrentMeterSig( currentStaffDef->GetMeterSigCopy() );
+    }
+    else {
+        this->SetCurrentMeterSig( currentScoreDef->GetMeterSigCopy() );
     }
 }
 
@@ -328,7 +333,7 @@ Clef* Layer::GetClef( LayerElement *test )
         return dynamic_cast<Clef*>(test);
     }
 
-    return &m_currentClef;
+    return m_currentClef;
 }
 
 int Layer::GetClefOffset( LayerElement *test )
@@ -359,7 +364,7 @@ void Layer::RemoveClefAndCustos()
                 if ( (i > 0) && previous && previous->IsNote() )
                 {
                     Note *note = dynamic_cast<Note*>(m_children[i - 1]);
-                    if ( note && (note->GetDur() == DUR_LG) )
+                    if ( note && (note->GetActualDur() == DUR_LG) )
                     {
                         bool removeLonga = false;
                         // we check only for the pitch, not the octave, but should be enough
@@ -414,8 +419,10 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time
-    // param 2: the current scoreDef (unused)
+    // param 2: the current Mensur
     double *time = static_cast<double*>(params[1]);
+    Mensur **currentMensur = static_cast<Mensur**>(params[2]);
+    MeterSig **currentMeterSig = static_cast<MeterSig**>(params[3]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -423,17 +430,22 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     // we are starting a new layer, reset the time;
     (*time) = 0.0;
     
-    if ( m_drawingClef ) {
-        m_drawingClef->AlignHorizontally( params );
+    (*currentMensur) = m_currentMensur;
+    (*currentMeterSig) = m_currentMeterSig;
+    
+    //LogDebug(" ----- " );
+    
+    if ( m_drawClef && m_currentClef ) {
+        m_currentClef->AlignHorizontally( params );
     }
-    if ( m_drawingKeySig ) {
-        m_drawingKeySig->AlignHorizontally( params );
+    if ( m_drawKeySig && m_currentKeySig ) {
+        m_currentKeySig->AlignHorizontally( params );
     }
-    if ( m_drawingMensur ) {
-        m_drawingMensur->AlignHorizontally( params );
+    if ( m_drawMensur && m_currentMensur) {
+        m_currentMensur->AlignHorizontally( params );
     }
-    if ( m_drawingMeterSig ) {
-        m_drawingMeterSig->AlignHorizontally( params );
+    if ( m_drawMeterSig && m_currentMeterSig ) {
+        m_currentMeterSig->AlignHorizontally( params );
     }
 
     return FUNCTOR_CONTINUE;

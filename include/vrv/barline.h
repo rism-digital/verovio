@@ -35,14 +35,7 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new Barline(*this); };
     virtual std::string GetClassName( ) { return "Barline"; };
-    ///@}
-    
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Barline and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
+    ///@}  
     
     /**
      * Use to set the alignment for the Measure Barline members.
@@ -65,6 +58,29 @@ public:
 
 private:
     
+};
+    
+//----------------------------------------------------------------------------
+// BarlineAttr
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the barLine reltaed attributes of a MEI measure
+ */
+class BarlineAttr: public Barline
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes.
+     * No Reset() method required.
+     */
+    ///@{
+    BarlineAttr();
+    virtual ~BarlineAttr();
+    virtual Object* Clone() { return new BarlineAttr(*this); };
+    virtual std::string GetClassName( ) { return "BarlineAttr"; };
+    ///@}
 };
     
 } // namespace vrv

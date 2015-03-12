@@ -205,7 +205,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep staffGrp for fast access.
      */
-    virtual void FilterList();
+    virtual void FilterList( ListOfObjects *childList );
     
 private:
     
@@ -270,7 +270,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep staffDef for fast access.
      */
-    virtual void FilterList();
+    virtual void FilterList( ListOfObjects *childList );
     
 private:
     
@@ -326,7 +326,7 @@ public:
     bool DrawKeySig() const { return m_drawKeySig; };
     void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
     bool DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawClef = drawMensur; };
+    void SetDrawMensur( bool drawMensur ) { m_drawMensur = drawMensur; };
     bool DrawMeterSig() const { return m_drawMeterSig; };
     void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
     ///@}

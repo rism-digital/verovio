@@ -80,7 +80,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Points to an element of which the current element is a copy. **/
     std::string m_copyof;
     /**
@@ -134,7 +134,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Captures relative scale degree information using Humdrum **deg syntax -- an
      * optional indicator of melodic approach (^ = ascending approach, v = descending
@@ -178,7 +178,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes the harmonic interval between this note and other pitches occurring at
      * the same time.
@@ -219,7 +219,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes the melodic interval from the previous pitch.
      * The value may be a general directional indication (u, d, s), an indication of
@@ -262,7 +262,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes melodic function using Humdrum **embel syntax. **/
     std::string m_mfunc;
 
@@ -300,7 +300,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Holds pitch class information. **/
     std::string m_pclass;
 
@@ -338,7 +338,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Contains sol-fa designation, e.g., do, re, mi, etc., in either a fixed or
      * movable Do system.

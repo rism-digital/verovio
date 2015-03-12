@@ -26,6 +26,7 @@ class MensurAttr;
  */
 class Mensur: public LayerElement,
     public AttDurationRatio,
+    public AttMensuralShared,
     public AttMensurLog,
     public AttMensurVis,
     public AttSlashcount
@@ -40,33 +41,9 @@ public:
     virtual Object* Clone() { return new Mensur(*this); };
     ///@}
     
-    /**
-     * Comparison operator. 
-     * Check if the LayerElement if a Mensur and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
-    /**
-     * Set the value for the mensur.
-     */
-	//virtual void SetValue( int value, int flag = 0 );
-    
 private:
     
 public:
-    /** Indicates the number of dots with the sign (max 1 for now). */
-    //unsigned char m_dot;
-    /** Indicates the numerator of the duration ratio. */
-    //int m_num;
-    /** Indicates the denominator of the duration ratio. */
-    //int m_numBase;
-    /** Indicates if the sign is reversed. */
-    //bool m_reversed;
-    /** Indicates the sign of the mensuration signature. */
-    //data_MENSURATIONSIGN m_sign;
-    /** Indicates the number of slashes with the sign (max 1 for now). */
-    //unsigned char m_slash;
-    
     /** 
      * Static member for setting a value from a controller.
      * Used for example in SetValue
@@ -91,6 +68,7 @@ private:
  * This class models the MEI @mensur attributes in scoreDef or staffDef elements.
  */
 class MensurAttr: public Object,
+    public AttMensuralShared,
     public AttMensuralLog
 {
 public:
@@ -105,12 +83,6 @@ public:
     virtual std::string GetClassName( ) { return "MensurAttr"; };
     virtual Object* Clone() { return new MensurAttr(*this); };
     ///@}
-    
-    /**
-     * Comparison operator.
-     * Check if the LayerElement if a MensurAttr and compare attributes
-     */
-    virtual bool operator==(Object& other);
     
 private:
     

@@ -249,7 +249,7 @@ int DarmsInput::do_Clef(int pos, const char* data) {
 int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     int position;
     data_ACCIDENTAL_EXPLICIT accidental = ACCIDENTAL_EXPLICIT_NONE;
-    int duration;
+    data_DURATION duration;
     int dot = 0;
     int tie = 0;
     
@@ -286,25 +286,25 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     
     switch (data[++pos]) {
         case 'W':
-            duration = DUR_1;
+            duration = DURATION_1;
             // wholes can be repeated, yes this way is not nice
             if (data[pos + 1] == 'W') { // WW = BREVE
-                duration = DUR_BR;
+                duration = DURATION_breve;
                 pos++;
                 if (data[pos + 1] == 'W') { // WWW - longa
                     pos++;
-                    duration = DUR_LG;
+                    duration = DURATION_long;
                 }
             }
             break;
-        case 'H': duration = DUR_2; break;
-        case 'Q': duration = DUR_4; break;
-        case 'E': duration = DUR_8; break;
-        case 'S': duration = DUR_16; break;
-        case 'T': duration = DUR_32; break;
-        case 'X': duration = DUR_64; break;
-        case 'Y': duration = DUR_128; break;
-        case 'Z': duration = DUR_256; break;
+        case 'H': duration = DURATION_2; break;
+        case 'Q': duration = DURATION_4; break;
+        case 'E': duration = DURATION_8; break;
+        case 'S': duration = DURATION_16; break;
+        case 'T': duration = DURATION_32; break;
+        case 'X': duration = DURATION_64; break;
+        case 'Y': duration = DURATION_128; break;
+        case 'Z': duration = DURATION_256; break;
             
         default:
             LogWarning("DarmsInput: Unkown note duration: %c", data[pos]);
@@ -326,7 +326,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     if (rest) {
         Rest *rest =  new Rest;
         rest->SetDur(duration);
-        rest->SetDurGes(DUR_8);
+        rest->SetDurGes(DURATION_8);
         rest->SetDots( dot );
         m_layer->AddLayerElement(rest);
     } else {
@@ -336,7 +336,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         
         Note *note = new Note;
         note->SetDur(duration);
-        note->SetDurGes(DUR_8);
+        note->SetDurGes(DURATION_8);
         note->SetAccid(accidental);
         note->SetOct( PitchMap[position + m_clef_offset].oct );
         note->SetPname( PitchMap[position + m_clef_offset].pitch );

@@ -42,6 +42,7 @@ bool AttSurface::ReadSurface(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("surface")) {
         this->SetSurface(StrToStr(element.attribute("surface").value()));
+        element.remove_attribute("surface");
         hasAttribute = true;
     }
     return hasAttribute;

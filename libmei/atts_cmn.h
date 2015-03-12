@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the direction in which an arpeggio is to be performed. **/
     std::string m_order;
 
@@ -93,7 +93,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates if an arrowhead is to be drawn as part of the arpeggiation symbol. **/
     std::string m_arrow;
 
@@ -131,7 +131,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
 
@@ -169,7 +169,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates that this event is "under a beam". **/
     std::string m_beam;
 
@@ -207,7 +207,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * In the case of cross-staff beams, the beam.with attribute is used to indicate
      * which staff the beam is connected to; that is, the staff above or the staff
@@ -254,7 +254,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Provides an example of how automated beaming (including secondary beams) is to
      * be performed.
@@ -305,7 +305,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     std::string m_rend;
     /** Records the slope of the beam. **/
@@ -345,7 +345,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Presence of this attribute indicates that the secondary beam should be broken
      * following this note/chord.
@@ -388,7 +388,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the appearance and usually the function of the bar line. **/
     std::string m_rend;
 
@@ -426,7 +426,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the amount of detuning.
      * The decimal values should be rendered as a fraction (or an integer plus a
@@ -468,7 +468,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** "Cut-out" style indicated for this measure. **/
     std::string m_cutout;
 
@@ -506,7 +506,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates whether to render a repeat symbol or the source material to which it
      * refers.
@@ -549,7 +549,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
 
@@ -592,7 +592,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
     /** Describes a clef's shape. **/
@@ -632,7 +632,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records a text string, such as 'gliss', that accompanies the glissando mark. **/
     std::string m_text;
 
@@ -675,7 +675,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Marks a note or chord as a "grace" (without a definitive written duration) and
      * records from which other note/chord it should "steal" time.
@@ -718,7 +718,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
 
@@ -756,7 +756,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Specifies the distance between the points of the open end of a hairpin dynamic
      * mark.
@@ -827,7 +827,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates the pedal setting for the harp's C strings. **/
     std::string m_c;
     /** Indicates the pedal setting for the harp's D strings. **/
@@ -877,7 +877,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates the attachment of an l.v.
      * (laissez vibrer) sign to this element.
@@ -918,7 +918,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * When the block attribute is used, combinations of the 1, 2, and 4 measure rest
      * forms (Read, p.
@@ -960,7 +960,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates that this element participates in a glissando. **/
     std::string m_gliss;
 
@@ -998,7 +998,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
@@ -1044,7 +1044,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** States where the tuplet number will be placed in relation to the note heads. **/
     std::string m_numPlace;
     /** Determines if the tuplet number is visible. **/
@@ -1084,7 +1084,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Indicates whether the octave displacement should be performed simultaneously
      * with the written notes, i.e., "coll' ottava".
@@ -1128,7 +1128,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the position of the piano damper pedal. **/
     std::string m_dir;
 
@@ -1166,7 +1166,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
     std::string m_style;
 
@@ -1204,7 +1204,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
     std::string m_pedalStyle;
 
@@ -1242,7 +1242,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the enclosing shape for rehearsal marks. **/
     std::string m_rehEnclose;
 
@@ -1280,7 +1280,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Determines whether to display guitar chord grids. **/
     std::string m_gridShow;
 
@@ -1318,7 +1318,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the line style of the slur. **/
     std::string m_slurRend;
 
@@ -1361,7 +1361,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
      * tremolo or Sprechstimme indicators.
@@ -1408,7 +1408,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the line style of the tie. **/
     std::string m_tieRend;
 
@@ -1446,7 +1446,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** The performed duration of an individual note in a measured tremolo. **/
     std::string m_measperf;
 
@@ -1499,7 +1499,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Used to state where a tuplet bracket will be placed in relation to the note
      * heads.

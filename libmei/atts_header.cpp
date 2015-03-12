@@ -42,6 +42,7 @@ bool AttRegularmethod::ReadRegularmethod(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("method")) {
         this->SetMethod(StrToStr(element.attribute("method").value()));
+        element.remove_attribute("method");
         hasAttribute = true;
     }
     return hasAttribute;

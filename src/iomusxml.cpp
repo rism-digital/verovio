@@ -475,7 +475,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
     // duration is common in notes and rests
     pugi::xml_node duration = note.append_child("duration");
     
-    switch (di->GetDur()) {
+    switch (di->GetActualDur()) {
         case DUR_LG: dur = "64"; t = "long"; break;
         case DUR_BR: dur = "32"; t = "breve"; break;
         case DUR_1: dur = "16"; t = "whole"; break;
@@ -536,7 +536,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
         
         // handle multi measure rest
         // break from the generation of this element
-        if (r->GetDur() == VALSilSpec) {
+        if (r->GetActualDur() == VALSilSpec) {
             WriteMultiMeasureRest(r);
             return;
         }

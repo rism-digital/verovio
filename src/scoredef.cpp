@@ -309,14 +309,12 @@ void ScoreDef::Replace( StaffDef *newStaffDef )
     }
 }
 
-void ScoreDef::FilterList()
+void ScoreDef::FilterList( ListOfObjects *childList )
 {
     // We want to keep only staffDef
-    ListOfObjects* childList = this->GetList(this);
-    ListOfObjects::iterator iter;
-        
-    for (iter = childList->begin(); iter != childList->end(); ++iter)
-    {
+    ListOfObjects::iterator iter = childList->begin();
+    
+    while ( iter != childList->end()) {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
         if ( !currentStaffDef )
         {
@@ -394,10 +392,9 @@ void StaffGrp::AddStaffGrp( StaffGrp *staffGrp )
     Modify();
 }
 
-void StaffGrp::FilterList()
+void StaffGrp::FilterList( ListOfObjects *childList )
 {
     // We want to keep only staffDef
-    ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {

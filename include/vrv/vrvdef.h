@@ -19,19 +19,19 @@
 
 namespace vrv {
     
-    class Object;
-    class AttComparison;
-    class Note;
-    
-    typedef std::vector<Object*> ArrayOfObjects;
-    
-    typedef std::list<Object*> ListOfObjects;
-    
-    typedef std::vector<void*> ArrayPtrVoid;
-    
-    typedef std::vector<AttComparison*> ArrayOfAttComparisons;
-    
-    typedef std::vector<Note*> ChordCluster;
+class Object;
+class AttComparison;
+class Note;
+
+typedef std::vector<Object*> ArrayOfObjects;
+
+typedef std::list<Object*> ListOfObjects;
+
+typedef std::vector<void*> ArrayPtrVoid;
+
+typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+
+typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Global defines
@@ -78,24 +78,6 @@ enum FunctorCode {
 
 /** Define the maximum levels between a note and its syls **/
 #define MAX_NOTE_DEPTH -1
-    
-//----------------------------------------------------------------------------
-// Durations
-//----------------------------------------------------------------------------
-    
-#define DUR_LG 0  // longa
-#define DUR_BR 1  // brevis
-#define DUR_1 2   // whole note
-#define DUR_2 3   // ...
-#define DUR_4 4
-#define DUR_8 5
-#define DUR_16 6
-#define DUR_32 7
-#define DUR_64 8
-#define DUR_128 9
-#define DUR_256 10
-// used for alignement
-#define DUR_MAX 1024
     
 //----------------------------------------------------------------------------
 // VerovioText codpoints
@@ -190,6 +172,9 @@ enum ClefId {
     C5 = CLEFSHAPE_C << 8 | 5,
     perc = CLEFSHAPE_perc << 8 | 1
 };
+    
+//Used in spacing accidentals on complex chords
+#define ACCID_WIDTH 4
 
 } // namespace vrv
 

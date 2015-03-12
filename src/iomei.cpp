@@ -351,12 +351,14 @@ bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef
         scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
     }
     if ( scoreDef->GetMensurAttr() ) {
-        dynamic_cast<AttMensuralLog*>(scoreDef)->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        scoreDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     if ( scoreDef->GetMeterSigAttr() ) {
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
     }
+    
     
     // this needs to be fixed
     return true;
@@ -390,6 +392,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     }
     if ( staffDef->GetMensurAttr() ) {
         staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
+        staffDef->GetMensurAttr()->WriteMensuralShared(currentNode);
     }
     if ( staffDef->GetMeterSigAttr() ) {
         staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
@@ -529,6 +532,7 @@ void MeiOutput::WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur )
 {
     WriteLayerElement( currentNode, mensur );
     mensur->WriteDurationRatio(currentNode);
+    mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashcount(currentNode);
@@ -636,6 +640,14 @@ void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
 {
     if ( !object->m_sameAs.empty() ) {
         element.append_attribute( "sameas" ) = object->m_sameAs.c_str();
+    }
+}
+
+void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, vrv::Object *object)
+{
+    ArrayOfStrAttr::iterator iter;
+    for (iter = object->m_unsupported.begin(); iter != object->m_unsupported.end(); iter++) {
+        element.append_attribute( (*iter).first.c_str() ) = (*iter).second.c_str();
     }
 }
     
@@ -866,22 +878,22 @@ bool MeiInput::ReadMeiPage( pugi::xml_node page )
     SetMeiUuid( page, vrvPage );
     
     if ( page.attribute( "page.height" ) ) {
-        m_page->m_pageHeight = atoi ( page.attribute( "page.height" ).value() );
+        vrvPage->m_pageHeight = atoi ( page.attribute( "page.height" ).value() );
     }
     if ( page.attribute( "page.width" ) ) {
-        m_page->m_pageWidth = atoi ( page.attribute( "page.width" ).value() );
+        vrvPage->m_pageWidth = atoi ( page.attribute( "page.width" ).value() );
     }
     if ( page.attribute( "page.leftmar" ) ) {
-        m_page->m_pageLeftMar = atoi ( page.attribute( "page.leftmar" ).value() );
+        vrvPage->m_pageLeftMar = atoi ( page.attribute( "page.leftmar" ).value() );
     }
     if ( page.attribute( "page.rightmar" ) ) {
-        m_page->m_pageRightMar = atoi ( page.attribute( "page.rightmar" ).value() );
+        vrvPage->m_pageRightMar = atoi ( page.attribute( "page.rightmar" ).value() );
     }
     if ( page.attribute( "page.topmar" ) ) {
-        m_page->m_pageTopMar = atoi ( page.attribute( "page.topmar" ).value() );
+        vrvPage->m_pageTopMar = atoi ( page.attribute( "page.topmar" ).value() );
     }
     if ( page.attribute( "surface" ) ) {
-        m_page->m_surface = page.attribute( "surface" ).value();
+        vrvPage->m_surface = page.attribute( "surface" ).value();
     }
 
     m_doc->AddPage( vrvPage );
@@ -935,7 +947,7 @@ bool MeiInput::ReadMeiSystem( Object *parent, pugi::xml_node system )
         vrvSystem->m_systemRightMar = atoi ( system.attribute( "system.rightmar" ).value() );
     }
     if ( system.attribute( "uly" ) ) {
-        vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() );
+        vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() ) * DEFINITON_FACTOR;
     }
     
     // This could me moved to an AddSystem method for consistency with AddLayerElement
@@ -1026,10 +1038,12 @@ bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
+        meterSig.ReadMeterSigDefaultVis( scoreDef );  // not great, but we need to do it in case we have both and the first one succeeded
         vrvScoreDef->ReplaceMeterSig( &meterSig );
     }
     MensurAttr mensur;
-    if ( mensur.ReadMensuralLog( scoreDef ) ) {
+    if ( mensur.ReadMensuralLog( scoreDef ) || mensur.ReadMensuralShared( scoreDef ) ) {
+        mensur.ReadMensuralShared( scoreDef ); // not great, but we need to do it in case we have both and the first one succeeded
         vrvScoreDef->ReplaceMensur( &mensur );
     }
     
@@ -1128,7 +1142,13 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     }
     MeterSigAttr meterSig;
     if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
+        meterSig.ReadMeterSigDefaultVis( staffDef );  // not great, but we need to do it in case we have both and the first one succeeded
         vrvStaffDef->ReplaceMeterSig( &meterSig );
+    }
+    MensurAttr mensur;
+    if ( mensur.ReadMensuralLog( staffDef ) || mensur.ReadMensuralShared( staffDef ) ) {
+        mensur.ReadMensuralShared( staffDef ); // not great, but we need to do it in case we have both and the first one succeeded
+        vrvStaffDef->ReplaceMensur( &mensur );
     }
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
@@ -1230,7 +1250,7 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
     vrvStaff->ReadCommon(staff);
     
     if ( staff.attribute( "uly" ) ) {
-        vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() );
+        vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() ) * DEFINITON_FACTOR;
     }
     if ( staff.attribute( "label" ) ) {
         // we use type only for typing mensural notation
@@ -1368,7 +1388,7 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
 bool MeiInput::ReadLayerElement( pugi::xml_node element, LayerElement *object )
 {
     if ( element.attribute( "ulx" ) ) {
-        object->m_xAbs = atoi ( element.attribute( "ulx" ).value() );
+        object->m_xAbs = atoi ( element.attribute( "ulx" ).value() ) * DEFINITON_FACTOR;
     }
 
     ReadSameAsAttr( element, object );
@@ -1482,6 +1502,7 @@ bool MeiInput::ReadMeiMensur( Object *parent, pugi::xml_node mensur )
     ReadLayerElement(mensur, vrvMensur);
     
     vrvMensur->ReadDurationRatio( mensur );
+    vrvMensur->ReadMensuralShared( mensur );
     vrvMensur->ReadMensurLog( mensur );
     vrvMensur->ReadMensurVis( mensur );
     vrvMensur->ReadSlashcount( mensur );
@@ -1658,6 +1679,15 @@ void MeiInput::ReadSameAsAttr( pugi::xml_node element, Object *object )
     object->m_sameAs = element.attribute( "sameas" ).value();
 }
 
+    
+void MeiInput::ReadUnsupportedAttr( pugi::xml_node element, Object *object )
+{
+    for (pugi::xml_attribute_iterator ait = element.attributes_begin(); ait != element.attributes_end(); ++ait)
+    {
+        object->m_unsupported.push_back(std::make_pair(ait->name(), ait->value()));
+    }
+}
+    
 void MeiInput::ReadText( pugi::xml_node element, Object *object )
 {
     if (element.text()) {
@@ -1867,6 +1897,12 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
         pugi::xml_node current;
         for( current = element.first_child( ); current; current = current.next_sibling( ) ) {
             if (!success) break;
+            // This will happen with unmeasured music - ReadMeiSystemChildren will read take over the loop
+            // This means that <pb> and <sb> (for example) will not be read
+            else if ( (std::string( current.name() ) == "staff") ) {
+                success = ReadMeiSystemChildren( m_system, element );
+                break;
+            }
             success = ReadScoreBasedMei( current );
         }
     }
@@ -1951,6 +1987,7 @@ void MeiInput::SetMeiUuid( pugi::xml_node element, Object *object )
     }
     
     object->SetUuid( element.attribute( "xml:id" ).value() );
+    element.remove_attribute("xml:id");
 }
 
 bool MeiInput::StrToBool(std::string value)

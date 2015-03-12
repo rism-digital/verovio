@@ -167,6 +167,11 @@ private:
     void WriteSameAsAttr( pugi::xml_node currentNode, Object *object );
     
     /**
+     * Write unsupported attributes stored in Object::m_unsupported (not tested)
+     */
+    void WriteUnsupportedAttr( pugi::xml_node currentNode, Object *object );
+    
+    /**
      * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
@@ -332,6 +337,11 @@ private:
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
     void ReadSameAsAttr( pugi::xml_node element, Object *object );
+    
+    /**
+     * Write unsupported attributes and store them in Object::m_unsupported (not tested)
+     */
+    void ReadUnsupportedAttr( pugi::xml_node element, Object *object );
     
     /**
      * Read the XML text content.

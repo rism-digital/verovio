@@ -14,6 +14,7 @@
 
 namespace vrv {
 
+class Mensur;
 class Object;
 
 //----------------------------------------------------------------------------
@@ -41,18 +42,22 @@ public:
     DurationInterface();
     virtual ~DurationInterface();
     virtual void Reset();
-    ///@}
-    
-    /* Set the logic (gestural) duration */
-    virtual void SetDurationGes( int value );
+    ///@}SetDurationGes
     
     /**
      * Returns the duration (in double) for the element.
      * It returns 0.0 for grace notes.
-     * Careful: this method is not overriding LayerElement::GetAlignementDuration since
+     * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    virtual double GetAlignementDuration( int num, int numbase );
+    virtual double GetAlignmentDuration( int num, int numbase );
+    
+    /**
+     * Returns the duration (in double) for the element for mensural notation
+     * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
+     * need to be modifiy for shorter equality in later repertoire.
+     */
+    virtual double GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
     /**
      * Look if the note or rest is in a beam.
@@ -70,6 +75,20 @@ public:
      * Return true if the note or rest is the last of a beam.
      */
     bool IsLastInBeam( Object *noteOrRest );
+
+    
+    /**
+     * Return the actual duration of the note, for both CMN and mensural durations
+     * See data_DURATION
+     * For CMN, it is the same (DURATION_1 == DUR_1)
+     * For mensural, we need to apply the DUR_MENSURAL_MASK
+     */
+    int GetActualDur();
+    
+    /**
+     * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
+     */
+    bool IsMensural();
     
     /**
      * Inteface comparison operator. 

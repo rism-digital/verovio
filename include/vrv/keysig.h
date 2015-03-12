@@ -89,12 +89,6 @@ public:
     virtual Object* Clone() { return new KeySigAttr(*this); };
     ///@}
     
-    /**
-     * Comparison operator.
-     * Check if the LayerElement if a KeySigAttr and compare attributes
-     */
-    virtual bool operator==(Object& other);
-    
 private:
     
 public:

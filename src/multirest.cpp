@@ -38,16 +38,4 @@ void MultiRest::Reset()
     ResetNumbered();
 }
 
-bool MultiRest::operator==( Object& other )
-{
-    MultiRest *otherM = dynamic_cast<MultiRest*>( &other );
-    if ( !otherM ) {
-        return false;
-    }
-    if ( this->GetNum() != otherM->GetNum() ) {
-        return false;
-    }
-    return true;
-}
-
 } // namespace vrv

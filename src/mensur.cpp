@@ -20,6 +20,7 @@ int Mensur::s_numBase = 2;
 Mensur::Mensur():
 	LayerElement("mensur-"),
     AttDurationRatio(),
+    AttMensuralShared(),
     AttMensurLog(),
     AttMensurVis(),
     AttSlashcount()
@@ -34,6 +35,14 @@ Mensur::Mensur( MensurAttr *mensurAttr ):
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
+    //
+    this->SetModusmaior(mensurAttr->GetModusmaior());
+    this->SetModusminor(mensurAttr->GetModusminor());
+    this->SetProlatio(mensurAttr->GetProlatio());
+    this->SetTempus(mensurAttr->GetTempus());
+    //
+    this->SetNum(mensurAttr->GetProportNum());
+    this->SetNumbase(mensurAttr->GetProportNumbase());
     // It is unclear why we don't have mensur.num and mensur.numbase attributes
     // in att.mensura.default.log - ask Perry...
 }
@@ -46,36 +55,10 @@ void Mensur::Reset()
 {
     LayerElement::Reset();
     ResetDurationRatio();
+    ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
     ResetSlashcount();
-}
-
-bool Mensur::operator==( Object& other )
-{
-    Mensur *otherMensur = dynamic_cast<Mensur*>( &other );
-    if ( !otherMensur ) {
-        return false;
-    }
-    if ( this->GetDot() != otherMensur->GetDot() ) {
-        return false;
-    }
-    if ( this->GetNum() != otherMensur->GetNum() ) {
-        return false;
-    }
-    if ( this->GetNumbase() != otherMensur->GetNumbase() ) {
-        return false;
-    }
-    if ( this->GetOrient() != otherMensur->GetOrient() ) {
-        return false;
-    }
-    if ( this->GetSign() != otherMensur->GetSign() ) {
-        return false;
-    }
-    if ( this->GetSlash() != otherMensur->GetSlash() ) {
-        return false;
-    }
-    return true;
 }
     
 //----------------------------------------------------------------------------
@@ -84,6 +67,7 @@ bool Mensur::operator==( Object& other )
 
 MensurAttr::MensurAttr():
     Object(),
+    AttMensuralShared(),
     AttMensuralLog()
 {
     Reset();
@@ -97,17 +81,8 @@ MensurAttr::~MensurAttr()
 void MensurAttr::Reset()
 {
     Object::Reset();
+    ResetMensuralShared();
     ResetMensuralLog();
-}
-
-bool MensurAttr::operator==( Object& other )
-{
-    MensurAttr *otherMensurAttr = dynamic_cast<MensurAttr*>( &other );
-    if ( !otherMensurAttr ) {
-        return false;
-    }
-    // we need member comparison here...
-    return true;
 }
     
 } // namespace vrv

@@ -310,6 +310,12 @@ void SvgDeviceContext::DrawCircle(int x, int y, int radius)
 
 void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
 {
+    assert( m_penStack.size() );
+    assert( m_brushStack.size() );
+    
+    Pen currentPen = m_penStack.top();
+    Brush currentBrush = m_brushStack.top();
+    
     int rh = height / 2;
     int rw = width  / 2;
     
@@ -318,6 +324,9 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("cy") = y+rh;
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
+    
+    ellipseChild.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
+        GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
 
         
@@ -341,6 +350,12 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     will be drawn. */
 
     //known bug: SVG draws with the current pen along the radii, but this does not happen in wxMSW
+    
+    assert( m_penStack.size() );
+    assert( m_brushStack.size() );
+    
+    Pen currentPen = m_penStack.top();
+    Brush currentBrush = m_brushStack.top();
 
     std::string s ;
     //radius
@@ -369,6 +384,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     pugi::xml_node pathChild = m_currentNode.append_child("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d",int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
+    pathChild.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
+                                                            GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
   
               

@@ -21,6 +21,35 @@ typedef std::vector<std::pair<std::string, std::string> >  ArrayOfStrAttr;
     
 #define VRV_UNSET -0x7FFFFFFF
     
+    
+//----------------------------------------------------------------------------
+// Durations
+//----------------------------------------------------------------------------
+ 
+/**
+ * These duration values are used for internal calculation and differ from the 
+ * MEI data.DURATION types (see below)
+ */
+#define DUR_MX -1  // maxima
+#define DUR_LG 0  // longa
+#define DUR_BR 1  // brevis
+#define DUR_1 2   // whole note
+#define DUR_2 3   // ...
+#define DUR_4 4
+#define DUR_8 5
+#define DUR_16 6
+#define DUR_32 7
+#define DUR_64 8
+#define DUR_128 9
+#define DUR_256 10  // this is it for now
+// used for alignement
+#define DUR_MAX 1024
+// mensural duration
+#define DUR_MENSURAL_OFFSET (2 * DUR_MAX)
+#define DUR_MENSURAL_MASK (2 * DUR_MAX -1)
+// used for mensural alignment
+#define DUR_MENSURAL_REF 1728
+    
 //----------------------------------------------------------------------------
 // MEI data defines
 //----------------------------------------------------------------------------
@@ -119,6 +148,35 @@ enum data_CON {
     CON_i,
     CON_b
 };
+
+/**
+ * MEI data.DURATION
+ */
+enum data_DURATION {
+    DURATION_NONE = VRV_UNSET,
+    DURATION_long = DUR_LG,
+    DURATION_breve,
+    DURATION_1,
+    DURATION_2,
+    DURATION_4,
+    DURATION_8,
+    DURATION_16,
+    DURATION_32,
+    DURATION_64,
+    DURATION_128,
+    DURATION_256,
+    DURATION_512,
+    DURATION_1024,
+    DURATION_2048,
+    DURATION_maxima = DUR_MX,
+    DURATION_longa = DUR_MENSURAL_OFFSET + DUR_LG,
+    DURATION_brevis,
+    DURATION_semibrevis,
+    DURATION_minima,
+    DURATION_semiminima,
+    DURATION_fusa,
+    DURATION_semifusa
+};
     
 /**
  * MEI data.FONTSTYLE
@@ -206,6 +264,26 @@ enum data_MODE {
     MODE_aeolian,
     MODE_locrian
 };
+
+/**
+ * MEI data.MODUSMAIOR
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_MODUSMAIOR {
+    MODUSMAIOR_NONE = -3,
+    MODUSMAIOR_2 = 2,
+    MODUSMAIOR_3
+};
+    
+/**
+ * MEI data.MODUSMINOR
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_MODUSMINOR {
+    MODUSMINOR_NONE = -3,
+    MODUSMINOR_2 = 2,
+    MODUSMINOR_3
+};
     
 /**
  * MEI data.OCTAVE.DIS
@@ -229,6 +307,16 @@ enum data_PITCHNAME {
     PITCHNAME_g,
     PITCHNAME_a,
     PITCHNAME_b,
+};
+    
+/**
+ * MEI data.PROLATIO
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_PROLATIO {
+    PROLATIO_NONE = -3,
+    PROLATIO_2 = 2,
+    PROLATIO_3
 };
 
 /**
@@ -267,6 +355,16 @@ enum data_STEMPOSITION {
     STEMPOSITION_left,
     STEMPOSITION_right,
     STEMPOSITION_center
+};
+    
+/**
+ * MEI data.TEMPUS
+ * NONE is -3 for perfect value (abs) by default
+ */
+enum data_TEMPUS {
+    TEMPUS_NONE = -3,
+    TEMPUS_2 = 2,
+    TEMPUS_3
 };
     
 /**
