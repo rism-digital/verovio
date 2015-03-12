@@ -55,7 +55,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
 
@@ -98,7 +98,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Records the function of the dot. **/
     std::string m_form;
     /** Describes the rotation or reflection of the base symbol. **/
@@ -158,7 +158,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Determines if a dot is to be added to the base symbol. **/
     data_BOOLEAN m_mensurDot;
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
@@ -230,7 +230,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Describes the maxima-long relationship. **/
     data_MODUSMAIOR m_modusmaior;
     /** Describes the long-breve relationship. **/
@@ -294,7 +294,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /**
      * Records the color of the mensuration sign.
      * Do not confuse this with the musical term 'color' as used in pre-CMN notation.
@@ -343,7 +343,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** Indicates this element's participation in a ligature. **/
     data_LIGATURE m_lig;
 
@@ -381,7 +381,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** States how many spaces are covered by the rest. **/
     int m_spacesInt;
 

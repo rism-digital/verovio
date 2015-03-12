@@ -60,8 +60,22 @@ void BBoxDeviceContext::StartGraphic( DocObject *object, std::string gClass, std
     object->ResetBB();
     m_objects.push_back( object );
 }
+    
+void BBoxDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
+{
+    // add object
+    object->ResetBB();
+    m_objects.push_back( object );
+}
       
 void BBoxDeviceContext::EndGraphic(DocObject *object, View *view ) 
+{
+    // detach the object
+    assert( m_objects.back() == object );
+    m_objects.pop_back();
+}
+    
+void BBoxDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 {
     // detach the object
     assert( m_objects.back() == object );

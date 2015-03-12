@@ -573,6 +573,12 @@ public:
     Object *m_parent;
     std::string m_sameAs;
     
+    /**
+     * Keep an array of unsupported attributes as pairs.
+     * This can be used for writing back data
+     */
+    ArrayOfStrAttr m_unsupported;
+    
 protected:
     std::string m_uuid;
     std::string m_classid;
@@ -600,7 +606,7 @@ private:
      * Values are set when GetFirst is called (which is mandatory)
      */
     ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
-    const std::type_info *m_iteratorElementType;    
+    const std::type_info *m_iteratorElementType;
 };
 
 

@@ -45,7 +45,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     wchar_t fontNo;
     int ledge;
     int verticalCenter = 0;
-    
+
     xStem = element->GetDrawingX();
     xLedger = xStem;
     

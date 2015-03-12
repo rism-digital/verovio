@@ -19,8 +19,10 @@
 
 namespace vrv {
 
+class Accid;
 class Beam;
 class Barline;
+class Chord;
 class DeviceContext;
 class Doc;
 class EditorialElement;
@@ -229,7 +231,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid = NULL );
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -260,8 +262,8 @@ protected:
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
-    void DrawLedgerLines( DeviceContext *dc, int y_n, int y_p, int xn, unsigned int smaller, int staffSize);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
@@ -302,7 +304,7 @@ protected:
      * Defined in view_beam.cpp
      */
     ///@{
-    void DrawBeamPostponed(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff );
+    void DrawBeamPostponed(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure );
     ///@}
     
     /**
@@ -341,6 +343,17 @@ private:
     bool OneBeamInTuplet(Tuplet* tuplet);
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
+    
+    /**
+     * @name Used for calculating clustered information/dot position
+     */
+    bool IsOnStaffLine ( int y, Staff *staff );
+    
+    /**
+     * Internal methods for calculating spacing chords
+     */
+    void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
+    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save);
     
     /**
      * Swap the to points passed as reference.

@@ -42,6 +42,7 @@ bool AttAgentident::ReadAgentident(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("agent")) {
         this->SetAgent(StrToStr(element.attribute("agent").value()));
+        element.remove_attribute("agent");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -85,10 +86,12 @@ bool AttEdit::ReadEdit(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("cert")) {
         this->SetCert(StrToStr(element.attribute("cert").value()));
+        element.remove_attribute("cert");
         hasAttribute = true;
     }
     if (element.attribute("evidence")) {
         this->SetEvidence(StrToStr(element.attribute("evidence").value()));
+        element.remove_attribute("evidence");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -140,6 +143,7 @@ bool AttExtent::ReadExtent(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("extent")) {
         this->SetExtent(StrToStr(element.attribute("extent").value()));
+        element.remove_attribute("extent");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -182,6 +186,7 @@ bool AttReasonident::ReadReasonident(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("reason")) {
         this->SetReason(StrToStr(element.attribute("reason").value()));
+        element.remove_attribute("reason");
         hasAttribute = true;
     }
     return hasAttribute;

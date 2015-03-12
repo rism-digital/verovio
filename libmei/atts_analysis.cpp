@@ -47,26 +47,32 @@ bool AttCommonAnl::ReadCommonAnl(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("copyof")) {
         this->SetCopyof(StrToStr(element.attribute("copyof").value()));
+        element.remove_attribute("copyof");
         hasAttribute = true;
     }
     if (element.attribute("corresp")) {
         this->SetCorresp(StrToStr(element.attribute("corresp").value()));
+        element.remove_attribute("corresp");
         hasAttribute = true;
     }
     if (element.attribute("next")) {
         this->SetNext(StrToStr(element.attribute("next").value()));
+        element.remove_attribute("next");
         hasAttribute = true;
     }
     if (element.attribute("prev")) {
         this->SetPrev(StrToStr(element.attribute("prev").value()));
+        element.remove_attribute("prev");
         hasAttribute = true;
     }
     if (element.attribute("sameas")) {
         this->SetSameas(StrToStr(element.attribute("sameas").value()));
+        element.remove_attribute("sameas");
         hasAttribute = true;
     }
     if (element.attribute("synch")) {
         this->SetSynch(StrToStr(element.attribute("synch").value()));
+        element.remove_attribute("synch");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -154,6 +160,7 @@ bool AttHarmonicfunction::ReadHarmonicfunction(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("deg")) {
         this->SetDeg(StrToStr(element.attribute("deg").value()));
+        element.remove_attribute("deg");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -196,6 +203,7 @@ bool AttIntervalharmonic::ReadIntervalharmonic(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("inth")) {
         this->SetInth(StrToStr(element.attribute("inth").value()));
+        element.remove_attribute("inth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -238,6 +246,7 @@ bool AttIntervallicdesc::ReadIntervallicdesc(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("intm")) {
         this->SetIntm(StrToStr(element.attribute("intm").value()));
+        element.remove_attribute("intm");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -280,6 +289,7 @@ bool AttMelodicfunction::ReadMelodicfunction(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("mfunc")) {
         this->SetMfunc(StrToStr(element.attribute("mfunc").value()));
+        element.remove_attribute("mfunc");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -322,6 +332,7 @@ bool AttPitchclass::ReadPitchclass(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("pclass")) {
         this->SetPclass(StrToStr(element.attribute("pclass").value()));
+        element.remove_attribute("pclass");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -364,6 +375,7 @@ bool AttSolfa::ReadSolfa(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("psolfa")) {
         this->SetPsolfa(StrToStr(element.attribute("psolfa").value()));
+        element.remove_attribute("psolfa");
         hasAttribute = true;
     }
     return hasAttribute;

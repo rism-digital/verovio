@@ -8,8 +8,10 @@
 #ifndef __VRV_NOTE_H__
 #define __VRV_NOTE_H__
 
+#include "accid.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "beam.h"
 #include "chord.h"
 #include "durationinterface.h"
 #include "layerelement.h"
@@ -17,9 +19,13 @@
 
 namespace vrv {
 
+class Accid;
+class Chord;
 class Slur;
 class Tie;
 class Verse;
+class Note;
+typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Note
@@ -76,9 +82,18 @@ public:
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
+    bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
+    
     bool HasDrawingStemDir( );
     data_STEMDIRECTION GetDrawingStemDir( );
+    
+    
     ///@}
+    
+    /**
+     * Returns a single integer representing pitch and octave.
+     */
+    int GetDiatonicPitch( ) { return this->GetPname() + (int)this->GetOct() * 7; };
     
     //----------//
     // Functors //
@@ -128,6 +143,14 @@ public:
     data_STEMDIRECTION m_drawingStemDir;
     /** drawing stem length */
     int d_stemLen;
+    
+    /** flags for determining clusters in chord **/
+    ChordCluster* m_cluster; //cluster this belongs to
+    int m_clusterPosition; //1-indexed position in said cluster; 0 if does not have position
+    
+    /** other information necessary for notes in chords **/
+    Accid m_accid;
+
     
 private:
     

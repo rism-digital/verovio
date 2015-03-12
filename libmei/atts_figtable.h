@@ -60,7 +60,7 @@ public:
     
     ///@}
 
-protected:
+private:
     /** The number of columns spanned by this cell. **/
     int m_colspanInt;
     /** The number of rows spanned by this cell. **/

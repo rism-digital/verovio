@@ -42,6 +42,7 @@ bool AttLigatureLog::ReadLigatureLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -85,10 +86,12 @@ bool AttMensurVis::ReadMensurVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToStr(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("orient")) {
         this->SetOrient(StrToOrientation(element.attribute("orient").value()));
+        element.remove_attribute("orient");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -144,22 +147,27 @@ bool AttMensuralLog::ReadMensuralLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("mensur.dot")) {
         this->SetMensurDot(StrToBool(element.attribute("mensur.dot").value()));
+        element.remove_attribute("mensur.dot");
         hasAttribute = true;
     }
     if (element.attribute("mensur.sign")) {
         this->SetMensurSign(StrToMensurationSign(element.attribute("mensur.sign").value()));
+        element.remove_attribute("mensur.sign");
         hasAttribute = true;
     }
     if (element.attribute("mensur.slash")) {
         this->SetMensurSlash(StrToInt(element.attribute("mensur.slash").value()));
+        element.remove_attribute("mensur.slash");
         hasAttribute = true;
     }
     if (element.attribute("proport.num")) {
         this->SetProportNum(StrToInt(element.attribute("proport.num").value()));
+        element.remove_attribute("proport.num");
         hasAttribute = true;
     }
     if (element.attribute("proport.numbase")) {
         this->SetProportNumbase(StrToInt(element.attribute("proport.numbase").value()));
+        element.remove_attribute("proport.numbase");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -241,18 +249,22 @@ bool AttMensuralShared::ReadMensuralShared(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("modusmaior")) {
         this->SetModusmaior(StrToModusmaior(element.attribute("modusmaior").value()));
+        element.remove_attribute("modusmaior");
         hasAttribute = true;
     }
     if (element.attribute("modusminor")) {
         this->SetModusminor(StrToModusminor(element.attribute("modusminor").value()));
+        element.remove_attribute("modusminor");
         hasAttribute = true;
     }
     if (element.attribute("prolatio")) {
         this->SetProlatio(StrToProlatio(element.attribute("prolatio").value()));
+        element.remove_attribute("prolatio");
         hasAttribute = true;
     }
     if (element.attribute("tempus")) {
         this->SetTempus(StrToTempus(element.attribute("tempus").value()));
+        element.remove_attribute("tempus");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -326,22 +338,27 @@ bool AttMensuralVis::ReadMensuralVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("mensur.color")) {
         this->SetMensurColor(StrToStr(element.attribute("mensur.color").value()));
+        element.remove_attribute("mensur.color");
         hasAttribute = true;
     }
     if (element.attribute("mensur.form")) {
         this->SetMensurForm(StrToStr(element.attribute("mensur.form").value()));
+        element.remove_attribute("mensur.form");
         hasAttribute = true;
     }
     if (element.attribute("mensur.loc")) {
         this->SetMensurLoc(StrToStr(element.attribute("mensur.loc").value()));
+        element.remove_attribute("mensur.loc");
         hasAttribute = true;
     }
     if (element.attribute("mensur.orient")) {
         this->SetMensurOrient(StrToStr(element.attribute("mensur.orient").value()));
+        element.remove_attribute("mensur.orient");
         hasAttribute = true;
     }
     if (element.attribute("mensur.size")) {
         this->SetMensurSize(StrToStr(element.attribute("mensur.size").value()));
+        element.remove_attribute("mensur.size");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -420,6 +437,7 @@ bool AttNoteLogMensural::ReadNoteLogMensural(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("lig")) {
         this->SetLig(StrToLigature(element.attribute("lig").value()));
+        element.remove_attribute("lig");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -462,6 +480,7 @@ bool AttRestVisMensural::ReadRestVisMensural(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("spaces")) {
         this->SetSpaces(StrToInt(element.attribute("spaces").value()));
+        element.remove_attribute("spaces");
         hasAttribute = true;
     }
     return hasAttribute;

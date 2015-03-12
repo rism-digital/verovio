@@ -19,16 +19,19 @@
 
 namespace vrv {
     
-    class Object;
-    class AttComparison;
-    
-    typedef std::vector<Object*> ArrayOfObjects;
-    
-    typedef std::list<Object*> ListOfObjects;
-    
-    typedef std::vector<void*> ArrayPtrVoid;
-    
-    typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+class Object;
+class AttComparison;
+class Note;
+
+typedef std::vector<Object*> ArrayOfObjects;
+
+typedef std::list<Object*> ListOfObjects;
+
+typedef std::vector<void*> ArrayPtrVoid;
+
+typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+
+typedef std::vector<Note*> ChordCluster;
     
 //----------------------------------------------------------------------------
 // Global defines
@@ -169,6 +172,9 @@ enum ClefId {
     C5 = CLEFSHAPE_C << 8 | 5,
     perc = CLEFSHAPE_perc << 8 | 1
 };
+    
+//Used in spacing accidentals on complex chords
+#define ACCID_WIDTH 4
 
 } // namespace vrv
 
