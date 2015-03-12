@@ -2,7 +2,7 @@
 
 function print_help {
 	 echo "Usage:
--l		Light version without ASM and no increased memory allocation
+-l		Light version with no increased memory allocation
 -w 		WebWorker-compatible build.
 -v N		Version number (e.g., 1.0.0); no number by default
 -c		Turns on \"Chatty\" compiling; Will print the compiler progress" >&2 ; 
@@ -42,9 +42,9 @@ while getopts "lwv:h:c" opt; do
 	case $opt in
 		l)
 			echo "light version (-l)"
-			ASM="-s ASM_JS=0 \
-				-O2 \
-				--memory-init-file 0"
+			ASM="\
+				-O2 --memory-init-file 0 \
+				-s ASM_JS=1 "
 			ASM_NAME="-light"
 			;;
 		v)
