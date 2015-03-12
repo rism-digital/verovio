@@ -184,6 +184,25 @@ void Doc::PrepareDrawing()
         }
     }
     
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+            
+            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // m_drawingLastNote is set only if the syl has a forward connector
+            ArrayPtrVoid paramsTieAttr;
+            //paramsTieAttr.push_back( &currentNotes );
+            //paramsTieAttr.push_back( &currentChord );
+            Functor prepareDots( &Object::PrepareDots );
+            this->Process( &prepareDots, paramsTieAttr, NULL, &filters, UNLIMITED_DEPTH, BACKWARD );
+        }
+    }
+    
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     Syl *currentSyl;
     Note *lastNote;
