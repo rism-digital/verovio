@@ -14,7 +14,7 @@
 
 namespace vrv {
     
-class ChildElement;
+class Note;
 
 //----------------------------------------------------------------------------
 // Dot
@@ -34,11 +34,30 @@ public:
     virtual std::string GetClassName( ) { return "Dot"; };
     ///@}
     
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid params );
+    
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid params );
+    
 protected:
 
 private:
     
 public:
+    /**
+     * A pointer to the note the point relates to.
+     */
+    Note *m_drawingNote;
     
 private:
 

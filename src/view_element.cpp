@@ -1603,8 +1603,14 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
+    
+    // Use the note to which the points to for position
+    if ( dot->m_drawingNote ) {
+        x = dot->m_drawingNote->GetDrawingX() + m_doc->m_drawingUnit[staff->staffSize]*7/2;
+        y = dot->m_drawingNote->GetDrawingY();
+    }
 
-    DrawDot ( dc, x, y );
+    DrawDots( dc, x, y, 1, staff );
     
     dc->EndGraphic(element, this );
 
