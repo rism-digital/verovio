@@ -109,7 +109,22 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     /************** Ledger lines: **************/
     
-    DrawLedgerLines( dc, noteY, staffY, xStem, ledge, staffSize );
+    int staffTop = staffY + m_doc->m_drawingUnit[staffSize];
+    int staffBot = staffY - m_doc->m_drawingStaffSize[staffSize] - m_doc->m_drawingUnit[staffSize];
+    
+    //if the note is not in the staff
+    if (!is_in(noteY,staffTop,staffBot))
+    {
+        int distance, highestNewLine, numLines;
+        bool aboveStaff = (noteY > staffTop);
+        
+        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->m_drawingStaffSize[staffSize] - noteY);
+        highestNewLine = ((distance % m_doc->m_drawingDoubleUnit[staffSize] > 0) ? (distance - m_doc->m_drawingUnit[staffSize]) : distance);
+        numLines = highestNewLine / m_doc->m_drawingDoubleUnit[staffSize];
+        
+        DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
+
+    }
     
     /************** Accidentals/dots/peripherals: **************/
     
