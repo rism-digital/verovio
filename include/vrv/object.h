@@ -498,12 +498,11 @@ public:
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Processes Chord and Note for matching @tie by processing by Layer and by looking
-     * at the Pname and Oct
-     * param 0: std::vector<Note*>* that holds the current notes with open ties
-     * param 1: Chord** currentChord for the current chord if in a chord
+     * Processes by Layer and set drawing pointers.
+     * Set Dot::m_drawingNote for Dot elements in mensural mode
+     * param 0: Note** currentNote for the current not to w
      */
-    virtual int PrepareDots( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int PreparePointersByLayer( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends
