@@ -65,6 +65,7 @@ void LayerElement::Reset()
     
     m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
+    m_drawingStemDir = STEMDIRECTION_NONE;
     m_beamElementCoord = NULL;
 }
     

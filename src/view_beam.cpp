@@ -367,7 +367,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         (*beamElementCoords)[i]->m_element->m_drawingStemStart.x = (*beamElementCoords)[i]->m_element->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
         (*beamElementCoords)[i]->m_element->m_drawingStemStart.y = fy2;
         (*beamElementCoords)[i]->m_element->m_drawingStemEnd.y = fy1;
-        (*beamElementCoords)[i]->m_element->m_drawingStemDir = false;
+        (*beamElementCoords)[i]->m_element->m_drawingStemDir = stemDir;
         
         if((*beamElementCoords)[i]->m_element->IsNote() || (*beamElementCoords)[i]->m_element->IsChord())
             DrawVerticalLine (dc,fy2, fy1, (*beamElementCoords)[i]->m_x, m_doc->m_style->m_stemWidth);
