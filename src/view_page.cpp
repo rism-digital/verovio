@@ -922,7 +922,7 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     
     //the normal case
-    if ( spanningType ==  SPANNING_START_END ) {
+    if ( spanningType == SPANNING_START_END ) {
         assert( note1 && note2 );
         // Copied from DrawNote
         // We could use the stamDir information
@@ -936,13 +936,13 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
-    else if ( spanningType ==  SPANNING_START ) {
+    else if ( spanningType == SPANNING_START ) {
         y1 = y2 = note1->GetDrawingY();
         assert(dynamic_cast<Note*>(note1));
         noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
     }
     // Now this is the case when the tie is split but we are drawing the end of it
-    else if ( spanningType ==  SPANNING_END ) {
+    else if ( spanningType == SPANNING_END ) {
         y1 = y2 = note2->GetDrawingY();
         x2 = note2->GetDrawingX();
         assert(dynamic_cast<Note*>(note2));
