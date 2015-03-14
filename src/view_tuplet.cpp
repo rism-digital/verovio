@@ -97,7 +97,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
         
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
-        if (firstNote->m_drawingStemDir)
+        if (firstNote->m_drawingStemDir == STEMDIRECTION_up)
             y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 + TUPLET_OFFSET;
         else 
             y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 - TUPLET_OFFSET;
@@ -107,20 +107,6 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
         center->y = y;
         direction =  firstNote->m_drawingStemDir; // stem direction is same for all notes
     } else {
-            
-        //ArrayOfObjects all_notes;
-        
-        // We can have a mixed group of Beams and notes. Flatten it
-        /*
-        for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
-            if (dynamic_cast<Note*>(tuplet->m_children[i]))
-                all_notes.push_back(tuplet->m_children[i]);
-            
-            if (dynamic_cast<Beam*>(tuplet->m_children[i])) {
-                Beam* beam = dynamic_cast<Beam*>(tuplet->m_children[i]);
-                std::copy( beam->m_list.begin(), beam->m_list.end(), std::back_inserter( all_notes ) );
-            }
-        }*/
         
         // There are unbeamed notes of two different beams
         // treat all the notes as unbeames
