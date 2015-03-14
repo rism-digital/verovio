@@ -70,9 +70,16 @@ protected:
      */
     virtual void FilterList( ListOfObjects *childList );
     /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by Beam::FilterList
+     */
+    void InitCoords( ListOfObjects *childList );
+    
+    /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();
+    
     
 private:
 
@@ -102,18 +109,18 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamElementCoord() { element = NULL; };
-    virtual ~BeamElementCoord() {};
+    BeamElementCoord() { m_element = NULL; };
+    virtual ~BeamElementCoord();
     
-    int x;
-    int y; // represents the point farthest from the beam
-    int yTop; // y value of topmost note
-    int yBottom; // y value of bottom-most note
-    int yBeam; // y value of stem top position
-    int dur; // drawing duration
-    int breaksec;
-    char partialFlags[MAX_DURATION_PARTIALS];
-    LayerElement *element;
+    int m_x;
+    int m_y; // represents the point farthest from the beam
+    int m_yTop; // y value of topmost note
+    int m_yBottom; // y value of bottom-most note
+    int m_yBeam; // y value of stem top position
+    int m_dur; // drawing duration
+    int m_breaksec;
+    char m_partialFlags[MAX_DURATION_PARTIALS];
+    LayerElement *m_element;
 };
     
     

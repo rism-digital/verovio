@@ -15,6 +15,7 @@
 namespace vrv {
 
 class Alignment;
+class BeamElementCoord;
 class Mensur;
 class MeterSig;
 
@@ -134,6 +135,10 @@ public:
     Point m_drawingStemEnd; // end point (!), near beam or stem
     /** stem direction as drawn, true = up, false = down */
     bool m_drawingStemDir;
+    /**
+     * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
+     */
+    BeamElementCoord *m_beamElementCoord;
     
 protected:
     Alignment *m_alignment;

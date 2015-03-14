@@ -65,6 +65,7 @@ void LayerElement::Reset()
     
     m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
+    m_beamElementCoord = NULL;
 }
     
 LayerElement::~LayerElement()

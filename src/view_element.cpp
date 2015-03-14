@@ -657,8 +657,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
 }
 
-/** This function draws multi-measure rests
- **/
+/** This function draws multi-measure rests **/
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {	
     int x1, x2, y1, y2, length;
