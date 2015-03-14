@@ -405,7 +405,7 @@ pae-active: pae-editor
 		var svg = vrvToolkit.renderData(music + "\n", JSON.stringify({inputFormat: 'pae', scale: 50, adjustPageHeight: 1, pageWidth: 1048, border: 0, spacingStaff: 2}));
 		document.getElementById('render_01').innerHTML = svg;
         
-		var mei = vrvToolkit.getMEI();
+		var mei = vrvToolkit.getMEI( 1 );
         //var parser = new DOMParser();
         $("#mei_output").text(mei);
         //var innerMei = parser.parseFromString(mei, "text/xml");
