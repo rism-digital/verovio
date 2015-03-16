@@ -6,11 +6,14 @@ javac -cp .:target/VerovioToolkit-1.0-SNAPSHOT.jar  main.java
 java -cp .:target/VerovioToolkit-1.0-SNAPSHOT.jar  main
 */
 
+import org.rism.verovio.toolkit;
+import org.rism.verovio.convertFileFormat;
+
 public class main {
 	public static void main(String argv[]) {
 		System.loadLibrary("verovio");
 
-		org.rism.verovio.toolkit toolkit = new org.rism.verovio.toolkit();
+		toolkit toolkit = new toolkit();
 
 		String s;
 		String out;
@@ -24,7 +27,7 @@ public class main {
 		s = s + "@end:00000400004625-1.1.1\n";
 		
 		
-		toolkit.setFormat(org.rism.verovio.convertFileFormat.paeFile);
+		toolkit.setFormat(convertFileFormat.paeFile);
 		toolkit.loadString(s);
 
 		out = toolkit.renderToSvg();
