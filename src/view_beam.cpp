@@ -29,35 +29,9 @@
 
 namespace vrv {
 
-// maximum number of elements allowed in a beam
-#define MAX_ELEMENTS_IN_BEAM 80
-// maximum number of partials allow
-#define MAX_DURATION_PARTIALS 10
-    
-enum  {
-    PARTIAL_NONE = 0,
-    PARTIAL_THROUGH,
-    PARTIAL_RIGHT,
-    PARTIAL_LEFT
-};
-
-struct BeamElementCoord {
-    int x;
-    int y; // represents the point farthest from the beam
-    int yTop; // y value of topmost note
-    int yBottom; // y value of bottom-most note
-    int yBeam; // y value of stem top position
-    int dur; // drawing duration
-    int breaksec;
-    char partialFlags[MAX_DURATION_PARTIALS];
-    LayerElement *element;
-};
-
 void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure )
 {
     LayerElement *current;
-    
-    BeamElementCoord beamElementCoord[MAX_ELEMENTS_IN_BEAM]; /* garde les coord.d'entree*/
 
 	bool changingDur = OFF;
     bool beamHasChord = OFF;
@@ -117,8 +91,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     if (beamChildren->empty()) {
         return;
     }
-    
-    assert( beamChildren->size() < MAX_ELEMENTS_IN_BEAM );
+    const ArrayOfBeamElementCoords *beamElementCoords = beam->GetElementCoords();
     
     // current point to the first Note in the layed out layer
     current = dynamic_cast<LayerElement*>(beamChildren->front());
@@ -134,6 +107,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
+    // This could be moved to Beam::InitCoord for optimization because there should be no
+    // need of redoing it everytime it is drawn.
     
     ListOfObjects::iterator iter = beamChildren->begin();
 	do {
@@ -148,16 +123,17 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
         // Can it happen? With rests?
 		if (currentDur > DUR_4) {
-			beamElementCoord[elementCount].element = current;
-            beamElementCoord[elementCount].x = current->GetDrawingX();
-			beamElementCoord[elementCount].dur = currentDur;
+			(*beamElementCoords)[elementCount]->m_element = current;
+            current->m_beamElementCoord = (*beamElementCoords)[elementCount];
+            (*beamElementCoords)[elementCount]->m_x = current->GetDrawingX();
+			(*beamElementCoords)[elementCount]->m_dur = currentDur;
             
             // Look at beam breaks
-            beamElementCoord[elementCount].breaksec = 0;
+            (*beamElementCoords)[elementCount]->m_breaksec = 0;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary*>(current);
             if ( elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
                 if (!changingDur) changingDur = ON;
-                beamElementCoord[elementCount].breaksec = beamsecondary->GetBreaksec();
+                (*beamElementCoords)[elementCount]->m_breaksec = beamsecondary->GetBreaksec();
             }
             
             // Skip rests
@@ -199,29 +175,29 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // elementCount holds the last one
 	for (i = 0; i < elementCount; i++) {
 
-        if (dynamic_cast<Chord*>(beamElementCoord[i].element)) {
-            dynamic_cast<Chord*>(beamElementCoord[i].element)->GetYExtremes(&yMax, &yMin);
-            beamElementCoord[i].yTop = yMax;
-            beamElementCoord[i].yBottom = yMin;
+        if (dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element)) {
+            dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element)->GetYExtremes(&yMax, &yMin);
+            (*beamElementCoords)[i]->m_yTop = yMax;
+            (*beamElementCoords)[i]->m_yBottom = yMin;
             
-            avgY += beamElementCoord[i].y + ((yMax - yMin) / 2);
+            avgY += (*beamElementCoords)[i]->m_y + ((yMax - yMin) / 2);
             
             // highest and lowest value;
             high= std::max(yMax, high);
             low = std::min(yMin, low);
         }
         else {
-            beamElementCoord[i].y = beamElementCoord[i].element->GetDrawingY();
+            (*beamElementCoords)[i]->m_y = (*beamElementCoords)[i]->m_element->GetDrawingY();
             
             // highest and lowest value;
-            high= std::max(beamElementCoord[i].y, high);
-            low = std::min(beamElementCoord[i].y, low);
+            high= std::max((*beamElementCoords)[i]->m_y, high);
+            low = std::min((*beamElementCoords)[i]->m_y, low);
             
-            curY = beamElementCoord[i].element->GetDrawingY();
-            beamElementCoord[i].y = curY;
-            beamElementCoord[i].yTop = curY;
-            beamElementCoord[i].yBottom = curY;
-            avgY += beamElementCoord[i].y;
+            curY = (*beamElementCoords)[i]->m_element->GetDrawingY();
+            (*beamElementCoords)[i]->m_y = curY;
+            (*beamElementCoords)[i]->m_yTop = curY;
+            (*beamElementCoords)[i]->m_yBottom = curY;
+            avgY += (*beamElementCoords)[i]->m_y;
         }
 	}
     yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
@@ -242,16 +218,16 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     
     if (stemDir == STEMDIRECTION_up) { //set stem direction for all the notes
         for (i = 0; i < elementCount; i++) {
-            beamElementCoord[i].y = beamElementCoord[i].yTop;
+            (*beamElementCoords)[i]->m_y = (*beamElementCoords)[i]->m_yTop;
         }
     }
     else {
         for (i = 0; i < elementCount; i++) {
-            beamElementCoord[i].y = beamElementCoord[i].yBottom;
+            (*beamElementCoords)[i]->m_y = (*beamElementCoords)[i]->m_yBottom;
         }
     }
 
-    if (beamElementCoord[last].element->m_cueSize == false)  {
+    if ((*beamElementCoords)[last]->m_element->m_cueSize == false)  {
         beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
         beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
     }
@@ -269,7 +245,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     verticalShift = ((shortestDur-DUR_8)*(beamWidth));
 
     //if the beam has smaller-size notes
-    if (beamElementCoord[last].element->m_cueSize) {
+    if ((*beamElementCoords)[last]->m_element->m_cueSize) {
         verticalShift += m_doc->m_drawingUnit[staff->staffSize]*5;
     }
     else {
@@ -288,27 +264,27 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     for (i=0; i<elementCount; i++)
     {
         //change the stem dir for all objects
-        if ( beamElementCoord[i].element->IsNote() ) {
-            ((Note*)beamElementCoord[i].element)->m_drawingStemDir = stemDir;
-            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+        if ( (*beamElementCoords)[i]->m_element->IsNote() ) {
+            ((Note*)(*beamElementCoords)[i]->m_element)->m_drawingStemDir = stemDir;
+            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
         
-        else if ( beamElementCoord[i].element->IsChord() ) {
-            ((Chord*)beamElementCoord[i].element)->SetDrawingStemDir(stemDir);
-            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+        else if ( (*beamElementCoords)[i]->m_element->IsChord() ) {
+            ((Chord*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir(stemDir);
+            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
         
         else {
-            beamElementCoord[i].yBeam = beamElementCoord[i].y + verticalShift;
+            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
         
-        beamElementCoord[i].x +=  dx[beamElementCoord[i].element->m_cueSize];
+        (*beamElementCoords)[i]->m_x +=  dx[(*beamElementCoords)[i]->m_element->m_cueSize];
         
-        s_y += beamElementCoord[i].yBeam;
-        s_y2 += beamElementCoord[i].yBeam * beamElementCoord[i].yBeam;
-        s_x += beamElementCoord[i].x;
-        s_x2 += beamElementCoord[i].x * beamElementCoord[i].x;
-        s_xy += beamElementCoord[i].x * beamElementCoord[i].yBeam;
+        s_y += (*beamElementCoords)[i]->m_yBeam;
+        s_y2 += (*beamElementCoords)[i]->m_yBeam * (*beamElementCoords)[i]->m_yBeam;
+        s_x += (*beamElementCoords)[i]->m_x;
+        s_x2 += (*beamElementCoords)[i]->m_x * (*beamElementCoords)[i]->m_x;
+        s_xy += (*beamElementCoords)[i]->m_x * (*beamElementCoords)[i]->m_yBeam;
     }
 
 
@@ -334,8 +310,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // Draw notes for all objects in the beam now that stem direction is calculated
     
     for (i = 0; i < elementCount; i++) {
-        if (beamElementCoord[i].element->IsChord()) {
-            Chord *chord = dynamic_cast<Chord*>(beamElementCoord[i].element);
+        if ((*beamElementCoords)[i]->m_element->IsChord()) {
+            Chord *chord = dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element);
             ListOfObjects *noteList = chord->GetList(chord);
             ListOfObjects::iterator iter = noteList->begin();
             
@@ -350,10 +326,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             }
             dc->EndResumedGraphic( dynamic_cast<DocObject*>(chord), this );
         }
-        else if (beamElementCoord[i].element->IsNote()) {
-            dc->ResumeGraphic( dynamic_cast<DocObject*>(beamElementCoord[i].element), beamElementCoord[i].element->GetUuid() );
-            DrawNote(dc, dynamic_cast<LayerElement*>(beamElementCoord[i].element), layer, staff, measure);
-            dc->EndResumedGraphic( dynamic_cast<DocObject*>(beamElementCoord[i].element), this );
+        else if ((*beamElementCoords)[i]->m_element->IsNote()) {
+            dc->ResumeGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), (*beamElementCoords)[i]->m_element->GetUuid() );
+            DrawNote(dc, dynamic_cast<LayerElement*>((*beamElementCoords)[i]->m_element), layer, staff, measure);
+            dc->EndResumedGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), this );
         }
     }
 
@@ -363,8 +339,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     double oldYPos; //holds y position before calculation to determine if beam needs extra height
     double expectedY;
 	for ( i=0; i<elementCount; i++ ) {
-        oldYPos = beamElementCoord[i].yBeam;
-		expectedY = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
+        oldYPos = (*beamElementCoords)[i]->m_yBeam;
+		expectedY = startingY + verticalBoost + beamSlope * (*beamElementCoords)[i]->m_x;
         
         //if the stem is not long enough, add extra stem length needed to all members of the beam
         if ((stemDir == STEMDIRECTION_up && (oldYPos > expectedY)) || (stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
@@ -374,27 +350,27 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     
     for (i=0; i<elementCount; i++)
     {
-		beamElementCoord[i].yBeam = startingY + verticalBoost + beamSlope * beamElementCoord[i].x;
+		(*beamElementCoords)[i]->m_yBeam = startingY + verticalBoost + beamSlope * (*beamElementCoords)[i]->m_x;
     }
         
 	for (i=0; i<elementCount; i++)
 	{
         if (stemDir == STEMDIRECTION_up) {
-            fy1 = beamElementCoord[i].yBeam - m_doc->m_style->m_stemWidth;
-            fy2 = beamElementCoord[i].yBottom + m_doc->m_drawingUnit[staff->staffSize]/4;
+            fy1 = (*beamElementCoords)[i]->m_yBeam - m_doc->m_style->m_stemWidth;
+            fy2 = (*beamElementCoords)[i]->m_yBottom + m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         else {
-            fy1 = beamElementCoord[i].yBeam + m_doc->m_style->m_stemWidth;
-            fy2 = beamElementCoord[i].yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
+            fy1 = (*beamElementCoords)[i]->m_yBeam + m_doc->m_style->m_stemWidth;
+            fy2 = (*beamElementCoords)[i]->m_yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         
-        beamElementCoord[i].element->m_drawingStemStart.x = beamElementCoord[i].element->m_drawingStemEnd.x = beamElementCoord[i].x;
-        beamElementCoord[i].element->m_drawingStemStart.y = fy2;
-        beamElementCoord[i].element->m_drawingStemEnd.y = fy1;
-        beamElementCoord[i].element->m_drawingStemDir = false;
+        (*beamElementCoords)[i]->m_element->m_drawingStemStart.x = (*beamElementCoords)[i]->m_element->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
+        (*beamElementCoords)[i]->m_element->m_drawingStemStart.y = fy2;
+        (*beamElementCoords)[i]->m_element->m_drawingStemEnd.y = fy1;
+        (*beamElementCoords)[i]->m_element->m_drawingStemDir = stemDir;
         
-        if(beamElementCoord[i].element->IsNote() || beamElementCoord[i].element->IsChord())
-            DrawVerticalLine (dc,fy2, fy1, beamElementCoord[i].x, m_doc->m_style->m_stemWidth);
+        if((*beamElementCoords)[i]->m_element->IsNote() || (*beamElementCoords)[i]->m_element->IsChord())
+            DrawVerticalLine (dc,fy2, fy1, (*beamElementCoords)[i]->m_x, m_doc->m_style->m_stemWidth);
 	}
 
     /******************************************************************/
@@ -406,17 +382,17 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     fullBars =  !changingDur ? (shortestDur - DUR_4) : 1;
     
     // Adjust the x position of the first and last element for taking into account the stem width
-	beamElementCoord[0].x -= (m_doc->m_style->m_stemWidth) / 2;
-	beamElementCoord[last].x += (m_doc->m_style->m_stemWidth) / 2;
+	(*beamElementCoords)[0]->m_x -= (m_doc->m_style->m_stemWidth) / 2;
+	(*beamElementCoords)[last]->m_x += (m_doc->m_style->m_stemWidth) / 2;
 
     // Shift direction
 	shiftY = (stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
 
-	fy1 = beamElementCoord[0].yBeam;
-    fy2 = beamElementCoord[last].yBeam;
+	fy1 = (*beamElementCoords)[0]->m_yBeam;
+    fy2 = (*beamElementCoords)[last]->m_yBeam;
 
-	fx1 = (*beamElementCoord).x;
-    fx2 = (beamElementCoord+last)->x;
+    fx1 = (*beamElementCoords)[0]->m_x;
+    fx2 = (*beamElementCoords)[last]->m_x;
 
 	s_y = shiftY;
 	s_y2 = shiftY;
@@ -469,23 +445,23 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             
             // all but the last one
             for (i = 0; i < elementCount - 1; i++) {
-                bool breakSec = ((beamElementCoord[i].breaksec) && (testDur - DUR_8 >= beamElementCoord[i].breaksec));
-                beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
+                bool breakSec = (((*beamElementCoords)[i]->m_breaksec) && (testDur - DUR_8 >= (*beamElementCoords)[i]->m_breaksec));
+                (*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] = PARTIAL_NONE;
                 // partial is needed
-                if (beamElementCoord[i].dur >= (char)testDur) {
+                if ((*beamElementCoords)[i]->m_dur >= (char)testDur) {
                     // and for the next one too, but no break - through
-                    if ((beamElementCoord[i+1].dur >= (char)testDur) && !breakSec) {
-                        beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_THROUGH;
+                    if (((*beamElementCoords)[i+1]->m_dur >= (char)testDur) && !breakSec) {
+                        (*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] = PARTIAL_THROUGH;
                     }
                     // not needed for the next one or break
                     else {
                         // we are starting a beam or after a beam break - put it right
                         if (start) {
-                            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_RIGHT;
+                            (*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] = PARTIAL_RIGHT;
                         }
                         // or the previous one had no partial - put it left
-                        else if (beamElementCoord[i-1].dur < (char)testDur) {
-                            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
+                        else if ((*beamElementCoords)[i-1]->m_dur < (char)testDur) {
+                            (*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
                         }
                     }
                 }
@@ -498,39 +474,39 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
                 }
             }
             // last one
-            beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_NONE;
+            (*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] = PARTIAL_NONE;
             // partial is needed
-            if (beamElementCoord[i].dur >= (char)testDur) {
+            if ((*beamElementCoords)[i]->m_dur >= (char)testDur) {
                 // and the previous one had no partial - put it left
-                if (beamElementCoord[i-1].dur < (char)testDur) {
-                    beamElementCoord[i].partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
+                if ((*beamElementCoords)[i-1]->m_dur < (char)testDur) {
+                    (*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] = PARTIAL_LEFT;
                 }
             }
             
             // draw them
             for (i=0; i<elementCount; i++) {
-                if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_THROUGH) {
+                if ((*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] == PARTIAL_THROUGH) {
                     // through should never be set on the last one
                     assert( i < elementCount - 1);
                     if (i >= elementCount - 1) continue; // assert for debug and skip otherwise
-                    fy1 = beamElementCoord[i].yBeam + barY;
-                    fy2 = beamElementCoord[i+1].yBeam + barY;
+                    fy1 = (*beamElementCoords)[i]->m_yBeam + barY;
+                    fy2 = (*beamElementCoords)[i+1]->m_yBeam + barY;
                     polygonHeight = beamWidthBlack * shiftY;
-                    DrawObliquePolygon (dc, beamElementCoord[i].x, fy1,beamElementCoord[i+1].x, fy2, polygonHeight);
+                    DrawObliquePolygon (dc, (*beamElementCoords)[i]->m_x, fy1,(*beamElementCoords)[i+1]->m_x, fy2, polygonHeight);
                 }
-                else if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_RIGHT) {
-                    fy1 = beamElementCoord[i].yBeam + barY;
-                    int x2 = beamElementCoord[i].x + m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                else if ((*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] == PARTIAL_RIGHT) {
+                    fy1 = (*beamElementCoords)[i]->m_yBeam + barY;
+                    int x2 = (*beamElementCoords)[i]->m_x + m_doc->m_drawingLedgerLine[staff->staffSize][0];
                     fy2 = startingY + verticalBoost + barY + beamSlope * x2;
                     polygonHeight= beamWidthBlack*shiftY;
-                    DrawObliquePolygon (dc, beamElementCoord[i].x, fy1, x2, fy2, polygonHeight);
+                    DrawObliquePolygon (dc, (*beamElementCoords)[i]->m_x, fy1, x2, fy2, polygonHeight);
                 }
-                else if (beamElementCoord[i].partialFlags[testDur-DUR_8] == PARTIAL_LEFT) {
-                    fy2 = beamElementCoord[i].yBeam + barY;
-                    int x1 = beamElementCoord[i].x - m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                else if ((*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] == PARTIAL_LEFT) {
+                    fy2 = (*beamElementCoords)[i]->m_yBeam + barY;
+                    int x1 = (*beamElementCoords)[i]->m_x - m_doc->m_drawingLedgerLine[staff->staffSize][0];
                     fy1 = startingY + verticalBoost + barY + beamSlope * x1;
                     polygonHeight = beamWidthBlack*shiftY;
-                    DrawObliquePolygon (dc, x1, fy1, beamElementCoord[i].x, fy2, polygonHeight);
+                    DrawObliquePolygon (dc, x1, fy1, (*beamElementCoords)[i]->m_x, fy2, polygonHeight);
                 }
             }
 

@@ -509,7 +509,7 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
         object->m_drawingStemStart.x = object->m_drawingStemEnd.x = x2 - (m_doc->m_style->m_stemWidth / 2);
         object->m_drawingStemStart.y = y1;
         object->m_drawingStemEnd.y = y2;
-        object->m_drawingStemDir = true;
+        object->m_drawingStemDir = STEMDIRECTION_up;
         
         if (drawingDur > DUR_4) {
             DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, object->m_cueSize );
@@ -523,7 +523,7 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
         object->m_drawingStemStart.x = object->m_drawingStemEnd.x = x2 - (m_doc->m_style->m_stemWidth / 2);
         object->m_drawingStemStart.y = y1;
         object->m_drawingStemEnd.y = y2;
-        object->m_drawingStemDir = false;
+        object->m_drawingStemDir = STEMDIRECTION_down;
         
         if (drawingDur > DUR_4) {
             DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->staffSize, object->m_cueSize );
@@ -657,8 +657,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
 }
 
-/** This function draws multi-measure rests
- **/
+/** This function draws multi-measure rests **/
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {	
     int x1, x2, y1, y2, length;

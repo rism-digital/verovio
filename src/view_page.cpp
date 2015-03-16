@@ -176,7 +176,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     
     if ( barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
-        DrawStaffGrp( dc, measure, staffGrp, x );
+        DrawStaffGrp( dc, measure, staffGrp, x, true );
         
         DrawStaffDefLabels( dc, measure, scoreDef, !scoreDef->DrawLabels() );
         // if this was true (non-abbreviated labels), set it to false for next one
@@ -192,7 +192,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
 	return;
 }
 
-void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x )
+void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp )
 {
     assert( measure );
     assert( staffGrp );
@@ -231,6 +231,10 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
+    if ( topStaffGrp ) {
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
+    }
+    // this will need to be changed with the next version of MEI will line means additional thick line 
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
     }
@@ -922,7 +926,7 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     
     //the normal case
-    if ( spanningType ==  SPANNING_START_END ) {
+    if ( spanningType == SPANNING_START_END ) {
         assert( note1 && note2 );
         // Copied from DrawNote
         // We could use the stamDir information
@@ -936,13 +940,13 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
-    else if ( spanningType ==  SPANNING_START ) {
+    else if ( spanningType == SPANNING_START ) {
         y1 = y2 = note1->GetDrawingY();
         assert(dynamic_cast<Note*>(note1));
         noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
     }
     // Now this is the case when the tie is split but we are drawing the end of it
-    else if ( spanningType ==  SPANNING_END ) {
+    else if ( spanningType == SPANNING_END ) {
         y1 = y2 = note2->GetDrawingY();
         x2 = note2->GetDrawingX();
         assert(dynamic_cast<Note*>(note2));

@@ -89,6 +89,36 @@ void Beam::FilterList( ListOfObjects *childList )
         }
     }
     
+    InitCoords( childList );
+}
+  
+void Beam::InitCoords( ListOfObjects *childList )
+{
+    this->ClearCoords();
+    m_beamElementCoords.reserve( childList->size() );
+    int i;
+    for (i = 0; i < childList->size(); i++ ) {
+        m_beamElementCoords.push_back( new BeamElementCoord() );
+    }
+}
+    
+void Beam::ClearCoords()
+{
+    ArrayOfBeamElementCoords::iterator iter;
+    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter)
+    {
+        delete *iter;
+    }
+    m_beamElementCoords.clear();
+}
+    
+//----------------------------------------------------------------------------
+// BeamElementCoord
+//----------------------------------------------------------------------------
+
+BeamElementCoord::~BeamElementCoord()
+{
+    if (m_element) m_element->m_beamElementCoord = NULL;
 }
 
 } // namespace vrv
