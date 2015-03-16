@@ -176,7 +176,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     
     if ( barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
-        DrawStaffGrp( dc, measure, staffGrp, x );
+        DrawStaffGrp( dc, measure, staffGrp, x, true );
         
         DrawStaffDefLabels( dc, measure, scoreDef, !scoreDef->DrawLabels() );
         // if this was true (non-abbreviated labels), set it to false for next one
@@ -192,7 +192,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
 	return;
 }
 
-void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x )
+void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp )
 {
     assert( measure );
     assert( staffGrp );
@@ -231,6 +231,10 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
+    if ( topStaffGrp ) {
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
+    }
+    // this will need to be changed with the next version of MEI will line means additional thick line 
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
     }
