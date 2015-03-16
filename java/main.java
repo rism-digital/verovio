@@ -6,8 +6,8 @@ javac -cp .:target/VerovioToolkit-1.0-SNAPSHOT.jar  main.java
 java -cp .:target/VerovioToolkit-1.0-SNAPSHOT.jar  main
 */
 
-import org.rism.verovio.toolkit;
-import org.rism.verovio.convertFileFormat;
+import org.rismch.verovio.toolkit;
+import org.rismch.verovio.convertFileFormat;
 
 public class main {
 	public static void main(String argv[]) {

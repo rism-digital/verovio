@@ -1,9 +1,9 @@
 #!/bin/bash
 
-mkdir -p src/main/java/org/rism/verovio
+mkdir -p src/main/java/org/rismch/verovio
 mkdir target
 
-swig -c++ -java -package org.rism.verovio -outdir src/main/java/org/rism/verovio verovio.i
+swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
 
 FILES="../src/accid.cpp \
              ../src/aligner.cpp \
