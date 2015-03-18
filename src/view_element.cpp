@@ -1019,7 +1019,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
 	}
 	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
 	*/
-    if (note->GetDur() == DUR_LG)
+    if (note->GetActualDur() == DUR_LG)
     {
 		verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
 		// ENZ

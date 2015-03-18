@@ -307,6 +307,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
     double *time = static_cast<double*>(params[1]);
     Mensur **currentMensur = static_cast<Mensur**>(params[2]);
+    MeterSig **currentMeterSig = static_cast<MeterSig**>(params[3]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -344,6 +345,8 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
             type = ALIGNMENT_MENSUR_ATTR;
         }
         else {
+            // replace the current mensur
+            (*currentMensur) = dynamic_cast<Mensur*>(this);
             type = ALIGNMENT_MENSUR;
         }
     }
@@ -352,6 +355,8 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
             type = ALIGNMENT_METERSIG_ATTR;
         }
         else {
+            // replace the current meter signature
+            (*currentMeterSig) = dynamic_cast<MeterSig*>(this);
             type = ALIGNMENT_METERSIG;
         }
     }
