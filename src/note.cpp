@@ -34,16 +34,23 @@ Note::Note():
     AttTiepresent()
 {
     m_drawingTieAttr = NULL;
+    m_accid = NULL;
     Reset();
 }
 
 
 Note::~Note()
 {
-    // This deletes the Tie and Slur objects if necessary
+    // This deletes the Tie, Slur, and Accid objects if necessary
     if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
     }
+    
+    if (m_accid) {
+        delete m_accid;
+        m_accid = NULL;
+    }
+    
 }
     
 void Note::Reset()

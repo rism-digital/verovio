@@ -149,7 +149,7 @@ public:
     int m_clusterPosition; //1-indexed position in said cluster; 0 if does not have position
     
     /** other information necessary for notes in chords **/
-    Accid m_accid;
+    Accid *m_accid;
 
     
 private:
