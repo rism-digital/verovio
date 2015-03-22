@@ -198,7 +198,8 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
         {
             x += m_doc->m_drawingUnit[staff->staffSize] * 5; // step forward because we have a sign or a meter symbol
         }
-        DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), mensur->GetNumbase(), staff);
+        int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
+        DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
     }
     
     dc->EndGraphic(element, this ); //RZ
