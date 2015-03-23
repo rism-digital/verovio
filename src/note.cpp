@@ -34,16 +34,22 @@ Note::Note():
     AttTiepresent()
 {
     m_drawingTieAttr = NULL;
+    m_drawingAccid = NULL;
     Reset();
 }
 
 
 Note::~Note()
 {
-    // This deletes the Tie and Slur objects if necessary
+    // This deletes the Tie, Slur, and Accid objects if necessary
     if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
     }
+    
+    if (m_drawingAccid) {
+        delete m_drawingAccid;
+    }
+    
 }
     
 void Note::Reset()
@@ -62,6 +68,8 @@ void Note::Reset()
     m_embellishment = EMB_NONE;
     // tie pointers
     ResetDrawingTieAttr();
+    // accid pointer
+    ResetDrawingAccid();
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -93,6 +101,13 @@ void Note::ResetDrawingTieAttr( )
     }
 }
   
+void Note::ResetDrawingAccid( )
+{
+    if ( m_drawingAccid ) {
+        delete m_drawingAccid;
+        m_drawingAccid = NULL;
+    }
+}
     
 Chord* Note::IsChordTone()
 {

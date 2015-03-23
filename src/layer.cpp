@@ -274,68 +274,29 @@ void Layer::Delete( LayerElement *element )
     Refresh();
 }
 
-// Dans la direction indiquee (direction), cavale sur tout element qui n'est pas un
-// symbol, de la nature indiquee (flg). Retourne le ptr si succes, ou 
-// l'element de depart; le ptr succ est vrai si symb trouve.
-
-LayerElement *Layer::GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ)
-{	
-    LayerElement *original = element;
-
-	*succ = false;
-	if (element == NULL)
-		return (element);
-
-    ResetList(this);
-    
-	int i = GetListIndex( element );
-	if ( i == -1 )
-		return (element);
-
-    *succ = true; // we assume we will find it. Change to false if not
-    while ( typeid(*element) != *elementType )
-	{
-		if (direction==BACKWARD)
-		{	
-			if (i < 1) {
-                *succ = false;
-                break;
-            }
-			i--;
-            element = static_cast<LayerElement*>( GetListPrevious(element) );
-		}
-		else
-		{	if (i >= (int)GetList(this)->size() - 1 ) {
-                *succ = false;
-                break;
-            }
-			i++;
-			element = static_cast<LayerElement*>( GetListNext(element) );
-		}
-	}	
-
-	return (*succ ? element : original);
-}
 
 Clef* Layer::GetClef( LayerElement *test )
 {
-	bool succ=false;
-
+    Object *testObject = test;
+    
     if (!test) {
         return NULL;
     }
 	
+    //make sure list is set
+    ResetList(this);
     if ( !test->IsClef() )
-    {	
-        test = GetFirstOld(test, BACKWARD, &typeid(Clef), &succ);
+    {
+        testObject = GetListFirstBackward(testObject, &typeid(Clef));
     }
-    if ( dynamic_cast<Clef*>(test) ) {
-        return dynamic_cast<Clef*>(test);
+    
+    if ( dynamic_cast<Clef*>(testObject) ) {
+        return dynamic_cast<Clef*>(testObject);
     }
 
     return m_currentClef;
 }
-
+ 
 int Layer::GetClefOffset( LayerElement *test )
 {
     Clef *clef = GetClef(test);
