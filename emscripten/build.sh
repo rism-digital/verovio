@@ -29,6 +29,7 @@ if [ ! -d data ]; then mkdir data; fi
 ASM="\
 	-O2 --memory-init-file 0 \
 	-s ASM_JS=1 \
+	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
 ASM_NAME=""
 
