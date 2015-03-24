@@ -798,9 +798,8 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
 {
     assert(dynamic_cast<TimeSpanningInterface*>(element)); // Element must be a TimeSpanningInterface
     TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
-    
-    if ( !Check( interface->GetStart() ) ) return;
-    if ( !Check( interface->GetEnd() ) ) return;
+
+    if ( !interface->HasStartAndEnd() ) return;
     
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System*>( interface->GetStart()->GetFirstParent( &typeid(System) )  );
