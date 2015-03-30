@@ -125,24 +125,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
         //DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
     }
     
-    /************** Accidentals/dots/peripherals: **************/
-    
-    /*
-    if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
-        xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
-        
-        Accid *accid = &note->m_accid;
-        accid->SetOloc(note->GetOct());
-        accid->SetPloc(note->GetPname());
-        accid->SetAccid(note->GetAccid());
-        accid->m_cueSize = note->m_cueSize;
-        accid->SetDrawingX( xAccid );
-        accid->SetDrawingY( noteY );
-        
-        //postpone drawing the accidental until later if it's in a chord
-        DrawAccid( dc, accid, layer, staff, measure, NULL ); // ax2
-    }
-    */
+    /************** dots **************/
     
     if (note->GetDots()) {
         int xDot;
