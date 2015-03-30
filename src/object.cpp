@@ -735,19 +735,19 @@ int ObjectListInterface::GetListIndex( const Object *listElement )
     
 Object* ObjectListInterface::GetListFirst(const Object *startFrom, const std::type_info *elementType)
 {
-    m_iteratorCurrent = m_list.begin();
-    std::advance(m_iteratorCurrent, GetListIndex(startFrom));
-    m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_list.end(), ObjectComparison( elementType ) );
-    return (m_iteratorCurrent == m_list.end()) ? NULL : *m_iteratorCurrent;
+    ListOfObjects::iterator it = m_list.begin();
+    std::advance(it, GetListIndex(startFrom));
+    it = std::find_if(it, m_list.end(), ObjectComparison( elementType ) );
+    return (it == m_list.end()) ? NULL : *it;
 }
     
 Object* ObjectListInterface::GetListFirstBackward(Object *startFrom, const std::type_info *elementType)
 {
-    m_iteratorCurrent = m_list.begin();
-    std::advance(m_iteratorCurrent, GetListIndex(startFrom));
-    ListOfObjects::reverse_iterator reverseIteratorCurrent(m_iteratorCurrent);
-    reverseIteratorCurrent = std::find_if(reverseIteratorCurrent, m_list.rend(), ObjectComparison( elementType ) );
-    return (reverseIteratorCurrent == m_list.rend()) ? NULL : *reverseIteratorCurrent;
+    ListOfObjects::iterator it = m_list.begin();
+    std::advance(it, GetListIndex(startFrom));
+    ListOfObjects::reverse_iterator rit(it);
+    rit = std::find_if(rit, m_list.rend(), ObjectComparison( elementType ) );
+    return (rit == m_list.rend()) ? NULL : *rit;
 }
     
 Object *ObjectListInterface::GetListPrevious( const Object *listElement )
