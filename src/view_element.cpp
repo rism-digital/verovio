@@ -33,6 +33,7 @@
 #include "note.h"
 #include "rest.h"
 #include "slur.h"
+#include "space.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -125,6 +126,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     }
     else if (dynamic_cast<Slur*>(element)) {
         DrawTie(dc, element, layer, staff, measure);
+    }
+    else if (dynamic_cast<Space*>(element)) {
+        DrawSpace(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Syl*>(element)) {
         DrawSyl(dc, element, layer, staff, measure);
@@ -1563,6 +1567,14 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this );
 }
 
+void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
+    
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    dc->EndGraphic(element, this );
+}
 
 void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {

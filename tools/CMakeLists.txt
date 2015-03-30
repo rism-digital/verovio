@@ -55,6 +55,7 @@ add_executable (verovio
 	../src/rest.cpp
 	../src/scoredef.cpp
 	../src/slur.cpp
+	../src/space.cpp
 	../src/staff.cpp
 	../src/style.cpp
 	../src/svgdevicecontext.cpp
