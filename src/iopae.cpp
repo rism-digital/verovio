@@ -24,6 +24,7 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "scoredef.h"
 #include "system.h"
 #include "staff.h"
 #include "tuplet.h"
@@ -119,6 +120,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     std::string s_key;
     MeasureObject current_measure;
     NoteObject current_note;
+    Clef *staffDefClef = NULL;
     
     std::vector<MeasureObject> staff;
     
@@ -150,7 +152,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     if (strlen(c_clef)) {
         Clef *c = new Clef;
         getClefInfo(c_clef, c );    // do we need to put a default clef?
-        current_measure.clef = c;
+        if (!staffDefClef) staffDefClef = c;
+        else current_measure.clef = c;
     }
 
     if (strlen(c_keysig)) {
@@ -366,6 +369,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN( 1 );
+    if (staffDefClef) {
+        staffDef->ReplaceClef( staffDefClef );
+        delete staffDefClef;
+    }
     staffGrp->AddStaffDef( staffDef );
     m_doc->m_scoreDef.AddStaffGrp( staffGrp );
 

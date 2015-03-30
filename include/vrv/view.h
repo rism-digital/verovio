@@ -149,7 +149,7 @@ protected:
     void DrawSystem( DeviceContext *dc, System *system );
     void DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
-	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
+    void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false );
     void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
 	void DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);

@@ -22,6 +22,7 @@ namespace vrv {
 class Object;
 class AttComparison;
 class Note;
+struct BeamElementCoord;
 
 typedef std::vector<Object*> ArrayOfObjects;
 
@@ -32,6 +33,8 @@ typedef std::vector<void*> ArrayPtrVoid;
 typedef std::vector<AttComparison*> ArrayOfAttComparisons;
 
 typedef std::vector<Note*> ChordCluster;
+    
+typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
     
 //----------------------------------------------------------------------------
 // Global defines
