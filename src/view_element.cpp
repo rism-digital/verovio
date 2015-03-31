@@ -1352,13 +1352,16 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
 	}
 
-	a -= m_doc->m_drawingUnit[staff->staffSize] * 2;
-	if (clef->m_cueSize)
-		a += m_doc->m_drawingUnit[staff->staffSize];
-
-	DrawSmuflCode ( dc, a, b, sym, staff->staffSize, clef->m_cueSize  );
+    bool cueSize = clef->m_cueSize;
+    // force cue size for intermediate clefs
+    if (clef->GetFirstParent(&typeid(Layer))) cueSize = true;
+    
+    if (!cueSize)
+        a -= m_doc->m_drawingUnit[staff->staffSize] * 2;
+    
+    DrawSmuflCode ( dc, a, b, sym, staff->staffSize, cueSize  );
    
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 }
 
 void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
