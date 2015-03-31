@@ -695,7 +695,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     //Draw the to lines at beginning and end
     // make it 8 pixesl longers, and 4 pixels width
-    int border = m_doc->m_drawingUnit[staff->staffSize] / 2;
+    int border = m_doc->m_drawingUnit[staff->staffSize];
     DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->m_style->m_stemWidth * 2);
     DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->m_style->m_stemWidth * 2);
     
