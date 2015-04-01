@@ -122,20 +122,7 @@ bool Note::IsClusterExtreme()
     
 bool Note::HasDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
-    if( chordParent && chordParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
-    {
-        return chordParent->GetDrawingStemDir();
-    }
-    else if( beamParent && beamParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
-    {
-        return beamParent->GetDrawingStemDir();
-    }
-    else
-    {
-        return this->HasStemDir();
-    }
+    return (this->GetDrawingStemDir() != STEMDIRECTION_NONE);
 }
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
