@@ -15,7 +15,7 @@
 #define HEADER_PUGICONFIG_HPP
 
 // Uncomment this to enable wchar_t mode
-// #define PUGIXML_WCHAR_MODE
+#define PUGIXML_WCHAR_MODE
 
 // Uncomment this to disable XPath
 // #define PUGIXML_NO_XPATH
