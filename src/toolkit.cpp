@@ -153,21 +153,41 @@ bool Toolkit::SetFont( std::string const &font )
 
 bool Toolkit::LoadFile( const std::string &filename )
 {
-    std::ifstream in( filename.c_str() );
+    /// Loading a UTF-16 file with basic conversion ot UTF-8
+    /// Will not convert all characters properly!
+    /// This should be called after checking if the file has a UTF-16 BOM
     
-    if (!in.is_open()) {
+    LogWarning("The file seems to be UTF-16 file but only UTF-8 is supported");
+    LogWarning("Trying to convert to UTF-8");
+    
+    std::wifstream win( filename.c_str() );
+    
+    if (!win.is_open()) {
         return false;
     }
     
-    in.seekg(0, std::ios::end);
-    std::streamsize fileSize = (std::streamsize)in.tellg();
-    in.seekg(0, std::ios::beg);
+    // Look at the size of the file
+    win.seekg(0, std::ios::end);
+    std::streamsize wfileSize = (std::streamsize)win.tellg();
+    win.clear();
+    win.seekg(0, std::wios::beg);
+    // Allocate a wstring
+    std::wstring wcontent;
+    wcontent.reserve( wfileSize );
     
-    // read the file into the string:
-    std::string content( fileSize, 0 );
-    in.read(&content[0], fileSize);
+    // Read the BOM
+    wchar_t c;
+    win.get(c);
+    win.get(c);
+    for(; win.get(c); )
+        // Remove 0 wchar
+        if ( (c > 0) ) wcontent += c;
     
-    return LoadString( content );
+    std::string ccontent = UTF16to8(wcontent.c_str());
+    LogDebug(ccontent.c_str());
+    LogDebug("%d %d", wcontent.size(), ccontent.size());
+    return LoadString( ccontent );
+    
 }
 
 bool Toolkit::LoadString( const std::string &data )
