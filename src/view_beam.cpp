@@ -35,6 +35,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
 	bool changingDur = OFF;
     bool beamHasChord = OFF;
+    bool hasMultipleStemDir = OFF;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     
     // position variables
@@ -110,6 +111,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // This could be moved to Beam::InitCoord for optimization because there should be no
     // need of redoing it everytime it is drawn.
     
+    data_STEMDIRECTION currentStemDir;
+    
     ListOfObjects::iterator iter = beamChildren->begin();
 	do {
         // Beam list should contain only DurationInterface objects
@@ -138,6 +141,16 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             
             // Skip rests
             if (current->IsNote() || current->IsChord()) {
+                // look at the stemDir to see if we have multiple stem Dir
+                if (!hasMultipleStemDir) {
+                    currentStemDir = dynamic_cast<AttStemmed*>(current)->GetStemDir();
+                    if (currentStemDir != STEMDIRECTION_NONE) {
+                        if ((stemDir != STEMDIRECTION_NONE) && (stemDir != currentStemDir)) {
+                            hasMultipleStemDir = ON;
+                        }
+                    }
+                    stemDir = currentStemDir;
+                }
                 // keep the shortest dur in the beam
                 shortestDur = std::max(currentDur,shortestDur);
                 // check if we have more than duration in the beam
@@ -207,8 +220,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
     avgY /= elementCount;
     
-    stemDir = layer->GetDrawingStemDir(); //force layer direction if it exists
+    // If we have one stem direction in the beam, then don't look at the layer
+    if (stemDir != STEMDIRECTION_NONE) stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
     
+    // Automatic stem direction if nothing in the notes or in the layer
     if (stemDir == STEMDIRECTION_NONE) {
         if (beamHasChord) stemDir = (yExtreme < verticalCenter) ?  STEMDIRECTION_up : STEMDIRECTION_down; //if it has a chord, go by the most extreme position
         else stemDir = (avgY <  verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; //otherwise go by average
