@@ -22,7 +22,7 @@ namespace vrv {
 class Object;
 class AttComparison;
 class Note;
-struct BeamElementCoord;
+class BeamElementCoord;
 
 typedef std::vector<Object*> ArrayOfObjects;
 

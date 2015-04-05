@@ -897,7 +897,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
 }
     
 void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
-                    char spanningType, DocObject *graphic )
+                         char spanningType, DocObject *graphic )
 {
     assert(dynamic_cast<Slur*>(element) || dynamic_cast<Tie*>(element)); // Element must be a Tie or a Slur
     TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
@@ -941,7 +941,8 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
-        y1 = y2 = note1->GetDrawingY();
+        y1 = note1->GetDrawingY();
+        y2 = y1;
         // m_drawingStemDir it not set properly in beam - needs to be fixed.
         if (dynamic_cast<Note*>(note1)) noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
         else if (dynamic_cast<Chord*>(note1)) noteStemDir = dynamic_cast<Chord*>(note1)->GetDrawingStemDir();
@@ -949,7 +950,8 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
-        y1 = y2 = note2->GetDrawingY();
+        y1 = note2->GetDrawingY();
+        y2 = y1;
         x2 = note2->GetDrawingX();
         if (dynamic_cast<Note*>(note2)) noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
         else if (dynamic_cast<Chord*>(note2)) noteStemDir = dynamic_cast<Chord*>(note2)->GetDrawingStemDir();
@@ -958,6 +960,7 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
     // Finally
     else {
         LogDebug("Slur across an entire system is not supported");
+        return;
     }
     
     assert( dynamic_cast<Note*>(note1) || dynamic_cast<Chord*>(note1));
