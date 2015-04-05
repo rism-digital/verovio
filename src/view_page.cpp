@@ -932,31 +932,35 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
         // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
         y1 = note1->GetDrawingY();
         y2 = note2->GetDrawingY();
-        assert(dynamic_cast<Note*>(note1));
         // for now we only look at the first note - needs to be improved
         // m_drawingStemDir it not set properly in beam - needs to be fixed.
-        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        if (dynamic_cast<Note*>(note1)) noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        else if (dynamic_cast<Chord*>(note1)) noteStemDir = dynamic_cast<Chord*>(note1)->GetDrawingStemDir();
+        else assert(false);
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
         y1 = y2 = note1->GetDrawingY();
-        assert(dynamic_cast<Note*>(note1));
-        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        // m_drawingStemDir it not set properly in beam - needs to be fixed.
+        if (dynamic_cast<Note*>(note1)) noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        else if (dynamic_cast<Chord*>(note1)) noteStemDir = dynamic_cast<Chord*>(note1)->GetDrawingStemDir();
+        else assert(false);
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
         y1 = y2 = note2->GetDrawingY();
         x2 = note2->GetDrawingX();
-        assert(dynamic_cast<Note*>(note2));
-        noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
+        if (dynamic_cast<Note*>(note2)) noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
+        else if (dynamic_cast<Chord*>(note2)) noteStemDir = dynamic_cast<Chord*>(note2)->GetDrawingStemDir();
+        else assert(false);
     }
     // Finally
     else {
-        LogDebug("Slur accross an entire system is not supported");
+        LogDebug("Slur across an entire system is not supported");
     }
     
-    assert( dynamic_cast<Note*>(note1));
+    assert( dynamic_cast<Note*>(note1) || dynamic_cast<Chord*>(note1));
     //layer direction trumps note direction
     if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;

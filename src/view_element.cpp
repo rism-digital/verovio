@@ -416,17 +416,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
 		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
-		
-        Accid *accid = &note->m_accid;
-        accid->SetOloc(note->GetOct());
-        accid->SetPloc(note->GetPname());
-		accid->SetAccid(note->GetAccid());
-        accid->m_cueSize = note->m_cueSize;
-        accid->SetDrawingX( xAccid );
-        accid->SetDrawingY( noteY );
+
+        if (note->m_drawingAccid == NULL)
+        {
+            note->m_drawingAccid = new Accid();
+            note->m_drawingAccid->SetOloc(note->GetOct());
+            note->m_drawingAccid->SetPloc(note->GetPname());
+            note->m_drawingAccid->SetAccid(note->GetAccid());
+            note->m_drawingAccid->m_cueSize = note->m_cueSize;
+        }
+        
+        note->m_drawingAccid->SetDrawingX( xAccid );
+        note->m_drawingAccid->SetDrawingY( noteY );
         
         //postpone drawing the accidental until later if it's in a chord
-        if (!inChord) DrawAccid( dc, accid, layer, staff, measure ); // ax2
+        if (!inChord) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure ); // ax2
 	}
 	
     if (note->GetDots() && !inChord) {
@@ -1185,7 +1189,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
         for(idx = 0; idx < size; idx++)
         {
-            Accid *curAccid = &noteList[idx]->m_accid;
+            Accid *curAccid = noteList[idx]->m_drawingAccid;
             //false as the last parameter for CalcAccidX will see if there are any vertical conflicts without setting anything
             if (CalculateAccidX(staff, curAccid, chord, false) > 0)
             {
@@ -1205,8 +1209,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx)
             {
-                Accid *accidFwd = &noteList[fwIdx]->m_accid;
-                Accid *accidBwd = &noteList[bwIdx]->m_accid;
+                Accid *accidFwd = noteList[fwIdx]->m_drawingAccid;
+                Accid *accidBwd = noteList[bwIdx]->m_drawingAccid;
                 
                 //if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
@@ -1447,9 +1451,9 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
     //Y-position limits
     int listTop = noteList[0]->GetDrawingY();
     int listBot = noteList[noteList.size() - 1]->GetDrawingY();
-    int topY = accid->GetDrawingY() + (2 * fullUnit);
+    int topY = accid->GetDrawingY() + doubleUnit;
     int topPos = std::max(0, listTop - topY) / halfUnit;
-    int bottomY = accid->GetDrawingY() - (2 * fullUnit);
+    int bottomY = accid->GetDrawingY() - doubleUnit;
     int botPos = (int)accidSpace->size() - 1 - ((std::max(0, bottomY - listBot)) / halfUnit);
     
     int currentX = 0;

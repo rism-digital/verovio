@@ -9,6 +9,7 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
+#include <iterator>
 #include <map>
 #include <string>
 #include <typeinfo>
@@ -699,6 +700,12 @@ public:
     int GetListIndex( const Object *listElement );
     
     /**
+     * Gets the first item of type elementType starting at startFrom
+     */
+    Object *GetListFirst(const Object *startFrom, const std::type_info *elementType = NULL );
+    Object *GetListFirstBackward(Object *startFrom, const std::type_info *elementType = NULL );
+    
+    /**
      * Returns the previous object in the list (NULL if not found)
      */
     Object *GetListPrevious( const Object *listElement );
@@ -718,6 +725,7 @@ public:
     
 private:
     ListOfObjects m_list;
+    ListOfObjects::iterator m_iteratorCurrent;
     
 protected:
     /**

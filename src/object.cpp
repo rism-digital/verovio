@@ -732,6 +732,24 @@ int ObjectListInterface::GetListIndex( const Object *listElement )
     return -1;
 }
 
+    
+Object* ObjectListInterface::GetListFirst(const Object *startFrom, const std::type_info *elementType)
+{
+    ListOfObjects::iterator it = m_list.begin();
+    std::advance(it, GetListIndex(startFrom));
+    it = std::find_if(it, m_list.end(), ObjectComparison( elementType ) );
+    return (it == m_list.end()) ? NULL : *it;
+}
+    
+Object* ObjectListInterface::GetListFirstBackward(Object *startFrom, const std::type_info *elementType)
+{
+    ListOfObjects::iterator it = m_list.begin();
+    std::advance(it, GetListIndex(startFrom));
+    ListOfObjects::reverse_iterator rit(it);
+    rit = std::find_if(rit, m_list.rend(), ObjectComparison( elementType ) );
+    return (rit == m_list.rend()) ? NULL : *rit;
+}
+    
 Object *ObjectListInterface::GetListPrevious( const Object *listElement )
 {
     ListOfObjects::iterator iter;

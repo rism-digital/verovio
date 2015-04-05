@@ -163,7 +163,7 @@ void Chord::ResetAccidList()
     ListOfObjects* childList = this->GetList(this); //make sure it's initialized
     for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
-        if (note->HasAccid()) {
+        if (note->m_drawingAccid != NULL) {
             m_accidList.push_back(note);
         }
     }
