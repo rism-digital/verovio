@@ -60,11 +60,11 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     
     //create the initial SVG element
     //width and height need to be set later; these are taken care of in "commit"
-    m_svgNode = m_svgDoc.append_child(L"svg");
-    m_svgNode.append_attribute( L"version" ) = L"1.1";
-    m_svgNode.append_attribute( L"xmlns" ) = L"http://www.w3.org/2000/svg";
-    m_svgNode.append_attribute( L"xmlns:xlink" ) = L"http://www.w3.org/1999/xlink";
-    m_svgNode.append_attribute( L"overflow" ) = L"visible";
+    m_svgNode = m_svgDoc.append_child("svg");
+    m_svgNode.append_attribute( "version" ) = "1.1";
+    m_svgNode.append_attribute( "xmlns" ) = "http://www.w3.org/2000/svg";
+    m_svgNode.append_attribute( "xmlns:xlink" ) = "http://www.w3.org/1999/xlink";
+    m_svgNode.append_attribute( "overflow" ) = "visible";
     
     //start the stack
     m_svgNodeStack.push_back(m_svgNode);
@@ -97,8 +97,8 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
     }
     
     // take care of width/height once userScale is updated
-    m_svgNode.prepend_attribute( L"height" ) = UTF8to16( StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str() ).c_str();
-    m_svgNode.prepend_attribute( L"width" ) = UTF8to16(StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str() ).c_str();
+    m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
+    m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
     
     // add the woff VerovioText font
     std::string woff = Resources::GetPath() + "/woff.xml";
@@ -110,7 +110,7 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
     if (m_smufl_glyphs.size() > 0)
     {
         
-        pugi::xml_node defs = m_svgNode.prepend_child( L"defs" );
+        pugi::xml_node defs = m_svgNode.prepend_child( "defs" );
         pugi::xml_document sourceDoc;
         
         //for each needed glyph
@@ -134,9 +134,9 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
         //edit the xml declaration
         output_flags = pugi::format_default;
         pugi::xml_node decl = m_svgDoc.prepend_child(pugi::node_declaration);
-        decl.append_attribute(L"version") = "1.0";
-        decl.append_attribute(L"encoding") = "UTF-8";
-        decl.append_attribute(L"standalone") = "no";
+        decl.append_attribute("version") = "1.0";
+        decl.append_attribute("encoding") = "UTF-8";
+        decl.append_attribute("standalone") = "no";
     }
     
     // save the glyph data to m_outdata
@@ -154,14 +154,14 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     std::string baseClass = object->GetClassName();
     std::transform( baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower );
     if (gClass.length() > 0) {
-        baseClass.append(L" " + UTF8to16(gClass.c_str());
+        baseClass.append(" " + gClass);
     }
     
-    m_currentNode = m_currentNode.append_child(L"g");
+    m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute( "class" ) = baseClass.c_str();
     m_currentNode.append_attribute( "id" ) = gId.c_str();
-    m_currentNode.append_attribute( "style" ) = StringFormat(L"stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
+    m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
     
 void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
@@ -224,17 +224,17 @@ void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
 void SvgDeviceContext::StartPage( )
 {
     // a graphic for definition scaling
-    m_currentNode = m_currentNode.append_child(L"svg");
+    m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute(L"id") = "definition-scale";
-    m_currentNode.append_attribute(L"viewBox") = StringFormat("0 0 %d %d",
+    m_currentNode.append_attribute("id") = "definition-scale";
+    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d",
         m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
 
     // a graphic for the origin
-    m_currentNode = m_currentNode.append_child(L"g");
+    m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
-    m_currentNode.append_attribute(L"class") = "page-margin";
-    m_currentNode.append_attribute(L"transform") = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
+    m_currentNode.append_attribute("class") = "page-margin";
+    m_currentNode.append_attribute("transform") = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
 }
  
        
@@ -294,12 +294,12 @@ Point SvgDeviceContext::GetLogicalOrigin( )
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
-    pugi::xml_node pathChild = m_currentNode.append_child(L"path");
-    pathChild.append_attribute(L"d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
+    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
        bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
        bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
        ).c_str();
-    pathChild.append_attribute(L"style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth() ).c_str();
+    pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth() ).c_str();
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
@@ -319,11 +319,11 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     int rh = height / 2;
     int rw = width  / 2;
     
-    pugi::xml_node ellipseChild = m_currentNode.append_child(L"ellipse");
-    ellipseChild.append_attribute(L"cx") = x+rw;
-    ellipseChild.append_attribute(L"cy") = y+rh;
-    ellipseChild.append_attribute(L"rx") = rw;
-    ellipseChild.append_attribute(L"ry") = rh;
+    pugi::xml_node ellipseChild = m_currentNode.append_child("ellipse");
+    ellipseChild.append_attribute("cx") = x+rw;
+    ellipseChild.append_attribute("cy") = y+rh;
+    ellipseChild.append_attribute("rx") = rw;
+    ellipseChild.append_attribute("ry") = rh;
     
     ellipseChild.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
         GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
@@ -382,8 +382,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     int fSweep ;
     if ( fabs(theta2 - theta1) > M_PI) fSweep = 1; else fSweep = 0 ;
 
-    pugi::xml_node pathChild = m_currentNode.append_child(L"path");
-    pathChild.append_attribute(L"d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d",int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
+    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d",int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
     pathChild.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
                                                             GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
@@ -391,9 +391,9 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
               
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    pugi::xml_node pathChild = m_currentNode.append_child(L"path");
-    pathChild.append_attribute(L"d") = StringFormat(L"M%d %d L%d %d", x1,y1,x2,y2).c_str();
-    pathChild.append_attribute(L"style") = StringFormat(L"stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1,y1,x2,y2).c_str();
+    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
  
                
@@ -401,19 +401,19 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
 {
     assert( m_penStack.size() );
     
-    pugi::xml_node polygonChild = m_currentNode.append_child(L"polygon");
+    pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
     //if ( fillStyle == wxODDEVEN_RULE )
-    //    polygonChild.append_attribute(L"style") = "fill-rule:evenodd;";
+    //    polygonChild.append_attribute("style") = "fill-rule:evenodd;";
     //else
-    polygonChild.append_attribute(L"style") = "fill-rule:nonzero;";
-    polygonChild.append_attribute(L"stroke-width") = StringFormat(L"%d", m_penStack.top().GetWidth()).c_str();
+    polygonChild.append_attribute("style") = "fill-rule:nonzero;";
+    polygonChild.append_attribute("stroke-width") = StringFormat("%d", m_penStack.top().GetWidth()).c_str();
     
     std::string pointsString;
     for (int i = 0; i < n;  i++)
     {
-        pointsString += StringFormat(L"%d,%d ", points [i].x+xoffset, points[i].y+yoffset );
+        pointsString += StringFormat("%d,%d ", points [i].x+xoffset, points[i].y+yoffset );
     }
-    polygonChild.append_attribute(L"points") = pointsString.c_str();
+    polygonChild.append_attribute("points") = pointsString.c_str();
 }
     
             
@@ -443,7 +443,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "width" ) = width;
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
-    rectChild.append_attribute( "style") = StringFormat(L"stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)
@@ -469,7 +469,7 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     }
     // font-size seems to be required in <text> in FireFox - however, we set it to 0px because otherwise we
     // end up with spaces between tspan because of the linebreaks in the SVG. Needs to be investigated
-    m_currentNode.append_attribute(L"font-size") = StringFormat(L"0px").c_str();
+    m_currentNode.append_attribute("font-size") = StringFormat("0px").c_str();
 }
     
 void SvgDeviceContext::EndText()
@@ -487,17 +487,17 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
         textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
     }
     if ( m_fontStack.top()->GetPointSize() != 0 ) {
-        textChild.append_attribute(L"font-size") = StringFormat(L"%dpx", m_fontStack.top()->GetPointSize() ).c_str();
+        textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();
     }
     if ( m_fontStack.top()->GetStyle() != FONTWEIGHT_NONE ) {
         if ( m_fontStack.top()->GetStyle() == FONTSTYLE_italic ) {
-            textChild.append_attribute(L"font-style") = "italic";
+            textChild.append_attribute("font-style") = "italic";
         }
         else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_normal ) {
-            textChild.append_attribute(L"font-style") = "normal";
+            textChild.append_attribute("font-style") = "normal";
         }
         else if ( m_fontStack.top()->GetStyle() == FONTSTYLE_oblique ) {
-            textChild.append_attribute(L"font-style") = "oblique";
+            textChild.append_attribute("font-style") = "oblique";
         }
     }
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
@@ -543,11 +543,11 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         
         // Write the char in the SVG
         pugi::xml_node useChild = m_currentNode.append_child( "use" );
-        useChild.append_attribute( "xlink:href" ) = StringFormat(L"#%s", glyph->GetCodeStr().c_str()).c_str();
+        useChild.append_attribute( "xlink:href" ) = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute( "x" ) = x;
         useChild.append_attribute( "y" ) = y;
-        useChild.append_attribute( "height" ) = StringFormat(L"%dpx", m_fontStack.top()->GetPointSize()).c_str();
-        useChild.append_attribute( "width" ) = StringFormat(L"%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        useChild.append_attribute( "height" ) = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
+        useChild.append_attribute( "width" ) = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
         
         // Get the bounds of the char
         glyph->GetBoundingBox(&gx, &gy, &w, &h);
