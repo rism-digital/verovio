@@ -1170,41 +1170,51 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Accidentals ************/
     
     //navigate through list of notes, starting with outside and working in
-    //set the default x position: only non-default case is a down-stemmed non-cluster which needs one more note diameter of space
 
-    int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
-    if (chord->GetDrawingStemDir() == STEMDIRECTION_down && chord->m_clusters.size() > 0) xAccid -= (radius * 2);
-
-    int fwIdx = 0;
-    int idx, bwIdx;
-    
     chord->ResetAccidList();
     std::vector<Note*> noteList = chord->m_accidList;
     int size = (int)noteList.size();
     if (size > 0)
     {
+        //set the default x position
+        int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
+
+        //if chord is a down-stemmed non-cluster, it needs one more note diameter of space
+        if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0))
+        {
+            xAccid -= (radius * 2);
+        }
+
+        int fwIdx, idx, bwIdx;
+
+        //reset the boolean 2d vector
         chord->ResetAccidSpace(fullUnit);
+        std::vector<int> accidClusterStarts;
         
-        std::vector<int> accidClusters;
-        
+        //iterate through the list of notes with accidentals
         for(idx = 0; idx < size; idx++)
         {
             Accid *curAccid = noteList[idx]->m_drawingAccid;
-            //false as the last parameter for CalcAccidX will see if there are any vertical conflicts without setting anything
-            if (CalculateAccidX(staff, curAccid, chord, false) > 0)
+
+            //if the note does not need to be moved, save a new cluster start position
+            if (CalculateAccidX(staff, curAccid, chord, false))
             {
-                accidClusters.push_back(idx);
+                accidClusterStarts.push_back(idx);
             }
         }
         
         chord->ResetAccidSpace(fullUnit);
-        int accidSize = (int)accidClusters.size();
+        int accidSize = (int)accidClusterStarts.size();
         
+        //for each note that conflicts
         for(idx = 0; idx < accidSize; idx++)
         {
-            fwIdx = accidClusters[idx];
+            //set fwIdx to the start of the cluster
+            fwIdx = accidClusterStarts[idx];
+            //if this is the last cluster, set bwIdx to the last note in the chord
             if (idx == accidSize - 1) bwIdx = size - 1;
-            else bwIdx = accidClusters[idx + 1] - 1;
+            //otherwise, set bwIdx to one before the beginning of the next cluster
+            else bwIdx = accidClusterStarts[idx + 1] - 1;
             
             //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx)
