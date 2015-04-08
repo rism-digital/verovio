@@ -1489,6 +1489,8 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
         };
     }
     
+    assert(currentX + ACCID_WIDTH <= xLength);
+
     //move the accidental position if requested
     if (save)
     {
