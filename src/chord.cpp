@@ -180,7 +180,7 @@ void Chord::ResetAccidSpace(int fullUnit)
     
     //make m_accidSpace into a 2D vector of size (vertical half-units, most possible horizontal halfunits)
     int idx, setIdx;
-    int size = (int)m_accidList.size();
+    int size = (int)m_accidList.size() + 1;
     std::vector<bool> *accidLine;
     //top y position - bottom y position in half-units
     int rows = ((m_accidList[0]->GetDrawingY() - m_accidList[m_accidList.size() - 1]->GetDrawingY()) / halfUnit);
