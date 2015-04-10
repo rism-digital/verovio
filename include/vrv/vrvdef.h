@@ -176,7 +176,7 @@ enum ClefId {
     perc = CLEFSHAPE_perc << 8 | 1
 };
     
-//Used in spacing accidentals on complex chords
+//Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
 #define ACCID_WIDTH 4
 
 } // namespace vrv

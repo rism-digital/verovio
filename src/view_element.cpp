@@ -1444,74 +1444,80 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->EndGraphic(element, this );
     
 }
-
-//returns false if no adjustment is necessary
-bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
+    
+bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally)
 {
-    //size declarations
+    std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
+    
+    //global drawing variables
     int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
     int doubleUnit = fullUnit * 2;
     int halfUnit = fullUnit / 2;
+    
+    //drawing variables for the chord
+    int xLength = (int)accidSpace->front().size();
+    int listTop = chord->m_accidSpaceTop;
+    int listBot = chord->m_accidSpaceBot;
+    
+    //drawing variables for the accidental
     int type = accid->GetAccid();
+    int centerY = accid->GetDrawingY();
+    int topY = centerY + doubleUnit;
+    int bottomY = centerY - doubleUnit;
     
-    std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
-    std::vector<Note*> noteList = chord->m_accidList;
-    int xLength = (int)accidSpace->at(0).size();
+    //drawing variables for the accidental in accidSpace units
+    int accidTop = std::max(0, listTop - topY) / halfUnit;
+    int accidBot = ((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit);
     
-    //Y-position limits
-    int listTop = noteList[0]->GetDrawingY();
-    int listBot = noteList[noteList.size() - 1]->GetDrawingY();
-    int topY = accid->GetDrawingY() + doubleUnit;
-    int topPos = std::max(0, listTop - topY) / halfUnit;
-    int bottomY = accid->GetDrawingY() - doubleUnit;
-    int botPos = (int)accidSpace->size() - 1 - ((std::max(0, bottomY - listBot)) / halfUnit);
-    
+    //how many halfunits we have moved the element
     int currentX = 0;
     
-    //move to the left by half-units until all four corners are false
+    /*
+     * Make sure all four corners of the accidental are not on an already-taken spot.
+     * The top right corner of a flat can overlap something else; make sure that the bordering sections do not overlap.
+     * Move the accidental one half-unit left until it doesn't overlap.
+     */
     if (type == ACCIDENTAL_EXPLICIT_f) {
         while (currentX < xLength) {
-            if (accidSpace->at(topPos + 1)[currentX]) currentX += 1;
-            if (accidSpace->at(topPos)[currentX + 1]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(topPos)[currentX + ACCID_WIDTH]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX + ACCID_WIDTH]) currentX += 1;
+            if (accidSpace->at(accidTop + 1)[currentX]) currentX += 1;
+            if (accidSpace->at(accidTop)[currentX + 1]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX + ACCID_WIDTH]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX + ACCID_WIDTH]) currentX += 1;
             else break;
         };
     }
     else {
         while (currentX < xLength) {
-            if (accidSpace->at(topPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(topPos)[currentX + ACCID_WIDTH]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX + ACCID_WIDTH]) currentX += 1;
+            if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX + ACCID_WIDTH]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX + ACCID_WIDTH]) currentX += 1;
             else break;
         };
     }
-    
-    assert(currentX + ACCID_WIDTH <= xLength);
 
-    //move the accidental position if requested
-    if (save)
+    //If we need to move the accidental horizontally, move it by currentX half-units.
+    if (adjustHorizontally)
     {
         int xShift = currentX * halfUnit;
         accid->SetDrawingX(accid->GetDrawingX() - xShift);
         
-        //mark the spaces as taken (true)
+        //mark the spaces as taken (true in accidSpace)
         for(int xIdx = currentX; xIdx < currentX + ACCID_WIDTH; xIdx++)
         {
-            for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
             {
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
         }
     }
-    //otherwise just mark the vertical position so we can see if there are any vertical conflicts
+    //Otherwise, just mark its vertical position so we can see if there are any vertical conflicts
     else
     {
         for(int xIdx = 0; xIdx < ACCID_WIDTH; xIdx++) //x from 0 to 4, base position
         {
-            for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
             {
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
@@ -1519,6 +1525,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
         
     }
     
+    //Regardless of whether or not we moved it, return true if there was a conflict and currentX would have been moved
     return (currentX == 0);
 }
 

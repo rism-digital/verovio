@@ -64,6 +64,11 @@ public:
      * Returns list of notes that have accidentals
      */
     void ResetAccidList();
+    
+    /**
+     * Prepares a 2D grid of booleans to track where accidentals are placed.
+     * Further documentation in chord.cpp comments.
+     */
     void ResetAccidSpace(int staffSize);
     
     /**
@@ -113,8 +118,13 @@ public:
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
+    
+    /**
+     * Variables related to preventing overlapping in the X dimension for accidentals
+     */
     std::vector<Note*> m_accidList;
     std::vector< std::vector<bool> > m_accidSpace;
+    int m_accidSpaceTop, m_accidSpaceBot, m_accidSpaceLeft;
 };
 
 } // namespace vrv

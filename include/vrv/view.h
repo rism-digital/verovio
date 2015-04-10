@@ -350,10 +350,14 @@ private:
     bool IsOnStaffLine ( int y, Staff *staff );
     
     /**
-     * Internal methods for calculating spacing chords
+     * Make sure dots on chords are vertically aligned correctly
      */
     void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
-    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save);
+    
+    /**
+     * Changes and/or calculates the horizontal alignment of accidentals to prevent overlapping
+     */
+    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
     
     /**
      * Swap the to points passed as reference.
