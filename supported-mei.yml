@@ -312,7 +312,5 @@ loaded-classes:
   - id: "score"
   - id: "section"
     comment: "During import, <code>&lt;section&gt;</code> elements are converted to <code>&lt;secb&gt;</code> elements."
-  - id: "slur"
-    comment: "During import and whenever possible, <code>&lt;slur&gt;</code> elements are converted to <code>@slur</code> attributes. This is possible only when the <code>&lt;slur&gt;</code> element refers to two notes with a <code>@startid</code> and an <code>@endid</code> attribute."
   - id: "tupletSpan"
     comment: "During import and whenever possible, <code>&lt;tupletSpan&gt;</code> elements are converted to <code>&lt;tuplet&gt;</code> elements."
