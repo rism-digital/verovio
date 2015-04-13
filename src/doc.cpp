@@ -541,6 +541,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
     m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
     
+    m_drawingMinMeasureWidth = m_drawingUnit[0] * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
+    
     float glyph_size;
     Glyph *glyph;
     int x, y, w, h;
