@@ -51,19 +51,76 @@
 		        <tr>
 		          	<td><code>@accid</code></td>
 		          	<td>Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.</td>
-					<td></td>
+					<td>accidental</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@oloc</code></td>
 		          	<td></td>
-					<td></td>
+					<td>staffloc.pitched</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@ploc</code></td>
 		          	<td></td>
-					<td></td>
+					<td>staffloc.pitched</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;app&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/app" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@n</code></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
 				</tr>
 			
 			</tbody>
@@ -137,6 +194,135 @@
 		          	<td><code>@rend</code></td>
 		          	<td>Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.</td>
 					<td>barLine.log</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;chord&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/chord" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@breaksec</code></td>
+		          	<td></td>
+					<td>beamsecondary</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@dots</code></td>
+		          	<td></td>
+					<td>augmentdots</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@dur</code></td>
+		          	<td>Longest duration supported is 'longa'. Shortest duration supported is 128.</td>
+					<td>duration.musical</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@fermata</code></td>
+		          	<td>Currently always place above</td>
+					<td>fermatapresent</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@n</code></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@num</code></td>
+		          	<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@numbase</code></td>
+		          	<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.dir</code></td>
+		          	<td></td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.len</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.pos</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.x</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@stem.y</code></td>
+		          	<td>Not supported yet</td>
+					<td>stemmed</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@tie</code></td>
+		          	<td></td>
+					<td>tiepresent</td>
 				</tr>
 			
 			</tbody>
@@ -254,15 +440,15 @@
 			<tbody>
 			
 		        <tr>
-		          	<td><code>@oct</code></td>
+		          	<td><code>@oloc</code></td>
 		          	<td></td>
-					<td></td>
+					<td>staffloc.pitched</td>
 				</tr>
 			
 		        <tr>
-		          	<td><code>@pname</code></td>
+		          	<td><code>@ploc</code></td>
 		          	<td></td>
-					<td></td>
+					<td>staffloc.pitched</td>
 				</tr>
 			
 			</tbody>
@@ -313,13 +499,13 @@
 		        <tr>
 		          	<td><code>@oloc</code></td>
 		          	<td></td>
-					<td></td>
+					<td>staffloc.pitched</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@ploc</code></td>
 		          	<td></td>
-					<td></td>
+					<td>staffloc.pitched</td>
 				</tr>
 			
 			</tbody>
@@ -377,6 +563,138 @@
 		          	<td><code>@n</code></td>
 		          	<td>Only numeric values are supported</td>
 					<td>common</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;lem&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/lem" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@n</code></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;mensur&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/mensur" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@dot</code></td>
+		          	<td></td>
+					<td>mensur.log</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@num</code></td>
+		          	<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@numbase</code></td>
+		          	<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@orient</code></td>
+		          	<td>Only reversed is supported.</td>
+					<td>mensur.vis</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@sign</code></td>
+		          	<td></td>
+					<td>mensur.log</td>
 				</tr>
 			
 			</tbody>
@@ -557,39 +875,15 @@
 			<tbody>
 			
 		        <tr>
-		          	<td><code>@dot</code></td>
+		          	<td><code>@meter.count</code></td>
 		          	<td></td>
-					<td>mensur.log</td>
+					<td>meterSigDefault.log</td>
 				</tr>
 			
 		        <tr>
-		          	<td><code>@num</code></td>
+		          	<td><code>@meter.unit</code></td>
 		          	<td></td>
-					<td>duration.ratio</td>
-				</tr>
-			
-		        <tr>
-		          	<td><code>@numbase</code></td>
-		          	<td></td>
-					<td>duration.ratio</td>
-				</tr>
-			
-		        <tr>
-		          	<td><code>@orient</code></td>
-		          	<td>Only reversed is supported.</td>
-					<td>mensur.vis</td>
-				</tr>
-			
-		        <tr>
-		          	<td><code>@sign</code></td>
-		          	<td></td>
-					<td>mensur.log</td>
-				</tr>
-			
-		        <tr>
-		          	<td><code>@slash</code></td>
-		          	<td></td>
-					<td>slashcount</td>
+					<td>meterSigDefault.log</td>
 				</tr>
 			
 			</tbody>
@@ -662,7 +956,7 @@
 		        <tr>
 		          	<td><code>@num</code></td>
 		          	<td></td>
-					<td></td>
+					<td>numbered</td>
 				</tr>
 			
 			</tbody>
@@ -713,7 +1007,13 @@
 		        <tr>
 		          	<td><code>@accid</code></td>
 		          	<td>Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.</td>
-					<td></td>
+					<td>accidental</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@breaksec</code></td>
+		          	<td></td>
+					<td>beamsecondary</td>
 				</tr>
 			
 		        <tr>
@@ -723,15 +1023,21 @@
 				</tr>
 			
 		        <tr>
-		          	<td><code>@dur</code></td>
-		          	<td>Longest duration supported is 'longa'. Shortest duration supported is 128.</td>
-					<td></td>
+		          	<td><code>@dots</code></td>
+		          	<td></td>
+					<td>augmentdots</td>
 				</tr>
 			
 		        <tr>
-		          	<td><code>@dur.ges</code></td>
-		          	<td>Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).</td>
-					<td></td>
+		          	<td><code>@dur</code></td>
+		          	<td>Longest duration supported is 'longa'. Shortest duration supported is 128.</td>
+					<td>duration.musical</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@fermata</code></td>
+		          	<td>Currently always place above</td>
+					<td>fermatapresent</td>
 				</tr>
 			
 		        <tr>
@@ -747,15 +1053,27 @@
 				</tr>
 			
 		        <tr>
-		          	<td><code>@oct</code></td>
+		          	<td><code>@num</code></td>
 		          	<td></td>
-					<td></td>
+					<td>duration.ratio</td>
 				</tr>
 			
 		        <tr>
-		          	<td><code>@pname</code></td>
+		          	<td><code>@numbase</code></td>
 		          	<td></td>
-					<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@oct</code></td>
+		          	<td></td>
+					<td>octave</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@pitch</code></td>
+		          	<td></td>
+					<td>pitch</td>
 				</tr>
 			
 		        <tr>
@@ -791,6 +1109,69 @@
 		        <tr>
 		          	<td><code>@tie</code></td>
 		          	<td></td>
+					<td>tiepresent</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;rdg&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/rdg" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@label</code></td>
+		          	<td></td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@n</code></td>
+		          	<td>Only numeric values are supported</td>
+					<td>common</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@source</code></td>
+		          	<td>Only for selection with the --rdg-xpath-query option</td>
 					<td></td>
 				</tr>
 			
@@ -840,21 +1221,45 @@
 			<tbody>
 			
 		        <tr>
+		          	<td><code>@breaksec</code></td>
+		          	<td></td>
+					<td>beamsecondary</td>
+				</tr>
+			
+		        <tr>
 		          	<td><code>@dots</code></td>
 		          	<td></td>
-					<td></td>
+					<td>augmentdots</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@dur</code></td>
 		          	<td>Longest duration supported is 'longa'. Shortest duration supported is 128.</td>
-					<td></td>
+					<td>duration.musical</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@dur.ges</code></td>
 		          	<td>Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).</td>
 					<td></td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@fermata</code></td>
+		          	<td>Currently always place above</td>
+					<td>fermatapresent</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@num</code></td>
+		          	<td></td>
+					<td>duration.ratio</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@numbase</code></td>
+		          	<td></td>
+					<td>duration.ratio</td>
 				</tr>
 			
 		        <tr>
@@ -965,19 +1370,19 @@
 		        <tr>
 		          	<td><code>@mensur.dot</code></td>
 		          	<td></td>
-					<td>mensur.default.log</td>
+					<td>mensural.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@mensur.sign</code></td>
 		          	<td></td>
-					<td>mensur.default.log</td>
+					<td>mensural.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@mensur.slash</code></td>
 		          	<td>Only 1 slash is supported.</td>
-					<td>mensur.default.log</td>
+					<td>mensural.log</td>
 				</tr>
 			
 		        <tr>
@@ -990,6 +1395,63 @@
 		          	<td><code>@meter.unit</code></td>
 		          	<td></td>
 					<td>meterSigDefault.log</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
+				<code class="panel-header">&lt;slur&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/slur" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@endid</code></td>
+		          	<td></td>
+					<td>startendid</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@startid</code></td>
+		          	<td></td>
+					<td>startid</td>
 				</tr>
 			
 			</tbody>
@@ -1151,19 +1613,19 @@
 		        <tr>
 		          	<td><code>@mensur.dot</code></td>
 		          	<td></td>
-					<td>mensur.default.log</td>
+					<td>mensural.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@mensur.sign</code></td>
 		          	<td></td>
-					<td>mensur.default.log</td>
+					<td>mensural.log</td>
 				</tr>
 			
 		        <tr>
 		          	<td><code>@mensur.slash</code></td>
 		          	<td>Only 1 slash is supported.</td>
-					<td>mensur.default.log</td>
+					<td>mensural.log</td>
 				</tr>
 			
 		        <tr>
@@ -1254,6 +1716,57 @@
 		
 		<div class="row">
 			<div class="col-xs-10">
+				<code class="panel-header">&lt;space&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/space" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@dur</code></td>
+		          	<td>Longest duration supported is 'longa'. Shortest duration supported is 128.</td>
+					<td>duration.musical</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
 				<code class="panel-header">&lt;syl&gt;</code>
 			</div>
 			<div class="col-xs-2">
@@ -1311,6 +1824,63 @@
 		
 		<div class="row">
 			<div class="col-xs-10">
+				<code class="panel-header">&lt;tie&gt;</code>
+			</div>
+			<div class="col-xs-2">
+				
+				<a href="http://music-encoding.org/documentation/guidelines2013/tie" target="_blank">
+					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+					</button>
+				</a>
+				
+			</div>
+		</div>
+	
+	</div>
+	
+	<div class="panel-body panel-option">
+		
+		<table class="table table-condensed">
+			<colgroup>
+		    	<col class="col-xs-1"/>
+		        <col class="col-xs-6"/>
+				<col class="col-xs-1"/>
+			</colgroup>
+			<thead>
+		        <tr>
+		        	<th>Attribute</th>
+		        	<th>Comment</th>
+					<th>Att-class</th>
+		        </tr>
+			</thead>
+			<tbody>
+			
+		        <tr>
+		          	<td><code>@endid</code></td>
+		          	<td></td>
+					<td>startendid</td>
+				</tr>
+			
+		        <tr>
+		          	<td><code>@startid</code></td>
+		          	<td></td>
+					<td>startid</td>
+				</tr>
+			
+			</tbody>
+		</table>
+		
+		
+	</div>
+	
+</div>
+	
+		<div class="panel panel-default">
+	<div class="panel-heading panel-supported-mei">
+		
+		<div class="row">
+			<div class="col-xs-10">
 				<code class="panel-header">&lt;tuplet&gt;</code>
 			</div>
 			<div class="col-xs-2">
@@ -1344,13 +1914,7 @@
 			<tbody>
 			
 		        <tr>
-		          	<td><code>@num</code></td>
-		          	<td></td>
-					<td></td>
-				</tr>
-			
-		        <tr>
-		          	<td><code>@numbase</code></td>
+		          	<td><code>@</code></td>
 		          	<td></td>
 					<td></td>
 				</tr>

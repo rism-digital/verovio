@@ -1,10 +1,13 @@
 att-classes:
+  - id: "accidental"
+    attributes:
+    - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
   - id: "augmentdots"
     attributes:
     - ["dots", "", ""]
   - id: "beamsecondary"
     attributes:
-    - ["breaksec", "Not supported yet", ""]
+    - ["breaksec", "", ""]
   - id: "barLine.log"
     attributes:
     - ["rend", "Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.", ""]
@@ -29,7 +32,7 @@ att-classes:
     - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
   - id: "duration.preformed"
     attributes:
-    - ["dur.ges", "", ""]
+    - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
   - id: "duration.ratio"
     attributes:
     - ["num", "", ""]
@@ -66,13 +69,32 @@ att-classes:
   - id: "meterSigDefault.vis"
     attributes:
     - ["meter.sym", "", ""] 
+  - id: "numbered"
+    attributes:
+      - ["num", "", ""]
+  - id: "octave"
+    attributes:
+    - ["oct", "", ""]
   - id: "octavedisplacement"
     attributes:
     - ["dis", "Only value '8' is supported and it assumes shape 'G' and line 2.", ""]
     - ["dis.place", "Supported values: 'below'", ""]
+  - id: "pitch"
+    attributes:
+    - ["pitch", "", ""]
   - id: "slashcount"
     attributes:
     - ["slash", "", ""] 
+  - id: "staffloc.pitched"
+    attributes:
+    - ["oloc", "", ""]
+    - ["ploc", "", ""]
+  - id: "startendid"
+    attributes:
+    - ["endid", "", ""]
+  - id: "startid"
+    attributes:
+    - ["startid", "", ""]
   - id: "stemmed"
     attributes:
     - ["stem.dir", "", ""] 
@@ -84,6 +106,9 @@ att-classes:
     attributes:
     - ["con", "Not supported yet", ""] 
     - ["wordpos", "Not supported yet", ""] 
+  - id: "tiepresent"
+    attributes:
+    - ["tie", "", ""] 
 
   - id: "note.log.mensural"
     attributes:
@@ -99,14 +124,30 @@ att-classes:
 
 classes:
   - id: "accid"
-    attributes:
-    - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
-    - ["oloc", "", ""]
-    - ["ploc", "", ""] 
+    att-classes:
+      - accidental
+      - staffloc.pitched # postionInterface
+    attributes: []
+  - id: "app"
+    att-classes:
+      - common
+    attributes: []
   - id: "beam"
   - id: "barLine"
     att-classes:
       - barLine.log
+    attributes: []
+  - id: "chord"
+    att-classes:
+      - augmentdots # durationInterface
+      - beamsecondary # durationInterface
+      - duration.musical # durationInterface
+      - duration.performed # durationInterface      
+      - duration.ratio # durationInterface
+      - fermatapresent # durationInterface
+      - common
+      - stemmed
+      - tiepresent
     attributes: []
   - id: "clef"
     att-classes:
@@ -115,16 +156,28 @@ classes:
       - octavedisplacement
     attributes: []
   - id: "custos"
-    attributes:
-    - ["oct", "", ""]
-    - ["pname", "", ""]
+    att-classes:
+      - staffloc.pitched # postionInterface
+    attributes: []
   - id: "dot"
-    attributes:
-    - ["oloc", "", ""]
-    - ["ploc", "", ""]
+    att-classes:
+      - staffloc.pitched # postionInterface
+    attributes: []
   - id: "layer"
     att-classes:
       - common
+    attributes: []
+  - id: "lem"
+    att-classes:
+      - common
+    attributes: []
+  - id: "mensur"
+    att-classes:
+      - duration.ratio
+      - mensural.shared
+      - mensur.log
+      - mensur.vis
+      - slash.count  
     attributes: []
   - id: "measure"
     att-classes:
@@ -137,15 +190,14 @@ classes:
     attributes: []
   - id: "meterSig"
     att-classes:
-      - duration.ratio
-      - mensur.log
-      - mensur.vis
-      - slashcount
+      - meterSigDefault.log
+      - mmeterSigDefault.vis
     attributes: []
   - id: "mRest"
   - id: "multiRest"
-    attributes:
-      - ["num", "", ""]
+    att-classes:
+      - numbered
+    attributes: []
   - id: "note"
     att-classes:
       - augmentdots # durationInterface
@@ -154,18 +206,22 @@ classes:
       - duration.performed # durationInterface      
       - duration.ratio # durationInterface
       - fermatapresent # durationInterface
+      - accidental # pitchInterface
+      - octave # pitchInterface
+      - pitch # pitchInterface
       - coloration
       - note.log.mensural
       - stemmed
+      - tiepresent
     attributes:
-      - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
-      - ["dur", "Longest duration supported is 'longa'. Shortest duration supported is 128.", ""]
-      - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
       - ["grace", "Currently all values will be treated undifferently", ""]
-      - ["oct", "", ""]
-      - ["pname", "", ""]
-      - ["tie", "", ""]
+  - id: "rdg"
+    att-classes:
+      - common
+    attributes:
+      - ["source", "Only for selection with the --rdg-xpath-query option", ""]
   - id: "rest"
+    att-classes:
       - augmentdots # durationInterface
       - beamsecondary # durationInterface
       - duration.musical # durationInterface
@@ -182,6 +238,11 @@ classes:
       - keySigDefault.log
       - meterSigDefault.log
       - mensural.log
+    attributes: []
+  - id: "slur"
+    att-classes:
+      - startendid
+      - startid
     attributes: []
   - id: "staff"
     att-classes:
@@ -200,14 +261,22 @@ classes:
     attributes:
       - ["symbol", "Supported values are 'brace', 'bracket' and 'line'. Default value is 'none' (no symbol).", ""]
       - ["barthru", "Default value is 'false'.", ""]
+  - id: "space"
+    att-classes:
+      - duration.musical # durationInterface
+    attributes: []
   - id: "syl"
     att-classes:
       - syl.log
     attributes: []
+  - id: "tie"
+    att-classes:
+      - startendid
+      - startid
+    attributes: []
   - id: "tuplet"
     attributes:   
-      - ["num", "", ""]
-      - ["numbase", "", ""]
+      - duration.ratio
   - id: "verse"
     att-classes:
       - common
