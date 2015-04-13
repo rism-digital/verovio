@@ -425,6 +425,16 @@ std::string Toolkit::GetLogString() {
 #endif
 }
 
+std::string Toolkit::GetVersion() {
+#ifdef USE_EMSCRIPTEN
+    std::string str = vrv::GetVersion();
+    return str;
+#else
+    // The non js version of the app should not use this function.
+    return "";
+#endif
+}
+
 
 void  Toolkit::ResetLogBuffer() {
 #ifdef USE_EMSCRIPTEN

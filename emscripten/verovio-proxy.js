@@ -15,6 +15,9 @@ verovio.vrvToolkit.destructor = Module.cwrap('vrvToolkit_destructor', null, ['nu
 // char *getLog(Toolkit *ic)
 verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number']);
 
+// char *getVersion(Toolkit *ic)
+verovio.vrvToolkit.getVersion = Module.cwrap('vrvToolkit_getVersion', 'string', ['number']);
+
 // int getPageCount(Toolkit *ic)
 verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'number', ['number']);
 
@@ -70,6 +73,10 @@ verovio.toolkit.prototype.destroy = function () {
 
 verovio.toolkit.prototype.getLog = function () {
   	return verovio.vrvToolkit.getLog(this.ptr);
+};
+
+verovio.toolkit.prototype.getVersion = function () {
+  	return verovio.vrvToolkit.getVersion(this.ptr);
 };
 
 verovio.toolkit.prototype.getPageCount = function () {

@@ -80,6 +80,12 @@ public:
     std::string GetLogString( );
     
     /**
+     * Returns the version number as a string.
+     * This is used only for Emscripten based compilation.
+     */
+    std::string GetVersion( );
+    
+    /**
      * Resets the vrv::logBuffer.
      * This is used only for Emscripten based compilation.
      */

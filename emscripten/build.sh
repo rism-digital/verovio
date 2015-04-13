@@ -156,6 +156,7 @@ python $EMCC $CHATTY \
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
 		'_vrvToolkit_getLog',\
+		'_vrvToolkit_getVersion',\
 		'_vrvToolkit_getMEI',\
 		'_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\
