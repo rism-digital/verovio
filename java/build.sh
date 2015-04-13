@@ -3,6 +3,9 @@
 mkdir -p src/main/java/org/rismch/verovio
 mkdir target
 
+# generate the git commit include file
+../tools/get_git_commit.sh
+
 swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/verovio verovio.i
 
 FILES="../src/accid.cpp \

@@ -4,7 +4,13 @@
 setup.py file for Verovio
 """
 
+
 from distutils.core import setup, Extension
+
+# generate the git commit include file
+import os
+os.system("../tools/get_git_commit.sh")
+
 
 verovio_module = Extension('_verovio',
     sources=['../src/accid.cpp', 

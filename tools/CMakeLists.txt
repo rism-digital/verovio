@@ -6,6 +6,8 @@ SET(CMAKE_BUILD_TYPE Release)
 
 add_definitions(-g)
 
+EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
+
 include_directories(/usr/local/include ../include/vrv ../libmei)
 
 add_executable (verovio 
