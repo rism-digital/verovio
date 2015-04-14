@@ -22,7 +22,7 @@
 	<body>
 		<mdiv>
 			<score>
-			    <scoreDef meter.count="4" meter.unit="4" meter.sym="common" key.sig="0" key.mode="major">
+			    <scoreDef meter.count="4" meter.unit="4" key.mode="major">
 			        <staffGrp symbol="line">
 			            <staffGrp n="1" barthru="false" symbol="bracket">
 			                <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
