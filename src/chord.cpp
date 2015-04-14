@@ -24,7 +24,6 @@ namespace vrv {
 
 Chord::Chord( ):
 LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
-    AttColoration(),
     AttCommon(),
     AttStemmed(),
     AttTiepresent()
@@ -49,7 +48,6 @@ void Chord::Reset()
     DurationInterface::Reset();
     ResetCommon();
     ResetStemmed();
-    ResetColoration();
     ResetTiepresent();
 }
     

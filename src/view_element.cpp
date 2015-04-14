@@ -1248,7 +1248,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Stems ************/
     
     int drawingDur = chord->GetDur();
-    drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     
     //(unless we're in a beam)
     if (!(inBeam && drawingDur > DUR_4)) {

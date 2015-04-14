@@ -16,7 +16,6 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
-#include "object.h"
 
 namespace vrv {
     
@@ -35,7 +34,6 @@ namespace vrv {
  */
     
 class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, 
-    public AttColoration,
     public AttCommon,
     public AttStemmed,
     public AttTiepresent
