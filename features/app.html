@@ -1,0 +1,57 @@
+---
+---
+<h3>Critical apparatus</h3>
+
+
+<p>
+	Verovio supports basic <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the <code>--rdg-xpath-query=QUERY</code> option (<code>rdgXPathQuery</code> with the JavaScript toolkit).
+</p>
+
+<p>
+    For example, the following example contains <code>&lt;app&gt;</code> elements with <code>&lt;lem&gt;</code> and <code>&lt;rdg&gt;</code> elements for the lyrics and some of the music notes. By default, the lemma is displayed.
+</p>
+<div id="svg_output-1" style="overflow:auto;"/>
+
+<p>
+    By passing the a <code>./rdg[contains(@source, '1570')]</code> value to the <code>--rdg-xpath-query</code> option, we can display the reading encoded with <code>&lt;rdg&gt;</code> elements with a <code>@source</code> attribute with value "1570". In this particular case, this will render alternate lyrics and notes in the fourth measure. It will also render an alternate <code>&lt;scoreDef&gt;</code> with a <code>&lt;staffDef&gt;</code> where some of the attributes are different (<code>@label</code>). Non redefined attributes (e.g. <code>@clef.line</code> or <code>@clef.shape</code>) are preserved from the original <code>&lt;staffDef&gt;</code>.
+</p>
+<div id="svg_output-2" style="overflow:auto;"/>
+
+<p>
+    Similarly, the <code>--rdg-xpath-query</code> option can be used to select a specific <code>&lt;scoreDef&gt;</code>, here with the <code>./rdg[contains(@label, 'original')]</code> value.
+</p>
+<div id="svg_output-3" style="overflow:auto;"/>
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	pageWidth = 1450;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+
+	$.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
+		load_data( data, $('#svg_output-1') );
+	});
+    
+	$.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
+        appXPath = "./rdg[contains(@source, '1570')]"
+		load_data( data, $('#svg_output-2') );
+	});
+    
+	$.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
+        appXPath = "./rdg[contains(@label, 'original')]"
+		load_data( data, $('#svg_output-3') );
+	});
+//]]>
+</script>
+
+{% include mei-excerpt.html id="code1" file="app.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/app.txt %}
+{% endhighlight %}
+</div>
+

@@ -19,6 +19,8 @@ features:
       name: "Grace notes"
     - id: "lyrics"
       name: "Lyrics"
+    - id: "app"
+      name: "Critical apparatus"
 ---
 
 <div class="row">
@@ -59,7 +61,8 @@ features:
 	var pageWidth = 2100;
 	var adjustPageHeight = 1;
 	var border = 25;
-	var spacingStaff = 4;
+	var spacingStaff = 3;
+	var appXPath = "";
 	var vrvToolkit = new verovio.toolkit();
 
 	function load_data(data, output_div) {
@@ -70,6 +73,7 @@ features:
 					adjustPageHeight: adjustPageHeight,
 					border: border,
 					spacingStaff: spacingStaff,
+					rdgXPathQuery: appXPath,
 					scale: zoom
 				});
 		
