@@ -14,19 +14,17 @@
             <mdiv>
                 <score>
                     <scoreDef label="feature-example">
-                        <staffGrp symbol="line">
-                            <staffGrp symbol="bracket" barthru="true">
-                                <staffDef n="1" clef.line="2" clef.shape="G" />
-                                <staffGrp symbol="brace">
-                                    <staffDef n="2" clef.line="2" clef.shape="G" />  
-                                    <staffDef n="3" clef.line="2" clef.shape="G" />
-                                </staffGrp>
+                        <staffGrp symbol="bracket" barthru="true">
+                            <staffDef n="1" clef.line="2" clef.shape="G" />
+                            <staffGrp symbol="brace">
+                                <staffDef n="2" clef.line="2" clef.shape="G" />  
+                                <staffDef n="3" clef.line="2" clef.shape="G" />
                             </staffGrp>
-                            <staffDef n="4" clef.line="2" clef.shape="G"/>
-                            <staffGrp symbol="brace" barthru="false">
-                                <staffDef n="5" clef.line="2" clef.shape="G" /> 
-                                <staffDef n="6" clef.line="4" clef.shape="F" />              
-                            </staffGrp>
+                        </staffGrp>
+                        <staffDef n="4" clef.line="2" clef.shape="G"/>
+                        <staffGrp symbol="brace" barthru="false">
+                            <staffDef n="5" clef.line="2" clef.shape="G" /> 
+                            <staffDef n="6" clef.line="4" clef.shape="F" />              
                         </staffGrp>
                     </scoreDef>
                     <section>
