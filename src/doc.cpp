@@ -184,6 +184,23 @@ void Doc::PrepareDrawing()
         }
     }
     
+    Note *currentNote = NULL;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+
+            ArrayPtrVoid paramsPointers;
+            paramsPointers.push_back( &currentNote );
+            Functor preparePointersByLayer( &Object::PreparePointersByLayer );
+            this->Process( &preparePointersByLayer, paramsPointers, NULL, &filters );
+        }
+    }
+    
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     Syl *currentSyl;
     Note *lastNote;

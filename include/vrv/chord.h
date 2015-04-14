@@ -48,6 +48,7 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
+    ///@}
     
     /**
      * Add an element (only note supported) to a chord.
@@ -86,7 +87,6 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr( ArrayPtrVoid params );
-    
     
     /**
      * See Object::PrepareTieAttr
