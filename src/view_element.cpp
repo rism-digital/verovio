@@ -1177,7 +1177,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (size > 0)
     {
         //set the default x position
-        int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
+        int xAccid = chord->GetDrawingX() - (radius * 2);
 
         //if chord is a down-stemmed non-cluster, it needs one more note diameter of space
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0))
@@ -1468,9 +1468,13 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     //drawing variables for the accidental in accidSpace units
     int accidTop = std::max(0, listTop - topY) / halfUnit;
     int accidBot = ((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit);
+
+    assert(accidBot > accidTop); //because the "origin" (0, 0) is in the top right
     
-    //how many halfunits we have moved the element
-    int currentX = 0;
+    //difference between left end and right end of the accidental
+    int accidDiff = ACCID_WIDTH - 1;
+    //the left side of the accidental; gets incremented to avoid conflicts
+    int currentX = accidDiff;
     
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.
@@ -1479,20 +1483,20 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
      */
     if (type == ACCIDENTAL_EXPLICIT_f) {
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + 1)[currentX]) currentX += 1;
-            if (accidSpace->at(accidTop)[currentX + 1]) currentX += 1;
+            if (accidSpace->at(accidTop + 2)[currentX - accidDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX - accidDiff + 1]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX + ACCID_WIDTH]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX + ACCID_WIDTH]) currentX += 1;
             else break;
         };
     }
     else {
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            if (accidSpace->at(accidTop)[currentX - accidDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX + ACCID_WIDTH]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX + ACCID_WIDTH]) currentX += 1;
             else break;
         };
     }
@@ -1504,7 +1508,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         accid->SetDrawingX(accid->GetDrawingX() - xShift);
         
         //mark the spaces as taken (true in accidSpace)
-        for(int xIdx = currentX; xIdx < currentX + ACCID_WIDTH; xIdx++)
+        for(int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--)
         {
             for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
             {
@@ -1522,11 +1526,23 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
         }
-        
     }
     
+    //For debugging; leaving this in temporarily
+//    for (int vIdx = 0; vIdx < accidSpace->size(); vIdx++)
+//    {
+//        std::cout << "|";
+//        std::vector<bool> thisRow = accidSpace->at(vIdx);
+//        for (int hIdx = (int)thisRow.size() - 1; hIdx >= 0; hIdx --)
+//        {
+//            std::cout << thisRow.at(hIdx) << "|";
+//        }
+//        std::cout << std::endl;
+//    }
+//    std::cout << std::endl;
+    
     //Regardless of whether or not we moved it, return true if there was a conflict and currentX would have been moved
-    return (currentX == 0);
+    return (currentX - accidDiff == 0);
 }
 
 void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )

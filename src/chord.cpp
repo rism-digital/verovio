@@ -192,7 +192,7 @@ void Chord::ResetAccidSpace(int fullUnit)
      *    -Prepare each line to account for one extra accidental so we can guarantee the grid has enough space
      *    -Set m_accidSpaceLeft to be used for asserts during drawing
      */
-    int accidLineLength = ((int)m_accidList.size() + 1) * ACCID_WIDTH;
+    int accidLineLength = (int)m_accidList.size() * ACCID_WIDTH;
     
     /*
      * Each accidental's Y position will be its vertical center; set the grid extremes to account for that
