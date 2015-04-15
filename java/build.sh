@@ -1,7 +1,8 @@
 #!/bin/bash
 
 mkdir -p src/main/java/org/rismch/verovio
-mkdir target
+mkdir -p target
+mkdir -p target/classes/META-INF/lib
 
 # generate the git commit include file
 ../tools/get_git_commit.sh
@@ -72,6 +73,6 @@ FILES="../src/accid.cpp \
              ../libmei/atts_pagebased.cpp"
 
 CXXOPTS="-g -fpic -I../include/vrv -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
-g++ -shared -o target/libverovio.dylib $CXXOPTS $FILES verovio_wrap.cxx
-sudo cp target/libverovio.dylib /usr/lib/java/
+g++ -shared -o target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
+cp target/libverovio.jnilib target/classes/META-INF/lib
 
