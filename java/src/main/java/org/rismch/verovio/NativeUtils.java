@@ -1,4 +1,4 @@
-package org.rismch;
+package org.rismch.verovio;
  
 import java.io.File;
 import java.io.FileNotFoundException;
