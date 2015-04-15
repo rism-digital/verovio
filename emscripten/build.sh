@@ -4,7 +4,7 @@ function print_help {
 	 echo "Usage:
 -l		Light version with no increased memory allocation
 -w 		WebWorker-compatible build.
--v N		Version number (e.g., 1.0.0); no number by default
+-v N	Version number (e.g., 1.0.0); no number by default
 -c		Turns on \"Chatty\" compiling; Will print the compiler progress" >&2 ; 
 } 
 
@@ -38,6 +38,9 @@ VERSION=""
 VERSION_NAME=""
 CHATTY=""
 WEBWORKER=false
+
+# generate the git commit file
+../tools/get_git_commit.sh 
 
 while getopts "lwv:h:c" opt; do
 	case $opt in
@@ -132,11 +135,12 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/rest.cpp \
 	$VEROVIO_ROOT/src/scoredef.cpp \
 	$VEROVIO_ROOT/src/slur.cpp \
+	$VEROVIO_ROOT/src/space.cpp \
 	$VEROVIO_ROOT/src/staff.cpp \
 	$VEROVIO_ROOT/src/style.cpp \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
-	$VEROVIO_ROOT/src/system.cpp \
+    $VEROVIO_ROOT/src/system.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/timeinterface.cpp \
 	$VEROVIO_ROOT/src/toolkit.cpp \
@@ -153,6 +157,7 @@ python $EMCC $CHATTY \
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
 		'_vrvToolkit_getLog',\
+		'_vrvToolkit_getVersion',\
 		'_vrvToolkit_getMEI',\
 		'_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\

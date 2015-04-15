@@ -33,6 +33,7 @@
 #include "note.h"
 #include "rest.h"
 #include "slur.h"
+#include "space.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -48,9 +49,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // View - LayerElement
 //----------------------------------------------------------------------------
-
-int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures    
-bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
 void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
@@ -126,6 +124,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (dynamic_cast<Slur*>(element)) {
         DrawTie(dc, element, layer, staff, measure);
     }
+    else if (dynamic_cast<Space*>(element)) {
+        DrawSpace(dc, element, layer, staff, measure);
+    }
     else if (dynamic_cast<Syl*>(element)) {
         DrawSyl(dc, element, layer, staff, measure);
     }
@@ -160,22 +161,20 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
     else if (dynamic_cast<Note*>(element))
     {
         Note *note = dynamic_cast<Note*>(element);
-        int oct = note->GetOct() - 4;
         
-        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
+        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), note->GetOct() ) );
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
         Rest *rest = dynamic_cast<Rest*>(element);
-        int oct = rest->GetOloc() - 4;
         
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE)
             element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
         else
-            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
+            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), rest->GetOloc()) );
 		
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff, measure );
@@ -356,10 +355,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     /************** Noteheads: **************/
     
-    // Long, breve and ligatures
-	if (drawingDur == DUR_LG || drawingDur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && drawingDur == DUR_1)) {
-		DrawLigature ( dc, noteY, element, layer, staff);
- 	}
+    if (drawingDur < DUR_1) {
+        DrawMaximaToBrevis( dc, noteY, element, layer, staff);
+    }
     // Whole notes
 	else if (drawingDur == DUR_1) {
         if (note->GetColored()==BOOLEAN_true)
@@ -885,174 +883,6 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
 	return;
 }
 
-
-
-void View::CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff)
-{
-    /*
-	if (element == NULL)
-    {
-    	return;
-    }
-    LayerElement *previous = layer->GetPrevious(element);
-	if (previous == NULL || !previous->IsNote()) 
-    {
-        return;
-    }
-    Note *previousNote = dynamic_cast<Note*>(previous);
-    if (previousNote->m_lig==LIG_TERMINAL)
-    {
-        return;
-    } 
-	if (previousNote->m_lig && previousNote->m_dur <= DUR_1)
-	{	
-        element->SetDrawingX( previous->GetDrawingX() + m_doc->m_drawingBrevisWidth[staff->staffSize] * 2 );
-	}
-    */
-    return;
-}
-
-void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff )
-{	
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Note*>(element)); // Element must be a Note"
-    
-
-    Note *note = dynamic_cast<Note*>(element);
-
-	int xn, x1, x2, y1, y2, y3, y4;
-    // int yy2, y5; // unused
-	int verticalCenter, up, epaisseur;
-
-	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
-	xn = element->GetDrawingX();
-
-    /*
-	if ((note->m_lig==LIG_MEDIAL) || (note->m_lig==LIG_TERMINAL))
-    {
-		CalculateLigaturePosX ( element, layer, staff );
-    }
-	else 
-    */{
-		xn = element->GetDrawingX();
-    }
-
-	// calcul des dimensions du rectangle
-	x1 = xn - m_doc->m_drawingBrevisWidth[staff->staffSize]; x2 = xn +  m_doc->m_drawingBrevisWidth[staff->staffSize];
-	y1 = y + m_doc->m_drawingUnit[staff->staffSize]; 
-	y2 = y - m_doc->m_drawingUnit[staff->staffSize]; 
-	y3 = (int)(y1 + m_doc->m_drawingUnit[staff->staffSize]/2);	// partie d'encadrement qui depasse
-	y4 = (int)(y2 - m_doc->m_drawingUnit[staff->staffSize]/2);
-
-    
-	//if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
-	{
-		if (note->GetColored()!=BOOLEAN_true)
-		{				//	double base des carrees
-			DrawObliquePolygon ( dc, x1,  y1,  x2,  y1, -epaisseur );
-			DrawObliquePolygon ( dc, x1,  y2,  x2,  y2, epaisseur );
-		}
-		else
-			DrawFullRectangle( dc,x1,y1,x2,y2);	// dessine val carree pleine // ENZ correction de x2
-
-		DrawVerticalLine ( dc, y3, y4, x1, m_doc->m_style->m_stemWidth );	// corset lateral
-		DrawVerticalLine ( dc, y3, y4, x2, m_doc->m_style->m_stemWidth );
-	}
-	/*
-    else			// traitement des obliques
-    {
-		if (!View::s_drawingLigObliqua)	// 1e passage: ligne flagStemHeighte initiale
-		{
-			DrawVerticalLine (dc,y3,y4,x1, m_doc->m_style->m_stemWidth );
-			View::s_drawingLigObliqua = true;
-			//oblique = OFF;
-//			if (val == DUR_1)	// queue gauche haut si DUR_1
-//				queue_lig = ON;
-		}
-		else	// 2e passage: lignes obl. et flagStemHeighte finale
-		{
-			x1 -=  m_doc->m_drawingBrevisWidth[staff->staffSize]*2;	// avance auto
-
-			y1 = *View::s_drawingLigY - m_doc->m_drawingUnit[staff->staffSize];	// ligat_y contient y original
-			yy2 = y2;
-			y5 = y1+ m_doc->m_drawingDoubleUnit[staff->staffSize]; y2 += m_doc->m_drawingDoubleUnit[staff->staffSize];	// on monte d'un INTERL
-
-			if (note->GetColored()==BOOLEAN_true)
-				DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingDoubleUnit[staff->staffSize]);
-			else
-			{	DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, 5);
-				DrawObliquePolygon ( dc,  x1,  y5,  x2,  y2, -5);
-			}
-			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_style->m_stemWidth);	//cloture flagStemHeighte
-
-			View::s_drawingLigObliqua = false;
-//			queue_lig = OFF;	//desamorce alg.queue DUR_BR
-
-		}
-	}
-
-	if (note->m_lig)	// memoriser positions d'une note a l'autre; relier notes par barres
-	{	
-        *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres flagStemHeightes
-		//if (in(x1,(*View::s_drawingLigX)-2,(*View::s_drawingLigX)+2) || (this->fligat && this->lat && !Note1::marq_obl))
-			// les dernieres conditions pour permettre ligature flagStemHeighte ancienne
-		//	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); // ax2 - drawing flagStemHeight lines missing
-		*View::s_drawingLigX = *(View::s_drawingLigX + 1);
-		*View::s_drawingLigY = *(View::s_drawingLigY + 1);
-	}
-
-	
-	y3 = y2 - m_doc->m_drawingUnit[staff->staffSize]*6;
-
-	if (note->m_lig)
-	{	
-        if (note->m_dur == DUR_BR) //  && this->queue_lig)	// queue gauche bas: DUR_BR initiale descendante // ax2 - no support of queue_lig (see WG corrigeLigature)
-		{
-            DrawVerticalLine ( dc, y2, y3, x1, m_doc->m_style->m_stemWidth );
-        }
-		else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG en ligature, queue droite bas // ax2 - no support of queue_lig
-		{
-            DrawVerticalLine (dc, y2, y3, x2, m_doc->m_style->m_stemWidth );
-        }
-		else if (note->m_dur == DUR_1) // && this->queue_lig )	// queue gauche haut // ax2 - no support of queue_lig
-		{	
-            y2 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
-			DrawVerticalLine ( dc, y1, y2, x1, m_doc->m_style->m_stemWidth );
-		} 
-	}
-	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
-	*/
-    if (note->GetDur() == DUR_LG)
-    {
-		verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
-		// ENZ
-		up = (y < verticalCenter) ? ON : OFF;
-		// ENZ
-		if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
-            if ( note->m_drawingStemDir == STEMDIRECTION_up) {
-                up = ON;
-            }
-            else {
-                up = OFF;
-            }
-        }
-			
-		if (!up)
-		{	
-            y3 = y1 - m_doc->m_drawingUnit[staff->staffSize]*8;
-			y2 = y1;
-		}
-        else {
-            y3 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
-			y2 = y1;
-        }
-		DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_style->m_stemWidth );
-	}
-
-	return;
-}
-
 void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
@@ -1244,7 +1074,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Stems ************/
     
     int drawingDur = chord->GetDur();
-    drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
     
     //(unless we're in a beam)
     if (!(inBeam && drawingDur > DUR_4)) {
@@ -1556,8 +1385,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
-        int oct = accid->GetOloc() - 4;
-        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
+        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
     }
     
     //Get the offset
@@ -1605,6 +1433,14 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this );
 }
 
+void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
+    
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    dc->EndGraphic(element, this );
+}
 
 void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
@@ -1615,8 +1451,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     Custos *custos = dynamic_cast<Custos*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int oct = custos->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), oct) );
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), custos->GetOloc()) );
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1639,13 +1474,18 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Dot *dot = dynamic_cast<Dot*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int oct = dot->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), oct) );
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), dot->GetOloc()) );
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
+    
+    // Use the note to which the points to for position
+    if ( dot->m_drawingNote ) {
+        x = dot->m_drawingNote->GetDrawingX() + m_doc->m_drawingUnit[staff->staffSize]*7/2;
+        y = dot->m_drawingNote->GetDrawingY();
+    }
 
-    DrawDot ( dc, x, y );
+    DrawDots( dc, x, y, 1, staff );
     
     dc->EndGraphic(element, this );
 

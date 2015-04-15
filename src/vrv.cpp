@@ -18,6 +18,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "git_commit.h"
 #include "glyph.h"
 #include "pugixml.hpp"
 #include "smufl.h"
@@ -465,7 +466,7 @@ std::string GetFilename( std::string fullpath )
 }
     
 std::string GetVersion() {
-    return StringFormat("%d.%d.%d", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION );
+    return StringFormat("%d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, GIT_COMMIT );
 }
 
 } // namespace vrv

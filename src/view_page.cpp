@@ -682,16 +682,19 @@ int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
 	char *ptouche, i;
 	ptouche=&touches[0];
 
+    // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
+    oct -= OCTAVE_OFFSET;
 	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_drawingUnit[staff->staffSize];
-	if (staff->m_drawingLines > 5)
+    if (staff->m_drawingLines > 5) {
 		y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->m_drawingUnit[staff->staffSize];
+    }
 
 	/* exprime distance separant m_drawingY de
 	position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
 	ensuite, donc elle doit etre NEGATIVE si plus bas que m_drawingY */
-	for (i=0; i<(signed)sizeof(touches); i++)
-		if (*(ptouche+i) == pname)
-			return(y_int += ((i+1)*m_doc->m_drawingUnit[staff->staffSize]));
+    for (i=0; i<(signed)sizeof(touches); i++) {
+		if (*(ptouche+i) == pname) return (y_int += ((i+1)*m_doc->m_drawingUnit[staff->staffSize]));
+    }
 	return 0;
 }
 

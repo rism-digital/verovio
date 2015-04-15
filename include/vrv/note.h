@@ -110,6 +110,11 @@ public:
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );
+ 
+    /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid params );
     
     /**
      */

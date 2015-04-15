@@ -49,7 +49,12 @@ extern "C" {
         tk->SetCString(tk->GetLogString());
         return tk->GetCString();
     }
-	
+
+    const char *vrvToolkit_getVersion(Toolkit *tk) {
+        tk->SetCString(tk->GetVersion());
+        return tk->GetCString();
+    }
+    
 	int vrvToolkit_getPageCount(Toolkit *tk) {
 		return tk->GetPageCount();
 	}

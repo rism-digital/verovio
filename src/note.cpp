@@ -240,6 +240,16 @@ int Note::PrepareLyrics( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
+int Note::PreparePointersByLayer( ArrayPtrVoid params )
+{
+    // param 0: the current Note
+    Note **currentNote = static_cast<Note**>(params[0]);
+    
+    (*currentNote) = this;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
 int Note::ResetDarwing( ArrayPtrVoid params )
 {
     this->ResetDrawingTieAttr();

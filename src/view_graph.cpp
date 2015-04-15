@@ -187,6 +187,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         vrvTxt.SetPointSize( m_doc->m_drawingLyricFonts[staffSize].GetPointSize());
         
         dc->SetFont( &vrvTxt );
+        dc->VrvTextFont();
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
         dc->DrawText( UTF16to8( str.c_str() ), str );
