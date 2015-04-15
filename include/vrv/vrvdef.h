@@ -99,7 +99,9 @@ enum FunctorCode {
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
-    
+  
+#define OCTAVE_OFFSET 4
+
 // ACCID
 #define ACCID_SHARP 1
 #define ACCID_FLAT 2

@@ -161,22 +161,20 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
     else if (dynamic_cast<Note*>(element))
     {
         Note *note = dynamic_cast<Note*>(element);
-        int oct = note->GetOct() - 4;
         
-        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
+        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), note->GetOct() ) );
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
         Rest *rest = dynamic_cast<Rest*>(element);
-        int oct = rest->GetOloc() - 4;
         
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE)
             element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
         else
-            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
+            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), rest->GetOloc()) );
 		
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff, measure );
@@ -1371,8 +1369,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
-        int oct = accid->GetOloc() - 4;
-        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
+        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
     }
     
     //Get the offset
@@ -1438,8 +1435,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     Custos *custos = dynamic_cast<Custos*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int oct = custos->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), oct) );
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), custos->GetOloc()) );
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1462,8 +1458,7 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Dot *dot = dynamic_cast<Dot*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int oct = dot->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), oct) );
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), dot->GetOloc()) );
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
