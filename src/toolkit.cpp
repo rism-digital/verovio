@@ -426,14 +426,7 @@ std::string Toolkit::GetLogString() {
 }
 
 std::string Toolkit::GetVersion() {
-#ifdef USE_EMSCRIPTEN
-    std::string str = vrv::GetVersion();
-    return str;
-#else
-    // For non js version, show the version and return empty string
-    LogMessage( vrv::GetVersion().c_str() );
-    return "";
-#endif
+    return vrv::GetVersion();
 }
 
 
