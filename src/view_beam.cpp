@@ -364,13 +364,15 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             fy2 = (*beamElementCoords)[i]->m_yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         
-        (*beamElementCoords)[i]->m_element->m_drawingStemStart.x = (*beamElementCoords)[i]->m_element->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
-        (*beamElementCoords)[i]->m_element->m_drawingStemStart.y = fy2;
-        (*beamElementCoords)[i]->m_element->m_drawingStemEnd.y = fy1;
-        (*beamElementCoords)[i]->m_element->m_drawingStemDir = stemDir;
+        LayerElement *el = (*beamElementCoords)[i]->m_element;
+        el->m_drawingStemStart.x = el->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
+        el->m_drawingStemStart.y = fy2;
+        el->m_drawingStemEnd.y = fy1;
+        el->m_drawingStemDir = stemDir;
         
-        if((*beamElementCoords)[i]->m_element->IsNote() || (*beamElementCoords)[i]->m_element->IsChord())
+        if((el->IsNote() && ! dynamic_cast<Note*>(el)->IsChordTone()) || el->IsChord()){
             DrawVerticalLine (dc,fy2, fy1, (*beamElementCoords)[i]->m_x, m_doc->m_style->m_stemWidth);
+        }
 	}
 
     /******************************************************************/

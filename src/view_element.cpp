@@ -933,7 +933,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             if (beam_parent->GetListIndex(chord) > -1) {
                 inBeam = true;
             }
-            
         }
         else {
             // the note is just in a beam
