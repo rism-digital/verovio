@@ -52,15 +52,15 @@
                             <staff n="2">
                                 <layer n="1">
                                     <note dur="1" dur.ges="1024p" oct="4" pname="a" xml:id="p1cad4n0v1b1s2">
-                                        <app>
-                                            <lem>
+                                        <app xml:id="app-001">
+                                            <lem xml:id="lem-001">
                                                 <verse xml:id="d2e199" n="1">
-                                                    <syl wordpos="t">Di</syl>
+                                                    <syl xml:id="syl-001" wordpos="t">Di</syl>
                                                 </verse>
                                             </lem>
-                                            <rdg source="1570">
+                                            <rdg xml:id="rdg-001" source="1570">
                                                 <verse xml:id="d2e208" n="1">
-                                                    <syl wordpos="t">When</syl>
+                                                    <syl xml:id="syl-002" wordpos="t">When</syl>
                                                 </verse>
                                             </rdg>
                                         </app>

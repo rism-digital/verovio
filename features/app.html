@@ -54,4 +54,50 @@
 {% include features/app.txt %}
 {% endhighlight %}
 </div>
+<br/>
+
+<p>
+    The MEI structure is preserved as much as possible in the SVG output. For example, for the first note of the excerpt above, the MEI and SVG structure can be outlined as displayed below. The <code>&lt;app&gt;</code> and <code>&lt;lem&gt;</code> becomes a <code>&lt;g&gt;</code> element in the SVG with the corresponding <code>@id</code> attribute.
+</p>
+
+<div class="row">
+    <div class="col-sm-6">
+{% highlight xml %}
+<note xml:id="p1cad4n0v1b1s2">
+  <app xml:id="app-001">
+    <lem xml:id="lem-001">
+      <verse xml:id="d2e199" n="1">
+        <syl xml:id="001">Di</syl>
+      </verse>
+    </lem>
+    <rdg xml:id="rdg-001" source="1570">
+      <verse xml:id="d2e208" n="1">
+        <syl xml:id="syl-002">When</syl>
+      </verse>
+    </rdg>
+  </app>
+</note>
+{% endhighlight %}
+    </div>
+    
+    <div class="col-sm-6">
+{% highlight xml %}
+<g class="note" id="p1cad4n0v1b1s2">
+  <g class="app" id="app-001">
+      <g class="lem" id="lem-001">
+        <g class="verse" id="d2e199">
+          <g class="syl" id="syl-001">
+              <text>
+                <tspan>Di</tspan>
+              </text>
+          </g>
+        </g>
+      </g>
+  </g>
+</g>
+{% endhighlight %}
+    </div>
+</div>
+
+
 

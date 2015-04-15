@@ -1,169 +1,519 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
-<meiHead>
-	<fileDesc>
-		<titleStmt>
-			<title>CANZ_24-6</title>
-			<respStmt>
-				<persName/>
-			</respStmt>
-		</titleStmt>
-		<pubStmt>
-			<availability>
-				<useRestrict/>
-			</availability>
-		</pubStmt>
-	</fileDesc>
-	<encodingDesc>
-		<appInfo>
-			<application version="7" xml:id="sibelius7">
-				<name>Sibelius</name>
-			</application>
-		</appInfo>
-	</encodingDesc>
-	<workDesc>
-		<work>
-			<titleStmt>
-				<title>CANZ_24-6</title>
-				<respStmt/>
-			</titleStmt>
-		</work>
-	</workDesc>
-</meiHead>
-<music>
-	<body>
-		<mdiv>
-			<score>
-				<scoreDef meter.count="4" meter.unit="2" ppq="256">
-					<staffGrp symbol="line">
-						<staffGrp n="1" symbol="bracket" barthru="true">
-							<staffDef clef.line="2" clef.shape="G" key.mode="major" key.sig="1f" label="Canto I" lines="5" n="1" xml:id="sd1"/>
-							<staffDef clef.line="1" clef.shape="C" key.mode="major" key.sig="1f" label="Alto I" lines="5" n="2" xml:id="sd2"/>
-							<staffDef clef.line="3" clef.shape="C" key.mode="major" key.sig="1f" label="Tenor I" lines="5" n="3" xml:id="sd3"/>
-							<staffDef clef.line="3" clef.shape="F" key.mode="major" key.sig="1f" label="Basso I" lines="5" n="4" xml:id="sd4"/>
-						</staffGrp>
-					</staffGrp>
-				</scoreDef>
-				<section>
-					<pb n="1"/>
-					<scoreDef meter.count="3" meter.unit="1"/>
-					<measure n="24">
-						<staff n="1">
-							<layer n="1">
-								<note dur="1" dots="1" oct="5" pname="d" xml:id="p1cdd5n0v1b25s1"/>
-								<note dur="2" oct="5" pname="d" xml:id="p1cdd5n512v1b25s1"/>
-								<note dur="1" oct="5" pname="c" xml:id="p1ccd5n682v1b25s1"/>
-							</layer>
-						</staff>
-						<staff n="2">
-							<layer n="1">
-							    <note dur="1" dots="1"  oct="4" pname="b" xml:id="p1cbd4n0v1b25s2"/>
-								<note dur="2" oct="4" pname="b" xml:id="p1cbd4n512v1b25s2"/>
-								<note dur="1" oct="4" pname="a" xml:id="p1cad4n682v1b25s2"/>
-							</layer>
-						</staff>
-						<staff n="3">
-							<layer n="1">
-							    <note dur="1" dots="1"  oct="4" pname="f" xml:id="p1cfd4n0v1b25s3"/>
-								<note dur="2" oct="4" pname="f" xml:id="p1cfd4n512v1b25s3"/>
-								<note dur="1" oct="4" pname="f" xml:id="p1cfd4n682v1b25s3"/>
-							</layer>
-						</staff>
-						<staff n="4">
-							<layer n="1">
-							    <note dur="1" dots="1"  oct="3" pname="b" xml:id="p1cbd3n0v1b25s4"/>
-								<note dur="2" oct="3" pname="b" xml:id="p1cbd3n512v1b25s4"/>
-								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n682v1b25s4"/>
-							</layer>
-						</staff>
-					</measure>
-					<measure n="25">
-						<staff n="1">
-							<layer n="1">
-								<note dur="2" oct="4" pname="b" xml:id="p1cbd4n0v1b26s1"/>
-								<note dur="2" oct="4" pname="a" xml:id="p1cad4n170v1b26s1"/>
-								<note dur="2" oct="4" pname="b" xml:id="p1cbd4n341v1b26s1"/>
-								<note dur="2" oct="4" pname="g" xml:id="p1cgd4n512v1b26s1"/>
-								<note dur="1" oct="4" pname="a" xml:id="p1cad4n682v1b26s1"/>
-							</layer>
-						</staff>
-						<staff n="2">
-							<layer n="1">
-							    <note dur="1" dots="1"  oct="4" pname="g" xml:id="p1cgd4n0v1b26s2"/>
-								<note dur="2" oct="4" pname="d" xml:id="p1cdd4n512v1b26s2"/>
-								<note dur="1" oct="4" pname="f" xml:id="p1cfd4n682v1b26s2"/>
-							</layer>
-						</staff>
-						<staff n="3">
-							<layer n="1">
-							    <note dur="1" dots="1"  oct="4" pname="d" xml:id="p1cdd4n0v1b26s3"/>
-								<note dur="2" oct="3" pname="b" xml:id="p1cbd3n512v1b26s3"/>
-								<note dur="1" oct="4" pname="c" xml:id="p1ccd4n682v1b26s3"/>
-							</layer>
-						</staff>
-						<staff n="4">
-							<layer n="1">
-							    <note dur="1" dots="1"  oct="3" pname="g" xml:id="p1cgd3n0v1b26s4"/>
-								<note dur="2" oct="3" pname="g" xml:id="p1cgd3n512v1b26s4"/>
-								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n682v1b26s4"/>
-							</layer>
-						</staff>
-					</measure>
-					<measure n="26">
-						<staff n="1">
-							<layer n="1">
-								<note dur="2" oct="4" pname="f" xml:id="p1cfd4n0v1b27s2"/>
-							    <note dur="4" oct="4" pname="g" xml:id="p1cfd4n0v1b27s3"/>
-							    <note dur="4" oct="4" pname="a" xml:id="p1cfd4n0v1b27s4"/>
-							    <note dur="1" oct="4" pname="b" tie="t" xml:id="p1cad4n768v1b27s4"/>								
-								<note dur="1" oct="4" pname="a" tie="t" xml:id="p1cad4n768v1b27s6"/>
-							</layer>
-						</staff>
-						<staff n="2">
-							<layer n="1">
-								<note dur="1" oct="4" pname="f" colored="true" xml:id="p1cfd4n0v1b27s7"/>
-							    <note dur="brevis" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b27s8"/>
-							</layer>
-						</staff>
-						<staff n="3">
-							<layer n="1">
-							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b27s3"/>
-							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b27s9"/>
-							</layer>
-						</staff>
-						<staff n="4">
-							<layer n="1">
-							    <note dur="1" oct="3" pname="d" colored="true" xml:id="p1cdd3n0v1b27s4"/>
-							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27z1"/>
-							</layer>
-						</staff>
-					</measure>
-					<measure n="27" right="end">
-						<staff n="1">
-							<layer n="1">
-							    <note dur="brevis" oct="4" pname="b" dots="1" xml:id="p1cbd4n0v1b28s1"/>
-							</layer>
-						</staff>
-						<staff n="2">
-							<layer n="1">
-							    <note dur="brevis" oct="4" pname="f" dots="1" xml:id="p1cfd4n0v1b28s2"/>
-							</layer>
-						</staff>
-						<staff n="3">
-							<layer n="1">
-							    <note dur="brevis" oct="4" pname="d" dots="1" xml:id="p1cdd4n0v1b28s3"/>
-							</layer>
-						</staff>
-						<staff n="4">
-							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" dots="1" xml:id="p1cbd2n0v1b28s4"/>
-							</layer>
-						</staff>
-					</measure>
-				    <sb/>
-				</section>
-			</score>
-		</mdiv>
-	</body>
-</music>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title />
+            </titleStmt>
+            <pubStmt>
+                <date>12 April 2015</date>
+            </pubStmt>
+        </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Mensural example</p>
+            </projectDesc>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" lines="5" clef.line="2" clef.shape="G" tempus="3" prolatio="3" proport.num="1" proport.numbase="3"/>
+                            <staffDef n="2" lines="5" clef.line="3" clef.shape="C" tempus="3" prolatio="2" proport.num="2" />
+                            <staffDef n="3" lines="5" clef.line="3" clef.shape="C" tempus="2" prolatio="3" proport.num="1" proport.numbase="2"/>
+                            <staffDef n="4" lines="5" clef.line="4" clef.shape="F" tempus="3" prolatio="2"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <staff n="1" label="feature-example">
+                            <layer>
+                                <note pname="g" dur="semibrevis" oct="4"/>
+                                <note pname="f" dur="semibrevis" oct="4" num="3" numbase="2"/>
+                                <!-- imp -->
+                                <note pname="g" dur="minima" oct="4"/>
+                                <note pname="b" dur="semibrevis" oct="4" num="3" numbase="2"/>
+                                <!-- imp -->
+                                <note pname="c" dur="minima" oct="5"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="3" num="1" numbase="2"/>
+                                <note pname="b" dur="minima" oct="4"/>
+                                <note pname="g" dur="semiminima" oct="4"/>
+                                <note pname="b" dur="semiminima" oct="4"/>
+                                <note pname="a" dur="minima" oct="4"/>
+                                <note pname="g" dur="semiminima" oct="4"/>
+                                <note pname="b" dur="semiminima" oct="4" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="a" dur="fusa" oct="4"/>
+                                <note pname="g" dur="minima" oct="4"/>
+                                <note pname="f" dur="semiminima" oct="4"/>
+                                <barLine/>
+                                <mensur tempus="3" prolatio="2" />
+                                <note pname="g" dur="minima" oct="4"/>
+                                <note pname="d" dur="semibrevis" oct="5"/>
+                                <note pname="c" dur="minima" oct="5"/>
+                                <note pname="e" dur="semibrevis" oct="5"/>
+                                <note pname="d" dur="minima" oct="5"/>
+                                <note pname="c" dur="semibrevis" oct="5"/>
+                                <note pname="b" dur="semibrevis" oct="4"/>
+                                <note pname="a" dur="minima" oct="4"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="3" /><!-- tempus perfectum in the source -->
+                                <note pname="b" dur="semibrevis" oct="4" />
+                                <rest dur="semibrevis"/>
+                                <note pname="b" dur="brevis" oct="4" />
+                                <note pname="c" dur="brevis" oct="5" />
+                                <barLine/>
+                                <note pname="e" dur="brevis" oct="5" />
+                                <note pname="d" dur="brevis" oct="5" />
+                                <note pname="c" dur="brevis" oct="5" />
+                                <barLine/>
+                                <!-- coloration 3/2 * imperfection 2/3 = 6/6 -->
+                                <note pname="d" dur="brevis" oct="5" colored="true" num="6" numbase="6"/>
+                                <note pname="b" dur="semibrevis" oct="4" colored="true" num="3" numbase="2"/>
+                                <!-- coloration 3/2 * alteration 1/2 = 3/4 -->
+                                <note pname="a" dur="semibrevis" oct="4" colored="true" num="3" numbase="4"/>
+                                <!-- coloration 3/2 * imperfection 2/3 = 6/6 -->
+                                <note pname="g" dur="brevis" oct="4" colored="true" num="6" numbase="6"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2"/>
+                                <note pname="f" dur="semibrevis" oct="4"/>
+                                <rest dur="semibrevis"/>
+                                <note pname="f" dur="semibrevis" oct="4"/>
+                                <note pname="g" dur="semibrevis" oct="4"/>
+                                <note pname="b" dur="semibrevis" oct="4"/>
+                                <note pname="c" dur="semibrevis" oct="5"/>
+                                <note pname="b" dur="semibrevis" oct="4"/>
+                                <note pname="c" dur="semibrevis" oct="5"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="2" />
+                                <note pname="d" dur="brevis" oct="5" />
+                                <rest dur="brevis"/>
+                                <note pname="f" dur="brevis" oct="4" />
+                                <barLine/>
+                                <note pname="g" dur="brevis" oct="4" />
+                                <note pname="b" dur="brevis" oct="4" />
+                                <note pname="c" dur="brevis" oct="5" />
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="3" modusminor="2" />
+                                <note pname="b" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="a" dur="minima" oct="4" />
+                                <note pname="g" dur="semibrevis" oct="4" />
+                                <note pname="f" dur="minima" oct="4" />
+                                <note pname="a" dur="semibrevis" oct="4" />
+                                <note pname="g" dur="semibrevis" oct="4" />
+                                <note pname="f" dur="minima" oct="4" />
+                                <note pname="g" dur="longa" oct="4" num="1" numbase="3" />
+                            </layer>
+                        </staff>
+                        <staff n="2">
+                            <layer>
+                                <note pname="d" dur="brevis" oct="4" num="3" numbase="2"/>
+                                <note pname="d" dur="semibrevis" oct="4"/>
+                                <note pname="e" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <!-- punctum augm. -->
+                                <dot/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="c" dur="minima" oct="4"/>
+                                <note pname="b" dur="minima" oct="3"/>
+                                <note pname="a" dur="semibrevis" oct="3"/>
+                                <note pname="d" dur="brevis" oct="4" num="3" numbase="2"/>
+                                <!-- imperfectio a parte ante? -->
+                                <dot/>
+                                <barLine/>
+                                <note pname="b" dur="brevis" oct="3"/>
+                                <note pname="g" dur="semibrevis" oct="3"/>
+                                <note pname="b" dur="semibrevis" oct="3" num="2" numbase="3"/>
+                                <!-- punctum augm. -->
+                                <dot/>
+                                <note pname="c" dur="minima" oct="4"/>
+                                <note pname="d" dur="brevis" oct="4" num="3" numbase="2"/>
+                                <!-- imperfectio -->
+                                <note pname="c" dur="semibrevis" oct="4"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="3" numbase="2"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <rest dur="semiminima"/>
+                                <note pname="d" dur="semiminima" oct="4"/>
+                                <note pname="e" dur="semiminima" oct="4"/>
+                                <note pname="d" dur="semiminima" oct="4"/>
+                                <note pname="g" dur="semibrevis" oct="4"/>
+                                <note pname="f" dur="minima" oct="4"/>
+                                <note pname="g" dur="minima" oct="4" num="2" numbase="3"/>
+                                <!-- punctum augm. -->
+                                <dot/>
+                                <note pname="f" dur="semiminima" oct="4"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="e" dur="minima" oct="4"/>
+                                <note pname="d" dur="semibrevis" oct="4"/>
+                                <barLine/>
+                                <mensur slash="1" tempus="2" prolatio="2" num="3" />
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="g" dur="brevis" oct="4" />
+                                <note pname="g" dur="semibrevis" oct="3" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <note pname="a" dur="minima" oct="3" />
+                                <barLine/>
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="c" dur="semibrevis" oct="4" />
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="e" dur="semibrevis" oct="4" />
+                                <note pname="f" dur="brevis" oct="4" />
+                                <barLine/>
+                                <mensur tempus="3" prolatio="2" num="3" />
+                                <note pname="d" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="e" dur="minima" oct="4" />
+                                <note pname="f" dur="semibrevis" oct="4" />
+                                <note pname="g" dur="brevis" oct="4" />
+                                <!-- div -->
+                                <dot/>
+                                <note pname="e" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="f" dur="minima" oct="4" />
+                                <note pname="g" dur="semibrevis" oct="4" />
+                                <barLine/>
+                                <note pname="c" dur="brevis" oct="4" num="3" numbase="2"/><!-- alteratio -->
+                                <rest dur="semibrevis"/>
+                                <note pname="f" dur="brevis" oct="4" num="3" numbase="2"/><!-- alteratio -->
+                                <note pname="g" dur="semibrevis" oct="4" />
+                                <note pname="a" dur="semibrevis" oct="4" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <note pname="g" dur="minima" oct="4" />
+                                <note pname="e" dur="semibrevis" oct="4" />
+                                <note pname="f" dur="semibrevis" oct="4" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <note pname="e" dur="minima" oct="4" />
+                                <note pname="d" dur="minima" oct="4" />
+                                <note pname="c" dur="minima" oct="4" />
+                                <!-- coloration = hemiola -->
+                                <note pname="d" dur="semibrevis" oct="4" colored="true" num="2" numbase="3" />
+                                <dot/>
+                                <note pname="c" dur="minima" oct="4" colored="true"  />
+                                <note pname="a" dur="semibrevis" oct="3" colored="true"  />
+                                <note pname="b" dur="semibrevis" oct="3" colored="true"  />
+                                <note pname="g" dur="brevis" oct="3" colored="true" num="3" numbase="2" />
+                                <barLine/>
+                                <mensur slash="1" tempus="2" prolatio="2" modusminor="2" num="4" />
+                                <note pname="a" dur="brevis" oct="3" />
+                                <note pname="d" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <dot/>
+                                <note pname="c" dur="minima" oct="4" />
+                                <barLine/>
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <barLine/>
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <note pname="d" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <dot/>
+                                <note pname="c" dur="minima" oct="4" />
+                                <barLine/>
+                                <note pname="b" dur="semibrevis" oct="3" num="2" numbase="3"/>
+                                <dot/>
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <barLine/>
+                                <note pname="g" dur="brevis" oct="4" />
+                                <note pname="d" dur="brevis" oct="4" />
+                                <barLine/>
+                                <rest dur="longa"/>
+                                <barLine/>
+                                <rest dur="semibrevis"/>
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="g" dur="brevis" oct="4" />
+                                <barLine/>
+                                <note pname="f" dur="semibrevis" oct="4" />
+                                <note pname="e" dur="minima" oct="4" />
+                                <note pname="d" dur="minima" oct="4" />
+                                <note pname="e" dur="semibrevis" oct="4" />
+                                <note pname="e" dur="semibrevis" oct="4" />
+                                <barLine/>
+                                <mensur slash="1" tempus="2" prolatio="2" modusminor="2" num="8" />
+                                <note pname="d" dur="longa" oct="4" />
+                                <note pname="a" dur="longa" oct="3" />
+                                <note pname="b" dur="brevis" oct="3" />
+                                <note pname="d" dur="longa" oct="4" />
+                                <note pname="c" dur="brevis" oct="4" />
+                                <note pname="d" dur="longa" oct="4" />
+                                <note pname="f" dur="longa" oct="4" />
+                                <note pname="e" dur="longa" oct="4" />
+                                <note pname="d" dur="longa" oct="4" />
+                                <note pname="d" dur="longa" oct="4" />
+                                <note pname="g" dur="longa" oct="4" />
+                                <note pname="g" dur="longa" oct="4" />
+                                <note pname="f" dur="longa" oct="4" />
+                                <note pname="g" dur="longa" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="d" dur="longa" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="e" dur="longa" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="f" dur="longa" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="f" dur="brevis" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="e" dur="brevis" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="d" dur="longa" oct="4" colored="true" num="3" numbase="2"/>
+                                <note pname="d" dur="longa" oct="4" num="1" numbase="8"/>
+                            </layer>
+                        </staff>
+                        <staff n="3">
+                            <layer>
+                                <note pname="g" dur="semiminima" oct="3" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="a" dur="fusa" oct="3"/>
+                                <note pname="b" dur="semiminima" oct="3"/>
+                                <note pname="c" dur="semiminima" oct="4" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="d" dur="fusa" oct="4"/>
+                                <note pname="e" dur="semiminima" oct="4"/>
+                                <note pname="d" dur="semiminima" oct="4" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="c" dur="fusa" oct="4"/>
+                                <note pname="b" dur="semiminima" oct="3"/>
+                                <note pname="a" dur="semiminima" oct="3"/>
+                                <note pname="g" dur="minima" oct="3"/>
+                                <barLine/>
+                                <mensur tempus="3" prolatio="2"/>
+                                <rest dur="minima"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="e" dur="semiminima" oct="4"/>
+                                <note pname="d" dur="semiminima" oct="4"/>
+                                <note pname="g" dur="semibrevis" oct="4"/>
+                                <note pname="f" dur="minima" oct="4"/>
+                                <note pname="g" dur="semibrevis" oct="4"/>
+                                <rest dur="minima"/>
+                                <note pname="g" dur="minima" oct="3"/>
+                                <note pname="d" dur="semibrevis" oct="4"/>
+                                <note pname="g" dur="minima" oct="3" num="2" numbase="3"/>
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="a" dur="semiminima" oct="3"/>
+                                <note pname="b" dur="minima" oct="3"/>
+                                <note pname="c" dur="minima" oct="4"/>
+                                <note pname="a" dur="semibrevis" oct="3"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="3" /><!-- tempus perfectum in the source -->
+                                <note pname="g" dur="semibrevis" oct="3" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="c" dur="brevis" oct="4" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <barLine/>
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="f" dur="semibrevis" oct="3" />
+                                <note pname="b" dur="brevis" oct="3" />
+                                <note pname="c" dur="brevis" oct="4" />
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="3" numbase="2" />
+                                <note pname="b" dur="semibrevis" oct="3"/>
+                                <rest dur="minima"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="c" dur="minima" oct="4"/>
+                                <note pname="e" dur="minima" oct="4" num="2" numbase="3" />
+                                <!-- augm -->
+                                <dot/>
+                                <note pname="f" dur="semiminima" oct="4"/>
+                                <note pname="g" dur="minima" oct="4"/>
+                                <note pname="f" dur="minima" oct="4"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="e" dur="minima" oct="4"/>
+                                <note pname="e" dur="minima" oct="4"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="f" dur="minima" oct="4"/>
+                                <note pname="g" dur="minima" oct="4"/>
+                                <note pname="d" dur="semibrevis" oct="4"/>
+                                <note pname="c" dur="minima" oct="4"/>
+                                <barLine/>
+                                <mensur slash="1" tempus="2" prolatio="2" num="2" />
+                                <note pname="d" dur="minima" oct="4" num="2" numbase="3"/>
+                                <dot/>
+                                <note pname="c" dur="semiminima" oct="4" />
+                                <note pname="b" dur="minima" oct="3" />
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="g" dur="minima" oct="3" />
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="b" dur="minima" oct="3" />
+                                <note pname="a" dur="minima" oct="3" />
+                                <barLine/>
+                                <note pname="d" dur="minima" oct="4" num="2" numbase="3"/>
+                                <dot/>
+                                <note pname="c" dur="semiminima" oct="4" />
+                                <note pname="b" dur="minima" oct="3" />
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <barLine/>
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="g" dur="semibrevis" oct="4" />
+                                <note pname="f" dur="minima" oct="4" />
+                                <note pname="e" dur="semiminima" oct="4" />
+                                <note pname="d" dur="semiminima" oct="4" />
+                                <note pname="e" dur="semibrevis" oct="4" />
+                                <barLine/>
+                                <note pname="d" dur="brevis" oct="4" />
+                                <rest dur="semibrevis"/>
+                                <note pname="c" dur="semibrevis" oct="4" />
+                                <barLine/>
+                                <mensur slash="1" tempus="2" prolatio="2" num="3" />
+                                <note pname="f" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="e" dur="minima" oct="4" />
+                                <note pname="d" dur="minima" oct="4" />
+                                <note pname="c" dur="minima" oct="4" />
+                                <note pname="b" dur="semibrevis" oct="3" num="2" numbase="3"/>
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <note pname="g" dur="semibrevis" oct="3" num="2" numbase="3"/>
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="b" dur="minima" oct="3" />
+                                <note pname="c" dur="minima" oct="4" />
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="c" dur="minima" oct="4" num="2" numbase="3"/>
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="d" dur="semiminima" oct="4" />
+                                <note pname="e" dur="minima" oct="4" />
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="c" dur="minima" oct="4" />
+                                <mensur slash="1" tempus="2" prolatio="2" num="6" modusminor="2" />
+                                <note pname="d" dur="brevis" oct="4" colored="true" num="2" numbase="3" />
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="c" dur="semibrevis" oct="4" colored="true" />
+                                <note pname="b" dur="brevis" oct="3" colored="true" />
+                                <note pname="a" dur="brevis" oct="3" colored="true" />
+                                <note pname="f" dur="semibrevis" oct="3" colored="true" />
+                                <note pname="g" dur="semibrevis" oct="3" colored="true" />
+                                <note pname="a" dur="brevis" oct="3" colored="true" />
+                                <note pname="g" dur="longa" oct="3" num="1" numbase="6" />
+                            </layer>
+                        </staff>
+                        <staff n="4">
+                            <layer>
+                                <note pname="g" dur="semibrevis" oct="3"/>
+                                <note pname="g" dur="minima" oct="3"/>
+                                <note pname="c" dur="semibrevis" oct="3" num="2" numbase="3"/>
+                                <!-- aug -->
+                                <dot/>
+                                <note pname="d" dur="brevis" oct="3" num="3" numbase="2"/>
+                                <rest dur="minima"/>
+                                <note pname="d" dur="minima" oct="4"/>
+                                <note pname="b" dur="semibrevis" oct="3"/>
+                                <note pname="g" dur="semibrevis" oct="3"/>
+                                <note pname="a" dur="semibrevis" oct="3"/>
+                                <barLine/>
+                                <mensur tempus="3" prolatio="2" num="3" />
+                                <note pname="g" dur="longa" oct="3" />
+                                <barLine/>
+                                 <note pname="d" dur="brevis" oct="3" num="3" numbase="2"/>
+                                <!-- alt -->
+                                <rest dur="semibrevis"/>
+                                <note pname="g" dur="semibrevis" oct="3"/>
+                                <note pname="g" dur="semibrevis" oct="3"/>
+                                <note pname="c" dur="semibrevis" oct="3"/>
+                                <note pname="d" dur="brevis" oct="3"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2"  num="3" numbase="2"/>
+                                <rest dur="minima"/>
+                                <note pname="g" dur="semibrevis" oct="3"/>
+                                <note pname="c" dur="minima" oct="3" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <note pname="d" dur="semiminima" oct="3"/>
+                                <note pname="e" dur="semiminima" oct="3"/>
+                                <note pname="f" dur="semiminima" oct="3"/>
+                                <note pname="g" dur="minima" oct="3"/>
+                                <note pname="a" dur="minima" oct="3"/>
+                                <note pname="b" dur="minima" oct="3"/>
+                                <note pname="g" dur="minima" oct="3"/>
+                                <note pname="f" dur="semibrevis" oct="3"/>
+                                <barLine/>
+                                <mensur tempus="2" prolatio="2" num="3" />
+                                <note pname="b" dur="minima" oct="3" num="2" numbase="3"/><!-- augm -->
+                                <dot/>
+                                <note pname="c" dur="semiminima" oct="4" />
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <note pname="c" dur="brevis" oct="3" />
+                                <barLine/>
+                                <rest dur="semibrevis"/>
+                                <note pname="c" dur="semibrevis" oct="4" />
+                                <note pname="d" dur="semibrevis" oct="4" />
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <barLine/>
+                                <note pname="d" dur="brevis" oct="3" />
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="f" dur="semibrevis" oct="3" />
+                                <note pname="e" dur="brevis" oct="3" />
+                                <barLine/>
+                                <mensur tempus="3" prolatio="2" num="2" />
+                                <note pname="d" dur="brevis" oct="3" />
+                                <dot/><!-- divisionis -->
+                                <rest dur="brevis"/>
+                                <note pname="d" dur="brevis" oct="3" num="3" numbase="2"/><!-- imperfectio -->
+                                <note pname="d" dur="semibrevis" oct="3" />
+                                <note pname="d" dur="semibrevis" oct="4" num="2" numbase="3"/>
+                                <!-- augmentationis -->
+                                <dot/>
+                                <note pname="c" dur="minima" oct="4" />
+                                <note pname="b" dur="minima" oct="3" />
+                                <note pname="a" dur="minima" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" num="3" numbase="2"/><!-- imperfectio -->
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="brevis" oct="3" num="3" numbase="2"/><!-- imperfectio -->
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="g" dur="semibrevis" oct="3" />
+                                <note pname="b" dur="semibrevis" oct="3" />
+                                <note pname="a" dur="brevis" oct="3" num="3" numbase="2"/><!-- imperfectio -->
+                                <note pname="a" dur="semibrevis" oct="3" />
+                                <barLine/>
+                                <mensur modusminor="2" num="4" />
+                                <note pname="d" dur="brevis" oct="3" />
+                                <note pname="f" dur="brevis" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <note pname="e" dur="brevis" oct="3" />
+                                <note pname="d" dur="longa" oct="3" />
+                                <rest dur="brevis"/>
+                                <note pname="d" dur="brevis" oct="4" />
+                                <note pname="b" dur="brevis" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <note pname="a" dur="longa" oct="3" />
+                                <mensur modusminor="2" num="8" />
+                                <note pname="g" dur="longa" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <note pname="g" dur="brevis" oct="3" />
+                                <note pname="d" dur="longa" oct="3" />
+                                <note pname="d" dur="longa" oct="3" />
+                                <note pname="g" dur="longa" oct="3" num="1" numbase="8" />
+                            </layer>
+                        </staff>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
 </mei>
