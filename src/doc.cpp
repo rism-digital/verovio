@@ -398,6 +398,7 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
 
     if (typeid(Barline) == *elementType) return 5;
     else if (typeid(Clef) == *elementType) return -20;
+    else if (typeid(MRest) == *elementType) return 30;
     //else if (typeid(Note) == *elementType) return 10;
     return 0;
 
@@ -411,7 +412,7 @@ short Doc::GetRightMargin( const std::type_info *elementType )
     else if (typeid(MeterSig) == *elementType) return 30;
     else if (typeid(Barline) == *elementType) return 30;
     else if (typeid(BarlineAttr) == *elementType) return 0;
-    else if (typeid(MRest) == *elementType) return 0;
+    else if (typeid(MRest) == *elementType) return 30;
     else if (typeid(MultiRest) == *elementType) return 30;
     //else if (typeid(Note) == *elementType) return 10;
     return 10;

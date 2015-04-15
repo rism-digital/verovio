@@ -74,9 +74,9 @@ namespace vrv {
 #define MIN_LYRIC_SIZE 2.0
 #define MAX_LYRIC_SIZE 8.0
     
-#define DEFAULT_MEASURE_WIDTH 15.0
-#define MIN_MEASURE_WIDTH 5.0
-#define MAX_MEASURE_WIDTH 50.0
+#define DEFAULT_MEASURE_WIDTH 3.0
+#define MIN_MEASURE_WIDTH 1.0
+#define MAX_MEASURE_WIDTH 30.0
     
 //----------------------------------------------------------------------------
 // Style
