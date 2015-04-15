@@ -430,7 +430,8 @@ std::string Toolkit::GetVersion() {
     std::string str = vrv::GetVersion();
     return str;
 #else
-    // The non js version of the app should not use this function.
+    // For non js version, show the version and return empty string
+    LogMessage( vrv::GetVersion().c_str() );
     return "";
 #endif
 }
