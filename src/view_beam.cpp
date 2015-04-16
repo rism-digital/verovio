@@ -309,7 +309,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     /******************************************************************/
     // Draw notes for all objects in the beam now that stem direction is calculated
     
-    /*for (i = 0; i < elementCount; i++) {
+    for (i = 0; i < elementCount; i++) {
         if ((*beamElementCoords)[i]->m_element->IsChord()) {
             Chord *chord = dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element);
             ListOfObjects *noteList = chord->GetList(chord);
@@ -320,7 +320,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
                 Note *note = dynamic_cast<Note*>(*iter);
                 if (!note) continue;
                 dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
-                DrawNote(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure);
+                DrawNote(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure, true);
                 dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
                 iter++;
             }
@@ -328,10 +328,10 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         }
         else if ((*beamElementCoords)[i]->m_element->IsNote()) {
             dc->ResumeGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), (*beamElementCoords)[i]->m_element->GetUuid() );
-            DrawNote(dc, dynamic_cast<LayerElement*>((*beamElementCoords)[i]->m_element), layer, staff, measure);
+            DrawNote(dc, dynamic_cast<LayerElement*>((*beamElementCoords)[i]->m_element), layer, staff, measure, true);
             dc->EndResumedGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), this );
         }
-    }*/
+    }
 
     /******************************************************************/
     // Calculate the stem lengths and draw them

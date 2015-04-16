@@ -225,7 +225,7 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 // l'accord (ptr_n->fchord), la valeur y extreme opposee au sommet de la
 // queue: le ptr *testchord extern peut garder le x et l'y.
     
-void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, bool fromBeam )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -261,6 +261,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             // the note is just in a beam
             inBeam = true;
         }
+    }
+    
+    if (inBeam && !fromBeam) {
+        // The note will be drawn from DrawBeamPostponed
+        return;
     }
     
 	int staffSize = staff->staffSize;
