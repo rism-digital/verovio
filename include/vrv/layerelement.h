@@ -18,6 +18,7 @@ class Alignment;
 class BeamElementCoord;
 class Mensur;
 class MeterSig;
+class Staff;
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -116,6 +117,11 @@ public:
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid params );
     
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetDrawingXY( ArrayPtrVoid params );
+    
 protected:
     /**
      * Returns the duration if the child element has a DurationInterface
@@ -141,6 +147,11 @@ public:
      * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
      */
     BeamElementCoord *m_beamElementCoord;
+    /**
+     * This store a pointer to the cross-staff (if any)
+     * Initialized in LayerElement::SetDrawingXY
+     */
+    Staff *m_crossStaff;
     
 protected:
     Alignment *m_alignment;

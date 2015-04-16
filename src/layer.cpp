@@ -17,6 +17,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "keysig.h"
+#include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
@@ -394,8 +395,6 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     (*currentMensur) = m_currentMensur;
     (*currentMeterSig) = m_currentMeterSig;
     
-    //LogDebug(" ----- " );
-    
     if ( m_drawClef && m_currentClef ) {
         m_currentClef->AlignHorizontally( params );
     }
@@ -423,6 +422,31 @@ int Layer::PrepareProcessingLists( ArrayPtrVoid params )
     Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
     assert( staff );
     tree->child[ staff->GetN() ].child[ this->GetN() ];
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::SetDrawingXY( ArrayPtrVoid params )
+{
+    // param 0: a pointer doc (unused)
+    // param 1: a pointer to the current system (unused)
+    // param 2: a pointer to the current measure
+    // param 3: a pointer to the current staff (unused)
+    Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    
+    // set the values for the scoreDef elements when required
+    if (this->GetDrawingClef()) {
+        this->GetDrawingClef()->SetDrawingX( this->GetDrawingClef()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
+    if (this->GetDrawingKeySig()) {
+        this->GetDrawingKeySig()->SetDrawingX( this->GetDrawingKeySig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
+    if (this->GetDrawingMensur()) {
+        this->GetDrawingMensur()->SetDrawingX( this->GetDrawingMensur()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
+    if (this->GetDrawingMeterSig()) {
+        this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
     
     return FUNCTOR_CONTINUE;
 }

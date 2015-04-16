@@ -15,7 +15,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
 #include "accid.h"
 #include "beam.h"
 #include "chord.h"
@@ -63,22 +62,7 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else {
         m_currentColour = AxBLACK;
     }
-    
-    // Here we set the appropriate x value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if ( element->m_xAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
-        element->SetDrawingY( staff->GetDrawingY() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        element->SetDrawingX( element->m_xAbs );
-        element->SetDrawingY( staff->GetDrawingY() );
-    }
-    
+
     if (dynamic_cast<Accid*>(element)) {
         DrawAccid(dc, element, layer, staff, measure);
     }
@@ -147,19 +131,6 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
-
-    DurationInterface *durElement = dynamic_cast<DurationInterface*>(element);
-	if ( !durElement )
-		return;
-    
-    if (durElement->HasStaff()) {
-        AttCommonNComparison comparisonFirst( &typeid(Staff), durElement->GetStaff() );
-        Staff *crossStaff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-        if (crossStaff) staff = crossStaff;
-        else LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff(), element->GetUuid().c_str());
-        element->SetDrawingY( staff->GetDrawingY() );
-        // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
-    }
     
 	if (dynamic_cast<Chord*>(element))
     {

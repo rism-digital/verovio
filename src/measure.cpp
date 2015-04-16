@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -255,6 +256,33 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     (*currentSystem)->AddMeasure( measure );
     
     return FUNCTOR_SIBLINGS;
+}
+   
+int Measure::SetDrawingXY( ArrayPtrVoid params )
+{
+    // param 0: a pointer doc
+    // param 1: a pointer to the current system
+    // param 2: a pointer to the current measure
+    // param 3: a pointer to the current staff (unused)
+    Doc *doc = static_cast<Doc*>(params[0]);
+    System **currentSystem = static_cast<System**>(params[1]);
+    Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    
+    // Here we set the appropriate y value to be used for drawing
+    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
+    // With Transcription documents, we use the m_xAbs
+    if ( this->m_xAbs == VRV_UNSET ) {
+        assert( doc->GetType() == Raw );
+        this->SetDrawingX( this->m_drawingXRel + (*currentSystem)->GetDrawingX() );
+    }
+    else
+    {
+        assert( doc->GetType() == Transcription );
+        this->SetDrawingX( this->m_xAbs );
+    }
+    (*currentMeasure) = this;
+    
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

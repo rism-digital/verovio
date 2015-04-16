@@ -52,13 +52,21 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     int i;
 	System *system = NULL;
+    Measure *measure = NULL;
+    Staff *staff = NULL;
+    ArrayPtrVoid params;
+    params.push_back( m_doc );
+    params.push_back( &system );
+    params.push_back( &measure );
+    params.push_back( &staff );
+    Functor setDrawingXY( &Object::SetDrawingXY );
+    m_currentPage->Process( &setDrawingXY, params );
     
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    if ( background )
-        dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
+    if ( background ) dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
     
     dc->DrawBackgroundImage( );
     
@@ -71,8 +79,6 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 	{
 		system = dynamic_cast<System*>(m_currentPage->m_children[i]);
         DrawSystem( dc, system );
-        
-        // TODO here: also update x_abs and m_drawingY positions for system. How to calculate them?
     }
     
     dc->EndPage();
@@ -93,18 +99,6 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
-    
-    if ( system->m_yAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        system->SetDrawingX( system->m_drawingXRel );
-        system->SetDrawingY( system->m_drawingYRel );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        system->SetDrawingX( system->m_xAbs );
-        system->SetDrawingY( system->m_yAbs );
-    }
 
     DrawSystemChildren(dc, system, system);
 
@@ -626,20 +620,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     if ( measure->IsMeasuredMusic()) {
         dc->StartGraphic( measure, "", measure->GetUuid() );
     }
-    
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if ( measure->m_xAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        measure->SetDrawingX( measure->m_drawingXRel + system->GetDrawingX() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        measure->SetDrawingX( measure->m_xAbs );
-    }
-    
+
     DrawMeasureChildren(dc, measure, measure, system);
 
     if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
@@ -732,18 +713,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     dc->StartGraphic( staff, "", staff->GetUuid());
     
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if ( staff->m_yAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        staff->SetDrawingY( staff->GetYRel() + system->GetDrawingY() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        staff->SetDrawingY( staff->m_yAbs );
-    }
+    // Doing it here might be problematic with cross-staff, even though the default value will be 5
     if ( StaffDef *staffDef = m_drawingScoreDef.GetStaffDef( staff->GetN() ) ) {
         staff->m_drawingLines = staffDef->GetLines( ) ;
     }

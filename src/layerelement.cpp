@@ -15,19 +15,23 @@
 
 #include "accid.h"
 #include "aligner.h"
+#include "att_comparison.h"
 #include "barline.h"
 #include "beam.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
+#include "doc.h"
 #include "dot.h"
 #include "keysig.h"
+#include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
+#include "staff.h"
 #include "syl.h"
 #include "tie.h"
 #include "timeinterface.h"
@@ -405,6 +409,52 @@ int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
         else {
             iter++;
         }
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int LayerElement::SetDrawingXY( ArrayPtrVoid params )
+{
+    // param 0: a pointer doc
+    // param 1: a pointer to the current system (unused)
+    // param 2: a pointer to the current measure
+    // param 3: a pointer to the current staff
+    Doc *doc = static_cast<Doc*>(params[0]);
+    Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    Staff **currentStaff = static_cast<Staff**>(params[3]);
+    
+    // Look for cross-staff situations
+    // If we have one, make is available in m_crossStaff
+    DurationInterface *durElement = dynamic_cast<DurationInterface*>(this);
+    if ( durElement && durElement->HasStaff()) {
+        AttCommonNComparison comparisonFirst( &typeid(Staff), durElement->GetStaff() );
+        m_crossStaff = dynamic_cast<Staff*>((*currentMeasure)->FindChildByAttComparison(&comparisonFirst, 1));
+        if (m_crossStaff) {
+            if (m_crossStaff == (*currentStaff)) LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff", durElement->GetStaff(), this->GetUuid().c_str());
+        }
+        else LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff(), this->GetUuid().c_str());
+        // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
+    } else {
+        m_crossStaff = NULL;
+    }
+    
+    Staff *staffY = m_crossStaff ? m_crossStaff : (*currentStaff);
+    
+    // Here we set the appropriate x value to be used for drawing
+    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
+    // With Transcription documents, we use the m_xAbs
+    if ( this->m_xAbs == VRV_UNSET ) {
+        assert( doc->GetType() == Raw );
+        this->SetDrawingX( this->GetXRel() + (*currentMeasure)->GetDrawingX() );
+        this->SetDrawingY( staffY->GetDrawingY() );
+    }
+    else
+    {
+        assert( doc->GetType() == Transcription );
+        this->SetDrawingX( this->m_xAbs );
+        // cross staff with Transcription does not make sense anyway
+        this->SetDrawingY( staffY->GetDrawingY() );
     }
     
     return FUNCTOR_CONTINUE;
