@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "keysig.h"
+#include "layer.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -37,6 +38,7 @@
 #include "timeinterface.h"
 #include "tuplet.h"
 #include "verse.h"
+#include "view.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -420,9 +422,13 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
     // param 1: a pointer to the current system (unused)
     // param 2: a pointer to the current measure
     // param 3: a pointer to the current staff
+    // param 4: a pointer to the current layer
+    // param 5: a pointer to the view
     Doc *doc = static_cast<Doc*>(params[0]);
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
     Staff **currentStaff = static_cast<Staff**>(params[3]);
+    Layer **currentLayer = static_cast<Layer**>(params[4]);
+    View *view = static_cast<View*>(params[5]);
     
     // Look for cross-staff situations
     // If we have one, make is available in m_crossStaff
@@ -455,6 +461,23 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
         this->SetDrawingX( this->m_xAbs );
         // cross staff with Transcription does not make sense anyway
         this->SetDrawingY( staffY->GetDrawingY() );
+    }
+    
+    // Finally, adjust Y for notes and rests
+    if (dynamic_cast<Note*>(this))
+    {
+        Note *note = dynamic_cast<Note*>(this);
+        this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, note->GetPname(), (*currentLayer)->GetClefOffset( this ), note->GetOct() ) );
+    }
+    else if (dynamic_cast<Rest*>(this)) {
+        Rest *rest = dynamic_cast<Rest*>(this);
+        
+        // Automatically calculate rest position, if so requested
+        if (rest->GetPloc() == PITCHNAME_NONE) {
+            this->SetDrawingY( this->GetDrawingY() + view->CalculateRestPosY( staffY, rest->GetActualDur()) );
+        } else {
+            this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, rest->GetPloc(), (*currentLayer)->GetClefOffset( this ), rest->GetOloc()) );
+        }
     }
     
     return FUNCTOR_CONTINUE;

@@ -132,54 +132,23 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
     
-	if (dynamic_cast<Chord*>(element))
-    {
+	if (dynamic_cast<Chord*>(element)) {
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawChord(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
     }
-    else if (dynamic_cast<Note*>(element))
-    {
-        Note *note = dynamic_cast<Note*>(element);
-        
-        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), note->GetOct() ) );
+    else if (dynamic_cast<Note*>(element)) {
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
-        Rest *rest = dynamic_cast<Rest*>(element);
-        
-        // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE) {
-            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
-        } else {
-            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), rest->GetOloc()) );
-        }
-		
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff, measure );
         dc->EndGraphic(element, this );
 	}
 	
 	return;
-}
-
-void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
-    
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    
-    Beam *beam = dynamic_cast<Beam*>(element);
-
-    dc->StartGraphic( element, "", element->GetUuid() );
-    
-    DrawLayerChildren(dc, beam, layer, staff, measure);
-    
-    // Add to the list of postponed element 
-    layer->AddToDrawingList( beam );
-    
-    dc->EndGraphic(element, this );
 }
 
 void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
@@ -206,7 +175,7 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
 // l'accord (ptr_n->fchord), la valeur y extreme opposee au sommet de la
 // queue: le ptr *testchord extern peut garder le x et l'y.
     
-void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, bool fromBeam )
+void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
@@ -242,11 +211,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             // the note is just in a beam
             inBeam = true;
         }
-    }
-    
-    if (inBeam && !fromBeam) {
-        // The note will be drawn from DrawBeamPostponed
-        return;
     }
     
 	int staffSize = staff->staffSize;

@@ -432,7 +432,10 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     // param 1: a pointer to the current system (unused)
     // param 2: a pointer to the current measure
     // param 3: a pointer to the current staff (unused)
+    // param 4: a pointer to the current layer
+    // param 5: a pointer to the view (unused)
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    Layer **currentLayer = static_cast<Layer**>(params[4]);
     
     // set the values for the scoreDef elements when required
     if (this->GetDrawingClef()) {
@@ -447,6 +450,7 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     if (this->GetDrawingMeterSig()) {
         this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
     }
+    (*currentLayer) = this;
     
     return FUNCTOR_CONTINUE;
 }

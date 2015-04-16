@@ -54,11 +54,14 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 	System *system = NULL;
     Measure *measure = NULL;
     Staff *staff = NULL;
+    Layer *layer = NULL;
     ArrayPtrVoid params;
     params.push_back( m_doc );
     params.push_back( &system );
     params.push_back( &measure );
     params.push_back( &staff );
+    params.push_back( &layer );
+    params.push_back( this );
     Functor setDrawingXY( &Object::SetDrawingXY );
     m_currentPage->Process( &setDrawingXY, params );
     
@@ -1076,9 +1079,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
     
-    // first draw the beams
-    DrawLayerList(dc, layer, staff, measure, &typeid(Beam) );
-    // then tuplets
+    // first draw the tuplets
     DrawLayerList(dc, layer, staff, measure, &typeid(Tuplet) );
     // then ties
     DrawLayerList(dc, layer, staff, measure, &typeid(Tie) );
@@ -1103,13 +1104,7 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         element = dynamic_cast<LayerElement*>(*iter);
         if (!element) continue; 
         
-        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
-            Beam *beam = dynamic_cast<Beam*>(element);
-            dc->ResumeGraphic(beam, beam->GetUuid());
-            DrawBeamPostponed( dc, layer, beam, staff, measure );
-            dc->EndResumedGraphic(beam, this);
-        }
-        else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
             dc->ResumeGraphic(tuplet, tuplet->GetUuid());
             DrawTupletPostponed( dc, tuplet, layer, staff );

@@ -29,8 +29,13 @@
 
 namespace vrv {
 
-void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure )
+void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    
+    Beam *beam = dynamic_cast<Beam*>(element);
+    
     LayerElement *current;
 
 	bool changingDur = OFF;
@@ -314,33 +319,13 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
     
 	startingY = (s_y - beamSlope * s_x) / elementCount;
-    
+
     /******************************************************************/
-    // Draw notes for all objects in the beam now that stem direction is calculated
+    // Start the Beam graphic and draw the children
     
-    for (i = 0; i < elementCount; i++) {
-        if ((*beamElementCoords)[i]->m_element->IsChord()) {
-            Chord *chord = dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element);
-            ListOfObjects *noteList = chord->GetList(chord);
-            ListOfObjects::iterator iter = noteList->begin();
-            
-            dc->ResumeGraphic( dynamic_cast<DocObject*>(chord), (chord)->GetUuid() );
-            while ( iter != noteList->end()) {
-                Note *note = dynamic_cast<Note*>(*iter);
-                if (!note) continue;
-                dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
-                DrawNote(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure, true);
-                dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
-                iter++;
-            }
-            dc->EndResumedGraphic( dynamic_cast<DocObject*>(chord), this );
-        }
-        else if ((*beamElementCoords)[i]->m_element->IsNote()) {
-            dc->ResumeGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), (*beamElementCoords)[i]->m_element->GetUuid() );
-            DrawNote(dc, dynamic_cast<LayerElement*>((*beamElementCoords)[i]->m_element), layer, staff, measure, true);
-            dc->EndResumedGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), this );
-        }
-    }
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
     // Calculate the stem lengths and draw them
@@ -438,8 +423,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	marqueurs partitionnant les sous-groupes; la troisieme boucle for est
 	pilotee par l'indice de l'array; elle dessine horizontalement les barres 
 	de chaque sous-groupe en suivant les marqueurs */
-    
-    //return;
 
     if (changingDur) {
         testDur = DUR_8 + fullBars;
@@ -525,9 +508,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             barY += shiftY * beamWidth;
         } // end of while
     } // end of drawing partial bars
-
-	return;	
-
+    
+    dc->EndGraphic(element, this );
 }
     
 } // namespace vrv

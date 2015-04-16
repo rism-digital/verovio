@@ -264,6 +264,8 @@ int Measure::SetDrawingXY( ArrayPtrVoid params )
     // param 1: a pointer to the current system
     // param 2: a pointer to the current measure
     // param 3: a pointer to the current staff (unused)
+    // param 4: a pointer to the current layer (unused)
+    // param 5: a pointer to the view (unused)
     Doc *doc = static_cast<Doc*>(params[0]);
     System **currentSystem = static_cast<System**>(params[1]);
     Measure **currentMeasure = static_cast<Measure**>(params[2]);

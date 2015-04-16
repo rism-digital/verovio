@@ -243,7 +243,7 @@ protected:
     void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, bool fromBeam = false  );
+    void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSpace( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -298,16 +298,6 @@ protected:
     void DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
-    ///@}
-    
-    /**
-     * @name Method for drawing Beam.
-     * Called from the the layer postponed drawing list.
-     * Wolfgang legacy code to be redesigned.
-     * Defined in view_beam.cpp
-     */
-    ///@{
-    void DrawBeamPostponed(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure );
     ///@}
     
     /**
