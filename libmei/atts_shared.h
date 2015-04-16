@@ -4594,8 +4594,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStaff(std::string staff_) { m_staff = staff_; };
-    std::string GetStaff() const { return m_staff; };    
+    void SetStaff(int staff_) { m_staff = staff_; };
+    int GetStaff() const { return m_staff; };    
     bool HasStaff( );
     
     ///@}
@@ -4606,7 +4606,7 @@ private:
      * applies.
      * Mandatory when applicable.
      **/
-    std::string m_staff;
+    int m_staff;
 
 /* include <attstaff> */
 };

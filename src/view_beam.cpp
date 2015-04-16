@@ -35,6 +35,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 
 	bool changingDur = OFF;
     bool beamHasChord = OFF;
+    bool hasMultipleStemDir = OFF;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     
     // position variables
@@ -110,6 +111,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // This could be moved to Beam::InitCoord for optimization because there should be no
     // need of redoing it everytime it is drawn.
     
+    data_STEMDIRECTION currentStemDir;
+    
     ListOfObjects::iterator iter = beamChildren->begin();
 	do {
         // Beam list should contain only DurationInterface objects
@@ -138,6 +141,16 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             
             // Skip rests
             if (current->IsNote() || current->IsChord()) {
+                // look at the stemDir to see if we have multiple stem Dir
+                if (!hasMultipleStemDir) {
+                    currentStemDir = dynamic_cast<AttStemmed*>(current)->GetStemDir();
+                    if (currentStemDir != STEMDIRECTION_NONE) {
+                        if ((stemDir != STEMDIRECTION_NONE) && (stemDir != currentStemDir)) {
+                            hasMultipleStemDir = ON;
+                        }
+                    }
+                    stemDir = currentStemDir;
+                }
                 // keep the shortest dur in the beam
                 shortestDur = std::max(currentDur,shortestDur);
                 // check if we have more than duration in the beam
@@ -200,18 +213,20 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             avgY += (*beamElementCoords)[i]->m_y;
         }
 	}
-    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
-    
-    avgY /= elementCount;
 
     /******************************************************************/
     // Set the stem direction
     
-    stemDir = layer->GetDrawingStemDir(); //force layer direction if it exists
+    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
+    avgY /= elementCount;
+    
+    // If we have one stem direction in the beam, then don't look at the layer
+    if (stemDir != STEMDIRECTION_NONE) stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    
+    // Automatic stem direction if nothing in the notes or in the layer
     if (stemDir == STEMDIRECTION_NONE) {
-        if (beamHasChord) stemDir = (yExtreme > verticalCenter ? STEMDIRECTION_down : STEMDIRECTION_up); //if it has a chord, go by the most extreme position
-        else if ( avgY <  verticalCenter ) stemDir = STEMDIRECTION_up; //otherwise go by average
-        else stemDir = STEMDIRECTION_down;
+        if (beamHasChord) stemDir = (yExtreme < verticalCenter) ?  STEMDIRECTION_up : STEMDIRECTION_down; //if it has a chord, go by the most extreme position
+        else stemDir = (avgY <  verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; //otherwise go by average
     }
     
     beam->SetDrawingStemDir(stemDir);
@@ -227,6 +242,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         }
     }
 
+    // We look only at the last note for checking if cuesized. Somehow arbitrarily
     if ((*beamElementCoords)[last]->m_element->m_cueSize == false)  {
         beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
         beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
@@ -266,18 +282,12 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         //change the stem dir for all objects
         if ( (*beamElementCoords)[i]->m_element->IsNote() ) {
             ((Note*)(*beamElementCoords)[i]->m_element)->m_drawingStemDir = stemDir;
-            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
-        
         else if ( (*beamElementCoords)[i]->m_element->IsChord() ) {
             ((Chord*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir(stemDir);
-            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
-        
-        else {
-            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
-        }
-        
+
+        (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         (*beamElementCoords)[i]->m_x +=  dx[(*beamElementCoords)[i]->m_element->m_cueSize];
         
         s_y += (*beamElementCoords)[i]->m_yBeam;
@@ -286,7 +296,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         s_x2 += (*beamElementCoords)[i]->m_x * (*beamElementCoords)[i]->m_x;
         s_xy += (*beamElementCoords)[i]->m_x * (*beamElementCoords)[i]->m_yBeam;
     }
-
 
 	y1 = elementCount * s_xy - s_x * s_y;
 	xr = elementCount * s_x2 - s_x * s_x;

@@ -33,7 +33,8 @@ DurationInterface::DurationInterface():
     AttDurationMusical(),
     AttDurationPerformed(),
     AttDurationRatio(),
-    AttFermatapresent()
+    AttFermatapresent(),
+    AttStaffident()
 {
     Reset();
 }
@@ -52,6 +53,7 @@ void DurationInterface::Reset()
     ResetDurationPerformed();
     ResetDurationRatio();
     ResetFermatapresent();
+    ResetStaffident();
 }
 
 double DurationInterface::GetAlignmentDuration( int num, int numbase )

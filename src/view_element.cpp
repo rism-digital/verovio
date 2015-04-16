@@ -151,7 +151,16 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
     DurationInterface *durElement = dynamic_cast<DurationInterface*>(element);
 	if ( !durElement )
 		return;
-        
+    
+    if (durElement->HasStaff()) {
+        AttCommonNComparison comparisonFirst( &typeid(Staff), durElement->GetStaff() );
+        Staff *crossStaff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
+        if (crossStaff) staff = crossStaff;
+        else LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff(), element->GetUuid().c_str());
+        element->SetDrawingY( staff->GetDrawingY() );
+        // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
+    }
+    
 	if (dynamic_cast<Chord*>(element))
     {
         dc->StartGraphic( element, "", element->GetUuid() );

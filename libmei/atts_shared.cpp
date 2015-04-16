@@ -5423,13 +5423,13 @@ AttStaffident::~AttStaffident() {
 }
 
 void AttStaffident::ResetStaffident() {
-    m_staff = "";
+    m_staff = 0;
 }
 
 bool AttStaffident::ReadStaffident(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("staff")) {
-        this->SetStaff(StrToStr(element.attribute("staff").value()));
+        this->SetStaff(StrToInt(element.attribute("staff").value()));
         element.remove_attribute("staff");
         hasAttribute = true;
     }
@@ -5439,7 +5439,7 @@ bool AttStaffident::ReadStaffident(  pugi::xml_node element ) {
 bool AttStaffident::WriteStaffident(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasStaff()) {
-        element.append_attribute("staff") = StrToStr(this->GetStaff()).c_str();
+        element.append_attribute("staff") = IntToStr(this->GetStaff()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5447,7 +5447,7 @@ bool AttStaffident::WriteStaffident(  pugi::xml_node element ) {
 
 bool AttStaffident::HasStaff( )
 {
-    return (m_staff != "");
+    return (m_staff != 0);
 }
 
 
@@ -7956,7 +7956,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (dynamic_cast<AttStaffident*>(element) ) {
         AttStaffident *att = dynamic_cast<AttStaffident*>(element);
         if (attrType == "staff") {
-            att->SetStaff(att->StrToStr(attrValue));
+            att->SetStaff(att->StrToInt(attrValue));
             return true;
         }
     }
@@ -9073,7 +9073,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttStaffident*>(element) ) {
         AttStaffident *att = dynamic_cast<AttStaffident*>(element);
         if (att->HasStaff()) {
-            attributes->push_back(std::make_pair("staff", att->StrToStr(att->GetStaff())));
+            attributes->push_back(std::make_pair("staff", att->IntToStr(att->GetStaff())));
         }
     }
     if (dynamic_cast<AttStaffloc*>(element) ) {
