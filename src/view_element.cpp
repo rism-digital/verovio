@@ -180,10 +180,11 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
         Rest *rest = dynamic_cast<Rest*>(element);
         
         // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE)
+        if (rest->GetPloc() == PITCHNAME_NONE) {
             element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
-        else
+        } else {
             element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), rest->GetOloc()) );
+        }
 		
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff, measure );
