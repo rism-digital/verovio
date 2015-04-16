@@ -74,6 +74,10 @@ namespace vrv {
 #define MIN_LYRIC_SIZE 2.0
 #define MAX_LYRIC_SIZE 8.0
     
+#define DEFAULT_MEASURE_WIDTH 3.0
+#define MIN_MEASURE_WIDTH 1.0
+#define MAX_MEASURE_WIDTH 30.0
+    
 //----------------------------------------------------------------------------
 // Style
 //----------------------------------------------------------------------------
@@ -128,6 +132,8 @@ public:
     /** The system minimal spacing */
     short m_spacingSystem;
     
+    /** The minimal measure width in units / PARAM_DENOMINATOR */
+    short m_minMeasureWidth;
     /** The lyrics size (in units / PARAM_DENOMINATOR) */
     int m_lyricSize;
     

@@ -22,7 +22,7 @@ namespace vrv {
 class Object;
 class AttComparison;
 class Note;
-struct BeamElementCoord;
+class BeamElementCoord;
 
 typedef std::vector<Object*> ArrayOfObjects;
 
@@ -99,7 +99,9 @@ enum FunctorCode {
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
-    
+  
+#define OCTAVE_OFFSET 4
+
 // ACCID
 #define ACCID_SHARP 1
 #define ACCID_FLAT 2
@@ -176,7 +178,7 @@ enum ClefId {
     perc = CLEFSHAPE_perc << 8 | 1
 };
     
-//Used in spacing accidentals on complex chords
+//Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
 #define ACCID_WIDTH 4
 
 } // namespace vrv

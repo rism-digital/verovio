@@ -16,7 +16,6 @@
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
-#include "object.h"
 
 namespace vrv {
     
@@ -35,7 +34,6 @@ namespace vrv {
  */
     
 class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, 
-    public AttColoration,
     public AttCommon,
     public AttStemmed,
     public AttTiepresent
@@ -50,6 +48,7 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
+    ///@}
     
     /**
      * Add an element (only note supported) to a chord.
@@ -64,6 +63,11 @@ public:
      * Returns list of notes that have accidentals
      */
     void ResetAccidList();
+    
+    /**
+     * Prepares a 2D grid of booleans to track where accidentals are placed.
+     * Further documentation in chord.cpp comments.
+     */
     void ResetAccidSpace(int staffSize);
     
     /**
@@ -83,7 +87,6 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr( ArrayPtrVoid params );
-    
     
     /**
      * See Object::PrepareTieAttr
@@ -113,8 +116,13 @@ public:
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
+    
+    /**
+     * Variables related to preventing overlapping in the X dimension for accidentals
+     */
     std::vector<Note*> m_accidList;
     std::vector< std::vector<bool> > m_accidSpace;
+    int m_accidSpaceTop, m_accidSpaceBot, m_accidSpaceLeft;
 };
 
 } // namespace vrv

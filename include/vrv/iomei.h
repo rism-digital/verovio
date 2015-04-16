@@ -43,6 +43,7 @@ class Rdg;
 class Rest;
 class ScoreDef;
 class Slur;
+class Space;
 class Staff;
 class Syl;
 class System;
@@ -131,6 +132,7 @@ private:
     void WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest );
     void WriteMeiNote( pugi::xml_node currentNode, Note *note );
     void WriteMeiRest( pugi::xml_node currentNode, Rest *rest );
+    void WriteMeiSpace( pugi::xml_node currentNode, Space *space );
     void WriteMeiTuplet( pugi::xml_node currentNode, Tuplet *tuplet );
     ///@}
     
@@ -289,6 +291,7 @@ private:
     bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
     bool ReadMeiNote( Object *parent, pugi::xml_node note );
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
+    bool ReadMeiSpace( Object *parent, pugi::xml_node space );
     bool ReadMeiSyl( Object *parent, pugi::xml_node syl );
     bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
     bool ReadMeiVerse( Object *parent, pugi::xml_node verse );

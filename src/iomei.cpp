@@ -32,6 +32,7 @@
 #include "page.h"
 #include "rest.h"
 #include "slur.h"
+#include "space.h"
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
@@ -215,6 +216,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (dynamic_cast<Rest*>(object)) {
         m_currentNode = m_currentNode.append_child("rest");
         WriteMeiRest( m_currentNode, dynamic_cast<Rest*>(object) );
+    }
+    else if (dynamic_cast<Space*>(object)) {
+        m_currentNode = m_currentNode.append_child("space");
+        WriteMeiSpace( m_currentNode, dynamic_cast<Space*>(object) );
     }
     else if (dynamic_cast<Tuplet*>(object)) {
         m_currentNode = m_currentNode.append_child("tuplet");
@@ -581,6 +586,13 @@ void MeiOutput::WriteMeiRest( pugi::xml_node currentNode, Rest *rest )
     WriteLayerElement( currentNode, rest );
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
+    return;
+}
+    
+void MeiOutput::WriteMeiSpace( pugi::xml_node currentNode, Space *space )
+{
+    WriteLayerElement( currentNode, space );
+    WriteDurationInterface(currentNode, space);
     return;
 }
 
@@ -1367,6 +1379,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "multiRest" ) {
             success = ReadMeiMultiRest( parent, xmlElement );
         }
+        else if ( elementName == "space" ) {
+            success = ReadMeiSpace( parent, xmlElement );
+        }
         else if ( elementName == "syl" ) {
             success = ReadMeiSyl( parent, xmlElement );
         }
@@ -1573,7 +1588,6 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
 	return ReadMeiLayerChildren(vrvNote, note, vrvNote);
 }
 
-
 bool MeiInput::ReadMeiRest( Object *parent, pugi::xml_node rest )
 {
     Rest *vrvRest = new Rest();
@@ -1583,6 +1597,17 @@ bool MeiInput::ReadMeiRest( Object *parent, pugi::xml_node rest )
     ReadPositionInterface(rest, vrvRest);
 	
     AddLayerElement(parent, vrvRest);
+    return true;
+}
+
+bool MeiInput::ReadMeiSpace( Object *parent, pugi::xml_node space )
+{
+    Space *vrvSpace = new Space();
+    ReadLayerElement(space, vrvSpace);
+    
+    ReadDurationInterface(space, vrvSpace);
+    
+    AddLayerElement(parent, vrvSpace);
     return true;
 }
 

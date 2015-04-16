@@ -138,7 +138,7 @@ int KeySig::GetOctave(unsigned char pitch, int clefId) {
         default: key_set = 0; break;
     }
     
-    return octave_map[alter_set][key_set][pitch - 1];
+    return octave_map[alter_set][key_set][pitch - 1] + OCTAVE_OFFSET;
 }
 
     

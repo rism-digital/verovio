@@ -499,6 +499,13 @@ public:
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
+     * Processes by Layer and set drawing pointers.
+     * Set Dot::m_drawingNote for Dot elements in mensural mode
+     * param 0: Note** currentNote for the current not to w
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
