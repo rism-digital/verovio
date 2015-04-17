@@ -1264,20 +1264,39 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     if (type == ACCIDENTAL_EXPLICIT_f) {
         accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_IGNORE)]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
     }
-    else {
+    else if (type == ACCIDENTAL_EXPLICIT_n) {
         accidBot = accidTop + accidHeightDiff;
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else break;
+        };
+    }
+    else {
+        accidBot = accidTop + accidHeightDiff;
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        while (currentX < xLength) {
+            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
@@ -1287,7 +1306,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     //This doesn't need to be done with accidentals that are as far left or up as possible
     if ((currentX < xLength) && (accidTop > 0))
     {
-        int yComp = accidTop - 1;
+        int yComp = accidTop - 2;
         if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
     }
     
@@ -1295,7 +1314,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     //This doesn't need to be done with accidentals that are as far left or down as possible
     if ((currentX < xLength) && (accidBot < (yHeight - 1)))
     {
-        int yComp = accidBot - 1;
+        int yComp = accidBot - 2;
         if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
     }
 
