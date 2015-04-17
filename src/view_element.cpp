@@ -188,6 +188,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
     
+    if (note->m_crossStaff) staff = note->m_crossStaff;
+    
     Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;
