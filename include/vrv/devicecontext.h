@@ -101,6 +101,12 @@ public:
     virtual void DrawSpline(int n, Point points[]) = 0;
     virtual void DrawBackgroundImage( int x = 0, int y = 0 ) = 0;
     ///@}
+    
+    /**
+     * Special method for forcing bounding boxes to be updated
+     * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
+     */
+    virtual void DrawPlaceholder( int x, int y ) {};
 
     /**
      * @name Method for starting and ending a text

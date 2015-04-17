@@ -1390,6 +1390,7 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff); // Pointer to staff cannot be NULL"
     
     dc->StartGraphic( element, "", element->GetUuid() );
+    dc->DrawPlaceholder( ToDeviceContextX( element->GetDrawingX() ), ToDeviceContextY( element->GetDrawingY() ) );
     dc->EndGraphic(element, this );
 }
 

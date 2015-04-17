@@ -1095,10 +1095,6 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsSpace() ) {
-        return FUNCTOR_CONTINUE;
-    }
-    
     if ( current->IsVerse() || current->IsSyl() ) {
         return FUNCTOR_CONTINUE;
     }
