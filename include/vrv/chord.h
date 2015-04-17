@@ -111,6 +111,7 @@ public:
      * m_ledgerLines[x][0] is below staff, m_ledgerLines[x][1] is above staff
      */
     char m_ledgerLines[2][2];
+    std::map<Staff*, std::vector<char> > test;
     
     /**
      * Positions of dots in the chord to avoid overlapping

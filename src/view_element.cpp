@@ -352,12 +352,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
  
         //if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
         if (inChord) {
+            std::vector<char> tmp;
+            tmp.resize(4);
+            tmp[3] = 3;
+            inChord->test[staff] = tmp;
             inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = ledgermax(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
         }
         //we do want to go ahead and draw if it's not in a chord
         else {
             DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
         }
+    }
+    
+    if (inChord) {
+        std::vector<char> *t = &inChord->test[staff];
+        std::vector<char> *t3 = &inChord->test[NULL];
     }
     
     /************** Accidentals/dots/peripherals: **************/

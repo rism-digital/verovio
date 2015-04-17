@@ -34,6 +34,8 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     m_ledgerLines[0][1] = 0;
     m_ledgerLines[1][0] = 0;
     m_ledgerLines[1][1] = 0;
+    
+    //test[NULL][0][0] = 0;
 }
 
 Chord::~Chord()
