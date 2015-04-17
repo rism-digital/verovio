@@ -266,9 +266,16 @@ int Measure::SetDrawingXY( ArrayPtrVoid params )
     // param 3: a pointer to the current staff (unused)
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
     Doc *doc = static_cast<Doc*>(params[0]);
     System **currentSystem = static_cast<System**>(params[1]);
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    (*currentMeasure) = this;
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
     
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
@@ -282,7 +289,7 @@ int Measure::SetDrawingXY( ArrayPtrVoid params )
         assert( doc->GetType() == Transcription );
         this->SetDrawingX( this->m_xAbs );
     }
-    (*currentMeasure) = this;
+
     
     return FUNCTOR_CONTINUE;
 }

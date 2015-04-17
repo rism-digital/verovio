@@ -424,6 +424,7 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
     // param 3: a pointer to the current staff
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view
+    // param 6: a bool indicating if we are processing layer elements or not (unused)
     Doc *doc = static_cast<Doc*>(params[0]);
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
     Staff **currentStaff = static_cast<Staff**>(params[3]);

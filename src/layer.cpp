@@ -434,8 +434,16 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     // param 3: a pointer to the current staff (unused)
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
     Layer **currentLayer = static_cast<Layer**>(params[4]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) {
+        (*currentLayer) = this;
+        return FUNCTOR_CONTINUE;
+    }
     
     // set the values for the scoreDef elements when required
     if (this->GetDrawingClef()) {
@@ -450,9 +458,9 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     if (this->GetDrawingMeterSig()) {
         this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
     }
-    (*currentLayer) = this;
     
-    return FUNCTOR_CONTINUE;
+    // If we are here it means we are not processing LayerElements
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv
