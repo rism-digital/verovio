@@ -1072,8 +1072,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     assert( current->GetAlignment() );
 
     if ( !current->HasUpdatedBB() ) {
-        // this is all we need for empty elements
-        current->GetAlignment()->SetXRel(*min_pos);
+        // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }
     
@@ -1093,6 +1092,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     }
     
     if ( current->IsTuplet() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( current->IsSpace() ) {
         return FUNCTOR_CONTINUE;
     }
     

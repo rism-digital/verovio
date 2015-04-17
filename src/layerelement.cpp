@@ -32,6 +32,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
+#include "space.h"
 #include "staff.h"
 #include "syl.h"
 #include "tie.h"
@@ -246,7 +247,12 @@ bool LayerElement::IsTuplet()
 {
     return (dynamic_cast<Tuplet*>(this));
 }
-    
+
+bool LayerElement::IsSpace()
+{
+    return (dynamic_cast<Space*>(this));
+}
+
 bool LayerElement::IsVerse()
 {
     return (dynamic_cast<Verse*>(this));
