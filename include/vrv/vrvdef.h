@@ -178,8 +178,20 @@ enum ClefId {
     perc = CLEFSHAPE_perc << 8 | 1
 };
     
+//The next four macros were tuned using the Leipzig font.
+    
 //Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
 #define ACCID_WIDTH 4
+    
+//Height
+#define ACCID_HEIGHT 12
+    
+//Only keeps track of this much of the top of flats so that their bottom can be drawn more concisely
+//This can also be thought of as height(sharp)*F_B_H_M = height(flat)
+#define FLAT_BOTTOM_HEIGHT_MULTIPLIER .75
+    
+//Ignores this much of the top/right of a flat for same purposes (empty space in top right of drawing)
+#define FLAT_CORNER_IGNORE .25
 
 } // namespace vrv
 
