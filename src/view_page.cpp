@@ -110,12 +110,6 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
-    DrawSystemChildren(dc, system, system);
-
-    // We draw the groups after the staves because we use the m_drawingY member of the staves
-    // that needs to be intialized.
-    // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
-    // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
     Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
@@ -130,6 +124,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
             dc->ResetFont();
         }
     }
+    
+    DrawSystemChildren(dc, system, system);
     
     // first draw the beams
     DrawSystemList(dc, system, &typeid(Syl) );
