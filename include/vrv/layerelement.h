@@ -16,6 +16,7 @@ namespace vrv {
 
 class Alignment;
 class BeamElementCoord;
+class Layer;
 class Mensur;
 class MeterSig;
 class Staff;
@@ -149,10 +150,11 @@ public:
      */
     BeamElementCoord *m_beamElementCoord;
     /**
-     * This store a pointer to the cross-staff (if any)
+     * This store a pointer to the cross-staff (if any) and the appropriate layer
      * Initialized in LayerElement::SetDrawingXY
      */
     Staff *m_crossStaff;
+    Layer *m_crossLayer;
     
 protected:
     Alignment *m_alignment;
