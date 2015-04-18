@@ -1258,6 +1258,11 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     //another way of calculating accidBot
     assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
     
+    // store it for asserts
+    int accidSpaceSize = (int)accidSpace->size();
+    assert(accidTop >= 0);
+    assert(accidTop < accidSpaceSize);
+    
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.
      * The top right corner of a flat can overlap something else; make sure that the bordering sections do not overlap.
@@ -1265,21 +1270,48 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
      */
     if (type == ACCIDENTAL_EXPLICIT_f) {
         accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
+        assert(accidBot < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_IGNORE)]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength ) break;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
     }
-    else {
+    else if (type == ACCIDENTAL_EXPLICIT_n) {
         accidBot = accidTop + accidHeightDiff;
+        assert(accidBot < accidSpaceSize);
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength ) break;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else break;
+        };
+    }
+    else {
+        accidBot = accidTop + accidHeightDiff;
+        assert(accidBot < accidSpaceSize);
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        assert(accidMid < accidSpaceSize);
+        while (currentX < xLength) {
+            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
@@ -1287,17 +1319,21 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     
     //If the accidental is lined up with the one above it, move it left by a halfunit to avoid visual confusion
     //This doesn't need to be done with accidentals that are as far left or up as possible
-    if ((currentX < xLength) && (accidTop > 0))
+    if ((currentX < xLength - 1) && (accidTop > 1))
     {
-        int yComp = accidTop - 1;
+        int yComp = accidTop - 2;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
         if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
     }
     
     //If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
     //This doesn't need to be done with accidentals that are as far left or down as possible
-    if ((currentX < xLength) && (accidBot < (yHeight - 1)))
+    if ((currentX < xLength - 1) && (accidBot < (yHeight - 1)) && accidBot > 1)
     {
-        int yComp = accidBot - 1;
+        int yComp = accidBot - 2;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
         if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
     }
 
