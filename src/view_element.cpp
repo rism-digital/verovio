@@ -894,6 +894,32 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
+    /************ Stems ************/
+    
+    int drawingDur = chord->GetDur();
+    
+    //(unless we're in a beam)
+    if (!(inBeam && drawingDur > DUR_4)) {
+        int yMax, yMin;
+        chord->GetYExtremes(&yMax, &yMin);
+        
+        if ( chord->HasStemDir() ) {
+            chord->SetDrawingStemDir(chord->GetStemDir());
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
+        }
+        else {
+            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
+        }
+        
+        int beamX = chord->GetDrawingX();
+        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int heightY = yMax - yMin;
+        
+        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+    }
+    
     /************ Dots ************/
     
     chord->m_dots.clear();
@@ -1019,32 +1045,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
             fwIdx = idx;
         }
-    }
-    
-    /************ Stems ************/
-    
-    int drawingDur = chord->GetDur();
-    
-    //(unless we're in a beam)
-    if (!(inBeam && drawingDur > DUR_4)) {
-        int yMax, yMin;
-        chord->GetYExtremes(&yMax, &yMin);
-        
-        if ( chord->HasStemDir() ) {
-            chord->SetDrawingStemDir(chord->GetStemDir());
-        }
-        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
-        }
-        else {
-            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
-        }
-        
-        int beamX = chord->GetDrawingX();
-        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
-        int heightY = yMax - yMin;
-        
-        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
     }
     
     /************ Ledger lines ************/
