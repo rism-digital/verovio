@@ -15,7 +15,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Space::Space( ):
-    LayerElement("space-")
+    LayerElement("space-"), DurationInterface()
 {
     Reset();
 }

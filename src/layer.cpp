@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 // Name:        layer.cpp
 // Author:      Laurent Pugin
 // Created:     2011
@@ -112,19 +112,13 @@ LayerElement *Layer::GetPrevious( LayerElement *element )
 LayerElement *Layer::GetAtPos( int x )
 {
 	LayerElement *element = dynamic_cast<LayerElement*>( this->GetFirst() );
-	if ( !element )
-		return NULL;
-
+	if ( !element || element->GetDrawingX() > x ) return NULL;
     
-	int dif = x - element->GetDrawingX();
     LayerElement *next = NULL;
-	while ( (next = dynamic_cast<LayerElement*>( this->GetNext() ) ) && (int)element->GetDrawingX() < x ){
-		element = next;
-		if ( (int)element->GetDrawingX() > x && dif < (int)element->GetDrawingX() - x )
-			return this->GetPrevious( element );
-		dif = x - element->GetDrawingX();
+	while ( (next = dynamic_cast<LayerElement*>( this->GetNext() ) ) ) {
+		if ( next->GetDrawingX() > x ) return element;
+        element = next;
 	}
-	
 	return element;
 }
     
@@ -281,7 +275,7 @@ Clef* Layer::GetClef( LayerElement *test )
     Object *testObject = test;
     
     if (!test) {
-        return NULL;
+        return m_currentClef;
     }
 	
     //make sure list is set
@@ -301,9 +295,7 @@ Clef* Layer::GetClef( LayerElement *test )
 int Layer::GetClefOffset( LayerElement *test )
 {
     Clef *clef = GetClef(test);
-    if (!clef) {
-        return 0;
-    }
+    if (!clef) return 0;
     return clef->GetClefOffset();
     
 }
@@ -434,8 +426,17 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     // param 3: a pointer to the current staff (unused)
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
     Layer **currentLayer = static_cast<Layer**>(params[4]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    (*currentLayer) = this;
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) {
+        return FUNCTOR_CONTINUE;
+    }
     
     // set the values for the scoreDef elements when required
     if (this->GetDrawingClef()) {
@@ -450,7 +451,6 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     if (this->GetDrawingMeterSig()) {
         this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
     }
-    (*currentLayer) = this;
     
     return FUNCTOR_CONTINUE;
 }

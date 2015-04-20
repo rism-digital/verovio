@@ -32,6 +32,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
+#include "space.h"
 #include "staff.h"
 #include "syl.h"
 #include "tie.h"
@@ -246,7 +247,12 @@ bool LayerElement::IsTuplet()
 {
     return (dynamic_cast<Tuplet*>(this));
 }
-    
+
+bool LayerElement::IsSpace()
+{
+    return (dynamic_cast<Space*>(this));
+}
+
 bool LayerElement::IsVerse()
 {
     return (dynamic_cast<Verse*>(this));
@@ -424,11 +430,32 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
     // param 3: a pointer to the current staff
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view
+    // param 6: a bool indicating if we are processing layer elements or not
     Doc *doc = static_cast<Doc*>(params[0]);
     Measure **currentMeasure = static_cast<Measure**>(params[2]);
     Staff **currentStaff = static_cast<Staff**>(params[3]);
     Layer **currentLayer = static_cast<Layer**>(params[4]);
     View *view = static_cast<View*>(params[5]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    // First pass, only set the X position
+    if ((*processLayerElements)==false) {
+        // Here we set the appropriate x value to be used for drawing
+        // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
+        // With Transcription documents, we use the m_xAbs
+        if ( this->m_xAbs == VRV_UNSET ) {
+            assert( doc->GetType() == Raw );
+            this->SetDrawingX( this->GetXRel() + (*currentMeasure)->GetDrawingX() );
+        }
+        else
+        {
+            assert( doc->GetType() == Transcription );
+            this->SetDrawingX( this->m_xAbs );
+        }
+        return FUNCTOR_CONTINUE;
+    }
+    
+    LayerElement *layerElementY = this;
     
     // Look for cross-staff situations
     // If we have one, make is available in m_crossStaff
@@ -438,28 +465,39 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
         m_crossStaff = dynamic_cast<Staff*>((*currentMeasure)->FindChildByAttComparison(&comparisonFirst, 1));
         if (m_crossStaff) {
             if (m_crossStaff == (*currentStaff)) LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff", durElement->GetStaff(), this->GetUuid().c_str());
+            // Now try to get the corresponding layer - for now look for the same layer @n
+            int layerN = (*currentLayer)->GetN();
+            // When we will have allowed @layer in <note>, we will have to do:
+            // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
+            AttCommonNComparison comparisonFirstLayer( &typeid(Layer), layerN );
+            m_crossLayer = dynamic_cast<Layer*>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
+            if (m_crossLayer) {
+                // Now we need to yet the element at the same position in the cross-staff layer of getting the right clef
+                layerElementY = m_crossLayer->GetAtPos( this->GetDrawingX() );
+                
+            } else {
+                LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'", durElement->GetStaff(), this->GetUuid().c_str());
+            }
+        } else {
+            LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff(), this->GetUuid().c_str());
         }
-        else LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff(), this->GetUuid().c_str());
         // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
     } else {
         m_crossStaff = NULL;
+        m_crossLayer = NULL;
     }
     
     Staff *staffY = m_crossStaff ? m_crossStaff : (*currentStaff);
+    Layer *layerY = m_crossLayer ? m_crossLayer : (*currentLayer);
     
-    // Here we set the appropriate x value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
+    // Here we set the appropriate Y value to be used for drawing
     if ( this->m_xAbs == VRV_UNSET ) {
         assert( doc->GetType() == Raw );
-        this->SetDrawingX( this->GetXRel() + (*currentMeasure)->GetDrawingX() );
         this->SetDrawingY( staffY->GetDrawingY() );
     }
     else
     {
         assert( doc->GetType() == Transcription );
-        this->SetDrawingX( this->m_xAbs );
-        // cross staff with Transcription does not make sense anyway
         this->SetDrawingY( staffY->GetDrawingY() );
     }
     
@@ -467,7 +505,7 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
     if (dynamic_cast<Note*>(this))
     {
         Note *note = dynamic_cast<Note*>(this);
-        this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, note->GetPname(), (*currentLayer)->GetClefOffset( this ), note->GetOct() ) );
+        this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, note->GetPname(), layerY->GetClefOffset( layerElementY ), note->GetOct() ) );
     }
     else if (dynamic_cast<Rest*>(this)) {
         Rest *rest = dynamic_cast<Rest*>(this);
@@ -476,7 +514,7 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
         if (rest->GetPloc() == PITCHNAME_NONE) {
             this->SetDrawingY( this->GetDrawingY() + view->CalculateRestPosY( staffY, rest->GetActualDur()) );
         } else {
-            this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, rest->GetPloc(), (*currentLayer)->GetClefOffset( this ), rest->GetOloc()) );
+            this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, rest->GetPloc(), layerY->GetClefOffset( layerElementY ), rest->GetOloc()) );
         }
     }
     

@@ -55,6 +55,7 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     Measure *measure = NULL;
     Staff *staff = NULL;
     Layer *layer = NULL;
+    bool processLayerElement = false;
     ArrayPtrVoid params;
     params.push_back( m_doc );
     params.push_back( &system );
@@ -62,7 +63,13 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     params.push_back( &staff );
     params.push_back( &layer );
     params.push_back( this );
+    params.push_back( &processLayerElement );
     Functor setDrawingXY( &Object::SetDrawingXY );
+    // First pass without processing the LayerElements - we need this for cross-staff going down because
+    // the elements will need the position of the staff below to have been set before
+    m_currentPage->Process( &setDrawingXY, params );
+    // Second pass that process the LayerElements (only)
+    processLayerElement = true;
     m_currentPage->Process( &setDrawingXY, params );
     
     // Set the current score def to the page one
@@ -103,12 +110,6 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
 
-    DrawSystemChildren(dc, system, system);
-
-    // We draw the groups after the staves because we use the m_drawingY member of the staves
-    // that needs to be intialized.
-    // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
-    // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
     Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
@@ -123,6 +124,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
             dc->ResetFont();
         }
     }
+    
+    DrawSystemChildren(dc, system, system);
     
     // first draw the beams
     DrawSystemList(dc, system, &typeid(Syl) );

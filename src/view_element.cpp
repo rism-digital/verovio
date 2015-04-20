@@ -188,6 +188,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
     
+    if (note->m_crossStaff) staff = note->m_crossStaff;
+    
     Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;
@@ -818,8 +820,8 @@ void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, uns
     int yMax, yMin;
     chord->GetYExtremes(&yMax, &yMin);
     
-    if (y > (yMax + doubleUnit)) return;
-    if (y < (yMin - doubleUnit)) return;
+    if (y > (yMax + fullUnit)) return;
+    if (y < (yMin - fullUnit)) return;
     
     dotsList->push_back(y);
     DrawDots(dc, x, y, dots, staff);
@@ -898,6 +900,32 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
+    
+    /************ Stems ************/
+    
+    int drawingDur = chord->GetDur();
+    
+    //(unless we're in a beam)
+    if (!(inBeam && drawingDur > DUR_4)) {
+        int yMax, yMin;
+        chord->GetYExtremes(&yMax, &yMin);
+        
+        if ( chord->HasStemDir() ) {
+            chord->SetDrawingStemDir(chord->GetStemDir());
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
+        }
+        else {
+            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
+        }
+        
+        int beamX = chord->GetDrawingX();
+        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int heightY = yMax - yMin;
+        
+        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+    }
     
     /************ Dots ************/
     
@@ -1012,7 +1040,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 accidFwd->SetDrawingX(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
                 DrawAccid(dc, accidFwd, layer, staff, measure);
-                
                 //same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
                     accidBwd->SetDrawingX(xAccid);
@@ -1025,32 +1052,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
             fwIdx = idx;
         }
-    }
-    
-    /************ Stems ************/
-    
-    int drawingDur = chord->GetDur();
-    
-    //(unless we're in a beam)
-    if (!(inBeam && drawingDur > DUR_4)) {
-        int yMax, yMin;
-        chord->GetYExtremes(&yMax, &yMin);
-        
-        if ( chord->HasStemDir() ) {
-            chord->SetDrawingStemDir(chord->GetStemDir());
-        }
-        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
-        }
-        else {
-            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
-        }
-        
-        int beamX = chord->GetDrawingX();
-        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
-        int heightY = yMax - yMin;
-        
-        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
     }
     
     /************ Ledger lines ************/
@@ -1245,30 +1246,38 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     
     //global drawing variables
     int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
-    int doubleUnit = fullUnit * 2;
     int halfUnit = fullUnit / 2;
+    int accidHeight = ACCID_HEIGHT * halfUnit;
     
     //drawing variables for the chord
     int xLength = (int)accidSpace->front().size();
+    int yHeight = (int)accidSpace->size() - 1;
     int listTop = chord->m_accidSpaceTop;
     int listBot = chord->m_accidSpaceBot;
     
     //drawing variables for the accidental
     int type = accid->GetAccid();
     int centerY = accid->GetDrawingY();
-    int topY = centerY + doubleUnit;
-    int bottomY = centerY - doubleUnit;
-    
-    //drawing variables for the accidental in accidSpace units
-    int accidTop = std::max(0, listTop - topY) / halfUnit;
-    int accidBot = ((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit);
-
-    assert(accidBot > accidTop); //because the "origin" (0, 0) is in the top right
+    int topY = centerY + (accidHeight / 2);
+    int bottomY = centerY - (accidHeight / 2);
     
     //difference between left end and right end of the accidental
-    int accidDiff = ACCID_WIDTH - 1;
+    int accidWidthDiff = ACCID_WIDTH - 1;
+    //difference between top and bottom of the accidental
+    int accidHeightDiff = ACCID_HEIGHT - 1;
+    //drawing variables for the accidental in accidSpace units
+    int accidTop = std::max(0, listTop - topY) / halfUnit;
+    int accidBot;
     //the left side of the accidental; gets incremented to avoid conflicts
-    int currentX = accidDiff;
+    int currentX = accidWidthDiff;
+    
+    //another way of calculating accidBot
+    assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
+    
+    // store it for asserts
+    int accidSpaceSize = (int)accidSpace->size();
+    assert(accidTop >= 0);
+    assert(accidTop < accidSpaceSize);
     
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.
@@ -1276,25 +1285,77 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
      * Move the accidental one half-unit left until it doesn't overlap.
      */
     if (type == ACCIDENTAL_EXPLICIT_f) {
+        accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
+        assert(accidBot < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + 2)[currentX - accidDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX - accidDiff + 1]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX - accidDiff]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength ) break;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else break;
+        };
+    }
+    else if (type == ACCIDENTAL_EXPLICIT_n) {
+        accidBot = accidTop + accidHeightDiff;
+        assert(accidBot < accidSpaceSize);
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        while (currentX < xLength) {
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength ) break;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
     }
     else {
+        accidBot = accidTop + accidHeightDiff;
+        assert(accidBot < accidSpaceSize);
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        assert(accidMid < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop)[currentX - accidDiff]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX - accidDiff]) currentX += 1;
+            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
     }
+    
+    //If the accidental is lined up with the one above it, move it left by a halfunit to avoid visual confusion
+    //This doesn't need to be done with accidentals that are as far left or up as possible
+    if ((currentX < xLength - 1) && (accidTop > 1))
+    {
+        int yComp = accidTop - 2;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
+        if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
+    }
+    
+    //If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
+    //This doesn't need to be done with accidentals that are as far left or down as possible
+    if ((currentX < xLength - 1) && (accidBot < (yHeight - 1)) && accidBot > 1)
+    {
+        int yComp = accidBot - 2;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
+        if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
+    }
 
+    //Just to make sure.
+    assert(currentX <= xLength);
+    
     //If we need to move the accidental horizontally, move it by currentX half-units.
     if (adjustHorizontally)
     {
@@ -1336,7 +1397,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
 //    std::cout << std::endl;
     
     //Regardless of whether or not we moved it, return true if there was a conflict and currentX would have been moved
-    return (currentX - accidDiff == 0);
+    return (currentX - accidWidthDiff == 0);
 }
 
 void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )
@@ -1404,6 +1465,7 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff); // Pointer to staff cannot be NULL"
     
     dc->StartGraphic( element, "", element->GetUuid() );
+    dc->DrawPlaceholder( ToDeviceContextX( element->GetDrawingX() ), ToDeviceContextY( element->GetDrawingY() ) );
     dc->EndGraphic(element, this );
 }
 
