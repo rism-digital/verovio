@@ -355,7 +355,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             std::vector<char> tmp;
             tmp.resize(4);
             tmp[3] = 3;
-            inChord->test[staff] = tmp;
+            inChord->test[NULL] = tmp;
             inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = ledgermax(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
         }
         //we do want to go ahead and draw if it's not in a chord
@@ -364,9 +364,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
-    if (inChord) {
+    if (inChord && inChord->test.size()) {
+        int s =  inChord->test.size();
+        int ts =  inChord->test.count(staff);
+        int ts3 = inChord->test.count(NULL);
         std::vector<char> *t = &inChord->test[staff];
         std::vector<char> *t3 = &inChord->test[NULL];
+        std::cout << t3;
     }
     
     /************** Accidentals/dots/peripherals: **************/
