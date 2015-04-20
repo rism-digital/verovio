@@ -1069,20 +1069,18 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         (*legerLines)[2] -= (*legerLines)[3];
         
         //double-length lines below the staff
-        DrawLedgerLines(dc, chord, staff, false, true, 0, (*legerLines)[1]);
+        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines)[1]);
         
         //remainder single-length lines below the staff
-        DrawLedgerLines(dc, chord, staff, false, false, (*legerLines)[1], (*legerLines)[0]);
+        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines)[1], (*legerLines)[0]);
         
         //double-length lines above the staff
-        DrawLedgerLines(dc, chord, staff, true, true, 0, (*legerLines)[3]);
+        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines)[3]);
         
         //remainder single-length lines above the staff
-        DrawLedgerLines(dc, chord, staff, true, false, (*legerLines)[3], (*legerLines)[2]);
+        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines)[3], (*legerLines)[2]);
 
     }
-    
-
     
     dc->ResetPen();
     dc->ResetBrush();
