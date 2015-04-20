@@ -892,6 +892,16 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
+    /************ Ledger line reset ************/
+    
+    //if there are double-length lines, we only need to draw single-length after they've been drawn
+    chord->m_ledgerLines[0][0] = 0;
+    chord->m_ledgerLines[0][1] = 0;
+    chord->m_ledgerLines[1][0] = 0;
+    chord->m_ledgerLines[1][1] = 0;
+    
+    /************ Draw children (notes) ************/
+    
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
     /************ Stems ************/
