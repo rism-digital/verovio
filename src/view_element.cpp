@@ -354,7 +354,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
  
         //if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
         if (inChord) {
-            inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = ledgermax(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
+            if (inChord->m_drawingLedgerLines.count(staff)==0) {
+                std::vector<char> legerLines;
+                legerLines.resize(4);
+                inChord->m_drawingLedgerLines[staff] = legerLines;
+            }
+            int idx = doubleLengthLedger + aboveStaff * 2; // 2x2 array
+            std::vector<char> *legerLines = &inChord->m_drawingLedgerLines[staff];
+            (*legerLines)[idx] = ledgermax(numLines, (*legerLines)[idx]);
         }
         //we do want to go ahead and draw if it's not in a chord
         else {
@@ -895,10 +902,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Ledger line reset ************/
     
     //if there are double-length lines, we only need to draw single-length after they've been drawn
-    chord->m_ledgerLines[0][0] = 0;
-    chord->m_ledgerLines[0][1] = 0;
-    chord->m_ledgerLines[1][0] = 0;
-    chord->m_ledgerLines[1][1] = 0;
+    chord->m_drawingLedgerLines.clear();
     
     /************ Draw children (notes) ************/
     
@@ -1058,25 +1062,32 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     /************ Ledger lines ************/
-    
-    //if there are double-length lines, we only need to draw single-length after they've been drawn
-    chord->m_ledgerLines[0][0] -= chord->m_ledgerLines[1][0];
-    chord->m_ledgerLines[0][1] -= chord->m_ledgerLines[1][1];
-    
+
     dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
     dc->SetBrush(m_currentColour , AxTRANSPARENT );
     
-    //double-length lines below the staff
-    DrawLedgerLines(dc, chord, staff, false, true, 0, chord->m_ledgerLines[1][0]);
-    
-    //remainder single-length lines below the staff
-    DrawLedgerLines(dc, chord, staff, false, false, chord->m_ledgerLines[1][0], chord->m_ledgerLines[0][0]);
-    
-    //double-length lines above the staff
-    DrawLedgerLines(dc, chord, staff, true, true, 0, chord->m_ledgerLines[1][1]);
-    
-    //remainder single-length lines above the staff
-    DrawLedgerLines(dc, chord, staff, true, false, chord->m_ledgerLines[1][1], chord->m_ledgerLines[0][1]);
+    MapOfLedgerLineFlags::iterator iter;
+    for(iter = chord->m_drawingLedgerLines.begin(); iter != chord->m_drawingLedgerLines.end(); iter++) {
+        
+        std::vector<char> *legerLines = &(*iter).second;
+        
+        //if there are double-length lines, we only need to draw single-length after they've been drawn
+        (*legerLines)[0] -= (*legerLines)[1];
+        (*legerLines)[2] -= (*legerLines)[3];
+        
+        //double-length lines below the staff
+        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines)[1]);
+        
+        //remainder single-length lines below the staff
+        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines)[1], (*legerLines)[0]);
+        
+        //double-length lines above the staff
+        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines)[3]);
+        
+        //remainder single-length lines above the staff
+        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines)[3], (*legerLines)[2]);
+
+    }
     
     dc->ResetPen();
     dc->ResetBrush();
