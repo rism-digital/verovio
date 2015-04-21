@@ -188,6 +188,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
     
+    if (note->m_crossStaff) staff = note->m_crossStaff;
+    
     Chord *inChord = note->IsChordTone();
     
     bool inBeam = false;
@@ -352,7 +354,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
  
         //if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
         if (inChord) {
-            inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = ledgermax(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
+            if (inChord->m_drawingLedgerLines.count(staff)==0) {
+                std::vector<char> legerLines;
+                legerLines.resize(4);
+                inChord->m_drawingLedgerLines[staff] = legerLines;
+            }
+            int idx = doubleLengthLedger + aboveStaff * 2; // 2x2 array
+            std::vector<char> *legerLines = &inChord->m_drawingLedgerLines[staff];
+            (*legerLines)[idx] = ledgermax(numLines, (*legerLines)[idx]);
         }
         //we do want to go ahead and draw if it's not in a chord
         else {
@@ -890,6 +899,39 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
+    /************ Ledger line reset ************/
+    
+    //if there are double-length lines, we only need to draw single-length after they've been drawn
+    chord->m_drawingLedgerLines.clear();
+    
+    /************ Stems ************/
+    
+    int drawingDur = chord->GetDur();
+    
+    //(unless we're in a beam)
+    if (!(inBeam && drawingDur > DUR_4)) {
+        int yMax, yMin;
+        chord->GetYExtremes(&yMax, &yMin);
+        
+        if ( chord->HasStemDir() ) {
+            chord->SetDrawingStemDir(chord->GetStemDir());
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
+        }
+        else {
+            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
+        }
+        
+        int beamX = chord->GetDrawingX();
+        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int heightY = yMax - yMin;
+        
+        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+    }
+    
+    /************ Draw children (notes) ************/
+    
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
     /************ Dots ************/
@@ -1019,52 +1061,33 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
-    /************ Stems ************/
-    
-    int drawingDur = chord->GetDur();
-    
-    //(unless we're in a beam)
-    if (!(inBeam && drawingDur > DUR_4)) {
-        int yMax, yMin;
-        chord->GetYExtremes(&yMax, &yMin);
-        
-        if ( chord->HasStemDir() ) {
-            chord->SetDrawingStemDir(chord->GetStemDir());
-        }
-        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
-        }
-        else {
-            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
-        }
-        
-        int beamX = chord->GetDrawingX();
-        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
-        int heightY = yMax - yMin;
-        
-        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
-    }
-    
     /************ Ledger lines ************/
-    
-    //if there are double-length lines, we only need to draw single-length after they've been drawn
-    chord->m_ledgerLines[0][0] -= chord->m_ledgerLines[1][0];
-    chord->m_ledgerLines[0][1] -= chord->m_ledgerLines[1][1];
-    
+
     dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
     dc->SetBrush(m_currentColour , AxTRANSPARENT );
     
-    //double-length lines below the staff
-    DrawLedgerLines(dc, chord, staff, false, true, 0, chord->m_ledgerLines[1][0]);
-    
-    //remainder single-length lines below the staff
-    DrawLedgerLines(dc, chord, staff, false, false, chord->m_ledgerLines[1][0], chord->m_ledgerLines[0][0]);
-    
-    //double-length lines above the staff
-    DrawLedgerLines(dc, chord, staff, true, true, 0, chord->m_ledgerLines[1][1]);
-    
-    //remainder single-length lines above the staff
-    DrawLedgerLines(dc, chord, staff, true, false, chord->m_ledgerLines[1][1], chord->m_ledgerLines[0][1]);
+    MapOfLedgerLineFlags::iterator iter;
+    for(iter = chord->m_drawingLedgerLines.begin(); iter != chord->m_drawingLedgerLines.end(); iter++) {
+        
+        std::vector<char> *legerLines = &(*iter).second;
+        
+        //if there are double-length lines, we only need to draw single-length after they've been drawn
+        (*legerLines)[0] -= (*legerLines)[1];
+        (*legerLines)[2] -= (*legerLines)[3];
+        
+        //double-length lines below the staff
+        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines)[1]);
+        
+        //remainder single-length lines below the staff
+        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines)[1], (*legerLines)[0]);
+        
+        //double-length lines above the staff
+        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines)[3]);
+        
+        //remainder single-length lines above the staff
+        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines)[3], (*legerLines)[2]);
+
+    }
     
     dc->ResetPen();
     dc->ResetBrush();
@@ -1256,6 +1279,11 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     //another way of calculating accidBot
     assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
     
+    // store it for asserts
+    int accidSpaceSize = (int)accidSpace->size();
+    assert(accidTop >= 0);
+    assert(accidTop < accidSpaceSize);
+    
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.
      * The top right corner of a flat can overlap something else; make sure that the bordering sections do not overlap.
@@ -1264,8 +1292,11 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     if (type == ACCIDENTAL_EXPLICIT_f) {
         alignmentThreshold = 2;
         accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
+        assert(accidBot < accidSpaceSize);
         while (currentX < xLength) {
             if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength ) break;
             else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
@@ -1276,10 +1307,13 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     else if (type == ACCIDENTAL_EXPLICIT_n) {
         alignmentThreshold = 1;
         accidBot = accidTop + accidHeightDiff;
+        assert(accidBot < accidSpaceSize);
         //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
             if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength ) break;
             else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)]) currentX += 1;
             else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
@@ -1307,8 +1341,10 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     else {
         accidBot = accidTop + accidHeightDiff;
         alignmentThreshold = 1;
+        assert(accidBot < accidSpaceSize);
         //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
         int accidMid = accidTop + (accidBot - accidTop) / 2;
+        assert(accidMid < accidSpaceSize);
         while (currentX < xLength) {
             if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
             else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
@@ -1322,17 +1358,21 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     
     //If the accidental is lined up with the one above it, move it left by a halfunit to avoid visual confusion
     //This doesn't need to be done with accidentals that are as far left or up as possible
-    if ((currentX < xLength) && (accidTop > 0))
+    if ((currentX < xLength - 1) && (accidTop > 1))
     {
         int yComp = accidTop - alignmentThreshold;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
         if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
     }
     
     //If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
     //This doesn't need to be done with accidentals that are as far left or down as possible
-    if ((currentX < xLength) && (accidBot < (yHeight - 1)))
+    if ((currentX < xLength - 1) && (accidBot < (yHeight - 1)) && accidBot > 1)
     {
-        int yComp = accidBot - alignmentThreshold;
+        int yComp = accidBot;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
         if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
     }
 
@@ -1448,6 +1488,7 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff); // Pointer to staff cannot be NULL"
     
     dc->StartGraphic( element, "", element->GetUuid() );
+    dc->DrawPlaceholder( ToDeviceContextX( element->GetDrawingX() ), ToDeviceContextY( element->GetDrawingY() ) );
     dc->EndGraphic(element, this );
 }
 

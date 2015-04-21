@@ -30,10 +30,9 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
 {
     Reset();
     m_drawingStemDir = STEMDIRECTION_NONE;
-    m_ledgerLines[0][0] = 0;
-    m_ledgerLines[0][1] = 0;
-    m_ledgerLines[1][0] = 0;
-    m_ledgerLines[1][1] = 0;
+    m_drawingLedgerLines.clear();
+    
+    //test[NULL][0][0] = 0;
 }
 
 Chord::~Chord()

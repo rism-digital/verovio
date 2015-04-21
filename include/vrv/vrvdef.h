@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <list>
+#include <map>
 #include <vector>
 
 //----------------------------------------------------------------------------
@@ -18,11 +19,12 @@
 #include "attdef.h"
 
 namespace vrv {
-    
-class Object;
+ 
 class AttComparison;
-class Note;
 class BeamElementCoord;
+class Note;
+class Object;
+class Staff;
 
 typedef std::vector<Object*> ArrayOfObjects;
 
@@ -35,6 +37,8 @@ typedef std::vector<AttComparison*> ArrayOfAttComparisons;
 typedef std::vector<Note*> ChordCluster;
     
 typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
+    
+typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
     
 //----------------------------------------------------------------------------
 // Global defines

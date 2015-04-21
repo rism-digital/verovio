@@ -199,10 +199,17 @@ int Staff::SetDrawingXY( ArrayPtrVoid params )
     // param 3: a pointer to the current staff
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
     Doc *doc = static_cast<Doc*>(params[0]);
     System **currentSystem = static_cast<System**>(params[1]);
     Staff **currentStaff = static_cast<Staff**>(params[3]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
     
+    (*currentStaff) = this;
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
+
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs
@@ -215,7 +222,6 @@ int Staff::SetDrawingXY( ArrayPtrVoid params )
         assert( m_doc->GetType() == Transcription );
         this->SetDrawingY( this->m_yAbs );
     }
-    (*currentStaff) = this;
     
     return FUNCTOR_CONTINUE;
 }
