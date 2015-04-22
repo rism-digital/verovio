@@ -52,13 +52,31 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     int i;
 	System *system = NULL;
+    Measure *measure = NULL;
+    Staff *staff = NULL;
+    Layer *layer = NULL;
+    bool processLayerElement = false;
+    ArrayPtrVoid params;
+    params.push_back( m_doc );
+    params.push_back( &system );
+    params.push_back( &measure );
+    params.push_back( &staff );
+    params.push_back( &layer );
+    params.push_back( this );
+    params.push_back( &processLayerElement );
+    Functor setDrawingXY( &Object::SetDrawingXY );
+    // First pass without processing the LayerElements - we need this for cross-staff going down because
+    // the elements will need the position of the staff below to have been set before
+    m_currentPage->Process( &setDrawingXY, params );
+    // Second pass that process the LayerElements (only)
+    processLayerElement = true;
+    m_currentPage->Process( &setDrawingXY, params );
     
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    if ( background )
-        dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
+    if ( background ) dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
     
     dc->DrawBackgroundImage( );
     
@@ -71,8 +89,6 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 	{
 		system = dynamic_cast<System*>(m_currentPage->m_children[i]);
         DrawSystem( dc, system );
-        
-        // TODO here: also update x_abs and m_drawingY positions for system. How to calculate them?
     }
     
     dc->EndPage();
@@ -93,25 +109,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
-    
-    if ( system->m_yAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        system->SetDrawingX( system->m_drawingXRel );
-        system->SetDrawingY( system->m_drawingYRel );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        system->SetDrawingX( system->m_xAbs );
-        system->SetDrawingY( system->m_yAbs );
-    }
 
-    DrawSystemChildren(dc, system, system);
-
-    // We draw the groups after the staves because we use the m_drawingY member of the staves
-    // that needs to be intialized.
-    // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
-    // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
     Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
@@ -126,6 +124,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
             dc->ResetFont();
         }
     }
+    
+    DrawSystemChildren(dc, system, system);
     
     // first draw the beams
     DrawSystemList(dc, system, &typeid(Syl) );
@@ -626,20 +626,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     if ( measure->IsMeasuredMusic()) {
         dc->StartGraphic( measure, "", measure->GetUuid() );
     }
-    
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if ( measure->m_xAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        measure->SetDrawingX( measure->m_drawingXRel + system->GetDrawingX() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        measure->SetDrawingX( measure->m_xAbs );
-    }
-    
+
     DrawMeasureChildren(dc, measure, measure, system);
 
     if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
@@ -732,18 +719,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     dc->StartGraphic( staff, "", staff->GetUuid());
     
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if ( staff->m_yAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        staff->SetDrawingY( staff->GetYRel() + system->GetDrawingY() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        staff->SetDrawingY( staff->m_yAbs );
-    }
+    // Doing it here might be problematic with cross-staff, even though the default value will be 5
     if ( StaffDef *staffDef = m_drawingScoreDef.GetStaffDef( staff->GetN() ) ) {
         staff->m_drawingLines = staffDef->GetLines( ) ;
     }
@@ -1106,9 +1082,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
     
-    // first draw the beams
-    DrawLayerList(dc, layer, staff, measure, &typeid(Beam) );
-    // then tuplets
+    // first draw the tuplets
     DrawLayerList(dc, layer, staff, measure, &typeid(Tuplet) );
     // then ties
     DrawLayerList(dc, layer, staff, measure, &typeid(Tie) );
@@ -1133,13 +1107,7 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         element = dynamic_cast<LayerElement*>(*iter);
         if (!element) continue; 
         
-        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
-            Beam *beam = dynamic_cast<Beam*>(element);
-            dc->ResumeGraphic(beam, beam->GetUuid());
-            DrawBeamPostponed( dc, layer, beam, staff, measure );
-            dc->EndResumedGraphic(beam, this);
-        }
-        else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
             dc->ResumeGraphic(tuplet, tuplet->GetUuid());
             DrawTupletPostponed( dc, tuplet, layer, staff );

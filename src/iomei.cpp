@@ -628,6 +628,7 @@ void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInte
     interface->WriteDurationPerformed(element);
     interface->WriteDurationRatio(element);
     interface->WriteFermatapresent(element);
+    interface->WriteStaffident(element);
 }
     
 void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface *interface)
@@ -1663,6 +1664,7 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
     interface->ReadDurationPerformed(element);
     interface->ReadDurationRatio(element);
     interface->ReadFermatapresent(element);
+    interface->ReadStaffident(element);
     return true;
 }
 

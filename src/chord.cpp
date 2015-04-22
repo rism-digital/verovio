@@ -30,10 +30,9 @@ LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
 {
     Reset();
     m_drawingStemDir = STEMDIRECTION_NONE;
-    m_ledgerLines[0][0] = 0;
-    m_ledgerLines[0][1] = 0;
-    m_ledgerLines[1][0] = 0;
-    m_ledgerLines[1][1] = 0;
+    m_drawingLedgerLines.clear();
+    
+    //test[NULL][0][0] = 0;
 }
 
 Chord::~Chord()
@@ -181,7 +180,6 @@ void Chord::ResetAccidSpace(int fullUnit)
     
     //dimensional units, other variables
     int halfUnit = fullUnit / 2;
-    int doubleUnit = fullUnit * 2;
     int idx, setIdx;
     
     /*
@@ -190,14 +188,15 @@ void Chord::ResetAccidSpace(int fullUnit)
      *    -Prepare each line to account for one extra accidental so we can guarantee the grid has enough space
      *    -Set m_accidSpaceLeft to be used for asserts during drawing
      */
-    int accidLineLength = ((int)m_accidList.size() + 1) * ACCID_WIDTH;
+    int accidLineLength = (int)m_accidList.size() * ACCID_WIDTH;
     
     /*
      * Each accidental's Y position will be its vertical center; set the grid extremes to account for that
      * Resize m_accidSpace to be as tall as is possibly necessary; must accomodate every accidental stacked vertically.
      */
-    m_accidSpaceTop = m_accidList.front()->GetDrawingY() + doubleUnit;
-    m_accidSpaceBot = m_accidList.back()->GetDrawingY() - doubleUnit;
+    int accidHeight = ACCID_HEIGHT * halfUnit;
+    m_accidSpaceTop = m_accidList.front()->GetDrawingY() + (accidHeight / 2);
+    m_accidSpaceBot = m_accidList.back()->GetDrawingY() - (accidHeight / 2);
     int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
     m_accidSpace.resize(height);
     

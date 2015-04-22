@@ -16,8 +16,10 @@ namespace vrv {
 
 class Alignment;
 class BeamElementCoord;
+class Layer;
 class Mensur;
 class MeterSig;
+class Staff;
 
 //----------------------------------------------------------------------------
 // LayerElement
@@ -93,6 +95,7 @@ public:
     bool IsRest();
     bool IsTie();
     bool IsTuplet();
+    bool IsSpace();
     bool IsSyl();
     bool IsVerse();
     bool IsGraceNote();
@@ -115,6 +118,11 @@ public:
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid params );
+    
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetDrawingXY( ArrayPtrVoid params );
     
 protected:
     /**
@@ -141,6 +149,12 @@ public:
      * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
      */
     BeamElementCoord *m_beamElementCoord;
+    /**
+     * This store a pointer to the cross-staff (if any) and the appropriate layer
+     * Initialized in LayerElement::SetDrawingXY
+     */
+    Staff *m_crossStaff;
+    Layer *m_crossLayer;
     
 protected:
     Alignment *m_alignment;

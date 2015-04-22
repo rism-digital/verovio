@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
 // Name:        layer.cpp
 // Author:      Laurent Pugin
 // Created:     2011
@@ -17,6 +17,7 @@
 #include "custos.h"
 #include "doc.h"
 #include "keysig.h"
+#include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
@@ -111,19 +112,13 @@ LayerElement *Layer::GetPrevious( LayerElement *element )
 LayerElement *Layer::GetAtPos( int x )
 {
 	LayerElement *element = dynamic_cast<LayerElement*>( this->GetFirst() );
-	if ( !element )
-		return NULL;
-
+	if ( !element || element->GetDrawingX() > x ) return NULL;
     
-	int dif = x - element->GetDrawingX();
     LayerElement *next = NULL;
-	while ( (next = dynamic_cast<LayerElement*>( this->GetNext() ) ) && (int)element->GetDrawingX() < x ){
-		element = next;
-		if ( (int)element->GetDrawingX() > x && dif < (int)element->GetDrawingX() - x )
-			return this->GetPrevious( element );
-		dif = x - element->GetDrawingX();
+	while ( (next = dynamic_cast<LayerElement*>( this->GetNext() ) ) ) {
+		if ( next->GetDrawingX() > x ) return element;
+        element = next;
 	}
-	
 	return element;
 }
     
@@ -280,7 +275,7 @@ Clef* Layer::GetClef( LayerElement *test )
     Object *testObject = test;
     
     if (!test) {
-        return NULL;
+        return m_currentClef;
     }
 	
     //make sure list is set
@@ -300,9 +295,7 @@ Clef* Layer::GetClef( LayerElement *test )
 int Layer::GetClefOffset( LayerElement *test )
 {
     Clef *clef = GetClef(test);
-    if (!clef) {
-        return 0;
-    }
+    if (!clef) return 0;
     return clef->GetClefOffset();
     
 }
@@ -394,8 +387,6 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     (*currentMensur) = m_currentMensur;
     (*currentMeterSig) = m_currentMeterSig;
     
-    //LogDebug(" ----- " );
-    
     if ( m_drawClef && m_currentClef ) {
         m_currentClef->AlignHorizontally( params );
     }
@@ -423,6 +414,43 @@ int Layer::PrepareProcessingLists( ArrayPtrVoid params )
     Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
     assert( staff );
     tree->child[ staff->GetN() ].child[ this->GetN() ];
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::SetDrawingXY( ArrayPtrVoid params )
+{
+    // param 0: a pointer doc (unused)
+    // param 1: a pointer to the current system (unused)
+    // param 2: a pointer to the current measure
+    // param 3: a pointer to the current staff (unused)
+    // param 4: a pointer to the current layer
+    // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
+    Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    Layer **currentLayer = static_cast<Layer**>(params[4]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    (*currentLayer) = this;
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // set the values for the scoreDef elements when required
+    if (this->GetDrawingClef()) {
+        this->GetDrawingClef()->SetDrawingX( this->GetDrawingClef()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
+    if (this->GetDrawingKeySig()) {
+        this->GetDrawingKeySig()->SetDrawingX( this->GetDrawingKeySig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
+    if (this->GetDrawingMensur()) {
+        this->GetDrawingMensur()->SetDrawingX( this->GetDrawingMensur()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
+    if (this->GetDrawingMeterSig()) {
+        this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+    }
     
     return FUNCTOR_CONTINUE;
 }

@@ -283,6 +283,11 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
     UpdateBB( x - penWidth / 2, y - penWidth / 2, x + width + penWidth / 2, y + height + penWidth / 2);
 }
     
+void BBoxDeviceContext::DrawPlaceholder( int x, int y )
+{
+    UpdateBB( x, y, x, y );
+}
+    
 void BBoxDeviceContext::StartText(int x, int y, char alignement)
 {
     assert( !m_drawingText );
@@ -357,7 +362,7 @@ void BBoxDeviceContext::DrawSpline(int n, Point points[])
 
 }
 
-void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2) 
+void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
 {
     if (m_isDeactivated) {
         return;
