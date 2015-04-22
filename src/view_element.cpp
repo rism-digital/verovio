@@ -289,6 +289,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             xNote = xStem - radius;
         }
         else {
+            //if we have a flipped notehead, we need to be in a chord
+            assert(inChord);
             if (note->m_drawingStemDir == STEMDIRECTION_up) {
                 xNote = xStem + radius - m_doc->m_style->m_stemWidth;
             }
@@ -820,13 +822,11 @@ void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, uns
     //finally, make sure it's not outside the acceptable extremes of the chord
     int yMax, yMin;
     chord->GetYExtremes(&yMax, &yMin);
-    
     if (y > (yMax + fullUnit)) return;
     if (y < (yMin - fullUnit)) return;
     
+    //if it's not, add it to the dots list and go back to DrawChord
     dotsList->push_back(y);
-    DrawDots(dc, x, y, dots, staff);
-
     return;
 }
 
@@ -955,12 +955,17 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         // Notes in clusters: If the stem points up and we have a note on the (incorrect) right side of the stem, add a note diameter to the dot positioning to avoid overlapping.
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_up) && (chord->m_clusters.size() > 0)) dotsX += (radius * 2);
         
-        //Then fill in otherwise
+        //Prep where the dots will go by preventing overlaps and using space efficiently
         for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin(); rit != chord->GetList(chord)->rend(); rit++)
         {
             Note *note = dynamic_cast<Note*>(*rit);
             PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), numDots, staff);
         }
+        
+        //And then draw them
+        std::list<int> *dotsList = &chord->m_dots;
+        for (std::list<int>::iterator it=dotsList->begin(); it != dotsList->end(); ++it)
+            DrawDots(dc, dotsX, *it, numDots, staff);
     }
     
     /************ Accidentals ************/
