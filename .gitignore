@@ -3,6 +3,7 @@ Verovio.xccheckout
 Verovio.xcodeproj/project.xcworkspace/xcuserdata
 Verovio.xcodeproj/xcuserdata/
 bin/
+build/
 
 # doc generated file
 doc/pae-tests.html
