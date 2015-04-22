@@ -795,12 +795,13 @@ void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, uns
     
     //if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
     if (IsOnStaffLine(y, staff)) {
-        y += fullUnit;
+        //defaults to the space above the staffline first
+        //if that position is not on the list already, we're good to go
+        if(std::find(dotsList->begin(), dotsList->end(), y + fullUnit) == dotsList->end()) y += fullUnit;
         
-        //if this position is not on the list, we're good to go
-        if(std::find(dotsList->begin(), dotsList->end(), y) == dotsList->end()) {}
         //if it is on the list, we should try the spot a doubleUnit below
-        else if(std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end()) y -= doubleUnit;
+        else if(std::find(dotsList->begin(), dotsList->end(), y - fullUnit) == dotsList->end()) y -= fullUnit;
+        
         //otherwise, any other space looks weird so let's not draw it
         else return;
     }
@@ -876,7 +877,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
     int fullUnit = m_doc->m_drawingUnit[staffSize];
-    int doubleUnit = fullUnit * 2;
     
     bool inBeam = false;
     // Get the immadiate parent of the note
@@ -939,7 +939,9 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     chord->m_dots.clear();
     
     if (chord->GetDots()) {
-        int dots = chord->GetDots();
+        int numDots = chord->GetDots();
+        
+        //Set the x value...
         int dotsX;
         
         //make sure all the dots are at the same X position
@@ -953,38 +955,11 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         // Notes in clusters: If the stem points up and we have a note on the (incorrect) right side of the stem, add a note diameter to the dot positioning to avoid overlapping.
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_up) && (chord->m_clusters.size() > 0)) dotsX += (radius * 2);
         
-        // Draw dots for notes in clusters first...
-        for(std::list<ChordCluster*>::iterator cit = chord->m_clusters.begin(); cit != chord->m_clusters.end(); cit++)
-        {
-            ChordCluster* cluster = *cit;
-            int clusterSize = (int)cluster->size();
-            
-            //find beginning and ending Y-point
-            Note* first = *(cluster->begin());
-            Note* last = cluster->at(clusterSize - 1);
-            int curY = first->GetDrawingY();
-            int endY = last->GetDrawingY();
-            
-            //if either is on a staff line, expand it to the next space
-            if (IsOnStaffLine(curY, staff)) curY -= fullUnit;
-            else if (clusterSize > 3) curY -= doubleUnit;
-            if (IsOnStaffLine(endY, staff)) endY += fullUnit;
-            else if (clusterSize == 3 || clusterSize == 5) endY += doubleUnit;
-            
-            //draw dots from one point to another
-            do {
-                PrepareChordDots(dc, chord, dotsX, curY, dots, staff);
-                curY += doubleUnit;
-            } while (curY <= endY);
-        }
-        
         //Then fill in otherwise
-        for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
+        for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin(); rit != chord->GetList(chord)->rend(); rit++)
         {
-            Note *note = dynamic_cast<Note*>(*it);
-            if (!note->m_cluster) {
-                PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), dots, staff);
-            }
+            Note *note = dynamic_cast<Note*>(*rit);
+            PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), numDots, staff);
         }
     }
     
