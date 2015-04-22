@@ -158,6 +158,11 @@ public:
      * and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists( ArrayPtrVoid params );
+
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetDrawingXY( ArrayPtrVoid params );
     
 private:
     

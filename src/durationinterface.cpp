@@ -33,7 +33,8 @@ DurationInterface::DurationInterface():
     AttDurationMusical(),
     AttDurationPerformed(),
     AttDurationRatio(),
-    AttFermatapresent()
+    AttFermatapresent(),
+    AttStaffident()
 {
     Reset();
 }
@@ -52,6 +53,7 @@ void DurationInterface::Reset()
     ResetDurationPerformed();
     ResetDurationRatio();
     ResetFermatapresent();
+    ResetStaffident();
 }
 
 double DurationInterface::GetAlignmentDuration( int num, int numbase )
@@ -72,6 +74,11 @@ double DurationInterface::GetAlignmentDuration( int num, int numbase )
 double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur )
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
+    
+    if (!currentMensur) {
+        LogWarning("No current mensur for calculating duration" );
+        return DUR_MENSURAL_REF;
+    }
     
     if (this->HasNum()) num *=this->GetNum();
     if (this->HasNumbase()) numbase *=this->GetNumbase();

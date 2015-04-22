@@ -1,0 +1,35 @@
+# xcode
+Verovio.xccheckout
+Verovio.xcodeproj/project.xcworkspace/xcuserdata
+Verovio.xcodeproj/xcuserdata/
+bin/
+
+# doc generated file
+doc/pae-tests.html
+
+# include file generated at compilation
+include/vrv/git_commit.h
+
+# cmake build
+tools/CMakeCache.txt
+tools/CMakeFiles/
+tools/Makefile
+tools/cmake_install.cmake
+tools/install_manifest.txt
+tools/verovio
+
+# emscripten build
+emscripten/data/
+emscripten/build/
+
+# python build
+python/verovio_wrap.cpp
+python/verovio.pyc
+python/verovio.py
+python/_verovio.so
+
+# java build
+java/verovio_wrap.cxx
+java/main.class
+java/src/
+java/target/

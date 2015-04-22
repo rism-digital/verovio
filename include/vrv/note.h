@@ -67,9 +67,10 @@ public:
     void AddLayerElement(LayerElement *element);
     
     /**
-     * @name Setter and getter for tie attribute
+     * @name Setter and getter for tie attribute and other pointers
      */
     ///@{
+    void ResetDrawingAccid( );
     void ResetDrawingTieAttr( );
     void SetDrawingTieAttr( );
     Tie *GetDrawingTieAttr( ) { return m_drawingTieAttr; };
@@ -109,6 +110,11 @@ public:
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int PrepareLyrics( ArrayPtrVoid params );
+ 
+    /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid params );
     
     /**
      */
@@ -149,7 +155,7 @@ public:
     int m_clusterPosition; //1-indexed position in said cluster; 0 if does not have position
     
     /** other information necessary for notes in chords **/
-    Accid m_accid;
+    Accid *m_drawingAccid;
 
     
 private:

@@ -15,7 +15,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
 #include "accid.h"
 #include "beam.h"
 #include "chord.h"
@@ -33,6 +32,7 @@
 #include "note.h"
 #include "rest.h"
 #include "slur.h"
+#include "space.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -49,9 +49,6 @@ namespace vrv {
 // View - LayerElement
 //----------------------------------------------------------------------------
 
-int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures    
-bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
-
 void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(layer); // Pointer to layer cannot be NULL"
@@ -65,22 +62,7 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else {
         m_currentColour = AxBLACK;
     }
-    
-    // Here we set the appropriate x value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if ( element->m_xAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        element->SetDrawingX( element->GetXRel() + measure->GetDrawingX() );
-        element->SetDrawingY( staff->GetDrawingY() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        element->SetDrawingX( element->m_xAbs );
-        element->SetDrawingY( staff->GetDrawingY() );
-    }
-    
+
     if (dynamic_cast<Accid*>(element)) {
         DrawAccid(dc, element, layer, staff, measure);
     }
@@ -126,6 +108,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (dynamic_cast<Slur*>(element)) {
         DrawTie(dc, element, layer, staff, measure);
     }
+    else if (dynamic_cast<Space*>(element)) {
+        DrawSpace(dc, element, layer, staff, measure);
+    }
     else if (dynamic_cast<Syl*>(element)) {
         DrawSyl(dc, element, layer, staff, measure);
     }
@@ -146,60 +131,24 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
 {
     assert(layer); // Pointer to layer cannot be NULL"
     assert(staff); // Pointer to staff cannot be NULL"
-
-    DurationInterface *durElement = dynamic_cast<DurationInterface*>(element);
-	if ( !durElement )
-		return;
-        
-	if (dynamic_cast<Chord*>(element))
-    {
+    
+	if (dynamic_cast<Chord*>(element)) {
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawChord(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
     }
-    else if (dynamic_cast<Note*>(element))
-    {
-        Note *note = dynamic_cast<Note*>(element);
-        int oct = note->GetOct() - 4;
-        
-        element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, note->GetPname(), layer->GetClefOffset( element ), oct ) );
+    else if (dynamic_cast<Note*>(element)) {
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this );
 	}
     else if (dynamic_cast<Rest*>(element)) {
-        Rest *rest = dynamic_cast<Rest*>(element);
-        int oct = rest->GetOloc() - 4;
-        
-        // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE)
-            element->SetDrawingY( element->GetDrawingY() + CalculateRestPosY( staff, rest->GetActualDur()) );
-        else
-            element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, rest->GetPloc(), layer->GetClefOffset( element ), oct) );
-		
         dc->StartGraphic( element, "", element->GetUuid() );
         DrawRest( dc, element, layer, staff, measure );
         dc->EndGraphic(element, this );
 	}
 	
 	return;
-}
-
-void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
-    
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    
-    Beam *beam = dynamic_cast<Beam*>(element);
-
-    dc->StartGraphic( element, "", element->GetUuid() );
-    
-    DrawLayerChildren(dc, beam, layer, staff, measure);
-    
-    // Add to the list of postponed element 
-    layer->AddToDrawingList( beam );
-    
-    dc->EndGraphic(element, this );
 }
 
 void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
@@ -238,6 +187,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         DrawMensuralNote(dc, element, layer, staff, measure);
         return;
     }
+    
+    if (note->m_crossStaff) staff = note->m_crossStaff;
     
     Chord *inChord = note->IsChordTone();
     
@@ -356,10 +307,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     /************** Noteheads: **************/
     
-    // Long, breve and ligatures
-	if (drawingDur == DUR_LG || drawingDur == DUR_BR || ((note->GetLig()!=LIGATURE_NONE) && drawingDur == DUR_1)) {
-		DrawLigature ( dc, noteY, element, layer, staff);
- 	}
+    if (drawingDur < DUR_1) {
+        DrawMaximaToBrevis( dc, noteY, element, layer, staff);
+    }
     // Whole notes
 	else if (drawingDur == DUR_1) {
         if (note->GetColored()==BOOLEAN_true)
@@ -404,7 +354,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
  
         //if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
         if (inChord) {
-            inChord->m_ledgerLines[doubleLengthLedger][aboveStaff] = ledgermax(numLines, inChord->m_ledgerLines[doubleLengthLedger][aboveStaff]);
+            if (inChord->m_drawingLedgerLines.count(staff)==0) {
+                std::vector<char> legerLines;
+                legerLines.resize(4);
+                inChord->m_drawingLedgerLines[staff] = legerLines;
+            }
+            int idx = doubleLengthLedger + aboveStaff * 2; // 2x2 array
+            std::vector<char> *legerLines = &inChord->m_drawingLedgerLines[staff];
+            (*legerLines)[idx] = ledgermax(numLines, (*legerLines)[idx]);
         }
         //we do want to go ahead and draw if it's not in a chord
         else {
@@ -416,17 +373,21 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
 		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
-		
-        Accid *accid = &note->m_accid;
-        accid->SetOloc(note->GetOct());
-        accid->SetPloc(note->GetPname());
-		accid->SetAccid(note->GetAccid());
-        accid->m_cueSize = note->m_cueSize;
-        accid->SetDrawingX( xAccid );
-        accid->SetDrawingY( noteY );
+
+        if (note->m_drawingAccid == NULL)
+        {
+            note->m_drawingAccid = new Accid();
+            note->m_drawingAccid->SetOloc(note->GetOct());
+            note->m_drawingAccid->SetPloc(note->GetPname());
+            note->m_drawingAccid->SetAccid(note->GetAccid());
+            note->m_drawingAccid->m_cueSize = note->m_cueSize;
+        }
+        
+        note->m_drawingAccid->SetDrawingX( xAccid );
+        note->m_drawingAccid->SetDrawingY( noteY );
         
         //postpone drawing the accidental until later if it's in a chord
-        if (!inChord) DrawAccid( dc, accid, layer, staff, measure ); // ax2
+        if (!inChord) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure ); // ax2
 	}
 	
     if (note->GetDots() && !inChord) {
@@ -695,7 +656,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     //Draw the to lines at beginning and end
     // make it 8 pixesl longers, and 4 pixels width
-    int border = m_doc->m_drawingUnit[staff->staffSize] / 2;
+    int border = m_doc->m_drawingUnit[staff->staffSize];
     DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->m_style->m_stemWidth * 2);
     DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->m_style->m_stemWidth * 2);
     
@@ -859,8 +820,8 @@ void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, uns
     int yMax, yMin;
     chord->GetYExtremes(&yMax, &yMin);
     
-    if (y > (yMax + doubleUnit)) return;
-    if (y < (yMin - doubleUnit)) return;
+    if (y > (yMax + fullUnit)) return;
+    if (y < (yMin - fullUnit)) return;
     
     dotsList->push_back(y);
     DrawDots(dc, x, y, dots, staff);
@@ -878,174 +839,6 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
         DrawDot ( dc, x, y );
 		x += std::max (6, 2 * m_doc->m_drawingUnit[staff->staffSize]);
 	}
-	return;
-}
-
-
-
-void View::CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff)
-{
-    /*
-	if (element == NULL)
-    {
-    	return;
-    }
-    LayerElement *previous = layer->GetPrevious(element);
-	if (previous == NULL || !previous->IsNote()) 
-    {
-        return;
-    }
-    Note *previousNote = dynamic_cast<Note*>(previous);
-    if (previousNote->m_lig==LIG_TERMINAL)
-    {
-        return;
-    } 
-	if (previousNote->m_lig && previousNote->m_dur <= DUR_1)
-	{	
-        element->SetDrawingX( previous->GetDrawingX() + m_doc->m_drawingBrevisWidth[staff->staffSize] * 2 );
-	}
-    */
-    return;
-}
-
-void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff )
-{	
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Note*>(element)); // Element must be a Note"
-    
-
-    Note *note = dynamic_cast<Note*>(element);
-
-	int xn, x1, x2, y1, y2, y3, y4;
-    // int yy2, y5; // unused
-	int verticalCenter, up, epaisseur;
-
-	epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
-	xn = element->GetDrawingX();
-
-    /*
-	if ((note->m_lig==LIG_MEDIAL) || (note->m_lig==LIG_TERMINAL))
-    {
-		CalculateLigaturePosX ( element, layer, staff );
-    }
-	else 
-    */{
-		xn = element->GetDrawingX();
-    }
-
-	// calcul des dimensions du rectangle
-	x1 = xn - m_doc->m_drawingBrevisWidth[staff->staffSize]; x2 = xn +  m_doc->m_drawingBrevisWidth[staff->staffSize];
-	y1 = y + m_doc->m_drawingUnit[staff->staffSize]; 
-	y2 = y - m_doc->m_drawingUnit[staff->staffSize]; 
-	y3 = (int)(y1 + m_doc->m_drawingUnit[staff->staffSize]/2);	// partie d'encadrement qui depasse
-	y4 = (int)(y2 - m_doc->m_drawingUnit[staff->staffSize]/2);
-
-    
-	//if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
-	{
-		if (note->GetColored()!=BOOLEAN_true)
-		{				//	double base des carrees
-			DrawObliquePolygon ( dc, x1,  y1,  x2,  y1, -epaisseur );
-			DrawObliquePolygon ( dc, x1,  y2,  x2,  y2, epaisseur );
-		}
-		else
-			DrawFullRectangle( dc,x1,y1,x2,y2);	// dessine val carree pleine // ENZ correction de x2
-
-		DrawVerticalLine ( dc, y3, y4, x1, m_doc->m_style->m_stemWidth );	// corset lateral
-		DrawVerticalLine ( dc, y3, y4, x2, m_doc->m_style->m_stemWidth );
-	}
-	/*
-    else			// traitement des obliques
-    {
-		if (!View::s_drawingLigObliqua)	// 1e passage: ligne flagStemHeighte initiale
-		{
-			DrawVerticalLine (dc,y3,y4,x1, m_doc->m_style->m_stemWidth );
-			View::s_drawingLigObliqua = true;
-			//oblique = OFF;
-//			if (val == DUR_1)	// queue gauche haut si DUR_1
-//				queue_lig = ON;
-		}
-		else	// 2e passage: lignes obl. et flagStemHeighte finale
-		{
-			x1 -=  m_doc->m_drawingBrevisWidth[staff->staffSize]*2;	// avance auto
-
-			y1 = *View::s_drawingLigY - m_doc->m_drawingUnit[staff->staffSize];	// ligat_y contient y original
-			yy2 = y2;
-			y5 = y1+ m_doc->m_drawingDoubleUnit[staff->staffSize]; y2 += m_doc->m_drawingDoubleUnit[staff->staffSize];	// on monte d'un INTERL
-
-			if (note->GetColored()==BOOLEAN_true)
-				DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingDoubleUnit[staff->staffSize]);
-			else
-			{	DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, 5);
-				DrawObliquePolygon ( dc,  x1,  y5,  x2,  y2, -5);
-			}
-			DrawVerticalLine ( dc,y3,y4,x2,m_doc->m_style->m_stemWidth);	//cloture flagStemHeighte
-
-			View::s_drawingLigObliqua = false;
-//			queue_lig = OFF;	//desamorce alg.queue DUR_BR
-
-		}
-	}
-
-	if (note->m_lig)	// memoriser positions d'une note a l'autre; relier notes par barres
-	{	
-        *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres flagStemHeightes
-		//if (in(x1,(*View::s_drawingLigX)-2,(*View::s_drawingLigX)+2) || (this->fligat && this->lat && !Note1::marq_obl))
-			// les dernieres conditions pour permettre ligature flagStemHeighte ancienne
-		//	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); // ax2 - drawing flagStemHeight lines missing
-		*View::s_drawingLigX = *(View::s_drawingLigX + 1);
-		*View::s_drawingLigY = *(View::s_drawingLigY + 1);
-	}
-
-	
-	y3 = y2 - m_doc->m_drawingUnit[staff->staffSize]*6;
-
-	if (note->m_lig)
-	{	
-        if (note->m_dur == DUR_BR) //  && this->queue_lig)	// queue gauche bas: DUR_BR initiale descendante // ax2 - no support of queue_lig (see WG corrigeLigature)
-		{
-            DrawVerticalLine ( dc, y2, y3, x1, m_doc->m_style->m_stemWidth );
-        }
-		else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG en ligature, queue droite bas // ax2 - no support of queue_lig
-		{
-            DrawVerticalLine (dc, y2, y3, x2, m_doc->m_style->m_stemWidth );
-        }
-		else if (note->m_dur == DUR_1) // && this->queue_lig )	// queue gauche haut // ax2 - no support of queue_lig
-		{	
-            y2 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
-			DrawVerticalLine ( dc, y1, y2, x1, m_doc->m_style->m_stemWidth );
-		} 
-	}
-	else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
-	*/
-    if (note->GetDur() == DUR_LG)
-    {
-		verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
-		// ENZ
-		up = (y < verticalCenter) ? ON : OFF;
-		// ENZ
-		if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
-            if ( note->m_drawingStemDir == STEMDIRECTION_up) {
-                up = ON;
-            }
-            else {
-                up = OFF;
-            }
-        }
-			
-		if (!up)
-		{	
-            y3 = y1 - m_doc->m_drawingUnit[staff->staffSize]*8;
-			y2 = y1;
-		}
-        else {
-            y3 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
-			y2 = y1;
-        }
-		DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_style->m_stemWidth );
-	}
-
 	return;
 }
 
@@ -1099,13 +892,45 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             if (beam_parent->GetListIndex(chord) > -1) {
                 inBeam = true;
             }
-            
         }
         else {
             // the note is just in a beam
             inBeam = true;
         }
     }
+    
+    /************ Ledger line reset ************/
+    
+    //if there are double-length lines, we only need to draw single-length after they've been drawn
+    chord->m_drawingLedgerLines.clear();
+    
+    /************ Stems ************/
+    
+    int drawingDur = chord->GetDur();
+    
+    //(unless we're in a beam)
+    if (!(inBeam && drawingDur > DUR_4)) {
+        int yMax, yMin;
+        chord->GetYExtremes(&yMax, &yMin);
+        
+        if ( chord->HasStemDir() ) {
+            chord->SetDrawingStemDir(chord->GetStemDir());
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
+        }
+        else {
+            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
+        }
+        
+        int beamX = chord->GetDrawingX();
+        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
+        int heightY = yMax - yMin;
+        
+        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+    }
+    
+    /************ Draw children (notes) ************/
     
     DrawLayerChildren(dc, chord, layer, staff, measure);
     
@@ -1166,53 +991,62 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************ Accidentals ************/
     
     //navigate through list of notes, starting with outside and working in
-    //set the default x position: only non-default case is a down-stemmed non-cluster which needs one more note diameter of space
 
-    int xAccid = chord->GetDrawingX() - (radius * 2) - fullUnit;
-    if (chord->GetDrawingStemDir() == STEMDIRECTION_down && chord->m_clusters.size() > 0) xAccid -= (radius * 2);
-
-    int fwIdx = 0;
-    int idx, bwIdx;
-    
     chord->ResetAccidList();
     std::vector<Note*> noteList = chord->m_accidList;
     int size = (int)noteList.size();
     if (size > 0)
     {
+        //set the default x position
+        int xAccid = chord->GetDrawingX() - (radius * 2);
+
+        //if chord is a down-stemmed non-cluster, it needs one more note diameter of space
+        if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0))
+        {
+            xAccid -= (radius * 2);
+        }
+
+        int fwIdx, idx, bwIdx;
+
+        //reset the boolean 2d vector
         chord->ResetAccidSpace(fullUnit);
+        std::vector<int> accidClusterStarts;
         
-        std::vector<int> accidClusters;
-        
+        //iterate through the list of notes with accidentals
         for(idx = 0; idx < size; idx++)
         {
-            Accid *curAccid = &noteList[idx]->m_accid;
-            //false as the last parameter for CalcAccidX will see if there are any vertical conflicts without setting anything
-            if (CalculateAccidX(staff, curAccid, chord, false) > 0)
+            Accid *curAccid = noteList[idx]->m_drawingAccid;
+
+            //if the note does not need to be moved, save a new cluster start position
+            if (CalculateAccidX(staff, curAccid, chord, false))
             {
-                accidClusters.push_back(idx);
+                accidClusterStarts.push_back(idx);
             }
         }
         
         chord->ResetAccidSpace(fullUnit);
-        int accidSize = (int)accidClusters.size();
+        int accidSize = (int)accidClusterStarts.size();
         
+        //for each note that conflicts
         for(idx = 0; idx < accidSize; idx++)
         {
-            fwIdx = accidClusters[idx];
+            //set fwIdx to the start of the cluster
+            fwIdx = accidClusterStarts[idx];
+            //if this is the last cluster, set bwIdx to the last note in the chord
             if (idx == accidSize - 1) bwIdx = size - 1;
-            else bwIdx = accidClusters[idx + 1] - 1;
+            //otherwise, set bwIdx to one before the beginning of the next cluster
+            else bwIdx = accidClusterStarts[idx + 1] - 1;
             
             //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx)
             {
-                Accid *accidFwd = &noteList[fwIdx]->m_accid;
-                Accid *accidBwd = &noteList[bwIdx]->m_accid;
+                Accid *accidFwd = noteList[fwIdx]->m_drawingAccid;
+                Accid *accidBwd = noteList[bwIdx]->m_drawingAccid;
                 
                 //if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
                 DrawAccid(dc, accidFwd, layer, staff, measure);
-                
                 //same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
                     accidBwd->SetDrawingX(xAccid);
@@ -1227,53 +1061,33 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         }
     }
     
-    /************ Stems ************/
-    
-    int drawingDur = chord->GetDur();
-    drawingDur = ((chord->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
-    
-    //(unless we're in a beam)
-    if (!(inBeam && drawingDur > DUR_4)) {
-        int yMax, yMin;
-        chord->GetYExtremes(&yMax, &yMin);
-        
-        if ( chord->HasStemDir() ) {
-            chord->SetDrawingStemDir(chord->GetStemDir());
-        }
-        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-            chord->SetDrawingStemDir(layer->GetDrawingStemDir());
-        }
-        else {
-            chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
-        }
-        
-        int beamX = chord->GetDrawingX();
-        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
-        int heightY = yMax - yMin;
-        
-        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
-    }
-    
     /************ Ledger lines ************/
-    
-    //if there are double-length lines, we only need to draw single-length after they've been drawn
-    chord->m_ledgerLines[0][0] -= chord->m_ledgerLines[1][0];
-    chord->m_ledgerLines[0][1] -= chord->m_ledgerLines[1][1];
-    
+
     dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
     dc->SetBrush(m_currentColour , AxTRANSPARENT );
     
-    //double-length lines below the staff
-    DrawLedgerLines(dc, chord, staff, false, true, 0, chord->m_ledgerLines[1][0]);
-    
-    //remainder single-length lines below the staff
-    DrawLedgerLines(dc, chord, staff, false, false, chord->m_ledgerLines[1][0], chord->m_ledgerLines[0][0]);
-    
-    //double-length lines above the staff
-    DrawLedgerLines(dc, chord, staff, true, true, 0, chord->m_ledgerLines[1][1]);
-    
-    //remainder single-length lines above the staff
-    DrawLedgerLines(dc, chord, staff, true, false, chord->m_ledgerLines[1][1], chord->m_ledgerLines[0][1]);
+    MapOfLedgerLineFlags::iterator iter;
+    for(iter = chord->m_drawingLedgerLines.begin(); iter != chord->m_drawingLedgerLines.end(); iter++) {
+        
+        std::vector<char> *legerLines = &(*iter).second;
+        
+        //if there are double-length lines, we only need to draw single-length after they've been drawn
+        (*legerLines)[0] -= (*legerLines)[1];
+        (*legerLines)[2] -= (*legerLines)[3];
+        
+        //double-length lines below the staff
+        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines)[1]);
+        
+        //remainder single-length lines below the staff
+        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines)[1], (*legerLines)[0]);
+        
+        //double-length lines above the staff
+        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines)[3]);
+        
+        //remainder single-length lines above the staff
+        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines)[3], (*legerLines)[2]);
+
+    }
     
     dc->ResetPen();
     dc->ResetBrush();
@@ -1352,13 +1166,16 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
 	}
 
-	a -= m_doc->m_drawingUnit[staff->staffSize] * 2;
-	if (clef->m_cueSize)
-		a += m_doc->m_drawingUnit[staff->staffSize];
-
-	DrawSmuflCode ( dc, a, b, sym, staff->staffSize, clef->m_cueSize  );
+    bool cueSize = clef->m_cueSize;
+    // force cue size for intermediate clefs
+    if (clef->GetFirstParent(&typeid(Layer))) cueSize = true;
+    
+    if (!cueSize)
+        a -= m_doc->m_drawingUnit[staff->staffSize] * 2;
+    
+    DrawSmuflCode ( dc, a, b, sym, staff->staffSize, cueSize  );
    
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 }
 
 void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
@@ -1427,80 +1244,183 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->EndGraphic(element, this );
     
 }
-
-//returns false if no adjustment is necessary
-bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save)
+    
+bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally)
 {
-    //size declarations
-    int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
-    int doubleUnit = fullUnit * 2;
-    int halfUnit = fullUnit / 2;
-    int type = accid->GetAccid();
-    
     std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
-    std::vector<Note*> noteList = chord->m_accidList;
-    int xLength = (int)accidSpace->at(0).size();
     
-    //Y-position limits
-    int listTop = noteList[0]->GetDrawingY();
-    int listBot = noteList[noteList.size() - 1]->GetDrawingY();
-    int topY = accid->GetDrawingY() + (2 * fullUnit);
-    int topPos = std::max(0, listTop - topY) / halfUnit;
-    int bottomY = accid->GetDrawingY() - (2 * fullUnit);
-    int botPos = (int)accidSpace->size() - 1 - ((std::max(0, bottomY - listBot)) / halfUnit);
+    //global drawing variables
+    int fullUnit = m_doc->m_drawingUnit[staff->staffSize];
+    int halfUnit = fullUnit / 2;
+    int accidHeight = ACCID_HEIGHT * halfUnit;
     
-    int currentX = 0;
+    //drawing variables for the chord
+    int xLength = (int)accidSpace->front().size();
+    int yHeight = (int)accidSpace->size() - 1;
+    int listTop = chord->m_accidSpaceTop;
+    int listBot = chord->m_accidSpaceBot;
     
-    //move to the left by half-units until all four corners are false
+    //drawing variables for the accidental
+    int type = accid->GetAccid();
+    int centerY = accid->GetDrawingY();
+    int topY = centerY + (accidHeight / 2);
+    int bottomY = centerY - (accidHeight / 2);
+    
+    //difference between left end and right end of the accidental
+    int accidWidthDiff = ACCID_WIDTH - 1;
+    //difference between top and bottom of the accidental
+    int accidHeightDiff = ACCID_HEIGHT - 1;
+    //drawing variables for the accidental in accidSpace units
+    int accidTop = std::max(0, listTop - topY) / halfUnit;
+    int accidBot, alignmentThreshold;
+    //the left side of the accidental; gets incremented to avoid conflicts
+    int currentX = accidWidthDiff;
+    
+    //another way of calculating accidBot
+    assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
+    
+    // store it for asserts
+    int accidSpaceSize = (int)accidSpace->size();
+    assert(accidTop >= 0);
+    assert(accidTop < accidSpaceSize);
+    
+    /*
+     * Make sure all four corners of the accidental are not on an already-taken spot.
+     * The top right corner of a flat can overlap something else; make sure that the bordering sections do not overlap.
+     * Move the accidental one half-unit left until it doesn't overlap.
+     */
     if (type == ACCIDENTAL_EXPLICIT_f) {
+        alignmentThreshold = 2;
+        accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
+        assert(accidBot < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(topPos + 1)[currentX]) currentX += 1;
-            if (accidSpace->at(topPos)[currentX + 1]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(topPos)[currentX + ACCID_WIDTH]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX + ACCID_WIDTH]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength ) break;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else break;
+        };
+    }
+    else if (type == ACCIDENTAL_EXPLICIT_n) {
+        alignmentThreshold = 1;
+        accidBot = accidTop + accidHeightDiff;
+        assert(accidBot < accidSpaceSize);
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        while (currentX < xLength) {
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            // just in case
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength ) break;
+            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else break;
+        };
+    }
+    else if (type == ACCIDENTAL_EXPLICIT_s) {
+        accidBot = accidTop + accidHeightDiff;
+        alignmentThreshold = 1;
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        while (currentX < xLength) {
+            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
     }
     else {
+        accidBot = accidTop + accidHeightDiff;
+        alignmentThreshold = 1;
+        assert(accidBot < accidSpaceSize);
+        //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
+        int accidMid = accidTop + (accidBot - accidTop) / 2;
+        assert(accidMid < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(topPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX]) currentX += 1;
-            else if (accidSpace->at(topPos)[currentX + ACCID_WIDTH]) currentX += 1;
-            else if (accidSpace->at(botPos)[currentX + ACCID_WIDTH]) currentX += 1;
+            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
+            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
             else break;
         };
     }
     
-    //move the accidental position if requested
-    if (save)
+    //If the accidental is lined up with the one above it, move it left by a halfunit to avoid visual confusion
+    //This doesn't need to be done with accidentals that are as far left or up as possible
+    if ((currentX < xLength - 1) && (accidTop > 1))
+    {
+        int yComp = accidTop - alignmentThreshold;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
+        if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
+    }
+    
+    //If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
+    //This doesn't need to be done with accidentals that are as far left or down as possible
+    if ((currentX < xLength - 1) && (accidBot < (yHeight - 1)) && accidBot > 1)
+    {
+        int yComp = accidBot;
+        assert(yComp < accidSpaceSize);
+        assert(yComp >= 0);
+        if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
+    }
+
+    //Just to make sure.
+    assert(currentX <= xLength);
+    
+    //If we need to move the accidental horizontally, move it by currentX half-units.
+    if (adjustHorizontally)
     {
         int xShift = currentX * halfUnit;
         accid->SetDrawingX(accid->GetDrawingX() - xShift);
         
-        //mark the spaces as taken (true)
-        for(int xIdx = currentX; xIdx < currentX + ACCID_WIDTH; xIdx++)
+        //mark the spaces as taken (true in accidSpace)
+        for(int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--)
         {
-            for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
             {
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
         }
     }
-    //otherwise just mark the vertical position so we can see if there are any vertical conflicts
+    //Otherwise, just mark its vertical position so we can see if there are any vertical conflicts
     else
     {
         for(int xIdx = 0; xIdx < ACCID_WIDTH; xIdx++) //x from 0 to 4, base position
         {
-            for(int yIdx = topPos; yIdx < botPos + 1; yIdx++)
+            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
             {
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
         }
-        
     }
     
-    return (currentX == 0);
+    //For debugging; leaving this in temporarily
+//    for (int vIdx = 0; vIdx < accidSpace->size(); vIdx++)
+//    {
+//        std::cout << "|";
+//        std::vector<bool> thisRow = accidSpace->at(vIdx);
+//        for (int hIdx = (int)thisRow.size() - 1; hIdx >= 0; hIdx --)
+//        {
+//            std::cout << thisRow.at(hIdx) << "|";
+//        }
+//        std::cout << std::endl;
+//    }
+//    std::cout << std::endl;
+    
+    //Regardless of whether or not we moved it, return true if there was a conflict and currentX would have been moved
+    return (currentX - accidWidthDiff == 0);
 }
 
 void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )
@@ -1514,8 +1434,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
-        int oct = accid->GetOloc() - 4;
-        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), oct) );
+        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
     }
     
     //Get the offset
@@ -1563,6 +1482,15 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this );
 }
 
+void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
+    
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    dc->DrawPlaceholder( ToDeviceContextX( element->GetDrawingX() ), ToDeviceContextY( element->GetDrawingY() ) );
+    dc->EndGraphic(element, this );
+}
 
 void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
@@ -1573,8 +1501,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     Custos *custos = dynamic_cast<Custos*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int oct = custos->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), oct) );
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), custos->GetOloc()) );
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1597,13 +1524,18 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Dot *dot = dynamic_cast<Dot*>(element);
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int oct = dot->GetOloc() - 4;
-    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), oct) );
+    element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), dot->GetOloc()) );
     
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
+    
+    // Use the note to which the points to for position
+    if ( dot->m_drawingNote ) {
+        x = dot->m_drawingNote->GetDrawingX() + m_doc->m_drawingUnit[staff->staffSize]*7/2;
+        y = dot->m_drawingNote->GetDrawingY();
+    }
 
-    DrawDot ( dc, x, y );
+    DrawDots( dc, x, y, 1, staff );
     
     dc->EndGraphic(element, this );
 

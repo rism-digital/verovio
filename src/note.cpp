@@ -34,16 +34,22 @@ Note::Note():
     AttTiepresent()
 {
     m_drawingTieAttr = NULL;
+    m_drawingAccid = NULL;
     Reset();
 }
 
 
 Note::~Note()
 {
-    // This deletes the Tie and Slur objects if necessary
+    // This deletes the Tie, Slur, and Accid objects if necessary
     if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
     }
+    
+    if (m_drawingAccid) {
+        delete m_drawingAccid;
+    }
+    
 }
     
 void Note::Reset()
@@ -62,6 +68,8 @@ void Note::Reset()
     m_embellishment = EMB_NONE;
     // tie pointers
     ResetDrawingTieAttr();
+    // accid pointer
+    ResetDrawingAccid();
     
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -93,6 +101,13 @@ void Note::ResetDrawingTieAttr( )
     }
 }
   
+void Note::ResetDrawingAccid( )
+{
+    if ( m_drawingAccid ) {
+        delete m_drawingAccid;
+        m_drawingAccid = NULL;
+    }
+}
     
 Chord* Note::IsChordTone()
 {
@@ -122,20 +137,7 @@ bool Note::IsClusterExtreme()
     
 bool Note::HasDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
-    if( chordParent && chordParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
-    {
-        return chordParent->GetDrawingStemDir();
-    }
-    else if( beamParent && beamParent->GetDrawingStemDir() != STEMDIRECTION_NONE )
-    {
-        return beamParent->GetDrawingStemDir();
-    }
-    else
-    {
-        return this->HasStemDir();
-    }
+    return (this->GetDrawingStemDir() != STEMDIRECTION_NONE);
 }
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
@@ -221,6 +223,16 @@ int Note::PrepareLyrics( ArrayPtrVoid params )
     
     (*lastButOneNote) = (*lastNote);
     (*lastNote) = this;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Note::PreparePointersByLayer( ArrayPtrVoid params )
+{
+    // param 0: the current Note
+    Note **currentNote = static_cast<Note**>(params[0]);
+    
+    (*currentNote) = this;
     
     return FUNCTOR_CONTINUE;
 }

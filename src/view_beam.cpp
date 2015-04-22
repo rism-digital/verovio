@@ -29,12 +29,18 @@
 
 namespace vrv {
 
-void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure )
+void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    
+    Beam *beam = dynamic_cast<Beam*>(element);
+    
     LayerElement *current;
 
 	bool changingDur = OFF;
     bool beamHasChord = OFF;
+    bool hasMultipleStemDir = OFF;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     
     // position variables
@@ -110,6 +116,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
     // This could be moved to Beam::InitCoord for optimization because there should be no
     // need of redoing it everytime it is drawn.
     
+    data_STEMDIRECTION currentStemDir;
+    
     ListOfObjects::iterator iter = beamChildren->begin();
 	do {
         // Beam list should contain only DurationInterface objects
@@ -138,6 +146,16 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             
             // Skip rests
             if (current->IsNote() || current->IsChord()) {
+                // look at the stemDir to see if we have multiple stem Dir
+                if (!hasMultipleStemDir) {
+                    currentStemDir = dynamic_cast<AttStemmed*>(current)->GetStemDir();
+                    if (currentStemDir != STEMDIRECTION_NONE) {
+                        if ((stemDir != STEMDIRECTION_NONE) && (stemDir != currentStemDir)) {
+                            hasMultipleStemDir = ON;
+                        }
+                    }
+                    stemDir = currentStemDir;
+                }
                 // keep the shortest dur in the beam
                 shortestDur = std::max(currentDur,shortestDur);
                 // check if we have more than duration in the beam
@@ -200,18 +218,20 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             avgY += (*beamElementCoords)[i]->m_y;
         }
 	}
-    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
-    
-    avgY /= elementCount;
 
     /******************************************************************/
     // Set the stem direction
     
-    stemDir = layer->GetDrawingStemDir(); //force layer direction if it exists
+    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
+    avgY /= elementCount;
+    
+    // If we have one stem direction in the beam, then don't look at the layer
+    if (stemDir != STEMDIRECTION_NONE) stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    
+    // Automatic stem direction if nothing in the notes or in the layer
     if (stemDir == STEMDIRECTION_NONE) {
-        if (beamHasChord) stemDir = (yExtreme > verticalCenter ? STEMDIRECTION_down : STEMDIRECTION_up); //if it has a chord, go by the most extreme position
-        else if ( avgY <  verticalCenter ) stemDir = STEMDIRECTION_up; //otherwise go by average
-        else stemDir = STEMDIRECTION_down;
+        if (beamHasChord) stemDir = (yExtreme < verticalCenter) ?  STEMDIRECTION_up : STEMDIRECTION_down; //if it has a chord, go by the most extreme position
+        else stemDir = (avgY <  verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; //otherwise go by average
     }
     
     beam->SetDrawingStemDir(stemDir);
@@ -227,6 +247,7 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         }
     }
 
+    // We look only at the last note for checking if cuesized. Somehow arbitrarily
     if ((*beamElementCoords)[last]->m_element->m_cueSize == false)  {
         beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
         beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
@@ -266,18 +287,12 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         //change the stem dir for all objects
         if ( (*beamElementCoords)[i]->m_element->IsNote() ) {
             ((Note*)(*beamElementCoords)[i]->m_element)->m_drawingStemDir = stemDir;
-            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
-        
         else if ( (*beamElementCoords)[i]->m_element->IsChord() ) {
             ((Chord*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir(stemDir);
-            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         }
-        
-        else {
-            (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
-        }
-        
+
+        (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
         (*beamElementCoords)[i]->m_x +=  dx[(*beamElementCoords)[i]->m_element->m_cueSize];
         
         s_y += (*beamElementCoords)[i]->m_yBeam;
@@ -286,7 +301,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
         s_x2 += (*beamElementCoords)[i]->m_x * (*beamElementCoords)[i]->m_x;
         s_xy += (*beamElementCoords)[i]->m_x * (*beamElementCoords)[i]->m_yBeam;
     }
-
 
 	y1 = elementCount * s_xy - s_x * s_y;
 	xr = elementCount * s_x2 - s_x * s_x;
@@ -305,33 +319,13 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
     
 	startingY = (s_y - beamSlope * s_x) / elementCount;
-    
+
     /******************************************************************/
-    // Draw notes for all objects in the beam now that stem direction is calculated
+    // Start the Beam graphic and draw the children
     
-    for (i = 0; i < elementCount; i++) {
-        if ((*beamElementCoords)[i]->m_element->IsChord()) {
-            Chord *chord = dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element);
-            ListOfObjects *noteList = chord->GetList(chord);
-            ListOfObjects::iterator iter = noteList->begin();
-            
-            dc->ResumeGraphic( dynamic_cast<DocObject*>(chord), (chord)->GetUuid() );
-            while ( iter != noteList->end()) {
-                Note *note = dynamic_cast<Note*>(*iter);
-                if (!note) continue;
-                dc->ResumeGraphic( dynamic_cast<DocObject*>(*iter), (*iter)->GetUuid() );
-                DrawNote(dc, dynamic_cast<LayerElement*>(*iter), layer, staff, measure);
-                dc->EndResumedGraphic( dynamic_cast<DocObject*>(*iter), this );
-                iter++;
-            }
-            dc->EndResumedGraphic( dynamic_cast<DocObject*>(chord), this );
-        }
-        else if ((*beamElementCoords)[i]->m_element->IsNote()) {
-            dc->ResumeGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), (*beamElementCoords)[i]->m_element->GetUuid() );
-            DrawNote(dc, dynamic_cast<LayerElement*>((*beamElementCoords)[i]->m_element), layer, staff, measure);
-            dc->EndResumedGraphic( dynamic_cast<DocObject*>((*beamElementCoords)[i]->m_element), this );
-        }
-    }
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
     // Calculate the stem lengths and draw them
@@ -364,13 +358,15 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             fy2 = (*beamElementCoords)[i]->m_yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         
-        (*beamElementCoords)[i]->m_element->m_drawingStemStart.x = (*beamElementCoords)[i]->m_element->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
-        (*beamElementCoords)[i]->m_element->m_drawingStemStart.y = fy2;
-        (*beamElementCoords)[i]->m_element->m_drawingStemEnd.y = fy1;
-        (*beamElementCoords)[i]->m_element->m_drawingStemDir = stemDir;
+        LayerElement *el = (*beamElementCoords)[i]->m_element;
+        el->m_drawingStemStart.x = el->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
+        el->m_drawingStemStart.y = fy2;
+        el->m_drawingStemEnd.y = fy1;
+        el->m_drawingStemDir = stemDir;
         
-        if((*beamElementCoords)[i]->m_element->IsNote() || (*beamElementCoords)[i]->m_element->IsChord())
+        if((el->IsNote() && ! dynamic_cast<Note*>(el)->IsChordTone()) || el->IsChord()){
             DrawVerticalLine (dc,fy2, fy1, (*beamElementCoords)[i]->m_x, m_doc->m_style->m_stemWidth);
+        }
 	}
 
     /******************************************************************/
@@ -427,8 +423,6 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
 	marqueurs partitionnant les sous-groupes; la troisieme boucle for est
 	pilotee par l'indice de l'array; elle dessine horizontalement les barres 
 	de chaque sous-groupe en suivant les marqueurs */
-    
-    //return;
 
     if (changingDur) {
         testDur = DUR_8 + fullBars;
@@ -514,9 +508,8 @@ void View::DrawBeamPostponed( DeviceContext *dc, Layer *layer, Beam *beam, Staff
             barY += shiftY * beamWidth;
         } // end of while
     } // end of drawing partial bars
-
-	return;	
-
+    
+    dc->EndGraphic(element, this );
 }
     
 } // namespace vrv

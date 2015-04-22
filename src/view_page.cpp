@@ -52,13 +52,31 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     int i;
 	System *system = NULL;
+    Measure *measure = NULL;
+    Staff *staff = NULL;
+    Layer *layer = NULL;
+    bool processLayerElement = false;
+    ArrayPtrVoid params;
+    params.push_back( m_doc );
+    params.push_back( &system );
+    params.push_back( &measure );
+    params.push_back( &staff );
+    params.push_back( &layer );
+    params.push_back( this );
+    params.push_back( &processLayerElement );
+    Functor setDrawingXY( &Object::SetDrawingXY );
+    // First pass without processing the LayerElements - we need this for cross-staff going down because
+    // the elements will need the position of the staff below to have been set before
+    m_currentPage->Process( &setDrawingXY, params );
+    // Second pass that process the LayerElements (only)
+    processLayerElement = true;
+    m_currentPage->Process( &setDrawingXY, params );
     
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    if ( background )
-        dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
+    if ( background ) dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
     
     dc->DrawBackgroundImage( );
     
@@ -71,8 +89,6 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
 	{
 		system = dynamic_cast<System*>(m_currentPage->m_children[i]);
         DrawSystem( dc, system );
-        
-        // TODO here: also update x_abs and m_drawingY positions for system. How to calculate them?
     }
     
     dc->EndPage();
@@ -93,25 +109,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     
     // first we need to clear the drawing list of postponed elements
     system->ResetDrawingList();
-    
-    if ( system->m_yAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        system->SetDrawingX( system->m_drawingXRel );
-        system->SetDrawingY( system->m_drawingYRel );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        system->SetDrawingX( system->m_xAbs );
-        system->SetDrawingY( system->m_yAbs );
-    }
 
-    DrawSystemChildren(dc, system, system);
-
-    // We draw the groups after the staves because we use the m_drawingY member of the staves
-    // that needs to be intialized.
-    // Warning: we assume for now the scoreDef occuring in the system will not change the staffGrps content
-    // and @symbol values, otherwise results will be unexpected...
     // First get the first measure of the system
     Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
     if ( measure ) {
@@ -126,6 +124,8 @@ void View::DrawSystem( DeviceContext *dc, System *system )
             dc->ResetFont();
         }
     }
+    
+    DrawSystemChildren(dc, system, system);
     
     // first draw the beams
     DrawSystemList(dc, system, &typeid(Syl) );
@@ -176,7 +176,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     
     if ( barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
-        DrawStaffGrp( dc, measure, staffGrp, x );
+        DrawStaffGrp( dc, measure, staffGrp, x, true );
         
         DrawStaffDefLabels( dc, measure, scoreDef, !scoreDef->DrawLabels() );
         // if this was true (non-abbreviated labels), set it to false for next one
@@ -192,7 +192,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
 	return;
 }
 
-void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x )
+void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp )
 {
     assert( measure );
     assert( staffGrp );
@@ -231,6 +231,10 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
+    if ( topStaffGrp ) {
+        DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
+    }
+    // this will need to be changed with the next version of MEI will line means additional thick line 
     if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
     }
@@ -622,20 +626,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     if ( measure->IsMeasuredMusic()) {
         dc->StartGraphic( measure, "", measure->GetUuid() );
     }
-    
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if ( measure->m_xAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        measure->SetDrawingX( measure->m_drawingXRel + system->GetDrawingX() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        measure->SetDrawingX( measure->m_xAbs );
-    }
-    
+
     DrawMeasureChildren(dc, measure, measure, system);
 
     if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
@@ -678,16 +669,19 @@ int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
 	char *ptouche, i;
 	ptouche=&touches[0];
 
+    // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
+    oct -= OCTAVE_OFFSET;
 	y_int = ((dec_clef + oct*7) - 9 ) * m_doc->m_drawingUnit[staff->staffSize];
-	if (staff->m_drawingLines > 5)
+    if (staff->m_drawingLines > 5) {
 		y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->m_drawingUnit[staff->staffSize];
+    }
 
 	/* exprime distance separant m_drawingY de
 	position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
 	ensuite, donc elle doit etre NEGATIVE si plus bas que m_drawingY */
-	for (i=0; i<(signed)sizeof(touches); i++)
-		if (*(ptouche+i) == pname)
-			return(y_int += ((i+1)*m_doc->m_drawingUnit[staff->staffSize]));
+    for (i=0; i<(signed)sizeof(touches); i++) {
+		if (*(ptouche+i) == pname) return (y_int += ((i+1)*m_doc->m_drawingUnit[staff->staffSize]));
+    }
 	return 0;
 }
 
@@ -725,18 +719,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     
     dc->StartGraphic( staff, "", staff->GetUuid());
     
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if ( staff->m_yAbs == VRV_UNSET ) {
-        assert( m_doc->GetType() == Raw );
-        staff->SetDrawingY( staff->GetYRel() + system->GetDrawingY() );
-    }
-    else
-    {
-        assert( m_doc->GetType() == Transcription );
-        staff->SetDrawingY( staff->m_yAbs );
-    }
+    // Doing it here might be problematic with cross-staff, even though the default value will be 5
     if ( StaffDef *staffDef = m_drawingScoreDef.GetStaffDef( staff->GetN() ) ) {
         staff->m_drawingLines = staffDef->GetLines( ) ;
     }
@@ -794,9 +777,8 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
 {
     assert(dynamic_cast<TimeSpanningInterface*>(element)); // Element must be a TimeSpanningInterface
     TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
-    
-    if ( !Check( interface->GetStart() ) ) return;
-    if ( !Check( interface->GetEnd() ) ) return;
+
+    if ( !interface->HasStartAndEnd() ) return;
     
     // Get the parent system of the first and last note
     System *parentSystem1 = dynamic_cast<System*>( interface->GetStart()->GetFirstParent( &typeid(System) )  );
@@ -894,7 +876,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
 }
     
 void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
-                    char spanningType, DocObject *graphic )
+                         char spanningType, DocObject *graphic )
 {
     assert(dynamic_cast<Slur*>(element) || dynamic_cast<Tie*>(element)); // Element must be a Tie or a Slur
     TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(element);
@@ -929,31 +911,38 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
         // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
         y1 = note1->GetDrawingY();
         y2 = note2->GetDrawingY();
-        assert(dynamic_cast<Note*>(note1));
         // for now we only look at the first note - needs to be improved
         // m_drawingStemDir it not set properly in beam - needs to be fixed.
-        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        if (dynamic_cast<Note*>(note1)) noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        else if (dynamic_cast<Chord*>(note1)) noteStemDir = dynamic_cast<Chord*>(note1)->GetDrawingStemDir();
+        else assert(false);
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
-        y1 = y2 = note1->GetDrawingY();
-        assert(dynamic_cast<Note*>(note1));
-        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        y1 = note1->GetDrawingY();
+        y2 = y1;
+        // m_drawingStemDir it not set properly in beam - needs to be fixed.
+        if (dynamic_cast<Note*>(note1)) noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
+        else if (dynamic_cast<Chord*>(note1)) noteStemDir = dynamic_cast<Chord*>(note1)->GetDrawingStemDir();
+        else assert(false);
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
-        y1 = y2 = note2->GetDrawingY();
+        y1 = note2->GetDrawingY();
+        y2 = y1;
         x2 = note2->GetDrawingX();
-        assert(dynamic_cast<Note*>(note2));
-        noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
+        if (dynamic_cast<Note*>(note2)) noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
+        else if (dynamic_cast<Chord*>(note2)) noteStemDir = dynamic_cast<Chord*>(note2)->GetDrawingStemDir();
+        else assert(false);
     }
     // Finally
     else {
-        LogDebug("Slur accross an entire system is not supported");
+        LogDebug("Slur across an entire system is not supported");
+        return;
     }
     
-    assert( dynamic_cast<Note*>(note1));
+    assert( dynamic_cast<Note*>(note1) || dynamic_cast<Chord*>(note1));
     //layer direction trumps note direction
     if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
@@ -1093,9 +1082,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
     
-    // first draw the beams
-    DrawLayerList(dc, layer, staff, measure, &typeid(Beam) );
-    // then tuplets
+    // first draw the tuplets
     DrawLayerList(dc, layer, staff, measure, &typeid(Tuplet) );
     // then ties
     DrawLayerList(dc, layer, staff, measure, &typeid(Tie) );
@@ -1120,13 +1107,7 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
         element = dynamic_cast<LayerElement*>(*iter);
         if (!element) continue; 
         
-        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Beam) ) ) {
-            Beam *beam = dynamic_cast<Beam*>(element);
-            dc->ResumeGraphic(beam, beam->GetUuid());
-            DrawBeamPostponed( dc, layer, beam, staff, measure );
-            dc->EndResumedGraphic(beam, this);
-        }
-        else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
+        if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tuplet) ) ) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
             dc->ResumeGraphic(tuplet, tuplet->GetUuid());
             DrawTupletPostponed( dc, tuplet, layer, staff );

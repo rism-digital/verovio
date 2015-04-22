@@ -31,7 +31,8 @@ class DurationInterface:
     public AttDurationMusical,
     public AttDurationPerformed,
     public AttDurationRatio,
-    public AttFermatapresent
+    public AttFermatapresent,
+    public AttStaffident
 {
 public:
     /**

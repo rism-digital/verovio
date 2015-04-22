@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "layer.h"
 #include "note.h"
 #include "syl.h"
@@ -188,5 +189,41 @@ int Staff::ResetDarwing( ArrayPtrVoid params )
     this->m_timeSpanningElements.clear();
     return FUNCTOR_CONTINUE;
 };
+    
+    
+int Staff::SetDrawingXY( ArrayPtrVoid params )
+{
+    // param 0: a pointer doc
+    // param 1: a pointer to the current system
+    // param 2: a pointer to the current measure (unused)
+    // param 3: a pointer to the current staff
+    // param 4: a pointer to the current layer (unused)
+    // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
+    Doc *doc = static_cast<Doc*>(params[0]);
+    System **currentSystem = static_cast<System**>(params[1]);
+    Staff **currentStaff = static_cast<Staff**>(params[3]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    (*currentStaff) = this;
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
+
+    // Here we set the appropriate y value to be used for drawing
+    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
+    // With Transcription documents, we use the m_yAbs
+    if ( this->m_yAbs == VRV_UNSET ) {
+        assert( doc->GetType() == Raw );
+        this->SetDrawingY( this->GetYRel() + (*currentSystem)->GetDrawingY() );
+    }
+    else
+    {
+        assert( m_doc->GetType() == Transcription );
+        this->SetDrawingY( this->m_yAbs );
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

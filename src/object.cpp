@@ -732,6 +732,24 @@ int ObjectListInterface::GetListIndex( const Object *listElement )
     return -1;
 }
 
+    
+Object* ObjectListInterface::GetListFirst(const Object *startFrom, const std::type_info *elementType)
+{
+    ListOfObjects::iterator it = m_list.begin();
+    std::advance(it, GetListIndex(startFrom));
+    it = std::find_if(it, m_list.end(), ObjectComparison( elementType ) );
+    return (it == m_list.end()) ? NULL : *it;
+}
+    
+Object* ObjectListInterface::GetListFirstBackward(Object *startFrom, const std::type_info *elementType)
+{
+    ListOfObjects::iterator it = m_list.begin();
+    std::advance(it, GetListIndex(startFrom));
+    ListOfObjects::reverse_iterator rit(it);
+    rit = std::find_if(rit, m_list.rend(), ObjectComparison( elementType ) );
+    return (rit == m_list.rend()) ? NULL : *rit;
+}
+    
 Object *ObjectListInterface::GetListPrevious( const Object *listElement )
 {
     ListOfObjects::iterator iter;
@@ -1054,8 +1072,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     assert( current->GetAlignment() );
 
     if ( !current->HasUpdatedBB() ) {
-        // this is all we need for empty elements
-        current->GetAlignment()->SetXRel(*min_pos);
+        // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }
     
@@ -1082,26 +1099,25 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsMRest() ) {
-        // We need to reconsider this: if the mrest is on the top staff, the aligner will be before any other note
-        // aligner. This means that it will not be shifted. We need to shift it but not take into account its own width.
-        //current->GetAlignment()->SetXShift( current->GetAlignment()->GetXRel() );
-        (*min_pos) = 0;
-        return FUNCTOR_CONTINUE;
-    }
-    
-    //(*min_pos) += doc->GetLeftMargin(current) * doc->m_drawingUnit / PARAM_DENOMINATOR;
-    
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
     int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
     
-    // this will probably never happen
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) {
         //LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
         negative_offset = 0;
+    }
+    
+    if ( current->IsMRest() ) {
+        // With MRest, the only thing we want to do it keep their with as possible measure with (if only MRest in all staves/layers)
+        int width =  current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR + negative_offset ;
+        // Keep it if more than the current measure width
+        (*measure_width) = std::max( (*measure_width), width );
+        (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
     }
     
     // check if the element overlaps with the preceeding one given by (*min_pos)

@@ -280,6 +280,8 @@ public:
     float m_drawingBeamMaxSlope;
     /** flag for disabling justification */
     bool m_drawingJustifyX;
+    /** minimum measure width */
+    int m_drawingMinMeasureWidth;
     
 private:
     /**

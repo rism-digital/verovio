@@ -9,6 +9,7 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
+#include <iterator>
 #include <map>
 #include <string>
 #include <typeinfo>
@@ -498,6 +499,13 @@ public:
     virtual int PrepareTieAttrEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
+     * Processes by Layer and set drawing pointers.
+     * Set Dot::m_drawingNote for Dot elements in mensural mode
+     * param 0: Note** currentNote for the current not to w
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
@@ -519,7 +527,12 @@ public:
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    virtual int ResetDarwing( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };    
+    
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetDrawingXY( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * @name Functors for justification
@@ -699,6 +712,12 @@ public:
     int GetListIndex( const Object *listElement );
     
     /**
+     * Gets the first item of type elementType starting at startFrom
+     */
+    Object *GetListFirst(const Object *startFrom, const std::type_info *elementType = NULL );
+    Object *GetListFirstBackward(Object *startFrom, const std::type_info *elementType = NULL );
+    
+    /**
      * Returns the previous object in the list (NULL if not found)
      */
     Object *GetListPrevious( const Object *listElement );
@@ -718,6 +737,7 @@ public:
     
 private:
     ListOfObjects m_list;
+    ListOfObjects::iterator m_iteratorCurrent;
     
 protected:
     /**

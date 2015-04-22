@@ -1,32 +1,33 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mrest.cpp
+// Name:        space.cpp
 // Author:      Laurent Pugin
-// Created:     2014
+// Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "mrest.h"
+#include "space.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// MRest
+// Space
 //----------------------------------------------------------------------------
 
-MRest::MRest( ):
-    LayerElement("mrest-")
+Space::Space( ):
+    LayerElement("space-"), DurationInterface()
 {
     Reset();
 }
 
-MRest::~MRest()
+Space::~Space()
 {
 }
     
-void MRest::Reset()
+void Space::Reset()
 {
     LayerElement::Reset();
+    DurationInterface::Reset();
 }
 
 } // namespace vrv

@@ -184,6 +184,23 @@ void Doc::PrepareDrawing()
         }
     }
     
+    Note *currentNote = NULL;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
+            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+
+            ArrayPtrVoid paramsPointers;
+            paramsPointers.push_back( &currentNote );
+            Functor preparePointersByLayer( &Object::PreparePointersByLayer );
+            this->Process( &preparePointersByLayer, paramsPointers, NULL, &filters );
+        }
+    }
+    
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     Syl *currentSyl;
     Note *lastNote;
@@ -380,22 +397,24 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
 {
 
     if (typeid(Barline) == *elementType) return 5;
+    else if (typeid(Chord) == *elementType) return 10;
     else if (typeid(Clef) == *elementType) return -20;
-    //else if (typeid(Note) == *elementType) return 10;
+    else if (typeid(MRest) == *elementType) return 30;
+    else if (typeid(Note) == *elementType) return 10;
     return 0;
 
 }
     
 short Doc::GetRightMargin( const std::type_info *elementType )
 {
-    if (typeid(Clef) == *elementType) return 20;
+    if (typeid(Clef) == *elementType) return 30;
     else if (typeid(KeySig) == *elementType)  return 30;
     else if (typeid(Mensur) == *elementType) return 30;
     else if (typeid(MeterSig) == *elementType) return 30;
     else if (typeid(Barline) == *elementType) return 30;
     else if (typeid(BarlineAttr) == *elementType) return 0;
-    else if (typeid(MRest) == *elementType) return 0;
-    else if (typeid(MultiRest) == *elementType) return 0;
+    else if (typeid(MRest) == *elementType) return 30;
+    else if (typeid(MultiRest) == *elementType) return 30;
     //else if (typeid(Note) == *elementType) return 10;
     return 10;
 }
@@ -540,6 +559,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingLyricFonts[1] = m_drawingLyricFont;
 	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
     m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
+    
+    m_drawingMinMeasureWidth = m_drawingUnit[0] * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
     
     float glyph_size;
     Glyph *glyph;

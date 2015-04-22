@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -181,8 +182,9 @@ int Measure::SetAligmentXPos( ArrayPtrVoid params )
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
-    // param 2: the functor to be redirected to Aligner
-    Functor *setAligmnentPosX = static_cast<Functor*>(params[2]);
+    // param 2: the minimum measure width (unused)
+    // param 3: the functor to be redirected to Aligner
+    Functor *setAligmnentPosX = static_cast<Functor*>(params[3]);
     
     m_measureAligner.Process( setAligmnentPosX, params);
     
@@ -254,6 +256,42 @@ int Measure::CastOffSystems( ArrayPtrVoid params )
     (*currentSystem)->AddMeasure( measure );
     
     return FUNCTOR_SIBLINGS;
+}
+   
+int Measure::SetDrawingXY( ArrayPtrVoid params )
+{
+    // param 0: a pointer doc
+    // param 1: a pointer to the current system
+    // param 2: a pointer to the current measure
+    // param 3: a pointer to the current staff (unused)
+    // param 4: a pointer to the current layer (unused)
+    // param 5: a pointer to the view (unused)
+    // param 6: a bool indicating if we are processing layer elements or not
+    Doc *doc = static_cast<Doc*>(params[0]);
+    System **currentSystem = static_cast<System**>(params[1]);
+    Measure **currentMeasure = static_cast<Measure**>(params[2]);
+    bool *processLayerElements = static_cast<bool*>(params[6]);
+    
+    (*currentMeasure) = this;
+    
+    // Second pass where we do just process layer elements
+    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
+    
+    // Here we set the appropriate y value to be used for drawing
+    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
+    // With Transcription documents, we use the m_xAbs
+    if ( this->m_xAbs == VRV_UNSET ) {
+        assert( doc->GetType() == Raw );
+        this->SetDrawingX( this->m_drawingXRel + (*currentSystem)->GetDrawingX() );
+    }
+    else
+    {
+        assert( doc->GetType() == Transcription );
+        this->SetDrawingX( this->m_xAbs );
+    }
+
+    
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

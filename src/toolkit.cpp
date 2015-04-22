@@ -425,6 +425,10 @@ std::string Toolkit::GetLogString() {
 #endif
 }
 
+std::string Toolkit::GetVersion() {
+    return vrv::GetVersion();
+}
+
 
 void  Toolkit::ResetLogBuffer() {
 #ifdef USE_EMSCRIPTEN

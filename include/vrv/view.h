@@ -149,7 +149,7 @@ protected:
     void DrawSystem( DeviceContext *dc, System *system );
     void DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
-	void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x );
+    void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false );
     void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
 	void DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
@@ -243,8 +243,9 @@ protected:
     void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawSpace( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawTuplet( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -263,7 +264,6 @@ protected:
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
     void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
-    void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
@@ -272,7 +272,6 @@ protected:
     void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
     void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
-    void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     ///@}
     
     /**
@@ -296,15 +295,9 @@ protected:
     void DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff );
     void DrawMensurSlash( DeviceContext *dc, int x, int yy, Staff *staff );
-    
-    /**
-     * @name Method for drawing Beam.
-     * Called from the the layer postponed drawing list.
-     * Wolfgang legacy code to be redesigned.
-     * Defined in view_beam.cpp
-     */
-    ///@{
-    void DrawBeamPostponed(  DeviceContext *dc, Layer *layer, Beam *beam, Staff *staff, Measure *measure );
+    void DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
+    void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
+    void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     ///@}
     
     /**
@@ -350,10 +343,14 @@ private:
     bool IsOnStaffLine ( int y, Staff *staff );
     
     /**
-     * Internal methods for calculating spacing chords
+     * Make sure dots on chords are vertically aligned correctly
      */
     void PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff );
-    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool save);
+    
+    /**
+     * Changes and/or calculates the horizontal alignment of accidentals to prevent overlapping
+     */
+    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
     
     /**
      * Swap the to points passed as reference.

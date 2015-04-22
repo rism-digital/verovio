@@ -24,17 +24,15 @@ namespace vrv {
 
 Chord::Chord( ):
 LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
-    AttColoration(),
     AttCommon(),
     AttStemmed(),
     AttTiepresent()
 {
     Reset();
     m_drawingStemDir = STEMDIRECTION_NONE;
-    m_ledgerLines[0][0] = 0;
-    m_ledgerLines[0][1] = 0;
-    m_ledgerLines[1][0] = 0;
-    m_ledgerLines[1][1] = 0;
+    m_drawingLedgerLines.clear();
+    
+    //test[NULL][0][0] = 0;
 }
 
 Chord::~Chord()
@@ -49,7 +47,6 @@ void Chord::Reset()
     DurationInterface::Reset();
     ResetCommon();
     ResetStemmed();
-    ResetColoration();
     ResetTiepresent();
 }
     
@@ -163,38 +160,53 @@ void Chord::ResetAccidList()
     ListOfObjects* childList = this->GetList(this); //make sure it's initialized
     for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
-        if (note->HasAccid()) {
+        if (note->m_drawingAccid != NULL) {
             m_accidList.push_back(note);
         }
     }
 }
     
+/**
+ * Creates a 2D grid of width (# of accidentals + 1) * 4 and of height (highest accid - lowest accid) / (half a drawing unit)
+ */
 void Chord::ResetAccidSpace(int fullUnit)
 {
     m_accidSpace.clear();
- 
+    m_accidSpaceBot = 0;
+    m_accidSpaceTop = 0;
+    
+    //if there are no accidentals in the chord, we don't need to plan for any
     if (m_accidList.size() == 0) return;
     
+    //dimensional units, other variables
     int halfUnit = fullUnit / 2;
-    int doubleUnit = fullUnit * 2;
-    
-    //make m_accidSpace into a 2D vector of size (vertical half-units, most possible horizontal halfunits)
     int idx, setIdx;
-    int size = (int)m_accidList.size();
-    std::vector<bool> *accidLine;
-    //top y position - bottom y position in half-units
-    int rows = ((m_accidList[0]->GetDrawingY() - m_accidList[m_accidList.size() - 1]->GetDrawingY()) / halfUnit);
-    m_accidSpace.resize(std::max(rows, ACCID_WIDTH));
     
-    //each line needs to be 4 times the number of notes in case every one overlaps fully
-    int lineLength = (doubleUnit*size) / halfUnit;
+    /*
+     * Prepare for the situation where every accidental conflicts horizontally:
+     *    -Assume each accidental to be 2 drawing units wide, drawn to 1/2-unit detail (ACCID_WIDTH should be represented in half-units)
+     *    -Prepare each line to account for one extra accidental so we can guarantee the grid has enough space
+     *    -Set m_accidSpaceLeft to be used for asserts during drawing
+     */
+    int accidLineLength = (int)m_accidList.size() * ACCID_WIDTH;
+    
+    /*
+     * Each accidental's Y position will be its vertical center; set the grid extremes to account for that
+     * Resize m_accidSpace to be as tall as is possibly necessary; must accomodate every accidental stacked vertically.
+     */
+    int accidHeight = ACCID_HEIGHT * halfUnit;
+    m_accidSpaceTop = m_accidList.front()->GetDrawingY() + (accidHeight / 2);
+    m_accidSpaceBot = m_accidList.back()->GetDrawingY() - (accidHeight / 2);
+    int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
+    m_accidSpace.resize(height);
+    
+    //Resize each row in m_accidSpace to be the proper length; set all the bools to false
+    std::vector<bool> *accidLine;
     for(idx = 0; idx < m_accidSpace.size(); idx++)
     {
         accidLine = &m_accidSpace.at(idx);
-        //resize each line
-        accidLine->resize(lineLength);
-        //initialize all spaces to false
-        for(setIdx = 0; setIdx < lineLength; setIdx++) accidLine->at(setIdx) = false;
+        accidLine->resize(accidLineLength);
+        for(setIdx = 0; setIdx < accidLineLength; setIdx++) accidLine->at(setIdx) = false;
     }
 }
     

@@ -139,6 +139,11 @@ public:
      * This is used by Doc::ContinuousLayout
      */
     virtual int UnCastOff( ArrayPtrVoid params );
+    
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetDrawingXY( ArrayPtrVoid params );
 
     
 private:

@@ -32,7 +32,11 @@ class Mensur: public LayerElement,
     public AttSlashcount
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes.
+     */
+    ///@{
     Mensur();
     Mensur( MensurAttr *mensurAttr );
     virtual ~Mensur();
