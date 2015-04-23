@@ -1,0 +1,21 @@
+<layer n="1">
+  <app xml:id="app1">
+    <rdg source="src1" xml:id="rdg1-1">
+      <note dur="1" oct="5" pname="d"/>
+    </rdg>
+    <rdg source="src2 src3" xml:id="rdg1-2">
+      <note dur="2" dots="1" oct="5" pname="d"/>
+      <app xml:id="app2">
+        <rdg source="src2" xml:id="rdg2-1">
+          <note dur="4" oct="4" pname="b"/>
+        </rdg>
+        <rdg source="src3" xml:id="rdg2-2">
+          <beam>
+            <note dur="8" oct="5" pname="c"/>
+            <note dur="8" oct="4" pname="b"/>
+          </beam>
+        </rdg>
+      </app>
+    </rdg>
+  </app>
+</layer>

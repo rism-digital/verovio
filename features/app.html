@@ -56,6 +56,9 @@
 </div>
 <br/>
 
+<!-- ***************************** -->
+<h4>SVG structure</h4>
+
 <p>
     The MEI structure is preserved as much as possible in the SVG output. For example, for the first note of the excerpt above, the MEI and SVG structure can be outlined as displayed below. The <code>&lt;app&gt;</code> and <code>&lt;lem&gt;</code> becomes a <code>&lt;g&gt;</code> element in the SVG with the corresponding <code>@id</code> attribute.
 </p>
@@ -84,15 +87,15 @@
 {% highlight xml %}
 <g class="note" id="p1cad4n0v1b1s2">
   <g class="app" id="app-001">
-      <g class="lem" id="lem-001">
-        <g class="verse" id="d2e199">
-          <g class="syl" id="syl-001">
-              <text>
-                <tspan>Di</tspan>
-              </text>
-          </g>
+    <g class="lem" id="lem-001">
+      <g class="verse" id="d2e199">
+        <g class="syl" id="syl-001">
+          <text>
+            <tspan>Di</tspan>
+          </text>
         </g>
       </g>
+    </g>
   </g>
 </g>
 {% endhighlight %}
@@ -100,4 +103,86 @@
 </div>
 
 
+<!-- ***************************** -->
+<h4>Nested apparati</h4>
+
+<p>
+    Verovio also supports nested apparati when differences between sources occur at different levels. The three example below show three versions. The difference between the second and the third sources is encoded in a nested <code>&lt;app&gt;</code> element. The corresponding hierarchy is also preserved in the SVG output.
+</p>
+
+<div class="row">
+    <div class="col-sm-4">
+        <table>
+			<tr>
+				<td><code>@source="src1"</code></td>
+            </tr>
+            <tr>
+				<td>
+                    <div id="svg_output-4-1" style="overflow:auto;"/>
+				</td>
+			</tr>
+        </table>
+    </div>
+    <div class="col-sm-4">
+        <table>
+			<tr>
+				<td><code>@source="src2"</code></td>
+            </tr>
+            <tr>
+				<td>
+                    <div id="svg_output-4-2" style="overflow:auto;"/>
+				</td>
+			</tr>
+        </table>
+    </div>
+    <div class="col-sm-4">
+        <table>
+			<tr>
+				<td><code>@source="src3"</code></td>
+            </tr>
+            <tr>
+				<td>
+                    <div id="svg_output-4-3" style="overflow:auto;"/>
+				</td>
+			</tr>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	pageWidth = 1450;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+    
+	$.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
+        appXPath = "";
+        noLayout = 1;
+		load_data( data, $('#svg_output-4-1') );
+	});;
+	$.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
+        appXPath = "./rdg[contains(@source, 'src2')]";
+        noLayout = 1;
+		load_data( data, $('#svg_output-4-2') );
+	});;
+	$.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
+        appXPath = "./rdg[contains(@source, 'src3')]";
+        noLayout = 1;
+		load_data( data, $('#svg_output-4-3') );
+	});;
+//]]>
+</script>
+    
+{% include mei-excerpt.html id="code2" file="app-nested.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/app-nested.txt %}
+{% endhighlight %}
+</div>
+<br/>
 
