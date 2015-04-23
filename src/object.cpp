@@ -285,6 +285,8 @@ void Object::AddEditorialElement( EditorialElement *child )
         || dynamic_cast<Layer*>(this)
         || dynamic_cast<LayerElement*>(this)
         || dynamic_cast<Note*>(this)
+        || dynamic_cast<Lem*>(this)
+        || dynamic_cast<Rdg*>(this)
            );
     child->SetParent( this );
     m_children.push_back( child );
