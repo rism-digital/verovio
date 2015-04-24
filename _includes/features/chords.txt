@@ -1,0 +1,48 @@
+<layer n="1">
+  <chord dots="1" dur="4">
+    <note oct="4" pname="d" accid="s"/>
+    <note oct="5" pname="f" accid="s"/>
+    <note oct="5" pname="f" accid="s"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="g" accid="s"/>
+    <note oct="4" pname="f" accid="f"/>
+    <note oct="5" pname="e" accid="s"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="e" accid="s"/>
+    <note oct="4" pname="c" accid="f"/>
+    <note oct="5" pname="e" accid="f"/>
+    <note oct="5" pname="b" accid="n"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="g" accid="s"/>
+    <note oct="3" pname="b" accid="s"/>
+    <note oct="4" pname="a" accid="f"/>
+    <note oct="4" pname="b" accid="f"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="c" accid="n"/>
+    <note oct="3" pname="f" accid="f"/>
+    <note oct="4" pname="c" accid="f"/>
+    <note oct="5" pname="a" accid="s"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="e" accid="f"/>
+    <note oct="3" pname="b"/>
+    <note oct="4" pname="c" accid="s"/>
+    <note oct="4" pname="e" accid="n"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="c" accid="s"/>
+    <note oct="4" pname="e"/>
+    <note oct="4" pname="f" accid="s"/>
+    <note oct="5" pname="b" accid="s"/>
+  </chord>
+  <chord dots="1" dur="4">
+    <note oct="3" pname="f" accid="s"/>
+    <note oct="4" pname="d" accid="f"/>
+    <note oct="4" pname="f" accid="s"/>
+    <note oct="5" pname="b" accid="s"/>
+  </chord>
+</layer>

@@ -1,0 +1,34 @@
+---
+---
+<h3>Chords</h3>
+
+
+<p>
+	Verovio supports chords with a optimized placement of note-heads, dots and accidental. The chords in the example below were chosen for a comparison with the Steinberg comparison. 
+</p>
+
+<div id="svg_output" style="overflow:auto;"/>
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	border = 35;
+	pageWidth = 2000;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+
+	$.get( "{{ site.baseurl }}/examples/features/chords.mei" , function( data ) {
+		load_data( data, $('#svg_output') );
+	});
+//]]>
+</script>
+
+{% include mei-excerpt.html id="code1" file="chords.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/chords.txt %}
+{% endhighlight %}
+</div>

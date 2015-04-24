@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title/>
+            </titleStmt>
+            <pubStmt>
+                <date>22 April 2015</date>
+            </pubStmt>
+        </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Cross-staff notation example</p>
+            </projectDesc>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="4" meter.unit="4">
+                        <staffGrp>
+                            <staffGrp n="1" symbol="brace">
+                                <staffDef clef.line="2" clef.shape="G" key.mode="major" lines="5" n="1"/>
+                                <staffDef clef.line="4" clef.shape="F" key.mode="major" lines="5" n="2"/>
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure label="1" n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam label="feature-example">
+                                        <chord dur="16">
+                                            <note dur="16" oct="4" pname="f"/>
+                                            <note dur="16" oct="5" pname="c"/>
+                                        </chord>
+                                        <note dur="16" oct="3" pname="c" staff="2"/>
+                                        <note dur="16" oct="3" pname="a" staff="2"/>
+                                        <chord dur="16">
+                                            <note dur="16" oct="4" pname="e"/>
+                                            <note dur="16" oct="5" pname="c"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord dur="16">
+                                            <note dur="16" oct="4" pname="e"/>
+                                            <note dur="16" oct="4" pname="a"/>
+                                        </chord>
+                                        <note dur="16" oct="3" pname="c" staff="2"/>
+                                        <chord dur="16">
+                                            <note dur="16" oct="4" pname="d"/>
+                                            <note dur="16" oct="4" pname="g"/>
+                                        </chord>
+                                        <note dur="16" oct="3" pname="a" staff="2"/>
+                                    </beam>
+                                    <beam>
+                                        <chord dur="16">
+                                            <note dur="16" oct="3" pname="f"/>
+                                            <note dur="16" oct="4" pname="d"/>
+                                        </chord>
+                                        <note dur="16" oct="4" pname="a" staff="2"/>
+                                        <note dur="16" oct="5" pname="f" staff="2"/>
+                                        <chord dur="16">
+                                            <note dur="16" oct="3" pname="g"/>
+                                            <note dur="16" oct="3" pname="b"/>
+                                        </chord>
+                                    </beam>
+                                    <clef line="4" shape="F"/>
+                                    <beam>
+                                        <note dur="16" oct="3" pname="c" staff="2"/>
+                                        <note dur="16" oct="3" pname="g"/>
+                                        <note dur="16" oct="3" pname="a" staff="2"/>
+                                    </beam>
+                                    <rest dur="16"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <space dur="2"/>
+                                    <clef line="2" shape="G"/>
+                                    <space dur="4"/>
+                                    <clef line="4" shape="F"/>
+                                    <space dur="4"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure label="1" n="1" right="end">
+                            <staff n="1">
+                                <layer n="1">
+                                    <space dur="2"/>
+                                    <chord dur="4" fermata="above">
+                                        <note oct="2" pname="e" staff="2"/>
+                                        <note oct="3" pname="c" staff="2"/>
+                                        <note oct="3" pname="f" staff="2"/>
+                                        <note oct="2" pname="c"/>
+                                        <note oct="4" pname="c"/>
+                                        <note oct="4" pname="d"/>
+                                    </chord>
+                                    <chord dur="4" fermata="above">
+                                        <note oct="4" pname="c" staff="2"/>
+                                        <note oct="4" pname="a" staff="2"/>
+                                        <note oct="5" pname="d" staff="2"/>
+                                        <note oct="2" pname="c"/>
+                                        <note oct="4" pname="c"/>
+                                        <note oct="4" pname="d"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord dur="2" fermata="above">
+                                        <note oct="2" pname="e"/>
+                                        <note oct="3" pname="c"/>
+                                        <note oct="3" pname="f"/>
+                                        <note oct="2" pname="c" staff="1"/>
+                                        <note oct="4" pname="c" accid="s" staff="1"/>
+                                        <note oct="4" pname="d" staff="1"/>
+                                    </chord>
+                                    <space dur="4"/>
+                                    <clef line="2" shape="G"/>
+                                    <space dur="4"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

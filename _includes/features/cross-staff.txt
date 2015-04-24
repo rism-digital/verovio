@@ -1,0 +1,12 @@
+<beam>
+  <chord dur="16">
+    <note dur="16" oct="4" pname="f"/>
+    <note dur="16" oct="5" pname="c"/>
+  </chord>
+  <note dur="16" oct="3" pname="c" staff="2"/>
+  <note dur="16" oct="3" pname="a" staff="2"/>
+  <chord dur="16">
+    <note dur="16" oct="4" pname="e"/>
+    <note dur="16" oct="5" pname="c"/>
+  </chord>
+</beam>
