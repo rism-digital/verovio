@@ -35,5 +35,29 @@
 			{{ content }}
 			
 		</div>
+        
+		<footer class="footer">			
+    		<p>
+                {% if page.version-footer %}
+                Notation generated with Verovio version <a href="" id="version">[version]</a>
+                {% endif %}
+    		</p>
+		</footer>
+
+        <script type="text/javascript">
+        //<![CDATA[
+            $(document).ready(function() {
+                
+                {% if page.version-footer %}
+                var version = vrvToolkit.getVersion();
+                var n = version.lastIndexOf('-');
+                var commit = version.substring(n + 1);
+                $('#version').text( version );
+                $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ; 
+                {% endif %}
+                
+            });
+        //]]>
+        </script>
 	</body>
 </html>
