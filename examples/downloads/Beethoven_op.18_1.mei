@@ -2067,7 +2067,7 @@
                             <tie tstamp="1" staff="1" curvedir="above" startid="#d690095e9364" endid="#d690095e9567"/>
                             <dynam tstamp="1" place="below" staff="4">pp</dynam>
                             <tie tstamp="1" staff="4" curvedir="below" startid="#d690095e9388" endid="#d690095e9669"/>
-                            <tie tstamp="1.125" staff="4" curvedir="below" startid="#d690095e9406" endid="#d690095e33860"/>
+                            
                             <dynam tstamp="1" place="below" staff="3">pp</dynam>
                             <slur tstamp="1" curvedir="below" startid="#d690095e9435" endid="#d690095e9474" staff="3"/>
                             <dynam tstamp="1" place="below" staff="2">pp</dynam>
@@ -2251,7 +2251,7 @@
                                 </layer>
                             </staff>
                             <slur tstamp="1" curvedir="above" startid="#d690095e10220" endid="#d690095e10237" staff="1"/>
-                            <tie tstamp="1" staff="4" curvedir="below" startid="#d690095e10298" endid="#d690095e33860"/>
+                            
                             <slur tstamp="1" curvedir="below" startid="#d690095e10321" endid="#d690095e10380" staff="3"/>
                             <tie tstamp="1" staff="2" curvedir="below" startid="#d690095e10422" endid="#d690095e10665"/>
                         </measure>
@@ -6387,7 +6387,7 @@
                             <dynam tstamp="1" place="below" staff="4">pp</dynam>
                             <slur tstamp="1" curvedir="above" startid="#d690095e33664" endid="#d690095e33683" staff="4"/>
                             <dynam tstamp="1" place="below" staff="3">pp</dynam>
-                            <tie tstamp="1" staff="3" curvedir="above" startid="#d690095e33769" endid="#d690095e33860"/>
+                            
                             <dynam tstamp="1" place="below" staff="2">pp</dynam>
                             <slur tstamp="1" curvedir="above" startid="#d690095e33797" endid="#d690095e33897" staff="2"/>
                         </measure>
@@ -6415,7 +6415,7 @@
                                 </layer>
                             </staff>
                             <slur tstamp="1" curvedir="above" startid="#d690095e33823" endid="#d690095e33839" staff="4"/>
-                            <slur tstamp="1" curvedir="above" startid="#d690095e33860" endid="#d690095e33880" staff="3"/>
+                            
                         </measure>
                         <measure n="125" xml:id="d690095e33914">
                             <staff n="1">

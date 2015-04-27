@@ -1,0 +1,607 @@
+---
+layout: verovio
+title: Verovio MEI Viewer
+active: mei-viewer
+downloads:
+    - name: "Guami Canzona 24"
+      description: "8 voices and b.c., 10 pages - 235Kb"
+      link: "Guami_Canzona_24.mei"
+    - name: "Hummel Concerto"
+      description: "Orchestra score, 121 pages - 7Mb"
+      link: "Hummel_Concerto_for_trumpet.mei"
+    - name: "Krebs Trio in Eb"
+      description: "Organ score, 6 pages - 380Kb"
+      link: "Krebs_Trio_Eb_2.mei"
+    - name: "Ahle, Jesu, meines Herzens Freud"
+      description: "Choral, 1 page - 70Kb"
+      link: "Ahle_Jesu_meines_Herzens_Freud.mei"
+    - name: "Beethoven Op 18/1"
+      description: "String quartet, 18 pages - 1.1Mb"
+      link: "Beethoven_op.18_1.mei"
+    - name: "Brahms Op 51/1"
+      description: "String quartet, 7 pages - 640Kb"
+      link: "Brahms_StringQuartet_Op51_No1.mei"
+---
+
+<script type="text/javascript">
+//<![CDATA[
+	var vrvToolkit = new verovio.toolkit();
+	var page = 1;
+	var zoom = 40;
+	var pageHeight = 2970;
+	var pageWidth = 2100;
+	var swipe_pages = false;
+	var log = false;
+	var thumbnails = false;
+	
+	// testing workers
+	/*var worker = new Worker("{{ site.baseurl }}/javascript/verovio-worker.js");
+	worker.onmessage = function(event) {
+	    alert("Reply: " + event.data);
+	}
+	worker.postMessage("Hello worker!");*/
+
+	function upload_file(option_form, format) {
+		
+		$('#submit-btn').popover('hide');
+		var file = $("#mei_files", option_form).prop('files')[0];
+		var reader = new FileReader();
+
+		// Closure to capture the file information.
+		reader.onload = (function(theFile) {
+			return function(e) {
+				load_data(e.target.result, option_form);
+			};
+		})(file);
+
+		// Read in the image file as a data URL.
+		reader.readAsText(file);
+	};
+	
+	function load_data(data, option_form) {
+		//unload_thumbnails();
+		ignoreLayout = $("#ignoreLayout", option_form).is(':checked') ? 1 : 0;
+		pageHeight = $("#pageHeight", option_form).val().length ? Number( $("#pageHeight", option_form).val() ) : 2970;
+		pageWidth = $("#pageWidth", option_form).val().length ? Number( $("#pageWidth", option_form).val() ) : 2100;
+		border = $("#border", option_form).val().length ? Number( $("#border", option_form).val() ) : 50;
+		options = JSON.stringify({
+					inputFormat: 'mei',
+					pageHeight: pageHeight,
+					pageWidth: pageWidth,
+					border: border,
+					scale: 10,
+					ignoreLayout: ignoreLayout
+				});
+		vrvToolkit.setOptions( options );
+		vrvToolkit.loadData(data);
+		
+		if (log) {
+			str = vrvToolkit.getLog();
+			$("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
+		}
+
+		$("#total_text").html(vrvToolkit.getPageCount());
+		page = 1;
+		load_page();
+	}
+
+	/*
+	function unload_thumbnails() {
+		thumbnails = false;
+		$("#thumbnails_output").html("<div class=\"row\"/>");
+	}
+	
+	function load_thumbnails() {
+		if ( !$("#thumbnails_output").is(":visible") || thumbnails ) {
+			return;
+		}
+		thumbnails = true;
+		for (idx = 0; idx < vrvToolkit.getPageCount(); idx++) { 
+			cv_id = "cv-" + idx;
+		    $("#thumbnails_hidden_placeholder div a canvas").attr('id', cv_id );
+			$("#thumbnails_hidden_placeholder div").clone().appendTo("#thumbnails_output div.row");
+			// reset the id to ""
+			$("#thumbnails_hidden_placeholder div a canvas").attr('id', '' );
+			var image = new Image();
+			var svg = vrvToolkit.renderPage(idx + 1, "");
+			image.src = 'data:image/svg+xml,' + escape(svg);
+			image.onload = function(){
+				var canvas = document.getElementById(cv_id);
+			    canvas.width = image.width;
+			    canvas.height = image.height;
+				var context = canvas.getContext('2d');
+				// this does not work (not drawn in the appropriate message)
+			    context.drawImage(image, 0, 0);	
+			}
+			// alternative with canvg (slower but nicer)
+			//canvg( cv_id, vrvToolkit.renderPage( 1, ""), { ignoreMouse: true, ignoreAnimation: true } )
+	 	}
+		
+	}
+	*/
+
+	function load_page() {
+		$("#jump_text").val(page);
+
+		svg = vrvToolkit.renderPage(page, "");
+		$("#svg_output").html(svg);
+		
+		apply_zoom();		
+	};
+
+	function next_page() {
+		if (page >= vrvToolkit.getPageCount()) {
+			return;
+		}
+
+		page = page + 1;
+		load_page();
+	};
+
+	function prev_page() {
+		if (page <= 1) {
+			return;
+		}
+
+		page = page - 1;
+		load_page();
+	};
+
+	function first_page() {
+		page = 1;
+		load_page();
+	};
+	
+	function last_page() {
+		page = vrvToolkit.getPageCount();
+		load_page();
+	};
+
+	function apply_zoom() {
+		/*
+		vrvToolkit.setOptions(JSON.stringify({
+			scale: zoom
+		}));
+		load_page();
+		*/
+		
+		adjust_page_height();
+	}
+
+	function zoom_out() {
+		if (zoom < 20) {
+			return;
+		}
+
+		zoom = zoom / 2;
+		apply_zoom();
+	}
+
+	function zoom_in() {
+		if (zoom > 80) {
+			return;
+		}
+
+		zoom = zoom * 2;
+		apply_zoom();
+	}
+
+	function do_page_enter(e) {
+		key = e.keyCode || e.which;
+		if (key == 13) {
+
+			text = $("#jump_text").val();
+
+			if (text <= vrvToolkit.getPageCount() && text > 0) {
+				page = Number(text);
+				load_page();
+			} else {
+				$("#jump_text").val(page);
+			}
+
+		}
+	}
+
+	function do_zoom_enter(e) {
+		key = e.keyCode || e.which;
+		if (key == 13) {
+			text = $("#zoom_text").val();
+			zoom_val = Number(text.replace("%", ""));
+			if (zoom_val < 10) zoom_val = 10;
+			else if (zoom_val > 160) zoom_val = 160;	
+			zoom = zoom_val;
+			apply_zoom();
+		}
+	}
+	
+	function adjust_page_height() {
+		// adjust the height of the panel
+		if ( $('#svg_panel svg') ) {
+			$('#svg_output').height( (pageHeight * zoom / 100) + 10 ); // slighly more for making sure we have no scroll bar	
+			$('#svg_panel svg').height(pageHeight * zoom / 100 );
+			$('#svg_panel svg').width(pageWidth * zoom / 100 );	
+		}
+		
+		// also update the zoom control
+		$("#zoom_text").val(zoom + "%");
+		
+		// enable the swipe (or not)
+		enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
+	}
+	 
+	function swipe_prev(event, direction, distance, duration, fingerCount) {
+	  	prev_page();
+	 }
+
+	 function swipe_next(event, direction, distance, duration, fingerCount) {
+		 next_page();
+	 }
+
+	 function swipe_zoom_in(event, target) {
+		 zoom_in();
+	 }
+	
+	 function swipe_zoom_out(event, target) {
+		 zoom_out();
+	 }
+	
+	function enable_swipe( pages ) {
+		if ( pages && !swipe_pages ) {
+			$("#svg_output").swipe( "destroy" );
+			$("#svg_output").swipe( { swipeLeft: swipe_next, swipeRight: swipe_prev, tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+			swipe_pages = true;
+		}
+		// zoom only
+		else if ( !pages && swipe_pages ) {
+			$("#svg_output").swipe( "destroy" );
+			$("#svg_output").swipe( { tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+			swipe_pages = false;		
+		}
+	}
+
+//]]>
+</script>
+
+<div class="row">
+	<div class="col-sm-8 col-md-9">
+		<div class="panel panel-default hidden-xs hidden-sm hidden-print">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-xs-10">
+						MEI file to render and optional parameters
+					</div>
+					<div class="col-xs-2">
+						<button id="toggle_options" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-chevron-down"/>
+						</button>
+						<button id="options_help" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
+			</div>
+			
+			<div id="options_panel_body" class="panel-body">
+				<form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
+					<div class="row">
+						<div class="col-md-10">
+							<input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
+						</div>
+						<div class="col-md-2">
+							<button type="submit" id="submit-btn" class="btn btn-default btn-sm pull-right popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to display the MEI file!" data-trigger="manual">Render</button>
+						</div>
+					</div>
+					<!-- /.row -->
+					<hr class="panel"/>
+					<div class="row">
+						<div class="col-md-3">
+							<div class="checkbox">
+								<label class="checkbox">
+									<input id="ignoreLayout" type="checkbox"/> Ignore encoded layout
+								</label>
+							</div>
+						</div>
+						<!-- /.col-xs -->
+						<div class="col-md-3">
+							<div class="checkbox">
+								<label class="checkbox">
+									<input id="adjustPageHeight" type="checkbox"/> Adjust height to content
+									</label>
+							</div>
+						</div>
+						<!-- /.col-xs -->
+						<div class="col-md-6">
+							 <div class="col-md-4 form-group">
+								<input type="text" class="form-control" id="pageHeight" placeholder="Height"/>
+							 </div>
+							 <div class="col-md-4 form-group">
+								<input type="text" class="form-control" id="pageWidth" placeholder="Width"/>
+							 </div>
+							 <div class="col-md-4 form-group">
+								<input type="text" class="form-control" id="border" placeholder="Margin"/>
+							 </div>
+						</div>
+						<!-- /.col-xs -->
+					</div>
+					<!-- /.row -->
+					
+					<div id="help_panel" style="display: none">
+						<hr class="panel"/>
+						<p><strong>Ignore encoded layout</strong></p>
+						<p>Make Verovio ignore the encoded layout information (if any) and have it fully recalculated</p>
+						
+						<p><strong>Adjust height to content</strong></p>
+						<p>Crop the page height to the height of the content</p>
+						
+						<p><strong>Height</strong></p>
+						<p>Specify the page height (default is 2970)</p>
+							
+						<p><strong>Width</strong></p>
+						<p>Specify the page width (default is 2100)</p>
+							
+						<p><strong>Margin</strong></p>
+						<p>Add a margin (default is 50)</p>
+					</div>
+
+					<!--><div id="log_panel" style="display: none">
+						<hr class="panel"/>
+						<p id="log_p"></p>
+					</div>
+					-->
+					
+				</form>
+			</div>
+		</div>
+		
+		<div id="svg_panel" class="panel panel-default">
+			<div id="svg_output" style="overflow:auto;">
+			</div>
+			<div id="thumbnails_output" style="margin: 10px; display: none;">
+			</div>
+			<div id="thumbnails_hidden_placeholder" style="display: none;">
+				<div class="col-lg-2 col-md-4 col-xs-6 thumb">
+				    <a class="thumbnail" href="#">
+						<canvas></canvas>
+				    </a>
+				</div>
+				<canvas id="canvas_output"/>
+			</div>
+		</div>
+	</div>
+	<div class="col-sm-4 col-md-3 sidebar-offcanvas hidden-print" id="sidebar" role="navigation">
+			
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-xs-10">
+						Navigation
+					</div>
+					<div class="col-xs-2">
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out. On desktops, you can use [ctrl+] left or right arrows and +/- keys.">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="panel-body">
+				<div class="row">
+					<div class="col-md-12">
+						<p>
+							Go to page [1-<span id="total_text">1</span>]:
+						</p>
+						<div class="col-xs-1 input-group input-group-sm">
+							<span class="input-group-btn">
+								<button onclick="first_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-fast-backward"/>
+								</button>
+								<button onclick="prev_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-backward"/>
+								</button>
+							</span>
+							<input type="text" class="form-control" placeholder="0" id="jump_text" style="width: 45px !important;" onkeypress="do_page_enter(event)"/>
+							<span class="input-group-btn">
+								<button onclick="next_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-forward"/>
+								</button>
+								<button onclick="last_page()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-fast-forward"/>
+								</button>
+							</span>
+						</div>
+						<!-- /input-group -->
+					</div>
+					<!-- /.col-lg-6 -->
+				</div>
+				<!-- /.row -->
+				<hr/>
+				<div class="row">
+					<div class="col-md-6">
+						<p>
+							Zoom:
+						</p>
+						<div class="col-xs-2 input-group input-group-sm">
+							<span class="input-group-btn">
+								<button onclick="zoom_out()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-zoom-out"/>
+								</button>
+							</span>
+							<input type="text" class="form-control" style="width:60px !important;" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
+							<span class="input-group-btn">
+								<button onclick="zoom_in()" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-zoom-in"/>
+								</button>
+							</span>
+						</div>
+						<!-- /input-group -->
+					</div>
+					<!-- /.col-md-6 -->
+				</div>
+				<!-- /.row -->
+				<!--
+				<hr/>
+				<div class="row">
+					<div class="col-md-6">
+						<p>
+							View:
+						</p>
+						<div class="col-xs-2 input-group input-group-sm">
+							<span class="input-group-btn">
+								<button id="show_thumbnails" class="btn btn-default" type="button">
+									<span class="glyphicon glyphicon-th"/>
+								</button>
+							</span>
+						</div>
+					</div>
+				</div>
+				-->
+				<!-- /.row -->
+			</div>
+		</div>
+		
+		<div class="panel panel-default hidden-xs hidden-sm">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-xs-7">
+						Examples
+					</div>
+					<div class="col-xs-5">
+						<button id="toggle_downloads" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-chevron-down"/>
+						</button>
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="These files are examples that can be downloaded locally on your machine and then selected for rendering in your browser.">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="downloads_panel_body" class="panel-body">
+				<div class="row">
+					<div class="col-md-12">
+						{% for d in page.downloads %}
+						<p><a href="{{ site.baseurl }}/examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+							 {{ d.description }}
+						 </p>
+						{% endfor %}
+					</div>
+					<!-- /.col-md-6 -->
+				</div>
+				<!-- /.row -->
+			</div>
+		</div>
+		
+		<div class="panel panel-default hidden-xs hidden-sm">
+			<div class="panel-heading">
+				<div class="row">
+					<div class="col-xs-7">
+						Log
+					</div>
+					<div class="col-xs-5">
+						<button id="toggle_log" class="btn btn-default btn-xs btn-heading pull-right" type="button">
+							<span class="glyphicon glyphicon-chevron-left"/>
+						</button>
+						<button class="btn btn-default btn-xs btn-heading pull-right popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="Shows the log information generated when loading the file.">
+							<span class="glyphicon glyphicon-question-sign"/>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="log_panel_body" class="panel-body" style="display: none">
+				<div style="max-height: 400px; overflow-x: auto">
+					<p id="log_p">[Render the file for seeing the log]</p>
+				</div>
+			</div>
+		</div>
+		
+		
+	</div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	$( document ).ready(function() {
+		
+		$(window).keyup(function(event){
+			// We need to make sure not to capture event on text fields
+			if ( $(event.target).hasClass('form-control') ) {
+				return;
+			}
+			if ( event.ctrlKey && (event.keyCode == 37) ) {
+				first_page();
+			}
+			else if ( event.keyCode == 37 ) {
+				prev_page();
+			}
+			else if ( event.ctrlKey && (event.keyCode == 39) ) {
+				last_page();
+			}
+			else if ( event.keyCode == 39 ) {
+				next_page();
+			}
+			else if ( event.keyCode == 107 ) {
+				zoom_in();
+			}
+			else if ( event.keyCode == 109 ) {
+				zoom_out();
+			}
+		});
+		
+		
+		// Toggle for the options help
+		$( "#options_help" ).click(function() {
+			if ( !$("#options_panel_body").is(":visible") ) {
+				$( "#toggle_options" ).click();
+			}
+			$( "#help_panel" ).slideToggle();	
+		});
+		
+		$( "#toggle_log" ).click(function() {
+			log = !log;
+			$( "#log_panel_body" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+		});
+		
+		$( "#toggle_downloads" ).click(function() {
+			$( "#downloads_panel_body" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+		});
+		
+		$('#toggle_options').click(function(){
+			$( "#options_panel_body" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-chevron-left glyphicon-chevron-down");
+		});
+		
+		/*
+		$( "#show_thumbnails" ).click(function() {
+			$( "#svg_output" ).toggle();
+			$( "#thumbnails_output" ).toggle();
+		  	// toggle icon
+		  	$("span", this).toggleClass("glyphicon-th glyphicon-file");
+			load_thumbnails();
+		});
+		*/
+		
+		// Set the popover for the btn
+		$( ".popover-btn" ).popover( );
+		
+		// Adjust the size of the svg_output and the zoom according to the div (screen) size
+		width = $('#svg_panel').width();
+		zoom = Math.floor( 100 * width / 2100 );
+		$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
+		
+		// Init the swip
+		enable_swipe( true );
+	
+		// Load the default file or the file passed in the URL
+		var file = location.search.substring(1);
+		if (file.length != 0) {
+			$( "#toggle_options" ).click();
+			$.get( file , function( data ) {
+				load_data( data, $('#upload_form') );
+			});
+		}
+	});
+//]]>
+</script>
