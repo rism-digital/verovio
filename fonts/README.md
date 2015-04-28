@@ -2,7 +2,7 @@
 
 * **Leipzig** is Verovios own font. 
 * **[Bravura] [1]** is designed by Daniel Spreadbury. 
-* **[Gootville]** [2] is designed by Grzegorz Pruchniakowski and comes with [MuseScore] [3].
+* **[Gootville] [2]** is designed by Grzegorz Pruchniakowski and comes with [MuseScore] [3].
 
 All fonts included in Verovio are licensed under the [SIL Open Font License] [4].
 
