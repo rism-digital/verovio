@@ -89,10 +89,12 @@ bool MeiOutput::ExportFile( )
             }
             Page *page = dynamic_cast<Page*>(m_doc->m_children[m_page]);
             assert( page );
-            if (m_scoreBasedMEI)
+            if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
-            else
+                m_currentNode = m_currentNode.append_child("section");
+            } else {
                 m_currentNode = meiDoc.append_child("pages");
+            }
             
             page->Save( this );
         }
@@ -130,14 +132,16 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     if (dynamic_cast<Page*>(object)) {
-        if (!m_scoreBasedMEI) {
-            m_currentNode = m_currentNode.append_child("page");
-            WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
-        } else {
-           return true;
-        }
+        if (m_scoreBasedMEI)
+            return true;
+        
+        m_currentNode = m_currentNode.append_child("page");
+        WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
     }
     else if (dynamic_cast<System*>(object)) {
+        if (m_scoreBasedMEI)
+            return true;
+        
         m_currentNode = m_currentNode.append_child("system");
         WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
     }
@@ -276,7 +280,7 @@ bool MeiOutput::WriteObject( Object *object )
     
 bool MeiOutput::WriteObjectEnd( Object *object )
 {
-    if (dynamic_cast<Page*>(object) && m_scoreBasedMEI)
+    if ((dynamic_cast<Page*>(object) || dynamic_cast<System*>(object)) && m_scoreBasedMEI)
         return true;
     
     m_nodeStack.pop_back();
