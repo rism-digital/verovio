@@ -132,15 +132,13 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     if (dynamic_cast<Page*>(object)) {
-        if (m_scoreBasedMEI)
-            return true;
+        if (m_scoreBasedMEI) return true;
         
         m_currentNode = m_currentNode.append_child("page");
         WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
     }
     else if (dynamic_cast<System*>(object)) {
-        if (m_scoreBasedMEI)
-            return true;
+        if (m_scoreBasedMEI) return true;
         
         m_currentNode = m_currentNode.append_child("system");
         WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
@@ -280,9 +278,10 @@ bool MeiOutput::WriteObject( Object *object )
     
 bool MeiOutput::WriteObjectEnd( Object *object )
 {
-    if ((dynamic_cast<Page*>(object) || dynamic_cast<System*>(object)) && m_scoreBasedMEI)
+    if ((dynamic_cast<Page*>(object) || dynamic_cast<System*>(object)) && m_scoreBasedMEI) {
         return true;
-    
+    }
+        
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
     
