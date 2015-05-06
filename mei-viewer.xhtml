@@ -432,9 +432,13 @@ downloads:
 		if (file.length == 0) {
             file = "examples/downloads/Krebs_Trio_Eb_2.mei";
         }
-		$.get( file , function( data ) {
-			load_data( data );
-		});
+        $.ajax({
+            url: file
+            , dataType: "text"
+            , success: function(data) {
+                load_data( data );
+            }
+        });
 	});
 //]]>
 </script>
