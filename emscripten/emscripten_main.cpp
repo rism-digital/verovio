@@ -68,8 +68,8 @@ extern "C" {
         return tk->LoadString( data );
 	}
 
-    const char *vrvToolkit_getMEI(Toolkit *tk, int page_no) {
-        tk->SetCString(tk->GetMEI( page_no ));
+    const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool scoreBased) {
+        tk->SetCString(tk->GetMEI( page_no, scoreBased ));
         return tk->GetCString();
     }
     
