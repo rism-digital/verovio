@@ -212,7 +212,7 @@ bool MeiOutput::WriteObject( Object *object )
         WriteMeiMensur( m_currentNode, dynamic_cast<Mensur*>(object) );
     }
     else if (dynamic_cast<MeterSig*>(object)) {
-        m_currentNode = m_currentNode.append_child("mRest");
+        m_currentNode = m_currentNode.append_child("meterSig");
         WriteMeiMeterSig( m_currentNode, dynamic_cast<MeterSig*>(object) );
     }
     else if (dynamic_cast<MRest*>(object)) {
