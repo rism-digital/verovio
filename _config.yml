@@ -1,6 +1,6 @@
 name: Verovio music engraving library
 markdown: redcarpet
 pygments: true
-baseurl: "http://rism-ch.github.io/verovio"
+baseurl: "http://www.verovio.org"
 
 exclude: []
