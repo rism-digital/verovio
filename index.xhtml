@@ -83,25 +83,25 @@ active: home
                     <!-- Wrapper for slides -->
                     <div class="carousel-inner" role="listbox">
                         <div class="item">
-                            <img src="images/carousel/hummel-p6.png"></img>
+            				{% include svg/hummel-p6.svg %}
                         </div>
                         <div class="item">
-                            <img src="images/carousel/schubert.png"></img>
+            				{% include svg/schubert.svg %}
                         </div>
                         <div class="item">
-                            <img src="images/carousel/chords.png"></img>
+            				{% include svg/chords.svg %}
                         </div>
                     </div>
                 </div>
                 <div id="carousel-descriptions">
-                    <p class="carousel-description">
-                        Hummel
+                    <p class="carousel-description text-center">
+                        Johann Nepomuk Hummel, <em>Concerto for Trumpet in E major</em>
                     </p>
-                    <p class="carousel-description">
-                        Schubert
+                    <p class="carousel-description text-center">
+                        Franz Schubert, <em>Der Lindenbaum</em>
                     </p>
-                    <p class="carousel-description">
-                        Chords
+                    <p class="carousel-description text-center">
+                        An example set of chords
                     </p>
                 </div>
 			</div>
@@ -137,28 +137,10 @@ active: home
 			zoom = width * 100 / pageWidth;
 		}
         
-        $(".carousel-inner item div svg" ).attr("height", pageHeight * zoom / 100 + "px" );	
-        $(".carousel-inner item div svg" ).attr("width", pageWidth * zoom / 100 + "px" );		
-	}
-
-	function adjust_svg_size( div, pageWidth, pageHeight, zoom ) {
-		// adjust the size according to the width of the div
-        console.log( $("#carousel").width() );
-        return;
-        
-		$( div ).show();
-		width = $( div ).width();
-		if ( width < zoom * pageWidth / 100 ) {
-			zoom = width * 100 / pageWidth;
-		}
-		//$( div + ' svg g.page-scale').attr("transform", "scale(" + zoom / 100 + ", "+ zoom / 100 +")") ;
-		//$( div + ' svg').height(pageHeight * zoom / 100 );
-		//$( div + ' svg').width(pageWidth * zoom / 100 );		
-		
-		if ( $( div + ' svg') ) {
-			$( div + ' svg').attr("height", pageHeight * zoom / 100 + "px" );
-			$( div + ' svg').attr("width", pageWidth * zoom / 100 + "px" );	
-		}
+        $(".carousel-inner .item").each(function(){
+			$( "svg", this).attr("height", pageHeight * zoom / 100 + "px" );
+			$( "svg", this).attr("width", pageWidth * zoom / 100 + "px" );
+        });	
 	}
     
     function load_description( image ) {
@@ -169,6 +151,7 @@ active: home
     }
 
 	$( document ).ready(function() {
+        adjust_svg_sizes( 2100, 2800, 20 ); 
         
         rand = Math.floor( Math.random() * $( "#carousel .item" ).length );
         load_description( rand );
