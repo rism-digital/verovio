@@ -156,7 +156,7 @@ active: home
         rand = Math.floor( Math.random() * $( "#carousel .item" ).length );
         load_description( rand );
         $( "#carousel .item").eq(rand).addClass("active");
-		$( "#carousel" ).carousel( { interval: 5000 } );
+		$( "#carousel" ).carousel( { interval: 7000 } );
         $( "#carousel" ).on('slid.bs.carousel', function (e) {
             idx = $(".active", e.target).index();
             load_description(idx);
