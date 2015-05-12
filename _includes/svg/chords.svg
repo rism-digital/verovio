@@ -1,0 +1,1720 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2100px" height="2800px" version="1.1" overflow="visible">
+	<defs>
+		<symbol id="E003" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M0 -0c49 0 97.5 -2.26367 135.5 4.73633c206 95 258.5 264.264 263.5 271.264c0 1 -14 7 -15 6c-88 -154 -251 -167 -321 -170c-1 0 -63 -1 -63 -1v-111z"/>
+			</g>
+		</symbol>
+		<symbol id="E004" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M0 0c49 0 97.5 2.26367 135.5 -4.73633c206 -95 258.5 -264.264 263.5 -271.264c0 -1 -14 -7 -15 -6c-88 154 -251 167 -321 170c-1 0 -63 1 -63 1v111z"/>
+			</g>
+		</symbol>
+		<symbol id="E050" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M441 -245c-23 -4 -48 -6 -76 -6c-59 0 -102 7 -130 20c-88 42 -150 93 -187 154c-26 44 -43 103 -48 176c-4 60 11 123 44 189c29 57 65 106 110 148s96 85 153 127c-3 16 -8 46 -13 92c-4 43 -5 73 -5 89c0 117 16 172 69 257c34 54 64 82 89 82c21 0 43 -30 69 -92 s39 -115 41 -159c2 -120 -19 -173 -67 -256c-13 -20 -63 -90 -98 -118c-13 -9 -25 -19 -37 -29l31 -181c8 1 18 2 28 2c58 0 102 -12 133 -35c59 -43 92 -104 98 -184c11 -135 -80 -229 -180 -270c8 -57 17 -110 25 -162c5 -31 6 -58 6 -80c0 -30 -5 -53 -14 -70 c-35 -64 -88 -99 -158 -103c-42 -3 -83 6 -124 26c-50 24 -77 59 -80 105c-2 34 5 63 20 87c18 28 45 42 79 44c51 4 99 -40 103 -87c4 -56 -30 -94 -105 -115c17 -24 51 -36 102 -36c62 0 116 43 140 85c9 16 13 41 13 74c0 20 -1 42 -5 67c-8 53 -18 106 -26 159zM461 939 c-95 0 -135 -175 -135 -286c0 -24 2 -48 5 -71c50 39 92 82 127 128c43 57 63 106 60 148c-4 54 -23 82 -57 81zM406 119l54 -326c80 27 116 88 109 184c-7 99 -62 146 -163 142zM382 117c-74 -2 -132 -50 -128 -127c2 -46 43 -99 75 -115c-3 -2 -7 -5 -10 -10 c-70 33 -116 88 -123 172c-5 73 42 135 88 170c23 17 49 29 78 36l-29 170c-21 -13 -52 -37 -92 -73c-50 -44 -86 -84 -109 -119c-49 -75 -71 -140 -67 -195c5 -68 35 -127 93 -176s125 -73 203 -73c25 0 50 3 75 9c-19 111 -36 221 -54 331z"/>
+			</g>
+		</symbol>
+		<symbol id="E0A4" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M0 -39c0 68 73 172 200 172c66 0 114 -37 114 -95c0 -84 -106 -171 -218 -171c-64 0 -96 30 -96 94z"/>
+			</g>
+		</symbol>
+		<symbol id="E262" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M136 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM60 73v-167l76 22v168z"/>
+			</g>
+		</symbol>
+		<symbol id="E260" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M20 110c32 16 54 27 93 27c26 0 35 -3 54 -13c13 -7 24 -20 27 -38l4 -25c0 -28 -16 -57 -45 -89c-23 -25 -39 -44 -65 -68l-88 -79v644h20v-359zM90 106c-32 0 -48 -10 -70 -29v-194c31 31 54 59 71 84c21 32 32 59 32 84c0 9 1 16 1 20c0 14 -3 21 -11 30l-8 3z"/>
+			</g>
+		</symbol>
+		<symbol id="E261" viewBox="0 0 1000 1000" overflow="inherit">
+			<g transform="scale(1,-1)">
+				<path d="M0 -188v539h18v-191l139 22v-533h-17v186zM18 -100l122 17v176l-122 -19v-174z"/>
+			</g>
+		</symbol>
+	</defs>
+	<svg id="definition-scale" viewBox="0 0 13500 18000">
+		<g class="page-margin" transform="translate(500, 500)" style="stroke: #000; stroke-opacity: 1.0; fill: #000; fill-opacity: 1.0">
+			<g class="system" id="system-000000035361426">
+				<path d="M0 1925 L0 13989" style="stroke-width: 30;"/>
+				<use xlink:href="#E003" x="-180" y="1925" height="720px" width="720px"/>
+				<use xlink:href="#E004" x="-180" y="13989" height="720px" width="720px"/>
+				<rect x="-180" y="1905" width="90" height="12104" rx="0" style="stroke-width: 0;"/>
+				<g class="measure" id="measure-000000129592464">
+					<g class="staff" id="staff-000000061973086">
+						<path d="M0 1940 L11527 1940" style="stroke-width: 30;"/>
+						<path d="M0 2120 L11527 2120" style="stroke-width: 30;"/>
+						<path d="M0 2300 L11527 2300" style="stroke-width: 30;"/>
+						<path d="M0 2480 L11527 2480" style="stroke-width: 30;"/>
+						<path d="M0 2660 L11527 2660" style="stroke-width: 30;"/>
+						<g class="layer" id="layer-000000137463437">
+							<g class="clef" id="clef-000000172489125">
+								<use xlink:href="#E050" x="90" y="2480" height="720px" width="720px"/>
+							</g>
+							<g class="chord" id="chord-000000026988154">
+								<rect x="1794" y="1872" width="20" height="1508" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000120236756">
+									<use xlink:href="#E0A4" x="1794" y="2750" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000024309618">
+									<use xlink:href="#E0A4" x="1588" y="1940" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000076301308">
+									<use xlink:href="#E0A4" x="1794" y="1850" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="2132" cy="2030" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="1850" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="2750" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000143097501">
+									<use xlink:href="#E262" x="1320" y="1850" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000055531488">
+									<use xlink:href="#E262" x="1140" y="1940" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000162662837">
+									<use xlink:href="#E262" x="1320" y="2750" height="720px" width="720px"/>
+								</g>
+							</g>
+							<g class="chord" id="chord-000000192204814">
+								<rect x="3658" y="1400" width="20" height="1688" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000122582043">
+									<use xlink:href="#E0A4" x="3452" y="3110" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000019835491">
+									<use xlink:href="#E0A4" x="3452" y="2570" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000076576212">
+									<use xlink:href="#E0A4" x="3452" y="2030" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="3790" cy="3110" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="3790" cy="2570" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="3790" cy="2030" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000149683553">
+									<use xlink:href="#E262" x="3204" y="2030" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000194498241">
+									<use xlink:href="#E260" x="3159" y="2570" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000011692410">
+									<use xlink:href="#E262" x="3204" y="3110" height="720px" width="720px"/>
+								</g>
+								<path d="M3403 2840 L3727 2840" style="stroke-width: 30;"/>
+								<path d="M3403 3020 L3727 3020" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000057013862">
+								<rect x="5406" y="1040" width="20" height="2228" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000096010489">
+									<use xlink:href="#E0A4" x="5200" y="3290" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000029338511">
+									<use xlink:href="#E0A4" x="5200" y="2840" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000169950524">
+									<use xlink:href="#E0A4" x="5200" y="2030" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000106493928">
+									<use xlink:href="#E0A4" x="5200" y="1670" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="5538" cy="3290" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="2750" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="2030" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="1670" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000055242283">
+									<use xlink:href="#E261" x="4952" y="1670" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000002721349">
+									<use xlink:href="#E260" x="4772" y="2030" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000026483071">
+									<use xlink:href="#E260" x="4952" y="2840" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000068045406">
+									<use xlink:href="#E262" x="4952" y="3290" height="720px" width="720px"/>
+								</g>
+								<path d="M5151 2840 L5475 2840" style="stroke-width: 30;"/>
+								<path d="M5151 3020 L5475 3020" style="stroke-width: 30;"/>
+								<path d="M5151 3200 L5475 3200" style="stroke-width: 30;"/>
+								<path d="M5151 1760 L5475 1760" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000155505706">
+								<rect x="7064" y="1670" width="20" height="1418" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000025873638">
+									<use xlink:href="#E0A4" x="6858" y="3110" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000110122269">
+									<use xlink:href="#E0A4" x="6858" y="2930" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000095997525">
+									<use xlink:href="#E0A4" x="6858" y="2390" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000084414111">
+									<use xlink:href="#E0A4" x="7064" y="2300" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="7422" cy="2390" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="2210" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="3110" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="2930" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000060729284">
+									<use xlink:href="#E260" x="6610" y="2300" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000149377763">
+									<use xlink:href="#E260" x="6430" y="2390" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000180692586">
+									<use xlink:href="#E262" x="6610" y="2930" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000084913666">
+									<use xlink:href="#E262" x="6430" y="3110" height="720px" width="720px"/>
+								</g>
+								<path d="M6809 2840 L7133 2840" style="stroke-width: 30;"/>
+								<path d="M6809 3020 L7133 3020" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000035860503">
+								<rect x="8812" y="1130" width="20" height="2318" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000022608715">
+									<use xlink:href="#E0A4" x="8606" y="3470" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000061051061">
+									<use xlink:href="#E0A4" x="8606" y="3200" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000087103108">
+									<use xlink:href="#E0A4" x="8606" y="2840" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000121743007">
+									<use xlink:href="#E0A4" x="8606" y="1760" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="8944" cy="3470" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="8944" cy="3110" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="8944" cy="2750" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="8944" cy="1670" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000090255664">
+									<use xlink:href="#E262" x="8358" y="1760" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000203677876">
+									<use xlink:href="#E260" x="8358" y="2840" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000125622405">
+									<use xlink:href="#E261" x="8358" y="3470" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000095313759">
+									<use xlink:href="#E260" x="8178" y="3200" height="720px" width="720px"/>
+								</g>
+								<path d="M8557 2840 L8881 2840" style="stroke-width: 30;"/>
+								<path d="M8557 3020 L8881 3020" style="stroke-width: 30;"/>
+								<path d="M8557 3200 L8881 3200" style="stroke-width: 30;"/>
+								<path d="M8557 3380 L8881 3380" style="stroke-width: 30;"/>
+								<path d="M8557 1760 L8881 1760" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000209276701">
+								<rect x="10740" y="2030" width="20" height="1238" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000137760130">
+									<use xlink:href="#E0A4" x="10534" y="3290" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000180331901">
+									<use xlink:href="#E0A4" x="10534" y="2930" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000024845604">
+									<use xlink:href="#E0A4" x="10740" y="2840" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000059297202">
+									<use xlink:href="#E0A4" x="10534" y="2660" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="11098" cy="2930" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="2750" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="3290" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="2570" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000161153016">
+									<use xlink:href="#E261" x="10286" y="2660" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000119028180">
+									<use xlink:href="#E260" x="10286" y="3290" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000136192609">
+									<use xlink:href="#E262" x="10106" y="2840" height="720px" width="720px"/>
+								</g>
+								<path d="M10485 2840 L11035 2840" style="stroke-width: 30;"/>
+								<path d="M10485 3020 L10809 3020" style="stroke-width: 30;"/>
+								<path d="M10485 3200 L10809 3200" style="stroke-width: 30;"/>
+							</g>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000138242178">
+						<path d="M0 4802 L11527 4802" style="stroke-width: 30;"/>
+						<path d="M0 4982 L11527 4982" style="stroke-width: 30;"/>
+						<path d="M0 5162 L11527 5162" style="stroke-width: 30;"/>
+						<path d="M0 5342 L11527 5342" style="stroke-width: 30;"/>
+						<path d="M0 5522 L11527 5522" style="stroke-width: 30;"/>
+						<g class="layer" id="layer-000000039150819">
+							<g class="clef" id="clef-000000036255636">
+								<use xlink:href="#E050" x="90" y="5342" height="720px" width="720px"/>
+							</g>
+							<g class="chord" id="chord-000000085931858">
+								<rect x="2000" y="3902" width="20" height="2408" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000063633619">
+									<use xlink:href="#E0A4" x="1794" y="6332" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000164499703">
+									<use xlink:href="#E0A4" x="1794" y="5522" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000121837236">
+									<use xlink:href="#E0A4" x="2000" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000070255663">
+									<use xlink:href="#E0A4" x="1794" y="4532" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="2358" cy="5612" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="5432" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="6332" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="4532" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000159654321">
+									<use xlink:href="#E262" x="1546" y="4532" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000022200381">
+									<use xlink:href="#E262" x="1546" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000214013826">
+									<use xlink:href="#E262" x="1546" y="6332" height="720px" width="720px"/>
+								</g>
+								<path d="M1745 5702 L2069 5702" style="stroke-width: 30;"/>
+								<path d="M1745 5882 L2069 5882" style="stroke-width: 30;"/>
+								<path d="M1745 6062 L2069 6062" style="stroke-width: 30;"/>
+								<path d="M1745 6242 L2069 6242" style="stroke-width: 30;"/>
+								<path d="M1745 4622 L2069 4622" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000180491528">
+								<rect x="3658" y="3902" width="20" height="2138" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000149499813">
+									<use xlink:href="#E0A4" x="3452" y="6062" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000184616100">
+									<use xlink:href="#E0A4" x="3452" y="5612" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000058757846">
+									<use xlink:href="#E0A4" x="3452" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000045710261">
+									<use xlink:href="#E0A4" x="3452" y="4532" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="3790" cy="5972" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="3790" cy="5612" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="3790" cy="5432" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="3790" cy="4532" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000037038620">
+									<use xlink:href="#E262" x="3204" y="4532" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000104465003">
+									<use xlink:href="#E262" x="3204" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000208034034">
+									<use xlink:href="#E260" x="3024" y="5612" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000157676199">
+									<use xlink:href="#E262" x="3204" y="6062" height="720px" width="720px"/>
+								</g>
+								<path d="M3403 5702 L3727 5702" style="stroke-width: 30;"/>
+								<path d="M3403 5882 L3727 5882" style="stroke-width: 30;"/>
+								<path d="M3403 6062 L3727 6062" style="stroke-width: 30;"/>
+								<path d="M3403 4622 L3727 4622" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000190655579">
+								<rect x="5200" y="4554" width="20" height="1688" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000202949888">
+									<use xlink:href="#E0A4" x="5200" y="5612" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000021810263">
+									<use xlink:href="#E0A4" x="5200" y="5342" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000063790977">
+									<use xlink:href="#E0A4" x="5200" y="4982" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000057931791">
+									<use xlink:href="#E0A4" x="5200" y="4712" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000141469326">
+									<use xlink:href="#E0A4" x="5200" y="4532" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="5538" cy="5612" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="5252" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="4892" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="4712" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5538" cy="4532" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000059257708">
+									<use xlink:href="#E262" x="4952" y="4532" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000161918261">
+									<use xlink:href="#E260" x="4952" y="5612" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000158564422">
+									<use xlink:href="#E262" x="4772" y="4712" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000058389369">
+									<use xlink:href="#E261" x="4772" y="5342" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000156492080">
+									<use xlink:href="#E262" x="4592" y="4982" height="720px" width="720px"/>
+								</g>
+								<path d="M5151 4622 L5475 4622" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000086229807">
+								<rect x="7064" y="4262" width="20" height="1958" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000160559100">
+									<use xlink:href="#E0A4" x="6858" y="6242" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000171800753">
+									<use xlink:href="#E0A4" x="6858" y="5882" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000023883526">
+									<use xlink:href="#E0A4" x="6858" y="5522" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000189657929">
+									<use xlink:href="#E0A4" x="7064" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000081462668">
+									<use xlink:href="#E0A4" x="6858" y="4892" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="7422" cy="5612" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="5432" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="6152" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="5792" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="4892" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000161870801">
+									<use xlink:href="#E261" x="6610" y="4892" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000211273762">
+									<use xlink:href="#E260" x="6610" y="5522" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000001324680">
+									<use xlink:href="#E260" x="6610" y="6242" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000100231480">
+									<use xlink:href="#E262" x="6430" y="5882" height="720px" width="720px"/>
+								</g>
+								<path d="M6809 5702 L7133 5702" style="stroke-width: 30;"/>
+								<path d="M6809 5882 L7133 5882" style="stroke-width: 30;"/>
+								<path d="M6809 6062 L7133 6062" style="stroke-width: 30;"/>
+								<path d="M6809 6242 L7133 6242" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000194945435">
+								<rect x="8812" y="4532" width="20" height="1688" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000208199073">
+									<use xlink:href="#E0A4" x="8606" y="6242" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000110666422">
+									<use xlink:href="#E0A4" x="8812" y="6152" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000175327764">
+									<use xlink:href="#E0A4" x="8606" y="6062" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000102916418">
+									<use xlink:href="#E0A4" x="8606" y="5882" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000052013626">
+									<use xlink:href="#E0A4" x="8812" y="5792" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000131495773">
+									<use xlink:href="#E0A4" x="8606" y="5162" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="9170" cy="6332" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="6152" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="5972" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="5792" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="5612" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="5072" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000000442302">
+									<use xlink:href="#E262" x="8358" y="5162" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000143070447">
+									<use xlink:href="#E262" x="8358" y="5792" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000044905141">
+									<use xlink:href="#E260" x="8268" y="6242" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000095136173">
+									<use xlink:href="#E260" x="8088" y="5882" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000142154503">
+									<use xlink:href="#E261" x="7998" y="6152" height="720px" width="720px"/>
+								</g>
+								<path d="M8557 5702 L9107 5702" style="stroke-width: 30;"/>
+								<path d="M8557 5882 L9107 5882" style="stroke-width: 30;"/>
+								<path d="M8557 6062 L9107 6062" style="stroke-width: 30;"/>
+								<path d="M8557 6242 L8881 6242" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000043082892">
+								<rect x="10534" y="4644" width="20" height="1508" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000114857970">
+									<use xlink:href="#E0A4" x="10328" y="5522" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000015916757">
+									<use xlink:href="#E0A4" x="10534" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000025708810">
+									<use xlink:href="#E0A4" x="10534" y="5252" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000141674934">
+									<use xlink:href="#E0A4" x="10328" y="5162" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000036281428">
+									<use xlink:href="#E0A4" x="10534" y="5072" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000154044268">
+									<use xlink:href="#E0A4" x="10534" y="4622" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="10872" cy="5612" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="10872" cy="5432" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="10872" cy="5252" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="10872" cy="5072" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="10872" cy="4892" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="10872" cy="4532" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000026501676">
+									<use xlink:href="#E262" x="10060" y="4622" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000083255713">
+									<use xlink:href="#E260" x="10060" y="5522" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000004154029">
+									<use xlink:href="#E260" x="9970" y="5072" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000115529176">
+									<use xlink:href="#E260" x="9880" y="5432" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000214308621">
+									<use xlink:href="#E260" x="9700" y="5162" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000214435461">
+									<use xlink:href="#E262" x="9520" y="5252" height="720px" width="720px"/>
+								</g>
+								<path d="M10485 4622 L10809 4622" style="stroke-width: 30;"/>
+							</g>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000185911346">
+						<path d="M0 7656 L11527 7656" style="stroke-width: 30;"/>
+						<path d="M0 7836 L11527 7836" style="stroke-width: 30;"/>
+						<path d="M0 8016 L11527 8016" style="stroke-width: 30;"/>
+						<path d="M0 8196 L11527 8196" style="stroke-width: 30;"/>
+						<path d="M0 8376 L11527 8376" style="stroke-width: 30;"/>
+						<g class="layer" id="layer-000000162258219">
+							<g class="clef" id="clef-000000172138756">
+								<use xlink:href="#E050" x="90" y="8196" height="720px" width="720px"/>
+							</g>
+							<g class="chord" id="chord-000000212247515">
+								<rect x="1794" y="7408" width="20" height="1598" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000059873696">
+									<use xlink:href="#E0A4" x="1794" y="8376" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000073057522">
+									<use xlink:href="#E0A4" x="1588" y="8286" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000078841419">
+									<use xlink:href="#E0A4" x="1794" y="8196" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000172910213">
+									<use xlink:href="#E0A4" x="1588" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000029337741">
+									<use xlink:href="#E0A4" x="1794" y="7566" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000101520106">
+									<use xlink:href="#E0A4" x="1794" y="7386" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="2132" cy="8466" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="8286" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="8106" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="7746" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="7566" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2132" cy="7386" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000156337467">
+									<use xlink:href="#E262" x="1320" y="7386" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000112270932">
+									<use xlink:href="#E262" x="1320" y="8376" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000093374491">
+									<use xlink:href="#E260" x="1140" y="7566" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000212359364">
+									<use xlink:href="#E262" x="1140" y="8286" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000100787421">
+									<use xlink:href="#E261" x="960" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000208168136">
+									<use xlink:href="#E260" x="915" y="8196" height="720px" width="720px"/>
+								</g>
+								<path d="M1745 7476 L2069 7476" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000195794892">
+								<rect x="3658" y="7026" width="20" height="2138" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000187642848">
+									<use xlink:href="#E0A4" x="3452" y="9186" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000047151636">
+									<use xlink:href="#E0A4" x="3452" y="8826" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000152016637">
+									<use xlink:href="#E0A4" x="3658" y="8736" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000102630897">
+									<use xlink:href="#E0A4" x="3452" y="8646" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000183968732">
+									<use xlink:href="#E0A4" x="3452" y="8466" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000072995018">
+									<use xlink:href="#E0A4" x="3452" y="7836" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000201888511">
+									<use xlink:href="#E0A4" x="3452" y="7656" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="4016" cy="8826" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="8646" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="8466" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="9186" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="8286" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="7746" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="7566" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000051400107">
+									<use xlink:href="#E260" x="3204" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000211073903">
+									<use xlink:href="#E262" x="3024" y="7836" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000190797342">
+									<use xlink:href="#E260" x="3204" y="8466" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000087533124">
+									<use xlink:href="#E260" x="3204" y="9186" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000011208213">
+									<use xlink:href="#E262" x="3024" y="8646" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000010761587">
+									<use xlink:href="#E261" x="2844" y="8826" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000179453866">
+									<use xlink:href="#E262" x="2664" y="8736" height="720px" width="720px"/>
+								</g>
+								<path d="M3403 8556 L3953 8556" style="stroke-width: 30;"/>
+								<path d="M3403 8736 L3953 8736" style="stroke-width: 30;"/>
+								<path d="M3403 8916 L3727 8916" style="stroke-width: 30;"/>
+								<path d="M3403 9096 L3727 9096" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000141792871">
+								<rect x="5406" y="6846" width="20" height="2318" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000105511218">
+									<use xlink:href="#E0A4" x="5200" y="9186" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000111270081">
+									<use xlink:href="#E0A4" x="5200" y="9006" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000116282438">
+									<use xlink:href="#E0A4" x="5200" y="8646" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000091764921">
+									<use xlink:href="#E0A4" x="5406" y="8556" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000077030042">
+									<use xlink:href="#E0A4" x="5200" y="8106" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000182848340">
+									<use xlink:href="#E0A4" x="5200" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000021643300">
+									<use xlink:href="#E0A4" x="5200" y="7476" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="5764" cy="8646" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="8466" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="9186" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="9006" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="8106" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="7566" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="7386" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000175951427">
+									<use xlink:href="#E260" x="4952" y="7476" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000083848278">
+									<use xlink:href="#E261" x="4952" y="9186" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000156423966">
+									<use xlink:href="#E262" x="4772" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000139790427">
+									<use xlink:href="#E260" x="4772" y="9006" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000088374823">
+									<use xlink:href="#E262" x="4952" y="8106" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000032638723">
+									<use xlink:href="#E262" x="4907" y="8646" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000193988761">
+									<use xlink:href="#E260" x="4727" y="8556" height="720px" width="720px"/>
+								</g>
+								<path d="M5151 8556 L5701 8556" style="stroke-width: 30;"/>
+								<path d="M5151 8736 L5475 8736" style="stroke-width: 30;"/>
+								<path d="M5151 8916 L5475 8916" style="stroke-width: 30;"/>
+								<path d="M5151 9096 L5475 9096" style="stroke-width: 30;"/>
+								<path d="M5151 7476 L5475 7476" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000121694757">
+								<rect x="7064" y="6756" width="20" height="2048" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000183918189">
+									<use xlink:href="#E0A4" x="6858" y="8826" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000212243336">
+									<use xlink:href="#E0A4" x="7064" y="8736" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000101029109">
+									<use xlink:href="#E0A4" x="6858" y="8466" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000162842810">
+									<use xlink:href="#E0A4" x="7064" y="8376" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000090325813">
+									<use xlink:href="#E0A4" x="6858" y="8286" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000031687227">
+									<use xlink:href="#E0A4" x="7064" y="8196" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000102043924">
+									<use xlink:href="#E0A4" x="6858" y="7386" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="7422" cy="8826" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="8646" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="8466" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="8286" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="8106" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="7926" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="7386" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000190380185">
+									<use xlink:href="#E260" x="6610" y="7386" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000111163147">
+									<use xlink:href="#E262" x="6610" y="8196" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000014882752">
+									<use xlink:href="#E261" x="6610" y="8826" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000075593480">
+									<use xlink:href="#E262" x="6430" y="8286" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000136621968">
+									<use xlink:href="#E261" x="6340" y="8736" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000000019017">
+									<use xlink:href="#E262" x="6160" y="8376" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000164723093">
+									<use xlink:href="#E261" x="5980" y="8466" height="720px" width="720px"/>
+								</g>
+								<path d="M6809 8556 L7359 8556" style="stroke-width: 30;"/>
+								<path d="M6809 8736 L7359 8736" style="stroke-width: 30;"/>
+								<path d="M6809 7476 L7133 7476" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000023630825">
+								<rect x="8812" y="6756" width="20" height="2228" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000167019857">
+									<use xlink:href="#E0A4" x="8606" y="9006" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000200459710">
+									<use xlink:href="#E0A4" x="8812" y="8916" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000137834028">
+									<use xlink:href="#E0A4" x="8606" y="8736" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000089177438">
+									<use xlink:href="#E0A4" x="8606" y="8286" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000074999862">
+									<use xlink:href="#E0A4" x="8606" y="8106" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000212315906">
+									<use xlink:href="#E0A4" x="8812" y="8016" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000201797888">
+									<use xlink:href="#E0A4" x="8606" y="7566" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000025920469">
+									<use xlink:href="#E0A4" x="8606" y="7386" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="9170" cy="9006" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="8826" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="8106" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="7926" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="8646" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="8286" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="7566" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="7386" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000058312923">
+									<use xlink:href="#E262" x="8358" y="7386" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000047342640">
+									<use xlink:href="#E261" x="8358" y="8286" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000102794977">
+									<use xlink:href="#E262" x="8178" y="7566" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000047696261">
+									<use xlink:href="#E262" x="8133" y="8106" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000209188029">
+									<use xlink:href="#E260" x="7953" y="8016" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000029560460">
+									<use xlink:href="#E260" x="8358" y="8916" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000145755252">
+									<use xlink:href="#E261" x="8178" y="9006" height="720px" width="720px"/>
+								</g>
+								<path d="M8557 8556 L9107 8556" style="stroke-width: 30;"/>
+								<path d="M8557 8736 L9107 8736" style="stroke-width: 30;"/>
+								<path d="M8557 8916 L9107 8916" style="stroke-width: 30;"/>
+								<path d="M8557 7476 L8881 7476" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000029780005">
+								<rect x="10740" y="6846" width="20" height="2138" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000119537132">
+									<use xlink:href="#E0A4" x="10534" y="9006" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000068905686">
+									<use xlink:href="#E0A4" x="10740" y="8916" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000031979995">
+									<use xlink:href="#E0A4" x="10534" y="8196" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000122599766">
+									<use xlink:href="#E0A4" x="10740" y="8106" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000151517799">
+									<use xlink:href="#E0A4" x="10534" y="8016" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000048099480">
+									<use xlink:href="#E0A4" x="10534" y="7746" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000167774185">
+									<use xlink:href="#E0A4" x="10740" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000083379112">
+									<use xlink:href="#E0A4" x="10534" y="7476" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="11098" cy="9006" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="8826" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="8286" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="8106" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="7926" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="7746" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="7566" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="7386" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000034568195">
+									<use xlink:href="#E260" x="10286" y="7476" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000108084830">
+									<use xlink:href="#E262" x="10286" y="8196" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000015642575">
+									<use xlink:href="#E262" x="10106" y="7656" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000010069507">
+									<use xlink:href="#E261" x="10016" y="8106" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000151661887">
+									<use xlink:href="#E260" x="9836" y="7746" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000003556700">
+									<use xlink:href="#E261" x="9746" y="8016" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000202009240">
+									<use xlink:href="#E260" x="10286" y="8916" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000021810710">
+									<use xlink:href="#E260" x="10106" y="9006" height="720px" width="720px"/>
+								</g>
+								<path d="M10485 8556 L11035 8556" style="stroke-width: 30;"/>
+								<path d="M10485 8736 L11035 8736" style="stroke-width: 30;"/>
+								<path d="M10485 8916 L11035 8916" style="stroke-width: 30;"/>
+								<path d="M10485 7476 L10809 7476" style="stroke-width: 30;"/>
+							</g>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000079593240">
+						<path d="M0 10518 L11527 10518" style="stroke-width: 30;"/>
+						<path d="M0 10698 L11527 10698" style="stroke-width: 30;"/>
+						<path d="M0 10878 L11527 10878" style="stroke-width: 30;"/>
+						<path d="M0 11058 L11527 11058" style="stroke-width: 30;"/>
+						<path d="M0 11238 L11527 11238" style="stroke-width: 30;"/>
+						<g class="layer" id="layer-000000111423929">
+							<g class="clef" id="clef-000000066003206">
+								<use xlink:href="#E050" x="90" y="11058" height="720px" width="720px"/>
+							</g>
+							<g class="chord" id="chord-000000153918931">
+								<rect x="2000" y="9708" width="20" height="2318" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000205609395">
+									<use xlink:href="#E0A4" x="1794" y="12048" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000166536968">
+									<use xlink:href="#E0A4" x="1794" y="11778" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000146373386">
+									<use xlink:href="#E0A4" x="2000" y="11688" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000015775118">
+									<use xlink:href="#E0A4" x="1794" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000081549081">
+									<use xlink:href="#E0A4" x="1794" y="11328" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000128665489">
+									<use xlink:href="#E0A4" x="1794" y="10698" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000151757144">
+									<use xlink:href="#E0A4" x="1794" y="10518" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000073476690">
+									<use xlink:href="#E0A4" x="1794" y="10338" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="2358" cy="11868" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="11688" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="11508" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="12048" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="11328" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="10608" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="10428" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="10248" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000136721173">
+									<use xlink:href="#E260" x="1546" y="10338" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000192202671">
+									<use xlink:href="#E262" x="1366" y="10698" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000098881881">
+									<use xlink:href="#E262" x="1186" y="10518" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000196702743">
+									<use xlink:href="#E260" x="1546" y="11328" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000122676206">
+									<use xlink:href="#E260" x="1546" y="12048" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000213078701">
+									<use xlink:href="#E260" x="1456" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000206368035">
+									<use xlink:href="#E262" x="1276" y="11778" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000152777151">
+									<use xlink:href="#E262" x="1096" y="11688" height="720px" width="720px"/>
+								</g>
+								<path d="M1745 11418 L2295 11418" style="stroke-width: 30;"/>
+								<path d="M1745 11598 L2295 11598" style="stroke-width: 30;"/>
+								<path d="M1745 11778 L2069 11778" style="stroke-width: 30;"/>
+								<path d="M1745 11958 L2069 11958" style="stroke-width: 30;"/>
+								<path d="M1745 10338 L2069 10338" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000028576902">
+								<rect x="3658" y="9618" width="20" height="2228" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000046805203">
+									<use xlink:href="#E0A4" x="3452" y="11868" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000172227529">
+									<use xlink:href="#E0A4" x="3658" y="11778" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000199117557">
+									<use xlink:href="#E0A4" x="3452" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000103329577">
+									<use xlink:href="#E0A4" x="3658" y="11508" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000193138336">
+									<use xlink:href="#E0A4" x="3452" y="10878" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000211327395">
+									<use xlink:href="#E0A4" x="3658" y="10788" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000164936979">
+									<use xlink:href="#E0A4" x="3452" y="10338" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000099889190">
+									<use xlink:href="#E0A4" x="3658" y="10248" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="4016" cy="11868" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="11688" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="11508" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="11328" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="10968" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="10788" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="10428" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="10248" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000031897943">
+									<use xlink:href="#E262" x="3204" y="10248" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000150819678">
+									<use xlink:href="#E260" x="3204" y="10878" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000045261766">
+									<use xlink:href="#E262" x="3024" y="10338" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000033247000">
+									<use xlink:href="#E261" x="2934" y="10788" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000078060471">
+									<use xlink:href="#E260" x="3204" y="11508" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000053171288">
+									<use xlink:href="#E260" x="3114" y="11868" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000022474826">
+									<use xlink:href="#E260" x="2934" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000025903148">
+									<use xlink:href="#E262" x="2754" y="11778" height="720px" width="720px"/>
+								</g>
+								<path d="M3403 11418 L3953 11418" style="stroke-width: 30;"/>
+								<path d="M3403 11598 L3953 11598" style="stroke-width: 30;"/>
+								<path d="M3403 11778 L3953 11778" style="stroke-width: 30;"/>
+								<path d="M3403 10338 L3953 10338" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000188927366">
+								<rect x="5406" y="9888" width="20" height="2138" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000214371874">
+									<use xlink:href="#E0A4" x="5200" y="12048" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000211120431">
+									<use xlink:href="#E0A4" x="5406" y="11958" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000092802523">
+									<use xlink:href="#E0A4" x="5200" y="11868" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000012290199">
+									<use xlink:href="#E0A4" x="5200" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000098117549">
+									<use xlink:href="#E0A4" x="5200" y="11418" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000049078962">
+									<use xlink:href="#E0A4" x="5200" y="10968" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000179484808">
+									<use xlink:href="#E0A4" x="5200" y="10608" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000108990033">
+									<use xlink:href="#E0A4" x="5406" y="10518" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="5764" cy="12048" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="11868" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="11688" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="10608" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="10428" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="11508" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="11328" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="10968" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000134632391">
+									<use xlink:href="#E260" x="4952" y="10518" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000000167086">
+									<use xlink:href="#E260" x="4952" y="12048" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000071510563">
+									<use xlink:href="#E260" x="4772" y="10608" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000083096437">
+									<use xlink:href="#E260" x="4772" y="11958" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000126961775">
+									<use xlink:href="#E260" x="4952" y="10968" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000015129614">
+									<use xlink:href="#E262" x="4592" y="11868" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000108249126">
+									<use xlink:href="#E260" x="4907" y="11418" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000167556680">
+									<use xlink:href="#E260" x="4412" y="11598" height="720px" width="720px"/>
+								</g>
+								<path d="M5151 11418 L5701 11418" style="stroke-width: 30;"/>
+								<path d="M5151 11598 L5701 11598" style="stroke-width: 30;"/>
+								<path d="M5151 11778 L5701 11778" style="stroke-width: 30;"/>
+								<path d="M5151 11958 L5701 11958" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000002397128">
+								<rect x="7064" y="9618" width="20" height="2318" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000095852972">
+									<use xlink:href="#E0A4" x="6858" y="11958" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000039822037">
+									<use xlink:href="#E0A4" x="6858" y="11328" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000185945661">
+									<use xlink:href="#E0A4" x="6858" y="11148" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000178747406">
+									<use xlink:href="#E0A4" x="7064" y="11058" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000144000202">
+									<use xlink:href="#E0A4" x="6858" y="10968" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000184435632">
+									<use xlink:href="#E0A4" x="6858" y="10788" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000098899598">
+									<use xlink:href="#E0A4" x="6858" y="10608" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000099000725">
+									<use xlink:href="#E0A4" x="6858" y="10338" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000190359579">
+									<use xlink:href="#E0A4" x="7064" y="10248" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="7422" cy="11148" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="10968" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="10788" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="10428" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="10248" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="11868" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="11328" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="10608" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000180359028">
+									<use xlink:href="#E260" x="6610" y="10248" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000183537319">
+									<use xlink:href="#E262" x="6610" y="11328" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000005287893">
+									<use xlink:href="#E261" x="6430" y="10338" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000074058184">
+									<use xlink:href="#E261" x="6430" y="11148" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000178965056">
+									<use xlink:href="#E262" x="6250" y="10608" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000191879086">
+									<use xlink:href="#E260" x="6160" y="11058" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000187629815">
+									<use xlink:href="#E260" x="6610" y="10788" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000003136533">
+									<use xlink:href="#E260" x="5980" y="10968" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000186168652">
+									<use xlink:href="#E260" x="6610" y="11958" height="720px" width="720px"/>
+								</g>
+								<path d="M6809 11418 L7133 11418" style="stroke-width: 30;"/>
+								<path d="M6809 11598 L7133 11598" style="stroke-width: 30;"/>
+								<path d="M6809 11778 L7133 11778" style="stroke-width: 30;"/>
+								<path d="M6809 11958 L7133 11958" style="stroke-width: 30;"/>
+								<path d="M6809 10338 L7359 10338" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000071715890">
+								<rect x="8812" y="9618" width="20" height="2228" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000148230118">
+									<use xlink:href="#E0A4" x="8606" y="11868" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000024127534">
+									<use xlink:href="#E0A4" x="8812" y="11778" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000076177284">
+									<use xlink:href="#E0A4" x="8606" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000020716726">
+									<use xlink:href="#E0A4" x="8812" y="11508" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000169722553">
+									<use xlink:href="#E0A4" x="8606" y="11418" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000004636741">
+									<use xlink:href="#E0A4" x="8606" y="11148" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000196764324">
+									<use xlink:href="#E0A4" x="8606" y="10968" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000123009309">
+									<use xlink:href="#E0A4" x="8606" y="10518" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000110602482">
+									<use xlink:href="#E0A4" x="8606" y="10248" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="9170" cy="11868" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="11688" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="11508" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="11328" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="11148" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="10968" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="10788" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="10428" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="10248" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000062950939">
+									<use xlink:href="#E262" x="8358" y="10248" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000047002148">
+									<use xlink:href="#E260" x="8358" y="10968" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000135740640">
+									<use xlink:href="#E261" x="8358" y="11868" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000034331560">
+									<use xlink:href="#E260" x="8313" y="11418" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000049008350">
+									<use xlink:href="#E261" x="8133" y="11598" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000194058880">
+									<use xlink:href="#E262" x="7953" y="11508" height="720px" width="720px"/>
+								</g>
+								<path d="M8557 11418 L9107 11418" style="stroke-width: 30;"/>
+								<path d="M8557 11598 L9107 11598" style="stroke-width: 30;"/>
+								<path d="M8557 11778 L9107 11778" style="stroke-width: 30;"/>
+								<path d="M8557 10338 L8881 10338" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000108558174">
+								<rect x="10740" y="9708" width="20" height="2318" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000181557150">
+									<use xlink:href="#E0A4" x="10534" y="12048" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000089992675">
+									<use xlink:href="#E0A4" x="10534" y="11508" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000119808559">
+									<use xlink:href="#E0A4" x="10740" y="11418" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000155481095">
+									<use xlink:href="#E0A4" x="10534" y="11328" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000034913886">
+									<use xlink:href="#E0A4" x="10534" y="10788" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000169483647">
+									<use xlink:href="#E0A4" x="10740" y="10698" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000123841608">
+									<use xlink:href="#E0A4" x="10534" y="10608" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000047254737">
+									<use xlink:href="#E0A4" x="10534" y="10428" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000167122280">
+									<use xlink:href="#E0A4" x="10740" y="10338" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="11098" cy="11508" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="11328" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="11148" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="10788" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="10608" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="10428" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="10248" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="12048" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000209295035">
+									<use xlink:href="#E260" x="10286" y="10338" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000096708659">
+									<use xlink:href="#E262" x="10286" y="10788" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000065057963">
+									<use xlink:href="#E262" x="10106" y="10428" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000045075547">
+									<use xlink:href="#E262" x="9926" y="10608" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000029381804">
+									<use xlink:href="#E261" x="10286" y="11418" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000125734616">
+									<use xlink:href="#E260" x="10286" y="12048" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000088082899">
+									<use xlink:href="#E261" x="10106" y="11508" height="720px" width="720px"/>
+								</g>
+								<path d="M10485 11418 L11035 11418" style="stroke-width: 30;"/>
+								<path d="M10485 11598 L10809 11598" style="stroke-width: 30;"/>
+								<path d="M10485 11778 L10809 11778" style="stroke-width: 30;"/>
+								<path d="M10485 11958 L10809 11958" style="stroke-width: 30;"/>
+								<path d="M10485 10338 L10809 10338" style="stroke-width: 30;"/>
+							</g>
+						</g>
+					</g>
+					<g class="staff" id="staff-000000107880753">
+						<path d="M0 13254 L11527 13254" style="stroke-width: 30;"/>
+						<path d="M0 13434 L11527 13434" style="stroke-width: 30;"/>
+						<path d="M0 13614 L11527 13614" style="stroke-width: 30;"/>
+						<path d="M0 13794 L11527 13794" style="stroke-width: 30;"/>
+						<path d="M0 13974 L11527 13974" style="stroke-width: 30;"/>
+						<g class="layer" id="layer-000000165307874">
+							<g class="clef" id="clef-000000086955554">
+								<use xlink:href="#E050" x="90" y="13794" height="720px" width="720px"/>
+							</g>
+							<g class="chord" id="chord-000000010228265">
+								<rect x="2000" y="12714" width="20" height="2048" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000155939003">
+									<use xlink:href="#E0A4" x="1794" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000010938690">
+									<use xlink:href="#E0A4" x="1794" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000075982420">
+									<use xlink:href="#E0A4" x="1794" y="14334" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000180650443">
+									<use xlink:href="#E0A4" x="1794" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000204044226">
+									<use xlink:href="#E0A4" x="2000" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000061081288">
+									<use xlink:href="#E0A4" x="1794" y="13704" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000112922959">
+									<use xlink:href="#E0A4" x="2000" y="13614" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000141401787">
+									<use xlink:href="#E0A4" x="1794" y="13524" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000162930903">
+									<use xlink:href="#E0A4" x="1794" y="13344" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="2358" cy="14244" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="14064" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="13704" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="13524" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="13344" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="14784" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="2358" cy="14424" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000049740123">
+									<use xlink:href="#E262" x="1546" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000023291597">
+									<use xlink:href="#E260" x="1546" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000182636866">
+									<use xlink:href="#E261" x="1366" y="13524" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000134261660">
+									<use xlink:href="#E262" x="1366" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000115969258">
+									<use xlink:href="#E260" x="1186" y="13704" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000033739467">
+									<use xlink:href="#E260" x="1546" y="14334" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000001235650">
+									<use xlink:href="#E262" x="1006" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000203571741">
+									<use xlink:href="#E262" x="1186" y="14154" height="720px" width="720px"/>
+								</g>
+								<path d="M1745 14154 L2069 14154" style="stroke-width: 30;"/>
+								<path d="M1745 14334 L2069 14334" style="stroke-width: 30;"/>
+								<path d="M1745 14514 L2069 14514" style="stroke-width: 30;"/>
+								<path d="M1745 14694 L2069 14694" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000011049461">
+								<rect x="3658" y="12444" width="20" height="2318" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000149470066">
+									<use xlink:href="#E0A4" x="3452" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000143495079">
+									<use xlink:href="#E0A4" x="3452" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000089672911">
+									<use xlink:href="#E0A4" x="3658" y="14424" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000050239677">
+									<use xlink:href="#E0A4" x="3452" y="14334" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000158562048">
+									<use xlink:href="#E0A4" x="3452" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000074737350">
+									<use xlink:href="#E0A4" x="3452" y="13974" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000120267389">
+									<use xlink:href="#E0A4" x="3452" y="13434" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000054424651">
+									<use xlink:href="#E0A4" x="3452" y="13254" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000041270817">
+									<use xlink:href="#E0A4" x="3658" y="13164" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000060290809">
+									<use xlink:href="#E0A4" x="3452" y="13074" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="4016" cy="14604" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="14424" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="14244" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="13344" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="13164" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="12984" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="14784" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="14064" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="13884" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="4016" cy="13524" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000162510683">
+									<use xlink:href="#E261" x="3204" y="13074" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000041866845">
+									<use xlink:href="#E260" x="3024" y="13434" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000124047358">
+									<use xlink:href="#E260" x="2844" y="13164" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000067295433">
+									<use xlink:href="#E260" x="2664" y="13254" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000027258243">
+									<use xlink:href="#E260" x="3204" y="13974" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000158205628">
+									<use xlink:href="#E261" x="3204" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000190002743">
+									<use xlink:href="#E260" x="3024" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000171048301">
+									<use xlink:href="#E261" x="2934" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000065357726">
+									<use xlink:href="#E262" x="2754" y="14334" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000047117753">
+									<use xlink:href="#E260" x="2574" y="14424" height="720px" width="720px"/>
+								</g>
+								<path d="M3403 14154 L3953 14154" style="stroke-width: 30;"/>
+								<path d="M3403 14334 L3953 14334" style="stroke-width: 30;"/>
+								<path d="M3403 14514 L3727 14514" style="stroke-width: 30;"/>
+								<path d="M3403 14694 L3727 14694" style="stroke-width: 30;"/>
+								<path d="M3403 13074 L3727 13074" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000099216837">
+								<rect x="5406" y="12534" width="20" height="2228" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000197522595">
+									<use xlink:href="#E0A4" x="5200" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000203098612">
+									<use xlink:href="#E0A4" x="5200" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000007377558">
+									<use xlink:href="#E0A4" x="5200" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000042262914">
+									<use xlink:href="#E0A4" x="5406" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000048127617">
+									<use xlink:href="#E0A4" x="5200" y="13974" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000137383020">
+									<use xlink:href="#E0A4" x="5200" y="13794" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000048584358">
+									<use xlink:href="#E0A4" x="5200" y="13524" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000089193604">
+									<use xlink:href="#E0A4" x="5200" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000061687239">
+									<use xlink:href="#E0A4" x="5406" y="13254" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000201546623">
+									<use xlink:href="#E0A4" x="5200" y="13164" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="5764" cy="14244" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="14064" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="13884" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="13344" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="13164" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="14784" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="14424" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="13704" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="5764" cy="13524" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000024189342">
+									<use xlink:href="#E260" x="4952" y="13164" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000057556108">
+									<use xlink:href="#E260" x="4952" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000097739010">
+									<use xlink:href="#E260" x="4772" y="13254" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000199249183">
+									<use xlink:href="#E261" x="4772" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000061721289">
+									<use xlink:href="#E261" x="4592" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000070762206">
+									<use xlink:href="#E262" x="4952" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000192711229">
+									<use xlink:href="#E262" x="4412" y="13524" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000108137381">
+									<use xlink:href="#E262" x="4592" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000201197273">
+									<use xlink:href="#E262" x="4772" y="13794" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000053163433">
+									<use xlink:href="#E262" x="4232" y="13974" height="720px" width="720px"/>
+								</g>
+								<path d="M5151 14154 L5475 14154" style="stroke-width: 30;"/>
+								<path d="M5151 14334 L5475 14334" style="stroke-width: 30;"/>
+								<path d="M5151 14514 L5475 14514" style="stroke-width: 30;"/>
+								<path d="M5151 14694 L5475 14694" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000049867059">
+								<rect x="7064" y="12534" width="20" height="2228" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000020581782">
+									<use xlink:href="#E0A4" x="6858" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000092261449">
+									<use xlink:href="#E0A4" x="7064" y="14694" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000187643516">
+									<use xlink:href="#E0A4" x="6858" y="14604" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000079730158">
+									<use xlink:href="#E0A4" x="6858" y="14244" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000163210484">
+									<use xlink:href="#E0A4" x="7064" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000060320715">
+									<use xlink:href="#E0A4" x="6858" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000206487118">
+									<use xlink:href="#E0A4" x="6858" y="13794" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000016228117">
+									<use xlink:href="#E0A4" x="7064" y="13704" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000094275066">
+									<use xlink:href="#E0A4" x="6858" y="13434" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000070071056">
+									<use xlink:href="#E0A4" x="7064" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000180476138">
+									<use xlink:href="#E0A4" x="6858" y="13164" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="7422" cy="14784" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="14604" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="14424" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="14244" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="14064" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="13884" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="13704" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="13524" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="13344" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="7422" cy="13164" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000106402019">
+									<use xlink:href="#E262" x="6610" y="13164" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000077009173">
+									<use xlink:href="#E261" x="6610" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000078381042">
+									<use xlink:href="#E262" x="6430" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000148516912">
+									<use xlink:href="#E261" x="6430" y="14694" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000137192801">
+									<use xlink:href="#E262" x="6250" y="13434" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000027612780">
+									<use xlink:href="#E260" x="6250" y="14604" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000003173044">
+									<use xlink:href="#E260" x="6610" y="13794" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000080189200">
+									<use xlink:href="#E262" x="6610" y="14244" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000204502118">
+									<use xlink:href="#E262" x="6430" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000147092320">
+									<use xlink:href="#E260" x="6250" y="14154" height="720px" width="720px"/>
+								</g>
+								<path d="M6809 14154 L7359 14154" style="stroke-width: 30;"/>
+								<path d="M6809 14334 L7359 14334" style="stroke-width: 30;"/>
+								<path d="M6809 14514 L7359 14514" style="stroke-width: 30;"/>
+								<path d="M6809 14694 L7359 14694" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000199595683">
+								<rect x="8812" y="12354" width="20" height="2408" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000183907146">
+									<use xlink:href="#E0A4" x="8606" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000120494385">
+									<use xlink:href="#E0A4" x="8606" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000116150021">
+									<use xlink:href="#E0A4" x="8812" y="14424" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000143510393">
+									<use xlink:href="#E0A4" x="8606" y="14334" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000139004667">
+									<use xlink:href="#E0A4" x="8606" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000200174397">
+									<use xlink:href="#E0A4" x="8606" y="13794" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000061564773">
+									<use xlink:href="#E0A4" x="8606" y="13614" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000089871923">
+									<use xlink:href="#E0A4" x="8606" y="13434" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000019100225">
+									<use xlink:href="#E0A4" x="8812" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000011132482">
+									<use xlink:href="#E0A4" x="8606" y="13074" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000189303096">
+									<use xlink:href="#E0A4" x="8812" y="12984" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="9170" cy="14604" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="14424" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="14244" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="13524" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="13344" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="13164" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="12984" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="14784" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="14064" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="9170" cy="13704" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000144750740">
+									<use xlink:href="#E262" x="8358" y="12984" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000165516268">
+									<use xlink:href="#E262" x="8358" y="14784" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000028500626">
+									<use xlink:href="#E262" x="8178" y="13074" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000125317127">
+									<use xlink:href="#E261" x="8178" y="14424" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000157769013">
+									<use xlink:href="#E261" x="7998" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000161240043">
+									<use xlink:href="#E262" x="7998" y="14334" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000180618065">
+									<use xlink:href="#E262" x="7818" y="13434" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000079861961">
+									<use xlink:href="#E262" x="8358" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000064575995">
+									<use xlink:href="#E262" x="8178" y="13614" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000144353341">
+									<use xlink:href="#E261" x="7638" y="13794" height="720px" width="720px"/>
+								</g>
+								<path d="M8557 14154 L9107 14154" style="stroke-width: 30;"/>
+								<path d="M8557 14334 L9107 14334" style="stroke-width: 30;"/>
+								<path d="M8557 14514 L8881 14514" style="stroke-width: 30;"/>
+								<path d="M8557 14694 L8881 14694" style="stroke-width: 30;"/>
+								<path d="M8557 13074 L9107 13074" style="stroke-width: 30;"/>
+							</g>
+							<g class="chord" id="chord-000000042454513">
+								<rect x="10740" y="12354" width="20" height="2138" rx="0" style="stroke-width: 0;"/>
+								<g class="note" id="note-000000196864241">
+									<use xlink:href="#E0A4" x="10534" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000091384973">
+									<use xlink:href="#E0A4" x="10740" y="14424" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000076803100">
+									<use xlink:href="#E0A4" x="10534" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000141232469">
+									<use xlink:href="#E0A4" x="10740" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000186712588">
+									<use xlink:href="#E0A4" x="10534" y="13884" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000026395360">
+									<use xlink:href="#E0A4" x="10534" y="13704" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000209180839">
+									<use xlink:href="#E0A4" x="10740" y="13614" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000141384367">
+									<use xlink:href="#E0A4" x="10534" y="13524" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000030423493">
+									<use xlink:href="#E0A4" x="10534" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000087462051">
+									<use xlink:href="#E0A4" x="10740" y="13254" height="720px" width="720px"/>
+								</g>
+								<g class="note" id="note-000000025032027">
+									<use xlink:href="#E0A4" x="10534" y="12984" height="720px" width="720px"/>
+								</g>
+								<ellipse cx="11098" cy="14604" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="14424" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="14244" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="14064" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="13704" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="13524" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="13344" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="13164" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="12984" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<ellipse cx="11098" cy="13884" rx="36" ry="36" style="stroke-opacity: 1.000000; stroke-width: 1; fill-opacity: 1.000000;"/>
+								<g class="accid" id="accid-000000085369402">
+									<use xlink:href="#E261" x="10286" y="12984" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000049145206">
+									<use xlink:href="#E262" x="10286" y="14514" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000095704383">
+									<use xlink:href="#E260" x="10106" y="13254" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000014470009">
+									<use xlink:href="#E260" x="10106" y="14424" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000089968288">
+									<use xlink:href="#E260" x="9926" y="13344" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000204797440">
+									<use xlink:href="#E260" x="9926" y="14154" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000002238169">
+									<use xlink:href="#E260" x="10286" y="13524" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000204830382">
+									<use xlink:href="#E261" x="9746" y="14064" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000141320048">
+									<use xlink:href="#E262" x="9566" y="13614" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000140852870">
+									<use xlink:href="#E262" x="10106" y="13884" height="720px" width="720px"/>
+								</g>
+								<g class="accid" id="accid-000000048025443">
+									<use xlink:href="#E262" x="9386" y="13704" height="720px" width="720px"/>
+								</g>
+								<path d="M10485 14154 L11035 14154" style="stroke-width: 30;"/>
+								<path d="M10485 14334 L11035 14334" style="stroke-width: 30;"/>
+								<path d="M10485 14514 L10809 14514" style="stroke-width: 30;"/>
+								<path d="M10485 13074 L10809 13074" style="stroke-width: 30;"/>
+							</g>
+						</g>
+					</g>
+					<g class="barlineAttr" id="bline-000000155048575"/>
+				</g>
+			</g>
+		</g>
+	</svg>
+</svg>

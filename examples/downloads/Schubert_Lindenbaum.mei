@@ -1,0 +1,1837 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Der Lindenbaum</title>
+                <respStmt>
+                    <persName role="composer">Franz Schubert</persName>
+                    <persName role="encoder">Maja Hartwig</persName>
+                    <persName role="encoder">Kristina Richts</persName>
+                    <persName role="encoder" xml:id="PR">Perry Roland</persName>
+                    <persName role="encoder" xml:id="LP">Laurent Pugin</persName>
+                </respStmt>
+            </titleStmt>
+            <pubStmt>
+                <respStmt>
+                    <corpName dbkey="5115204-6" authURI="http://d-nb.info/gnd" authority="GND">Musikwissenschaftliches Seminar &lt;Detmold&gt;
+                        <address>
+              <addrLine>Gartenstrasse 20</addrLine>
+              <addrLine>32756 <geogName>Detmold</geogName></addrLine>
+              <addrLine>
+                <geogName>Germany</geogName>
+              </addrLine>
+            </address>
+                    </corpName>
+                </respStmt>
+                <date>2011</date>
+                <availability>
+                    <useRestrict>This encoding is in the public domain. However, the sources used to create it may be under copyright. We believe their use by the MEI project for educational and
+                        research purposes is covered by the Fair Use doctrine. However, we will remove any material from the project archive when requested to do so by the copyright
+                        owner.</useRestrict>
+                </availability>
+            </pubStmt>
+            <seriesStmt>
+                <title>
+                    <ref target="http://music-encoding.org/Support/MEI_Sample_Collection">MEI Sample Collection</ref>
+                </title>
+                <respStmt>
+                    <corpName role="publisher">MEI Project</corpName>
+                    <corpName role="funder">German Research Foundation
+                        <address>
+              <addrLine>Kennedyallee 40</addrLine>
+              <addrLine>
+                <geogName>Bonn</geogName>
+              </addrLine>
+              <addrLine>
+                <geogName>Germany</geogName>
+              </addrLine>
+            </address>
+                    </corpName>
+                    <corpName role="funder">National Endowment for the Humanities
+                        <address>
+              <addrLine>1100 Pennsylvania Avenue N.W.</addrLine>
+              <addrLine>
+                <geogName>Washington, DC</geogName> 20004</addrLine>
+              <addrLine>
+                <geogName>United States</geogName>
+              </addrLine>
+            </address>
+                    </corpName>
+                </respStmt>
+            </seriesStmt>
+            <sourceDesc>
+                <source n="1">
+                    <identifier type="URI">http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/songs/erk/liederschatz/band2&amp;file=erk205.krn&amp;=pdf</identifier>
+                    <titleStmt>
+                        <title>Der Lindenbaum</title>
+                        <respStmt>
+                            <persName role="composer">Franz Schubert</persName>
+                            <persName role="lyricist">Wilhelm Müller</persName>
+                        </respStmt>
+                    </titleStmt>
+                    <langUsage>
+                        <language>German</language>
+                    </langUsage>
+                    <notesStmt>
+                        <annot>MusicXML file created using SharpEye Music Reader 2.</annot>
+                        <annot>Transcoded MusicXML version 1.1 file using an XSLT stylesheet (musicxml2mei v. 3.0) <date>2015-04-21</date>.</annot>
+                    </notesStmt>
+                </source>
+            </sourceDesc>
+        </fileDesc>
+        <encodingDesc>
+            <editorialDecl>
+                <normalization>
+                    <p>Calculation of @tstamp and @tstamp2 values on control events, such as dir, dynam, hairpin, etc., includes MusicXML offset values.</p>
+                    <p>The parameters for musicxml2mei.xsl were set as follows: <list>
+                            <li>accidStyle: "both", </li>
+                            <li>articStyle: "both", </li>
+                            <li>formeWork: "preserve", </li>
+                            <li>generateMIDI: "true", </li>
+                            <li>keepAttributes: "true", </li>
+                            <li>keepRights: "false", </li>
+                            <li>labelStyle: "attr", </li>
+                            <li>layout: "preserve", </li>
+                            <li>tieStyle: "both"</li>
+                        </list>
+                    </p>
+                </normalization>
+            </editorialDecl>
+            <projectDesc>
+                <p>This encoding represents the use of verse-element for multiple verses.</p>
+            </projectDesc>
+        </encodingDesc>
+        <workDesc>
+            <work>
+                <identifier type="opus">Op. 89</identifier>
+                <identifier type="work">D. 911</identifier>
+                <titleStmt>
+                    <title>Der Lindenbaum</title>
+                    <title type="uniform">Winterreise, "Der Lindenbaum"</title>
+                    <respStmt>
+                        <persName role="composer">Franz Schubert</persName>
+                        <persName role="lyricist">Wilhelm Müller</persName>
+                    </respStmt>
+                </titleStmt>
+                <key pname="f" mode="major">F major</key>
+                <tempo>Mässig.</tempo>
+                <meter count="3" unit="4"/>
+                <incip>
+                    <incipCode form="parsons">*rdrrrdruuuddu</incipCode>
+                    <incipText>
+                        <p>Am Brunnen vor dem Thore, da steht ein Lindenbaum</p>
+                    </incipText>
+                </incip>
+                <perfMedium>
+                    <instrumentation>
+                        <instrVoice n="1" code="vu">Voice</instrVoice>
+                        <instrVoice n="2" code="ka">Piano</instrVoice>
+                    </instrumentation>
+                </perfMedium>
+            </work>
+        </workDesc>
+        <revisionDesc>
+            <change n="1" resp="#PR">
+                <changeDesc>
+                    <p>Re-coded notation from MusicXML 1.1 file generated using SharpEye; modified header.</p>
+                </changeDesc>
+                <date>2015-04-21</date>
+            </change>
+            <change n="2" resp="#LP">
+                <changeDesc>
+                    <p>Fixing various issues.</p>
+                </changeDesc>
+                <date>2015-05-12</date>
+            </change>
+        </revisionDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef ppq="24" meter.count="3" meter.unit="4" key.sig="1f">
+                        <staffGrp>
+                            <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G" key.sig="1f"/>
+                            <staffGrp xml:id="P2" symbol="brace">
+                                <staffDef n="2" lines="5" clef.line="2" clef.shape="G" key.sig="1f"/>
+                                <staffDef n="3" lines="5" clef.line="4" clef.shape="F" key.sig="1f"/>
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" xml:id="d1e15">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e37" tstamp.ges="0" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down" syl="Am//Ich//Die">
+                                        <verse n="1">
+                                            <syl>Am</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>Ich</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>Die</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d13e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e101" pname="c" oct="5"/>
+                                        <note xml:id="d1e118" pname="a" oct="4"/>
+                                        <note xml:id="d1e136" pname="c" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d17e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e157" pname="f" oct="3"/>
+                                        <note xml:id="d1e174" pname="f" oct="2"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <dynam label="direction" tstamp="1" tstamp.ges="0" place="below" staff="2">p</dynam>
+                            <tempo staff="1" place="above" tstamp="0">Mässig.</tempo>
+                            <dir staff="1" place="above" tstamp="0">205.</dir>
+                        </measure>
+                        <measure n="2" xml:id="d1e192">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e194" tstamp.ges="0" pname="c" oct="5" dur="4" dots="1" dur.ges="36p" stem.dir="down" syl="Brun-//musst'//kal-">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">Brun</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>musst'</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">kal</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e225" tstamp.ges="36" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="nen//auch//ten">
+                                        <verse n="1">
+                                            <syl wordpos="t">nen</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>auch</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">ten</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e255" tstamp.ges="48" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="vor//heu-//Win-">
+                                        <verse n="1">
+                                            <syl>vor</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">heu</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">Win</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e285" tstamp.ges="60" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="dem//te//de">
+                                        <verse n="1">
+                                            <syl>dem</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">te</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">de</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d35e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="up">
+                                        <note xml:id="d1e316" pname="c" oct="5"/>
+                                        <note xml:id="d1e334" pname="a" oct="4"/>
+                                        <note xml:id="d1e353" pname="c" oct="4"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d39e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e372" pname="a" oct="4"/>
+                                            <note xml:id="d1e391" pname="f" oct="4"/>
+                                            <note xml:id="d1e409" pname="c" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d43e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e428" pname="a" oct="4"/>
+                                            <note xml:id="d1e449" pname="f" oct="4"/>
+                                            <note xml:id="d1e467" pname="c" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d47e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e485" pname="a" oct="4"/>
+                                            <note xml:id="d1e506" pname="f" oct="4"/>
+                                            <note xml:id="d1e525" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d51e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="up">
+                                        <note xml:id="d1e547" pname="f" oct="3"/>
+                                        <note xml:id="d1e565" pname="f" oct="2"/>
+                                    </chord>
+                                    <beam>
+                                        <note xml:id="d1e584" tstamp.ges="36" pname="f" oct="2" dur="8" dur.ges="12p" beam="i1" stem.dir="up"/>
+                                        <note xml:id="d1e604" tstamp.ges="48" pname="a" oct="2" dur="8" dur.ges="12p" beam="m1" stem.dir="up"/>
+                                        <note xml:id="d1e623" tstamp.ges="60" pname="c" oct="3" dur="8" dur.ges="12p" beam="t1" stem.dir="up"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e409" curvedir="below" tstamp2="0m+3.5" endid="#d1e525" staff="2"/>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e584" curvedir="below" tstamp2="0m+3.5" endid="#d1e623" staff="3"/>
+                        </measure>
+                        <measure n="3" xml:id="d1e643">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e645" tstamp.ges="0" pname="a" oct="4" dur="4" dur.ges="24p" stem.dir="up" syl="Tho-//wan-//blie-">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">Tho</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">wan</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">blie</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e675" tstamp.ges="24" pname="f" oct="4" dur="4" dur.ges="24p" stem.dir="up" syl="re,//dern//sen">
+                                        <verse n="1">
+                                            <syl wordpos="t">re,</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">dern</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">sen</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e705" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e714" tstamp.ges="60" pname="f" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="da//vor-//mir">
+                                        <verse n="1">
+                                            <syl>da</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">vor</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>mir</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d69e1" tstamp.ges="0" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e745" pname="a" oct="4"/>
+                                        <note xml:id="d1e762" pname="f" oct="4"/>
+                                        <note xml:id="d1e780" pname="c" oct="4"/>
+                                    </chord>
+                                    <chord xml:id="d73e1" tstamp.ges="24" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e799" pname="f" oct="4"/>
+                                        <note xml:id="d1e816" pname="c" oct="4"/>
+                                        <note xml:id="d1e834" pname="a" oct="3"/>
+                                    </chord>
+                                    <rest xml:id="d1e853" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <chord xml:id="d78e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e864" pname="f" oct="4"/>
+                                        <note xml:id="d1e881" pname="c" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e902" tstamp.ges="0" pname="f" oct="3" dur="2" dur.ges="48p" stem.dir="down"/>
+                                    <rest xml:id="d1e920" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e931" tstamp.ges="60" pname="a" oct="2" dur="8" dur.ges="12p" stem.dir="up"/>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e780" curvedir="below" tstamp2="0m+2" endid="#d1e834" staff="2"/>
+                            <slur tstamp="3.5" tstamp.ges="60" startid="#d1e931" curvedir="below" tstamp2="1m+1" endid="#d1e1222" staff="3"/>
+                        </measure>
+                        <measure n="4" xml:id="d1e949">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e951" tstamp.ges="0" pname="g" oct="4" dur="4" dots="1" dur.ges="36p" stem.dir="up" syl="steht//bei//grad">
+                                        <verse n="1">
+                                            <syl>steht</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">bei</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>grad</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e982" tstamp.ges="36" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="ein//in//in's">
+                                        <verse n="1">
+                                            <syl>ein</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>in</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>in's</syl>
+                                        </verse>
+                                    </note>
+                                    <tuplet tstamp="3" tstamp.ges="48" startid="#d1e1012" num="3" numbase="2" num.format="count" endid="#d1e1076" staff="1">
+                                        <beam>
+                                            <note xml:id="d1e1012" tstamp.ges="48" pname="b" oct="4" dur="8" dur.ges="8p" beam="i1" tuplet="i1" stem.dir="up" accid.ges="f" syl="Lin-//tie-//An-">
+                                                <verse n="1">
+                                                    <syl wordpos="i" con="d">Lin</syl>
+                                                </verse>
+                                                <verse n="2">
+                                                    <syl wordpos="i" con="d">tie</syl>
+                                                </verse>
+                                                <verse n="3">
+                                                    <syl wordpos="i" con="d">An</syl>
+                                                </verse>
+                                            </note>
+                                            <note xml:id="d1e1053" tstamp.ges="56" pname="a" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up"/>
+                                        </beam>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d96e1" tstamp.ges="0" dur="2" dur.ges="48p" stem.dir="up">
+                                        <note xml:id="d1e1113" pname="g" oct="4"/>
+                                        <note xml:id="d1e1130" pname="f" oct="4"/>
+                                        <note xml:id="d1e1148" pname="c" oct="4"/>
+                                    </chord>
+                                    <chord xml:id="d100e1" tstamp.ges="48" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e1166" pname="g" oct="4"/>
+                                        <note xml:id="d1e1183" pname="e" oct="4"/>
+                                        <note xml:id="d1e1201" pname="c" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e1222" tstamp.ges="0" pname="c" oct="3" dur="2" dur.ges="48p" stem.dir="up" slur="t1"/>
+                                    <note xml:id="d1e1240" tstamp.ges="48" pname="c" oct="3" dur="4" dur.ges="24p" stem.dir="up"/>
+                                </layer>
+                            </staff>
+                            <slur tstamp="3" tstamp.ges="48" startid="#d1e1012" curvedir="below" tstamp2="0m+3.3333" endid="#d1e1053" staff="1"/>
+                        </measure>
+                        <measure n="5" xml:id="d1e1257">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e1259" tstamp.ges="0" pname="a" oct="4" dur="2" dur.ges="48p" stem.dir="up" syl="baum;//Nacht,//sicht,">
+                                        <verse n="1">
+                                            <syl wordpos="t">baum;</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>Nacht,</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">sicht,</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e1289" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e1298" tstamp.ges="60" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down" syl="ich//da//der">
+                                        <verse n="1">
+                                            <syl>ich</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>da</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>der</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d118e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e1329" pname="a" oct="4"/>
+                                        <note xml:id="d1e1346" pname="f" oct="4"/>
+                                        <note xml:id="d1e1364" pname="c" oct="4"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d122e1" tstamp.ges="12" dur="8" dur.ges="12p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e1382" pname="c" oct="5"/>
+                                            <note xml:id="d1e1401" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d126e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e1420" pname="a" oct="4"/>
+                                            <note xml:id="d1e1439" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d130e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e1457" pname="c" oct="5"/>
+                                            <note xml:id="d1e1476" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d134e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e1494" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d1e1515" pname="g" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d138e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e1534" pname="g" oct="4"/>
+                                            <note xml:id="d1e1553" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e1575" tstamp.ges="0" pname="f" oct="2" dur="8" dur.ges="12p" stem.dir="up"/>
+                                    <beam>
+                                        <chord xml:id="d142e1" tstamp.ges="12" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e1592" pname="c" oct="4"/>
+                                            <note xml:id="d1e1612" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d146e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e1630" pname="a" oct="3"/>
+                                            <note xml:id="d1e1649" pname="f" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d150e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e1667" pname="c" oct="4"/>
+                                            <note xml:id="d1e1686" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d154e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e1704" pname="b" oct="3" accid.ges="f"/>
+                                            <note xml:id="d1e1726" pname="g" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d158e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e1744" pname="g" oct="3"/>
+                                            <note xml:id="d1e1764" pname="c" oct="3"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1.5" tstamp.ges="12" startid="#d1e1401" curvedir="below" tstamp2="0m+3.5" endid="#d1e1553" staff="2"/>
+                            <slur tstamp="1.5" tstamp.ges="12" startid="#d1e1592" curvedir="above" tstamp2="0m+3.5" endid="#d1e1744" staff="3"/>
+                        </measure>
+                        <sb/>
+                        <measure n="6" xml:id="d1e1782">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e1785" tstamp.ges="0" pname="c" oct="5" dur="4" dots="1" dur.ges="36p" stem.dir="down" syl="träumt'//hab'//Hut">
+                                        <verse n="1">
+                                            <syl>träumt'</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>hab'</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>Hut</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e1816" tstamp.ges="36" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="in//ich//flog">
+                                        <verse n="1">
+                                            <syl>in</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>ich</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>flog</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e1846" tstamp.ges="48" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="sei-//noch//mir">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">sei</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>noch</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>mir</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e1876" tstamp.ges="60" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="nem//im//vom">
+                                        <verse n="1">
+                                            <syl wordpos="t">nem</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>im</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>vom</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d175e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e1908" pname="f" oct="4"/>
+                                        <note xml:id="d1e1925" pname="a" oct="3"/>
+                                    </chord>
+                                    <chord xml:id="d179e1" tstamp.ges="12" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e1943" pname="c" oct="5"/>
+                                        <note xml:id="d1e1960" pname="a" oct="4"/>
+                                        <note xml:id="d1e1978" pname="c" oct="4"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d183e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="i1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e1996" pname="a" oct="4"/>
+                                            <note xml:id="d1e2017" pname="f" oct="4"/>
+                                            <note xml:id="d1e2035" pname="c" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d187e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e2054" pname="a" oct="4"/>
+                                            <note xml:id="d1e2075" pname="f" oct="4"/>
+                                            <note xml:id="d1e2094" pname="c" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d191e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e2112" pname="a" oct="4"/>
+                                            <note xml:id="d1e2133" pname="f" oct="4"/>
+                                            <note xml:id="d1e2151" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d195e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e2173" pname="f" oct="3"/>
+                                        <note xml:id="d1e2190" pname="f" oct="2"/>
+                                    </chord>
+                                    <note xml:id="d1e2208" tstamp.ges="12" pname="f" oct="3" dur="4" dur.ges="24p" stem.dir="down"/>
+                                    <beam>
+                                        <note xml:id="d1e2225" tstamp.ges="36" pname="f" oct="2" dur="8" dur.ges="24p" stem.dir="up"/>
+                                        <note xml:id="d1e2245" tstamp.ges="48" pname="a" oct="2" dur="8" dur.ges="24p" stem.dir="up"/>
+                                        <note xml:id="d1e2245x" tstamp.ges="48" pname="c" oct="2" dur="8" dur.ges="24p" stem.dir="up"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e2035" curvedir="below" tstamp2="0m+3.5" endid="#d1e2151" staff="2"/>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e2225" curvedir="below" tstamp2="0m+3.5" endid="#d1e2245x" staff="3"/>
+                        </measure>
+                        <measure n="7" xml:id="d1e2262">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e2264" tstamp.ges="0" pname="a" oct="4" dur="4" dur.ges="24p" stem.dir="up" syl="Schat-//Dun-//Ko-">
+                                        <verse n="1">
+                                            <syl>Schat-</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">Dun</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">Ko</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e2294" tstamp.ges="24" pname="f" oct="4" dur="4" dur.ges="24p" stem.dir="up" syl="ten//kel//pfe,">
+                                        <verse n="1">
+                                            <syl wordpos="t">ten</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">kel</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">pfe,</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e2319" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e2328" tstamp.ges="60" pname="f" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="so//die//ich">
+                                        <verse n="1">
+                                            <syl>so</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>die</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>ich</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d213e1" tstamp.ges="0" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e2359" pname="a" oct="4"/>
+                                        <note xml:id="d1e2376" pname="f" oct="4"/>
+                                        <note xml:id="d1e2394" pname="c" oct="4"/>
+                                    </chord>
+                                    <chord xml:id="d217e1" tstamp.ges="24" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e2413" pname="f" oct="4"/>
+                                        <note xml:id="d1e2430" pname="c" oct="4"/>
+                                        <note xml:id="d1e2448" pname="a" oct="3"/>
+                                    </chord>
+                                    <rest xml:id="d1e2467" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <chord xml:id="d222e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e2478" pname="f" oct="4"/>
+                                        <note xml:id="d1e2495" pname="c" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e2516" tstamp.ges="0" pname="f" oct="3" dur="2" dur.ges="48p" stem.dir="down"/>
+                                    <rest xml:id="d1e2534" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e2545" tstamp.ges="60" pname="a" oct="2" dur="8" dur.ges="12p" stem.dir="up"/>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e2394" curvedir="below" tstamp2="0m+2" endid="#d1e2448" staff="2"/>
+                            <slur tstamp="3.5" tstamp.ges="60" startid="#d1e2545" curvedir="below" tstamp2="1m+1" endid="#d1e2834" staff="3"/>
+                        </measure>
+                        <measure n="8" xml:id="d1e2563">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e2565" tstamp.ges="0" pname="g" oct="4" dur="4" dots="1" dur.ges="36p" stem.dir="up" syl="man-//Au-//wen-">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">man</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">Au</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">wen</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e2596" tstamp.ges="36" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="chen//gen//de-">
+                                        <verse n="1">
+                                            <syl wordpos="t">chen</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">gen</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="m" con="d">de</syl>
+                                        </verse>
+                                    </note>
+                                    <tuplet tstamp="3" tstamp.ges="48" startid="#d1e2626" num="3" numbase="2" num.format="count" endid="#d1e2698" staff="1">
+                                        <beam>
+                                            <note xml:id="d1e2626" tstamp.ges="48" pname="b" oct="4" dur="8" dur.ges="8p" beam="i1" tuplet="i1" stem.dir="up" accid.ges="f" syl="sü-//zu-//te">
+                                                <verse n="1">
+                                                    <syl wordpos="i" con="d">sü</syl>
+                                                </verse>
+                                                <verse n="2">
+                                                    <syl wordpos="i" con="d">zu</syl>
+                                                </verse>
+                                                <verse n="3">
+                                                    <syl wordpos="t">te</syl>
+                                                </verse>
+                                            </note>
+                                            <note xml:id="d1e2626x" tstamp.ges="56" pname="a" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up"> </note>
+                                        </beam>
+                                    </tuplet>
+                                    <note xml:id="d1e2666" tstamp.ges="64" pname="a" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up" syl="ssen//ge//mich">
+                                        <verse n="1">
+                                            <syl wordpos="t">ssen</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="m">ge</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>mich</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d240e1" tstamp.ges="0" dur="2" dur.ges="48p" stem.dir="up">
+                                        <note xml:id="d1e2725" pname="g" oct="4"/>
+                                        <note xml:id="d1e2742" pname="f" oct="4"/>
+                                        <note xml:id="d1e2760" pname="c" oct="4"/>
+                                    </chord>
+                                    <chord xml:id="d244e1" tstamp.ges="48" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e2778" pname="g" oct="4"/>
+                                        <note xml:id="d1e2795" pname="e" oct="4"/>
+                                        <note xml:id="d1e2813" pname="c" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e2834" tstamp.ges="0" pname="c" oct="3" dur="2" dur.ges="48p" stem.dir="up" slur="t1"/>
+                                    <note xml:id="d1e2852" tstamp.ges="48" pname="c" oct="3" dur="4" dur.ges="24p" stem.dir="up"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="9" xml:id="d1e2869">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e2871" tstamp.ges="0" pname="f" oct="4" dur="2" dur.ges="48p" stem.dir="up" syl="Traum.//macht;//nicht.">
+                                        <verse n="1">
+                                            <syl>Traum.</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">macht;</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>nicht.</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e2901" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e2910" tstamp.ges="60" pname="f" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="Ich//Und//Nun">
+                                        <verse n="1">
+                                            <syl>Ich</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>Und</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>Nun</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d262e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="up">
+                                        <note xml:id="d1e2941" pname="f" oct="4"/>
+                                        <note xml:id="d1e2958" pname="c" oct="4"/>
+                                        <note xml:id="d1e2976" pname="a" oct="3"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d266e1" tstamp.ges="12" dur="8" dur.ges="12p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e2994" pname="c" oct="5"/>
+                                            <note xml:id="d1e3013" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d270e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e3032" pname="a" oct="4"/>
+                                            <note xml:id="d1e3051" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d274e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e3069" pname="c" oct="5"/>
+                                            <note xml:id="d1e3088" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d278e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e3106" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d1e3127" pname="g" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d282e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e3146" pname="a" oct="4"/>
+                                            <note xml:id="d1e3165" pname="f" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e3187" tstamp.ges="0" pname="f" oct="2" dur="8" dur.ges="12p" stem.dir="up"/>
+                                    <beam>
+                                        <chord xml:id="d286e1" tstamp.ges="12" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e3204" pname="c" oct="4"/>
+                                            <note xml:id="d1e3224" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d290e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e3242" pname="a" oct="3"/>
+                                            <note xml:id="d1e3261" pname="f" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d294e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e3279" pname="c" oct="4"/>
+                                            <note xml:id="d1e3298" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d298e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e3316" pname="b" oct="3" accid.ges="f"/>
+                                            <note xml:id="d1e3338" pname="g" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d302e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e3356" pname="a" oct="3"/>
+                                            <note xml:id="d1e3376" pname="f" oct="3"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1.5" tstamp.ges="12" startid="#d1e3013" curvedir="below" tstamp2="0m+3.5" endid="#d1e3165" staff="2"/>
+                            <slur tstamp="1.5" tstamp.ges="12" startid="#d1e3204" curvedir="above" tstamp2="0m+3.5" endid="#d1e3356" staff="3"/>
+                        </measure>
+                        <measure n="10" xml:id="d1e3395">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e3397" tstamp.ges="0" pname="g" oct="4" dur="4" dots="1" dur.ges="36p" stem.dir="up" syl="schnitt//sei-//bin">
+                                        <verse n="1">
+                                            <syl>schnitt</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">sei</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>bin</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e3428" tstamp.ges="36" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="in//ne//ich">
+                                        <verse n="1">
+                                            <syl>in</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">ne</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>ich</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e3458" tstamp.ges="48" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="sei-//Zwei-//man-">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">sei</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i">Zwei-</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">man</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e3488" tstamp.ges="60" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="ne//ge//che">
+                                        <verse n="1">
+                                            <syl wordpos="t">ne</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">ge</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">che</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d319e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="up">
+                                        <note xml:id="d1e3514" pname="g" oct="4"/>
+                                        <note xml:id="d1e3532" pname="f" oct="4"/>
+                                        <note xml:id="d1e3551" pname="d" oct="4"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d323e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="i1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e3575" pname="g" oct="4"/>
+                                            <note xml:id="d1e3596" pname="f" oct="4"/>
+                                            <note xml:id="d1e3614" pname="d" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d327e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e3633" pname="g" oct="4"/>
+                                            <note xml:id="d1e3654" pname="e" oct="4"/>
+                                            <note xml:id="d1e3672" pname="c" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d331e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e3690" pname="g" oct="4"/>
+                                            <note xml:id="d1e3710" pname="e" oct="4"/>
+                                            <note xml:id="d1e3728" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d335e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="down">
+                                        <note xml:id="d1e3755" pname="g" oct="3"/>
+                                        <note xml:id="d1e3773" pname="b" accid="n" oct="2">
+                                            <accid accid="n"/>
+                                        </note>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d339e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e3794" pname="g" oct="3"/>
+                                            <note xml:id="d1e3813" pname="b" oct="2" accid.ges="n"/>
+                                        </chord>
+                                        <chord xml:id="d343e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e3831" pname="g" oct="3"/>
+                                            <note xml:id="d1e3850" pname="b" accid="f" oct="2">
+                                                <accid accid="f"/>
+                                            </note>
+                                        </chord>
+                                        <chord xml:id="d347e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e3872" pname="g" oct="3"/>
+                                            <note xml:id="d1e3892" pname="b" oct="2" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <hairpin tstamp="2.5" tstamp.ges="36" place="below" staff="2" form="cres" tstamp2="0m+4" endid="#d1e3728"/>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e3614" curvedir="below" tstamp2="0m+3.5" endid="#d1e3728" staff="2"/>
+                        </measure>
+                        <sb/>
+                        <measure n="11" xml:id="d1e3912">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="d1e3915" tstamp.ges="0" pname="a" oct="4" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="up" syl="Rin-">
+                                            <verse n="1">
+                                                <syl wordpos="i" con="d">Rin-</syl>
+                                            </verse>
+                                            <verse n="2">
+                                                <syl>rausch-</syl>
+                                            </verse>
+                                            <verse n="3">
+                                                <syl wordpos="i" con="d">Stun-</syl>
+                                            </verse>
+                                        </note>
+                                        <note xml:id="d1e3938" tstamp.ges="18" pname="b" oct="4" dur="16" dur.ges="6p" beam="t1" stem.dir="up" accid.ges="f"> </note>
+                                    </beam>
+                                    <note xml:id="d1e3964" tstamp.ges="24" pname="c" oct="5" dur="4" dots="1" dur.ges="36p" stem.dir="down" syl="de//ten,//de">
+                                        <verse n="1">
+                                            <syl wordpos="t">de</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>ten,</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">de</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e3995" tstamp.ges="60" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down" syl="so//a//ent-">
+                                        <verse n="1">
+                                            <syl>so</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>als</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">ent</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <chord xml:id="d364e1" tstamp.ges="0" dur="8" dots="1" dur.ges="18p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e4047" pname="a" oct="4"/>
+                                            <note xml:id="d1e4068" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d368e1" tstamp.ges="18" dur="16" dur.ges="6p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e4087" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d1e4110" pname="g" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                    <chord xml:id="d372e1" tstamp.ges="24" dur="4" dots="1" dur.ges="36p" stem.dir="up">
+                                        <note xml:id="d1e4128" pname="c" oct="5"/>
+                                        <note xml:id="d1e4147" pname="a" oct="4"/>
+                                    </chord>
+                                    <chord xml:id="d376e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down">
+                                        <note xml:id="d1e4188" pname="c" oct="5"/>
+                                        <note xml:id="d1e4206" pname="a" oct="4"/>
+                                    </chord>
+                                </layer>
+                                <layer n="2">
+                                    <note xml:id="d1e4027" tstamp.ges="0" pname="c" oct="4" dur="4" dur.ges="24p" stem.dir="down"/>
+                                    <note xml:id="d1e4169" tstamp.ges="24" pname="c" oct="4" dur="4" dots="1" dur.ges="36p" stem.dir="down"/>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e4227" tstamp.ges="0" pname="f" oct="3" dur="4" dur.ges="24p" stem.dir="up"/>
+                                    <note xml:id="d1e4289" tstamp.ges="24" pname="f" oct="3" dur="4" dots="1" dur.ges="36p" stem.dir="up"/>
+                                    <chord xml:id="d380e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down">
+                                        <note xml:id="d1e4329" pname="c" oct="4"/>
+                                        <note xml:id="d1e4348" pname="a" oct="3"/>
+                                    </chord>
+                                </layer>
+                                <layer n="2">
+                                    <beam>
+                                        <note xml:id="d1e4247" tstamp.ges="0" pname="a" oct="2" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="down"/>
+                                        <note xml:id="d1e4268" tstamp.ges="18" pname="g" oct="2" dur="16" dur.ges="6p" beam="t1" stem.dir="down"/>
+                                    </beam>
+                                    <note xml:id="d1e4310" tstamp.ges="24" pname="f" oct="2" dur="4" dots="1" dur.ges="36p" stem.dir="down"/>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e3915" curvedir="below" tstamp2="0m+0.25" endid="#d1e3938" staff="2"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e4047" curvedir="above" tstamp2="0m+2" endid="#d1e4128" staff="2"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e4247" curvedir="below" tstamp2="0m+2" endid="#d1e4310" staff="3"/>
+                            <slur tstamp="3.5" tstamp.ges="60" startid="#d1e4188" curvedir="above" tstamp2="1m+3.5" endid="#d1e4605" staff="2"/>
+                            <slur tstamp="3.5" tstamp.ges="60" startid="#d1e4329" curvedir="above" tstamp2="1m+3.5" endid="#d1e4760" staff="3"/>
+                            <hairpin form="dim" tstamp="1" tstamp2="2" place="below" staff="2" startid="#d1e4027" endid="#d1e4169"/>
+                        </measure>
+                        <measure n="12" xml:id="d1e4366">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e4368" tstamp.ges="0" pname="d" oct="5" dur="4" dots="1" dur.ges="36p" stem.dir="down" syl="man-//rie-//fernt">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">man</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">rie</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">fernt</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e4399" tstamp.ges="36" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down" syl="ches//fen//von">
+                                        <verse n="1">
+                                            <syl wordpos="t">ches</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">fen</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>von</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e4429" tstamp.ges="48" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="lie-//sie//je-">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">lie</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>sie</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">je</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e4459" tstamp.ges="60" pname="f" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="be//mir//nem">
+                                        <verse n="1">
+                                            <syl wordpos="t">be</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>mir</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">nem</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d397e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="down" artic="acc">
+                                        <artic artic="acc" place="above"/>
+                                        <note xml:id="d1e4490" pname="d" oct="5"/>
+                                        <note xml:id="d1e4510" pname="b" oct="4" accid.ges="f"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d401e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e4531" pname="c" oct="5"/>
+                                            <note xml:id="d1e4550" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d405e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e4568" pname="a" oct="4"/>
+                                            <note xml:id="d1e4587" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d409e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e4605" pname="f" oct="4"/>
+                                            <note xml:id="d1e4625" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d413e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="down" artic="acc">
+                                        <artic artic="acc" place="below"/>
+                                        <note xml:id="d1e4646" pname="d" oct="4"/>
+                                        <note xml:id="d1e4664" pname="b" oct="3" accid.ges="f"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d417e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e4686" pname="c" oct="4"/>
+                                            <note xml:id="d1e4705" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d421e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e4723" pname="a" oct="3"/>
+                                            <note xml:id="d1e4742" pname="f" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d425e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e4760" pname="f" oct="3"/>
+                                            <note xml:id="d1e4780" pname="a" oct="2"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="13" xml:id="d1e4798">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e4800" tstamp.ges="0" pname="g" oct="4" dur="2" dur.ges="48p" stem.dir="up" syl="Wort;//zu://Ort,">
+                                        <verse n="1">
+                                            <syl>Wort;</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>zu:</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>Ort,</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e4830" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e4839" tstamp.ges="60" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="es//Komm//und">
+                                        <verse n="1">
+                                            <syl>es</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>Komm</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>und</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <chord xml:id="d443e1" tstamp.ges="0" dur="8" dots="1" dur.ges="18p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e4870" pname="g" oct="4"/>
+                                            <note xml:id="d1e4890" pname="e" oct="4"/>
+                                            <note xml:id="d1e4909" pname="c" oct="4"/>
+                                        </chord>
+                                        <note xml:id="d1e4934" tstamp.ges="18" pname="c" oct="5" dur="32" dur.ges="3p" beam="m1" stem.dir="up"/>
+                                        <note xml:id="d1e4958" tstamp.ges="21" pname="d" oct="5" dur="32" dur.ges="3p" beam="t1" stem.dir="up"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d1e4981" tstamp.ges="24" pname="c" oct="5" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="up"/>
+                                        <chord xml:id="d447e1" tstamp.ges="42" dur="16" dur.ges="6p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e5002" pname="a" oct="4"/>
+                                            <note xml:id="d1e5023" pname="f" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                    <chord xml:id="d451e1" tstamp.ges="48" dur="4" dur.ges="24p" stem.dir="up">
+                                        <note xml:id="d1e5042" pname="c" oct="5"/>
+                                        <note xml:id="d1e5059" pname="e" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <beam>
+                                        <chord xml:id="d455e1" tstamp.ges="0" dur="8" dots="1" dur.ges="18p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e5082" pname="g" oct="3"/>
+                                            <note xml:id="d1e5102" pname="c" oct="3"/>
+                                        </chord>
+                                        <note xml:id="d1e5121" tstamp.ges="18" pname="c" oct="4" dur="32" dur.ges="3p" beam="m1" stem.dir="down"/>
+                                        <note xml:id="d1e5145" tstamp.ges="21" pname="d" oct="4" dur="32" dur.ges="3p" beam="t1" stem.dir="down"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d1e5168" tstamp.ges="24" pname="c" oct="4" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="down"/>
+                                        <chord xml:id="d459e1" tstamp.ges="42" dur="16" dur.ges="6p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e5189" pname="a" oct="3"/>
+                                            <note xml:id="d1e5211" pname="f" oct="3"/>
+                                        </chord>
+                                    </beam>
+                                    <chord xml:id="d463e1" tstamp.ges="48" dur="4" dur.ges="24p" stem.dir="down">
+                                        <note xml:id="d1e5229" pname="g" oct="3"/>
+                                        <note xml:id="d1e5247" pname="c" oct="3"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <dynam label="direction" tstamp="1.75" tstamp.ges="18" place="below" staff="2">pp</dynam>
+                            <slur tstamp="1.75" tstamp.ges="18" startid="#d1e4934" curvedir="below" tstamp2="0m+2" endid="#d1e4981" staff="2"/>
+                            <slur tstamp="1.75" tstamp.ges="18" startid="#d1e5121" curvedir="above" tstamp2="0m+2" endid="#d1e5168" staff="3"/>
+                            <slur tstamp="2.75" tstamp.ges="42" startid="#d1e5023" curvedir="below" tstamp2="0m+3" endid="#d1e5059" staff="2"/>
+                            <slur tstamp="2.75" tstamp.ges="42" startid="#d1e5189" curvedir="above" tstamp2="0m+3" endid="#d1e5229" staff="3"/>
+                        </measure>
+                        <measure n="14" xml:id="d1e5265">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e5267" tstamp.ges="0" pname="g" oct="4" dur="4" dots="1" dur.ges="36p" stem.dir="up" syl="zog//her//im-">
+                                        <verse n="1">
+                                            <syl>zog</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>her</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">im</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e5298" tstamp.ges="36" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="in//zu//mer">
+                                        <verse n="1">
+                                            <syl>in</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>zu</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">mer</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e5328" tstamp.ges="48" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="Freud'//mir//hor'">
+                                        <verse n="1">
+                                            <syl>Freud'</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>mir</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>hör'</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e5358" tstamp.ges="60" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="und//Ge-//ich's">
+                                        <verse n="1">
+                                            <syl>und</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">Ge</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>ich's</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d481e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="up">
+                                        <note xml:id="d1e5389" pname="g" oct="4"/>
+                                        <note xml:id="d1e5407" pname="f" oct="4"/>
+                                        <note xml:id="d1e5426" pname="d" oct="4"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d485e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="i1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e5450" pname="g" oct="4"/>
+                                            <note xml:id="d1e5471" pname="f" oct="4"/>
+                                            <note xml:id="d1e5489" pname="d" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d489e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e5507" pname="g" oct="4"/>
+                                            <note xml:id="d1e5528" pname="e" oct="4"/>
+                                            <note xml:id="d1e5546" pname="c" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d493e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1" artic="stacc">
+                                            <artic artic="stacc"/>
+                                            <note xml:id="d1e5564" pname="g" oct="4"/>
+                                            <note xml:id="d1e5586" pname="e" oct="4"/>
+                                            <note xml:id="d1e5604" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d497e1" tstamp.ges="0" dur="4" dots="1" dur.ges="36p" stem.dir="down">
+                                        <note xml:id="d1e5630" pname="g" oct="3"/>
+                                        <note xml:id="d1e5648" pname="b" accid="n" oct="2">
+                                            <accid accid="n"/>
+                                        </note>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d501e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e5669" pname="g" oct="3"/>
+                                            <note xml:id="d1e5688" pname="b" oct="2" accid.ges="n"/>
+                                        </chord>
+                                        <chord xml:id="d505e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e5706" pname="g" oct="3"/>
+                                            <note xml:id="d1e5725" pname="b" accid="f" oct="2">
+                                                <accid accid="f"/>
+                                            </note>
+                                        </chord>
+                                        <chord xml:id="d509e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e5747" pname="g" oct="3"/>
+                                            <note xml:id="d1e5767" pname="b" oct="2" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <hairpin tstamp="2.5" tstamp.ges="36" place="below" staff="2" form="cres" tstamp2="0m+4" endid="#d1e5604"/>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e5489" curvedir="below" tstamp2="3.5" endid="#d1e5604" staff="2"/>
+                        </measure>
+                        <measure n="15" xml:id="d1e5787">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="d1e5789" tstamp.ges="0" pname="a" oct="4" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="up" syl="Lei-//sel-//rau-">
+                                            <verse n="1">
+                                                <syl wordpos="i" con="d">Lei</syl>
+                                            </verse>
+                                            <verse n="2">
+                                                <syl wordpos="m" con="d">sel</syl>
+                                            </verse>
+                                            <verse n="3">
+                                                <syl wordpos="i" con="d">rau</syl>
+                                            </verse>
+                                        </note>
+                                        <note xml:id="d1e5822" tstamp.ges="18" pname="b" oct="4" dur="16" dur.ges="6p" beam="t1" stem.dir="up" accid.ges="f"/>
+                                    </beam>
+                                    <note xml:id="d1e5843" tstamp.ges="24" pname="c" oct="5" dur="4" dur.ges="24p" stem.dir="down" syl="de//le,//schen:">
+                                        <verse n="1">
+                                            <syl wordpos="t">de</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">le,</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">schen:</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e5873" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e5882" tstamp.ges="60" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down" syl="zu//hier//du">
+                                        <verse n="1">
+                                            <syl>zu</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>hier</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>du</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <chord xml:id="d527e1" tstamp.ges="0" dur="8" dots="1" dur.ges="18p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e5913" pname="a" oct="4"/>
+                                            <note xml:id="d1e5934" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d531e1" tstamp.ges="18" dur="8" dur.ges="12p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e5976" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d1e5997" pname="g" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                    <chord xml:id="d535e1" tstamp.ges="24" dur="4" dots="1" dur.ges="36p" stem.dir="up">
+                                        <note xml:id="d1e6039" pname="c" oct="5"/>
+                                        <note xml:id="d1e6059" pname="a" oct="4"/>
+                                    </chord>
+                                    <chord xml:id="d539e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down">
+                                        <note xml:id="d1e6078" pname="c" oct="5"/>
+                                        <note xml:id="d1e6095" pname="a" oct="4"/>
+                                    </chord>
+                                </layer>
+                                <layer n="2">
+                                    <note xml:id="d1e5956" tstamp.ges="0" pname="c" oct="4" dur="4" dur.ges="24p" stem.dir="down"/>
+                                    <note xml:id="d1e6018" tstamp.ges="24" pname="c" oct="4" dur="4" dots="1" dur.ges="36p" stem.dir="down"/>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e6116" tstamp.ges="0" pname="f" oct="3" dur="4" dur.ges="24p" tie="i" stem.dir="up"/>
+                                    <note xml:id="d1e6180" tstamp.ges="24" pname="f" oct="3" dur="4" dots="1" dur.ges="36p" tie="t" stem.dir="up"/>
+                                </layer>
+                                <layer n="2">
+                                    <beam>
+                                        <note xml:id="d1e6139" tstamp.ges="0" pname="a" oct="2" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="down"/>
+                                        <note xml:id="d1e6159" tstamp.ges="18" pname="g" oct="2" dur="16" dur.ges="6p" beam="t1" stem.dir="down"/>
+                                    </beam>
+                                    <note xml:id="d1e6203" tstamp.ges="24" pname="f" oct="2" dur="4" dots="1" dur.ges="36p" stem.dir="down"/>
+                                    <chord xml:id="d543e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down">
+                                        <note xml:id="d1e6223" pname="c" oct="4"/>
+                                        <note xml:id="d1e6240" pname="a" oct="3"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e6116" curvedir="below" tstamp2="0m+1.75" endid="#d1e5822" staff="1"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e5913" curvedir="above" tstamp2="0m+2" endid="#d1e6039" staff="2"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e6139" curvedir="below" tstamp2="0m+2" endid="#d1e6203" staff="3"/>
+                        </measure>
+                        <sb/>
+                        <measure n="16" xml:id="d1e6258">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e6261" tstamp.ges="0" pname="f" oct="5" dur="4" dur.ges="24p" stem.dir="down" syl="ihm//find'st//fän-">
+                                        <verse n="1">
+                                            <syl>ihm</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>find'st</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">fän</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e6287" tstamp.ges="24" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down"> </note>
+                                    <note xml:id="d1e6308" tstamp.ges="36" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="mich//du//dest">
+                                        <verse n="1">
+                                            <syl>mich</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>du</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">dest</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e6338" tstamp.ges="48" pname="b" oct="4" dur="8" dur.ges="12p" stem.dir="down" accid.ges="f" syl="im-//dei-//Ru-">
+                                        <verse n="1">
+                                            <syl wordpos="i" con="d">im</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="i" con="d">dei</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">Ru</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e6370" tstamp.ges="60" pname="g" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="mer//ne//he">
+                                        <verse n="1">
+                                            <syl wordpos="t">mer</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl wordpos="t">ne</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">he</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d1e6402" tstamp.ges="0" grace="unknown" stem.mod="1slash" pname="c" oct="5" dur="8" dur.ges="0p" stem.dir="up"/>
+                                    <chord xml:id="d560e1" tstamp.ges="0" dur="4" dur.ges="24p" stem.dir="down">
+                                        <note xml:id="d1e6418" pname="f" oct="5"/>
+                                        <note xml:id="d1e6436" pname="a" oct="4"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d564e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e6454" pname="c" oct="5"/>
+                                            <note xml:id="d1e6474" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d568e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e6492" pname="a" oct="4"/>
+                                            <note xml:id="d1e6511" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d572e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e6530" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d1e6551" pname="g" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d576e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e6569" pname="g" oct="4"/>
+                                            <note xml:id="d1e6589" pname="e" oct="4"/>
+                                            <note xml:id="d1e6607" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e6402x" tstamp.ges="0" grace="unknown" stem.mod="1slash" pname="c" oct="4" dur="8" dur.ges="0p" stem.dir="up"/>
+                                    <chord xml:id="d580e1" tstamp.ges="0" dur="4" dur.ges="24p" stem.dir="down">
+                                        <note xml:id="d1e6629" pname="f" oct="4"/>
+                                        <note xml:id="d1e6647" pname="a" oct="3"/>
+                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d584e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e6665" pname="c" oct="4"/>
+                                            <note xml:id="d1e6685" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d588e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e6703" pname="a" oct="3"/>
+                                            <note xml:id="d1e6723" pname="f" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d592e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e6741" pname="b" oct="3" accid.ges="f"/>
+                                            <note xml:id="d1e6762" pname="g" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d596e1" tstamp.ges="60" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e6781" pname="g" oct="3"/>
+                                            <note xml:id="d1e6801" pname="b" oct="2" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e6261" curvedir="above" tstamp2="0m+2" endid="#d1e6287" staff="1"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e6418" curvedir="above" tstamp2="0m+2" endid="#d1e6454" staff="2"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e6629" curvedir="above" tstamp2="0m+2" endid="#d1e6665" staff="3"/>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e6511" curvedir="below" tstamp2="0m+3.5" endid="#d1e6607" staff="2"/>
+                            <slur tstamp="2.5" tstamp.ges="36" startid="#d1e6703" curvedir="above" tstamp2="0m+3.5" endid="#d1e6781" staff="3"/>
+                        </measure>
+                        <measure n="17" xml:id="d1e6821">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e6823" tstamp.ges="0" pname="c" oct="5" dur="2" dur.ges="48p" stem.dir="down" syl="fort,//Ruh,//dort,">
+                                        <verse n="1">
+                                            <syl>fort,</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>Ruh,</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>dort,</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e6853" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                    <note xml:id="d1e6862" tstamp.ges="60" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down" syl="zu//hier//du">
+                                        <verse n="1">
+                                            <syl>zu</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>hier</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>du</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord xml:id="d614e1" tstamp.ges="0" dur="4" dur.ges="24p" stem.dir="up" tie="i">
+                                        <note xml:id="d1e6899" pname="c" oct="5"/>
+                                        <note xml:id="d1e6918" pname="f" oct="4"/>
+                                        <note xml:id="d1e6938" pname="c" oct="4"/>
+                                    </chord>
+                                    <tuplet tstamp="2" tstamp.ges="24" startid="#d1e6958" num="3" numbase="2" num.format="count" endid="#d1e7042" staff="2">
+                                        <beam>
+                                            <chord xml:id="d618e1" tstamp.ges="24" dur="8" dots="1" dur.ges="18p" stem.dir="up" beam="i1" tie="t">
+                                                <note xml:id="d1e6958" pname="c" oct="5"/>
+                                                <note xml:id="d1e6980" pname="f" oct="4"/>
+                                                <note xml:id="d1e7001" pname="c" oct="4"/>
+                                            </chord>
+                                            <note xml:id="d1e7022" tstamp.ges="42" pname="c" oct="5" dur="8" dur.ges="12p" beam="m1" stem.dir="up"/>
+                                            <note xml:id="d1e7042" tstamp.ges="54" pname="f" oct="5" dur="8" dur.ges="12p" beam="t1" stem.dir="up"/>
+                                        </beam>
+                                    </tuplet>
+                                    <tuplet tstamp="3" tstamp.ges="48" startid="#d1e7064" num="3" numbase="2" num.format="count" endid="#d1e7114" staff="2">
+                                        <beam>
+                                            <note xml:id="d1e7064" tstamp.ges="48" pname="a" oct="5" dur="8" dur.ges="8p" beam="i1" tuplet="i1" stem.dir="down"/>
+                                            <note xml:id="d1e7090" tstamp.ges="56" pname="f" oct="5" dur="8" dur.ges="8p" beam="m1" tuplet="m1" stem.dir="down"/>
+                                            <note xml:id="d1e7114" tstamp.ges="64" pname="c" oct="5" dur="8" dur.ges="8p" beam="t1" tuplet="t1" stem.dir="down"/>
+                                        </beam>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord xml:id="d622e1" tstamp.ges="0" dur="4" dur.ges="24p" stem.dir="down" tie="i">
+                                        <note xml:id="d1e7143" pname="a" oct="3"/>
+                                        <note xml:id="d1e7162" pname="f" oct="3"/>
+                                        <note xml:id="d1e7182" pname="a" oct="2"/>
+                                    </chord>
+                                    <tuplet tstamp="2" tstamp.ges="24" startid="#d1e7202" num="3" numbase="2" num.format="count" endid="#d1e7303" staff="2 3">
+                                        <beam>
+                                            <chord xml:id="d626e1" tstamp.ges="24" dur="8" dur.ges="8p" tuplet="i1" stem.dir="down" beam="i1" tie="t">
+                                                <note xml:id="d1e7202" pname="a" oct="3"/>
+                                                <note xml:id="d1e7229" pname="f" oct="3"/>
+                                                <note xml:id="d1e7254" pname="a" oct="2"/>
+                                            </chord>
+                                            <note xml:id="d1e7279" tstamp.ges="32" pname="c" oct="4" dur="8" dur.ges="8p" beam="m1" tuplet="m1" stem.dir="down"/>
+                                            <note xml:id="d1e7303" tstamp.ges="40" pname="f" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="t1" stem.dir="down"/>
+                                        </beam>
+                                    </tuplet>
+                                    <tuplet tstamp="3" tstamp.ges="48" startid="#d1e7329" num="3" numbase="2" num.format="count" endid="#d1e7380" staff="2 3">
+                                        <beam>
+                                            <note xml:id="d1e7329" tstamp.ges="48" pname="a" oct="4" dur="8" dur.ges="8p" beam="i1" tuplet="i1" stem.dir="down"/>
+                                            <note xml:id="d1e7354" tstamp.ges="56" pname="f" oct="4" dur="8" artic="stacc" dur.ges="8p" beam="m1" tuplet="m1" stem.dir="down">
+                                                <artic artic="stacc"/>
+                                            </note>
+                                            <note xml:id="d1e7380" tstamp.ges="64" pname="c" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="t1" stem.dir="down"/>
+                                        </beam>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                            <dynam label="direction" tstamp="1" tstamp.ges="0" place="below" staff="2">fp</dynam>
+                            <tie tstamp="1" tstamp.ges="0" startid="#d1e6899" curvedir="below" tstamp2="0m+2" endid="#d1e6958" staff="2"/>
+                            <tie tstamp="1" tstamp.ges="0" startid="#d1e6918" curvedir="below" tstamp2="0m+2" endid="#d1e6980" staff="2"/>
+                            <tie tstamp="1" tstamp.ges="0" startid="#d1e6938" curvedir="below" tstamp2="0m+2" endid="#d1e7001" staff="2"/>
+                            <tie tstamp="1" tstamp.ges="0" startid="#d1e7143" curvedir="above" tstamp2="0m+2" endid="#d1e7202" staff="3"/>
+                            <tie tstamp="1" tstamp.ges="0" startid="#d1e7162" curvedir="above" tstamp2="0m+2" endid="#d1e7229" staff="3"/>
+                            <tie tstamp="1" tstamp.ges="0" startid="#d1e7182" curvedir="above" tstamp2="0m+2" endid="#d1e7254" staff="3"/>
+                            <slur tstamp="2.33" tstamp.ges="42" startid="#d1e7022" curvedir="above" tstamp2="0m+3.6667" endid="#d1e7114" staff="2"/>
+                            <hairpin form="cres" tstamp="2.33" tstamp2="2.6667"/>
+                            <hairpin form="dim" tstamp="3" tstamp2="3.6667"/>
+                        </measure>
+                        <measure n="18" xml:id="d1e7405">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e7407" tstamp.ges="0" pname="f" oct="5" dur="4" dur.ges="24p" stem.dir="down" syl="ihm//find'st//fän-">
+                                        <verse n="1">
+                                            <syl>ihm</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>find'st</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="i" con="d">fän</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e7438" tstamp.ges="24" pname="c" oct="5" dur="8" dur.ges="12p" stem.dir="down"/>
+                                    <note xml:id="d1e7454" tstamp.ges="36" pname="a" oct="4" dur="8" dur.ges="12p" stem.dir="up" syl="mich//da//dest">
+                                        <verse n="1">
+                                            <syl>mich</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>da</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl wordpos="t">dest</syl>
+                                        </verse>
+                                    </note>
+                                    <tuplet tstamp="1" tstamp.ges="0" startid="#d1e7484" num="3" numbase="2" num.format="count" endid="#d1e7523x" staff="1">
+                                        <beam>
+                                            <note xml:id="d1e7484" tstamp.ges="48" pname="c" oct="5" dur="8" dur.ges="8p" beam="i1" tuplet="i1" stem.dir="down" syl="im-//dei-//Ru-">
+                                                <verse n="1">
+                                                    <syl wordpos="i" con="d">im</syl>
+                                                </verse>
+                                                <verse n="2">
+                                                    <syl wordpos="i" con="d">dei</syl>
+                                                </verse>
+                                                <verse n="3">
+                                                    <syl wordpos="i" con="d">Ru</syl>
+                                                </verse>
+                                            </note>
+                                            <note xml:id="d1e7523" tstamp.ges="56" pname="b" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="down" accid.ges="f"/>
+                                        </beam>
+                                        <note xml:id="d1e7523x" tstamp.ges="64" pname="g" oct="4" dur="8" dur.ges="8p" tuplet="t1" stem.dir="down">
+                                            <verse n="1">
+                                                <syl wordpos="t" con="d">mer</syl>
+                                            </verse>
+                                            <verse n="2">
+                                                <syl wordpos="t" con="d">ne</syl>
+                                            </verse>
+                                            <verse n="3">
+                                                <syl wordpos="t" con="d">he</syl>
+                                            </verse>
+                                        </note>
+                                    </tuplet>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <tuplet tstamp="1" tstamp.ges="0" startid="#d1e7585" num="3" numbase="2" num.format="count" endid="#d1e7681" staff="2">
+                                        <beam>
+                                            <chord xml:id="d644e1" tstamp.ges="0" dur="8" dur.ges="8p" tuplet="i1" stem.dir="down" beam="i1">
+                                                <note xml:id="d1e7585" pname="a" oct="4"/>
+                                                <note xml:id="d1e7611" pname="f" oct="4"/>
+                                            </chord>
+                                            <chord xml:id="d648e1" tstamp.ges="8" dur="8" dur.ges="8p" tuplet="m1" stem.dir="down" beam="m1">
+                                                <note xml:id="d1e7634" pname="c" oct="5"/>
+                                                <note xml:id="d1e7658" pname="a" oct="4"/>
+                                            </chord>
+                                            <chord xml:id="d652e1" tstamp.ges="16" dur="8" dur.ges="8p" tuplet="t1" stem.dir="down" beam="t1">
+                                                <note xml:id="d1e7681" pname="f" oct="5"/>
+                                                <note xml:id="d1e7706" pname="c" oct="5"/>
+                                            </chord>
+                                        </beam>
+                                    </tuplet>
+                                    <beam>
+                                        <chord xml:id="d656e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e7734" pname="c" oct="5"/>
+                                            <note xml:id="d1e7753" pname="a" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d660e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e7771" pname="a" oct="4"/>
+                                            <note xml:id="d1e7790" pname="f" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d664e1" tstamp.ges="48" dur="8" dots="1" dur.ges="18p" stem.dir="up" beam="m1">
+                                            <note xml:id="d1e7809" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d1e7831" pname="g" oct="4"/>
+                                        </chord>
+                                        <chord xml:id="d668e1" tstamp.ges="66" dur="16" dur.ges="6p" stem.dir="up" beam="t1">
+                                            <note xml:id="d1e7855" pname="g" oct="4"/>
+                                            <note xml:id="d1e7877" pname="c" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <tuplet tstamp="1" tstamp.ges="0" startid="#d1e7898" num="3" numbase="2" num.format="count" endid="#d1e7972" staff="3">
+                                        <beam>
+                                            <chord xml:id="d672e1" tstamp.ges="0" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                                <note xml:id="d1e7898" pname="a" oct="3"/>
+                                                <note xml:id="d1e7917" pname="f" oct="3"/>
+                                            </chord>
+                                            <chord xml:id="d676e1" tstamp.ges="12" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                                <note xml:id="d1e7935" pname="c" oct="4"/>
+                                                <note xml:id="d1e7954" pname="a" oct="3"/>
+                                            </chord>
+                                            <chord xml:id="d680e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                                <note xml:id="d1e7972" pname="f" oct="4"/>
+                                                <note xml:id="d1e7992" pname="c" oct="4"/>
+                                            </chord>
+                                        </beam>
+                                    </tuplet>
+                                    <beam>
+                                        <chord xml:id="d684e1" tstamp.ges="24" dur="8" dur.ges="12p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e8013" pname="c" oct="4"/>
+                                            <note xml:id="d1e8032" pname="a" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d688e1" tstamp.ges="36" dur="8" dur.ges="12p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e8050" pname="a" oct="3"/>
+                                            <note xml:id="d1e8069" pname="f" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d692e1" tstamp.ges="48" dur="8" dots="1" dur.ges="18p" stem.dir="down" beam="m1">
+                                            <note xml:id="d1e8087" pname="b" oct="3" accid.ges="f"/>
+                                            <note xml:id="d1e8109" pname="g" oct="3"/>
+                                        </chord>
+                                        <chord xml:id="d696e1" tstamp.ges="66" dur="16" dur.ges="6p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e8128" pname="g" oct="3"/>
+                                            <note xml:id="d1e8149" pname="c" oct="3"/>
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e7407" curvedir="above" tstamp2="0m+2" endid="#d1e7438" staff="1"/>
+                            <slur tstamp="1" tstamp.ges="0" startid="#d1e7585" curvedir="above" tstamp2="0m+3.75" endid="#d1e7855" staff="2"/>
+                            <hairpin tstamp="1" tstamp.ges="24" startid="#d1e7611" place="below" staff="2" form="cres" tstamp2="0m+1.75" endid="#d1e7706"/>
+                            <hairpin tstamp="2" tstamp.ges="24" startid="#d1e7753" place="below" staff="2" form="dim" tstamp2="0m+3.25" endid="#d1e7831"/>
+                            <slur tstamp="3" tstamp.ges="48" startid="#d1e7484" curvedir="above" tstamp2="0m+3.3333" endid="#d1e7523" staff="1"/>
+                        </measure>
+                        <measure n="19" xml:id="d1e8167" right="end">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e8169" tstamp.ges="0" pname="f" oct="4" dur="2" dur.ges="48p" stem.dir="up" syl="fort.//Ruh!//dort!">
+                                        <verse n="1">
+                                            <syl>fort.</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>Ruh!</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>dort!</syl>
+                                        </verse>
+                                    </note>
+                                    <rest xml:id="d1e8199" tstamp.ges="48" dur="8" dur.ges="12p"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <chord xml:id="d715e1" tstamp.ges="0" dur="8" dots="1" dur.ges="18p" stem.dir="up" beam="i1">
+                                            <note xml:id="d1e8221" pname="f" oct="4"/>
+                                            <note xml:id="d1e8241" pname="a" oct="3"/>
+                                        </chord>
+                                        <note xml:id="d1e8260" tstamp.ges="18" pname="a" oct="4" dur="32" dur.ges="3p" beam="m1" stem.dir="up"/>
+                                        <note xml:id="d1e8284" tstamp.ges="21" pname="d" oct="5" dur="32" dur.ges="3p" beam="t1" stem.dir="up"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d1e8307" tstamp.ges="24" pname="c" oct="5" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="down"/>
+                                        <chord xml:id="d719e1" tstamp.ges="42" dur="16" dur.ges="6p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e8327" pname="e" oct="5"/>
+                                            <note xml:id="d1e8349" pname="g" oct="4"/>
+                                        </chord>
+                                    </beam>
+                                    <chord xml:id="d723e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down">
+                                        <note xml:id="d1e8368" pname="f" oct="5"/>
+                                        <note xml:id="d1e8386" pname="f" oct="4"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <beam>
+                                        <chord xml:id="d728e1" tstamp.ges="0" dur="8" dots="1" dur.ges="18p" stem.dir="down" beam="i1">
+                                            <note xml:id="d1e8419" pname="f" oct="3"/>
+                                            <note xml:id="d1e8439" pname="f" oct="2"/>
+                                        </chord>
+                                        <note xml:id="d1e8458" tstamp.ges="18" pname="a" oct="3" dur="32" dur.ges="3p" beam="m1" stem.dir="down"/>
+                                        <note xml:id="d1e8482" tstamp.ges="21" pname="d" oct="4" dur="32" dur.ges="3p" beam="t1" stem.dir="down"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d1e8505" tstamp.ges="24" pname="c" oct="4" dur="8" dots="1" dur.ges="18p" beam="i1" stem.dir="down"/>
+                                        <chord xml:id="d732e1" tstamp.ges="42" dur="8" dur.ges="12p" stem.dir="down" beam="t1">
+                                            <note xml:id="d1e8526" pname="b" oct="3" accid.ges="f"/>
+                                            <note xml:id="d1e8548" pname="c" oct="3"/>
+                                        </chord>
+                                    </beam>
+                                    <chord xml:id="d736e1" tstamp.ges="48" dur="8" dur.ges="12p" stem.dir="down">
+                                        <note xml:id="d1e8569" pname="a" oct="3"/>
+                                        <note xml:id="d1e8587" pname="f" oct="3"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <slur tstamp="1.75" tstamp.ges="18" startid="#d1e8260" curvedir="below" tstamp2="0m+2" endid="#d1e8307" staff="2"/>
+                            <slur tstamp="1.75" tstamp.ges="18" startid="#d1e8458" curvedir="above" tstamp2="0m+2" endid="#d1e8505" staff="3"/>
+                            <slur tstamp="2.75" tstamp.ges="42" startid="#d1e8327" curvedir="above" tstamp2="0m+3" endid="#d1e8368" staff="2"/>
+                            <slur tstamp="2.75" tstamp.ges="42" startid="#d1e8526" curvedir="above" tstamp2="0m+3" endid="#d1e8569" staff="3"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

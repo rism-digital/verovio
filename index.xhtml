@@ -79,9 +79,31 @@ active: home
 	<div class="col-md-5">
 		<div class="panel panel-default">
 			<div class="panel-body">
-				<div id="hummel-p6" style="display: none;" class="text-center">
-					{% include svg/hummel-p6.svg %}
-				</div>
+                <div id="carousel" class="carousel slide" data-ride="carousel">
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" role="listbox">
+                        <div class="item">
+                            <img src="images/carousel/hummel-p6.png"></img>
+                        </div>
+                        <div class="item">
+                            <img src="images/carousel/schubert.png"></img>
+                        </div>
+                        <div class="item">
+                            <img src="images/carousel/chords.png"></img>
+                        </div>
+                    </div>
+                </div>
+                <div id="carousel-descriptions">
+                    <p class="carousel-description">
+                        Hummel
+                    </p>
+                    <p class="carousel-description">
+                        Schubert
+                    </p>
+                    <p class="carousel-description">
+                        Chords
+                    </p>
+                </div>
 			</div>
 		</div>
 
@@ -108,8 +130,22 @@ active: home
 
 <script type="text/javascript">
 //<![CDATA[
+	function adjust_svg_sizes( pageWidth, pageHeight, zoom ) {
+		// adjust the size according to the width of the div
+		width = $("#carousel").width();
+		if ( width < zoom * pageWidth / 100 ) {
+			zoom = width * 100 / pageWidth;
+		}
+        
+        $(".carousel-inner item div svg" ).attr("height", pageHeight * zoom / 100 + "px" );	
+        $(".carousel-inner item div svg" ).attr("width", pageWidth * zoom / 100 + "px" );		
+	}
+
 	function adjust_svg_size( div, pageWidth, pageHeight, zoom ) {
 		// adjust the size according to the width of the div
+        console.log( $("#carousel").width() );
+        return;
+        
 		$( div ).show();
 		width = $( div ).width();
 		if ( width < zoom * pageWidth / 100 ) {
@@ -124,9 +160,25 @@ active: home
 			$( div + ' svg').attr("width", pageWidth * zoom / 100 + "px" );	
 		}
 	}
+    
+    function load_description( image ) {
+        console.log( image );
+        des = $("#carousel-descriptions p").eq( image );
+        des.show();
+        $("#carousel-descriptions p").not(des).hide();
+    }
 
 	$( document ).ready(function() {
-		adjust_svg_size( "#hummel-p6", 2100, 2800, 20 );
+        
+        rand = Math.floor( Math.random() * $( "#carousel .item" ).length );
+        load_description( rand );
+        $( "#carousel .item").eq(rand).addClass("active");
+		$( "#carousel" ).carousel( { interval: 5000 } );
+        $( "#carousel" ).on('slid.bs.carousel', function (e) {
+            idx = $(".active", e.target).index();
+            load_description(idx);
+        });
+        
 	});
 //]]>
 </script>

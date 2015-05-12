@@ -77,6 +77,15 @@ code.panel-header {
     }
 }
 
+// Fixing strange blinking text in carousel with Safari
+.carousel-inner {
+  -webkit-transform-style: preserve-3d;
+}
+
+.carousel-description {
+    display: none;
+}
+
 // Does not work with Firefox and not very well with Safari
 @media print 
 {
