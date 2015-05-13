@@ -1,0 +1,20 @@
+<tuplet num="12" numbase="8">
+  <beam>
+    <note xml:id="d1e41" pname="a" oct="4" dur="64" tuplet="i1"/>
+    <note xml:id="d1e58" pname="d" oct="4" dur="64" tuplet="m1">
+      <accid accid="n"/>
+    </note>
+    <note xml:id="d1e92" pname="e" oct="4" dur="64" tuplet="m1" breaksec="2"/>
+    <note xml:id="d1e125" pname="f" oct="4" dur="64" tuplet="m1"/>
+    <note xml:id="d1e156" pname="e" oct="4" dur="64" tuplet="m1"/>
+    <note xml:id="d1e189" pname="d" oct="4" dur="64" tuplet="m1" breaksec="1"/>
+    <note xml:id="d1e220" pname="a" oct="4" dur="64" tuplet="m1"/>
+    <note xml:id="d1e253" pname="g" oct="4" dur="64" tuplet="m1"/>
+    <note xml:id="d1e284" pname="f" oct="4" dur="64" tuplet="m1" breaksec="2"/>
+    <note xml:id="d1e315" pname="d" oct="5" dur="64" tuplet="m1">
+      <accid accid="n"/>
+    </note>
+    <note xml:id="d1e349" pname="c" oct="5" dur="64" tuplet="m1"/>
+    <note xml:id="d1e380" pname="b" oct="4" dur="64" tuplet="t1"/>
+  </beam>
+</tuplet>

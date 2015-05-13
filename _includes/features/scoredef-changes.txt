@@ -1,0 +1,33 @@
+<section>
+  <measure n="1" right="dbl">
+    <staff n="1">
+      <layer n="1">
+        <multiRest num="2"/>
+      </layer>
+    </staff>
+  </measure>
+  <scoreDef>
+    <staffGrp>
+      <staffDef n="1" clef.line="3" clef.shape="C" key.sig="3f"/>
+    </staffGrp>
+  </scoreDef>
+  <measure n="2" right="dbl">
+    <staff n="1">
+      <layer n="1">
+        <multiRest num="2"/>
+      </layer>
+    </staff>
+  </measure>
+  <scoreDef>
+    <staffGrp>
+      <staffDef n="1" meter.count="3" meter.unit="4"/>
+    </staffGrp>
+  </scoreDef>
+  <measure n="3">
+    <staff n="1">
+      <layer n="1">
+        <multiRest num="2"/>
+      </layer>
+    </staff>
+  </measure>
+</section>

@@ -1,0 +1,14 @@
+<layer n="1">
+  <chord dur="8" stem.dir="up">
+    <note pname="f" oct="4" accid.ges="s"/>
+    <note pname="d" oct="4"/>
+  </chord>
+  <rest dur="8"/>
+  <clef shape="F" line="4"/>
+  <chord dur="8" stem.dir="down">
+    <note pname="e" oct="4"/>
+    <note pname="e" oct="3"/>
+  </chord>
+  <rest dur="8"/>
+  <clef shape="G" line="2"/>
+</layer>

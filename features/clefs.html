@@ -1,17 +1,39 @@
 ---
 ---
-<h3>Clef changes</h3>
-
+<h3>Score definition and clef changes</h3>
 
 <p>
-	Coming soon.
+	Verovio supports <code>&lt;scoreDef&gt;</code> redefinitions between measures. Any attribute supported by Verovio can be redefined.
 </p>
 
-<div id="svg_output" style="overflow:auto;"/>
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="scoredef-changes.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/scoredef-changes.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
+<h4>Clefs</h4>
+<p>
+	Intermediate clef changes can be encoded with <code>&lt;clef&gt;</code> elements.
+</p>
+
+<div id="svg_output-2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code2" file="clef-changes.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/clef-changes.txt %}
+{% endhighlight %}
+</div>
+
 <script type="text/javascript">
 //<![CDATA[
 	zoom = 40;
-	pageWidth = 800;
+	pageWidth = 1500;
 	
 	// adjust the zoom for small screens
 	width = $('#feature').width();
@@ -19,8 +41,12 @@
 		zoom = width * 100 / pageWidth;
 	}
 
-	$.get( "{{ site.baseurl }}/examples/features/tie.mei" , function( data ) {
-		//load_data( data, $('#svg_output') );
+	$.get( "{{ site.baseurl }}/examples/features/scoredef-changes.mei" , function( data ) {
+		load_data( data, $('#svg_output-1') );
+	});
+    
+	$.get( "{{ site.baseurl }}/examples/features/clef-changes.mei" , function( data ) {
+		load_data( data, $('#svg_output-2') );
 	});
 //]]>
 </script>
