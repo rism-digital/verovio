@@ -142,7 +142,8 @@
             </change>
             <change n="2" resp="#LP">
                 <changeDesc>
-                    <p>Fixing various issues.</p>
+                    <p>Removing tupletSpan duplicating with tuplet</p>
+                    <p>Fixing measure 4 (note missing in tuplet)</p>
                 </changeDesc>
                 <date>2015-05-12</date>
             </change>
@@ -400,6 +401,17 @@
                                             </note>
                                             <note xml:id="d1e1053" tstamp.ges="56" pname="a" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up"/>
                                         </beam>
+                                        <note xml:id="d1e1012-2"  pname="g" oct="4" dur="8" dur.ges="8p" stem.dir="up" >
+                                            <verse n="1">
+                                                <syl wordpos="i" con="d">den</syl>
+                                            </verse>
+                                            <verse n="2">
+                                                <syl wordpos="t">fer</syl>
+                                            </verse>
+                                            <verse n="3">
+                                                <syl wordpos="i" con="d">ge</syl>
+                                            </verse>
+                                        </note>
                                     </tuplet>
                                 </layer>
                             </staff>
