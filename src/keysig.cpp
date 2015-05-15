@@ -19,8 +19,8 @@ namespace vrv {
 // KeySig
 //----------------------------------------------------------------------------
 
-unsigned char KeySig::flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
-unsigned char KeySig::sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
+data_PITCHNAME KeySig::flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
+data_PITCHNAME KeySig::sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
 
 int KeySig::octave_map[2][9][7] = {
     {// flats
@@ -107,7 +107,7 @@ void KeySig::Reset()
 }
     
     
-void KeySig::Convert( )
+void KeySig::ConvertToInternal( )
 {
     int i;
     if (this->GetAccid() == ACCIDENTAL_EXPLICIT_s) {
@@ -131,9 +131,24 @@ void KeySig::Convert( )
     }
     else return;
 }
+    
+void KeySig::ConvertToMei()
+{
+    if ((m_num_alter < 1) || (m_num_alter > 7)) return;
+    
+    if (m_alteration == ACCID_SHARP) {
+        this->SetAccid( ACCIDENTAL_EXPLICIT_s);
+        this->SetPname(KeySig::sharps[m_num_alter - 1]);
+    }
+    else if (m_alteration == ACCID_FLAT) {
+        this->SetAccid( ACCIDENTAL_EXPLICIT_f);
+        this->SetPname(KeySig::flats[m_num_alter - 1]);
+    }
+    else return;
+}
 
 unsigned char KeySig::GetAlterationAt(int pos) {
-    unsigned char *alteration_set;
+    data_PITCHNAME *alteration_set;
     
     if (pos > 6)
         return 0;

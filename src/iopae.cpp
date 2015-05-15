@@ -975,6 +975,8 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
     
     key->SetAlterationNumber(alt_nr);
     
+    key->ConvertToMei();
+    
     return i - index;
 }
 

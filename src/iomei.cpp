@@ -1555,7 +1555,7 @@ bool MeiInput::ReadMeiKeySig( Object *parent, pugi::xml_node keySig )
     vrvKeySig->ReadAccidental( keySig );
     vrvKeySig->ReadPitch( keySig );
     
-    vrvKeySig->Convert();
+    vrvKeySig->ConvertToInternal();
     
     AddLayerElement(parent, vrvKeySig);
     return true;
