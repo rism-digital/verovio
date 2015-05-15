@@ -99,12 +99,12 @@ verovio.toolkit.prototype.renderData = function (data, options) {
   	return verovio.vrvToolkit.renderData(this.ptr, data, options);
 };
 
-verovio.toolkit.prototype.renderPage = function (page_no, options) {
-  	return verovio.vrvToolkit.renderPage(this.ptr, page_no, options);
+verovio.toolkit.prototype.renderPage = function (pageNo, options) {
+  	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
 };
 
-verovio.toolkit.prototype.getMEI = function (page_no, scoreBased) {
-  	return verovio.vrvToolkit.getMEI(this.ptr, page_no, scoreBased);
+verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
+  	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {

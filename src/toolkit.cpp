@@ -252,7 +252,7 @@ std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
     pageNo--;
     
     MeiOutput meioutput( &m_doc, "" );
-    meioutput.SetScoreBasedMEI(scoreBased);
+    meioutput.SetScoreBasedMEI( scoreBased );
     return meioutput.GetOutput( pageNo );
 }
 

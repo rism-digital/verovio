@@ -1213,7 +1213,6 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
     return;
 }
     
-    
 void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
