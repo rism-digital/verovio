@@ -33,7 +33,7 @@
                                     <chord dots="1" dur="4" >
                                         <note oct="4" pname="d" accid="s" />
                                         <note oct="5" pname="f" accid="s" />
-                                        <note oct="5" pname="f" accid="s" />
+                                        <note oct="5" pname="g" accid="f" />
                                     </chord>
                                     <chord dots="1" dur="4" >
                                         <note oct="3" pname="g" accid="s" />
