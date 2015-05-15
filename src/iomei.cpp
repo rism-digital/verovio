@@ -92,6 +92,9 @@ bool MeiOutput::ExportFile( )
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
                 m_currentNode = m_currentNode.append_child("section");
+                m_nodeStack.push_back(m_currentNode);
+                // First save the main scoreDef
+                m_doc->m_scoreDef.Save( this );
             } else {
                 m_currentNode = meiDoc.append_child("pages");
             }
@@ -208,6 +211,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (dynamic_cast<Dot*>(object)) {
         m_currentNode = m_currentNode.append_child( "dot" );
         WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
+    }
+    else if (dynamic_cast<KeySig*>(object)) {
+        m_currentNode = m_currentNode.append_child("keySig");
+        WriteMeiKeySig( m_currentNode, dynamic_cast<KeySig*>(object) );
     }
     else if (dynamic_cast<Mensur*>(object)) {
         m_currentNode = m_currentNode.append_child("mensur");
