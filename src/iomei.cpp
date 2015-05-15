@@ -132,19 +132,18 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     if (dynamic_cast<Page*>(object)) {
-        if (m_scoreBasedMEI) return true;
-        
-        m_currentNode = m_currentNode.append_child("page");
-        WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
+        if (!m_scoreBasedMEI) {
+            m_currentNode = m_currentNode.append_child("page");
+            WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
+        }
+        // Here we could add a <pb> element
     }
     else if (dynamic_cast<System*>(object)) {
-        if (m_scoreBasedMEI) {
-			m_nodeStack.push_back(m_currentNode);
-			return true;
+        if (!m_scoreBasedMEI) {
+            m_currentNode = m_currentNode.append_child("system");
+            WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
         }
-		
-        m_currentNode = m_currentNode.append_child("system");
-        WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
+        // Here we could add a <sb> element (but not for the first system of the page?)
     }
     else if (dynamic_cast<ScoreDef*>(object)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
@@ -280,11 +279,7 @@ bool MeiOutput::WriteObject( Object *object )
 }
     
 bool MeiOutput::WriteObjectEnd( Object *object )
-{
-    if (dynamic_cast<Page*>(object) && m_scoreBasedMEI) {
-        return true;
-    }
-        
+{ 
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
     
