@@ -24,7 +24,9 @@ class KeySigAttr;
 /**
  * This class models the MEI <keySig> element.
  */
-class KeySig: public LayerElement
+class KeySig: public LayerElement,
+    public AttAccidental,
+    public AttPitch
 {
 public:
     /**
@@ -50,6 +52,9 @@ public:
     /* Alteration number getter/setter */
     unsigned char GetAlteration() { return m_alteration; };
     void SetAlteration(int n) { m_alteration = n; };
+    
+    /* Temporary method for turning @accid and @pitch into num_alter and alter */
+    void Convert( );
     
 private:
     

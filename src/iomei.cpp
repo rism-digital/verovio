@@ -549,6 +549,14 @@ void MeiOutput::WriteMeiDot( pugi::xml_node currentNode, Dot *dot )
     WriteLayerElement( currentNode, dot );
     WritePositionInterface(currentNode, dot);
 }
+    
+void MeiOutput::WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig )
+{
+    WriteLayerElement( currentNode, keySig );
+    keySig->WriteAccidental(currentNode);
+    keySig->WritePitch(currentNode);
+    return;
+}
 
 void MeiOutput::WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur )
 {
@@ -1379,6 +1387,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "dot" ) {
             success = ReadMeiDot( parent, xmlElement );
         }
+        else if ( elementName == "keySig" ) {
+            success = ReadMeiKeySig( parent, xmlElement );
+        }
         else if ( elementName == "mensur" ) {
             success = ReadMeiMensur( parent, xmlElement );
         }
@@ -1526,6 +1537,20 @@ bool MeiInput::ReadMeiDot( Object *parent, pugi::xml_node dot )
     
     AddLayerElement(parent, vrvDot);
     
+    return true;
+}
+    
+bool MeiInput::ReadMeiKeySig( Object *parent, pugi::xml_node keySig )
+{
+    KeySig *vrvKeySig = new KeySig();
+    ReadLayerElement(keySig, vrvKeySig);
+    
+    vrvKeySig->ReadAccidental( keySig );
+    vrvKeySig->ReadPitch( keySig );
+    
+    vrvKeySig->Convert();
+    
+    AddLayerElement(parent, vrvKeySig);
     return true;
 }
 

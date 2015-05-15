@@ -56,7 +56,9 @@ KeySig::KeySig():
 }
 
 KeySig::KeySig(int num_alter, char alter):
-    LayerElement("ksig-")
+    LayerElement("ksig-"),
+    AttAccidental(),
+    AttPitch()
 {
     Reset();
     m_num_alter = num_alter;
@@ -64,7 +66,9 @@ KeySig::KeySig(int num_alter, char alter):
 }
     
 KeySig::KeySig( KeySigAttr *keySigAttr ):
-    LayerElement("ksig-")
+    LayerElement("ksig-"),
+    AttAccidental(),
+    AttPitch()
 {
     Reset();
     char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
@@ -96,8 +100,36 @@ KeySig::~KeySig()
 void KeySig::Reset()
 {
     LayerElement::Reset();
+    ResetAccidental();
+    ResetPitch();
     m_num_alter = 0;
     m_alteration = ACCID_NATURAL;
+}
+    
+    
+void KeySig::Convert( )
+{
+    int i;
+    if (this->GetAccid() == ACCIDENTAL_EXPLICIT_s) {
+        m_alteration = ACCID_SHARP;
+        for (i = 0;i < 7; i++) {
+            if (KeySig::sharps[i] == this->GetPname()) {
+                m_num_alter = i + 1;
+                break;
+            }
+        }
+        
+    }
+    else if (this->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
+        m_alteration = ACCID_FLAT;
+        for (i = 0;i < 7; i++) {
+            if (KeySig::flats[i] == this->GetPname()) {
+                m_num_alter = i + 1;
+                break;
+            }
+        }
+    }
+    else return;
 }
 
 unsigned char KeySig::GetAlterationAt(int pos) {
