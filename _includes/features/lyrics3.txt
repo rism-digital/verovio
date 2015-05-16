@@ -1,0 +1,22 @@
+<layer n="1">
+  <note dur="4" oct="5" pname="f">
+    <verse n="1">
+      <syl wordpos="t">fra</syl>
+    </verse>
+  </note>
+  <note dur="4" oct="5" pname="g">
+    <verse n="1">
+      <syl wordpos="t">le</syl>
+    </verse>
+  </note>
+  <beam>
+    <note dur="8" oct="5" pname="a">
+      <verse n="1">
+        <syl con="u" wordpos="t">due,</syl>
+      </verse>
+    </note>
+    <note dur="8" oct="5" pname="g"/>
+    <note dur="8" oct="5" pname="f"/>
+    <note dur="8" oct="5" pname="e"/>
+  </beam>
+</layer>

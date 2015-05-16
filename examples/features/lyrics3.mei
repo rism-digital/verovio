@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="file:/Users/laurent/Documents/mei/sources/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Lyric connectors example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.sym="common">
+                        <staffGrp>
+                            <staffGrp n="1" symbol="bracket">
+                                <staffDef clef.line="2" clef.shape="G" key.sig="1f" lines="5" n="1"/>
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest dur="2"/>
+                                    <rest dur="4"/>
+                                    <note dur="4" oct="5" pname="e">
+                                        <verse n="1">
+                                            <syl wordpos="t">o</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1" label="feature-example">
+                                    <note dur="4" oct="5" pname="f">
+                                        <verse n="1">
+                                            <syl wordpos="t">fra</syl>
+                                        </verse>
+                                    </note>
+                                    <note dur="4" oct="5" pname="g">
+                                        <verse n="1">
+                                            <syl wordpos="t">le</syl>
+                                        </verse>
+                                    </note>
+                                    <beam>
+                                        <note dur="8" oct="5" pname="a">
+                                            <verse n="1">
+                                                <syl con="u" wordpos="t">due,</syl>
+                                            </verse>
+                                        </note>
+                                        <note dur="8" oct="5" pname="g"/>
+                                        <note dur="8" oct="5" pname="f"/>
+                                        <note dur="8" oct="5" pname="e"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="2" oct="5" pname="d"/>
+                                    <rest dur="4"/>
+                                    <note dur="4" oct="5" pname="d">
+                                        <verse n="1">
+                                            <syl wordpos="t">o</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="5" pname="f">
+                                        <verse n="1">
+                                            <syl wordpos="t">fra</syl>
+                                        </verse>
+                                    </note>
+                                    <note dur="4" oct="5" pname="g">
+                                        <verse n="1">
+                                            <syl wordpos="t">le</syl>
+                                        </verse>
+                                    </note>
+                                    <beam>
+                                        <note dur="8" oct="5" pname="a">
+                                            <verse n="1">
+                                                <syl con="u" wordpos="t">due</syl>
+                                            </verse>
+                                        </note>
+                                        <note dur="8" oct="5" pname="g"/>
+                                        <note dur="8" oct="5" pname="f"/>
+                                        <note dur="8" oct="5" pname="e"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="5" pname="d"/>
+                                    <note dur="4" oct="5" pname="f">
+                                        <verse n="1">
+                                            <syl wordpos="t">fa</syl>
+                                        </verse>
+                                    </note>
+                                    <note dots="1" dur="4" oct="5" pname="f">
+                                        <verse n="1">
+                                            <syl con="d" wordpos="i">ter</syl>
+                                        </verse>
+                                    </note>
+                                    <beam>
+                                        <note dur="16" oct="5" pname="e"/>
+                                        <note dur="16" oct="5" pname="d"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="5" pname="c">
+                                        <accid accid="s"/>
+                                    </note>
+                                    <note dur="2" oct="5" pname="d"/>
+                                    <note dur="4" oct="5" pname="c">
+                                        <accid accid="s" func="caution"/>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure right="end">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="1" oct="5" pname="d" fermata="above">
+                                        <verse n="1">
+                                            <syl wordpos="t">zo.</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
