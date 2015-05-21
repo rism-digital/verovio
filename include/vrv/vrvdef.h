@@ -49,7 +49,7 @@ typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
     
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 6
+#define VERSION_REVISION 7
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 

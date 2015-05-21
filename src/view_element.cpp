@@ -1193,7 +1193,6 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
     return;
 }
     
-    
 void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
@@ -1215,8 +1214,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
         DrawSmuflCode( dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->staffSize, false);
         x += m_doc->m_drawingUnit[staff->staffSize] * 5; // step forward because we have a symbol
     }
-
-    if (meterSig->GetCount())
+    else if (meterSig->GetCount())
     {	
         DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
     }

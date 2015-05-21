@@ -53,6 +53,7 @@ public:
     ///@{
     ScoreOrStaffDefAttrInterface();
     virtual ~ScoreOrStaffDefAttrInterface();
+    virtual void Reset();
     ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface ); // copy contructor
     ScoreOrStaffDefAttrInterface& operator=( const ScoreOrStaffDefAttrInterface& interface ); // copy assignement;
     ///@}
