@@ -22,9 +22,10 @@ MeterSig::MeterSig():
 }
     
 MeterSig::MeterSig( MeterSigAttr *meterSigAttr ):
-    LayerElement("msig-")
+    LayerElement("msig-"),
+    AttMeterSigLog()
 {
-    MeterSig();
+    Reset();
     this->SetCount(meterSigAttr->GetMeterCount());
     this->SetSym(meterSigAttr->GetMeterSym());
     this->SetUnit(meterSigAttr->GetMeterUnit());

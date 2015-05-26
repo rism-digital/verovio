@@ -195,8 +195,10 @@ void Chord::ResetAccidSpace(int fullUnit)
      * Resize m_accidSpace to be as tall as is possibly necessary; must accomodate every accidental stacked vertically.
      */
     int accidHeight = ACCID_HEIGHT * halfUnit;
-    m_accidSpaceTop = m_accidList.front()->GetDrawingY() + (accidHeight / 2);
-    m_accidSpaceBot = m_accidList.back()->GetDrawingY() - (accidHeight / 2);
+    int yMax, yMin;
+    this->GetYExtremes(&yMax, &yMin);
+    m_accidSpaceTop = yMax + (accidHeight / 2);
+    m_accidSpaceBot = yMin - (accidHeight / 2);
     int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
     m_accidSpace.resize(height);
     

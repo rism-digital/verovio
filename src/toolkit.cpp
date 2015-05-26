@@ -246,12 +246,13 @@ bool Toolkit::LoadString( const std::string &data )
 }
 
 
-std::string Toolkit::GetMEI( int pageNo )
+std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
 {
     // Page number is one-based - correction to 0-based first
     pageNo--;
     
     MeiOutput meioutput( &m_doc, "" );
+    meioutput.SetScoreBasedMEI( scoreBased );
     return meioutput.GetOutput( pageNo );
 }
 

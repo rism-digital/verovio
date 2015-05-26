@@ -89,7 +89,13 @@ bool MeiOutput::ExportFile( )
             }
             Page *page = dynamic_cast<Page*>(m_doc->m_children[m_page]);
             assert( page );
-            m_currentNode = meiDoc.append_child("pages");
+            if (m_scoreBasedMEI) {
+                m_currentNode = meiDoc.append_child("score");
+                m_currentNode = m_currentNode.append_child("section");
+            } else {
+                m_currentNode = meiDoc.append_child("pages");
+            }
+            
             page->Save( this );
         }
         if ( m_writeToStreamString ) {
@@ -126,10 +132,14 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     if (dynamic_cast<Page*>(object)) {
+        if (m_scoreBasedMEI) return true;
+        
         m_currentNode = m_currentNode.append_child("page");
         WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
     }
     else if (dynamic_cast<System*>(object)) {
+        if (m_scoreBasedMEI) return true;
+        
         m_currentNode = m_currentNode.append_child("system");
         WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
     }
@@ -201,6 +211,10 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("mensur");
         WriteMeiMensur( m_currentNode, dynamic_cast<Mensur*>(object) );
     }
+    else if (dynamic_cast<MeterSig*>(object)) {
+        m_currentNode = m_currentNode.append_child("meterSig");
+        WriteMeiMeterSig( m_currentNode, dynamic_cast<MeterSig*>(object) );
+    }
     else if (dynamic_cast<MRest*>(object)) {
         m_currentNode = m_currentNode.append_child("mRest");
         WriteMeiMRest( m_currentNode, dynamic_cast<MRest*>(object) );
@@ -264,8 +278,13 @@ bool MeiOutput::WriteObject( Object *object )
     
 bool MeiOutput::WriteObjectEnd( Object *object )
 {
+    if ((dynamic_cast<Page*>(object) || dynamic_cast<System*>(object)) && m_scoreBasedMEI) {
+        return true;
+    }
+        
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
+    
     return true;
 }
 
