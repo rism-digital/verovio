@@ -44,6 +44,7 @@ FILES="../src/accid.cpp \
              ../src/page.cpp \
              ../src/pitchinterface.cpp \
              ../src/positioninterface.cpp \
+             ../src/proport.cpp \
              ../src/view.cpp \
              ../src/view_beam.cpp \
              ../src/view_element.cpp \

@@ -15,8 +15,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Proport::Proport():
-	LayerElement("msig-")
-    //AttMeterSigLog()
+	LayerElement("prop-"),
+    AttDurationRatio()
 {
     Reset();
 }
@@ -41,7 +41,7 @@ Proport::~Proport()
 void Proport::Reset()
 {
     LayerElement::Reset();
-    //ResetMeterSigLog();
+    ResetDurationRatio();
 }
 
 } // namespace vrv
