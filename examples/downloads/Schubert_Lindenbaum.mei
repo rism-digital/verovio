@@ -147,6 +147,12 @@
                 </changeDesc>
                 <date>2015-05-12</date>
             </change>
+            <change n="3" resp="KR">
+                <changeDesc>
+                    <p>Fixing measure 8 (tuplet and tuplet)</p>
+                </changeDesc>
+                <date>2015-05-12</date>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -734,18 +740,18 @@
                                             </note>
                                             <note xml:id="d1e2626x" tstamp.ges="56" pname="a" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up"> </note>
                                         </beam>
+                                        <note xml:id="d1e2666" tstamp.ges="64" pname="g" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up" syl="ssen//ge//mich">
+                                            <verse n="1">
+                                                <syl wordpos="t">ssen</syl>
+                                            </verse>
+                                            <verse n="2">
+                                                <syl wordpos="m">ge</syl>
+                                            </verse>
+                                            <verse n="3">
+                                                <syl>mich</syl>
+                                            </verse>
+                                        </note>
                                     </tuplet>
-                                    <note xml:id="d1e2666" tstamp.ges="64" pname="a" oct="4" dur="8" dur.ges="8p" beam="t1" tuplet="m1" stem.dir="up" syl="ssen//ge//mich">
-                                        <verse n="1">
-                                            <syl wordpos="t">ssen</syl>
-                                        </verse>
-                                        <verse n="2">
-                                            <syl wordpos="m">ge</syl>
-                                        </verse>
-                                        <verse n="3">
-                                            <syl>mich</syl>
-                                        </verse>
-                                    </note>
                                 </layer>
                             </staff>
                             <staff n="2">
