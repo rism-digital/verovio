@@ -68,7 +68,7 @@ how-active: how-js
   $.get( "examples/hello-world/Haydn_StringQuartet_Op1_No1-p1.mei", function( data ) {
     var svg = vrvToolkit.renderData( data + "\n", "" );
     $("#output").html(svg);
-  });
+  }, 'text');
 </script>
 {% endhighlight %}
 

@@ -600,7 +600,7 @@ downloads:
 			$( "#toggle_options" ).click();
 			$.get( file , function( data ) {
 				load_data( data, $('#upload_form') );
-			});
+			}, 'text');
 		}
 	});
 //]]>
