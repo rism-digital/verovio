@@ -342,24 +342,24 @@ int main(int argc, char** argv)
             data_stream << line << endl;
         }
         if ( !toolkit.LoadString( data_stream.str() ) ) {
-            cerr << "The input could not be loaded" << endl;
+            cerr << "The input could not be loaded." << endl;
             exit(1);
         }
     }
     else {
         if ( !toolkit.LoadFile( infile ) ) {
-            cerr << "The file '" << infile << "' could not be open" << endl;
+            cerr << "The file '" << infile << "' could not be opened." << endl;
             exit(1);
         }
     }
 
     // Check the page range
     if (page > toolkit.GetPageCount()) {
-        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount() << ")" << endl;
+        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount() << ")." << endl;
         exit(1);
     }
     if (page < 1) {
-        cerr << "The page number has to be greater than 0" << endl;
+        cerr << "The page number has to be greater than 0." << endl;
         exit(1);
     }
     
