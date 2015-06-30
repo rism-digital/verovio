@@ -87,10 +87,14 @@ enum {
   SMUFL_E887_tuplet7 = 0xE887,
   SMUFL_E888_tuplet8 = 0xE888,
   SMUFL_E889_tuplet9 = 0xE889,
+  SMUFL_E938_mensuralNoteheadSemibrevisBlack = 0xE938,
+  SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
+  SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
+  SMUFL_E93D_mensuralNoteheadSemiminimaWhite = 0xE93D,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 65
+#define SMUFL_COUNT 69
 
 } // vrv namespace
 
