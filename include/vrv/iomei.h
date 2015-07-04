@@ -126,6 +126,7 @@ private:
     void WriteMeiClef( pugi::xml_node currentNode, Clef *clef );
     void WriteMeiCustos( pugi::xml_node currentNode, Custos *custos );
     void WriteMeiDot( pugi::xml_node currentNode, Dot *dot );
+    void WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig );
     void WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur );
     void WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig );
     void WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest );
@@ -285,6 +286,7 @@ private:
     bool ReadMeiClef( Object *parent, pugi::xml_node clef );
     bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
     bool ReadMeiDot( Object *parent, pugi::xml_node dot );
+    bool ReadMeiKeySig( Object *parent, pugi::xml_node keySig );
     bool ReadMeiMensur( Object *parent, pugi::xml_node mensur );
     bool ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig );
     bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );

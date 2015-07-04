@@ -92,6 +92,9 @@ bool MeiOutput::ExportFile( )
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
                 m_currentNode = m_currentNode.append_child("section");
+                m_nodeStack.push_back(m_currentNode);
+                // First save the main scoreDef
+                m_doc->m_scoreDef.Save( this );
             } else {
                 m_currentNode = meiDoc.append_child("pages");
             }
@@ -132,16 +135,18 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     if (dynamic_cast<Page*>(object)) {
-        if (m_scoreBasedMEI) return true;
-        
-        m_currentNode = m_currentNode.append_child("page");
-        WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
+        if (!m_scoreBasedMEI) {
+            m_currentNode = m_currentNode.append_child("page");
+            WriteMeiPage( m_currentNode, dynamic_cast<Page*>(object) );
+        }
+        // Here we could add a <pb> element
     }
     else if (dynamic_cast<System*>(object)) {
-        if (m_scoreBasedMEI) return true;
-        
-        m_currentNode = m_currentNode.append_child("system");
-        WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
+        if (!m_scoreBasedMEI) {
+            m_currentNode = m_currentNode.append_child("system");
+            WriteMeiSystem( m_currentNode, dynamic_cast<System*>(object) );
+        }
+        // Here we could add a <sb> element (but not for the first system of the page?)
     }
     else if (dynamic_cast<ScoreDef*>(object)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
@@ -206,6 +211,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (dynamic_cast<Dot*>(object)) {
         m_currentNode = m_currentNode.append_child( "dot" );
         WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
+    }
+    else if (dynamic_cast<KeySig*>(object)) {
+        m_currentNode = m_currentNode.append_child("keySig");
+        WriteMeiKeySig( m_currentNode, dynamic_cast<KeySig*>(object) );
     }
     else if (dynamic_cast<Mensur*>(object)) {
         m_currentNode = m_currentNode.append_child("mensur");
@@ -277,11 +286,7 @@ bool MeiOutput::WriteObject( Object *object )
 }
     
 bool MeiOutput::WriteObjectEnd( Object *object )
-{
-    if ((dynamic_cast<Page*>(object) || dynamic_cast<System*>(object)) && m_scoreBasedMEI) {
-        return true;
-    }
-        
+{ 
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
     
@@ -550,6 +555,14 @@ void MeiOutput::WriteMeiDot( pugi::xml_node currentNode, Dot *dot )
 {
     WriteLayerElement( currentNode, dot );
     WritePositionInterface(currentNode, dot);
+}
+    
+void MeiOutput::WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig )
+{
+    WriteLayerElement( currentNode, keySig );
+    keySig->WriteAccidental(currentNode);
+    keySig->WritePitch(currentNode);
+    return;
 }
 
 void MeiOutput::WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur )
@@ -1381,6 +1394,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "dot" ) {
             success = ReadMeiDot( parent, xmlElement );
         }
+        else if ( elementName == "keySig" ) {
+            success = ReadMeiKeySig( parent, xmlElement );
+        }
         else if ( elementName == "mensur" ) {
             success = ReadMeiMensur( parent, xmlElement );
         }
@@ -1528,6 +1544,20 @@ bool MeiInput::ReadMeiDot( Object *parent, pugi::xml_node dot )
     
     AddLayerElement(parent, vrvDot);
     
+    return true;
+}
+    
+bool MeiInput::ReadMeiKeySig( Object *parent, pugi::xml_node keySig )
+{
+    KeySig *vrvKeySig = new KeySig();
+    ReadLayerElement(keySig, vrvKeySig);
+    
+    vrvKeySig->ReadAccidental( keySig );
+    vrvKeySig->ReadPitch( keySig );
+    
+    vrvKeySig->ConvertToInternal();
+    
+    AddLayerElement(parent, vrvKeySig);
     return true;
 }
 
