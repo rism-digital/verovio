@@ -32,6 +32,7 @@ ASM="\
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
 ASM_NAME=""
+WEBWORKER_NAME=""
 
 # default is master (no version)
 VERSION=""
@@ -63,6 +64,7 @@ while getopts "lwv:h:c" opt; do
 		w)
 			WEBWORKER=true
 			echo "building with webworker compatibility"
+			WEBWORKER_NAME="-webworker"
 			;;
 		h)
 			print_help
@@ -75,7 +77,7 @@ while getopts "lwv:h:c" opt; do
 	esac
 done
 
-FILENAME="verovio-toolkit$ASM_NAME$VERSION_NAME.js"
+FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME$VERSION_NAME.js"
 
 echo "Sync svg resources"
 cp -r ../data/* data/
