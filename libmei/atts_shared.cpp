@@ -5219,23 +5219,23 @@ AttStaffDefVis::~AttStaffDefVis() {
 }
 
 void AttStaffDefVis::ResetStaffDefVis() {
-    m_gridShow = "";
-    m_layerscheme = "";
+    m_gridShow = BOOLEAN_NONE;
+    m_layerscheme = LAYERSCHEME_NONE;
     m_linesInt = 0;
     m_linesColor = "";
-    m_linesVisible = "";
+    m_linesVisible = BOOLEAN_NONE;
     m_spacing = "";
 }
 
 bool AttStaffDefVis::ReadStaffDefVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("grid.show")) {
-        this->SetGridShow(StrToStr(element.attribute("grid.show").value()));
+        this->SetGridShow(StrToBool(element.attribute("grid.show").value()));
         element.remove_attribute("grid.show");
         hasAttribute = true;
     }
     if (element.attribute("layerscheme")) {
-        this->SetLayerscheme(StrToStr(element.attribute("layerscheme").value()));
+        this->SetLayerscheme(StrToLayerscheme(element.attribute("layerscheme").value()));
         element.remove_attribute("layerscheme");
         hasAttribute = true;
     }
@@ -5250,7 +5250,7 @@ bool AttStaffDefVis::ReadStaffDefVis(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("lines.visible")) {
-        this->SetLinesVisible(StrToStr(element.attribute("lines.visible").value()));
+        this->SetLinesVisible(StrToBool(element.attribute("lines.visible").value()));
         element.remove_attribute("lines.visible");
         hasAttribute = true;
     }
@@ -5265,11 +5265,11 @@ bool AttStaffDefVis::ReadStaffDefVis(  pugi::xml_node element ) {
 bool AttStaffDefVis::WriteStaffDefVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasGridShow()) {
-        element.append_attribute("grid.show") = StrToStr(this->GetGridShow()).c_str();
+        element.append_attribute("grid.show") = BoolToStr(this->GetGridShow()).c_str();
         wroteAttribute = true;
     }
     if (this->HasLayerscheme()) {
-        element.append_attribute("layerscheme") = StrToStr(this->GetLayerscheme()).c_str();
+        element.append_attribute("layerscheme") = LayerschemeToStr(this->GetLayerscheme()).c_str();
         wroteAttribute = true;
     }
     if (this->HasLines()) {
@@ -5281,7 +5281,7 @@ bool AttStaffDefVis::WriteStaffDefVis(  pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasLinesVisible()) {
-        element.append_attribute("lines.visible") = StrToStr(this->GetLinesVisible()).c_str();
+        element.append_attribute("lines.visible") = BoolToStr(this->GetLinesVisible()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSpacing()) {
@@ -5293,12 +5293,12 @@ bool AttStaffDefVis::WriteStaffDefVis(  pugi::xml_node element ) {
 
 bool AttStaffDefVis::HasGridShow( )
 {
-    return (m_gridShow != "");
+    return (m_gridShow != BOOLEAN_NONE);
 }
 
 bool AttStaffDefVis::HasLayerscheme( )
 {
-    return (m_layerscheme != "");
+    return (m_layerscheme != LAYERSCHEME_NONE);
 }
 
 bool AttStaffDefVis::HasLines( )
@@ -5313,7 +5313,7 @@ bool AttStaffDefVis::HasLinesColor( )
 
 bool AttStaffDefVis::HasLinesVisible( )
 {
-    return (m_linesVisible != "");
+    return (m_linesVisible != BOOLEAN_NONE);
 }
 
 bool AttStaffDefVis::HasSpacing( )
@@ -7915,11 +7915,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (dynamic_cast<AttStaffDefVis*>(element) ) {
         AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
         if (attrType == "gridShow") {
-            att->SetGridShow(att->StrToStr(attrValue));
+            att->SetGridShow(att->StrToBool(attrValue));
             return true;
         }
         if (attrType == "layerscheme") {
-            att->SetLayerscheme(att->StrToStr(attrValue));
+            att->SetLayerscheme(att->StrToLayerscheme(attrValue));
             return true;
         }
         if (attrType == "linesInt") {
@@ -7931,7 +7931,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
         if (attrType == "linesVisible") {
-            att->SetLinesVisible(att->StrToStr(attrValue));
+            att->SetLinesVisible(att->StrToBool(attrValue));
             return true;
         }
         if (attrType == "spacing") {
@@ -9040,10 +9040,10 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttStaffDefVis*>(element) ) {
         AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
         if (att->HasGridShow()) {
-            attributes->push_back(std::make_pair("gridShow", att->StrToStr(att->GetGridShow())));
+            attributes->push_back(std::make_pair("gridShow", att->BoolToStr(att->GetGridShow())));
         }
         if (att->HasLayerscheme()) {
-            attributes->push_back(std::make_pair("layerscheme", att->StrToStr(att->GetLayerscheme())));
+            attributes->push_back(std::make_pair("layerscheme", att->LayerschemeToStr(att->GetLayerscheme())));
         }
         if (att->HasLines()) {
             attributes->push_back(std::make_pair("linesInt", att->IntToStr(att->GetLines())));
@@ -9052,7 +9052,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("linesColor", att->StrToStr(att->GetLinesColor())));
         }
         if (att->HasLinesVisible()) {
-            attributes->push_back(std::make_pair("linesVisible", att->StrToStr(att->GetLinesVisible())));
+            attributes->push_back(std::make_pair("linesVisible", att->BoolToStr(att->GetLinesVisible())));
         }
         if (att->HasSpacing()) {
             attributes->push_back(std::make_pair("spacing", att->StrToStr(att->GetSpacing())));

@@ -411,6 +411,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     
     staffDef->WriteCommon(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
+    staffDef->WriteStaffDefVis(currentNode);
     
     if (staffDef->GetClefAttr()) {
         staffDef->GetClefAttr()->WriteCleffingLog(currentNode);
@@ -1171,6 +1172,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     
     vrvStaffDef->ReadCommon(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
+    vrvStaffDef->ReadStaffDefVis(staffDef);
     
     if ( !vrvStaffDef->HasN() ) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");

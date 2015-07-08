@@ -293,7 +293,8 @@ private:
  */
 class StaffDef: public Object, public ScoreOrStaffDefAttrInterface,
     public AttCommon,
-    public AttLabelsAddl
+    public AttLabelsAddl,
+    public AttStaffDefVis
 {
 public:
     /**
@@ -306,14 +307,6 @@ public:
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
-    ///@}
-    
-    /**
-     * @name Set and get  the staff lines.
-     */
-    ///@{
-    int GetLines() const { return m_lines; };
-    void SetLines( int lines ) { m_lines = lines; };
     ///@}
     
     /**
@@ -358,9 +351,6 @@ private:
 public:
     
 private:
-    /** The staff number of lines */
-    int m_lines;
-    
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
      */

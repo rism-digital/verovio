@@ -224,6 +224,18 @@ enum data_KEYSIGNATURE {
 };
 
 /**
+ * MEI data.LAYERSCHEME
+ */
+enum data_LAYERSCHEME {
+    LAYERSCHEME_NONE = 0,
+    LAYERSCHEME_1,
+    LAYERSCHEME_2o,
+    LAYERSCHEME_2f,
+    LAYERSCHEME_3o,
+    LAYERSCHEME_3f
+};
+
+/**
  * MEI values for @lig (no datatype in MEI)
  */
 enum data_LIGATURE {

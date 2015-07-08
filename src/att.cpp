@@ -462,6 +462,37 @@ data_KEYSIGNATURE Att::StrToKeySignature(std::string value)
 	return KEYSIGNATURE_NONE;
 }
     
+std::string Att::LayerschemeToStr(data_LAYERSCHEME data)
+{
+    std::string value;
+    switch(data)
+    {
+        case LAYERSCHEME_1 : value = "1"; break;
+        case LAYERSCHEME_2o : value = "2o"; break;
+        case LAYERSCHEME_2f : value = "2f"; break;
+        case LAYERSCHEME_3o : value = "3o"; break;
+        case LAYERSCHEME_3f : value = "3f"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_LAYERSCHEME Att::StrToLayerscheme(std::string value)
+{
+    if (value == "1") return LAYERSCHEME_1;
+    else if (value == "2o") return LAYERSCHEME_2o;
+    else if (value == "2f") return LAYERSCHEME_2f;
+    else if (value == "3o") return LAYERSCHEME_3o;
+    else if (value == "3f") return LAYERSCHEME_3f;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return LAYERSCHEME_NONE;
+}
+    
 std::string Att::LigatureToStr(data_LIGATURE data)
 {
     std::string value;

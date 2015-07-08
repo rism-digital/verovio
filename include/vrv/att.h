@@ -132,6 +132,9 @@ public:
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);
     
+    std::string LayerschemeToStr(data_LAYERSCHEME data);
+    data_LAYERSCHEME StrToLayerscheme(std::string value);
+    
     std::string LigatureToStr(data_LIGATURE data);
     data_LIGATURE StrToLigature(std::string value);
     
