@@ -72,15 +72,6 @@ bool MeiOutput::ExportFile( )
             
             // this starts the call of all the functors
             m_doc->Save( this );
-            
-            /* To be change to pugixml
-            TiXmlUnknown *schema = new TiXmlUnknown();
-            schema->SetValue("?xml-model href=\"http://www.aruspix.net/mei-page-based-2013-08-29.rng\" type=\"application/xml\" schematypens=\"http://relaxng.org/ns/structure/1.0\"?");
-            
-            meiDoc->LinkEndChild( new TiXmlDeclaration( "1.0", "UTF-8", "" ) );
-            meiDoc->LinkEndChild(schema);
-            */
-
         }
         else {
             if (m_page >= m_doc->GetPageCount()) {
@@ -330,10 +321,18 @@ bool MeiOutput::WriteMeiDoc( Doc *doc )
     pugi::xml_node body = music.append_child("body");
     pugi::xml_node mdiv = body.append_child("mdiv");
     
-    // element to place the pages
-    m_currentNode = mdiv.append_child("pages");
-    m_currentNode.append_attribute( "type" ) = DocTypeToStr( m_doc->GetType() ).c_str();
-    m_currentNode.append_child(pugi::node_comment).set_value( "Coordinates in MEI axis direction" );
+    if (m_scoreBasedMEI) {
+        m_currentNode = mdiv.append_child("score");
+        m_currentNode = m_currentNode.append_child("section");
+        m_nodeStack.push_back(m_currentNode);
+        // First save the main scoreDef
+        m_doc->m_scoreDef.Save( this );
+    } else {
+        // element to place the pages
+        m_currentNode = mdiv.append_child("pages");
+        m_currentNode.append_attribute( "type" ) = DocTypeToStr( m_doc->GetType() ).c_str();
+        m_currentNode.append_child(pugi::node_comment).set_value( "Coordinates in MEI axis direction" );
+    }
     
     return true;
 }
