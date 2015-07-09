@@ -20,6 +20,7 @@ namespace vrv {
 
 class App;
 class Accid;
+class Annot;
 class Barline;
 class Beam;
 class Chord;
@@ -152,6 +153,7 @@ private:
     bool WriteMeiApp( pugi::xml_node currentNode, App *app );
     bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
     bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
+    bool WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot );
     ///@}
     
     /**
@@ -315,6 +317,8 @@ private:
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
+    ///@}
     ///@}
     
     /**

@@ -263,6 +263,10 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("rdg");
         WriteMeiRdg( m_currentNode, dynamic_cast<Rdg*>(object) );
     }
+    else if (dynamic_cast<Annot*>(object)) {
+        m_currentNode = m_currentNode.append_child("annot");
+        WriteMeiAnnot( m_currentNode, dynamic_cast<Annot*>(object) );
+    }
     
     else {
         // Missing output method for the class
@@ -393,7 +397,6 @@ bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
         scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
     }
-    
     
     // this needs to be fixed
     return true;
@@ -735,6 +738,20 @@ bool MeiOutput::WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg )
     WriteEditorialElement(currentNode, rdg);
     return true;
 };
+
+bool MeiOutput::WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot )
+{
+    WriteEditorialElement(currentNode, annot);
+    annot->WritePlist(currentNode);
+    annot->WriteSource(currentNode);
+    
+    for (pugi::xml_node child = annot->m_content.first_child(); child; child = child.next_sibling())
+    {
+        currentNode.append_copy(child);
+    }
+    
+    return true;
+};
     
 std::string MeiOutput::BoolToStr(bool value)
 {
@@ -834,6 +851,9 @@ bool MeiInput::IsAllowed(std::string element, vrv::Object *filterParent)
     
     const std::type_info *elementType = &typeid(*filterParent);
     if ( element == "app" ) {
+        return true;
+    }
+    if ( element == "annot" ) {
         return true;
     }
     else if (*elementType  == typeid(Note))
@@ -1066,6 +1086,9 @@ bool MeiInput::ReadMeiSystemChildren( Object *parent, pugi::xml_node parentNode 
         else if ( std::string( current.name() ) == "app" ) {
             success = ReadMeiApp( parent, current, EDITORIAL_SYSTEM );
         }
+        else if ( std::string( current.name() ) == "annot" ) {
+            success = ReadMeiAnnot( parent, current );
+        }
         else {
             LogWarning("Unsupported '<%s>' within <system>", current.name() );
         }
@@ -1122,6 +1145,9 @@ bool MeiInput::ReadMeiScoreDefChildren( Object *parent, pugi::xml_node parentNod
         if ( std::string( current.name() ) == "app" ) {
             success = ReadMeiApp( parent, current, EDITORIAL_SCOREDEF);
         }
+        if ( std::string( current.name() ) == "annot" ) {
+            success = ReadMeiAnnot( parent, current );
+        }
         else if ( std::string( current.name() ) == "staffGrp" ) {
             success = ReadMeiStaffGrp( parent, current );
         }
@@ -1162,6 +1188,9 @@ bool MeiInput::ReadMeiStaffGrpChildren( Object *parent, pugi::xml_node parentNod
         if (!success) break;
         if ( std::string( current.name() ) == "app" ) {
             success = ReadMeiApp( parent, current, EDITORIAL_STAFFGRP );
+        }
+        if ( std::string( current.name() ) == "annot" ) {
+            success = ReadMeiAnnot( parent, current );
         }
         else if ( std::string( current.name() ) == "staffGrp" ) {
             success = ReadMeiStaffGrp( parent, current);
@@ -1256,6 +1285,9 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
         if ( std::string( current.name() ) == "app" ) {
             success = ReadMeiApp( parent, current, EDITORIAL_MEASURE);
         }
+        if ( std::string( current.name() ) == "annot" ) {
+            success = ReadMeiAnnot( parent, current );
+        }
         else if ( std::string( current.name() ) == "staff" ) {
             success = ReadMeiStaff( parent, current );
         }
@@ -1338,6 +1370,9 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
         if ( std::string( current.name() ) == "app" ) {
             success = ReadMeiApp( parent, current, EDITORIAL_STAFF);
         }
+        if ( std::string( current.name() ) == "annot" ) {
+            success = ReadMeiAnnot( parent, current );
+        }
         else if ( std::string( current.name() ) == "layer" ) {
             success = ReadMeiLayer( parent, current);
         }
@@ -1390,6 +1425,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "app" ) {
             success = ReadMeiApp( parent, xmlElement, EDITORIAL_LAYER, filter);
+        }
+        else if ( elementName == "annot" ) {
+            success = ReadMeiAnnot( parent, xmlElement);
         }
         else if ( elementName  == "barLine" ) {
             success = ReadMeiBarline( parent, xmlElement );
@@ -1869,6 +1907,26 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
     }
 }
     
+bool MeiInput::ReadMeiAnnot( Object *parent, pugi::xml_node annot )
+{
+    
+    Annot *vrvAnnot = new Annot( );
+    ReadEditorialElement( annot, vrvAnnot );
+    vrvAnnot->ReadPlist(annot);
+    vrvAnnot->ReadSource(annot);
+    
+    vrvAnnot->m_content.reset();
+    //copy all the nodes inside into the document
+    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling())
+    {
+        vrvAnnot->m_content.append_copy(child);
+    }
+    
+    parent->AddEditorialElement(vrvAnnot);
+    
+    return true;
+}
+    
 void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
 {
     if (!m_hasScoreDef) {
@@ -1951,6 +2009,9 @@ bool MeiInput::ReadScoreBasedMei( pugi::xml_node element )
     bool success = true;
     if ( (std::string( element.name() ) == "app") ) {
         success = ReadMeiApp( m_system, element, EDITORIAL_SYSTEM );
+    }
+    if ( (std::string( element.name() ) == "annot") ) {
+        success = ReadMeiAnnot( m_system, element );
     }
     else if ( std::string( element.name() ) == "measure" ) {
         // This is the call that will put us back on the page-based reading loop
