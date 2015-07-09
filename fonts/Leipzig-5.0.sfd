@@ -20,7 +20,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1420559201
+ModificationTime: 1435652447
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -49,11 +49,11 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 57450 15 7
+WinInfo: 59700 15 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 1114115 65
+BeginChars: 1114115 69
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -430,15 +430,15 @@ StartChar: uniE0A2
 Encoding: 57506 57506 11
 Width: 405
 VWidth: 2048
-Flags: HW
+Flags: HWO
 LayerCount: 2
 Fore
 SplineSet
-198 133 m 4
+198 133 m 0
  300 133 405 88 405 0 c 0
- 405 -92 307 -133 198 -133 c 0
+ 405 -92 307 -133 198 -133 c 4
  97 -133 0 -87 0 0 c 256
- 0 88 93 133 198 133 c 4
+ 0 88 93 133 198 133 c 0
 293 -21 m 0
  293 -7 290 8 285 23 c 0
  278 43 267 61 252 77 c 0
@@ -3347,6 +3347,80 @@ SplineSet
  296 128 133 115 63 112 c 5
  62 112 0 111 0 111 c 5
  -0 74 0 37 0 -0 c 5
+EndSplineSet
+EndChar
+
+StartChar: uniE938
+Encoding: 59704 59704 65
+Width: 312
+VWidth: 2048
+Flags: HWO
+LayerCount: 2
+Fore
+SplineSet
+155 194 m 5
+ 312 0 l 5
+ 155 -192 l 5
+ 0 0 l 5
+ 155 194 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE939
+Encoding: 59705 59705 66
+Width: 312
+VWidth: 2048
+Flags: HWO
+LayerCount: 2
+Fore
+SplineSet
+155 194 m 5
+ 312 0 l 5
+ 155 -192 l 5
+ 0 0 l 5
+ 155 194 l 5
+125 111 m 5
+ 68 38 l 5
+ 190 -111 l 5
+ 246 -40 l 5
+ 125 111 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE93D
+Encoding: 59709 59709 67
+Width: 312
+VWidth: 2048
+Flags: HWO
+LayerCount: 2
+Fore
+SplineSet
+155 194 m 5
+ 312 0 l 5
+ 155 -192 l 5
+ 0 0 l 5
+ 155 194 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE93C
+Encoding: 59708 59708 68
+Width: 312
+VWidth: 2048
+Flags: HWO
+LayerCount: 2
+Fore
+SplineSet
+155 194 m 5
+ 312 0 l 5
+ 155 -192 l 5
+ 0 0 l 5
+ 155 194 l 5
+125 111 m 5
+ 68 38 l 5
+ 190 -111 l 5
+ 246 -40 l 5
+ 125 111 l 5
 EndSplineSet
 EndChar
 EndChars
