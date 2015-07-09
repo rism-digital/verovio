@@ -740,7 +740,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 /* Linewidth for staff lines in mensural notation, relative to the "normal" width of staff lines */
 #define MENSURAL_LINEWIDTH_FACTOR 0.5
 
-    void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system )
+void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system )
 {
     assert( dc ); // DC cannot be NULL
     
