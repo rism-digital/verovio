@@ -150,6 +150,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/verse.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
+	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \

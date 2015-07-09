@@ -48,7 +48,7 @@ public:
     //static bool SetAnalysis( Object *element, std::string attrType, std::string attrValue );
     static bool SetCmn( Object *element, std::string attrType, std::string attrValue );
     //static bool SetCmnornaments( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
+    static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
     //static bool SetEdittrans( Object *element, std::string attrType, std::string attrValue );
     //static bool SetFacsimile( Object *element, std::string attrType, std::string attrValue );
     //static bool SetFigtable( Object *element, std::string attrType, std::string attrValue );
@@ -69,7 +69,7 @@ public:
     //static void GetAnalysis( Object *element, ArrayOfStrAttr *attributes );
     static void GetCmn( Object *element, ArrayOfStrAttr *attributes );
     //static void GetCmnornaments( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetCritapp( Object *element, ArrayOfStrAttr *attributes );
+    static void GetCritapp( Object *element, ArrayOfStrAttr *attributes );
     //static void GetEdittrans( Object *element, ArrayOfStrAttr *attributes );
     //static void GetFacsimile( Object *element, ArrayOfStrAttr *attributes );
     //static void GetFigtable( Object *element, ArrayOfStrAttr *attributes );

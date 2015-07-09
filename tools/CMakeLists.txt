@@ -79,7 +79,7 @@ add_executable (verovio
 	#../libmei/atts_midi.cpp
 	../libmei/atts_shared.cpp
 	../libmei/atts_cmn.cpp
-	#../libmei/atts_critapp.cpp
+	../libmei/atts_critapp.cpp
 	#../libmei/atts_facsimile.cpp
 	#../libmei/atts_harmony.cpp
 	#../libmei/atts_linkalign.cpp

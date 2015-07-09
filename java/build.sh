@@ -69,6 +69,7 @@ FILES="../src/accid.cpp \
              ../src/pugixml.cpp \
              ../libmei/atts_shared.cpp \
              ../libmei/atts_cmn.cpp \
+             ../libmei/atts_critapp.cpp \
              ../libmei/atts_mensural.cpp \
              ../libmei/atts_pagebased.cpp"
 
