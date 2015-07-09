@@ -25,6 +25,13 @@
 
 namespace vrv {    
 
+    enum {
+        SMUFL_E938_mensNoteheadSemibrevisBlack,
+        SMUFL_E939_mensNoteheadSemibrevisVoid,
+        SMUFL_E93C_mensNoteheadMinimaWhite,
+        SMUFL_E93D_mensNoteheadSemiminimaWhite	// for fusa as well as semiminima
+    };
+
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
@@ -88,12 +95,12 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     else if (drawingDur < DUR_1) {
         DrawMaximaToBrevis( dc, noteY, element, layer, staff);
     }
-    // Whole notes
+    // Whole notes ??WE WANT SEMIBREVIS'ES, NOT WHOLE NOTES!!! CHANGE THIS, AND SIMILARLY FOR SHORTER DURATIONS!!!!!!!!
     else if (drawingDur == DUR_1) {
         if (note->GetColored()==BOOLEAN_true)
-            fontNo = SMUFL_E0FA_noteheadWholeFilled;
+            fontNo = SMUFL_E938_mensNoteheadSemibrevisBlack;
         else
-            fontNo = SMUFL_E0A2_noteheadWhole;
+            fontNo = SMUFL_E939_mensNoteheadSemibrevisVoid;
         
         DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
     }
@@ -195,15 +202,22 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
 }
 
-
+/* The entire mensuration sign fits easily between two staff lines, so the radius is considerably less
+   than half the distance between them. ??HOW MUCH LESS? WHERE SHOULD THESE REALLY BE SET, doc.h? */
+#define CIRCLE_RADIUS_FACTOR 0.32
+/* Set default vertical position as distance below the top of the staff of center of the circle */
+#define STAFFLINES_BELOW_TOP 1.5
+    
 void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc ); // DC cannot be NULL
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    r = (int)(CIRCLE_RADIUS_FACTOR*r);
     
-    dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
+    int lineWidth = (int)(m_doc->m_style->m_staffLineWidth * 0.5);
+    dc->SetPen( m_currentColour, lineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
     dc->DrawCircle( ToDeviceContextX(x), y, r );
@@ -219,8 +233,9 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    r = (int)(CIRCLE_RADIUS_FACTOR*r);
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
@@ -255,12 +270,15 @@ void View::DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff
     return;
 }
 
+/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
+#define MENSUR_DOTSIZE 0.15
+    
 void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc ); // DC cannot be NULL
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-    int r = m_doc->m_drawingUnit[staff->staffSize] * 2 / 3;
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * STAFFLINES_BELOW_TOP);
+    int r = m_doc->m_drawingUnit[staff->staffSize] * MENSUR_DOTSIZE;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );

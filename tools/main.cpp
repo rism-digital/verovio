@@ -296,13 +296,13 @@ int main(int argc, char** argv)
     // Make sure the user uses a valid Resource path
     // Save many headaches for empty SVGs
     if(!dir_exists(vrv::Resources::GetPath())) {
-        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found, please use -r option." << endl;
+        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option." << endl;
         exit(1);
     }
 
     // Loaded the music font from the resource diretory
     if (!Resources::InitFonts()) {
-        cerr << "The music font could not be loaded, please verify the content of the directory." << endl;
+        cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
         exit(1);
     }
     
@@ -313,7 +313,7 @@ int main(int argc, char** argv)
     }
 
     if (outformat != "svg" && outformat != "mei") {
-        cerr << "Output format can only be: mei svg" << endl;
+        cerr << "Output format can only be 'mei' or 'svg'." << endl;
         exit(1);
     }
     
