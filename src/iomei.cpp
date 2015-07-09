@@ -300,6 +300,12 @@ bool MeiOutput::WriteMeiDoc( Doc *doc )
     
     pugi::xml_node meiHead = m_mei.append_child("meiHead");
     
+    for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling())
+    {
+        meiHead.append_copy(child);
+    }
+    
+    /*
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
     titleStmt.append_child("title");
@@ -314,6 +320,7 @@ bool MeiOutput::WriteMeiDoc( Doc *doc )
     // date
     time_t now = time(0);
     date.append_child(pugi::node_pcdata).set_value( ctime( &now ) );
+    */
     
     // ---- music ----
    
@@ -913,6 +920,13 @@ bool MeiInput::ReadMei( pugi::xml_node root )
 
 bool MeiInput::ReadMeiHeader( pugi::xml_node meiHead )
 {
+    m_doc->m_header.reset();
+    //copy all the nodes inside into the master document
+    for (pugi::xml_node child = meiHead.first_child(); child; child = child.next_sibling())
+    {
+        m_doc->m_header.append_copy(child);
+    }
+    
     return true;
 }
 
