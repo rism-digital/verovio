@@ -347,10 +347,7 @@ std::string Toolkit::GetElementAttr( const std::string &xmlId )
     
     // Fill the attribute array (pair of string) by looking by attributes for all available MEI modules
     ArrayOfStrAttr attributes;
-    Att::GetCmn(element, &attributes );
-    Att::GetMensural(element, &attributes );
-    Att::GetPagebased(element, &attributes );
-    Att::GetShared(element, &attributes );
+    element->GetAttributes(&attributes);
     
     // Fill the JSON object
     ArrayOfStrAttr::iterator iter;

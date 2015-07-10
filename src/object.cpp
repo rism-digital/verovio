@@ -149,8 +149,32 @@ int Object::GetChildCount( const std::type_info *elementType )
 {
     return (int)count_if (m_children.begin(), m_children.end(), ObjectComparison( elementType ));
 }
+
+int Object::GetAttributes(ArrayOfStrAttr *attributes)
+{
+    assert(attributes);
+    attributes->clear();
     
+    Att::GetCmn(this, attributes );
+    Att::GetMensural(this, attributes );
+    Att::GetPagebased(this, attributes );
+    Att::GetShared(this, attributes );
     
+    return (int)attributes->size();
+}
+    
+bool Object::HasAttribute( std::string attribute, std::string value )
+{
+    ArrayOfStrAttr attributes;
+    this->GetAttributes( &attributes );
+    ArrayOfStrAttr::iterator iter;
+    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+        if ( ( (*iter).first == attribute ) && ( (*iter).second == value ) ) return true;
+    }
+    return false;
+}
+    
+        
 Object* Object::GetFirst( const std::type_info *elementType )
 {
     m_iteratorElementType = elementType;

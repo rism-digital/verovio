@@ -121,6 +121,17 @@ public:
     Object *GetChild( int idx );
     
     /**
+     * Fill an array of pair with all attributes and their value.
+     * Return the number of attribute found.
+     */
+    int GetAttributes( ArrayOfStrAttr *attributes );
+    
+    /**
+     * Check if an Object has an attribute with the specified values
+     */
+    bool HasAttribute( std::string attribute, std::string value );
+    
+    /**
      * @name Iterator methods for accessing children.
      * GetFirst returns the first element child of the specified type.
      * Its position and the specified type are stored and used of accessing next elements
