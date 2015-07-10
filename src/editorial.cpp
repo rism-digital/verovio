@@ -178,6 +178,7 @@ Rdg::~Rdg()
 void Rdg::Reset()
 {
     EditorialElement::Reset();
+    m_visibility = Visible;
 }
 
 //----------------------------------------------------------------------------

@@ -25,6 +25,11 @@ class ScoreDef;
 class StaffDef;
 class StaffGrp;
     
+enum VisibilityType {
+    Hidden = 0,
+    Visible
+};
+    
 //----------------------------------------------------------------------------
 // EditorialElement
 //----------------------------------------------------------------------------
@@ -79,6 +84,7 @@ protected:
 private:
     
 public:
+    VisibilityType m_visibility;
     
 private:
     
