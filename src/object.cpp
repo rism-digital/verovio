@@ -326,12 +326,12 @@ void Object::Modify( bool modified )
     m_isModified = modified;
 }
 
-void Object::FillList( ListOfObjects *list )
+void Object::FillFlatList( ListOfObjects *flatList )
 {
-    Functor addToList( &Object::AddLayerElementToList );
+    Functor addToFlatList( &Object::AddLayerElementToFlatList );
     ArrayPtrVoid params;
-    params.push_back ( &list );
-    this->Process( &addToList, params );
+    params.push_back ( &flatList );
+    this->Process( &addToFlatList, params );
 
     /* // For debuging
     ListOfObjects::iterator iter;
@@ -709,7 +709,7 @@ void ObjectListInterface::ResetList( Object *node )
     
     node->Modify( false );
     m_list.clear();
-    node->FillList( &m_list );
+    node->FillFlatList( &m_list );
     this->FilterList( &m_list );
 }
 
@@ -818,7 +818,7 @@ void Functor::Call( Object *ptr, ArrayPtrVoid params )
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToList( ArrayPtrVoid params )
+int Object::AddLayerElementToFlatList( ArrayPtrVoid params )
 {
     // param 0: the ListOfObjects
     ListOfObjects **list = static_cast<ListOfObjects**>(params[0]);

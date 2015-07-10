@@ -206,6 +206,7 @@ int main(int argc, char** argv)
                     page = atoi(optarg);
                 }
                 else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
+                    cout << string(optarg) << endl;
                     toolkit.SetRdgXPathQuery( string(optarg) );
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {

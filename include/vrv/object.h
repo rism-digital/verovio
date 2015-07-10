@@ -248,7 +248,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */  
-    void FillList( ListOfObjects *list );
+    void FillFlatList( ListOfObjects *list );
     
     /**
      * Add a sameAs attribute to the object.
@@ -307,9 +307,9 @@ public:
     //----------//
     
     /**
-     * Add each LayerElements and its children to a list
+     * Add each LayerElements and its children to a flat list
      */
-    virtual int AddLayerElementToList( ArrayPtrVoid params );
+    virtual int AddLayerElementToFlatList( ArrayPtrVoid params );
     
     /**
      * Find a Object with a specified uuid.
@@ -692,7 +692,7 @@ public:
 //----------------------------------------------------------------------------
 
 /** 
- * This class is an pseudo interface for elements maintaining a list of
+ * This class is an pseudo interface for elements maintaining a flat list of
  * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
  * It is not an abstract class but should not be instanciate directly.
