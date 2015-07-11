@@ -517,6 +517,11 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         return;
     }
     
+    EditorialElement *editorialElement = dynamic_cast<EditorialElement*>(this);
+    if (functor->m_visibleOnly && editorialElement && ( editorialElement->m_visibility == Hidden ) ) {
+        return;
+    }
+    
     functor->Call( this, params );
     
     // do not go any deeper in this case
@@ -589,6 +594,8 @@ int Object::Save( FileOutputStream *output )
     params.push_back( output );
     
     Functor save( &Object::Save );
+    // Special case where we want to process all objects
+    save.m_visibleOnly = false;
     Functor saveEnd( &Object::SaveEnd );
     this->Process( &save, params, &saveEnd );
     
@@ -821,14 +828,14 @@ Object *ObjectListInterface::GetListNext( const Object *listElement )
 Functor::Functor( )
 { 
     m_returnCode = FUNCTOR_CONTINUE;
-    m_reverse = false;
+    m_visibleOnly = true;
     obj_fpt = NULL; 
 }
 
 Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid ))
 { 
     m_returnCode = FUNCTOR_CONTINUE;
-    m_reverse = false;
+    m_visibleOnly = true;
     obj_fpt = _obj_fpt; 
 }
 

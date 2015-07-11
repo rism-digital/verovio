@@ -1839,38 +1839,69 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
         return false;
     }
     
-    // Special case where we select the child either by looking at the m_rdgXPathQuery or by
-    // selecting the <lem> or the first child
-    pugi::xml_node selectedLemOrRdg;
-    if ( m_rdgXPathQuery.length() > 0 ) {
-        pugi::xpath_node selection = app.select_single_node( m_rdgXPathQuery.c_str() );
-        if ( selection ) {
-            selectedLemOrRdg = selection.node();
-        }
-    }
-    // try to get the <lem> (if any)
-    if ( !selectedLemOrRdg ) {
-        selectedLemOrRdg = app.child("lem");
-    }
-    // otherwise just the first child
-    if ( !selectedLemOrRdg ) {
-        selectedLemOrRdg = app.first_child( );
-    }
-    if ( !selectedLemOrRdg ) {
-        LogError("Could not find a <lem> or <rdg> in the <app>");
-        return false;
-    }
-    
     App *vrvApp = new App( level );
     ReadEditorialElement( app, vrvApp );
     parent->AddEditorialElement(vrvApp);
     
-    return ReadMeiAppChildren( vrvApp, selectedLemOrRdg, level, filter );
+    return ReadMeiAppChildren( vrvApp, app, level, filter );
 }
     
     
-bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter )
+bool MeiInput::ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter )
 {
+    assert( dynamic_cast<App*>( parent ) );
+    
+    // Check if one child node matches the m_rdgXPathQuery
+    pugi::xml_node selectedLemOrRdg;
+    if ( m_rdgXPathQuery.length() > 0 ) {
+        pugi::xpath_node selection = parentNode.select_single_node( m_rdgXPathQuery.c_str() );
+        if ( selection ) selectedLemOrRdg = selection.node();
+    }
+    
+    bool success = true;
+    bool hasXPathSelected = false;
+    pugi::xml_node current;
+    for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
+        if (!success) break;
+        if ( std::string( current.name() ) == "lem" ) {
+            success = ReadMeiLemOrRdg( parent, current, level, filter);
+        }
+        else if ( std::string( current.name() ) == "rdg" ) {
+            success = ReadMeiLemOrRdg( parent, current, level, filter);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <app>", current.name() );
+        }
+        // Now we check if the xpath selection (if any) matches the current node.
+        // If yes, make it visible
+        if ( selectedLemOrRdg == current ) {
+            EditorialElement *last = dynamic_cast<EditorialElement*>(parent->m_children.back());
+            if (last) {
+                last->m_visibility = Visible;
+                hasXPathSelected = true;
+            }
+        }
+    }
+    
+    // If no child was made visible through the xpath selection, make the first one visible
+    if (!hasXPathSelected) {
+        EditorialElement *first = dynamic_cast<EditorialElement*>(parent->m_children.front());
+        if (first) {
+            first->m_visibility = Visible;
+        }
+        else {
+            LogWarning("Could not make one <rdg> or <lem> visible" );
+        }
+    }
+
+    return success;
+}
+    
+bool MeiInput::ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter )
+
+{
+    assert( dynamic_cast<App*>( parent ) );
+    
     EditorialElement *vrvLemOrRdg;
     if ( std::string( lemOrRdg.name() ) == "lem" ) {
         vrvLemOrRdg = new Lem();
@@ -1878,9 +1909,11 @@ bool MeiInput::ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialL
     else {
         vrvLemOrRdg = new Rdg();
     }
+    // By default make them all hidden. MeiInput::ReadMeiAppChildren will make one visible.
+    vrvLemOrRdg->m_visibility = Hidden;
     
     ReadEditorialElement( lemOrRdg, vrvLemOrRdg );
-    app->AddLemOrRdg(vrvLemOrRdg);
+    dynamic_cast<App*>( parent )->AddLemOrRdg(vrvLemOrRdg);
     
     if (level == EDITORIAL_SYSTEM) {
         return ReadMeiSystemChildren(vrvLemOrRdg, lemOrRdg);

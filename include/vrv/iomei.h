@@ -315,7 +315,8 @@ private:
      */
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
     ///@}
     ///@}

@@ -789,8 +789,21 @@ public:
     // override function "Call"
     virtual void Call( Object *ptr, ArrayPtrVoid params );
     
+private:
+    
+public:
+    /**
+     * The return code of the functor.
+     * FUNCTOR_CONTINUE: continue processing
+     * FUNCTOR_SIBLINGS: process only siblings (do not go deeper)
+     * FUNCTOR_STOP: stop the functor (e.g., when an Object or a value is found)
+     */
     int m_returnCode;
-    bool m_reverse;
+    /** 
+     * A flag for indicating if only visible Object have to be processed.
+     * The value is true by default.
+     */
+    bool m_visibleOnly;
     
 private:
     
@@ -821,7 +834,12 @@ public:
     }
     
 private:
+    
+public:
+    
+private:
     const std::type_info *m_elementType;
+    
 };
 
 } // namespace vrv

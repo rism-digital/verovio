@@ -1234,7 +1234,9 @@ void View::DrawSystemEditorialElement( DeviceContext *dc, EditorialElement *elem
     }
     
     dc->StartGraphic( element, "", element->GetUuid());
-    DrawSystemChildren( dc, element, system);
+    if (element->m_visibility == Visible) {
+        DrawSystemChildren( dc, element, system);
+    }
     dc->EndGraphic( element, this );
 }
 
@@ -1245,7 +1247,9 @@ void View::DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *ele
     }
     
     dc->StartGraphic( element, "", element->GetUuid());
-    DrawMeasureChildren(dc, element, measure, system);
+    if (element->m_visibility == Visible) {
+        DrawMeasureChildren(dc, element, measure, system);
+    }
     dc->EndGraphic( element, this );
 }
     
@@ -1256,7 +1260,9 @@ void View::DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *eleme
     }
     
     dc->StartGraphic( element, "", element->GetUuid());
-    DrawStaffChildren(dc, element, staff, measure);
+    if (element->m_visibility == Visible) {
+        DrawStaffChildren(dc, element, staff, measure);
+    }
     dc->EndGraphic( element, this );
 }
 
@@ -1267,7 +1273,9 @@ void View::DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *eleme
     }
     
     dc->StartGraphic( element, "", element->GetUuid());
-    DrawLayerChildren(dc, element, layer, staff, measure);
+    if (element->m_visibility == Visible) {
+        DrawLayerChildren(dc, element, layer, staff, measure);
+    }
     dc->EndGraphic( element, this );
 }
     

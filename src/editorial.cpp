@@ -42,6 +42,7 @@ void EditorialElement::Reset()
 {
     Object::Reset();
     ResetCommon();
+    m_visibility = Visible;
 }
 
 EditorialElement::~EditorialElement()
@@ -178,7 +179,6 @@ Rdg::~Rdg()
 void Rdg::Reset()
 {
     EditorialElement::Reset();
-    m_visibility = Visible;
 }
 
 //----------------------------------------------------------------------------
