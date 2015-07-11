@@ -1556,9 +1556,7 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     }
     
     AddLayerElement(parent, vrvChord);
-    bool success = ReadMeiLayerChildren(vrvChord, chord);
-    
-    return success;
+    return ReadMeiLayerChildren(vrvChord, chord);
 }
 
 bool MeiInput::ReadMeiClef( Object *parent, pugi::xml_node clef )

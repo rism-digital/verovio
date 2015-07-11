@@ -274,8 +274,6 @@ private:
     bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
     bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
-    bool ReadMeiChord( Object* parent, pugi::xml_node chord );
-    bool ReadMeiChordChildren( Object* parent, pugi::xml_node parentNode, Object *filter = NULL );
     ///@}
 
     /**
@@ -285,6 +283,7 @@ private:
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
+    bool ReadMeiChord( Object* parent, pugi::xml_node chord );
     bool ReadMeiClef( Object *parent, pugi::xml_node clef );
     bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
     bool ReadMeiDot( Object *parent, pugi::xml_node dot );
