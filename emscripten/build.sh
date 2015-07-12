@@ -9,7 +9,8 @@ function print_help {
 } 
 
 VEROVIO_ROOT=../
-VEROVIO_INCLUDE=../include/vrv
+VEROVIO_INCLUDE=../include
+VEROVIO_INCLUDE_VRV=../include/vrv
 VEROVIO_LIBMEI=../libmei
 if command -v emcc >/dev/null 2>&1 ; then
 	EMCC=`command -v emcc`
@@ -87,6 +88,7 @@ echo "Compiling"
 python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
+	-I$VEROVIO_INCLUDE_VRV \
 	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \

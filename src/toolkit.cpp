@@ -160,13 +160,13 @@ bool Toolkit::LoadFile( const std::string &filename )
     }
     
     std::ifstream in( filename.c_str() );
-    
     if (!in.is_open()) {
         return false;
     }
     
     in.seekg(0, std::ios::end);
     std::streamsize fileSize = (std::streamsize)in.tellg();
+    in.clear();
     in.seekg(0, std::ios::beg);
     
     // read the file into the string:
@@ -178,17 +178,53 @@ bool Toolkit::LoadFile( const std::string &filename )
  
 bool Toolkit::IsUTF16( const std::string &filename )
 {
-    const char* data = NULL;
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+    
+    char data[2];
+    memset( data, 0, 2 );
+    fin.read( data, 2 );
+    fin.close();
+    
     if (memcmp(data, UTF_16_LE_BOM, 2) == 0) return true;
     if (memcmp(data, UTF_16_BE_BOM, 2) == 0) return true;
+    
     return false;
 }
     
 bool Toolkit::LoadUTF16File( const std::string &filename )
 {
-    std::string content;
+    /// Loading a UTF-16 file with basic conversion ot UTF-8
+    /// This is called after checking if the file has a UTF-16 BOM
     
-    return LoadString( content );
+    LogWarning("The file seems to be UTF-16 - trying to convert to UTF-8");
+    
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+    
+    fin.seekg(0, std::ios::end);
+    std::streamsize wfileSize = (std::streamsize)fin.tellg();
+    fin.clear();
+    fin.seekg(0, std::wios::beg);
+    
+    std::vector<unsigned short> utf16line;
+    utf16line.reserve(wfileSize / 2 + 1);
+    
+    unsigned short buffer;
+    while(fin.read((char *)&buffer, sizeof(unsigned short)))
+    {
+        utf16line.push_back(buffer);
+    }
+    //LogDebug("%d %d", wfileSize, utf8line.size());
+    
+    std::string utf8line;
+    utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
+    
+    return LoadString( utf8line );
 }
 
 bool Toolkit::LoadString( const std::string &data )
