@@ -28,6 +28,9 @@
 
 namespace vrv {
     
+const char *UTF_16_BE_BOM = "\xFE\xFF";
+const char *UTF_16_LE_BOM = "\xFF\xFE";
+    
 //----------------------------------------------------------------------------
 // Toolkit
 //----------------------------------------------------------------------------
@@ -150,9 +153,12 @@ bool Toolkit::SetFont( std::string const &font )
     return Resources::SetFont(font);
 };
 
-
 bool Toolkit::LoadFile( const std::string &filename )
 {
+    if ( IsUTF16( filename ) ) {
+        return LoadUTF16File( filename );
+    }
+    
     std::ifstream in( filename.c_str() );
     
     if (!in.is_open()) {
@@ -166,6 +172,21 @@ bool Toolkit::LoadFile( const std::string &filename )
     // read the file into the string:
     std::string content( fileSize, 0 );
     in.read(&content[0], fileSize);
+    
+    return LoadString( content );
+}
+ 
+bool Toolkit::IsUTF16( const std::string &filename )
+{
+    const char* data = NULL;
+    if (memcmp(data, UTF_16_LE_BOM, 2) == 0) return true;
+    if (memcmp(data, UTF_16_BE_BOM, 2) == 0) return true;
+    return false;
+}
+    
+bool Toolkit::LoadUTF16File( const std::string &filename )
+{
+    std::string content;
     
     return LoadString( content );
 }

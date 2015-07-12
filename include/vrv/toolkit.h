@@ -265,6 +265,9 @@ public:
     ///@}
 
 private:
+    bool IsUTF16( const std::string &filename );
+    bool LoadUTF16File( const std::string &filename );
+    
     
 protected:
 #ifdef USE_EMSCRIPTEN
