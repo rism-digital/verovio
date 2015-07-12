@@ -70,7 +70,7 @@ verovio_module = Extension('_verovio',
              '../libmei/atts_pagebased.cpp', 
              'verovio.i'],
                 swig_opts=['-c++'],
-                include_dirs=['/usr/local/include', '../include/vrv', '../libmei'],
+                include_dirs=['/usr/local/include', '../include', '../include/vrv', '../libmei'],
                 extra_compile_args=['-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field'])
 
 setup (name = 'verovio',

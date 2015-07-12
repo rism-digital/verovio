@@ -160,36 +160,31 @@ bool Toolkit::LoadFile( const std::string &filename )
     LogWarning("The file seems to be UTF-16 file but only UTF-8 is supported");
     LogWarning("Trying to convert to UTF-8");
     
-    std::wifstream win( filename.c_str() );
+    std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary) ;
+    unsigned short buffer;
     
-    if (!win.is_open()) {
-        return false;
+    fin.seekg(0, std::ios::end);
+    std::streamsize wfileSize = (std::streamsize)fin.tellg();
+    fin.clear();
+    fin.seekg(0, std::wios::beg);
+    
+    std::vector<unsigned short> utf16line;
+    utf16line.reserve(wfileSize / 2 + 1);
+    
+    while(fin.read((char *)&buffer, sizeof(unsigned short)))
+    {
+        utf16line.push_back(buffer);
     }
     
-    // Look at the size of the file
-    win.seekg(0, std::ios::end);
-    std::streamsize wfileSize = (std::streamsize)win.tellg();
-    win.clear();
-    win.seekg(0, std::wios::beg);
-    // Allocate a wstring
-    std::wstring wcontent;
-    wcontent.reserve( wfileSize );
+    std::string utf8line;
+    utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
     
-    // Read the BOM
-    wchar_t c;
-    win.get(c);
-    win.get(c);
-    for(; win.get(c); )
-        // Remove 0 wchar
-        if ( (c > 0) ) wcontent += c;
+    //LogDebug("%d %d", wfileSize, utf8line.size());
     
-    std::string ccontent = UTF16to8(wcontent.c_str());
-    LogDebug(ccontent.c_str());
-    LogDebug("%d %d", wcontent.size(), ccontent.size());
-    return LoadString( ccontent );
+    return LoadString( utf8line );
     
 }
-
+    
 bool Toolkit::LoadString( const std::string &data )
 {
     FileInputStream *input = NULL;

@@ -38,6 +38,10 @@
 		4D9A9C1C199F576100028D93 /* syl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C1B199F576100028D93 /* syl.h */; };
 		4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
 		4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
+		4D9C53111B52E4AE0003C6EC /* checked.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C530D1B52E4AE0003C6EC /* checked.h */; };
+		4D9C53121B52E4AE0003C6EC /* core.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C530E1B52E4AE0003C6EC /* core.h */; };
+		4D9C53131B52E4AE0003C6EC /* unchecked.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C530F1B52E4AE0003C6EC /* unchecked.h */; };
+		4D9C53141B52E4AE0003C6EC /* utf8.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C53101B52E4AE0003C6EC /* utf8.h */; };
 		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA80D961A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
@@ -221,6 +225,10 @@
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
 		4D9A9C1D19A1DE2000028D93 /* syl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = syl.cpp; path = src/syl.cpp; sourceTree = "<group>"; };
+		4D9C530D1B52E4AE0003C6EC /* checked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = checked.h; path = include/utf8/checked.h; sourceTree = "<group>"; };
+		4D9C530E1B52E4AE0003C6EC /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core.h; path = include/utf8/core.h; sourceTree = "<group>"; };
+		4D9C530F1B52E4AE0003C6EC /* unchecked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unchecked.h; path = include/utf8/unchecked.h; sourceTree = "<group>"; };
+		4D9C53101B52E4AE0003C6EC /* utf8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utf8.h; path = include/utf8.h; sourceTree = "<group>"; };
 		4DA80D941A6940120089802D /* style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = style.h; path = include/vrv/style.h; sourceTree = "<group>"; };
 		4DA80D951A6ACF5D0089802D /* style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = style.cpp; path = src/style.cpp; sourceTree = "<group>"; };
 		4DC34B9F19BC4A70006175CD /* accid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accid.h; path = include/vrv/accid.h; sourceTree = "<group>"; };
@@ -387,6 +395,17 @@
 			path = tinyxml;
 			sourceTree = "<group>";
 		};
+		4DBC09271B51960100B1832C /* utf8 */ = {
+			isa = PBXGroup;
+			children = (
+				4D9C530D1B52E4AE0003C6EC /* checked.h */,
+				4D9C530E1B52E4AE0003C6EC /* core.h */,
+				4D9C530F1B52E4AE0003C6EC /* unchecked.h */,
+				4D9C53101B52E4AE0003C6EC /* utf8.h */,
+			);
+			name = utf8;
+			sourceTree = "<group>";
+		};
 		4DC34B9E19BC33A0006175CD /* interfaces */ = {
 			isa = PBXGroup;
 			children = (
@@ -465,6 +484,7 @@
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
 				4D22C42118891D7300D0831F /* pugixml */,
+				4DBC09271B51960100B1832C /* utf8 */,
 				8F086EAA188534680037FD8E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -629,6 +649,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4D9C53111B52E4AE0003C6EC /* checked.h in Headers */,
 				8F59293418854BF800FE51AD /* aligner.h in Headers */,
 				8F59293618854BF800FE51AD /* barline.h in Headers */,
 				8F59293718854BF800FE51AD /* bboxdevicecontext.h in Headers */,
@@ -655,6 +676,7 @@
 				8F59294A18854BF800FE51AD /* note.h in Headers */,
 				8F59294B18854BF800FE51AD /* object.h in Headers */,
 				8F59294C18854BF800FE51AD /* page.h in Headers */,
+				4D9C53131B52E4AE0003C6EC /* unchecked.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* measureelement.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
@@ -673,8 +695,10 @@
 				4D22C41C18890E9900D0831F /* mrest.h in Headers */,
 				4D22C42418891FC000D0831F /* pugixml.hpp in Headers */,
 				4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */,
+				4D9C53121B52E4AE0003C6EC /* core.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 				4D422101199805E400963292 /* att.h in Headers */,
+				4D9C53141B52E4AE0003C6EC /* utf8.h in Headers */,
 				4D422102199805E400963292 /* attdef.h in Headers */,
 				4D9A9C17199F560200028D93 /* verse.h in Headers */,
 				4D9A9C1C199F576100028D93 /* syl.h in Headers */,
@@ -916,9 +940,14 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = ../include;
 			};
 			name = Debug;
 		};
@@ -946,9 +975,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					./include/vrv/,
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.7;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = macosx;
+				USER_HEADER_SEARCH_PATHS = ../include;
 			};
 			name = Release;
 		};

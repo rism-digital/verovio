@@ -6,7 +6,7 @@ SET(CMAKE_BUILD_TYPE Release)
 
 add_definitions(-g)
 
-include_directories(/usr/local/include ../include/vrv ../libmei)
+include_directories(/usr/local/include ../include ../include/vrv ../libmei)
 
 add_executable (verovio 
 	main.cpp
