@@ -226,7 +226,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     avgY /= elementCount;
     
     // If we have one stem direction in the beam, then don't look at the layer
-    if (stemDir != STEMDIRECTION_NONE) stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    if (stemDir == STEMDIRECTION_NONE) stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
     
     // Automatic stem direction if nothing in the notes or in the layer
     if (stemDir == STEMDIRECTION_NONE) {
