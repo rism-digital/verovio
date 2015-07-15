@@ -373,23 +373,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     /************** Accidentals/dots/peripherals: **************/
     
-	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
+	if (note->m_drawingAccid) {
 		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
-
-        if (note->m_drawingAccid == NULL)
-        {
-            note->m_drawingAccid = new Accid();
-            note->m_drawingAccid->SetOloc(note->GetOct());
-            note->m_drawingAccid->SetPloc(note->GetPname());
-            note->m_drawingAccid->SetAccid(note->GetAccid());
-            note->m_drawingAccid->m_cueSize = note->m_cueSize;
-        }
         
         note->m_drawingAccid->SetDrawingX( xAccid );
         note->m_drawingAccid->SetDrawingY( noteY );
         
-        //postpone drawing the accidental until later if it's in a chord
-        if (!inChord) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure ); // ax2
+        //postpone drawing the accidental until later if it's in a chord or if it is not an attribute
+        if (!inChord && note->m_isDrawingAccidAttr) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure );
 	}
 	
     if (note->GetDots() && !inChord) {
@@ -410,8 +401,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
 
-    // This will draw lyrics, accid, etc.
-    DrawLayerChildren(dc, note, layer, staff, measure);
+    // This will draw lyrics, accid, etc. (but only if not in chord)
+    if (!inChord) DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->GetFermata() != PLACE_NONE) {
         DrawFermata(dc, element, staff);
@@ -1412,10 +1403,10 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
-        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
+        //accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
     }
     
-    //Get the offset
+    // Get the offset
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
     

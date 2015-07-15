@@ -35,13 +35,13 @@ AttAccidLog::~AttAccidLog() {
 }
 
 void AttAccidLog::ResetAccidLog() {
-    m_func = "";
+    m_func = FUNC_NONE;
 }
 
 bool AttAccidLog::ReadAccidLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("func")) {
-        this->SetFunc(StrToStr(element.attribute("func").value()));
+        this->SetFunc(StrToFunc(element.attribute("func").value()));
         element.remove_attribute("func");
         hasAttribute = true;
     }
@@ -51,7 +51,7 @@ bool AttAccidLog::ReadAccidLog(  pugi::xml_node element ) {
 bool AttAccidLog::WriteAccidLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasFunc()) {
-        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        element.append_attribute("func") = FuncToStr(this->GetFunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -59,7 +59,7 @@ bool AttAccidLog::WriteAccidLog(  pugi::xml_node element ) {
 
 bool AttAccidLog::HasFunc( )
 {
-    return (m_func != "");
+    return (m_func != FUNC_NONE);
 }
 
 
@@ -4068,13 +4068,13 @@ AttPbVis::~AttPbVis() {
 }
 
 void AttPbVis::ResetPbVis() {
-    m_func = "";
+    m_func = FUNC_NONE;
 }
 
 bool AttPbVis::ReadPbVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("func")) {
-        this->SetFunc(StrToStr(element.attribute("func").value()));
+        this->SetFunc(StrToFunc(element.attribute("func").value()));
         element.remove_attribute("func");
         hasAttribute = true;
     }
@@ -4084,7 +4084,7 @@ bool AttPbVis::ReadPbVis(  pugi::xml_node element ) {
 bool AttPbVis::WritePbVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasFunc()) {
-        element.append_attribute("func") = StrToStr(this->GetFunc()).c_str();
+        element.append_attribute("func") = FuncToStr(this->GetFunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4092,7 +4092,7 @@ bool AttPbVis::WritePbVis(  pugi::xml_node element ) {
 
 bool AttPbVis::HasFunc( )
 {
-    return (m_func != "");
+    return (m_func != FUNC_NONE);
 }
 
 
@@ -6948,7 +6948,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (dynamic_cast<AttAccidLog*>(element) ) {
         AttAccidLog *att = dynamic_cast<AttAccidLog*>(element);
         if (attrType == "func") {
-            att->SetFunc(att->StrToStr(attrValue));
+            att->SetFunc(att->StrToFunc(attrValue));
             return true;
         }
     }
@@ -7684,7 +7684,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (dynamic_cast<AttPbVis*>(element) ) {
         AttPbVis *att = dynamic_cast<AttPbVis*>(element);
         if (attrType == "func") {
-            att->SetFunc(att->StrToStr(attrValue));
+            att->SetFunc(att->StrToFunc(attrValue));
             return true;
         }
     }
@@ -8245,7 +8245,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttAccidLog*>(element) ) {
         AttAccidLog *att = dynamic_cast<AttAccidLog*>(element);
         if (att->HasFunc()) {
-            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+            attributes->push_back(std::make_pair("func", att->FuncToStr(att->GetFunc())));
         }
     }
     if (dynamic_cast<AttAccidental*>(element) ) {
@@ -8854,7 +8854,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttPbVis*>(element) ) {
         AttPbVis *att = dynamic_cast<AttPbVis*>(element);
         if (att->HasFunc()) {
-            attributes->push_back(std::make_pair("func", att->StrToStr(att->GetFunc())));
+            attributes->push_back(std::make_pair("func", att->FuncToStr(att->GetFunc())));
         }
     }
     if (dynamic_cast<AttPitch*>(element) ) {

@@ -515,6 +515,7 @@ void MeiOutput::WriteMeiAccid( pugi::xml_node currentNode, Accid *accid )
     WriteLayerElement( currentNode, accid );
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
+    accid->WriteAccidLog(currentNode);
 }
 
 void MeiOutput::WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine )
@@ -858,9 +859,8 @@ bool MeiInput::IsAllowed(std::string element, vrv::Object *filterParent)
     }
     else if (*elementType  == typeid(Note))
     {
-        //if ( element == "accid" ) return true;
-        //else 
-        if ( element == "syl" ) return true;
+        if ( element == "accid" ) return true;
+        else if ( element == "syl" ) return true;
         else if ( element == "verse" ) return true;
         else return false;
     }
@@ -1508,6 +1508,7 @@ bool MeiInput::ReadMeiAccid( Object *parent, pugi::xml_node accid )
     
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
+    vrvAccid->ReadAccidLog(accid);
     
     AddLayerElement(parent, vrvAccid);
     return true;
@@ -1682,7 +1683,7 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     pugi::xml_node current;
     for( current = note.first_child( ); current; current = current.next_sibling( ) ) {
         if ( std::string( current.name() ) == "accid" ) {
-            ReadAccidAsAttr(  vrvNote, current );
+            //ReadAccidAsAttr(  vrvNote, current );
         }
     }
     

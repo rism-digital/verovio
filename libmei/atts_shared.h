@@ -49,15 +49,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() const { return m_func; };    
+    void SetFunc(data_FUNC func_) { m_func = func_; };
+    data_FUNC GetFunc() const { return m_func; };    
     bool HasFunc( );
     
     ///@}
 
 private:
     /** Records the function of an accidental. **/
-    std::string m_func;
+    data_FUNC m_func;
 
 /* include <attfunc> */
 };
@@ -3528,15 +3528,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() const { return m_func; };    
+    void SetFunc(data_FUNC func_) { m_func = func_; };
+    data_FUNC GetFunc() const { return m_func; };    
     bool HasFunc( );
     
     ///@}
 
 private:
     /** Records the function of an accidental. **/
-    std::string m_func;
+    data_FUNC m_func;
 
 /* include <attfunc> */
 };

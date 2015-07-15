@@ -512,6 +512,7 @@ public:
     /**
      * Processes by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
+     * Set Note::m_drawingAccid for Note elements having an Accid child
      * param 0: Note** currentNote for the current not to w
      */
     virtual int PreparePointersByLayer( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };

@@ -35,6 +35,7 @@ Note::Note():
 {
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
+    m_isDrawingAccidAttr = false;
     Reset();
 }
 
@@ -45,8 +46,8 @@ Note::~Note()
     if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
     }
-    
-    if (m_drawingAccid) {
+    // We delete it only if it is an attribute - otherwise we do not own it
+    if (m_drawingAccid && m_isDrawingAccidAttr) {
         delete m_drawingAccid;
     }
     
@@ -79,7 +80,9 @@ void Note::Reset()
 
 void Note::AddLayerElement(vrv::LayerElement *element)
 {
-    assert( dynamic_cast<Verse*>(element) || dynamic_cast<EditorialElement*>(element) );
+    assert(dynamic_cast<Accid*>(element)
+        || dynamic_cast<Verse*>(element)
+        || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
     m_children.push_back(element);
     Modify();
@@ -104,9 +107,13 @@ void Note::ResetDrawingTieAttr( )
 void Note::ResetDrawingAccid( )
 {
     if ( m_drawingAccid ) {
-        delete m_drawingAccid;
+        // We delete it only if it is an attribute - otherwise we do not own it
+        if (m_isDrawingAccidAttr) delete m_drawingAccid;
         m_drawingAccid = NULL;
+        m_isDrawingAccidAttr = false;
     }
+    // we should never have no m_drawingAccid but have the attr flag to true
+    assert( !m_isDrawingAccidAttr );
 }
     
 Chord* Note::IsChordTone()
@@ -231,6 +238,17 @@ int Note::PreparePointersByLayer( ArrayPtrVoid params )
 {
     // param 0: the current Note
     Note **currentNote = static_cast<Note**>(params[0]);
+    
+    this->ResetDrawingAccid();
+    if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE)
+    {
+        this->m_isDrawingAccidAttr = true;
+        this->m_drawingAccid = new Accid();
+        this->m_drawingAccid->SetOloc(this->GetOct());
+        this->m_drawingAccid->SetPloc(this->GetPname());
+        this->m_drawingAccid->SetAccid(this->GetAccid());
+        this->m_drawingAccid->m_cueSize = this->m_cueSize;
+    }
     
     (*currentNote) = this;
     

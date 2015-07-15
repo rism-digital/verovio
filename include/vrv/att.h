@@ -128,6 +128,9 @@ public:
     
     std::string FontweightToStr(data_FONTWEIGHT data);
     data_FONTWEIGHT StrToFontweight(std::string value);
+    
+    std::string FuncToStr(data_FUNC data);
+    data_FUNC StrToFunc(std::string value);
         
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);

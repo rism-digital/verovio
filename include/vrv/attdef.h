@@ -197,6 +197,16 @@ enum data_FONTWEIGHT {
     FONTWEIGHT_normal
 };
     
+    
+/**
+ * MEI values for @func (no datatype in MEI)
+ */
+enum data_FUNC {
+    FUNC_NONE = 0,
+    FUNC_caution,
+    FUNC_edit
+};
+    
 /**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)

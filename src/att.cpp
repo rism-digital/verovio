@@ -409,6 +409,31 @@ data_FONTWEIGHT Att::StrToFontweight(std::string value)
     return FONTWEIGHT_NONE;
 }
     
+std::string Att::FuncToStr(data_FUNC data)
+{
+    std::string value;
+    switch(data)
+    {
+        case FUNC_caution : value = "caution"; break; //
+        case FUNC_edit : value = "edit"; break; //
+        default:
+            LogWarning("Unknown Func '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FUNC Att::StrToFunc(std::string value)
+{
+    if (value == "caution") return FUNC_caution; //
+    else if (value == "edit") return FUNC_edit; //
+    else {
+        LogWarning("Unknown Func '%s'", value.c_str() );
+    }
+    return FUNC_NONE;
+}
+    
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
 {
     std::string value;
