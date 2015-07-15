@@ -1113,11 +1113,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsNote() ) {
-        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-        if( chordParent ) {
-            return FUNCTOR_CONTINUE;
-        }
+    if ( current->IsNote() && dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH ) ) ) {
+        return FUNCTOR_CONTINUE;
     }
     
     if ( current->IsTie() ) {
@@ -1129,6 +1126,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     }
     
     if ( current->IsVerse() || current->IsSyl() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( current->IsAccid() && dynamic_cast<Note*>(current->GetFirstParent( &typeid( Note ), MAX_ACCID_DEPTH ) ) ) {
         return FUNCTOR_CONTINUE;
     }
     

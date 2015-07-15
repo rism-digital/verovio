@@ -50,7 +50,7 @@ int Accid::PreparePointersByLayer( ArrayPtrVoid params )
     // param 0: the current Note (not used)
     //Note **currentNote = static_cast<Note**>(params[0]);
     
-    Note *note = dynamic_cast<Note*>( this->GetFirstParent( &typeid(Note) ) );
+    Note *note = dynamic_cast<Note*>( this->GetFirstParent( &typeid(Note), MAX_ACCID_DEPTH ) );
     if ( !note ) {
         return FUNCTOR_CONTINUE;
     }

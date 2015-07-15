@@ -71,6 +71,9 @@ enum FunctorCode {
     
 /** All values set to -1 (no limit) since this has not major incidence **/
     
+/** Define the maximum levels between a note and its accids **/
+#define MAX_ACCID_DEPTH -1
+    
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
     
