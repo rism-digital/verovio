@@ -15,7 +15,7 @@
                 <score>
                     <scoreDef>
                         <staffGrp symbol="bracket">
-                            <staffDef n="1" clef.line="2" clef.shape="G" meter.sym="cut" />  
+                            <staffDef n="1" clef.line="2" clef.shape="G" meter.sym="cut" lines="5" />  
                         </staffGrp>
                     </scoreDef>
                     <section label="feature-example">
