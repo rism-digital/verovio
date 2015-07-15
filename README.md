@@ -4,7 +4,7 @@ Verovio can be used as a standalone command-line tool for converting a MEI files
 
 Verovio follows the [Standard Music Font Layout (SMuFL)](http://www.smufl.org) specification and the font can be changed for personalizing the output.
 
-The project page is http://www.verovio.org. Verovio is available under the GPL license (see LICENSE.txt).
+The project page is http://www.verovio.org. Verovio is available under the LGPL license (see LICENSE.txt).
 
 LibMEI
 ------
