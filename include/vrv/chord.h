@@ -18,7 +18,7 @@
 #include "layerelement.h"
 
 namespace vrv {
-    
+
 #define ledgermin(a,b) (((a)<(b))?(a):(b))
 #define ledgermax(a,b) (((a)>(b))?(a):(b))
     
@@ -68,7 +68,7 @@ public:
      * Prepares a 2D grid of booleans to track where accidentals are placed.
      * Further documentation in chord.cpp comments.
      */
-    void ResetAccidSpace(int staffSize);
+    void ResetAccidSpace(int fullUnit);
     
     /**
      * @name Set and get the stem direction of the beam.

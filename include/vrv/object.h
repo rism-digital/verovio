@@ -121,6 +121,17 @@ public:
     Object *GetChild( int idx );
     
     /**
+     * Fill an array of pair with all attributes and their value.
+     * Return the number of attribute found.
+     */
+    int GetAttributes( ArrayOfStrAttr *attributes );
+    
+    /**
+     * Check if an Object has an attribute with the specified values
+     */
+    bool HasAttribute( std::string attribute, std::string value );
+    
+    /**
      * @name Iterator methods for accessing children.
      * GetFirst returns the first element child of the specified type.
      * Its position and the specified type are stored and used of accessing next elements
@@ -248,7 +259,7 @@ public:
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */  
-    void FillList( ListOfObjects *list );
+    void FillFlatList( ListOfObjects *list );
     
     /**
      * Add a sameAs attribute to the object.
@@ -307,9 +318,9 @@ public:
     //----------//
     
     /**
-     * Add each LayerElements and its children to a list
+     * Add each LayerElements and its children to a flat list
      */
-    virtual int AddLayerElementToList( ArrayPtrVoid params );
+    virtual int AddLayerElementToFlatList( ArrayPtrVoid params );
     
     /**
      * Find a Object with a specified uuid.
@@ -501,6 +512,7 @@ public:
     /**
      * Processes by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
+     * Set Note::m_drawingAccid for Note elements having an Accid child
      * param 0: Note** currentNote for the current not to w
      */
     virtual int PreparePointersByLayer( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
@@ -692,7 +704,7 @@ public:
 //----------------------------------------------------------------------------
 
 /** 
- * This class is an pseudo interface for elements maintaining a list of
+ * This class is an pseudo interface for elements maintaining a flat list of
  * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
  * It is not an abstract class but should not be instanciate directly.
@@ -778,8 +790,21 @@ public:
     // override function "Call"
     virtual void Call( Object *ptr, ArrayPtrVoid params );
     
+private:
+    
+public:
+    /**
+     * The return code of the functor.
+     * FUNCTOR_CONTINUE: continue processing
+     * FUNCTOR_SIBLINGS: process only siblings (do not go deeper)
+     * FUNCTOR_STOP: stop the functor (e.g., when an Object or a value is found)
+     */
     int m_returnCode;
-    bool m_reverse;
+    /** 
+     * A flag for indicating if only visible Object have to be processed.
+     * The value is true by default.
+     */
+    bool m_visibleOnly;
     
 private:
     
@@ -810,7 +835,12 @@ public:
     }
     
 private:
+    
+public:
+    
+private:
     const std::type_info *m_elementType;
+    
 };
 
 } // namespace vrv

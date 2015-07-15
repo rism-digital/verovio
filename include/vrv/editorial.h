@@ -9,6 +9,7 @@
 #ifndef __VRV_EDITORIAL_H__
 #define __VRV_EDITORIAL_H__
 
+#include "atts_critapp.h"
 #include "atts_shared.h"
 #include "object.h"
 
@@ -23,6 +24,11 @@ class Rdg;
 class ScoreDef;
 class StaffDef;
 class StaffGrp;
+    
+enum VisibilityType {
+    Hidden = 0,
+    Visible
+};
     
 //----------------------------------------------------------------------------
 // EditorialElement
@@ -78,6 +84,7 @@ protected:
 private:
     
 public:
+    VisibilityType m_visibility;
     
 private:
     
@@ -174,6 +181,40 @@ protected:
 private:
     
 public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// Annot
+//----------------------------------------------------------------------------
+
+class Annot: public EditorialElement,
+    public AttPlist,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Annot();
+    virtual ~Annot();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Annot"; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    /**
+     * A copy of the annot content tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_content;
     
 private:
     

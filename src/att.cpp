@@ -409,6 +409,31 @@ data_FONTWEIGHT Att::StrToFontweight(std::string value)
     return FONTWEIGHT_NONE;
 }
     
+std::string Att::FuncToStr(data_FUNC data)
+{
+    std::string value;
+    switch(data)
+    {
+        case FUNC_caution : value = "caution"; break; //
+        case FUNC_edit : value = "edit"; break; //
+        default:
+            LogWarning("Unknown Func '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FUNC Att::StrToFunc(std::string value)
+{
+    if (value == "caution") return FUNC_caution; //
+    else if (value == "edit") return FUNC_edit; //
+    else {
+        LogWarning("Unknown Func '%s'", value.c_str() );
+    }
+    return FUNC_NONE;
+}
+    
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
 {
     std::string value;
@@ -460,6 +485,37 @@ data_KEYSIGNATURE Att::StrToKeySignature(std::string value)
 		LogWarning("Unsupported pitch name '%s'", value.c_str() );
 	}
 	return KEYSIGNATURE_NONE;
+}
+    
+std::string Att::LayerschemeToStr(data_LAYERSCHEME data)
+{
+    std::string value;
+    switch(data)
+    {
+        case LAYERSCHEME_1 : value = "1"; break;
+        case LAYERSCHEME_2o : value = "2o"; break;
+        case LAYERSCHEME_2f : value = "2f"; break;
+        case LAYERSCHEME_3o : value = "3o"; break;
+        case LAYERSCHEME_3f : value = "3f"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_LAYERSCHEME Att::StrToLayerscheme(std::string value)
+{
+    if (value == "1") return LAYERSCHEME_1;
+    else if (value == "2o") return LAYERSCHEME_2o;
+    else if (value == "2f") return LAYERSCHEME_2f;
+    else if (value == "3o") return LAYERSCHEME_3o;
+    else if (value == "3f") return LAYERSCHEME_3f;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return LAYERSCHEME_NONE;
 }
     
 std::string Att::LigatureToStr(data_LIGATURE data)

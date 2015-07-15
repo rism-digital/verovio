@@ -156,6 +156,13 @@ public:
     
     /** other information necessary for notes in chords **/
     Accid *m_drawingAccid;
+    
+    /** 
+     * Flag indicating if the drawing accid is an attribute.
+     * If yes, then it is owned by the Note and will be deleted
+     */
+    bool m_isDrawingAccidAttr;
+    
 
     
 private:

@@ -69,10 +69,11 @@ FILES="../src/accid.cpp \
              ../src/pugixml.cpp \
              ../libmei/atts_shared.cpp \
              ../libmei/atts_cmn.cpp \
+             ../libmei/atts_critapp.cpp \
              ../libmei/atts_mensural.cpp \
              ../libmei/atts_pagebased.cpp"
 
-CXXOPTS="-g -fpic -I../include/vrv -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
+CXXOPTS="-g -fpic -I../include -I../include/vrv -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
 g++ -shared -o target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
 cp target/libverovio.jnilib target/classes/META-INF/lib
 

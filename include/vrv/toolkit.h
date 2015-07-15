@@ -15,6 +15,8 @@
 #include "jsonxx.h"
 #endif
 
+#include "utf8.h"
+
 //----------------------------------------------------------------------------
 
 #include "doc.h"
@@ -107,7 +109,7 @@ public:
      * Get the MEI as a string.
      * Get all the pages unless a page number (1-based) is specified
      */
-    std::string GetMEI( int pageNo =  0 );
+    std::string GetMEI( int pageNo =  0, bool scoreBased = false );
     
     /**
      * Return element attributes as a JSON string
@@ -265,6 +267,9 @@ public:
     ///@}
 
 private:
+    bool IsUTF16( const std::string &filename );
+    bool LoadUTF16File( const std::string &filename );
+    
     
 protected:
 #ifdef USE_EMSCRIPTEN

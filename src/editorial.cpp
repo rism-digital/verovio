@@ -42,6 +42,7 @@ void EditorialElement::Reset()
 {
     Object::Reset();
     ResetCommon();
+    m_visibility = Visible;
 }
 
 EditorialElement::~EditorialElement()
@@ -161,7 +162,6 @@ void Lem::Reset()
     EditorialElement::Reset();
 }
 
-    
 //----------------------------------------------------------------------------
 // Rdg
 //----------------------------------------------------------------------------
@@ -179,6 +179,29 @@ Rdg::~Rdg()
 void Rdg::Reset()
 {
     EditorialElement::Reset();
+}
+
+//----------------------------------------------------------------------------
+// Annot
+//----------------------------------------------------------------------------
+
+Annot::Annot( ):
+    EditorialElement("annot-"),
+    AttPlist(),
+    AttSource()
+{
+    Reset();
+}
+
+Annot::~Annot()
+{
+}
+
+void Annot::Reset()
+{
+    EditorialElement::Reset();
+    ResetPlist();
+    ResetSource();
 }
     
 //----------------------------------------------------------------------------

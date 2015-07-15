@@ -202,6 +202,11 @@ public:
     std::string m_fname;
     
     /**
+     * A copy of the header tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_header;
+    
+    /**
      * The object with the default values.
      * This could be saved somewhere as preferences (todo).
      */

@@ -9,7 +9,8 @@ function print_help {
 } 
 
 VEROVIO_ROOT=../
-VEROVIO_INCLUDE=../include/vrv
+VEROVIO_INCLUDE=../include
+VEROVIO_INCLUDE_VRV=../include/vrv
 VEROVIO_LIBMEI=../libmei
 if command -v emcc >/dev/null 2>&1 ; then
 	EMCC=`command -v emcc`
@@ -32,6 +33,7 @@ ASM="\
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
 ASM_NAME=""
+WEBWORKER_NAME=""
 
 # default is master (no version)
 VERSION=""
@@ -63,6 +65,7 @@ while getopts "lwv:h:c" opt; do
 		w)
 			WEBWORKER=true
 			echo "building with webworker compatibility"
+			WEBWORKER_NAME="-webworker"
 			;;
 		h)
 			print_help
@@ -75,7 +78,7 @@ while getopts "lwv:h:c" opt; do
 	esac
 done
 
-FILENAME="verovio-toolkit$ASM_NAME$VERSION_NAME.js"
+FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME$VERSION_NAME.js"
 
 echo "Sync svg resources"
 cp -r ../data/* data/
@@ -85,6 +88,7 @@ echo "Compiling"
 python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
+	-I$VEROVIO_INCLUDE_VRV \
 	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \
@@ -148,6 +152,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/verse.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
+	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \

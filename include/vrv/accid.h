@@ -19,7 +19,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class Accid: public LayerElement, public PositionInterface,
-    public AttAccidental
+    public AttAccidental,
+    public AttAccidLog
 {
 public:
     /**
@@ -32,6 +33,16 @@ public:
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Accid"; };
     ///@}
+    
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid params );
     
 protected:
 

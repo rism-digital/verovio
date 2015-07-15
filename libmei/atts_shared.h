@@ -49,15 +49,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() const { return m_func; };    
+    void SetFunc(data_FUNC func_) { m_func = func_; };
+    data_FUNC GetFunc() const { return m_func; };    
     bool HasFunc( );
     
     ///@}
 
 private:
     /** Records the function of an accidental. **/
-    std::string m_func;
+    data_FUNC m_func;
 
 /* include <attfunc> */
 };
@@ -3528,15 +3528,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(std::string func_) { m_func = func_; };
-    std::string GetFunc() const { return m_func; };    
+    void SetFunc(data_FUNC func_) { m_func = func_; };
+    data_FUNC GetFunc() const { return m_func; };    
     bool HasFunc( );
     
     ///@}
 
 private:
     /** Records the function of an accidental. **/
-    std::string m_func;
+    data_FUNC m_func;
 
 /* include <attfunc> */
 };
@@ -4430,13 +4430,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGridShow(std::string gridShow_) { m_gridShow = gridShow_; };
-    std::string GetGridShow() const { return m_gridShow; };    
+    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; };
+    data_BOOLEAN GetGridShow() const { return m_gridShow; };    
     bool HasGridShow( );
     
     //
-    void SetLayerscheme(std::string layerscheme_) { m_layerscheme = layerscheme_; };
-    std::string GetLayerscheme() const { return m_layerscheme; };    
+    void SetLayerscheme(data_LAYERSCHEME layerscheme_) { m_layerscheme = layerscheme_; };
+    data_LAYERSCHEME GetLayerscheme() const { return m_layerscheme; };    
     bool HasLayerscheme( );
     
     //
@@ -4450,8 +4450,8 @@ public:
     bool HasLinesColor( );
     
     //
-    void SetLinesVisible(std::string linesVisible_) { m_linesVisible = linesVisible_; };
-    std::string GetLinesVisible() const { return m_linesVisible; };    
+    void SetLinesVisible(data_BOOLEAN linesVisible_) { m_linesVisible = linesVisible_; };
+    data_BOOLEAN GetLinesVisible() const { return m_linesVisible; };    
     bool HasLinesVisible( );
     
     //
@@ -4463,9 +4463,9 @@ public:
 
 private:
     /** Determines whether to display guitar chord grids. **/
-    std::string m_gridShow;
+    data_BOOLEAN m_gridShow;
     /** Indicates the number of layers and their stem directions. **/
-    std::string m_layerscheme;
+    data_LAYERSCHEME m_layerscheme;
     /** Indicates the number of staff lines. **/
     int m_linesInt;
     /**
@@ -4477,7 +4477,7 @@ private:
      **/
     std::string m_linesColor;
     /** Records whether all staff lines are visible. **/
-    std::string m_linesVisible;
+    data_BOOLEAN m_linesVisible;
     /**
      * Records the absolute distance (as opposed to the relative distances recorded in
      * <scoreDef> elements) between this staff and the preceding one in the same

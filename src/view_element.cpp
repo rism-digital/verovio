@@ -289,6 +289,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             xNote = xStem - radius;
         }
         else {
+            //if we have a flipped notehead, we need to be in a chord
+            assert(inChord);
             if (note->m_drawingStemDir == STEMDIRECTION_up) {
                 xNote = xStem + radius - m_doc->m_style->m_stemWidth;
             }
@@ -371,23 +373,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     /************** Accidentals/dots/peripherals: **************/
     
-	if (note->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
+	if (note->m_drawingAccid) {
 		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
-
-        if (note->m_drawingAccid == NULL)
-        {
-            note->m_drawingAccid = new Accid();
-            note->m_drawingAccid->SetOloc(note->GetOct());
-            note->m_drawingAccid->SetPloc(note->GetPname());
-            note->m_drawingAccid->SetAccid(note->GetAccid());
-            note->m_drawingAccid->m_cueSize = note->m_cueSize;
-        }
         
         note->m_drawingAccid->SetDrawingX( xAccid );
         note->m_drawingAccid->SetDrawingY( noteY );
         
-        //postpone drawing the accidental until later if it's in a chord
-        if (!inChord) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure ); // ax2
+        //postpone drawing the accidental until later if it's in a chord or if it is not an attribute
+        if (!inChord && note->m_isDrawingAccidAttr) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure );
 	}
 	
     if (note->GetDots() && !inChord) {
@@ -408,8 +401,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
 
-    // This will draw lyrics, accid, etc.
-    DrawLayerChildren(dc, note, layer, staff, measure);
+    // This will draw lyrics, accid, etc. (but only if not in chord)
+    if (!inChord) DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->GetFermata() != PLACE_NONE) {
         DrawFermata(dc, element, staff);
@@ -795,12 +788,13 @@ void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, uns
     
     //if it's on a staff line to start with, we need to compensate here and add a full unit like DrawDots would
     if (IsOnStaffLine(y, staff)) {
-        y += fullUnit;
+        //defaults to the space above the staffline first
+        //if that position is not on the list already, we're good to go
+        if(std::find(dotsList->begin(), dotsList->end(), y + fullUnit) == dotsList->end()) y += fullUnit;
         
-        //if this position is not on the list, we're good to go
-        if(std::find(dotsList->begin(), dotsList->end(), y) == dotsList->end()) {}
         //if it is on the list, we should try the spot a doubleUnit below
-        else if(std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end()) y -= doubleUnit;
+        else if(std::find(dotsList->begin(), dotsList->end(), y - fullUnit) == dotsList->end()) y -= fullUnit;
+        
         //otherwise, any other space looks weird so let's not draw it
         else return;
     }
@@ -819,13 +813,11 @@ void View::PrepareChordDots ( DeviceContext *dc, Chord *chord, int x, int y, uns
     //finally, make sure it's not outside the acceptable extremes of the chord
     int yMax, yMin;
     chord->GetYExtremes(&yMax, &yMin);
-    
     if (y > (yMax + fullUnit)) return;
     if (y < (yMin - fullUnit)) return;
     
+    //if it's not, add it to the dots list and go back to DrawChord
     dotsList->push_back(y);
-    DrawDots(dc, x, y, dots, staff);
-
     return;
 }
 
@@ -876,7 +868,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
     int fullUnit = m_doc->m_drawingUnit[staffSize];
-    int doubleUnit = fullUnit * 2;
     
     bool inBeam = false;
     // Get the immadiate parent of the note
@@ -939,7 +930,9 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     chord->m_dots.clear();
     
     if (chord->GetDots()) {
-        int dots = chord->GetDots();
+        int numDots = chord->GetDots();
+        
+        //Set the x value...
         int dotsX;
         
         //make sure all the dots are at the same X position
@@ -953,39 +946,17 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         // Notes in clusters: If the stem points up and we have a note on the (incorrect) right side of the stem, add a note diameter to the dot positioning to avoid overlapping.
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_up) && (chord->m_clusters.size() > 0)) dotsX += (radius * 2);
         
-        // Draw dots for notes in clusters first...
-        for(std::list<ChordCluster*>::iterator cit = chord->m_clusters.begin(); cit != chord->m_clusters.end(); cit++)
+        //Prep where the dots will go by preventing overlaps and using space efficiently
+        for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin(); rit != chord->GetList(chord)->rend(); rit++)
         {
-            ChordCluster* cluster = *cit;
-            int clusterSize = (int)cluster->size();
-            
-            //find beginning and ending Y-point
-            Note* first = *(cluster->begin());
-            Note* last = cluster->at(clusterSize - 1);
-            int curY = first->GetDrawingY();
-            int endY = last->GetDrawingY();
-            
-            //if either is on a staff line, expand it to the next space
-            if (IsOnStaffLine(curY, staff)) curY -= fullUnit;
-            else if (clusterSize > 3) curY -= doubleUnit;
-            if (IsOnStaffLine(endY, staff)) endY += fullUnit;
-            else if (clusterSize == 3 || clusterSize == 5) endY += doubleUnit;
-            
-            //draw dots from one point to another
-            do {
-                PrepareChordDots(dc, chord, dotsX, curY, dots, staff);
-                curY += doubleUnit;
-            } while (curY <= endY);
+            Note *note = dynamic_cast<Note*>(*rit);
+            PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), numDots, staff);
         }
         
-        //Then fill in otherwise
-        for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
-        {
-            Note *note = dynamic_cast<Note*>(*it);
-            if (!note->m_cluster) {
-                PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), dots, staff);
-            }
-        }
+        //And then draw them
+        std::list<int> *dotsList = &chord->m_dots;
+        for (std::list<int>::iterator it=dotsList->begin(); it != dotsList->end(); ++it)
+            DrawDots(dc, dotsX, *it, numDots, staff);
     }
     
     /************ Accidentals ************/
@@ -1213,7 +1184,6 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
     return;
 }
     
-    
 void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert(layer); // Pointer to layer cannot be NULL"
@@ -1433,10 +1403,10 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
-        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
+        //accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
     }
     
-    //Get the offset
+    // Get the offset
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
     

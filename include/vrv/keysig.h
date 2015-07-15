@@ -23,8 +23,18 @@ class KeySigAttr;
 
 /**
  * This class models the MEI <keySig> element.
+ * Since it is unclear how to encode the logical key signature in keySig, an
+ * internal representation is used (there is no equivalent of staffDef @key 
+ * within keySig. Currently the @accid and @pname are used for this. The 
+ * @pname store the value of the latest accidental, which is doubtfully the
+ * expected use of it.
+ * Two temporary method KeySig::ConvertToMei and KeySig::ConvertToInternal
+ * are available for converting from and to the MEI representation to the 
+ * internal (and reverse)
  */
-class KeySig: public LayerElement
+class KeySig: public LayerElement,
+    public AttAccidental,
+    public AttPitch
 {
 public:
     /**
@@ -51,13 +61,17 @@ public:
     unsigned char GetAlteration() { return m_alteration; };
     void SetAlteration(int n) { m_alteration = n; };
     
+    /* Temporary methods for turning @accid and @pitch into num_alter and alter */
+    void ConvertToMei( );
+    void ConvertToInternal( );
+    
 private:
     
 public:
     
 private:
-    static unsigned char flats[];
-    static unsigned char sharps[];
+    static data_PITCHNAME flats[];
+    static data_PITCHNAME sharps[];
     static int octave_map[2][9][7];
     
     // This is temporary - it needs to be changed to libMEI atts

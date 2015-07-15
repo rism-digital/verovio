@@ -48,7 +48,7 @@ public:
     //static bool SetAnalysis( Object *element, std::string attrType, std::string attrValue );
     static bool SetCmn( Object *element, std::string attrType, std::string attrValue );
     //static bool SetCmnornaments( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
+    static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
     //static bool SetEdittrans( Object *element, std::string attrType, std::string attrValue );
     //static bool SetFacsimile( Object *element, std::string attrType, std::string attrValue );
     //static bool SetFigtable( Object *element, std::string attrType, std::string attrValue );
@@ -69,7 +69,7 @@ public:
     //static void GetAnalysis( Object *element, ArrayOfStrAttr *attributes );
     static void GetCmn( Object *element, ArrayOfStrAttr *attributes );
     //static void GetCmnornaments( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetCritapp( Object *element, ArrayOfStrAttr *attributes );
+    static void GetCritapp( Object *element, ArrayOfStrAttr *attributes );
     //static void GetEdittrans( Object *element, ArrayOfStrAttr *attributes );
     //static void GetFacsimile( Object *element, ArrayOfStrAttr *attributes );
     //static void GetFigtable( Object *element, ArrayOfStrAttr *attributes );
@@ -128,9 +128,15 @@ public:
     
     std::string FontweightToStr(data_FONTWEIGHT data);
     data_FONTWEIGHT StrToFontweight(std::string value);
+    
+    std::string FuncToStr(data_FUNC data);
+    data_FUNC StrToFunc(std::string value);
         
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);
+    
+    std::string LayerschemeToStr(data_LAYERSCHEME data);
+    data_LAYERSCHEME StrToLayerscheme(std::string value);
     
     std::string LigatureToStr(data_LIGATURE data);
     data_LIGATURE StrToLigature(std::string value);

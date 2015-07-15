@@ -149,8 +149,32 @@ int Object::GetChildCount( const std::type_info *elementType )
 {
     return (int)count_if (m_children.begin(), m_children.end(), ObjectComparison( elementType ));
 }
+
+int Object::GetAttributes(ArrayOfStrAttr *attributes)
+{
+    assert(attributes);
+    attributes->clear();
     
+    Att::GetCmn(this, attributes );
+    Att::GetMensural(this, attributes );
+    Att::GetPagebased(this, attributes );
+    Att::GetShared(this, attributes );
     
+    return (int)attributes->size();
+}
+    
+bool Object::HasAttribute( std::string attribute, std::string value )
+{
+    ArrayOfStrAttr attributes;
+    this->GetAttributes( &attributes );
+    ArrayOfStrAttr::iterator iter;
+    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+        if ( ( (*iter).first == attribute ) && ( (*iter).second == value ) ) return true;
+    }
+    return false;
+}
+    
+        
 Object* Object::GetFirst( const std::type_info *elementType )
 {
     m_iteratorElementType = elementType;
@@ -326,12 +350,12 @@ void Object::Modify( bool modified )
     m_isModified = modified;
 }
 
-void Object::FillList( ListOfObjects *list )
+void Object::FillFlatList( ListOfObjects *flatList )
 {
-    Functor addToList( &Object::AddLayerElementToList );
+    Functor addToFlatList( &Object::AddLayerElementToFlatList );
     ArrayPtrVoid params;
-    params.push_back ( &list );
-    this->Process( &addToList, params );
+    params.push_back ( &flatList );
+    this->Process( &addToFlatList, params );
 
     /* // For debuging
     ListOfObjects::iterator iter;
@@ -493,6 +517,11 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         return;
     }
     
+    EditorialElement *editorialElement = dynamic_cast<EditorialElement*>(this);
+    if (functor->m_visibleOnly && editorialElement && ( editorialElement->m_visibility == Hidden ) ) {
+        return;
+    }
+    
     functor->Call( this, params );
     
     // do not go any deeper in this case
@@ -565,6 +594,8 @@ int Object::Save( FileOutputStream *output )
     params.push_back( output );
     
     Functor save( &Object::Save );
+    // Special case where we want to process all objects
+    save.m_visibleOnly = false;
     Functor saveEnd( &Object::SaveEnd );
     this->Process( &save, params, &saveEnd );
     
@@ -709,7 +740,7 @@ void ObjectListInterface::ResetList( Object *node )
     
     node->Modify( false );
     m_list.clear();
-    node->FillList( &m_list );
+    node->FillFlatList( &m_list );
     this->FilterList( &m_list );
 }
 
@@ -797,14 +828,14 @@ Object *ObjectListInterface::GetListNext( const Object *listElement )
 Functor::Functor( )
 { 
     m_returnCode = FUNCTOR_CONTINUE;
-    m_reverse = false;
+    m_visibleOnly = true;
     obj_fpt = NULL; 
 }
 
 Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid ))
 { 
     m_returnCode = FUNCTOR_CONTINUE;
-    m_reverse = false;
+    m_visibleOnly = true;
     obj_fpt = _obj_fpt; 
 }
 
@@ -818,7 +849,7 @@ void Functor::Call( Object *ptr, ArrayPtrVoid params )
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToList( ArrayPtrVoid params )
+int Object::AddLayerElementToFlatList( ArrayPtrVoid params )
 {
     // param 0: the ListOfObjects
     ListOfObjects **list = static_cast<ListOfObjects**>(params[0]);
@@ -988,7 +1019,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     
     // starting a new keysig
     KeySig *keysig = dynamic_cast<KeySig*>(this);
-    if ( keysig  ) {
+    if ( keysig ) {
         assert( *currentStaffDef );
         (*currentStaffDef)->ReplaceKeySig( keysig );
         return FUNCTOR_CONTINUE;

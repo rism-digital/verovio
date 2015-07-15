@@ -279,9 +279,13 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
 		else if ((incipit[i] == '%') && (i+1 < length)) {
             Clef *c = new Clef;
             i += getClefInfo(incipit, c, i + 1);
+            //
+            if (!staffDefClef) {
+                staffDefClef = c;
+            }          
             // If there are no notes yet in the measure
             // attach this clef change to the measure
-            if (current_measure.notes.size() == 0) {
+            else if (current_measure.notes.size() == 0) {
                 // If a clef was already assigned, remove it
                 if (current_measure.clef)
                     delete current_measure.clef;
@@ -370,7 +374,12 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN( 1 );
     if (staffDefClef) {
-        staffDef->ReplaceClef( staffDefClef );
+        ClefAttr clefAttr;
+        clefAttr.SetClefShape(staffDefClef->GetShape());
+        clefAttr.SetClefLine(staffDefClef->GetLine());
+        clefAttr.SetClefDis(staffDefClef->GetDis());
+        clefAttr.SetClefDisPlace(staffDefClef->GetDisPlace());
+        staffDef->ReplaceClef( &clefAttr );
         delete staffDefClef;
     }
     staffGrp->AddStaffDef( staffDef );
@@ -965,6 +974,8 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
     }
     
     key->SetAlterationNumber(alt_nr);
+    
+    key->ConvertToMei();
     
     return i - index;
 }

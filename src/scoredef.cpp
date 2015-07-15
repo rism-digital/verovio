@@ -28,10 +28,12 @@ namespace vrv {
 
 ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface()
 {
+    // owned pointers need to be set to NULL;
     m_clef = NULL;
     m_keySig = NULL;
     m_mensur = NULL;
     m_meterSig = NULL;
+    Reset();
 }
 
 ScoreOrStaffDefAttrInterface::~ScoreOrStaffDefAttrInterface()
@@ -50,6 +52,26 @@ ScoreOrStaffDefAttrInterface::~ScoreOrStaffDefAttrInterface()
     }
 }
 
+void ScoreOrStaffDefAttrInterface::Reset()
+{
+    if (m_clef) {
+        delete m_clef;
+        m_clef = NULL;
+    }
+    if (m_keySig) {
+        delete m_keySig;
+        m_keySig = NULL;
+    }
+    if (m_mensur) {
+        delete m_mensur;
+        m_mensur = NULL;
+    }
+    if (m_meterSig) {
+        delete m_meterSig;
+        m_meterSig = NULL;
+    }
+}
+    
 ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface )
 {
     m_clef = NULL;
@@ -264,10 +286,7 @@ ScoreDef::~ScoreDef()
 void ScoreDef::Reset()
 {
     Object::Reset();
-    ReplaceClef(NULL);
-    ReplaceKeySig(NULL);
-    ReplaceMensur(NULL);
-    ReplaceMeterSig(NULL);
+    ScoreOrStaffDefAttrInterface::Reset();
     m_drawLabels = false;
 }
 
@@ -415,7 +434,8 @@ void StaffGrp::FilterList( ListOfObjects *childList )
 StaffDef::StaffDef() :
     Object(), ScoreOrStaffDefAttrInterface(),
     AttCommon(),
-    AttLabelsAddl()
+    AttLabelsAddl(),
+    AttStaffDefVis()
 {
     Reset();
 }
@@ -427,13 +447,14 @@ StaffDef::~StaffDef()
 void StaffDef::Reset()
 {
     Object::Reset();
+    ScoreOrStaffDefAttrInterface::Reset();
     ResetCommon();
     ResetLabelsAddl();
+    ResetStaffDefVis();
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawMensur = false;
     m_drawMeterSig = false;
-    m_lines = 5;
 }
     
     

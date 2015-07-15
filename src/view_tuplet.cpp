@@ -230,13 +230,17 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     tuplet->ResetList(tuplet);
     
-    int txt_length, txt_height;
+    int txt_length = 0;
+    int txt_height = 0;
     
-    std::wstring notes = IntToTupletFigures((short int)tuplet->GetNum());
+    std::wstring notes;
     
     dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
     
-    dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
+    if (tuplet->GetNum() > 0) {
+        notes = IntToTupletFigures((short int)tuplet->GetNum());
+        dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
+    }
     
     Point start, end, center;
     bool direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
@@ -248,7 +252,9 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     // we need to move down the figure of half of it height, which is about an accid width
     int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][tuplet->m_cueSize];
     
-    DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
+    if (tuplet->GetNum()) {
+        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
+    }
     
     dc->ResetFont();
     
