@@ -373,6 +373,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN( 1 );
+    staffDef->SetLines(5);
     if (staffDefClef) {
         ClefAttr clefAttr;
         clefAttr.SetClefShape(staffDefClef->GetShape());
