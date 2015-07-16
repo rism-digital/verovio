@@ -397,7 +397,7 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
 {
 
     if (typeid(Barline) == *elementType) return 5;
-    if (typeid(BarlineAttr) == *elementType) return 25;
+    else if (typeid(BarlineAttr) == *elementType) return 25;
     else if (typeid(Chord) == *elementType) return 10;
     else if (typeid(Clef) == *elementType) return -20;
     else if (typeid(MRest) == *elementType) return 30;
