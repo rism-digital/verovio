@@ -374,7 +374,10 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************** Accidentals/dots/peripherals: **************/
     
 	if (note->m_drawingAccid) {
-		xAccid = xNote - 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
+        xAccid = xNote;
+        if (note->m_drawingAccid->GetFunc() != FUNC_edit) {
+            xAccid -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
+        }
         
         note->m_drawingAccid->SetDrawingX( xAccid );
         note->m_drawingAccid->SetDrawingY( noteY );
@@ -1403,10 +1406,12 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
-        //accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
+        accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
+    }
+    if ( accid->GetFunc() == FUNC_edit ) {
+        accid->SetDrawingY( staff->GetDrawingY() + TEMP_STYLE_ACCID_EDIT_SPACE * m_doc->m_drawingUnit[staff->staffSize] / PARAM_DENOMINATOR );
     }
     
-    // Get the offset
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
     
@@ -1516,7 +1521,8 @@ int View::GetSylY( Syl *syl, Staff *staff )
     
     int y = syl->GetStart()->GetDrawingY();
     if (staff->GetAlignment() ) {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() - syl->m_drawingVerse * m_doc->m_drawingUnit[staff->staffSize] * 4;
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight() -
+        syl->m_drawingVerse * TEMP_STYLE_LYIRC_LINE_SPACE * m_doc->m_drawingUnit[staff->staffSize]  / PARAM_DENOMINATOR;
     }
     return y;
 }

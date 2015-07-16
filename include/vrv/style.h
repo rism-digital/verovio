@@ -81,6 +81,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Style
 //----------------------------------------------------------------------------
+    
+#define TEMP_STYLE_ACCID_EDIT_SPACE 4.0 * PARAM_DENOMINATOR
+
+#define TEMP_STYLE_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
+
 
 /**
  * This class contains the document default environment variables.

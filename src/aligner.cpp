@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "style.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -272,7 +273,10 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid params )
     int **interlineSizes = static_cast<int**>(params[2]);
     
     // take into account the number of lyrics
-    m_yShift -= this->GetVerseCount() * 2 * (*interlineSizes[0]) + (*interlineSizes[0]);
+    if (this->GetVerseCount() > 0) {
+        // We need + 1 lyric line space
+        m_yShift -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSizes[0] / 2) / PARAM_DENOMINATOR;
+    }
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
     

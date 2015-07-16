@@ -311,11 +311,12 @@ void BBoxDeviceContext::DrawText(const std::string& text, const std::wstring wte
     int w, h;
     GetTextExtent(wtext, &w, &h);
     m_textWidth += w;
+    m_textHeight = std::max( m_textHeight, h );
     // very approximative, we should use GetTextExtend once implemented
     //m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
     // ignore y bounding boxes for text
     //m_textHeight = m_fontStack.top()->GetPointSize();
-        UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
+    UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY - m_textHeight);
     
     
 }

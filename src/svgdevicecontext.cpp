@@ -457,6 +457,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
     rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    //rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empy rectangles
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)
