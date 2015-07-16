@@ -363,6 +363,7 @@ public:
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
+     * param 0: the cumulated shift
      */
     virtual int AlignMeasures( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
     
