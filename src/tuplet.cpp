@@ -49,7 +49,7 @@ void Tuplet::FilterList( ListOfObjects *childList )
     
     while ( iter != childList->end()) {
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
-        if ( currentElement && !currentElement->HasDurationInterface() )
+        if ( !currentElement || !currentElement->HasDurationInterface() )
         {
             iter = childList->erase( iter );
         } else {
