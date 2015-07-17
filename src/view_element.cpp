@@ -903,7 +903,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int drawingDur = chord->GetDur();
     
     //(unless we're in a beam)
-    if (!(inBeam && drawingDur > DUR_4)) {
+    if (!inBeam && (drawingDur > DUR_1)) {
         int yMax, yMin;
         chord->GetYExtremes(&yMax, &yMin);
         
