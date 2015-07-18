@@ -902,7 +902,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     int drawingDur = chord->GetDur();
     
-    //(unless we're in a beam)
+    //(unless we're in a beam or whole notes)
     if (!inBeam && (drawingDur > DUR_1)) {
         int yMax, yMin;
         chord->GetYExtremes(&yMax, &yMin);
@@ -1408,8 +1408,28 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if ( accid->m_parent ) {
         accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
     }
+    
+    /************** editorial accidental **************/
+    
     if ( accid->GetFunc() == FUNC_edit ) {
-        accid->SetDrawingY( staff->GetDrawingY() + TEMP_STYLE_ACCID_EDIT_SPACE * m_doc->m_drawingUnit[staff->staffSize] / PARAM_DENOMINATOR );
+        // position is currently only above the staff
+        int y = staff->GetDrawingY();
+        // look at the note position and adjust it if necessary
+        Note *note = dynamic_cast<Note*>( accid->GetFirstParent( &typeid(Note), MAX_ACCID_DEPTH ) );
+        if ( note ) {
+            if ( note->GetDrawingY() > y ) {
+                y = note->GetDrawingY() + m_doc->m_drawingUnit[staff->staffSize];
+            }
+            if ( (note->m_drawingStemDir == STEMDIRECTION_up) && (note->m_drawingStemEnd.y > y )) {
+                y = note->m_drawingStemEnd.y;
+            }
+            
+            // adjust the x position so it is centered
+            int radius = m_doc->m_drawingNoteRadius[staff->staffSize][note->m_cueSize];
+            if ( note->GetActualDur() < DUR_2 ) radius += radius/3;
+            accid->SetDrawingX( accid->GetDrawingX() + radius / 2 );
+        }
+        accid->SetDrawingY( y + TEMP_STYLE_ACCID_EDIT_SPACE * m_doc->m_drawingUnit[staff->staffSize] / PARAM_DENOMINATOR );
     }
     
     int x = accid->GetDrawingX();

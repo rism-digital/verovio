@@ -319,16 +319,14 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	/* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
     
 	startingY = (s_y - beamSlope * s_x) / elementCount;
-
+    
     /******************************************************************/
     // Start the Beam graphic and draw the children
     
     dc->StartGraphic( element, "", element->GetUuid() );
-    
-    DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
-    // Calculate the stem lengths and draw them
+    // Calculate the stem lengths
 
     double oldYPos; //holds y position before calculation to determine if beam needs extra height
     double expectedY;
@@ -363,14 +361,24 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         el->m_drawingStemStart.y = fy2;
         el->m_drawingStemEnd.y = fy1;
         el->m_drawingStemDir = stemDir;
-        
-        if((el->IsNote() && ! dynamic_cast<Note*>(el)->IsChordTone()) || el->IsChord()){
-            DrawVerticalLine (dc,fy2, fy1, (*beamElementCoords)[i]->m_x, m_doc->m_style->m_stemWidth);
-        }
 	}
+    
+    
+    /******************************************************************/
+    // Draw the children
+    
+    DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
-    // Draw the beam full bars
+    // Draw the stems and the beam full bars
+    
+    for (i=0; i<elementCount; i++)
+    {
+        LayerElement *el = (*beamElementCoords)[i]->m_element;
+        if((el->IsNote() && !dynamic_cast<Note*>(el)->IsChordTone()) || el->IsChord()) {
+            DrawVerticalLine (dc, el->m_drawingStemStart.y, el->m_drawingStemEnd.y, el->m_drawingStemStart.x, m_doc->m_style->m_stemWidth);
+        }
+    }
     
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
