@@ -356,6 +356,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             fy2 = (*beamElementCoords)[i]->m_yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
         }
         
+        // All notes and chords, including notes within chords, get their stem value stored
         LayerElement *el = (*beamElementCoords)[i]->m_element;
         el->m_drawingStemStart.x = el->m_drawingStemEnd.x = (*beamElementCoords)[i]->m_x;
         el->m_drawingStemStart.y = fy2;
