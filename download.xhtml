@@ -25,6 +25,14 @@ $ sudo make install
 				</p>
 				{% highlight bash %}$ ./verovio --help{% endhighlight %}
 				
+				<p>
+					For building it without Plain and Easy support (without <code>regex.h</code>), run:
+				</p>
+
+{% highlight bash %}
+$ cmake . -DNO_PAE_SUPPORT=OFF
+{% endhighlight %}
+
 				<h5>Building with XCode</h5>
 				<p>
 					For OS X users, there is also an XCode 4 project in the Verovio root directory.
@@ -67,6 +75,14 @@ $ python setup.py build_ext --inplace
 $ cd python
 $ python setup.py build_ext
 $ sudo python setup.py install
+{% endhighlight %}
+
+				<p>
+					For building it without Plain and Easy support (without <code>regex.h</code>), run:
+				</p>
+
+{% highlight bash %}
+$ python setup.py build_ext --inplace --define NO_PAE_SUPPORT
 {% endhighlight %}
 
 			</div>
