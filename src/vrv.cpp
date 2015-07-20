@@ -466,7 +466,9 @@ std::string GetFilename( std::string fullpath )
 }
     
 std::string GetVersion() {
-    return StringFormat("%d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, GIT_COMMIT );
+    std::string dev;
+    if (VERSION_DEV) dev = "-dev";
+    return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT );
 }
 
 } // namespace vrv

@@ -49,7 +49,9 @@ typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
     
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 8
+#define VERSION_REVISION 9
+// Adds "-dev" in the version number - should be set to false for releases
+#define VERSION_DEV true
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
