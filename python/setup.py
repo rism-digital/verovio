@@ -82,7 +82,7 @@ verovio_module = Extension('_verovio',
                 extra_compile_args=['-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field'])
 
 setup (name = 'verovio',
-       version = '0.9.4',
+       version = '0.9.9',
        url      = "www.verovio.org",
        description = """A library and toolkit for engraving MEI music notation into SVG""",
        ext_modules = [verovio_module],

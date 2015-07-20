@@ -4,11 +4,17 @@ project(Verovio)
 
 SET(CMAKE_BUILD_TYPE Release)
 
+option(NO_PAE_SUPPORT "Disable Plain and Easy support" OFF)
+
 add_definitions(-g)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
 include_directories(/usr/local/include ../include ../include/vrv ../libmei)
+
+if(NO_PAE_SUPPORT)
+  add_definitions(-DNO_PAE_SUPPORT)
+endif()
 
 add_executable (verovio 
 	main.cpp

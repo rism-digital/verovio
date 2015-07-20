@@ -32,8 +32,9 @@
 
 //----------------------------------------------------------------------------
 
-
+#ifndef NO_PAE_SUPPORT
 #include <regex.h>
+#endif
 
 namespace vrv {
 
@@ -83,24 +84,31 @@ PaeInput::~PaeInput()
 
 bool PaeInput::ImportFile()
 {
-    
+#ifndef NO_PAE_SUPPORT
     std::ifstream infile;
     infile.open(m_filename.c_str());
-    
     parsePlainAndEasy(infile);
-    
     return true;
+#else
+    LogError("Plain and Easy import is not supported in the build.");
+    return false;
+#endif
 }
 
 bool PaeInput::ImportString(std::string pae)
 {
-    
+#ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
-    
     parsePlainAndEasy(in_stream);
-    
     return true;
+#else
+    LogError("Plain and Easy import is not support in the build.");
+    return false;
+#endif
+
 }
+    
+#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////
 //
@@ -1324,5 +1332,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
         break;
     }
 }
+
+#endif // NO_PAE_SUPPORT
 
 } // namespace vrv
