@@ -86,7 +86,7 @@ void display_usage() {
     
     cerr << " -o, --outfile=FILE_NAME    Output file name (use \"-\" for standard output)" << endl;
     
-    cerr << " -r, --recources=PATH       Path to SVG resources (default is " <<  vrv::Resources::GetPath() << ")" << endl;
+    cerr << " -r, --resources=PATH       Path to SVG resources (default is " <<  vrv::Resources::GetPath() << ")" << endl;
     
     cerr << " -s, --scale=FACTOR         Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
     
@@ -101,7 +101,7 @@ void display_usage() {
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura and Gootville are also available)" << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig; Bravura and Gootville are also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
     
