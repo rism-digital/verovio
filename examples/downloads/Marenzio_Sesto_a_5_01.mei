@@ -311,7 +311,7 @@
                         <staffGrp symbol="line">
                             <staffGrp n="1" symbol="bracket">
                                 <staffDef clef.line="2" clef.shape="G" key.mode="major" key.sig="0" label="Canto" label.abbr="C" lines="5" n="1" xml:id="sd1"/>
-                                <staffDef clef.line="2" clef.shape="G" key.mode="major" key.sig="0" label="Quinto" label.abbr="Q" lines="5" n="2" xml:id="sd2"/>
+                                <staffDef clef.line="3" clef.shape="C" key.mode="major" key.sig="0" label="Quinto" label.abbr="Q" lines="5" n="2" xml:id="sd2"/>
                                 <staffDef clef.dis="8" clef.dis.place="below" clef.line="2" clef.shape="G" key.mode="major" key.sig="0" label="Alto" label.abbr="A" lines="5" n="3" xml:id="sd3"/>
                                 <staffDef clef.dis="8" clef.dis.place="below" clef.line="2" clef.shape="G" key.mode="major" key.sig="0" label="Tenore" label.abbr="T" lines="5" n="4" xml:id="sd4"/>
                                 <staffDef clef.line="4" clef.shape="F" key.mode="major" key.sig="0" label="Basso" label.abbr="B" lines="5" n="5" xml:id="sd5"/>
