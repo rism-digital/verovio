@@ -202,7 +202,7 @@ public:
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params );
     
 
-    virtual int IdealHorizSpace(double intervalTime, bool isMensural);
+    virtual int HorizontalSpaceForDuration(double intervalTime, bool isMensural);
 
     /**
      * Set the position of the Alignment.

@@ -365,7 +365,7 @@ notation (CMN), this is a function of the interval; for short intervals, it may 
 be enough to keep consecutive symbols from overlapping. For mensural notation, ideal
 spacing is as tight as possible without overlapping and with just a bit of space
 between symbols. */
-int Alignment::IdealHorizSpace(double intervalTime, bool isMensural)
+int Alignment::HorizontalSpaceForDuration(double intervalTime, bool isMensural)
 {
     int intervalXRel = 0;
     if (isMensural)
@@ -388,7 +388,7 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid params )
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
-    if ( intervalTime > 0.0 ) intervalXRel = IdealHorizSpace(intervalTime, true);   // ??2ND PARAM = IS MENSURAL!
+    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, true);   // ??2ND PARAM = IS MENSURAL!
     
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
