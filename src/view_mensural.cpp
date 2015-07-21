@@ -88,18 +88,17 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     else if (drawingDur < DUR_1) {
         DrawMaximaToBrevis( dc, noteY, element, layer, staff);
     }
-    // Whole notes ??WE WANT SEMIBREVIS'ES, NOT WHOLE NOTES!!! CHANGE THIS, AND SIMILARLY FOR SHORTER DURATIONS!!!!!!!!
     else if (drawingDur == DUR_1) {
-        if (note->GetColored()==BOOLEAN_true)
+        if (note->GetColored())
             fontNo = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
         else
             fontNo = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
         
         DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
     }
-    // Other values
-    else {
-        if (note->GetColored()==BOOLEAN_true) {
+    // Other values ??WE WANT MENSURAL NOTEHEADS, NOT CMN!!!!!!!!
+   else {
+        if (note->GetColored()) {
             if (drawingDur == DUR_2) fontNo = SMUFL_E0A4_noteheadBlack;
             else fontNo = SMUFL_E0A3_noteheadHalf;
         }
@@ -455,7 +454,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      yy2 = y2;
      y5 = y1+ m_doc->m_drawingDoubleUnit[staff->staffSize]; y2 += m_doc->m_drawingDoubleUnit[staff->staffSize];	// on monte d'un INTERL
      
-     if (note->GetColored()==BOOLEAN_true)
+     if (note->GetColored())
      DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingDoubleUnit[staff->staffSize]);
      else
      {	DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, 5);
