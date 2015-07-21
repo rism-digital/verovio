@@ -359,6 +359,23 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
+    
+/* Compute "ideal" horizontal space to allow for a given time interval. For modern
+notation (CMN), this is a function of the interval; for short intervals, it may not
+be enough to keep consecutive symbols from overlapping. For mensural notation, ideal
+spacing is as tight as possible without overlapping and with just a bit of space
+between symbols. */
+int Alignment::IdealHorizSpace(double intervalTime, bool isMensural)
+{
+    int intervalXRel = 0;
+    if (isMensural)
+        intervalXRel = 20;           // ??EXPERIMENTAL! A very small value => space as tightly as possible
+    else
+        intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
+    return intervalXRel;
+}
+
+    
 int Alignment::SetAligmentXPos( ArrayPtrVoid params )
 {
     // param 0: the previous time position
@@ -371,16 +388,7 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid params )
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
-    if ( intervalTime > 0.0 ) {
-        // Compute "ideal" horizontal space to allow. For modern notation (CMN),
-        // this is a function of time (duration); we may increase it later to
-        // keep symbols from overlapping. For mensural notation, ideal spacing is
-        // as tight as possible without overlapping.
-        if (true)                      // ??TEMPORARY!
-            intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value
-        else
-            intervalXRel = 20;           // ??EXPERIMENTAL! A very small value => space as tightly as possible
-   }
+    if ( intervalTime > 0.0 ) intervalXRel = IdealHorizSpace(intervalTime, true);   // ??2ND PARAM = IS MENSURAL!
     
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
