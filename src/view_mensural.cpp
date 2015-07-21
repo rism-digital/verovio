@@ -23,14 +23,7 @@
 #include "staff.h"
 #include "style.h"
 
-namespace vrv {    
-
-    enum {
-        SMUFL_E938_mensNoteheadSemibrevisBlack,
-        SMUFL_E939_mensNoteheadSemibrevisVoid,
-        SMUFL_E93C_mensNoteheadMinimaWhite,
-        SMUFL_E93D_mensNoteheadSemiminimaWhite	// for fusa as well as semiminima
-    };
+namespace vrv {
 
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
@@ -98,9 +91,9 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     // Whole notes ??WE WANT SEMIBREVIS'ES, NOT WHOLE NOTES!!! CHANGE THIS, AND SIMILARLY FOR SHORTER DURATIONS!!!!!!!!
     else if (drawingDur == DUR_1) {
         if (note->GetColored()==BOOLEAN_true)
-            fontNo = SMUFL_E938_mensNoteheadSemibrevisBlack;
+            fontNo = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
         else
-            fontNo = SMUFL_E939_mensNoteheadSemibrevisVoid;
+            fontNo = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
         
         DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
     }
@@ -203,7 +196,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
 }
 
 /* The entire mensuration sign fits easily between two staff lines, so the radius is considerably less
-   than half the distance between them. ??HOW MUCH LESS? WHERE SHOULD THESE REALLY BE SET, doc.h? */
+   than half the distance between them. ??HOW MUCH LESS? THESE PROBABLY BELONG IN style.h . */
 #define CIRCLE_RADIUS_FACTOR 0.32
 /* Set default vertical position as distance below the top of the staff of center of the circle */
 #define STAFFLINES_BELOW_TOP 1.5
