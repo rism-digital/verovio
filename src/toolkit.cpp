@@ -68,6 +68,12 @@ Toolkit::~Toolkit()
         free( m_cString );
     }
 }
+    
+bool Toolkit::SetResourcePath( const std::string &path )
+{
+    Resources::SetPath( path );
+    return Resources::InitFonts();
+};
 
 bool Toolkit::SetBorder( int border )
 {

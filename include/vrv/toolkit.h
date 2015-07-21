@@ -46,6 +46,12 @@ public:
     Toolkit( bool initFont = true );
     virtual ~Toolkit();
     ///@}
+
+    /**
+     * Set the resource path. To be called if the constructor had initFont=false.
+     * This needs refactoring.
+     */
+    bool SetResourcePath( const std::string &path );
     
     /**
      * Load a file with the specified type.
