@@ -194,19 +194,23 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
 }
 
-/* The entire mensuration sign fits easily between two staff lines, so the radius is considerably less
-   than half the distance between them. ??HOW MUCH LESS? THESE PROBABLY BELONG IN style.h . */
-#define CIRCLE_RADIUS_FACTOR 0.32
-/* Set default vertical position as distance below the top of the staff of center of the circle */
-#define STAFFLINES_BELOW_TOP 1.5
+/* Set size of mensuration sign circle relative to space between staff lines. The entire mensuration sign fits easily between two staff lines, so the radius is considerably less than half the distance between them.
+    ??THESE #defines PROBABLY BELONG IN style.h . */
+#define MCIRCLE_RADIUS_FACTOR 0.32
+/* Set default vertical position of mensuration sign circle as distance below the top of the staff for center
+ of the circle */
+#define MCIRCLE_STAFFLINES_BELOW_TOP 1.5
+/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
+#define MENSUR_DOTSIZE 0.15
+
     
 void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc ); // DC cannot be NULL
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * MCIRCLE_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-    r = (int)(CIRCLE_RADIUS_FACTOR*r);
+    r = (int)(MCIRCLE_RADIUS_FACTOR*r);
     
     int lineWidth = (int)(m_doc->m_style->m_staffLineWidth * 0.5);
     dc->SetPen( m_currentColour, lineWidth, AxSOLID );
@@ -225,9 +229,9 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * MCIRCLE_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-    r = (int)(CIRCLE_RADIUS_FACTOR*r);
+    r = (int)(MCIRCLE_RADIUS_FACTOR*r);
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
@@ -262,14 +266,11 @@ void View::DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff
     return;
 }
 
-/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
-#define MENSUR_DOTSIZE 0.15
-    
 void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc ); // DC cannot be NULL
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * MCIRCLE_STAFFLINES_BELOW_TOP);
     int r = m_doc->m_drawingUnit[staff->staffSize] * MENSUR_DOTSIZE;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
