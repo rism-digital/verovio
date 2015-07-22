@@ -88,12 +88,12 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     else if (drawingDur < DUR_1) {
         DrawMaximaToBrevis( dc, noteY, element, layer, staff);
     }
-    // Whole notes
+    // Whole notes ??WE WANT SEMIBREVIS'ES, NOT WHOLE NOTES!!! CHANGE THIS, AND SIMILARLY FOR SHORTER DURATIONS!!!!!!!!
     else if (drawingDur == DUR_1) {
         if (note->GetColored()==BOOLEAN_true)
-            fontNo = SMUFL_E0FA_noteheadWholeFilled;
+            fontNo = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
         else
-            fontNo = SMUFL_E0A2_noteheadWhole;
+            fontNo = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
         
         DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
     }
