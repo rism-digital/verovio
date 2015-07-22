@@ -229,9 +229,9 @@ public:
   
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** Half a the space between to staff lines for normal and small staff */
+    /** Half of the space between two staff lines for normal and small staff */
     int m_drawingUnit[2];
-    /** Space between to staff lines for normal and small staff */
+    /** Space between two staff lines for normal and small staff */
     int m_drawingDoubleUnit[2];
     /** Height of a five line staff for normal and small staff */
     int m_drawingStaffSize[2];

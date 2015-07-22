@@ -86,7 +86,7 @@ void display_usage() {
     
     cerr << " -o, --outfile=FILE_NAME    Output file name (use \"-\" for standard output)" << endl;
     
-    cerr << " -r, --recources=PATH       Path to SVG resources (default is " <<  vrv::Resources::GetPath() << ")" << endl;
+    cerr << " -r, --resources=PATH       Path to SVG resources (default is " <<  vrv::Resources::GetPath() << ")" << endl;
     
     cerr << " -s, --scale=FACTOR         Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
     
@@ -101,7 +101,7 @@ void display_usage() {
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig, Bravura and Gootville are also available)" << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig; Bravura and Gootville are also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
     
@@ -296,13 +296,13 @@ int main(int argc, char** argv)
     // Make sure the user uses a valid Resource path
     // Save many headaches for empty SVGs
     if(!dir_exists(vrv::Resources::GetPath())) {
-        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found, please use -r option." << endl;
+        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option." << endl;
         exit(1);
     }
 
     // Loaded the music font from the resource diretory
     if (!Resources::InitFonts()) {
-        cerr << "The music font could not be loaded, please verify the content of the directory." << endl;
+        cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
         exit(1);
     }
     
@@ -313,7 +313,7 @@ int main(int argc, char** argv)
     }
 
     if (outformat != "svg" && outformat != "mei") {
-        cerr << "Output format can only be: mei svg" << endl;
+        cerr << "Output format can only be 'mei' or 'svg'." << endl;
         exit(1);
     }
     
@@ -342,24 +342,24 @@ int main(int argc, char** argv)
             data_stream << line << endl;
         }
         if ( !toolkit.LoadString( data_stream.str() ) ) {
-            cerr << "The input could not be loaded" << endl;
+            cerr << "The input could not be loaded." << endl;
             exit(1);
         }
     }
     else {
         if ( !toolkit.LoadFile( infile ) ) {
-            cerr << "The file '" << infile << "' could not be open" << endl;
+            cerr << "The file '" << infile << "' could not be opened." << endl;
             exit(1);
         }
     }
 
     // Check the page range
     if (page > toolkit.GetPageCount()) {
-        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount() << ")" << endl;
+        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount() << ")." << endl;
         exit(1);
     }
     if (page < 1) {
-        cerr << "The page number has to be greater than 0" << endl;
+        cerr << "The page number has to be greater than 0." << endl;
         exit(1);
     }
     

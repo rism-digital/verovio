@@ -88,18 +88,17 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     else if (drawingDur < DUR_1) {
         DrawMaximaToBrevis( dc, noteY, element, layer, staff);
     }
-    // Whole notes ??WE WANT SEMIBREVIS'ES, NOT WHOLE NOTES!!! CHANGE THIS, AND SIMILARLY FOR SHORTER DURATIONS!!!!!!!!
     else if (drawingDur == DUR_1) {
-        if (note->GetColored()==BOOLEAN_true)
+        if (note->GetColored())
             fontNo = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
         else
             fontNo = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
         
         DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
     }
-    // Other values
-    else {
-        if (note->GetColored()==BOOLEAN_true) {
+    // Other values ??WE WANT MENSURAL NOTEHEADS, NOT CMN!!!!!!!!
+   else {
+        if (note->GetColored()) {
             if (drawingDur == DUR_2) fontNo = SMUFL_E0A4_noteheadBlack;
             else fontNo = SMUFL_E0A3_noteheadHalf;
         }
@@ -195,15 +194,26 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
 }
 
+/* Set size of mensuration sign circle relative to space between staff lines. The entire mensuration sign fits easily between two staff lines, so the radius is considerably less than half the distance between them.
+    ??THESE #defines PROBABLY BELONG IN style.h . */
+#define MCIRCLE_RADIUS_FACTOR 0.32
+/* Set default vertical position of mensuration sign circle as distance below the top of the staff for center
+ of the circle */
+#define MCIRCLE_STAFFLINES_BELOW_TOP 1.5
+/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
+#define MENSUR_DOTSIZE 0.15
 
+    
 void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc ); // DC cannot be NULL
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * MCIRCLE_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    r = (int)(MCIRCLE_RADIUS_FACTOR*r);
     
-    dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
+    int lineWidth = (int)(m_doc->m_style->m_staffLineWidth * 0.5);
+    dc->SetPen( m_currentColour, lineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
     dc->DrawCircle( ToDeviceContextX(x), y, r );
@@ -219,8 +229,9 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * MCIRCLE_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    r = (int)(MCIRCLE_RADIUS_FACTOR*r);
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
@@ -259,8 +270,8 @@ void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc ); // DC cannot be NULL
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-    int r = m_doc->m_drawingUnit[staff->staffSize] * 2 / 3;
+    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * MCIRCLE_STAFFLINES_BELOW_TOP);
+    int r = m_doc->m_drawingUnit[staff->staffSize] * MENSUR_DOTSIZE;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -444,7 +455,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      yy2 = y2;
      y5 = y1+ m_doc->m_drawingDoubleUnit[staff->staffSize]; y2 += m_doc->m_drawingDoubleUnit[staff->staffSize];	// on monte d'un INTERL
      
-     if (note->GetColored()==BOOLEAN_true)
+     if (note->GetColored())
      DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingDoubleUnit[staff->staffSize]);
      else
      {	DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, 5);
