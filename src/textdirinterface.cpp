@@ -58,7 +58,7 @@ TempoInterface::~TempoInterface()
 
 void TempoInterface::Reset()
 {
-    TempoInterface::Reset();
+    TextDirInterface::Reset();
 }
     
 } // namespace vrv

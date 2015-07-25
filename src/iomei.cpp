@@ -36,6 +36,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "textdirective.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -168,6 +169,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (dynamic_cast<Slur*>(object)) {
         m_currentNode = m_currentNode.append_child("slur");
         WriteMeiSlur( m_currentNode, dynamic_cast<Slur*>(object) );
+    }
+    else if (dynamic_cast<MeasureTempo*>(object)) {
+        m_currentNode = m_currentNode.append_child("tempo");
+        WriteMeiTempo( m_currentNode, dynamic_cast<MeasureTempo*>(object) );
     }
     else if (dynamic_cast<Tie*>(object)) {
         m_currentNode = m_currentNode.append_child("tie");
@@ -662,6 +667,14 @@ void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
     WriteText( currentNode, syl );
     return;
 }
+
+void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, MeasureTempo *tempo )
+{
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tempo ).c_str();
+    WriteTempoInterface(currentNode, tempo);
+    WriteText( currentNode, tempo );
+    return;
+}
     
 void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *interface)
 {
@@ -684,6 +697,18 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface 
 void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInterface *interface)
 {
     interface->WriteStafflocPitched(element);
+}
+    
+void MeiOutput::WriteTempoInterface( pugi::xml_node element, vrv::TempoInterface *interface)
+{
+    WriteTextDirInterface(element, interface);
+}
+
+void MeiOutput::WriteTextDirInterface(pugi::xml_node element, vrv::TextDirInterface *interface)
+{
+    interface->WriteCommon(element);
+    interface->WritePlacement(element);
+    interface->WriteStaffident(element);
 }
     
 void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, vrv::TimeSpanningInterface *interface)
@@ -1296,11 +1321,14 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
                 LogWarning( "<tupletSpan> not readable as <tuplet> and ignored" );
             }
         }
-        else if ( std::string( current.name() ) == "tie" ) {
-            success = ReadMeiTie( parent, current );
-        }
         else if ( std::string( current.name() ) == "slur" ) {
             success = ReadMeiSlur( parent, current );
+        }
+        else if ( std::string( current.name() ) == "tempo" ) {
+            success = ReadMeiMeasureTempo( parent, current );
+        }
+        else if ( std::string( current.name() ) == "tie" ) {
+            success = ReadMeiTie( parent, current );
         }
         else {
             LogWarning("Unsupported '<%s>' within <measure>", current.name() );
@@ -1756,6 +1784,19 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }
+    
+bool MeiInput::ReadMeiMeasureTempo(Object *parent, pugi::xml_node tempo)
+{
+    MeasureTempo *vrvMeasureTempo = new MeasureTempo();
+    SetMeiUuid(tempo, vrvMeasureTempo);
+    
+    ReadTempoInterface(tempo, vrvMeasureTempo);
+    ReadText( tempo, vrvMeasureTempo );
+    
+    AddMeasureElement(parent, vrvMeasureTempo);
+    
+    return true;
+}
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
 {
@@ -1780,6 +1821,20 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStafflocPitched(element);
+    return true;
+}
+    
+bool MeiInput::ReadTempoInterface(pugi::xml_node element, TempoInterface *interface)
+{
+    ReadTextDirInterface(element, interface);
+    return true;
+}
+    
+bool MeiInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
+{
+    interface->ReadCommon(element);
+    interface->ReadPlacement(element);
+    interface->ReadStaffident(element);
     return true;
 }
     

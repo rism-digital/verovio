@@ -23,8 +23,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MeasureTempo::MeasureTempo():
-    MeasureElement(),
-    TempoInterface()
+    MeasureElement("tempo-"), TempoInterface()
 {
     Reset();
 }
