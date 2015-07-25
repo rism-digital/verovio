@@ -180,6 +180,25 @@ void Rdg::Reset()
 {
     EditorialElement::Reset();
 }
+    
+//----------------------------------------------------------------------------
+// Supplied
+//----------------------------------------------------------------------------
+
+Supplied::Supplied( ):
+    EditorialElement("supplied-")
+{
+    Reset();
+}
+
+Supplied::~Supplied()
+{
+}
+
+void Supplied::Reset()
+{
+    EditorialElement::Reset();
+}
 
 //----------------------------------------------------------------------------
 // Annot

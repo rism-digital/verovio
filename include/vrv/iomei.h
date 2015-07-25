@@ -47,6 +47,7 @@ class ScoreDef;
 class Slur;
 class Space;
 class Staff;
+class Supplied;
 class Syl;
 class System;
 class TempoInterface;
@@ -156,6 +157,7 @@ private:
     bool WriteMeiApp( pugi::xml_node currentNode, App *app );
     bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
     bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
+    bool WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied );
     bool WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot );
     ///@}
     
@@ -328,14 +330,15 @@ private:
     ///@}
   
     /**
-     * @name Methods for reading critical apparatus.
-     * Only one child of <app> is loaded
+     * @name Methods for reading critical apparatus, other editorial markup and <annot>.
      * The filter is propagated (if any)
      */
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiEditorialChildren( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
     ///@}
     ///@}

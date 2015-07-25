@@ -184,6 +184,34 @@ public:
     
 private:
     
+};    
+
+//----------------------------------------------------------------------------
+// Supplied
+//----------------------------------------------------------------------------
+
+class Supplied: public EditorialElement
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Supplied();
+    virtual ~Supplied();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Supplied"; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
 };
     
 //----------------------------------------------------------------------------
