@@ -9,6 +9,7 @@
 #ifndef __VRV_TEXT_DIRECTIVE_H__
 #define __VRV_TEXT_DIRECTIVE_H__
 
+#include "measureelement.h"
 #include "textdirinterface.h"
 
 namespace vrv {

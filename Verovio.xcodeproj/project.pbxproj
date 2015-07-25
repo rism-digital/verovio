@@ -46,6 +46,12 @@
 		4D9C53141B52E4AE0003C6EC /* utf8.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9C53101B52E4AE0003C6EC /* utf8.h */; };
 		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
+		4DA60EE01B6307A8006E2DFC /* textdirective.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA60EDE1B6307A8006E2DFC /* textdirective.h */; };
+		4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */; };
+		4DA60EE41B6307B9006E2DFC /* textdirective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE21B6307B9006E2DFC /* textdirective.cpp */; };
+		4DA60EE51B6307B9006E2DFC /* textdirective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE21B6307B9006E2DFC /* textdirective.cpp */; };
+		4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */; };
+		4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */; };
 		4DA80D961A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
 		4DA80D971A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
 		4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3072E1AC9ED2500EE0982 /* space.cpp */; };
@@ -228,11 +234,15 @@
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
 		4D9A9C1B199F576100028D93 /* syl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = syl.h; path = include/vrv/syl.h; sourceTree = "<group>"; };
 		4D9A9C1D19A1DE2000028D93 /* syl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = syl.cpp; path = src/syl.cpp; sourceTree = "<group>"; };
-		4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = git_commit.h; path = include/vrv/git_commit.h; sourceTree = SOURCE_ROOT; };
 		4D9C530D1B52E4AE0003C6EC /* checked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = checked.h; path = include/utf8/checked.h; sourceTree = "<group>"; };
 		4D9C530E1B52E4AE0003C6EC /* core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = core.h; path = include/utf8/core.h; sourceTree = "<group>"; };
 		4D9C530F1B52E4AE0003C6EC /* unchecked.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unchecked.h; path = include/utf8/unchecked.h; sourceTree = "<group>"; };
 		4D9C53101B52E4AE0003C6EC /* utf8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = utf8.h; path = include/utf8.h; sourceTree = "<group>"; };
+		4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = git_commit.h; path = include/vrv/git_commit.h; sourceTree = SOURCE_ROOT; };
+		4DA60EDE1B6307A8006E2DFC /* textdirective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textdirective.h; path = include/vrv/textdirective.h; sourceTree = "<group>"; };
+		4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textdirinterface.h; path = include/vrv/textdirinterface.h; sourceTree = "<group>"; };
+		4DA60EE21B6307B9006E2DFC /* textdirective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirective.cpp; path = src/textdirective.cpp; sourceTree = "<group>"; };
+		4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirinterface.cpp; path = src/textdirinterface.cpp; sourceTree = "<group>"; };
 		4DA80D941A6940120089802D /* style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = style.h; path = include/vrv/style.h; sourceTree = "<group>"; };
 		4DA80D951A6ACF5D0089802D /* style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = style.cpp; path = src/style.cpp; sourceTree = "<group>"; };
 		4DB3072D1AC9ED1800EE0982 /* space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space.h; path = include/vrv/space.h; sourceTree = "<group>"; };
@@ -426,6 +436,8 @@
 				8F59292718854BF800FE51AD /* positioninterface.h */,
 				4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */,
 				4DF289FC1A7545CC00BA9F7D /* timeinterface.h */,
+				4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */,
+				4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */,
 			);
 			name = interfaces;
 			sourceTree = "<group>";
@@ -531,6 +543,8 @@
 				4D1D733B1A1D0390001E08F6 /* smufl.h */,
 				4DA80D951A6ACF5D0089802D /* style.cpp */,
 				4DA80D941A6940120089802D /* style.h */,
+				4DA60EE21B6307B9006E2DFC /* textdirective.cpp */,
+				4DA60EDE1B6307A8006E2DFC /* textdirective.h */,
 				8F086EBF188539540037FD8E /* toolkit.cpp */,
 				8F59291618854BF800FE51AD /* toolkit.h */,
 			);
@@ -677,6 +691,7 @@
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
+				4DA60EE01B6307A8006E2DFC /* textdirective.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
@@ -704,6 +719,7 @@
 				4D22C41C18890E9900D0831F /* mrest.h in Headers */,
 				4D22C42418891FC000D0831F /* pugixml.hpp in Headers */,
 				4D22C42518891FC300D0831F /* pugiconfig.hpp in Headers */,
+				4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */,
 				4D9C53121B52E4AE0003C6EC /* core.h in Headers */,
 				4D763EC91987D067003FCAB5 /* metersig.h in Headers */,
 				4D422101199805E400963292 /* att.h in Headers */,
@@ -806,6 +822,7 @@
 				8F086EE2188539540037FD8E /* aligner.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
+				4DA60EE41B6307B9006E2DFC /* textdirective.cpp in Sources */,
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
@@ -852,6 +869,7 @@
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C42018891D6D00D0831F /* pugixml.cpp in Sources */,
+				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
@@ -892,6 +910,7 @@
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
 				8F3DD34418854B2E0051330C /* keysig.cpp in Sources */,
 				4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */,
+				4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
 				8F3DD34A18854B2E0051330C /* multirest.cpp in Sources */,
@@ -912,6 +931,7 @@
 				8F3DD32418854B090051330C /* io.cpp in Sources */,
 				8F3DD32618854B090051330C /* iodarms.cpp in Sources */,
 				4DF2AF811A62FC4A0016F869 /* drawinglistinterface.cpp in Sources */,
+				4DA60EE51B6307B9006E2DFC /* textdirective.cpp in Sources */,
 				8F3DD32818854B090051330C /* iomei.cpp in Sources */,
 				8F3DD32A18854B090051330C /* iomusxml.cpp in Sources */,
 				8F3DD32C18854B090051330C /* iopae.cpp in Sources */,

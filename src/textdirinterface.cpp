@@ -14,9 +14,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "layerelement.h"
-#include "staff.h"
-#include "vrv.h"
 
 namespace vrv {
 
@@ -25,7 +22,9 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 TextDirInterface::TextDirInterface():
-    AttCommon()
+    AttCommon(),
+    AttPlacement(),
+    AttStaffident()
 {
     Reset();
 }
@@ -37,7 +36,9 @@ TextDirInterface::~TextDirInterface()
     
 void TextDirInterface::Reset()
 {
-    AttCommon::Reset();
+    ResetCommon();
+    ResetPlacement();
+    ResetStaffident();
 }
         
 //----------------------------------------------------------------------------

@@ -24,7 +24,9 @@ namespace vrv {
  * It is not an abstract class but should not be instanciate directly.
  */
 class TextDirInterface:
-    public AttCommon
+    public AttCommon,
+    public AttPlacement,
+    public AttStaffident
 {
 public:
     /**
@@ -57,7 +59,7 @@ private:
  * MeasureElement or LayerElement in MeasureTempo and LayerTempo respectively
  * It is not an abstract class but should not be instanciate directly.
  */
-class TempoInterface: public TextDirInterface,
+class TempoInterface: public TextDirInterface
 {
 public:
     /**
