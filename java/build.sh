@@ -60,6 +60,8 @@ FILES="../src/accid.cpp \
              ../src/svgdevicecontext.cpp \
              ../src/syl.cpp \
              ../src/system.cpp \
+             ../src/textdirective.cpp \
+             ../src/textdirinterface.cpp \
              ../src/tie.cpp \
              ../src/timeinterface.cpp \
              ../src/toolkit.cpp \
