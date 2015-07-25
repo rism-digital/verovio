@@ -359,6 +359,16 @@ enum data_PLACE {
     PLACE_above,
     PLACE_below
 };
+    
+/**
+ * MEI data.STAFFREL
+ */
+enum data_STAFFREL {
+    STAFFREL_NONE = 0,
+    STAFFREL_above,
+    STAFFREL_below,
+    STAFFREL_within
+};
 
 /**
  * MEI data.STEMDIRECTION

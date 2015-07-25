@@ -4154,13 +4154,13 @@ AttPlacement::~AttPlacement() {
 }
 
 void AttPlacement::ResetPlacement() {
-    m_place = "";
+    m_place = STAFFREL_NONE;
 }
 
 bool AttPlacement::ReadPlacement(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("place")) {
-        this->SetPlace(StrToStr(element.attribute("place").value()));
+        this->SetPlace(StrToStaffRel(element.attribute("place").value()));
         element.remove_attribute("place");
         hasAttribute = true;
     }
@@ -4170,7 +4170,7 @@ bool AttPlacement::ReadPlacement(  pugi::xml_node element ) {
 bool AttPlacement::WritePlacement(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasPlace()) {
-        element.append_attribute("place") = StrToStr(this->GetPlace()).c_str();
+        element.append_attribute("place") = StaffRelToStr(this->GetPlace()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4178,7 +4178,7 @@ bool AttPlacement::WritePlacement(  pugi::xml_node element ) {
 
 bool AttPlacement::HasPlace( )
 {
-    return (m_place != "");
+    return (m_place != STAFFREL_NONE);
 }
 
 
@@ -7698,7 +7698,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (dynamic_cast<AttPlacement*>(element) ) {
         AttPlacement *att = dynamic_cast<AttPlacement*>(element);
         if (attrType == "place") {
-            att->SetPlace(att->StrToStr(attrValue));
+            att->SetPlace(att->StrToStaffRel(attrValue));
             return true;
         }
     }
@@ -8866,7 +8866,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttPlacement*>(element) ) {
         AttPlacement *att = dynamic_cast<AttPlacement*>(element);
         if (att->HasPlace()) {
-            attributes->push_back(std::make_pair("place", att->StrToStr(att->GetPlace())));
+            attributes->push_back(std::make_pair("place", att->StaffRelToStr(att->GetPlace())));
         }
     }
     if (dynamic_cast<AttPlist*>(element) ) {

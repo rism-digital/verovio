@@ -170,6 +170,9 @@ public:
     
     std::string ProlatioToStr(data_PROLATIO data);
     data_PROLATIO StrToProlatio(std::string value);
+
+    std::string StaffRelToStr(data_STAFFREL data);
+    data_STAFFREL StrToStaffRel(std::string value);
     
     std::string StemDirectionToStr(data_STEMDIRECTION data);
     data_STEMDIRECTION StrToStemDirection(std::string value);

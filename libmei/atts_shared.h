@@ -3604,8 +3604,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPlace(std::string place_) { m_place = place_; };
-    std::string GetPlace() const { return m_place; };    
+    void SetPlace(data_STAFFREL place_) { m_place = place_; };
+    data_STAFFREL GetPlace() const { return m_place; };    
     bool HasPlace( );
     
     ///@}
@@ -3615,7 +3615,7 @@ private:
      * Captures the placement of the item with respect to the staff with which it is
      * associated.
      **/
-    std::string m_place;
+    data_STAFFREL m_place;
 
 /* include <attplace> */
 };

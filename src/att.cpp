@@ -828,6 +828,35 @@ data_PROLATIO Att::StrToProlatio(std::string value)
     return PROLATIO_NONE;
 }
 
+std::string Att::StaffRelToStr( data_STAFFREL data )
+{
+    std::string value;
+    switch(data)
+    {
+        case STAFFREL_above : value = "above"; break;
+        case STAFFREL_below : value = "below"; break;
+        case STAFFREL_within : value = "within"; break;
+        default:
+            LogWarning("Unknown staffrel '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STAFFREL Att::StrToStaffRel(std::string value)
+{
+    if (value == "below") return STAFFREL_below;
+    else if (value == "above") return STAFFREL_above;
+    else if (value == "within") return STAFFREL_within;
+    else {
+        LogWarning("Unsupported staffrel '%s'", value.c_str() );
+    }
+    // default
+    return STAFFREL_NONE;
+}
+
+
 std::string Att::StemDirectionToStr(data_STEMDIRECTION data)
 {
     std::string value;
