@@ -183,7 +183,7 @@ if [ $? -eq 0 ]; then
 	if [ "$WEBWORKER" = true ]; then
 		cat build/verovio.js verovio-proxy.js > "build/$FILENAME"
 	else
-		cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
+		cat build/verovio.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
 	fi
 	# all good
 	echo "build/$FILENAME written"

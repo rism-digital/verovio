@@ -417,7 +417,8 @@ Object *Object::GetFirstChild( const std::type_info *elementType )
     int i;
     for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++)
     {
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( typeid(*o) == *elementType )
         {
             return *iter;
         }
@@ -447,7 +448,8 @@ Object *Object::GetNextSibling( const std::type_info *elementType )
         if ( !elementType ) {
             return *iter;
         }
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( typeid(*o) == *elementType )
         {
             return *iter;
         }
@@ -477,7 +479,8 @@ Object *Object::GetPreviousSibling( const std::type_info *elementType )
         if ( !elementType ) {
             return *iter;
         }
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( typeid(*o) == *elementType )
         {
             return *iter;
         }
@@ -560,7 +563,8 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
             for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
                 // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                 // the attribute (see below)
-                if ((*attComparisonIter)->GetType() == &typeid(**iter)) {
+                Object *o = *iter;
+                if ((*attComparisonIter)->GetType() == &typeid(*o)) {
                     hasAttComparison = true;
                     break;
                 }
