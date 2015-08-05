@@ -760,18 +760,21 @@ bool MeiOutput::WriteMeiApp( pugi::xml_node currentNode, App *app )
 bool MeiOutput::WriteMeiLem( pugi::xml_node currentNode, Lem *lem )
 {
     WriteEditorialElement(currentNode, lem);
+    lem->WriteSource( currentNode );
     return true;
 };
 
 bool MeiOutput::WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg )
 {
     WriteEditorialElement(currentNode, rdg);
+    rdg->WriteSource( currentNode );
     return true;
 };
     
 bool MeiOutput::WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied )
 {
     WriteEditorialElement(currentNode, supplied);
+    supplied->WriteSource( currentNode );
     return true;
 };
 
@@ -1964,10 +1967,10 @@ bool MeiInput::ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, Ed
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if (!success) break;
         if ( std::string( current.name() ) == "lem" ) {
-            success = ReadMeiLemOrRdg( parent, current, level, filter);
+            success = ReadMeiLem( parent, current, level, filter);
         }
         else if ( std::string( current.name() ) == "rdg" ) {
-            success = ReadMeiLemOrRdg( parent, current, level, filter);
+            success = ReadMeiRdg( parent, current, level, filter);
         }
         else {
             LogWarning("Unsupported '<%s>' within <app>", current.name() );
@@ -1997,32 +2000,44 @@ bool MeiInput::ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, Ed
     return success;
 }
     
-bool MeiInput::ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter )
-
+bool MeiInput::ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter )
 {
     assert( dynamic_cast<App*>( parent ) );
     
-    EditorialElement *vrvLemOrRdg;
-    if ( std::string( lemOrRdg.name() ) == "lem" ) {
-        vrvLemOrRdg = new Lem();
-    }
-    else {
-        vrvLemOrRdg = new Rdg();
-    }
+    Lem *vrvLem = new Lem();
     // By default make them all hidden. MeiInput::ReadMeiAppChildren will make one visible.
-    vrvLemOrRdg->m_visibility = Hidden;
+    vrvLem->m_visibility = Hidden;
     
-    ReadEditorialElement( lemOrRdg, vrvLemOrRdg );
-    dynamic_cast<App*>( parent )->AddLemOrRdg(vrvLemOrRdg);
+    ReadEditorialElement( lem, vrvLem );
+    vrvLem->ReadSource( lem );
     
-    return ReadMeiEditorialChildren(vrvLemOrRdg, lemOrRdg, level, filter);
+    dynamic_cast<App*>( parent )->AddLemOrRdg( vrvLem );
+    
+    return ReadMeiEditorialChildren(vrvLem, lem, level, filter);
 }
 
+bool MeiInput::ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter )
+{
+    assert( dynamic_cast<App*>( parent ) );
+    
+    Rdg *vrvRdg = new Rdg();
+    // By default make them all hidden. MeiInput::ReadMeiAppChildren will make one visible.
+    vrvRdg->m_visibility = Hidden;
+    
+    ReadEditorialElement( rdg, vrvRdg );
+    vrvRdg->ReadSource( rdg );
+    
+    dynamic_cast<App*>( parent )->AddLemOrRdg(vrvRdg);
+    
+    return ReadMeiEditorialChildren(vrvRdg, rdg, level, filter);
+}
+    
 bool MeiInput::ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter )
 {
     Supplied *vrvSupplied = new Supplied();;
     
     ReadEditorialElement( supplied, vrvSupplied );
+    vrvSupplied->ReadSource( supplied );
     parent->AddEditorialElement(vrvSupplied);
     
     return ReadMeiEditorialChildren(vrvSupplied, supplied, level, filter);

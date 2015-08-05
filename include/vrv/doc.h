@@ -212,11 +212,6 @@ public:
      */
     Style *m_style;
     
-    /** 
-     * The source id. Exact use to be clarified.
-     */
-    std::string m_source;
-    
     /**
      * Holds the top scoreDef.
      * In a standard MEI file, this is the <scoreDef> encoded before the first <section>.

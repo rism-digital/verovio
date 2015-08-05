@@ -134,7 +134,8 @@ private:
 // Lem
 //----------------------------------------------------------------------------
 
-class Lem: public EditorialElement
+class Lem: public EditorialElement,
+    public AttSource
 {
 public:
     /**
@@ -162,7 +163,8 @@ private:
 // Rdg
 //----------------------------------------------------------------------------
 
-class Rdg: public EditorialElement
+class Rdg: public EditorialElement,
+    public AttSource
 {
 public:
     /**
@@ -190,7 +192,8 @@ private:
 // Supplied
 //----------------------------------------------------------------------------
 
-class Supplied: public EditorialElement
+class Supplied: public EditorialElement,
+    public AttSource
 {
 public:
     /**
