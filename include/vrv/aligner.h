@@ -24,12 +24,14 @@ class MeasureAligner;
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
+    // Non-justiable
     ALIGNMENT_MEASURE_START = 0,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF_ATTR,
     ALIGNMENT_KEYSIG_ATTR,
     ALIGNMENT_MENSUR_ATTR,
     ALIGNMENT_METERSIG_ATTR,
+    // Justifiable
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
