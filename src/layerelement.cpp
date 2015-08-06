@@ -139,6 +139,10 @@ LayerElement *LayerElement::GetChildCopy( bool newUuid )
 void LayerElement::ResetHorizontalAlignment()
 {
     m_drawingX = 0;
+    m_alignment = NULL;
+    if ( this->IsNote() ) {
+        dynamic_cast<Note*>(this)->ResetGraceAlignment();
+    }
 }
     
 bool LayerElement::IsAccid( )

@@ -83,6 +83,7 @@ public:
     Alignment *GetGraceAlignment();
     void SetGraceAlignment( Alignment *graceAlignment );
     bool HasGraceAlignment( ) { return (m_graceAlignment != NULL); };
+    void ResetGraceAlignment( ) { m_graceAlignment = NULL; };
     ///@}
     
     /**
