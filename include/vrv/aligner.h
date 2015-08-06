@@ -13,9 +13,13 @@
 
 namespace vrv {
 
-class SystemAligner;
-class StaffAlignment;
+class GraceAligner;
 class MeasureAligner;
+class Note;
+class StaffAlignment;
+class SystemAligner;
+
+
 
 /**
  * Alignment types for aligning types together.
@@ -156,7 +160,6 @@ private:
     int m_verseCount;
 };
 
-
 //----------------------------------------------------------------------------
 // Alignment
 //----------------------------------------------------------------------------
@@ -178,8 +181,11 @@ public:
     void SetXShift( int xShift );
     int GetXShift() { return m_xShift; };
     
-    void SetMaxWidth( int max_width );
+    void SetMaxWidth( int maxWidth );
     int GetMaxWidth() { return m_maxWidth; };
+    
+    void SetMaxLeftSide( int maxLeftSide );
+    int GetMaxLeftSide() { return m_maxLeftSide; };
 
     /**
      * @name Set and get the time value of the alignment
@@ -196,6 +202,23 @@ public:
     void SetType( AlignmentType type ) { m_type = type; };
     AlignmentType GetType() { return m_type; };
     ///@}
+    
+    /**
+     * Returns the GraceAligner for the Alignment.
+     * Creates it if necessary.
+     */
+    GraceAligner *GetGraceAligner( );
+    
+    /**
+     * Returns true if the aligner has a GraceAligner
+     */
+    bool HasGraceAligner( ) { return (m_graceAligner != NULL); };
+    
+    /**
+     * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
+     * Special case that redirects the functor to the GraceAligner.
+     */
+    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params );
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
@@ -240,6 +263,10 @@ private:
      */
     int m_maxWidth;
     /**
+     * Stores the maximum left side bearing (distance between the left-most point and the x-rel)
+     */
+    int m_maxLeftSide;
+    /**
      * Stores the time at which the alignment occur.
      * It is set by Object::AlignHorizontally.
      */
@@ -252,6 +279,11 @@ private:
      * of them occur at time 0.
      */
     AlignmentType m_type;
+    /**
+     * A pointer to a GraceAligner if any.
+     * The Algnment owns it.
+     */
+    GraceAligner *m_graceAligner;
     
 };
 
@@ -347,6 +379,59 @@ private:
      * Store the measure non justifiable margin used by the scoreDef attributes.
      */
     int m_nonJustifiableLeftMargin;
+};
+    
+//----------------------------------------------------------------------------
+// GraceAligner
+//----------------------------------------------------------------------------
+
+/**
+ * This class aligns the content of a grace note group
+ * It contains a vector of Alignment
+ */
+class GraceAligner: public MeasureAligner
+{
+public:
+    // constructors and destructors
+    GraceAligner( );
+    virtual ~GraceAligner();
+    
+    /**
+     * Because the grace notes appear from left to right but need to be aligned
+     * from right to left, we first need to stack them and align them eventually 
+     * when we have all of them. This is done by GraceAligner::AlignNote called 
+     * at the end of each Layer in
+     */
+    void StackNote( Note *note );
+    
+    /**
+     * Align the notes in the reverse order
+     */
+    void AlignStack( );
+    
+    /**
+     * @name Setter and getter for the width ofthe group of grace notes
+     */
+    ///@{
+    void SetWidth( int totalWidth ) { m_totalWidth = totalWidth; };
+    int GetWidth( ) { return m_totalWidth; };
+    ///@}
+    
+private:
+    
+public:
+    
+private:
+    /**
+     * The stack of notes where the are piled up before getting aligned
+     */
+    ArrayOfObjects m_noteStack;
+    /**
+     * The witdth of the group of grace notes instanciated after the bounding
+     * boxes X are integrated in Alignment::IntegrateBoundingBoxGraceXShift
+     */
+    int m_totalWidth;
+    
 };
 
 } // namespace vrv

@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "note.h"
 #include "style.h"
 #include "vrv.h"
 
@@ -173,10 +174,13 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
             // they will all have their own alignment. We need something more sophisticated that takes
             // care of the staff/layer number (or using the layer uuid?)
             if ( (alignment->GetType() == ALIGNMENT_DEFAULT) && (type == ALIGNMENT_GRACENOTE) ) {
-                idx = i;
-                break;
+                return alignment;
             }
-            else if ( (alignment->GetType() == type) && (type != ALIGNMENT_GRACENOTE) ) {
+            else if ( (alignment->GetType() == ALIGNMENT_GRACENOTE) && (type == ALIGNMENT_DEFAULT) ) {
+                //alignment->SetType(ALIGNMENT_DEFAULT);
+                return alignment;
+            }
+            else if (alignment->GetType() == type) {
                 return alignment;
             }
             else if ( alignment->GetType() > type ) {
@@ -207,6 +211,40 @@ void MeasureAligner::SetMaxTime( double time )
         m_rightAlignment->SetTime( time );
     }
 }
+    
+//----------------------------------------------------------------------------
+// GraceAligner
+//----------------------------------------------------------------------------
+
+GraceAligner::GraceAligner():
+    MeasureAligner()
+{
+    m_totalWidth = 0;
+}
+
+GraceAligner::~GraceAligner()
+{
+    
+}
+    
+void GraceAligner::StackNote( Note *note )
+{
+    m_noteStack.push_back( note );
+}
+    
+void GraceAligner::AlignStack( )
+{
+    int i;
+    double time = 0.0;
+    for (i = (int)m_noteStack.size(); i > 0; i--) {
+        Note *note = dynamic_cast<Note*>( m_noteStack[i-1] );
+        // get the duration of the event
+        double duration = note->LayerElement::GetAlignmentDuration( NULL, NULL, false );
+        time -= duration;
+        note->SetGraceAlignment( this->GetAlignmentAtTime( time, ALIGNMENT_DEFAULT ) );
+    }
+    m_noteStack.clear();
+}
 
 //----------------------------------------------------------------------------
 // Alignement
@@ -218,8 +256,10 @@ Alignment::Alignment( ):
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
+    m_maxLeftSide = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
+    m_graceAligner = NULL;
 }
 
 Alignment::Alignment( double time, AlignmentType type ):
@@ -228,12 +268,17 @@ Alignment::Alignment( double time, AlignmentType type ):
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
+    m_maxLeftSide = 0;
     m_time = time;
     m_type = type;
+    m_graceAligner = NULL;
 }
 
 Alignment::~Alignment()
 {
+    if (m_graceAligner) {
+        delete m_graceAligner;
+    }
     
 }
 
@@ -244,18 +289,32 @@ void Alignment::SetXRel( int x_rel )
 
 void Alignment::SetXShift( int xShift )
 {
-    if ( xShift > m_xShift )
-    {
+    if ( xShift > m_xShift ) {
         m_xShift = xShift;
     }
 }
 
-void Alignment::SetMaxWidth( int max_width )
+void Alignment::SetMaxWidth( int maxWidth )
 {
-    if ( max_width > m_maxWidth )
-    {
-        m_maxWidth = max_width;
+    if ( maxWidth > m_maxWidth ) {
+        m_maxWidth = maxWidth;
     }
+}
+
+void Alignment::SetMaxLeftSide( int maxLeftSide )
+{
+    if ( maxLeftSide > m_maxLeftSide ) {
+        LogDebug("Max left size %d", maxLeftSide);
+        m_maxLeftSide = maxLeftSide;
+    }
+}
+    
+GraceAligner *Alignment::GetGraceAligner( )
+{
+    if (!m_graceAligner) {
+        m_graceAligner = new GraceAligner( );
+    }
+    return m_graceAligner;
 }
 
 //----------------------------------------------------------------------------
@@ -318,6 +377,30 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
     // Reset the cumulated shift to 0;
     (*shift) = 0;
     (*justifiable_shift) = -1;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Alignment::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params )
+{
+    if (!m_graceAligner) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    int i;
+    int shift = 0;
+    for (i = 0; i < (int)m_graceAligner->m_children.size(); i++) {
+        Alignment *alignment = dynamic_cast<Alignment*>(m_graceAligner->m_children[i]);
+        alignment->SetXRel( alignment->GetXShift() + shift );
+        shift += alignment->GetXShift();
+    }
+    
+    // Set the total width by looking at the position and maximum width of the last alignment
+    if ( m_graceAligner->m_children.empty() ) {
+        return FUNCTOR_CONTINUE;
+    }
+    Alignment *alignment = dynamic_cast<Alignment*>(m_graceAligner->m_children.back());
+    m_graceAligner->SetWidth( alignment->GetXRel() + alignment->GetMaxWidth() );
     
     return FUNCTOR_CONTINUE;
 }

@@ -133,7 +133,8 @@ void Page::LayOutHorizontally( )
     params.push_back( &currentMensur );
     params.push_back( &currentMeterSig );
     Functor alignHorizontally( &Object::AlignHorizontally );
-    this->Process( &alignHorizontally, params );
+    Functor alignHorizontallyEnd( &Object::AlignHorizontallyEnd );
+    this->Process( &alignHorizontally, params, &alignHorizontallyEnd );
     
     // Set the X position of each Alignment
     // Does a duration-based non linear spacing looking at the duration space between two Alignment objects
@@ -147,7 +148,7 @@ void Page::LayOutHorizontally( )
     Functor setAlignmentX( &Object::SetAligmentXPos );
     // Special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentX );
-    this->Process( &setAlignmentX, params );
+    //this->Process( &setAlignmentX, params );
     
     // Render it for filling the bounding boxing
     View view;
@@ -156,6 +157,23 @@ void Page::LayOutHorizontally( )
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage( this->GetIdx(), false );
     view.DrawCurrentPage(  &bb_dc, false );
+
+    // Adjust the X shift of the Alignment looking at the bounding boxes
+    // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
+    params.clear();
+    int grace_min_pos = 0;
+    params.push_back( &grace_min_pos );
+    params.push_back( doc );
+    Functor setBoundingBoxGraceXShift( &Object::SetBoundingBoxGraceXShift );
+    this->Process( &setBoundingBoxGraceXShift, params );
+    
+    // Integrate the X bounding box shift of the elements
+    // Once the m_xShift have been calculated, move all positions accordingly
+    params.clear();
+    Functor integrateBoundingBoxGraceXShift( &Object::IntegrateBoundingBoxGraceXShift );
+    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    params.push_back( &integrateBoundingBoxGraceXShift );
+    this->Process( &integrateBoundingBoxGraceXShift, params );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping

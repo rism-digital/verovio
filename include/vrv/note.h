@@ -77,6 +77,15 @@ public:
     ///@}
     
     /**
+     * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
+     */
+    ///@{
+    Alignment *GetGraceAlignment();
+    void SetGraceAlignment( Alignment *graceAlignment );
+    bool HasGraceAlignment( ) { return (m_graceAlignment != NULL); };
+    ///@}
+    
+    /**
      * Overriding functions to return information from chord parent if 
      * note is direct child of a chord.
      */
@@ -127,17 +136,6 @@ public:
     
 private:
     
-protected:
-    
-    /**
-     * @name Tie attributes are represented a pointers to Tie objects.
-     * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and take care of deleting it
-     */
-    ///@{
-    Tie *m_drawingTieAttr;
-    ///@}
-    
 public:
     /** indicates if the appoggiatura is slashed (i.e. it is an acciaccatura)
      used with cueSize = true */
@@ -163,9 +161,17 @@ public:
      */
     bool m_isDrawingAccidAttr;
     
-
-    
 private:
+    /**
+     * Tie attributes are represented a pointers to Tie objects.
+     * There is one pointer for the initial attribute (TIE_i or TIE_m).
+     * The note with the initial attribute owns the Tie object and take care of deleting it
+     */
+    Tie *m_drawingTieAttr;
+    /**
+     * An alignment for grace notes
+     */
+    Alignment *m_graceAlignment;
     
 };
 

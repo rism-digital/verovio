@@ -152,6 +152,11 @@ public:
      * Align horizontally the content of a layer.
      */
     virtual int AlignHorizontally( ArrayPtrVoid params );
+
+    /**
+     * Align horizontally the content of a layer.
+     */
+    virtual int AlignHorizontallyEnd( ArrayPtrVoid params );
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers

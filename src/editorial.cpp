@@ -148,7 +148,8 @@ void App::AddLemOrRdg(EditorialElement *child)
 //----------------------------------------------------------------------------
 
 Lem::Lem( ):
-    EditorialElement("lem-")
+    EditorialElement("lem-"),
+    AttSource()
 {
     Reset();
 }
@@ -160,6 +161,7 @@ Lem::~Lem()
 void Lem::Reset()
 {
     EditorialElement::Reset();
+    ResetSource();
 }
 
 //----------------------------------------------------------------------------
@@ -167,7 +169,8 @@ void Lem::Reset()
 //----------------------------------------------------------------------------
 
 Rdg::Rdg( ):
-    EditorialElement("rdg-")
+    EditorialElement("rdg-"),
+    AttSource()
 {
     Reset();
 }
@@ -179,6 +182,7 @@ Rdg::~Rdg()
 void Rdg::Reset()
 {
     EditorialElement::Reset();
+    ResetSource();
 }
     
 //----------------------------------------------------------------------------
@@ -186,7 +190,8 @@ void Rdg::Reset()
 //----------------------------------------------------------------------------
 
 Supplied::Supplied( ):
-    EditorialElement("supplied-")
+    EditorialElement("supplied-"),
+    AttSource()
 {
     Reset();
 }
@@ -198,6 +203,7 @@ Supplied::~Supplied()
 void Supplied::Reset()
 {
     EditorialElement::Reset();
+    ResetSource();
 }
 
 //----------------------------------------------------------------------------

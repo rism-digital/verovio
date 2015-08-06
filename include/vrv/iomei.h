@@ -336,7 +336,8 @@ private:
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiLemOrRdg( Object *parent, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiEditorialChildren( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );

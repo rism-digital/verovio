@@ -362,6 +362,11 @@ public:
     virtual int AlignHorizontally( ArrayPtrVoid params );
     
     /**
+     * For each Layer, align the grace note stacked in GraceAlignment
+     */
+    virtual int AlignHorizontallyEnd( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * param 0: the cumulated shift
      */
@@ -377,6 +382,12 @@ public:
      * Correct the X alignment once the the content of a system has been aligned and laid out
      * See Measure::IntegrateBoundingBoxXShift for actual implementation
      */
+    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Correct the X alignment once the the content of a system has been aligned and laid out
+     * See Measure::IntegrateBoundingBoxXShift for actual implementation
+     */
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };    
     
     /**
@@ -384,6 +395,12 @@ public:
      * Looks at the time different with the previous Alignment.
      */
     virtual int SetAligmentXPos( ArrayPtrVoid params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Lay out the X positions of the grace notes looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxGraceXShift( ArrayPtrVoid params );
     
     /**
      * Lay out the X positions of the staff content looking that the bounding boxes.

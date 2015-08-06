@@ -374,6 +374,7 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     // param 0: the measureAligner (unused)
     // param 1: the time
     // param 2: the current Mensur
+    // param 3: the current MeterSig
     double *time = static_cast<double*>(params[1]);
     Mensur **currentMensur = static_cast<Mensur**>(params[2]);
     MeterSig **currentMeterSig = static_cast<MeterSig**>(params[3]);
@@ -400,6 +401,25 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
         m_currentMeterSig->AlignHorizontally( params );
     }
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::AlignHorizontallyEnd( ArrayPtrVoid params )
+{
+    // param 0: the measureAligner
+    // param 1: the time  (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
+    
+    int i;
+    for(i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
+        Alignment *alignment = dynamic_cast<Alignment*>((*measureAligner)->m_children[i]);
+        if (alignment && alignment->HasGraceAligner()) {
+            alignment->GetGraceAligner()->AlignStack();
+        }
+    }
+    
     return FUNCTOR_CONTINUE;
 }
     

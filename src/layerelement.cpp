@@ -275,9 +275,9 @@ void LayerElement::AdjustPname( int *pname, int *oct )
 	}
 }
 
-double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig )
+double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, bool notGraceOnly )
 {
-    if ( this->IsGraceNote() ) {
+    if ( this->IsGraceNote() && notGraceOnly ) {
         return 0.0;
     }
     
@@ -376,7 +376,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
         type = ALIGNMENT_MULTIREST;
     }
     else if ( this->IsGraceNote() ) {
-        type = ALIGNMENT_GRACENOTE;
+        //type = ALIGNMENT_GRACENOTE;
     }
     else if ( this->IsBeam() || this->IsTuplet() || this->IsVerse() || this->IsSyl() ) {
         type = ALIGNMENT_CONTAINER;
@@ -391,6 +391,11 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
     (*measureAligner)->SetMaxTime( (*time) + duration );
     
     m_alignment = (*measureAligner)->GetAlignmentAtTime( *time, type );
+    
+    if ( this->IsGraceNote() ) {
+        GraceAligner *graceAligner = m_alignment->GetGraceAligner();
+        graceAligner->StackNote( dynamic_cast<Note*>(this) );
+    }
     
     //LogDebug("Time %f - %s", (*time), this->GetClassName().c_str() );
     
@@ -446,6 +451,12 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
         if ( this->m_xAbs == VRV_UNSET ) {
             assert( doc->GetType() == Raw );
             this->SetDrawingX( this->GetXRel() + (*currentMeasure)->GetDrawingX() );
+            // Grace notes, also take into account the GraceAlignment
+            Note *note = dynamic_cast<Note*>(this);
+            if (note && note->HasGraceAlignment() ) {
+                this->SetDrawingX( this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
+                                  + note->GetGraceAlignment()->GetXRel() - note->GetAlignment()->GetMaxLeftSide() );
+            }
         }
         else
         {

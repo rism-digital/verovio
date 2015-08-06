@@ -76,6 +76,7 @@ void Note::Reset()
     d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
+    m_graceAlignment = NULL;
 }
 
 void Note::AddLayerElement(vrv::LayerElement *element)
@@ -88,6 +89,18 @@ void Note::AddLayerElement(vrv::LayerElement *element)
     Modify();
 }
 
+Alignment* Note::GetGraceAlignment(  )
+{
+    assert(m_graceAlignment);
+    return m_graceAlignment;
+}
+
+void Note::SetGraceAlignment( Alignment *graceAlignment )
+{
+    assert(!m_graceAlignment && graceAlignment);
+    m_graceAlignment = graceAlignment;
+}
+    
 void Note::SetDrawingTieAttr(  )
 {
     assert(!this->m_drawingTieAttr);
@@ -124,12 +137,10 @@ Chord* Note::IsChordTone()
 int Note::GetDrawingDur( )
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    if( chordParent )
-    {
+    if( chordParent ) {
         return chordParent->GetActualDur();
     }
-    else
-    {
+    else {
         return GetActualDur();
     }
 }
@@ -151,16 +162,13 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
-    if( chordParent )
-    {
+    if( chordParent ) {
         return chordParent->GetDrawingStemDir();
     }
-    else if( beamParent )
-    {
+    else if( beamParent ) {
         return beamParent->GetDrawingStemDir();
     }
-    else
-    {
+    else {
         return this->GetStemDir();
     }
 }
@@ -240,8 +248,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid params )
     Note **currentNote = static_cast<Note**>(params[0]);
     
     this->ResetDrawingAccid();
-    if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE)
-    {
+    if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
         this->m_isDrawingAccidAttr = true;
         this->m_drawingAccid = new Accid();
         this->m_drawingAccid->SetOloc(this->GetOct());

@@ -105,6 +105,11 @@ public:
     
     int GetXRel();
     
+    /**
+     * Returns the duration if the child element has a DurationInterface
+     */
+    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true );
+    
     //----------//
     // Functors //
     //----------//
@@ -123,12 +128,6 @@ public:
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
     virtual int SetDrawingXY( ArrayPtrVoid params );
-    
-protected:
-    /**
-     * Returns the duration if the child element has a DurationInterface
-     */
-    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL );
     
 private:
     

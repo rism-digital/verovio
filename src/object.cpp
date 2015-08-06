@@ -417,7 +417,8 @@ Object *Object::GetFirstChild( const std::type_info *elementType )
     int i;
     for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++)
     {
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( typeid(*o) == *elementType )
         {
             return *iter;
         }
@@ -447,7 +448,8 @@ Object *Object::GetNextSibling( const std::type_info *elementType )
         if ( !elementType ) {
             return *iter;
         }
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( typeid(*o) == *elementType )
         {
             return *iter;
         }
@@ -477,7 +479,8 @@ Object *Object::GetPreviousSibling( const std::type_info *elementType )
         if ( !elementType ) {
             return *iter;
         }
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( typeid(*o) == *elementType )
         {
             return *iter;
         }
@@ -560,7 +563,8 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
             for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
                 // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                 // the attribute (see below)
-                if ((*attComparisonIter)->GetType() == &typeid(**iter)) {
+                Object *o = *iter;
+                if ((*attComparisonIter)->GetType() == &typeid(*o)) {
                     hasAttComparison = true;
                     break;
                 }
@@ -1053,6 +1057,62 @@ int Object::AlignVertically( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid params )
+{
+    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 1: the Doc
+    int *min_pos = static_cast<int*>(params[0]);
+    Doc *doc = static_cast<Doc*>(params[1]);
+    
+    // starting an new layer
+    Layer *current_layer = dynamic_cast<Layer*>(this);
+    if ( current_layer  ) {
+        (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
+    }
+    
+    Note *note = dynamic_cast<Note*>(this);
+    if ( !note  ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if (!note->IsGraceNote()) {
+        (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // we should have processed aligned before
+    assert( note->GetGraceAlignment() );
+    
+    // the negative offset it the part of the bounding box that overflows on the left
+    // |____x_____|
+    //  ---- = negative offset
+    //int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+    int negative_offset = - note->m_contentBB_x1;
+    if ( (*min_pos) > 0 ) {
+        //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+    }
+    
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    if ( negative_offset < 0 ) negative_offset = 0;
+    
+    // check if the element overlaps with the preceeding one given by (*min_pos)
+    int overlap = (*min_pos) - note->GetGraceAlignment()->GetXRel() + negative_offset;
+    
+    if ( (note->GetGraceAlignment()->GetXRel() - negative_offset) < (*min_pos) ) {
+        note->GetGraceAlignment()->SetXShift( overlap );
+    }
+    
+    // the next minimal position if given by the right side of the bounding box + the spacing of the element
+    //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
+    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
+    //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
+    note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 );
+    
+    return FUNCTOR_CONTINUE;
+}
+
 
 int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
 {
@@ -1136,14 +1196,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
     int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
-    if ( negative_offset < 0 ) {
-        //LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
-        negative_offset = 0;
-    }
+    if ( negative_offset < 0 ) negative_offset = 0;
     
     if ( current->IsMRest() ) {
         // With MRest, the only thing we want to do it keep their with as possible measure with (if only MRest in all staves/layers)
@@ -1154,17 +1210,29 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
+    if (current->IsGraceNote()) {
+        current->GetAlignment()->SetXShift( current->GetAlignment()->GetGraceAligner()->GetWidth() );
+        //LogDebug("Grace group with %d notes", current->GetAlignment()->GetGraceAligner()->GetChildCount() );
+        return FUNCTOR_CONTINUE;
+    }
+    else {
+        current->GetAlignment()->SetMaxLeftSide( negative_offset );
+    }
+    
+    if (current->GetAlignment()->HasGraceAligner() && !current->IsGraceNote()) {
+        LogDebug("Has grace alignment, %s", current->GetClassName().c_str());
+        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
+    }
+    
     // check if the element overlaps with the preceeding one given by (*min_pos)
-    int overlap = 0;
-    overlap = (*min_pos) - current->GetAlignment()->GetXRel() + negative_offset;
+    int overlap = (*min_pos) - current->GetAlignment()->GetXRel() + negative_offset;
+    
     if ( (current->GetAlignment()->GetXRel() - negative_offset) < (*min_pos) ) {
-        overlap = (*min_pos) - current->GetAlignment()->GetXRel() + negative_offset;
-        // shift the current element
         current->GetAlignment()->SetXShift( overlap );
     }
     
     //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
-    
+
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
     current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );

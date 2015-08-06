@@ -117,6 +117,12 @@ public:
      * AlignVertically the content of a measure.
      */
     virtual int AlignVertically( ArrayPtrVoid params );
+
+    /**
+     * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
+     * Special case that redirects the functor to the GraceAligner.
+     */
+    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params );
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.

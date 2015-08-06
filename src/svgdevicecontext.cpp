@@ -17,6 +17,7 @@
 
 #include "doc.h"
 #include "glyph.h"
+#include "layerelement.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -180,7 +181,7 @@ void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
  
-    bool drawBoundingBox = false;
+    bool drawBoundingBox = true;
     if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
         SetPen( AxRED, 10, AxDOT_DASH );
@@ -194,6 +195,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y2 ) -
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ));
         }
+        
         EndGraphic( object, NULL );
         
         SetPen( AxBLUE, 10, AxDOT_DASH );
@@ -205,6 +207,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
                                 view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y2 ) -
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ));
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() ), view->ToDeviceContextY( object->GetDrawingY() ), 5, 300);
         }
         EndGraphic( object, NULL );
         
@@ -457,7 +460,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
     rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
-    //rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empy rectangles
+    rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empy rectangles
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)

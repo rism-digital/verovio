@@ -166,6 +166,16 @@ int Measure::AlignVertically( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
+int Measure::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params )
+{
+    // param 0: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxGraceXShift = static_cast<Functor*>(params[0]);
+    
+    m_measureAligner.Process( integrateBoundingBoxGraceXShift, params );
+    
+    return FUNCTOR_SIBLINGS;
+}
+    
 int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid params )
 {
     // param 0: the cumulated shift (unused)
