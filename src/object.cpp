@@ -1105,8 +1105,8 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid params )
     }
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
-    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
+    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
+    //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
     //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
     note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 );
     
@@ -1196,7 +1196,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+    int negative_offset = - (current->m_contentBB_x1);
+    if (!current->IsGraceNote()) negative_offset += (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
@@ -1210,28 +1211,32 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if (current->IsGraceNote()) {
-        current->GetAlignment()->SetXShift( current->GetAlignment()->GetGraceAligner()->GetWidth() );
-        //LogDebug("Grace group with %d notes", current->GetAlignment()->GetGraceAligner()->GetChildCount() );
-        return FUNCTOR_CONTINUE;
-    }
-    else {
-        current->GetAlignment()->SetMaxLeftSide( negative_offset );
-    }
-    
-    if (current->GetAlignment()->HasGraceAligner() && !current->IsGraceNote()) {
-        LogDebug("Has grace alignment, %s", current->GetClassName().c_str());
+    // with a grace note, also take into account the full with of the group given by the GraceAligner
+    if (current->GetAlignment()->HasGraceAligner()) {
         negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
     }
     
-    // check if the element overlaps with the preceeding one given by (*min_pos)
-    int overlap = (*min_pos) - current->GetAlignment()->GetXRel() + negative_offset;
+    int currentX = current->GetAlignment()->GetXRel();
+    // with grace note, take into account the position of the note in the grace group
+    if (current->IsGraceNote()) {
+        Note *note = dynamic_cast<Note*>(current);
+        currentX += note->GetGraceAlignment()->GetXRel();
+    }
     
-    if ( (current->GetAlignment()->GetXRel() - negative_offset) < (*min_pos) ) {
+    // check if the element overlaps with the preceeding one given by (*min_pos)
+    int overlap = (*min_pos) - currentX + negative_offset;
+    
+    if ( (currentX - negative_offset) < (*min_pos) ) {
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
+    // do not ajust the min pos and the max width since this is already handled by
+    // the GraceAligner
+    if ( current->IsGraceNote() ) {
+        (*min_pos) = current->GetAlignment()->GetXRel();
+        current->GetAlignment()->SetMaxWidth( 0 );
+        return FUNCTOR_CONTINUE;
+    }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
     (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;

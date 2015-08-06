@@ -395,7 +395,6 @@ int Doc::GetPageCount( )
 
 short Doc::GetLeftMargin( const std::type_info *elementType )
 {
-    return 0;
     if (typeid(Barline) == *elementType) return 5;
     else if (typeid(BarlineAttr) == *elementType) return 25;
     else if (typeid(Chord) == *elementType) return 10;
@@ -408,7 +407,6 @@ short Doc::GetLeftMargin( const std::type_info *elementType )
     
 short Doc::GetRightMargin( const std::type_info *elementType )
 {
-    return 0;
     if (typeid(Clef) == *elementType) return 30;
     else if (typeid(KeySig) == *elementType)  return 30;
     else if (typeid(Mensur) == *elementType) return 30;

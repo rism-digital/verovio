@@ -181,7 +181,7 @@ void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
  
-    bool drawBoundingBox = true;
+    bool drawBoundingBox = false;
     if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
     {
         SetPen( AxRED, 10, AxDOT_DASH );
@@ -460,7 +460,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
     rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
-    rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empy rectangles
+    //rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empty rectangles with bounding boxes
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)

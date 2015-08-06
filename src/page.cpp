@@ -148,7 +148,7 @@ void Page::LayOutHorizontally( )
     Functor setAlignmentX( &Object::SetAligmentXPos );
     // Special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentX );
-    //this->Process( &setAlignmentX, params );
+    this->Process( &setAlignmentX, params );
     
     // Render it for filling the bounding boxing
     View view;

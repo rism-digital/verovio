@@ -184,9 +184,6 @@ public:
     void SetMaxWidth( int maxWidth );
     int GetMaxWidth() { return m_maxWidth; };
     
-    void SetMaxLeftSide( int maxLeftSide );
-    int GetMaxLeftSide() { return m_maxLeftSide; };
-
     /**
      * @name Set and get the time value of the alignment
      */
@@ -263,10 +260,6 @@ private:
      */
     int m_maxWidth;
     /**
-     * Stores the maximum left side bearing (distance between the left-most point and the x-rel)
-     */
-    int m_maxLeftSide;
-    /**
      * Stores the time at which the alignment occur.
      * It is set by Object::AlignHorizontally.
      */
@@ -309,7 +302,7 @@ public:
      */
     virtual void Reset();
     
-    Alignment* GetAlignmentAtTime( double time, AlignmentType type );
+    Alignment* GetAlignmentAtTime( double time, AlignmentType type, bool hasEndAlignment = true );
     
     /**
      * Keep the maximum time of the measure.

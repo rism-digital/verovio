@@ -376,7 +376,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
         type = ALIGNMENT_MULTIREST;
     }
     else if ( this->IsGraceNote() ) {
-        //type = ALIGNMENT_GRACENOTE;
+        type = ALIGNMENT_GRACENOTE;
     }
     else if ( this->IsBeam() || this->IsTuplet() || this->IsVerse() || this->IsSyl() ) {
         type = ALIGNMENT_CONTAINER;
@@ -455,7 +455,7 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
             Note *note = dynamic_cast<Note*>(this);
             if (note && note->HasGraceAlignment() ) {
                 this->SetDrawingX( this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
-                                  + note->GetGraceAlignment()->GetXRel() - note->GetAlignment()->GetMaxLeftSide() );
+                                  + note->GetGraceAlignment()->GetXRel() );
             }
         }
         else

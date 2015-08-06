@@ -155,7 +155,7 @@ void MeasureAligner::AddAlignment( Alignment *alignment, int idx )
     }
 }
 
-Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
+Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type, bool hasEndAlignment )
 {
     int i;
     int idx = -1; // the index if we reach the end.
@@ -168,19 +168,7 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
         
         double alignment_time = alignment->GetTime();
         if ( vrv::AreEqual( alignment_time, time ) ) {
-            // we found a default alignment, but we are inserting a grace note (another layer)
-            // we need the grace note to be inserted before so we stop here
-            // this does not work when we have grace notes simultanously at different voices because
-            // they will all have their own alignment. We need something more sophisticated that takes
-            // care of the staff/layer number (or using the layer uuid?)
-            if ( (alignment->GetType() == ALIGNMENT_DEFAULT) && (type == ALIGNMENT_GRACENOTE) ) {
-                return alignment;
-            }
-            else if ( (alignment->GetType() == ALIGNMENT_GRACENOTE) && (type == ALIGNMENT_DEFAULT) ) {
-                //alignment->SetType(ALIGNMENT_DEFAULT);
-                return alignment;
-            }
-            else if (alignment->GetType() == type) {
+            if (alignment->GetType() == type) {
                 return alignment;
             }
             else if ( alignment->GetType() > type ) {
@@ -196,9 +184,10 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type )
     }
     // nothing found
     if ( idx == -1 ) {
-        // this is tricky! Because we want m_rightAlignment to always stay at the end,
+        // this is tricky! Because we want m_rightAlignment to always stay at the end (with hasEndAlignment),
         // we always to insert _before_ the last one - m_rightAlignment is added in Reset()
-        idx = GetAlignmentCount() - 1;
+        if ( hasEndAlignment ) idx = GetAlignmentCount() - 1;
+        else idx = GetAlignmentCount();
     }
     Alignment *newAlignement = new Alignment( time, type );
     AddAlignment( newAlignement, idx );
@@ -240,8 +229,10 @@ void GraceAligner::AlignStack( )
         Note *note = dynamic_cast<Note*>( m_noteStack[i-1] );
         // get the duration of the event
         double duration = note->LayerElement::GetAlignmentDuration( NULL, NULL, false );
+        // Time goes backward with grace notes
         time -= duration;
-        note->SetGraceAlignment( this->GetAlignmentAtTime( time, ALIGNMENT_DEFAULT ) );
+        // Set the hasEndAlignment to false with grace notes because we don't have an end-measure alignment
+        note->SetGraceAlignment( this->GetAlignmentAtTime( time, ALIGNMENT_DEFAULT, false ) );
     }
     m_noteStack.clear();
 }
@@ -256,7 +247,6 @@ Alignment::Alignment( ):
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
-    m_maxLeftSide = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
     m_graceAligner = NULL;
@@ -268,7 +258,6 @@ Alignment::Alignment( double time, AlignmentType type ):
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
-    m_maxLeftSide = 0;
     m_time = time;
     m_type = type;
     m_graceAligner = NULL;
@@ -298,14 +287,6 @@ void Alignment::SetMaxWidth( int maxWidth )
 {
     if ( maxWidth > m_maxWidth ) {
         m_maxWidth = maxWidth;
-    }
-}
-
-void Alignment::SetMaxLeftSide( int maxLeftSide )
-{
-    if ( maxLeftSide > m_maxLeftSide ) {
-        LogDebug("Max left size %d", maxLeftSide);
-        m_maxLeftSide = maxLeftSide;
     }
 }
     
