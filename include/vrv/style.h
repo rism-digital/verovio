@@ -43,7 +43,7 @@ namespace vrv {
 #define MIN_BARLINE_WIDTH 1.0
 #define MAX_BARLINE_WIDTH 8.0
     
-#define DEFAULT_STAFFLINE_WITDH 3.0
+#define DEFAULT_STAFFLINE_WITDH 2.0
 #define MIN_STAFFLINE_WIDTH 1.0
 #define MAX_STAFFLINE_WIDTH 8.0
     

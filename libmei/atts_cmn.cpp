@@ -725,14 +725,14 @@ AttGraced::~AttGraced() {
 }
 
 void AttGraced::ResetGraced() {
-    m_grace = "";
+    m_grace = GRACE_NONE;
     m_graceTime = "";
 }
 
 bool AttGraced::ReadGraced(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("grace")) {
-        this->SetGrace(StrToStr(element.attribute("grace").value()));
+        this->SetGrace(StrToGrace(element.attribute("grace").value()));
         element.remove_attribute("grace");
         hasAttribute = true;
     }
@@ -747,7 +747,7 @@ bool AttGraced::ReadGraced(  pugi::xml_node element ) {
 bool AttGraced::WriteGraced(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasGrace()) {
-        element.append_attribute("grace") = StrToStr(this->GetGrace()).c_str();
+        element.append_attribute("grace") = GraceToStr(this->GetGrace()).c_str();
         wroteAttribute = true;
     }
     if (this->HasGraceTime()) {
@@ -759,7 +759,7 @@ bool AttGraced::WriteGraced(  pugi::xml_node element ) {
 
 bool AttGraced::HasGrace( )
 {
-    return (m_grace != "");
+    return (m_grace != GRACE_NONE);
 }
 
 bool AttGraced::HasGraceTime( )
@@ -1873,7 +1873,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (dynamic_cast<AttGraced*>(element) ) {
         AttGraced *att = dynamic_cast<AttGraced*>(element);
         if (attrType == "grace") {
-            att->SetGrace(att->StrToStr(attrValue));
+            att->SetGrace(att->StrToGrace(attrValue));
             return true;
         }
         if (attrType == "graceTime") {
@@ -2165,7 +2165,7 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
     if (dynamic_cast<AttGraced*>(element) ) {
         AttGraced *att = dynamic_cast<AttGraced*>(element);
         if (att->HasGrace()) {
-            attributes->push_back(std::make_pair("grace", att->StrToStr(att->GetGrace())));
+            attributes->push_back(std::make_pair("grace", att->GraceToStr(att->GetGrace())));
         }
         if (att->HasGraceTime()) {
             attributes->push_back(std::make_pair("graceTime", att->StrToStr(att->GetGraceTime())));

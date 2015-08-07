@@ -249,8 +249,9 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     // since the number is slanted, move the center left
     // by 4 pixels so it seems more centered to the eye
     int txt_x = center.x - (txt_length / 2);
-    // we need to move down the figure of half of it height, which is about an accid width
-    int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][tuplet->m_cueSize];
+    // we need to move down the figure of half of it height, which is about an accid width;
+    // also, cue size is not supported. Does it has to?
+    int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][false];
     
     if (tuplet->GetNum()) {
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);

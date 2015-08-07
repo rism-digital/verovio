@@ -39,8 +39,8 @@ Style::Style()
      */
     m_smallStaffNum = 4;
     m_smallStaffDen = 5;
-    m_graceNum = 3;
-    m_graceDen = 4;
+    m_graceNum = 5;
+    m_graceDen = 7;
     
     m_pageHeight = DEFAULT_PAGE_HEIGHT * DEFINITON_FACTOR;
     m_pageWidth = DEFAULT_PAGE_WIDTH * DEFINITON_FACTOR;

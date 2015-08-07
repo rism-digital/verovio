@@ -664,8 +664,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGrace(std::string grace_) { m_grace = grace_; };
-    std::string GetGrace() const { return m_grace; };    
+    void SetGrace(data_GRACE grace_) { m_grace = grace_; };
+    data_GRACE GetGrace() const { return m_grace; };    
     bool HasGrace( );
     
     //
@@ -680,7 +680,7 @@ private:
      * Marks a note or chord as a "grace" (without a definitive written duration) and
      * records from which other note/chord it should "steal" time.
      **/
-    std::string m_grace;
+    data_GRACE m_grace;
     /** Records the amount of time to be "stolen" from a non-grace note/chord. **/
     std::string m_graceTime;
 

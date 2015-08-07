@@ -44,6 +44,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     int noteY = element->GetDrawingY();
     int xLedger, xNote, xStem;
     int drawingDur;
+    bool drawingCueSize;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
     int ledge;
@@ -53,14 +54,15 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     xLedger = xStem;
     
     drawingDur = note->GetDrawingDur();
+    drawingCueSize = note->HasGrace();
     
-    int radius = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
+    int radius = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize];
     
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
-        ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
+        ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
     }
     else {
-        ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
+        ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
         radius += radius/3;
     }
     
@@ -95,7 +97,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
         else
             fontNo = SMUFL_E0A2_noteheadWhole;
         
-        DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
+        DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, drawingCueSize );
     }
     // Other values
     else {
@@ -108,7 +110,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
             else fontNo = SMUFL_E0A3_noteheadHalf;
         }
 
-        DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->staffSize, note->m_cueSize );
+        DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->staffSize, drawingCueSize );
         
         DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, noteY);
     }

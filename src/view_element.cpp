@@ -192,6 +192,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     Chord *inChord = note->IsChordTone();
     
+    bool drawingCueSize = note->HasGrace();
+    
     bool inBeam = false;
     
     // Get the immediate parent of the note
@@ -200,7 +202,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     // This note is beamed and cue sized
     if (beam_parent != NULL) {
-        if (note->m_cueSize == true) {
+        if (drawingCueSize == true) {
             // Get the Parent of the parent
             // we want to see if we are in a group of
             // beamed cue notes
@@ -232,13 +234,13 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
     
-	int radius = m_doc->m_drawingNoteRadius[staffSize][note->m_cueSize];
+	int radius = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize];
 
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
-		ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
+		ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
 	}
     else {
-        ledge = m_doc->m_drawingLedgerLine[staffSize][note->m_cueSize];
+        ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
 		radius += radius/3;
 	}
     
@@ -319,7 +321,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		else
 			fontNo = SMUFL_E0A2_noteheadWhole;
 
-		DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, xNote, noteY, fontNo, staff->staffSize, drawingCueSize );
 	}
     // Other values
 	else {
@@ -330,7 +332,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 			fontNo = SMUFL_E0A4_noteheadBlack;
         }
         
-		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->staffSize, note->m_cueSize );
+		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->staffSize, drawingCueSize );
 
 		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
             DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, noteY);
@@ -376,7 +378,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	if (note->m_drawingAccid) {
         xAccid = xNote;
         if (note->m_drawingAccid->GetFunc() != FUNC_edit) {
-            xAccid -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][note->m_cueSize];
+            xAccid -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][drawingCueSize];
         }
         
         note->m_drawingAccid->SetDrawingX( xAccid );
@@ -424,10 +426,16 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
     int drawingDur = dynamic_cast<DurationInterface*>(object)->GetActualDur();
+    bool drawingCueSize = object->IsCueSize();
     int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
     
-    baseStem = object->m_cueSize ? ( m_doc->m_drawingUnit[staffSize]*5) : ( m_doc->m_drawingUnit[staffSize]*7);
-    flagStemHeight = object->m_cueSize ?  m_doc->m_drawingUnit[staffSize] :  m_doc->m_drawingDoubleUnit[staffSize];
+    baseStem = m_doc->m_drawingUnit[staffSize]*7;
+    flagStemHeight = m_doc->m_drawingDoubleUnit[staffSize];
+    if (drawingCueSize) {
+        baseStem = baseStem * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen;
+        flagStemHeight = flagStemHeight * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen;
+    }
+
     nbFlags = drawingDur - DUR_8;
     totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
     
@@ -456,7 +464,10 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     int stemY2 = y2;
     if (drawingDur > DUR_4) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
-        stemY2 = (dir == STEMDIRECTION_up) ? y2 - m_doc->m_drawingUnit[staffSize] : y2 + m_doc->m_drawingUnit[staffSize];
+        int shortener = (drawingCueSize) ?
+            m_doc->m_drawingUnit[staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen :
+            m_doc->m_drawingUnit[staffSize];
+        stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
     }
     
     // draw the stems and the flags
@@ -469,9 +480,9 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
         object->m_drawingStemDir = STEMDIRECTION_up;
         
         if (drawingDur > DUR_4) {
-            DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, object->m_cueSize );
+            DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2, SMUFL_E240_flag8thUp, staff->staffSize, drawingCueSize );
             for (int i=0; i < nbFlags; i++)
-                DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, object->m_cueSize );
+                DrawSmuflCode( dc, x2 - m_doc->m_style->m_stemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,  staff->staffSize, drawingCueSize );
         }
     }
     else {
@@ -483,13 +494,12 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
         object->m_drawingStemDir = STEMDIRECTION_down;
         
         if (drawingDur > DUR_4) {
-            DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->staffSize, object->m_cueSize );
+            DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->staffSize, drawingCueSize );
             for (int i=0; i < nbFlags; i++)
-                DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->staffSize,
-                              object->m_cueSize );
+                DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->staffSize, drawingCueSize );
         }
     }
-    if (object->m_cueSize && dynamic_cast<Note*>(object)->m_acciaccatura) {
+    if ( drawingCueSize && ( dynamic_cast<Note*>(object)->GetGrace() == GRACE_acc ) ) {
         DrawAcciaccaturaSlash(dc, object);
     }
     
@@ -503,8 +513,9 @@ void View::DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *st
     int staffY = staff->GetDrawingY();
     int staffSize = staff->staffSize;
     int betweenLines = m_doc->m_drawingDoubleUnit[staffSize];
-    int ledge = m_doc->m_drawingLedgerLine[staffSize][element->m_cueSize];
-    int noteDiameter = m_doc->m_drawingNoteRadius[staffSize][element->m_cueSize] * 2;
+    bool drawingCueSize = element->IsCueSize();
+    int ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
+    int noteDiameter = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize] * 2;
     
     //prep start and end positions of ledger line depending on stem direction and doubleLength
     int xLedgerStart, xLedgerEnd;
@@ -557,6 +568,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
     Rest *rest = dynamic_cast<Rest*>(element);
 
+    bool drawingCueSize = rest->IsCueSize();
 	int drawingDur = rest->GetActualDur();
 	int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -568,7 +580,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     if (drawingDur > DUR_2)
     {
-		x -= m_doc->m_drawingNoteRadius[staff->staffSize][rest->m_cueSize];
+		x -= m_doc->m_drawingNoteRadius[staff->staffSize][drawingCueSize];
     }
 
     switch (drawingDur)
@@ -576,8 +588,8 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         case DUR_LG: DrawLongRest ( dc, x, y, staff); break;
         case DUR_BR: DrawBreveRest( dc, x, y, staff); break;
         case DUR_1:
-        case DUR_2: DrawWholeRest ( dc, x, y, drawingDur, rest->GetDots(), rest->m_cueSize, staff); break;
-        default: DrawQuarterRest( dc, x, y, drawingDur, rest->GetDots(), rest->m_cueSize, staff);
+        case DUR_2: DrawWholeRest ( dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff); break;
+        default: DrawQuarterRest( dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff);
     }
     
     if(rest->GetFermata() != PLACE_NONE) {
@@ -869,7 +881,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
 	int verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
-    int radius = m_doc->m_drawingNoteRadius[staffSize][chord->m_cueSize];
+    bool drawingCueSize = chord->IsCueSize();
+    int radius = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize];
     int fullUnit = m_doc->m_drawingUnit[staffSize];
     
     bool inBeam = false;
@@ -879,7 +892,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     // This note is beamed and cue sized
     if (beam_parent != NULL) {
-        if (chord->m_cueSize == true) {
+        if (drawingCueSize == true) {
             // Get the Parent of the parent
             // we want to see if we are in a group of
             // beamed cue notes
@@ -1140,14 +1153,14 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
 	}
 
-    bool cueSize = clef->m_cueSize;
+    bool cueSize = false;
     // force cue size for intermediate clefs
     if (clef->GetFirstParent(&typeid(Layer))) cueSize = true;
     
     if (!cueSize)
         a -= m_doc->m_drawingUnit[staff->staffSize] * 2;
     
-    DrawSmuflCode ( dc, a, b, sym, staff->staffSize, cueSize  );
+    DrawSmuflCode ( dc, a, b, sym, staff->staffSize, cueSize );
    
     dc->EndGraphic(element, this );
 }
@@ -1407,6 +1420,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
         accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
+        accid->m_drawingCueSize = accid->IsCueSize();
     }
     
     /************** editorial accidental **************/
@@ -1425,7 +1439,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
             
             // adjust the x position so it is centered
-            int radius = m_doc->m_drawingNoteRadius[staff->staffSize][note->m_cueSize];
+            int radius = m_doc->m_drawingNoteRadius[staff->staffSize][accid->m_drawingCueSize];
             if ( note->GetActualDur() < DUR_2 ) radius += radius/3;
             accid->SetDrawingX( accid->GetDrawingX() + radius / 2 );
         }
@@ -1457,7 +1471,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
             // mensural notation
             if (staff->notAnc) {
                     symc = SMUFL_E262_accidentalSharp;
-                    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_cueSize );
+                    DrawSmuflCode ( dc, x, y, symc,  staff->staffSize, accid->m_drawingCueSize );
                     y += 7*m_doc->m_drawingUnit[staff->staffSize]; // LP
             } else {
                 symc = SMUFL_E263_accidentalDoubleSharp;
@@ -1471,7 +1485,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         default : break;
     }
     
-    DrawSmuflCode ( dc, x, y, symc, staff->staffSize, accid->m_cueSize );
+    DrawSmuflCode ( dc, x, y, symc, staff->staffSize, accid->m_drawingCueSize );
 
     dc->EndGraphic(element, this );
 }
@@ -1503,7 +1517,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     y -= m_doc->m_drawingUnit[staff->staffSize] - m_doc->m_drawingUnit[staff->staffSize]/4;  // LP - correction in 2.0.0
     
     // HARDCODED (smufl code wrong)
-    DrawSmuflCode( dc, x, y, 35,  staff->staffSize, custos->m_cueSize );
+    DrawSmuflCode( dc, x, y, 35,  staff->staffSize, false );
     
     dc->EndGraphic(element, this ); //RZ
 
@@ -1865,18 +1879,36 @@ void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     
     Note *note = dynamic_cast<Note*>(element);
+    assert( note );
+
+    Staff *staff = dynamic_cast<Staff*>( note->GetFirstParent( &typeid( Staff ) ) );
+    assert( staff );
     
     if (note->GetActualDur() < DUR_8)
         return;
     
-    dc->SetPen(AxBLACK, 2, AxSOLID);
+    dc->SetPen(AxBLACK, m_doc->m_style->m_stemWidth, AxSOLID);
     dc->SetBrush( AxBLACK, AxSOLID );
     
+    int positionShift = m_doc->m_drawingUnit[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen;
+    int positionShiftX1 = positionShift * 3 / 2;
+    int positionShiftY1 = positionShift * 2;
+    int positionShiftX2 = positionShift * 3;
+    int positionShiftY2 = positionShift * 6;
+    
     // HARDCODED
-    if (element->m_drawingStemDir)
-        dc->DrawLine(element->m_drawingStemStart.x - 10, ToDeviceContextY(element->m_drawingStemStart.y + 10), element->m_drawingStemStart.x + 20, ToDeviceContextY(element->m_drawingStemStart.y + 40));
-    else
-        dc->DrawLine(element->m_drawingStemStart.x - 10, ToDeviceContextY(element->m_drawingStemStart.y - 10), element->m_drawingStemStart.x + 20, ToDeviceContextY(element->m_drawingStemStart.y - 40));
+    if (element->m_drawingStemDir == STEMDIRECTION_up) {
+        dc->DrawLine(
+                     ToDeviceContextX(element->m_drawingStemStart.x - positionShiftX1 ),
+                     ToDeviceContextY(element->m_drawingStemStart.y + positionShiftY1),
+                     ToDeviceContextX(element->m_drawingStemStart.x + positionShiftX2),
+                     ToDeviceContextY(element->m_drawingStemStart.y + positionShiftY2));
+    } else {
+        dc->DrawLine(ToDeviceContextX(element->m_drawingStemStart.x - positionShiftX1),
+                     ToDeviceContextY(element->m_drawingStemStart.y - positionShiftY1),
+                     ToDeviceContextX(element->m_drawingStemStart.x + positionShiftX2),
+                     ToDeviceContextY(element->m_drawingStemStart.y - positionShiftY2));
+    }
     
     dc->ResetPen();
     dc->ResetBrush();
@@ -1948,7 +1980,7 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
     int x, y;    
 
     // It shoud be moved according to half of the trill size
-    x = element->GetDrawingX() - m_doc->m_drawingAccidWidth[staff->staffSize][element->m_cueSize];
+    x = element->GetDrawingX() - m_doc->m_drawingAccidWidth[staff->staffSize][false];
 
     // HARDCODED
     if ((element->GetDrawingY()) < staff->GetDrawingY())

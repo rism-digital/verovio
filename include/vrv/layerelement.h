@@ -100,6 +100,11 @@ public:
     bool IsVerse();
     bool IsGraceNote();
     ///@}
+    
+    /**
+     * Returns true if the element is a note or a note child and the note has a @grace
+     */
+    bool IsCueSize();
 
     Alignment *GetAlignment() { return m_alignment; };
     
@@ -134,10 +139,9 @@ private:
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-    /** Indicates if cue size - to be changed to MEI equivalent (size="cue") */
-    bool m_cueSize;
-
-    /** If this is a note, store here the stem coordinates (useful for ex. tuplets) */
+    /** 
+     * If this is a note, store here the stem coordinates (useful for ex. tuplets) 
+     */
     Point m_drawingStemStart; // beginning point, the one near the note
     Point m_drawingStemEnd; // end point (!), near beam or stem
     /** 

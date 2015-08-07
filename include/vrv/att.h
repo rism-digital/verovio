@@ -131,6 +131,9 @@ public:
     
     std::string FuncToStr(data_FUNC data);
     data_FUNC StrToFunc(std::string value);
+    
+    std::string GraceToStr(data_GRACE data);
+    data_GRACE StrToGrace(std::string value);
         
     std::string KeySignatureToStr(data_KEYSIGNATURE data);
     data_KEYSIGNATURE StrToKeySignature(std::string value);

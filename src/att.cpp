@@ -434,6 +434,33 @@ data_FUNC Att::StrToFunc(std::string value)
     return FUNC_NONE;
 }
     
+std::string Att::GraceToStr(data_GRACE data)
+{
+    std::string value;
+    switch(data)
+    {
+        case GRACE_acc : value = "acc"; break;
+        case GRACE_unacc : value = "unacc"; break;
+        case GRACE_unknown : value = "unknown"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_GRACE Att::StrToGrace(std::string value)
+{
+    if (value == "acc") return GRACE_acc;
+    else if (value == "unacc") return GRACE_unacc;
+    else if (value == "unknown") return GRACE_unknown;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return GRACE_NONE;
+}
+    
 std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
 {
     std::string value;

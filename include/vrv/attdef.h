@@ -197,6 +197,16 @@ enum data_FONTWEIGHT {
     FONTWEIGHT_normal
 };
     
+/**
+ * MEI data.GRACE
+ */
+enum data_GRACE {
+    GRACE_NONE = 0,
+    GRACE_acc,
+    GRACE_unacc,
+    GRACE_unknown
+};
+    
     
 /**
  * MEI values for @func (no datatype in MEI)

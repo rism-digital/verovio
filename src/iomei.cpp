@@ -548,11 +548,7 @@ void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
     chord->WriteCommon(currentNode);
     chord->WriteStemmed(currentNode);
     chord->WriteTiepresent(currentNode);
-    
-    if ( chord->m_cueSize ) {
-        currentNode.append_attribute( "grace" ) = "unknown";
-    }
-    
+
     return;
 }
 
@@ -623,13 +619,11 @@ void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
     note->WriteColoration(currentNode);
+    note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStemmed(currentNode);
     note->WriteTiepresent(currentNode);
     
-    if ( note->m_cueSize ) {
-        currentNode.append_attribute( "grace" ) = "unknown";
-    }
     return;
 }
 
@@ -1627,10 +1621,6 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     vrvChord->ReadStemmed(chord);
     vrvChord->ReadTiepresent(chord);
     
-    if ( chord.attribute( "grace" ) ) {
-        vrvChord->m_cueSize = true;
-    }
-    
     AddLayerElement(parent, vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord);
 }
@@ -1743,14 +1733,10 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     vrvNote->ReadColoration(note);
+    vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStemmed(note);
     vrvNote->ReadTiepresent(note);
-    
-    // grace
-    if ( note.attribute( "grace" ) ) {
-		vrvNote->m_cueSize = true; //
-	}
     
     AddLayerElement(parent, vrvNote);
     

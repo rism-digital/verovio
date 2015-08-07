@@ -29,6 +29,7 @@ namespace vrv {
 Note::Note():
 	LayerElement("note-"), DurationInterface(), PitchInterface(),
     AttColoration(),
+    AttGraced(),
     AttNoteLogMensural(),
     AttStemmed(),
     AttTiepresent()
@@ -60,12 +61,12 @@ void Note::Reset()
     PitchInterface::Reset();
     
     ResetColoration();
+    ResetGraced();
     ResetNoteLogMensural();
     ResetStemmed();
     ResetTiepresent();
     
     // TO BE REMOVED
-    m_acciaccatura = false;
     m_embellishment = EMB_NONE;
     // tie pointers
     ResetDrawingTieAttr();
@@ -254,7 +255,8 @@ int Note::PreparePointersByLayer( ArrayPtrVoid params )
         this->m_drawingAccid->SetOloc(this->GetOct());
         this->m_drawingAccid->SetPloc(this->GetPname());
         this->m_drawingAccid->SetAccid(this->GetAccid());
-        this->m_drawingAccid->m_cueSize = this->m_cueSize;
+        // We need to set the drawing cue size since there will be no access to the note
+        this->m_drawingAccid->m_drawingCueSize = this->HasGrace();
     }
     
     (*currentNote) = this;

@@ -70,14 +70,14 @@ void Beam::FilterList( ListOfObjects *childList )
                 // and the note is cueSize
                 // assume all the beam is of grace notes
                 if (childList->begin() == iter) {
-                  if (n->m_cueSize)
+                  if (n->HasGrace())
                       firstNoteGrace = true;
                 }
                 
                 // if the first note in beam was NOT a grace
                 // we have grace notes embedded in a beam
                 // drop them
-                if ( !firstNoteGrace && n->m_cueSize == true)
+                if ( !firstNoteGrace && n->HasGrace() == true)
                     iter = childList->erase( iter );
                 else
                     iter++;

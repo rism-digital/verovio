@@ -1185,12 +1185,16 @@ void PaeInput::parseNote(NoteObject note) {
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
     if (note.acciaccatura && dynamic_cast<Note *>(element)) {
-        element->m_cueSize = true;
-        dynamic_cast<Note *>(element)->m_acciaccatura = true;
+        Note *note = dynamic_cast<Note*>(element);
+        note->SetDur(DURATION_8);
+        note->SetGrace(GRACE_acc);
+        note->SetStemDir(STEMDIRECTION_up);
     }
     
     if (note.appoggiatura > 0) {
-        element->m_cueSize = true;
+        Note *note = dynamic_cast<Note*>(element);
+        note->SetGrace(GRACE_unacc);
+        note->SetStemDir(STEMDIRECTION_up);
     }
 
     if (note.beam == BEAM_INITIAL) {

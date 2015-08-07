@@ -44,6 +44,7 @@ typedef std::vector<Note*> ChordCluster;
 
 class Note: public LayerElement, public DurationInterface, public PitchInterface,
     public AttColoration,
+    public AttGraced,
     public AttNoteLogMensural,
     public AttStemmed,
     public AttTiepresent
@@ -138,9 +139,6 @@ public:
 private:
     
 public:
-    /** indicates if the appoggiatura is slashed (i.e. it is an acciaccatura)
-     used with cueSize = true */
-    bool m_acciaccatura; // To be changed to Att grace="acc"
     /** embellishment on this note **/
     unsigned int m_embellishment; // To be changed to Att
     

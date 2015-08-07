@@ -64,8 +64,6 @@ void LayerElement::Reset()
 {
     DocObject::Reset();
     
-    m_cueSize = false;
-    
     m_xAbs = VRV_UNSET;
     m_drawingX = 0;
     m_drawingY = 0;
@@ -85,8 +83,6 @@ LayerElement& LayerElement::operator=( const LayerElement& element )
 {
 	if ( this != &element ) // not self assignement
 	{
-        // is this necessary?
-        m_cueSize = element.m_cueSize;
         // pointers have to be NULL
         m_parent = NULL;
         m_alignment = NULL;
@@ -219,7 +215,7 @@ bool LayerElement::IsNote()
 bool LayerElement::IsGraceNote()
 {
     Note *note = dynamic_cast<Note*>(this);
-    return (note && note->m_cueSize);
+    return (note && note->HasGrace());
 }
     
 bool LayerElement::HasPitchInterface() 
@@ -262,6 +258,13 @@ bool LayerElement::IsVerse()
     return (dynamic_cast<Verse*>(this));
 }
 
+bool LayerElement::IsCueSize()
+{
+    if (this->IsNote()) return dynamic_cast<Note*>(this)->HasGrace();
+    Note *note = dynamic_cast<Note*>(this->GetFirstParent(&typeid(Note), MAX_ACCID_DEPTH ) );
+    return ( note && ( note->HasGrace() ) );
+}
+    
 void LayerElement::AdjustPname( int *pname, int *oct )
 {
 	if ((*pname) < PITCHNAME_c)

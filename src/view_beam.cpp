@@ -248,7 +248,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // We look only at the last note for checking if cuesized. Somehow arbitrarily
-    if ((*beamElementCoords)[last]->m_element->m_cueSize == false)  {
+    if ((*beamElementCoords)[last]->m_element->IsCueSize() == false)  {
         beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
         beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
     }
@@ -266,7 +266,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     verticalShift = ((shortestDur-DUR_8)*(beamWidth));
 
     //if the beam has smaller-size notes
-    if ((*beamElementCoords)[last]->m_element->m_cueSize) {
+    if ((*beamElementCoords)[last]->m_element->IsCueSize()) {
         verticalShift += m_doc->m_drawingUnit[staff->staffSize]*5;
     }
     else {
@@ -293,7 +293,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         }
 
         (*beamElementCoords)[i]->m_yBeam = (*beamElementCoords)[i]->m_y + verticalShift;
-        (*beamElementCoords)[i]->m_x +=  dx[(*beamElementCoords)[i]->m_element->m_cueSize];
+        (*beamElementCoords)[i]->m_x +=  dx[(*beamElementCoords)[i]->m_element->IsCueSize()];
         
         s_y += (*beamElementCoords)[i]->m_yBeam;
         s_y2 += (*beamElementCoords)[i]->m_yBeam * (*beamElementCoords)[i]->m_yBeam;
