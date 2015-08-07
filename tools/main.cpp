@@ -62,9 +62,14 @@ bool dir_exists (string dir) {
     }
 }
 
+void display_version() {
+    cerr << "verovio-" << GetVersion() << endl;
+}
+
 void display_usage() {
     
-    cerr << "Verovio " << GetVersion() << endl << "Usage:" << endl << endl;
+    display_version();
+    cerr << endl << "Usage:" << endl << endl;
     cerr << " verovio [-f format] [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
     
     // These need to be kept in alphabetical order:
@@ -91,6 +96,8 @@ void display_usage() {
     cerr << " -s, --scale=FACTOR         Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
     
     cerr << " -t, --type=OUTPUT_TYPE     Select output format: mei, svg (default is svg)" << endl;
+    
+    cerr << " -v, --version              Display the version number" << endl;
 
     cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGE_WIDTH << ")" << endl;
     
@@ -148,6 +155,7 @@ int main(int argc, char** argv)
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
+    int show_version = 0;
     
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
@@ -188,11 +196,12 @@ int main(int argc, char** argv)
         {"spacing-staff",       required_argument,  0, 0},
         {"spacing-system",      required_argument,  0, 0},
         {"type",                required_argument,  0, 't'},
+        {"version",             no_argument,        &show_version, 1},
         {0, 0, 0, 0}
     };
     
     int option_index = 0;
-    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:", long_options, &option_index)) != -1)
+    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1)
     {                
         switch (c)
         {
@@ -256,6 +265,10 @@ int main(int argc, char** argv)
                      exit(1);
                 }
                 break;
+                
+            case 'v':
+                show_version = 1;
+                break;
             
             case 'w':
                 if ( !toolkit.SetPageWidth( atoi(optarg) ) ) {
@@ -271,6 +284,11 @@ int main(int argc, char** argv)
             default:
                 break;
         }
+    }
+    
+    if (show_version) {
+        display_version();
+        exit(0);
     }
     
     if (show_help) {
