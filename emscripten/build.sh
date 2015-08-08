@@ -28,7 +28,7 @@ if [ ! -d data ]; then mkdir data; fi
 # Empirically, the memory amount required is approx. 5 times the file size (as an indication).
 # We can disable this for a light version that uses the default memory settings 	
 ASM="\
-	-O2 --memory-init-file 0 \
+	-O3 --memory-init-file 0 \
 	-s ASM_JS=1 \
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
@@ -49,7 +49,7 @@ while getopts "lwv:h:c" opt; do
 		l)
 			echo "light version (-l)"
 			ASM="\
-				-O2 --memory-init-file 0 \
+				-O3 --memory-init-file 0 \
 				-s ASM_JS=1 "
 			ASM_NAME="-light"
 			;;
