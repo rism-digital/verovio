@@ -63,7 +63,7 @@ bool dir_exists (string dir) {
 }
 
 void display_version() {
-    cerr << "verovio-" << GetVersion() << endl;
+    cerr << "Verovio " << GetVersion() << endl;
 }
 
 void display_usage() {
