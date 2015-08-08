@@ -1113,13 +1113,9 @@ void View::DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure
             DrawTupletPostponed( dc, tuplet, layer, staff );
             dc->EndResumedGraphic(tuplet, this);
         }
-        else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Tie) ) ) {
-            // Not sure about ReStart and ReEnd Tie and Slur
-            DrawTie( dc, element, layer, staff, measure );
-        }
-        else if ( (typeid(*element) == *elementType) &&  (*elementType == typeid(Slur) ) ) {
-            // Not sure about ReStart and ReEnd Tie and Slur
-            DrawTie( dc, element, layer, staff, measure );
+        else {
+            // This should never happen
+            LogError("Element '%s' in the layer list cannot be drawn", element->GetClassName().c_str());
         }
     }
 }

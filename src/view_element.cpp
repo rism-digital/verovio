@@ -105,23 +105,21 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (dynamic_cast<Rest*>(element)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Slur*>(element)) {
-        DrawTie(dc, element, layer, staff, measure);
-    }
     else if (dynamic_cast<Space*>(element)) {
         DrawSpace(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Syl*>(element)) {
         DrawSyl(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Tie*>(element)) {
-        DrawTie(dc, element, layer, staff, measure);
-    }
     else if (dynamic_cast<Tuplet*>(element)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
     else if (dynamic_cast<Verse*>(element)) {
         DrawVerse(dc, element, layer, staff, measure);
+    }
+    else {
+        // This should never happen
+        LogError("Element '%s' cannot be drawn", element->GetClassName().c_str());
     }
     
     m_currentColour = previousColor;
@@ -1742,137 +1740,6 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     
     dc->EndGraphic(element, this ); //RZ
-    
-}
-
-void View::DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
-{
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Tie*>(element) || dynamic_cast<Slur*>(element)); // The element must be a tie
-    
-    bool up = false;
-    LayerElement *note1 = NULL;
-    LayerElement *note2 = NULL;
-    
-    // coordinates for the tie/slur
-    int x1, x2, y1, y2;
-    up = true;
-    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
-    
-    Tie *tie = dynamic_cast<Tie*>(element);
-    Slur *slur = dynamic_cast<Slur*>(element);
-    if ( tie ) {
-        note1 = tie->GetStart();
-        note2 = tie->GetEnd();
-    } else if ( slur ) {
-        note1 = slur->GetStart();
-        note2 = slur->GetEnd();
-    }
-    
-    if ( !note1 && !note2 ) {
-        // no note, obviously nothing to do...
-        return;
-    }
-
-    System *currentSystem = dynamic_cast<System*>( staff->GetFirstParent( &typeid(System) ) );
-    System *parentSystem1 = NULL;
-    System *parentSystem2 = NULL;
-    
-    // In order to know if we are drawing a normal tie or a tie splitted over two systems, we need
-    // to look at the parent system of each note.
-    if ( note1 ) {
-        parentSystem1 = dynamic_cast<System*>( note1->GetFirstParent( &typeid(System) ) );
-    }
-    if ( note2 ) {
-        parentSystem2 = dynamic_cast<System*>( note2->GetFirstParent( &typeid(System) ) );
-    }
-
-    // This is the case when the tie is split over two system of two pages.
-    // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
-    if ( parentSystem2 && currentSystem && ( parentSystem2 != currentSystem) ) {
-        Alignment *nextAlignement = note1->GetAlignment();
-        while (nextAlignement) {
-            if (nextAlignement->GetType() == ALIGNMENT_MEASURE_END) break;
-            nextAlignement = dynamic_cast<Alignment*>(nextAlignement->GetNextSibling());
-        }
-        if (!nextAlignement) {
-            return;
-        }
-        y1 = y2 = note1->GetDrawingY();
-        x1 = note1->GetDrawingX();
-        x2 = measure->GetDrawingX() + nextAlignement->GetXRel();
-        assert(dynamic_cast<Note*>(note1));
-        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
-        //DrawTieOrSlurBezier(dc, note1->GetDrawingX(), y - 14, x2, y - 14, true);
-    }
-    // Now this is the case when the tie is split but we are drawing the end of it
-    else if ( parentSystem1 && currentSystem && ( parentSystem1 != currentSystem) ) {
-        Alignment *previousAlignement = note2->GetAlignment();
-        while (previousAlignement) {
-            if (previousAlignement->GetType() != ALIGNMENT_DEFAULT) break;
-            previousAlignement = dynamic_cast<Alignment*>(previousAlignement->GetPreviousSibling());
-        }
-        if (!previousAlignement) {
-            return;
-        }
-        y1 = y2 = note2->GetDrawingY();
-        x2 = note2->GetDrawingX();
-        x1 = x2 - m_doc->m_drawingDoubleUnit[ staff->staffSize ];
-        assert(dynamic_cast<Note*>(note2));
-        noteStemDir = dynamic_cast<Note*>(note2)->m_drawingStemDir;
-        //DrawTieOrSlurBezier(dc, x1, y - 14, note2->GetDrawingX(), y - 14, true);
-    }
-    // Finally the normal case
-    else {
-        assert( note1 && note2 );
-        // Copied from DrawNote
-        // We could use the stamDir information
-        // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
-        y1 = note1->GetDrawingY();
-        y2 = note2->GetDrawingY();
-        x1 = note1->GetDrawingX();
-        x2 = note2->GetDrawingX();
-        assert(dynamic_cast<Note*>(note1));
-        // for now we only look at the first note - needs to be improved
-        // m_drawingStemDir it not set properly in beam - needs to be fixed.
-        noteStemDir = dynamic_cast<Note*>(note1)->m_drawingStemDir;
-        /*
-        assert(dynamic_cast<Note*>(note2));
-        if (dynamic_cast<Note*>(note2)->m_drawingStemDir != noteStemDir) {
-            LogDebug("Diverging stem directions (%d;%d)", noteStemDir, dynamic_cast<Note*>(note2)->m_drawingStemDir);
-        }
-        */
-    }
-    
-    assert( dynamic_cast<Note*>(note1));
-    if (noteStemDir == STEMDIRECTION_up) {
-        up = false;
-    }
-    else if (noteStemDir == STEMDIRECTION_NONE) {
-        // no information from the note stem directions, look at the position in the notes
-        int center = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize] * 2;
-        up = (y1 > center) ? true : false;
-    }
-    
-    // FIXME, take in account elements that can be netween notes, eg keys time etc
-    // 20 height nice with 70, not nice with 50
-    // Also remove HARDCODED values!
-    if (up) {
-        y1 += m_doc->m_drawingUnit[staff->staffSize] * 1.6;
-        y2 += m_doc->m_drawingUnit[staff->staffSize] * 1.6;
-    }
-    else {
-        y1 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
-        y2 -= m_doc->m_drawingUnit[staff->staffSize] * 1.6;
-    }
-    
-    dc->StartGraphic( element, "", element->GetUuid() );
-    dc->DeactivateGraphic();
-    DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
-    dc->ReactivateGraphic();
-    dc->EndGraphic(element, this );
-
     
 }
 

@@ -247,7 +247,6 @@ protected:
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSpace( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawTuplet( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
