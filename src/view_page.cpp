@@ -231,7 +231,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     y_bottom -= m_doc->m_style->m_staffLineWidth / 2;
     
     // actually draw the line, the brace or the bracket
-    if ( topStaffGrp ) {
+    if ( topStaffGrp && ( (firstDef != lastDef) || (staffGrp->GetSymbol() != STAFFGRP_NONE) ) ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->m_style->m_barlineWidth );
     }
     // this will need to be changed with the next version of MEI will line means additional thick line 
@@ -1082,12 +1082,8 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
     
-    // first draw the tuplets
+    // first draw the postponed tuplets
     DrawLayerList(dc, layer, staff, measure, &typeid(Tuplet) );
-    // then ties
-    DrawLayerList(dc, layer, staff, measure, &typeid(Tie) );
-    // then slurs
-    DrawLayerList(dc, layer, staff, measure, &typeid(Slur) );
     
     dc->EndGraphic( layer, this );
 }
