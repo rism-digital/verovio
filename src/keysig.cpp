@@ -147,7 +147,8 @@ void KeySig::ConvertToMei()
     else return;
 }
 
-unsigned char KeySig::GetAlterationAt(int pos) {
+unsigned char KeySig::GetAlterationAt(int pos)
+{
     data_PITCHNAME *alteration_set;
     
     if (pos > 6)
@@ -161,7 +162,8 @@ unsigned char KeySig::GetAlterationAt(int pos) {
     return alteration_set[pos];
 }
 
-int KeySig::GetOctave(unsigned char pitch, int clefId) {
+int KeySig::GetOctave(unsigned char pitch, int clefId)
+{
     int alter_set = 0; // flats
     int key_set = 0;
     

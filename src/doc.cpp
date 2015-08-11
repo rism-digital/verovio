@@ -393,30 +393,28 @@ int Doc::GetPageCount( )
 }
     
 
-short Doc::GetLeftMargin( const std::type_info *elementType )
+char Doc::GetLeftMargin( const std::type_info *elementType )
 {
-    if (typeid(Barline) == *elementType) return 5;
-    else if (typeid(BarlineAttr) == *elementType) return 25;
-    else if (typeid(Chord) == *elementType) return 10;
-    else if (typeid(Clef) == *elementType) return -20;
-    else if (typeid(MRest) == *elementType) return 30;
-    else if (typeid(Note) == *elementType) return 10;
-    return 0;
-
+    if (typeid(Barline) == *elementType) return m_style->m_leftMarginBarline;
+    else if (typeid(BarlineAttr) == *elementType) return m_style->m_leftMarginBarlineAttr;
+    else if (typeid(Chord) == *elementType) return m_style->m_leftMarginChord;
+    else if (typeid(Clef) == *elementType) return m_style->m_leftMarginClef;
+    else if (typeid(MRest) == *elementType) return m_style->m_leftMarginMRest;
+    else if (typeid(Note) == *elementType) return m_style->m_leftMarginNote;
+    return m_style->m_leftMarginDefault;
 }
     
-short Doc::GetRightMargin( const std::type_info *elementType )
+char Doc::GetRightMargin( const std::type_info *elementType )
 {
-    if (typeid(Clef) == *elementType) return 30;
-    else if (typeid(KeySig) == *elementType)  return 30;
-    else if (typeid(Mensur) == *elementType) return 30;
-    else if (typeid(MeterSig) == *elementType) return 30;
-    else if (typeid(Barline) == *elementType) return 30;
-    else if (typeid(BarlineAttr) == *elementType) return 0;
-    else if (typeid(MRest) == *elementType) return 30;
-    else if (typeid(MultiRest) == *elementType) return 30;
-    //else if (typeid(Note) == *elementType) return 10;
-    return 10;
+    if (typeid(Barline) == *elementType) return m_style->m_rightMarginBarline;
+    else if (typeid(BarlineAttr) == *elementType) return m_style->m_rightMarginBarlineAttr;
+    else if (typeid(Clef) == *elementType) return m_style->m_rightMarginClef;
+    else if (typeid(KeySig) == *elementType)  return m_style->m_rightMarginKeySig;
+    else if (typeid(Mensur) == *elementType) return m_style->m_rightMarginMensur;
+    else if (typeid(MeterSig) == *elementType) return m_style->m_rightMarginMeterSig;
+    else if (typeid(MRest) == *elementType) return m_style->m_rightMarginMRest;
+    else if (typeid(MultiRest) == *elementType) return m_style->m_rightMarginMultiRest;
+    return m_style->m_rightMarginDefault;
 }
     
 void Doc:: SetPageHeight( int pageHeight )

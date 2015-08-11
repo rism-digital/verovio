@@ -96,8 +96,8 @@ public:
      * These should eventually be set at parameters.
      */
     ///@{
-    short GetLeftMargin( const std::type_info *elementType  );
-    short GetRightMargin( const std::type_info *elementType );
+    char GetLeftMargin( const std::type_info *elementType  );
+    char GetRightMargin( const std::type_info *elementType );
     ///@}
 
     /*
