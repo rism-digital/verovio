@@ -242,20 +242,6 @@ public:
     Object *GetFirstChild( const std::type_info *elementType );
     
     /**
-     * Return the previous sibling object of the specified type.
-     * If no type is specified, returns the previous object.
-     * Returns NULL if not found in both cases.
-     */
-    Object *GetPreviousSibling( const std::type_info *elementType = NULL );
-    
-    /**
-     * Return the next sibling object of the specified type.
-     * If no type is specified, returns the next object.
-     * Returns NULL if not found in both cases.
-     */
-    Object *GetNextSibling( const std::type_info *elementType = NULL );
-    
-    /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */  

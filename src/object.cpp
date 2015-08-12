@@ -426,69 +426,6 @@ Object *Object::GetFirstChild( const std::type_info *elementType )
     return NULL;
 }
 
-Object *Object::GetNextSibling( const std::type_info *elementType )
-{
-    if (!m_parent) {
-        return NULL;
-    }
-    
-    ArrayOfObjects::iterator iter;
-    bool foundCurrent = false;
-    for (iter = this->m_parent->m_children.begin(); iter != this->m_parent->m_children.end(); ++iter)
-    {
-        // we have not found the current object
-        if ( this == *iter ) {
-            foundCurrent = true;
-            // continue to find the next sibling
-            continue;
-        }
-        else if (!foundCurrent) {
-            continue;
-        }
-        if ( !elementType ) {
-            return *iter;
-        }
-        Object *o = *iter;
-        if ( typeid(*o) == *elementType )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
-Object *Object::GetPreviousSibling( const std::type_info *elementType )
-{
-    if (!m_parent) {
-        return NULL;
-    }
-    
-    ArrayOfObjects::reverse_iterator iter;
-    bool foundCurrent = false;
-    for (iter = this->m_parent->m_children.rbegin(); iter != this->m_parent->m_children.rend(); ++iter)
-    {
-        // we have not found the current object
-        if ( this == *iter ) {
-            foundCurrent = true;
-            // continue to find the next sibling
-            continue;
-        }
-        else if (!foundCurrent) {
-            continue;
-        }
-        if ( !elementType ) {
-            return *iter;
-        }
-        Object *o = *iter;
-        if ( typeid(*o) == *elementType )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
-
 bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
 {
     int i = 0;

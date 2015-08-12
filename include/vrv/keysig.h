@@ -106,6 +106,9 @@ public:
 private:
     
 public:
+    /** */
+    data_ACCIDENTAL_EXPLICIT m_drawingCancelAccid;
+    char m_drawingCancelAccidCount;
     
 private:
     

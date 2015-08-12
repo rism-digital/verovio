@@ -168,9 +168,9 @@ Clef *ScoreOrStaffDefAttrInterface::GetClefCopy() const
     else {
         ClefAttr *current_attr = dynamic_cast<ClefAttr*>(m_clef);
         copy = new Clef(current_attr);
+        copy->SetScoreOrStaffDefAttr(true);
     }
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
@@ -186,9 +186,9 @@ KeySig *ScoreOrStaffDefAttrInterface::GetKeySigCopy() const
     else {
         KeySigAttr *current_attr = dynamic_cast<KeySigAttr*>(m_keySig);
         copy = new KeySig(current_attr);
+        copy->SetScoreOrStaffDefAttr(true);
     }
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
@@ -204,9 +204,9 @@ Mensur *ScoreOrStaffDefAttrInterface::GetMensurCopy() const
     else {
         MensurAttr *current_attr = dynamic_cast<MensurAttr*>(m_mensur);
         copy = new Mensur(current_attr);
+        copy->SetScoreOrStaffDefAttr(true);
     }
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
@@ -222,9 +222,9 @@ MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigCopy() const
     else {
         MeterSigAttr *current_attr = dynamic_cast<MeterSigAttr*>(m_meterSig);
         copy = new MeterSig(current_attr);
+        copy->SetScoreOrStaffDefAttr(true);
     }
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
