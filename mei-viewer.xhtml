@@ -53,7 +53,7 @@ downloads:
                     adjustPageHeight: 1,
 					ignoreLayout: 1
 				});
-        console.log( options );
+		//console.log( options );
 		vrvToolkit.setOptions( options );
     }
     
@@ -77,7 +77,10 @@ downloads:
 	
 	function load_data(data) {
 		set_options();
+        
+		console.time("loading");
 		vrvToolkit.loadData(data);
+		console.timeEnd("loading");
 		
 		if (log) {
 			str = vrvToolkit.getLog();
@@ -431,7 +434,7 @@ downloads:
 	
 		// Load the default file or the file passed in the URL
 		var file = location.search.substring(1);
-        console.log( file );
+		//console.log( file );
 		if (file.length == 0) {
             file = "examples/downloads/Krebs_Trio_Eb_2.mei";
         }
