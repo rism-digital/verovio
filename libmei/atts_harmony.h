@@ -28,6 +28,8 @@ namespace vrv {
 // AttFretlocation
 //----------------------------------------------------------------------------
 
+#define ATT_FRETLOCATION 55
+
 class AttFretlocation: public Att
 {
 public:
@@ -66,6 +68,8 @@ private:
 // AttHarmLog
 //----------------------------------------------------------------------------
 
+#define ATT_HARMLOG 56
+
 class AttHarmLog: public Att
 {
 public:
@@ -103,6 +107,8 @@ private:
 //----------------------------------------------------------------------------
 // AttHarmVis
 //----------------------------------------------------------------------------
+
+#define ATT_HARMVIS 57
 
 class AttHarmVis: public Att
 {

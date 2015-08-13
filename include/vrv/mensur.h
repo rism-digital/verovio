@@ -39,9 +39,11 @@ public:
     ///@{
     Mensur();
     Mensur( MensurAttr *mensurAttr );
+    void Init();
     virtual ~Mensur();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Mensur"; };
+    virtual int Is() { return MENSUR; };
     virtual Object* Clone() { return new Mensur(*this); };
     ///@}
     
@@ -85,6 +87,7 @@ public:
     virtual ~MensurAttr();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "MensurAttr"; };
+    virtual int Is() { return MENSUR_ATTR; };
     virtual Object* Clone() { return new MensurAttr(*this); };
     ///@}
     

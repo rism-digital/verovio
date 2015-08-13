@@ -30,6 +30,7 @@ public:
     virtual ~Slur();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Slur"; };
+    virtual int Is() { return SLUR; };
     ///@}
     
     //----------//
@@ -39,17 +40,17 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
     
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
+    virtual int PrepareTimeSpanning( ArrayPtrVoid *params );
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid params );
+    virtual int ResetDarwing( ArrayPtrVoid *params );
     
 private:
     

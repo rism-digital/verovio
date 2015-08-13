@@ -34,6 +34,7 @@ Layer::Layer( ):
 	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(),
     AttCommon()
 {
+    RegisterAttClass(ATT_COMMON);
     // own pointers need to be initialized before Reset()
     m_currentClef = NULL;
     m_currentKeySig = NULL;
@@ -369,15 +370,15 @@ void Layer::RemoveClefAndCustos()
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-int Layer::AlignHorizontally( ArrayPtrVoid params )
+int Layer::AlignHorizontally( ArrayPtrVoid *params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig
-    double *time = static_cast<double*>(params[1]);
-    Mensur **currentMensur = static_cast<Mensur**>(params[2]);
-    MeterSig **currentMeterSig = static_cast<MeterSig**>(params[3]);
+    double *time = static_cast<double*>((*params)[1]);
+    Mensur **currentMensur = static_cast<Mensur**>((*params)[2]);
+    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params)[3]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -404,13 +405,13 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::AlignHorizontallyEnd( ArrayPtrVoid params )
+int Layer::AlignHorizontallyEnd( ArrayPtrVoid *params )
 {
     // param 0: the measureAligner
     // param 1: the time  (unused)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
-    MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params)[0]);
     
     int i;
     for(i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
@@ -423,22 +424,22 @@ int Layer::AlignHorizontallyEnd( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::PrepareProcessingLists( ArrayPtrVoid params )
+int Layer::PrepareProcessingLists( ArrayPtrVoid *params )
 {
     // param 0: the IntTree* for staff/layer/verse (unused)
     // param 1: the IntTree* for staff/layer
-    IntTree *tree = static_cast<IntTree*>(params[1]);
+    IntTree *tree = static_cast<IntTree*>((*params)[1]);
     // Alternate solution with StaffN_LayerN_VerseN_t
-    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params)[0]);
     
-    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
+    Staff *staff = reinterpret_cast<Staff*>( this->GetFirstParent( STAFF ) );
     assert( staff );
     tree->child[ staff->GetN() ].child[ this->GetN() ];
     
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::SetDrawingXY( ArrayPtrVoid params )
+int Layer::SetDrawingXY( ArrayPtrVoid *params )
 {
     // param 0: a pointer doc (unused)
     // param 1: a pointer to the current system (unused)
@@ -447,9 +448,9 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
-    Measure **currentMeasure = static_cast<Measure**>(params[2]);
-    Layer **currentLayer = static_cast<Layer**>(params[4]);
-    bool *processLayerElements = static_cast<bool*>(params[6]);
+    Measure **currentMeasure = static_cast<Measure**>((*params)[2]);
+    Layer **currentLayer = static_cast<Layer**>((*params)[4]);
+    bool *processLayerElements = static_cast<bool*>((*params)[6]);
     
     (*currentLayer) = this;
     

@@ -41,6 +41,7 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
+    virtual int Is() { return LAYER_ELEMENT; };
     ///@}
     
     LayerElement& operator=( const LayerElement& element ); // copy assignement - this need to be changed to the Object::Clone way;
@@ -122,17 +123,17 @@ public:
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid *params );
     
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
+    virtual int PrepareTimeSpanning( ArrayPtrVoid *params );
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
     
 private:
     

@@ -66,8 +66,8 @@ bool AttRegularmethod::HasMethod( )
 /* include <attmethod> */
 
 bool Att::SetHeader( Object *element, std::string attrType, std::string attrValue ) {
-    if (dynamic_cast<AttRegularmethod*>(element) ) {
-        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+    if (element->HasAttClass( ATT_REGULARMETHOD ) ) {
+        AttRegularmethod *att = reinterpret_cast<AttRegularmethod*>(element);
         if (attrType == "method") {
             att->SetMethod(att->StrToStr(attrValue));
             return true;
@@ -78,8 +78,8 @@ bool Att::SetHeader( Object *element, std::string attrType, std::string attrValu
 }
 
 void Att::GetHeader( Object *element, ArrayOfStrAttr *attributes ) {
-    if (dynamic_cast<AttRegularmethod*>(element) ) {
-        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+    if (element->HasAttClass( ATT_REGULARMETHOD ) ) {
+        AttRegularmethod *att = reinterpret_cast<AttRegularmethod*>(element);
         if (att->HasMethod()) {
             attributes->push_back(std::make_pair("method", att->StrToStr(att->GetMethod())));
         }

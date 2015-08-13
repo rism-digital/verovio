@@ -41,19 +41,19 @@ void Slur::Reset()
 // Slur functor methods
 //----------------------------------------------------------------------------
 
-int Slur::PrepareTimeSpanning( ArrayPtrVoid params )
+int Slur::PrepareTimeSpanning( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::PrepareTimeSpanning(params, this);
 }
     
-int Slur::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+int Slur::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
 }
     
-int Slur::ResetDarwing( ArrayPtrVoid params )
+int Slur::ResetDarwing( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     return  TimeSpanningInterface::ResetDrawing(params, this);

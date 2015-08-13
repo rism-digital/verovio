@@ -51,6 +51,7 @@ public:
     virtual ~Layer();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Layer"; };
+    virtual int Is() { return LAYER; };
     ///@}
 	
 	void AddLayerElement( LayerElement *element, int idx = -1 );
@@ -151,23 +152,23 @@ public:
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid *params );
 
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontallyEnd( ArrayPtrVoid params );
+    virtual int AlignHorizontallyEnd( ArrayPtrVoid *params );
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists( ArrayPtrVoid params );
+    virtual int PrepareProcessingLists( ArrayPtrVoid *params );
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
     
 private:
     

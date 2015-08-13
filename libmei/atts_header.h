@@ -28,6 +28,8 @@ namespace vrv {
 // AttRegularmethod
 //----------------------------------------------------------------------------
 
+#define ATT_REGULARMETHOD 58
+
 class AttRegularmethod: public Att
 {
 public:

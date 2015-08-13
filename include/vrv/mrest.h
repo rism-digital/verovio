@@ -32,6 +32,7 @@ public:
     virtual ~MRest();
     virtual void Reset();
     virtual std::string GetClassName( ){ return "MRest"; }; ;
+    virtual int Is() { return MREST; };
     ///@}
 
 private:

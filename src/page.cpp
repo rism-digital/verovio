@@ -134,7 +134,7 @@ void Page::LayOutHorizontally( )
     params.push_back( &currentMeterSig );
     Functor alignHorizontally( &Object::AlignHorizontally );
     Functor alignHorizontallyEnd( &Object::AlignHorizontallyEnd );
-    this->Process( &alignHorizontally, params, &alignHorizontallyEnd );
+    this->Process( &alignHorizontally, &params, &alignHorizontallyEnd );
     
     // Set the X position of each Alignment
     // Does a duration-based non linear spacing looking at the duration space between two Alignment objects
@@ -148,7 +148,7 @@ void Page::LayOutHorizontally( )
     Functor setAlignmentX( &Object::SetAligmentXPos );
     // Special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentX );
-    this->Process( &setAlignmentX, params );
+    this->Process( &setAlignmentX, &params );
     
     // Render it for filling the bounding boxing
     View view;
@@ -165,7 +165,7 @@ void Page::LayOutHorizontally( )
     params.push_back( &grace_min_pos );
     params.push_back( doc );
     Functor setBoundingBoxGraceXShift( &Object::SetBoundingBoxGraceXShift );
-    this->Process( &setBoundingBoxGraceXShift, params );
+    this->Process( &setBoundingBoxGraceXShift, &params );
     
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
@@ -173,7 +173,7 @@ void Page::LayOutHorizontally( )
     Functor integrateBoundingBoxGraceXShift( &Object::IntegrateBoundingBoxGraceXShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxGraceXShift );
-    this->Process( &integrateBoundingBoxGraceXShift, params );
+    this->Process( &integrateBoundingBoxGraceXShift, &params );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
@@ -185,7 +185,7 @@ void Page::LayOutHorizontally( )
     params.push_back( doc );
     Functor setBoundingBoxXShift( &Object::SetBoundingBoxXShift );
     Functor setBoundingBoxXShiftEnd( &Object::SetBoundingBoxXShiftEnd );
-    this->Process( &setBoundingBoxXShift, params, &setBoundingBoxXShiftEnd );
+    this->Process( &setBoundingBoxXShift, &params, &setBoundingBoxXShiftEnd );
     
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
@@ -197,7 +197,7 @@ void Page::LayOutHorizontally( )
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );
-    this->Process( &integrateBoundingBoxXShift, params );
+    this->Process( &integrateBoundingBoxXShift, &params );
     
     // Adjust measure X position
     params.clear();
@@ -205,7 +205,7 @@ void Page::LayOutHorizontally( )
     params.push_back( &shift );
     Functor alignMeasures( &Object::AlignMeasures );
     Functor alignMeasuresEnd( &Object::AlignMeasuresEnd );
-    this->Process( &alignMeasures, params, &alignMeasuresEnd );
+    this->Process( &alignMeasures, &params, &alignMeasuresEnd );
 }
     
 void Page::LayOutVertically( )
@@ -230,7 +230,7 @@ void Page::LayOutVertically( )
     params.push_back( &systemAlignerPtr );
     params.push_back( &staffNb );
     Functor alignVertically( &Object::AlignVertically );
-    this->Process( &alignVertically, params );
+    this->Process( &alignVertically, &params );
     
     // Render it for filling the bounding boxing
     View view;
@@ -249,7 +249,7 @@ void Page::LayOutVertically( )
     params.push_back( &system_height );
     Functor setBoundingBoxYShift( &Object::SetBoundingBoxYShift );
     Functor setBoundingBoxYShiftEnd( &Object::SetBoundingBoxYShiftEnd );
-    this->Process( &setBoundingBoxYShift, params, &setBoundingBoxYShiftEnd );
+    this->Process( &setBoundingBoxYShift, &params, &setBoundingBoxYShiftEnd );
     
     // Set the Y position of each StaffAlignment
     // Adjusts the Y shift for making sure there is a minimal space (staffMargin) between each staff
@@ -263,7 +263,7 @@ void Page::LayOutVertically( )
     Functor setAlignmentY( &Object::SetAligmentYPos );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentY );
-    this->Process( &setAlignmentY, params );
+    this->Process( &setAlignmentY, &params );
     
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
@@ -273,7 +273,7 @@ void Page::LayOutVertically( )
     Functor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxYShift );
-    this->Process( &integrateBoundingBoxYShift, params );
+    this->Process( &integrateBoundingBoxYShift, &params );
     
     // Adjust system Y position
     params.clear();
@@ -283,7 +283,7 @@ void Page::LayOutVertically( )
     params.push_back( &systemMargin );
     Functor alignSystems( &Object::AlignSystems );
     Functor alignSystemsEnd( &Object::AlignSystemsEnd );
-    this->Process( &alignSystems, params, &alignSystemsEnd );
+    this->Process( &alignSystems, &params, &alignSystemsEnd );
 }
     
 void Page::JustifyHorizontally( )
@@ -317,7 +317,7 @@ void Page::JustifyHorizontally( )
     Functor justifyX( &Object::JustifyX );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &justifyX );
-    this->Process( &justifyX, params );
+    this->Process( &justifyX, &params );
 }
     
 int Page::GetContentHeight( )

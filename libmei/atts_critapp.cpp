@@ -109,15 +109,15 @@ bool AttSource::HasSource( )
 /* include <attsource> */
 
 bool Att::SetCritapp( Object *element, std::string attrType, std::string attrValue ) {
-    if (dynamic_cast<AttCrit*>(element) ) {
-        AttCrit *att = dynamic_cast<AttCrit*>(element);
+    if (element->HasAttClass( ATT_CRIT ) ) {
+        AttCrit *att = reinterpret_cast<AttCrit*>(element);
         if (attrType == "cause") {
             att->SetCause(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttSource*>(element) ) {
-        AttSource *att = dynamic_cast<AttSource*>(element);
+    if (element->HasAttClass( ATT_SOURCE ) ) {
+        AttSource *att = reinterpret_cast<AttSource*>(element);
         if (attrType == "source") {
             att->SetSource(att->StrToStr(attrValue));
             return true;
@@ -128,14 +128,14 @@ bool Att::SetCritapp( Object *element, std::string attrType, std::string attrVal
 }
 
 void Att::GetCritapp( Object *element, ArrayOfStrAttr *attributes ) {
-    if (dynamic_cast<AttCrit*>(element) ) {
-        AttCrit *att = dynamic_cast<AttCrit*>(element);
+    if (element->HasAttClass( ATT_CRIT ) ) {
+        AttCrit *att = reinterpret_cast<AttCrit*>(element);
         if (att->HasCause()) {
             attributes->push_back(std::make_pair("cause", att->StrToStr(att->GetCause())));
         }
     }
-    if (dynamic_cast<AttSource*>(element) ) {
-        AttSource *att = dynamic_cast<AttSource*>(element);
+    if (element->HasAttClass( ATT_SOURCE ) ) {
+        AttSource *att = reinterpret_cast<AttSource*>(element);
         if (att->HasSource()) {
             attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));
         }

@@ -43,6 +43,7 @@ public:
     virtual ~Measure();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Measure"; };
+    virtual int Is() { return MEASURE; };
     ///@}
     
     /**
@@ -111,53 +112,53 @@ public:
     /**
      * AlignHorizontally the content of a measure.
      */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid *params );
 
     /**
      * AlignVertically the content of a measure.
      */
-    virtual int AlignVertically( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid *params );
 
     /**
      * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
-    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params );
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
     
     /**
      * Set the position of the Alignment.
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid params );
+    virtual int SetAligmentXPos( ArrayPtrVoid *params );
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * This method also moves the end position of the measure according to the barLine width.
      */
-    virtual int AlignMeasures( ArrayPtrVoid params );
+    virtual int AlignMeasures( ArrayPtrVoid *params );
     
     /**
      * Justify the X positions
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int JustifyX( ArrayPtrVoid params );
+    virtual int JustifyX( ArrayPtrVoid *params );
     
     /**
      * Fill a page by adding systems with the appropriate length
      *
      */
-    virtual int CastOffSystems( ArrayPtrVoid params );
+    virtual int CastOffSystems( ArrayPtrVoid *params );
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
     
         
 public:

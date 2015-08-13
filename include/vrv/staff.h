@@ -43,7 +43,8 @@ public:
     Staff( int n = -1 );
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Staff"; };	
+    virtual std::string GetClassName( ) { return "Staff"; };
+    virtual int Is() { return STAFF; };
     ///@}
     
     void AddLayer( Layer *layer );
@@ -77,33 +78,33 @@ public:
     /**
      * Currently unused - kept for "documentation"
      */
-    virtual bool GetPosOnPage( ArrayPtrVoid params );
+    virtual bool GetPosOnPage( ArrayPtrVoid *params );
     
     /**
      * Align the content of a staff vertically.
      */
-    virtual int AlignVertically( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid *params );
     
     /**
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
 
     /**
      * Functor for setting running lyrics in staves
      * This is necessary for <syl> that starts in one measure and ends in another one
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
+    virtual int FillStaffCurrentLyrics( ArrayPtrVoid *params );
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid params );
+    virtual int ResetDarwing( ArrayPtrVoid *params );
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
     
 public:
 	/**

@@ -18,19 +18,25 @@ MeterSig::MeterSig():
 	LayerElement("msig-"),
     AttMeterSigLog()
 {
-    Reset();
+    Init();
 }
     
 MeterSig::MeterSig( MeterSigAttr *meterSigAttr ):
     LayerElement("msig-"),
     AttMeterSigLog()
 {
-    Reset();
+    Init();
+    
     this->SetCount(meterSigAttr->GetMeterCount());
     this->SetSym(meterSigAttr->GetMeterSym());
     this->SetUnit(meterSigAttr->GetMeterUnit());
 }
-
+    
+void MeterSig::Init()
+{
+    RegisterAttClass(ATT_METERSIGLOG);
+    Reset();
+}
 
 MeterSig::~MeterSig()
 {
@@ -51,6 +57,8 @@ MeterSigAttr::MeterSigAttr():
     AttMeterSigDefaultLog(),
     AttMeterSigDefaultVis()
 {
+    RegisterAttClass(ATT_METERSIGDEFAULTLOG);
+    RegisterAttClass(ATT_METERSIGDEFAULTVIS);
     Reset();
 }
 

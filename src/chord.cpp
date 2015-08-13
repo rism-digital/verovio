@@ -23,16 +23,18 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Chord::Chord( ):
-LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
+    LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     AttCommon(),
     AttStemmed(),
     AttTiepresent()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_TIEPRESENT);
     Reset();
+    
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingLedgerLines.clear();
-    
-    //test[NULL][0][0] = 0;
 }
 
 Chord::~Chord()
@@ -55,12 +57,10 @@ void Chord::ClearClusters()
     std::list<ChordCluster*>::iterator iter;
     for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter)
     {
-        ChordCluster *cluster = dynamic_cast<ChordCluster*>(*iter);
-        for (std::vector<Note*>::iterator clIter = cluster->begin(); clIter != cluster->end(); ++clIter)
+        for (std::vector<Note*>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter)
         {
-            Note *note = dynamic_cast<Note*>(*clIter);
-            note->m_cluster = NULL;
-            note->m_clusterPosition = 0;
+            (*clIter)->m_cluster = NULL;
+            (*clIter)->m_clusterPosition = 0;
         }
         delete *iter;
     }
@@ -237,11 +237,11 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Chord::PrepareTieAttr( ArrayPtrVoid params )
+int Chord::PrepareTieAttr( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
     // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord**>(params[1]);
+    Chord **currentChord = static_cast<Chord**>((*params)[1]);
     
     assert(!(*currentChord));
     (*currentChord) = this;
@@ -249,11 +249,11 @@ int Chord::PrepareTieAttr( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareTieAttrEnd( ArrayPtrVoid params )
+int Chord::PrepareTieAttrEnd( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
     // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord**>(params[1]);
+    Chord **currentChord = static_cast<Chord**>((*params)[1]);
     
     assert((*currentChord));
     (*currentChord) = NULL;

@@ -67,10 +67,10 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     Functor setDrawingXY( &Object::SetDrawingXY );
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
-    m_currentPage->Process( &setDrawingXY, params );
+    m_currentPage->Process( &setDrawingXY, &params );
     // Second pass that process the LayerElements (only)
     processLayerElement = true;
-    m_currentPage->Process( &setDrawingXY, params );
+    m_currentPage->Process( &setDrawingXY, &params );
     
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
@@ -111,7 +111,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     system->ResetDrawingList();
 
     // First get the first measure of the system
-    Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( &typeid(Measure) ) );
+    Measure *measure  = reinterpret_cast<Measure*>(system->FindChildByType( MEASURE ) );
     if ( measure ) {
         // NULL for the Barline parameters indicates that we are drawing the scoreDef
         DrawScoreDef( dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL );
@@ -169,7 +169,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     // we need at least one measure to be able to draw the groups - we need access to the staff elements,
     assert( measure );
     
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp*>(scoreDef->FindChildByType( &typeid(StaffGrp) ) );
+    StaffGrp *staffGrp = reinterpret_cast<StaffGrp*>(scoreDef->FindChildByType( STAFF_GRP ) );
     if ( !staffGrp ) {
         return;
     }
@@ -212,9 +212,9 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     }
     
     // Get the corresponding staff looking at the previous (or first) measure
-    AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
+    AttCommonNComparison comparisonFirst( STAFF, firstDef->GetN() );
     Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-    AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
+    AttCommonNComparison comparisonLast( STAFF, lastDef->GetN() );
     Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, 1));
     
     if (!first || !last ) {
@@ -276,9 +276,9 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
             continue;
         }
         
-        AttCommonNComparison comparison( &typeid(Staff), staffDef->GetN() );
+        AttCommonNComparison comparison( STAFF, staffDef->GetN() );
         Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ));
-        System *system = dynamic_cast<System*>(measure->GetFirstParent( &typeid(System) ) );
+        System *system = reinterpret_cast<System*>(measure->GetFirstParent( SYSTEM ) );
         
         if (!staff || !system) {
             LogDebug("Staff or System missing in View::DrawStaffDefLabels");
@@ -445,8 +445,8 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 DrawBarlines( dc, measure, childStaffGrp, barLine );
             }
             else if ( childStaffDef ) {
-                AttCommonNComparison comparison( &typeid(Staff), childStaffDef->GetN() );
-                Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ) );
+                AttCommonNComparison comparison( STAFF, childStaffDef->GetN() );
+                Staff *staff = reinterpret_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ) );
                 if (!staff ) {
                     LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
                     continue;
@@ -478,9 +478,9 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         }
         
         // Get the corresponding staff looking at the previous (or first) measure
-        AttCommonNComparison comparisonFirst( &typeid(Staff), firstDef->GetN() );
+        AttCommonNComparison comparisonFirst( STAFF, firstDef->GetN() );
         Staff *first = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonFirst, 1));
-        AttCommonNComparison comparisonLast( &typeid(Staff), lastDef->GetN() );
+        AttCommonNComparison comparisonLast( STAFF, lastDef->GetN() );
         Staff *last = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparisonLast, 1));
         
         if (!first || !last ) {
@@ -501,7 +501,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             for (i = 0; i < staffGrp->GetChildCount(); i++) {
                 childStaffDef = dynamic_cast<StaffDef*>(staffGrp->GetChild( i ));
                 if ( childStaffDef ) {
-                    AttCommonNComparison comparison( &typeid(Staff), childStaffDef->GetN() );
+                    AttCommonNComparison comparison( STAFF, childStaffDef->GetN() );
                     Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff ) {
                         LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
@@ -781,8 +781,8 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
     if ( !interface->HasStartAndEnd() ) return;
     
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System*>( interface->GetStart()->GetFirstParent( &typeid(System) )  );
-    System *parentSystem2 = dynamic_cast<System*>( interface->GetEnd()->GetFirstParent( &typeid(System) )  );
+    System *parentSystem1 = reinterpret_cast<System*>( interface->GetStart()->GetFirstParent( SYSTEM )  );
+    System *parentSystem2 = reinterpret_cast<System*>( interface->GetEnd()->GetFirstParent( SYSTEM )  );
     
     int x1, x2;
     Staff *staff = NULL;
@@ -792,7 +792,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (( system == parentSystem1 ) && ( system == parentSystem2 )) {
         // Get the parent staff for calculating the y position
-        staff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        staff = reinterpret_cast<Staff*>( interface->GetStart()->GetFirstParent( STAFF ) );
         if ( !Check( staff ) ) return;
         
         x1 = interface->GetStart()->GetDrawingX();
@@ -802,9 +802,9 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if ( system == parentSystem1 ) {
         // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        Measure *last = reinterpret_cast<Measure*>( system->FindChildByType( MEASURE, 1, BACKWARD ) );
         if ( !Check( last ) ) return;
-        staff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        staff = reinterpret_cast<Staff*>( interface->GetStart()->GetFirstParent( STAFF ) );
         if ( !Check( staff ) ) return;
         
         x1 = interface->GetStart()->GetDrawingX();
@@ -815,13 +815,13 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
     // We are in the system of the last note - draw the element from the beginning of the system
     else if ( system == parentSystem2 ) {
         // We need the first measure of the system for x1
-        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        Measure *first = reinterpret_cast<Measure*>( system->FindChildByType( MEASURE, 1, FORWARD ) );
         if ( !Check( first ) ) return;
         // Get the staff of the first note - however, not the staff we need
-        Staff *lastStaff = dynamic_cast<Staff*>( interface->GetEnd()->GetFirstParent( &typeid(Staff) ) );
+        Staff *lastStaff = reinterpret_cast<Staff*>( interface->GetEnd()->GetFirstParent( STAFF ) );
         if ( !Check( lastStaff ) ) return;
         // We need the first staff from the current system, i.e., the first measure.
-        AttCommonNComparison comparison( &typeid(Staff), lastStaff->GetN() );
+        AttCommonNComparison comparison( STAFF, lastStaff->GetN() );
         staff = dynamic_cast<Staff*>(system->FindChildByAttComparison(&comparison, 2));
         if (!staff ) {
             LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", lastStaff->GetN() );
@@ -829,7 +829,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         }
         // Also try to get a first note - we should change this once we have a x position in measure that
         // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( &typeid(Note) ) );
+        Note *firstNote = reinterpret_cast<Note*>( staff->FindChildByType( NOTE ) );
         
         x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->m_drawingDoubleUnit[staff->staffSize] : first->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
@@ -838,20 +838,20 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
     // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
     else {
         // We need the first measure of the system for x1
-        Measure *first = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, FORWARD ) );
+        Measure *first = reinterpret_cast<Measure*>( system->FindChildByType( MEASURE, 1, FORWARD ) );
         if ( !Check( first ) ) return;
         // Also try to get a first note - we should change this once we have a x position in measure that
         // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note*>( first->FindChildByType( &typeid(Note) ) );
+        Note *firstNote = reinterpret_cast<Note*>( first->FindChildByType( NOTE ) );
         // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure*>( system->FindChildByType( &typeid(Measure), 1, BACKWARD ) );
+        Measure *last = reinterpret_cast<Measure*>( system->FindChildByType( MEASURE, 1, BACKWARD ) );
         if ( !Check( last ) ) return;
         // Get the staff of the first note - however, not the staff we need
-        Staff *firstStaff = dynamic_cast<Staff*>( interface->GetStart()->GetFirstParent( &typeid(Staff) ) );
+        Staff *firstStaff = reinterpret_cast<Staff*>( interface->GetStart()->GetFirstParent( STAFF ) );
         if ( !Check( firstStaff ) ) return;
         
         // We need the staff from the current system, i.e., the first measure.
-        AttCommonNComparison comparison( &typeid(Staff), firstStaff->GetN() );
+        AttCommonNComparison comparison( STAFF, firstStaff->GetN() );
         staff = dynamic_cast<Staff*>(first->FindChildByAttComparison(&comparison, 1));
         if (!staff ) {
             LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", firstStaff->GetN() );
@@ -896,8 +896,8 @@ void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, in
         return;
     }
     
-    Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent(&typeid(Layer)));
-    Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent(&typeid(Layer)));
+    Layer* layer1 = reinterpret_cast<Layer*>(note1->GetFirstParent( LAYER ) );
+    Layer* layer2 = reinterpret_cast<Layer*>(note2->GetFirstParent( LAYER ) );
     
     if ( layer1->GetN() != layer2->GetN() ) {
         LogWarning("Ties between different layers may not be fully supported.");

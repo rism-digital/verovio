@@ -18,6 +18,7 @@ Barline::Barline():
 	LayerElement("bline-"),
     AttBarLineLog()
 {
+    RegisterAttClass(ATT_BARLINELOG);
     Reset();
     m_partialBarline = false; // this was used unitialized
     m_onStaffOnly = false; // is this good?

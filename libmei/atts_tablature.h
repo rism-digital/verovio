@@ -28,6 +28,8 @@ namespace vrv {
 // AttNoteGesTablature
 //----------------------------------------------------------------------------
 
+#define ATT_NOTEGESTABLATURE 201
+
 class AttNoteGesTablature: public Att
 {
 public:
@@ -72,6 +74,8 @@ private:
 //----------------------------------------------------------------------------
 // AttStaffDefGesTablature
 //----------------------------------------------------------------------------
+
+#define ATT_STAFFDEFGESTABLATURE 202
 
 class AttStaffDefGesTablature: public Att
 {

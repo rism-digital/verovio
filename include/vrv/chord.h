@@ -48,6 +48,7 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
+    virtual int Is() { return CHORD; };
     ///@}
     
     /**
@@ -86,12 +87,12 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    virtual int PrepareTieAttr( ArrayPtrVoid *params );
     
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
+    virtual int PrepareTieAttrEnd( ArrayPtrVoid *params );
     
 protected:
     /**

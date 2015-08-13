@@ -34,9 +34,18 @@ Note::Note():
     AttStemmed(),
     AttTiepresent()
 {
+    RegisterAttClass(ATT_COLORATION);
+    RegisterAttClass(ATT_GRACED);
+    RegisterAttClass(ATT_NOTELOGMENSURAL);
+    RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_TIEPRESENT);
+    
+    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::InterfaceId() );
+    
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
     m_isDrawingAccidAttr = false;
+    
     Reset();
 }
 
@@ -132,12 +141,12 @@ void Note::ResetDrawingAccid( )
     
 Chord* Note::IsChordTone()
 {
-    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    return reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
 }
     
 int Note::GetDrawingDur( )
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    Chord* chordParent = reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
     if( chordParent ) {
         return chordParent->GetActualDur();
     }
@@ -161,8 +170,8 @@ bool Note::HasDrawingStemDir()
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
+    Chord* chordParent = reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    Beam* beamParent = reinterpret_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
     if( chordParent ) {
         return chordParent->GetDrawingStemDir();
     }
@@ -178,12 +187,12 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::PrepareTieAttr( ArrayPtrVoid params )
+int Note::PrepareTieAttr( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties
     // param 1: Chord** currentChord for the current chord if in a chord
-    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>(params[0]);
-    Chord **currentChord = static_cast<Chord**>(params[1]);
+    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>((*params)[0]);
+    Chord **currentChord = static_cast<Chord**>((*params)[1]);
     
     AttTiepresent *check = this;
     if ((*currentChord)) {
@@ -220,7 +229,7 @@ int Note::PrepareTieAttr( ArrayPtrVoid params )
 }
     
 
-int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     if (this->m_drawingTieAttr) {
@@ -229,13 +238,13 @@ int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::PrepareLyrics( ArrayPtrVoid params )
+int Note::PrepareLyrics( ArrayPtrVoid *params )
 {
     // param 0: the current Syl (unused)
     // param 1: the last Note
     // param 2: the last but one Note
-    Note **lastNote = static_cast<Note**>(params[1]);
-    Note **lastButOneNote = static_cast<Note**>(params[2]);
+    Note **lastNote = static_cast<Note**>((*params)[1]);
+    Note **lastButOneNote = static_cast<Note**>((*params)[2]);
     
     (*lastButOneNote) = (*lastNote);
     (*lastNote) = this;
@@ -243,10 +252,10 @@ int Note::PrepareLyrics( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::PreparePointersByLayer( ArrayPtrVoid params )
+int Note::PreparePointersByLayer( ArrayPtrVoid *params )
 {
     // param 0: the current Note
-    Note **currentNote = static_cast<Note**>(params[0]);
+    Note **currentNote = static_cast<Note**>((*params)[0]);
     
     this->ResetDrawingAccid();
     if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
@@ -264,7 +273,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::ResetDarwing( ArrayPtrVoid params )
+int Note::ResetDarwing( ArrayPtrVoid *params )
 {
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;

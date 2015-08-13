@@ -28,6 +28,8 @@ namespace vrv {
 // AttLigatureLog
 //----------------------------------------------------------------------------
 
+#define ATT_LIGATURELOG 61
+
 class AttLigatureLog: public Att
 {
 public:
@@ -65,6 +67,8 @@ private:
 //----------------------------------------------------------------------------
 // AttMensurVis
 //----------------------------------------------------------------------------
+
+#define ATT_MENSURVIS 62
 
 class AttMensurVis: public Att
 {
@@ -110,6 +114,8 @@ private:
 //----------------------------------------------------------------------------
 // AttMensuralLog
 //----------------------------------------------------------------------------
+
+#define ATT_MENSURALLOG 63
 
 class AttMensuralLog: public Att
 {
@@ -188,6 +194,8 @@ private:
 // AttMensuralShared
 //----------------------------------------------------------------------------
 
+#define ATT_MENSURALSHARED 64
+
 class AttMensuralShared: public Att
 {
 public:
@@ -246,6 +254,8 @@ private:
 //----------------------------------------------------------------------------
 // AttMensuralVis
 //----------------------------------------------------------------------------
+
+#define ATT_MENSURALVIS 65
 
 class AttMensuralVis: public Att
 {
@@ -316,6 +326,8 @@ private:
 // AttNoteLogMensural
 //----------------------------------------------------------------------------
 
+#define ATT_NOTELOGMENSURAL 66
+
 class AttNoteLogMensural: public Att
 {
 public:
@@ -353,6 +365,8 @@ private:
 //----------------------------------------------------------------------------
 // AttRestVisMensural
 //----------------------------------------------------------------------------
+
+#define ATT_RESTVISMENSURAL 67
 
 class AttRestVisMensural: public Att
 {

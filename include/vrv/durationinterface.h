@@ -25,7 +25,7 @@ class Object;
  * This class is an interface for elements with duration, such as notes and rests.
  * It is not an abstract class but should not be instanciate directly.
  */
-class DurationInterface:
+class DurationInterface: public AttInterface,
     public AttAugmentdots,
     public AttBeamsecondary,
     public AttDurationMusical,

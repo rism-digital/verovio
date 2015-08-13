@@ -36,10 +36,12 @@ public:
     ///@{
     Clef();
     Clef( ClefAttr *clefAttr );
+    void Init();
     virtual ~Clef();
     virtual void Reset();
     virtual Object* Clone() { return new Clef(*this); };
     virtual std::string GetClassName( ) { return "Clef"; };
+    virtual int Is() { return CLEF; };
     ///@}
     
     /**
@@ -81,6 +83,7 @@ public:
     virtual ~ClefAttr();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "ClefAttr"; };
+    virtual int Is() { return CLEF_ATTR; };
     virtual Object* Clone() { return new ClefAttr(*this); };
     ///@}
     

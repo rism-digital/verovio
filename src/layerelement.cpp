@@ -143,37 +143,37 @@ void LayerElement::ResetHorizontalAlignment()
     
 bool LayerElement::IsAccid( )
 {
-    return (dynamic_cast<Accid*>(this));
+    return (this->Is() == ACCID);
 }
 
 bool LayerElement::IsBarline() 
 {  
-    return (dynamic_cast<Barline*>(this));
+    return (this->Is() == BAR_LINE);
 }
 
 bool LayerElement::IsBeam() 
 {  
-    return (dynamic_cast<Beam*>(this));
+    return (this->Is() == BEAM);
 }
 
 bool LayerElement::IsChord()
 {
-    return (dynamic_cast<Chord*>(this));
+    return (this->Is() == CHORD);
 }
     
 bool LayerElement::IsClef() 
 {  
-    return (dynamic_cast<Clef*>(this));
+    return (this->Is() == CLEF);
 }
 
 bool LayerElement::IsCustos( )
 {
-    return (dynamic_cast<Custos*>(this));
+    return (this->Is() == CUSTOS);
 }
 
 bool LayerElement::IsDot( )
 {
-    return (dynamic_cast<Dot*>(this));
+    return (this->Is() == DOT);
 }
     
 bool LayerElement::HasDurationInterface() 
@@ -183,33 +183,33 @@ bool LayerElement::HasDurationInterface()
 
 bool LayerElement::IsKeySig()
 {
-    return (dynamic_cast<KeySig*>(this));
+    return (this->Is() == KEY_SIG);
 }
 
     
 bool LayerElement::IsMRest()
 {
-    return (dynamic_cast<MRest*>(this));
+    return (this->Is() == MREST);
 }
     
 bool LayerElement::IsMultiRest() 
 {  
-    return (dynamic_cast<MultiRest*>(this));
+    return (this->Is() == MULTI_REST);
 }
 
-bool LayerElement::IsMensur() 
-{  
-    return (dynamic_cast<Mensur*>(this));
+bool LayerElement::IsMensur()
+{
+    return (this->Is() == MENSUR);
 }
     
 bool LayerElement::IsMeterSig()
 {
-    return (dynamic_cast<MeterSig*>(this));
+    return (this->Is() == METER_SIG);
 }
     
 bool LayerElement::IsNote() 
 {  
-    return (dynamic_cast<Note*>(this));
+    return (this->Is() == NOTE);
 }
 
 bool LayerElement::IsGraceNote()
@@ -261,7 +261,7 @@ bool LayerElement::IsVerse()
 bool LayerElement::IsCueSize()
 {
     if (this->IsNote()) return dynamic_cast<Note*>(this)->HasGrace();
-    Note *note = dynamic_cast<Note*>(this->GetFirstParent(&typeid(Note), MAX_ACCID_DEPTH ) );
+    Note *note = reinterpret_cast<Note*>(this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
     return ( note && ( note->HasGrace() ) );
 }
     
@@ -289,7 +289,7 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
     }
     
     if ( HasDurationInterface() ) {
-        Tuplet *tuplet = dynamic_cast<Tuplet*>( this->GetFirstParent( &typeid(Tuplet), MAX_TUPLET_DEPTH ) );
+        Tuplet *tuplet = reinterpret_cast<Tuplet*>( this->GetFirstParent( TUPLET, MAX_TUPLET_DEPTH ) );
         int num = 1;
         int numbase = 1;
         if ( tuplet ) {
@@ -317,22 +317,22 @@ int LayerElement::GetXRel()
 // LayerElement functors methods
 //----------------------------------------------------------------------------
 
-int LayerElement::AlignHorizontally( ArrayPtrVoid params )
+int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
 {
     // param 0: the measureAligner
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig (unused)
-    MeasureAligner **measureAligner = static_cast<MeasureAligner**>(params[0]);
-    double *time = static_cast<double*>(params[1]);
-    Mensur **currentMensur = static_cast<Mensur**>(params[2]);
-    MeterSig **currentMeterSig = static_cast<MeterSig**>(params[3]);
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params)[0]);
+    double *time = static_cast<double*>((*params)[1]);
+    Mensur **currentMensur = static_cast<Mensur**>((*params)[2]);
+    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params)[3]);
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
     
     
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    Chord* chordParent = reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
     if( chordParent )
     {
         m_alignment = chordParent->GetAlignment();
@@ -413,11 +413,11 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid params )
 }
     
 
-int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
+int LayerElement::PrepareTimeSpanning( ArrayPtrVoid *params )
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
     
     std::vector<DocObject*>::iterator iter = elements->begin();
     while ( iter != elements->end()) {
@@ -434,7 +434,7 @@ int LayerElement::PrepareTimeSpanning( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int LayerElement::SetDrawingXY( ArrayPtrVoid params )
+int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
 {
     // param 0: a pointer doc
     // param 1: a pointer to the current system (unused)
@@ -443,12 +443,12 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view
     // param 6: a bool indicating if we are processing layer elements or not
-    Doc *doc = static_cast<Doc*>(params[0]);
-    Measure **currentMeasure = static_cast<Measure**>(params[2]);
-    Staff **currentStaff = static_cast<Staff**>(params[3]);
-    Layer **currentLayer = static_cast<Layer**>(params[4]);
-    View *view = static_cast<View*>(params[5]);
-    bool *processLayerElements = static_cast<bool*>(params[6]);
+    Doc *doc = static_cast<Doc*>((*params)[0]);
+    Measure **currentMeasure = static_cast<Measure**>((*params)[2]);
+    Staff **currentStaff = static_cast<Staff**>((*params)[3]);
+    Layer **currentLayer = static_cast<Layer**>((*params)[4]);
+    View *view = static_cast<View*>((*params)[5]);
+    bool *processLayerElements = static_cast<bool*>((*params)[6]);
     
     // First pass, only set the X position
     if ((*processLayerElements)==false) {
@@ -479,7 +479,7 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
     // If we have one, make is available in m_crossStaff
     DurationInterface *durElement = dynamic_cast<DurationInterface*>(this);
     if ( durElement && durElement->HasStaff()) {
-        AttCommonNComparison comparisonFirst( &typeid(Staff), durElement->GetStaff() );
+        AttCommonNComparison comparisonFirst( STAFF, durElement->GetStaff() );
         m_crossStaff = dynamic_cast<Staff*>((*currentMeasure)->FindChildByAttComparison(&comparisonFirst, 1));
         if (m_crossStaff) {
             if (m_crossStaff == (*currentStaff)) LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff", durElement->GetStaff(), this->GetUuid().c_str());
@@ -487,7 +487,7 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid params )
             int layerN = (*currentLayer)->GetN();
             // When we will have allowed @layer in <note>, we will have to do:
             // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
-            AttCommonNComparison comparisonFirstLayer( &typeid(Layer), layerN );
+            AttCommonNComparison comparisonFirstLayer( LAYER, layerN );
             m_crossLayer = dynamic_cast<Layer*>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
             if (m_crossLayer) {
                 // Now we need to yet the element at the same position in the cross-staff layer of getting the right clef

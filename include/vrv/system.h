@@ -40,6 +40,7 @@ public:
     virtual ~System();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "System"; };
+    virtual int Is() { return SYSTEM; };
     ///@}
 	
 	void AddMeasure( Measure *measure );
@@ -87,63 +88,63 @@ public:
     /**
      * Align the content of a system vertically.
      */
-    virtual int AlignVertically( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid *params );
     
     /**
      * Set the position of the StaffAlignment.
      * Redirect the functor to the SytemAligner
      */
-    virtual int SetAligmentYPos( ArrayPtrVoid params );
+    virtual int SetAligmentYPos( ArrayPtrVoid *params );
     
     /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the SystemAligner.
      */
-    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid *params );
     
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
-    virtual int AlignSystems( ArrayPtrVoid params );
+    virtual int AlignSystems( ArrayPtrVoid *params );
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * In System object resets the shift to 0;
      */
-    virtual int AlignMeasures( ArrayPtrVoid params );
+    virtual int AlignMeasures( ArrayPtrVoid *params );
     
     /** 
      * Store the width of the system in the MeasureAligner for justification
      */
-    virtual int AlignMeasuresEnd( ArrayPtrVoid params );
+    virtual int AlignMeasuresEnd( ArrayPtrVoid *params );
     
     /**
      * Justify the X positions
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int JustifyX( ArrayPtrVoid params );
+    virtual int JustifyX( ArrayPtrVoid *params );
     
     /**
      * Lay out the Y positions of the staff looking that the bounding boxes of each staff
      * This is the Functor called at the end of the system or a measure.
      */
-    virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid params );
+    virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid *params );
     
     /**
      *
      */
-    virtual int CastOffPages( ArrayPtrVoid params );
+    virtual int CastOffPages( ArrayPtrVoid *params );
     
     /**
      * Undo the cast of the system.
      * This is used by Doc::ContinuousLayout
      */
-    virtual int UnCastOff( ArrayPtrVoid params );
+    virtual int UnCastOff( ArrayPtrVoid *params );
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
 
     
 private:

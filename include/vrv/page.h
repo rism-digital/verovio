@@ -40,6 +40,7 @@ public:
     virtual ~Page();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Page"; };
+    virtual int Is() { return PAGE; };
     ///@}
 
 	void AddSystem( System *system );

@@ -1716,7 +1716,7 @@ bool MeiInput::ReadMeiMRest( Object *parent, pugi::xml_node mRest )
 
 bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
 {
-	MultiRest *vrvMultiRest = new MultiRest( 1 );
+	MultiRest *vrvMultiRest = new MultiRest( );
     ReadLayerElement(multiRest, vrvMultiRest);
     
     vrvMultiRest->ReadNumbered(multiRest);
@@ -2262,8 +2262,8 @@ bool MeiInput::ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSp
         return false;
     }
     
-    LayerElement *startChild =  dynamic_cast<LayerElement*>( start->GetLastParentNot( &typeid(Layer) ) );
-    LayerElement *endChild =  dynamic_cast<LayerElement*>( end->GetLastParentNot( &typeid(Layer) ) );
+    LayerElement *startChild =  reinterpret_cast<LayerElement*>( start->GetLastParentNot( LAYER ) );
+    LayerElement *endChild =  reinterpret_cast<LayerElement*>( end->GetLastParentNot( LAYER ) );
     
     if ( !startChild || !endChild || (startChild->m_parent != endChild->m_parent) ) {
         LogWarning( "Start and end elements for <tupletSpan> '%s' not in the same layer", tuplet->GetUuid().c_str() );

@@ -20,17 +20,26 @@ Clef::Clef():
     AttLineloc(),
     AttOctavedisplacement()
 {
-    Reset();
+    Init();
 }
     
 Clef::Clef( ClefAttr *clefAttr ):
     LayerElement("clef-")
 {
-    Clef();
+    Init();
+    
     this->SetShape(clefAttr->GetClefShape());
     this->SetLine(clefAttr->GetClefLine());
     this->SetDis(clefAttr->GetClefDis());
     this->SetDisPlace(clefAttr->GetClefDisPlace());
+}
+    
+void Clef::Init()
+{
+    RegisterAttClass(ATT_CLEFSHAPE);
+    RegisterAttClass(ATT_LINELOC);
+    RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    Reset();
 }
 
 Clef::~Clef()
@@ -82,9 +91,9 @@ ClefAttr::ClefAttr():
     Object(),
     AttCleffingLog()
 {
+    RegisterAttClass(ATT_CLEFFINGLOG);
     Reset();
 }
-
 
 ClefAttr::~ClefAttr()
 {

@@ -39,6 +39,7 @@ public:
     // constructors and destructors
     Doc();
     virtual ~Doc();
+    virtual int Is() { return DOC; }
 	
 	void AddPage( Page *page );
     
@@ -185,7 +186,7 @@ public:
      * Functor for setting wordpos and connector ends
      * The functor is process by doc at the end of a document of closing opened syl.
      */
-    virtual int PrepareLyricsEnd( ArrayPtrVoid params );
+    virtual int PrepareLyricsEnd( ArrayPtrVoid *params );
 
 private:
     /**

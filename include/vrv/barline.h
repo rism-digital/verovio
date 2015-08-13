@@ -35,6 +35,7 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new Barline(*this); };
     virtual std::string GetClassName( ) { return "Barline"; };
+    virtual int Is() { return BAR_LINE; };
     ///@}  
     
     /**
@@ -80,6 +81,7 @@ public:
     virtual ~BarlineAttr();
     virtual Object* Clone() { return new BarlineAttr(*this); };
     virtual std::string GetClassName( ) { return "BarlineAttr"; };
+    virtual int Is() { return BAR_LINE_ATTR; };
     ///@}
 };
     

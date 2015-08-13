@@ -30,6 +30,7 @@ Verse::Verse():
     LayerElement("verse-"),
     AttCommon()
 {
+    RegisterAttClass(ATT_COMMON);
     Reset();
 }
 
@@ -55,12 +56,12 @@ void Verse::AddLayerElement(vrv::LayerElement *element)
 // Verse functor methods
 //----------------------------------------------------------------------------
 
-int Verse::AlignVertically( ArrayPtrVoid params )
+int Verse::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner
     // param 1: the staffNb
-    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[0]);
-    int *staffNb = static_cast<int*>(params[1]);
+    SystemAligner **systemAligner = static_cast<SystemAligner**>((*params)[0]);
+    int *staffNb = static_cast<int*>((*params)[1]);
     
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
@@ -76,16 +77,16 @@ int Verse::AlignVertically( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Verse::PrepareProcessingLists( ArrayPtrVoid params )
+int Verse::PrepareProcessingLists( ArrayPtrVoid *params )
 {
     // param 0: the IntTree* for staff/layer/verse
     // param 1: the IntTree* for staff/layer (unused)
-    IntTree *tree = static_cast<IntTree*>(params[0]);
+    IntTree *tree = static_cast<IntTree*>((*params)[0]);
     // Alternate solution with StaffN_LayerN_VerseN_t
-    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params)[0]);
     
-    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
-    Layer *layer = dynamic_cast<Layer*>( this->GetFirstParent( &typeid( Layer ) ) );
+    Staff *staff = reinterpret_cast<Staff*>( this->GetFirstParent( STAFF ) );
+    Layer *layer = reinterpret_cast<Layer*>( this->GetFirstParent( LAYER ) );
     assert( staff && layer );
     
     tree->child[ staff->GetN() ].child[ layer->GetN() ].child[ this->GetN() ];

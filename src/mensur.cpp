@@ -25,13 +25,14 @@ Mensur::Mensur():
     AttMensurVis(),
     AttSlashcount()
 {
-    Reset();
+    Init();
 }
     
 Mensur::Mensur( MensurAttr *mensurAttr ):
     LayerElement("mensur-")
 {
-    Mensur();
+    Init();
+    
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
@@ -45,6 +46,16 @@ Mensur::Mensur( MensurAttr *mensurAttr ):
     this->SetNumbase(mensurAttr->GetProportNumbase());
     // It is unclear why we don't have mensur.num and mensur.numbase attributes
     // in att.mensura.default.log - ask Perry...
+}
+    
+void Mensur::Init()
+{
+    RegisterAttClass(ATT_DURATIONRATIO);
+    RegisterAttClass(ATT_MENSURALSHARED);
+    RegisterAttClass(ATT_MENSURLOG);
+    RegisterAttClass(ATT_METERSIGVIS);
+    RegisterAttClass(ATT_SLASHCOUNT);
+    Reset();
 }
 
 Mensur::~Mensur()

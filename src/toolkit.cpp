@@ -574,7 +574,7 @@ int Toolkit::GetPageWithElement( const std::string &xmlId ) {
     if (!element) {
         return 0;
     }
-    Page *page = dynamic_cast<Page*>( element->GetFirstParent( &typeid(Page) ) );
+    Page *page = reinterpret_cast<Page*>( element->GetFirstParent( PAGE ) );
     if (!page) {
         return 0;
     }
@@ -611,9 +611,9 @@ bool Toolkit::Drag( std::string elementId, int x, int y )
 {
     if ( !m_doc.GetDrawingPage() ) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if ( dynamic_cast<Note*>(element) ) {
-        Note *note = dynamic_cast<Note*>(element);
-        Layer *layer = dynamic_cast<Layer*>(note->GetFirstParent(&typeid(Layer)));
+    if ( element->Is() == NOTE ) {
+        Note *note = reinterpret_cast<Note*>(element);
+        Layer *layer = reinterpret_cast<Layer*>(note->GetFirstParent( LAYER ) );
         if ( !layer ) return false;
         int oct;
         data_PITCHNAME pname = (data_PITCHNAME)m_view.CalculatePitchCode( layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct  );
@@ -645,7 +645,7 @@ bool Toolkit::Insert( std::string elementType, std::string startid, std::string 
         return false;
     }
     
-    Measure *measure = dynamic_cast<Measure*>(start->GetFirstParent(&typeid(Measure)));
+    Measure *measure = reinterpret_cast<Measure*>(start->GetFirstParent( MEASURE ) );
     assert( measure );
     if (elementType == "slur" ) {
         Slur *slur = new Slur();

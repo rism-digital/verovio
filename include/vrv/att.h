@@ -16,7 +16,7 @@
 #include "attdef.h"
 
 namespace vrv {
-    
+
 class Object;
 
 //----------------------------------------------------------------------------
@@ -200,6 +200,33 @@ public:
 };
     
 //----------------------------------------------------------------------------
+// AttInterface
+//----------------------------------------------------------------------------
+
+class AttInterface
+{
+    
+public:
+    AttInterface() {};
+    virtual ~AttInterface() {};
+    
+    /**
+     *
+     */
+    void RegisterInterfaceAttClass( int attClassId ) { m_interfaceAttClasses.push_back( attClassId ); };
+    std::vector<int> *GetAttClasses() { return &m_interfaceAttClasses; };
+    
+    virtual int InterfaceId() { return 0; };
+    
+    
+private:
+    /**
+     *
+     */
+    std::vector<int> m_interfaceAttClasses;
+};
+    
+//----------------------------------------------------------------------------
 // AttComparison
 //----------------------------------------------------------------------------
 
@@ -207,18 +234,18 @@ class AttComparison
 {
     
 public:
-    AttComparison( const std::type_info *elementType ) {
-        m_elementType = elementType;
+    AttComparison( int classId ) {
+        m_classId = classId;
     };
     
     virtual bool operator() (Object *object);
     
-    const std::type_info *GetType() { return m_elementType; };
+    int GetType() { return m_classId; };
     
     bool MatchesType( Object *object );
     
 protected:
-    const std::type_info *m_elementType;
+    int m_classId;
 };
     
 } // namespace vrv

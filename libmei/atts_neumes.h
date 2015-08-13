@@ -28,6 +28,8 @@ namespace vrv {
 // AttIneumeLog
 //----------------------------------------------------------------------------
 
+#define ATT_INEUMELOG 74
+
 class AttIneumeLog: public Att
 {
 public:
@@ -72,6 +74,8 @@ private:
 //----------------------------------------------------------------------------
 // AttUneumeLog
 //----------------------------------------------------------------------------
+
+#define ATT_UNEUMELOG 75
 
 class AttUneumeLog: public Att
 {

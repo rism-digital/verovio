@@ -28,6 +28,8 @@ namespace vrv {
 // AttTabular
 //----------------------------------------------------------------------------
 
+#define ATT_TABULAR 54
+
 class AttTabular: public Att
 {
 public:

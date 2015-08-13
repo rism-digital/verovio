@@ -40,6 +40,7 @@ public:
     virtual ~Beam();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Beam"; };
+    virtual int Is() { return BEAM; };
     ///@}
     
     int GetNoteCount() const { return (int)m_children.size(); };

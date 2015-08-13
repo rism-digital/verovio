@@ -196,7 +196,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     // Get the immediate parent of the note
     // to see if beamed or not
-    Beam *beam_parent = dynamic_cast<Beam*>(note->GetFirstParent(&typeid(Beam)));
+    Beam *beam_parent = reinterpret_cast<Beam*>(note->GetFirstParent( BEAM ));
     
     // This note is beamed and cue sized
     if (beam_parent != NULL) {
@@ -397,7 +397,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
     
     if (note->GetDrawingTieAttr()) {
-        System *system = dynamic_cast<System*>(measure->GetFirstParent(&typeid(System)));
+        System *system = reinterpret_cast<System*>(measure->GetFirstParent( SYSTEM ) );
         // create a placeholder for the tie attribute that will be drawn from the system
         dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
         dc->EndGraphic(note->GetDrawingTieAttr(), this);
@@ -886,7 +886,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     bool inBeam = false;
     // Get the immadiate parent of the note
     // to see if beamed or not
-    Beam *beam_parent = dynamic_cast<Beam*>(chord->GetFirstParent(&typeid(Beam)));
+    Beam *beam_parent = reinterpret_cast<Beam*>(chord->GetFirstParent( BEAM ));
     
     // This note is beamed and cue sized
     if (beam_parent != NULL) {
@@ -1153,7 +1153,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     bool cueSize = false;
     // force cue size for intermediate clefs
-    if (clef->GetFirstParent(&typeid(Layer))) cueSize = true;
+    if (clef->GetFirstParent( LAYER )) cueSize = true;
     
     if (!cueSize)
         a -= m_doc->m_drawingUnit[staff->staffSize] * 2;
@@ -1427,7 +1427,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         // position is currently only above the staff
         int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
-        Note *note = dynamic_cast<Note*>( accid->GetFirstParent( &typeid(Note), MAX_ACCID_DEPTH ) );
+        Note *note = reinterpret_cast<Note*>( accid->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
         if ( note ) {
             if ( note->GetDrawingY() > y ) {
                 y = note->GetDrawingY() + m_doc->m_drawingUnit[staff->staffSize];
@@ -1592,7 +1592,7 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->ResetBrush();
     
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( &typeid(System) ) );
+        System *currentSystem = reinterpret_cast<System*>( measure->GetFirstParent( SYSTEM ) );
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1748,7 +1748,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
     Note *note = dynamic_cast<Note*>(element);
     assert( note );
 
-    Staff *staff = dynamic_cast<Staff*>( note->GetFirstParent( &typeid( Staff ) ) );
+    Staff *staff = reinterpret_cast<Staff*>( note->GetFirstParent( STAFF ) );
     assert( staff );
     
     if (note->GetActualDur() < DUR_8)

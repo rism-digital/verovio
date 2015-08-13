@@ -28,6 +28,8 @@ namespace vrv {
 // AttAlignment
 //----------------------------------------------------------------------------
 
+#define ATT_ALIGNMENT 59
+
 class AttAlignment: public Att
 {
 public:

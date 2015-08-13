@@ -52,6 +52,7 @@ public:
     EditorialElement(std::string classid);
     virtual ~EditorialElement();
     virtual void Reset();
+    virtual int Is() { return EDITORIAL_ELEMENT; };
     ///@}
 
     /**
@@ -77,7 +78,7 @@ public:
      * For EditorialElement, this means only moving them since their width is not
      * taken into account. Only system children EditorialElement are processed.
      */
-    virtual int CastOffSystems( ArrayPtrVoid params );
+    virtual int CastOffSystems( ArrayPtrVoid *params );
     
 protected:
     
@@ -107,6 +108,7 @@ public:
     virtual ~App();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "App"; };
+    virtual int Is() { return APP; };
     ///@}
     
     /** Getter for level **/
@@ -147,6 +149,7 @@ public:
     virtual ~Lem();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Lem"; };
+    virtual int Is() { return LEM; };
     ///@}
     
 protected:
@@ -176,6 +179,7 @@ public:
     virtual ~Rdg();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Rdg"; };
+    virtual int Is() { return RDG; };
     ///@}
     
 protected:
@@ -205,6 +209,7 @@ public:
     virtual ~Supplied();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Supplied"; };
+    virtual int Is() { return SUPPLIED; };
     ///@}
     
 protected:

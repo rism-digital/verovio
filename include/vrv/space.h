@@ -33,6 +33,7 @@ public:
     virtual ~Space();
     virtual void Reset();
     virtual std::string GetClassName( ){ return "Space"; }; ;
+    virtual int Is() { return SPACE; };
     ///@}
 
 private:

@@ -28,6 +28,8 @@ namespace vrv {
 // AttSurface
 //----------------------------------------------------------------------------
 
+#define ATT_SURFACE 76
+
 class AttSurface: public Att
 {
 public:

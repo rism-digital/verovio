@@ -28,6 +28,8 @@ namespace vrv {
 // AttAgentident
 //----------------------------------------------------------------------------
 
+#define ATT_AGENTIDENT 49
+
 class AttAgentident: public Att
 {
 public:
@@ -68,6 +70,8 @@ private:
 //----------------------------------------------------------------------------
 // AttEdit
 //----------------------------------------------------------------------------
+
+#define ATT_EDIT 50
 
 class AttEdit: public Att
 {
@@ -118,6 +122,8 @@ private:
 // AttExtent
 //----------------------------------------------------------------------------
 
+#define ATT_EXTENT 51
+
 class AttExtent: public Att
 {
 public:
@@ -155,6 +161,8 @@ private:
 //----------------------------------------------------------------------------
 // AttReasonident
 //----------------------------------------------------------------------------
+
+#define ATT_REASONIDENT 52
 
 class AttReasonident: public Att
 {

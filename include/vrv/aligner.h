@@ -62,6 +62,7 @@ public:
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
+    virtual int Is() { return SYSTEM_ALIGNER; }
     
     int GetStaffAlignmentCount() const { return (int)m_children.size(); };
     
@@ -108,6 +109,7 @@ public:
     // constructors and destructors
     StaffAlignment();
     virtual ~StaffAlignment();
+    virtual int Is() { return STAFF_ALIGNMENT; }
     
     void SetYRel( int yRel ) { m_yRel = yRel; };
     int GetYRel() { return m_yRel; };
@@ -131,13 +133,13 @@ public:
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
      */
-    virtual int SetAligmentYPos( ArrayPtrVoid params );
+    virtual int SetAligmentYPos( ArrayPtrVoid *params );
     
     /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from System.
      */
-    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid *params );
     
 private:
     
@@ -174,6 +176,7 @@ public:
     Alignment( );
     Alignment( double time, AlignmentType type = ALIGNMENT_DEFAULT );
     virtual ~Alignment();
+    virtual int Is() { return ALIGNMENT; }
     
     void SetXRel( int x_rel );
     int GetXRel() { return m_xRel; };
@@ -215,25 +218,25 @@ public:
      * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
-    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params );
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
     
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid params );
+    virtual int SetAligmentXPos( ArrayPtrVoid *params );
     
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX( ArrayPtrVoid params );
+    virtual int JustifyX( ArrayPtrVoid *params );
     
 private:
     
@@ -294,6 +297,7 @@ public:
     // constructors and destructors
     MeasureAligner();
     virtual ~MeasureAligner();
+    virtual int Is() { return MEASURE_ALIGNER; }
     
     int GetAlignmentCount() const { return (int)m_children.size(); };
     
@@ -337,20 +341,20 @@ public:
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid params );
+    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
     
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid params );
+    virtual int SetAligmentXPos( ArrayPtrVoid *params );
     
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX( ArrayPtrVoid params );
+    virtual int JustifyX( ArrayPtrVoid *params );
     
 private:
     void AddAlignment( Alignment *alignment, int idx = -1 );
@@ -388,6 +392,7 @@ public:
     // constructors and destructors
     GraceAligner( );
     virtual ~GraceAligner();
+    virtual int Is() { return GRACE_ALIGNER; }
     
     /**
      * Because the grace notes appear from left to right but need to be aligned

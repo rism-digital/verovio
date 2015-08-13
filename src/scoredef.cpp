@@ -308,7 +308,7 @@ void ScoreDef::Replace( ScoreDef *newScoreDef )
     ArrayPtrVoid params;
 	params.push_back( this );
     Functor replaceStaffDefsInScoreDef( &Object::ReplaceStaffDefsInScoreDef );
-    newScoreDef->Process( &replaceStaffDefsInScoreDef, params );
+    newScoreDef->Process( &replaceStaffDefsInScoreDef, &params );
 }
 
 void ScoreDef::Replace( StaffDef *newStaffDef )
@@ -373,7 +373,7 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSi
 	params.push_back( &mensur );
     params.push_back( &meterSig );
     Functor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
-    this->Process( &setStaffDefDraw, params );
+    this->Process( &setStaffDefDraw, &params );
 }
 
 //----------------------------------------------------------------------------
@@ -437,6 +437,9 @@ StaffDef::StaffDef() :
     AttLabelsAddl(),
     AttStaffDefVis()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_LABELSADDL);
+    RegisterAttClass(ATT_STAFFDEFVIS);
     Reset();
 }
 
@@ -462,15 +465,15 @@ void StaffDef::Reset()
 // ScoreDef functor methods
 //----------------------------------------------------------------------------
 
-int ScoreDef::CastOffSystems( ArrayPtrVoid params )
+int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
 {
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to (unused)
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
-    System *contentSystem = static_cast<System*>(params[0]);
-    System **currentSystem = static_cast<System**>(params[2]);
+    System *contentSystem = static_cast<System*>((*params)[0]);
+    System **currentSystem = static_cast<System**>((*params)[2]);
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert( dynamic_cast<System*>(this->m_parent));
@@ -489,26 +492,26 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid params )
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceStaffDefsInScoreDef( ArrayPtrVoid params )
+int StaffDef::ReplaceStaffDefsInScoreDef( ArrayPtrVoid *params )
 {
     // param 0: the scoreDef
-    ScoreDef *scoreDef = static_cast<ScoreDef*>(params[0]);
+    ScoreDef *scoreDef = static_cast<ScoreDef*>((*params)[0]);
     
     scoreDef->Replace( this );
     
     return FUNCTOR_CONTINUE;
 }
 
-int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid params )
+int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid *params )
 {
     // param 0: bool clef flag
     // param 1: bool keysig flag
     // param 2: bool mensur flag
     // param 3: bool meterSig flag
-    bool *clef = static_cast<bool*>(params[0]);
-    bool *keysig = static_cast<bool*>(params[1]);
-    bool *mensur = static_cast<bool*>(params[2]);
-    bool *meterSig = static_cast<bool*>(params[3]);
+    bool *clef = static_cast<bool*>((*params)[0]);
+    bool *keysig = static_cast<bool*>((*params)[1]);
+    bool *mensur = static_cast<bool*>((*params)[2]);
+    bool *meterSig = static_cast<bool*>((*params)[3]);
     
     if ( (*clef) ) {
         this->SetDrawClef( true );

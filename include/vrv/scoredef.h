@@ -155,6 +155,7 @@ public:
     virtual ~ScoreDef();    
     virtual void Reset();
     virtual std::string GetClassName( ) { return "ScoreDef"; };
+    virtual int Is() { return SCORE_DEF; };
     ///@}
     
 	void AddStaffGrp( StaffGrp *staffGrp );
@@ -199,7 +200,7 @@ public:
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
-    virtual int CastOffSystems( ArrayPtrVoid params );
+    virtual int CastOffSystems( ArrayPtrVoid *params );
     
 protected:
     /**
@@ -240,6 +241,7 @@ public:
     virtual Object* Clone() { return new StaffGrp(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffGrp"; };
+    virtual int Is() { return STAFF_GRP; };
     ///@}
 	
 	void AddStaffDef( StaffDef *staffDef );
@@ -307,6 +309,7 @@ public:
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
+    virtual int Is() { return STAFF_DEF; };
     ///@}
     
     /**
@@ -335,7 +338,7 @@ public:
      * Calls ScoreDef::Replace.
      * param 0: a pointer to the scoreDef we are going to replace the staffDefs
      */
-    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid params );
+    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid *params );
     
     /**
      * Set flags for the staff set for indicating whether clefs, keysig, etc. needs to be redrawn.
@@ -344,7 +347,7 @@ public:
      * param 1: bool keysig flag.
      * param 2: bool the mensur flag.
      */
-    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params );
+    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid *params );
     
 private:
     

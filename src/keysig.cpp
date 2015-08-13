@@ -50,9 +50,11 @@ int KeySig::octave_map[2][9][7] = {
 };
 
 KeySig::KeySig():
-    LayerElement("ksig-")
+    LayerElement("ksig-"),
+    AttAccidental(),
+    AttPitch()
 {
-    Reset();
+    Init();
 }
 
 KeySig::KeySig(int num_alter, char alter):
@@ -60,7 +62,8 @@ KeySig::KeySig(int num_alter, char alter):
     AttAccidental(),
     AttPitch()
 {
-    Reset();
+    Init();
+    
     m_num_alter = num_alter;
     m_alteration = alter;
 }
@@ -70,7 +73,8 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
     AttAccidental(),
     AttPitch()
 {
-    Reset();
+    Init();
+    
     char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
     /* see data_KEYSIGNATURE order; key will be:
       0 for KEYSIGNATURE_0
@@ -91,6 +95,13 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
         m_alteration = ACCID_FLAT;
     }
     m_num_alter = abs(key);
+}
+   
+void KeySig::Init()
+{
+    RegisterAttClass(ATT_ACCIDENTAL);
+    RegisterAttClass(ATT_PITCH);
+    Reset();
 }
 
 KeySig::~KeySig()
@@ -199,9 +210,9 @@ KeySigAttr::KeySigAttr():
     Object(),
     AttKeySigDefaultLog()
 {
+    RegisterAttClass(ATT_KEYSIGDEFAULTLOG);
     Reset();
 }
-
 
 KeySigAttr::~KeySigAttr()
 {

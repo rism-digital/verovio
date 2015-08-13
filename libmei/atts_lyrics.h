@@ -28,6 +28,8 @@ namespace vrv {
 // AttVerseLog
 //----------------------------------------------------------------------------
 
+#define ATT_VERSELOG 60
+
 class AttVerseLog: public Att
 {
 public:

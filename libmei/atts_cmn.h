@@ -28,6 +28,8 @@ namespace vrv {
 // AttArpegLog
 //----------------------------------------------------------------------------
 
+#define ATT_ARPEGLOG 8
+
 class AttArpegLog: public Att
 {
 public:
@@ -65,6 +67,8 @@ private:
 //----------------------------------------------------------------------------
 // AttArpegVis
 //----------------------------------------------------------------------------
+
+#define ATT_ARPEGVIS 9
 
 class AttArpegVis: public Att
 {
@@ -104,6 +108,8 @@ private:
 // AttBTremLog
 //----------------------------------------------------------------------------
 
+#define ATT_BTREMLOG 10
+
 class AttBTremLog: public Att
 {
 public:
@@ -142,6 +148,8 @@ private:
 // AttBeamed
 //----------------------------------------------------------------------------
 
+#define ATT_BEAMED 11
+
 class AttBeamed: public Att
 {
 public:
@@ -179,6 +187,8 @@ private:
 //----------------------------------------------------------------------------
 // AttBeamedwith
 //----------------------------------------------------------------------------
+
+#define ATT_BEAMEDWITH 12
 
 class AttBeamedwith: public Att
 {
@@ -221,6 +231,8 @@ private:
 //----------------------------------------------------------------------------
 // AttBeamingLog
 //----------------------------------------------------------------------------
+
+#define ATT_BEAMINGLOG 13
 
 class AttBeamingLog: public Att
 {
@@ -273,6 +285,8 @@ private:
 // AttBeamrend
 //----------------------------------------------------------------------------
 
+#define ATT_BEAMREND 14
+
 class AttBeamrend: public Att
 {
 public:
@@ -318,6 +332,8 @@ private:
 // AttBeamsecondary
 //----------------------------------------------------------------------------
 
+#define ATT_BEAMSECONDARY 15
+
 class AttBeamsecondary: public Att
 {
 public:
@@ -361,6 +377,8 @@ private:
 // AttBeatRptVis
 //----------------------------------------------------------------------------
 
+#define ATT_BEATRPTVIS 16
+
 class AttBeatRptVis: public Att
 {
 public:
@@ -398,6 +416,8 @@ private:
 //----------------------------------------------------------------------------
 // AttBendGes
 //----------------------------------------------------------------------------
+
+#define ATT_BENDGES 17
 
 class AttBendGes: public Att
 {
@@ -441,6 +461,8 @@ private:
 // AttCutout
 //----------------------------------------------------------------------------
 
+#define ATT_CUTOUT 18
+
 class AttCutout: public Att
 {
 public:
@@ -478,6 +500,8 @@ private:
 //----------------------------------------------------------------------------
 // AttExpandable
 //----------------------------------------------------------------------------
+
+#define ATT_EXPANDABLE 19
 
 class AttExpandable: public Att
 {
@@ -522,6 +546,8 @@ private:
 // AttFTremLog
 //----------------------------------------------------------------------------
 
+#define ATT_FTREMLOG 20
+
 class AttFTremLog: public Att
 {
 public:
@@ -559,6 +585,8 @@ private:
 //----------------------------------------------------------------------------
 // AttFermataVis
 //----------------------------------------------------------------------------
+
+#define ATT_FERMATAVIS 21
 
 class AttFermataVis: public Att
 {
@@ -605,6 +633,8 @@ private:
 // AttGlissVis
 //----------------------------------------------------------------------------
 
+#define ATT_GLISSVIS 22
+
 class AttGlissVis: public Att
 {
 public:
@@ -642,6 +672,8 @@ private:
 //----------------------------------------------------------------------------
 // AttGraced
 //----------------------------------------------------------------------------
+
+#define ATT_GRACED 23
 
 class AttGraced: public Att
 {
@@ -691,6 +723,8 @@ private:
 // AttHairpinLog
 //----------------------------------------------------------------------------
 
+#define ATT_HAIRPINLOG 24
+
 class AttHairpinLog: public Att
 {
 public:
@@ -728,6 +762,8 @@ private:
 //----------------------------------------------------------------------------
 // AttHairpinVis
 //----------------------------------------------------------------------------
+
+#define ATT_HAIRPINVIS 25
 
 class AttHairpinVis: public Att
 {
@@ -769,6 +805,8 @@ private:
 //----------------------------------------------------------------------------
 // AttHarpPedalLog
 //----------------------------------------------------------------------------
+
+#define ATT_HARPPEDALLOG 26
 
 class AttHarpPedalLog: public Att
 {
@@ -850,6 +888,8 @@ private:
 // AttLvpresent
 //----------------------------------------------------------------------------
 
+#define ATT_LVPRESENT 27
+
 class AttLvpresent: public Att
 {
 public:
@@ -890,6 +930,8 @@ private:
 //----------------------------------------------------------------------------
 // AttMultiRestVis
 //----------------------------------------------------------------------------
+
+#define ATT_MULTIRESTVIS 28
 
 class AttMultiRestVis: public Att
 {
@@ -933,6 +975,8 @@ private:
 // AttNoteGesCmn
 //----------------------------------------------------------------------------
 
+#define ATT_NOTEGESCMN 29
+
 class AttNoteGesCmn: public Att
 {
 public:
@@ -970,6 +1014,8 @@ private:
 //----------------------------------------------------------------------------
 // AttNumbered
 //----------------------------------------------------------------------------
+
+#define ATT_NUMBERED 30
 
 class AttNumbered: public Att
 {
@@ -1011,6 +1057,8 @@ private:
 //----------------------------------------------------------------------------
 // AttNumberplacement
 //----------------------------------------------------------------------------
+
+#define ATT_NUMBERPLACEMENT 31
 
 class AttNumberplacement: public Att
 {
@@ -1057,6 +1105,8 @@ private:
 // AttOctaveLog
 //----------------------------------------------------------------------------
 
+#define ATT_OCTAVELOG 32
+
 class AttOctaveLog: public Att
 {
 public:
@@ -1101,6 +1151,8 @@ private:
 // AttPedalLog
 //----------------------------------------------------------------------------
 
+#define ATT_PEDALLOG 33
+
 class AttPedalLog: public Att
 {
 public:
@@ -1138,6 +1190,8 @@ private:
 //----------------------------------------------------------------------------
 // AttPedalVis
 //----------------------------------------------------------------------------
+
+#define ATT_PEDALVIS 34
 
 class AttPedalVis: public Att
 {
@@ -1177,6 +1231,8 @@ private:
 // AttPianopedals
 //----------------------------------------------------------------------------
 
+#define ATT_PIANOPEDALS 35
+
 class AttPianopedals: public Att
 {
 public:
@@ -1214,6 +1270,8 @@ private:
 //----------------------------------------------------------------------------
 // AttRehearsal
 //----------------------------------------------------------------------------
+
+#define ATT_REHEARSAL 36
 
 class AttRehearsal: public Att
 {
@@ -1253,6 +1311,8 @@ private:
 // AttScoreDefVisCmn
 //----------------------------------------------------------------------------
 
+#define ATT_SCOREDEFVISCMN 37
+
 class AttScoreDefVisCmn: public Att
 {
 public:
@@ -1291,6 +1351,8 @@ private:
 // AttSlurrend
 //----------------------------------------------------------------------------
 
+#define ATT_SLURREND 38
+
 class AttSlurrend: public Att
 {
 public:
@@ -1328,6 +1390,8 @@ private:
 //----------------------------------------------------------------------------
 // AttStemmedCmn
 //----------------------------------------------------------------------------
+
+#define ATT_STEMMEDCMN 39
 
 class AttStemmedCmn: public Att
 {
@@ -1381,6 +1445,8 @@ private:
 // AttTierend
 //----------------------------------------------------------------------------
 
+#define ATT_TIEREND 40
+
 class AttTierend: public Att
 {
 public:
@@ -1419,6 +1485,8 @@ private:
 // AttTremmeasured
 //----------------------------------------------------------------------------
 
+#define ATT_TREMMEASURED 41
+
 class AttTremmeasured: public Att
 {
 public:
@@ -1456,6 +1524,8 @@ private:
 //----------------------------------------------------------------------------
 // AttTupletVis
 //----------------------------------------------------------------------------
+
+#define ATT_TUPLETVIS 42
 
 class AttTupletVis: public Att
 {

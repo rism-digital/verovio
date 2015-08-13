@@ -35,7 +35,7 @@ bool View::OneBeamInTuplet(Tuplet* tuplet) {
     ArrayOfObjects elems;
     
     // Are we contained in a beam?
-    if (dynamic_cast<Beam*>(tuplet->GetFirstParent(&typeid(Beam), MAX_BEAM_DEPTH)) && !tuplet->m_children.empty())
+    if (reinterpret_cast<Beam*>(tuplet->GetFirstParent( BEAM, MAX_BEAM_DEPTH )) && !tuplet->m_children.empty())
         return true;
     
     // No we contain a beam? Go on and search for it in the children

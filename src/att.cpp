@@ -1032,7 +1032,7 @@ data_WORDPOS Att::StrToWordPos(std::string value)
 
 bool AttComparison::operator()(Object *object)
 {
-    if  (typeid(*object) == *m_elementType) {
+    if  ( object->Is() == m_classId ) {
         return true;
     }
     return false;
@@ -1040,7 +1040,7 @@ bool AttComparison::operator()(Object *object)
     
 bool AttComparison::MatchesType(Object *object)
 {
-    if  (typeid(*object) == *m_elementType) {
+    if  ( object->Is() == m_classId ) {
         return true;
     }
     return false;

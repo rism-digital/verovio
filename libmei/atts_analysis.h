@@ -28,6 +28,8 @@ namespace vrv {
 // AttCommonAnl
 //----------------------------------------------------------------------------
 
+#define ATT_COMMONANL 1
+
 class AttCommonAnl: public Att
 {
 public:
@@ -107,6 +109,8 @@ private:
 // AttHarmonicfunction
 //----------------------------------------------------------------------------
 
+#define ATT_HARMONICFUNCTION 2
+
 class AttHarmonicfunction: public Att
 {
 public:
@@ -151,6 +155,8 @@ private:
 // AttIntervalharmonic
 //----------------------------------------------------------------------------
 
+#define ATT_INTERVALHARMONIC 3
+
 class AttIntervalharmonic: public Att
 {
 public:
@@ -191,6 +197,8 @@ private:
 //----------------------------------------------------------------------------
 // AttIntervallicdesc
 //----------------------------------------------------------------------------
+
+#define ATT_INTERVALLICDESC 4
 
 class AttIntervallicdesc: public Att
 {
@@ -235,6 +243,8 @@ private:
 // AttMelodicfunction
 //----------------------------------------------------------------------------
 
+#define ATT_MELODICFUNCTION 5
+
 class AttMelodicfunction: public Att
 {
 public:
@@ -273,6 +283,8 @@ private:
 // AttPitchclass
 //----------------------------------------------------------------------------
 
+#define ATT_PITCHCLASS 6
+
 class AttPitchclass: public Att
 {
 public:
@@ -310,6 +322,8 @@ private:
 //----------------------------------------------------------------------------
 // AttSolfa
 //----------------------------------------------------------------------------
+
+#define ATT_SOLFA 7
 
 class AttSolfa: public Att
 {

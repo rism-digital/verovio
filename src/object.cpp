@@ -107,6 +107,18 @@ void Object::Init(std::string classid)
     m_classid = classid;
     this->GenerateUuid();
 }
+    
+int Object::Is()
+{
+    // we should always have the method overwritten
+    assert( false );
+    return OBJECT;
+};
+    
+void Object::RegisterInterface( std::vector<int> *attClasses, int interfaceId )
+{
+    
+}
        
 void Object::MoveChildren(  Object *object )
 {
@@ -241,13 +253,13 @@ Object *Object::FindChildByUuid( std::string uuid, int deepness, bool direction 
     ArrayPtrVoid params;
     params.push_back( &uuid );
     params.push_back( &element );
-    this->Process( &findByUuid, params, NULL, NULL, deepness, direction );
+    this->Process( &findByUuid, &params, NULL, NULL, deepness, direction );
     return element;
 }
 
-Object *Object::FindChildByType(const std::type_info *elementType, int deepness, bool direction )
+Object *Object::FindChildByType( int classId, int deepness, bool direction )
 {
-    AttComparison attComparison( elementType );
+    AttComparison attComparison( classId );
     return FindChildByAttComparison( &attComparison, deepness, direction );
 }
     
@@ -258,7 +270,7 @@ Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deep
     ArrayPtrVoid params;
     params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByAttComparison, params, NULL, NULL, deepness, direction );
+    this->Process( &findByAttComparison, &params, NULL, NULL, deepness, direction );
     return element;
 }
     
@@ -355,7 +367,7 @@ void Object::FillFlatList( ListOfObjects *flatList )
     Functor addToFlatList( &Object::AddLayerElementToFlatList );
     ArrayPtrVoid params;
     params.push_back ( &flatList );
-    this->Process( &addToFlatList, params );
+    this->Process( &addToFlatList, &params );
 
     /* // For debuging
     ListOfObjects::iterator iter;
@@ -381,13 +393,13 @@ void Object::AddSameAs( std::string id, std::string filename )
     m_sameAs += sameAs;
 }
 
-Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps )
+Object *Object::GetFirstParent( const int elementType, int maxSteps )
 {
     if ( (maxSteps == 0) || !m_parent ) {
         return NULL;
     }
     
-    if ( typeid(*m_parent) == *elementType ) {
+    if ( m_parent->Is() == elementType ) {
         return m_parent;
     }
     else {
@@ -396,13 +408,13 @@ Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps 
 }
 
     
-Object *Object::GetLastParentNot( const std::type_info *elementType, int maxSteps )
+Object *Object::GetLastParentNot( const int elementType, int maxSteps )
 {
     if ( (maxSteps == 0) || !m_parent ) {
         return NULL;
     }
     
-    if ( typeid(*m_parent) == *elementType ) {
+    if ( m_parent->Is() == elementType ) {
         return this;
     }
     else {
@@ -514,16 +526,18 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction )
+void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
     }
     
+    /*
     EditorialElement *editorialElement = dynamic_cast<EditorialElement*>(this);
     if (functor->m_visibleOnly && editorialElement && ( editorialElement->m_visibility == Hidden ) ) {
         return;
     }
+    */
     
     functor->Call( this, params );
     
@@ -533,10 +547,10 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         return;
     }
 
-    else if (dynamic_cast<EditorialElement*>(this)) {
+    //else if (dynamic_cast<EditorialElement*>(this)) {
         // since editorial object do not count, we re-increase the deepness limit
-        deepness++;
-    }
+     //   deepness++;
+    //}
     if (deepness == 0) {
         // any need to change the functor m_returnCode?
         return;
@@ -564,7 +578,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
                 // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                 // the attribute (see below)
                 Object *o = *iter;
-                if ((*attComparisonIter)->GetType() == &typeid(*o)) {
+                if (o->Is() == (*attComparisonIter)->GetType() ) {
                     hasAttComparison = true;
                     break;
                 }
@@ -601,7 +615,7 @@ int Object::Save( FileOutputStream *output )
     // Special case where we want to process all objects
     save.m_visibleOnly = false;
     Functor saveEnd( &Object::SaveEnd );
-    this->Process( &save, params, &saveEnd );
+    this->Process( &save, &params, &saveEnd );
     
     return true;
 }
@@ -836,14 +850,14 @@ Functor::Functor( )
     obj_fpt = NULL; 
 }
 
-Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid ))
+Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid* ))
 { 
     m_returnCode = FUNCTOR_CONTINUE;
     m_visibleOnly = true;
     obj_fpt = _obj_fpt; 
 }
 
-void Functor::Call( Object *ptr, ArrayPtrVoid params )
+void Functor::Call( Object *ptr, ArrayPtrVoid *params )
 {
     // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
     m_returnCode = (*ptr.*obj_fpt)( params );
@@ -853,22 +867,22 @@ void Functor::Call( Object *ptr, ArrayPtrVoid params )
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToFlatList( ArrayPtrVoid params )
+int Object::AddLayerElementToFlatList( ArrayPtrVoid *params )
 {
     // param 0: the ListOfObjects
-    ListOfObjects **list = static_cast<ListOfObjects**>(params[0]);
+    ListOfObjects **list = static_cast<ListOfObjects**>((*params)[0]);
     //if ( dynamic_cast<LayerElement*>(this ) ) {
         (*list)->push_back( this );
     //}
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByUuid( ArrayPtrVoid params )
+int Object::FindByUuid( ArrayPtrVoid *params )
 {
     // param 0: the uuid we are looking for
     // param 1: the pointer to pointer to the Object
-    std::string *uuid = static_cast<std::string*>(params[0]);
-    Object **element = static_cast<Object**>(params[1]);
+    std::string *uuid = static_cast<std::string*>((*params)[0]);
+    Object **element = static_cast<Object**>((*params)[1]);
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -884,12 +898,12 @@ int Object::FindByUuid( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByAttComparison( ArrayPtrVoid params )
+int Object::FindByAttComparison( ArrayPtrVoid *params )
 {
     // param 0: the type we are looking for
     // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison*>(params[0]);
-    Object **element = static_cast<Object**>(params[1]);
+    AttComparison *test = static_cast<AttComparison*>((*params)[0]);
+    Object **element = static_cast<Object**>((*params)[1]);
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -907,12 +921,12 @@ int Object::FindByAttComparison( ArrayPtrVoid params )
 }
 
     
-int Object::SetCurrentScoreDef( ArrayPtrVoid params )
+int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 {
 
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = static_cast<ScoreDef*>(params[0]);
-    StaffDef **currentStaffDef = static_cast<StaffDef**>(params[1]);
+    ScoreDef *currentScoreDef = static_cast<ScoreDef*>((*params)[0]);
+    StaffDef **currentStaffDef = static_cast<StaffDef**>((*params)[1]);
 
     assert( currentScoreDef );
     
@@ -1032,7 +1046,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Object::AlignHorizontally( ArrayPtrVoid params )
+int Object::AlignHorizontally( ArrayPtrVoid *params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time (unused)
@@ -1046,7 +1060,7 @@ int Object::AlignHorizontally( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Object::AlignVertically( ArrayPtrVoid params )
+int Object::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner (unused)
     // param 1: the staffNb (unused
@@ -1058,12 +1072,12 @@ int Object::AlignVertically( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid params )
+int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the Doc
-    int *min_pos = static_cast<int*>(params[0]);
-    Doc *doc = static_cast<Doc*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    Doc *doc = static_cast<Doc*>((*params)[1]);
     
     // starting an new layer
     Layer *current_layer = dynamic_cast<Layer*>(this);
@@ -1114,14 +1128,14 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid params )
 }
 
 
-int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
+int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
-    int *min_pos = static_cast<int*>(params[0]);
-    int *measure_width = static_cast<int*>(params[1]);
-    Doc *doc = static_cast<Doc*>(params[2]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *measure_width = static_cast<int*>((*params)[1]);
+    Doc *doc = static_cast<Doc*>((*params)[2]);
 
     // starting a new measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -1173,7 +1187,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsNote() && dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH ) ) ) {
+    if ( current->IsNote() && reinterpret_cast<Chord*>(current->GetFirstParent( CHORD, MAX_CHORD_DEPTH ) ) ) {
         return FUNCTOR_CONTINUE;
     }
     
@@ -1189,7 +1203,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsAccid() && dynamic_cast<Note*>(current->GetFirstParent( &typeid( Note ), MAX_ACCID_DEPTH ) ) ) {
+    if ( current->IsAccid() && reinterpret_cast<Note*>(current->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) ) ) {
         return FUNCTOR_CONTINUE;
     }
     
@@ -1245,12 +1259,12 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
+int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
-    int *min_pos = static_cast<int*>(params[0]);
-    int *measure_width = static_cast<int*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *measure_width = static_cast<int*>((*params)[1]);
     
     // ending a measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -1276,12 +1290,12 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
+int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>(params[0]);
-    int *system_height = static_cast<int*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *system_height = static_cast<int*>((*params)[1]);
     
     // starting a new system
     System *current_system = dynamic_cast<System*>(this);
@@ -1333,12 +1347,12 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     return FUNCTOR_SIBLINGS;
 }
     
-int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
+int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>(params[0]);
-    int *system_height = static_cast<int*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *system_height = static_cast<int*>((*params)[1]);
     
     // ending a measure
     Measure *current_measure = dynamic_cast<Measure*>(this);
@@ -1354,10 +1368,10 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
         
-int Object::Save( ArrayPtrVoid params )
+int Object::Save( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
     if (!output->WriteObject( this )) {
         return FUNCTOR_STOP;
     }
@@ -1365,10 +1379,10 @@ int Object::Save( ArrayPtrVoid params )
 }
     
     
-int Object::SaveEnd( ArrayPtrVoid params )
+int Object::SaveEnd( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
     if (!output->WriteObjectEnd( this )) {
         return FUNCTOR_STOP;
     }

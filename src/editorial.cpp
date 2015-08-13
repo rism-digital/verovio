@@ -27,20 +27,24 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 EditorialElement::EditorialElement():
-    DocObject("ee-")
+    DocObject("ee-"),
+    AttCommon()
 {
+    RegisterAttClass(ATT_COMMON);
     Reset();
 }
 
 EditorialElement::EditorialElement(std::string classid):
-    DocObject(classid)
+    DocObject(classid),
+    AttCommon()
 {
+    RegisterAttClass(ATT_COMMON);
     Reset();
 }
 
 void EditorialElement::Reset()
 {
-    Object::Reset();
+    DocObject::Reset();
     ResetCommon();
     m_visibility = Visible;
 }
@@ -126,8 +130,7 @@ App::App( EditorialLevel level ):
     
 void App::Reset()
 {
-    Object::Reset();
-    ResetCommon();
+    EditorialElement::Reset();
 }
 
 App::~App()
@@ -151,6 +154,7 @@ Lem::Lem( ):
     EditorialElement("lem-"),
     AttSource()
 {
+    RegisterAttClass(ATT_SOURCE);
     Reset();
 }
 
@@ -172,6 +176,7 @@ Rdg::Rdg( ):
     EditorialElement("rdg-"),
     AttSource()
 {
+    RegisterAttClass(ATT_SOURCE);
     Reset();
 }
 
@@ -193,6 +198,7 @@ Supplied::Supplied( ):
     EditorialElement("supplied-"),
     AttSource()
 {
+    RegisterAttClass(ATT_SOURCE);
     Reset();
 }
 
@@ -215,6 +221,8 @@ Annot::Annot( ):
     AttPlist(),
     AttSource()
 {
+    RegisterAttClass( ATT_PLIST );
+    RegisterAttClass( ATT_SOURCE );
     Reset();
 }
 
@@ -233,15 +241,15 @@ void Annot::Reset()
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::CastOffSystems( ArrayPtrVoid params )
+int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
 {
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to (unused)
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
-    System *contentSystem = static_cast<System*>(params[0]);
-    System **currentSystem = static_cast<System**>(params[2]);
+    System *contentSystem = static_cast<System*>((*params)[0]);
+    System **currentSystem = static_cast<System**>((*params)[2]);
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert( dynamic_cast<System*>(this->m_parent));

@@ -59,6 +59,7 @@ public:
     virtual ~Note();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Note"; };
+    virtual int Is() { return NOTE; };
     ///@}
     
     /**
@@ -114,27 +115,27 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    virtual int PrepareTieAttr( ArrayPtrVoid *params );
     
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareLyrics( ArrayPtrVoid params );
+    virtual int PrepareLyrics( ArrayPtrVoid *params );
  
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid params );
+    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
     
     /**
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid params );
+    virtual int ResetDarwing( ArrayPtrVoid *params );
     
 private:
     

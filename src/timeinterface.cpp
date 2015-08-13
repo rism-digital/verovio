@@ -25,12 +25,16 @@ namespace vrv {
 // TimeSpanningInterface
 //----------------------------------------------------------------------------
 
-TimeSpanningInterface::TimeSpanningInterface():
+TimeSpanningInterface::TimeSpanningInterface(): AttInterface(),
     AttStartendid(),
     AttStartid(),
     AttTimestampMusical(),
     AttTimestamp2Musical()
 {
+    RegisterInterfaceAttClass(ATT_STARTENDID);
+    RegisterInterfaceAttClass(ATT_STARTID);
+    RegisterInterfaceAttClass(ATT_TIMESTAMPMUSICAL);
+    RegisterInterfaceAttClass(ATT_TIMESTAMP2MUSICAL);
     Reset();
 }
 
@@ -95,12 +99,12 @@ std::string TimeSpanningInterface::ExtractUuidFragment(std::string refUuid)
     return refUuid;
 }
     
-int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object )
+int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid *params, DocObject *object )
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stack or not
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
-    bool *fillList = static_cast<bool*>(params[1]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
+    bool *fillList = static_cast<bool*>((*params)[1]);
     
     if ((*fillList)==false) {
         return FUNCTOR_CONTINUE;
@@ -112,13 +116,13 @@ int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid params, DocObject *
     return FUNCTOR_CONTINUE;
 }
     
-int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid params, DocObject *object  )
+int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params, DocObject *object  )
 {
     // param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>(params[0]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
     
     if (this->HasStartAndEnd()) {
-        if ( GetStart()->GetFirstParent( &typeid(Staff) ) != GetEnd()->GetFirstParent( &typeid(Staff) ) ) {
+        if ( GetStart()->GetFirstParent( STAFF ) != GetEnd()->GetFirstParent( STAFF ) ) {
             // We have a running syl started in a previous measure
             elements->push_back(object);
         }
@@ -126,7 +130,7 @@ int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid params, Do
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::ResetDrawing( ArrayPtrVoid params, DocObject *object  )
+int TimeSpanningInterface::ResetDrawing( ArrayPtrVoid *params, DocObject *object  )
 {
     m_start = NULL;
     m_end = NULL;

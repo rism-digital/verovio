@@ -21,7 +21,7 @@ namespace vrv {
  * This class is an interface for elements with pitch, such as notes and neumes.
  * It is not an abstract class but should not be instanciate directly.
  */
-class PitchInterface:
+class PitchInterface: public AttInterface,
     public AttAccidental,
     public AttOctave,
     public AttPitch

@@ -28,6 +28,8 @@ namespace vrv {
 // AttFacsimile
 //----------------------------------------------------------------------------
 
+#define ATT_FACSIMILE 53
+
 class AttFacsimile: public Att
 {
 public:
