@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_classes.h"
 #include "attdef.h"
 
 namespace vrv {
@@ -40,63 +41,82 @@ typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
     
 typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
     
-//----------------------------------------------------------------------------
-// Object defines
-//----------------------------------------------------------------------------
     
-enum {
-    OBJECT = 0,
-    ACCID,
-    ALIGNMENT,
-    APP,
-    ANNOT,
-    BAR_LINE,
-    BAR_LINE_ATTR,
-    BEAM,
-    CHORD,
-    CLEF,
-    CLEF_ATTR,
-    CUSTOS,
-    DOC,
-    DOC_OBJECT,
-    DOT,
-    EDITORIAL_ELEMENT,
-    GRACE_ALIGNER,
-    KEY_SIG,
-    KEY_SIG_ATTR,
-    LAYER,
-    LAYER_ELEMENT,
-    LEM,
-    MEASURE,
-    MEASURE_ELEMENT,
-    MEASURE_ALIGNER,
-    MENSUR,
-    MENSUR_ATTR,
-    METER_SIG,
-    METER_SIG_ATTR,
-    MREST,
-    MULTI_REST,
-    NOTE,
-    PAGE,
-    RDG,
-    REST,
-    SCORE_DEF,
-    SLUR,
-    SPACE,
-    STAFF,
-    STAFF_ALIGNMENT,
-    STAFF_DEF,
-    STAFF_GRP,
-    SUPPLIED,
-    SYL,
-    SYSTEM,
-    SYSTEM_ALIGNER,
-    SYSTEM_ALIGNMENT,
-    TIE,
-    TUPLET,
-    VERSE
-};
+    //----------------------------------------------------------------------------
+    // Object defines
+    //----------------------------------------------------------------------------
     
+    enum ClassId {
+        OBJECT = 0,
+        ALIGNMENT,
+        CLEF_ATTR,
+        DOC,
+        DOC_OBJECT,
+        GRACE_ALIGNER,
+        KEY_SIG_ATTR,
+        LAYER,
+        MEASURE,
+        MEASURE_ALIGNER,
+        MENSUR_ATTR,
+        METER_SIG_ATTR,
+        PAGE,
+        SCORE_DEF,
+        STAFF_ALIGNMENT,
+        STAFF_DEF,
+        STAFF_GRP,
+        SYSTEM,
+        SYSTEM_ALIGNER,
+        SYSTEM_ALIGNMENT,
+        //
+        EDITORIAL_ELEMENT,
+        ANNOT,
+        APP,
+        LEM,
+        RDG,
+        SUPPLIED,
+        EDITORIAL_ELEMENT_max,
+        //
+        LAYER_ELEMENT,
+        ACCID,
+        BAR_LINE,
+        BAR_LINE_ATTR,
+        BEAM,
+        CHORD,
+        CLEF,
+        CUSTOS,
+        DOT,
+        KEY_SIG,
+        MENSUR,
+        METER_SIG,
+        MREST,
+        MULTI_REST,
+        NOTE,
+        REST,
+        SPACE,
+        SYL,
+        TUPLET,
+        VERSE,
+        LAYER_ELEMENT_max,
+        //
+        MEASURE_ELEMENT,
+        SLUR,
+        STAFF,
+        TEMPO,
+        TIE,
+        MEASURE_ELEMENT_max,
+        //
+        UNSPECIFIED
+    };
+    
+    enum InterfaceId {
+        INTERFACE,
+        INTERFACE_DURATION,
+        INTERFACE_PITCH,
+        INTERFACE_POSITION,
+        INTERFACE_TEXT,
+        INTERFACE_TIME_SPANNING
+    };
+
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------

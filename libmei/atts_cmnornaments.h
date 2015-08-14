@@ -16,6 +16,7 @@
 #define __VRV_ATTS_CMNORNAMENTS_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttMordentLog
 //----------------------------------------------------------------------------
-
-#define ATT_MORDENTLOG 43
 
 class AttMordentLog: public Att
 {
@@ -78,8 +77,6 @@ private:
 // AttOrnam
 //----------------------------------------------------------------------------
 
-#define ATT_ORNAM 44
-
 class AttOrnam: public Att
 {
 public:
@@ -121,8 +118,6 @@ private:
 //----------------------------------------------------------------------------
 // AttOrnamentaccid
 //----------------------------------------------------------------------------
-
-#define ATT_ORNAMENTACCID 45
 
 class AttOrnamentaccid: public Att
 {
@@ -168,8 +163,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTurnLog
 //----------------------------------------------------------------------------
-
-#define ATT_TURNLOG 46
 
 class AttTurnLog: public Att
 {

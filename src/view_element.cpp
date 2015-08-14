@@ -51,8 +51,11 @@ namespace vrv {
 
 void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     int previousColor = m_currentColour;
 
@@ -63,58 +66,58 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
         m_currentColour = AxBLACK;
     }
 
-    if (dynamic_cast<Accid*>(element)) {
+    if (element->Is() == ACCID) {
         DrawAccid(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Barline*>(element)) {
+    else if (element->Is() == BAR_LINE) {
         DrawBarline(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Beam*>(element)) {
+    else if (element->Is() == BEAM) {
         DrawBeam(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Chord*>(element)) {
+    else if (element->Is() == CHORD) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Clef*>(element)) {
+    else if (element->Is() == CLEF) {
         DrawClef(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Custos*>(element)) {
+    else if (element->Is() == CUSTOS) {
         DrawCustos(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Dot*>(element)) {
+    else if (element->Is() == DOT) {
         DrawDot(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<KeySig*>(element)) {
+    else if (element->Is() == KEY_SIG) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Mensur*>(element)) {
+    else if (element->Is() == MENSUR) {
         DrawMensur(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<MeterSig*>(element)) {
+    else if (element->Is() == METER_SIG) {
         DrawMeterSig(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<MRest*>(element)) {
+    else if (element->Is() == MREST) {
         DrawMRest(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<MultiRest*>(element)) {
+    else if (element->Is() == MULTI_REST) {
         DrawMultiRest(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Note*>(element)) {
+    else if (element->Is() == NOTE) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Rest*>(element)) {
+    else if (element->Is() == REST) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Space*>(element)) {
+    else if (element->Is() == SPACE) {
         DrawSpace(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Syl*>(element)) {
+    else if (element->Is() == SYL) {
         DrawSyl(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Tuplet*>(element)) {
+    else if (element->Is() == TUPLET) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
-    else if (dynamic_cast<Verse*>(element)) {
+    else if (element->Is() == VERSE) {
         DrawVerse(dc, element, layer, staff, measure);
     }
     else {
@@ -127,8 +130,11 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
 
 void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
 	if (dynamic_cast<Chord*>(element)) {
         dc->StartGraphic( element, "", element->GetUuid() );
@@ -149,12 +155,16 @@ void View::DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer 
 	return;
 }
 
-void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
-    
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Tuplet *tuplet = dynamic_cast<Tuplet*>(element);
+    assert( tuplet );
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
@@ -175,11 +185,14 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Note*>(element)); // Element must be a Note"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Note *note = dynamic_cast<Note*>(element);
+    assert( note );
     
     if (note->IsMensural()){
         DrawMensuralNote(dc, element, layer, staff, measure);
@@ -196,7 +209,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     // Get the immediate parent of the note
     // to see if beamed or not
-    Beam *beam_parent = reinterpret_cast<Beam*>(note->GetFirstParent( BEAM ));
+    Beam *beam_parent = dynamic_cast<Beam*>(note->GetFirstParent( BEAM ));
     
     // This note is beamed and cue sized
     if (beam_parent != NULL) {
@@ -397,7 +410,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	}
     
     if (note->GetDrawingTieAttr()) {
-        System *system = reinterpret_cast<System*>(measure->GetFirstParent( SYSTEM ) );
+        System *system = dynamic_cast<System*>(measure->GetFirstParent( SYSTEM ) );
         // create a placeholder for the tie attribute that will be drawn from the system
         dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
         dc->EndGraphic(note->GetDrawingTieAttr(), this);
@@ -420,6 +433,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
+    assert(dynamic_cast<DurationInterface*>(object));
+    
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
@@ -497,6 +512,8 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
                 DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->staffSize, drawingCueSize );
         }
     }
+    
+    // cast to note is check when setting drawingCueSize value
     if ( drawingCueSize && ( dynamic_cast<Note*>(object)->GetGrace() == GRACE_acc ) ) {
         DrawAcciaccaturaSlash(dc, object);
     }
@@ -518,7 +535,9 @@ void View::DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *st
     //prep start and end positions of ledger line depending on stem direction and doubleLength
     int xLedgerStart, xLedgerEnd;
     if (doubleLength) {
-        if (dynamic_cast<Chord*>(element)->GetDrawingStemDir() == STEMDIRECTION_down) {
+        Chord *chord = dynamic_cast<Chord*>(element);
+        assert( chord );
+        if (chord->GetDrawingStemDir() == STEMDIRECTION_down) {
             xLedgerStart = element->GetDrawingX() - ledge - noteDiameter;
             xLedgerEnd = element->GetDrawingX() + ledge;
         }
@@ -560,11 +579,14 @@ void View::DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *st
     
 void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {	
-    assert(layer); // Pointer to layer cannot be NULL
-    assert(staff); // Pointer to staff cannot be NULL
-    assert(dynamic_cast<Rest*>(element)); // Element must be a Rest
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
         
     Rest *rest = dynamic_cast<Rest*>(element);
+    assert( rest );
 
     bool drawingCueSize = rest->IsCueSize();
 	int drawingDur = rest->GetActualDur();
@@ -599,11 +621,13 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<MRest*>(element)); // Element must be a MultiRest"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
-    //MRest *mrest = dynamic_cast<MRest*>(element);
+    assert( dynamic_cast<MRest*>(element) ); // Element must be a MultiRest"
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
@@ -626,15 +650,18 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 /** This function draws multi-measure rests **/
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{	
-    int x1, x2, y1, y2, length;
-
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<MultiRest*>(element)); // Element must be a Symbol"
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     MultiRest *multirest = dynamic_cast<MultiRest*>(element);
+    assert( multirest );
     
+    int x1, x2, y1, y2, length;
+
     dc->StartGraphic( element, "", element->GetUuid() );
     
     int x = element->GetDrawingX();
@@ -849,32 +876,33 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
 
 void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(staff->m_parent); // Pointer to system cannot be NULL"
-    assert(dynamic_cast<Barline*>(element)); // Element must be a Barline"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Barline *barLine = dynamic_cast<Barline*>(element);
-    int x = element->GetDrawingX();
+    assert( barLine );
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    if (barLine->m_partialBarline)
-    {
-        DrawPartialBarline ( dc, dynamic_cast<System*>( staff->m_parent ), x, staff);
-    }
-    else
-    {
-        int y = staff->GetDrawingY();
-        DrawBarline( dc, y, y - m_doc->m_drawingStaffSize[staff->staffSize], barLine );
-    }
+    int y = staff->GetDrawingY();
+    DrawBarline( dc, y, y - m_doc->m_drawingStaffSize[staff->staffSize], barLine );
     
     dc->EndGraphic(element, this );
 }
     
 void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
     Chord* chord = dynamic_cast<Chord*>(element);
+    assert( chord );
     
     int staffSize = staff->staffSize;
     int staffY = staff->GetDrawingY();
@@ -886,7 +914,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     bool inBeam = false;
     // Get the immadiate parent of the note
     // to see if beamed or not
-    Beam *beam_parent = reinterpret_cast<Beam*>(chord->GetFirstParent( BEAM ));
+    Beam *beam_parent = dynamic_cast<Beam*>(chord->GetFirstParent( BEAM ));
     
     // This note is beamed and cue sized
     if (beam_parent != NULL) {
@@ -1080,11 +1108,14 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Clef*>(element)); // Element must be a Clef"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Clef *clef = dynamic_cast<Clef*>(element);
+    assert( clef );
 
     dc->StartGraphic( element, "", element->GetUuid() );
 	
@@ -1165,7 +1196,8 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
 {
-    assert( dc ); // DC cannot be NULL
+    assert( dc );
+    assert( staff );
     
     int ynum, yden;
     std::wstring wtext;
@@ -1200,11 +1232,14 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
     
 void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<MeterSig*>(element)); // Element must be a Mensur"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     MeterSig *meterSig = dynamic_cast<MeterSig*>(element);
+    assert( meterSig );
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
@@ -1408,11 +1443,15 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
 
 void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Accid*>(element)); // Element must be a Symbol"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Accid *accid = dynamic_cast<Accid*>(element);
+    assert( accid );
+    
     dc->StartGraphic( element, "", element->GetUuid() );
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
@@ -1427,7 +1466,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
         // position is currently only above the staff
         int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
-        Note *note = reinterpret_cast<Note*>( accid->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
+        Note *note = dynamic_cast<Note*>( accid->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
         if ( note ) {
             if ( note->GetDrawingY() > y ) {
                 y = note->GetDrawingY() + m_doc->m_drawingUnit[staff->staffSize];
@@ -1488,10 +1527,13 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this );
 }
 
-void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure) {
-    
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     dc->StartGraphic( element, "", element->GetUuid() );
     dc->DrawPlaceholder( ToDeviceContextX( element->GetDrawingX() ), ToDeviceContextY( element->GetDrawingY() ) );
@@ -1500,11 +1542,15 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Custos*>(element)); // Element must be a Symbol"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Custos *custos = dynamic_cast<Custos*>(element);
+    assert( custos );
+    
     dc->StartGraphic( element, "", element->GetUuid() );
     
     element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, custos->GetPloc(), layer->GetClefOffset( element ), custos->GetOloc()) );
@@ -1523,11 +1569,15 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
 
 void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
-    assert(dynamic_cast<Dot*>(element)); // Element must be a Symbol"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Dot *dot = dynamic_cast<Dot*>(element);
+    assert( dot );
+    
     dc->StartGraphic( element, "", element->GetUuid() );
     
     element->SetDrawingY( element->GetDrawingY() + CalculatePitchPosY( staff, dot->GetPloc(), layer->GetClefOffset( element ), dot->GetOloc()) );
@@ -1562,6 +1612,7 @@ int View::GetSylY( Syl *syl, Staff *staff )
 void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     Syl *syl = dynamic_cast<Syl*>(element);
+    assert( syl );
     
     if ( !syl->GetStart() ) {
         LogDebug("Syl parent note was not found");
@@ -1592,7 +1643,7 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->ResetBrush();
     
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = reinterpret_cast<System*>( measure->GetFirstParent( SYSTEM ) );
+        System *currentSystem = dynamic_cast<System*>( measure->GetFirstParent( SYSTEM ) );
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1606,8 +1657,9 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
 void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic )
 {
-    assert( syl->GetStart() && syl->GetEnd());
-    if ( !syl->GetStart() || !syl->GetEnd()) return;
+    assert( syl );
+    assert( syl->GetStart() && syl->GetEnd() );
+    if ( !syl->GetStart() || !syl->GetEnd() ) return;
     
     int y = GetSylY(syl, staff);
     int w, h;
@@ -1694,7 +1746,14 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
     
 void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
     Verse *verse = dynamic_cast<Verse*>(element);
+    assert( verse );
     
     dc->StartGraphic( verse, "", verse->GetUuid() );
     
@@ -1706,12 +1765,16 @@ void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
 
-    KeySig *ks = dynamic_cast<KeySig*>(element);
+    KeySig *keySig = dynamic_cast<KeySig*>(element);
+    assert( keySig );
     
-    if (ks->GetAlterationNumber()==0) {
+    if (keySig->GetAlterationNumber()==0) {
         return;
     }
     
@@ -1725,13 +1788,14 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    for (int i = 0; i < ks->GetAlterationNumber(); i++) {
+    for (int i = 0; i < keySig->GetAlterationNumber(); i++) {
         
         // HARDCODED
         x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.2) * i;
-        y = staff->GetDrawingY() + CalculatePitchPosY( staff, ks->GetAlterationAt(i), layer->GetClefOffset( element ), ks->GetOctave(ks->GetAlterationAt(i), c->GetClefId()));;
+        y = staff->GetDrawingY() + CalculatePitchPosY( staff, keySig->GetAlterationAt(i), layer->GetClefOffset( element ),
+                                                      keySig->GetOctave(keySig->GetAlterationAt(i), c->GetClefId()));;
         
-        if (ks->GetAlteration() == ACCID_FLAT)
+        if (keySig->GetAlteration() == ACCID_FLAT)
             symb = SMUFL_E260_accidentalFlat;
         else
             symb = SMUFL_E262_accidentalSharp;
@@ -1743,12 +1807,12 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
 }
 
-void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
-    
+void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
+{
     Note *note = dynamic_cast<Note*>(element);
     assert( note );
 
-    Staff *staff = reinterpret_cast<Staff*>( note->GetFirstParent( STAFF ) );
+    Staff *staff = dynamic_cast<Staff*>( note->GetFirstParent( STAFF ) );
     assert( staff );
     
     if (note->GetActualDur() < DUR_8)
@@ -1786,7 +1850,8 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element) {
  note - for breves and semibreves, only above the staff
       - for flagged notes, the fermata is on the side of the notehead
  */
-void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
+void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff)
+{
     int x, y;
     int emb_offset = 0; // if there is and embellishment, offset the note up
     
@@ -1795,8 +1860,9 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
     x = element->GetDrawingX() - m_doc->m_drawingDoubleUnit[staff->staffSize];
     
     // First case, notes
-    if (dynamic_cast<Note*>(element)) {
+    if (element->Is() == NOTE) {
         Note *note = dynamic_cast<Note*>(element);
+        assert( note );
         
         /*
         // stem down or semibreve/longa, fermata up!
@@ -1831,7 +1897,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
             DrawSmuflCode ( dc, x, y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
         */
-    } else if (dynamic_cast<Rest*>(element)) {
+    } else if (element->Is() == REST) {
         // this is a rest
         // rests for the moment are always in the staff
         // so just place the fermata above the staff
@@ -1843,7 +1909,8 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff) {
 // Draw a trill above the notehead
 // This function works as the up-fermata portion of DrawFermata
 // if there are many symbols to draw we could make a generalized function
-void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff) {
+void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff)
+{
     int x, y;    
 
     // It shoud be moved according to half of the trill size

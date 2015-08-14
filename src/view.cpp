@@ -64,7 +64,6 @@ void View::SetDoc( Doc *doc )
 
 void View::SetPage( int pageIdx, bool doLayout )
 {
-
 	assert( m_doc ); // Page cannot be NULL
     assert( m_doc->HasPage( pageIdx ) );
     

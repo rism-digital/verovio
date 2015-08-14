@@ -44,7 +44,7 @@ public:
     virtual ~Staff();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Staff"; };
-    virtual int Is() { return STAFF; };
+    virtual ClassId Is() { return STAFF; };
     ///@}
     
     void AddLayer( Layer *layer );

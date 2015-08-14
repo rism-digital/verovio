@@ -73,27 +73,6 @@ int Page::GetStaffPosOnPage( Staff *staff )
     return 0;
 }
 
-System *Page::GetAtPos( int y )
-{
-
-	//y -= ( SYSTEM_OFFSET / 2 ); // SYSTEM_OFFSET used to be 190
-    System *system = dynamic_cast<System*>( this->GetFirst( &typeid(System) ) );
-	if ( !system )
-		return NULL;
-	
-    System *next = NULL;
-	while ( (next = dynamic_cast<System*>( this->GetNext() ) ) )
-	{
-		if ( (int)next->m_yAbs < y )
-		{
-			return system;
-		}
-		system = next;
-	}
-
-	return system;
-}
-
 void Page::LayOut( bool force )
 {
     if ( m_layoutDone && !force ) {
@@ -109,11 +88,8 @@ void Page::LayOut( bool force )
     
 void Page::LayOutHorizontally( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
@@ -210,11 +186,8 @@ void Page::LayOutHorizontally( )
     
 void Page::LayOutVertically( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
@@ -288,11 +261,8 @@ void Page::LayOutVertically( )
     
 void Page::JustifyHorizontally( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     if (!doc->GetJustificationX()) {
         return;
@@ -322,11 +292,8 @@ void Page::JustifyHorizontally( )
     
 int Page::GetContentHeight( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return 0;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
@@ -342,12 +309,8 @@ int Page::GetContentHeight( )
 
 int Page::GetContentWidth( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return 0;
-    }
-    Doc *doc = NULL;
-    doc = dynamic_cast<Doc*>(m_parent);
+    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page

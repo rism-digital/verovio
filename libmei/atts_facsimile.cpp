@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -69,7 +73,8 @@ void AttFacsimile::getCoords() {
 
 bool Att::SetFacsimile( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_FACSIMILE ) ) {
-        AttFacsimile *att = reinterpret_cast<AttFacsimile*>(element);
+        AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
+        assert( att );
         if (attrType == "facs") {
             att->SetFacs(att->StrToStr(attrValue));
             return true;
@@ -81,7 +86,8 @@ bool Att::SetFacsimile( Object *element, std::string attrType, std::string attrV
 
 void Att::GetFacsimile( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_FACSIMILE ) ) {
-        AttFacsimile *att = reinterpret_cast<AttFacsimile*>(element);
+        AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
+        assert( att );
         if (att->HasFacs()) {
             attributes->push_back(std::make_pair("facs", att->StrToStr(att->GetFacs())));
         }

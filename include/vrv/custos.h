@@ -30,7 +30,7 @@ public:
     virtual ~Custos();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Custos"; };
-    virtual int Is() { return CUSTOS; };
+    virtual ClassId Is() { return CUSTOS; };
     ///@}
     
 protected:

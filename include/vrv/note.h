@@ -59,7 +59,7 @@ public:
     virtual ~Note();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Note"; };
-    virtual int Is() { return NOTE; };
+    virtual ClassId Is() { return NOTE; };
     ///@}
     
     /**

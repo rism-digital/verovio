@@ -52,7 +52,7 @@ public:
     EditorialElement(std::string classid);
     virtual ~EditorialElement();
     virtual void Reset();
-    virtual int Is() { return EDITORIAL_ELEMENT; };
+    virtual ClassId Is() { return EDITORIAL_ELEMENT; };
     ///@}
 
     /**
@@ -108,7 +108,7 @@ public:
     virtual ~App();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "App"; };
-    virtual int Is() { return APP; };
+    virtual ClassId Is() { return APP; };
     ///@}
     
     /** Getter for level **/
@@ -149,7 +149,7 @@ public:
     virtual ~Lem();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Lem"; };
-    virtual int Is() { return LEM; };
+    virtual ClassId Is() { return LEM; };
     ///@}
     
 protected:
@@ -179,7 +179,7 @@ public:
     virtual ~Rdg();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Rdg"; };
-    virtual int Is() { return RDG; };
+    virtual ClassId Is() { return RDG; };
     ///@}
     
 protected:
@@ -209,7 +209,7 @@ public:
     virtual ~Supplied();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Supplied"; };
-    virtual int Is() { return SUPPLIED; };
+    virtual ClassId Is() { return SUPPLIED; };
     ///@}
     
 protected:

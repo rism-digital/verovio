@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -82,7 +86,8 @@ bool AttTabular::HasRowspan( )
 
 bool Att::SetFigtable( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_TABULAR ) ) {
-        AttTabular *att = reinterpret_cast<AttTabular*>(element);
+        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        assert( att );
         if (attrType == "colspanInt") {
             att->SetColspan(att->StrToInt(attrValue));
             return true;
@@ -98,7 +103,8 @@ bool Att::SetFigtable( Object *element, std::string attrType, std::string attrVa
 
 void Att::GetFigtable( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_TABULAR ) ) {
-        AttTabular *att = reinterpret_cast<AttTabular*>(element);
+        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        assert( att );
         if (att->HasColspan()) {
             attributes->push_back(std::make_pair("colspanInt", att->IntToStr(att->GetColspan())));
         }

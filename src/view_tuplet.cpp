@@ -29,18 +29,19 @@ namespace vrv {
  * Analyze a tuplet object and figure out if all the notes are in the same beam
  * or not
  */
-bool View::OneBeamInTuplet(Tuplet* tuplet) {
+bool View::OneBeamInTuplet(Tuplet* tuplet)
+{
+    assert( tuplet );
     
     Beam *currentBeam = NULL;
     ArrayOfObjects elems;
     
     // Are we contained in a beam?
-    if (reinterpret_cast<Beam*>(tuplet->GetFirstParent( BEAM, MAX_BEAM_DEPTH )) && !tuplet->m_children.empty())
-        return true;
+    if (tuplet->GetFirstParent( BEAM, MAX_BEAM_DEPTH ) && !tuplet->m_children.empty()) return true;
     
     // No we contain a beam? Go on and search for it in the children
     for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {        
-        currentBeam = dynamic_cast<Beam*>(tuplet->m_children[i]);
+        currentBeam = dynamic_cast<Beam*>(tuplet->m_children.at(i));
         
         // first child is not a beam, or it is a beam but we have more than one child
         if (!currentBeam || tuplet->GetChildCount() > 1) {
@@ -78,7 +79,14 @@ bool View::OneBeamInTuplet(Tuplet* tuplet) {
  
  */
 
-bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center) {
+bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center)
+{
+    assert( tuplet );
+    assert( layer );
+    assert( start );
+    assert( end );
+    assert( center );
+    
     Point first, last;
     int x, y;
     bool direction = true; //true = up, false = down
@@ -225,8 +233,10 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
 
 void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff)
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert( dc );
+    assert( tuplet );
+    assert( layer );
+    assert( staff );
     
     tuplet->ResetList(tuplet);
     

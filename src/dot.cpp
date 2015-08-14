@@ -24,6 +24,8 @@ namespace vrv {
 Dot::Dot():
     LayerElement("dot-"), PositionInterface()
 {
+    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    
     Reset();
 }
 

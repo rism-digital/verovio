@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -67,7 +71,8 @@ bool AttRegularmethod::HasMethod( )
 
 bool Att::SetHeader( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_REGULARMETHOD ) ) {
-        AttRegularmethod *att = reinterpret_cast<AttRegularmethod*>(element);
+        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+        assert( att );
         if (attrType == "method") {
             att->SetMethod(att->StrToStr(attrValue));
             return true;
@@ -79,7 +84,8 @@ bool Att::SetHeader( Object *element, std::string attrType, std::string attrValu
 
 void Att::GetHeader( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_REGULARMETHOD ) ) {
-        AttRegularmethod *att = reinterpret_cast<AttRegularmethod*>(element);
+        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+        assert( att );
         if (att->HasMethod()) {
             attributes->push_back(std::make_pair("method", att->StrToStr(att->GetMethod())));
         }

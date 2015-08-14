@@ -41,7 +41,7 @@ public:
     virtual ~Syl();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Syl"; };
-    virtual int Is() { return SYL; };
+    virtual ClassId Is() { return SYL; };
     ///@}
     
     //----------//

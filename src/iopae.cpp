@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -1184,15 +1185,17 @@ void PaeInput::parseNote(NoteObject note) {
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
-    if (note.acciaccatura && dynamic_cast<Note *>(element)) {
+    if (note.acciaccatura && (element->Is() == NOTE) ) {
         Note *note = dynamic_cast<Note*>(element);
+        assert( note );
         note->SetDur(DURATION_8);
         note->SetGrace(GRACE_acc);
         note->SetStemDir(STEMDIRECTION_up);
     }
     
-    if (note.appoggiatura > 0) {
+    if ( (note.appoggiatura > 0) && (element->Is() == NOTE) ) {
         Note *note = dynamic_cast<Note*>(element);
+        assert( note );
         note->SetGrace(GRACE_unacc);
         note->SetStemDir(STEMDIRECTION_up);
     }
@@ -1242,11 +1245,15 @@ void PaeInput::addLayerElement(LayerElement *element) {
     if (m_nested_objects.size() > 0) {
         LayerElement *bottom = m_nested_objects.back();
         
-        if ( dynamic_cast<Beam*>( bottom ) ) {
-            ((Beam*)bottom)->AddLayerElement( element );
+        if ( bottom->Is() == BEAM ) {
+            Beam *beam = dynamic_cast<Beam*>( bottom );
+            assert( beam );
+            beam->AddLayerElement( element );
         }
-        else if ( dynamic_cast<Tuplet*>( bottom ) ) {
-            ((Tuplet*)bottom)->AddLayerElement( element );
+        else if ( bottom->Is() == TUPLET ) {
+            Tuplet *tuplet = dynamic_cast<Tuplet*>( bottom );
+            assert( tuplet );
+            tuplet->AddLayerElement( element );
         }
         
     } else {

@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -67,7 +71,8 @@ bool AttSurface::HasSurface( )
 
 bool Att::SetPagebased( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_SURFACE ) ) {
-        AttSurface *att = reinterpret_cast<AttSurface*>(element);
+        AttSurface *att = dynamic_cast<AttSurface*>(element);
+        assert( att );
         if (attrType == "surface") {
             att->SetSurface(att->StrToStr(attrValue));
             return true;
@@ -79,7 +84,8 @@ bool Att::SetPagebased( Object *element, std::string attrType, std::string attrV
 
 void Att::GetPagebased( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_SURFACE ) ) {
-        AttSurface *att = reinterpret_cast<AttSurface*>(element);
+        AttSurface *att = dynamic_cast<AttSurface*>(element);
+        assert( att );
         if (att->HasSurface()) {
             attributes->push_back(std::make_pair("surface", att->StrToStr(att->GetSurface())));
         }

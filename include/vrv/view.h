@@ -9,10 +9,6 @@
 #ifndef __VRV_RENDERER_H__
 #define __VRV_RENDERER_H__
 
-#include <typeinfo>
-
-//----------------------------------------------------------------------------
-
 #include "devicecontextbase.h"
 #include "scoredef.h"
 #include "vrvdef.h"
@@ -147,7 +143,7 @@ protected:
      */
     ///@{
     void DrawSystem( DeviceContext *dc, System *system );
-    void DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType );
+    void DrawSystemList( DeviceContext *dc, System *system, const ClassId classId );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
     void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false );
     void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
@@ -156,12 +152,11 @@ protected:
     void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine );
     void DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barLine );
 	void DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barLine );
-	void DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff *pportee);
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
 	void DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
     void DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff,  Measure *measure );
-    void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const std::type_info *elementType );
+    void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId );
 	void DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height = -1);
     ///@}
     

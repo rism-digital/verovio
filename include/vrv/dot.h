@@ -32,7 +32,7 @@ public:
     virtual ~Dot();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Dot"; };
-    virtual int Is() { return DOT; };
+    virtual ClassId Is() { return DOT; };
     ///@}
     
     

@@ -16,6 +16,7 @@
 #define __VRV_ATTS_HEADER_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttRegularmethod
 //----------------------------------------------------------------------------
-
-#define ATT_REGULARMETHOD 58
 
 class AttRegularmethod: public Att
 {

@@ -40,7 +40,8 @@ Note::Note():
     RegisterAttClass(ATT_STEMMED);
     RegisterAttClass(ATT_TIEPRESENT);
     
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::InterfaceId() );
+    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
+    RegisterInterface( PitchInterface::GetAttClasses(), PitchInterface::IsInterface() );
     
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
@@ -141,12 +142,12 @@ void Note::ResetDrawingAccid( )
     
 Chord* Note::IsChordTone()
 {
-    return reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    return dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH) );
 }
     
 int Note::GetDrawingDur( )
 {
-    Chord* chordParent = reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
     if( chordParent ) {
         return chordParent->GetActualDur();
     }
@@ -170,8 +171,8 @@ bool Note::HasDrawingStemDir()
     
 data_STEMDIRECTION Note::GetDrawingStemDir()
 {
-    Chord* chordParent = reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
-    Beam* beamParent = reinterpret_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
     if( chordParent ) {
         return chordParent->GetDrawingStemDir();
     }

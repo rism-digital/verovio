@@ -85,8 +85,8 @@ int Verse::PrepareProcessingLists( ArrayPtrVoid *params )
     // Alternate solution with StaffN_LayerN_VerseN_t
     //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params)[0]);
     
-    Staff *staff = reinterpret_cast<Staff*>( this->GetFirstParent( STAFF ) );
-    Layer *layer = reinterpret_cast<Layer*>( this->GetFirstParent( LAYER ) );
+    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( STAFF ) );
+    Layer *layer = dynamic_cast<Layer*>( this->GetFirstParent( LAYER ) );
     assert( staff && layer );
     
     tree->child[ staff->GetN() ].child[ layer->GetN() ].child[ this->GetN() ];

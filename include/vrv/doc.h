@@ -39,7 +39,7 @@ public:
     // constructors and destructors
     Doc();
     virtual ~Doc();
-    virtual int Is() { return DOC; }
+    virtual ClassId Is() { return DOC; }
 	
 	void AddPage( Page *page );
     
@@ -97,8 +97,8 @@ public:
      * These should eventually be set at parameters.
      */
     ///@{
-    char GetLeftMargin( const std::type_info *elementType  );
-    char GetRightMargin( const std::type_info *elementType );
+    char GetLeftMargin( const ClassId classId  );
+    char GetRightMargin( const ClassId classId );
     ///@}
 
     /*

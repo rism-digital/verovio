@@ -370,8 +370,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     }
     
     // the array should not be empty
-    assert( !m_objects.empty() ); // Array cannot be empty
-    
+    assert( !m_objects.empty() );
     
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View object)
     (m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );

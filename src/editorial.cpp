@@ -90,8 +90,10 @@ void EditorialElement::AddMeasureElement( MeasureElement *child )
     child->SetParent( this );
     m_children.push_back( child );
     Modify();
-    if ( dynamic_cast<Staff*>(child) &&  dynamic_cast<Staff*>(child)->GetN() < 1 ) {
-        LogError("Staff without @n is not supported within editorial markup element");
+    if ( child->Is() == STAFF ) {
+        Staff *staff = dynamic_cast<Staff*>(child);
+        assert( staff );
+        if ( staff->GetN() < 1 ) LogError("Staff without @n is not supported within editorial markup element");
     }
 }
     
@@ -140,7 +142,6 @@ App::~App()
 void App::AddLemOrRdg(EditorialElement *child)
 {
     assert( dynamic_cast<Lem*>(child) || dynamic_cast<Rdg*>(child) );
-    
     child->SetParent( this );
     m_children.push_back(child);
     Modify();
@@ -259,6 +260,7 @@ int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     EditorialElement *editorialElement = dynamic_cast<EditorialElement*>( contentSystem->Relinquish( this->GetIdx()) );
+    assert( editorialElement );
     (*currentSystem)->AddEditorialElement( editorialElement );
     
     return FUNCTOR_SIBLINGS;

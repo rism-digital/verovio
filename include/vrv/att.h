@@ -8,12 +8,11 @@
 #ifndef __VRV_ATT_H__
 #define __VRV_ATT_H__
 
-#include <typeinfo>
 #include <string>
 
 //----------------------------------------------------------------------------
 
-#include "attdef.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -200,30 +199,30 @@ public:
 };
     
 //----------------------------------------------------------------------------
-// AttInterface
+// Interface
 //----------------------------------------------------------------------------
 
-class AttInterface
+class Interface
 {
     
 public:
-    AttInterface() {};
-    virtual ~AttInterface() {};
+    Interface() {};
+    virtual ~Interface() {};
     
     /**
      *
      */
-    void RegisterInterfaceAttClass( int attClassId ) { m_interfaceAttClasses.push_back( attClassId ); };
-    std::vector<int> *GetAttClasses() { return &m_interfaceAttClasses; };
+    void RegisterInterfaceAttClass( AttClassId attClassId ) { m_interfaceAttClasses.push_back( attClassId ); };
+    std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; };
     
-    virtual int InterfaceId() { return 0; };
+    virtual InterfaceId IsInterface() { return INTERFACE; };
     
     
 private:
     /**
      *
      */
-    std::vector<int> m_interfaceAttClasses;
+    std::vector<AttClassId> m_interfaceAttClasses;
 };
     
 //----------------------------------------------------------------------------
@@ -234,18 +233,18 @@ class AttComparison
 {
     
 public:
-    AttComparison( int classId ) {
+    AttComparison( ClassId classId ) {
         m_classId = classId;
     };
     
     virtual bool operator() (Object *object);
     
-    int GetType() { return m_classId; };
+    ClassId GetType() { return m_classId; };
     
     bool MatchesType( Object *object );
     
 protected:
-    int m_classId;
+    ClassId m_classId;
 };
     
 } // namespace vrv

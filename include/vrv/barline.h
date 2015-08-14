@@ -35,7 +35,7 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new Barline(*this); };
     virtual std::string GetClassName( ) { return "Barline"; };
-    virtual int Is() { return BAR_LINE; };
+    virtual ClassId Is() { return BAR_LINE; };
     ///@}  
     
     /**
@@ -52,10 +52,6 @@ public:
 private:
     
 public:
-    /** Indicates a partial barLine (inbetween the staves) - no MEI equivalent */
-    bool m_partialBarline;
-    /** Indicates a barLine displayed only on the staff - no MEI equivalent */
-    bool m_onStaffOnly;
 
 private:
     
@@ -81,7 +77,7 @@ public:
     virtual ~BarlineAttr();
     virtual Object* Clone() { return new BarlineAttr(*this); };
     virtual std::string GetClassName( ) { return "BarlineAttr"; };
-    virtual int Is() { return BAR_LINE_ATTR; };
+    virtual ClassId Is() { return BAR_LINE_ATTR; };
     ///@}
 };
     

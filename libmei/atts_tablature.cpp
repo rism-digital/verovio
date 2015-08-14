@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -125,7 +129,8 @@ bool AttStaffDefGesTablature::HasTabStrings( )
 
 bool Att::SetTablature( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_NOTEGESTABLATURE ) ) {
-        AttNoteGesTablature *att = reinterpret_cast<AttNoteGesTablature*>(element);
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
+        assert( att );
         if (attrType == "tabFret") {
             att->SetTabFret(att->StrToStr(attrValue));
             return true;
@@ -136,7 +141,8 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
         }
     }
     if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {
-        AttStaffDefGesTablature *att = reinterpret_cast<AttStaffDefGesTablature*>(element);
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
+        assert( att );
         if (attrType == "tabStrings") {
             att->SetTabStrings(att->StrToStr(attrValue));
             return true;
@@ -148,7 +154,8 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
 
 void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_NOTEGESTABLATURE ) ) {
-        AttNoteGesTablature *att = reinterpret_cast<AttNoteGesTablature*>(element);
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
+        assert( att );
         if (att->HasTabFret()) {
             attributes->push_back(std::make_pair("tabFret", att->StrToStr(att->GetTabFret())));
         }
@@ -157,7 +164,8 @@ void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
         }
     }
     if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {
-        AttStaffDefGesTablature *att = reinterpret_cast<AttStaffDefGesTablature*>(element);
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
+        assert( att );
         if (att->HasTabStrings()) {
             attributes->push_back(std::make_pair("tabStrings", att->StrToStr(att->GetTabStrings())));
         }

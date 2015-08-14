@@ -16,6 +16,7 @@
 #define __VRV_ATTS_FACSIMILE_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttFacsimile
 //----------------------------------------------------------------------------
-
-#define ATT_FACSIMILE 53
 
 class AttFacsimile: public Att
 {

@@ -23,6 +23,8 @@ namespace vrv {
 Slur::Slur():
     MeasureElement("slur-"), TimeSpanningInterface()
 {
+    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
+    
     Reset();
 }
 

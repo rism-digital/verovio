@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -211,14 +215,16 @@ bool AttReasonident::HasReason( )
 
 bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_AGENTIDENT ) ) {
-        AttAgentident *att = reinterpret_cast<AttAgentident*>(element);
+        AttAgentident *att = dynamic_cast<AttAgentident*>(element);
+        assert( att );
         if (attrType == "agent") {
             att->SetAgent(att->StrToStr(attrValue));
             return true;
         }
     }
     if (element->HasAttClass( ATT_EDIT ) ) {
-        AttEdit *att = reinterpret_cast<AttEdit*>(element);
+        AttEdit *att = dynamic_cast<AttEdit*>(element);
+        assert( att );
         if (attrType == "cert") {
             att->SetCert(att->StrToStr(attrValue));
             return true;
@@ -229,14 +235,16 @@ bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrV
         }
     }
     if (element->HasAttClass( ATT_EXTENT ) ) {
-        AttExtent *att = reinterpret_cast<AttExtent*>(element);
+        AttExtent *att = dynamic_cast<AttExtent*>(element);
+        assert( att );
         if (attrType == "extent") {
             att->SetExtent(att->StrToStr(attrValue));
             return true;
         }
     }
     if (element->HasAttClass( ATT_REASONIDENT ) ) {
-        AttReasonident *att = reinterpret_cast<AttReasonident*>(element);
+        AttReasonident *att = dynamic_cast<AttReasonident*>(element);
+        assert( att );
         if (attrType == "reason") {
             att->SetReason(att->StrToStr(attrValue));
             return true;
@@ -248,13 +256,15 @@ bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrV
 
 void Att::GetEdittrans( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_AGENTIDENT ) ) {
-        AttAgentident *att = reinterpret_cast<AttAgentident*>(element);
+        AttAgentident *att = dynamic_cast<AttAgentident*>(element);
+        assert( att );
         if (att->HasAgent()) {
             attributes->push_back(std::make_pair("agent", att->StrToStr(att->GetAgent())));
         }
     }
     if (element->HasAttClass( ATT_EDIT ) ) {
-        AttEdit *att = reinterpret_cast<AttEdit*>(element);
+        AttEdit *att = dynamic_cast<AttEdit*>(element);
+        assert( att );
         if (att->HasCert()) {
             attributes->push_back(std::make_pair("cert", att->StrToStr(att->GetCert())));
         }
@@ -263,13 +273,15 @@ void Att::GetEdittrans( Object *element, ArrayOfStrAttr *attributes ) {
         }
     }
     if (element->HasAttClass( ATT_EXTENT ) ) {
-        AttExtent *att = reinterpret_cast<AttExtent*>(element);
+        AttExtent *att = dynamic_cast<AttExtent*>(element);
+        assert( att );
         if (att->HasExtent()) {
             attributes->push_back(std::make_pair("extent", att->StrToStr(att->GetExtent())));
         }
     }
     if (element->HasAttClass( ATT_REASONIDENT ) ) {
-        AttReasonident *att = reinterpret_cast<AttReasonident*>(element);
+        AttReasonident *att = dynamic_cast<AttReasonident*>(element);
+        assert( att );
         if (att->HasReason()) {
             attributes->push_back(std::make_pair("reason", att->StrToStr(att->GetReason())));
         }

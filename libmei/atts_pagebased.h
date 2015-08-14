@@ -16,6 +16,7 @@
 #define __VRV_ATTS_PAGEBASED_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttSurface
 //----------------------------------------------------------------------------
-
-#define ATT_SURFACE 76
 
 class AttSurface: public Att
 {

@@ -9,10 +9,6 @@
 #ifndef __VRV_LAYER_H__
 #define __VRV_LAYER_H__
 
-#include <typeinfo>
-
-//----------------------------------------------------------------------------
-
 #include "atts_shared.h"
 #include "clef.h"
 #include "drawinglistinterface.h"
@@ -51,7 +47,7 @@ public:
     virtual ~Layer();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Layer"; };
-    virtual int Is() { return LAYER; };
+    virtual ClassId Is() { return LAYER; };
     ///@}
 	
 	void AddLayerElement( LayerElement *element, int idx = -1 );
@@ -68,17 +64,6 @@ public:
 	LayerElement *GetAtPos( int x );
 	LayerElement *Insert( LayerElement *element, int x ); // return a pointer on the inserted element
     
-    void Insert( LayerElement *element, LayerElement *before );
-    
-	void Delete( LayerElement *element );
-	
-    /**
-     * Looks for the first LayerElement of type elementType.
-     * Looks FORWARD of BACKWARD depending on the direction parameter.
-     * Returns the retrieved element if *succ == true or the original element if not.
-     */
-    LayerElement *GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ );
-    
     /** 
      * Get the current clef for the test element.
      * Goes back on the layer until a clef is found.
@@ -92,12 +77,6 @@ public:
      * The method uses Layer::GetClef first to find the clef before test.
      */
     int GetClefOffset( LayerElement *test  );
-    
-    /**
-     * Basic method that remove intermediate clefs and custos.
-     * Used for building collations (See CmpFile::Collate).
-     */
-    void RemoveClefAndCustos( );
     
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.

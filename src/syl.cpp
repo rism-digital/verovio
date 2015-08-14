@@ -30,6 +30,9 @@ Syl::Syl():
 {
     RegisterAttClass(ATT_TYPOGRAPHY);
     RegisterAttClass(ATT_SYLLOG);
+    
+    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
+    
     Reset();
 }
 
@@ -60,12 +63,12 @@ int Syl::PrepareLyrics( ArrayPtrVoid *params )
     Note **lastNote = static_cast<Note**>((*params)[1]);
     Note **lastButOneNote = static_cast<Note**>((*params)[2]);
     
-    Verse *verse = reinterpret_cast<Verse*>( this->GetFirstParent( VERSE, MAX_NOTE_DEPTH ) );
+    Verse *verse = dynamic_cast<Verse*>( this->GetFirstParent( VERSE, MAX_NOTE_DEPTH ) );
     if ( verse ) {
         m_drawingVerse = std::max(verse->GetN(), 1);
     }
     
-    this->SetStart( reinterpret_cast<LayerElement*>( this->GetFirstParent( NOTE, MAX_NOTE_DEPTH ) ) );
+    this->SetStart( dynamic_cast<LayerElement*>( this->GetFirstParent( NOTE, MAX_NOTE_DEPTH ) ) );
     
     // At this stage currentSyl is actually the previous one that is ending here
     if ((*currentSyl)) {

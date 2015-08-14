@@ -23,6 +23,8 @@ namespace vrv {
 Tie::Tie():
     MeasureElement("tie-"), TimeSpanningInterface()
 {
+    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
+    
     Reset();
 }
 

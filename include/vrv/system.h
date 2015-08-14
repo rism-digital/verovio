@@ -40,14 +40,12 @@ public:
     virtual ~System();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "System"; };
-    virtual int Is() { return SYSTEM; };
+    virtual ClassId Is() { return SYSTEM; };
     ///@}
 	
 	void AddMeasure( Measure *measure );
     
     void AddScoreDef( ScoreDef *scoreDef );
-	
-    Measure *GetAtPos( int x );
     
     /**
      * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)

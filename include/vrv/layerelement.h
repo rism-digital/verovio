@@ -41,16 +41,10 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual int Is() { return LAYER_ELEMENT; };
+    virtual ClassId Is() { return LAYER_ELEMENT; };
     ///@}
     
     LayerElement& operator=( const LayerElement& element ); // copy assignement - this need to be changed to the Object::Clone way;
-    
-    /**
-     * Return a copy of the LayerElement (child class).
-     * By default, a new uuid is generated
-     */
-    LayerElement *GetChildCopy( bool newUuid = true );
     
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
@@ -77,28 +71,9 @@ public:
      * @name Child type checkers.
      */
     ///@{
-    bool IsAccid();
-    bool IsBarline();
-    bool IsBeam();
-    bool IsChord();
-    bool IsClef();
-    bool IsCustos();
-    bool IsDot();
     bool HasDurationInterface();
-    bool IsKeySig();
-    bool IsMensur();
-    bool IsMeterSig();
-    bool IsMultiRest();
-    bool IsMRest();
-    bool IsNote();
     bool HasPitchInterface();
     bool HasPositionInterface();
-    bool IsRest();
-    bool IsTie();
-    bool IsTuplet();
-    bool IsSpace();
-    bool IsSyl();
-    bool IsVerse();
     bool IsGraceNote();
     ///@}
     

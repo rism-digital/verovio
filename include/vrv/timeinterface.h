@@ -25,7 +25,7 @@ class LayerElement;
  * This class is an interface for elements with duration, such as notes and rests.
  * It is not an abstract class but should not be instanciate directly.
  */
-class TimeSpanningInterface: public AttInterface,
+class TimeSpanningInterface: public Interface,
     public AttStartendid,
     public AttStartid,
     public AttTimestampMusical,
@@ -40,6 +40,7 @@ public:
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
     virtual void Reset();
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
     ///@}
     
     /**

@@ -144,7 +144,7 @@ int Staff::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
     while ( iter != elements->end()) {
         TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(*iter);
         assert(interface);
-        Staff *endParent = reinterpret_cast<Staff *>(interface->GetEnd()->GetFirstParent( STAFF ) );
+        Staff *endParent = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent( STAFF ) );
         assert( endParent );
         // Because we are not processing following staff @n, we need to check it here.
         // this might cause problem with cross-staves slurs if the end is on a lower staff than the start:

@@ -31,10 +31,13 @@ namespace vrv {
 
 void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-    assert(layer); // Pointer to layer cannot be NULL"
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert( dc );
+    assert( layer );
+    assert( staff );
+    assert( measure );
     
     Beam *beam = dynamic_cast<Beam*>(element);
+    assert( beam );
     
     LayerElement *current;
 
@@ -122,10 +125,9 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	do {
         // Beam list should contain only DurationInterface objects
         assert( dynamic_cast<DurationInterface*>(current) );
-        
         currentDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
         
-        if ( current->IsChord() ) {
+        if (current->Is() == CHORD) {
             beamHasChord = true;
         }
 
@@ -145,9 +147,10 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             }
             
             // Skip rests
-            if (current->IsNote() || current->IsChord()) {
+            if ( (current->Is() == NOTE) || (current->Is() == CHORD) ) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!hasMultipleStemDir) {
+                    assert( dynamic_cast<AttStemmed*>(current) );
                     currentStemDir = dynamic_cast<AttStemmed*>(current)->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((stemDir != STEMDIRECTION_NONE) && (stemDir != currentStemDir)) {
@@ -193,8 +196,11 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // elementCount holds the last one
 	for (i = 0; i < elementCount; i++) {
 
-        if (dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element)) {
-            dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element)->GetYExtremes(&yMax, &yMin);
+    
+        if ((*beamElementCoords)[i]->m_element->Is() == CHORD) {
+            Chord *chord = dynamic_cast<Chord*>((*beamElementCoords)[i]->m_element);
+            assert( chord );
+            chord->GetYExtremes(&yMax, &yMin);
             (*beamElementCoords)[i]->m_yTop = yMax;
             (*beamElementCoords)[i]->m_yBottom = yMin;
             
@@ -285,10 +291,10 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     for (i=0; i<elementCount; i++)
     {
         //change the stem dir for all objects
-        if ( (*beamElementCoords)[i]->m_element->IsNote() ) {
+        if ( (*beamElementCoords)[i]->m_element->Is() == NOTE ) {
             ((Note*)(*beamElementCoords)[i]->m_element)->m_drawingStemDir = stemDir;
         }
-        else if ( (*beamElementCoords)[i]->m_element->IsChord() ) {
+        else if ( (*beamElementCoords)[i]->m_element->Is() == CHORD ) {
             ((Chord*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir(stemDir);
         }
 
@@ -376,7 +382,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     for (i=0; i<elementCount; i++)
     {
         LayerElement *el = (*beamElementCoords)[i]->m_element;
-        if((el->IsNote() && !dynamic_cast<Note*>(el)->IsChordTone()) || el->IsChord()) {
+        if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
             DrawVerticalLine (dc, el->m_drawingStemStart.y, el->m_drawingStemEnd.y, el->m_drawingStemStart.x, m_doc->m_style->m_stemWidth);
         }
     }

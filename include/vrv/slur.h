@@ -30,7 +30,7 @@ public:
     virtual ~Slur();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Slur"; };
-    virtual int Is() { return SLUR; };
+    virtual ClassId Is() { return SLUR; };
     ///@}
     
     //----------//

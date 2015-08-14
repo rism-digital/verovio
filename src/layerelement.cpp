@@ -89,127 +89,22 @@ LayerElement& LayerElement::operator=( const LayerElement& element )
 	}
 	return *this;
 }
-
-
-LayerElement *LayerElement::GetChildCopy( bool newUuid ) 
-{
-    
-    // Is there another way to do this in C++ ?
-    // Yes, change this to the Object::Clone method - however, newUuid will not be possible in this way
-    LayerElement *element = NULL;
-
-    if ( this->IsAccid() )
-        element = new Accid( *(Accid*)this );
-    else if ( this->IsBarline() )
-        element = new Barline( *(Barline*)this );
-    else if (this->IsClef() )
-        element = new Clef( *(Clef*)this );
-    else if (this->IsCustos() )
-        element = new Custos( *(Custos*)this );
-    else if (this->IsDot() )
-        element = new Dot( *(Dot*)this );
-    else if (this->IsMensur() )
-        element = new Mensur( *(Mensur*)this );
-    else if (this->IsNote() )
-        element = new Note( *(Note*)this );
-    else if (this->IsRest() )
-        element = new Rest( *(Rest*)this );
-    else {
-        LogDebug( "Missing %s", this->GetClassName().c_str() );
-        assert( false ); // Copy of this type unimplemented
-        return NULL;
-    }
-        
-    element->m_parent = NULL;
-    
-    if ( !newUuid ) {
-        element->SetUuid( this->GetUuid() );
-    }
-    else {
-        element->ResetUuid( );
-    }
-    
-    return element;
-}
     
 void LayerElement::ResetHorizontalAlignment()
 {
     m_drawingX = 0;
     m_alignment = NULL;
-    if ( this->IsNote() ) {
-        dynamic_cast<Note*>(this)->ResetGraceAlignment();
+    if (this->Is() == NOTE) {
+        Note *note = dynamic_cast<Note*>(this);
+        assert( note );
+        note->ResetGraceAlignment();
     }
 }
-    
-bool LayerElement::IsAccid( )
-{
-    return (this->Is() == ACCID);
-}
 
-bool LayerElement::IsBarline() 
-{  
-    return (this->Is() == BAR_LINE);
-}
-
-bool LayerElement::IsBeam() 
-{  
-    return (this->Is() == BEAM);
-}
-
-bool LayerElement::IsChord()
-{
-    return (this->Is() == CHORD);
-}
-    
-bool LayerElement::IsClef() 
-{  
-    return (this->Is() == CLEF);
-}
-
-bool LayerElement::IsCustos( )
-{
-    return (this->Is() == CUSTOS);
-}
-
-bool LayerElement::IsDot( )
-{
-    return (this->Is() == DOT);
-}
-    
 bool LayerElement::HasDurationInterface() 
 {  
+    return (this->HasInterface(INTERFACE_DURATION));
     return (dynamic_cast<DurationInterface*>(this));
-}
-
-bool LayerElement::IsKeySig()
-{
-    return (this->Is() == KEY_SIG);
-}
-
-    
-bool LayerElement::IsMRest()
-{
-    return (this->Is() == MREST);
-}
-    
-bool LayerElement::IsMultiRest() 
-{  
-    return (this->Is() == MULTI_REST);
-}
-
-bool LayerElement::IsMensur()
-{
-    return (this->Is() == MENSUR);
-}
-    
-bool LayerElement::IsMeterSig()
-{
-    return (this->Is() == METER_SIG);
-}
-    
-bool LayerElement::IsNote() 
-{  
-    return (this->Is() == NOTE);
 }
 
 bool LayerElement::IsGraceNote()
@@ -219,49 +114,25 @@ bool LayerElement::IsGraceNote()
 }
     
 bool LayerElement::HasPitchInterface() 
-{  
+{
+    return (this->HasInterface(INTERFACE_PITCH));
     return (dynamic_cast<PitchInterface*>(this));
 }
 
 bool LayerElement::HasPositionInterface() 
-{  
+{
+    return (this->HasInterface(INTERFACE_POSITION));
     return (dynamic_cast<PositionInterface*>(this));
-}
-
-bool LayerElement::IsRest() 
-{  
-    return (dynamic_cast<Rest*>(this));
-}
-    
-bool LayerElement::IsSyl()
-{
-    return (dynamic_cast<Syl*>(this));
-}
-
-bool LayerElement::IsTie()
-{
-    return (dynamic_cast<Tie*>(this));
-}
-
-bool LayerElement::IsTuplet()
-{
-    return (dynamic_cast<Tuplet*>(this));
-}
-
-bool LayerElement::IsSpace()
-{
-    return (dynamic_cast<Space*>(this));
-}
-
-bool LayerElement::IsVerse()
-{
-    return (dynamic_cast<Verse*>(this));
 }
 
 bool LayerElement::IsCueSize()
 {
-    if (this->IsNote()) return dynamic_cast<Note*>(this)->HasGrace();
-    Note *note = reinterpret_cast<Note*>(this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
+    if ( this->Is() == NOTE ) {
+        Note *note = dynamic_cast<Note*>(this);
+        assert( note );
+        return ( note->HasGrace() );
+    }
+    Note *note = dynamic_cast<Note*>(this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
     return ( note && ( note->HasGrace() ) );
 }
     
@@ -289,14 +160,15 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
     }
     
     if ( HasDurationInterface() ) {
-        Tuplet *tuplet = reinterpret_cast<Tuplet*>( this->GetFirstParent( TUPLET, MAX_TUPLET_DEPTH ) );
         int num = 1;
         int numbase = 1;
+        Tuplet *tuplet = dynamic_cast<Tuplet*>( this->GetFirstParent( TUPLET, MAX_TUPLET_DEPTH ) );
         if ( tuplet ) {
             num = tuplet->GetNum();
             numbase = tuplet->GetNumbase();
         }
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
+        assert( duration );
         if (duration->IsMensural()) return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
         else return duration->GetAlignmentDuration( num, numbase );
     }
@@ -332,7 +204,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
     this->ResetHorizontalAlignment();
     
     
-    Chord* chordParent = reinterpret_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
     if( chordParent )
     {
         m_alignment = chordParent->GetAlignment();
@@ -340,10 +212,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
     }
     
     AlignmentType type = ALIGNMENT_DEFAULT;
-    if ( this->IsBarline() ) {
+    if (this->Is() == BAR_LINE) {
         type = ALIGNMENT_BARLINE;
     }
-    else if ( this->IsClef() ) {
+    else if ( this->Is() == CLEF ) {
         if ( this->GetScoreOrStaffDefAttr() ) {
             type = ALIGNMENT_CLEF_ATTR;
         }
@@ -351,7 +223,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_CLEF;
         }
     }
-    else if ( this->IsKeySig() ) {
+    else if (this->Is() == KEY_SIG) {
         if ( this->GetScoreOrStaffDefAttr() ) {
             type = ALIGNMENT_KEYSIG_ATTR;
         }
@@ -359,36 +231,38 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_KEYSIG;
         }
     }
-    else if ( this->IsMensur() ) {
+    else if (this->Is() == MENSUR) {
         if ( this->GetScoreOrStaffDefAttr() ) {
             type = ALIGNMENT_MENSUR_ATTR;
         }
         else {
             // replace the current mensur
             (*currentMensur) = dynamic_cast<Mensur*>(this);
+            assert( *currentMensur );
             type = ALIGNMENT_MENSUR;
         }
     }
-    else if ( this->IsMeterSig() ) {
+    else if (this->Is() == METER_SIG) {
         if ( this->GetScoreOrStaffDefAttr() ) {
             type = ALIGNMENT_METERSIG_ATTR;
         }
         else {
             // replace the current meter signature
             (*currentMeterSig) = dynamic_cast<MeterSig*>(this);
+            assert( *currentMeterSig );
             type = ALIGNMENT_METERSIG;
         }
     }
-    else if ( this->IsMultiRest() || this->IsMRest() ) {
+    else if ( (this->Is() == MULTI_REST) || (this->Is() == MREST) ) {
         type = ALIGNMENT_MULTIREST;
     }
     else if ( this->IsGraceNote() ) {
         type = ALIGNMENT_GRACENOTE;
     }
-    else if ( this->IsBeam() || this->IsTuplet() || this->IsVerse() || this->IsSyl() ) {
+    else if ((this->Is() == BEAM)|| (this->Is() == TUPLET) || (this->Is() == VERSE) || (this->Is() == SYL) ) {
         type = ALIGNMENT_CONTAINER;
     }
-    else if ( this->IsDot() ) {
+    else if (this->Is() == DOT) {
         type = ALIGNMENT_DOT;
     }
     
@@ -520,14 +394,15 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
     }
     
     // Finally, adjust Y for notes and rests
-    if (dynamic_cast<Note*>(this))
+    if (this->Is() == NOTE)
     {
         Note *note = dynamic_cast<Note*>(this);
+        assert( note );
         this->SetDrawingY( this->GetDrawingY() + view->CalculatePitchPosY( staffY, note->GetPname(), layerY->GetClefOffset( layerElementY ), note->GetOct() ) );
     }
-    else if (dynamic_cast<Rest*>(this)) {
+    else if (this->Is() == REST) {
         Rest *rest = dynamic_cast<Rest*>(this);
-        
+        assert( rest );
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE) {
             this->SetDrawingY( this->GetDrawingY() + view->CalculateRestPosY( staffY, rest->GetActualDur()) );

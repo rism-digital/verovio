@@ -155,7 +155,7 @@ public:
     virtual ~ScoreDef();    
     virtual void Reset();
     virtual std::string GetClassName( ) { return "ScoreDef"; };
-    virtual int Is() { return SCORE_DEF; };
+    virtual ClassId Is() { return SCORE_DEF; };
     ///@}
     
 	void AddStaffGrp( StaffGrp *staffGrp );
@@ -241,7 +241,7 @@ public:
     virtual Object* Clone() { return new StaffGrp(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffGrp"; };
-    virtual int Is() { return STAFF_GRP; };
+    virtual ClassId Is() { return STAFF_GRP; };
     ///@}
 	
 	void AddStaffDef( StaffDef *staffDef );
@@ -309,7 +309,7 @@ public:
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
-    virtual int Is() { return STAFF_DEF; };
+    virtual ClassId Is() { return STAFF_DEF; };
     ///@}
     
     /**

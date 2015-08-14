@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -82,7 +86,8 @@ bool AttVerseLog::HasRhythm( )
 
 bool Att::SetLyrics( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_VERSELOG ) ) {
-        AttVerseLog *att = reinterpret_cast<AttVerseLog*>(element);
+        AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
+        assert( att );
         if (attrType == "refrain") {
             att->SetRefrain(att->StrToStr(attrValue));
             return true;
@@ -98,7 +103,8 @@ bool Att::SetLyrics( Object *element, std::string attrType, std::string attrValu
 
 void Att::GetLyrics( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_VERSELOG ) ) {
-        AttVerseLog *att = reinterpret_cast<AttVerseLog*>(element);
+        AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
+        assert( att );
         if (att->HasRefrain()) {
             attributes->push_back(std::make_pair("refrain", att->StrToStr(att->GetRefrain())));
         }

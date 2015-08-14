@@ -16,6 +16,7 @@
 #define __VRV_ATTS_MIDI_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttChannelized
 //----------------------------------------------------------------------------
-
-#define ATT_CHANNELIZED 68
 
 class AttChannelized: public Att
 {
@@ -88,8 +87,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMidiinstrument
 //----------------------------------------------------------------------------
-
-#define ATT_MIDIINSTRUMENT 69
 
 class AttMidiinstrument: public Att
 {
@@ -153,8 +150,6 @@ private:
 // AttMidinumber
 //----------------------------------------------------------------------------
 
-#define ATT_MIDINUMBER 70
-
 class AttMidinumber: public Att
 {
 public:
@@ -195,8 +190,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMiditempo
 //----------------------------------------------------------------------------
-
-#define ATT_MIDITEMPO 71
 
 class AttMiditempo: public Att
 {
@@ -239,8 +232,6 @@ private:
 // AttMidivalue
 //----------------------------------------------------------------------------
 
-#define ATT_MIDIVALUE 72
-
 class AttMidivalue: public Att
 {
 public:
@@ -278,8 +269,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTimebase
 //----------------------------------------------------------------------------
-
-#define ATT_TIMEBASE 73
 
 class AttTimebase: public Att
 {

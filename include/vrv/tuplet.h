@@ -33,7 +33,7 @@ public:
     virtual ~Tuplet();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tuplet"; };
-    virtual int Is() { return TUPLET; };
+    virtual ClassId Is() { return TUPLET; };
     ///@}
 
 	int GetNoteCount() const { return (int)m_children.size(); };

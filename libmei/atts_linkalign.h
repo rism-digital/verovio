@@ -16,6 +16,7 @@
 #define __VRV_ATTS_LINKALIGN_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttAlignment
 //----------------------------------------------------------------------------
-
-#define ATT_ALIGNMENT 59
 
 class AttAlignment: public Att
 {

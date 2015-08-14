@@ -33,7 +33,7 @@ public:
     MeasureElement(std::string classid);
     virtual ~MeasureElement();
     virtual void Reset();
-    virtual int Is() { return MEASURE_ELEMENT; };
+    virtual ClassId Is() { return MEASURE_ELEMENT; };
     ///@}
     
 private:

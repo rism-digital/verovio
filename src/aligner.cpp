@@ -54,7 +54,7 @@ StaffAlignment* SystemAligner::GetStaffAlignment( int idx )
     
     if (idx < GetStaffAlignmentCount()) {
         this->m_children.push_back( m_bottomAlignment );
-        return reinterpret_cast<StaffAlignment*>(m_children[idx]);
+        return dynamic_cast<StaffAlignment*>(m_children.at(idx));
     }
     // check that we are searching for the next one (not gap)
     assert( idx == GetStaffAlignmentCount() );
@@ -163,7 +163,7 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type, 
     // First try to see if we already have something at the time position
     for (i = 0; i < GetAlignmentCount(); i++)
     {
-        alignment = reinterpret_cast<Alignment*>(m_children[i]);
+        alignment = dynamic_cast<Alignment*>(m_children.at(i));
         assert( alignment );
         
         double alignment_time = alignment->GetTime();
@@ -226,7 +226,8 @@ void GraceAligner::AlignStack( )
     int i;
     double time = 0.0;
     for (i = (int)m_noteStack.size(); i > 0; i--) {
-        Note *note = reinterpret_cast<Note*>( m_noteStack[i-1] );
+        Note *note = dynamic_cast<Note*>( m_noteStack[i-1] );
+        assert( note );
         // get the duration of the event
         double duration = note->LayerElement::GetAlignmentDuration( NULL, NULL, false );
         // Time goes backward with grace notes
@@ -371,7 +372,8 @@ int Alignment::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
     int i;
     int shift = 0;
     for (i = 0; i < (int)m_graceAligner->m_children.size(); i++) {
-        Alignment *alignment = reinterpret_cast<Alignment*>(m_graceAligner->m_children[i]);
+        Alignment *alignment = dynamic_cast<Alignment*>(m_graceAligner->m_children.at(i));
+        assert( alignment );
         alignment->SetXRel( alignment->GetXShift() + shift );
         shift += alignment->GetXShift();
     }
@@ -380,7 +382,8 @@ int Alignment::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
     if ( m_graceAligner->m_children.empty() ) {
         return FUNCTOR_CONTINUE;
     }
-    Alignment *alignment = reinterpret_cast<Alignment*>(m_graceAligner->m_children.back());
+    Alignment *alignment = dynamic_cast<Alignment*>(m_graceAligner->m_children.back());
+    assert( alignment );
     m_graceAligner->SetWidth( alignment->GetXRel() + alignment->GetMaxWidth() );
     
     return FUNCTOR_CONTINUE;
@@ -400,7 +403,9 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     (*shift) += m_xShift;
     
     if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
-        reinterpret_cast<MeasureAligner*>(m_parent)->SetNonJustifiableMargin(m_xRel);
+        MeasureAligner *aligner = dynamic_cast<MeasureAligner*>(m_parent);
+        assert( aligner );
+        aligner->SetNonJustifiableMargin(m_xRel);
         (*justifiable_shift) = m_xRel;
     }
 

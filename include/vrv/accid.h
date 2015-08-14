@@ -32,7 +32,7 @@ public:
     virtual ~Accid();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Accid"; };
-    virtual int Is() { return ACCID; };
+    virtual ClassId Is() { return ACCID; };
     ///@}
     
     

@@ -12,10 +12,10 @@
 #include <iterator>
 #include <map>
 #include <string>
-#include <typeinfo>
 
 //----------------------------------------------------------------------------
 
+#include "att_classes.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -68,15 +68,18 @@ public:
     Object();
     Object(std::string classid);
     virtual ~Object();
-    virtual int Is();
+    virtual ClassId Is();
+    bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
+    bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
+    bool IsMeasureElement() { return (this->Is() > MEASURE_ELEMENT && this->Is() < MEASURE_ELEMENT_max); };
     
     /**
      *
      */
-    void RegisterAttClass( int attClassId ) { m_attClasses.push_back( attClassId ); };
-    bool HasAttClass( int attClassId ) { return std::find(m_attClasses.begin(), m_attClasses.end(), attClassId) != m_attClasses.end(); };
-    void RegisterInterface( std::vector<int> *attClasses, int interfaceId );
-    bool HasInterface( int interfaceId );
+    void RegisterAttClass( AttClassId attClassId ) { m_attClasses.push_back( attClassId ); };
+    bool HasAttClass( AttClassId attClassId ) { return std::find(m_attClasses.begin(), m_attClasses.end(), attClassId) != m_attClasses.end(); };
+    void RegisterInterface( std::vector<AttClassId> *attClasses, InterfaceId interfaceId );
+    bool HasInterface( InterfaceId interfaceId ) { return std::find(m_interfaces.begin(), m_interfaces.end(), interfaceId) != m_interfaces.end(); };
     
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
@@ -122,7 +125,7 @@ public:
      * Used for classes with several types of children
      */
     int GetChildCount() { return (int)m_children.size(); };
-    int GetChildCount( const std::type_info *elementType );
+    int GetChildCount( const ClassId classId );
     
     /**
      * Child access (generic)
@@ -148,7 +151,7 @@ public:
      * Always call GetFirst before calling GetNext
      */
     ///@{
-    Object *GetFirst( const std::type_info *elementType = NULL );
+    Object *GetFirst( const ClassId classId = UNSPECIFIED );
     Object *GetNext( );
     ///@}
     
@@ -207,7 +210,7 @@ public:
      * Look for a child with the specified type (returns NULL if not found)
      * This method is a wrapper to a Object::FindByType functor.
      */
-    Object *FindChildByType( int classId,
+    Object *FindChildByType( ClassId classId,
                             int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
@@ -237,32 +240,32 @@ public:
      * Return the first parent of the specified type.
      * The maxSteps parameter limit the search to a certain number of level if not -1.
      */
-    Object *GetFirstParent( const int elementType, int maxSteps = -1 );
+    Object *GetFirstParent( const ClassId classId, int maxSteps = -1 );
 
     /**
      * Return the last parent that is NOT of the specified type.
      * The maxSteps parameter limit the search to a certain number of level if not -1.
      */
-    Object *GetLastParentNot( const int elementType, int maxSteps = -1 );
+    Object *GetLastParentNot( const ClassId classId, int maxSteps = -1 );
     
     /**
      * Return the first of the specified type.
      */
-    Object *GetFirstChild( const std::type_info *elementType );
+    Object *GetFirstChild( const ClassId classId );
     
     /**
      * Return the previous sibling object of the specified type.
      * If no type is specified, returns the previous object.
      * Returns NULL if not found in both cases.
      */
-    Object *GetPreviousSibling( const std::type_info *elementType = NULL );
+    Object *GetPreviousSibling( const ClassId classId = UNSPECIFIED );
     
     /**
      * Return the next sibling object of the specified type.
      * If no type is specified, returns the next object.
      * Returns NULL if not found in both cases.
      */
-    Object *GetNextSibling( const std::type_info *elementType = NULL );
+    Object *GetNextSibling( const ClassId classId = UNSPECIFIED );
     
     /**
      * Fill the list of all the children LayerElement.
@@ -658,12 +661,17 @@ private:
      * Values are set when GetFirst is called (which is mandatory)
      */
     ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
-    const std::type_info *m_iteratorElementType;
+    ClassId m_iteratorElementType;
     
     /**
      *
      */
-    std::vector<int> m_attClasses;
+    std::vector<AttClassId> m_attClasses;
+    
+    /**
+     *
+     */
+    std::vector<InterfaceId> m_interfaces;
 };
 
 //----------------------------------------------------------------------------
@@ -680,13 +688,7 @@ public:
     DocObject();
     DocObject(std::string classid);
     virtual ~DocObject();
-    virtual int Is() { return DOC_OBJECT; }
-    
-    /**
-     * Refreshes the views from Doc.
-     * From other DocObject, simply pass it to its parent until Doc is reached.
-     */
-    virtual void Refresh();
+    virtual ClassId Is() { return DOC_OBJECT; }
     
     void UpdateContentBB( int x1, int y1, int x2, int y2);
     void UpdateSelfBB( int x1, int y1, int x2, int y2 );
@@ -758,8 +760,8 @@ public:
     /**
      * Gets the first item of type elementType starting at startFrom
      */
-    Object *GetListFirst(const Object *startFrom, const std::type_info *elementType = NULL );
-    Object *GetListFirstBackward(Object *startFrom, const std::type_info *elementType = NULL );
+    Object *GetListFirst(const Object *startFrom, const ClassId classId = UNSPECIFIED );
+    Object *GetListFirstBackward(Object *startFrom, const ClassId classId = UNSPECIFIED );
     
     /**
      * Returns the previous object in the list (NULL if not found)
@@ -856,14 +858,14 @@ class ObjectComparison
 {
 
 public:
-    ObjectComparison( const std::type_info *elementType ) { m_elementType = elementType; };
+    ObjectComparison( const ClassId classId ) { m_classId = classId; };
     
     bool operator() (Object *object)
     {
-        if (!m_elementType) {
+        if (m_classId == UNSPECIFIED) {
             return true;
         }
-        return (typeid(*object) == *m_elementType);
+        return (object->Is() == m_classId);
     }
     
 private:
@@ -871,7 +873,7 @@ private:
 public:
     
 private:
-    const std::type_info *m_elementType;
+    ClassId m_classId;
     
 };
 

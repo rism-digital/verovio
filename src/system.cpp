@@ -86,25 +86,6 @@ void System::ResetVerticalAlignment()
     m_drawingYRel = 0;
     m_drawingY = 0;
 }
-
-Measure *System::GetAtPos( int x )
-{
-	Measure *measure = dynamic_cast<Measure*>( this->GetFirst( &typeid(Measure) ) );
-	if ( !measure )
-		return NULL;
-    
-    Measure *next = NULL;
-	while ( (next = dynamic_cast<Measure*>( this->GetNext() ) ) )
-	{
-		if ( (int)measure->GetDrawingX() < x )
-		{
-			return measure;
-		}
-		measure = next;
-	}
-
-	return measure;
-}
     
 int System::GetHeight()
 {

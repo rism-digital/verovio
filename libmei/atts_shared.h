@@ -16,6 +16,7 @@
 #define __VRV_ATTS_SHARED_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttAccidLog
 //----------------------------------------------------------------------------
-
-#define ATT_ACCIDLOG 77
 
 class AttAccidLog: public Att
 {
@@ -68,8 +67,6 @@ private:
 // AttAccidental
 //----------------------------------------------------------------------------
 
-#define ATT_ACCIDENTAL 78
-
 class AttAccidental: public Att
 {
 public:
@@ -107,8 +104,6 @@ private:
 //----------------------------------------------------------------------------
 // AttAccidentalPerformed
 //----------------------------------------------------------------------------
-
-#define ATT_ACCIDENTALPERFORMED 79
 
 class AttAccidentalPerformed: public Att
 {
@@ -151,8 +146,6 @@ private:
 // AttAltsym
 //----------------------------------------------------------------------------
 
-#define ATT_ALTSYM 80
-
 class AttAltsym: public Att
 {
 public:
@@ -193,8 +186,6 @@ private:
 //----------------------------------------------------------------------------
 // AttArticulation
 //----------------------------------------------------------------------------
-
-#define ATT_ARTICULATION 81
 
 class AttArticulation: public Att
 {
@@ -240,8 +231,6 @@ private:
 // AttArticulationPerformed
 //----------------------------------------------------------------------------
 
-#define ATT_ARTICULATIONPERFORMED 82
-
 class AttArticulationPerformed: public Att
 {
 public:
@@ -280,8 +269,6 @@ private:
 // AttAugmentdots
 //----------------------------------------------------------------------------
 
-#define ATT_AUGMENTDOTS 83
-
 class AttAugmentdots: public Att
 {
 public:
@@ -319,8 +306,6 @@ private:
 //----------------------------------------------------------------------------
 // AttAuthorized
 //----------------------------------------------------------------------------
-
-#define ATT_AUTHORIZED 84
 
 class AttAuthorized: public Att
 {
@@ -373,8 +358,6 @@ private:
 // AttBarLineLog
 //----------------------------------------------------------------------------
 
-#define ATT_BARLINELOG 85
-
 class AttBarLineLog: public Att
 {
 public:
@@ -412,8 +395,6 @@ private:
 //----------------------------------------------------------------------------
 // AttBarplacement
 //----------------------------------------------------------------------------
-
-#define ATT_BARPLACEMENT 86
 
 class AttBarplacement: public Att
 {
@@ -469,8 +450,6 @@ private:
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
-#define ATT_BEAMINGVIS 87
-
 class AttBeamingVis: public Att
 {
 public:
@@ -523,8 +502,6 @@ private:
 // AttBibl
 //----------------------------------------------------------------------------
 
-#define ATT_BIBL 88
-
 class AttBibl: public Att
 {
 public:
@@ -565,8 +542,6 @@ private:
 //----------------------------------------------------------------------------
 // AttCalendared
 //----------------------------------------------------------------------------
-
-#define ATT_CALENDARED 89
 
 class AttCalendared: public Att
 {
@@ -609,8 +584,6 @@ private:
 // AttCanonical
 //----------------------------------------------------------------------------
 
-#define ATT_CANONICAL 90
-
 class AttCanonical: public Att
 {
 public:
@@ -648,8 +621,6 @@ private:
 //----------------------------------------------------------------------------
 // AttChordVis
 //----------------------------------------------------------------------------
-
-#define ATT_CHORDVIS 91
 
 class AttChordVis: public Att
 {
@@ -693,8 +664,6 @@ private:
 // AttClefLog
 //----------------------------------------------------------------------------
 
-#define ATT_CLEFLOG 92
-
 class AttClefLog: public Att
 {
 public:
@@ -735,8 +704,6 @@ private:
 //----------------------------------------------------------------------------
 // AttCleffingLog
 //----------------------------------------------------------------------------
-
-#define ATT_CLEFFINGLOG 93
 
 class AttCleffingLog: public Att
 {
@@ -801,8 +768,6 @@ private:
 // AttCleffingVis
 //----------------------------------------------------------------------------
 
-#define ATT_CLEFFINGVIS 94
-
 class AttCleffingVis: public Att
 {
 public:
@@ -848,8 +813,6 @@ private:
 // AttClefshape
 //----------------------------------------------------------------------------
 
-#define ATT_CLEFSHAPE 95
-
 class AttClefshape: public Att
 {
 public:
@@ -888,8 +851,6 @@ private:
 // AttCoded
 //----------------------------------------------------------------------------
 
-#define ATT_CODED 96
-
 class AttCoded: public Att
 {
 public:
@@ -927,8 +888,6 @@ private:
 //----------------------------------------------------------------------------
 // AttColor
 //----------------------------------------------------------------------------
-
-#define ATT_COLOR 97
 
 class AttColor: public Att
 {
@@ -970,8 +929,6 @@ private:
 //----------------------------------------------------------------------------
 // AttColoration
 //----------------------------------------------------------------------------
-
-#define ATT_COLORATION 98
 
 class AttColoration: public Att
 {
@@ -1017,8 +974,6 @@ private:
 //----------------------------------------------------------------------------
 // AttCommon
 //----------------------------------------------------------------------------
-
-#define ATT_COMMON 99
 
 class AttCommon: public Att
 {
@@ -1078,8 +1033,6 @@ private:
 // AttCoordinated
 //----------------------------------------------------------------------------
 
-#define ATT_COORDINATED 100
-
 class AttCoordinated: public Att
 {
 public:
@@ -1138,8 +1091,6 @@ private:
 //----------------------------------------------------------------------------
 // AttCurvature
 //----------------------------------------------------------------------------
-
-#define ATT_CURVATURE 101
 
 class AttCurvature: public Att
 {
@@ -1201,8 +1152,6 @@ private:
 // AttCurverend
 //----------------------------------------------------------------------------
 
-#define ATT_CURVEREND 102
-
 class AttCurverend: public Att
 {
 public:
@@ -1240,8 +1189,6 @@ private:
 //----------------------------------------------------------------------------
 // AttCustosLog
 //----------------------------------------------------------------------------
-
-#define ATT_CUSTOSLOG 103
 
 class AttCustosLog: public Att
 {
@@ -1283,8 +1230,6 @@ private:
 //----------------------------------------------------------------------------
 // AttDatable
 //----------------------------------------------------------------------------
-
-#define ATT_DATABLE 104
 
 class AttDatable: public Att
 {
@@ -1352,8 +1297,6 @@ private:
 // AttDatapointing
 //----------------------------------------------------------------------------
 
-#define ATT_DATAPOINTING 105
-
 class AttDatapointing: public Att
 {
 public:
@@ -1391,8 +1334,6 @@ private:
 //----------------------------------------------------------------------------
 // AttDeclaring
 //----------------------------------------------------------------------------
-
-#define ATT_DECLARING 106
 
 class AttDeclaring: public Att
 {
@@ -1434,8 +1375,6 @@ private:
 //----------------------------------------------------------------------------
 // AttDistances
 //----------------------------------------------------------------------------
-
-#define ATT_DISTANCES 107
 
 class AttDistances: public Att
 {
@@ -1492,8 +1431,6 @@ private:
 // AttDotLog
 //----------------------------------------------------------------------------
 
-#define ATT_DOTLOG 108
-
 class AttDotLog: public Att
 {
 public:
@@ -1531,8 +1468,6 @@ private:
 //----------------------------------------------------------------------------
 // AttDurationAdditive
 //----------------------------------------------------------------------------
-
-#define ATT_DURATIONADDITIVE 109
 
 class AttDurationAdditive: public Att
 {
@@ -1577,8 +1512,6 @@ private:
 //----------------------------------------------------------------------------
 // AttDurationDefault
 //----------------------------------------------------------------------------
-
-#define ATT_DURATIONDEFAULT 110
 
 class AttDurationDefault: public Att
 {
@@ -1642,8 +1575,6 @@ private:
 // AttDurationMusical
 //----------------------------------------------------------------------------
 
-#define ATT_DURATIONMUSICAL 111
-
 class AttDurationMusical: public Att
 {
 public:
@@ -1688,8 +1619,6 @@ private:
 // AttDurationPerformed
 //----------------------------------------------------------------------------
 
-#define ATT_DURATIONPERFORMED 112
-
 class AttDurationPerformed: public Att
 {
 public:
@@ -1732,8 +1661,6 @@ private:
 //----------------------------------------------------------------------------
 // AttDurationRatio
 //----------------------------------------------------------------------------
-
-#define ATT_DURATIONRATIO 113
 
 class AttDurationRatio: public Att
 {
@@ -1786,8 +1713,6 @@ private:
 // AttEnclosingchars
 //----------------------------------------------------------------------------
 
-#define ATT_ENCLOSINGCHARS 114
-
 class AttEnclosingchars: public Att
 {
 public:
@@ -1831,8 +1756,6 @@ private:
 // AttFermatapresent
 //----------------------------------------------------------------------------
 
-#define ATT_FERMATAPRESENT 115
-
 class AttFermatapresent: public Att
 {
 public:
@@ -1875,8 +1798,6 @@ private:
 // AttHandident
 //----------------------------------------------------------------------------
 
-#define ATT_HANDIDENT 116
-
 class AttHandident: public Att
 {
 public:
@@ -1918,8 +1839,6 @@ private:
 // AttHorizontalalign
 //----------------------------------------------------------------------------
 
-#define ATT_HORIZONTALALIGN 117
-
 class AttHorizontalalign: public Att
 {
 public:
@@ -1957,8 +1876,6 @@ private:
 //----------------------------------------------------------------------------
 // AttInstrumentident
 //----------------------------------------------------------------------------
-
-#define ATT_INSTRUMENTIDENT 118
 
 class AttInstrumentident: public Att
 {
@@ -2001,8 +1918,6 @@ private:
 // AttInternetmedia
 //----------------------------------------------------------------------------
 
-#define ATT_INTERNETMEDIA 119
-
 class AttInternetmedia: public Att
 {
 public:
@@ -2044,8 +1959,6 @@ private:
 //----------------------------------------------------------------------------
 // AttJoined
 //----------------------------------------------------------------------------
-
-#define ATT_JOINED 120
 
 class AttJoined: public Att
 {
@@ -2092,8 +2005,6 @@ private:
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
-#define ATT_KEYSIGLOG 121
-
 class AttKeySigLog: public Att
 {
 public:
@@ -2131,8 +2042,6 @@ private:
 //----------------------------------------------------------------------------
 // AttKeySigDefaultLog
 //----------------------------------------------------------------------------
-
-#define ATT_KEYSIGDEFAULTLOG 122
 
 class AttKeySigDefaultLog: public Att
 {
@@ -2216,8 +2125,6 @@ private:
 // AttKeySigDefaultVis
 //----------------------------------------------------------------------------
 
-#define ATT_KEYSIGDEFAULTVIS 123
-
 class AttKeySigDefaultVis: public Att
 {
 public:
@@ -2263,8 +2170,6 @@ private:
 // AttLabelsAddl
 //----------------------------------------------------------------------------
 
-#define ATT_LABELSADDL 124
-
 class AttLabelsAddl: public Att
 {
 public:
@@ -2306,8 +2211,6 @@ private:
 // AttLang
 //----------------------------------------------------------------------------
 
-#define ATT_LANG 125
-
 class AttLang: public Att
 {
 public:
@@ -2345,8 +2248,6 @@ private:
 //----------------------------------------------------------------------------
 // AttLayerLog
 //----------------------------------------------------------------------------
-
-#define ATT_LAYERLOG 126
 
 class AttLayerLog: public Att
 {
@@ -2386,8 +2287,6 @@ private:
 // AttLayerident
 //----------------------------------------------------------------------------
 
-#define ATT_LAYERIDENT 127
-
 class AttLayerident: public Att
 {
 public:
@@ -2425,8 +2324,6 @@ private:
 //----------------------------------------------------------------------------
 // AttLineloc
 //----------------------------------------------------------------------------
-
-#define ATT_LINELOC 128
 
 class AttLineloc: public Att
 {
@@ -2470,8 +2367,6 @@ private:
 // AttLinerend
 //----------------------------------------------------------------------------
 
-#define ATT_LINEREND 129
-
 class AttLinerend: public Att
 {
 public:
@@ -2509,8 +2404,6 @@ private:
 //----------------------------------------------------------------------------
 // AttLyricstyle
 //----------------------------------------------------------------------------
-
-#define ATT_LYRICSTYLE 130
 
 class AttLyricstyle: public Att
 {
@@ -2585,8 +2478,6 @@ private:
 // AttMeasureLog
 //----------------------------------------------------------------------------
 
-#define ATT_MEASURELOG 131
-
 class AttMeasureLog: public Att
 {
 public:
@@ -2636,8 +2527,6 @@ private:
 // AttMeasurement
 //----------------------------------------------------------------------------
 
-#define ATT_MEASUREMENT 132
-
 class AttMeasurement: public Att
 {
 public:
@@ -2675,8 +2564,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMediabounds
 //----------------------------------------------------------------------------
-
-#define ATT_MEDIABOUNDS 133
 
 class AttMediabounds: public Att
 {
@@ -2743,8 +2630,6 @@ private:
 // AttMedium
 //----------------------------------------------------------------------------
 
-#define ATT_MEDIUM 134
-
 class AttMedium: public Att
 {
 public:
@@ -2782,8 +2667,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMeiversion
 //----------------------------------------------------------------------------
-
-#define ATT_MEIVERSION 135
 
 class AttMeiversion: public Att
 {
@@ -2830,8 +2713,6 @@ private:
 // AttMensurLog
 //----------------------------------------------------------------------------
 
-#define ATT_MENSURLOG 136
-
 class AttMensurLog: public Att
 {
 public:
@@ -2876,8 +2757,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMeterSigLog
 //----------------------------------------------------------------------------
-
-#define ATT_METERSIGLOG 137
 
 class AttMeterSigLog: public Att
 {
@@ -2939,8 +2818,6 @@ private:
 // AttMeterSigVis
 //----------------------------------------------------------------------------
 
-#define ATT_METERSIGVIS 138
-
 class AttMeterSigVis: public Att
 {
 public:
@@ -2978,8 +2855,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultLog
 //----------------------------------------------------------------------------
-
-#define ATT_METERSIGDEFAULTLOG 139
 
 class AttMeterSigDefaultLog: public Att
 {
@@ -3033,8 +2908,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultVis
 //----------------------------------------------------------------------------
-
-#define ATT_METERSIGDEFAULTVIS 140
 
 class AttMeterSigDefaultVis: public Att
 {
@@ -3094,8 +2967,6 @@ private:
 // AttMeterconformance
 //----------------------------------------------------------------------------
 
-#define ATT_METERCONFORMANCE 141
-
 class AttMeterconformance: public Att
 {
 public:
@@ -3136,8 +3007,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMeterconformanceBar
 //----------------------------------------------------------------------------
-
-#define ATT_METERCONFORMANCEBAR 142
 
 class AttMeterconformanceBar: public Att
 {
@@ -3192,8 +3061,6 @@ private:
 //----------------------------------------------------------------------------
 // AttMmtempo
 //----------------------------------------------------------------------------
-
-#define ATT_MMTEMPO 143
 
 class AttMmtempo: public Att
 {
@@ -3251,8 +3118,6 @@ private:
 // AttMultinummeasures
 //----------------------------------------------------------------------------
 
-#define ATT_MULTINUMMEASURES 144
-
 class AttMultinummeasures: public Att
 {
 public:
@@ -3293,8 +3158,6 @@ private:
 //----------------------------------------------------------------------------
 // AttName
 //----------------------------------------------------------------------------
-
-#define ATT_NAME 145
 
 class AttName: public Att
 {
@@ -3346,8 +3209,6 @@ private:
 //----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
-
-#define ATT_NOTEGES 146
 
 class AttNoteGes: public Att
 {
@@ -3401,8 +3262,6 @@ private:
 // AttNoteVis
 //----------------------------------------------------------------------------
 
-#define ATT_NOTEVIS 147
-
 class AttNoteVis: public Att
 {
 public:
@@ -3441,8 +3300,6 @@ private:
 // AttOctave
 //----------------------------------------------------------------------------
 
-#define ATT_OCTAVE 148
-
 class AttOctave: public Att
 {
 public:
@@ -3480,8 +3337,6 @@ private:
 //----------------------------------------------------------------------------
 // AttOctavedefault
 //----------------------------------------------------------------------------
-
-#define ATT_OCTAVEDEFAULT 149
 
 class AttOctavedefault: public Att
 {
@@ -3524,8 +3379,6 @@ private:
 //----------------------------------------------------------------------------
 // AttOctavedisplacement
 //----------------------------------------------------------------------------
-
-#define ATT_OCTAVEDISPLACEMENT 150
 
 class AttOctavedisplacement: public Att
 {
@@ -3572,8 +3425,6 @@ private:
 // AttOnelinestaff
 //----------------------------------------------------------------------------
 
-#define ATT_ONELINESTAFF 151
-
 class AttOnelinestaff: public Att
 {
 public:
@@ -3616,8 +3467,6 @@ private:
 // AttPadLog
 //----------------------------------------------------------------------------
 
-#define ATT_PADLOG 152
-
 class AttPadLog: public Att
 {
 public:
@@ -3659,8 +3508,6 @@ private:
 // AttPbVis
 //----------------------------------------------------------------------------
 
-#define ATT_PBVIS 153
-
 class AttPbVis: public Att
 {
 public:
@@ -3699,8 +3546,6 @@ private:
 // AttPitch
 //----------------------------------------------------------------------------
 
-#define ATT_PITCH 154
-
 class AttPitch: public Att
 {
 public:
@@ -3738,8 +3583,6 @@ private:
 //----------------------------------------------------------------------------
 // AttPlacement
 //----------------------------------------------------------------------------
-
-#define ATT_PLACEMENT 155
 
 class AttPlacement: public Att
 {
@@ -3781,8 +3624,6 @@ private:
 //----------------------------------------------------------------------------
 // AttPlist
 //----------------------------------------------------------------------------
-
-#define ATT_PLIST 156
 
 class AttPlist: public Att
 {
@@ -3831,8 +3672,6 @@ private:
 //----------------------------------------------------------------------------
 // AttPointing
 //----------------------------------------------------------------------------
-
-#define ATT_POINTING 157
 
 class AttPointing: public Att
 {
@@ -3916,8 +3755,6 @@ private:
 // AttRelativesize
 //----------------------------------------------------------------------------
 
-#define ATT_RELATIVESIZE 158
-
 class AttRelativesize: public Att
 {
 public:
@@ -3955,8 +3792,6 @@ private:
 //----------------------------------------------------------------------------
 // AttResponsibility
 //----------------------------------------------------------------------------
-
-#define ATT_RESPONSIBILITY 159
 
 class AttResponsibility: public Att
 {
@@ -4000,8 +3835,6 @@ private:
 // AttSbVis
 //----------------------------------------------------------------------------
 
-#define ATT_SBVIS 160
-
 class AttSbVis: public Att
 {
 public:
@@ -4040,8 +3873,6 @@ private:
 // AttScalable
 //----------------------------------------------------------------------------
 
-#define ATT_SCALABLE 161
-
 class AttScalable: public Att
 {
 public:
@@ -4079,8 +3910,6 @@ private:
 //----------------------------------------------------------------------------
 // AttScoreDefGes
 //----------------------------------------------------------------------------
-
-#define ATT_SCOREDEFGES 162
 
 class AttScoreDefGes: public Att
 {
@@ -4133,8 +3962,6 @@ private:
 //----------------------------------------------------------------------------
 // AttScoreDefVis
 //----------------------------------------------------------------------------
-
-#define ATT_SCOREDEFVIS 163
 
 class AttScoreDefVis: public Att
 {
@@ -4345,8 +4172,6 @@ private:
 // AttSectionVis
 //----------------------------------------------------------------------------
 
-#define ATT_SECTIONVIS 164
-
 class AttSectionVis: public Att
 {
 public:
@@ -4384,8 +4209,6 @@ private:
 //----------------------------------------------------------------------------
 // AttSequence
 //----------------------------------------------------------------------------
-
-#define ATT_SEQUENCE 165
 
 class AttSequence: public Att
 {
@@ -4428,8 +4251,6 @@ private:
 // AttSlashcount
 //----------------------------------------------------------------------------
 
-#define ATT_SLASHCOUNT 166
-
 class AttSlashcount: public Att
 {
 public:
@@ -4467,8 +4288,6 @@ private:
 //----------------------------------------------------------------------------
 // AttSlurpresent
 //----------------------------------------------------------------------------
-
-#define ATT_SLURPRESENT 167
 
 class AttSlurpresent: public Att
 {
@@ -4512,8 +4331,6 @@ private:
 // AttSpaceVis
 //----------------------------------------------------------------------------
 
-#define ATT_SPACEVIS 168
-
 class AttSpaceVis: public Att
 {
 public:
@@ -4555,8 +4372,6 @@ private:
 // AttStaffLog
 //----------------------------------------------------------------------------
 
-#define ATT_STAFFLOG 169
-
 class AttStaffLog: public Att
 {
 public:
@@ -4594,8 +4409,6 @@ private:
 //----------------------------------------------------------------------------
 // AttStaffDefVis
 //----------------------------------------------------------------------------
-
-#define ATT_STAFFDEFVIS 170
 
 class AttStaffDefVis: public Att
 {
@@ -4682,8 +4495,6 @@ private:
 // AttStaffGrpVis
 //----------------------------------------------------------------------------
 
-#define ATT_STAFFGRPVIS 171
-
 class AttStaffGrpVis: public Att
 {
 public:
@@ -4725,8 +4536,6 @@ private:
 // AttStaffgroupingsym
 //----------------------------------------------------------------------------
 
-#define ATT_STAFFGROUPINGSYM 172
-
 class AttStaffgroupingsym: public Att
 {
 public:
@@ -4764,8 +4573,6 @@ private:
 //----------------------------------------------------------------------------
 // AttStaffident
 //----------------------------------------------------------------------------
-
-#define ATT_STAFFIDENT 173
 
 class AttStaffident: public Att
 {
@@ -4809,8 +4616,6 @@ private:
 // AttStaffloc
 //----------------------------------------------------------------------------
 
-#define ATT_STAFFLOC 174
-
 class AttStaffloc: public Att
 {
 public:
@@ -4848,8 +4653,6 @@ private:
 //----------------------------------------------------------------------------
 // AttStafflocPitched
 //----------------------------------------------------------------------------
-
-#define ATT_STAFFLOCPITCHED 175
 
 class AttStafflocPitched: public Att
 {
@@ -4896,8 +4699,6 @@ private:
 // AttStartendid
 //----------------------------------------------------------------------------
 
-#define ATT_STARTENDID 176
-
 class AttStartendid: public Att
 {
 public:
@@ -4939,8 +4740,6 @@ private:
 // AttStartid
 //----------------------------------------------------------------------------
 
-#define ATT_STARTID 177
-
 class AttStartid: public Att
 {
 public:
@@ -4981,8 +4780,6 @@ private:
 //----------------------------------------------------------------------------
 // AttStemmed
 //----------------------------------------------------------------------------
-
-#define ATT_STEMMED 178
 
 class AttStemmed: public Att
 {
@@ -5050,8 +4847,6 @@ private:
 // AttSylLog
 //----------------------------------------------------------------------------
 
-#define ATT_SYLLOG 179
-
 class AttSylLog: public Att
 {
 public:
@@ -5100,8 +4895,6 @@ private:
 // AttSyltext
 //----------------------------------------------------------------------------
 
-#define ATT_SYLTEXT 180
-
 class AttSyltext: public Att
 {
 public:
@@ -5139,8 +4932,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTextstyle
 //----------------------------------------------------------------------------
-
-#define ATT_TEXTSTYLE 181
 
 class AttTextstyle: public Att
 {
@@ -5223,8 +5014,6 @@ private:
 // AttTiepresent
 //----------------------------------------------------------------------------
 
-#define ATT_TIEPRESENT 182
-
 class AttTiepresent: public Att
 {
 public:
@@ -5267,8 +5056,6 @@ private:
 // AttTimestampMusical
 //----------------------------------------------------------------------------
 
-#define ATT_TIMESTAMPMUSICAL 183
-
 class AttTimestampMusical: public Att
 {
 public:
@@ -5309,8 +5096,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTimestampPerformed
 //----------------------------------------------------------------------------
-
-#define ATT_TIMESTAMPPERFORMED 184
 
 class AttTimestampPerformed: public Att
 {
@@ -5360,8 +5145,6 @@ private:
 // AttTimestamp2Musical
 //----------------------------------------------------------------------------
 
-#define ATT_TIMESTAMP2MUSICAL 185
-
 class AttTimestamp2Musical: public Att
 {
 public:
@@ -5402,8 +5185,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTransposition
 //----------------------------------------------------------------------------
-
-#define ATT_TRANSPOSITION 186
 
 class AttTransposition: public Att
 {
@@ -5456,8 +5237,6 @@ private:
 // AttTupletpresent
 //----------------------------------------------------------------------------
 
-#define ATT_TUPLETPRESENT 187
-
 class AttTupletpresent: public Att
 {
 public:
@@ -5499,8 +5278,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTyped
 //----------------------------------------------------------------------------
-
-#define ATT_TYPED 188
 
 class AttTyped: public Att
 {
@@ -5552,8 +5329,6 @@ private:
 //----------------------------------------------------------------------------
 // AttTypography
 //----------------------------------------------------------------------------
-
-#define ATT_TYPOGRAPHY 189
 
 class AttTypography: public Att
 {
@@ -5621,8 +5396,6 @@ private:
 // AttVisibility
 //----------------------------------------------------------------------------
 
-#define ATT_VISIBILITY 190
-
 class AttVisibility: public Att
 {
 public:
@@ -5663,8 +5436,6 @@ private:
 //----------------------------------------------------------------------------
 // AttVisualoffsetHo
 //----------------------------------------------------------------------------
-
-#define ATT_VISUALOFFSETHO 191
 
 class AttVisualoffsetHo: public Att
 {
@@ -5708,8 +5479,6 @@ private:
 // AttVisualoffsetTo
 //----------------------------------------------------------------------------
 
-#define ATT_VISUALOFFSETTO 192
-
 class AttVisualoffsetTo: public Att
 {
 public:
@@ -5750,8 +5519,6 @@ private:
 //----------------------------------------------------------------------------
 // AttVisualoffsetVo
 //----------------------------------------------------------------------------
-
-#define ATT_VISUALOFFSETVO 193
 
 class AttVisualoffsetVo: public Att
 {
@@ -5794,8 +5561,6 @@ private:
 //----------------------------------------------------------------------------
 // AttVisualoffset2Ho
 //----------------------------------------------------------------------------
-
-#define ATT_VISUALOFFSET2HO 194
 
 class AttVisualoffset2Ho: public Att
 {
@@ -5848,8 +5613,6 @@ private:
 // AttVisualoffset2To
 //----------------------------------------------------------------------------
 
-#define ATT_VISUALOFFSET2TO 195
-
 class AttVisualoffset2To: public Att
 {
 public:
@@ -5900,8 +5663,6 @@ private:
 //----------------------------------------------------------------------------
 // AttVisualoffset2Vo
 //----------------------------------------------------------------------------
-
-#define ATT_VISUALOFFSET2VO 196
 
 class AttVisualoffset2Vo: public Att
 {
@@ -5954,8 +5715,6 @@ private:
 // AttWhitespace
 //----------------------------------------------------------------------------
 
-#define ATT_WHITESPACE 197
-
 class AttWhitespace: public Att
 {
 public:
@@ -5993,8 +5752,6 @@ private:
 //----------------------------------------------------------------------------
 // AttWidth
 //----------------------------------------------------------------------------
-
-#define ATT_WIDTH 198
 
 class AttWidth: public Att
 {
@@ -6038,8 +5795,6 @@ private:
 //----------------------------------------------------------------------------
 // AttXy
 //----------------------------------------------------------------------------
-
-#define ATT_XY 199
 
 class AttXy: public Att
 {
@@ -6093,8 +5848,6 @@ private:
 //----------------------------------------------------------------------------
 // AttXy2
 //----------------------------------------------------------------------------
-
-#define ATT_XY2 200
 
 class AttXy2: public Att
 {

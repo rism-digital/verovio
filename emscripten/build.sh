@@ -30,7 +30,6 @@ if [ ! -d data ]; then mkdir data; fi
 ASM="\
 	-O3 --memory-init-file 0 \
 	-s ASM_JS=1 \
-    --profiling -g2 \
     -s OUTLINING_LIMIT=10000
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"

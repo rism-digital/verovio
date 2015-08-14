@@ -25,7 +25,7 @@ namespace vrv {
 // TimeSpanningInterface
 //----------------------------------------------------------------------------
 
-TimeSpanningInterface::TimeSpanningInterface(): AttInterface(),
+TimeSpanningInterface::TimeSpanningInterface(): Interface(),
     AttStartendid(),
     AttStartid(),
     AttTimestampMusical(),

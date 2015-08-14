@@ -9,10 +9,6 @@
 #ifndef __VRV_CHORD_H__
 #define __VRV_CHORD_H__
 
-#include <typeinfo>
-
-//----------------------------------------------------------------------------
-
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
@@ -48,7 +44,7 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
-    virtual int Is() { return CHORD; };
+    virtual ClassId Is() { return CHORD; };
     ///@}
     
     /**

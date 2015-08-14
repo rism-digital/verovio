@@ -62,7 +62,7 @@ public:
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
-    virtual int Is() { return SYSTEM_ALIGNER; }
+    virtual ClassId Is() { return SYSTEM_ALIGNER; }
     
     int GetStaffAlignmentCount() const { return (int)m_children.size(); };
     
@@ -109,7 +109,7 @@ public:
     // constructors and destructors
     StaffAlignment();
     virtual ~StaffAlignment();
-    virtual int Is() { return STAFF_ALIGNMENT; }
+    virtual ClassId Is() { return STAFF_ALIGNMENT; }
     
     void SetYRel( int yRel ) { m_yRel = yRel; };
     int GetYRel() { return m_yRel; };
@@ -176,7 +176,7 @@ public:
     Alignment( );
     Alignment( double time, AlignmentType type = ALIGNMENT_DEFAULT );
     virtual ~Alignment();
-    virtual int Is() { return ALIGNMENT; }
+    virtual ClassId Is() { return ALIGNMENT; }
     
     void SetXRel( int x_rel );
     int GetXRel() { return m_xRel; };
@@ -297,7 +297,7 @@ public:
     // constructors and destructors
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual int Is() { return MEASURE_ALIGNER; }
+    virtual ClassId Is() { return MEASURE_ALIGNER; }
     
     int GetAlignmentCount() const { return (int)m_children.size(); };
     
@@ -392,7 +392,7 @@ public:
     // constructors and destructors
     GraceAligner( );
     virtual ~GraceAligner();
-    virtual int Is() { return GRACE_ALIGNER; }
+    virtual ClassId Is() { return GRACE_ALIGNER; }
     
     /**
      * Because the grace notes appear from left to right but need to be aligned

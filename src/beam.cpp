@@ -10,6 +10,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "assert.h"
+
+//----------------------------------------------------------------------------
+
 #include "note.h"
 
 namespace vrv {
@@ -52,12 +56,13 @@ void Beam::FilterList( ListOfObjects *childList )
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {
-        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
-        if ( !currentElement ) {
+        if ( !(*iter)->IsLayerElement() ) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
             iter = childList->erase( iter );           
         }
-        else if ( !currentElement->HasDurationInterface() )
+        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
+        assert( currentElement );
+        if ( !currentElement->HasDurationInterface() )
         {
             // remove anything that has not a DurationInterface
             iter = childList->erase( iter );

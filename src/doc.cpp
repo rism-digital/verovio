@@ -393,27 +393,27 @@ int Doc::GetPageCount( )
 }
     
 
-char Doc::GetLeftMargin( const std::type_info *elementType )
+char Doc::GetLeftMargin( const ClassId classId  )
 {
-    if (typeid(Barline) == *elementType) return m_style->m_leftMarginBarline;
-    else if (typeid(BarlineAttr) == *elementType) return m_style->m_leftMarginBarlineAttr;
-    else if (typeid(Chord) == *elementType) return m_style->m_leftMarginChord;
-    else if (typeid(Clef) == *elementType) return m_style->m_leftMarginClef;
-    else if (typeid(MRest) == *elementType) return m_style->m_leftMarginMRest;
-    else if (typeid(Note) == *elementType) return m_style->m_leftMarginNote;
+    if (classId == BAR_LINE) return m_style->m_leftMarginBarline;
+    else if (classId == BAR_LINE_ATTR) return m_style->m_leftMarginBarlineAttr;
+    else if (classId == CHORD) return m_style->m_leftMarginChord;
+    else if (classId == CLEF) return m_style->m_leftMarginClef;
+    else if (classId == MREST) return m_style->m_leftMarginMRest;
+    else if (classId == NOTE) return m_style->m_leftMarginNote;
     return m_style->m_leftMarginDefault;
 }
     
-char Doc::GetRightMargin( const std::type_info *elementType )
+char Doc::GetRightMargin( const ClassId classId )
 {
-    if (typeid(Barline) == *elementType) return m_style->m_rightMarginBarline;
-    else if (typeid(BarlineAttr) == *elementType) return m_style->m_rightMarginBarlineAttr;
-    else if (typeid(Clef) == *elementType) return m_style->m_rightMarginClef;
-    else if (typeid(KeySig) == *elementType)  return m_style->m_rightMarginKeySig;
-    else if (typeid(Mensur) == *elementType) return m_style->m_rightMarginMensur;
-    else if (typeid(MeterSig) == *elementType) return m_style->m_rightMarginMeterSig;
-    else if (typeid(MRest) == *elementType) return m_style->m_rightMarginMRest;
-    else if (typeid(MultiRest) == *elementType) return m_style->m_rightMarginMultiRest;
+    if (classId == BAR_LINE) return m_style->m_rightMarginBarline;
+    else if (classId == BAR_LINE_ATTR) return m_style->m_rightMarginBarlineAttr;
+    else if (classId == CLEF) return m_style->m_rightMarginClef;
+    else if (classId == KEY_SIG)  return m_style->m_rightMarginKeySig;
+    else if (classId == MENSUR) return m_style->m_rightMarginMensur;
+    else if (classId == METER_SIG) return m_style->m_rightMarginMeterSig;
+    else if (classId == MREST) return m_style->m_rightMarginMRest;
+    else if (classId == MULTI_REST) return m_style->m_rightMarginMultiRest;
     return m_style->m_rightMarginDefault;
 }
     
@@ -465,7 +465,6 @@ Page *Doc::SetDrawingPage( int pageIdx )
         return m_drawingPage;
     }
     m_drawingPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
-    
     assert( m_drawingPage );
     
     // we use the page members only if set (!= -1) 

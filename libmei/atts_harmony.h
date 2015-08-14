@@ -16,6 +16,7 @@
 #define __VRV_ATTS_HARMONY_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttFretlocation
 //----------------------------------------------------------------------------
-
-#define ATT_FRETLOCATION 55
 
 class AttFretlocation: public Att
 {
@@ -68,8 +67,6 @@ private:
 // AttHarmLog
 //----------------------------------------------------------------------------
 
-#define ATT_HARMLOG 56
-
 class AttHarmLog: public Att
 {
 public:
@@ -107,8 +104,6 @@ private:
 //----------------------------------------------------------------------------
 // AttHarmVis
 //----------------------------------------------------------------------------
-
-#define ATT_HARMVIS 57
 
 class AttHarmVis: public Att
 {

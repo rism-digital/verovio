@@ -71,11 +71,14 @@ void Measure::AddMeasureElement( MeasureElement *element )
 	element->SetParent( this );
 	m_children.push_back( element );
     
-    Staff *staff = dynamic_cast<Staff*>(element);
-    if ( staff && (staff->GetN() < 1) ) {
-        // This is not 100% safe if we have a <app> and <rdg> with more than
-        // one staff as a previous child.
-        staff->SetN( this->GetChildCount() );
+    if (element->Is() == STAFF) {
+        Staff *staff = dynamic_cast<Staff*>(element);
+        assert( staff );
+        if ( staff->GetN() < 1) {
+            // This is not 100% safe if we have a <app> and <rdg> with more than
+            // one staff as a previous child.
+            staff->SetN( this->GetChildCount() );
+        }
     }
 }
 
@@ -265,6 +268,7 @@ int Measure::CastOffSystems( ArrayPtrVoid *params )
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     Measure *measure = dynamic_cast<Measure*>( contentSystem->Relinquish( this->GetIdx()) );
+    assert( measure );
     (*currentSystem)->AddMeasure( measure );
     
     return FUNCTOR_SIBLINGS;

@@ -28,6 +28,9 @@ Accid::Accid():
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_ACCIDLOG);
+    
+    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    
     Reset();
 }
 
@@ -53,7 +56,7 @@ int Accid::PreparePointersByLayer( ArrayPtrVoid *params )
     // param 0: the current Note (not used)
     //Note **currentNote = static_cast<Note**>((*params)[0]);
     
-    Note *note = reinterpret_cast<Note*>( this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
+    Note *note = dynamic_cast<Note*>( this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
     if ( !note ) {
         return FUNCTOR_CONTINUE;
     }

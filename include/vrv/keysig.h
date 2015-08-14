@@ -50,7 +50,7 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new KeySig(*this); };
     virtual std::string GetClassName( ) { return "KeySig"; };
-    virtual int Is() { return KEY_SIG; };
+    virtual ClassId Is() { return KEY_SIG; };
     
     unsigned char GetAlterationAt(int pos);
     int GetOctave(unsigned char pitch, int clefId);
@@ -102,7 +102,7 @@ public:
     virtual ~KeySigAttr();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "KeySigAttr"; };
-    virtual int Is() { return KEY_SIG_ATTR; };
+    virtual ClassId Is() { return KEY_SIG_ATTR; };
     virtual Object* Clone() { return new KeySigAttr(*this); };
     ///@}
     

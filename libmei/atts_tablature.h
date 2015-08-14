@@ -16,6 +16,7 @@
 #define __VRV_ATTS_TABLATURE_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -27,8 +28,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // AttNoteGesTablature
 //----------------------------------------------------------------------------
-
-#define ATT_NOTEGESTABLATURE 201
 
 class AttNoteGesTablature: public Att
 {
@@ -74,8 +73,6 @@ private:
 //----------------------------------------------------------------------------
 // AttStaffDefGesTablature
 //----------------------------------------------------------------------------
-
-#define ATT_STAFFDEFGESTABLATURE 202
 
 class AttStaffDefGesTablature: public Att
 {

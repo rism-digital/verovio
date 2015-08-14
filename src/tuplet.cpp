@@ -51,8 +51,7 @@ void Tuplet::FilterList( ListOfObjects *childList )
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {
-        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
-        if ( !currentElement || !currentElement->HasDurationInterface() )
+        if ( !(*iter)->IsLayerElement() || !(*iter)->HasInterface(INTERFACE_DURATION) )
         {
             iter = childList->erase( iter );
         } else {

@@ -20,7 +20,7 @@ class AttCommonNComparison: public AttComparison
 {
 
 public:
-    AttCommonNComparison( int AttClassId, const int n ):
+    AttCommonNComparison( ClassId AttClassId, const int n ):
         AttComparison( AttClassId )
     {
         m_n = n;
@@ -31,14 +31,10 @@ public:
     virtual bool operator() (Object *object)
     {
         if (!MatchesType(object)) return false;
-        /*
-        AttCommon *element = dynamic_cast<AttCommon*>(object);
-        if (!element) return false;
-        return (element->GetN() == m_n);
-        */
-        
+        // This should not happen but, but just in case
         if (!object->HasAttClass( ATT_COMMON )) return false;
         AttCommon *element = dynamic_cast<AttCommon*>(object);
+        assert( element );
         return (element->GetN() == m_n);
     }
     

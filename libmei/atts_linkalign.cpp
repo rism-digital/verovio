@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -67,7 +71,8 @@ bool AttAlignment::HasWhen( )
 
 bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_ALIGNMENT ) ) {
-        AttAlignment *att = reinterpret_cast<AttAlignment*>(element);
+        AttAlignment *att = dynamic_cast<AttAlignment*>(element);
+        assert( att );
         if (attrType == "when") {
             att->SetWhen(att->StrToStr(attrValue));
             return true;
@@ -79,7 +84,8 @@ bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrV
 
 void Att::GetLinkalign( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_ALIGNMENT ) ) {
-        AttAlignment *att = reinterpret_cast<AttAlignment*>(element);
+        AttAlignment *att = dynamic_cast<AttAlignment*>(element);
+        assert( att );
         if (att->HasWhen()) {
             attributes->push_back(std::make_pair("when", att->StrToStr(att->GetWhen())));
         }

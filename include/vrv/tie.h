@@ -32,7 +32,7 @@ public:
     virtual ~Tie();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tie"; };
-    virtual int Is() { return TIE; };
+    virtual ClassId Is() { return TIE; };
     ///@}
     ///@}
     

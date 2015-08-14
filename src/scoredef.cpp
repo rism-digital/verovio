@@ -161,12 +161,14 @@ Clef *ScoreOrStaffDefAttrInterface::GetClefCopy() const
     // we should not call it without having checked if a clef is set
     if (!m_clef) return NULL;
     Clef *copy = NULL;
-    Clef *current_clef = dynamic_cast<Clef*>(m_clef);
-    if (current_clef) {
+    if (m_clef->Is() == CLEF) {
+        Clef *current_clef = dynamic_cast<Clef*>(m_clef);
+        assert( current_clef );
         copy = new Clef(*current_clef);
     }
     else {
         ClefAttr *current_attr = dynamic_cast<ClefAttr*>(m_clef);
+        assert( current_attr );
         copy = new Clef(current_attr);
     }
     assert(copy);
@@ -179,12 +181,14 @@ KeySig *ScoreOrStaffDefAttrInterface::GetKeySigCopy() const
     // we should not call it without having checked if a keysig is set
     if (!m_keySig) return NULL;
     KeySig *copy = NULL;
-    KeySig *current_keySig = dynamic_cast<KeySig*>(m_keySig);
-    if (current_keySig) {
+    if (m_keySig->Is() == KEY_SIG) {
+        KeySig *current_keySig = dynamic_cast<KeySig*>(m_keySig);
+        assert( current_keySig );
         copy = new KeySig(*current_keySig);
     }
     else {
         KeySigAttr *current_attr = dynamic_cast<KeySigAttr*>(m_keySig);
+        assert( current_attr );
         copy = new KeySig(current_attr);
     }
     assert(copy);
@@ -197,12 +201,14 @@ Mensur *ScoreOrStaffDefAttrInterface::GetMensurCopy() const
     // we should not call it without having checked if a mensur is set
     if (!m_mensur) return NULL;
     Mensur *copy = NULL;
-    Mensur *current_mensur = dynamic_cast<Mensur*>(m_mensur);
-    if (current_mensur) {
+    if (m_mensur->Is() == MENSUR) {
+        Mensur *current_mensur = dynamic_cast<Mensur*>(m_mensur);
+        assert( current_mensur );
         copy = new Mensur(*current_mensur);
     }
     else {
         MensurAttr *current_attr = dynamic_cast<MensurAttr*>(m_mensur);
+        assert( current_attr );
         copy = new Mensur(current_attr);
     }
     assert(copy);
@@ -215,12 +221,14 @@ MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigCopy() const
     // we should not call it without having checked if a meterSig is set
     if (!m_meterSig) return NULL;
     MeterSig *copy = NULL;
-    MeterSig *current_meterSig = dynamic_cast<MeterSig*>(m_meterSig);
-    if (current_meterSig) {
+    if (m_meterSig->Is() == METER_SIG) {
+        MeterSig *current_meterSig = dynamic_cast<MeterSig*>(m_meterSig);
+        assert( current_meterSig );
         copy = new MeterSig(*current_meterSig);
     }
     else {
         MeterSigAttr *current_attr = dynamic_cast<MeterSigAttr*>(m_meterSig);
+        assert( current_attr );
         copy = new MeterSig(current_attr);
     }
     assert(copy);

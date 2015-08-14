@@ -40,12 +40,10 @@ public:
     virtual ~Page();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Page"; };
-    virtual int Is() { return PAGE; };
+    virtual ClassId Is() { return PAGE; };
     ///@}
 
 	void AddSystem( System *system );
-
-	System *GetAtPos( int y );
 	
 	int GetSystemCount() const { return (int)m_children.size(); };
     
