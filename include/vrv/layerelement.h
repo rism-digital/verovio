@@ -71,9 +71,6 @@ public:
      * @name Child type checkers.
      */
     ///@{
-    bool HasDurationInterface();
-    bool HasPitchInterface();
-    bool HasPositionInterface();
     bool IsGraceNote();
     ///@}
     

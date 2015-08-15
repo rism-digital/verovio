@@ -101,28 +101,10 @@ void LayerElement::ResetHorizontalAlignment()
     }
 }
 
-bool LayerElement::HasDurationInterface() 
-{  
-    return (this->HasInterface(INTERFACE_DURATION));
-    return (dynamic_cast<DurationInterface*>(this));
-}
-
 bool LayerElement::IsGraceNote()
 {
     Note *note = dynamic_cast<Note*>(this);
     return (note && note->HasGrace());
-}
-    
-bool LayerElement::HasPitchInterface() 
-{
-    return (this->HasInterface(INTERFACE_PITCH));
-    return (dynamic_cast<PitchInterface*>(this));
-}
-
-bool LayerElement::HasPositionInterface() 
-{
-    return (this->HasInterface(INTERFACE_POSITION));
-    return (dynamic_cast<PositionInterface*>(this));
 }
 
 bool LayerElement::IsCueSize()
@@ -159,7 +141,7 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
         return 0.0;
     }
     
-    if ( HasDurationInterface() ) {
+    if ( this->HasInterface(INTERFACE_DURATION) ) {
         int num = 1;
         int numbase = 1;
         Tuplet *tuplet = dynamic_cast<Tuplet*>( this->GetFirstParent( TUPLET, MAX_TUPLET_DEPTH ) );

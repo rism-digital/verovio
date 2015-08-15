@@ -35,7 +35,7 @@ void Tuplet::Reset()
 
 void Tuplet::AddLayerElement(LayerElement *element) {
     
-    //if (!element->HasDurationInterface()) {
+    //if (!element->HasInterface(INTERFACE_DURATION)()) {
     //    return;
     //}
     

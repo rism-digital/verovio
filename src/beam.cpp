@@ -62,7 +62,7 @@ void Beam::FilterList( ListOfObjects *childList )
         }
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         assert( currentElement );
-        if ( !currentElement->HasDurationInterface() )
+        if ( !currentElement->HasInterface(INTERFACE_DURATION) )
         {
             // remove anything that has not a DurationInterface
             iter = childList->erase( iter );
