@@ -53,9 +53,6 @@ public:
     virtual std::string GetClassName( ) { return "KeySig"; };
     virtual ClassId Is() { return KEY_SIG; };
     
-    unsigned char GetAlterationAt(int pos);
-    int GetOctave(unsigned char pitch, int clefId);
-    
     /* Alteration number getter/setter */
     int GetAlterationNumber() { return m_alterationNumber; };
     void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; };
@@ -67,6 +64,12 @@ public:
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
     void ConvertToMei( );
     void ConvertToInternal( );
+    
+    /**
+     * Static methods for calculating position;
+     */
+    static data_PITCHNAME GetAlterationAt( data_ACCIDENTAL_EXPLICIT alterationType, int pos );
+    static int GetOctave( data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
     
 private:
     
@@ -91,7 +94,8 @@ private:
  * This class models the MEI @key attributes in scoreDef or staffDef elements.
  */
 class KeySigAttr: public Object, public  KeySigDrawingInterface,
-    public AttKeySigDefaultLog
+    public AttKeySigDefaultLog,
+    public AttKeySigDefaultVis
 {
 public:
     /**

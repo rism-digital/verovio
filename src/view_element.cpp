@@ -1563,7 +1563,7 @@ void View::DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, S
     // HARDCODED (smufl code wrong)
     DrawSmuflCode( dc, x, y, 35,  staff->staffSize, false );
     
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
 
 }
 
@@ -1779,7 +1779,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     }
     
     int symb;
-    int x, y;
+    int x, y, i;
     
     Clef *c = layer->GetClef(element);
     if (!c) {
@@ -1788,20 +1788,34 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    for (int i = 0; i < keySig->GetAlterationNumber(); i++) {
-        
-        // HARDCODED
-        x = element->GetDrawingX() + (m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.2) * i;
-        y = staff->GetDrawingY() + CalculatePitchPosY( staff, keySig->GetAlterationAt(i), layer->GetClefOffset( element ),
-                                                      keySig->GetOctave(keySig->GetAlterationAt(i), c->GetClefId()));;
+    x = element->GetDrawingX();
+    // HARDCODED
+    int step = m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.3;
+    
+    if (layer->DrawKeySigCancellation()) {
+        for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
+            data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->m_drawingCancelAccidType, i);
+            y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),
+                                        KeySig::GetOctave( keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));;
+
+            DrawSmuflCode ( dc, x, y, SMUFL_E261_accidentalNatural, staff->staffSize, false );   
+            x += step;
+        }
+    }
+    
+    for (i = 0; i < keySig->GetAlterationNumber(); i++) {
+        data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->GetAlterationType(), i);
+        y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),
+                                    KeySig::GetOctave( keySig->GetAlterationType(), pitch, c->GetClefId()));;
         
         if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f) symb = SMUFL_E260_accidentalFlat;
         else symb = SMUFL_E262_accidentalSharp;
         
         DrawSmuflCode ( dc, x, y, symb,  staff->staffSize, false );
+        x += step;
     }
     
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
     
 }
 

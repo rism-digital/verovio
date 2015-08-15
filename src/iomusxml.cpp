@@ -528,7 +528,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
         
         
     } else if (dynamic_cast<Rest*>(element)) {
-        Rest *r = dynamic_cast<Rest*>(element);
+        //Rest *r = dynamic_cast<Rest*>(element);
         // rests just link a <rest /> item
         //pugi::xml_node rest = note.append_child("rest");
         

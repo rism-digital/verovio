@@ -199,7 +199,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
         DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
     }
     
-    dc->EndGraphic(element, this ); //RZ
+    dc->EndGraphic(element, this );
     
 }
 

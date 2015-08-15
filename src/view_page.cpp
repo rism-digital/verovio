@@ -653,7 +653,7 @@ void View::DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measu
 // View - MeasureElement
 //----------------------------------------------------------------------------
 
-int View::CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct)
+int View::CalculatePitchPosY ( Staff *staff, data_PITCHNAME pname, int dec_clef, int oct)
 {
     assert(staff); // Pointer to staff cannot be NULL"
 	
@@ -1188,6 +1188,7 @@ void View::DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *meas
             DrawMeasureEditorialElement( dc , dynamic_cast<EditorialElement*>(current), measure, system );
         }
         else {
+            LogDebug("Current is %s", current->GetClassName().c_str() );
             assert(false);
         }
     }

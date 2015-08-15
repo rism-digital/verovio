@@ -106,6 +106,11 @@ public:
     ///@}
     
     /**
+     * Getter for seeing if the key signature cancellation applies
+     */
+    bool DrawKeySigCancellation() { return m_drawKeySigCancellation; };
+    
+    /**
      * @name Set the current clef, keySig, mensur and meterSig.
      */
     ///@{

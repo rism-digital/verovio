@@ -33,6 +33,7 @@ public:
     virtual ~MeasureTempo();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tempo"; };
+    virtual ClassId Is() { return TEMPO; };
     ///@}
     
 protected:

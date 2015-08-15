@@ -958,19 +958,15 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         bool drawMensur = false;
         bool drawMeterSig = false;
         if (scoreDef->GetClef()) {
-            currentScoreDef->ReplaceClef(scoreDef->GetClef());
             drawClef = true;
         }
         if (scoreDef->GetKeySig()) {
-            currentScoreDef->ReplaceKeySig(scoreDef->GetKeySig());
             drawKeySig = true;
         }
         if (scoreDef->GetMensur()) {
-            currentScoreDef->ReplaceMensur(scoreDef->GetMensur());
             drawMensur = true;
         }
         if (scoreDef->GetMeterSig()) {
-            currentScoreDef->ReplaceMeterSig(scoreDef->GetMeterSig());
             drawMeterSig = true;
         }
         // Replace the current scoreDef with the new one, including its content (staffDef)

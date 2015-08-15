@@ -16,9 +16,9 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// KeySig
+// Static members with some default values
 //----------------------------------------------------------------------------
-
+    
 data_PITCHNAME KeySig::flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
 data_PITCHNAME KeySig::sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
 
@@ -49,12 +49,17 @@ int KeySig::octave_map[2][9][7] = {
     },
 };
 
+//----------------------------------------------------------------------------
+// KeySig
+//----------------------------------------------------------------------------
+
 KeySig::KeySig():
     LayerElement("ksig-"), KeySigDrawingInterface(),
     AttAccidental(),
     AttPitch()
 {
     Init();
+    Reset();
 }
 
 KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
@@ -63,17 +68,19 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
     AttPitch()
 {
     Init();
+    Reset();
     
     m_alterationNumber = alterationNumber;
     m_alterationType = alterationType;
 }
     
 KeySig::KeySig( KeySigAttr *keySigAttr ):
-    LayerElement("ksig-"), KeySigDrawingInterface(),
+    LayerElement("ksig-"), KeySigDrawingInterface( *keySigAttr ),
     AttAccidental(),
     AttPitch()
 {
     Init();
+    // Do not call reset because we key values passed by the keySigAttr arg
     
     char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
     /* see data_KEYSIGNATURE order; key will be:
@@ -101,7 +108,6 @@ void KeySig::Init()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_PITCH);
-    Reset();
 }
 
 KeySig::~KeySig()
@@ -158,25 +164,30 @@ void KeySig::ConvertToMei()
     }
     else return;
 }
+    
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
 
-unsigned char KeySig::GetAlterationAt(int pos)
+
+data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos)
 {
     data_PITCHNAME *alteration_set;
     
-    if (pos > 6) return 0;
+    if (pos > 6) return PITCHNAME_c;
     
-    if (m_alterationType == ACCIDENTAL_EXPLICIT_f) alteration_set = flats;
+    if (alterationType == ACCIDENTAL_EXPLICIT_f) alteration_set = flats;
     else alteration_set = sharps;
     
     return alteration_set[pos];
 }
 
-int KeySig::GetOctave(unsigned char pitch, int clefId)
+int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId)
 {
     int alter_set = 0; // flats
     int key_set = 0;
     
-    if (m_alterationType == ACCIDENTAL_EXPLICIT_f) alter_set = 1;
+    if (alterationType == ACCIDENTAL_EXPLICIT_s) alter_set = 1;
     
     switch (clefId) {
         case G2: key_set = 0; break;
