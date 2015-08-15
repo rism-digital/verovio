@@ -698,8 +698,6 @@ int View::CalculateRestPosY ( Staff *staff, char duration)
         case DUR_64: offset = 10; break;
         case DUR_128: offset = 10; break;
         case DUR_256: offset = 9; break;
-        case VALSilSpec: offset = 15; break; // MM rests have same height as wholes
-            
         default: offset = 12; break; // Signal an error, put the clef up high
     }
     return base + staff_space * offset;

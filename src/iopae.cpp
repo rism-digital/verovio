@@ -966,8 +966,8 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
     bool end_of_keysig = false;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': key->SetAlteration(ACCID_FLAT); break;
-            case 'x': key->SetAlteration(ACCID_SHARP); break;
+            case 'b': key->SetAlterationType(ACCIDENTAL_EXPLICIT_f); break;
+            case 'x': key->SetAlterationType(ACCIDENTAL_EXPLICIT_s); break;
             case 'F':
             case 'C':
             case 'G':

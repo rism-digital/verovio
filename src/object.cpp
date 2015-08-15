@@ -923,14 +923,16 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     
     // starting a new page
     if (this->Is() == PAGE) {
+        // The keySig cancellation is set to false, which means that a scoreDef change has to occur
+        // after a page break if right at the begining. This is the same for systems below
         Page *page = dynamic_cast<Page*>(this);
         assert( page );
         if ( page->m_parent->GetChildIndex( page ) == 0 ) {
-            currentScoreDef->SetRedrawFlags( true, true, true, true );
+            currentScoreDef->SetRedrawFlags( true, true, true, true, false );
             currentScoreDef->SetDrawLabels( true );
         }
         else {
-            currentScoreDef->SetRedrawFlags( true, true, false, false );
+            currentScoreDef->SetRedrawFlags( true, true, false, false, false );
             currentScoreDef->SetDrawLabels( false );
         }
         page->m_drawingScoreDef = *currentScoreDef;
@@ -941,7 +943,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     if (this->Is() == SYSTEM) {
         System *system = dynamic_cast<System*>(this);
         assert( system );
-        currentScoreDef->SetRedrawFlags( true, true, false, false );
+        
+        currentScoreDef->SetRedrawFlags( true, true, false, false, false );
         return FUNCTOR_CONTINUE;
     }
     
@@ -972,7 +975,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         }
         // Replace the current scoreDef with the new one, including its content (staffDef)
         currentScoreDef->Replace(scoreDef);
-        currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig );
+        // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
+        currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig );
         return FUNCTOR_CONTINUE;
     }
 
@@ -991,6 +995,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         }
         if (staffDef->GetKeySig()) {
             tmpStaffDef->SetDrawKeySig( true );
+            tmpStaffDef->SetDrawKeySigCancellation( true );
         }
         if (staffDef->GetMensur()) {
             tmpStaffDef->SetDrawMensur( true );

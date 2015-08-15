@@ -90,6 +90,7 @@ public:
     ///@{
     void SetDrawClef( bool draw ) { m_drawClef = draw; };
     void SetDrawKeySig( bool draw ) { m_drawKeySig = draw; };
+    void SetDrawKeySigCancellation( bool draw ) { m_drawKeySigCancellation = draw; };
     void SetDrawMensur( bool draw ) { m_drawMensur = draw; };
     void SetDrawMeterSig( bool draw ) { m_drawMeterSig = draw; };
     ///@}
@@ -160,8 +161,12 @@ protected:
     ///@{
     /** The clef attribute */
     bool m_drawClef;
-    /** The key signature */
+    /** 
+     * The key signature and key signature cancellation 
+     * We need two because flags are reset at the beginning of a as system
+     */
     bool m_drawKeySig;
+    bool m_drawKeySigCancellation;
     /** The mensur */
     bool m_drawMensur;
     /** The meter signature (time signature) */

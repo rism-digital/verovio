@@ -128,7 +128,15 @@ void ScoreOrStaffDefAttrInterface::ReplaceKeySig( Object *newKeySig )
     if ( newKeySig ) {
         assert( dynamic_cast<KeySigAttr*>(newKeySig) || dynamic_cast<KeySig*>(newKeySig) );
         if (m_keySig) {
+            // Set the KeySigDrawingInterface values the key sig cancellation.
+            KeySig *oldKeySig = this->GetKeySigCopy();
+            assert( oldKeySig );
+            KeySigDrawingInterface *interface = dynamic_cast<KeySigDrawingInterface*>(newKeySig);
+            assert( interface );
+            interface->m_drawingCancelAccidCount = oldKeySig->GetAlterationNumber();
+            interface->m_drawingCancelAccidType = oldKeySig->GetAlterationType();
             delete m_keySig;
+            delete oldKeySig;
         }
         m_keySig = newKeySig->Clone();
     }
@@ -373,13 +381,14 @@ StaffDef *ScoreDef::GetStaffDef( int n )
 }
 
 
-void ScoreDef::SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSig )
+void ScoreDef::SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation )
 {
     ArrayPtrVoid params;
 	params.push_back( &clef );
-    params.push_back( &keysig );
+    params.push_back( &keySig );
 	params.push_back( &mensur );
     params.push_back( &meterSig );
+    params.push_back( &keySigCancellation );
     Functor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
     this->Process( &setStaffDefDraw, &params );
 }
@@ -516,10 +525,12 @@ int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid *params )
     // param 1: bool keysig flag
     // param 2: bool mensur flag
     // param 3: bool meterSig flag
+    // param 4: bool keySig cancellation flag
     bool *clef = static_cast<bool*>((*params)[0]);
     bool *keysig = static_cast<bool*>((*params)[1]);
     bool *mensur = static_cast<bool*>((*params)[2]);
     bool *meterSig = static_cast<bool*>((*params)[3]);
+    bool *keySigCancellation = static_cast<bool*>((*params)[4]);
     
     if ( (*clef) ) {
         this->SetDrawClef( true );
@@ -532,6 +543,9 @@ int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid *params )
     }
     if ( (*meterSig) ) {
         this->SetDrawMeterSig( true );
+    }
+    if ( (*keySigCancellation) ) {
+        this->SetDrawKeySigCancellation( true );
     }
     
     return FUNCTOR_CONTINUE;

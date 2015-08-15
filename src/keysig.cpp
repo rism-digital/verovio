@@ -50,26 +50,26 @@ int KeySig::octave_map[2][9][7] = {
 };
 
 KeySig::KeySig():
-    LayerElement("ksig-"),
+    LayerElement("ksig-"), KeySigDrawingInterface(),
     AttAccidental(),
     AttPitch()
 {
     Init();
 }
 
-KeySig::KeySig(int num_alter, char alter):
-    LayerElement("ksig-"),
+KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
+    LayerElement("ksig-"), KeySigDrawingInterface(),
     AttAccidental(),
     AttPitch()
 {
     Init();
     
-    m_num_alter = num_alter;
-    m_alteration = alter;
+    m_alterationNumber = alterationNumber;
+    m_alterationType = alterationType;
 }
     
 KeySig::KeySig( KeySigAttr *keySigAttr ):
-    LayerElement("ksig-"),
+    LayerElement("ksig-"), KeySigDrawingInterface(),
     AttAccidental(),
     AttPitch()
 {
@@ -89,12 +89,12 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
         return;
     }
     if (key > 0) {
-        m_alteration = ACCID_SHARP;
+        m_alterationType = ACCIDENTAL_EXPLICIT_s;
     }
     else if (key < 0) {
-        m_alteration = ACCID_FLAT;
+        m_alterationType = ACCIDENTAL_EXPLICIT_f;
     }
-    m_num_alter = abs(key);
+    m_alterationNumber = abs(key);
 }
    
 void KeySig::Init()
@@ -111,10 +111,11 @@ KeySig::~KeySig()
 void KeySig::Reset()
 {
     LayerElement::Reset();
+    KeySigDrawingInterface::Reset();
     ResetAccidental();
     ResetPitch();
-    m_num_alter = 0;
-    m_alteration = ACCID_NATURAL;
+    m_alterationNumber = 0;
+    m_alterationType = ACCIDENTAL_EXPLICIT_n;
 }
     
     
@@ -122,20 +123,20 @@ void KeySig::ConvertToInternal( )
 {
     int i;
     if (this->GetAccid() == ACCIDENTAL_EXPLICIT_s) {
-        m_alteration = ACCID_SHARP;
+        m_alterationType = ACCIDENTAL_EXPLICIT_s;
         for (i = 0;i < 7; i++) {
             if (KeySig::sharps[i] == this->GetPname()) {
-                m_num_alter = i + 1;
+                m_alterationNumber = i + 1;
                 break;
             }
         }
         
     }
     else if (this->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
-        m_alteration = ACCID_FLAT;
+        m_alterationType = ACCIDENTAL_EXPLICIT_f;
         for (i = 0;i < 7; i++) {
             if (KeySig::flats[i] == this->GetPname()) {
-                m_num_alter = i + 1;
+                m_alterationNumber = i + 1;
                 break;
             }
         }
@@ -145,15 +146,15 @@ void KeySig::ConvertToInternal( )
     
 void KeySig::ConvertToMei()
 {
-    if ((m_num_alter < 1) || (m_num_alter > 7)) return;
+    if ((m_alterationNumber < 1) || (m_alterationNumber > 7)) return;
     
-    if (m_alteration == ACCID_SHARP) {
+    if (m_alterationType == ACCIDENTAL_EXPLICIT_s) {
         this->SetAccid( ACCIDENTAL_EXPLICIT_s);
-        this->SetPname(KeySig::sharps[m_num_alter - 1]);
+        this->SetPname(KeySig::sharps[m_alterationNumber - 1]);
     }
-    else if (m_alteration == ACCID_FLAT) {
+    else if (m_alterationType == ACCIDENTAL_EXPLICIT_f) {
         this->SetAccid( ACCIDENTAL_EXPLICIT_f);
-        this->SetPname(KeySig::flats[m_num_alter - 1]);
+        this->SetPname(KeySig::flats[m_alterationNumber - 1]);
     }
     else return;
 }
@@ -162,13 +163,10 @@ unsigned char KeySig::GetAlterationAt(int pos)
 {
     data_PITCHNAME *alteration_set;
     
-    if (pos > 6)
-        return 0;
+    if (pos > 6) return 0;
     
-    if (m_alteration == ACCID_FLAT)
-        alteration_set = flats;
-    else
-        alteration_set = sharps;
+    if (m_alterationType == ACCIDENTAL_EXPLICIT_f) alteration_set = flats;
+    else alteration_set = sharps;
     
     return alteration_set[pos];
 }
@@ -178,8 +176,7 @@ int KeySig::GetOctave(unsigned char pitch, int clefId)
     int alter_set = 0; // flats
     int key_set = 0;
     
-    if (m_alteration == ACCID_SHARP)
-        alter_set = 1;
+    if (m_alterationType == ACCIDENTAL_EXPLICIT_f) alter_set = 1;
     
     switch (clefId) {
         case G2: key_set = 0; break;
@@ -207,7 +204,7 @@ int KeySig::GetOctave(unsigned char pitch, int clefId)
 //----------------------------------------------------------------------------
 
 KeySigAttr::KeySigAttr():
-    Object(),
+    Object(), KeySigDrawingInterface(),
     AttKeySigDefaultLog()
 {
     RegisterAttClass(ATT_KEYSIGDEFAULTLOG);
@@ -221,6 +218,7 @@ KeySigAttr::~KeySigAttr()
 void KeySigAttr::Reset()
 {
     Object::Reset();
+    KeySigDrawingInterface::Reset();
     ResetKeySigDefaultLog();
 }
 

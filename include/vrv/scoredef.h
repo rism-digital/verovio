@@ -181,7 +181,7 @@ public:
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
      */
-    void SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSig );
+    void SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation );
     
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
@@ -322,6 +322,8 @@ public:
     void SetDrawClef( bool drawClef ) { m_drawClef = drawClef; };
     bool DrawKeySig() const { return m_drawKeySig; };
     void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
+    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
+    void SetDrawKeySigCancellation( bool drawKeySigCancellation ) { m_drawKeySigCancellation = drawKeySigCancellation; };
     bool DrawMensur() const { return m_drawMensur; };
     void SetDrawMensur( bool drawMensur ) { m_drawMensur = drawMensur; };
     bool DrawMeterSig() const { return m_drawMeterSig; };
@@ -360,6 +362,7 @@ private:
     ///@{
     bool m_drawClef;
     bool m_drawKeySig;
+    bool m_drawKeySigCancellation;
     bool m_drawMensur;
     bool m_drawMeterSig;
     ///@}

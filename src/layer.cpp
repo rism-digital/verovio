@@ -166,11 +166,13 @@ void Layer::SetDrawingAndCurrentValues( ScoreDef *currentScoreDef, StaffDef *cur
     this->SetDrawKeySig( currentStaffDef->DrawKeySig() );
     this->SetDrawMensur( currentStaffDef->DrawMensur() );
     this->SetDrawMeterSig( currentStaffDef->DrawMeterSig() );
+    this->SetDrawKeySigCancellation( currentStaffDef->DrawKeySigCancellation() );
     // Don't draw on the next one
     currentStaffDef->SetDrawClef( false );
     currentStaffDef->SetDrawKeySig( false );
     currentStaffDef->SetDrawMensur( false );
     currentStaffDef->SetDrawMeterSig( false );
+    currentStaffDef->SetDrawKeySigCancellation( false );
 
     if ( currentStaffDef->GetClef() ) {
         this->SetCurrentClef( currentStaffDef->GetClefCopy() );

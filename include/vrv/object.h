@@ -501,6 +501,7 @@ public:
      * param 1: bool keysig flag.
      * param 2: bool the mensur flag.
      * param 3: bool the metersig flag.
+     * param 4: bool the keysig cancellation flag;
      */
     virtual int SetStaffDefRedrawFlags( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
    

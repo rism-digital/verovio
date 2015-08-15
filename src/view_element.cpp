@@ -1795,10 +1795,8 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
         y = staff->GetDrawingY() + CalculatePitchPosY( staff, keySig->GetAlterationAt(i), layer->GetClefOffset( element ),
                                                       keySig->GetOctave(keySig->GetAlterationAt(i), c->GetClefId()));;
         
-        if (keySig->GetAlteration() == ACCID_FLAT)
-            symb = SMUFL_E260_accidentalFlat;
-        else
-            symb = SMUFL_E262_accidentalSharp;
+        if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f) symb = SMUFL_E260_accidentalFlat;
+        else symb = SMUFL_E262_accidentalSharp;
         
         DrawSmuflCode ( dc, x, y, symb,  staff->staffSize, false );
     }

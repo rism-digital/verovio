@@ -11,6 +11,7 @@
 #define __VRV_KEYSIG_H__
 
 #include "atts_shared.h"
+#include "drawinglistinterface.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -32,7 +33,7 @@ class KeySigAttr;
  * are available for converting from and to the MEI representation to the 
  * internal (and reverse)
  */
-class KeySig: public LayerElement,
+class KeySig: public LayerElement, public KeySigDrawingInterface,
     public AttAccidental,
     public AttPitch
 {
@@ -43,7 +44,7 @@ public:
      */
     ///@{
     KeySig();
-    KeySig(int num_alter, char alter);
+    KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType);
     KeySig( KeySigAttr *keySigAttr );
     void Init();
     virtual ~KeySig();
@@ -56,12 +57,12 @@ public:
     int GetOctave(unsigned char pitch, int clefId);
     
     /* Alteration number getter/setter */
-    int GetAlterationNumber() { return m_num_alter; };
-    void SetAlterationNumber(int n) { m_num_alter = n; };
+    int GetAlterationNumber() { return m_alterationNumber; };
+    void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; };
     
     /* Alteration number getter/setter */
-    unsigned char GetAlteration() { return m_alteration; };
-    void SetAlteration(int n) { m_alteration = n; };
+    data_ACCIDENTAL_EXPLICIT GetAlterationType() { return m_alterationType; };
+    void SetAlterationType( data_ACCIDENTAL_EXPLICIT alterationType ) { m_alterationType = m_alterationType; };
     
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
     void ConvertToMei( );
@@ -77,8 +78,8 @@ private:
     static int octave_map[2][9][7];
     
     // This is temporary - it needs to be changed to libMEI atts
-    int m_num_alter;
-    unsigned char m_alteration;
+    int m_alterationNumber;
+    data_ACCIDENTAL_EXPLICIT m_alterationType;
     
 };
     
@@ -89,7 +90,7 @@ private:
 /**
  * This class models the MEI @key attributes in scoreDef or staffDef elements.
  */
-class KeySigAttr: public Object,
+class KeySigAttr: public Object, public  KeySigDrawingInterface,
     public AttKeySigDefaultLog
 {
 public:
@@ -109,9 +110,6 @@ public:
 private:
     
 public:
-    /** */
-    data_ACCIDENTAL_EXPLICIT m_drawingCancelAccid;
-    char m_drawingCancelAccidCount;
     
 private:
     
