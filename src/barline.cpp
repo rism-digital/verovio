@@ -41,13 +41,12 @@ bool Barline::HasRepetitionDots()
 }
     
 //----------------------------------------------------------------------------
-// Barline
+// BarlineAttr
 //----------------------------------------------------------------------------
 
 BarlineAttr::BarlineAttr():
     Barline()
 {
-    
 }
 
 BarlineAttr::~BarlineAttr()

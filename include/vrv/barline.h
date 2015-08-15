@@ -62,7 +62,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models the barLine reltaed attributes of a MEI measure
+ * This class models the barLine related attributes of a MEI measure.
  */
 class BarlineAttr: public Barline
 {
