@@ -59,7 +59,7 @@ public:
     
     /* Alteration number getter/setter */
     data_ACCIDENTAL_EXPLICIT GetAlterationType() { return m_alterationType; };
-    void SetAlterationType( data_ACCIDENTAL_EXPLICIT alterationType ) { m_alterationType = m_alterationType; };
+    void SetAlterationType( data_ACCIDENTAL_EXPLICIT alterationType ) { m_alterationType = alterationType; };
     
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
     void ConvertToMei( );

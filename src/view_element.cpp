@@ -1793,8 +1793,8 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     // HARDCODED
     int step = m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.3;
     
-    // Show cancellation if any and if C major (0) or show cancellation (showchange) is true (false by default)
-    if (layer->DrawKeySigCancellation() && ( (keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange) ) {
+    // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by default)
+    if ( (keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange) ) {
         for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
             data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->m_drawingCancelAccidType, i);
             y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),

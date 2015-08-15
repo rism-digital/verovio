@@ -968,6 +968,8 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
         switch (incipit[i]) {
             case 'b': key->SetAlterationType(ACCIDENTAL_EXPLICIT_f); break;
             case 'x': key->SetAlterationType(ACCIDENTAL_EXPLICIT_s); break;
+            case 'n': key->SetAlterationType(ACCIDENTAL_EXPLICIT_n); break;
+            case '[': break;
             case 'F':
             case 'C':
             case 'G':
@@ -983,7 +985,9 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
             i++;
     }
     
-    key->SetAlterationNumber(alt_nr);
+    if (key->GetAlterationType() != ACCIDENTAL_EXPLICIT_n) {
+        key->SetAlterationNumber(alt_nr);
+    }
     
     key->ConvertToMei();
     
