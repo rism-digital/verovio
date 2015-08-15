@@ -24,6 +24,7 @@ FILES="../src/accid.cpp \
              ../src/drawinglistinterface.cpp \
              ../src/durationinterface.cpp \
              ../src/editorial.cpp \
+             ../src/floatingelement.cpp \
              ../src/glyph.cpp \
              ../src/io.cpp \
              ../src/iodarms.cpp \
@@ -36,7 +37,6 @@ FILES="../src/accid.cpp \
              ../src/mensur.cpp \
              ../src/metersig.cpp \
              ../src/measure.cpp \
-             ../src/measureelement.cpp \
              ../src/mrest.cpp \
              ../src/multirest.cpp \
              ../src/note.cpp \

@@ -10,7 +10,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
-#include "measureelement.h"
+#include "object.h"
 
 namespace vrv {
 
@@ -30,7 +30,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, on single Measure is added for simplifying internal processing
 */
-class Staff: public MeasureElement,
+class Staff: public DocObject,
     public AttCommon
 {
     
@@ -47,7 +47,12 @@ public:
     virtual ClassId Is() { return STAFF; };
     ///@}
     
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
     void AddLayer( Layer *layer );
+    ///@}
 	
 	int GetLayerCount() const { return (int)m_children.size(); };
     

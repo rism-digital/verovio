@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "floatingelement.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -66,7 +67,7 @@ void Measure::Reset()
     }
 }
 
-void Measure::AddMeasureElement( MeasureElement *element )
+void Measure::AddFloatingElement( FloatingElement *element )
 {    
 	element->SetParent( this );
 	m_children.push_back( element );
@@ -81,7 +82,19 @@ void Measure::AddMeasureElement( MeasureElement *element )
         }
     }
 }
-
+    
+void Measure::AddStaff( Staff *staff )
+{
+    staff->SetParent( this );
+    m_children.push_back( staff );
+    
+    if ( staff->GetN() < 1) {
+        // This is not 100% safe if we have a <app> and <rdg> with more than
+        // one staff as a previous child.
+        staff->SetN( this->GetChildCount() );
+    }
+}
+    
 void Measure::ResetHorizontalAlignment()
 {
     m_drawingXRel = 0;

@@ -71,7 +71,7 @@ public:
     virtual ClassId Is();
     bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
     bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
-    bool IsMeasureElement() { return (this->Is() > MEASURE_ELEMENT && this->Is() < MEASURE_ELEMENT_max); };
+    bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
     
     /**
      *

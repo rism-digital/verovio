@@ -244,9 +244,13 @@ public:
     virtual ClassId Is() { return STAFF_GRP; };
     ///@}
 	
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddStaffDef( StaffDef *staffDef );
-    
 	void AddStaffGrp( StaffGrp *staffGrp );
+    ///@}
     
     /**
      * @name Set and get the staffGrp @symbol

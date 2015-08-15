@@ -326,8 +326,6 @@ void Doc::CastOff( )
     contentSystem->Process( &castOffSystems, &params );
     delete contentSystem;
     
-    //LogDebug("Layout: %d systems", contentPage->GetSystemCount());
-    
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDef( true );
     contentPage->LayOutVertically( );

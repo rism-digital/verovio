@@ -28,12 +28,11 @@ class Clef;
 class Custos;
 class Dot;
 class DurationInterface;
+class FloatingElement;
 class Layer;
 class LayerElement;
 class Lem;
 class Measure;
-class MeasureElement;
-class MeasureTempo;
 class Mensur;
 class MeterSig;
 class MRest;
@@ -50,7 +49,7 @@ class Staff;
 class Supplied;
 class Syl;
 class System;
-class TempoInterface;
+class Tempo;
 class TextDirInterface;
 class Tie;
 class TimeSpanningInterface;
@@ -143,11 +142,12 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting MeasureElement children (other the staff).
+     * @name Methods for wrining FloatingElement
      */
     ///@{
-    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
     void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
+    void WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo );
+    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
     ///@}
     
     /**
@@ -159,13 +159,6 @@ private:
     bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
     bool WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied );
     bool WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot );
-    ///@}
-    
-    /**
-     * @name Methods for wrinting text directive elements.
-     */
-    ///@{
-    void WriteMeiTempo( pugi::xml_node currentNode, MeasureTempo *tempo );
     ///@}
     
     /**
@@ -198,7 +191,6 @@ private:
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
-    void WriteTempoInterface( pugi::xml_node currentNode, TempoInterface *interface );
     void WriteTextDirInterface( pugi::xml_node currentNode, TextDirInterface *interface );
     void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
     ///@}
@@ -315,18 +307,12 @@ private:
     ///@}
     
     /**
-     * @name Methods for reading MEI measure elements
+     * @name Methods for reading MEI floating elements
      */
     ///@{
     bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
+    bool ReadMeiTempo( Object *parent, pugi::xml_node tempo );
     bool ReadMeiTie( Object *parent, pugi::xml_node tie );
-    ///@}
-    
-    /**
-     * @name Methods for reading MEI text directives
-     */
-    ///@{
-    bool ReadMeiMeasureTempo( Object *parent, pugi::xml_node tempo );
     ///@}
   
     /**
@@ -353,7 +339,6 @@ private:
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
-    bool ReadTempoInterface( pugi::xml_node element, TempoInterface *interface );
     bool ReadTextDirInterface( pugi::xml_node element, TextDirInterface *interface );
     bool ReadTimeSpanningInterface( pugi::xml_node element, TimeSpanningInterface *interface );
     ///@}
@@ -391,7 +376,7 @@ private:
      */
     ///@{
     void AddLayerElement( Object *parent, LayerElement *element );
-    void AddMeasureElement( Object *parent, MeasureElement *element );
+    void AddFloatingElement( Object *parent, FloatingElement *element );
     void AddScoreDef( Object *parent, ScoreDef *element );
     void AddStaffGrp( Object *parent, StaffGrp *element );
     ///@}

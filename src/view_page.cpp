@@ -630,7 +630,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     }
 }
 
-void View::DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measure *measure, System *system)
+void View::DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system)
 {
     assert( dc );
     assert( system );
@@ -643,14 +643,10 @@ void View::DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measu
         dc->EndGraphic( element, this);
         system->AddToDrawingList(element);
     }
-    else if (element->Is() == STAFF) {
-        // cast to Staff check in DrawStaff
-        DrawStaff(dc,  dynamic_cast<Staff*>(element), measure, system);
-    }
 }
     
 //----------------------------------------------------------------------------
-// View - MeasureElement
+// View - FloatingElement
 //----------------------------------------------------------------------------
 
 int View::CalculatePitchPosY ( Staff *staff, data_PITCHNAME pname, int dec_clef, int oct)
@@ -879,7 +875,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
 
 }
     
-void View::DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2, Staff *staff,
+void View::DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, int x2, Staff *staff,
                          char spanningType, DocObject *graphic )
 {
     assert( dc );
@@ -1179,9 +1175,13 @@ void View::DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *meas
     Object* current;
     for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
     {
-        if (current->IsMeasureElement()) {
-            // cast to MeasureElement check in DrawMeasureElement
-            DrawMeasureElement( dc , dynamic_cast<MeasureElement*>(current), measure, system );
+        if (current->Is() == STAFF) {
+            // cast to Staff check in DrawStaff
+            DrawStaff(dc,  dynamic_cast<Staff*>(current), measure, system);
+        }
+        else if (current->IsFloatingElement()) {
+            // cast to FloatingElement check in DrawFloatingElement
+            DrawFloatingElement( dc , dynamic_cast<FloatingElement*>(current), measure, system );
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement

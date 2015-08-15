@@ -9,7 +9,7 @@
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
-#include "measureelement.h"
+#include "floatingelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -20,7 +20,7 @@ namespace vrv {
 // NOTE tie NOTE tie etc
 //----------------------------------------------------------------------------
 
-class Tie: public MeasureElement, public TimeSpanningInterface
+class Tie: public FloatingElement, public TimeSpanningInterface
 {
 public:
     /**

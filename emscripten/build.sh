@@ -110,6 +110,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/drawinglistinterface.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
+	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
@@ -120,7 +121,6 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/layer.cpp \
 	$VEROVIO_ROOT/src/layerelement.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
-	$VEROVIO_ROOT/src/measureelement.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
 	$VEROVIO_ROOT/src/metersig.cpp \
 	$VEROVIO_ROOT/src/mrest.cpp \

@@ -21,7 +21,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Tie::Tie():
-    MeasureElement("tie-"), TimeSpanningInterface()
+    FloatingElement("tie-"), TimeSpanningInterface()
 {
     RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
     
@@ -35,7 +35,7 @@ Tie::~Tie()
     
 void Tie::Reset()
 {
-    MeasureElement::Reset();
+    FloatingElement::Reset();
     TimeSpanningInterface::Reset();
 }
 

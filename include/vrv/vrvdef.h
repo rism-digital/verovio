@@ -61,6 +61,7 @@ typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
         METER_SIG_ATTR,
         PAGE,
         SCORE_DEF,
+        STAFF,
         STAFF_ALIGNMENT,
         STAFF_DEF,
         STAFF_GRP,
@@ -98,12 +99,11 @@ typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
         VERSE,
         LAYER_ELEMENT_max,
         //
-        MEASURE_ELEMENT,
+        FLOATING_ELEMENT,
         SLUR,
-        STAFF,
         TEMPO,
         TIE,
-        MEASURE_ELEMENT_max,
+        FLOATING_ELEMENT_max,
         //
         UNSPECIFIED
     };

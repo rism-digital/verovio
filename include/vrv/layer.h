@@ -50,10 +50,13 @@ public:
     virtual ClassId Is() { return LAYER; };
     ///@}
 	
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddLayerElement( LayerElement *element, int idx = -1 );
-    	
-	int GetElementCount() const { return (int)m_children.size(); };
-    
+    ///@}
+    	    
     /**
      * Return the index position of the layer in its staff parent.
      * The index position is 0-based.

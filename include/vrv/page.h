@@ -43,7 +43,12 @@ public:
     virtual ClassId Is() { return PAGE; };
     ///@}
 
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddSystem( System *system );
+    ///@}
 	
 	int GetSystemCount() const { return (int)m_children.size(); };
     

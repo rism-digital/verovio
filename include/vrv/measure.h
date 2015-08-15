@@ -16,7 +16,7 @@
 
 namespace vrv {
 
-class MeasureElement;
+class FloatingElement;
 
 //----------------------------------------------------------------------------
 // Measure
@@ -51,10 +51,14 @@ public:
      */
     bool IsMeasuredMusic() { return m_measuredMusic; };
     
-	void AddMeasureElement( MeasureElement *element );
-	
-	int GetStaffCount() const { return (int)m_children.size(); };
-    
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
+	void AddStaff( Staff *staff );
+    void AddFloatingElement( FloatingElement *element );
+    ///@}
+	    
     /**
      * Return the index position of the measure in its system parent
      */

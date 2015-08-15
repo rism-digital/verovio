@@ -1,27 +1,27 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measureelement.h
+// Name:        floatingelement.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_MEASURE_ELEMENT_H__
-#define __VRV_MEASURE_ELEMENT_H__
+#ifndef __VRV_FLOATING_ELEMENT_H__
+#define __VRV_FLOATING_ELEMENT_H__
 
 #include "object.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// MeasureElement
+// FloatingElement
 //----------------------------------------------------------------------------
 
 /** 
  * This class is an interface for elements with duration, such as notes and rests.
  * It is not an abstract class but should not be instanciate directly.
  */
-class MeasureElement: public DocObject
+class FloatingElement: public DocObject
 {
 public:
     /**
@@ -29,11 +29,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MeasureElement();
-    MeasureElement(std::string classid);
-    virtual ~MeasureElement();
+    FloatingElement();
+    FloatingElement(std::string classid);
+    virtual ~FloatingElement();
     virtual void Reset();
-    virtual ClassId Is() { return MEASURE_ELEMENT; };
+    virtual ClassId Is() { return FLOATING_ELEMENT; };
     ///@}
     
 private:

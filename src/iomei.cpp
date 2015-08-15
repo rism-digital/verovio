@@ -172,7 +172,7 @@ bool MeiOutput::WriteObject( Object *object )
     }
     else if (object->Is() == TEMPO) {
         m_currentNode = m_currentNode.append_child("tempo");
-        WriteMeiTempo( m_currentNode, dynamic_cast<MeasureTempo*>(object) );
+        WriteMeiTempo( m_currentNode, dynamic_cast<Tempo*>(object) );
     }
     else if (object->Is() == TIE) {
         m_currentNode = m_currentNode.append_child("tie");
@@ -727,12 +727,12 @@ void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
     return;
 }
 
-void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, MeasureTempo *tempo )
+void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo )
 {
     assert( tempo );
     
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tempo ).c_str();
-    WriteTempoInterface(currentNode, tempo);
+    WriteTextDirInterface( currentNode, tempo);
     WriteText( currentNode, tempo );
     return;
 }
@@ -764,13 +764,6 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInte
     assert( interface );
     
     interface->WriteStafflocPitched(element);
-}
-    
-void MeiOutput::WriteTempoInterface( pugi::xml_node element, vrv::TempoInterface *interface)
-{
-    assert( interface );
-    
-    WriteTextDirInterface(element, interface);
 }
 
 void MeiOutput::WriteTextDirInterface(pugi::xml_node element, vrv::TextDirInterface *interface)
@@ -1453,7 +1446,7 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
             success = ReadMeiSlur( parent, current );
         }
         else if ( std::string( current.name() ) == "tempo" ) {
-            success = ReadMeiMeasureTempo( parent, current );
+            success = ReadMeiTempo( parent, current );
         }
         else if ( std::string( current.name() ) == "tie" ) {
             success = ReadMeiTie( parent, current );
@@ -1478,7 +1471,7 @@ bool MeiInput::ReadMeiTie( Object *parent, pugi::xml_node tie )
     
     ReadTimeSpanningInterface(tie, vrvTie);
     
-    AddMeasureElement(parent, vrvTie);
+    AddFloatingElement(parent, vrvTie);
     
     return true;
 }
@@ -1490,7 +1483,7 @@ bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
     
     ReadTimeSpanningInterface(slur, vrvSlur);
     
-    AddMeasureElement(parent, vrvSlur);
+    AddFloatingElement(parent, vrvSlur);
     
     return true;
 }
@@ -1514,7 +1507,17 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
         LogWarning("No @n on <staff> might yield unpredictable results");
     }
     
-    AddMeasureElement(parent, vrvStaff);
+    // This could me moved to an AddLayer method for consistency with AddLayerElement
+    if ( parent->Is() == MEASURE ) {
+        Measure *measure = dynamic_cast<Measure*>( parent );
+        assert( measure );
+        measure->AddStaff( vrvStaff );
+    }
+    else if ( parent->IsEditorialElement() ) {
+        EditorialElement *element = dynamic_cast<EditorialElement*>( parent );
+        assert( element );
+        element->AddStaff( vrvStaff );
+    }
 
     return ReadMeiStaffChildren( vrvStaff, staff );
 }
@@ -1922,15 +1925,15 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }
     
-bool MeiInput::ReadMeiMeasureTempo(Object *parent, pugi::xml_node tempo)
+bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
 {
-    MeasureTempo *vrvMeasureTempo = new MeasureTempo();
-    SetMeiUuid(tempo, vrvMeasureTempo);
+    Tempo *vrvTempo = new Tempo();
+    SetMeiUuid(tempo, vrvTempo);
     
-    ReadTempoInterface(tempo, vrvMeasureTempo);
-    ReadText( tempo, vrvMeasureTempo );
+    ReadTextDirInterface(tempo, vrvTempo);
+    ReadText( tempo, vrvTempo );
     
-    AddMeasureElement(parent, vrvMeasureTempo);
+    AddFloatingElement(parent, vrvTempo);
     
     return true;
 }
@@ -1958,12 +1961,6 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStafflocPitched(element);
-    return true;
-}
-    
-bool MeiInput::ReadTempoInterface(pugi::xml_node element, TempoInterface *interface)
-{
-    ReadTextDirInterface(element, interface);
     return true;
 }
     
@@ -2263,17 +2260,17 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
     }
 }
     
-void MeiInput::AddMeasureElement(Object *parent, MeasureElement *element)
+void MeiInput::AddFloatingElement(Object *parent, FloatingElement *element)
 {
     if ( parent->IsEditorialElement() ) {
         EditorialElement *editorialElement = dynamic_cast<EditorialElement*>( parent );
         assert( editorialElement );
-        editorialElement->AddMeasureElement( element );
+        editorialElement->AddFloatingElement( element );
     }
     else if ( parent->Is() == MEASURE ) {
         Measure *measure = dynamic_cast<Measure*>( parent );
         assert( measure );
-        measure->AddMeasureElement( element );
+        measure->AddFloatingElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );

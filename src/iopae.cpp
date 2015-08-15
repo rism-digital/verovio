@@ -370,7 +370,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         m_layer->SetN( 1 );
         
         m_staff->AddLayer(m_layer);
-        m_measure->AddMeasureElement( m_staff );
+        m_measure->AddStaff( m_staff );
         system->AddMeasure( m_measure );
         
         MeasureObject obj = *it;

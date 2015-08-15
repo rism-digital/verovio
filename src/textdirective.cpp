@@ -14,29 +14,31 @@
 
 //----------------------------------------------------------------------------
 
-#include "measureelement.h"
+#include "floatingelement.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// MeasureTempo
+// Tempo
 //----------------------------------------------------------------------------
 
-MeasureTempo::MeasureTempo():
-    MeasureElement("tempo-"), TempoInterface()
+Tempo::Tempo():
+    FloatingElement("tempo-"), TextDirInterface()
 {
+    RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
+    
     Reset();
 }
 
 
-MeasureTempo::~MeasureTempo()
+Tempo::~Tempo()
 {
 }    
     
-void MeasureTempo::Reset()
+void Tempo::Reset()
 {
-    MeasureElement::Reset();
-    TempoInterface::Reset();
+    FloatingElement::Reset();
+    TextDirInterface::Reset();
 }
     
 } // namespace vrv

@@ -22,10 +22,10 @@ class Chord;
 class DeviceContext;
 class Doc;
 class EditorialElement;
+class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
-class MeasureElement;
 class Page;
 class Slur;
 class Staff;
@@ -187,22 +187,22 @@ protected:
     ///@}
     
     /**
-     * @name Top level method for drawing MeasureElement.
-     * Call appropriate method of child classes (Staff, Slur, etc).
+     * @name Top level method for drawing FloatingElement.
+     * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
      * Defined in page_element.cpp
      */
     ///@{
-    void DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measure *measure, System *system );
+    void DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system );
     ///@}
     
     /**
-     * @name Methods for drawing MeasureElement child classes.
+     * @name Methods for drawing FloatingElement classes.
      * They are base drawing methods that are called directly from DrawMeasureElement
      * Defined in view_page.cpp
      */
     ///@{
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
-    void DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
+    void DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, int x2,
                   Staff *staff, char spanningType, DocObject *graphic = NULL );
     void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
                           Staff *staff, char spanningType, DocObject *graphic = NULL );

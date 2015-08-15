@@ -9,7 +9,7 @@
 #ifndef __VRV_SLUR_H__
 #define __VRV_SLUR_H__
 
-#include "measureelement.h"
+#include "floatingelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -18,7 +18,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur: public MeasureElement, public TimeSpanningInterface
+class Slur: public FloatingElement, public TimeSpanningInterface
 {
 public:
     /**

@@ -9,7 +9,7 @@
 #ifndef __VRV_TEXT_DIRECTIVE_H__
 #define __VRV_TEXT_DIRECTIVE_H__
 
-#include "measureelement.h"
+#include "floatingelement.h"
 #include "textdirinterface.h"
 
 namespace vrv {
@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class MeasureTempo: public MeasureElement, public TempoInterface
+class Tempo: public FloatingElement, public TextDirInterface
 {
 public:
     /**
@@ -29,8 +29,8 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MeasureTempo();
-    virtual ~MeasureTempo();
+    Tempo();
+    virtual ~Tempo();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tempo"; };
     virtual ClassId Is() { return TEMPO; };

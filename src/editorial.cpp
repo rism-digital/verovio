@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "floatingelement.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -53,6 +54,14 @@ EditorialElement::~EditorialElement()
 {
     
 }
+        
+void EditorialElement::AddFloatingElement( FloatingElement *child )
+{
+    child->SetParent( this );
+    m_children.push_back( child );
+    Modify();
+    
+}
 
 void EditorialElement::AddLayer( Layer *child )
 {
@@ -85,15 +94,13 @@ void EditorialElement::AddScoreDef( ScoreDef *child )
     Modify();
 }
     
-void EditorialElement::AddMeasureElement( MeasureElement *child )
+void EditorialElement::AddStaff( Staff *child )
 {
     child->SetParent( this );
     m_children.push_back( child );
     Modify();
-    if ( child->Is() == STAFF ) {
-        Staff *staff = dynamic_cast<Staff*>(child);
-        assert( staff );
-        if ( staff->GetN() < 1 ) LogError("Staff without @n is not supported within editorial markup element");
+    if ( child->GetN() < 1 ) {
+        LogError("Staff without @n is not supported within editorial markup element");
     }
 }
     

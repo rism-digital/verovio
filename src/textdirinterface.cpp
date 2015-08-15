@@ -21,11 +21,14 @@ namespace vrv {
 // TextDirInterface
 //----------------------------------------------------------------------------
 
-TextDirInterface::TextDirInterface():
+TextDirInterface::TextDirInterface(): Interface(),
     AttCommon(),
     AttPlacement(),
     AttStaffident()
 {
+    RegisterInterfaceAttClass(ATT_COMMON);
+    RegisterInterfaceAttClass(ATT_PLACEMENT);
+    RegisterInterfaceAttClass(ATT_STAFFIDENT);
     Reset();
 }
 
@@ -39,26 +42,6 @@ void TextDirInterface::Reset()
     ResetCommon();
     ResetPlacement();
     ResetStaffident();
-}
-        
-//----------------------------------------------------------------------------
-// TempoInterface
-//----------------------------------------------------------------------------
-
-TempoInterface::TempoInterface():
-    TextDirInterface()
-{
-    Reset();
-}
-
-
-TempoInterface::~TempoInterface()
-{
-}
-
-void TempoInterface::Reset()
-{
-    TextDirInterface::Reset();
 }
     
 } // namespace vrv

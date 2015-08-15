@@ -21,7 +21,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Slur::Slur():
-    MeasureElement("slur-"), TimeSpanningInterface()
+    FloatingElement("slur-"), TimeSpanningInterface()
 {
     RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
     
@@ -35,7 +35,7 @@ Slur::~Slur()
         
 void Slur::Reset()
 {
-    MeasureElement::Reset();
+    FloatingElement::Reset();
     TimeSpanningInterface::Reset();
 }
 

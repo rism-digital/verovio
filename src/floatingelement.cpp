@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measureelement.cpp
+// Name:        floatingelement.cpp
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "measureelement.h"
+#include "floatingelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -18,27 +18,27 @@ namespace vrv {
 
 
 //----------------------------------------------------------------------------
-// MeasureElement
+// FloatingElement
 //----------------------------------------------------------------------------
 
-MeasureElement::MeasureElement():
+FloatingElement::FloatingElement():
     DocObject("me")
 {
     Reset();
 }
 
-MeasureElement::MeasureElement(std::string classid):
+FloatingElement::FloatingElement(std::string classid):
     DocObject(classid)
 {
     Reset();
 }
 
-MeasureElement::~MeasureElement()
+FloatingElement::~FloatingElement()
 {
 
 }
     
-void MeasureElement::Reset()
+void FloatingElement::Reset()
 {
     DocObject::Reset();
 }

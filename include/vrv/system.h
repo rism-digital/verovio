@@ -43,9 +43,13 @@ public:
     virtual ClassId Is() { return SYSTEM; };
     ///@}
 	
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddMeasure( Measure *measure );
-    
     void AddScoreDef( ScoreDef *scoreDef );
+    ///@}
     
     /**
      * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
