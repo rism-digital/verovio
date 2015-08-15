@@ -95,6 +95,13 @@ public:
      */
     data_ACCIDENTAL_EXPLICIT m_drawingCancelAccidType;
     char m_drawingCancelAccidCount;
+    /**
+     * Equivalent to @key.sig.show and @showchange, but set for drawing
+     * KeySig has no equivalent in MEI and will be true and false by default
+     * See KeySig::KeySig( KeySigAttr *keySigAttr ) for initialisation
+     */
+    bool m_drawingShow;
+    bool m_drawingShowchange;
     
 private:
     

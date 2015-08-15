@@ -2437,19 +2437,19 @@ AttKeySigDefaultVis::~AttKeySigDefaultVis() {
 }
 
 void AttKeySigDefaultVis::ResetKeySigDefaultVis() {
-    m_keySigShow = "";
-    m_keySigShowchange = "";
+    m_keySigShow = BOOLEAN_NONE;
+    m_keySigShowchange = BOOLEAN_NONE;
 }
 
 bool AttKeySigDefaultVis::ReadKeySigDefaultVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("key.sig.show")) {
-        this->SetKeySigShow(StrToStr(element.attribute("key.sig.show").value()));
+        this->SetKeySigShow(StrToBool(element.attribute("key.sig.show").value()));
         element.remove_attribute("key.sig.show");
         hasAttribute = true;
     }
     if (element.attribute("key.sig.showchange")) {
-        this->SetKeySigShowchange(StrToStr(element.attribute("key.sig.showchange").value()));
+        this->SetKeySigShowchange(StrToBool(element.attribute("key.sig.showchange").value()));
         element.remove_attribute("key.sig.showchange");
         hasAttribute = true;
     }
@@ -2459,11 +2459,11 @@ bool AttKeySigDefaultVis::ReadKeySigDefaultVis(  pugi::xml_node element ) {
 bool AttKeySigDefaultVis::WriteKeySigDefaultVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasKeySigShow()) {
-        element.append_attribute("key.sig.show") = StrToStr(this->GetKeySigShow()).c_str();
+        element.append_attribute("key.sig.show") = BoolToStr(this->GetKeySigShow()).c_str();
         wroteAttribute = true;
     }
     if (this->HasKeySigShowchange()) {
-        element.append_attribute("key.sig.showchange") = StrToStr(this->GetKeySigShowchange()).c_str();
+        element.append_attribute("key.sig.showchange") = BoolToStr(this->GetKeySigShowchange()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2471,12 +2471,12 @@ bool AttKeySigDefaultVis::WriteKeySigDefaultVis(  pugi::xml_node element ) {
 
 bool AttKeySigDefaultVis::HasKeySigShow( )
 {
-    return (m_keySigShow != "");
+    return (m_keySigShow != BOOLEAN_NONE);
 }
 
 bool AttKeySigDefaultVis::HasKeySigShowchange( )
 {
-    return (m_keySigShowchange != "");
+    return (m_keySigShowchange != BOOLEAN_NONE);
 }
 
 
@@ -7433,11 +7433,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
         assert( att );
         if (attrType == "keySigShow") {
-            att->SetKeySigShow(att->StrToStr(attrValue));
+            att->SetKeySigShow(att->StrToBool(attrValue));
             return true;
         }
         if (attrType == "keySigShowchange") {
-            att->SetKeySigShowchange(att->StrToStr(attrValue));
+            att->SetKeySigShowchange(att->StrToBool(attrValue));
             return true;
         }
     }
@@ -8780,10 +8780,10 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
         assert( att );
         if (att->HasKeySigShow()) {
-            attributes->push_back(std::make_pair("keySigShow", att->StrToStr(att->GetKeySigShow())));
+            attributes->push_back(std::make_pair("keySigShow", att->BoolToStr(att->GetKeySigShow())));
         }
         if (att->HasKeySigShowchange()) {
-            attributes->push_back(std::make_pair("keySigShowchange", att->StrToStr(att->GetKeySigShowchange())));
+            attributes->push_back(std::make_pair("keySigShowchange", att->BoolToStr(att->GetKeySigShowchange())));
         }
     }
     if (element->HasAttClass( ATT_LABELSADDL ) ) {

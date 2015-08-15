@@ -102,6 +102,13 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
         m_alterationType = ACCIDENTAL_EXPLICIT_f;
     }
     m_alterationNumber = abs(key);
+    
+    if ( keySigAttr->GetKeySigShow() == BOOLEAN_false ) {
+        m_drawingShow = false;
+    }
+    if ( keySigAttr->GetKeySigShowchange() == BOOLEAN_true ) {
+        m_drawingShowchange = true;
+    }
 }
    
 void KeySig::Init()
@@ -216,9 +223,11 @@ int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pi
 
 KeySigAttr::KeySigAttr():
     Object(), KeySigDrawingInterface(),
-    AttKeySigDefaultLog()
+    AttKeySigDefaultLog(),
+    AttKeySigDefaultVis()
 {
     RegisterAttClass(ATT_KEYSIGDEFAULTLOG);
+    RegisterAttClass(ATT_KEYSIGDEFAULTVIS);
     Reset();
 }
 
@@ -231,6 +240,7 @@ void KeySigAttr::Reset()
     Object::Reset();
     KeySigDrawingInterface::Reset();
     ResetKeySigDefaultLog();
+    ResetKeySigDefaultVis();
 }
 
 } // namespace vrv

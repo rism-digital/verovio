@@ -1774,15 +1774,16 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     KeySig *keySig = dynamic_cast<KeySig*>(element);
     assert( keySig );
     
-    if (keySig->GetAlterationNumber()==0) {
-        return;
-    }
-    
     int symb;
     int x, y, i;
     
     Clef *c = layer->GetClef(element);
     if (!c) {
+        return;
+    }
+    
+    // hidden key signature
+    if (!keySig->m_drawingShow) {
         return;
     }
     
@@ -1792,7 +1793,8 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     // HARDCODED
     int step = m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.3;
     
-    if (layer->DrawKeySigCancellation()) {
+    // Show cancellation if any and if C major (0) or show cancellation (showchange) is true (false by default)
+    if (layer->DrawKeySigCancellation() && ( (keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange) ) {
         for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
             data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->m_drawingCancelAccidType, i);
             y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),
