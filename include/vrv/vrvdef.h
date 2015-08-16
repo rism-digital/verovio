@@ -40,82 +40,81 @@ typedef std::vector<Note*> ChordCluster;
 typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
     
 typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
-    
-    
-    //----------------------------------------------------------------------------
-    // Object defines
-    //----------------------------------------------------------------------------
-    
-    enum ClassId {
-        OBJECT = 0,
-        ALIGNMENT,
-        CLEF_ATTR,
-        DOC,
-        DOC_OBJECT,
-        GRACE_ALIGNER,
-        KEY_SIG_ATTR,
-        LAYER,
-        MEASURE,
-        MEASURE_ALIGNER,
-        MENSUR_ATTR,
-        METER_SIG_ATTR,
-        PAGE,
-        SCORE_DEF,
-        STAFF,
-        STAFF_ALIGNMENT,
-        STAFF_DEF,
-        STAFF_GRP,
-        SYSTEM,
-        SYSTEM_ALIGNER,
-        SYSTEM_ALIGNMENT,
-        //
-        EDITORIAL_ELEMENT,
-        ANNOT,
-        APP,
-        LEM,
-        RDG,
-        SUPPLIED,
-        EDITORIAL_ELEMENT_max,
-        //
-        LAYER_ELEMENT,
-        ACCID,
-        BAR_LINE,
-        BAR_LINE_ATTR,
-        BEAM,
-        CHORD,
-        CLEF,
-        CUSTOS,
-        DOT,
-        KEY_SIG,
-        MENSUR,
-        METER_SIG,
-        MREST,
-        MULTI_REST,
-        NOTE,
-        REST,
-        SPACE,
-        SYL,
-        TUPLET,
-        VERSE,
-        LAYER_ELEMENT_max,
-        //
-        FLOATING_ELEMENT,
-        SLUR,
-        TEMPO,
-        TIE,
-        FLOATING_ELEMENT_max,
-        //
-        UNSPECIFIED
-    };
-    
-    enum InterfaceId {
-        INTERFACE,
-        INTERFACE_DURATION,
-        INTERFACE_PITCH,
-        INTERFACE_POSITION,
-        INTERFACE_TEXT,
-        INTERFACE_TIME_SPANNING
-    };
+
+//----------------------------------------------------------------------------
+// Object defines
+//----------------------------------------------------------------------------
+
+enum ClassId {
+    OBJECT = 0,
+    ALIGNMENT,
+    CLEF_ATTR,
+    DOC,
+    DOC_OBJECT,
+    GRACE_ALIGNER,
+    KEY_SIG_ATTR,
+    LAYER,
+    MEASURE,
+    MEASURE_ALIGNER,
+    MENSUR_ATTR,
+    METER_SIG_ATTR,
+    PAGE,
+    SCORE_DEF,
+    STAFF,
+    STAFF_ALIGNMENT,
+    STAFF_DEF,
+    STAFF_GRP,
+    SYSTEM,
+    SYSTEM_ALIGNER,
+    SYSTEM_ALIGNMENT,
+    //
+    EDITORIAL_ELEMENT,
+    ANNOT,
+    APP,
+    LEM,
+    RDG,
+    SUPPLIED,
+    EDITORIAL_ELEMENT_max,
+    //
+    LAYER_ELEMENT,
+    ACCID,
+    BAR_LINE,
+    BAR_LINE_ATTR,
+    BEAM,
+    CHORD,
+    CLEF,
+    CUSTOS,
+    DOT,
+    KEY_SIG,
+    MENSUR,
+    METER_SIG,
+    MREST,
+    MULTI_REST,
+    NOTE,
+    REST,
+    SPACE,
+    SYL,
+    TUPLET,
+    VERSE,
+    LAYER_ELEMENT_max,
+    //
+    FLOATING_ELEMENT,
+    SLUR,
+    TEMPO,
+    TIE,
+    FLOATING_ELEMENT_max,
+    //
+    UNSPECIFIED
+};
+
+enum InterfaceId {
+    INTERFACE,
+    INTERFACE_DURATION,
+    INTERFACE_PITCH,
+    INTERFACE_POSITION,
+    INTERFACE_TEXT_DIR,
+    INTERFACE_TIME_SPANNING
+};
 
 //----------------------------------------------------------------------------
 // Global defines

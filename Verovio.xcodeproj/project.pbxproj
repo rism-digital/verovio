@@ -435,10 +435,10 @@
 				8F59292618854BF800FE51AD /* pitchinterface.h */,
 				8F086ED0188539540037FD8E /* positioninterface.cpp */,
 				8F59292718854BF800FE51AD /* positioninterface.h */,
-				4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */,
-				4DF289FC1A7545CC00BA9F7D /* timeinterface.h */,
 				4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */,
 				4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */,
+				4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */,
+				4DF289FC1A7545CC00BA9F7D /* timeinterface.h */,
 			);
 			name = interfaces;
 			sourceTree = "<group>";

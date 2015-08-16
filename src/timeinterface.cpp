@@ -99,7 +99,11 @@ std::string TimeSpanningInterface::ExtractUuidFragment(std::string refUuid)
     return refUuid;
 }
     
-int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid *params, DocObject *object )
+//----------------------------------------------------------------------------
+// Interface pseudo functor (redirected)
+//----------------------------------------------------------------------------
+   
+int TimeSpanningInterface::InterfacePrepareTimeSpanning( ArrayPtrVoid *params, DocObject *object )
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stack or not
@@ -116,7 +120,7 @@ int TimeSpanningInterface::PrepareTimeSpanning( ArrayPtrVoid *params, DocObject 
     return FUNCTOR_CONTINUE;
 }
     
-int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params, DocObject *object  )
+int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning( ArrayPtrVoid *params, DocObject *object  )
 {
     // param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
     std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
@@ -130,7 +134,7 @@ int TimeSpanningInterface::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params, D
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::ResetDrawing( ArrayPtrVoid *params, DocObject *object  )
+int TimeSpanningInterface::InterfaceResetDrawing( ArrayPtrVoid *params, DocObject *object  )
 {
     m_start = NULL;
     m_end = NULL;

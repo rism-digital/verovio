@@ -7,6 +7,7 @@
 
 
 #include "floatingelement.h"
+#include "timeinterface.h"
 
 //----------------------------------------------------------------------------
 
@@ -42,5 +43,42 @@ void FloatingElement::Reset()
 {
     DocObject::Reset();
 }
+    
+//----------------------------------------------------------------------------
+// FloatingElement functor methods
+//----------------------------------------------------------------------------
+
+int FloatingElement::PrepareTimeSpanning( ArrayPtrVoid *params )
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(this);
+        assert( interface );
+        return interface->InterfacePrepareTimeSpanning(params, this);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingElement::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(this);
+        assert( interface );
+        return interface->InterfaceFillStaffCurrentTimeSpanning(params, this);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingElement::ResetDarwing( ArrayPtrVoid *params )
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(this);
+        assert( interface );
+        return interface->InterfaceResetDrawing(params, this);
+    }
+    return FUNCTOR_CONTINUE;
+};
     
 } // namespace vrv

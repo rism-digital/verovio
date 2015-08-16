@@ -38,27 +38,5 @@ void Slur::Reset()
     FloatingElement::Reset();
     TimeSpanningInterface::Reset();
 }
-
-//----------------------------------------------------------------------------
-// Slur functor methods
-//----------------------------------------------------------------------------
-
-int Slur::PrepareTimeSpanning( ArrayPtrVoid *params )
-{
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::PrepareTimeSpanning(params, this);
-}
-    
-int Slur::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
-{
-    // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
-}
-    
-int Slur::ResetDarwing( ArrayPtrVoid *params )
-{
-    // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::ResetDrawing(params, this);
-};
     
 } // namespace vrv

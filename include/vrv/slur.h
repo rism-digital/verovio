@@ -33,25 +33,6 @@ public:
     virtual ClassId Is() { return SLUR; };
     ///@}
     
-    //----------//
-    // Functors //
-    //----------//
-    
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
-    
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid *params );
-    
-    /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
-     */
-    virtual int ResetDarwing( ArrayPtrVoid *params );
-    
 private:
     
 public:

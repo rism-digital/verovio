@@ -101,13 +101,13 @@ int Syl::PrepareLyrics( ArrayPtrVoid *params )
 int Syl::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
+    return  TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(params, this);
 }
     
 int Syl::ResetDarwing( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::ResetDrawing(params, this);
+    return  TimeSpanningInterface::InterfaceResetDrawing(params, this);
 };
 
 } // namespace vrv
