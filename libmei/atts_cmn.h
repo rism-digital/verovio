@@ -1479,23 +1479,23 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBracketPlace(std::string bracketPlace_) { m_bracketPlace = bracketPlace_; };
-    std::string GetBracketPlace() const { return m_bracketPlace; };    
+    void SetBracketPlace(data_PLACE bracketPlace_) { m_bracketPlace = bracketPlace_; };
+    data_PLACE GetBracketPlace() const { return m_bracketPlace; };    
     bool HasBracketPlace( );
     
     //
-    void SetBracketVisible(std::string bracketVisible_) { m_bracketVisible = bracketVisible_; };
-    std::string GetBracketVisible() const { return m_bracketVisible; };    
+    void SetBracketVisible(data_BOOLEAN bracketVisible_) { m_bracketVisible = bracketVisible_; };
+    data_BOOLEAN GetBracketVisible() const { return m_bracketVisible; };    
     bool HasBracketVisible( );
     
     //
-    void SetDurVisible(std::string durVisible_) { m_durVisible = durVisible_; };
-    std::string GetDurVisible() const { return m_durVisible; };    
+    void SetDurVisible(data_BOOLEAN durVisible_) { m_durVisible = durVisible_; };
+    data_BOOLEAN GetDurVisible() const { return m_durVisible; };    
     bool HasDurVisible( );
     
     //
-    void SetNumFormat(std::string numFormat_) { m_numFormat = numFormat_; };
-    std::string GetNumFormat() const { return m_numFormat; };    
+    void SetNumFormat(data_NUMFORMAT numFormat_) { m_numFormat = numFormat_; };
+    data_NUMFORMAT GetNumFormat() const { return m_numFormat; };    
     bool HasNumFormat( );
     
     ///@}
@@ -1505,13 +1505,13 @@ private:
      * Used to state where a tuplet bracket will be placed in relation to the note
      * heads.
      **/
-    std::string m_bracketPlace;
+    data_PLACE m_bracketPlace;
     /** States whether a bracket should be rendered with a tuplet. **/
-    std::string m_bracketVisible;
+    data_BOOLEAN m_bracketVisible;
     /** Determines if the tuplet duration is visible. **/
-    std::string m_durVisible;
+    data_BOOLEAN m_durVisible;
     /** Controls how the num:numbase ratio is to be displayed. **/
-    std::string m_numFormat;
+    data_NUMFORMAT m_numFormat;
 
 /* include <attnum.format> */
 };

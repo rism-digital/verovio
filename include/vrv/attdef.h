@@ -317,6 +317,15 @@ enum data_MODUSMINOR {
 };
     
 /**
+ * MEI values for @num.format (no datatype in MEI)
+ */
+enum data_NUMFORMAT {
+    NUMFORMAT_NONE = 0,
+    NUMFORMAT_count,
+    NUMFORMAT_ratio,
+};
+    
+/**
  * MEI data.OCTAVE.DIS
  */
 enum data_OCTAVE_DIS {

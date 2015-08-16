@@ -712,6 +712,32 @@ data_MODUSMINOR Att::StrToModusminor(std::string value)
     return MODUSMINOR_NONE;
 }
     
+std::string Att::NumformatToStr(data_NUMFORMAT data)
+{
+    std::string value;
+    switch(data)
+    {
+        case NUMFORMAT_count : value = "count"; break;
+        case NUMFORMAT_ratio : value = "ratio"; break;
+        default:
+            LogWarning("Unknown numformat '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_NUMFORMAT Att::StrToNumformat(std::string value)
+{
+    if (value == "count") return NUMFORMAT_count;
+    else if (value == "ratio") return NUMFORMAT_ratio;
+    else {
+        LogWarning("Unsupported numformat '%s'", value.c_str() );
+    }
+    // default
+    return NUMFORMAT_NONE;
+}
+    
 std::string Att::OctaveDisToStr( data_OCTAVE_DIS data )
 {
     std::string value;

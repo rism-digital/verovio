@@ -1681,31 +1681,31 @@ AttTupletVis::~AttTupletVis() {
 }
 
 void AttTupletVis::ResetTupletVis() {
-    m_bracketPlace = "";
-    m_bracketVisible = "";
-    m_durVisible = "";
-    m_numFormat = "";
+    m_bracketPlace = PLACE_NONE;
+    m_bracketVisible = BOOLEAN_NONE;
+    m_durVisible = BOOLEAN_NONE;
+    m_numFormat = NUMFORMAT_NONE;
 }
 
 bool AttTupletVis::ReadTupletVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("bracket.place")) {
-        this->SetBracketPlace(StrToStr(element.attribute("bracket.place").value()));
+        this->SetBracketPlace(StrToPlace(element.attribute("bracket.place").value()));
         element.remove_attribute("bracket.place");
         hasAttribute = true;
     }
     if (element.attribute("bracket.visible")) {
-        this->SetBracketVisible(StrToStr(element.attribute("bracket.visible").value()));
+        this->SetBracketVisible(StrToBool(element.attribute("bracket.visible").value()));
         element.remove_attribute("bracket.visible");
         hasAttribute = true;
     }
     if (element.attribute("dur.visible")) {
-        this->SetDurVisible(StrToStr(element.attribute("dur.visible").value()));
+        this->SetDurVisible(StrToBool(element.attribute("dur.visible").value()));
         element.remove_attribute("dur.visible");
         hasAttribute = true;
     }
     if (element.attribute("num.format")) {
-        this->SetNumFormat(StrToStr(element.attribute("num.format").value()));
+        this->SetNumFormat(StrToNumformat(element.attribute("num.format").value()));
         element.remove_attribute("num.format");
         hasAttribute = true;
     }
@@ -1715,19 +1715,19 @@ bool AttTupletVis::ReadTupletVis(  pugi::xml_node element ) {
 bool AttTupletVis::WriteTupletVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasBracketPlace()) {
-        element.append_attribute("bracket.place") = StrToStr(this->GetBracketPlace()).c_str();
+        element.append_attribute("bracket.place") = PlaceToStr(this->GetBracketPlace()).c_str();
         wroteAttribute = true;
     }
     if (this->HasBracketVisible()) {
-        element.append_attribute("bracket.visible") = StrToStr(this->GetBracketVisible()).c_str();
+        element.append_attribute("bracket.visible") = BoolToStr(this->GetBracketVisible()).c_str();
         wroteAttribute = true;
     }
     if (this->HasDurVisible()) {
-        element.append_attribute("dur.visible") = StrToStr(this->GetDurVisible()).c_str();
+        element.append_attribute("dur.visible") = BoolToStr(this->GetDurVisible()).c_str();
         wroteAttribute = true;
     }
     if (this->HasNumFormat()) {
-        element.append_attribute("num.format") = StrToStr(this->GetNumFormat()).c_str();
+        element.append_attribute("num.format") = NumformatToStr(this->GetNumFormat()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1735,22 +1735,22 @@ bool AttTupletVis::WriteTupletVis(  pugi::xml_node element ) {
 
 bool AttTupletVis::HasBracketPlace( )
 {
-    return (m_bracketPlace != "");
+    return (m_bracketPlace != PLACE_NONE);
 }
 
 bool AttTupletVis::HasBracketVisible( )
 {
-    return (m_bracketVisible != "");
+    return (m_bracketVisible != BOOLEAN_NONE);
 }
 
 bool AttTupletVis::HasDurVisible( )
 {
-    return (m_durVisible != "");
+    return (m_durVisible != BOOLEAN_NONE);
 }
 
 bool AttTupletVis::HasNumFormat( )
 {
-    return (m_numFormat != "");
+    return (m_numFormat != NUMFORMAT_NONE);
 }
 
 
@@ -2081,19 +2081,19 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
         AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
         assert( att );
         if (attrType == "bracketPlace") {
-            att->SetBracketPlace(att->StrToStr(attrValue));
+            att->SetBracketPlace(att->StrToPlace(attrValue));
             return true;
         }
         if (attrType == "bracketVisible") {
-            att->SetBracketVisible(att->StrToStr(attrValue));
+            att->SetBracketVisible(att->StrToBool(attrValue));
             return true;
         }
         if (attrType == "durVisible") {
-            att->SetDurVisible(att->StrToStr(attrValue));
+            att->SetDurVisible(att->StrToBool(attrValue));
             return true;
         }
         if (attrType == "numFormat") {
-            att->SetNumFormat(att->StrToStr(attrValue));
+            att->SetNumFormat(att->StrToNumformat(attrValue));
             return true;
         }
     }
@@ -2380,16 +2380,16 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
         assert( att );
         if (att->HasBracketPlace()) {
-            attributes->push_back(std::make_pair("bracketPlace", att->StrToStr(att->GetBracketPlace())));
+            attributes->push_back(std::make_pair("bracketPlace", att->PlaceToStr(att->GetBracketPlace())));
         }
         if (att->HasBracketVisible()) {
-            attributes->push_back(std::make_pair("bracketVisible", att->StrToStr(att->GetBracketVisible())));
+            attributes->push_back(std::make_pair("bracketVisible", att->BoolToStr(att->GetBracketVisible())));
         }
         if (att->HasDurVisible()) {
-            attributes->push_back(std::make_pair("durVisible", att->StrToStr(att->GetDurVisible())));
+            attributes->push_back(std::make_pair("durVisible", att->BoolToStr(att->GetDurVisible())));
         }
         if (att->HasNumFormat()) {
-            attributes->push_back(std::make_pair("numFormat", att->StrToStr(att->GetNumFormat())));
+            attributes->push_back(std::make_pair("numFormat", att->NumformatToStr(att->GetNumFormat())));
         }
     }
 

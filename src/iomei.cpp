@@ -703,6 +703,8 @@ void MeiOutput::WriteMeiTuplet( pugi::xml_node currentNode, Tuplet *tuplet )
     
     WriteLayerElement( currentNode, tuplet  );
     tuplet->WriteDurationRatio( currentNode );
+    tuplet->WriteNumberplacement( currentNode );
+    tuplet->WriteTupletVis( currentNode );
     return;
 }
     
@@ -1901,6 +1903,8 @@ bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
     
     // Read in the numerator and denominator properties
     vrvTuplet->ReadDurationRatio(tuplet);
+    vrvTuplet->ReadNumberplacement(tuplet);
+    vrvTuplet->ReadTupletVis(tuplet);
     
     AddLayerElement(parent, vrvTuplet);
     
