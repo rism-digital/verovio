@@ -769,7 +769,6 @@ int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
     } else if ( is_one_number == 0) {
         int beats = atoi(timesig_str);
         meter->SetCount(beats);
-        meter->SetUnit(1);
     } else if (strcmp(timesig_str, "c") == 0) {
         // C
         meter->SetSym(METERSIGN_common);
