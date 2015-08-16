@@ -47,6 +47,7 @@ FILES="../src/accid.cpp \
              ../src/view.cpp \
              ../src/view_beam.cpp \
              ../src/view_element.cpp \
+             ../src/view_floating.cpp \
              ../src/view_graph.cpp \
              ../src/view_mensural.cpp \
              ../src/view_page.cpp \

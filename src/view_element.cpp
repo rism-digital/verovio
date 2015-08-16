@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        musrc_element.cpp
+// Name:        view_element.cpp
 // Author:      Laurent Pugin and Chris Niven
 // Created:     2011
 // Copyright (c) Authors and others. All rights reserved.
@@ -31,7 +31,6 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
-#include "slur.h"
 #include "space.h"
 #include "smufl.h"
 #include "staff.h"
@@ -1653,95 +1652,6 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     dc->EndGraphic(syl, this );
 
-}
-
-void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic )
-{
-    assert( syl );
-    assert( syl->GetStart() && syl->GetEnd() );
-    if ( !syl->GetStart() || !syl->GetEnd() ) return;
-    
-    int y = GetSylY(syl, staff);
-    int w, h;
-    
-    // The both correspond to the current system, which means no system break in-between (simple case)
-    if ( spanningType ==  SPANNING_START_END ) {
-        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
-        dc->GetTextExtent(syl->GetText(), &w, &h);
-        dc->ResetFont();
-        // x position of the syl is two units back
-        x1 += w - m_doc->m_drawingUnit[staff->staffSize] * 2;
-    }
-    // Only the first parent is the same, this means that the syl is "open" at the end of the system
-    else  if ( spanningType ==  SPANNING_START) {
-        dc->SetFont( &m_doc->m_drawingLyricFonts[ staff->staffSize ] );
-        dc->GetTextExtent(syl->GetText(), &w, &h);
-        dc->ResetFont();
-        // idem
-        x1 += w - m_doc->m_drawingUnit[staff->staffSize] * 2;
-        
-    }
-    // We are in the system of the last note - draw the connector from the beginning of the system
-    else if ( spanningType ==  SPANNING_END ) {
-        // nothing to adjust
-    }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
-    else {
-        // nothing to adjust
-    }
-    
-    if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
-    else dc->StartGraphic(syl, "spanning-connector", "");
-    dc->DeactivateGraphic();
-    DrawSylConnectorLines( dc, x1, x2, y, syl, staff);
-    dc->ReactivateGraphic();
-    if ( graphic ) dc->EndResumedGraphic(graphic, this);
-    else dc->EndGraphic(syl, this);
-    
-}
-
-void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff )
-{
-    if (syl->GetCon() == CON_d) {
-        
-        y += m_doc->m_drawingUnit[staff->staffSize] * 2 / 3;
-        // x position of the syl is two units back
-        x2 -= 2 * (int)m_doc->m_drawingUnit[staff->staffSize];
-        
-        //if ( x1 > x2 ) {
-        //    DrawFullRectangle(dc, x1, y + 2* m_doc->m_style->m_barlineWidth, x2, y + 3 * m_doc->m_style->m_barlineWidth);
-        //    LogDebug("x1 > x2 (%d %d)", x1, x2 );
-        //}
-        
-        // the length of the dash and the space between them - can be made a parameter
-        int dashLength = m_doc->m_drawingUnit[staff->staffSize] * 4 / 3;
-        int dashSpace = m_doc->m_drawingStaffSize[staff->staffSize] * 5 / 3;
-        int halfDashLength = dashLength / 2;
-        
-        int dist = x2 - x1;
-        int nbDashes = dist / dashSpace;
-        
-        int margin = dist / 2;
-        // at least one dash
-        if (nbDashes < 2) {
-            nbDashes = 1;
-        }
-        else {
-            margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
-        }
-        margin -= dashLength / 2;
-        int i, x;
-        for (i = 0; i < nbDashes; i++) {
-            x = x1 + margin + (i *  dashSpace);
-            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + m_doc->m_style->m_barlineWidth);
-        }
-        
-    }
-    else if (syl->GetCon() == CON_u) {
-        x1 += (int)m_doc->m_drawingUnit[staff->staffSize] / 2;
-        DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_style->m_barlineWidth);
-    }
-    
 }
     
 void View::DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )

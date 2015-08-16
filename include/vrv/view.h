@@ -186,28 +186,6 @@ protected:
     void DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
     
-    /**
-     * @name Top level method for drawing FloatingElement.
-     * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
-     * Defined in page_element.cpp
-     */
-    ///@{
-    void DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system );
-    ///@}
-    
-    /**
-     * @name Methods for drawing FloatingElement classes.
-     * They are base drawing methods that are called directly from DrawMeasureElement
-     * Defined in view_page.cpp
-     */
-    ///@{
-    void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
-    void DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, int x2,
-                  Staff *staff, char spanningType, DocObject *graphic = NULL );
-    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
-                          Staff *staff, char spanningType, DocObject *graphic = NULL );
-    ///@}
-    
     /** 
      * @name Top level method for drawing LayerElement.
      * This can be called recursively for elements containing other elements.
@@ -262,10 +240,25 @@ protected:
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
-    void DrawSylConnector( DeviceContext *dc, Syl *syl, System *system );
-    void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
     void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    ///@}
+    
+    /**
+     * @name Methods for drawing Floating child classes.
+     * They are base drawing methods that are called directly from DrawFloatingElement
+     * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
+     * Defined in floating_element.cpp
+     */
+    ///@{
+    void DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system );
+    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
+                          Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
+    void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
+    void DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, int x2,
+                       Staff *staff, char spanningType, DocObject *graphic = NULL );
+
     ///@}
     
     /**
