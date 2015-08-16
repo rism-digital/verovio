@@ -79,7 +79,7 @@ bool View::OneBeamInTuplet(Tuplet* tuplet)
  
  */
 
-bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center)
+data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center)
 {
     assert( tuplet );
     assert( layer );
@@ -89,7 +89,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
     
     Point first, last;
     int x, y;
-    bool direction = true; //true = up, false = down
+    data_STEMDIRECTION direction = STEMDIRECTION_up;
     
     ListOfObjects* tupletChildren = tuplet->GetList(tuplet);
     LayerElement *firstNote = dynamic_cast<LayerElement*>(tupletChildren->front());
@@ -134,23 +134,21 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
         ListOfObjects::iterator iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
             LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
-            
-            if (currentNote->m_drawingStemDir == true)
-                ups++;
-            else
-                downs++;
-            
+            assert( currentNote );
+            if (currentNote->m_drawingStemDir == STEMDIRECTION_up) ups++;
+            else downs++;
+         
             ++iter;
         }
         // true means up
-        direction = ups > downs ? true : false;
+        direction = ups > downs ? STEMDIRECTION_up : STEMDIRECTION_down;
         
         // if ups or downs is 0, it means all the stems go in the same direction
         if (ups == 0 || downs == 0) {
             
             // Calculate the average between the first and last stem
             // set center, start and end too.
-            if (direction) { // up
+            if (direction == STEMDIRECTION_up) { // up
                 y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 + TUPLET_OFFSET;
                 start->y = firstNote->m_drawingStemEnd.y + TUPLET_OFFSET;
                 end->y = lastNote->m_drawingStemEnd.y + TUPLET_OFFSET;
@@ -168,7 +166,7 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
             while (iter != tupletChildren->end()) {
                  LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
                 
-                if (direction) {
+                if (direction == STEMDIRECTION_up) {
                     // The note is more than the avg, adjust to y the difference
                     // from this note to the avg
                     if (currentNote->m_drawingStemEnd.y + TUPLET_OFFSET > y) {
@@ -202,21 +200,18 @@ bool View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Poin
                 LayerElement *currentNote = dynamic_cast<LayerElement*>(*iter);
                 
                 if (currentNote->m_drawingStemDir == direction) {
-                                        
-                    if (direction) {
+                    if (direction == STEMDIRECTION_up) {
                         if (y == 0 || currentNote->m_drawingStemEnd.y + TUPLET_OFFSET >= y)
                             y = currentNote->m_drawingStemEnd.y + TUPLET_OFFSET;
                     } else {
                         if (y == 0 || currentNote->m_drawingStemEnd.y - TUPLET_OFFSET <= y)
                             y = currentNote->m_drawingStemEnd.y - TUPLET_OFFSET;
                     }
-                        
                 } else {
                     // do none for now
                     // but if a notehead with a reversed stem is taller that the last
                     // calculated y, we need to offset
                 }
-                
                 ++iter;
             }
             
@@ -253,7 +248,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     }
     
     Point start, end, center;
-    bool direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
+    data_STEMDIRECTION direction = GetTupletCoordinates(tuplet, layer, &start, &end, &center);
         
     // Calculate position for number 0x82
     // since the number is slanted, move the center left
@@ -295,7 +290,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
         dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
         
         // vertical bracket lines
-        if (direction) {
+        if (direction == STEMDIRECTION_up) {
             dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
             dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
         } else {
