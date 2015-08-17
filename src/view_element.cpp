@@ -244,8 +244,9 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored()==BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur+1) : drawingDur;
     
-	int radius = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize];
-
+	//int radius = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize];
+    int radius = m_doc->GetGlyphHeight(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
+    
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
 		ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
 	}

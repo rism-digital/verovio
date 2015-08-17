@@ -389,8 +389,32 @@ int Doc::GetPageCount( )
 {
     return GetChildCount() ;
 }
-    
 
+void Doc::GetGlyphBoundingBox( wchar_t smuflCode,  int *x, int *y, int *w, int *h )
+{
+    assert( x && y && w && h );
+    Glyph *glyph;
+    glyph = Resources::GetGlyph( smuflCode );
+    assert( glyph );
+    glyph->GetBoundingBox( x, y, w, h );
+}
+    
+int Doc::GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize )
+{
+    int x, y, w, h;
+    this->GetGlyphBoundingBox( smuflCode, &x, &y, &w, &h);
+    if ( graceSize ) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return h;
+}
+    
+int Doc::GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize )
+{
+    int x, y, w, h;
+    this->GetGlyphBoundingBox( smuflCode, &x, &y, &w, &h);
+    if ( graceSize ) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return w;
+}
+    
 char Doc::GetLeftMargin( const ClassId classId  )
 {
     if (classId == BAR_LINE) return m_style->m_leftMarginBarline;

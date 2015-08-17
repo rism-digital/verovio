@@ -68,6 +68,13 @@ public:
 	* Get the total page count
 	*/
 	int GetPageCount( );
+    
+    /*
+     * @name Get the height or width for a glyph taking into account the staff and grace sizes  */
+    ///@{
+    int GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize );
+    int GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize );
+    ///@}
 	
     /**
      * @name Setters for the page dimensions and margins
@@ -193,6 +200,13 @@ private:
      * Calculates the music font size according to the m_interlDefin reference value.
      */
     int CalcMusicFontSize( );
+    
+    /**
+     * Get the glyph bounding box.
+     * Asserts the parameters and the glyph in the resources.
+     */
+    void GetGlyphBoundingBox( wchar_t smuflCode, int *x, int *y, int *w, int *h );
+    
     
 public:
     
