@@ -53,6 +53,7 @@ Toolkit::Toolkit( bool initFont )
     m_adjustPageHeight = false;
     m_noJustification = false;
     m_showBoundingBoxes = false;
+    m_scoreBasedMei = false;
     
     m_cString = NULL;
     
@@ -323,6 +324,7 @@ std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
 bool Toolkit::SaveFile( const std::string &filename )
 {
     MeiOutput meioutput( &m_doc, filename.c_str());
+    meioutput.SetScoreBasedMEI( m_scoreBasedMei );
     if (!meioutput.ExportFile()) {
         LogError( "Unknown error" );
         return false;

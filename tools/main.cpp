@@ -387,15 +387,14 @@ int main(int argc, char** argv)
     if (all_pages) {
         to = toolkit.GetPageCount() + 1;
     }
-        
-    int p;
-    for (p = from; p < to; p++) {
-        std::string cur_outfile = outfile;
-        if (all_pages) {
-            cur_outfile += StringFormat("_%03d", p);
-        }
-        // Create SVG or mei
-        if (outformat == "svg") {
+    
+    if (outformat == "svg") {
+        int p;
+        for (p = from; p < to; p++) {
+            std::string cur_outfile = outfile;
+            if (all_pages) {
+                cur_outfile += StringFormat("_%03d", p);
+            }
             cur_outfile += ".svg";
             if (std_output) {
                 cout << toolkit.RenderToSvg( p );
@@ -405,25 +404,36 @@ int main(int argc, char** argv)
                 exit(1);
             }
             else {
-                cerr << "Output written to " << cur_outfile << endl;
+                cerr << "Output written to " << cur_outfile << "." << endl;
             }
-            // Write it to file
-            
-        } else {
-            // To be implemented in Toolkit
-            cur_outfile += ".mei";
+        }
+    }
+    else {
+        if (all_pages) {
+            toolkit.SetScoreBasedMei( true );
+            outfile += ".mei";
             if (std_output) {
-                cout << toolkit.GetMEI( p );
+                cerr << "MEI output of all pages to standard output is not possible." << endl;
+                exit(1);
+
             }
-            else if ( !toolkit.SaveFile( cur_outfile ) ) {
-                cerr << "Unable to write MEI to " << cur_outfile << "." << endl;
+            else if ( !toolkit.SaveFile( outfile ) ) {
+                cerr << "Unable to write MEI to " << outfile << "." << endl;
                 exit(1);
             }
             else {
-                cerr << "Output written to " << cur_outfile << endl;
+                cerr << "Output written to " << outfile <<  "." << endl;
             }
         }
-        
+        else {
+            if (std_output) {
+                cout << toolkit.GetMEI( page );
+            }
+            else {
+                cerr << "MEI output of one page is available only to standard output." << endl;
+                exit(1);
+            }
+        }
     }
     
     return 0;
