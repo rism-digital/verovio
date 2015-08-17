@@ -201,13 +201,6 @@ private:
      */
     int CalcMusicFontSize( );
     
-    /**
-     * Get the glyph bounding box.
-     * Asserts the parameters and the glyph in the resources.
-     */
-    void GetGlyphBoundingBox( wchar_t smuflCode, int *x, int *y, int *w, int *h );
-    
-    
 public:
     
 
