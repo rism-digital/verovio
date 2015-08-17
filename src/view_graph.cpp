@@ -109,12 +109,6 @@ void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
 						 int staffSize, bool dimin )
 {
     assert( dc );
-    
-	int fontCorr = 0;
-    
-    if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][dimin];
-    }
 	
     dc->SetBackground( AxBLUE );
     dc->SetBackgroundMode( AxTRANSPARENT );
@@ -125,7 +119,7 @@ void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
     dc->SetBrush( m_currentColour, AxSOLID );
     dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][dimin] );
 
-    dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y + fontCorr) );
+    dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y) );
 
     dc->ResetFont();
     dc->ResetBrush();
@@ -136,18 +130,11 @@ void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
 void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize)
 { 
 	assert( dc );
-
-    int fontCorr = 0;
     
     int xDC = ToDeviceContextX(x);
-    if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][0];
-    }
     
 	if ( centrer )
 	{
-        LogDebug("Centering string not implemented with DeviceContext");
-		
         int w, h;
 		dc->GetSmuflTextExtent( s, &w, &h );
 		xDC -= w / 2;
@@ -156,7 +143,7 @@ void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, in
     dc->SetBrush( m_currentColour, AxSOLID );
     dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][0] );
     
-	dc->DrawMusicText( s, xDC, ToDeviceContextY(y + fontCorr ));
+	dc->DrawMusicText( s, xDC, ToDeviceContextY(y) );
     
     dc->ResetFont();
     dc->ResetBrush();

@@ -538,13 +538,6 @@ Page *Doc::SetDrawingPage( int pageIdx )
     
     m_drawingFontHeight = CalcMusicFontSize();
     
-    /*
-    m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
-	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
-    m_drawingFontHeightAscent[1][0] = (m_drawingFontHeightAscent[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
-    */
-    
 	m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
     m_drawingSmuflFonts[0][1].SetPointSize( (m_drawingFontHeight * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
     m_drawingSmuflFonts[1][0].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] );

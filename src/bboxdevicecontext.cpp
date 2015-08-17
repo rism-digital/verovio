@@ -33,9 +33,7 @@ static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
 
 BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     DeviceContext()
-{	
-    m_correctMusicAscent = false; // do not correct the ascent in the music font    
-    
+{
     m_view = view;
     m_width = width;
     m_height = height;

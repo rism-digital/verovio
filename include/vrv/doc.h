@@ -240,8 +240,6 @@ public:
     int m_drawingOctaveSize[2];
     /** Font height (100 par defaut) */
     int m_drawingFontHeight;
-    /** Font height with ascent for normal and small staff and normal and grace size */
-	int m_drawingFontHeightAscent[2][2];
     /** Normal and small staff ration (4 / 5 by default) */
     int m_drawingSmallStaffRatio[2];
     /** Normal and grace size (3 / 4 by default) */
