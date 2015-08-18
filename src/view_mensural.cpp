@@ -59,19 +59,19 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     drawingDur = note->GetDrawingDur();
     drawingCueSize = note->HasGrace();
     
-    int radius = m_doc->m_drawingNoteRadius[staffSize][drawingCueSize];
+    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize);
     
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
-        ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
+        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
     }
     else {
-        ledge = m_doc->m_drawingLedgerLine[staffSize][drawingCueSize];
+        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
         radius += radius/3;
     }
     
     /************** Stem/notehead direction: **************/
     
-    verticalCenter = staffY - m_doc->m_drawingDoubleUnit[staffSize]*2;
+    verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
     if ( note->HasDrawingStemDir() ) {
         note->m_drawingStemDir = note->GetDrawingStemDir();
     }
@@ -120,8 +120,8 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     /************** Ledger lines: **************/
     
-    int staffTop = staffY + m_doc->m_drawingUnit[staffSize];
-    int staffBot = staffY - m_doc->m_drawingStaffSize[staffSize] - m_doc->m_drawingUnit[staffSize];
+    int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
+    int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
     
     //if the note is not in the staff
     if (!is_in(noteY,staffTop,staffBot))
@@ -129,9 +129,9 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
         int distance, highestNewLine, numLines;
         bool aboveStaff = (noteY > staffTop);
         
-        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->m_drawingStaffSize[staffSize] - noteY);
-        highestNewLine = ((distance % m_doc->m_drawingDoubleUnit[staffSize] > 0) ? (distance - m_doc->m_drawingUnit[staffSize]) : distance);
-        numLines = highestNewLine / m_doc->m_drawingDoubleUnit[staffSize];
+        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
+        highestNewLine = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize)) : distance);
+        numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
         
         DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
 
@@ -142,9 +142,9 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     if (note->GetDots()) {
         int xDot;
         if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->m_drawingStemDir == STEMDIRECTION_up)))
-            xDot = xStem + m_doc->m_drawingUnit[staffSize]*7/2;
+            xDot = xStem + m_doc->GetDrawingUnit(staffSize)*7/2;
         else
-            xDot = xStem + m_doc->m_drawingUnit[staffSize]*5/2;
+            xDot = xStem + m_doc->GetDrawingUnit(staffSize)*5/2;
         
         DrawDots( dc, xDot, noteY, note->GetDots(), staff );
     }
@@ -193,7 +193,7 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
         x = element->GetDrawingX();
         if (mensur->GetSign() || mensur->HasTempus())
         {
-            x += m_doc->m_drawingUnit[staff->staffSize] * 5; // step forward because we have a sign or a meter symbol
+            x += m_doc->GetDrawingUnit(staff->staffSize) * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
         DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
@@ -209,8 +209,8 @@ void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
     assert( dc );
     assert( staff );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-    int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->staffSize ) * 2);
+    int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->staffSize ));
     
     dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
@@ -229,8 +229,8 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-    int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->staffSize ));
+    int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->staffSize ));
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
@@ -251,8 +251,8 @@ void View::DrawMensurReversedHalfCircle( DeviceContext *dc, int x, int yy, Staff
     dc->SetPen( m_currentColour, m_doc->m_style->m_staffLineWidth, AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ]);
-    int r = ToDeviceContextX( m_doc->m_drawingDoubleUnit[ staff->staffSize ] );
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->staffSize ));
+    int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->staffSize ) );
     
     // needs to be fixed
     x = ToDeviceContextX (x);
@@ -271,8 +271,8 @@ void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
     assert( dc );
     assert( staff );
     
-    int y =  ToDeviceContextY (yy - m_doc->m_drawingDoubleUnit[ staff->staffSize ] * 2);
-    int r = m_doc->m_drawingUnit[staff->staffSize] * 2 / 3;
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->staffSize ) * 2);
+    int r = m_doc->GetDrawingUnit(staff->staffSize) * 2 / 3;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -292,7 +292,7 @@ void View::DrawMensurSlash ( DeviceContext *dc, int a, int yy, Staff *staff )
     assert( staff );
     
     int y1 = yy;
-    int y2 = y1 - m_doc->m_drawingStaffSize[ staff->staffSize ];
+    int y2 = y1 - m_doc->GetDrawingStaffSize( staff->staffSize );
     
     DrawVerticalLine ( dc, y1, y2, a, m_doc->m_style->m_staffLineWidth);
     return;
@@ -337,20 +337,20 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
     // int yy2, y5; // unused
     int verticalCenter, up, height;
     
-    height = m_doc->m_drawingBeamWidth[staff->staffSize]/2 ;
+    height = m_doc->GetDrawingBeamWidth(staff->staffSize, false) / 2 ;
     xn = element->GetDrawingX();
     
     // calcul des dimensions du rectangle
-    x1 = xn - m_doc->m_drawingBrevisWidth[staff->staffSize];
-    x2 = xn +  m_doc->m_drawingBrevisWidth[staff->staffSize];
+    x1 = xn - m_doc->GetDrawingBrevisWidth( staff->staffSize );
+    x2 = xn +  m_doc->GetDrawingBrevisWidth( staff->staffSize );
     if (note->GetActualDur() == DUR_MX) {
-        x1 -= m_doc->m_drawingBrevisWidth[staff->staffSize];
-        x2 += m_doc->m_drawingBrevisWidth[staff->staffSize];
+        x1 -= m_doc->GetDrawingBrevisWidth( staff->staffSize );
+        x2 += m_doc->GetDrawingBrevisWidth( staff->staffSize );
     }
-    y1 = y + m_doc->m_drawingUnit[staff->staffSize];
-    y2 = y - m_doc->m_drawingUnit[staff->staffSize];
-    y3 = (int)(y1 + m_doc->m_drawingUnit[staff->staffSize]/2);	// partie d'encadrement qui depasse
-    y4 = (int)(y2 - m_doc->m_drawingUnit[staff->staffSize]/2);
+    y1 = y + m_doc->GetDrawingUnit(staff->staffSize);
+    y2 = y - m_doc->GetDrawingUnit(staff->staffSize);
+    y3 = (int)(y1 + m_doc->GetDrawingUnit(staff->staffSize)/2);	// partie d'encadrement qui depasse
+    y4 = (int)(y2 - m_doc->GetDrawingUnit(staff->staffSize)/2);
     
     if (note->GetColored()!=BOOLEAN_true) {
         //	double base des carrees
@@ -367,7 +367,7 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
     // stem
     if (note->GetActualDur() < DUR_BR)
     {
-        verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
+        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->staffSize)*2;
         up = (y < verticalCenter) ? true : false;
         if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
             if ( note->m_drawingStemDir == STEMDIRECTION_up) {
@@ -379,11 +379,11 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
         }
         
         if (!up) {
-            y3 = y1 - m_doc->m_drawingUnit[staff->staffSize]*8;
+            y3 = y1 - m_doc->GetDrawingUnit(staff->staffSize)*8;
             y2 = y1;
         }
         else {
-            y3 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
+            y3 = y1 + m_doc->GetDrawingUnit(staff->staffSize)*6;
             y2 = y1;
         }
         DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_style->m_stemWidth );
@@ -406,7 +406,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
     // int yy2, y5; // unused
     int verticalCenter, up, epaisseur;
     
-    epaisseur = std::max (2, m_doc->m_drawingBeamWidth[staff->staffSize]/2);
+    epaisseur = std::max (2, m_doc->GetDrawingBeamWidth(staff->staffSize, false) / 2);
     xn = element->GetDrawingX();
     
     /*
@@ -420,11 +420,11 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      }
     
     // calcul des dimensions du rectangle
-    x1 = xn - m_doc->m_drawingBrevisWidth[staff->staffSize]; x2 = xn +  m_doc->m_drawingBrevisWidth[staff->staffSize];
-    y1 = y + m_doc->m_drawingUnit[staff->staffSize];
-    y2 = y - m_doc->m_drawingUnit[staff->staffSize];
-    y3 = (int)(y1 + m_doc->m_drawingUnit[staff->staffSize]/2);	// partie d'encadrement qui depasse
-    y4 = (int)(y2 - m_doc->m_drawingUnit[staff->staffSize]/2);
+    x1 = xn - m_doc->GetDrawingBrevisWidth(staff->staffSize); x2 = xn +  m_doc->GetDrawingBrevisWidth(staff->staffSize);
+    y1 = y + m_doc->GetDrawingUnit(staff->staffSize);
+    y2 = y - m_doc->GetDrawingUnit(staff->staffSize);
+    y3 = (int)(y1 + m_doc->GetDrawingUnit(staff->staffSize)/2);	// partie d'encadrement qui depasse
+    y4 = (int)(y2 - m_doc->GetDrawingUnit(staff->staffSize)/2);
     
     
     //if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
@@ -455,12 +455,12 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      {
      x1 -=  m_doc->m_drawingBrevisWidth[staff->staffSize]*2;	// avance auto
      
-     y1 = *View::s_drawingLigY - m_doc->m_drawingUnit[staff->staffSize];	// ligat_y contient y original
+     y1 = *View::s_drawingLigY - m_doc->GetDrawingUnit(staff->staffSize);	// ligat_y contient y original
      yy2 = y2;
-     y5 = y1+ m_doc->m_drawingDoubleUnit[staff->staffSize]; y2 += m_doc->m_drawingDoubleUnit[staff->staffSize];	// on monte d'un INTERL
+     y5 = y1+ m_doc->GetDrawingDoubleUnit(staff->staffSize); y2 += m_doc->GetDrawingDoubleUnit(staff->staffSize);	// on monte d'un INTERL
      
      if (note->GetColored()==BOOLEAN_true)
-     DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->m_drawingDoubleUnit[staff->staffSize]);
+     DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, m_doc->GetDrawingDoubleUnit(staff->staffSize));
      else
      {	DrawObliquePolygon ( dc,  x1,  y1,  x2,  yy2, 5);
      DrawObliquePolygon ( dc,  x1,  y5,  x2,  y2, -5);
@@ -484,7 +484,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      }
      
      
-     y3 = y2 - m_doc->m_drawingUnit[staff->staffSize]*6;
+     y3 = y2 - m_doc->GetDrawingUnit(staff->staffSize)*6;
      
      if (note->m_lig)
      {
@@ -498,7 +498,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      }
      else if (note->m_dur == DUR_1) // && this->queue_lig )	// queue gauche haut // ax2 - no support of queue_lig
      {
-     y2 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
+     y2 = y1 + m_doc->GetDrawingUnit(staff->staffSize)*6;
      DrawVerticalLine ( dc, y1, y2, x1, m_doc->m_style->m_stemWidth );
      }
      }
@@ -506,7 +506,7 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
      */
     if (note->GetActualDur() == DUR_LG)
     {
-        verticalCenter = staff->GetDrawingY() - m_doc->m_drawingDoubleUnit[staff->staffSize]*2;
+        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->staffSize)*2;
         // ENZ
         up = (y < verticalCenter) ? ON : OFF;
         // ENZ
@@ -521,11 +521,11 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
         
         if (!up)
         {
-            y3 = y1 - m_doc->m_drawingUnit[staff->staffSize]*8;
+            y3 = y1 - m_doc->GetDrawingUnit(staff->staffSize)*8;
             y2 = y1;
         }
         else {
-            y3 = y1 + m_doc->m_drawingUnit[staff->staffSize]*6;
+            y3 = y1 + m_doc->GetDrawingUnit(staff->staffSize)*6;
             y2 = y1;
         }
         DrawVerticalLine ( dc, y2,y3,x2, m_doc->m_style->m_stemWidth );

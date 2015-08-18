@@ -76,6 +76,8 @@ void Doc::Reset( DocType type )
     
     m_scoreDef.Reset();
     
+    m_drawingSmuflFontSize = 0;
+    m_drawingLyricFontSize = 0;
     m_drawingLyricFont.SetFaceName("Garamond");
 }
 
@@ -397,7 +399,7 @@ int Doc::GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize )
     glyph = Resources::GetGlyph( smuflCode );
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
-    h = h * m_drawingFontHeight / glyph->GetUnitsPerEm();
+    h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if ( graceSize ) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return h;
 }
@@ -409,7 +411,7 @@ int Doc::GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize )
     glyph = Resources::GetGlyph( smuflCode );
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
-    w = w * m_drawingFontHeight / glyph->GetUnitsPerEm();
+    w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if ( graceSize ) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return w;
 }
@@ -533,64 +535,45 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingBeamMaxSlope /= 100;
 	m_drawingBeamMinSlope /= 100;
     
+    /*
     m_drawingSmallStaffRatio[0] = this->m_style->m_smallStaffNum;
     m_drawingSmallStaffRatio[1] = this->m_style->m_smallStaffDen;
     m_drawingGraceRatio[0] = this->m_style->m_graceNum;
     m_drawingGraceRatio[1] = this->m_style->m_graceDen;
+    */
     
     // half of the space between two lines
-    m_drawingUnit[0] = m_style->m_unit;
-    // same for small staves
-    m_drawingUnit[1] = (m_drawingUnit[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingUnit = m_style->m_unit;
     // space between two lines
-    m_drawingDoubleUnit[0] = m_drawingUnit[0] * 2;
-    // same for small staves
-    m_drawingDoubleUnit[1] = m_drawingUnit[1] * 2;
+    m_drawingDoubleUnit = m_drawingUnit * 2;
     // staff (with five lines)
-    m_drawingStaffSize[0] = m_drawingDoubleUnit[0] * 4;
-    m_drawingStaffSize[1] = m_drawingDoubleUnit[1] * 4;
+    m_drawingStaffSize = m_drawingDoubleUnit * 4;
     //
-    m_drawingOctaveSize[0] = m_drawingUnit[0] * 7;
-    m_drawingOctaveSize[1] = m_drawingUnit[1] * 7;
+    m_drawingOctaveSize = m_drawingUnit * 7;
     
     // values for beams
-    m_drawingBeamWidth[0] = this->m_style->m_unit;
-    m_drawingBeamWhiteWidth[0] = this->m_style->m_unit / 2;
-    m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-    m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingBeamWidth = this->m_style->m_unit;
+    m_drawingBeamWhiteWidth = this->m_style->m_unit / 2;
+
+    m_drawingSmuflFontSize = CalcMusicFontSize();
+    m_drawingLyricFontSize = m_drawingUnit * m_style->m_lyricSize / PARAM_DENOMINATOR;
     
-    m_drawingFontHeight = CalcMusicFontSize();
+	//m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
     
-	m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
-    m_drawingSmuflFonts[0][1].SetPointSize( (m_drawingFontHeight * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
-    m_drawingSmuflFonts[1][0].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] );
-    m_drawingSmuflFonts[1][1].SetPointSize( ( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
+    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
     
-    m_drawingLyricFonts[0] = m_drawingLyricFont;
-    m_drawingLyricFonts[1] = m_drawingLyricFont;
-	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
-    m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
-    
-    m_drawingMinMeasureWidth = m_drawingUnit[0] * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
-    
-    float glyph_size;
+    int glyph_size;
     Glyph *glyph;
     int x, y, w, h;
     glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
 
-    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingNoteRadius[0][0] = ceil(glyph_size / 2);
-    m_drawingNoteRadius[0][1] = (m_drawingNoteRadius[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingNoteRadius[1][0] = (m_drawingNoteRadius[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
-    m_drawingNoteRadius[1][1] = (m_drawingNoteRadius[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    glyph_size = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     
-    m_drawingLedgerLine[0][0] = (int)(glyph_size * .72);
-    m_drawingLedgerLine[0][1] = (m_drawingLedgerLine[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingLedgerLine[1][0] = (m_drawingLedgerLine[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
-    m_drawingLedgerLine[1][1] = (m_drawingLedgerLine[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    
+    m_drawingLedgerLine = glyph_size * 100 / 72;
+   
+    /*
     glyph = Resources::GetGlyph(SMUFL_E0A2_noteheadWhole);
     assert( glyph );
     glyph->GetBoundingBox( &x, &y, &w, &h );
@@ -614,6 +597,7 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingAccidHeight[0][1] = (m_drawingAccidHeight[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
     m_drawingAccidHeight[1][0] = (m_drawingAccidHeight[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
     m_drawingAccidHeight[1][1] = (m_drawingAccidHeight[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    */
     
 	return m_drawingPage;
 }

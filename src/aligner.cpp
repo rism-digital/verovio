@@ -311,12 +311,12 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
     // param 3: the functor to be redirected to SystemAligner (unused)
     int *previousStaffHeight = static_cast<int*>((*params)[0]);
     int *staffMargin = static_cast<int*>((*params)[1]);
-    int **interlineSizes = static_cast<int**>((*params)[2]);
+    int *interlineSize = static_cast<int*>((*params)[2]);
     
     // take into account the number of lyrics
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
-        m_yShift -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSizes[0] / 2) / PARAM_DENOMINATOR;
+        m_yShift -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
     }
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
@@ -326,7 +326,7 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
     }
     
     // for now always four interlines, eventually should be taken from the staffDef, so should the staff size
-    (*previousStaffHeight) = 4 * (*interlineSizes)[0];
+    (*previousStaffHeight) = 4 * (*interlineSize);
     
     return FUNCTOR_CONTINUE;
 }

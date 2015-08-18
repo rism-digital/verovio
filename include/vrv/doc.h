@@ -69,13 +69,30 @@ public:
 	*/
 	int GetPageCount( );
     
-    /*
-     * @name Get the height or width for a glyph taking into account the staff and grace sizes  */
+    /**
+     * @name Get the height or width for a glyph taking into account the staff and grace sizes  
+     */
     ///@{
     int GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize );
     int GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize );
+    int GetDrawingUnit( int staffSize );
+    int GetDrawingDoubleUnit( int staffSize );
+    int GetDrawingStaffSize( int staffSize );
+    int GetDrawingOctaveSize( int staffSize );
+    int GetDrawingBrevisWidth( int staffSize );
+    int GetDrawingBeamWidth( int staffSize, bool graceSize );
+    int GetDrawingBeamWhiteWidth( int staffSize, bool graceSize );
+    int GetDrawingLedgerLineLength( int staffSize, bool graceSize );
     ///@}
-	
+    
+    /**
+     * @name Get the height or width for a glyph taking into account the staff and grace sizes  
+     */
+    ///@{
+    FontInfo *GetDrawingSmuflFont( int staffSize, bool graceSize );
+    FontInfo *GetDrawingLyricFont( int staffSize );
+    ///@}
+
     /**
      * @name Setters for the page dimensions and margins
      */
@@ -237,39 +254,36 @@ public:
   
     /** The page currently being drawn */
     Page *m_drawingPage;
-    /** Half a the space between to staff lines for normal and small staff */
-    int m_drawingUnit[2];
-    /** Space between to staff lines for normal and small staff */
-    int m_drawingDoubleUnit[2];
-    /** Height of a five line staff for normal and small staff */
-    int m_drawingStaffSize[2];
-    /** Height of an octave for normal and small staff */
-    int m_drawingOctaveSize[2];
-    /** Font height (100 par defaut) */
-    int m_drawingFontHeight;
-    /** Normal and small staff ration (4 / 5 by default) */
-    int m_drawingSmallStaffRatio[2];
-    /** Normal and grace size (3 / 4 by default) */
-    int m_drawingGraceRatio[2];
-    /** Height of a beam for normal and small staff (10 and 6 by default) */
-    int m_drawingBeamWidth[2];
-    /** Height of a beam spacing (white) for normal and small staff (10 and 6 by default) */
-    int m_drawingBeamWhiteWidth[2];
-    /** Note radius for normal and small staff and normal and grace size */
-    int m_drawingNoteRadius[2][2];
-    /** Ledger line length for normal and small staff and normal and grace size */
-    int m_drawingLedgerLine[2][3];
-    /** Brevis width for normal and small staff */
-    int m_drawingBrevisWidth[2];
-    /** Accident width/height for normal and small staff and normal and grace size */
+    /** Half a the space between to staff lines */
+    int m_drawingUnit;
+    /** Space between to staff lines */
+    int m_drawingDoubleUnit;
+    /** Height of a five line staff */
+    int m_drawingStaffSize;
+    /** Height of an octave */
+    int m_drawingOctaveSize;
+    /** Height of a beam (10 and 6 by default) */
+    int m_drawingBeamWidth;
+    /** Height of a beam spacing (white) (10 and 6 by default) */
+    int m_drawingBeamWhiteWidth;
+    /** Ledger line length and normal and grace size */
+    int m_drawingLedgerLine;
+    /** Brevis width */
+    int m_drawingBrevisWidth;
+    
+    /** Smufl font size (100 par defaut) */
+    int m_drawingSmuflFontSize;
+    /** Lyric font size  */
+    int m_drawingLyricFontSize;
+    /** Current music font */
+    FontInfo m_drawingSmuflFont;
+    /** Current lyric font */
+    FontInfo m_drawingLyricFont;
+                            
+    /** Accident width/height and normal and grace size */
     int m_drawingAccidWidth[2][2];
     int m_drawingAccidHeight[2][2];
-    /** Current music font for normal and small staff and normal and grace size */
-    FontInfo m_drawingSmuflFonts[2][2];
-    /** Current lyric font for normal and small staff and normal and grace size */
-    FontInfo m_drawingLyricFonts[2];
-    /** Lyric font by default */
-    FontInfo m_drawingLyricFont;
+    
     /** The current page height */
     int m_drawingPageHeight;
     /** The current page height */
