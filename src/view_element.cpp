@@ -1770,9 +1770,8 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff)
     int x, y;
     int emb_offset = 0; // if there is and embellishment, offset the note up
     
-    // We position the fermata in the same horizontal pos. of th object
-    // but it shoud be moved according to half of the fermata size
-    x = element->GetDrawingX() - m_doc->GetDrawingDoubleUnit(staff->staffSize);
+    // We move the fermata position of half of the fermata size
+    x = element->GetDrawingX() - m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->staffSize, false) / 2;
     
     // First case, notes
     if (element->Is() == NOTE) {
