@@ -48,7 +48,7 @@ void Staff::Reset()
     notAnc = false; // LP we want modern notation :))
     grise = false;
     invisible = false;
-    staffSize = 0;
+    staffSize = 100;
     m_drawingLines = 5;
     m_yAbs = VRV_UNSET;
     m_drawingY = 0;

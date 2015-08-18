@@ -279,10 +279,6 @@ public:
     FontInfo m_drawingSmuflFont;
     /** Current lyric font */
     FontInfo m_drawingLyricFont;
-                            
-    /** Accident width/height and normal and grace size */
-    int m_drawingAccidWidth[2][2];
-    int m_drawingAccidHeight[2][2];
     
     /** The current page height */
     int m_drawingPageHeight;

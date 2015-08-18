@@ -389,7 +389,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	if (note->m_drawingAccid) {
         xAccid = xNote;
         if (note->m_drawingAccid->GetFunc() != FUNC_edit) {
-            xAccid -= 1.5 * m_doc->m_drawingAccidWidth[staffSize][drawingCueSize];
+            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
         }
         
         note->m_drawingAccid->SetDrawingX( xAccid );
@@ -700,7 +700,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     // convert to string
     std::wstring wtext = IntToTimeSigFigures(multirest->GetNum());
     
-    dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->staffSize, false));
     dc->GetSmuflTextExtent( wtext, &w, &h);
     start_offset = (x2 - x1 - w) /  2; // calculate offset to center text
     DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 5, wtext, false);
@@ -753,23 +753,13 @@ void View::DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff)
 	return;
 }
 
-void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
+void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
 {
     int x1, x2, y1, y2, vertic;
     y1 = y;
     vertic = m_doc->GetDrawingUnit(staff->staffSize);
 	
-    int off;
-	float foff;
-
-	if (staff->notAnc)
-		foff = (m_doc->GetDrawingUnit(staff->staffSize) *1 / 3);
-	else
-		foff = (m_doc->m_drawingLedgerLine[staff->staffSize][2] * 2) / 3; // i.e., la moitie de la ronde
-
-	if (smaller)
-		foff *= (int)( (float)m_doc->m_drawingGraceRatio[0] / (float)m_doc->m_drawingGraceRatio[1] );
-	off = (int)foff;
+    int off = m_doc->GetDrawingLedgerLineLength(staff->staffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde
 
 	x1 = x - off;
 	x2 = x + off;
@@ -794,7 +784,7 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 	x2 += off;
 
     // legder line
-	if (y > (int)staff->GetDrawingY()  || y < staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->staffSize])
+	if (y > (int)staff->GetDrawingY()  || y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->staffSize))
 		DrawHorizontalLine ( dc, x1, x2, y1, m_doc->m_style->m_staffLineWidth);
 
 	if (dots)
@@ -802,10 +792,10 @@ void View::DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned
 }
 
 
-void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff)
+void View::DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
 {
     int y2 = y + m_doc->GetDrawingDoubleUnit(staff->staffSize);
-	DrawSmuflCode( dc, x, y2, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->staffSize, smaller );
+	DrawSmuflCode( dc, x, y2, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->staffSize, cueSize );
     
 	if (dots)
 	{	if (valeur < DUR_16)
@@ -888,7 +878,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->StartGraphic( element, "", element->GetUuid() );
     
     int y = staff->GetDrawingY();
-    DrawBarline( dc, y, y - m_doc->m_drawingStaffSize[staff->staffSize], barLine );
+    DrawBarline( dc, y, y - m_doc->GetDrawingStaffSize(staff->staffSize), barLine );
     
     dc->EndGraphic(element, this );
 }
@@ -1131,50 +1121,50 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	{
 		case C1 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->m_drawingStaffSize[ staff->staffSize ];
+            b -= m_doc->GetDrawingStaffSize(staff->staffSize);
             break;
 		case G1 :
-            b -= m_doc->m_drawingStaffSize[ staff->staffSize ]; 
+            b -= m_doc->GetDrawingStaffSize(staff->staffSize);
             break;
 		case G2_8va :
             sym = SMUFL_E053_gClef8va;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*3;
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize) * 3;
             break;
         case G2_8vb :
             sym = SMUFL_E052_gClef8vb;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*3;
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize) * 3;
             break;
 		case C2 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*3;
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize) * 3;
             break;
 		case G2 :
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*3; 
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize) * 3;
             break;
 		case F3 :
             sym = SMUFL_E062_fClef;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*2;
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize)*2;
             break;
 		case C3 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*2;
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize)*2;
             break;
 		case F5 :
             sym =SMUFL_E062_fClef;
             break;
 		case F4 :
             sym = SMUFL_E062_fClef;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize );
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize);
             break;
 		case C4 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize );
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize);
             break;
 		case C5 :
             sym = SMUFL_E05C_cClef;
             break;
 		case perc :
-            b -= m_doc->GetDrawingDoubleUnit( staff->staffSize )*2;
+            b -= m_doc->GetDrawingDoubleUnit(staff->staffSize) * 2;
             // FIXME
             sym = SMUFL_E05C_cClef;
             break;
@@ -1214,7 +1204,7 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
         x += m_doc->GetDrawingUnit(staff->staffSize) * 2;
     }
     
-    dc->SetFont( &m_doc->m_drawingSmuflFonts[staff->staffSize][0] );
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->staffSize, false));
     
     wtext = IntToTimeSigFigures(num);
     DrawSmuflString ( dc, x, ynum, wtext, 1, staff->staffSize);	// '1' = centrer
@@ -1243,7 +1233,7 @@ void View::DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer,
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int y = staff->GetDrawingY() - (m_doc->m_drawingUnit[ staff->staffSize ]*4);
+    int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->staffSize) * 4);
     int x = element->GetDrawingX();
     
     if ( meterSig->GetSym() == METERSIGN_common ) {
@@ -1629,12 +1619,12 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     FontInfo currentFont;
     if (syl->HasFontstyle()) {
-        currentFont = m_doc->GetDrawingLyricFonts( staff->staffSize );
+        currentFont = *m_doc->GetDrawingLyricFont(staff->staffSize);
         currentFont.SetStyle(syl->GetFontstyle());
         dc->SetFont(&currentFont);
     }
     else {
-        dc->SetFont( &m_doc->GetDrawingLyricFonts( staff->staffSize ) );
+        dc->SetFont( m_doc->GetDrawingLyricFont(staff->staffSize) );
     }
     
     DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str(), staff->staffSize );
@@ -1702,7 +1692,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     x = element->GetDrawingX();
     // HARDCODED
-    int step = m_doc->m_drawingAccidWidth[staff->staffSize][0] * 1.3;
+    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->staffSize, false) * 1.3;
     
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by default)
     if ( (keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange) ) {
@@ -1839,7 +1829,7 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff)
     int x, y;    
 
     // It shoud be moved according to half of the trill size
-    x = element->GetDrawingX() - m_doc->m_drawingAccidWidth[staff->staffSize][false];
+    x = element->GetDrawingX() - m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->staffSize, false);
 
     // HARDCODED
     if ((element->GetDrawingY()) < staff->GetDrawingY())

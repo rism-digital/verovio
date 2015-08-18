@@ -401,6 +401,7 @@ int Doc::GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize )
     glyph->GetBoundingBox( &x, &y, &w, &h );
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if ( graceSize ) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    h = h * staffSize / 100;
     return h;
 }
     
@@ -413,7 +414,61 @@ int Doc::GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize )
     glyph->GetBoundingBox( &x, &y, &w, &h );
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if ( graceSize ) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    w = w * staffSize / 100;
     return w;
+}
+
+int Doc::GetDrawingUnit( int staffSize )
+{
+    return m_drawingUnit * staffSize / 100;
+}
+int Doc::GetDrawingDoubleUnit( int staffSize )
+{
+    return m_drawingDoubleUnit * staffSize / 100;
+}
+int Doc::GetDrawingStaffSize( int staffSize )
+{
+    return m_drawingStaffSize * staffSize / 100;
+    
+}
+int Doc::GetDrawingOctaveSize( int staffSize )
+{
+    return m_drawingOctaveSize * staffSize / 100;
+}
+int Doc::GetDrawingBrevisWidth( int staffSize )
+{
+    return m_drawingBrevisWidth * staffSize / 100;
+}
+int Doc::GetDrawingBeamWidth( int staffSize, bool graceSize )
+{
+    int value = m_drawingBeamWidth * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value;
+}
+int Doc::GetDrawingBeamWhiteWidth( int staffSize, bool graceSize )
+{
+    int value = m_drawingBeamWhiteWidth * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value;
+}
+int Doc::GetDrawingLedgerLineLength( int staffSize, bool graceSize )
+{
+    int value = m_drawingLedgerLine * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value;
+}
+
+FontInfo *Doc::GetDrawingSmuflFont( int staffSize, bool graceSize )
+{
+    int value = m_drawingSmuflFontSize * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    m_drawingSmuflFont.SetPointSize( value );
+    return &m_drawingSmuflFont;
+}
+    FontInfo *Doc::GetDrawingLyricFont( int staffSize )
+{
+    m_drawingLyricFont.SetPointSize( m_drawingLyricFontSize * staffSize / 100 );
+    return &m_drawingLyricFont;
 }
     
 char Doc::GetLeftMargin( const ClassId classId  )
@@ -490,6 +545,8 @@ Page *Doc::SetDrawingPage( int pageIdx )
     m_drawingPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
     assert( m_drawingPage );
     
+    int glyph_size;
+    
     // we use the page members only if set (!= -1) 
     if ( m_drawingPage->m_pageHeight != -1 )
     {
@@ -535,69 +592,31 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingBeamMaxSlope /= 100;
 	m_drawingBeamMinSlope /= 100;
     
-    /*
-    m_drawingSmallStaffRatio[0] = this->m_style->m_smallStaffNum;
-    m_drawingSmallStaffRatio[1] = this->m_style->m_smallStaffDen;
-    m_drawingGraceRatio[0] = this->m_style->m_graceNum;
-    m_drawingGraceRatio[1] = this->m_style->m_graceDen;
-    */
-    
     // half of the space between two lines
     m_drawingUnit = m_style->m_unit;
     // space between two lines
     m_drawingDoubleUnit = m_drawingUnit * 2;
     // staff (with five lines)
     m_drawingStaffSize = m_drawingDoubleUnit * 4;
-    //
+    // octave height
     m_drawingOctaveSize = m_drawingUnit * 7;
+    // measure minimal width
+    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
     
     // values for beams
     m_drawingBeamWidth = this->m_style->m_unit;
     m_drawingBeamWhiteWidth = this->m_style->m_unit / 2;
 
+    // values for fonts
     m_drawingSmuflFontSize = CalcMusicFontSize();
     m_drawingLyricFontSize = m_drawingUnit * m_style->m_lyricSize / PARAM_DENOMINATOR;
-    
-	//m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
-    
-    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
-    
-    int glyph_size;
-    Glyph *glyph;
-    int x, y, w, h;
-    glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
-    assert( glyph );
-    glyph->GetBoundingBox( &x, &y, &w, &h );
 
-    glyph_size = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    glyph_size = GetGlyphWidth(SMUFL_E0A3_noteheadHalf, 100, 0);
+    m_drawingLedgerLine = glyph_size * 72 / 100;
     
-    m_drawingLedgerLine = glyph_size * 100 / 72;
-   
-    /*
-    glyph = Resources::GetGlyph(SMUFL_E0A2_noteheadWhole);
-    assert( glyph );
-    glyph->GetBoundingBox( &x, &y, &w, &h );
-    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingLedgerLine[0][2] = (int)(glyph_size * .66);
-    m_drawingLedgerLine[1][2] = (m_drawingLedgerLine[0][2] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    
-    m_drawingBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
-    m_drawingBrevisWidth[1] = (m_drawingBrevisWidth[0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
- 
-    glyph = Resources::GetGlyph(SMUFL_E262_accidentalSharp);
-    assert( glyph );
-    glyph->GetBoundingBox( &x, &y, &w, &h );
-    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingAccidWidth[0][0] = glyph_size;
-    m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    m_drawingAccidWidth[1][1] = (m_drawingAccidWidth[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    glyph_size = round((double)h * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingAccidHeight[0][0] = glyph_size;
-    m_drawingAccidHeight[0][1] = (m_drawingAccidHeight[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingAccidHeight[1][0] = (m_drawingAccidHeight[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    m_drawingAccidHeight[1][1] = (m_drawingAccidHeight[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    */
+    glyph_size = GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
+
+    m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
     
 	return m_drawingPage;
 }

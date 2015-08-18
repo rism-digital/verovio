@@ -17,6 +17,7 @@
 #include "beam.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "tuplet.h"
@@ -240,7 +241,8 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     std::wstring notes;
     
-    dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
+    //
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->staffSize, tuplet->IsCueSize()));
     
     if (tuplet->GetNum() > 0) {
         notes = IntToTupletFigures((short int)tuplet->GetNum());
@@ -256,7 +258,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     int txt_x = center.x - (txt_length / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][false];
+    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->staffSize, tuplet->IsCueSize());
     
     if (tuplet->GetNum()) {
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
@@ -264,7 +266,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     dc->ResetFont();
     
-    int verticalLine = m_doc->m_drawingUnit[0];
+    int verticalLine = m_doc->GetDrawingUnit(100);
     
     dc->SetPen(m_currentColour, m_doc->m_style->m_stemWidth, AxSOLID);
     

@@ -1106,10 +1106,10 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    //int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+    //int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     int negative_offset = - note->m_contentBB_x1;
     if ( (*min_pos) > 0 ) {
-        //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+        //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
@@ -1123,9 +1123,9 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     }
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin( NOTE ) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
+    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin( NOTE ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
-    //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
+    //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
     note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 );
     
     return FUNCTOR_CONTINUE;
@@ -1159,7 +1159,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
         // reset it as the minimum position to the step (HARDCODED)
-        (*min_pos) = 30 * doc->m_drawingUnit[0] / 10;
+        (*min_pos) = 30 * doc->GetDrawingUnit(100) / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1219,14 +1219,14 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = - (current->m_contentBB_x1);
-    if (!current->IsGraceNote()) negative_offset += (doc->GetLeftMargin( current->Is() ) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+    if (!current->IsGraceNote()) negative_offset += (doc->GetLeftMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
     
     if (current->Is() == MREST) {
         // With MRest, the only thing we want to do it keep their with as possible measure with (if only MRest in all staves/layers)
-        int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR + negative_offset ;
+        int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR + negative_offset ;
         // Keep it if more than the current measure width
         (*measure_width) = std::max( (*measure_width), width );
         (*min_pos) = 0;
@@ -1261,8 +1261,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
     
     return FUNCTOR_CONTINUE;
 }

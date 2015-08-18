@@ -112,8 +112,8 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     lastDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
     
     // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    dx[0] =  m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->staffSize, false) - (m_doc->m_style->m_stemWidth)/2;
-    dx[1] =  m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->staffSize, true) - (m_doc->m_style->m_stemWidth)/2;
+    dx[0] =  m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->staffSize, false) / 2 - (m_doc->m_style->m_stemWidth)/2;
+    dx[1] =  m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->staffSize, true) / 2 - (m_doc->m_style->m_stemWidth)/2;
     
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
