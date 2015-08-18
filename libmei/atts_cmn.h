@@ -1034,22 +1034,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumPlace(std::string numPlace_) { m_numPlace = numPlace_; };
-    std::string GetNumPlace() const { return m_numPlace; };    
+    void SetNumPlace(data_PLACE numPlace_) { m_numPlace = numPlace_; };
+    data_PLACE GetNumPlace() const { return m_numPlace; };    
     bool HasNumPlace( );
     
     //
-    void SetNumVisible(std::string numVisible_) { m_numVisible = numVisible_; };
-    std::string GetNumVisible() const { return m_numVisible; };    
+    void SetNumVisible(data_BOOLEAN numVisible_) { m_numVisible = numVisible_; };
+    data_BOOLEAN GetNumVisible() const { return m_numVisible; };    
     bool HasNumVisible( );
     
     ///@}
 
 private:
     /** States where the tuplet number will be placed in relation to the note heads. **/
-    std::string m_numPlace;
+    data_PLACE m_numPlace;
     /** Determines if the tuplet number is visible. **/
-    std::string m_numVisible;
+    data_BOOLEAN m_numVisible;
 
 /* include <attnum.visible> */
 };
