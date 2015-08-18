@@ -300,6 +300,7 @@ private:
 class StaffDef: public Object, public ScoreOrStaffDefAttrInterface,
     public AttCommon,
     public AttLabelsAddl,
+    public AttScalable,
     public AttStaffDefVis
 {
 public:

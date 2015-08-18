@@ -22,7 +22,7 @@ Style::Style()
     
     m_unit = DEFAULT_UNIT * DEFINITON_FACTOR;
     m_landscape = false;
-    m_barlineWidth = (unsigned short)(DEFAULT_BARLINE_WITDH * DEFINITON_FACTOR);
+    m_barLineWidth = (unsigned short)(DEFAULT_BARLINE_WITDH * DEFINITON_FACTOR);
     m_staffLineWidth = (unsigned short)(DEFAULT_STAFFLINE_WITDH * DEFINITON_FACTOR);
     m_stemWidth = (unsigned short)(DEFAULT_STEM_WITDH * DEFINITON_FACTOR);
     

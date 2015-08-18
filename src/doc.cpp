@@ -422,40 +422,67 @@ int Doc::GetDrawingUnit( int staffSize )
 {
     return m_drawingUnit * staffSize / 100;
 }
+    
 int Doc::GetDrawingDoubleUnit( int staffSize )
 {
     return m_drawingDoubleUnit * staffSize / 100;
 }
+    
 int Doc::GetDrawingStaffSize( int staffSize )
 {
     return m_drawingStaffSize * staffSize / 100;
     
 }
+    
 int Doc::GetDrawingOctaveSize( int staffSize )
 {
     return m_drawingOctaveSize * staffSize / 100;
 }
+    
 int Doc::GetDrawingBrevisWidth( int staffSize )
 {
     return m_drawingBrevisWidth * staffSize / 100;
 }
+    
+int Doc::GetDrawingBarLineWidth( int staffSize )
+{
+    return m_style->m_barLineWidth * staffSize / 100;
+}
+
+int Doc::GetDrawingStaffLineWidth( int staffSize )
+{
+    return m_style->m_staffLineWidth * staffSize / 100;
+}
+
+int Doc::GetDrawingStemWidth( int staffSize )
+{
+    return m_style->m_stemWidth * staffSize / 100;
+}
+
 int Doc::GetDrawingBeamWidth( int staffSize, bool graceSize )
 {
     int value = m_drawingBeamWidth * staffSize / 100;
     if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
+    
 int Doc::GetDrawingBeamWhiteWidth( int staffSize, bool graceSize )
 {
     int value = m_drawingBeamWhiteWidth * staffSize / 100;
     if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
+    
 int Doc::GetDrawingLedgerLineLength( int staffSize, bool graceSize )
 {
     int value = m_drawingLedgerLine * staffSize / 100;
     if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
+}
+    
+int Doc::GetGraceSize(int value)
+{
+    return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }
 
 FontInfo *Doc::GetDrawingSmuflFont( int staffSize, bool graceSize )

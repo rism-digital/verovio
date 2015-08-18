@@ -738,6 +738,25 @@ data_NUMFORMAT Att::StrToNumformat(std::string value)
     return NUMFORMAT_NONE;
 }
     
+std::string Att::PercentToStr( data_PERCENT data)
+{
+    return StringFormat("%d%%", data);
+}
+
+data_PERCENT Att::StrToPercent(std::string value)
+{
+    int percent = atoi( std::string( value.begin(), value.end() - 1 ).c_str() );
+    if (percent > 1000) {
+        LogWarning("Percent cannot be greater than 1000%");
+        return 100;
+    }
+    else if (percent < 1) {
+        LogWarning("Percent has to be greater than 0%");
+        return 100;
+    }
+    return percent;
+}
+    
 std::string Att::OctaveDisToStr( data_OCTAVE_DIS data )
 {
     std::string value;

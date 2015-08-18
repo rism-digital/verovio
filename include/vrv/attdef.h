@@ -336,6 +336,11 @@ enum data_OCTAVE_DIS {
 };
     
 /**
+ * MEI data.PERCENT
+ */
+typedef int data_PERCENT;
+    
+/**
  * MEI data.PITCHNAME
  */
 enum data_PITCHNAME {

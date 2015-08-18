@@ -130,7 +130,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         // takes into account the scoreDef
         Note *firstNote = dynamic_cast<Note*>( staff->FindChildByType( NOTE ) );
         
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->staffSize) : first->GetDrawingX();
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : first->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
@@ -157,7 +157,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
             return;
         }
         
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->staffSize) : first->GetDrawingX();
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : first->GetDrawingX();
         x2 = last->GetDrawingX() + last->GetRightBarlineX();
         spanningType = SPANNING_MIDDLE;
     }
@@ -267,7 +267,7 @@ void View::DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, i
     }
     else if (noteStemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
-        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->staffSize) * 2;
+        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         up = (y1 > center) ? true : false;
     }
     
@@ -275,12 +275,12 @@ void View::DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, i
     // 20 height nice with 70, not nice with 50
     // Also remove HARDCODED values!
     if (up) {
-        y1 += m_doc->GetDrawingUnit(staff->staffSize) * 1.6;
-        y2 += m_doc->GetDrawingUnit(staff->staffSize) * 1.6;
+        y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
+        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
     }
     else {
-        y1 -= m_doc->GetDrawingUnit(staff->staffSize) * 1.6;
-        y2 -= m_doc->GetDrawingUnit(staff->staffSize) * 1.6;
+        y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
+        y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
     }
     
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
@@ -304,19 +304,19 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
     
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ( spanningType ==  SPANNING_START_END ) {
-        dc->SetFont( m_doc->GetDrawingLyricFont( staff->staffSize ) );
+        dc->SetFont( m_doc->GetDrawingLyricFont( staff->m_drawingStaffSize ) );
         dc->GetTextExtent(syl->GetText(), &w, &h);
         dc->ResetFont();
         // x position of the syl is two units back
-        x1 += w - m_doc->GetDrawingUnit(staff->staffSize) * 2;
+        x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else  if ( spanningType ==  SPANNING_START) {
-        dc->SetFont( m_doc->GetDrawingLyricFont( staff->staffSize ) );
+        dc->SetFont( m_doc->GetDrawingLyricFont( staff->m_drawingStaffSize ) );
         dc->GetTextExtent(syl->GetText(), &w, &h);
         dc->ResetFont();
         // idem
-        x1 += w - m_doc->GetDrawingUnit(staff->staffSize) * 2;
+        x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
         
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
@@ -342,18 +342,18 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
 {
     if (syl->GetCon() == CON_d) {
         
-        y += m_doc->GetDrawingUnit(staff->staffSize) * 2 / 3;
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
         // x position of the syl is two units back
-        x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->staffSize);
+        x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         
         //if ( x1 > x2 ) {
-        //    DrawFullRectangle(dc, x1, y + 2* m_doc->m_style->m_barlineWidth, x2, y + 3 * m_doc->m_style->m_barlineWidth);
+        //    DrawFullRectangle(dc, x1, y + 2* m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         //    LogDebug("x1 > x2 (%d %d)", x1, x2 );
         //}
         
         // the length of the dash and the space between them - can be made a parameter
-        int dashLength = m_doc->GetDrawingUnit(staff->staffSize) * 4 / 3;
-        int dashSpace = m_doc->GetDrawingStaffSize(staff->staffSize) * 5 / 3;
+        int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
+        int dashSpace = m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) * 5 / 3;
         int halfDashLength = dashLength / 2;
         
         int dist = x2 - x1;
@@ -371,13 +371,13 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i *  dashSpace);
-            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + m_doc->m_style->m_barlineWidth);
+            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
         
     }
     else if (syl->GetCon() == CON_u) {
-        x1 += (int)m_doc->GetDrawingUnit(staff->staffSize) / 2;
-        DrawFullRectangle(dc, x1, y, x2, y + m_doc->m_style->m_barlineWidth);
+        x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        DrawFullRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     }
     
 }

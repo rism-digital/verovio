@@ -442,6 +442,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     
     staffDef->WriteCommon(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
+    staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
     
     if (staffDef->GetClefAttr()) {
@@ -1354,6 +1355,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     
     vrvStaffDef->ReadCommon(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
+    vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefVis(staffDef);
     
     if ( !vrvStaffDef->HasN() ) {

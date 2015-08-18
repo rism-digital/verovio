@@ -242,7 +242,7 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     std::wstring notes;
     
     //
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->staffSize, tuplet->IsCueSize()));
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, tuplet->IsCueSize()));
     
     if (tuplet->GetNum() > 0) {
         notes = IntToTupletFigures((short int)tuplet->GetNum());
@@ -258,17 +258,17 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     int txt_x = center.x - (txt_length / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->staffSize, tuplet->IsCueSize());
+    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
     
     if (tuplet->GetNum()) {
-        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
+        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
     }
     
     dc->ResetFont();
     
     int verticalLine = m_doc->GetDrawingUnit(100);
     
-    dc->SetPen(m_currentColour, m_doc->m_style->m_stemWidth, AxSOLID);
+    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     
     // Start is 0 when no line is necessary (i.e. beamed notes)
     if (start.x > 0) {

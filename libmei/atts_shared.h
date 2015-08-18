@@ -3894,15 +3894,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetScale(std::string scale_) { m_scale = scale_; };
-    std::string GetScale() const { return m_scale; };    
+    void SetScale(data_PERCENT scale_) { m_scale = scale_; };
+    data_PERCENT GetScale() const { return m_scale; };    
     bool HasScale( );
     
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
-    std::string m_scale;
+    data_PERCENT m_scale;
 
 /* include <attscale> */
 };

@@ -92,9 +92,9 @@ void View::DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y
 }
 
 
-void View::DrawDot ( DeviceContext *dc, int x, int y )
+void View::DrawDot ( DeviceContext *dc, int x, int y, int staffSize )
 {
-	int r = std::max( ToDeviceContextX( m_doc->GetDrawingDoubleUnit( 100 ) / 5 ), 2 );
+	int r = std::max( ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staffSize ) / 5 ), 2 );
 	
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -219,7 +219,7 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
-    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_style->m_stemWidth / 2 ), AxSOLID );
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(100) / 2 ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
     dc->ResetPen();
 }

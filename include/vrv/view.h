@@ -304,11 +304,11 @@ protected:
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
-	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
-	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 0);
+	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 100);
+	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
-	void DrawDot ( DeviceContext *dc, int x, int y );
+	void DrawDot ( DeviceContext *dc, int x, int y, int staffSize );
     ///@}
     
 private:    
