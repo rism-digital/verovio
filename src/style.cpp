@@ -34,11 +34,8 @@ Style::Style()
     m_beamMinSlope = 0;
     
     /**
-     * We should probably keep graceNum and Den for cue sized notes.
-     * smallStaffNum and Den should be replaced for a more MEI way (percentage?)
+     * graceNum and Den for cue sized notes.
      */
-    m_smallStaffNum = 4;
-    m_smallStaffDen = 5;
     m_graceNum = 5;
     m_graceDen = 7;
     
