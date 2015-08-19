@@ -25,13 +25,6 @@ class MeterSigAttr;
 class StaffGrp;
 class StaffDef;
 
-// unused? LP
-#define STAFFDEF_DRAW_NONE  0
-#define STAFFDEF_DRAW_CLEF  (1<<0)
-#define STAFFDEF_DRAW_KEYSIG  (1<<1)
-#define STAFFDEF_DRAW_MENSUR  (1<<2)
-#define STAFFDEF_DRAW_ALL (1<<3) - 1
-
 //----------------------------------------------------------------------------
 // ScoreOrStaffDefAttrInterface
 //----------------------------------------------------------------------------
