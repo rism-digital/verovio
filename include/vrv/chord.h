@@ -68,12 +68,11 @@ public:
     void ResetAccidSpace(int fullUnit);
     
     /**
-     * @name Set and get the stem direction of the beam.
+     * @name Set and get the stem direction of the chord.
      */
     ///@{
     void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
     data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
-
     ///@}
     
     //----------//

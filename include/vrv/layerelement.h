@@ -78,6 +78,12 @@ public:
      * Returns true if the element is a note or a note child and the note has a @grace
      */
     bool IsCueSize();
+    
+    /**
+     * Returns the drawing stem direction if the element is a note or a chord.
+     * (Could one day go in a drawing stem interface)
+     */
+    data_STEMDIRECTION GetDrawingStemDir();
 
     Alignment *GetAlignment() { return m_alignment; };
     

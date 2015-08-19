@@ -289,7 +289,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     {
         //change the stem dir for all objects
         if ( (*beamElementCoords)[i]->m_element->Is() == NOTE ) {
-            ((Note*)(*beamElementCoords)[i]->m_element)->m_drawingStemDir = stemDir;
+            ((Note*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir( stemDir );
         }
         else if ( (*beamElementCoords)[i]->m_element->Is() == CHORD ) {
             ((Chord*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir(stemDir);

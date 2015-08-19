@@ -72,14 +72,15 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     /************** Stem/notehead direction: **************/
     
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
-    if ( note->HasDrawingStemDir() ) {
-        note->m_drawingStemDir = note->GetDrawingStemDir();
+    data_STEMDIRECTION noteStemDir = note->CalcDrawingStemDir();
+    if ( noteStemDir != STEMDIRECTION_NONE ) {
+        note->SetDrawingStemDir( noteStemDir );
     }
     else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        note->m_drawingStemDir = layer->GetDrawingStemDir();
+        note->SetDrawingStemDir( layer->GetDrawingStemDir() );
     }
     else {
-        note->m_drawingStemDir = (noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        note->SetDrawingStemDir((noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up);
     }
     
     xNote = xStem - radius;
@@ -115,7 +116,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
 
         DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->m_drawingStaffSize, drawingCueSize );
         
-        DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, noteY);
+        DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
     
     /************** Ledger lines: **************/
@@ -141,7 +142,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     if (note->GetDots()) {
         int xDot;
-        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->m_drawingStemDir == STEMDIRECTION_up)))
+        if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
             xDot = xStem + m_doc->GetDrawingUnit(staffSize)*7/2;
         else
             xDot = xStem + m_doc->GetDrawingUnit(staffSize)*5/2;
@@ -369,8 +370,8 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
     {
         verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
         up = (y < verticalCenter) ? true : false;
-        if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
-            if ( note->m_drawingStemDir == STEMDIRECTION_up) {
+        if ( note->GetDrawingStemDir() != STEMDIRECTION_NONE ) {
+            if ( note->GetDrawingStemDir() == STEMDIRECTION_up) {
                 up = true;
             }
             else {
@@ -510,8 +511,8 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
         // ENZ
         up = (y < verticalCenter) ? ON : OFF;
         // ENZ
-        if ( note->m_drawingStemDir != STEMDIRECTION_NONE ) {
-            if ( note->m_drawingStemDir == STEMDIRECTION_up) {
+        if ( note->GetDrawingStemDir() != STEMDIRECTION_NONE ) {
+            if ( note->GetDrawingStemDir() == STEMDIRECTION_up) {
                 up = ON;
             }
             else {

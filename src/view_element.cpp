@@ -258,19 +258,20 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************** Stem/notehead direction: **************/
     
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
-    if ( note->HasDrawingStemDir() ) {
-        note->m_drawingStemDir = note->GetDrawingStemDir();
+    data_STEMDIRECTION noteStemDir = note->CalcDrawingStemDir();
+    if ( noteStemDir != STEMDIRECTION_NONE ) {
+        note->SetDrawingStemDir( noteStemDir );
     }
     else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        note->m_drawingStemDir = layer->GetDrawingStemDir();
+        note->SetDrawingStemDir( layer->GetDrawingStemDir() );
     }
     else {
-        note->m_drawingStemDir = (noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        note->SetDrawingStemDir( (noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up );
     }
     
     //if the note is clustered, calculations are different
     if (note->m_cluster) {
-        if (note->m_drawingStemDir == STEMDIRECTION_down) {
+        if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
             //stem down/even cluster = noteheads start on left (incorrect side)
             if (note->m_cluster->size() % 2 == 0) {
                 flippedNotehead = (note->m_clusterPosition % 2 != 0);
@@ -304,10 +305,10 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         else {
             //if we have a flipped notehead, we need to be in a chord
             assert(inChord);
-            if (note->m_drawingStemDir == STEMDIRECTION_up) {
+            if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
                 xNote = xStem + radius - m_doc->GetDrawingStemWidth(staffSize);
             }
-            else if (note->m_drawingStemDir == STEMDIRECTION_down) {
+            else if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
                 xNote = xStem - radius * 3 + m_doc->GetDrawingStemWidth(staffSize);
             }
             else {
@@ -346,7 +347,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->m_drawingStaffSize, drawingCueSize );
 
 		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
-            DrawStem(dc, note, staff, note->m_drawingStemDir, radius, xStem, noteY);
+            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
 
 	}
@@ -401,7 +402,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	
     if (note->GetDots() && !inChord) {
         int xDot;
-        if (note->GetActualDur() < DUR_2 || (note->GetActualDur() > DUR_8 && !inBeam && (note->m_drawingStemDir == STEMDIRECTION_up)))
+        if (note->GetActualDur() < DUR_2 || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
             xDot = xStem + m_doc->GetDrawingUnit(staffSize)*7/2;
         else
             xDot = xStem + m_doc->GetDrawingUnit(staffSize)*5/2;
@@ -1461,7 +1462,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
             if ( note->GetDrawingY() > y ) {
                 y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
-            if ( (note->m_drawingStemDir == STEMDIRECTION_up) && (note->m_drawingStemEnd.y > y )) {
+            if ( (note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->m_drawingStemEnd.y > y )) {
                 y = note->m_drawingStemEnd.y;
             }
             

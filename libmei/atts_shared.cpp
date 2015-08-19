@@ -1268,7 +1268,7 @@ AttCurvature::~AttCurvature() {
 void AttCurvature::ResetCurvature() {
     m_bezier = "";
     m_bulge = "";
-    m_curvedir = "";
+    m_curvedir = CURVEDIR_NONE;
 }
 
 bool AttCurvature::ReadCurvature(  pugi::xml_node element ) {
@@ -1284,7 +1284,7 @@ bool AttCurvature::ReadCurvature(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("curvedir")) {
-        this->SetCurvedir(StrToStr(element.attribute("curvedir").value()));
+        this->SetCurvedir(StrToCurvedir(element.attribute("curvedir").value()));
         element.remove_attribute("curvedir");
         hasAttribute = true;
     }
@@ -1302,7 +1302,7 @@ bool AttCurvature::WriteCurvature(  pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasCurvedir()) {
-        element.append_attribute("curvedir") = StrToStr(this->GetCurvedir()).c_str();
+        element.append_attribute("curvedir") = CurvedirToStr(this->GetCurvedir()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1320,7 +1320,7 @@ bool AttCurvature::HasBulge( )
 
 bool AttCurvature::HasCurvedir( )
 {
-    return (m_curvedir != "");
+    return (m_curvedir != CURVEDIR_NONE);
 }
 
 
@@ -7205,7 +7205,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
         if (attrType == "curvedir") {
-            att->SetCurvedir(att->StrToStr(attrValue));
+            att->SetCurvedir(att->StrToCurvedir(attrValue));
             return true;
         }
     }
@@ -8587,7 +8587,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
         }
         if (att->HasCurvedir()) {
-            attributes->push_back(std::make_pair("curvedir", att->StrToStr(att->GetCurvedir())));
+            attributes->push_back(std::make_pair("curvedir", att->CurvedirToStr(att->GetCurvedir())));
         }
     }
     if (element->HasAttClass( ATT_CURVEREND ) ) {

@@ -256,7 +256,9 @@ protected:
                           Staff *staff, char spanningType, DocObject *graphic = NULL );
     void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
-    void DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, int x2,
+    void DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2,
+                       Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2,
                        Staff *staff, char spanningType, DocObject *graphic = NULL );
 
     ///@}

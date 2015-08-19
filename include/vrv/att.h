@@ -119,6 +119,9 @@ public:
     std::string ConToStr(data_CON data);
     data_CON StrToCon(std::string value);
     
+    std::string CurvedirToStr(data_CURVEDIR data);
+    data_CURVEDIR StrToCurvedir(std::string value);
+    
     std::string DurToStr(data_DURATION data);
     data_DURATION StrToDur(std::string value);
     

@@ -497,6 +497,8 @@ void MeiOutput::WriteMeiSlur( pugi::xml_node currentNode, Slur *slur )
     
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( slur ).c_str();
     
+    slur->WriteCurvature(currentNode);
+    
     WriteTimeSpanningInterface(currentNode, slur);
     
     return;
@@ -1484,6 +1486,8 @@ bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
 {
     Slur *vrvSlur = new Slur();
     SetMeiUuid(slur, vrvSlur);
+    
+    vrvSlur->ReadCurvature(slur);
     
     ReadTimeSpanningInterface(slur, vrvSlur);
     

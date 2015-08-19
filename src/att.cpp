@@ -211,7 +211,6 @@ std::string Att::BoolToStr(data_BOOLEAN data)
             break;
     }
     return value;
-    
 }
     
 data_BOOLEAN Att::StrToBool(std::string value)
@@ -292,6 +291,31 @@ data_CON Att::StrToCon(std::string value)
         LogWarning("Unsupported pitch name '%s'", value.c_str() );
     }
     return CON_NONE;
+}
+    
+std::string Att::CurvedirToStr(data_CURVEDIR data)
+{
+    std::string value;
+    switch(data)
+    {
+        case CURVEDIR_above : value = "above"; break;
+        case CURVEDIR_below: value = "below"; break;
+        default:
+            LogWarning("Unknown curvedir '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+    
+data_CURVEDIR Att::StrToCurvedir(std::string value)
+{
+    if (value == "above") return CURVEDIR_above;
+    else if (value == "below") return CURVEDIR_below;
+    else {
+        LogWarning("Unsupported curvedir '%s'", value.c_str() );
+    }
+    return CURVEDIR_NONE;
 }
     
 std::string Att::DurToStr(data_DURATION data)
