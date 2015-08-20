@@ -452,10 +452,12 @@ StaffDef::StaffDef() :
     Object(), ScoreOrStaffDefAttrInterface(),
     AttCommon(),
     AttLabelsAddl(),
+    AttScalable(),
     AttStaffDefVis()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_LABELSADDL);
+    RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFVIS);
     Reset();
 }
@@ -470,6 +472,7 @@ void StaffDef::Reset()
     ScoreOrStaffDefAttrInterface::Reset();
     ResetCommon();
     ResetLabelsAddl();
+    ResetScalable();
     ResetStaffDefVis();
     m_drawClef = false;
     m_drawKeySig = false;

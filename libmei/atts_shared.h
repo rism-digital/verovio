@@ -1123,8 +1123,8 @@ public:
     bool HasBulge( );
     
     //
-    void SetCurvedir(std::string curvedir_) { m_curvedir = curvedir_; };
-    std::string GetCurvedir() const { return m_curvedir; };    
+    void SetCurvedir(data_CURVEDIR curvedir_) { m_curvedir = curvedir_; };
+    data_CURVEDIR GetCurvedir() const { return m_curvedir; };    
     bool HasCurvedir( );
     
     ///@}
@@ -1143,7 +1143,7 @@ private:
      **/
     std::string m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
-    std::string m_curvedir;
+    data_CURVEDIR m_curvedir;
 
 /* include <attcurvedir> */
 };
@@ -3894,15 +3894,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetScale(std::string scale_) { m_scale = scale_; };
-    std::string GetScale() const { return m_scale; };    
+    void SetScale(data_PERCENT scale_) { m_scale = scale_; };
+    data_PERCENT GetScale() const { return m_scale; };    
     bool HasScale( );
     
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
-    std::string m_scale;
+    data_PERCENT m_scale;
 
 /* include <attscale> */
 };

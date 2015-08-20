@@ -30,10 +30,11 @@
         <xsl:if test="$supported/*/glyph[concat('uni', @glyph-code)=$thisGlyph]">
             <xsl:variable name="glyphCode" select="substring-after(@glyph-name, 'uni')"/>
             <xsl:variable name="smuflName" select="$supported/*/glyph[@glyph-code=$glyphCode]/@smufl-name"/>
+            <xsl:variable name="horiz-adv-x" select="@horiz-adv-x"/>
 
             <!-- redirect to a file for each glyph -->
             <xsl:result-document href="../data/{$fontName}/{$glyphCode}-{$smuflName}.xml">
-                <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit">
+                <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit" horiz-adv-x="{$horiz-adv-x}">
                     <g transform="scale(1,-1)">
                         <path>
                             <xsl:copy-of select="@d"/>

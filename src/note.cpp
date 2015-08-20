@@ -164,12 +164,7 @@ bool Note::IsClusterExtreme()
     else return false;
 }
     
-bool Note::HasDrawingStemDir()
-{
-    return (this->GetDrawingStemDir() != STEMDIRECTION_NONE);
-}
-    
-data_STEMDIRECTION Note::GetDrawingStemDir()
+data_STEMDIRECTION Note::CalcDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));

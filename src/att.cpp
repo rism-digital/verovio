@@ -211,7 +211,6 @@ std::string Att::BoolToStr(data_BOOLEAN data)
             break;
     }
     return value;
-    
 }
     
 data_BOOLEAN Att::StrToBool(std::string value)
@@ -292,6 +291,31 @@ data_CON Att::StrToCon(std::string value)
         LogWarning("Unsupported pitch name '%s'", value.c_str() );
     }
     return CON_NONE;
+}
+    
+std::string Att::CurvedirToStr(data_CURVEDIR data)
+{
+    std::string value;
+    switch(data)
+    {
+        case CURVEDIR_above : value = "above"; break;
+        case CURVEDIR_below: value = "below"; break;
+        default:
+            LogWarning("Unknown curvedir '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+    
+data_CURVEDIR Att::StrToCurvedir(std::string value)
+{
+    if (value == "above") return CURVEDIR_above;
+    else if (value == "below") return CURVEDIR_below;
+    else {
+        LogWarning("Unsupported curvedir '%s'", value.c_str() );
+    }
+    return CURVEDIR_NONE;
 }
     
 std::string Att::DurToStr(data_DURATION data)
@@ -736,6 +760,25 @@ data_NUMFORMAT Att::StrToNumformat(std::string value)
     }
     // default
     return NUMFORMAT_NONE;
+}
+    
+std::string Att::PercentToStr( data_PERCENT data)
+{
+    return StringFormat("%d%%", data);
+}
+
+data_PERCENT Att::StrToPercent(std::string value)
+{
+    int percent = atoi( std::string( value.begin(), value.end() - 1 ).c_str() );
+    if (percent > 1000) {
+        LogWarning("Percent cannot be greater than 1000%");
+        return 100;
+    }
+    else if (percent < 1) {
+        LogWarning("Percent has to be greater than 0%");
+        return 100;
+    }
+    return percent;
 }
     
 std::string Att::OctaveDisToStr( data_OCTAVE_DIS data )

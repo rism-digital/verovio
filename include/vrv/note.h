@@ -96,13 +96,21 @@ public:
     Chord* IsChordTone( );
     int GetDrawingDur( );
     bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
-    
-    bool HasDrawingStemDir( );
-    data_STEMDIRECTION GetDrawingStemDir( );
-    
-    
+    ///@}
+
+    /**
+     * @name Set and get the stem direction of the note.
+     */
+    ///@{
+    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
     ///@}
     
+    /**
+     * Calculate the drawing stem direction looking a potential beam or chord parents
+     */
+    data_STEMDIRECTION CalcDrawingStemDir( );
+
     /**
      * Returns a single integer representing pitch and octave.
      */
@@ -143,8 +151,6 @@ public:
     /** embellishment on this note **/
     unsigned int m_embellishment; // To be changed to Att
     
-    /** drawing stem direction */
-    data_STEMDIRECTION m_drawingStemDir;
     /** drawing stem length */
     int d_stemLen;
     
@@ -172,6 +178,8 @@ private:
      * An alignment for grace notes
      */
     Alignment *m_graceAlignment;
+    /** drawing stem direction */
+    data_STEMDIRECTION m_drawingStemDir;
     
 };
 

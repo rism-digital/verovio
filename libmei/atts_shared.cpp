@@ -1268,7 +1268,7 @@ AttCurvature::~AttCurvature() {
 void AttCurvature::ResetCurvature() {
     m_bezier = "";
     m_bulge = "";
-    m_curvedir = "";
+    m_curvedir = CURVEDIR_NONE;
 }
 
 bool AttCurvature::ReadCurvature(  pugi::xml_node element ) {
@@ -1284,7 +1284,7 @@ bool AttCurvature::ReadCurvature(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("curvedir")) {
-        this->SetCurvedir(StrToStr(element.attribute("curvedir").value()));
+        this->SetCurvedir(StrToCurvedir(element.attribute("curvedir").value()));
         element.remove_attribute("curvedir");
         hasAttribute = true;
     }
@@ -1302,7 +1302,7 @@ bool AttCurvature::WriteCurvature(  pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasCurvedir()) {
-        element.append_attribute("curvedir") = StrToStr(this->GetCurvedir()).c_str();
+        element.append_attribute("curvedir") = CurvedirToStr(this->GetCurvedir()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1320,7 +1320,7 @@ bool AttCurvature::HasBulge( )
 
 bool AttCurvature::HasCurvedir( )
 {
-    return (m_curvedir != "");
+    return (m_curvedir != CURVEDIR_NONE);
 }
 
 
@@ -4506,13 +4506,13 @@ AttScalable::~AttScalable() {
 }
 
 void AttScalable::ResetScalable() {
-    m_scale = "";
+    m_scale = 0;
 }
 
 bool AttScalable::ReadScalable(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("scale")) {
-        this->SetScale(StrToStr(element.attribute("scale").value()));
+        this->SetScale(StrToPercent(element.attribute("scale").value()));
         element.remove_attribute("scale");
         hasAttribute = true;
     }
@@ -4522,7 +4522,7 @@ bool AttScalable::ReadScalable(  pugi::xml_node element ) {
 bool AttScalable::WriteScalable(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasScale()) {
-        element.append_attribute("scale") = StrToStr(this->GetScale()).c_str();
+        element.append_attribute("scale") = PercentToStr(this->GetScale()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -4530,7 +4530,7 @@ bool AttScalable::WriteScalable(  pugi::xml_node element ) {
 
 bool AttScalable::HasScale( )
 {
-    return (m_scale != "");
+    return (m_scale != 0);
 }
 
 
@@ -7205,7 +7205,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
         if (attrType == "curvedir") {
-            att->SetCurvedir(att->StrToStr(attrValue));
+            att->SetCurvedir(att->StrToCurvedir(attrValue));
             return true;
         }
     }
@@ -7853,7 +7853,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttScalable *att = dynamic_cast<AttScalable*>(element);
         assert( att );
         if (attrType == "scale") {
-            att->SetScale(att->StrToStr(attrValue));
+            att->SetScale(att->StrToPercent(attrValue));
             return true;
         }
     }
@@ -8587,7 +8587,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
         }
         if (att->HasCurvedir()) {
-            attributes->push_back(std::make_pair("curvedir", att->StrToStr(att->GetCurvedir())));
+            attributes->push_back(std::make_pair("curvedir", att->CurvedirToStr(att->GetCurvedir())));
         }
     }
     if (element->HasAttClass( ATT_CURVEREND ) ) {
@@ -9133,7 +9133,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttScalable *att = dynamic_cast<AttScalable*>(element);
         assert( att );
         if (att->HasScale()) {
-            attributes->push_back(std::make_pair("scale", att->StrToStr(att->GetScale())));
+            attributes->push_back(std::make_pair("scale", att->PercentToStr(att->GetScale())));
         }
     }
     if (element->HasAttClass( ATT_SCOREDEFGES ) ) {

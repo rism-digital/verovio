@@ -119,6 +119,9 @@ public:
     std::string ConToStr(data_CON data);
     data_CON StrToCon(std::string value);
     
+    std::string CurvedirToStr(data_CURVEDIR data);
+    data_CURVEDIR StrToCurvedir(std::string value);
+    
     std::string DurToStr(data_DURATION data);
     data_DURATION StrToDur(std::string value);
     
@@ -161,6 +164,9 @@ public:
     std::string NumformatToStr(data_NUMFORMAT data);
     data_NUMFORMAT StrToNumformat(std::string value);
     
+    std::string PercentToStr(data_PERCENT data);
+    data_PERCENT StrToPercent(std::string value);
+
     std::string OctaveDisToStr(data_OCTAVE_DIS data);
     data_OCTAVE_DIS StrToOctaveDis(std::string value);
     

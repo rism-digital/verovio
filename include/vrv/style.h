@@ -179,15 +179,11 @@ public:
     /** The stem width */
     unsigned short m_stemWidth;
     /** The barLine width */
-    unsigned short m_barlineWidth;
+    unsigned short m_barLineWidth;
     /** The maximum beam slope */
     unsigned char m_beamMaxSlope;
     /** The minimum beam slope */
     unsigned char m_beamMinSlope;
-    /** The small staff size ratio numerator */
-    unsigned char m_smallStaffNum;
-    /** The small staff size ratio denominator */
-    unsigned char m_smallStaffDen;
     /** The grace size ratio numerator */
     unsigned char m_graceNum;
     /** The grace size ratio denominator */

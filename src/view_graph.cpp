@@ -92,9 +92,9 @@ void View::DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y
 }
 
 
-void View::DrawDot ( DeviceContext *dc, int x, int y )
+void View::DrawDot ( DeviceContext *dc, int x, int y, int staffSize )
 {
-	int r = std::max( ToDeviceContextX( m_doc->m_drawingDoubleUnit[0] / 5 ), 2 );
+	int r = std::max( ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staffSize ) / 5 ), 2 );
 	
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -117,7 +117,7 @@ void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
     str.push_back(code);
     
     dc->SetBrush( m_currentColour, AxSOLID );
-    dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][dimin] );
+    dc->SetFont( m_doc->GetDrawingSmuflFont(staffSize, dimin) );
 
     dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y) );
 
@@ -141,7 +141,7 @@ void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, in
         
 	}
     dc->SetBrush( m_currentColour, AxSOLID );
-    dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][0] );
+    dc->SetFont( m_doc->GetDrawingSmuflFont(staffSize, 0) );
     
 	dc->DrawMusicText( s, xDC, ToDeviceContextY(y) );
     
@@ -166,7 +166,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
-        vrvTxt.SetPointSize( m_doc->m_drawingLyricFonts[staffSize].GetPointSize());
+        vrvTxt.SetPointSize( m_doc->GetDrawingLyricFont(staffSize)->GetPointSize() );
         
         dc->SetFont( &vrvTxt );
         dc->VrvTextFont();
@@ -184,9 +184,9 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
 {
     assert( dc );
     
-    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->m_drawingDoubleUnit[0] / 3, abs( x1 - x ) / 4 ) );
+    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->GetDrawingDoubleUnit( 100 ) / 3, abs( x1 - x ) / 4 ) );
     
-    int thickness = std::max( m_doc->m_drawingDoubleUnit[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
+    int thickness = std::max( m_doc->GetDrawingDoubleUnit(100) / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
     
     int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point
@@ -219,7 +219,7 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
-    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_style->m_stemWidth / 2 ), AxSOLID );
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(100) / 2 ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
     dc->ResetPen();
 }

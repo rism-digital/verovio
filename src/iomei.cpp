@@ -442,6 +442,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     
     staffDef->WriteCommon(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
+    staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
     
     if (staffDef->GetClefAttr()) {
@@ -495,6 +496,8 @@ void MeiOutput::WriteMeiSlur( pugi::xml_node currentNode, Slur *slur )
     assert( slur );
     
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( slur ).c_str();
+    
+    slur->WriteCurvature(currentNode);
     
     WriteTimeSpanningInterface(currentNode, slur);
     
@@ -1354,6 +1357,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     
     vrvStaffDef->ReadCommon(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
+    vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefVis(staffDef);
     
     if ( !vrvStaffDef->HasN() ) {
@@ -1482,6 +1486,8 @@ bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
 {
     Slur *vrvSlur = new Slur();
     SetMeiUuid(slur, vrvSlur);
+    
+    vrvSlur->ReadCurvature(slur);
     
     ReadTimeSpanningInterface(slur, vrvSlur);
     

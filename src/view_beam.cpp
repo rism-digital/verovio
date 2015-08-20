@@ -23,6 +23,7 @@
 #include "layer.h"
 #include "layerelement.h"
 #include "note.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "vrv.h"
@@ -91,7 +92,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     lastDur = elementCount = 0;
     high = avgY = verticalBoost = 0.0;
     
-    verticalCenter = staff->GetDrawingY() - (m_doc->m_drawingDoubleUnit[staff->staffSize] * 2); //center point of the staff
+    verticalCenter = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); //center point of the staff
     yExtreme = verticalCenter; //value of farthest y point on the staff from verticalCenter minus verticalCenter; used if beamHasChord = ON
 
     ListOfObjects* beamChildren = beam->GetList(beam);
@@ -111,8 +112,10 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     lastDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
     
     // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    dx[0] =  m_doc->m_drawingNoteRadius[staff->staffSize][0] - (m_doc->m_style->m_stemWidth)/2;
-    dx[1] =  m_doc->m_drawingNoteRadius[staff->staffSize][1] - (m_doc->m_style->m_stemWidth)/2;
+    dx[0] =  m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false) / 2 -
+        (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize))/2;
+    dx[1] =  m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true) / 2 -
+        (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize))/2;
     
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
@@ -254,14 +257,8 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // We look only at the last note for checking if cuesized. Somehow arbitrarily
-    if ((*beamElementCoords)[last]->m_element->IsCueSize() == false)  {
-        beamWidthBlack = m_doc->m_drawingBeamWidth[staff->staffSize];
-        beamWidthWhite = m_doc->m_drawingBeamWhiteWidth[staff->staffSize];
-    }
-    else {
-        beamWidthBlack = std::max(2, (m_doc->m_drawingBeamWidth[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen));
-        beamWidthWhite = std::max(2, (m_doc->m_drawingBeamWhiteWidth[staff->staffSize] * m_doc->m_style->m_graceNum / m_doc->m_style->m_graceDen));
-    }
+    beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, (*beamElementCoords)[last]->m_element->IsCueSize());
+    beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, (*beamElementCoords)[last]->m_element->IsCueSize());
     
 	beamWidth = beamWidthBlack + beamWidthWhite;
 
@@ -273,12 +270,12 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     //if the beam has smaller-size notes
     if ((*beamElementCoords)[last]->m_element->IsCueSize()) {
-        verticalShift += m_doc->m_drawingUnit[staff->staffSize]*5;
+        verticalShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*5;
     }
     else {
         verticalShift += (shortestDur > DUR_8) ?
-            m_doc->m_drawingDoubleUnit[staff->staffSize] * verticalShiftFactor :
-            m_doc->m_drawingDoubleUnit[staff->staffSize] * (verticalShiftFactor + 0.5);
+            m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * verticalShiftFactor :
+            m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
     }
     
     // swap x position and verticalShift direction with stem down
@@ -292,7 +289,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     {
         //change the stem dir for all objects
         if ( (*beamElementCoords)[i]->m_element->Is() == NOTE ) {
-            ((Note*)(*beamElementCoords)[i]->m_element)->m_drawingStemDir = stemDir;
+            ((Note*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir( stemDir );
         }
         else if ( (*beamElementCoords)[i]->m_element->Is() == CHORD ) {
             ((Chord*)(*beamElementCoords)[i]->m_element)->SetDrawingStemDir(stemDir);
@@ -354,12 +351,12 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	for (i=0; i<elementCount; i++)
 	{
         if (stemDir == STEMDIRECTION_up) {
-            fy1 = (*beamElementCoords)[i]->m_yBeam - m_doc->m_style->m_stemWidth;
-            fy2 = (*beamElementCoords)[i]->m_yBottom + m_doc->m_drawingUnit[staff->staffSize]/4;
+            fy1 = (*beamElementCoords)[i]->m_yBeam - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            fy2 = (*beamElementCoords)[i]->m_yBottom + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/4;
         }
         else {
-            fy1 = (*beamElementCoords)[i]->m_yBeam + m_doc->m_style->m_stemWidth;
-            fy2 = (*beamElementCoords)[i]->m_yTop - m_doc->m_drawingUnit[staff->staffSize]/4;
+            fy1 = (*beamElementCoords)[i]->m_yBeam + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            fy2 = (*beamElementCoords)[i]->m_yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/4;
         }
         
         // All notes and chords, including notes within chords, get their stem value stored
@@ -383,7 +380,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     {
         LayerElement *el = (*beamElementCoords)[i]->m_element;
         if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
-            DrawVerticalLine (dc, el->m_drawingStemStart.y, el->m_drawingStemEnd.y, el->m_drawingStemStart.x, m_doc->m_style->m_stemWidth);
+            DrawVerticalLine (dc, el->m_drawingStemStart.y, el->m_drawingStemEnd.y, el->m_drawingStemStart.x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
         }
     }
     
@@ -393,8 +390,8 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     fullBars =  !changingDur ? (shortestDur - DUR_4) : 1;
     
     // Adjust the x position of the first and last element for taking into account the stem width
-	(*beamElementCoords)[0]->m_x -= (m_doc->m_style->m_stemWidth) / 2;
-	(*beamElementCoords)[last]->m_x += (m_doc->m_style->m_stemWidth) / 2;
+	(*beamElementCoords)[0]->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+	(*beamElementCoords)[last]->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     // Shift direction
 	shiftY = (stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
@@ -505,14 +502,14 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 }
                 else if ((*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] == PARTIAL_RIGHT) {
                     fy1 = (*beamElementCoords)[i]->m_yBeam + barY;
-                    int x2 = (*beamElementCoords)[i]->m_x + m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                    int x2 = (*beamElementCoords)[i]->m_x + m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false);
                     fy2 = startingY + verticalBoost + barY + beamSlope * x2;
                     polygonHeight= beamWidthBlack*shiftY;
                     DrawObliquePolygon (dc, (*beamElementCoords)[i]->m_x, fy1, x2, fy2, polygonHeight);
                 }
                 else if ((*beamElementCoords)[i]->m_partialFlags[testDur-DUR_8] == PARTIAL_LEFT) {
                     fy2 = (*beamElementCoords)[i]->m_yBeam + barY;
-                    int x1 = (*beamElementCoords)[i]->m_x - m_doc->m_drawingLedgerLine[staff->staffSize][0];
+                    int x1 = (*beamElementCoords)[i]->m_x - m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, false);
                     fy1 = startingY + verticalBoost + barY + beamSlope * x1;
                     polygonHeight = beamWidthBlack*shiftY;
                     DrawObliquePolygon (dc, x1, fy1, (*beamElementCoords)[i]->m_x, fy2, polygonHeight);

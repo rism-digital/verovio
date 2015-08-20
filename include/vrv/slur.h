@@ -18,7 +18,8 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur: public FloatingElement, public TimeSpanningInterface
+class Slur: public FloatingElement, public TimeSpanningInterface,
+    public AttCurvature
 {
 public:
     /**

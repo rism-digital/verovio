@@ -238,10 +238,10 @@ protected:
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
-    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
-    void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     ///@}
     
     /**
@@ -256,7 +256,9 @@ protected:
                           Staff *staff, char spanningType, DocObject *graphic = NULL );
     void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
-    void DrawTieOrSlur( DeviceContext *dc, FloatingElement *element, int x1, int x2,
+    void DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2,
+                       Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2,
                        Staff *staff, char spanningType, DocObject *graphic = NULL );
 
     ///@}
@@ -304,11 +306,11 @@ protected:
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
-	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 0);
-	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 0);
+	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize = 100);
+	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
-	void DrawDot ( DeviceContext *dc, int x, int y );
+	void DrawDot ( DeviceContext *dc, int x, int y, int staffSize );
     ///@}
     
 private:    

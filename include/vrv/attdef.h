@@ -147,6 +147,15 @@ enum data_CON {
     CON_i,
     CON_b
 };
+    
+/**
+ * MEI values for @curvedir (no datatype in MEI)
+ */
+enum data_CURVEDIR {
+    CURVEDIR_NONE = 0,
+    CURVEDIR_above,
+    CURVEDIR_below
+};
 
 /**
  * MEI data.DURATION
@@ -334,6 +343,11 @@ enum data_OCTAVE_DIS {
     OCTAVE_DIS_15 = 15,
     OCTAVE_DIS_22 = 22
 };
+    
+/**
+ * MEI value for @scale (no datatype in MEI)
+ */
+typedef int data_PERCENT;
     
 /**
  * MEI data.PITCHNAME

@@ -17,6 +17,7 @@
 #include "beam.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "tuplet.h"
@@ -233,6 +234,10 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     assert( layer );
     assert( staff );
     
+    if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+        return;
+    }
+    
     tuplet->ResetList(tuplet);
     
     int txt_length = 0;
@@ -240,7 +245,8 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     
     std::wstring notes;
     
-    dc->SetFont(&m_doc->m_drawingSmuflFonts[staff->staffSize][0]);
+    //
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, tuplet->IsCueSize()));
     
     if (tuplet->GetNum() > 0) {
         notes = IntToTupletFigures((short int)tuplet->GetNum());
@@ -256,17 +262,22 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
     int txt_x = center.x - (txt_length / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y = center.y - m_doc->m_drawingAccidWidth[staff->staffSize][false];
+    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
     
-    if (tuplet->GetNum()) {
-        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->staffSize);
+    if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
+        DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
     }
     
     dc->ResetFont();
     
-    int verticalLine = m_doc->m_drawingUnit[0];
+    // Nothing to do if the bracket is not visible
+    if (tuplet->GetBracketVisible() == BOOLEAN_false) {
+        return;
+    }
     
-    dc->SetPen(m_currentColour, m_doc->m_style->m_stemWidth, AxSOLID);
+    int verticalLine = m_doc->GetDrawingUnit(100);
+    
+    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     
     // Start is 0 when no line is necessary (i.e. beamed notes)
     if (start.x > 0) {
@@ -276,19 +287,25 @@ void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer,
         double m = (double)(start.y - end.y) / (double)(start.x - end.x);
         
         // x = 10 pixels before the number
-        double x = txt_x - 40;
+        int x = txt_x - 40;
         // xa = just after, the number is abundant so I do not add anything
-        double xa = txt_x + txt_length + 20;
+        int xa = txt_x + txt_length + 20;
         
         // calculate the y coords in the slope
         double y1 = (double)start.y + m * (x - (double)start.x);
         double y2 = (double)start.y + m * (xa - (double)start.x);
         
-        // first line
-        dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
-        // second line after gap
-        dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
-        
+        if (tuplet->GetNumVisible() == BOOLEAN_false) {
+            // one single line
+            dc->DrawLine(start.x, ToDeviceContextY(start.y), end.x, ToDeviceContextY((int)y1));
+        }
+        else {
+            // first line
+            dc->DrawLine(start.x, ToDeviceContextY(start.y), (int)x, ToDeviceContextY((int)y1));
+            // second line after gap
+            dc->DrawLine((int)xa, ToDeviceContextY((int)y2), end.x, ToDeviceContextY(end.y));
+        }
+
         // vertical bracket lines
         if (direction == STEMDIRECTION_up) {
             dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
