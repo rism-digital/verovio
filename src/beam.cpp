@@ -58,7 +58,8 @@ void Beam::FilterList( ListOfObjects *childList )
     while ( iter != childList->end()) {
         if ( !(*iter)->IsLayerElement() ) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase( iter );           
+            iter = childList->erase( iter );
+            continue;
         }
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         assert( currentElement );

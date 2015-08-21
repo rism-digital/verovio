@@ -95,6 +95,7 @@ void Chord::FilterList( ListOfObjects *childList )
         if ( !(*iter)->IsLayerElement() ) {
             // remove anything that is not an LayerElement
             iter = childList->erase( iter );
+            continue;
         }
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         assert( currentElement );
