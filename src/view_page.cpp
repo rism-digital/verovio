@@ -920,9 +920,9 @@ void View::DrawSystemChildren( DeviceContext *dc, Object *parent, System *system
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is() == SCORE_DEF) {
-            ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(current);
-            assert( scoreDef );
-            m_drawingScoreDef.Replace( scoreDef );
+            // nothing to do, then
+            // ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(current);
+            // assert( scoreDef );
         }
         else {
             assert(false);

@@ -295,6 +295,10 @@ void Doc::SetCurrentScoreDef( bool force )
     params.push_back( &staffDef );
     Functor setCurrentScoreDef( &Object::SetCurrentScoreDef );
     
+    // First process the current scoreDef in order to fill the staffDef with
+    // the appropriate drawing values
+    currentScoreDef.Process( &setCurrentScoreDef, &params );
+    
     //LogElapsedTimeStart( );
     this->Process( &setCurrentScoreDef, &params );
     //LogElapsedTimeEnd ( "Setting scoreDefs" );

@@ -43,6 +43,7 @@ class PositionInterface;
 class Rdg;
 class Rest;
 class ScoreDef;
+class ScoreDefInterface;
 class Slur;
 class Space;
 class Staff;
@@ -191,6 +192,7 @@ private:
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
+    void WriteScoreDefInterface( pugi::xml_node currentNode, ScoreDefInterface *interface );
     void WriteTextDirInterface( pugi::xml_node currentNode, TextDirInterface *interface );
     void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
     ///@}
@@ -339,6 +341,7 @@ private:
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
+    bool ReadScoreDefInterface( pugi::xml_node element, ScoreDefInterface *interface );
     bool ReadTextDirInterface( pugi::xml_node element, TextDirInterface *interface );
     bool ReadTimeSpanningInterface( pugi::xml_node element, TimeSpanningInterface *interface );
     ///@}

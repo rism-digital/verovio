@@ -13,8 +13,8 @@
 #include "layerelement.h"
 
 namespace vrv {
-    
-class ClefAttr;
+
+class ScoreDefInterface;
     
 //----------------------------------------------------------------------------
 // Clef
@@ -35,7 +35,7 @@ public:
      */
     ///@{
     Clef();
-    Clef( ClefAttr *clefAttr );
+    Clef( ScoreDefInterface *clefAttr );
     void Init();
     virtual ~Clef();
     virtual void Reset();
@@ -59,38 +59,6 @@ private:
     
 public:
 
-private:
-    
-};
-    
-//----------------------------------------------------------------------------
-// ClefAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the MEI @clef attributes in scoreDef or staffDef elements.
- */
-class ClefAttr: public Object,
-    public AttCleffingLog
-{
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    ClefAttr();
-    virtual ~ClefAttr();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "ClefAttr"; };
-    virtual ClassId Is() { return CLEF_ATTR; };
-    virtual Object* Clone() { return new ClefAttr(*this); };
-    ///@}
-    
-private:
-    
-public:
-    
 private:
     
 };

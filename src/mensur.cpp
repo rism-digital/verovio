@@ -7,6 +7,7 @@
 
 
 #include "mensur.h"
+#include "scoredefinterface.h"
 
 namespace vrv {
 
@@ -28,7 +29,7 @@ Mensur::Mensur():
     Init();
 }
     
-Mensur::Mensur( MensurAttr *mensurAttr ):
+Mensur::Mensur( ScoreDefInterface *mensurAttr ):
     LayerElement("mensur-")
 {
     Init();
@@ -70,30 +71,6 @@ void Mensur::Reset()
     ResetMensurLog();
     ResetMensurVis();
     ResetSlashcount();
-}
-    
-//----------------------------------------------------------------------------
-// MensurAttr
-//----------------------------------------------------------------------------
-
-MensurAttr::MensurAttr():
-    Object(),
-    AttMensuralShared(),
-    AttMensuralLog()
-{
-    Reset();
-}
-
-
-MensurAttr::~MensurAttr()
-{
-}
-
-void MensurAttr::Reset()
-{
-    Object::Reset();
-    ResetMensuralShared();
-    ResetMensuralLog();
 }
     
 } // namespace vrv

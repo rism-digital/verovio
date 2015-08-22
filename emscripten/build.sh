@@ -107,7 +107,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
-	$VEROVIO_ROOT/src/drawinglistinterface.cpp \
+	$VEROVIO_ROOT/src/drawinginterface.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
 	$VEROVIO_ROOT/src/floatingelement.cpp \
@@ -140,6 +140,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/rest.cpp \
 	$VEROVIO_ROOT/src/scoredef.cpp \
+	$VEROVIO_ROOT/src/scoredefinterface.cpp \
 	$VEROVIO_ROOT/src/slur.cpp \
 	$VEROVIO_ROOT/src/space.cpp \
 	$VEROVIO_ROOT/src/staff.cpp \

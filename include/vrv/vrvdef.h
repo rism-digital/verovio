@@ -59,10 +59,8 @@ enum ClassId {
     MENSUR_ATTR,
     METER_SIG_ATTR,
     PAGE,
-    SCORE_DEF,
     STAFF,
     STAFF_ALIGNMENT,
-    STAFF_DEF,
     STAFF_GRP,
     SYSTEM,
     SYSTEM_ALIGNER,
@@ -104,6 +102,11 @@ enum ClassId {
     TIE,
     FLOATING_ELEMENT_max,
     //
+    SCORE_DEF_ELEMENT,
+    SCORE_DEF,
+    STAFF_DEF,
+    SCORE_DEF_ELEMENT_max,
+    //
     UNSPECIFIED
 };
 
@@ -112,6 +115,7 @@ enum InterfaceId {
     INTERFACE_DURATION,
     INTERFACE_PITCH,
     INTERFACE_POSITION,
+    INTERFACE_SCOREDEF,
     INTERFACE_TEXT_DIR,
     INTERFACE_TIME_SPANNING
 };

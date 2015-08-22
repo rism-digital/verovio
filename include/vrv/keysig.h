@@ -11,12 +11,11 @@
 #define __VRV_KEYSIG_H__
 
 #include "atts_shared.h"
-#include "drawinglistinterface.h"
 #include "layerelement.h"
 
 namespace vrv {
     
-class KeySigAttr;
+class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
 // KeySig
@@ -33,7 +32,7 @@ class KeySigAttr;
  * are available for converting from and to the MEI representation to the 
  * internal (and reverse)
  */
-class KeySig: public LayerElement, public KeySigDrawingInterface,
+class KeySig: public LayerElement,
     public AttAccidental,
     public AttPitch
 {
@@ -45,7 +44,7 @@ public:
     ///@{
     KeySig();
     KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType);
-    KeySig( KeySigAttr *keySigAttr );
+    KeySig( ScoreDefInterface *keySigAttr );
     void Init();
     virtual ~KeySig();
     virtual void Reset();
@@ -73,7 +72,20 @@ public:
     
 private:
     
-public:
+public:    
+    /**
+     * Variables for storing cancellation introduced by the key sig.
+     * The values are StaffDefDrawingInterface::ReplaceKeySig
+     */
+    data_ACCIDENTAL_EXPLICIT m_drawingCancelAccidType;
+    char m_drawingCancelAccidCount;
+    /**
+     * Equivalent to @key.sig.show and @showchange, but set for drawing
+     * KeySig has no equivalent in MEI and will be true and false by default
+     * See KeySig::KeySig( KeySigAttr *keySigAttr ) for initialisation
+     */
+    bool m_drawingShow;
+    bool m_drawingShowchange;
     
 private:
     static data_PITCHNAME flats[];
@@ -83,39 +95,6 @@ private:
     // This is temporary - it needs to be changed to libMEI atts
     int m_alterationNumber;
     data_ACCIDENTAL_EXPLICIT m_alterationType;
-    
-};
-    
-//----------------------------------------------------------------------------
-// KeySigAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the MEI @key attributes in scoreDef or staffDef elements.
- */
-class KeySigAttr: public Object, public  KeySigDrawingInterface,
-    public AttKeySigDefaultLog,
-    public AttKeySigDefaultVis
-{
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    KeySigAttr();
-    virtual ~KeySigAttr();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "KeySigAttr"; };
-    virtual ClassId Is() { return KEY_SIG_ATTR; };
-    virtual Object* Clone() { return new KeySigAttr(*this); };
-    ///@}
-    
-private:
-    
-public:
-    
-private:
     
 };
 

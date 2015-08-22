@@ -33,6 +33,7 @@ Beam::Beam():
 
 Beam::~Beam()
 {
+    ClearCoords();
 }
     
 void Beam::Reset()
@@ -100,7 +101,7 @@ void Beam::FilterList( ListOfObjects *childList )
   
 void Beam::InitCoords( ListOfObjects *childList )
 {
-    this->ClearCoords();
+    ClearCoords();
     m_beamElementCoords.reserve( childList->size() );
     int i;
     for (i = 0; i < childList->size(); i++ ) {

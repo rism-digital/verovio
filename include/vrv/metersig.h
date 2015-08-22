@@ -13,8 +13,8 @@
 #include "layerelement.h"
 
 namespace vrv {
-    
-class MeterSigAttr;
+
+class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
 // MeterSig
@@ -33,7 +33,7 @@ public:
      */
     ///@{
     MeterSig();
-    MeterSig( MeterSigAttr *meterSigAttr );
+    MeterSig( ScoreDefInterface *meterSigAttr );
     void Init();
     virtual ~MeterSig();
     virtual void Reset();
@@ -46,40 +46,6 @@ private:
     
 public:
 
-private:
-    
-};
-    
-
-//----------------------------------------------------------------------------
-// MeterSigAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the MEI @meter attributes in scoreDef or staffDef elements.
- */
-class MeterSigAttr: public Object,
-    public AttMeterSigDefaultLog,
-    public AttMeterSigDefaultVis
-{
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    MeterSigAttr();
-    virtual ~MeterSigAttr();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "MeterSigAttr"; };
-    virtual ClassId Is() { return METER_SIG_ATTR; };
-    virtual Object* Clone() { return new MeterSigAttr(*this); };
-    ///@}
-    
-private:
-    
-public:
-    
 private:
     
 };

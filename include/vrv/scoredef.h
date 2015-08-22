@@ -6,27 +6,25 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_SCOREDEF_H__
-#define __VRV_SCOREDEF_H__
+#ifndef __VRV_SCORE_DEF_H__
+#define __VRV_SCORE_DEF_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "object.h"
+#include "scoredefinterface.h"
 
 namespace vrv {
 
 class Clef;
-class ClefAttr;
 class KeySig;
-class KeySigAttr;
 class Mensur;
-class MensurAttr;
 class MeterSig;
-class MeterSigAttr;
 class StaffGrp;
 class StaffDef;
 
 //----------------------------------------------------------------------------
-// ScoreOrStaffDefAttrInterface
+// ScoreOrStaffDefElement
 //----------------------------------------------------------------------------
 
 /**
@@ -37,31 +35,17 @@ class StaffDef;
  * that create a copy of the Element object or a corresponding Element object if a attribute value
  * object is hold.
  */
-class ScoreOrStaffDefAttrInterface
+class ScoreDefElement: public Object, public ScoreDefInterface
 {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    ScoreOrStaffDefAttrInterface();
-    virtual ~ScoreOrStaffDefAttrInterface();
+    ScoreDefElement(std::string classid);
+    virtual ~ScoreDefElement();
     virtual void Reset();
-    ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface ); // copy contructor
-    ScoreOrStaffDefAttrInterface& operator=( const ScoreOrStaffDefAttrInterface& interface ); // copy assignement;
-    ///@}
-    
-    /**
-     * @name Replace the clef, keysig, mensur and meterSig.
-     * The current value (if any) is replaced by the new value (if any).
-     * Values passed and hold can be either a object or attribute value object.
-     * For example, it can be either a Clef or a ClefAttr.
-    ///@{
-     */
-    void ReplaceClef( Object *newClef );
-    void ReplaceKeySig( Object *newKeySig );
-    void ReplaceMensur( Object *newMensur );
-    void ReplaceMeterSig( Object *newMeterSig );
+    virtual ClassId Is() { return SCORE_DEF_ELEMENT; };
     ///@}
     
     /**
@@ -72,58 +56,49 @@ public:
      * They are used when writing the MEI.
      */
     ///@{
-    Clef *GetClefCopy() const;
-    KeySig *GetKeySigCopy() const;
-    Mensur *GetMensurCopy() const;
-    MeterSig *GetMeterSigCopy() const;
+    bool HasClefInfo();
+    bool HasKeySigInfo();
+    bool HasMensurInfo();
+    bool HasMeterSigInfo();
     ///@}
     
     /**
-     * @name Get the clef, keysig, mensur and meterSig.
-     * They will return a reference only if the value hold is
-     * an element (e.g., Clef) and not a attribute value object (ClefAttr).
+     * @name Get a copy of the clef, keysig, mensur and meterSig.
+     * These methods creates new objects that need to be deleted.
+     * The also convert attribute value object to an object. For example,
+     * if m_clef holds a ClefAttr object, the copy will be a Clef object.
      * They are used when writing the MEI.
      */
     ///@{
-    Clef *GetClefElement() const;
-    KeySig *GetKeySigElement() const;
-    Mensur *GetMensurElement() const;
-    MeterSig *GetMeterSigElement() const;
-    ///@}
-    
-    /**
-     * @name Get the clef, keysig, mensur and meterSig attributes.
-     * They will return a reference only if the value hold is
-     * an attibute value object (e.g., ClefAtt) and not an element (Clef).
-     */
-    ///@{
-    ClefAttr *GetClefAttr() const;
-    KeySigAttr *GetKeySigAttr() const;
-    MensurAttr *GetMensurAttr() const;
-    MeterSigAttr *GetMeterSigAttr() const;
-    ///@}
-    
-    /**
-     * @name Get the clef, keysig, mensur and meterSig object.
-     * They will return a reference to the hold object (element or attribute).
-     */
-    ///@{
-    Object *GetClef() const { return m_clef; };
-    Object *GetKeySig() const { return m_keySig; };
-    Object *GetMensur() const { return m_mensur; };
-    Object *GetMeterSig() const { return m_meterSig; };
+    Clef *GetClefCopy();
+    KeySig *GetKeySigCopy();
+    Mensur *GetMensurCopy();
+    MeterSig *GetMeterSigCopy();
     ///@}
     
 protected:
-    /** The clef or clef attributes */
-    Object *m_clef;
-    /** The key signature */
-    Object *m_keySig;
-    /** The mensur */
-    Object *m_mensur;
-    /** The meter signature (time signature) */
-    Object *m_meterSig;
+    
+private:
+    /**
+     * @name Methods for checking if clef info is available at the attribute level
+     */
+    ///@{
+    bool HasClefAttrInfo();
+    bool HasKeySigAttrInfo();
+    bool HasMensurAttrInfo();
+    bool HasMeterSigAttrInfo();
+    ///@}
 
+    /**
+     * @name Methods for checking if clef info is available at the element level
+     */
+    ///@{
+    bool HasClefElementInfo();
+    bool HasKeySigElementInfo();
+    bool HasMensurElementInfo();
+    bool HasMeterSigElementInfo();
+    ///@}
+    
 };
 
 
@@ -136,7 +111,7 @@ protected:
  * This class represents a MEI scoreDef.
  * It contains StaffGrp objects.
 */
-class ScoreDef: public Object, public ScoreOrStaffDefAttrInterface, public ObjectListInterface
+class ScoreDef: public ScoreDefElement, public ObjectListInterface
 {
 public:
     /**
@@ -156,14 +131,14 @@ public:
     /**
      * Replace the scoreDef with the content of the newScoreDef.
      */
-    void Replace( ScoreDef *newScoreDef );
+    void ReplaceDrawingValues( ScoreDef *newScoreDef );
     
     /**
      * Replace the corresponding staffDef with the content of the newStaffDef.
      * Looks for the staffDef with the same m_n (@n) and replace the attribute set.
-     * Attribute set is provided by the ScoreOrStaffDefAttrInterface.
+     * Attribute set is provided by the ScoreOrStaffDefInterface.
      */
-    void Replace( StaffDef *newStaffDef );
+    void ReplaceDrawingValues( StaffDef *newStaffDef );
     
     /**
      * Get the staffDef with number n (NULL if not found).
@@ -290,7 +265,7 @@ private:
 /**
  * This class represents a MEI staffDef.
  */
-class StaffDef: public Object, public ScoreOrStaffDefAttrInterface,
+class StaffDef: public ScoreDefElement, public StaffDefDrawingInterface,
     public AttCommon,
     public AttLabelsAddl,
     public AttScalable,
@@ -310,25 +285,6 @@ public:
     virtual ClassId Is() { return STAFF_DEF; };
     ///@}
     
-    /**
-     * @name Set and get the layer drawing flags for clef, keysig and mensur.
-     * This will be true when starting a new system or when a scoreDef or staffDef changes occurs
-     * This will be true only for the first layer in the staff.
-     */
-    ///@{
-    bool DrawClef() const { return m_drawClef; };
-    void SetDrawClef( bool drawClef ) { m_drawClef = drawClef; };
-    bool DrawKeySig() const { return m_drawKeySig; };
-    void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
-    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
-    void SetDrawKeySigCancellation( bool drawKeySigCancellation ) { m_drawKeySigCancellation = drawKeySigCancellation; };
-    bool DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawMensur = drawMensur; };
-    bool DrawMeterSig() const { return m_drawMeterSig; };
-    void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
-    ///@}
-
-    
     //----------//
     // Functors //
     //----------//
@@ -338,7 +294,7 @@ public:
      * Calls ScoreDef::Replace.
      * param 0: a pointer to the scoreDef we are going to replace the staffDefs
      */
-    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid *params );
+    virtual int ReplaceDrawingValuesInScoreDef( ArrayPtrVoid *params );
     
     /**
      * Set flags for the staff set for indicating whether clefs, keysig, etc. needs to be redrawn.
@@ -354,16 +310,6 @@ private:
 public:
     
 private:
-    /**
-     *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
-     */
-    ///@{
-    bool m_drawClef;
-    bool m_drawKeySig;
-    bool m_drawKeySigCancellation;
-    bool m_drawMensur;
-    bool m_drawMeterSig;
-    ///@}
     
 };
     

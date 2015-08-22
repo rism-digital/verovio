@@ -7,6 +7,7 @@
 
 
 #include "metersig.h"
+#include "scoredefinterface.h"
 
 namespace vrv {
 
@@ -21,7 +22,7 @@ MeterSig::MeterSig():
     Init();
 }
     
-MeterSig::MeterSig( MeterSigAttr *meterSigAttr ):
+MeterSig::MeterSig( ScoreDefInterface *meterSigAttr ):
     LayerElement("msig-"),
     AttMeterSigLog()
 {
@@ -46,32 +47,6 @@ void MeterSig::Reset()
 {
     LayerElement::Reset();
     ResetMeterSigLog();
-}
-
-//----------------------------------------------------------------------------
-// MeterSigAttr
-//----------------------------------------------------------------------------
-
-MeterSigAttr::MeterSigAttr():
-    Object(),
-    AttMeterSigDefaultLog(),
-    AttMeterSigDefaultVis()
-{
-    RegisterAttClass(ATT_METERSIGDEFAULTLOG);
-    RegisterAttClass(ATT_METERSIGDEFAULTVIS);
-    Reset();
-}
-
-
-MeterSigAttr::~MeterSigAttr()
-{
-}
-
-void MeterSigAttr::Reset()
-{
-    Object::Reset();
-    ResetMeterSigDefaultLog();
-    ResetMeterSigDefaultVis();
 }
 
 } // namespace vrv

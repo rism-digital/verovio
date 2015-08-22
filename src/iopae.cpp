@@ -384,12 +384,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     staffDef->SetN( 1 );
     staffDef->SetLines(5);
     if (staffDefClef) {
-        ClefAttr clefAttr;
-        clefAttr.SetClefShape(staffDefClef->GetShape());
-        clefAttr.SetClefLine(staffDefClef->GetLine());
-        clefAttr.SetClefDis(staffDefClef->GetDis());
-        clefAttr.SetClefDisPlace(staffDefClef->GetDisPlace());
-        staffDef->ReplaceClef( &clefAttr );
+        staffDef->SetClefShape(staffDefClef->GetShape());
+        staffDef->SetClefLine(staffDefClef->GetLine());
+        staffDef->SetClefDis(staffDefClef->GetDis());
+        staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
         delete staffDefClef;
     }
     staffGrp->AddStaffDef( staffDef );

@@ -30,7 +30,7 @@ add_executable (verovio
 	../src/devicecontext.cpp
 	../src/doc.cpp	
 	../src/dot.cpp
-	../src/drawinglistinterface.cpp
+	../src/drawinginterface.cpp
 	../src/durationinterface.cpp
 	../src/editorial.cpp
 	../src/floatingelement.cpp
@@ -63,6 +63,7 @@ add_executable (verovio
 	../src/view_tuplet.cpp
 	../src/rest.cpp
 	../src/scoredef.cpp
+	../src/scoredefinterface.cpp
 	../src/slur.cpp
 	../src/space.cpp
 	../src/staff.cpp

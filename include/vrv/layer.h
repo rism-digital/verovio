@@ -11,19 +11,16 @@
 
 #include "atts_shared.h"
 #include "clef.h"
-#include "drawinglistinterface.h"
+#include "drawinginterface.h"
 #include "object.h"
 
 namespace vrv {
 
 class DeviceContext;
-class KeySig;
 class LayerElement;
 class Note;
 class ScoreDef;
 class StaffDef;
-class Mensur;
-class MeterSig;
 
 //----------------------------------------------------------------------------
 // Layer
@@ -34,7 +31,7 @@ class MeterSig;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public DrawingListInterface, public ObjectListInterface,
+class Layer: public DocObject, public DrawingListInterface, public ObjectListInterface, public StaffDefDrawingInterface,
     public AttCommon
 {
 public:
@@ -85,43 +82,7 @@ public:
      * Set drawing clef, keysig and mensur if necessary and if available.
      * Also set the current clef.
      */
-    void SetDrawingAndCurrentValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
-    
-    /**
-     * @name Set the clef, keySig, mensur and meterSig to be drawn.
-     */
-    ///@{
-    void SetDrawClef( bool draw ) { m_drawClef = draw; };
-    void SetDrawKeySig( bool draw ) { m_drawKeySig = draw; };
-    void SetDrawKeySigCancellation( bool draw ) { m_drawKeySigCancellation = draw; };
-    void SetDrawMensur( bool draw ) { m_drawMensur = draw; };
-    void SetDrawMeterSig( bool draw ) { m_drawMeterSig = draw; };
-    ///@}
-    
-    /**
-     * @name Get the clef, keySig, mensur and meterSig to be drawn.
-     */
-    ///@{
-    Clef *GetDrawingClef( ) { if (m_drawClef) return m_currentClef; return NULL; };
-    KeySig *GetDrawingKeySig( ) { if (m_drawKeySig) return m_currentKeySig; return NULL; };
-    Mensur *GetDrawingMensur( ) { if (m_drawMensur) return m_currentMensur; return NULL; };
-    MeterSig *GetDrawingMeterSig( ) { if (m_drawMeterSig) return m_currentMeterSig; return NULL; };
-    ///@}
-    
-    /**
-     * Getter for seeing if the key signature cancellation applies
-     */
-    bool DrawKeySigCancellation() { return m_drawKeySigCancellation; };
-    
-    /**
-     * @name Set the current clef, keySig, mensur and meterSig.
-     */
-    ///@{
-    void SetCurrentClef( Clef *clef );
-    void SetCurrentKeySig( KeySig *keySig );
-    void SetCurrentMensur( Mensur *mensur );
-    void SetCurrentMeterSig( MeterSig *meterSig );
-    ///@}
+    void SetDrawingAndCurrentValues( StaffDef *currentStaffDef );
     
     /**
      * @name Set and get the stem direction of the layer.
@@ -163,38 +124,8 @@ private:
 public:
     
 protected:
-    /**
-     * @name Drawing flags
-     */
-    ///@{
-    /** The clef attribute */
-    bool m_drawClef;
-    /** 
-     * The key signature and key signature cancellation 
-     * We need two because flags are reset at the beginning of a as system
-     */
-    bool m_drawKeySig;
-    bool m_drawKeySigCancellation;
-    /** The mensur */
-    bool m_drawMensur;
-    /** The meter signature (time signature) */
-    bool m_drawMeterSig;
-    ///@}
     
 private:
-    /**
-     * @name The current values
-     */
-    ///@{
-    /** The clef attribute */
-    Clef *m_currentClef;
-    /** The key signature */
-    KeySig *m_currentKeySig;
-    /** The mensur */
-    Mensur *m_currentMensur;
-    /** The meter signature (time signature) */
-    MeterSig *m_currentMeterSig;
-    ///@}
     /**
      *
      */

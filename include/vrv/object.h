@@ -72,6 +72,7 @@ public:
     bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
     bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
     bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
+    bool IsScoreDefElement() { return (this->Is() > SCORE_DEF_ELEMENT && this->Is() < SCORE_DEF_ELEMENT_max); };
     
     /**
      *
@@ -486,7 +487,7 @@ public:
      * Replace all the staffDefs in a scoreDef.
      * param 0: a pointer to the scoreDef we are going to replace the staffDefs
      */
-    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
+    virtual int ReplaceDrawingValuesInScoreDef( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Set the initial scoreDef of each page.

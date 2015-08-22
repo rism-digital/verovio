@@ -23,274 +23,167 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// ScoreOrStaffDefAttrInterface
+// ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface()
+ScoreDefElement::ScoreDefElement(std::string classid):
+    Object(classid),
+    ScoreDefInterface()
 {
-    // owned pointers need to be set to NULL;
-    m_clef = NULL;
-    m_keySig = NULL;
-    m_mensur = NULL;
-    m_meterSig = NULL;
+    RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    
     Reset();
 }
 
-ScoreOrStaffDefAttrInterface::~ScoreOrStaffDefAttrInterface()
+ScoreDefElement::~ScoreDefElement()
 {
-    if (m_clef) {
-        delete m_clef;
-    }
-    if (m_keySig) {
-        delete m_keySig;
-    }
-    if (m_mensur) {
-        delete m_mensur;
-    }
-    if (m_meterSig) {
-        delete m_meterSig;
-    }
+
 }
 
-void ScoreOrStaffDefAttrInterface::Reset()
+void ScoreDefElement::Reset()
 {
-    if (m_clef) {
-        delete m_clef;
-        m_clef = NULL;
-    }
-    if (m_keySig) {
-        delete m_keySig;
-        m_keySig = NULL;
-    }
-    if (m_mensur) {
-        delete m_mensur;
-        m_mensur = NULL;
-    }
-    if (m_meterSig) {
-        delete m_meterSig;
-        m_meterSig = NULL;
-    }
+    Object::Reset();
+    ScoreDefInterface::Reset();
+}
+
+bool ScoreDefElement::HasClefInfo()
+{
+    if (this->HasClefAttrInfo()) return true;
+    return (this->HasClefElementInfo());
+}
+
+bool ScoreDefElement::HasKeySigInfo()
+{
+    if (this->HasKeySigAttrInfo()) return true;
+    return (this->HasKeySigElementInfo());
+}
+
+bool ScoreDefElement::HasMensurInfo()
+{
+    if (this->HasMensurAttrInfo()) return true;
+    return (this->HasMensurElementInfo());
+}
+
+bool ScoreDefElement::HasMeterSigInfo()
+{
+    if (this->HasMeterSigAttrInfo()) return true;
+    return (this->HasMeterSigElementInfo());
+}
+
+bool ScoreDefElement::HasClefAttrInfo()
+{
+    // We need at least a @clef.shape and a @clef.line ?
+    return (this->HasClefShape() && this->HasClefLine());
+    
+    // Eventually we can look a child clef element
+    // We would probably need to take into account app and rdg?
+    return false;
+}
+
+bool ScoreDefElement::HasKeySigAttrInfo()
+{
+    return (this->HasKeySig());
+}
+
+bool ScoreDefElement::HasMensurAttrInfo()
+{
+    // What is the minimum we need? Checking only some for now. Need clarification
+    return (this->HasProlatio() || this->HasTempus() || this->HasProportNum() || this->HasProportNumbase());
+}
+
+bool ScoreDefElement::HasMeterSigAttrInfo()
+{
+    return ( this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
+}
+
+bool ScoreDefElement::HasClefElementInfo()
+{
+    // Eventually we can look a child clef element
+    // We would probably need to take into account app and rdg?
+    return false;
+}
+
+bool ScoreDefElement::HasKeySigElementInfo()
+{
+    return false;
+}
+
+bool ScoreDefElement::HasMensurElementInfo()
+{
+    return false;
+}
+
+bool ScoreDefElement::HasMeterSigElementInfo()
+{
+    return false;
 }
     
-ScoreOrStaffDefAttrInterface::ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface )
+Clef *ScoreDefElement::GetClefCopy()
 {
-    m_clef = NULL;
-    m_keySig = NULL;
-    m_mensur = NULL;
-    m_meterSig = NULL;
-    this->ReplaceClef( interface.m_clef );
-    this->ReplaceKeySig( interface.m_keySig );
-    this->ReplaceMensur( interface.m_mensur );
-    this->ReplaceMeterSig( interface.m_meterSig );
-}
-
-ScoreOrStaffDefAttrInterface& ScoreOrStaffDefAttrInterface::operator=( const ScoreOrStaffDefAttrInterface& interface )
-{
-	if ( this != &interface ) // not self assignement
-	{
-        if (m_clef) {
-            delete m_clef;
-            m_clef = NULL;
-        }
-        if (m_keySig) {
-            delete m_keySig;
-            m_keySig = NULL;
-        }
-        if (m_mensur) {
-            delete m_mensur;
-            m_mensur = NULL;
-        }
-        if (m_meterSig) {
-            delete m_meterSig;
-            m_meterSig = NULL;
-        }        
-        this->ReplaceClef( interface.m_clef );
-        this->ReplaceKeySig( interface.m_keySig );
-        this->ReplaceMensur( interface.m_mensur );
-        this->ReplaceMeterSig( interface.m_meterSig );
-	}
-	return *this;
-}
-
-void ScoreOrStaffDefAttrInterface::ReplaceClef( Object *newClef )
-{
-    if ( newClef ) {
-        assert( dynamic_cast<ClefAttr*>(newClef) || dynamic_cast<Clef*>(newClef) );
-        if (m_clef) {
-            delete m_clef;
-        }
-        m_clef = newClef->Clone();
-    }
-}
-
-void ScoreOrStaffDefAttrInterface::ReplaceKeySig( Object *newKeySig )
-{
-    if ( newKeySig ) {
-        assert( dynamic_cast<KeySigAttr*>(newKeySig) || dynamic_cast<KeySig*>(newKeySig) );
-        if (m_keySig) {
-            // Set the KeySigDrawingInterface values the key sig cancellation.
-            KeySig *oldKeySig = this->GetKeySigCopy();
-            assert( oldKeySig );
-            KeySigDrawingInterface *interface = dynamic_cast<KeySigDrawingInterface*>(newKeySig);
-            assert( interface );
-            interface->m_drawingCancelAccidCount = oldKeySig->GetAlterationNumber();
-            interface->m_drawingCancelAccidType = oldKeySig->GetAlterationType();
-            delete m_keySig;
-            delete oldKeySig;
-        }
-        m_keySig = newKeySig->Clone();
-    }
-}
-
-void ScoreOrStaffDefAttrInterface::ReplaceMensur( Object *newMensur )
-{
-    if ( newMensur ) {
-        assert( dynamic_cast<MensurAttr*>(newMensur) || dynamic_cast<Mensur*>(newMensur) );
-        if (m_mensur) {
-            delete m_mensur;
-        }
-        m_mensur = newMensur->Clone();
-    }
-}
-    
-void ScoreOrStaffDefAttrInterface::ReplaceMeterSig( Object *newMeterSig )
-{
-    if ( newMeterSig ) {
-        assert( dynamic_cast<MeterSigAttr*>(newMeterSig) || dynamic_cast<MeterSig*>(newMeterSig) );
-        if (m_meterSig) {
-            delete m_meterSig;
-        }
-        m_meterSig = newMeterSig->Clone();
-    }
-}
-    
-Clef *ScoreOrStaffDefAttrInterface::GetClefCopy() const
-{
-    // we should not call it without having checked if a clef is set
-    if (!m_clef) return NULL;
     Clef *copy = NULL;
-    if (m_clef->Is() == CLEF) {
-        Clef *current_clef = dynamic_cast<Clef*>(m_clef);
-        assert( current_clef );
-        copy = new Clef(*current_clef);
+    if (this->HasClefAttrInfo()) {
+        copy = new Clef( this );
     }
-    else {
-        ClefAttr *current_attr = dynamic_cast<ClefAttr*>(m_clef);
-        assert( current_attr );
-        copy = new Clef(current_attr);
+    else if (this->HasClefElementInfo()) {
+        // Eventually return a copy of the child element;
     }
+    // Always check if HasClefInfo() is true before asking for a copy
     assert(copy);
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
-KeySig *ScoreOrStaffDefAttrInterface::GetKeySigCopy() const
+KeySig *ScoreDefElement::GetKeySigCopy()
 {
-    // we should not call it without having checked if a keysig is set
-    if (!m_keySig) return NULL;
     KeySig *copy = NULL;
-    if (m_keySig->Is() == KEY_SIG) {
-        KeySig *current_keySig = dynamic_cast<KeySig*>(m_keySig);
-        assert( current_keySig );
-        copy = new KeySig(*current_keySig);
+    if (this->HasKeySigAttrInfo()) {
+        copy = new KeySig(this);
     }
     else {
-        KeySigAttr *current_attr = dynamic_cast<KeySigAttr*>(m_keySig);
-        assert( current_attr );
-        copy = new KeySig(current_attr);
+        // Eventually return a copy of the child element;
     }
+    // Always check if HasKeySigInfo() is true before asking for a copy
     assert(copy);
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
-Mensur *ScoreOrStaffDefAttrInterface::GetMensurCopy() const
+Mensur *ScoreDefElement::GetMensurCopy()
 {
-    // we should not call it without having checked if a mensur is set
-    if (!m_mensur) return NULL;
     Mensur *copy = NULL;
-    if (m_mensur->Is() == MENSUR) {
-        Mensur *current_mensur = dynamic_cast<Mensur*>(m_mensur);
-        assert( current_mensur );
-        copy = new Mensur(*current_mensur);
+    if (this->HasMensurAttrInfo()) {
+        copy = new Mensur(this);
     }
     else {
-        MensurAttr *current_attr = dynamic_cast<MensurAttr*>(m_mensur);
-        assert( current_attr );
-        copy = new Mensur(current_attr);
+        // Eventually return a copy of the child element;
     }
+    // Always check if HasMensurInfo() is true before asking for a copy
     assert(copy);
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
-MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigCopy() const
+MeterSig *ScoreDefElement::GetMeterSigCopy()
 {
-    // we should not call it without having checked if a meterSig is set
-    if (!m_meterSig) return NULL;
     MeterSig *copy = NULL;
-    if (m_meterSig->Is() == METER_SIG) {
-        MeterSig *current_meterSig = dynamic_cast<MeterSig*>(m_meterSig);
-        assert( current_meterSig );
-        copy = new MeterSig(*current_meterSig);
+    if (this->HasMeterSigAttrInfo()) {
+        copy = new MeterSig(this);
     }
     else {
-        MeterSigAttr *current_attr = dynamic_cast<MeterSigAttr*>(m_meterSig);
-        assert( current_attr );
-        copy = new MeterSig(current_attr);
+        // Eventually return a copy of the child element;
     }
+    // Always check if HasMeterSigInfo() is true before asking for a copy
     assert(copy);
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
     
-Clef *ScoreOrStaffDefAttrInterface::GetClefElement() const
-{
-    return dynamic_cast<Clef*>(m_clef);
-}
-    
-KeySig *ScoreOrStaffDefAttrInterface::GetKeySigElement() const
-{
-    return dynamic_cast<KeySig*>(m_keySig);
-}
-    
-Mensur *ScoreOrStaffDefAttrInterface::GetMensurElement() const
-{
-    return dynamic_cast<Mensur*>(m_mensur);
-}
-    
-MeterSig *ScoreOrStaffDefAttrInterface::GetMeterSigElement() const
-{
-    return dynamic_cast<MeterSig*>(m_meterSig);
-}
-
-ClefAttr *ScoreOrStaffDefAttrInterface::GetClefAttr() const
-{
-    return dynamic_cast<ClefAttr*>(m_clef);
-}
-    
-KeySigAttr *ScoreOrStaffDefAttrInterface::GetKeySigAttr() const
-{
-    return dynamic_cast<KeySigAttr*>(m_keySig);
-}
-    
-MensurAttr *ScoreOrStaffDefAttrInterface::GetMensurAttr() const
-{
-    return dynamic_cast<MensurAttr*>(m_mensur);
-}
-    
-MeterSigAttr *ScoreOrStaffDefAttrInterface::GetMeterSigAttr() const
-{
-    return dynamic_cast<MeterSigAttr*>(m_meterSig);
-}
-
-
 //----------------------------------------------------------------------------
 // ScoreDef
 //----------------------------------------------------------------------------
 
 ScoreDef::ScoreDef() :
-	Object("scoredef-"), ScoreOrStaffDefAttrInterface(), ObjectListInterface()
+	ScoreDefElement("scoredef-"), ObjectListInterface()
 {
     Reset();
 }
@@ -301,8 +194,7 @@ ScoreDef::~ScoreDef()
 
 void ScoreDef::Reset()
 {
-    Object::Reset();
-    ScoreOrStaffDefAttrInterface::Reset();
+    ScoreDefElement::Reset();
     m_drawLabels = false;
 }
 
@@ -314,30 +206,76 @@ void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )
     Modify();
 }
 
-void ScoreDef::Replace( ScoreDef *newScoreDef )
+void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
 {
-    ReplaceClef( newScoreDef->m_clef );
-    ReplaceKeySig( newScoreDef->m_keySig );
-    ReplaceMensur( newScoreDef->m_mensur );
-    ReplaceMeterSig( newScoreDef->m_meterSig );
+    bool drawClef = false;
+    bool drawKeySig = false;
+    bool drawMensur = false;
+    bool drawMeterSig = false;
+    Clef *clef = NULL;
+    KeySig *keySig = NULL;
+    Mensur *mensur = NULL;
+    MeterSig *meterSig = NULL;
     
+    if (newScoreDef->HasClefInfo()) {
+        drawClef = true;
+        clef = newScoreDef->GetClefCopy();
+    }
+    if (newScoreDef->HasKeySigInfo()) {
+        drawKeySig = true;
+        keySig = newScoreDef->GetKeySigCopy();
+    }
+    if (newScoreDef->HasMensurInfo()) {
+        drawMensur = true;
+        mensur = newScoreDef->GetMensurCopy();
+    }
+    if (newScoreDef->HasMeterSigInfo()) {
+        drawMeterSig = true;
+        meterSig = newScoreDef->GetMeterSigCopy();
+    }
+
     ArrayPtrVoid params;
-	params.push_back( this );
-    Functor replaceStaffDefsInScoreDef( &Object::ReplaceStaffDefsInScoreDef );
-    newScoreDef->Process( &replaceStaffDefsInScoreDef, &params );
+	params.push_back( clef );
+	params.push_back( keySig );
+	params.push_back( mensur );
+	params.push_back( meterSig );
+    Functor replaceDrawingValuesInScoreDef( &Object::ReplaceDrawingValuesInScoreDef );
+    this->Process( &replaceDrawingValuesInScoreDef, &params );
+    
+    if (clef) delete clef;
+    if (keySig) delete keySig;
+    if (mensur) delete mensur;
+    if (meterSig) delete meterSig;
+    
+    // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
+    this->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig );
+
 }
 
-void ScoreDef::Replace( StaffDef *newStaffDef )
+void ScoreDef::ReplaceDrawingValues( StaffDef *newStaffDef )
 {
     // first find the staffDef with the same @n
     StaffDef *staffDef = this->GetStaffDef( newStaffDef->GetN() );
     
     // if found, replace attributes
     if (staffDef) {
-        staffDef->ReplaceClef( newStaffDef->GetClef() );
-        staffDef->ReplaceKeySig( newStaffDef->GetKeySig() );
-        staffDef->ReplaceMensur( newStaffDef->GetMensur() );
-        staffDef->ReplaceMeterSig( newStaffDef->GetMeterSig() );
+        if (newStaffDef->HasClefInfo()) {
+            staffDef->SetDrawClef(true);
+            staffDef->SetCurrentClef( newStaffDef->GetClefCopy() );
+        }
+        if (staffDef->HasKeySigInfo()) {
+            staffDef->SetDrawKeySig(true);
+            staffDef->SetDrawKeySigCancellation(true);
+            staffDef->SetCurrentKeySig( newStaffDef->GetKeySigCopy() );
+        }
+        if (staffDef->HasMensurInfo()) {
+            staffDef->SetDrawMensur(true);
+            staffDef->SetCurrentMensur(newStaffDef->GetMensurCopy());
+        }
+        if (staffDef->HasMeterSigInfo()) {
+            staffDef->SetDrawMeterSig(true);
+            staffDef->SetCurrentMeterSig(newStaffDef->GetMeterSigCopy());
+        }
         // copy other attributes if present
         if ( newStaffDef->HasLabel() ) staffDef->SetLabel( newStaffDef->GetLabel() );
         if ( newStaffDef->HasLabelAbbr() ) staffDef->SetLabelAbbr( newStaffDef->GetLabelAbbr() );
@@ -449,7 +387,7 @@ void StaffGrp::FilterList( ListOfObjects *childList )
 //----------------------------------------------------------------------------
 
 StaffDef::StaffDef() :
-    Object(), ScoreOrStaffDefAttrInterface(),
+    ScoreDefElement("staffdef-"),
     AttCommon(),
     AttLabelsAddl(),
     AttScalable(),
@@ -468,16 +406,11 @@ StaffDef::~StaffDef()
     
 void StaffDef::Reset()
 {
-    Object::Reset();
-    ScoreOrStaffDefAttrInterface::Reset();
+    ScoreDefElement::Reset();
     ResetCommon();
     ResetLabelsAddl();
     ResetScalable();
     ResetStaffDefVis();
-    m_drawClef = false;
-    m_drawKeySig = false;
-    m_drawMensur = false;
-    m_drawMeterSig = false;
 }
     
     
@@ -512,12 +445,26 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceStaffDefsInScoreDef( ArrayPtrVoid *params )
+int StaffDef::ReplaceDrawingValuesInScoreDef( ArrayPtrVoid *params )
 {
     // param 0: the scoreDef
-    ScoreDef *scoreDef = static_cast<ScoreDef*>((*params)[0]);
+    Clef *clef = static_cast<Clef*>((*params)[0]);
+    KeySig *keySig = static_cast<KeySig*>((*params)[1]);
+    Mensur *mensur = static_cast<Mensur*>((*params)[2]);
+    MeterSig *meterSig = static_cast<MeterSig*>((*params)[3]);
     
-    scoreDef->Replace( this );
+    if (clef) {
+        this->SetCurrentClef(new Clef(*clef));
+    }
+    if (keySig) {
+        this->SetCurrentKeySig(new KeySig(*keySig));
+    }
+    if (mensur) {
+        this->SetCurrentMensur(new Mensur(*mensur));
+    }
+    if (meterSig) {
+        this->SetCurrentMeterSig(new MeterSig(*meterSig));
+    }
     
     return FUNCTOR_CONTINUE;
 }

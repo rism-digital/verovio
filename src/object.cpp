@@ -943,62 +943,27 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     if (this->Is() == SYSTEM) {
         System *system = dynamic_cast<System*>(this);
         assert( system );
-        
         currentScoreDef->SetRedrawFlags( true, true, false, false, false );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new scoreDef
-    
     if (this->Is() == SCORE_DEF) {
         ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
         assert( scoreDef );
-        bool drawClef = false;
-        bool drawKeySig = false;
-        bool drawMensur = false;
-        bool drawMeterSig = false;
-        if (scoreDef->GetClef()) {
-            drawClef = true;
-        }
-        if (scoreDef->GetKeySig()) {
-            drawKeySig = true;
-        }
-        if (scoreDef->GetMensur()) {
-            drawMensur = true;
-        }
-        if (scoreDef->GetMeterSig()) {
-            drawMeterSig = true;
-        }
         // Replace the current scoreDef with the new one, including its content (staffDef)
-        currentScoreDef->Replace(scoreDef);
-        // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
-        currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig );
+        currentScoreDef->ReplaceDrawingValues(scoreDef);
         return FUNCTOR_CONTINUE;
     }
 
 
     // starting a new staffDef
-    // Because staffDef have to be included in a scoreDef, a new staffDef was already
-    // replaced by the new scoreDef (see above). Here we only need to reset the drawing flags
-    
     if (this->Is() == STAFF_DEF) {
         StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
         assert( staffDef );
         StaffDef *tmpStaffDef = currentScoreDef->GetStaffDef( staffDef->GetN() );
         assert( tmpStaffDef );
-        if (staffDef->GetClef()) {
-            tmpStaffDef->SetDrawClef( true );
-        }
-        if (staffDef->GetKeySig()) {
-            tmpStaffDef->SetDrawKeySig( true );
-            tmpStaffDef->SetDrawKeySigCancellation( true );
-        }
-        if (staffDef->GetMensur()) {
-            tmpStaffDef->SetDrawMensur( true );
-        }
-        if (staffDef->GetMeterSig()) {
-            tmpStaffDef->SetDrawMeterSig( true );
-        }
+        currentScoreDef->ReplaceDrawingValues(tmpStaffDef);
     }
     
     // starting a new staff
@@ -1024,7 +989,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingAndCurrentValues( currentScoreDef, (*currentStaffDef) );
+        layer->SetDrawingAndCurrentValues( (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
     
@@ -1033,7 +998,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         Clef *clef = dynamic_cast<Clef*>(this);
         assert( clef );
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceClef( clef );
+        (*currentStaffDef)->SetCurrentClef( new Clef( *clef ) );
         return FUNCTOR_CONTINUE;
     }
     
@@ -1042,7 +1007,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         KeySig *keysig = dynamic_cast<KeySig*>(this);
         assert( keysig );
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceKeySig( keysig );
+        (*currentStaffDef)->SetCurrentKeySig( new KeySig( *keysig ) );
         return FUNCTOR_CONTINUE;
     }
     

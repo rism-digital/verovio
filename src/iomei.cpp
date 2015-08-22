@@ -399,23 +399,9 @@ bool MeiOutput::WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef
     assert( scoreDef );
     
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( scoreDef ).c_str();
-    if (scoreDef->GetClefAttr()) {
-        scoreDef->GetClefAttr()->WriteCleffingLog(currentNode);
-    }
-    if (scoreDef->GetKeySigAttr()) {
-        scoreDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
-        scoreDef->GetKeySigAttr()->WriteKeySigDefaultVis(currentNode);
-    }
-    if ( scoreDef->GetMensurAttr() ) {
-        scoreDef->GetMensurAttr()->WriteMensuralLog(currentNode);
-        scoreDef->GetMensurAttr()->WriteMensuralShared(currentNode);
-    }
-    if ( scoreDef->GetMeterSigAttr() ) {
-        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
-        scoreDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
-    }
+
+    WriteScoreDefInterface(currentNode, scoreDef);
     
-    // this needs to be fixed
     return true;
 }
 
@@ -445,21 +431,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
     
-    if (staffDef->GetClefAttr()) {
-        staffDef->GetClefAttr()->WriteCleffingLog(currentNode);
-    }
-    if (staffDef->GetKeySigAttr()) {
-        staffDef->GetKeySigAttr()->WriteKeySigDefaultLog(currentNode);
-        staffDef->GetKeySigAttr()->WriteKeySigDefaultVis(currentNode);
-    }
-    if ( staffDef->GetMensurAttr() ) {
-        staffDef->GetMensurAttr()->WriteMensuralLog(currentNode);
-        staffDef->GetMensurAttr()->WriteMensuralShared(currentNode);
-    }
-    if ( staffDef->GetMeterSigAttr() ) {
-        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultLog(currentNode);
-        staffDef->GetMeterSigAttr()->WriteMeterSigDefaultVis(currentNode);
-    }
+    WriteScoreDefInterface(currentNode, staffDef);
     
     return true;
 }
@@ -755,7 +727,7 @@ void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInte
     interface->WriteStaffident(element);
 }
     
-void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface *interface)
+void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     assert( interface );
     
@@ -764,14 +736,27 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, vrv::PitchInterface 
     interface->WritePitch(element);
 }
     
-void MeiOutput::WritePositionInterface(pugi::xml_node element, vrv::PositionInterface *interface)
+void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     assert( interface );
     
     interface->WriteStafflocPitched(element);
 }
+    
+void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
+{
+    assert( interface );
+    
+    interface->WriteCleffingLog(element);
+    interface->WriteKeySigDefaultLog(element);
+    interface->WriteKeySigDefaultVis(element);
+    interface->WriteMensuralLog(element);
+    interface->WriteMensuralShared(element);
+    interface->WriteMeterSigDefaultLog(element);
+    interface->WriteMeterSigDefaultVis(element);
+}
 
-void MeiOutput::WriteTextDirInterface(pugi::xml_node element, vrv::TextDirInterface *interface)
+void MeiOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
 {
     assert( interface );
     
@@ -780,7 +765,7 @@ void MeiOutput::WriteTextDirInterface(pugi::xml_node element, vrv::TextDirInterf
     interface->WriteStaffident(element);
 }
     
-void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, vrv::TimeSpanningInterface *interface)
+void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
 {
     assert( interface );
     
@@ -795,7 +780,7 @@ void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
     }
 }
 
-void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, vrv::Object *object)
+void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
     ArrayOfStrAttr::iterator iter;
     for (iter = object->m_unsupported.begin(); iter != object->m_unsupported.end(); iter++) {
@@ -1241,25 +1226,7 @@ bool MeiInput::ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef )
     }
     SetMeiUuid(scoreDef, vrvScoreDef);
     
-    ClefAttr clefAttr;
-    if ( clefAttr.ReadCleffingLog( scoreDef ) ) {
-        vrvScoreDef->ReplaceClef( &clefAttr );
-    }
-    KeySigAttr keySigAttr;
-    if ( keySigAttr.ReadKeySigDefaultLog( scoreDef ) || keySigAttr.ReadKeySigDefaultVis( scoreDef ) ) {
-        keySigAttr.ReadKeySigDefaultVis( scoreDef ); // not great, but we need to do it in case we have both and the first one succeeded
-        vrvScoreDef->ReplaceKeySig( &keySigAttr );
-    }
-    MeterSigAttr meterSig;
-    if ( meterSig.ReadMeterSigDefaultLog( scoreDef ) || meterSig.ReadMeterSigDefaultVis( scoreDef ) ) {
-        meterSig.ReadMeterSigDefaultVis( scoreDef );  // same as above, needs refactoring
-        vrvScoreDef->ReplaceMeterSig( &meterSig );
-    }
-    MensurAttr mensur;
-    if ( mensur.ReadMensuralLog( scoreDef ) || mensur.ReadMensuralShared( scoreDef ) ) {
-        mensur.ReadMensuralShared( scoreDef ); // same as above, needs refactoring
-        vrvScoreDef->ReplaceMensur( &mensur );
-    }
+    ReadScoreDefInterface(scoreDef, vrvScoreDef);
     
     AddScoreDef(parent, vrvScoreDef);
     
@@ -1364,25 +1331,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
         LogWarning("No @n on <staffDef> might yield unpredictable results");
     }
     
-    ClefAttr clefAttr;
-    if ( clefAttr.ReadCleffingLog( staffDef ) ) {
-        vrvStaffDef->ReplaceClef( &clefAttr );
-    }
-    KeySigAttr keySigAttr;
-    if ( keySigAttr.ReadKeySigDefaultLog( staffDef ) || keySigAttr.ReadKeySigDefaultVis( staffDef ) ) {
-        keySigAttr.ReadKeySigDefaultVis( staffDef ); // not great, but we need to do it in case we have both and the first one succeeded
-        vrvStaffDef->ReplaceKeySig( &keySigAttr );
-    }
-    MeterSigAttr meterSig;
-    if ( meterSig.ReadMeterSigDefaultLog( staffDef ) || meterSig.ReadMeterSigDefaultVis( staffDef ) ) {
-        meterSig.ReadMeterSigDefaultVis( staffDef );  // same as above, needs refactoring
-        vrvStaffDef->ReplaceMeterSig( &meterSig );
-    }
-    MensurAttr mensur;
-    if ( mensur.ReadMensuralLog( staffDef ) || mensur.ReadMensuralShared( staffDef ) ) {
-        mensur.ReadMensuralShared( staffDef ); // same as above, needs refactoring
-        vrvStaffDef->ReplaceMensur( &mensur );
-    }
+    ReadScoreDefInterface(staffDef, vrvStaffDef);
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
     if ( parent->Is() == STAFF_GRP ) {
@@ -1971,6 +1920,18 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
     interface->ReadStafflocPitched(element);
+    return true;
+}
+    
+bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface)
+{
+    interface->ReadCleffingLog(element);
+    interface->ReadKeySigDefaultLog(element);
+    interface->ReadKeySigDefaultVis(element);
+    interface->ReadMensuralLog(element);
+    interface->ReadMensuralShared(element);
+    interface->ReadMeterSigDefaultLog(element);
+    interface->ReadMeterSigDefaultVis(element);
     return true;
 }
     
