@@ -899,7 +899,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffY = staff->GetDrawingY();
 	int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
     bool drawingCueSize = chord->IsCueSize();
-    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize);
+    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
     int fullUnit = m_doc->GetDrawingUnit(staffSize);
     
     bool inBeam = false;
