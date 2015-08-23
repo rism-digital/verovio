@@ -24,22 +24,22 @@ class StaffGrp;
 class StaffDef;
 
 //----------------------------------------------------------------------------
-// ScoreOrStaffDefElement
+// ScoreDefElement
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur.
- * It can either hold element or attribute values. Element values are hold in normal objects
- * (e.g., Clef) and attribute values are hold in dedicated Object classes (e.g., ClefAttr)
- * During rendering, only Element object are used. They are obained by the GetXXXCopy methods
- * that create a copy of the Element object or a corresponding Element object if a attribute value
- * object is hold.
+ * This class is a base class for MEI scoreDef or staffDef elements.
+ * It implements the ScoreDefInterface that implements the attribute classes
+ * for clef, key signature, mensur and meter signature.
+ * It also provides methods for checking if the scoreDef or staffDef has some
+ * information about clef, key signature, etc. This information can be either 
+ * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
 class ScoreDefElement: public Object, public ScoreDefInterface
 {
 public:
     /**
-     * @name Constructors, destructors, and other standard methods
+     * @name Constructors, destructors, and other standard methods.
      */
     ///@{
     ScoreDefElement(std::string classid);
@@ -49,11 +49,8 @@ public:
     ///@}
     
     /**
-     * @name Get a copy of the clef, keysig, mensur and meterSig.
-     * These methods creates new objects that need to be deleted.
-     * The also convert attribute value object to an object. For example,
-     * if m_clef holds a ClefAttr object, the copy will be a Clef object.
-     * They are used when writing the MEI.
+     * @name Methods for checking the presence of clef, key signature, etc. information.
+     * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
      */
     ///@{
     bool HasClefInfo();
@@ -64,10 +61,11 @@ public:
     
     /**
      * @name Get a copy of the clef, keysig, mensur and meterSig.
-     * These methods creates new objects that need to be deleted.
+     * These methods create new objects (heap) that will need to be deleted.
      * The also convert attribute value object to an object. For example,
-     * if m_clef holds a ClefAttr object, the copy will be a Clef object.
-     * They are used when writing the MEI.
+     * if a staffDef has a @key.sig, the copy will be a KeySig object.
+     * The conversion from attribute to element is performed in the appropriate
+     * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
     Clef *GetClefCopy();
@@ -80,7 +78,7 @@ protected:
     
 private:
     /**
-     * @name Methods for checking if clef info is available at the attribute level
+     * @name Methods for checking if clef info is available at the attribute level.
      */
     ///@{
     bool HasClefAttrInfo();
@@ -90,7 +88,8 @@ private:
     ///@}
 
     /**
-     * @name Methods for checking if clef info is available at the element level
+     * @name Methods for checking if clef info is available at the element level.
+     * To be implemented.
      */
     ///@{
     bool HasClefElementInfo();
@@ -100,7 +99,6 @@ private:
     ///@}
     
 };
-
 
 
 //----------------------------------------------------------------------------
@@ -290,18 +288,17 @@ public:
     //----------//
     
     /**
-     * Replace all the staffDefs in a scoreDef.
-     * Calls ScoreDef::Replace.
-     * param 0: a pointer to the scoreDef we are going to replace the staffDefs
+     * Set the current / drawing clef, key signature, etc. to the StaffDef
+     * Called form ScoreDef::ReplaceDrawingValues.
+     * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
      */
-    virtual int ReplaceDrawingValuesInScoreDef( ArrayPtrVoid *params );
+    virtual int ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params );
     
     /**
-     * Set flags for the staff set for indicating whether clefs, keysig, etc. needs to be redrawn.
-     * This is typically occurs when a new system or a new scoreDef is encountered.
-     * param 0: bool clef flag.
-     * param 1: bool keysig flag.
-     * param 2: bool the mensur flag.
+     * Set drawing flags for the StaffDef for indicating whether clefs, keysig, etc. needs
+     * to be redrawn.
+     * This typically occurs when a new System or a new  ScoreDef is encountered.
+     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
     virtual int SetStaffDefRedrawFlags( ArrayPtrVoid *params );
     

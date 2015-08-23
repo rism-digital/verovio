@@ -63,7 +63,8 @@ public:
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
      * The value is false by default. Is it set to true of ScoreDef and StaffDef and used when
-     * drawing the element
+     * drawing the element.
+     * NB In the scoreDef or staffDef itself, it can be attributes or an element.
      */
     ///@{
     bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };

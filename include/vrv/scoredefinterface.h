@@ -20,8 +20,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /** 
- * This class is an interface for elements implementing a text directive, such
- * as <dir>, <tempo>, or <dynam>
+ * This class is an interface for elements implementing score attributes, such
+ * as <scoreDef>, or <staffDef>
  * It is not an abstract class but should not be instanciate directly.
  */
 class ScoreDefInterface: public Interface,

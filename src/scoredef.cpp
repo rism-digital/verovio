@@ -19,6 +19,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "system.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -37,7 +38,6 @@ ScoreDefElement::ScoreDefElement(std::string classid):
 
 ScoreDefElement::~ScoreDefElement()
 {
-
 }
 
 void ScoreDefElement::Reset()
@@ -208,6 +208,8 @@ void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )
 
 void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
 {
+    assert(newScoreDef);
+    
     bool drawClef = false;
     bool drawKeySig = false;
     bool drawMensur = false;
@@ -239,7 +241,7 @@ void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
 	params.push_back( keySig );
 	params.push_back( mensur );
 	params.push_back( meterSig );
-    Functor replaceDrawingValuesInScoreDef( &Object::ReplaceDrawingValuesInScoreDef );
+    Functor replaceDrawingValuesInScoreDef( &Object::ReplaceDrawingValuesInStaffDef );
     this->Process( &replaceDrawingValuesInScoreDef, &params );
     
     if (clef) delete clef;
@@ -254,6 +256,8 @@ void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
 
 void ScoreDef::ReplaceDrawingValues( StaffDef *newStaffDef )
 {
+    assert(newStaffDef);
+    
     // first find the staffDef with the same @n
     StaffDef *staffDef = this->GetStaffDef( newStaffDef->GetN() );
     
@@ -263,22 +267,25 @@ void ScoreDef::ReplaceDrawingValues( StaffDef *newStaffDef )
             staffDef->SetDrawClef(true);
             staffDef->SetCurrentClef( newStaffDef->GetClefCopy() );
         }
-        if (staffDef->HasKeySigInfo()) {
+        if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
             staffDef->SetDrawKeySigCancellation(true);
             staffDef->SetCurrentKeySig( newStaffDef->GetKeySigCopy() );
         }
-        if (staffDef->HasMensurInfo()) {
+        if (newStaffDef->HasMensurInfo()) {
             staffDef->SetDrawMensur(true);
             staffDef->SetCurrentMensur(newStaffDef->GetMensurCopy());
         }
-        if (staffDef->HasMeterSigInfo()) {
+        if (newStaffDef->HasMeterSigInfo()) {
             staffDef->SetDrawMeterSig(true);
             staffDef->SetCurrentMeterSig(newStaffDef->GetMeterSigCopy());
         }
         // copy other attributes if present
         if ( newStaffDef->HasLabel() ) staffDef->SetLabel( newStaffDef->GetLabel() );
         if ( newStaffDef->HasLabelAbbr() ) staffDef->SetLabelAbbr( newStaffDef->GetLabelAbbr() );
+    }
+    else {
+        LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetUuid().c_str());
     }
 }
 
@@ -445,9 +452,12 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceDrawingValuesInScoreDef( ArrayPtrVoid *params )
+int StaffDef::ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params )
 {
-    // param 0: the scoreDef
+    // param 0: Clef pointer (NULL if none)
+    // param 1: KeySig pointer (NULL if none)
+    // param 2: Mensur pointer (NULL if none)
+    // param 3: MeterSig pointer (NULL if none)
     Clef *clef = static_cast<Clef*>((*params)[0]);
     KeySig *keySig = static_cast<KeySig*>((*params)[1]);
     Mensur *mensur = static_cast<Mensur*>((*params)[2]);

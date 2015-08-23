@@ -64,23 +64,39 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 class Object
 {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Object();
     Object(std::string classid);
     virtual ~Object();
     virtual ClassId Is();
+    virtual std::string GetClassName( ) { return "[MISSING]"; };
+    ///@}
+    
+    /**
+     * @name Methods for checking if an object is part of a group of classId.
+     * For example, all LayerElement child class classId is in between LAYER_ELEMENT and LAYER_ELEMENT_max.
+     * See classId enum.
+     */
+    ///@{
     bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
     bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
     bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
     bool IsScoreDefElement() { return (this->Is() > SCORE_DEF_ELEMENT && this->Is() < SCORE_DEF_ELEMENT_max); };
+    ///@}
     
     /**
-     *
+     * @name Methods for registering a MEI att class and for registering interfaces regrouping MEI att classes.
      */
+    ///@{
     void RegisterAttClass( AttClassId attClassId ) { m_attClasses.push_back( attClassId ); };
     bool HasAttClass( AttClassId attClassId ) { return std::find(m_attClasses.begin(), m_attClasses.end(), attClassId) != m_attClasses.end(); };
     void RegisterInterface( std::vector<AttClassId> *attClasses, InterfaceId interfaceId );
     bool HasInterface( InterfaceId interfaceId ) { return std::find(m_interfaces.begin(), m_interfaces.end(), interfaceId) != m_interfaces.end(); };
+    ///@}
     
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
@@ -99,9 +115,9 @@ public:
     Object( const Object& object );
 
     /**
-     * See copy constructor.
+     * Copy assignement - see copy constructor.
      */
-    Object& operator=( const Object& object ); // copy assignement;
+    Object& operator=( const Object& object );
     
     /**
      * Move all the children of the object passed as parameter to this one.
@@ -111,22 +127,24 @@ public:
     void MoveChildren( Object *object );
     
     /**
-     * Method call for copying child classes
+     * Method call for copying child classes.
+     * The method has to be overwritten.
      */
     virtual Object* Clone();
-    
-    virtual bool operator==( Object& other );
     
     std::string GetUuid() { return m_uuid; };
     void SetUuid( std::string uuid );
     void ResetUuid( );
     
     /**
-     * Children count
-     * Used for classes with several types of children
+     * @name Children count, with or without a ClassId.
+     * Used for classes with several types of children.
+     * The method with a ClassId only searches at the first level.
      */
+    ///@{
     int GetChildCount() { return (int)m_children.size(); };
     int GetChildCount( const ClassId classId );
+    ///@}
     
     /**
      * Child access (generic)
@@ -161,8 +179,6 @@ public:
      * The current parent is expected to be NULL.
      */
     void SetParent( Object *parent );
-    
-    virtual std::string GetClassName( ) { return "[MISSING]"; };
     
     /**
      * Add an EditorialElement as child.
@@ -484,10 +500,13 @@ public:
     ///@{
     
     /**
-     * Replace all the staffDefs in a scoreDef.
-     * param 0: a pointer to the scoreDef we are going to replace the staffDefs
+     * Replace the drawing values a staffDef.
+     * param 0: Clef pointer (NULL if none)
+     * param 1: KeySig pointer (NULL if none)
+     * param 2: Mensur pointer (NULL if none)
+     * param 3: MeterSig pointer (NULL if none)
      */
-    virtual int ReplaceDrawingValuesInScoreDef( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
+    virtual int ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Set the initial scoreDef of each page.
@@ -666,12 +685,12 @@ private:
     ClassId m_iteratorElementType;
     
     /**
-     *
+     * A vector for storing the list of AttClassId (MEI att classes) implemented.
      */
     std::vector<AttClassId> m_attClasses;
     
     /**
-     *
+     * A vector for storing the list of InterfaceId (group of MEI att classes) implemented.
      */
     std::vector<InterfaceId> m_interfaces;
 };

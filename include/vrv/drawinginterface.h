@@ -1,13 +1,13 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        drawinglistinterface
+// Name:        drawinginterface.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_DRAWING_LIST_INTERFACE_H__
-#define __VRV_DRAWING_LIST_INTERFACE_H__
+#ifndef __VRV_DRAWING_INTERFACE_H__
+#define __VRV_DRAWING_INTERFACE_H__
 
 #include "vrvdef.h"
 

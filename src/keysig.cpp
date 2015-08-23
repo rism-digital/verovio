@@ -60,7 +60,6 @@ KeySig::KeySig():
     AttPitch()
 {
     Init();
-    Reset();
 }
 
 KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
@@ -69,7 +68,6 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
     AttPitch()
 {
     Init();
-    Reset();
     
     m_alterationNumber = alterationNumber;
     m_alterationType = alterationType;
@@ -81,7 +79,6 @@ KeySig::KeySig( ScoreDefInterface *keySigAttr ):
     AttPitch()
 {
     Init();
-    Reset();
     
     char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
     /* see data_KEYSIGNATURE order; key will be:
@@ -116,6 +113,7 @@ void KeySig::Init()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_PITCH);
+    Reset();
 }
 
 KeySig::~KeySig()

@@ -45,8 +45,16 @@ typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
 // Object defines
 //----------------------------------------------------------------------------
 
+/**
+ * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
+ * Each Object child class has to have its own id and has to overwrite the Is() method.
+ * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
+ * used for checking if an Object is child of a base class. See for example
+ * Object::IsLayerElement.
+ */
 enum ClassId {
     OBJECT = 0,
+    //
     ALIGNMENT,
     CLEF_ATTR,
     DOC,
@@ -65,7 +73,7 @@ enum ClassId {
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
-    //
+    // Ids for EditorialElement child classes
     EDITORIAL_ELEMENT,
     ANNOT,
     APP,
@@ -73,7 +81,7 @@ enum ClassId {
     RDG,
     SUPPLIED,
     EDITORIAL_ELEMENT_max,
-    //
+    // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,
     BAR_LINE,
@@ -95,13 +103,13 @@ enum ClassId {
     TUPLET,
     VERSE,
     LAYER_ELEMENT_max,
-    //
+    // Ids for FloatingElement child classes
     FLOATING_ELEMENT,
     SLUR,
     TEMPO,
     TIE,
     FLOATING_ELEMENT_max,
-    //
+    // Ids for ScoreDefElement child classes
     SCORE_DEF_ELEMENT,
     SCORE_DEF,
     STAFF_DEF,
@@ -110,6 +118,10 @@ enum ClassId {
     UNSPECIFIED
 };
 
+/**
+ * The InterfaceIds are used to identify Interface child classes through the Interface::IsInterface virtual method.
+ * Each Interface child class has to have its own id and has to overwrite the IsInterface() method.
+ */
 enum InterfaceId {
     INTERFACE,
     INTERFACE_DURATION,

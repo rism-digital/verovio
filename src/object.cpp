@@ -331,16 +331,6 @@ void Object::AddEditorialElement( EditorialElement *child )
     Modify();
 }
 
-bool Object::operator==( Object& other )
-{
-    // This should never happen.
-    // The comparison is performed in the CmpFile::Align method.
-    // We expect to compare only Note, Rest, etc object for which we have an overwritten method
-    LogError( "Missing comparison operator for '%s'", this->GetClassName().c_str() );
-    assert( false );
-    return false;
-}
-
 int Object::GetChildIndex( const Object *child )
 {
     ArrayOfObjects::iterator iter;
@@ -956,14 +946,11 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         return FUNCTOR_CONTINUE;
     }
 
-
     // starting a new staffDef
     if (this->Is() == STAFF_DEF) {
         StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
         assert( staffDef );
-        StaffDef *tmpStaffDef = currentScoreDef->GetStaffDef( staffDef->GetN() );
-        assert( tmpStaffDef );
-        currentScoreDef->ReplaceDrawingValues(tmpStaffDef);
+        currentScoreDef->ReplaceDrawingValues(staffDef);
     }
     
     // starting a new staff
