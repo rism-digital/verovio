@@ -19,8 +19,6 @@ class Note;
 class StaffAlignment;
 class SystemAligner;
 
-
-
 /**
  * Alignment types for aligning types together.
  * For example, we align notes and rests (default) together, clef separately, etc.

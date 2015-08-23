@@ -223,13 +223,6 @@ private:
     int CalcMusicFontSize( );
     
 public:
-    
-
-    /** 
-     * The full name of the file. Exact use to be clarified.
-     */
-    std::string m_fname;
-    
     /**
      * A copy of the header tree stored as pugi::xml_document
      */

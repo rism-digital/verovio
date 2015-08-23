@@ -44,7 +44,10 @@ public:
     virtual ClassId Is() { return LAYER_ELEMENT; };
     ///@}
     
-    LayerElement& operator=( const LayerElement& element ); // copy assignement - this need to be changed to the Object::Clone way;
+    /**
+     * Copy assignment for resetting pointers
+     */
+    LayerElement& operator=( const LayerElement& element );
     
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
@@ -71,13 +74,11 @@ public:
      * @name Child type checkers.
      */
     ///@{
+    /** Returns true if the element is a grace note */
     bool IsGraceNote();
-    ///@}
-    
-    /**
-     * Returns true if the element is a note or a note child and the note has a @grace
-     */
+    /** Returns true if the element is a note or a note child and the note has a @grace */
     bool IsCueSize();
+    ///@}
     
     /**
      * Returns the drawing stem direction if the element is a note or a chord.

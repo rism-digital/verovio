@@ -901,7 +901,6 @@ MeiInput::MeiInput( Doc *doc, std::string filename ) :
 	FileInputStream( doc )
 {
     m_filename = filename;
-    m_doc->m_fname = GetFilename( filename );
     m_page = NULL;
     m_system = NULL;
     //
