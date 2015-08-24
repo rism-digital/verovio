@@ -60,6 +60,12 @@
 		4DA80D961A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
 		4DA80D971A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
 		4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3072E1AC9ED2500EE0982 /* space.cpp */; };
+		4DB726C01B8B9F480040231B /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
+		4DB726C11B8B9F480040231B /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
+		4DB726C31B8B9F540040231B /* rpt.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C21B8B9F540040231B /* rpt.h */; };
+		4DB726C51B8BB0E80040231B /* trem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* trem.cpp */; };
+		4DB726C61B8BB0E80040231B /* trem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* trem.cpp */; };
+		4DB726C81B8BB0F30040231B /* trem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C71B8BB0F30040231B /* trem.h */; };
 		4DC34BA219BC4A71006175CD /* accid.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34B9F19BC4A70006175CD /* accid.h */; };
 		4DC34BA319BC4A71006175CD /* custos.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA019BC4A70006175CD /* custos.h */; };
 		4DC34BA419BC4A71006175CD /* dot.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DC34BA119BC4A70006175CD /* dot.h */; };
@@ -257,6 +263,10 @@
 		4DA80D951A6ACF5D0089802D /* style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = style.cpp; path = src/style.cpp; sourceTree = "<group>"; };
 		4DB3072D1AC9ED1800EE0982 /* space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space.h; path = include/vrv/space.h; sourceTree = "<group>"; };
 		4DB3072E1AC9ED2500EE0982 /* space.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space.cpp; path = src/space.cpp; sourceTree = "<group>"; };
+		4DB726BF1B8B9F480040231B /* rpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rpt.cpp; path = src/rpt.cpp; sourceTree = "<group>"; };
+		4DB726C21B8B9F540040231B /* rpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpt.h; path = include/vrv/rpt.h; sourceTree = "<group>"; };
+		4DB726C41B8BB0E80040231B /* trem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trem.cpp; path = src/trem.cpp; sourceTree = "<group>"; };
+		4DB726C71B8BB0F30040231B /* trem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trem.h; path = include/vrv/trem.h; sourceTree = "<group>"; };
 		4DC34B9F19BC4A70006175CD /* accid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = accid.h; path = include/vrv/accid.h; sourceTree = "<group>"; };
 		4DC34BA019BC4A70006175CD /* custos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = custos.h; path = include/vrv/custos.h; sourceTree = "<group>"; };
 		4DC34BA119BC4A70006175CD /* dot.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dot.h; path = include/vrv/dot.h; sourceTree = "<group>"; };
@@ -668,10 +678,14 @@
 				1579B3421B15033100B16F5C /* proport.cpp */,
 				8F086ED1188539540037FD8E /* rest.cpp */,
 				8F59292818854BF800FE51AD /* rest.h */,
+				4DB726BF1B8B9F480040231B /* rpt.cpp */,
+				4DB726C21B8B9F540040231B /* rpt.h */,
 				4DB3072E1AC9ED2500EE0982 /* space.cpp */,
 				4DB3072D1AC9ED1800EE0982 /* space.h */,
 				4D9A9C1D19A1DE2000028D93 /* syl.cpp */,
 				4D9A9C1B199F576100028D93 /* syl.h */,
+				4DB726C41B8BB0E80040231B /* trem.cpp */,
+				4DB726C71B8BB0F30040231B /* trem.h */,
 				8F086ED9188539540037FD8E /* tuplet.cpp */,
 				8F59293018854BF800FE51AD /* tuplet.h */,
 				4D9A9C18199F561200028D93 /* verse.cpp */,
@@ -699,6 +713,7 @@
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
+				4DB726C81B8BB0F30040231B /* trem.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
@@ -722,6 +737,7 @@
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
+				4DB726C31B8B9F540040231B /* rpt.h in Headers */,
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
 				8F59295318854BF800FE51AD /* svgdevicecontext.h in Headers */,
@@ -859,6 +875,7 @@
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
+				4DB726C51B8BB0E80040231B /* trem.cpp in Sources */,
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
@@ -882,6 +899,7 @@
 				8F086F09188539540037FD8E /* view_graph.cpp in Sources */,
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
+				4DB726C01B8B9F480040231B /* rpt.cpp in Sources */,
 				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
@@ -922,6 +940,7 @@
 				4D1D73411A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
+				4DB726C61B8BB0E80040231B /* trem.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
@@ -948,6 +967,7 @@
 				8F3DD33618854B250051330C /* staff.cpp in Sources */,
 				8F3DD33818854B250051330C /* system.cpp in Sources */,
 				8F3DD32418854B090051330C /* io.cpp in Sources */,
+				4DB726C11B8B9F480040231B /* rpt.cpp in Sources */,
 				8F3DD32618854B090051330C /* iodarms.cpp in Sources */,
 				4DA60EE51B6307B9006E2DFC /* textdirective.cpp in Sources */,
 				8F3DD32818854B090051330C /* iomei.cpp in Sources */,

@@ -32,6 +32,7 @@
 #include "page.h"
 #include "proport.h"
 #include "rest.h"
+#include "rpt.h"
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
@@ -39,6 +40,7 @@
 #include "system.h"
 #include "textdirective.h"
 #include "tie.h"
+#include "trem.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -193,6 +195,10 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("beam");
         WriteMeiBeam( m_currentNode, dynamic_cast<Beam*>(object) );
     }
+    else if (object->Is() == BEAT_RPT) {
+        m_currentNode = m_currentNode.append_child("beatRpt");
+        WriteMeiBeatRpt( m_currentNode, dynamic_cast<BeatRpt*>(object) );
+    }
     else if (object->Is() == CHORD) {
         m_currentNode = m_currentNode.append_child( "chord" );
         WriteMeiChord( m_currentNode, dynamic_cast<Chord*>(object) );
@@ -225,9 +231,21 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("mRest");
         WriteMeiMRest( m_currentNode, dynamic_cast<MRest*>(object) );
     }
+    else if (object->Is() == MRPT) {
+        m_currentNode = m_currentNode.append_child("mRpt");
+        WriteMeiMRpt( m_currentNode, dynamic_cast<MRpt*>(object) );
+    }
+    else if (object->Is() == MRPT2) {
+        m_currentNode = m_currentNode.append_child("mRpt2");
+        WriteMeiMRpt2( m_currentNode, dynamic_cast<MRpt2*>(object) );
+    }
     else if (object->Is() == MULTI_REST) {
         m_currentNode = m_currentNode.append_child("multiRest");
         WriteMeiMultiRest( m_currentNode, dynamic_cast<MultiRest*>(object) );
+    }
+    else if (object->Is() == MULTI_RPT) {
+        m_currentNode = m_currentNode.append_child("multiRpt");
+        WriteMeiMultiRpt( m_currentNode, dynamic_cast<MultiRpt*>(object) );
     }
     else if (object->Is() == NOTE) {
         m_currentNode = m_currentNode.append_child("note");
@@ -550,6 +568,13 @@ void MeiOutput::WriteMeiBeam( pugi::xml_node currentNode, Beam *beam )
     WriteLayerElement( currentNode, beam );
     return;
 }
+    
+void MeiOutput::WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt )
+{
+    assert( beatRpt );
+    
+    WriteLayerElement( currentNode, beatRpt );
+}
 
 void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
 {
@@ -631,6 +656,20 @@ void MeiOutput::WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest )
     WriteLayerElement( currentNode, mRest );
     return;
 }
+    
+void MeiOutput::WriteMeiMRpt( pugi::xml_node currentNode, MRpt *mRpt )
+{
+    assert( mRpt );
+    
+    WriteLayerElement( currentNode, mRpt );
+}
+    
+    void MeiOutput::WriteMeiMRpt2( pugi::xml_node currentNode, MRpt2 *mRpt2 )
+    {
+        assert( mRpt2 );
+        
+        WriteLayerElement( currentNode, mRpt2 );
+    }
 
 void MeiOutput::WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest )
 {
@@ -639,6 +678,13 @@ void MeiOutput::WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiR
     WriteLayerElement( currentNode, multiRest );
     multiRest->WriteNumbered(currentNode);
     return;
+}
+
+void MeiOutput::WriteMeiMultiRpt( pugi::xml_node currentNode, MultiRpt *multiRpt )
+{
+    assert( multiRpt );
+    
+    WriteLayerElement( currentNode, multiRpt );
 }
 
 void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
@@ -1552,6 +1598,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
         }
+        else if ( elementName == "beatRpt" ) {
+            success = ReadMeiBeatRpt( parent, xmlElement);
+        }
         else if ( elementName == "chord" ) {
             success = ReadMeiChord( parent, xmlElement);
         }
@@ -1582,8 +1631,17 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "mRest" ) {
             success = ReadMeiMRest( parent, xmlElement );
         }
+        else if ( elementName == "mRpt" ) {
+            success = ReadMeiMRpt( parent, xmlElement );
+        }
+        else if ( elementName == "mRpt2" ) {
+            success = ReadMeiMRpt2( parent, xmlElement );
+        }
         else if ( elementName == "multiRest" ) {
             success = ReadMeiMultiRest( parent, xmlElement );
+        }
+        else if ( elementName == "multiRpt" ) {
+            success = ReadMeiMultiRpt( parent, xmlElement );
         }
         else if ( elementName == "proport" ) {
             success = ReadMeiProport( parent, xmlElement );
@@ -1662,6 +1720,15 @@ bool MeiInput::ReadMeiBeam( Object *parent, pugi::xml_node beam )
         LogWarning("<beam> with only one note");
     }
     
+    return true;
+}
+    
+bool MeiInput::ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt )
+{
+    BeatRpt *vrvBeatRpt = new BeatRpt();
+    ReadLayerElement(beatRpt, vrvBeatRpt);
+    
+    AddLayerElement(parent, vrvBeatRpt);
     return true;
 }
     
@@ -1767,7 +1834,25 @@ bool MeiInput::ReadMeiMRest( Object *parent, pugi::xml_node mRest )
     AddLayerElement(parent, vrvMRest);
     return true;
 }
+    
+bool MeiInput::ReadMeiMRpt( Object *parent, pugi::xml_node mRpt )
+{
+    MRpt *vrvMRpt = new MRpt();
+    ReadLayerElement(mRpt, vrvMRpt);
+    
+    AddLayerElement(parent, vrvMRpt);
+    return true;
+}
 
+bool MeiInput::ReadMeiMRpt2( Object *parent, pugi::xml_node mRpt2 )
+{
+    MRpt2 *vrvMRpt2 = new MRpt2();
+    ReadLayerElement(mRpt2, vrvMRpt2);
+    
+    AddLayerElement(parent, vrvMRpt2);
+    return true;
+}
+    
 bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
 {
 	MultiRest *vrvMultiRest = new MultiRest( );
@@ -1777,6 +1862,15 @@ bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
     
     AddLayerElement(parent, vrvMultiRest);
 	return true;
+}
+
+bool MeiInput::ReadMeiMultiRpt( Object *parent, pugi::xml_node multiRpt )
+{
+    MultiRpt *vrvMultiRpt = new MultiRpt();
+    ReadLayerElement(multiRpt, vrvMultiRpt);
+    
+    AddLayerElement(parent, vrvMultiRpt);
+    return true;
 }
 
 bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
