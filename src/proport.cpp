@@ -18,21 +18,9 @@ Proport::Proport():
 	LayerElement("prop-"),
     AttDurationRatio()
 {
+    RegisterAttClass(ATT_DURATIONRATIO);
     Reset();
 }
-
-    
-/* ??DO I NEED THIS?
-Proport::Proport( MeterSigAttr *meterSigAttr ):
-    LayerElement("msig-")
-{
-    Proport();
-    //this->SetCount(meterSigAttr->GetMeterCount());
-    //this->SetSym(meterSigAttr->GetMeterSym());
-    //this->SetUnit(meterSigAttr->GetMeterUnit());
-}
- */
-
 
 Proport::~Proport()
 {

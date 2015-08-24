@@ -22,7 +22,8 @@ namespace vrv {
  * It is not an abstract class but should not be instanciate directly.
  * For now, the position is handled in a similar way that for PitchInterface, that is with a pitch and octave. 
  */
-class PositionInterface: public AttStafflocPitched
+class PositionInterface: public Interface,
+    public AttStafflocPitched
 {
 public:
     /**
@@ -33,6 +34,7 @@ public:
     PositionInterface();
     virtual ~PositionInterface();
     virtual void Reset();
+    virtual InterfaceId IsInterface() { return INTERFACE_POSITION; };
     ///@}
     
     /**

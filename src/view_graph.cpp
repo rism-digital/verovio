@@ -24,7 +24,7 @@ namespace vrv {
 
 void View::DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr)
 {
-	assert( dc ); // DC cannot be NULL
+	assert( dc );
 
     dc->SetPen( m_currentColour, std::max( 1, ToDeviceContextX(nbr) ), AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -38,7 +38,7 @@ void View::DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr
 
 void View::DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr)
 {		
-	assert( dc ); // DC cannot be NULL
+	assert( dc );
 
     dc->SetPen( m_currentColour, std::max( 1, ToDeviceContextX(nbr) ), AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -75,7 +75,7 @@ void View::DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int n
 
     void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 )	/* dessine rectangle plein */
 {	
-	assert( dc ); // DC cannot be NULL
+    assert( dc );
 
 	SwapY( &y1, &y2 );
 
@@ -115,9 +115,9 @@ void View::DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y
 }
 
 
-void View::DrawDot ( DeviceContext *dc, int x, int y )
+void View::DrawDot ( DeviceContext *dc, int x, int y, int staffSize )
 {
-	int r = std::max( ToDeviceContextX( m_doc->m_drawingDoubleUnit[0] / 5 ), 2 );
+	int r = std::max( ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staffSize ) / 5 ), 2 );
 	
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -130,61 +130,43 @@ void View::DrawDot ( DeviceContext *dc, int x, int y )
 
 void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
 						 int staffSize, bool dimin )
-{  
-	int fontCorr = 0;
+{
+    assert( dc );
+	
+    dc->SetBackground( AxBLUE );
+    dc->SetBackgroundMode( AxTRANSPARENT );
     
-    if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][dimin];
-    }
-
-	assert( dc ); // DC cannot be NULL
+    std::wstring str;
+    str.push_back(code);
     
+    dc->SetBrush( m_currentColour, AxSOLID );
+    dc->SetFont( m_doc->GetDrawingSmuflFont(staffSize, dimin) );
 
-	if ( dc)
-	{	
-		dc->SetBackground( AxBLUE );
-		dc->SetBackgroundMode( AxTRANSPARENT );
-        
-        std::wstring str;
-        str.push_back(code);
-        
-        dc->SetBrush( m_currentColour, AxSOLID );
-        dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][dimin] );
+    dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y) );
 
-		dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y + fontCorr) );
-
-        dc->ResetFont();
-        dc->ResetBrush();
-
-	}
+    dc->ResetFont();
+    dc->ResetBrush();
 
 	return;
 }
 
 void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize)
 { 
-	assert( dc ); // DC cannot be NULL
-
-    int fontCorr = 0;
+	assert( dc );
     
     int xDC = ToDeviceContextX(x);
-    if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][0];
-    }
     
 	if ( center )
 	{
-        //LogDebug("Centering string not implemented with DeviceContext");  ??WHAT DOES THIS MEAN?
-		
         int w, h;
 		dc->GetSmuflTextExtent( s, &w, &h );
 		xDC -= w / 2;
         
 	}
     dc->SetBrush( m_currentColour, AxSOLID );
-    dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][0] );
+    dc->SetFont( m_doc->GetDrawingSmuflFont(staffSize, 0) );
     
-	dc->DrawMusicText( s, xDC, ToDeviceContextY(y + fontCorr ));
+	dc->DrawMusicText( s, xDC, ToDeviceContextY(y) );
     
     dc->ResetFont();
     dc->ResetBrush();
@@ -192,7 +174,7 @@ void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bo
 
 void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize)
 {
-    assert( dc ); // DC cannot be NULL
+    assert( dc );
     
     dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
@@ -207,7 +189,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
-        vrvTxt.SetPointSize( m_doc->m_drawingLyricFonts[staffSize].GetPointSize());
+        vrvTxt.SetPointSize( m_doc->GetDrawingLyricFont(staffSize)->GetPointSize() );
         
         dc->SetFont( &vrvTxt );
         dc->VrvTextFont();
@@ -223,9 +205,11 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 
 void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
 {
-    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->m_drawingDoubleUnit[0] / 3, abs( x1 - x ) / 4 ) );
+    assert( dc );
     
-    int thickness = std::max( m_doc->m_drawingDoubleUnit[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
+    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->GetDrawingDoubleUnit( 100 ) / 3, abs( x1 - x ) / 4 ) );
+    
+    int thickness = std::max( m_doc->GetDrawingDoubleUnit(100) / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
     
     int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point
@@ -258,7 +242,7 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
-    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_style->m_stemWidth / 2 ), AxSOLID );
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(100) / 2 ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
     dc->ResetPen();
 }

@@ -20,6 +20,7 @@ namespace vrv {
 
 class App;
 class Accid;
+class Annot;
 class Barline;
 class Beam;
 class Chord;
@@ -27,11 +28,11 @@ class Clef;
 class Custos;
 class Dot;
 class DurationInterface;
+class FloatingElement;
 class Layer;
 class LayerElement;
 class Lem;
 class Measure;
-class MeasureElement;
 class Mensur;
 class MeterSig;
 class MRest;
@@ -43,11 +44,15 @@ class Proport;
 class Rdg;
 class Rest;
 class ScoreDef;
+class ScoreDefInterface;
 class Slur;
 class Space;
 class Staff;
+class Supplied;
 class Syl;
 class System;
+class Tempo;
+class TextDirInterface;
 class Tie;
 class TimeSpanningInterface;
 class Tuplet;
@@ -127,6 +132,7 @@ private:
     void WriteMeiClef( pugi::xml_node currentNode, Clef *clef );
     void WriteMeiCustos( pugi::xml_node currentNode, Custos *custos );
     void WriteMeiDot( pugi::xml_node currentNode, Dot *dot );
+    void WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig );
     void WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur );
     void WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig );
     void WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest );
@@ -139,11 +145,12 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting MeasureElement children (other the staff).
+     * @name Methods for wrining FloatingElement
      */
     ///@{
-    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
     void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
+    void WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo );
+    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
     ///@}
     
     /**
@@ -153,6 +160,8 @@ private:
     bool WriteMeiApp( pugi::xml_node currentNode, App *app );
     bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
     bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
+    bool WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied );
+    bool WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot );
     ///@}
     
     /**
@@ -185,6 +194,8 @@ private:
     void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
     void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
     void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
+    void WriteScoreDefInterface( pugi::xml_node currentNode, ScoreDefInterface *interface );
+    void WriteTextDirInterface( pugi::xml_node currentNode, TextDirInterface *interface );
     void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
     ///@}
     
@@ -273,8 +284,6 @@ private:
     bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
     bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
-    bool ReadMeiChord( Object* parent, pugi::xml_node chord );
-    bool ReadMeiChordChildren( Object* parent, pugi::xml_node parentNode, Object *filter = NULL );
     ///@}
 
     /**
@@ -284,9 +293,11 @@ private:
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
+    bool ReadMeiChord( Object* parent, pugi::xml_node chord );
     bool ReadMeiClef( Object *parent, pugi::xml_node clef );
     bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
     bool ReadMeiDot( Object *parent, pugi::xml_node dot );
+    bool ReadMeiKeySig( Object *parent, pugi::xml_node keySig );
     bool ReadMeiMensur( Object *parent, pugi::xml_node mensur );
     bool ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig );
     bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );
@@ -301,21 +312,27 @@ private:
     ///@}
     
     /**
-     * @name Methods for reading MEI measure elements
+     * @name Methods for reading MEI floating elements
      */
     ///@{
     bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
+    bool ReadMeiTempo( Object *parent, pugi::xml_node tempo );
     bool ReadMeiTie( Object *parent, pugi::xml_node tie );
     ///@}
   
     /**
-     * @name Methods for reading critical apparatus.
-     * Only one child of <app> is loaded
+     * @name Methods for reading critical apparatus, other editorial markup and <annot>.
      * The filter is propagated (if any)
      */
     ///@{
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAppChildren( App *app, pugi::xml_node lemOrRdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiEditorialChildren( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
+    ///@}
     ///@}
     
     /**
@@ -327,6 +344,8 @@ private:
     bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
     bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
     bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
+    bool ReadScoreDefInterface( pugi::xml_node element, ScoreDefInterface *interface );
+    bool ReadTextDirInterface( pugi::xml_node element, TextDirInterface *interface );
     bool ReadTimeSpanningInterface( pugi::xml_node element, TimeSpanningInterface *interface );
     ///@}
 
@@ -363,7 +382,7 @@ private:
      */
     ///@{
     void AddLayerElement( Object *parent, LayerElement *element );
-    void AddMeasureElement( Object *parent, MeasureElement *element );
+    void AddFloatingElement( Object *parent, FloatingElement *element );
     void AddScoreDef( Object *parent, ScoreDef *element );
     void AddStaffGrp( Object *parent, StaffGrp *element );
     ///@}

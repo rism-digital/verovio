@@ -226,7 +226,9 @@ public:
     
     virtual bool ImportFile( );
     virtual bool ImportString(std::string pae);
-    
+
+#ifndef NO_PAE_SUPPORT
+
 private:
     // function declarations:
     
@@ -260,7 +262,8 @@ private:
 
      // input functions
      void      getAtRecordKeyValue (char *key, char* value, const char* input);
-     
+
+#endif // NO_PAE_SUPPORT
     
 public:
     

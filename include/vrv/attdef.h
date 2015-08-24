@@ -20,8 +20,7 @@ namespace vrv {
 typedef std::vector<std::pair<std::string, std::string> >  ArrayOfStrAttr;
     
 #define VRV_UNSET -0x7FFFFFFF
-    
-    
+
 //----------------------------------------------------------------------------
 // Durations
 //----------------------------------------------------------------------------
@@ -148,6 +147,15 @@ enum data_CON {
     CON_i,
     CON_b
 };
+    
+/**
+ * MEI values for @curvedir (no datatype in MEI)
+ */
+enum data_CURVEDIR {
+    CURVEDIR_NONE = 0,
+    CURVEDIR_above,
+    CURVEDIR_below
+};
 
 /**
  * MEI data.DURATION
@@ -198,6 +206,26 @@ enum data_FONTWEIGHT {
 };
     
 /**
+ * MEI data.GRACE
+ */
+enum data_GRACE {
+    GRACE_NONE = 0,
+    GRACE_acc,
+    GRACE_unacc,
+    GRACE_unknown
+};
+    
+    
+/**
+ * MEI values for @func (no datatype in MEI)
+ */
+enum data_FUNC {
+    FUNC_NONE = 0,
+    FUNC_caution,
+    FUNC_edit
+};
+    
+/**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)
  * Order for 7f to 7s should not be changes. This is a special case since we use abs()
@@ -221,6 +249,18 @@ enum data_KEYSIGNATURE {
     KEYSIGNATURE_6s,
     KEYSIGNATURE_7s,
     KEYSIGNATURE_mixed
+};
+
+/**
+ * MEI data.LAYERSCHEME
+ */
+enum data_LAYERSCHEME {
+    LAYERSCHEME_NONE = 0,
+    LAYERSCHEME_1,
+    LAYERSCHEME_2o,
+    LAYERSCHEME_2f,
+    LAYERSCHEME_3o,
+    LAYERSCHEME_3f
 };
 
 /**
@@ -286,6 +326,15 @@ enum data_MODUSMINOR {
 };
     
 /**
+ * MEI values for @num.format (no datatype in MEI)
+ */
+enum data_NUMFORMAT {
+    NUMFORMAT_NONE = 0,
+    NUMFORMAT_count,
+    NUMFORMAT_ratio,
+};
+    
+/**
  * MEI data.OCTAVE.DIS
  */
 enum data_OCTAVE_DIS {
@@ -294,6 +343,11 @@ enum data_OCTAVE_DIS {
     OCTAVE_DIS_15 = 15,
     OCTAVE_DIS_22 = 22
 };
+    
+/**
+ * MEI value for @scale (no datatype in MEI)
+ */
+typedef int data_PERCENT;
     
 /**
  * MEI data.PITCHNAME
@@ -336,6 +390,16 @@ enum data_PLACE {
     PLACE_NONE = 0,
     PLACE_above,
     PLACE_below
+};
+    
+/**
+ * MEI data.STAFFREL
+ */
+enum data_STAFFREL {
+    STAFFREL_NONE = 0,
+    STAFFREL_above,
+    STAFFREL_below,
+    STAFFREL_within
 };
 
 /**

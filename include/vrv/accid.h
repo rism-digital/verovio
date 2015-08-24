@@ -19,7 +19,8 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class Accid: public LayerElement, public PositionInterface,
-    public AttAccidental
+    public AttAccidental,
+    public AttAccidLog
 {
 public:
     /**
@@ -31,13 +32,29 @@ public:
     virtual ~Accid();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Accid"; };
+    virtual ClassId Is() { return ACCID; };
     ///@}
+    
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::PreparePointersByLayer
+     */
+    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
     
 protected:
 
 private:
     
 public:
+    /**
+     * Indicates if is cue size for accid object created for @accid.
+     * See Note::PreparePointersByLayer and View::DrawAccid
+     */
+    bool m_drawingCueSize;
     
 private:
 

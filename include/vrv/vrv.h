@@ -11,6 +11,7 @@
 
 #include <cstring>
 #include <map>
+#include <stdarg.h>
 #include <stdio.h>
 #include <string>
 #include <sys/time.h>

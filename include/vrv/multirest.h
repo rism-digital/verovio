@@ -31,10 +31,11 @@ public:
      */
     ///@{
     MultiRest();
-    MultiRest(int number);
+    //MultiRest(int number);
     virtual ~MultiRest();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "MultiRest"; };
+    virtual ClassId Is() { return MULTI_REST; };
     ///@}
     
 private:

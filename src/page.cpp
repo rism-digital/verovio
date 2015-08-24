@@ -73,27 +73,6 @@ int Page::GetStaffPosOnPage( Staff *staff )
     return 0;
 }
 
-System *Page::GetAtPos( int y )
-{
-
-	//y -= ( SYSTEM_OFFSET / 2 ); // SYSTEM_OFFSET used to be 190
-    System *system = dynamic_cast<System*>( this->GetFirst( &typeid(System) ) );
-	if ( !system )
-		return NULL;
-	
-    System *next = NULL;
-	while ( (next = dynamic_cast<System*>( this->GetNext() ) ) )
-	{
-		if ( (int)next->m_yAbs < y )
-		{
-			return system;
-		}
-		system = next;
-	}
-
-	return system;
-}
-
 void Page::LayOut( bool force )
 {
     if ( m_layoutDone && !force ) {
@@ -109,11 +88,8 @@ void Page::LayOut( bool force )
     
 void Page::LayOutHorizontally( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
@@ -133,7 +109,8 @@ void Page::LayOutHorizontally( )
     params.push_back( &currentMensur );
     params.push_back( &currentMeterSig );
     Functor alignHorizontally( &Object::AlignHorizontally );
-    this->Process( &alignHorizontally, params );
+    Functor alignHorizontallyEnd( &Object::AlignHorizontallyEnd );
+    this->Process( &alignHorizontally, &params, &alignHorizontallyEnd );
     
     // Set the X position of each Alignment
     // Does a duration-based non linear spacing looking at the duration space between two Alignment objects
@@ -147,7 +124,7 @@ void Page::LayOutHorizontally( )
     Functor setAlignmentX( &Object::SetAligmentXPos );
     // Special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentX );
-    this->Process( &setAlignmentX, params );
+    this->Process( &setAlignmentX, &params );
     
     // Render it for filling the bounding boxing
     View view;
@@ -156,6 +133,23 @@ void Page::LayOutHorizontally( )
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage( this->GetIdx(), false );
     view.DrawCurrentPage(  &bb_dc, false );
+
+    // Adjust the X shift of the Alignment looking at the bounding boxes
+    // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
+    params.clear();
+    int grace_min_pos = 0;
+    params.push_back( &grace_min_pos );
+    params.push_back( doc );
+    Functor setBoundingBoxGraceXShift( &Object::SetBoundingBoxGraceXShift );
+    this->Process( &setBoundingBoxGraceXShift, &params );
+    
+    // Integrate the X bounding box shift of the elements
+    // Once the m_xShift have been calculated, move all positions accordingly
+    params.clear();
+    Functor integrateBoundingBoxGraceXShift( &Object::IntegrateBoundingBoxGraceXShift );
+    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    params.push_back( &integrateBoundingBoxGraceXShift );
+    this->Process( &integrateBoundingBoxGraceXShift, &params );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
@@ -167,7 +161,7 @@ void Page::LayOutHorizontally( )
     params.push_back( doc );
     Functor setBoundingBoxXShift( &Object::SetBoundingBoxXShift );
     Functor setBoundingBoxXShiftEnd( &Object::SetBoundingBoxXShiftEnd );
-    this->Process( &setBoundingBoxXShift, params, &setBoundingBoxXShiftEnd );
+    this->Process( &setBoundingBoxXShift, &params, &setBoundingBoxXShiftEnd );
     
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
@@ -179,7 +173,7 @@ void Page::LayOutHorizontally( )
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );
-    this->Process( &integrateBoundingBoxXShift, params );
+    this->Process( &integrateBoundingBoxXShift, &params );
     
     // Adjust measure X position
     params.clear();
@@ -187,16 +181,13 @@ void Page::LayOutHorizontally( )
     params.push_back( &shift );
     Functor alignMeasures( &Object::AlignMeasures );
     Functor alignMeasuresEnd( &Object::AlignMeasuresEnd );
-    this->Process( &alignMeasures, params, &alignMeasuresEnd );
+    this->Process( &alignMeasures, &params, &alignMeasuresEnd );
 }
     
 void Page::LayOutVertically( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
@@ -212,7 +203,7 @@ void Page::LayOutVertically( )
     params.push_back( &systemAlignerPtr );
     params.push_back( &staffNb );
     Functor alignVertically( &Object::AlignVertically );
-    this->Process( &alignVertically, params );
+    this->Process( &alignVertically, &params );
     
     // Render it for filling the bounding boxing
     View view;
@@ -231,21 +222,21 @@ void Page::LayOutVertically( )
     params.push_back( &system_height );
     Functor setBoundingBoxYShift( &Object::SetBoundingBoxYShift );
     Functor setBoundingBoxYShiftEnd( &Object::SetBoundingBoxYShiftEnd );
-    this->Process( &setBoundingBoxYShift, params, &setBoundingBoxYShiftEnd );
+    this->Process( &setBoundingBoxYShift, &params, &setBoundingBoxYShiftEnd );
     
     // Set the Y position of each StaffAlignment
     // Adjusts the Y shift for making sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
-    int staffMargin = doc->GetSpacingStaff() * doc->m_drawingDoubleUnit[0]; // the minimal space we want to have between each staff
-    int* interlineSizes = doc->m_drawingDoubleUnit; // the interline sizes to be used for calculating the (previous) staff height
+    int staffMargin = doc->GetSpacingStaff() * doc->GetDrawingDoubleUnit( 100 ); // the minimal space we want to have between each staff
+    int interlineSize = doc->GetDrawingDoubleUnit( 100 ); // the interline sizes to be used for calculating the (previous) staff height
     params.push_back( &previousStaffHeight );
     params.push_back( &staffMargin );
-    params.push_back( &interlineSizes );
+    params.push_back( &interlineSize );
     Functor setAlignmentY( &Object::SetAligmentYPos );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentY );
-    this->Process( &setAlignmentY, params );
+    this->Process( &setAlignmentY, &params );
     
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
@@ -255,26 +246,23 @@ void Page::LayOutVertically( )
     Functor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxYShift );
-    this->Process( &integrateBoundingBoxYShift, params );
+    this->Process( &integrateBoundingBoxYShift, &params );
     
     // Adjust system Y position
     params.clear();
     shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
-    int systemMargin = doc->GetSpacingSystem() * doc->m_drawingDoubleUnit[0];
+    int systemMargin = doc->GetSpacingSystem() * doc->GetDrawingDoubleUnit( 100 );
     params.push_back( &shift );
     params.push_back( &systemMargin );
     Functor alignSystems( &Object::AlignSystems );
     Functor alignSystemsEnd( &Object::AlignSystemsEnd );
-    this->Process( &alignSystems, params, &alignSystemsEnd );
+    this->Process( &alignSystems, &params, &alignSystemsEnd );
 }
     
 void Page::JustifyHorizontally( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     if (!doc->GetJustificationX()) {
         return;
@@ -299,16 +287,13 @@ void Page::JustifyHorizontally( )
     Functor justifyX( &Object::JustifyX );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &justifyX );
-    this->Process( &justifyX, params );
+    this->Process( &justifyX, &params );
 }
     
 int Page::GetContentHeight( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return 0;
-    }
     Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
@@ -324,12 +309,8 @@ int Page::GetContentHeight( )
 
 int Page::GetContentWidth( )
 {
-    if (!dynamic_cast<Doc*>(m_parent)) {
-        assert( false );
-        return 0;
-    }
-    Doc *doc = NULL;
-    doc = dynamic_cast<Doc*>(m_parent);
+    Doc *doc = dynamic_cast<Doc*>(m_parent);
+    assert( doc );
     
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page

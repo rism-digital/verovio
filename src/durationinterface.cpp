@@ -27,7 +27,7 @@ namespace vrv {
 // DurationInterface
 //----------------------------------------------------------------------------
 
-DurationInterface::DurationInterface():
+DurationInterface::DurationInterface(): Interface(),
     AttAugmentdots(),
     AttBeamsecondary(),
     AttDurationMusical(),
@@ -36,6 +36,13 @@ DurationInterface::DurationInterface():
     AttFermatapresent(),
     AttStaffident()
 {
+    RegisterInterfaceAttClass(ATT_AUGMENTDOTS);
+    RegisterInterfaceAttClass(ATT_BEAMSECONDARY);
+    RegisterInterfaceAttClass(ATT_DURATIONMUSICAL);
+    RegisterInterfaceAttClass(ATT_DURATIONPERFORMED);
+    RegisterInterfaceAttClass(ATT_DURATIONRATIO);
+    RegisterInterfaceAttClass(ATT_FERMATAPRESENT);
+    RegisterInterfaceAttClass(ATT_STAFFIDENT);
     Reset();
 }
 
@@ -104,7 +111,7 @@ double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Me
 
 bool DurationInterface::IsInBeam( Object *noteOrRest )
 {
-    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( &typeid(Beam), MAX_BEAM_DEPTH ) );
+    Object *beam = noteOrRest->GetFirstParent( BEAM, MAX_BEAM_DEPTH );
     if ( !beam ) {
         return false;
     }
@@ -113,7 +120,7 @@ bool DurationInterface::IsInBeam( Object *noteOrRest )
 
 bool DurationInterface::IsFirstInBeam( Object *noteOrRest )
 {
-    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( &typeid(Beam), MAX_BEAM_DEPTH ) );
+    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( BEAM, MAX_BEAM_DEPTH ) );
     if ( !beam ) {
         return false;
     }
@@ -127,7 +134,7 @@ bool DurationInterface::IsFirstInBeam( Object *noteOrRest )
 
 bool DurationInterface::IsLastInBeam( Object *noteOrRest )
 {
-    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( &typeid(Beam), MAX_BEAM_DEPTH ) );
+    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( BEAM, MAX_BEAM_DEPTH ) );
     if ( !beam ) {
         return false;
     }

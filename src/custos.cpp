@@ -18,6 +18,8 @@ namespace vrv {
 Custos::Custos():
     LayerElement("custos-"), PositionInterface()
 {
+    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    
     Reset();
 }
 

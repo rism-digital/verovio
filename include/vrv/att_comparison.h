@@ -20,8 +20,8 @@ class AttCommonNComparison: public AttComparison
 {
 
 public:
-    AttCommonNComparison( const std::type_info *elementType, const int n ):
-    AttComparison( elementType )
+    AttCommonNComparison( ClassId AttClassId, const int n ):
+        AttComparison( AttClassId )
     {
         m_n = n;
     };
@@ -31,8 +31,10 @@ public:
     virtual bool operator() (Object *object)
     {
         if (!MatchesType(object)) return false;
+        // This should not happen but, but just in case
+        if (!object->HasAttClass( ATT_COMMON )) return false;
         AttCommon *element = dynamic_cast<AttCommon*>(object);
-        if (!element) return false;
+        assert( element );
         return (element->GetN() == m_n);
     }
     

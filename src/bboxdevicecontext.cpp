@@ -33,9 +33,7 @@ static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
 
 BBoxDeviceContext::BBoxDeviceContext ( View *view, int width, int height):
     DeviceContext()
-{	
-    m_correctMusicAscent = false; // do not correct the ascent in the music font    
-    
+{
     m_view = view;
     m_width = width;
     m_height = height;
@@ -311,11 +309,12 @@ void BBoxDeviceContext::DrawText(const std::string& text, const std::wstring wte
     int w, h;
     GetTextExtent(wtext, &w, &h);
     m_textWidth += w;
+    m_textHeight = std::max( m_textHeight, h );
     // very approximative, we should use GetTextExtend once implemented
     //m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
     // ignore y bounding boxes for text
     //m_textHeight = m_fontStack.top()->GetPointSize();
-        UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY + m_textHeight);
+    UpdateBB( m_textX, m_textY, m_textX + m_textWidth, m_textY - m_textHeight);
     
     
 }
@@ -369,8 +368,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     }
     
     // the array should not be empty
-    assert( !m_objects.empty() ); // Array cannot be empty
-    
+    assert( !m_objects.empty() );
     
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View object)
     (m_objects.back())->UpdateSelfBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );

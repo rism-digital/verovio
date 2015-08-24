@@ -1,27 +1,27 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measureelement.h
+// Name:        textdirective.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_MEASURE_ELEMENT_H__
-#define __VRV_MEASURE_ELEMENT_H__
+#ifndef __VRV_TEXT_DIRECTIVE_H__
+#define __VRV_TEXT_DIRECTIVE_H__
 
-#include "object.h"
+#include "floatingelement.h"
+#include "textdirinterface.h"
 
 namespace vrv {
-
+    
 //----------------------------------------------------------------------------
-// MeasureElement
+// MeasureTempo
 //----------------------------------------------------------------------------
 
-/** 
- * This class is an interface for elements with duration, such as notes and rests.
- * It is not an abstract class but should not be instanciate directly.
+/**
+ * This class is an interface for <tempo> elements at the measure level
  */
-class MeasureElement: public DocObject
+class Tempo: public FloatingElement, public TextDirInterface
 {
 public:
     /**
@@ -29,16 +29,19 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MeasureElement();
-    MeasureElement(std::string classid);
-    virtual ~MeasureElement();
+    Tempo();
+    virtual ~Tempo();
     virtual void Reset();
+    virtual std::string GetClassName( ) { return "Tempo"; };
+    virtual ClassId Is() { return TEMPO; };
     ///@}
+    
+protected:
     
 private:
     
 public:
-
+    
 private:
     
 };

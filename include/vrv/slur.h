@@ -9,7 +9,7 @@
 #ifndef __VRV_SLUR_H__
 #define __VRV_SLUR_H__
 
-#include "measureelement.h"
+#include "floatingelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -18,7 +18,8 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur: public MeasureElement, public TimeSpanningInterface
+class Slur: public FloatingElement, public TimeSpanningInterface,
+    public AttCurvature
 {
 public:
     /**
@@ -30,26 +31,8 @@ public:
     virtual ~Slur();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Slur"; };
+    virtual ClassId Is() { return SLUR; };
     ///@}
-    
-    //----------//
-    // Functors //
-    //----------//
-    
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
-    
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
-    
-    /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
-     */
-    virtual int ResetDarwing( ArrayPtrVoid params );
     
 private:
     

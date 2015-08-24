@@ -41,15 +41,13 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
+    virtual ClassId Is() { return LAYER_ELEMENT; };
     ///@}
     
-    LayerElement& operator=( const LayerElement& element ); // copy assignement - this need to be changed to the Object::Clone way;
-    
     /**
-     * Return a copy of the LayerElement (child class).
-     * By default, a new uuid is generated
+     * Copy assignment for resetting pointers
      */
-    LayerElement *GetChildCopy( bool newUuid = true );
+    LayerElement& operator=( const LayerElement& element );
     
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
@@ -65,7 +63,8 @@ public:
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
      * The value is false by default. Is it set to true of ScoreDef and StaffDef and used when
-     * drawing the element
+     * drawing the element.
+     * NB In the scoreDef or staffDef itself, it can be attributes or an element.
      */
     ///@{
     bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
@@ -76,34 +75,26 @@ public:
      * @name Child type checkers.
      */
     ///@{
-    bool IsAccid();
-    bool IsBarline();
-    bool IsBeam();
-    bool IsChord();
-    bool IsClef();
-    bool IsCustos();
-    bool IsDot();
-    bool HasDurationInterface();
-    bool IsKeySig();
-    bool IsMensur();
-    bool IsMeterSig();
-    bool IsMultiRest();
-    bool IsMRest();
-    bool IsNote();
-    bool HasPitchInterface();
-    bool HasPositionInterface();
-    bool IsRest();
-    bool IsTie();
-    bool IsTuplet();
-    bool IsSpace();
-    bool IsSyl();
-    bool IsVerse();
+    /** Returns true if the element is a grace note */
     bool IsGraceNote();
+    /** Returns true if the element is a note or a note child and the note has a @grace */
+    bool IsCueSize();
     ///@}
+    
+    /**
+     * Returns the drawing stem direction if the element is a note or a chord.
+     * (Could one day go in a drawing stem interface)
+     */
+    data_STEMDIRECTION GetDrawingStemDir();
 
     Alignment *GetAlignment() { return m_alignment; };
     
     int GetXRel();
+    
+    /**
+     * Returns the duration if the child element has a DurationInterface
+     */
+    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true );
     
     //----------//
     // Functors //
@@ -112,33 +103,26 @@ public:
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid *params );
     
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
+    virtual int PrepareTimeSpanning( ArrayPtrVoid *params );
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
-    
-protected:
-    /**
-     * Returns the duration if the child element has a DurationInterface
-     */
-    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
     
 private:
     
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-    /** Indicates if cue size - to be changed to MEI equivalent (size="cue") */
-    bool m_cueSize;
-
-    /** If this is a note, store here the stem coordinates (useful for ex. tuplets) */
+    /** 
+     * If this is a note, store here the stem coordinates (useful for ex. tuplets) 
+     */
     Point m_drawingStemStart; // beginning point, the one near the note
     Point m_drawingStemEnd; // end point (!), near beam or stem
     /** 

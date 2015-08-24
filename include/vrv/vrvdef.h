@@ -16,6 +16,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_classes.h"
 #include "attdef.h"
 
 namespace vrv {
@@ -39,7 +40,99 @@ typedef std::vector<Note*> ChordCluster;
 typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
     
 typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
-    
+
+//----------------------------------------------------------------------------
+// Object defines
+//----------------------------------------------------------------------------
+
+/**
+ * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
+ * Each Object child class has to have its own id and has to overwrite the Is() method.
+ * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
+ * used for checking if an Object is child of a base class. See for example
+ * Object::IsLayerElement.
+ */
+enum ClassId {
+    OBJECT = 0,
+    //
+    ALIGNMENT,
+    CLEF_ATTR,
+    DOC,
+    DOC_OBJECT,
+    GRACE_ALIGNER,
+    KEY_SIG_ATTR,
+    LAYER,
+    MEASURE,
+    MEASURE_ALIGNER,
+    MENSUR_ATTR,
+    METER_SIG_ATTR,
+    PAGE,
+    STAFF,
+    STAFF_ALIGNMENT,
+    STAFF_GRP,
+    SYSTEM,
+    SYSTEM_ALIGNER,
+    SYSTEM_ALIGNMENT,
+    // Ids for EditorialElement child classes
+    EDITORIAL_ELEMENT,
+    ANNOT,
+    APP,
+    LEM,
+    RDG,
+    SUPPLIED,
+    EDITORIAL_ELEMENT_max,
+    // Ids for LayerElement child classes
+    LAYER_ELEMENT,
+    ACCID,
+    BAR_LINE,
+    BAR_LINE_ATTR,
+    BEAM,
+    CHORD,
+    CLEF,
+    CUSTOS,
+    DOT,
+    KEY_SIG,
+    MENSUR,
+    METER_SIG,
+    MREST,
+    MULTI_REST,
+    NOTE,
+    PROPORT,
+    REST,
+    SPACE,
+    SYL,
+    TUPLET,
+    VERSE,
+    LAYER_ELEMENT_max,
+    // Ids for FloatingElement child classes
+    FLOATING_ELEMENT,
+    SLUR,
+    TEMPO,
+    TIE,
+    FLOATING_ELEMENT_max,
+    // Ids for ScoreDefElement child classes
+    SCORE_DEF_ELEMENT,
+    SCORE_DEF,
+    STAFF_DEF,
+    SCORE_DEF_ELEMENT_max,
+    //
+    UNSPECIFIED
+};
+
+/**
+ * The InterfaceIds are used to identify Interface child classes through the Interface::IsInterface virtual method.
+ * Each Interface child class has to have its own id and has to overwrite the IsInterface() method.
+ */
+enum InterfaceId {
+    INTERFACE,
+    INTERFACE_DURATION,
+    INTERFACE_PITCH,
+    INTERFACE_POSITION,
+    INTERFACE_SCOREDEF,
+    INTERFACE_TEXT_DIR,
+    INTERFACE_TIME_SPANNING
+};
+
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------
@@ -49,7 +142,9 @@ typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
     
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 7
+#define VERSION_REVISION 9
+// Adds "-dev" in the version number - should be set to false for releases
+#define VERSION_DEV true
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
@@ -70,6 +165,9 @@ enum FunctorCode {
 //----------------------------------------------------------------------------
     
 /** All values set to -1 (no limit) since this has not major incidence **/
+    
+/** Define the maximum levels between a note and its accids **/
+#define MAX_ACCID_DEPTH -1
     
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
@@ -99,6 +197,22 @@ enum FunctorCode {
 #define VRV_TEXT_E550 0xE550
 #define VRV_TEXT_E551 0xE551
 #define VRV_TEXT_E552 0xE552
+    
+//----------------------------------------------------------------------------
+// Types for editorial element
+//----------------------------------------------------------------------------
+
+// the maximum is 255 (unsigned char)
+enum EditorialLevel {
+    EDITORIAL_UNDEFINED = 0,
+    EDITORIAL_SYSTEM,
+    EDITORIAL_SCOREDEF,
+    EDITORIAL_STAFFGRP,
+    EDITORIAL_MEASURE,
+    EDITORIAL_STAFF,
+    EDITORIAL_LAYER,
+    EDITORIAL_NOTE
+};
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
@@ -106,50 +220,8 @@ enum FunctorCode {
   
 #define OCTAVE_OFFSET 4
 
-// ACCID
-#define ACCID_SHARP 1
-#define ACCID_FLAT 2
-#define ACCID_NATURAL 3
-#define ACCID_DOUBLE_SHARP 4
-#define ACCID_DOUBLE_FLAT 5
-#define ACCID_QUARTER_SHARP 6
-#define ACCID_QUARTER_FLAT 7
-
 #define ON 1
 #define OFF 0
-
-// TODO // ax2
-
-// RESTS
-#define VALSilSpec 15	/* val indiquant silence sp‚cial avec chiffre */ // ???
-
-// pour le flag tetenote
-#define LOSANGEVIDE 1
-#define OPTIONLIBRE 6
-#define SANSQUEUE 7
-
-/* valeurs des attributs de staccato in menu (getcode2()) */
-#define STACC 0
-#define LOURE 1
-#define ACCENT_OBL 2
-#define ACCENT_VERT 3
-#define BEBUNG 4
-#define STAC_AIGU 5
-#define ACCENT_OBL_PNT 6
-#define ACCENT_VERT_PNT 7
-
-    
-// the maximum is 255 (unsigned char)
-enum EditorialLevel {
-    EDITORIAL_UNDEFINED = 0,
-    EDITORIAL_SYSTEM,
-    EDITORIAL_SCOREDEF,
-    EDITORIAL_STAFFGRP,    
-    EDITORIAL_MEASURE,
-    EDITORIAL_STAFF,
-    EDITORIAL_LAYER,
-    EDITORIAL_NOTE
-};
     
 // the maximum is 255 (unsigned char)
 enum StaffGrpSymbol {

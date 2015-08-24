@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -240,8 +244,9 @@ bool AttTurnLog::HasForm( )
 /* include <attform> */
 
 bool Att::SetCmnornaments( Object *element, std::string attrType, std::string attrValue ) {
-    if (dynamic_cast<AttMordentLog*>(element) ) {
+    if (element->HasAttClass( ATT_MORDENTLOG ) ) {
         AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
+        assert( att );
         if (attrType == "form") {
             att->SetForm(att->StrToStr(attrValue));
             return true;
@@ -251,15 +256,17 @@ bool Att::SetCmnornaments( Object *element, std::string attrType, std::string at
             return true;
         }
     }
-    if (dynamic_cast<AttOrnam*>(element) ) {
+    if (element->HasAttClass( ATT_ORNAM ) ) {
         AttOrnam *att = dynamic_cast<AttOrnam*>(element);
+        assert( att );
         if (attrType == "ornam") {
             att->SetOrnam(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttOrnamentaccid*>(element) ) {
+    if (element->HasAttClass( ATT_ORNAMENTACCID ) ) {
         AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
+        assert( att );
         if (attrType == "accidupper") {
             att->SetAccidupper(att->StrToStr(attrValue));
             return true;
@@ -269,8 +276,9 @@ bool Att::SetCmnornaments( Object *element, std::string attrType, std::string at
             return true;
         }
     }
-    if (dynamic_cast<AttTurnLog*>(element) ) {
+    if (element->HasAttClass( ATT_TURNLOG ) ) {
         AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
+        assert( att );
         if (attrType == "delayed") {
             att->SetDelayed(att->StrToStr(attrValue));
             return true;
@@ -285,8 +293,9 @@ bool Att::SetCmnornaments( Object *element, std::string attrType, std::string at
 }
 
 void Att::GetCmnornaments( Object *element, ArrayOfStrAttr *attributes ) {
-    if (dynamic_cast<AttMordentLog*>(element) ) {
+    if (element->HasAttClass( ATT_MORDENTLOG ) ) {
         AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
+        assert( att );
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
         }
@@ -294,14 +303,16 @@ void Att::GetCmnornaments( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("long", att->StrToStr(att->GetLong())));
         }
     }
-    if (dynamic_cast<AttOrnam*>(element) ) {
+    if (element->HasAttClass( ATT_ORNAM ) ) {
         AttOrnam *att = dynamic_cast<AttOrnam*>(element);
+        assert( att );
         if (att->HasOrnam()) {
             attributes->push_back(std::make_pair("ornam", att->StrToStr(att->GetOrnam())));
         }
     }
-    if (dynamic_cast<AttOrnamentaccid*>(element) ) {
+    if (element->HasAttClass( ATT_ORNAMENTACCID ) ) {
         AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
+        assert( att );
         if (att->HasAccidupper()) {
             attributes->push_back(std::make_pair("accidupper", att->StrToStr(att->GetAccidupper())));
         }
@@ -309,8 +320,9 @@ void Att::GetCmnornaments( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("accidlower", att->StrToStr(att->GetAccidlower())));
         }
     }
-    if (dynamic_cast<AttTurnLog*>(element) ) {
+    if (element->HasAttClass( ATT_TURNLOG ) ) {
         AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
+        assert( att );
         if (att->HasDelayed()) {
             attributes->push_back(std::make_pair("delayed", att->StrToStr(att->GetDelayed())));
         }

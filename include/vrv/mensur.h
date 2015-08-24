@@ -19,7 +19,7 @@ namespace vrv {
 // Mensur
 //----------------------------------------------------------------------------
 
-class MensurAttr;
+class ScoreDefInterface;
     
 /** 
  * This class models the MEI <mensur> element. 
@@ -38,10 +38,12 @@ public:
      */
     ///@{
     Mensur();
-    Mensur( MensurAttr *mensurAttr );
+    Mensur( ScoreDefInterface *mensurAttr );
+    void Init();
     virtual ~Mensur();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Mensur"; };
+    virtual ClassId Is() { return MENSUR; };
     virtual Object* Clone() { return new Mensur(*this); };
     ///@}
     
@@ -59,39 +61,6 @@ public:
      */
     static int s_numBase;
 
-private:
-    
-};
-
-    
-//----------------------------------------------------------------------------
-// MensurAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the MEI @mensur attributes in scoreDef or staffDef elements.
- */
-class MensurAttr: public Object,
-    public AttMensuralShared,
-    public AttMensuralLog
-{
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    MensurAttr();
-    virtual ~MensurAttr();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "MensurAttr"; };
-    virtual Object* Clone() { return new MensurAttr(*this); };
-    ///@}
-    
-private:
-    
-public:
-    
 private:
     
 };

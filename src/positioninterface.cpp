@@ -17,9 +17,10 @@ namespace vrv {
 // PositionInterface
 //----------------------------------------------------------------------------
 
-PositionInterface::PositionInterface():
+PositionInterface::PositionInterface(): Interface(),
     AttStafflocPitched()
 {
+    RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
     Reset();
 }
 

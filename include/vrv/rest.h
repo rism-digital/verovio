@@ -34,6 +34,7 @@ public:
     virtual ~Rest();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Rest"; };
+    virtual ClassId Is() { return REST; };
     ///@}
     
 private:

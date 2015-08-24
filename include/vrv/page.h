@@ -40,11 +40,15 @@ public:
     virtual ~Page();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Page"; };
+    virtual ClassId Is() { return PAGE; };
     ///@}
 
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddSystem( System *system );
-
-	System *GetAtPos( int y );
+    ///@}
 	
 	int GetSystemCount() const { return (int)m_children.size(); };
     

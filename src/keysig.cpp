@@ -7,6 +7,7 @@
 
 
 #include "keysig.h"
+#include "scoredefinterface.h"
 
 //----------------------------------------------------------------------------
 
@@ -16,11 +17,11 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// KeySig
+// Static members with some default values
 //----------------------------------------------------------------------------
-
-unsigned char KeySig::flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
-unsigned char KeySig::sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
+    
+data_PITCHNAME KeySig::flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
+data_PITCHNAME KeySig::sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
 
 int KeySig::octave_map[2][9][7] = {
     {// flats
@@ -49,24 +50,36 @@ int KeySig::octave_map[2][9][7] = {
     },
 };
 
+//----------------------------------------------------------------------------
+// KeySig
+//----------------------------------------------------------------------------
+
 KeySig::KeySig():
-    LayerElement("ksig-")
+    LayerElement("ksig-"),
+    AttAccidental(),
+    AttPitch()
 {
-    Reset();
+    Init();
 }
 
-KeySig::KeySig(int num_alter, char alter):
-    LayerElement("ksig-")
+KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
+    LayerElement("ksig-"),
+    AttAccidental(),
+    AttPitch()
 {
-    Reset();
-    m_num_alter = num_alter;
-    m_alteration = alter;
+    Init();
+    
+    m_alterationNumber = alterationNumber;
+    m_alterationType = alterationType;
 }
     
-KeySig::KeySig( KeySigAttr *keySigAttr ):
-    LayerElement("ksig-")
+KeySig::KeySig( ScoreDefInterface *keySigAttr ):
+    LayerElement("ksig-"),
+    AttAccidental(),
+    AttPitch()
 {
-    Reset();
+    Init();
+    
     char key = keySigAttr->GetKeySig() - KEYSIGNATURE_0;
     /* see data_KEYSIGNATURE order; key will be:
       0 for KEYSIGNATURE_0
@@ -81,12 +94,26 @@ KeySig::KeySig( KeySigAttr *keySigAttr ):
         return;
     }
     if (key > 0) {
-        m_alteration = ACCID_SHARP;
+        m_alterationType = ACCIDENTAL_EXPLICIT_s;
     }
     else if (key < 0) {
-        m_alteration = ACCID_FLAT;
+        m_alterationType = ACCIDENTAL_EXPLICIT_f;
     }
-    m_num_alter = abs(key);
+    m_alterationNumber = abs(key);
+    
+    if ( keySigAttr->GetKeySigShow() == BOOLEAN_false ) {
+        m_drawingShow = false;
+    }
+    if ( keySigAttr->GetKeySigShowchange() == BOOLEAN_true ) {
+        m_drawingShowchange = true;
+    }
+}
+   
+void KeySig::Init()
+{
+    RegisterAttClass(ATT_ACCIDENTAL);
+    RegisterAttClass(ATT_PITCH);
+    Reset();
 }
 
 KeySig::~KeySig()
@@ -96,30 +123,82 @@ KeySig::~KeySig()
 void KeySig::Reset()
 {
     LayerElement::Reset();
-    m_num_alter = 0;
-    m_alteration = ACCID_NATURAL;
+    ResetAccidental();
+    ResetPitch();
+    m_alterationNumber = 0;
+    m_alterationType = ACCIDENTAL_EXPLICIT_n;
+    
+    // key change drawing values
+    m_drawingCancelAccidType = ACCIDENTAL_EXPLICIT_n;
+    m_drawingCancelAccidCount = 0;
+    m_drawingShow = true;
+    m_drawingShowchange = false;
 }
+    
+    
+void KeySig::ConvertToInternal( )
+{
+    int i;
+    if (this->GetAccid() == ACCIDENTAL_EXPLICIT_s) {
+        m_alterationType = ACCIDENTAL_EXPLICIT_s;
+        for (i = 0;i < 7; i++) {
+            if (KeySig::sharps[i] == this->GetPname()) {
+                m_alterationNumber = i + 1;
+                break;
+            }
+        }
+        
+    }
+    else if (this->GetAccid() == ACCIDENTAL_EXPLICIT_f) {
+        m_alterationType = ACCIDENTAL_EXPLICIT_f;
+        for (i = 0;i < 7; i++) {
+            if (KeySig::flats[i] == this->GetPname()) {
+                m_alterationNumber = i + 1;
+                break;
+            }
+        }
+    }
+    else return;
+}
+    
+void KeySig::ConvertToMei()
+{
+    if ((m_alterationNumber < 1) || (m_alterationNumber > 7)) return;
+    
+    if (m_alterationType == ACCIDENTAL_EXPLICIT_s) {
+        this->SetAccid( ACCIDENTAL_EXPLICIT_s);
+        this->SetPname(KeySig::sharps[m_alterationNumber - 1]);
+    }
+    else if (m_alterationType == ACCIDENTAL_EXPLICIT_f) {
+        this->SetAccid( ACCIDENTAL_EXPLICIT_f);
+        this->SetPname(KeySig::flats[m_alterationNumber - 1]);
+    }
+    else return;
+}
+    
+//----------------------------------------------------------------------------
+// Static methods
+//----------------------------------------------------------------------------
 
-unsigned char KeySig::GetAlterationAt(int pos) {
-    unsigned char *alteration_set;
+
+data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos)
+{
+    data_PITCHNAME *alteration_set;
     
-    if (pos > 6)
-        return 0;
+    if (pos > 6) return PITCHNAME_c;
     
-    if (m_alteration == ACCID_FLAT)
-        alteration_set = flats;
-    else
-        alteration_set = sharps;
+    if (alterationType == ACCIDENTAL_EXPLICIT_f) alteration_set = flats;
+    else alteration_set = sharps;
     
     return alteration_set[pos];
 }
 
-int KeySig::GetOctave(unsigned char pitch, int clefId) {
+int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId)
+{
     int alter_set = 0; // flats
     int key_set = 0;
     
-    if (m_alteration == ACCID_SHARP)
-        alter_set = 1;
+    if (alterationType == ACCIDENTAL_EXPLICIT_s) alter_set = 1;
     
     switch (clefId) {
         case G2: key_set = 0; break;
@@ -139,29 +218,6 @@ int KeySig::GetOctave(unsigned char pitch, int clefId) {
     }
     
     return octave_map[alter_set][key_set][pitch - 1] + OCTAVE_OFFSET;
-}
-
-    
-//----------------------------------------------------------------------------
-// KeySigAttr
-//----------------------------------------------------------------------------
-
-KeySigAttr::KeySigAttr():
-    Object(),
-    AttKeySigDefaultLog()
-{
-    Reset();
-}
-
-
-KeySigAttr::~KeySigAttr()
-{
-}
-
-void KeySigAttr::Reset()
-{
-    Object::Reset();
-    ResetKeySigDefaultLog();
 }
 
 } // namespace vrv
