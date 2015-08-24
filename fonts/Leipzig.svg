@@ -2,14 +2,16 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd" >
 <!--
 2014-03-21: Created.
-Version 5.2 - adding glyphs (dynamics, ornaments, mensural note heads, etc)
+Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)
+Version 5.2.1 - adding repeats
 -->
 <svg>
 <metadata>
-Created by FontForge 20120731 at Mon Aug 24 12:43:09 2015
+Created by FontForge 20120731 at Mon Aug 24 21:49:58 2015
  By laurent
-Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin with FontForge 2.0. This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.0
+Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
+This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
+Version 5.2.1
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="274" >
@@ -22,7 +24,7 @@ Version 5.2.0
     ascent="800"
     descent="-200"
     x-height="265"
-    bbox="-163 -893 1230 1317"
+    bbox="-163 -893 1234 1317"
     underline-thickness="50"
     underline-position="-50"
     unicode-range="U+0075-E93D"
@@ -469,5 +471,14 @@ d="M155 194l157 -194l-157 -192l-155 192zM125 111l-57 -73l122 -149l56 71z" />
 d="M155 194l157 -194l-157 -192l-155 192zM125 111l-57 -73l122 -149l56 71z" />
     <glyph glyph-name="uniE93D" unicode="&#xe93d;" horiz-adv-x="312" 
 d="M155 194l157 -194l-157 -192l-155 192z" />
+    <glyph glyph-name="uniE101" unicode="&#xe101;" horiz-adv-x="508" 
+d="M508 212l-362 -424h-146l362 424h146z" />
+    <glyph glyph-name="uniE501" unicode="&#xe501;" horiz-adv-x="751" 
+d="M750 212l-362 -424h-146l362 424h146zM508 212l-362 -424h-146l362 424h146zM52 108c0 13.333 4.333 24.667 13 34s19.333 14.333 32 15c14 0 25.667 -4 35 -12c9.33299 -8 14.333 -19 15 -33c0 -13.333 -4.33299 -24.667 -13 -34c-8.667 -9.333 -19.333 -14.333 -32 -15
+c-14 0 -25.667 4 -35 12s-14.333 19 -15 33zM603 -111c0 13.333 4.33301 24.667 13 34s19.334 14.333 32 15c14 0 25.667 -4 35 -12s14.333 -19 15 -33c0 -13.333 -4.33301 -24.667 -13 -34s-19.333 -14.333 -32 -15c-14 0 -25.667 4 -35 12s-14.333 19 -15 33z" />
+    <glyph glyph-name="uniE502" unicode="&#xe502;" horiz-adv-x="1234" 
+d="M1234 212l-362 -424h-146l362 424h146zM992 212l-362 -424h-146l362 424h146zM750 212l-362 -424h-146l362 424h146zM508 212l-362 -424h-146l362 424h146zM52 108c0 13.333 4.333 24.667 13 34s19.333 14.333 32 15c14 0 25.667 -4 35 -12c9.33299 -8 14.333 -19 15 -33
+c0 -13.333 -4.33299 -24.667 -13 -34c-8.667 -9.333 -19.333 -14.333 -32 -15c-14 0 -25.667 4 -35 12s-14.333 19 -15 33zM1087 -111c0 13.333 4.33301 24.667 13 34s19.334 14.333 32 15c14 0 25.667 -4 35 -12s14.333 -19 15 -33c0 -13.333 -4.33301 -24.667 -13 -34
+s-19.333 -14.333 -32 -15c-14 0 -25.667 4 -35 12s-14.333 19 -15 33z" />
   </font>
 </defs></svg>
