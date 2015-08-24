@@ -191,6 +191,9 @@ public:
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
     
+    std::string SymbolToStr(data_SYMBOL data);
+    data_SYMBOL StrToSymbol(std::string value);
+    
     std::string TempusToStr(data_TEMPUS data);
     data_TEMPUS StrToTempus(std::string value);
     

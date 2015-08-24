@@ -237,17 +237,17 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 2;
     
     // actually draw the line, the brace or the bracket
-    if ( topStaffGrp && ( (firstDef != lastDef) || (staffGrp->GetSymbol() != STAFFGRP_NONE) ) ) {
+    if ( topStaffGrp && ( (firstDef != lastDef) || (staffGrp->GetSymbol() != SYMBOL_NONE) ) ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, barLineWidth);
     }
     // this will need to be changed with the next version of MEI will line means additional thick line 
-    if ( staffGrp->GetSymbol() == STAFFGRP_LINE ) {
+    if ( staffGrp->GetSymbol() == SYMBOL_line ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, barLineWidth);
     }
-    else if ( staffGrp->GetSymbol() == STAFFGRP_BRACE ) {
+    else if ( staffGrp->GetSymbol() == SYMBOL_brace ) {
         DrawBrace ( dc, x, y_top, y_bottom, last->m_drawingStaffSize );
     }
-    else if ( staffGrp->GetSymbol() == STAFFGRP_BRACKET ) {
+    else if ( staffGrp->GetSymbol() == SYMBOL_bracket ) {
         DrawBracket( dc, x, y_top, y_bottom, last->m_drawingStaffSize );
         x -= 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBeamWhiteWidth(100, false);
     }
@@ -444,8 +444,8 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     assert( staffGrp );
     assert( barLine );
     
-    if ( !staffGrp->GetBarthru() ) {
-        // recursively draw the children (staffDef or staffGrp)
+    if (staffGrp->GetBarthru() != BOOLEAN_true) {
+        // recursively draw the children (staffDef or staffGrp) - we assume @barthru is false by default
         int i;
         StaffGrp *childStaffGrp = NULL;
         StaffDef *childStaffDef = NULL;

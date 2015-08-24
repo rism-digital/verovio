@@ -391,6 +391,16 @@ enum data_PLACE {
     PLACE_above,
     PLACE_below
 };
+
+/**
+ * MEI values for @symbol (no datatype in MEI)
+ */
+enum data_SYMBOL {
+    SYMBOL_NONE = 0,
+    SYMBOL_brace,
+    SYMBOL_bracket,
+    SYMBOL_line
+};
     
 /**
  * MEI data.STAFFREL

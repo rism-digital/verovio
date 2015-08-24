@@ -194,7 +194,10 @@ private:
  * This class represents a MEI staffGrp.
  * It contains StaffDef objects.
  */
-class StaffGrp: public Object, public ObjectListInterface
+class StaffGrp: public Object, public ObjectListInterface,
+    public AttLabelsAddl,
+    public AttStaffgroupingsym,
+    public AttStaffGrpVis
 {
 public:
     /**
@@ -218,22 +221,6 @@ public:
 	void AddStaffGrp( StaffGrp *staffGrp );
     ///@}
     
-    /**
-     * @name Set and get the staffGrp @symbol
-     */
-    ///@{
-    StaffGrpSymbol GetSymbol() const { return m_symbol; };
-    void SetSymbol( StaffGrpSymbol symbol ) { m_symbol = symbol; };
-    ///@}
-    
-    /**
-     * @name Set and get the staffGrp @barthru
-     */
-    ///@{
-    bool GetBarthru() const { return m_barthru; };
-    void SetBarthru( bool barthru ) { m_barthru = barthru; };
-    ///@}
-    
     //----------//
     // Functors //
     //----------//
@@ -250,8 +237,6 @@ private:
 public:
     
 private:
-    StaffGrpSymbol m_symbol;
-    bool m_barthru;
 
 };
 

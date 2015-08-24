@@ -205,9 +205,7 @@ private:
     /** @name Methods for converting members into MEI attributes. */
     ///@{
     std::string UuidToMeiStr( Object *element );
-    std::string BoolToStr(bool value );
     std::string DocTypeToStr(DocType type);
-    std::string StaffGrpSymbolToStr(StaffGrpSymbol symbol);
     ///@}
 
     
@@ -394,9 +392,7 @@ private:
      */
     ///@{
     void SetMeiUuid( pugi::xml_node element, Object *object );
-    bool StrToBool(std::string value);
     DocType StrToDocType(std::string type);
-    StaffGrpSymbol StrToStaffGrpSymbol(std::string sign);
     /** Extract the uuid for references to uuids with ..#uuid values */
     std::string ExtractUuidFragment(std::string refUuid);
     ///@}

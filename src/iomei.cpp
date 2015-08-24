@@ -410,12 +410,10 @@ bool MeiOutput::WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp
     assert( staffGrp );
     
     currentNode.append_attribute( "xml:id" ) = UuidToMeiStr( staffGrp ).c_str();
-    if ( staffGrp->GetSymbol() != STAFFGRP_NONE ) {
-        currentNode.append_attribute( "symbol" ) = StaffGrpSymbolToStr( staffGrp->GetSymbol() ).c_str();
-    }
-    if ( staffGrp->GetBarthru() ) {
-        currentNode.append_attribute( "barthru" ) = BoolToStr( staffGrp->GetBarthru() ).c_str();
-    }
+    
+    staffGrp->WriteLabelsAddl(currentNode);
+    staffGrp->WriteStaffgroupingsym(currentNode);
+    staffGrp->WriteStaffGrpVis(currentNode);
     
     return true;
 }
@@ -855,12 +853,6 @@ bool MeiOutput::WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot )
     
     return true;
 };
-    
-std::string MeiOutput::BoolToStr(bool value)
-{
-    if (value) return "true";
-    return "false";
-}
 
 std::string MeiOutput::DocTypeToStr(DocType type)
 {
@@ -876,21 +868,6 @@ std::string MeiOutput::DocTypeToStr(DocType type)
             break;
 	}
 	return value;   
-}
-
-std::string MeiOutput::StaffGrpSymbolToStr(StaffGrpSymbol symbol)
-{
- 	std::string value;
-	switch(symbol)
-	{	case STAFFGRP_LINE : value = "line"; break;
-		case STAFFGRP_BRACE : value = "brace"; break;
-        case STAFFGRP_BRACKET : value = "bracket"; break;
-        default:
-            LogWarning("Unknown staffGrp @symbol  '%d'", symbol);
-            value = "line";
-            break;
-	}
-	return value;
 }
 
 //----------------------------------------------------------------------------
@@ -1269,12 +1246,9 @@ bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
     StaffGrp *vrvStaffGrp = new StaffGrp( );
     SetMeiUuid( staffGrp, vrvStaffGrp );
     
-    if ( staffGrp.attribute( "symbol" ) ) {
-        vrvStaffGrp->SetSymbol( StrToStaffGrpSymbol( staffGrp.attribute( "symbol" ).value() ) );
-    }
-    if ( staffGrp.attribute( "barthru" ) ) {
-        vrvStaffGrp->SetBarthru( StrToBool( staffGrp.attribute( "barthru" ).value() ) );
-    }
+    vrvStaffGrp->ReadLabelsAddl(staffGrp);
+    vrvStaffGrp->ReadStaffGrpVis(staffGrp);
+    vrvStaffGrp->ReadStaffgroupingsym(staffGrp);
     
     AddStaffGrp(parent, vrvStaffGrp);
     
@@ -2390,12 +2364,6 @@ void MeiInput::SetMeiUuid( pugi::xml_node element, Object *object )
     object->SetUuid( element.attribute( "xml:id" ).value() );
     element.remove_attribute("xml:id");
 }
-
-bool MeiInput::StrToBool(std::string value)
-{
-    if (value == "false") return false;
-	return true;
-}
    
 DocType MeiInput::StrToDocType(std::string type)
 {
@@ -2407,18 +2375,6 @@ DocType MeiInput::StrToDocType(std::string type)
 	}
     // default
 	return Raw;
-}
-
-StaffGrpSymbol MeiInput::StrToStaffGrpSymbol(std::string symbol)
-{
-    if (symbol == "line") return STAFFGRP_LINE;
-    else if (symbol == "brace") return STAFFGRP_BRACE;
-    else if (symbol == "bracket") return STAFFGRP_BRACKET;
-    else {
-        LogWarning("Unknown staffGrp @symbol '%s'", symbol.c_str() );
-	}
-    // default
-	return STAFFGRP_LINE;
 }
     
 std::string MeiInput::ExtractUuidFragment(std::string refUuid)

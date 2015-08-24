@@ -1005,6 +1005,33 @@ data_STEMPOSITION Att::StrToStemPosition(std::string value)
     return STEMPOSITION_NONE;
 }    
 
+std::string Att::SymbolToStr(data_SYMBOL data)
+{
+    std::string value;
+    switch(data)
+    {
+        case SYMBOL_brace : value = "brace"; break;
+        case SYMBOL_bracket: value = "bracket"; break;
+        case SYMBOL_line: value = "line"; break;
+        default:
+            LogWarning("Unknown symbol '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_SYMBOL Att::StrToSymbol(std::string value)
+{
+    if (value == "brace") return SYMBOL_brace;
+    else if (value == "bracket") return SYMBOL_bracket;
+    else if (value == "line") return SYMBOL_line;
+    else {
+        LogWarning("Unsupported symbol '%s'", value.c_str() );
+    }
+    return SYMBOL_NONE;
+}
+
 std::string Att::TieToStr(data_TIE data)
 {
     std::string value;

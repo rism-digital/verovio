@@ -222,14 +222,6 @@ enum EditorialLevel {
 #define ON 1
 #define OFF 0
     
-// the maximum is 255 (unsigned char)
-enum StaffGrpSymbol {
-    STAFFGRP_NONE = 0,
-    STAFFGRP_LINE,
-    STAFFGRP_BRACE,
-    STAFFGRP_BRACKET
-};
-    
 /* This is used for fast clef offset calculation.
  * It uses 4 bytes with, from right to left
  * - line

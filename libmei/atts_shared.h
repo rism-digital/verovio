@@ -4516,8 +4516,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBarthru(std::string barthru_) { m_barthru = barthru_; };
-    std::string GetBarthru() const { return m_barthru; };    
+    void SetBarthru(data_BOOLEAN barthru_) { m_barthru = barthru_; };
+    data_BOOLEAN GetBarthru() const { return m_barthru; };    
     bool HasBarthru( );
     
     ///@}
@@ -4527,7 +4527,7 @@ private:
      * Indicates whether bar lines go across the space between staves (true) or are
      * only drawn across the lines of each staff (false).
      **/
-    std::string m_barthru;
+    data_BOOLEAN m_barthru;
 
 /* include <attbarthru> */
 };
@@ -4557,15 +4557,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSymbol(std::string symbol_) { m_symbol = symbol_; };
-    std::string GetSymbol() const { return m_symbol; };    
+    void SetSymbol(data_SYMBOL symbol_) { m_symbol = symbol_; };
+    data_SYMBOL GetSymbol() const { return m_symbol; };    
     bool HasSymbol( );
     
     ///@}
 
 private:
     /** Specifies the symbol used to group a set of staves. **/
-    std::string m_symbol;
+    data_SYMBOL m_symbol;
 
 /* include <attsymbol> */
 };
