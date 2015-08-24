@@ -76,6 +76,8 @@ void Doc::Reset( DocType type )
     
     m_scoreDef.Reset();
     
+    m_drawingSmuflFontSize = 0;
+    m_drawingLyricFontSize = 0;
     m_drawingLyricFont.SetFaceName("Garamond");
 }
 
@@ -97,7 +99,7 @@ void Doc::PrepareDrawing()
     
     if (m_drawingPreparationDone) {
         Functor resetDrawing( &Object::ResetDarwing );
-        this->Process( &resetDrawing, params );
+        this->Process( &resetDrawing, &params );
     }
     
     // Try to match all spanning elements (slur, tie, etc) by processing backward
@@ -106,7 +108,7 @@ void Doc::PrepareDrawing()
     params.push_back( &timeSpanningElements );
     params.push_back( &fillList );
     Functor prepareTimeSpanning( &Object::PrepareTimeSpanning );
-    this->Process( &prepareTimeSpanning, params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD );
+    this->Process( &prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD );
     
     // First we tried backward because nomrally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
@@ -115,7 +117,7 @@ void Doc::PrepareDrawing()
     // but this time without filling the list (that is only will the remaining elements)
     if ( !timeSpanningElements.empty() ) {
         fillList = false;
-        this->Process( &prepareTimeSpanning, params );
+        this->Process( &prepareTimeSpanning, &params );
     }
     
     // If some are still there, then it is probably an issue in the encoding
@@ -137,7 +139,7 @@ void Doc::PrepareDrawing()
     // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
     //LogElapsedTimeStart( );
     Functor prepareProcessingLists( &Object::PrepareProcessingLists );
-    this->Process( &prepareProcessingLists, params );
+    this->Process( &prepareProcessingLists, &params );
     
     // The tree is used to process each staff/layer/verse separatly
     // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
@@ -156,8 +158,8 @@ void Doc::PrepareDrawing()
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
-            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            AttCommonNComparison matchStaff( STAFF, staves->first );
+            AttCommonNComparison matchLayer( LAYER, layers->first );
             filters.push_back( &matchStaff );
             filters.push_back( &matchLayer );
             
@@ -170,7 +172,7 @@ void Doc::PrepareDrawing()
             paramsTieAttr.push_back( &currentChord );
             Functor prepareTieAttr( &Object::PrepareTieAttr );
             Functor prepareTieAttrEnd( &Object::PrepareTieAttrEnd );
-            this->Process( &prepareTieAttr, paramsTieAttr, &prepareTieAttrEnd, &filters );
+            this->Process( &prepareTieAttr, &paramsTieAttr, &prepareTieAttrEnd, &filters );
         
             // After having processed one layer, we check if we have open ties - if yes, we
             // must reset them and they will be ignored.
@@ -189,15 +191,15 @@ void Doc::PrepareDrawing()
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
-            AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
+            AttCommonNComparison matchStaff( STAFF, staves->first );
+            AttCommonNComparison matchLayer( LAYER, layers->first );
             filters.push_back( &matchStaff );
             filters.push_back( &matchLayer );
 
             ArrayPtrVoid paramsPointers;
             paramsPointers.push_back( &currentNote );
             Functor preparePointersByLayer( &Object::PreparePointersByLayer );
-            this->Process( &preparePointersByLayer, paramsPointers, NULL, &filters );
+            this->Process( &preparePointersByLayer, &paramsPointers, NULL, &filters );
         }
     }
     
@@ -211,9 +213,9 @@ void Doc::PrepareDrawing()
                 //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 filters.clear();
                 // Create ad comparison object for each type / @n
-                AttCommonNComparison matchStaff( &typeid(Staff), staves->first );
-                AttCommonNComparison matchLayer( &typeid(Layer), layers->first );
-                AttCommonNComparison matchVerse( &typeid(Verse), verses->first );
+                AttCommonNComparison matchStaff( STAFF, staves->first );
+                AttCommonNComparison matchLayer( LAYER, layers->first );
+                AttCommonNComparison matchVerse( VERSE, verses->first );
                 filters.push_back( &matchStaff );
                 filters.push_back( &matchLayer );
                 filters.push_back( &matchVerse );
@@ -229,7 +231,7 @@ void Doc::PrepareDrawing()
                 paramsLyrics.push_back( &lastButOneNote );
                 Functor prepareLyrics( &Object::PrepareLyrics );
                 Functor prepareLyricsEnd( &Object::PrepareLyricsEnd );
-                this->Process( &prepareLyrics, paramsLyrics, &prepareLyricsEnd, &filters );
+                this->Process( &prepareLyrics, &paramsLyrics, &prepareLyricsEnd, &filters );
             }
         }
     }
@@ -241,7 +243,7 @@ void Doc::PrepareDrawing()
     timeSpanningElements.clear();
     params.push_back( &timeSpanningElements );
     Functor fillStaffCurrentTimeSpanning( &Object::FillStaffCurrentTimeSpanning );
-    this->Process( &fillStaffCurrentTimeSpanning, params );
+    this->Process( &fillStaffCurrentTimeSpanning, &params );
     
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if ( !timeSpanningElements.empty() ) {
@@ -293,8 +295,12 @@ void Doc::SetCurrentScoreDef( bool force )
     params.push_back( &staffDef );
     Functor setCurrentScoreDef( &Object::SetCurrentScoreDef );
     
+    // First process the current scoreDef in order to fill the staffDef with
+    // the appropriate drawing values
+    currentScoreDef.Process( &setCurrentScoreDef, &params );
+    
     //LogElapsedTimeStart( );
-    this->Process( &setCurrentScoreDef, params );
+    this->Process( &setCurrentScoreDef, &params );
     //LogElapsedTimeEnd ( "Setting scoreDefs" );
     
     m_currentScoreDefDone = true;
@@ -323,10 +329,8 @@ void Doc::CastOff( )
     params.push_back( &shift );
     params.push_back( &systemFullWidth );
     Functor castOffSystems( &Object::CastOffSystems );
-    contentSystem->Process( &castOffSystems, params );
+    contentSystem->Process( &castOffSystems, &params );
     delete contentSystem;
-    
-    //LogDebug("Layout: %d systems", contentPage->GetSystemCount());
     
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDef( true );
@@ -347,7 +351,7 @@ void Doc::CastOff( )
     params.push_back( &shift );
     params.push_back( &pageFullHeight );
     Functor castOffPages( &Object::CastOffPages );
-    contentPage->Process( &castOffPages, params );
+    contentPage->Process( &castOffPages, &params );
     delete contentPage;
     
     //LogDebug("Layout: %d pages", this->GetChildCount());
@@ -368,7 +372,7 @@ void Doc::UnCastOff( )
     params.push_back( contentSystem );
 
     Functor unCastOff( &Object::UnCastOff );
-    this->Process( &unCastOff, params );
+    this->Process( &unCastOff, &params );
     
     this->ClearChildren();
     
@@ -392,31 +396,134 @@ int Doc::GetPageCount( )
     return GetChildCount() ;
 }
     
-
-short Doc::GetLeftMargin( const std::type_info *elementType )
+int Doc::GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize )
 {
-
-    if (typeid(Barline) == *elementType) return 5;
-    else if (typeid(Chord) == *elementType) return 10;
-    else if (typeid(Clef) == *elementType) return -20;
-    else if (typeid(MRest) == *elementType) return 30;
-    else if (typeid(Note) == *elementType) return 10;
-    return 0;
-
+    int x, y, w, h;
+    Glyph *glyph;
+    glyph = Resources::GetGlyph( smuflCode );
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+    h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if ( graceSize ) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    h = h * staffSize / 100;
+    return h;
 }
     
-short Doc::GetRightMargin( const std::type_info *elementType )
+int Doc::GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize )
 {
-    if (typeid(Clef) == *elementType) return 30;
-    else if (typeid(KeySig) == *elementType)  return 30;
-    else if (typeid(Mensur) == *elementType) return 30;
-    else if (typeid(MeterSig) == *elementType) return 30;
-    else if (typeid(Barline) == *elementType) return 30;
-    else if (typeid(BarlineAttr) == *elementType) return 0;
-    else if (typeid(MRest) == *elementType) return 30;
-    else if (typeid(MultiRest) == *elementType) return 30;
-    //else if (typeid(Note) == *elementType) return 10;
-    return 10;
+    int x, y, w, h;
+    Glyph *glyph;
+    glyph = Resources::GetGlyph( smuflCode );
+    assert( glyph );
+    glyph->GetBoundingBox( &x, &y, &w, &h );
+    w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if ( graceSize ) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    w = w * staffSize / 100;
+    return w;
+}
+
+int Doc::GetDrawingUnit( int staffSize )
+{
+    return m_drawingUnit * staffSize / 100;
+}
+    
+int Doc::GetDrawingDoubleUnit( int staffSize )
+{
+    return m_drawingDoubleUnit * staffSize / 100;
+}
+    
+int Doc::GetDrawingStaffSize( int staffSize )
+{
+    return m_drawingStaffSize * staffSize / 100;
+    
+}
+    
+int Doc::GetDrawingOctaveSize( int staffSize )
+{
+    return m_drawingOctaveSize * staffSize / 100;
+}
+    
+int Doc::GetDrawingBrevisWidth( int staffSize )
+{
+    return m_drawingBrevisWidth * staffSize / 100;
+}
+    
+int Doc::GetDrawingBarLineWidth( int staffSize )
+{
+    return m_style->m_barLineWidth * staffSize / 100;
+}
+
+int Doc::GetDrawingStaffLineWidth( int staffSize )
+{
+    return m_style->m_staffLineWidth * staffSize / 100;
+}
+
+int Doc::GetDrawingStemWidth( int staffSize )
+{
+    return m_style->m_stemWidth * staffSize / 100;
+}
+
+int Doc::GetDrawingBeamWidth( int staffSize, bool graceSize )
+{
+    int value = m_drawingBeamWidth * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value;
+}
+    
+int Doc::GetDrawingBeamWhiteWidth( int staffSize, bool graceSize )
+{
+    int value = m_drawingBeamWhiteWidth * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value;
+}
+    
+int Doc::GetDrawingLedgerLineLength( int staffSize, bool graceSize )
+{
+    int value = m_drawingLedgerLine * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value;
+}
+    
+int Doc::GetGraceSize(int value)
+{
+    return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+}
+
+FontInfo *Doc::GetDrawingSmuflFont( int staffSize, bool graceSize )
+{
+    int value = m_drawingSmuflFontSize * staffSize / 100;
+    if ( graceSize ) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    m_drawingSmuflFont.SetPointSize( value );
+    return &m_drawingSmuflFont;
+}
+    FontInfo *Doc::GetDrawingLyricFont( int staffSize )
+{
+    m_drawingLyricFont.SetPointSize( m_drawingLyricFontSize * staffSize / 100 );
+    return &m_drawingLyricFont;
+}
+    
+char Doc::GetLeftMargin( const ClassId classId  )
+{
+    if (classId == BAR_LINE) return m_style->m_leftMarginBarline;
+    else if (classId == BAR_LINE_ATTR) return m_style->m_leftMarginBarlineAttr;
+    else if (classId == CHORD) return m_style->m_leftMarginChord;
+    else if (classId == CLEF) return m_style->m_leftMarginClef;
+    else if (classId == MREST) return m_style->m_leftMarginMRest;
+    else if (classId == NOTE) return m_style->m_leftMarginNote;
+    return m_style->m_leftMarginDefault;
+}
+    
+char Doc::GetRightMargin( const ClassId classId )
+{
+    if (classId == BAR_LINE) return m_style->m_rightMarginBarline;
+    else if (classId == BAR_LINE_ATTR) return m_style->m_rightMarginBarlineAttr;
+    else if (classId == CLEF) return m_style->m_rightMarginClef;
+    else if (classId == KEY_SIG)  return m_style->m_rightMarginKeySig;
+    else if (classId == MENSUR) return m_style->m_rightMarginMensur;
+    else if (classId == METER_SIG) return m_style->m_rightMarginMeterSig;
+    else if (classId == MREST) return m_style->m_rightMarginMRest;
+    else if (classId == MULTI_REST) return m_style->m_rightMarginMultiRest;
+    return m_style->m_rightMarginDefault;
 }
     
 void Doc:: SetPageHeight( int pageHeight )
@@ -467,8 +574,9 @@ Page *Doc::SetDrawingPage( int pageIdx )
         return m_drawingPage;
     }
     m_drawingPage = dynamic_cast<Page*>(this->GetChild( pageIdx ) );
-    
     assert( m_drawingPage );
+    
+    int glyph_size;
     
     // we use the page members only if set (!= -1) 
     if ( m_drawingPage->m_pageHeight != -1 )
@@ -515,94 +623,31 @@ Page *Doc::SetDrawingPage( int pageIdx )
 	m_drawingBeamMaxSlope /= 100;
 	m_drawingBeamMinSlope /= 100;
     
-    m_drawingSmallStaffRatio[0] = this->m_style->m_smallStaffNum;
-    m_drawingSmallStaffRatio[1] = this->m_style->m_smallStaffDen;
-    m_drawingGraceRatio[0] = this->m_style->m_graceNum;
-    m_drawingGraceRatio[1] = this->m_style->m_graceDen;
-    
     // half of the space between two lines
-    m_drawingUnit[0] = m_style->m_unit;
-    // same for small staves
-    m_drawingUnit[1] = (m_drawingUnit[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
+    m_drawingUnit = m_style->m_unit;
     // space between two lines
-    m_drawingDoubleUnit[0] = m_drawingUnit[0] * 2;
-    // same for small staves
-    m_drawingDoubleUnit[1] = m_drawingUnit[1] * 2;
+    m_drawingDoubleUnit = m_drawingUnit * 2;
     // staff (with five lines)
-    m_drawingStaffSize[0] = m_drawingDoubleUnit[0] * 4;
-    m_drawingStaffSize[1] = m_drawingDoubleUnit[1] * 4;
-    //
-    m_drawingOctaveSize[0] = m_drawingUnit[0] * 7;
-    m_drawingOctaveSize[1] = m_drawingUnit[1] * 7;
+    m_drawingStaffSize = m_drawingDoubleUnit * 4;
+    // octave height
+    m_drawingOctaveSize = m_drawingUnit * 7;
+    // measure minimal width
+    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
     
     // values for beams
-    m_drawingBeamWidth[0] = this->m_style->m_unit;
-    m_drawingBeamWhiteWidth[0] = this->m_style->m_unit / 2;
-    m_drawingBeamWidth[1] = (m_drawingBeamWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-    m_drawingBeamWhiteWidth[1] = (m_drawingBeamWhiteWidth[0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-    
-    m_drawingFontHeight = CalcMusicFontSize();
-    
-    /*
-    m_drawingFontHeightAscent[0][0] = floor(LEIPZIG_ASCENT * (double)m_drawingFontHeight / LEIPZIG_UNITS_PER_EM);
-	m_drawingFontHeightAscent[0][1] = (m_drawingFontHeightAscent[0][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
-    m_drawingFontHeightAscent[1][0] = (m_drawingFontHeightAscent[0][0] * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1];
-	m_drawingFontHeightAscent[1][1] = (m_drawingFontHeightAscent[1][0] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1];
-    */
-    
-	m_drawingSmuflFonts[0][0].SetPointSize( m_drawingFontHeight );
-    m_drawingSmuflFonts[0][1].SetPointSize( (m_drawingFontHeight * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
-    m_drawingSmuflFonts[1][0].SetPointSize( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] );
-    m_drawingSmuflFonts[1][1].SetPointSize( ( (m_drawingFontHeight * m_drawingSmallStaffRatio[0]) / m_drawingSmallStaffRatio[1] * m_drawingGraceRatio[0]) / m_drawingGraceRatio[1] );
-    
-    m_drawingLyricFonts[0] = m_drawingLyricFont;
-    m_drawingLyricFonts[1] = m_drawingLyricFont;
-	m_drawingLyricFonts[0].SetPointSize( m_drawingUnit[0] * m_style->m_lyricSize / PARAM_DENOMINATOR );
-    m_drawingLyricFonts[1].SetPointSize( m_drawingUnit[1] * m_style->m_lyricSize / PARAM_DENOMINATOR );
-    
-    m_drawingMinMeasureWidth = m_drawingUnit[0] * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
-    
-    float glyph_size;
-    Glyph *glyph;
-    int x, y, w, h;
-    glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
-    assert( glyph );
-    glyph->GetBoundingBox( &x, &y, &w, &h );
+    m_drawingBeamWidth = this->m_style->m_unit;
+    m_drawingBeamWhiteWidth = this->m_style->m_unit / 2;
 
-    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingNoteRadius[0][0] = ceil(glyph_size / 2);
-    m_drawingNoteRadius[0][1] = (m_drawingNoteRadius[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingNoteRadius[1][0] = (m_drawingNoteRadius[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
-    m_drawingNoteRadius[1][1] = (m_drawingNoteRadius[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    // values for fonts
+    m_drawingSmuflFontSize = CalcMusicFontSize();
+    m_drawingLyricFontSize = m_drawingUnit * m_style->m_lyricSize / PARAM_DENOMINATOR;
+
+    glyph_size = GetGlyphWidth(SMUFL_E0A3_noteheadHalf, 100, 0);
+    m_drawingLedgerLine = glyph_size * 72 / 100;
     
-    m_drawingLedgerLine[0][0] = (int)(glyph_size * .72);
-    m_drawingLedgerLine[0][1] = (m_drawingLedgerLine[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingLedgerLine[1][0] = (m_drawingLedgerLine[0][0] * m_drawingSmallStaffRatio[0])/m_drawingSmallStaffRatio[1];
-    m_drawingLedgerLine[1][1] = (m_drawingLedgerLine[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    
-    glyph = Resources::GetGlyph(SMUFL_E0A2_noteheadWhole);
-    assert( glyph );
-    glyph->GetBoundingBox( &x, &y, &w, &h );
-    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingLedgerLine[0][2] = (int)(glyph_size * .66);
-    m_drawingLedgerLine[1][2] = (m_drawingLedgerLine[0][2] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    
-    m_drawingBrevisWidth[0] = (int)((glyph_size * 0.8) / 2);
-    m_drawingBrevisWidth[1] = (m_drawingBrevisWidth[0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
- 
-    glyph = Resources::GetGlyph(SMUFL_E262_accidentalSharp);
-    assert( glyph );
-    glyph->GetBoundingBox( &x, &y, &w, &h );
-    glyph_size = round((double)w * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingAccidWidth[0][0] = glyph_size;
-    m_drawingAccidWidth[0][1] = (m_drawingAccidWidth[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingAccidWidth[1][0] = (m_drawingAccidWidth[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    m_drawingAccidWidth[1][1] = (m_drawingAccidWidth[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    glyph_size = round((double)h * (double)m_drawingFontHeight / (double)glyph->GetUnitsPerEm());
-    m_drawingAccidHeight[0][0] = glyph_size;
-    m_drawingAccidHeight[0][1] = (m_drawingAccidHeight[0][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
-    m_drawingAccidHeight[1][0] = (m_drawingAccidHeight[0][0] * m_drawingSmallStaffRatio[0]) /m_drawingSmallStaffRatio[1];
-    m_drawingAccidHeight[1][1] = (m_drawingAccidHeight[1][0] * m_drawingGraceRatio[0])/m_drawingGraceRatio[1];
+    glyph_size = GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
+
+    m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
     
 	return m_drawingPage;
 }
@@ -631,12 +676,12 @@ int Doc::GetAdjustedDrawingPageWidth()
 // Doc functors methods
 //----------------------------------------------------------------------------
 
-int Doc::PrepareLyricsEnd( ArrayPtrVoid params )
+int Doc::PrepareLyricsEnd( ArrayPtrVoid *params )
 {
     // param 0: the current Syl
     // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl**>(params[0]);
-    Note **lastNote = static_cast<Note**>(params[1]);
+    Syl **currentSyl = static_cast<Syl**>((*params)[0]);
+    Note **lastNote = static_cast<Note**>((*params)[1]);
     
     if ( (*currentSyl) && (*lastNote) ) {
         (*currentSyl)->SetEnd(*lastNote);

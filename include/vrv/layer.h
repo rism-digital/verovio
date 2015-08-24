@@ -9,25 +9,18 @@
 #ifndef __VRV_LAYER_H__
 #define __VRV_LAYER_H__
 
-#include <typeinfo>
-
-//----------------------------------------------------------------------------
-
 #include "atts_shared.h"
 #include "clef.h"
-#include "drawinglistinterface.h"
+#include "drawinginterface.h"
 #include "object.h"
 
 namespace vrv {
 
 class DeviceContext;
-class KeySig;
 class LayerElement;
 class Note;
 class ScoreDef;
 class StaffDef;
-class Mensur;
-class MeterSig;
 
 //----------------------------------------------------------------------------
 // Layer
@@ -38,7 +31,7 @@ class MeterSig;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer: public DocObject, public DrawingListInterface, public ObjectListInterface,
+class Layer: public DocObject, public DrawingListInterface, public ObjectListInterface, public StaffDefDrawingInterface,
     public AttCommon
 {
 public:
@@ -51,12 +44,16 @@ public:
     virtual ~Layer();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Layer"; };
+    virtual ClassId Is() { return LAYER; };
     ///@}
 	
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddLayerElement( LayerElement *element, int idx = -1 );
-    	
-	int GetElementCount() const { return (int)m_children.size(); };
-    
+    ///@}
+    	    
     /**
      * Return the index position of the layer in its staff parent.
      * The index position is 0-based.
@@ -66,17 +63,6 @@ public:
 	LayerElement *GetPrevious( LayerElement *element );
 	LayerElement *GetAtPos( int x );
 	LayerElement *Insert( LayerElement *element, int x ); // return a pointer on the inserted element
-    
-    void Insert( LayerElement *element, LayerElement *before );
-    
-	void Delete( LayerElement *element );
-	
-    /**
-     * Looks for the first LayerElement of type elementType.
-     * Looks FORWARD of BACKWARD depending on the direction parameter.
-     * Returns the retrieved element if *succ == true or the original element if not.
-     */
-    LayerElement *GetFirstOld( LayerElement *element, bool direction, const std::type_info *elementType, bool *succ );
     
     /** 
      * Get the current clef for the test element.
@@ -93,46 +79,10 @@ public:
     int GetClefOffset( LayerElement *test  );
     
     /**
-     * Basic method that remove intermediate clefs and custos.
-     * Used for building collations (See CmpFile::Collate).
-     */
-    void RemoveClefAndCustos( );
-    
-    /**
      * Set drawing clef, keysig and mensur if necessary and if available.
      * Also set the current clef.
      */
-    void SetDrawingAndCurrentValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef );
-    
-    /**
-     * @name Set the clef, keySig, mensur and meterSig to be drawn.
-     */
-    ///@{
-    void SetDrawClef( bool draw ) { m_drawClef = draw; };
-    void SetDrawKeySig( bool draw ) { m_drawKeySig = draw; };
-    void SetDrawMensur( bool draw ) { m_drawMensur = draw; };
-    void SetDrawMeterSig( bool draw ) { m_drawMeterSig = draw; };
-    ///@}
-    
-    /**
-     * @name Get the clef, keySig, mensur and meterSig to be drawn.
-     */
-    ///@{
-    Clef *GetDrawingClef( ) { if (m_drawClef) return m_currentClef; return NULL; };
-    KeySig *GetDrawingKeySig( ) { if (m_drawKeySig) return m_currentKeySig; return NULL; };
-    Mensur *GetDrawingMensur( ) { if (m_drawMensur) return m_currentMensur; return NULL; };
-    MeterSig *GetDrawingMeterSig( ) { if (m_drawMeterSig) return m_currentMeterSig; return NULL; };
-    ///@}
-    
-    /**
-     * @name Set the current clef, keySig, mensur and meterSig.
-     */
-    ///@{
-    void SetCurrentClef( Clef *clef );
-    void SetCurrentKeySig( KeySig *keySig );
-    void SetCurrentMensur( Mensur *mensur );
-    void SetCurrentMeterSig( MeterSig *meterSig );
-    ///@}
+    void SetDrawingAndCurrentValues( StaffDef *currentStaffDef );
     
     /**
      * @name Set and get the stem direction of the layer.
@@ -151,52 +101,31 @@ public:
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontally( ArrayPtrVoid params );
+    virtual int AlignHorizontally( ArrayPtrVoid *params );
+
+    /**
+     * Align horizontally the content of a layer.
+     */
+    virtual int AlignHorizontallyEnd( ArrayPtrVoid *params );
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists( ArrayPtrVoid params );
+    virtual int PrepareProcessingLists( ArrayPtrVoid *params );
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
     
 private:
     
 public:
     
 protected:
-    /**
-     * @name Drawing flags
-     */
-    ///@{
-    /** The clef attribute */
-    bool m_drawClef;
-    /** The key signature */
-    bool m_drawKeySig;
-    /** The mensur */
-    bool m_drawMensur;
-    /** The meter signature (time signature) */
-    bool m_drawMeterSig;
-    ///@}
     
 private:
-    /**
-     * @name The current values
-     */
-    ///@{
-    /** The clef attribute */
-    Clef *m_currentClef;
-    /** The key signature */
-    KeySig *m_currentKeySig;
-    /** The mensur */
-    Mensur *m_currentMensur;
-    /** The meter signature (time signature) */
-    MeterSig *m_currentMeterSig;
-    ///@}
     /**
      *
      */

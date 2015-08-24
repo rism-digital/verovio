@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -167,22 +171,25 @@ bool AttHarmVis::HasRendgrid( )
 /* include <attrendgrid> */
 
 bool Att::SetHarmony( Object *element, std::string attrType, std::string attrValue ) {
-    if (dynamic_cast<AttFretlocation*>(element) ) {
+    if (element->HasAttClass( ATT_FRETLOCATION ) ) {
         AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
+        assert( att );
         if (attrType == "fret") {
             att->SetFret(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttHarmLog*>(element) ) {
+    if (element->HasAttClass( ATT_HARMLOG ) ) {
         AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
+        assert( att );
         if (attrType == "chordref") {
             att->SetChordref(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttHarmVis*>(element) ) {
+    if (element->HasAttClass( ATT_HARMVIS ) ) {
         AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        assert( att );
         if (attrType == "extender") {
             att->SetExtender(att->StrToStr(attrValue));
             return true;
@@ -197,20 +204,23 @@ bool Att::SetHarmony( Object *element, std::string attrType, std::string attrVal
 }
 
 void Att::GetHarmony( Object *element, ArrayOfStrAttr *attributes ) {
-    if (dynamic_cast<AttFretlocation*>(element) ) {
+    if (element->HasAttClass( ATT_FRETLOCATION ) ) {
         AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
+        assert( att );
         if (att->HasFret()) {
             attributes->push_back(std::make_pair("fret", att->StrToStr(att->GetFret())));
         }
     }
-    if (dynamic_cast<AttHarmLog*>(element) ) {
+    if (element->HasAttClass( ATT_HARMLOG ) ) {
         AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
+        assert( att );
         if (att->HasChordref()) {
             attributes->push_back(std::make_pair("chordref", att->StrToStr(att->GetChordref())));
         }
     }
-    if (dynamic_cast<AttHarmVis*>(element) ) {
+    if (element->HasAttClass( ATT_HARMVIS ) ) {
         AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        assert( att );
         if (att->HasExtender()) {
             attributes->push_back(std::make_pair("extender", att->StrToStr(att->GetExtender())));
         }

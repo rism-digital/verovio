@@ -9,7 +9,7 @@
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
-#include "measureelement.h"
+#include "floatingelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -20,7 +20,7 @@ namespace vrv {
 // NOTE tie NOTE tie etc
 //----------------------------------------------------------------------------
 
-class Tie: public MeasureElement, public TimeSpanningInterface
+class Tie: public FloatingElement, public TimeSpanningInterface
 {
 public:
     /**
@@ -32,27 +32,8 @@ public:
     virtual ~Tie();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Tie"; };
+    virtual ClassId Is() { return TIE; };
     ///@}
-    ///@}
-    
-    //----------//
-    // Functors //
-    //----------//
-    
-    /**
-     * See Object::FillStaffCurrentTimeSpanning
-     */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
-    
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params );
-    
-    /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
-     */
-    virtual int ResetDarwing( ArrayPtrVoid params );
     
 private:
     

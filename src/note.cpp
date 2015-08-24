@@ -29,12 +29,24 @@ namespace vrv {
 Note::Note():
 	LayerElement("note-"), DurationInterface(), PitchInterface(),
     AttColoration(),
+    AttGraced(),
     AttNoteLogMensural(),
     AttStemmed(),
     AttTiepresent()
 {
+    RegisterAttClass(ATT_COLORATION);
+    RegisterAttClass(ATT_GRACED);
+    RegisterAttClass(ATT_NOTELOGMENSURAL);
+    RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_TIEPRESENT);
+    
+    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
+    RegisterInterface( PitchInterface::GetAttClasses(), PitchInterface::IsInterface() );
+    
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
+    m_isDrawingAccidAttr = false;
+    
     Reset();
 }
 
@@ -45,8 +57,8 @@ Note::~Note()
     if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
     }
-    
-    if (m_drawingAccid) {
+    // We delete it only if it is an attribute - otherwise we do not own it
+    if (m_drawingAccid && m_isDrawingAccidAttr) {
         delete m_drawingAccid;
     }
     
@@ -59,12 +71,12 @@ void Note::Reset()
     PitchInterface::Reset();
     
     ResetColoration();
+    ResetGraced();
     ResetNoteLogMensural();
     ResetStemmed();
     ResetTiepresent();
     
     // TO BE REMOVED
-    m_acciaccatura = false;
     m_embellishment = EMB_NONE;
     // tie pointers
     ResetDrawingTieAttr();
@@ -75,16 +87,31 @@ void Note::Reset()
     d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
+    m_graceAlignment = NULL;
 }
 
 void Note::AddLayerElement(vrv::LayerElement *element)
 {
-    assert( dynamic_cast<Verse*>(element) || dynamic_cast<EditorialElement*>(element) );
+    assert(dynamic_cast<Accid*>(element)
+        || dynamic_cast<Verse*>(element)
+        || dynamic_cast<EditorialElement*>(element) );
     element->SetParent( this );
     m_children.push_back(element);
     Modify();
 }
 
+Alignment* Note::GetGraceAlignment(  )
+{
+    assert(m_graceAlignment);
+    return m_graceAlignment;
+}
+
+void Note::SetGraceAlignment( Alignment *graceAlignment )
+{
+    assert(!m_graceAlignment && graceAlignment);
+    m_graceAlignment = graceAlignment;
+}
+    
 void Note::SetDrawingTieAttr(  )
 {
     assert(!this->m_drawingTieAttr);
@@ -104,25 +131,27 @@ void Note::ResetDrawingTieAttr( )
 void Note::ResetDrawingAccid( )
 {
     if ( m_drawingAccid ) {
-        delete m_drawingAccid;
+        // We delete it only if it is an attribute - otherwise we do not own it
+        if (m_isDrawingAccidAttr) delete m_drawingAccid;
         m_drawingAccid = NULL;
+        m_isDrawingAccidAttr = false;
     }
+    // we should never have no m_drawingAccid but have the attr flag to true
+    assert( !m_isDrawingAccidAttr );
 }
     
 Chord* Note::IsChordTone()
 {
-    return dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
+    return dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH) );
 }
     
 int Note::GetDrawingDur( )
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    if( chordParent )
-    {
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    if( chordParent ) {
         return chordParent->GetActualDur();
     }
-    else
-    {
+    else {
         return GetActualDur();
     }
 }
@@ -135,25 +164,17 @@ bool Note::IsClusterExtreme()
     else return false;
 }
     
-bool Note::HasDrawingStemDir()
+data_STEMDIRECTION Note::CalcDrawingStemDir()
 {
-    return (this->GetDrawingStemDir() != STEMDIRECTION_NONE);
-}
-    
-data_STEMDIRECTION Note::GetDrawingStemDir()
-{
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( &typeid( Beam ), MAX_BEAM_DEPTH));
-    if( chordParent )
-    {
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
+    if( chordParent ) {
         return chordParent->GetDrawingStemDir();
     }
-    else if( beamParent )
-    {
+    else if( beamParent ) {
         return beamParent->GetDrawingStemDir();
     }
-    else
-    {
+    else {
         return this->GetStemDir();
     }
 }
@@ -162,12 +183,12 @@ data_STEMDIRECTION Note::GetDrawingStemDir()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::PrepareTieAttr( ArrayPtrVoid params )
+int Note::PrepareTieAttr( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties
     // param 1: Chord** currentChord for the current chord if in a chord
-    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>(params[0]);
-    Chord **currentChord = static_cast<Chord**>(params[1]);
+    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>((*params)[0]);
+    Chord **currentChord = static_cast<Chord**>((*params)[1]);
     
     AttTiepresent *check = this;
     if ((*currentChord)) {
@@ -204,7 +225,7 @@ int Note::PrepareTieAttr( ArrayPtrVoid params )
 }
     
 
-int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     if (this->m_drawingTieAttr) {
@@ -213,13 +234,13 @@ int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::PrepareLyrics( ArrayPtrVoid params )
+int Note::PrepareLyrics( ArrayPtrVoid *params )
 {
     // param 0: the current Syl (unused)
     // param 1: the last Note
     // param 2: the last but one Note
-    Note **lastNote = static_cast<Note**>(params[1]);
-    Note **lastButOneNote = static_cast<Note**>(params[2]);
+    Note **lastNote = static_cast<Note**>((*params)[1]);
+    Note **lastButOneNote = static_cast<Note**>((*params)[2]);
     
     (*lastButOneNote) = (*lastNote);
     (*lastNote) = this;
@@ -227,17 +248,28 @@ int Note::PrepareLyrics( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::PreparePointersByLayer( ArrayPtrVoid params )
+int Note::PreparePointersByLayer( ArrayPtrVoid *params )
 {
     // param 0: the current Note
-    Note **currentNote = static_cast<Note**>(params[0]);
+    Note **currentNote = static_cast<Note**>((*params)[0]);
+    
+    this->ResetDrawingAccid();
+    if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
+        this->m_isDrawingAccidAttr = true;
+        this->m_drawingAccid = new Accid();
+        this->m_drawingAccid->SetOloc(this->GetOct());
+        this->m_drawingAccid->SetPloc(this->GetPname());
+        this->m_drawingAccid->SetAccid(this->GetAccid());
+        // We need to set the drawing cue size since there will be no access to the note
+        this->m_drawingAccid->m_drawingCueSize = this->HasGrace();
+    }
     
     (*currentNote) = this;
     
     return FUNCTOR_CONTINUE;
 }
     
-int Note::ResetDarwing( ArrayPtrVoid params )
+int Note::ResetDarwing( ArrayPtrVoid *params )
 {
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;

@@ -16,6 +16,7 @@
 #define __VRV_ATTS_LYRICS_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------

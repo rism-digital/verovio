@@ -9,10 +9,6 @@
 #ifndef __VRV_RENDERER_H__
 #define __VRV_RENDERER_H__
 
-#include <typeinfo>
-
-//----------------------------------------------------------------------------
-
 #include "devicecontextbase.h"
 #include "scoredef.h"
 #include "vrvdef.h"
@@ -26,10 +22,10 @@ class Chord;
 class DeviceContext;
 class Doc;
 class EditorialElement;
+class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
-class MeasureElement;
 class Page;
 class Slur;
 class Staff;
@@ -134,7 +130,7 @@ public:
      * Defined in view_element.cpp
      */
     ///@{
-    int CalculatePitchPosY ( Staff *staff, char pname, int dec_clef, int oct);
+    int CalculatePitchPosY ( Staff *staff, data_PITCHNAME pname, int dec_clef, int oct);
     int CalculateRestPosY ( Staff *staff, char duration);
     int CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave );
     ///@}
@@ -147,7 +143,7 @@ protected:
      */
     ///@{
     void DrawSystem( DeviceContext *dc, System *system );
-    void DrawSystemList( DeviceContext *dc, System *system, const std::type_info *elementType );
+    void DrawSystemList( DeviceContext *dc, System *system, const ClassId classId );
 	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
     void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false );
     void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
@@ -156,12 +152,11 @@ protected:
     void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine );
     void DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barLine );
 	void DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barLine );
-	void DrawPartialBarline ( DeviceContext *dc, System *system, int x, Staff *pportee);
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
 	void DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
     void DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff,  Measure *measure );
-    void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const std::type_info *elementType );
+    void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId );
 	void DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height = -1);
     ///@}
     
@@ -189,28 +184,6 @@ protected:
     void DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
     void DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
     void DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
-    ///@}
-    
-    /**
-     * @name Top level method for drawing MeasureElement.
-     * Call appropriate method of child classes (Staff, Slur, etc).
-     * Defined in page_element.cpp
-     */
-    ///@{
-    void DrawMeasureElement( DeviceContext *dc, MeasureElement *element, Measure *measure, System *system );
-    ///@}
-    
-    /**
-     * @name Methods for drawing MeasureElement child classes.
-     * They are base drawing methods that are called directly from DrawMeasureElement
-     * Defined in view_page.cpp
-     */
-    ///@{
-    void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
-    void DrawTieOrSlur( DeviceContext *dc, MeasureElement *element, int x1, int x2,
-                  Staff *staff, char spanningType, DocObject *graphic = NULL );
-    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
-                          Staff *staff, char spanningType, DocObject *graphic = NULL );
     ///@}
     
     /** 
@@ -248,7 +221,6 @@ protected:
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSpace( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawTie( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawTuplet( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawVerse( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     ///@}
@@ -267,12 +239,29 @@ protected:
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
-    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
-    void DrawSylConnector( DeviceContext *dc, Syl *syl, System *system );
-    void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
-    void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, unsigned int smaller, Staff *staff);
+    void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
+    ///@}
+    
+    /**
+     * @name Methods for drawing Floating child classes.
+     * They are base drawing methods that are called directly from DrawFloatingElement
+     * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
+     * Defined in floating_element.cpp
+     */
+    ///@{
+    void DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system );
+    void DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2,
+                          Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff );
+    void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
+    void DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2,
+                       Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2,
+                       Staff *staff, char spanningType, DocObject *graphic = NULL );
+
     ///@}
     
     /**
@@ -318,12 +307,12 @@ protected:
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
-	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 0);
-	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 0);
 	void DrawPartFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
+	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
-	void DrawDot ( DeviceContext *dc, int x, int y );
+	void DrawDot ( DeviceContext *dc, int x, int y, int staffSize );
     ///@}
     
 private:    
@@ -331,7 +320,7 @@ private:
      * @name Internal methods used for calculating tuplets
      */
     ///@{
-    bool GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center);
+    data_STEMDIRECTION GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center);
     std::wstring IntToTupletFigures(unsigned short number);
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);

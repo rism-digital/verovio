@@ -4,11 +4,17 @@ project(Verovio)
 
 SET(CMAKE_BUILD_TYPE Release)
 
+option(NO_PAE_SUPPORT "Disable Plain and Easy support" OFF)
+
 add_definitions(-g)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
-include_directories(/usr/local/include ../include/vrv ../libmei)
+include_directories(/usr/local/include ../include ../include/vrv ../libmei)
+
+if(NO_PAE_SUPPORT)
+  add_definitions(-DNO_PAE_SUPPORT)
+endif()
 
 add_executable (verovio 
 	main.cpp
@@ -24,9 +30,10 @@ add_executable (verovio
 	../src/devicecontext.cpp
 	../src/doc.cpp	
 	../src/dot.cpp
-	../src/drawinglistinterface.cpp
+	../src/drawinginterface.cpp
 	../src/durationinterface.cpp
 	../src/editorial.cpp
+	../src/floatingelement.cpp
 	../src/glyph.cpp
 	../src/io.cpp
 	../src/iodarms.cpp
@@ -39,7 +46,6 @@ add_executable (verovio
 	../src/mensur.cpp
 	../src/metersig.cpp
 	../src/measure.cpp
-	../src/measureelement.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
 	../src/note.cpp
@@ -51,12 +57,14 @@ add_executable (verovio
 	../src/view.cpp
 	../src/view_beam.cpp
 	../src/view_element.cpp
+	../src/view_floating.cpp
 	../src/view_graph.cpp
 	../src/view_mensural.cpp
 	../src/view_page.cpp
 	../src/view_tuplet.cpp
 	../src/rest.cpp
 	../src/scoredef.cpp
+	../src/scoredefinterface.cpp
 	../src/slur.cpp
 	../src/space.cpp
 	../src/staff.cpp
@@ -64,6 +72,8 @@ add_executable (verovio
 	../src/svgdevicecontext.cpp
 	../src/syl.cpp
 	../src/system.cpp
+	../src/textdirective.cpp
+	../src/textdirinterface.cpp
 	../src/tie.cpp
 	../src/timeinterface.cpp
 	../src/toolkit.cpp
@@ -80,7 +90,7 @@ add_executable (verovio
 	#../libmei/atts_midi.cpp
 	../libmei/atts_shared.cpp
 	../libmei/atts_cmn.cpp
-	#../libmei/atts_critapp.cpp
+	../libmei/atts_critapp.cpp
 	#../libmei/atts_facsimile.cpp
 	#../libmei/atts_harmony.cpp
 	#../libmei/atts_linkalign.cpp

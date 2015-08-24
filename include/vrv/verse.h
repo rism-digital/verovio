@@ -33,6 +33,7 @@ public:
     virtual ~Verse();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Verse"; };
+    virtual ClassId Is() { return VERSE; };
     ///@}
     
     /**
@@ -49,13 +50,13 @@ public:
      * Align the content of a staff vertically.
      * See Object::AlignVertically
      */
-    virtual int AlignVertically( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid *params );
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists( ArrayPtrVoid params );
+    virtual int PrepareProcessingLists( ArrayPtrVoid *params );
     
 protected:
 

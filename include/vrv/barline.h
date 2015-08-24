@@ -35,6 +35,7 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new Barline(*this); };
     virtual std::string GetClassName( ) { return "Barline"; };
+    virtual ClassId Is() { return BAR_LINE; };
     ///@}  
     
     /**
@@ -51,10 +52,6 @@ public:
 private:
     
 public:
-    /** Indicates a partial barLine (inbetween the staves) - no MEI equivalent */
-    bool m_partialBarline;
-    /** Indicates a barLine displayed only on the staff - no MEI equivalent */
-    bool m_onStaffOnly;
 
 private:
     
@@ -65,7 +62,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models the barLine reltaed attributes of a MEI measure
+ * This class models the barLine related attributes of a MEI measure.
  */
 class BarlineAttr: public Barline
 {
@@ -80,6 +77,7 @@ public:
     virtual ~BarlineAttr();
     virtual Object* Clone() { return new BarlineAttr(*this); };
     virtual std::string GetClassName( ) { return "BarlineAttr"; };
+    virtual ClassId Is() { return BAR_LINE_ATTR; };
     ///@}
 };
     

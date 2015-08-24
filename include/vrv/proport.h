@@ -13,8 +13,6 @@
 #include "layerelement.h"
 
 namespace vrv {
-    
-class ProportAttr;
 
 //----------------------------------------------------------------------------
 // Proport
@@ -33,10 +31,10 @@ public:
      */
     ///@{
     Proport();
-    Proport( ProportAttr *proportAttr );
     virtual ~Proport();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Proport"; };
+    virtual ClassId Is() { return PROPORT; };
     virtual Object* Clone() { return new Proport(*this); };
     ///@}
 

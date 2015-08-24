@@ -7,6 +7,7 @@
 
 
 #include "clef.h"
+#include "scoredefinterface.h"
 
 namespace vrv {
     
@@ -20,17 +21,26 @@ Clef::Clef():
     AttLineloc(),
     AttOctavedisplacement()
 {
-    Reset();
+    Init();
 }
     
-Clef::Clef( ClefAttr *clefAttr ):
+Clef::Clef( ScoreDefInterface *clefAttr ):
     LayerElement("clef-")
 {
-    Clef();
+    Init();
+    
     this->SetShape(clefAttr->GetClefShape());
     this->SetLine(clefAttr->GetClefLine());
     this->SetDis(clefAttr->GetClefDis());
     this->SetDisPlace(clefAttr->GetClefDisPlace());
+}
+    
+void Clef::Init()
+{
+    RegisterAttClass(ATT_CLEFSHAPE);
+    RegisterAttClass(ATT_LINELOC);
+    RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    Reset();
 }
 
 Clef::~Clef()
@@ -71,29 +81,6 @@ int Clef::GetClefOffset ()
         default: break;
     }
     return offset;
-}
-    
-
-//----------------------------------------------------------------------------
-// ClefAttr
-//----------------------------------------------------------------------------
-
-ClefAttr::ClefAttr():
-    Object(),
-    AttCleffingLog()
-{
-    Reset();
-}
-
-
-ClefAttr::~ClefAttr()
-{
-}
-    
-void ClefAttr::Reset()
-{
-    Object::Reset();
-    ResetCleffingLog();
 }
 
 } // namespace vrv

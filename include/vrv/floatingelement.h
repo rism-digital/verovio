@@ -1,29 +1,27 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        drawinglistinterface
+// Name:        floatingelement.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_DRAWING_LIST_INTERFACE_H__
-#define __VRV_DRAWING_LIST_INTERFACE_H__
+#ifndef __VRV_FLOATING_ELEMENT_H__
+#define __VRV_FLOATING_ELEMENT_H__
 
-#include "vrvdef.h"
+#include "object.h"
 
 namespace vrv {
-    
-class DocObject;
 
 //----------------------------------------------------------------------------
-// DrawingListInterface
+// FloatingElement
 //----------------------------------------------------------------------------
 
 /** 
  * This class is an interface for elements with duration, such as notes and rests.
  * It is not an abstract class but should not be instanciate directly.
  */
-class DrawingListInterface
+class FloatingElement: public DocObject
 {
 public:
     /**
@@ -31,38 +29,39 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    DrawingListInterface();
-    virtual ~DrawingListInterface();
+    FloatingElement();
+    FloatingElement(std::string classid);
+    virtual ~FloatingElement();
     virtual void Reset();
+    virtual ClassId Is() { return FLOATING_ELEMENT; };
     ///@}
     
-    /**
-     * Add an element to the drawing list.
-     * The drawing list is used to postponed the drawing of elements
-     * that need to be drawn in a particular order.
-     * For example, we need to draw beams before tuplets
-     */
-    void AddToDrawingList( DocObject *element );
+    //----------//
+    // Functors //
+    //----------//
     
     /**
-     * Return the drawing list.
-     * This is used when actually drawing the list (see View::DrawLayerList)
+     * See Object::FillStaffCurrentTimeSpanning
      */
-    ListOfObjects *GetDrawingList( );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
     
     /**
-     * Reset the drawing list.
-     * Clears the list - called when the layer starts to be drawn
+     * See Object::PrepareTimeSpanning
      */
-    void ResetDrawingList( );
+    virtual int PrepareTimeSpanning( ArrayPtrVoid *params );
+    
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDarwing( ArrayPtrVoid *params );
+    ///@}
     
 private:
     
 public:
 
 private:
-    /** The list of object for which drawing is postponed */
-    ListOfObjects m_drawingList;
+    
 };
     
 } // namespace vrv 

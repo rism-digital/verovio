@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measureelement.cpp
+// Name:        textdirective.cpp
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "measureelement.h"
+#include "textdirective.h"
 
 //----------------------------------------------------------------------------
 
@@ -14,33 +14,31 @@
 
 //----------------------------------------------------------------------------
 
+#include "floatingelement.h"
+
 namespace vrv {
 
-
 //----------------------------------------------------------------------------
-// MeasureElement
+// Tempo
 //----------------------------------------------------------------------------
 
-MeasureElement::MeasureElement():
-    DocObject("me")
+Tempo::Tempo():
+    FloatingElement("tempo-"), TextDirInterface()
 {
-    Reset();
-}
-
-MeasureElement::MeasureElement(std::string classid):
-    DocObject(classid)
-{
-    Reset();
-}
-
-MeasureElement::~MeasureElement()
-{
-
-}
+    RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
     
-void MeasureElement::Reset()
+    Reset();
+}
+
+
+Tempo::~Tempo()
 {
-    DocObject::Reset();
+}    
+    
+void Tempo::Reset()
+{
+    FloatingElement::Reset();
+    TextDirInterface::Reset();
 }
     
 } // namespace vrv

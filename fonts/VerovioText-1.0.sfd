@@ -6,8 +6,8 @@ Weight: Regular
 Copyright: 
 Version: 1.0
 ItalicAngle: 0
-UnderlinePosition: -102.4
-UnderlineWidth: 102.4
+UnderlinePosition: -102
+UnderlineWidth: 102
 Ascent: 1638
 Descent: 410
 sfntRevision: 0x00010000
@@ -20,25 +20,25 @@ OS2Version: 3
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1413579002
-ModificationTime: 1421248418
+ModificationTime: 1436786702
 PfmFamily: 81
 TTFWeight: 400
 TTFWidth: 5
-LineGap: 184
+LineGap: 410
 VLineGap: 0
 Panose: 5 6 0 0 0 0 0 0 0 0
 OS2TypoAscent: 1638
 OS2TypoAOffset: 0
 OS2TypoDescent: -410
 OS2TypoDOffset: 0
-OS2TypoLinegap: 184
-OS2WinAscent: 4129
+OS2TypoLinegap: 410
+OS2WinAscent: 2315
 OS2WinAOffset: 0
-OS2WinDescent: 2445
+OS2WinDescent: 676
 OS2WinDOffset: 0
-HheadAscent: 4129
+HheadAscent: 1638
 HheadAOffset: 0
-HheadDescent: -2445
+HheadDescent: -410
 HheadDOffset: 0
 OS2SubXSize: 1331
 OS2SubYSize: 1434
@@ -62,7 +62,7 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 58690 10 4
+WinInfo: 50560 10 4
 BeginPrivate: 3
 BlueScale 8 0.039625
 BlueShift 2 27

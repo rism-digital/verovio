@@ -409,7 +409,7 @@ bool DarmsInput::ImportString(std::string data_str) {
     
     m_current_tie = NULL;
     m_staff->AddLayer(m_layer);
-    m_measure->AddMeasureElement( m_staff );
+    m_measure->AddStaff( m_staff );
     system->AddMeasure( m_measure );
     
     // do this the C style, char by char

@@ -9,7 +9,8 @@ function print_help {
 } 
 
 VEROVIO_ROOT=../
-VEROVIO_INCLUDE=../include/vrv
+VEROVIO_INCLUDE=../include
+VEROVIO_INCLUDE_VRV=../include/vrv
 VEROVIO_LIBMEI=../libmei
 if command -v emcc >/dev/null 2>&1 ; then
 	EMCC=`command -v emcc`
@@ -27,11 +28,13 @@ if [ ! -d data ]; then mkdir data; fi
 # Empirically, the memory amount required is approx. 5 times the file size (as an indication).
 # We can disable this for a light version that uses the default memory settings 	
 ASM="\
-	-O2 --memory-init-file 0 \
+	-O3 --memory-init-file 0 \
 	-s ASM_JS=1 \
+	-s OUTLINING_LIMIT=10000 \
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
 ASM_NAME=""
+WEBWORKER_NAME=""
 
 # default is master (no version)
 VERSION=""
@@ -47,7 +50,7 @@ while getopts "lwv:h:c" opt; do
 		l)
 			echo "light version (-l)"
 			ASM="\
-				-O2 --memory-init-file 0 \
+				-O3 --memory-init-file 0 \
 				-s ASM_JS=1 "
 			ASM_NAME="-light"
 			;;
@@ -63,6 +66,7 @@ while getopts "lwv:h:c" opt; do
 		w)
 			WEBWORKER=true
 			echo "building with webworker compatibility"
+			WEBWORKER_NAME="-webworker"
 			;;
 		h)
 			print_help
@@ -75,7 +79,7 @@ while getopts "lwv:h:c" opt; do
 	esac
 done
 
-FILENAME="verovio-toolkit$ASM_NAME$VERSION_NAME.js"
+FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME$VERSION_NAME.js"
 
 echo "Sync svg resources"
 cp -r ../data/* data/
@@ -85,6 +89,7 @@ echo "Compiling"
 python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
+	-I$VEROVIO_INCLUDE_VRV \
 	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \
@@ -102,9 +107,10 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
-	$VEROVIO_ROOT/src/drawinglistinterface.cpp \
+	$VEROVIO_ROOT/src/drawinginterface.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
+	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
@@ -115,7 +121,6 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/layer.cpp \
 	$VEROVIO_ROOT/src/layerelement.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
-	$VEROVIO_ROOT/src/measureelement.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
 	$VEROVIO_ROOT/src/metersig.cpp \
 	$VEROVIO_ROOT/src/mrest.cpp \
@@ -129,19 +134,23 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view.cpp \
 	$VEROVIO_ROOT/src/view_beam.cpp \
 	$VEROVIO_ROOT/src/view_element.cpp \
+	$VEROVIO_ROOT/src/view_floating.cpp \
 	$VEROVIO_ROOT/src/view_graph.cpp \
 	$VEROVIO_ROOT/src/view_mensural.cpp \
 	$VEROVIO_ROOT/src/view_page.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/rest.cpp \
 	$VEROVIO_ROOT/src/scoredef.cpp \
+	$VEROVIO_ROOT/src/scoredefinterface.cpp \
 	$VEROVIO_ROOT/src/slur.cpp \
 	$VEROVIO_ROOT/src/space.cpp \
 	$VEROVIO_ROOT/src/staff.cpp \
 	$VEROVIO_ROOT/src/style.cpp \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
-    $VEROVIO_ROOT/src/system.cpp \
+	$VEROVIO_ROOT/src/system.cpp \
+	$VEROVIO_ROOT/src/textdirective.cpp \
+	$VEROVIO_ROOT/src/textdirinterface.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/timeinterface.cpp \
 	$VEROVIO_ROOT/src/toolkit.cpp \
@@ -149,6 +158,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/verse.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
+	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
@@ -177,7 +187,7 @@ if [ $? -eq 0 ]; then
 	if [ "$WEBWORKER" = true ]; then
 		cat build/verovio.js verovio-proxy.js > "build/$FILENAME"
 	else
-		cat verovio-wrapper-start.js build/verovio.js verovio-wrapper-end.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
+		cat build/verovio.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
 	fi
 	# all good
 	echo "build/$FILENAME written"

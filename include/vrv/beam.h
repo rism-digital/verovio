@@ -10,7 +10,7 @@
 #define __VRV_BEAM_H__
 
 #include "layerelement.h"
-#include "drawinglistinterface.h"
+#include "drawinginterface.h"
 
 namespace vrv {
     
@@ -40,6 +40,7 @@ public:
     virtual ~Beam();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Beam"; };
+    virtual ClassId Is() { return BEAM; };
     ///@}
     
     int GetNoteCount() const { return (int)m_children.size(); };

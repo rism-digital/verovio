@@ -63,7 +63,7 @@ Object::Object( const Object& object )
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++)
     {
-        Object *current = object.m_children[i];
+        Object *current = object.m_children.at(i);
         Object* copy = current->Clone();
         copy->Modify();
         copy->SetParent( this );
@@ -84,7 +84,7 @@ Object& Object::operator=( const Object& object )
         int i;
         for (i = 0; i < (int)object.m_children.size(); i++)
         {
-            Object *current = object.m_children[i];
+            Object *current = object.m_children.at(i);
             Object* copy = current->Clone();
             copy->Modify();
             copy->SetParent( this );
@@ -107,6 +107,19 @@ void Object::Init(std::string classid)
     m_classid = classid;
     this->GenerateUuid();
 }
+    
+ClassId Object::Is()
+{
+    // we should always have the method overwritten
+    assert( false );
+    return OBJECT;
+};
+    
+void Object::RegisterInterface( std::vector<AttClassId> *attClasses, InterfaceId interfaceId )
+{
+    m_attClasses.insert(m_attClasses.end(), attClasses->begin(), attClasses->end());
+    m_interfaces.push_back(interfaceId);
+}
        
 void Object::MoveChildren(  Object *object )
 {
@@ -121,7 +134,7 @@ void Object::MoveChildren(  Object *object )
     for (i = 0; i < (int)object->m_children.size(); i++)
     {
         this->m_children.push_back( object->Relinquish(i) );
-        object->m_children[i]->m_parent = this;
+        object->m_children.at(i)->m_parent = this;
     }
 }
 
@@ -145,15 +158,39 @@ void Object::ClearChildren()
 }
  
     
-int Object::GetChildCount( const std::type_info *elementType )
+int Object::GetChildCount( const ClassId classId )
 {
-    return (int)count_if (m_children.begin(), m_children.end(), ObjectComparison( elementType ));
+    return (int)count_if (m_children.begin(), m_children.end(), ObjectComparison( classId ));
+}
+
+int Object::GetAttributes(ArrayOfStrAttr *attributes)
+{
+    assert(attributes);
+    attributes->clear();
+    
+    Att::GetCmn(this, attributes );
+    Att::GetMensural(this, attributes );
+    Att::GetPagebased(this, attributes );
+    Att::GetShared(this, attributes );
+    
+    return (int)attributes->size();
 }
     
-    
-Object* Object::GetFirst( const std::type_info *elementType )
+bool Object::HasAttribute( std::string attribute, std::string value )
 {
-    m_iteratorElementType = elementType;
+    ArrayOfStrAttr attributes;
+    this->GetAttributes( &attributes );
+    ArrayOfStrAttr::iterator iter;
+    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
+        if ( ( (*iter).first == attribute ) && ( (*iter).second == value ) ) return true;
+    }
+    return false;
+}
+    
+        
+Object* Object::GetFirst( const ClassId classId )
+{
+    m_iteratorElementType = classId;
     m_iteratorEnd = m_children.end();
     m_iteratorCurrent = std::find_if(m_children.begin(), m_iteratorEnd, ObjectComparison( m_iteratorElementType ) );
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
@@ -192,7 +229,7 @@ Object *Object::DetachChild( int idx )
     if ( idx >= (int)m_children.size() ) {
         return NULL;
     }
-    Object *child = m_children[idx];
+    Object *child = m_children.at(idx);
     child->m_parent = NULL;
     ArrayOfObjects::iterator iter = m_children.begin();
     m_children.erase( iter+(idx) );
@@ -205,7 +242,7 @@ Object *Object::Relinquish( int idx )
     if ( idx >= (int)m_children.size() ) {
         return NULL;
     }
-    Object *child = m_children[idx];
+    Object *child = m_children.at(idx);
     child->m_parent = NULL;
     return child;
 }
@@ -217,13 +254,13 @@ Object *Object::FindChildByUuid( std::string uuid, int deepness, bool direction 
     ArrayPtrVoid params;
     params.push_back( &uuid );
     params.push_back( &element );
-    this->Process( &findByUuid, params, NULL, NULL, deepness, direction );
+    this->Process( &findByUuid, &params, NULL, NULL, deepness, direction );
     return element;
 }
 
-Object *Object::FindChildByType(const std::type_info *elementType, int deepness, bool direction )
+Object *Object::FindChildByType( ClassId classId, int deepness, bool direction )
 {
-    AttComparison attComparison( elementType );
+    AttComparison attComparison( classId );
     return FindChildByAttComparison( &attComparison, deepness, direction );
 }
     
@@ -234,7 +271,7 @@ Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deep
     ArrayPtrVoid params;
     params.push_back( attComparison );
     params.push_back( &element );
-    this->Process( &findByAttComparison, params, NULL, NULL, deepness, direction );
+    this->Process( &findByAttComparison, &params, NULL, NULL, deepness, direction );
     return element;
 }
     
@@ -243,7 +280,7 @@ Object* Object::GetChild( int idx )
     if ( (idx < 0) || (idx >= (int)m_children.size()) ) {
         return NULL;
     }
-    return m_children[idx];
+    return m_children.at(idx);
 }
 
 void Object::RemoveChildAt( int idx )
@@ -251,12 +288,13 @@ void Object::RemoveChildAt( int idx )
     if ( idx >= (int)m_children.size() ) {
         return;
     }
-    delete m_children[idx];
+    delete m_children.at(idx);
     ArrayOfObjects::iterator iter = m_children.begin();
     m_children.erase( iter+(idx) );
 }
 
-void Object::GenerateUuid() {
+void Object::GenerateUuid()
+{
     int nr = std::rand();
     char str[17];
     // I do not want to use a stream to do this!
@@ -293,16 +331,6 @@ void Object::AddEditorialElement( EditorialElement *child )
     Modify();
 }
 
-bool Object::operator==( Object& other )
-{
-    // This should never happen.
-    // The comparison is performed in the CmpFile::Align method.
-    // We expect to compare only Note, Rest, etc object for which we have an overwritten method
-    LogError( "Missing comparison operator for '%s'", this->GetClassName().c_str() );
-    assert( false );
-    return false;
-}
-
 int Object::GetChildIndex( const Object *child )
 {
     ArrayOfObjects::iterator iter;
@@ -326,12 +354,12 @@ void Object::Modify( bool modified )
     m_isModified = modified;
 }
 
-void Object::FillList( ListOfObjects *list )
+void Object::FillFlatList( ListOfObjects *flatList )
 {
-    Functor addToList( &Object::AddLayerElementToList );
+    Functor addToFlatList( &Object::AddLayerElementToFlatList );
     ArrayPtrVoid params;
-    params.push_back ( &list );
-    this->Process( &addToList, params );
+    params.push_back ( &flatList );
+    this->Process( &addToFlatList, &params );
 
     /* // For debuging
     ListOfObjects::iterator iter;
@@ -357,43 +385,44 @@ void Object::AddSameAs( std::string id, std::string filename )
     m_sameAs += sameAs;
 }
 
-Object *Object::GetFirstParent( const std::type_info *elementType, int maxSteps )
+Object *Object::GetFirstParent( const ClassId classId, int maxSteps )
 {
     if ( (maxSteps == 0) || !m_parent ) {
         return NULL;
     }
     
-    if ( typeid(*m_parent) == *elementType ) {
+    if ( m_parent->Is() == classId ) {
         return m_parent;
     }
     else {
-        return ( m_parent->GetFirstParent( elementType, maxSteps - 1 ) );
+        return ( m_parent->GetFirstParent( classId, maxSteps - 1 ) );
     }
 }
 
     
-Object *Object::GetLastParentNot( const std::type_info *elementType, int maxSteps )
+Object *Object::GetLastParentNot( const ClassId classId, int maxSteps )
 {
     if ( (maxSteps == 0) || !m_parent ) {
         return NULL;
     }
     
-    if ( typeid(*m_parent) == *elementType ) {
+    if ( m_parent->Is() == classId ) {
         return this;
     }
     else {
-        return ( m_parent->GetLastParentNot( elementType, maxSteps - 1 ) );
+        return ( m_parent->GetLastParentNot( classId, maxSteps - 1 ) );
     }
 }
     
 
-Object *Object::GetFirstChild( const std::type_info *elementType )
+Object *Object::GetFirstChild( const ClassId classId )
 {
     ArrayOfObjects::iterator iter;
     int i;
     for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++)
     {
-        if ( typeid(**iter) == *elementType )
+        Object *o = *iter;
+        if ( o->Is() == classId )
         {
             return *iter;
         }
@@ -401,7 +430,7 @@ Object *Object::GetFirstChild( const std::type_info *elementType )
     return NULL;
 }
 
-Object *Object::GetNextSibling( const std::type_info *elementType )
+Object *Object::GetNextSibling( const ClassId classId )
 {
     if (!m_parent) {
         return NULL;
@@ -420,10 +449,10 @@ Object *Object::GetNextSibling( const std::type_info *elementType )
         else if (!foundCurrent) {
             continue;
         }
-        if ( !elementType ) {
+        if ( classId == UNSPECIFIED ) {
             return *iter;
         }
-        if ( typeid(**iter) == *elementType )
+        if ( (*iter)->Is() == classId )
         {
             return *iter;
         }
@@ -431,7 +460,7 @@ Object *Object::GetNextSibling( const std::type_info *elementType )
     return NULL;
 }
 
-Object *Object::GetPreviousSibling( const std::type_info *elementType )
+Object *Object::GetPreviousSibling( const ClassId classId )
 {
     if (!m_parent) {
         return NULL;
@@ -450,10 +479,10 @@ Object *Object::GetPreviousSibling( const std::type_info *elementType )
         else if (!foundCurrent) {
             continue;
         }
-        if ( !elementType ) {
+        if ( classId == UNSPECIFIED ) {
             return *iter;
         }
-        if ( typeid(**iter) == *elementType )
+        if ( (*iter)->Is() == classId )
         {
             return *iter;
         }
@@ -487,10 +516,18 @@ bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction )
+void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction )
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
+    }
+    
+    if (functor->m_visibleOnly && this->IsEditorialElement()) {
+        EditorialElement *editorialElement = dynamic_cast<EditorialElement*>(this);
+        assert( editorialElement );
+        if ( editorialElement->m_visibility == Hidden ) {
+            return;
+        }
     }
     
     functor->Call( this, params );
@@ -500,8 +537,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
         functor->m_returnCode = FUNCTOR_CONTINUE;
         return;
     }
-
-    else if (dynamic_cast<EditorialElement*>(this)) {
+    else if (this->IsEditorialElement()) {
         // since editorial object do not count, we re-increase the deepness limit
         deepness++;
     }
@@ -531,7 +567,8 @@ void Object::Process(Functor *functor, ArrayPtrVoid params, Functor *endFunctor,
             for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
                 // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                 // the attribute (see below)
-                if ((*attComparisonIter)->GetType() == &typeid(**iter)) {
+                Object *o = *iter;
+                if (o->Is() == (*attComparisonIter)->GetType() ) {
                     hasAttComparison = true;
                     break;
                 }
@@ -565,8 +602,10 @@ int Object::Save( FileOutputStream *output )
     params.push_back( output );
     
     Functor save( &Object::Save );
+    // Special case where we want to process all objects
+    save.m_visibleOnly = false;
     Functor saveEnd( &Object::SaveEnd );
-    this->Process( &save, params, &saveEnd );
+    this->Process( &save, &params, &saveEnd );
     
     return true;
 }
@@ -595,15 +634,6 @@ DocObject::DocObject(std::string classid) :
 DocObject::~DocObject()
 {
 }
-
-void DocObject::Refresh() 
-{
-    // if we have a parent DocObject, propagate it
-    if ( dynamic_cast<DocObject*>(m_parent) ) {
-        ((DocObject*)m_parent)->Refresh();
-    }
-}
-
 
 void DocObject::UpdateContentBB( int x1, int y1, int x2, int y2) 
 {
@@ -709,7 +739,7 @@ void ObjectListInterface::ResetList( Object *node )
     
     node->Modify( false );
     m_list.clear();
-    node->FillList( &m_list );
+    node->FillFlatList( &m_list );
     this->FilterList( &m_list );
 }
 
@@ -735,20 +765,20 @@ int ObjectListInterface::GetListIndex( const Object *listElement )
 }
 
     
-Object* ObjectListInterface::GetListFirst(const Object *startFrom, const std::type_info *elementType)
+Object* ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
     std::advance(it, GetListIndex(startFrom));
-    it = std::find_if(it, m_list.end(), ObjectComparison( elementType ) );
+    it = std::find_if(it, m_list.end(), ObjectComparison( classId ) );
     return (it == m_list.end()) ? NULL : *it;
 }
     
-Object* ObjectListInterface::GetListFirstBackward(Object *startFrom, const std::type_info *elementType)
+Object* ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
     std::advance(it, GetListIndex(startFrom));
     ListOfObjects::reverse_iterator rit(it);
-    rit = std::find_if(rit, m_list.rend(), ObjectComparison( elementType ) );
+    rit = std::find_if(rit, m_list.rend(), ObjectComparison( classId ) );
     return (rit == m_list.rend()) ? NULL : *rit;
 }
     
@@ -797,18 +827,18 @@ Object *ObjectListInterface::GetListNext( const Object *listElement )
 Functor::Functor( )
 { 
     m_returnCode = FUNCTOR_CONTINUE;
-    m_reverse = false;
+    m_visibleOnly = true;
     obj_fpt = NULL; 
 }
 
-Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid ))
+Functor::Functor( int(Object::*_obj_fpt)( ArrayPtrVoid* ))
 { 
     m_returnCode = FUNCTOR_CONTINUE;
-    m_reverse = false;
+    m_visibleOnly = true;
     obj_fpt = _obj_fpt; 
 }
 
-void Functor::Call( Object *ptr, ArrayPtrVoid params )
+void Functor::Call( Object *ptr, ArrayPtrVoid *params )
 {
     // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
     m_returnCode = (*ptr.*obj_fpt)( params );
@@ -818,22 +848,22 @@ void Functor::Call( Object *ptr, ArrayPtrVoid params )
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToList( ArrayPtrVoid params )
+int Object::AddLayerElementToFlatList( ArrayPtrVoid *params )
 {
     // param 0: the ListOfObjects
-    ListOfObjects **list = static_cast<ListOfObjects**>(params[0]);
+    ListOfObjects **list = static_cast<ListOfObjects**>((*params)[0]);
     //if ( dynamic_cast<LayerElement*>(this ) ) {
         (*list)->push_back( this );
     //}
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByUuid( ArrayPtrVoid params )
+int Object::FindByUuid( ArrayPtrVoid *params )
 {
     // param 0: the uuid we are looking for
     // param 1: the pointer to pointer to the Object
-    std::string *uuid = static_cast<std::string*>(params[0]);
-    Object **element = static_cast<Object**>(params[1]);
+    std::string *uuid = static_cast<std::string*>((*params)[0]);
+    Object **element = static_cast<Object**>((*params)[1]);
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -849,12 +879,12 @@ int Object::FindByUuid( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByAttComparison( ArrayPtrVoid params )
+int Object::FindByAttComparison( ArrayPtrVoid *params )
 {
     // param 0: the type we are looking for
     // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison*>(params[0]);
-    Object **element = static_cast<Object**>(params[1]);
+    AttComparison *test = static_cast<AttComparison*>((*params)[0]);
+    Object **element = static_cast<Object**>((*params)[1]);
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -872,24 +902,27 @@ int Object::FindByAttComparison( ArrayPtrVoid params )
 }
 
     
-int Object::SetCurrentScoreDef( ArrayPtrVoid params )
+int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 {
 
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = static_cast<ScoreDef*>(params[0]);
-    StaffDef **currentStaffDef = static_cast<StaffDef**>(params[1]);
+    ScoreDef *currentScoreDef = static_cast<ScoreDef*>((*params)[0]);
+    StaffDef **currentStaffDef = static_cast<StaffDef**>((*params)[1]);
 
     assert( currentScoreDef );
     
     // starting a new page
-    Page *page = dynamic_cast<Page*>(this);
-    if ( page  ) {
+    if (this->Is() == PAGE) {
+        // The keySig cancellation is set to false, which means that a scoreDef change has to occur
+        // after a page break if right at the begining. This is the same for systems below
+        Page *page = dynamic_cast<Page*>(this);
+        assert( page );
         if ( page->m_parent->GetChildIndex( page ) == 0 ) {
-            currentScoreDef->SetRedrawFlags( true, true, true, true );
+            currentScoreDef->SetRedrawFlags( true, true, true, true, false );
             currentScoreDef->SetDrawLabels( true );
         }
         else {
-            currentScoreDef->SetRedrawFlags( true, true, false, false );
+            currentScoreDef->SetRedrawFlags( true, true, false, false, false );
             currentScoreDef->SetDrawLabels( false );
         }
         page->m_drawingScoreDef = *currentScoreDef;
@@ -897,72 +930,41 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
     }
 
     // starting a new system
-    System *system = dynamic_cast<System*>(this);
-    if ( system  ) {
-        currentScoreDef->SetRedrawFlags( true, true, false, false );
+    if (this->Is() == SYSTEM) {
+        System *system = dynamic_cast<System*>(this);
+        assert( system );
+        currentScoreDef->SetRedrawFlags( true, true, false, false, false );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new scoreDef
-    ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
-    if ( scoreDef  ) {
-        bool drawClef = false;
-        bool drawKeySig = false;
-        bool drawMensur = false;
-        bool drawMeterSig = false;
-        if (scoreDef->GetClef()) {
-            currentScoreDef->ReplaceClef(scoreDef->GetClef());
-            drawClef = true;
-        }
-        if (scoreDef->GetKeySig()) {
-            currentScoreDef->ReplaceKeySig(scoreDef->GetKeySig());
-            drawKeySig = true;
-        }
-        if (scoreDef->GetMensur()) {
-            currentScoreDef->ReplaceMensur(scoreDef->GetMensur());
-            drawMensur = true;
-        }
-        if (scoreDef->GetMeterSig()) {
-            currentScoreDef->ReplaceMeterSig(scoreDef->GetMeterSig());
-            drawMeterSig = true;
-        }
+    if (this->Is() == SCORE_DEF) {
+        ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
+        assert( scoreDef );
         // Replace the current scoreDef with the new one, including its content (staffDef)
-        currentScoreDef->Replace(scoreDef);
-        currentScoreDef->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig );
+        currentScoreDef->ReplaceDrawingValues(scoreDef);
         return FUNCTOR_CONTINUE;
     }
 
-
     // starting a new staffDef
-    // Because staffDef have to be included in a scoreDef, a new staffDef was already
-    // replaced by the new scoreDef (see above). Here we only need to reset the drawing flags
-    StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
-    if ( staffDef  ) {
-        StaffDef *tmpStaffDef = currentScoreDef->GetStaffDef( staffDef->GetN() );
-        if (staffDef->GetClef()) {
-            tmpStaffDef->SetDrawClef( true );
-        }
-        if (staffDef->GetKeySig()) {
-            tmpStaffDef->SetDrawKeySig( true );
-        }
-        if (staffDef->GetMensur()) {
-            tmpStaffDef->SetDrawMensur( true );
-        }
-        if (staffDef->GetMeterSig()) {
-            tmpStaffDef->SetDrawMeterSig( true );
-        }
+    if (this->Is() == STAFF_DEF) {
+        StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
+        assert( staffDef );
+        currentScoreDef->ReplaceDrawingValues(staffDef);
     }
     
     // starting a new staff
-    Staff *staff = dynamic_cast<Staff*>(this);
-    if ( staff  ) {
+    if (this->Is() == STAFF) {
+        Staff *staff = dynamic_cast<Staff*>(this);
+        assert( staff );
         (*currentStaffDef) = currentScoreDef->GetStaffDef( staff->GetN() );
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new layer
-    Layer *layer = dynamic_cast<Layer*>(this);
-    if ( layer  ) {
+    if (this->Is() == LAYER) {
+        Layer *layer = dynamic_cast<Layer*>(this);
+        assert( layer );
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something more
         // generic (PrepareDrawing?) might be a good idea...
@@ -974,30 +976,32 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid params )
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingAndCurrentValues( currentScoreDef, (*currentStaffDef) );
+        layer->SetDrawingAndCurrentValues( (*currentStaffDef) );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new clef
-    Clef *clef = dynamic_cast<Clef*>(this);
-    if ( clef  ) {
+    if (this->Is() == CLEF) {
+        Clef *clef = dynamic_cast<Clef*>(this);
+        assert( clef );
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceClef( clef );
+        (*currentStaffDef)->SetCurrentClef( new Clef( *clef ) );
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new keysig
-    KeySig *keysig = dynamic_cast<KeySig*>(this);
-    if ( keysig  ) {
+    if (this->Is() == KEY_SIG) {
+        KeySig *keysig = dynamic_cast<KeySig*>(this);
+        assert( keysig );
         assert( *currentStaffDef );
-        (*currentStaffDef)->ReplaceKeySig( keysig );
+        (*currentStaffDef)->SetCurrentKeySig( new KeySig( *keysig ) );
         return FUNCTOR_CONTINUE;
     }
     
     return FUNCTOR_CONTINUE;
 }
     
-int Object::AlignHorizontally( ArrayPtrVoid params )
+int Object::AlignHorizontally( ArrayPtrVoid *params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time (unused)
@@ -1011,7 +1015,7 @@ int Object::AlignHorizontally( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Object::AlignVertically( ArrayPtrVoid params )
+int Object::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner (unused)
     // param 1: the staffNb (unused
@@ -1022,19 +1026,77 @@ int Object::AlignVertically( ArrayPtrVoid params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
+{
+    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 1: the Doc
+    int *min_pos = static_cast<int*>((*params)[0]);
+    Doc *doc = static_cast<Doc*>((*params)[1]);
+    
+    // starting an new layer
+    if (this->Is() == LAYER) {
+        (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if (this->Is() != NOTE) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    Note *note = dynamic_cast<Note*>(this);
+    assert( note );
+    
+    if (!note->IsGraceNote()) {
+        (*min_pos) = 0;
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // we should have processed aligned before
+    assert( note->GetGraceAlignment() );
+    
+    // the negative offset it the part of the bounding box that overflows on the left
+    // |____x_____|
+    //  ---- = negative offset
+    //int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    int negative_offset = - note->m_contentBB_x1;
+    if ( (*min_pos) > 0 ) {
+        //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    }
+    
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    if ( negative_offset < 0 ) negative_offset = 0;
+    
+    // check if the element overlaps with the preceeding one given by (*min_pos)
+    int overlap = (*min_pos) - note->GetGraceAlignment()->GetXRel() + negative_offset;
+    
+    if ( (note->GetGraceAlignment()->GetXRel() - negative_offset) < (*min_pos) ) {
+        note->GetGraceAlignment()->SetXShift( overlap );
+    }
+    
+    // the next minimal position if given by the right side of the bounding box + the spacing of the element
+    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin( NOTE ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
+    //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
+    note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 );
+    
+    return FUNCTOR_CONTINUE;
+}
 
-int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
+
+int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
-    int *min_pos = static_cast<int*>(params[0]);
-    int *measure_width = static_cast<int*>(params[1]);
-    Doc *doc = static_cast<Doc*>(params[2]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *measure_width = static_cast<int*>((*params)[1]);
+    Doc *doc = static_cast<Doc*>((*params)[2]);
 
     // starting a new measure
-    Measure *current_measure = dynamic_cast<Measure*>(this);
-    if ( current_measure  ) {
+    if (this->Is() == MEASURE) {
+        Measure *current_measure = dynamic_cast<Measure*>(this);
+        assert( current_measure );
         // we reset the measure width and the minimum position
         (*measure_width) = 0;
         (*min_pos) = 0;
@@ -1045,10 +1107,11 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
     }
     
     // starting an new layer
-    Layer *current_layer = dynamic_cast<Layer*>(this);
-    if ( current_layer  ) {
+    if (this->Is() == LAYER) {
+        Layer *current_layer = dynamic_cast<Layer*>(this);
+        assert( current_layer );
         // reset it as the minimum position to the step (HARDCODED)
-        (*min_pos) = 30 * doc->m_drawingUnit[0] / 10;
+        (*min_pos) = 30 * doc->GetDrawingUnit(100) / 10;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1065,10 +1128,12 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
 
-    LayerElement *current = dynamic_cast<LayerElement*>(this);
-    if ( !current  ) {
+    if (!this->IsLayerElement()) {
         return FUNCTOR_CONTINUE;
     }
+    
+    LayerElement *current = dynamic_cast<LayerElement*>(this);
+    assert( current );
     
     // we should have processed aligned before
     assert( current->GetAlignment() );
@@ -1078,78 +1143,93 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid params )
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsBeam() ) {
+    if (current->Is() == BEAM) {
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsNote() ) {
-        Chord* chordParent = dynamic_cast<Chord*>(current->GetFirstParent( &typeid( Chord ), MAX_CHORD_DEPTH));
-        if( chordParent ) {
-            return FUNCTOR_CONTINUE;
-        }
-    }
-    
-    if ( current->IsTie() ) {
+    if ( (current->Is() == NOTE) && current->GetFirstParent( CHORD, MAX_CHORD_DEPTH ) ) {
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsTuplet() ) {
+    if (current->Is() == TIE) {
         return FUNCTOR_CONTINUE;
     }
     
-    if ( current->IsVerse() || current->IsSyl() ) {
+    if (current->Is() == TUPLET) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( (current->Is() == VERSE) || (current->Is() == SYL) ) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    if ( (current->Is() == ACCID) && current->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) ) {
         return FUNCTOR_CONTINUE;
     }
     
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    //int negative_offset = current->GetAlignment()->GetXRel() - current->m_contentBB_x1;
-    int negative_offset = - (current->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR);
+    int negative_offset = - (current->m_contentBB_x1);
+    if (!current->IsGraceNote()) negative_offset += (doc->GetLeftMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
-    if ( negative_offset < 0 ) {
-        //LogDebug("%s negative offset %d;", current->GetClassName().c_str(), negative_offset );
-        negative_offset = 0;
-    }
+    if ( negative_offset < 0 ) negative_offset = 0;
     
-    if ( current->IsMRest() ) {
+    if (current->Is() == MREST) {
         // With MRest, the only thing we want to do it keep their with as possible measure with (if only MRest in all staves/layers)
-        int width =  current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR + negative_offset ;
+        int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR + negative_offset ;
         // Keep it if more than the current measure width
         (*measure_width) = std::max( (*measure_width), width );
         (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
     }
     
+    // with a grace note, also take into account the full with of the group given by the GraceAligner
+    if (current->GetAlignment()->HasGraceAligner()) {
+        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
+    }
+    
+    int currentX = current->GetAlignment()->GetXRel();
+    // with grace note, take into account the position of the note in the grace group
+    if (current->IsGraceNote()) {
+        Note *note = dynamic_cast<Note*>(current);
+        currentX += note->GetGraceAlignment()->GetXRel();
+    }
+    
     // check if the element overlaps with the preceeding one given by (*min_pos)
-    int overlap = 0;
-    overlap = (*min_pos) - current->GetAlignment()->GetXRel() + negative_offset;
-    if ( (current->GetAlignment()->GetXRel() - negative_offset) < (*min_pos) ) {
-        overlap = (*min_pos) - current->GetAlignment()->GetXRel() + negative_offset;
-        // shift the current element
+    int overlap = (*min_pos) - currentX + negative_offset;
+    
+    if ( (currentX - negative_offset) < (*min_pos) ) {
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    //LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d; m_drawingX %d", current->GetClassName().c_str(), (*min_pos), negative_offset, current->GetAlignment()->GetXRel(), overlap, current->GetDrawingX() );
-    
+    // do not ajust the min pos and the max width since this is already handled by
+    // the GraceAligner
+    if ( current->IsGraceNote() ) {
+        (*min_pos) = current->GetAlignment()->GetXRel();
+        current->GetAlignment()->SetMaxWidth( 0 );
+        return FUNCTOR_CONTINUE;
+    }
+
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin(&typeid(*current)) * doc->m_drawingUnit[0] / PARAM_DENOMINATOR );
+    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
     
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
+int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
-    int *min_pos = static_cast<int*>(params[0]);
-    int *measure_width = static_cast<int*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *measure_width = static_cast<int*>((*params)[1]);
     
     // ending a measure
-    Measure *current_measure = dynamic_cast<Measure*>(this);
-    if ( current_measure  ) {
+    if (this->Is() == MEASURE) {
+        Measure *current_measure = dynamic_cast<Measure*>(this);
+        assert( current_measure );
         // as minimum position of the barLine use the measure width
         (*min_pos) = (*measure_width);
         if (current_measure->GetRightBarlineType() != BARRENDITION_NONE) {
@@ -1159,8 +1239,9 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
     }
     
     // ending a layer
-    Layer *current_layer = dynamic_cast<Layer*>(this);
-    if ( current_layer  ) {
+    if (this->Is() == LAYER) {
+        Layer *current_layer = dynamic_cast<Layer*>(this);
+        assert( current_layer );
         // mininimum position is the with the layer
         // we keep it if is higher than what we had so far
         // this will be used for shifting the right barLine
@@ -1171,16 +1252,17 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
+int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>(params[0]);
-    int *system_height = static_cast<int*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *system_height = static_cast<int*>((*params)[1]);
     
     // starting a new system
-    System *current_system = dynamic_cast<System*>(this);
-    if ( current_system  ) {
+    if (this->Is() == SYSTEM) {
+        System *current_system = dynamic_cast<System*>(this);
+        assert( current_system );
         // we reset the system height
         (*system_height) = 0;
         (*min_pos) = 0;
@@ -1188,17 +1270,18 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     }
     
     // starting a new measure
-    Measure *current_measure = dynamic_cast<Measure*>(this);
-    if ( current_measure  ) {
+    if (this->Is() == MEASURE) {
         (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
     }
     
     // starting a new staff
-    Staff *current = dynamic_cast<Staff*>(this);
-    if ( !current  ) {
+    if (this->Is() != STAFF) {
         return FUNCTOR_CONTINUE;
     }
+    
+    Staff *current = dynamic_cast<Staff*>(this);
+    assert( current );
     
     // at this stage we assume we have instanciated the alignment pointer
     assert( current->GetAlignment() );
@@ -1228,16 +1311,17 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid params )
     return FUNCTOR_SIBLINGS;
 }
     
-int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
+int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>(params[0]);
-    int *system_height = static_cast<int*>(params[1]);
+    int *min_pos = static_cast<int*>((*params)[0]);
+    int *system_height = static_cast<int*>((*params)[1]);
     
     // ending a measure
-    Measure *current_measure = dynamic_cast<Measure*>(this);
-    if ( current_measure  ) {
+    if (this->Is() == MEASURE) {
+        Measure *current_measure = dynamic_cast<Measure*>(this);
+        assert( current_measure );
         // mininimum position is the height for the last (previous) staff
         // we keep it if it is higher than what we had so far
         (*system_height) = std::min( (*system_height), (*min_pos) );
@@ -1249,10 +1333,10 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
         
-int Object::Save( ArrayPtrVoid params )
+int Object::Save( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
     if (!output->WriteObject( this )) {
         return FUNCTOR_STOP;
     }
@@ -1260,10 +1344,10 @@ int Object::Save( ArrayPtrVoid params )
 }
     
     
-int Object::SaveEnd( ArrayPtrVoid params )
+int Object::SaveEnd( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>(params[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
     if (!output->WriteObjectEnd( this )) {
         return FUNCTOR_STOP;
     }
