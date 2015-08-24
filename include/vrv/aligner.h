@@ -224,6 +224,9 @@ public:
      */
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
     
+
+    virtual int HorizontalSpaceForDuration(double intervalTime, bool isMensural);
+
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.

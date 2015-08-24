@@ -30,6 +30,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
+#include "proport.h"
 #include "rest.h"
 #include "slur.h"
 #include "space.h"
@@ -231,6 +232,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (object->Is() == NOTE) {
         m_currentNode = m_currentNode.append_child("note");
         WriteMeiNote( m_currentNode, dynamic_cast<Note*>(object) );
+    }
+    else if (object->Is() == PROPORT) {
+        m_currentNode = m_currentNode.append_child("proport");
+        WriteMeiProport( m_currentNode, dynamic_cast<Proport*>(object) );
     }
     else if (object->Is() == REST) {
         m_currentNode = m_currentNode.append_child("rest");
@@ -658,6 +663,13 @@ void MeiOutput::WriteMeiRest( pugi::xml_node currentNode, Rest *rest )
     WriteLayerElement( currentNode, rest );
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
+    return;
+}
+
+void MeiOutput::WriteMeiProport( pugi::xml_node currentNode, Proport *proport )
+{
+    WriteLayerElement( currentNode, proport );
+    //meterSig->WriteMeterSigLog(currentNode);
     return;
 }
     
@@ -1571,6 +1583,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "multiRest" ) {
             success = ReadMeiMultiRest( parent, xmlElement );
         }
+        else if ( elementName == "proport" ) {
+            success = ReadMeiProport( parent, xmlElement );
+        }
         else if ( elementName == "space" ) {
             success = ReadMeiSpace( parent, xmlElement );
         }
@@ -1797,6 +1812,18 @@ bool MeiInput::ReadMeiRest( Object *parent, pugi::xml_node rest )
     ReadPositionInterface(rest, vrvRest);
 	
     AddLayerElement(parent, vrvRest);
+    return true;
+}
+
+bool MeiInput::ReadMeiProport( Object *parent, pugi::xml_node proport )
+{
+    Proport *vrvProport = new Proport();
+    ReadLayerElement(proport, vrvProport);
+    
+    //vrvMeterSig->ReadMeterSigLog(meterSig);
+    vrvProport->ReadDurationRatio( proport );
+    
+    AddLayerElement(parent, vrvProport);
     return true;
 }
 

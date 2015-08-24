@@ -2185,13 +2185,13 @@
             <!--<glyph glyph-code="E935" smufl-name="mensuralNoteheadLongaVoid"/>-->
             <!--<glyph glyph-code="E936" smufl-name="mensuralNoteheadLongaBlackVoid"/>-->
             <!--<glyph glyph-code="E937" smufl-name="mensuralNoteheadLongaWhite"/>-->
-            <!--<glyph glyph-code="E938" smufl-name="mensuralNoteheadSemibrevisBlack"/>-->
-            <!--<glyph glyph-code="E939" smufl-name="mensuralNoteheadSemibrevisVoid"/>-->
+            <glyph glyph-code="E938" smufl-name="mensuralNoteheadSemibrevisBlack"/>
+            <glyph glyph-code="E939" smufl-name="mensuralNoteheadSemibrevisVoid"/>
             <!--<glyph glyph-code="E93A" smufl-name="mensuralNoteheadSemibrevisBlackVoid"/>-->
             <!--<glyph glyph-code="E93B"
                 smufl-name="mensuralNoteheadSemibrevisBlackVoidTurned"/>-->
-            <!--<glyph glyph-code="E93C" smufl-name="mensuralNoteheadMinimaWhite"/>-->
-            <!--<glyph glyph-code="E93D" smufl-name="mensuralNoteheadSemiminimaWhite"/>-->
+            <glyph glyph-code="E93C" smufl-name="mensuralNoteheadMinimaWhite"/>
+            <glyph glyph-code="E93D" smufl-name="mensuralNoteheadSemiminimaWhite"/>
             <!--<glyph glyph-code="E93E" smufl-name="mensuralCombStemUp"/>-->
             <!--<glyph glyph-code="E93F" smufl-name="mensuralCombStemDown"/>-->
             <!--<glyph glyph-code="E940" smufl-name="mensuralCombStemDiagonal"/>-->

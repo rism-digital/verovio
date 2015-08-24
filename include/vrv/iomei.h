@@ -40,6 +40,7 @@ class MultiRest;
 class Note;
 class PitchInterface;
 class PositionInterface;
+class Proport;
 class Rdg;
 class Rest;
 class ScoreDef;
@@ -137,6 +138,7 @@ private:
     void WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest );
     void WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest );
     void WriteMeiNote( pugi::xml_node currentNode, Note *note );
+    void WriteMeiProport( pugi::xml_node currentNode, Proport *proport );
     void WriteMeiRest( pugi::xml_node currentNode, Rest *rest );
     void WriteMeiSpace( pugi::xml_node currentNode, Space *space );
     void WriteMeiTuplet( pugi::xml_node currentNode, Tuplet *tuplet );
@@ -299,6 +301,7 @@ private:
     bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );
     bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
     bool ReadMeiNote( Object *parent, pugi::xml_node note );
+    bool ReadMeiProport( Object *parent, pugi::xml_node proport );
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
     bool ReadMeiSpace( Object *parent, pugi::xml_node space );
     bool ReadMeiSyl( Object *parent, pugi::xml_node syl );

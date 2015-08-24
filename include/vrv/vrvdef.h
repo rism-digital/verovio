@@ -97,6 +97,7 @@ enum ClassId {
     MREST,
     MULTI_REST,
     NOTE,
+    PROPORT,
     REST,
     SPACE,
     SYL,

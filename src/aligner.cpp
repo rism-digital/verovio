@@ -189,9 +189,9 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type, 
         if ( hasEndAlignment ) idx = GetAlignmentCount() - 1;
         else idx = GetAlignmentCount();
     }
-    Alignment *newAlignement = new Alignment( time, type );
-    AddAlignment( newAlignement, idx );
-    return newAlignement;
+    Alignment *newAlignment = new Alignment( time, type );
+    AddAlignment( newAlignment, idx );
+    return newAlignment;
 }
 
 void MeasureAligner::SetMaxTime( double time )
@@ -239,7 +239,7 @@ void GraceAligner::AlignStack( )
 }
 
 //----------------------------------------------------------------------------
-// Alignement
+// Alignment
 //----------------------------------------------------------------------------
 
 Alignment::Alignment( ):
@@ -333,7 +333,7 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
 
 int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
 {
-    // param 0: the cumulated shift
+    // param 0: the accumulated shift
     // param 1: the functor to be redirected to the SystemAligner (unused)
     int *shift = static_cast<int*>((*params)[0]);
     
@@ -349,14 +349,14 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
 
 int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
-    // param 0: the cumulated shift
-    // param 1: the cumulated justifiable shift
+    // param 0: the accumulated shift
+    // param 1: the accumulated justifiable shift
     // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>((*params)[0]);
     int *justifiable_shift = static_cast<int*>((*params)[1]);
     
     // We start a new MeasureAligner
-    // Reset the cumulated shift to 0;
+    // Reset the accumulated shift to 0;
     (*shift) = 0;
     (*justifiable_shift) = -1;
     
@@ -391,8 +391,8 @@ int Alignment::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
 
 int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
-    // param 0: the cumulated shift
-    // param 1: the cumulated justifiable shift
+    // param 0: the accumulated shift
+    // param 1: the accumulated justifiable shift
     // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>((*params)[0]);
     int *justifiable_shift = static_cast<int*>((*params)[1]);
@@ -432,6 +432,22 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
+    
+/* Compute "ideal" horizontal space to allow for a given time interval. For modern
+notation (CMN), this is a function of the interval; for short intervals, it may not
+be enough to keep consecutive symbols from overlapping. For mensural notation, ideal
+spacing is as tight as possible without overlapping and with just a bit of space
+between symbols. */
+int Alignment::HorizontalSpaceForDuration(double intervalTime, bool isMensural)
+{
+    int intervalXRel = 0;
+    if (isMensural)
+        intervalXRel = 20;           // ??EXPERIMENTAL! A very small value => space as tightly as possible
+    else
+        intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
+    return intervalXRel;
+}
+
 int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
@@ -444,9 +460,7 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
-    if ( intervalTime > 0.0 ) {
-        intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an abritrary value
-    }
+    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, true);   // ??2ND PARAM = IS MENSURAL!
     
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
@@ -473,7 +487,7 @@ int MeasureAligner::JustifyX( ArrayPtrVoid *params )
     int width = GetRightAlignment()->GetXRel() + GetRightAlignment()->GetMaxWidth();
     
     // the ratio in the measure has to take into account the non justifiable width
-    // for element within the margin, we do not move them
+    // for elements within the margin, we do not move them
     // for after the margin (right) we have a position that is given by:
     // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
     // (ratio - 1) * (margin / justifiable) + ratio
@@ -505,7 +519,7 @@ int Alignment::JustifyX( ArrayPtrVoid *params )
     }
     
     // the ratio in the measure has to take into account the non justifiable width
-    // for element within the margin, we do not move them
+    // for elements within the margin, we do not move them
     // for after the margin (right) we have a position that is given by:
     // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
     // (ratio - 1) * (margin / justifiable) + ratio

@@ -31,6 +31,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "proport.h"
 #include "rest.h"
 #include "space.h"
 #include "smufl.h"
@@ -104,6 +105,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     }
     else if (element->Is() == NOTE) {
         DrawDurationElement(dc, element, layer, staff, measure);
+    }
+    else if (element->Is() == PROPORT) {
+        DrawProport(dc, element, layer, staff, measure);
     }
     else if (element->Is() == REST) {
         DrawDurationElement(dc, element, layer, staff, measure);
@@ -1208,12 +1212,12 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     
     wtext = IntToTimeSigFigures(num);
-    DrawSmuflString ( dc, x, ynum, wtext, 1, staff->m_drawingStaffSize);	// '1' = centrer
+    DrawSmuflString ( dc, x, ynum, wtext, true, staff->m_drawingStaffSize);	// true = center
     
     if (numBase)
     {
         wtext = IntToTimeSigFigures(numBase);
-        DrawSmuflString ( dc, x, yden, wtext, 1, staff->m_drawingStaffSize);	// '1' = centrer
+        DrawSmuflString ( dc, x, yden, wtext, true, staff->m_drawingStaffSize);	// '1' = center
     }
     
     dc->ResetFont();
@@ -1587,6 +1591,43 @@ void View::DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->EndGraphic(element, this );
 
 }
+
+    
+void View::DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
+    assert(layer); // Pointer to layer cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL"
+    assert(dynamic_cast<Proport*>(element)); // Element must be a Mensur"
+    
+	int x1, x2, y1, y2;
+    
+    Proport *proport = dynamic_cast<Proport*>(element);
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*4);
+    int x = element->GetDrawingX();
+    
+    x1 = x+120;  x2 = x1+150;					// ??TEST: JUST DRAW AN ARBITRARY RECTANGLE
+    y1 = y;	y2 = y+50+(50*proport->GetNum());
+	//DrawFullRectangle( dc,x1,y1,x2,y2);
+	DrawPartFullRectangle( dc,x1,y1,x2,y2, 0);
+
+    if (proport->HasNum())
+    {
+        x = element->GetDrawingX();
+        //if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
+        {
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a sign or a meter symbol
+        }
+        int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
+        DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), proport->GetNum(), numbase, staff);
+    }
+
+    
+    dc->EndGraphic(element, this );
+}
+
     
 int View::GetSylY( Syl *syl, Staff *staff )
 {
