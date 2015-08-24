@@ -416,6 +416,7 @@ bool MeiOutput::WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp
     
     currentNode.append_attribute( "xml:id" ) = UuidToMeiStr( staffGrp ).c_str();
     
+    staffGrp->WriteCommon(currentNode);
     staffGrp->WriteLabelsAddl(currentNode);
     staffGrp->WriteStaffgroupingsym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
@@ -1258,6 +1259,7 @@ bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
     StaffGrp *vrvStaffGrp = new StaffGrp( );
     SetMeiUuid( staffGrp, vrvStaffGrp );
     
+    vrvStaffGrp->ReadCommon(staffGrp);
     vrvStaffGrp->ReadLabelsAddl(staffGrp);
     vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadStaffgroupingsym(staffGrp);

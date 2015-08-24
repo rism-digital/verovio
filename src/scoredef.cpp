@@ -342,12 +342,13 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSi
 // StaffGrp
 //----------------------------------------------------------------------------
 
-StaffGrp::StaffGrp() :
-    Object(), ObjectListInterface(),
+StaffGrp::StaffGrp() : Object(), ObjectListInterface(),
+    AttCommon(),
     AttLabelsAddl(),
     AttStaffgroupingsym(),
     AttStaffGrpVis()
 {
+    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
@@ -361,6 +362,7 @@ StaffGrp::~StaffGrp()
 void StaffGrp::Reset()
 {
     Object::Reset();
+    ResetCommon();
     ResetLabelsAddl();
     ResetStaffgroupingsym();
     ResetStaffGrpVis();

@@ -195,6 +195,7 @@ private:
  * It contains StaffDef objects.
  */
 class StaffGrp: public Object, public ObjectListInterface,
+    public AttCommon,
     public AttLabelsAddl,
     public AttStaffgroupingsym,
     public AttStaffGrpVis
