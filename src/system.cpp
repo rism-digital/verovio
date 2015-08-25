@@ -207,7 +207,7 @@ int System::JustifyX( ArrayPtrVoid *params )
     
     (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar) / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
     
-    LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
+    //LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
 
     if ((*ratio) < 0.8 ) {
         // Arbitrary value for avoiding over-compressed justification
