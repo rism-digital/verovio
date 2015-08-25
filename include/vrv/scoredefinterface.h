@@ -31,7 +31,8 @@ class ScoreDefInterface: public Interface,
     public AttMensuralLog,
     public AttMensuralShared,
     public AttMeterSigDefaultLog,
-    public AttMeterSigDefaultVis
+    public AttMeterSigDefaultVis,
+    public AttMultinummeasures
 {
 public:
     /**

@@ -21,6 +21,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "rpt.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -262,6 +263,20 @@ int Layer::SetDrawingXY( ArrayPtrVoid *params )
         this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
     }
     
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::PrepareRpt( ArrayPtrVoid *params )
+{
+    // param 0: a pointer to the current MRpt pointer
+    // param 1: a pointer to the data_BOOLEAN indicating if multiNumber (unused)
+    // param 2: a pointer to the doc scoreDef (unused)
+    MRpt **currentMRpt =  static_cast<MRpt**>((*params)[0]);
+
+    // If we have encountered a mRpt before and there is none is this layer, reset it to NULL
+    if ((*currentMRpt) && !this->FindChildByType(MRPT)) {
+        (*currentMRpt) = NULL;
+    }
     return FUNCTOR_CONTINUE;
 }
 

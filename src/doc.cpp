@@ -27,6 +27,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
+#include "rpt.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -248,6 +249,32 @@ void Doc::PrepareDrawing()
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if ( !timeSpanningElements.empty() ) {
         LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
+    }
+    
+    // Process by staff for matching mRpt elements and setting the drawing number
+    MRpt *currentMRpt;
+    data_BOOLEAN multiNumber;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( STAFF, staves->first );
+            AttCommonNComparison matchLayer( LAYER, layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+            
+            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // m_drawingLastNote is set only if the syl has a forward connector
+            currentMRpt = NULL;
+            // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
+            multiNumber = BOOLEAN_NONE;
+            ArrayPtrVoid paramsRptAttr;
+            paramsRptAttr.push_back(&currentMRpt);
+            paramsRptAttr.push_back(&multiNumber);
+            paramsRptAttr.push_back(&m_scoreDef);
+            Functor prepareRpt( &Object::PrepareRpt );
+            this->Process( &prepareRpt, &paramsRptAttr, NULL, &filters );
+        }
     }
     
     /*
@@ -509,6 +536,7 @@ char Doc::GetLeftMargin( const ClassId classId  )
     else if (classId == CHORD) return m_style->m_leftMarginChord;
     else if (classId == CLEF) return m_style->m_leftMarginClef;
     else if (classId == MREST) return m_style->m_leftMarginMRest;
+    else if (classId == MRPT) return m_style->m_leftMarginMRest;
     else if (classId == NOTE) return m_style->m_leftMarginNote;
     return m_style->m_leftMarginDefault;
 }
@@ -522,6 +550,7 @@ char Doc::GetRightMargin( const ClassId classId )
     else if (classId == MENSUR) return m_style->m_rightMarginMensur;
     else if (classId == METER_SIG) return m_style->m_rightMarginMeterSig;
     else if (classId == MREST) return m_style->m_rightMarginMRest;
+    else if (classId == MRPT) return m_style->m_rightMarginMRest;
     else if (classId == MULTI_REST) return m_style->m_rightMarginMultiRest;
     return m_style->m_rightMarginDefault;
 }

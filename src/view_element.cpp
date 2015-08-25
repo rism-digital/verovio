@@ -33,6 +33,7 @@
 #include "note.h"
 #include "proport.h"
 #include "rest.h"
+#include "rpt.h"
 #include "space.h"
 #include "smufl.h"
 #include "staff.h"
@@ -76,6 +77,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (element->Is() == BEAM) {
         DrawBeam(dc, element, layer, staff, measure);
     }
+    else if (element->Is() == BEAT_RPT) {
+        DrawBeatRpt(dc, element, layer, staff, measure);
+    }
     else if (element->Is() == CHORD) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
@@ -100,8 +104,17 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (element->Is() == MREST) {
         DrawMRest(dc, element, layer, staff, measure);
     }
+    else if (element->Is() == MRPT) {
+        DrawMRpt(dc, element, layer, staff, measure);
+    }
+    else if (element->Is() == MRPT2) {
+        DrawMRpt2(dc, element, layer, staff, measure);
+    }
     else if (element->Is() == MULTI_REST) {
         DrawMultiRest(dc, element, layer, staff, measure);
+    }
+    else if (element->Is() == MULTI_RPT) {
+        DrawMultiRpt(dc, element, layer, staff, measure);
     }
     else if (element->Is() == NOTE) {
         DrawDurationElement(dc, element, layer, staff, measure);
@@ -715,6 +728,59 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     return;
 
+}
+    
+void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+}
+    
+void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
+    MRpt *mRpt = dynamic_cast<MRpt*>(element);
+    assert( mRpt );
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    int x = element->GetDrawingX();
+    int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
+    int xSymbol = xCentered - m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
+    
+    int y = element->GetDrawingY();
+    
+    y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    
+    DrawSmuflCode( dc, xSymbol, y, SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false );
+    
+    if (mRpt->m_drawingMeasureCount > 0) {
+        dc->SetFont( m_doc->GetDrawingSmuflFont( staff->m_drawingStaffSize, false) );
+        // calculate the width of the figures
+        int txt_length = 0;
+        int txt_height = 0;
+        std::wstring figures = IntToTupletFigures(mRpt->m_drawingMeasureCount);
+        dc->GetSmuflTextExtent(figures, &txt_length, &txt_height);
+        dc->DrawMusicText( figures, ToDeviceContextX(xCentered - txt_length / 2),
+                          ToDeviceContextY(staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) );
+        dc->ResetFont();
+    }
+    
+    dc->EndGraphic(element, this);
+    
+    return;
+    
+}
+
+void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+}
+    
+void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
 }
 
 void View::DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff)

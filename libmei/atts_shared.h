@@ -3139,8 +3139,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMultiNumber(std::string multiNumber_) { m_multiNumber = multiNumber_; };
-    std::string GetMultiNumber() const { return m_multiNumber; };    
+    void SetMultiNumber(data_BOOLEAN multiNumber_) { m_multiNumber = multiNumber_; };
+    data_BOOLEAN GetMultiNumber() const { return m_multiNumber; };    
     bool HasMultiNumber( );
     
     ///@}
@@ -3150,7 +3150,7 @@ private:
      * Indicates whether programmatically calculated counts of multiple measures of
      * rest (mRest) and whole measure repeats (mRpt) in parts should be rendered.
      **/
-    std::string m_multiNumber;
+    data_BOOLEAN m_multiNumber;
 
 /* include <attmulti.number> */
 };

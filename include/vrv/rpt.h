@@ -64,10 +64,22 @@ public:
     virtual std::string GetClassName( ){ return "MRpt"; }; ;
     virtual ClassId Is() { return MRPT; };
     ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * Functor for setting mRpt drawing numbers (if required)
+     * See implementation and Object::PrepareRpt
+     */
+    virtual int PrepareRpt( ArrayPtrVoid *params );
 
 private:
     
 public:
+    /** measure count */
+    int m_drawingMeasureCount;
 
 private:
     

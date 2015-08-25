@@ -1176,7 +1176,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
     
-    if (current->Is() == MREST) {
+    if ((current->Is() == MREST) || (current->Is() == MRPT)) {
         // With MRest, the only thing we want to do it keep their with as possible measure with (if only MRest in all staves/layers)
         int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR + negative_offset ;
         // Keep it if more than the current measure width

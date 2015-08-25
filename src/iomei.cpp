@@ -811,6 +811,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteMensuralShared(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
+    interface->WriteMultinummeasures(element);
 }
 
 void MeiOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
@@ -2028,6 +2029,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
+    interface->ReadMultinummeasures(element);
     return true;
 }
     

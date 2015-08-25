@@ -226,5 +226,31 @@ int Staff::SetDrawingXY( ArrayPtrVoid *params )
     
     return FUNCTOR_CONTINUE;
 }
+    
+int Staff::PrepareRpt( ArrayPtrVoid *params )
+{
+    // param 0: a pointer to the current MRpt pointer (unused)
+    // param 1: a pointer to the data_BOOLEAN indicating if multiNumber
+    // param 2: a pointer to the doc scoreDef
+    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN*>((*params)[1]);
+    ScoreDef *scoreDef = static_cast<ScoreDef*>((*params)[2]);
+    
+    // If multiNumber is set, we already know that nothing needs to be done
+    // Futhermore, if @multi.number is false, the functor should have stop (see below)
+    if ((*multiNumber) != BOOLEAN_NONE) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // This is happening only for the first staff element of the staff @n
+    if (StaffDef *staffDef = scoreDef->GetStaffDef( this->GetN() ) ) {
+        if ((staffDef->HasMultiNumber()) && (staffDef->GetMultiNumber() == BOOLEAN_false)) {
+            // Set it just in case, but stopping the functor should do it for this staff @n
+            (*multiNumber) = BOOLEAN_false;
+            return FUNCTOR_STOP;
+        }
+    }
+    (*multiNumber) = BOOLEAN_true;
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

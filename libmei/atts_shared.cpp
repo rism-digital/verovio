@@ -3625,13 +3625,13 @@ AttMultinummeasures::~AttMultinummeasures() {
 }
 
 void AttMultinummeasures::ResetMultinummeasures() {
-    m_multiNumber = "";
+    m_multiNumber = BOOLEAN_NONE;
 }
 
 bool AttMultinummeasures::ReadMultinummeasures(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("multi.number")) {
-        this->SetMultiNumber(StrToStr(element.attribute("multi.number").value()));
+        this->SetMultiNumber(StrToBool(element.attribute("multi.number").value()));
         element.remove_attribute("multi.number");
         hasAttribute = true;
     }
@@ -3641,7 +3641,7 @@ bool AttMultinummeasures::ReadMultinummeasures(  pugi::xml_node element ) {
 bool AttMultinummeasures::WriteMultinummeasures(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasMultiNumber()) {
-        element.append_attribute("multi.number") = StrToStr(this->GetMultiNumber()).c_str();
+        element.append_attribute("multi.number") = BoolToStr(this->GetMultiNumber()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -3649,7 +3649,7 @@ bool AttMultinummeasures::WriteMultinummeasures(  pugi::xml_node element ) {
 
 bool AttMultinummeasures::HasMultiNumber( )
 {
-    return (m_multiNumber != "");
+    return (m_multiNumber != BOOLEAN_NONE);
 }
 
 
@@ -7677,7 +7677,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
         assert( att );
         if (attrType == "multiNumber") {
-            att->SetMultiNumber(att->StrToStr(attrValue));
+            att->SetMultiNumber(att->StrToBool(attrValue));
             return true;
         }
     }
@@ -8984,7 +8984,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
         assert( att );
         if (att->HasMultiNumber()) {
-            attributes->push_back(std::make_pair("multiNumber", att->StrToStr(att->GetMultiNumber())));
+            attributes->push_back(std::make_pair("multiNumber", att->BoolToStr(att->GetMultiNumber())));
         }
     }
     if (element->HasAttClass( ATT_NAME ) ) {

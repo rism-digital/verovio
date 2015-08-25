@@ -250,7 +250,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_METERSIG;
         }
     }
-    else if ( (this->Is() == MULTI_REST) || (this->Is() == MREST) ) {
+    else if ( (this->Is() == MULTI_REST) || (this->Is() == MREST)  || (this->Is() == MRPT) ) {
         type = ALIGNMENT_MULTIREST;
     }
     else if ( this->IsGraceNote() ) {

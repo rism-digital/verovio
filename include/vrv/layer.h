@@ -119,6 +119,12 @@ public:
      */
     virtual int SetDrawingXY( ArrayPtrVoid *params );
     
+    /**
+     * Functor for setting mRpt drawing numbers (if required)
+     * See implementation and Object::PrepareRpt
+     */
+    virtual int PrepareRpt( ArrayPtrVoid *params );
+    
 private:
     
 public:
