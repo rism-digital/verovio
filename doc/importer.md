@@ -5,7 +5,7 @@ Verovio supports import for Plain and Easy and for Darms codes (See the PaeInput
 
 ![Snippet](https://cloud.githubusercontent.com/assets/3487289/9319255/2f5187de-4501-11e5-808b-897ed35aa6dd.png)
 
-The resulting MEI file is available [here](importer.mei) and the SVG output for version 0.9.9 [there](importer.svg).
+Some features (articulation, endings, etc.) are still missing but will be added eventually. The resulting MEI file is available [here](importer.mei) and the SVG output for version 0.9.9 [there](importer.svg).
 
 ``` C++
 ////////////////////////////////////
