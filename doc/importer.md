@@ -1,7 +1,7 @@
-Writing and importer
---------------------
+Writing an importer
+-------------------
 
-Verovio supports import of Plain and Easy and of Darms (See the PaeInput and DarmsInput classes). Writing an importer from another code could follow the same approach. The code below illustrates how the following snippet can be created in Verovio.
+Verovio supports import for Plain and Easy and for Darms codes (See the PaeInput and DarmsInput classes). Writing an importer from another code could follow the same approach. The code below illustrates how the following snippet can be created in Verovio.
 
 ![Snippet](https://cloud.githubusercontent.com/assets/3487289/9319255/2f5187de-4501-11e5-808b-897ed35aa6dd.png)
 
