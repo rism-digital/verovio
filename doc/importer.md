@@ -55,8 +55,8 @@ m_doc->m_scoreDef.SetKeySig(KEYSIGNATURE_2s);
 m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
 
 // adding the staffDef to the staffGrp and the staffGrp to the doc scoreDef
-staffGrp->AddStaffDef( staffDef );
-m_doc->m_scoreDef.AddStaffGrp( staffGrp );
+staffGrp->AddStaffDef(staffDef);
+m_doc->m_scoreDef.AddStaffGrp(staffGrp);
 
 // we need one page and one system
 Page *page = new Page();
