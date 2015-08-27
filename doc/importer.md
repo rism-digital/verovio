@@ -5,7 +5,7 @@ Verovio supports import of Plain and Easy and of Darms (See the PaeInput and Dar
 
 
 
-The resulting MEI file is available here
+The resulting MEI file is available [here](importer.mei)
 
 ``` C++
 ////////////////////////////////////
