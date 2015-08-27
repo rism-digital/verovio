@@ -3,9 +3,9 @@ Writing and importer
 
 Verovio supports import of Plain and Easy and of Darms (See the PaeInput and DarmsInput classes). Writing an importer from another code could follow the same approach. The code below illustrates how the following snippet can be created in Verovio.
 
+![Snippet](https://cloud.githubusercontent.com/assets/3487289/9319255/2f5187de-4501-11e5-808b-897ed35aa6dd.png)
 
-
-The resulting MEI file is available [here](importer.mei)
+The resulting MEI file is available [here](importer.mei) and the SVG output for version 0.9.9 [there](importer.svg).
 
 ``` C++
 ////////////////////////////////////
