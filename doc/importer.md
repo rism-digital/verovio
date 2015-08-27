@@ -425,9 +425,8 @@ staff->AddLayer(layer2);
 measure->AddStaff(staff);
 system->AddMeasure(measure);
 
-
 ////////////////////////////////////
-// Eight measure
+// Eighth measure
 ////////////////////////////////////
 
 measure = new Measure();
