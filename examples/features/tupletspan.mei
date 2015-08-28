@@ -22,7 +22,7 @@
                 <score>
                     <scoreDef clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" key.sig="0">
                         <staffGrp symbol="line">
-                            <staffGrp xml:id="P1" symbol="brace" label="Part_1">
+                            <staffGrp xml:id="P1" symbol="brace" label="Piano">
                                 <staffDef n="1" lines="5" clef.line="2" clef.shape="G" key.sig="0"/>
                                 <staffDef n="2" lines="5" clef.line="4" clef.shape="F" key.sig="0"/>
                             </staffGrp>

@@ -11,6 +11,8 @@
 //<![CDATA[
 	zoom = 40;
 	pageWidth = 1450;
+	spacingStaff = 4;
+	border = 60;
 	
 	// adjust the zoom for small screens
 	width = $('#feature').width();
@@ -30,7 +32,14 @@
 {% include features/tuplet.txt %}
 {% endhighlight %}
 </div>
+<br/>
 
+<p>
+	The bracket and the number of the tuplets can be hidden with <code>@bracket.visible="false"</code> and <code>bracket.visible="false"</code> respectively.
+</p>
+
+<!-- ***************************** -->
+<h4>MEI tupletSpan elements</h4>
 
 <p>
 	Verovio also supports tuplet spans, an alternate MEI approach for encoding tuplets. The limitation of Verovio <code>&lt;tupletSpan&gt;</code> element support is that they are supported as load-only elements. It means that they are converted to <code>&lt;tuplet&gt;</code> elements when the document is loaded, and this is possible only if all the elements contained by the tuplet have the same parent.
@@ -38,11 +47,12 @@
 <div id="svg_output-2" style="overflow:auto;"/>
 <script type="text/javascript">
 //<![CDATA[
-	 pageWidth = 1450;
+	pageWidth = 1450;
+	spacingStaff = 4;
 
-	 $.get( "{{ site.baseurl }}/examples/features/tupletspan.mei" , function( data ) {
-		 load_data( data, $('#svg_output-2') );
-	 });
+	$.get( "{{ site.baseurl }}/examples/features/tupletspan.mei" , function( data ) {
+		load_data( data, $('#svg_output-2') );
+	});
 //]]>
 </script>
 
