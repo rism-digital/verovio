@@ -110,6 +110,9 @@ public:
     std::string BarRenditionToStr(data_BARRENDITION data);
     data_BARRENDITION StrToBarRendition(std::string value);
     
+    std::string BeatrptRendToStr(data_BEATRPT_REND data);
+    data_BEATRPT_REND StrToBeatrptRend(std::string value);
+    
     std::string BoolToStr(data_BOOLEAN data);
     data_BOOLEAN StrToBool(std::string value);
     

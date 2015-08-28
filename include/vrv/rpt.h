@@ -9,6 +9,7 @@
 #ifndef __VRV_RPT_H__
 #define __VRV_RPT_H__
 
+#include "atts_cmn.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -20,7 +21,8 @@ namespace vrv {
 /**
  * This class models the MEI <beatRpt>
  */
-class BeatRpt: public LayerElement
+class BeatRpt: public LayerElement,
+    public AttBeatRptVis
 {
 public:
     /**

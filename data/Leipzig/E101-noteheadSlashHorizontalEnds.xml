@@ -3,6 +3,6 @@
         overflow="inherit"
         horiz-adv-x="508">
    <g transform="scale(1,-1)">
-      <path d="M508 212l-362 -424h-146l362 424h146z"/>
+      <path d="M508 242l-362 -484h-146l362 484h146z"/>
    </g>
 </symbol>

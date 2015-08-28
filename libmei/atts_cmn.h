@@ -295,8 +295,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() const { return m_rend; };    
+    void SetRend(data_BEATRPT_REND rend_) { m_rend = rend_; };
+    data_BEATRPT_REND GetRend() const { return m_rend; };    
     bool HasRend( );
     
     //
@@ -308,7 +308,7 @@ public:
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_rend;
+    data_BEATRPT_REND m_rend;
     /** Records the slope of the beam. **/
     double m_slopeDbl;
 
@@ -383,15 +383,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() const { return m_rend; };    
+    void SetRend(data_BEATRPT_REND rend_) { m_rend = rend_; };
+    data_BEATRPT_REND GetRend() const { return m_rend; };    
     bool HasRend( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_rend;
+    data_BEATRPT_REND m_rend;
 
 /* include <attrend> */
 };

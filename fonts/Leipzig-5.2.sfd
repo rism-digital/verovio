@@ -4,7 +4,7 @@ FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
 Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.1
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats" 
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA" 
 Version: 5.2.1
 ItalicAngle: 0
 UnderlinePosition: -50
@@ -20,7 +20,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1440516689
+ModificationTime: 1440762871
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -49,7 +49,7 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 58554 18 9
+WinInfo: 57510 18 9
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
@@ -5504,15 +5504,15 @@ StartChar: uniE101
 Encoding: 57601 57601 111
 Width: 508
 VWidth: 2048
-Flags: HW
+Flags: HWO
 LayerCount: 2
 Fore
 SplineSet
-508 212 m 5
- 146 -212 l 5
- 0 -212 l 5
- 362 212 l 5
- 508 212 l 5
+508 242 m 1
+ 146 -242 l 1
+ 0 -242 l 1
+ 362 242 l 1
+ 508 242 l 1
 EndSplineSet
 EndChar
 
@@ -5559,7 +5559,7 @@ StartChar: uniE502
 Encoding: 58626 58626 113
 Width: 1234
 VWidth: 2048
-Flags: HWO
+Flags: HW
 LayerCount: 2
 Fore
 SplineSet

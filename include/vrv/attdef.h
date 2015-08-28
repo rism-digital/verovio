@@ -94,7 +94,7 @@ enum data_ACCIDENTAL_IMPLICIT  {
 };
 
 /**
- * MEI data_BARRENDITION
+ * MEI data.BARRENDITION
  */
 enum data_BARRENDITION {
     BARRENDITION_NONE = 0,
@@ -109,6 +109,19 @@ enum data_BARRENDITION {
     BARRENDITION_rptboth,
     BARRENDITION_rptend,
     BARRENDITION_single
+};
+    
+/**
+ * MEI data.BEATRPT_REND
+ */
+enum data_BEATRPT_REND {
+    BEATRPT_REND_NONE = 0,
+    BEATRPT_REND_4,
+    BEATRPT_REND_16,
+    BEATRPT_REND_32,
+    BEATRPT_REND_64,
+    BEATRPT_REND_128,
+    BEATRPT_REND_mixed
 };
     
 /**

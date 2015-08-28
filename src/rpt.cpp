@@ -16,8 +16,10 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 BeatRpt::BeatRpt( ):
-LayerElement("beatrpt-")
+    LayerElement("beatrpt-"),
+    AttBeatRptVis()
 {
+    RegisterAttClass(ATT_BEATRPTVIS);
     Reset();
 }
 
@@ -28,6 +30,7 @@ BeatRpt::~BeatRpt()
 void BeatRpt::Reset()
 {
     LayerElement::Reset();
+    ResetBeatRptVis();
 }
 
 //----------------------------------------------------------------------------

@@ -732,6 +732,30 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
 void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
+    BeatRpt *beatRpt = dynamic_cast<BeatRpt*>(element);
+    assert( beatRpt );
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    int x = element->GetDrawingX();
+    int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
+    int halfWidth = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
+    
+    int xSymbol = xCentered - halfWidth;
+    
+    int y = element->GetDrawingY();
+    
+    y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    
+    DrawSmuflCode( dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false );
+
+    dc->EndGraphic(element, this);    
 }
     
 void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

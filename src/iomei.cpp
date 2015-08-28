@@ -570,6 +570,7 @@ void MeiOutput::WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt )
     assert( beatRpt );
     
     WriteLayerElement( currentNode, beatRpt );
+    beatRpt->WriteBeatRptVis(currentNode);
 }
 
 void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
@@ -1720,6 +1721,7 @@ bool MeiInput::ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt )
 {
     BeatRpt *vrvBeatRpt = new BeatRpt();
     ReadLayerElement(beatRpt, vrvBeatRpt);
+    vrvBeatRpt->ReadBeatRptVis(beatRpt);
     
     AddLayerElement(parent, vrvBeatRpt);
     return true;

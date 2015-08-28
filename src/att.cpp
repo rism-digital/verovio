@@ -197,6 +197,39 @@ data_BARRENDITION Att::StrToBarRendition(std::string value)
 	}
 	return BARRENDITION_NONE;
 }
+    
+std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
+{
+    std::string value;
+    switch(data)
+    {
+        case BEATRPT_REND_4 : value = "4"; break;
+        case BEATRPT_REND_16 : value = "16"; break;
+        case BEATRPT_REND_32 : value = "32"; break;
+        case BEATRPT_REND_64 : value = "64"; break;
+        case BEATRPT_REND_128 : value = "128"; break;
+        case BEATRPT_REND_mixed : value = "mixed"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
+{
+    if (value == "4") return BEATRPT_REND_4;
+    else if (value == "16") return BEATRPT_REND_16;
+    else if (value == "32") return BEATRPT_REND_32;
+    else if (value == "64") return BEATRPT_REND_64;
+    else if (value == "128") return BEATRPT_REND_128;
+    else if (value == "mixed") return BEATRPT_REND_mixed;
+    else {
+        LogWarning("Unsupported beatrpt rend '%s'", value.c_str() );
+    }
+    return BEATRPT_REND_NONE;
+}
 
 std::string Att::BoolToStr(data_BOOLEAN data)
 {
