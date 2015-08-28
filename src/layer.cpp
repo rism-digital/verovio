@@ -98,8 +98,17 @@ void Layer::SetDrawingAndCurrentValues(  StaffDef *currentStaffDef )
     // Remove any previous value in the Layer
     this->StaffDefDrawingInterface::Reset();
     
+    // Special case with C-major / A-minor key signature (0) : if key cancellation is false, we are at the beginning
+    // of a new system, and hence we should not draw it. Maybe this can be improved?
+    bool drawKeySig = currentStaffDef->DrawKeySig();
+    if (currentStaffDef->GetCurrentKeySig() && (currentStaffDef->GetCurrentKeySig()->GetAlterationNumber() == 0)) {
+        if (currentStaffDef->DrawKeySigCancellation() == false) {
+            drawKeySig = false;
+        }
+    }
+    
     this->SetDrawClef( currentStaffDef->DrawClef() );
-    this->SetDrawKeySig( currentStaffDef->DrawKeySig() );
+    this->SetDrawKeySig( drawKeySig ); // see above
     this->SetDrawMensur( currentStaffDef->DrawMensur() );
     this->SetDrawMeterSig( currentStaffDef->DrawMeterSig() );
     this->SetDrawKeySigCancellation( currentStaffDef->DrawKeySigCancellation() );

@@ -465,10 +465,6 @@ bool MeiOutput::WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure )
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
 
     measure->WriteCommon(currentNode);
-
-    // here we transfer the barLine object values to @left and @right
-    measure->SetLeft( measure->GetLeftBarlineType() );
-    measure->SetRight( measure->GetRightBarlineType() );
     measure->WriteMeasureLog(currentNode);
     
     return true;
@@ -1389,10 +1385,6 @@ bool MeiInput::ReadMeiMeasure( Object *parent, pugi::xml_node measure )
     
     vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
-    
-    // here we transfer the @left and @right values to the barLine objects
-    vrvMeasure->SetLeftBarlineType( vrvMeasure->GetLeft() );
-    vrvMeasure->SetRightBarlineType( vrvMeasure->GetRight() );
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
     if ( parent->Is() == SYSTEM ) {

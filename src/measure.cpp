@@ -150,6 +150,10 @@ int Measure::AlignHorizontally( ArrayPtrVoid *params )
     // clear the content of the measureAligner
     m_measureAligner.Reset();
     
+    // here we transfer the @left and @right values to the barLine objects
+    this->SetLeftBarlineType( this->GetLeft() );
+    this->SetRightBarlineType( this->GetRight() );
+    
     // point to it
     (*measureAligner) = &m_measureAligner;
     

@@ -324,7 +324,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     }
     // Finally
     else {
-        LogDebug("Slur across an entire system is not supported");
+        LogDebug("Tie across an entire system is not supported");
         return;
     }
     
