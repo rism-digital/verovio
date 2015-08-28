@@ -1,0 +1,35 @@
+---
+---
+<h3>Repeats</h3>
+
+<p>
+	Verovio supports <code>&lt;mRpt&gt;</code>. The number on top of each repeat is calculated by Verovio. The <code>@mutli.number</code> in <code>&lt;scoreDef&gt;</code> or <code>&lt;staffDef&gt;</code> can be set to false for not showing the number. (The value of the <code>@mutli.number</code> will be set for the entire score or staff and cannot be redefined.)
+</p>
+
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="mrpt.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/mrpt.txt %}
+{% endhighlight %}
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+	zoom = 40;
+	pageWidth = 1500;
+	spacingStaff = 4;
+	
+	// adjust the zoom for small screens
+	width = $('#feature').width();
+	if ( width < zoom * pageWidth / 100 ) {
+		zoom = width * 100 / pageWidth;
+	}
+    
+	$.get( "{{ site.baseurl }}/examples/features/mrpt.mei" , function( data ) {
+		load_data( data, $('#svg_output-1') );
+	});
+//]]>
+</script>
+

@@ -1,0 +1,94 @@
+<score>
+  <scoreDef meter.count="6" meter.unit="8">
+    <staffGrp symbol="bracket">
+      <staffDef n="1" clef.line="2" clef.shape="G" meter.count="6" meter.unit="8" lines="5"/>
+      <staffDef n="2" clef.line="4" clef.shape="F" lines="5" multi.number="false"/>
+    </staffGrp>
+  </scoreDef>
+  <section>
+    <measure n="1">
+      <staff n="1">
+        <layer n="1">
+          <beam>
+            <note pname="f" oct="4" dur="8"/>
+            <note pname="a" oct="4" dur="16"/>
+            <note pname="c" oct="5" dur="16"/>
+            <note pname="a" oct="4" dur="8"/>
+          </beam>
+          <beam>
+            <note pname="c" oct="5" dur="8"/>
+            <note pname="a" oct="4" dur="8"/>
+            <note pname="g" oct="4" dur="8"/>
+          </beam>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <note pname="f" oct="3" dur="2" dots="1"/>
+        </layer>
+      </staff>
+    </measure>
+    <measure n="2">
+      <staff n="1">
+        <layer n="1">
+          <supplied>
+            <mRpt/>
+          </supplied>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <mRpt/>
+        </layer>
+      </staff>
+    </measure>
+    <measure n="3">
+      <staff n="1">
+        <layer n="1">
+          <mRpt/>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <mRpt/>
+        </layer>
+      </staff>
+    </measure>
+    <measure n="4">
+      <staff n="1">
+        <layer n="1">
+          <beam>
+            <note pname="f" oct="4" dur="16"/>
+            <note pname="g" oct="4" dur="16"/>
+            <note pname="a" oct="4" dur="16"/>
+            <note pname="b" oct="4" dur="16"/>
+            <note pname="c" oct="5" dur="16"/>
+            <note pname="a" oct="4" dur="8"/>
+          </beam>
+          <beam>
+            <note pname="c" oct="5" dur="8"/>
+            <note pname="a" oct="4" dur="8"/>
+            <note pname="c" oct="4" dur="8"/>
+          </beam>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <mRpt/>
+        </layer>
+      </staff>
+    </measure>
+    <measure n="5">
+      <staff n="1">
+        <layer n="1">
+          <mRpt/>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <mRpt/>
+        </layer>
+      </staff>
+    </measure>
+  </section>
+</score>
