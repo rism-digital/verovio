@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1//mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1//mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
     <meiHead>
         <fileDesc>
@@ -153,6 +153,18 @@
                 </changeDesc>
                 <date>2015-05-12</date>
             </change>
+            <change n="4" resp="LP">
+                <changeDesc>
+                    <p>Adding staffGrp/staffDef labels</p>
+                </changeDesc>
+                <date>2015-05-12</date>
+            </change> 
+            <change n="5" resp="LP">
+                <changeDesc>
+                    <p>Changing schema path</p>
+                </changeDesc>
+                <date>2015-08-28</date>
+            </change> 
         </revisionDesc>
     </meiHead>
     <music>
@@ -161,8 +173,8 @@
                 <score>
                     <scoreDef ppq="24" meter.count="3" meter.unit="4" key.sig="1f">
                         <staffGrp>
-                            <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G" key.sig="1f"/>
-                            <staffGrp xml:id="P2" symbol="brace">
+                            <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G" key.sig="1f"  label="Singstimme"/>
+                            <staffGrp xml:id="P2" symbol="brace" label="Pianoforte">
                                 <staffDef n="2" lines="5" clef.line="2" clef.shape="G" key.sig="1f"/>
                                 <staffDef n="3" lines="5" clef.line="4" clef.shape="F" key.sig="1f"/>
                             </staffGrp>
