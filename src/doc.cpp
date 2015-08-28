@@ -709,8 +709,8 @@ int Doc::PrepareLyricsEnd( ArrayPtrVoid *params )
 {
     // param 0: the current Syl
     // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl**>((*params)[0]);
-    Note **lastNote = static_cast<Note**>((*params)[1]);
+    Syl **currentSyl = static_cast<Syl**>((*params).at(0));
+    Note **lastNote = static_cast<Note**>((*params).at(1));
     
     if ( (*currentSyl) && (*lastNote) ) {
         (*currentSyl)->SetEnd(*lastNote);

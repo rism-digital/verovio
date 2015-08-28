@@ -376,7 +376,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     int i;
     // Stretch the content BB of the other objects
     for (i = 0; i < (int)m_objects.size(); i++) {
-        (m_objects[i])->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
+        (m_objects.at(i))->UpdateContentBB( m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2) );
     }
 }
 

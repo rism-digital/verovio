@@ -59,9 +59,9 @@ int Syl::PrepareLyrics( ArrayPtrVoid *params )
     // param 0: the current Syl
     // param 1: the last Note
     // param 2: the last but one Note
-    Syl **currentSyl = static_cast<Syl**>((*params)[0]);
-    Note **lastNote = static_cast<Note**>((*params)[1]);
-    Note **lastButOneNote = static_cast<Note**>((*params)[2]);
+    Syl **currentSyl = static_cast<Syl**>((*params).at(0));
+    Note **lastNote = static_cast<Note**>((*params).at(1));
+    Note **lastButOneNote = static_cast<Note**>((*params).at(2));
     
     Verse *verse = dynamic_cast<Verse*>( this->GetFirstParent( VERSE, MAX_NOTE_DEPTH ) );
     if ( verse ) {

@@ -103,8 +103,8 @@ int MRpt::PrepareRpt( ArrayPtrVoid *params )
     // param 0: a pointer to the current MRpt pointer
     // param 1: a pointer to the data_BOOLEAN indicating if multiNumber
     // param 2: a pointer to the doc scoreDef (unused)
-    MRpt **currentMRpt =  static_cast<MRpt**>((*params)[0]);
-    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN*>((*params)[1]);
+    MRpt **currentMRpt =  static_cast<MRpt**>((*params).at(0));
+    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN*>((*params).at(1));
     
     // If multiNumber is not true, nothing needs to be done
     if ((*multiNumber) != BOOLEAN_true) {

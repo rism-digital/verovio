@@ -241,7 +241,7 @@ int Chord::PrepareTieAttr( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
     // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord**>((*params)[1]);
+    Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     assert(!(*currentChord));
     (*currentChord) = this;
@@ -253,7 +253,7 @@ int Chord::PrepareTieAttrEnd( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
     // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord**>((*params)[1]);
+    Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     assert((*currentChord));
     (*currentChord) = NULL;

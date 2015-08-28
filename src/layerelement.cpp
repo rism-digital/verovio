@@ -192,10 +192,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig (unused)
-    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params)[0]);
-    double *time = static_cast<double*>((*params)[1]);
-    Mensur **currentMensur = static_cast<Mensur**>((*params)[2]);
-    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params)[3]);
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params).at(0));
+    double *time = static_cast<double*>((*params).at(1));
+    Mensur **currentMensur = static_cast<Mensur**>((*params).at(2));
+    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params).at(3));
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -288,7 +288,7 @@ int LayerElement::PrepareTimeSpanning( ArrayPtrVoid *params )
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params).at(0));
     
     std::vector<DocObject*>::iterator iter = elements->begin();
     while ( iter != elements->end()) {
@@ -314,12 +314,12 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view
     // param 6: a bool indicating if we are processing layer elements or not
-    Doc *doc = static_cast<Doc*>((*params)[0]);
-    Measure **currentMeasure = static_cast<Measure**>((*params)[2]);
-    Staff **currentStaff = static_cast<Staff**>((*params)[3]);
-    Layer **currentLayer = static_cast<Layer**>((*params)[4]);
-    View *view = static_cast<View*>((*params)[5]);
-    bool *processLayerElements = static_cast<bool*>((*params)[6]);
+    Doc *doc = static_cast<Doc*>((*params).at(0));
+    Measure **currentMeasure = static_cast<Measure**>((*params).at(2));
+    Staff **currentStaff = static_cast<Staff**>((*params).at(3));
+    Layer **currentLayer = static_cast<Layer**>((*params).at(4));
+    View *view = static_cast<View*>((*params).at(5));
+    bool *processLayerElements = static_cast<bool*>((*params).at(6));
     
     // First pass, only set the X position
     if ((*processLayerElements)==false) {

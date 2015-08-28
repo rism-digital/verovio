@@ -226,7 +226,7 @@ void GraceAligner::AlignStack( )
     int i;
     double time = 0.0;
     for (i = (int)m_noteStack.size(); i > 0; i--) {
-        Note *note = dynamic_cast<Note*>( m_noteStack[i-1] );
+        Note *note = dynamic_cast<Note*>( m_noteStack.at(i-1) );
         assert( note );
         // get the duration of the event
         double duration = note->LayerElement::GetAlignmentDuration( NULL, NULL, false );
@@ -309,9 +309,9 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
     // param 1: the staff margin
     // param 2: the staff interline sizes (int[2])
     // param 3: the functor to be redirected to SystemAligner (unused)
-    int *previousStaffHeight = static_cast<int*>((*params)[0]);
-    int *staffMargin = static_cast<int*>((*params)[1]);
-    int *interlineSize = static_cast<int*>((*params)[2]);
+    int *previousStaffHeight = static_cast<int*>((*params).at(0));
+    int *staffMargin = static_cast<int*>((*params).at(1));
+    int *interlineSize = static_cast<int*>((*params).at(2));
     
     // take into account the number of lyrics
     if (this->GetVerseCount() > 0) {
@@ -335,7 +335,7 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
 {
     // param 0: the accumulated shift
     // param 1: the functor to be redirected to the SystemAligner (unused)
-    int *shift = static_cast<int*>((*params)[0]);
+    int *shift = static_cast<int*>((*params).at(0));
     
     // integrates the m_yShift into the m_yRel
     m_yRel += m_yShift + (*shift);
@@ -352,8 +352,8 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    int *shift = static_cast<int*>((*params)[0]);
-    int *justifiable_shift = static_cast<int*>((*params)[1]);
+    int *shift = static_cast<int*>((*params).at(0));
+    int *justifiable_shift = static_cast<int*>((*params).at(1));
     
     // We start a new MeasureAligner
     // Reset the accumulated shift to 0;
@@ -394,8 +394,8 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
     // param 2: the functor to be redirected to the MeasureAligner (unused)
-    int *shift = static_cast<int*>((*params)[0]);
-    int *justifiable_shift = static_cast<int*>((*params)[1]);
+    int *shift = static_cast<int*>((*params).at(0));
+    int *justifiable_shift = static_cast<int*>((*params).at(1));
     
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
@@ -421,8 +421,8 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid *params )
     // param 1: the previous x rel position
     // param 2: the minimum measure width (unused)
     // param 3: the functor to be redirected to the MeasureAligner (unused)
-    double *previousTime = static_cast<double*>((*params)[0]);
-    int *previousXRel = static_cast<int*>((*params)[1]);
+    double *previousTime = static_cast<double*>((*params).at(0));
+    int *previousXRel = static_cast<int*>((*params).at(1));
     
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
@@ -454,9 +454,9 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
     // param 1: the previous x rel position
     // param 2: the minimum measure width
     // param 3: the functor to be redirected to the MeasureAligner (unused)
-    double *previousTime = static_cast<double*>((*params)[0]);
-    int *previousXRel = static_cast<int*>((*params)[1]);
-    int *minMeasureWidth = static_cast<int*>((*params)[2]);
+    double *previousTime = static_cast<double*>((*params).at(0));
+    int *previousXRel = static_cast<int*>((*params).at(1));
+    int *minMeasureWidth = static_cast<int*>((*params).at(2));
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
@@ -480,9 +480,9 @@ int MeasureAligner::JustifyX( ArrayPtrVoid *params )
     // param 2: the non justifiable margin
     // param 3: the system full width (without system margins) (unused)
     // param 4: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio =static_cast<double*>((*params)[0]);
-    double *measureRatio =static_cast<double*>((*params)[1]);
-    int *margin =static_cast<int*>((*params)[2]);
+    double *ratio =static_cast<double*>((*params).at(0));
+    double *measureRatio =static_cast<double*>((*params).at(1));
+    int *margin =static_cast<int*>((*params).at(2));
     
     int width = GetRightAlignment()->GetXRel() + GetRightAlignment()->GetMaxWidth();
     
@@ -506,9 +506,9 @@ int Alignment::JustifyX( ArrayPtrVoid *params )
     // param 2: the non justifiable margin
     // param 3: the system full width (without system margins) (unused)
     // param 4: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio =static_cast<double*>((*params)[0]);
-    double *measureRatio =static_cast<double*>((*params)[1]);
-    int *margin =static_cast<int*>((*params)[2]);
+    double *ratio =static_cast<double*>((*params).at(0));
+    double *measureRatio =static_cast<double*>((*params).at(1));
+    int *margin =static_cast<int*>((*params).at(2));
     
     if (GetType() == ALIGNMENT_MEASURE_START) {
         return FUNCTOR_CONTINUE;

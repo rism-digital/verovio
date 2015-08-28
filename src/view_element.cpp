@@ -393,8 +393,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 inChord->m_drawingLedgerLines[staff] = legerLines;
             }
             int idx = doubleLengthLedger + aboveStaff * 2; // 2x2 array
-            std::vector<char> *legerLines = &inChord->m_drawingLedgerLines[staff];
-            (*legerLines)[idx] = ledgermax(numLines, (*legerLines)[idx]);
+            std::vector<char> *legerLines = &inChord->m_drawingLedgerLines.at(staff);
+            (*legerLines).at(idx) = ledgermax(numLines, (*legerLines).at(idx));
         }
         //we do want to go ahead and draw if it's not in a chord
         else {
@@ -1113,7 +1113,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         //iterate through the list of notes with accidentals
         for(idx = 0; idx < size; idx++)
         {
-            Accid *curAccid = noteList[idx]->m_drawingAccid;
+            Accid *curAccid = noteList.at(idx)->m_drawingAccid;
 
             //if the note does not need to be moved, save a new cluster start position
             if (CalculateAccidX(staff, curAccid, chord, false))
@@ -1129,17 +1129,17 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         for(idx = 0; idx < accidSize; idx++)
         {
             //set fwIdx to the start of the cluster
-            fwIdx = accidClusterStarts[idx];
+            fwIdx = accidClusterStarts.at(idx);
             //if this is the last cluster, set bwIdx to the last note in the chord
             if (idx == accidSize - 1) bwIdx = size - 1;
             //otherwise, set bwIdx to one before the beginning of the next cluster
-            else bwIdx = accidClusterStarts[idx + 1] - 1;
+            else bwIdx = accidClusterStarts.at(idx + 1) - 1;
             
             //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx)
             {
-                Accid *accidFwd = noteList[fwIdx]->m_drawingAccid;
-                Accid *accidBwd = noteList[bwIdx]->m_drawingAccid;
+                Accid *accidFwd = noteList.at(fwIdx)->m_drawingAccid;
+                Accid *accidBwd = noteList.at(bwIdx)->m_drawingAccid;
                 
                 //if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
@@ -1170,20 +1170,20 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         std::vector<char> *legerLines = &(*iter).second;
         
         //if there are double-length lines, we only need to draw single-length after they've been drawn
-        (*legerLines)[0] -= (*legerLines)[1];
-        (*legerLines)[2] -= (*legerLines)[3];
+        (*legerLines).at(0) -= (*legerLines).at(1);
+        (*legerLines).at(2) -= (*legerLines).at(3);
         
         //double-length lines below the staff
-        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines)[1]);
+        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines).at(1));
         
         //remainder single-length lines below the staff
-        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines)[1], (*legerLines)[0]);
+        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines).at(1), (*legerLines).at(0));
         
         //double-length lines above the staff
-        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines)[3]);
+        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines).at(3));
         
         //remainder single-length lines above the staff
-        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines)[3], (*legerLines)[2]);
+        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines).at(3), (*legerLines).at(2));
 
     }
     
@@ -1397,13 +1397,13 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
         assert(accidBot < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE)).at(currentX - accidWidthDiff)) currentX += 1;
             // just in case
             else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength ) break;
-            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidTop).at(currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE))) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidTop).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX)) currentX += 1;
             else break;
         };
     }
@@ -1414,15 +1414,15 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))[currentX - accidWidthDiff]) currentX += 1;
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE)).at(currentX - accidWidthDiff)) currentX += 1;
             // just in case
             else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength ) break;
-            else if (accidSpace->at(accidTop)[currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)]) currentX += 1;
-            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            else if (accidSpace->at(accidTop).at(currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE))) currentX += 1;
+            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidTop).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidMid).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX)) currentX += 1;
             else break;
         };
     }
@@ -1432,12 +1432,12 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         //Midpoint needs to be checked for non-flats as there's a chance that a natural/sharp could completely overlap a flat
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            if (accidSpace->at(accidTop).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidTop).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidMid).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX)) currentX += 1;
             else break;
         };
     }
@@ -1449,12 +1449,12 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         assert(accidMid < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidMid)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX - accidWidthDiff]) currentX += 1;
-            else if (accidSpace->at(accidTop)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidMid)[currentX]) currentX += 1;
-            else if (accidSpace->at(accidBot)[currentX]) currentX += 1;
+            if (accidSpace->at(accidTop).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) currentX += 1;
+            else if (accidSpace->at(accidTop).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidMid).at(currentX)) currentX += 1;
+            else if (accidSpace->at(accidBot).at(currentX)) currentX += 1;
             else break;
         };
     }
@@ -1466,7 +1466,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         int yComp = accidTop - alignmentThreshold;
         assert(yComp < accidSpaceSize);
         assert(yComp >= 0);
-        if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
+        if((accidSpace->at(yComp).at(currentX + 1) == false) && (accidSpace->at(yComp).at(currentX) == true)) currentX += 1;
     }
     
     //If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
@@ -1476,7 +1476,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         int yComp = accidBot;
         assert(yComp < accidSpaceSize);
         assert(yComp >= 0);
-        if((accidSpace->at(yComp)[currentX + 1] == false) && (accidSpace->at(yComp)[currentX] == true)) currentX += 1;
+        if((accidSpace->at(yComp).at(currentX + 1) == false) && (accidSpace->at(yComp).at(currentX) == true)) currentX += 1;
     }
 
     //Just to make sure.
@@ -1933,9 +1933,9 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff)
             
             // This works as above, only we check that the note head is not
             // UNDER the staff
-            if ((element->GetDrawingY()) > (staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->m_drawingStaffSize]))
+            if ((element->GetDrawingY()) > (staff->GetDrawingY() - m_doc->m_drawingStaffSize.at(staff->m_drawingStaffSize)))
                 // notehead in staff, set  under
-                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize[staff->m_drawingStaffSize] - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize.at(staff->m_drawingStaffSize) - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             else
                 // notehead under staff, set under notehead
                 y = (element->GetDrawingY()) - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);

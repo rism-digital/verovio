@@ -54,7 +54,7 @@ void Accid::Reset()
 int Accid::PreparePointersByLayer( ArrayPtrVoid *params )
 {
     // param 0: the current Note (not used)
-    //Note **currentNote = static_cast<Note**>((*params)[0]);
+    //Note **currentNote = static_cast<Note**>((*params).at(0));
     
     Note *note = dynamic_cast<Note*>( this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
     if ( !note ) {

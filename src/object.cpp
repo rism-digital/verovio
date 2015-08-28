@@ -851,7 +851,7 @@ void Functor::Call( Object *ptr, ArrayPtrVoid *params )
 int Object::AddLayerElementToFlatList( ArrayPtrVoid *params )
 {
     // param 0: the ListOfObjects
-    ListOfObjects **list = static_cast<ListOfObjects**>((*params)[0]);
+    ListOfObjects **list = static_cast<ListOfObjects**>((*params).at(0));
     //if ( dynamic_cast<LayerElement*>(this ) ) {
         (*list)->push_back( this );
     //}
@@ -862,8 +862,8 @@ int Object::FindByUuid( ArrayPtrVoid *params )
 {
     // param 0: the uuid we are looking for
     // param 1: the pointer to pointer to the Object
-    std::string *uuid = static_cast<std::string*>((*params)[0]);
-    Object **element = static_cast<Object**>((*params)[1]);
+    std::string *uuid = static_cast<std::string*>((*params).at(0));
+    Object **element = static_cast<Object**>((*params).at(1));
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -883,8 +883,8 @@ int Object::FindByAttComparison( ArrayPtrVoid *params )
 {
     // param 0: the type we are looking for
     // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison*>((*params)[0]);
-    Object **element = static_cast<Object**>((*params)[1]);
+    AttComparison *test = static_cast<AttComparison*>((*params).at(0));
+    Object **element = static_cast<Object**>((*params).at(1));
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -906,8 +906,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 {
 
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = static_cast<ScoreDef*>((*params)[0]);
-    StaffDef **currentStaffDef = static_cast<StaffDef**>((*params)[1]);
+    ScoreDef *currentScoreDef = static_cast<ScoreDef*>((*params).at(0));
+    StaffDef **currentStaffDef = static_cast<StaffDef**>((*params).at(1));
 
     assert( currentScoreDef );
     
@@ -1031,8 +1031,8 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the Doc
-    int *min_pos = static_cast<int*>((*params)[0]);
-    Doc *doc = static_cast<Doc*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    Doc *doc = static_cast<Doc*>((*params).at(1));
     
     // starting an new layer
     if (this->Is() == LAYER) {
@@ -1089,9 +1089,9 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *measure_width = static_cast<int*>((*params)[1]);
-    Doc *doc = static_cast<Doc*>((*params)[2]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *measure_width = static_cast<int*>((*params).at(1));
+    Doc *doc = static_cast<Doc*>((*params).at(2));
 
     // starting a new measure
     if (this->Is() == MEASURE) {
@@ -1223,8 +1223,8 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *measure_width = static_cast<int*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *measure_width = static_cast<int*>((*params).at(1));
     
     // ending a measure
     if (this->Is() == MEASURE) {
@@ -1256,8 +1256,8 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *system_height = static_cast<int*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *system_height = static_cast<int*>((*params).at(1));
     
     // starting a new system
     if (this->Is() == SYSTEM) {
@@ -1315,8 +1315,8 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *system_height = static_cast<int*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *system_height = static_cast<int*>((*params).at(1));
     
     // ending a measure
     if (this->Is() == MEASURE) {
@@ -1336,7 +1336,7 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 int Object::Save( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params).at(0));
     if (!output->WriteObject( this )) {
         return FUNCTOR_STOP;
     }
@@ -1347,7 +1347,7 @@ int Object::Save( ArrayPtrVoid *params )
 int Object::SaveEnd( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params).at(0));
     if (!output->WriteObjectEnd( this )) {
         return FUNCTOR_STOP;
     }

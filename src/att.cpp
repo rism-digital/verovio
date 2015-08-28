@@ -404,7 +404,7 @@ data_DURATION Att::StrToDur(std::string value)
     else if (value == "256") dur = DURATION_256;
     else {
         if ((value.length() > 0) && (value[value.length()-1] == 'p')) {
-            LogWarning("PPQ duration dur_s are not supported");
+            //LogWarning("PPQ duration dur_s are not supported"); // remove it for now
         }
         else {
             LogWarning("Unknown @dur dur '%s'", value.c_str());

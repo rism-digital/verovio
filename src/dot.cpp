@@ -47,7 +47,7 @@ void Dot::Reset()
 int Dot::PreparePointersByLayer( ArrayPtrVoid *params )
 {
     // param 0: the current Note
-    Note **currentNote = static_cast<Note**>((*params)[0]);
+    Note **currentNote = static_cast<Note**>((*params).at(0));
     
     m_drawingNote = (*currentNote);
     
