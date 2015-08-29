@@ -37,6 +37,13 @@ public:
     virtual ClassId Is() { return BEAT_RPT; };
     ///@}
     
+    /**
+     * Returns the duration (in double) for the element.
+     * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
+     * LayerElement and DurationInterface have no inheritance link.
+     */
+    virtual double GetAlignmentDuration( int meterUnit );
+    
 private:
     
 public:

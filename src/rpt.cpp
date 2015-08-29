@@ -8,6 +8,11 @@
 
 #include "rpt.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+#include <math.h>
+
 namespace vrv {
     
 
@@ -31,6 +36,11 @@ void BeatRpt::Reset()
 {
     LayerElement::Reset();
     ResetBeatRptVis();
+}
+    
+double BeatRpt::GetAlignmentDuration( int meterUnit )
+{
+    return  DUR_MAX / meterUnit;
 }
 
 //----------------------------------------------------------------------------

@@ -32,6 +32,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "rest.h"
+#include "rpt.h"
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
@@ -168,6 +169,13 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
         assert( duration );
         if (duration->IsMensural()) return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
         else return duration->GetAlignmentDuration( num, numbase );
+    }
+    else if (this->Is() == BEAT_RPT) {
+        BeatRpt *beatRpt = dynamic_cast<BeatRpt*>(this);
+        assert(beatRpt);
+        int meterUnit = 4;
+        if (meterSig) meterSig->GetUnit();
+        return beatRpt->GetAlignmentDuration(meterUnit);
     }
     else {
         return 0.0;

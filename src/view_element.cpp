@@ -744,10 +744,8 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->StartGraphic( element, "", element->GetUuid() );
     
     int x = element->GetDrawingX();
-    int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
     int halfWidth = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
-    
-    int xSymbol = xCentered - halfWidth;
+    int xSymbol = x; // - halfWidth;
     
     int y = element->GetDrawingY();
     

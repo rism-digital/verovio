@@ -533,6 +533,7 @@ char Doc::GetLeftMargin( const ClassId classId  )
 {
     if (classId == BAR_LINE) return m_style->m_leftMarginBarline;
     else if (classId == BAR_LINE_ATTR) return m_style->m_leftMarginBarlineAttr;
+    else if (classId == BEAT_RPT) return m_style->m_leftMarginBeatRpt;
     else if (classId == CHORD) return m_style->m_leftMarginChord;
     else if (classId == CLEF) return m_style->m_leftMarginClef;
     else if (classId == MREST) return m_style->m_leftMarginMRest;
@@ -545,6 +546,7 @@ char Doc::GetRightMargin( const ClassId classId )
 {
     if (classId == BAR_LINE) return m_style->m_rightMarginBarline;
     else if (classId == BAR_LINE_ATTR) return m_style->m_rightMarginBarlineAttr;
+    else if (classId == BEAT_RPT) return m_style->m_rightMarginBeatRpt;
     else if (classId == CLEF) return m_style->m_rightMarginClef;
     else if (classId == KEY_SIG)  return m_style->m_rightMarginKeySig;
     else if (classId == MENSUR) return m_style->m_rightMarginMensur;
