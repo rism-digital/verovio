@@ -2,6 +2,8 @@
 ---
 <h3>Repeats</h3>
 
+<!-- ***************************** -->
+<h4>Measure repeats</h4>
 <p>
 	Verovio supports <code>&lt;mRpt&gt;</code>. The number on top of each repeat is calculated by Verovio. The <code>@mutli.number</code> in <code>&lt;scoreDef&gt;</code> or <code>&lt;staffDef&gt;</code> can be set to false for not showing the number. (The value of the <code>@mutli.number</code> will be set for the entire score or staff and cannot be redefined.)
 </p>
@@ -14,6 +16,35 @@
 {% include features/mrpt.txt %}
 {% endhighlight %}
 </div>
+<br/>
+
+<!-- ***************************** -->
+<h4>Beat repeats</h4>
+
+<p>
+    Verovio also supports beat repetition with <code>&lt;beatRpt&gt;</code> elements. The <code>@rend</code> determines the number of slashes.
+</p>
+
+<div id="svg_output-2" style="overflow:auto;"/>
+    
+{% include mei-excerpt.html id="code2" file="beatrpt1.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/beatrpt1.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
+<div id="svg_output-3" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code3" file="beatrpt2.mei" %}
+<div id="code3-xml" style="display: none">
+{% highlight xml %}
+{% include features/beatrpt2.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
 
 <script type="text/javascript">
 //<![CDATA[
@@ -29,6 +60,14 @@
     
 	$.get( "{{ site.baseurl }}/examples/features/mrpt.mei" , function( data ) {
 		load_data( data, $('#svg_output-1') );
+	});
+	
+	$.get( "{{ site.baseurl }}/examples/features/beatrpt1.mei" , function( data ) {
+		load_data( data, $('#svg_output-2') );
+	});
+	
+	$.get( "{{ site.baseurl }}/examples/features/beatrpt2.mei" , function( data ) {
+		load_data( data, $('#svg_output-3') );
 	});
 //]]>
 </script>

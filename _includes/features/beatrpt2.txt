@@ -1,0 +1,38 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <beam>
+          <note pname="f" oct="4" dur="32"/>
+          <note pname="a" oct="4" dur="32"/>
+          <note pname="c" oct="5" dur="32"/>
+          <note pname="f" oct="5" dur="32"/>
+          <note pname="c" oct="5" dur="32"/>
+          <note pname="f" oct="5" dur="32"/>
+          <note pname="c" oct="5" dur="32"/>
+          <note pname="a" oct="4" dur="32"/>
+        </beam>
+        <beatRpt rend="32"/>
+        <beatRpt rend="32"/>
+        <beatRpt rend="32"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <beam>
+          <note pname="f" oct="4" dur="8"/>
+          <tuplet num="3" numbase="2">
+            <note pname="a" oct="4" dur="16"/>
+            <note pname="c" oct="5" dur="16"/>
+            <note pname="a" oct="4" dur="16"/>
+          </tuplet>
+        </beam>
+        <beatRpt rend="mixed"/>
+        <beatRpt rend="mixed"/>
+        <beatRpt rend="mixed"/>
+      </layer>
+    </staff>
+  </measure>
+</section>
