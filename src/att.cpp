@@ -204,6 +204,7 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
     switch(data)
     {
         case BEATRPT_REND_4 : value = "4"; break;
+        case BEATRPT_REND_8 : value = "8"; break;
         case BEATRPT_REND_16 : value = "16"; break;
         case BEATRPT_REND_32 : value = "32"; break;
         case BEATRPT_REND_64 : value = "64"; break;
@@ -220,6 +221,7 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
 data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
 {
     if (value == "4") return BEATRPT_REND_4;
+    else if (value == "8") return BEATRPT_REND_8;
     else if (value == "16") return BEATRPT_REND_16;
     else if (value == "32") return BEATRPT_REND_32;
     else if (value == "64") return BEATRPT_REND_64;

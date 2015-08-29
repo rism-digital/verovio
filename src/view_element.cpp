@@ -744,16 +744,25 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     dc->StartGraphic( element, "", element->GetUuid() );
     
     int x = element->GetDrawingX();
-    int halfWidth = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
-    int xSymbol = x; // - halfWidth;
-    
+    int xSymbol = x;
     int y = element->GetDrawingY();
-    
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     
-    DrawSmuflCode( dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false );
+    if (beatRpt->GetRend() == BEATRPT_REND_mixed) {
+        DrawSmuflCode( dc, xSymbol, y, SMUFL_E501_repeat2Bars, staff->m_drawingStaffSize, false );
+    }
+    else {
+        DrawSmuflCode( dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false );
+        int additionalSlash = beatRpt->GetRend() - BEATRPT_REND_8;
+        int halfWidth = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
+        int i;
+        for (i = 0; i < additionalSlash; i++) {
+            xSymbol += halfWidth;
+            DrawSmuflCode( dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false );
+        }
+    }
 
-    dc->EndGraphic(element, this);    
+    dc->EndGraphic(element, this);
 }
     
 void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -772,9 +781,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int x = element->GetDrawingX();
     int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
     int xSymbol = xCentered - m_doc->GetGlyphWidth(SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false) / 2;
-    
     int y = element->GetDrawingY();
-    
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     
     DrawSmuflCode( dc, xSymbol, y, SMUFL_E500_repeat1Bar, staff->m_drawingStaffSize, false );
