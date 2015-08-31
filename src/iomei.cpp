@@ -682,6 +682,7 @@ void MeiOutput::WriteMeiMultiRpt( pugi::xml_node currentNode, MultiRpt *multiRpt
     assert( multiRpt );
     
     WriteLayerElement( currentNode, multiRpt );
+    multiRpt->WriteNumbered(currentNode);
 }
 
 void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
@@ -1863,6 +1864,7 @@ bool MeiInput::ReadMeiMultiRpt( Object *parent, pugi::xml_node multiRpt )
 {
     MultiRpt *vrvMultiRpt = new MultiRpt();
     ReadLayerElement(multiRpt, vrvMultiRpt);
+    vrvMultiRpt->ReadNumbered(multiRpt);
     
     AddLayerElement(parent, vrvMultiRpt);
     return true;

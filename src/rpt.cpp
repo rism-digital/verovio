@@ -90,8 +90,10 @@ void MRpt2::Reset()
 //----------------------------------------------------------------------------
 
 MultiRpt::MultiRpt( ):
-    LayerElement("multirpt-")
+    LayerElement("multirpt-"),
+    AttNumbered()
 {
+    RegisterAttClass(ATT_NUMBERED);
     Reset();
 }
 
@@ -102,6 +104,7 @@ MultiRpt::~MultiRpt()
 void MultiRpt::Reset()
 {
     LayerElement::Reset();
+    ResetNumbered();
 }
     
 //----------------------------------------------------------------------------

@@ -132,7 +132,8 @@ private:
 /**
  * This class models the MEI <multiRpt>
  */
-class MultiRpt: public LayerElement
+class MultiRpt: public LayerElement,
+    public AttNumbered
 {
 public:
     /**
