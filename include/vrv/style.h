@@ -104,6 +104,14 @@ namespace vrv {
 #define MIN_LEFT_MARGIN_MREST -10.0
 #define MAX_LEFT_MARGIN_MREST 10.0
     
+#define DEFAULT_LEFT_MARGIN_MRPT2 6.0
+#define MIN_LEFT_MARGIN_MRPT2 -10.0
+#define MAX_LEFT_MARGIN_MRPT2 10.0
+    
+#define DEFAULT_LEFT_MARGIN_MULTIRPT 6.0
+#define MIN_LEFT_MARGIN_MULTIRPT -10.0
+#define MAX_LEFT_MARGIN_MULTIRPT 10.0
+    
 #define DEFAULT_LEFT_MARGIN_NOTE 1.0
 #define MIN_LEFT_MARGIN_NOTE -10.0
 #define MAX_LEFT_MARGIN_NOTE 10.0
@@ -146,9 +154,17 @@ namespace vrv {
 #define MIN_RIGHT_MARGIN_MREST 0.0
 #define MAX_RIGHT_MARGIN_MREST 10.0
     
+#define DEFAULT_RIGHT_MARGIN_MRPT2 6.0
+#define MIN_RIGHT_MARGIN_MRPT2 -10.0
+#define MAX_RIGHT_MARGIN_MRPT2 10.0
+    
 #define DEFAULT_RIGHT_MARGIN_MULTIREST 0.5
 #define MIN_RIGHT_MARGIN_MULTIREST 0.0
 #define MAX_RIGHT_MARGIN_MULTIREST 10.0
+    
+#define DEFAULT_RIGHT_MARGIN_MULTIRPT 6.0
+#define MIN_RIGHT_MARGIN_MULTIRPT -10.0
+#define MAX_RIGHT_MARGIN_MULTIRPT 10.0
     
 #define DEFAULT_RIGHT_MARGIN_DEFAULT 1.0
 #define MIN_RIGHT_MARGIN_DEFAULT 0.0
@@ -223,6 +239,8 @@ public:
     char m_leftMarginChord;
     char m_leftMarginClef;
     char m_leftMarginMRest;
+    char m_leftMarginMRpt2;
+    char m_leftMarginMultiRpt;
     char m_leftMarginNote;
     /** The default left margin */
     char m_leftMarginDefault;
@@ -236,7 +254,9 @@ public:
     char m_rightMarginMensur;
     char m_rightMarginMeterSig;
     char m_rightMarginMRest;
+    char m_rightMarginMRpt2;
     char m_rightMarginMultiRest;
+    char m_rightMarginMultiRpt;
 
     /** The default right margin */
     char m_rightMarginDefault;

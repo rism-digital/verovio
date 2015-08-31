@@ -538,6 +538,8 @@ char Doc::GetLeftMargin( const ClassId classId  )
     else if (classId == CLEF) return m_style->m_leftMarginClef;
     else if (classId == MREST) return m_style->m_leftMarginMRest;
     else if (classId == MRPT) return m_style->m_leftMarginMRest;
+    else if (classId == MRPT2) return m_style->m_leftMarginMRpt2;
+    else if (classId == MULTI_RPT) return m_style->m_leftMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_leftMarginNote;
     return m_style->m_leftMarginDefault;
 }
@@ -553,7 +555,9 @@ char Doc::GetRightMargin( const ClassId classId )
     else if (classId == METER_SIG) return m_style->m_rightMarginMeterSig;
     else if (classId == MREST) return m_style->m_rightMarginMRest;
     else if (classId == MRPT) return m_style->m_rightMarginMRest;
+    else if (classId == MRPT2) return m_style->m_rightMarginMRpt2;
     else if (classId == MULTI_REST) return m_style->m_rightMarginMultiRest;
+    else if (classId == MULTI_RPT) return m_style->m_rightMarginMultiRpt;
     return m_style->m_rightMarginDefault;
 }
     
