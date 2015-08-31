@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1//mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1//mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Multi-measure repeat example</title>
+            </titleStmt>
+            <pubStmt></pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="2" meter.unit="4">
+                        <staffGrp>
+                            <staffDef n="1" clef.line="2" clef.shape="G"  lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section label="feature-example">
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="f" oct="4" dur="4" dots="1"/>
+                                    <note pname="a" oct="4" dur="8"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="c" oct="5" dur="4" dots="1"/>
+                                    <note pname="d" oct="5" dur="8"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note pname="f" oct="5" dur="8"/>
+                                        <note pname="d" oct="5" dur="8"/>
+                                    </beam>
+                                    <note pname="c" oct="5" dur="4"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="4">
+                            <staff n="1">
+                                <layer n="1">
+                                    <multiRpt num="3"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

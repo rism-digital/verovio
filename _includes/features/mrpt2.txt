@@ -1,0 +1,41 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <beam>
+          <note pname="f" oct="4" dur="8"/>
+          <note pname="g" oct="4" dur="16"/>
+          <note pname="a" oct="4" dur="16"/>
+        </beam>
+        <beam>
+          <note pname="c" oct="5" dur="8"/>
+          <note pname="b" oct="4" dur="16"/>
+          <note pname="g" oct="4" dur="16"/>
+        </beam>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <beam>
+          <note pname="f" oct="4" dur="8"/>
+          <note pname="a" oct="4" dur="16"/>
+          <note pname="c" oct="5" dur="16"/>
+        </beam>
+        <beam>
+          <note pname="d" oct="5" dur="8"/>
+          <note pname="c" oct="5" dur="16"/>
+          <note pname="g" oct="4" dur="16"/>
+        </beam>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="3">
+    <staff n="1">
+      <layer n="1">
+        <mRpt2/>
+      </layer>
+    </staff>
+  </measure>
+</section>
