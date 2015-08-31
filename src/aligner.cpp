@@ -441,10 +441,12 @@ between symbols. */
 int Alignment::HorizontalSpaceForDuration(double intervalTime, bool isMensural)
 {
     int intervalXRel = 0;
-    if (isMensural)
+    if (isMensural) {
         intervalXRel = 20;           // ??EXPERIMENTAL! A very small value => space as tightly as possible
-    else
+    }
+    else {
         intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
+    }
     return intervalXRel;
 }
 
@@ -460,7 +462,8 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
-    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, true);   // ??2ND PARAM = IS MENSURAL!
+    // HARDCODED parameter for HorizontalSpaceForDuration
+    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, false);
     
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
