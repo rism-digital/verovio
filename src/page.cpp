@@ -122,11 +122,11 @@ void Page::LayOutHorizontally( )
     params.push_back( &previousXRel );
     params.push_back( &minMeasureWidth );
     Functor setAlignmentX( &Object::SetAligmentXPos );
-    // Special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &setAlignmentX );
     this->Process( &setAlignmentX, &params );
     
-    // Render it for filling the bounding boxing
+    // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bb_dc( &view, 0, 0 );
     view.SetDoc(doc);
@@ -147,12 +147,12 @@ void Page::LayOutHorizontally( )
     // Once the m_xShift have been calculated, move all positions accordingly
     params.clear();
     Functor integrateBoundingBoxGraceXShift( &Object::IntegrateBoundingBoxGraceXShift );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxGraceXShift );
     this->Process( &integrateBoundingBoxGraceXShift, &params );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
-    // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
+    // Look at each LayerElement and changes the m_xShift if the bounding box is overlapping
     params.clear();
     int min_pos = 0;
     int measure_width = 0;
@@ -171,7 +171,7 @@ void Page::LayOutHorizontally( )
     params.push_back( &shift );
     params.push_back( &justifiable_shift );
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );
     this->Process( &integrateBoundingBoxXShift, &params );
     
@@ -205,7 +205,7 @@ void Page::LayOutVertically( )
     Functor alignVertically( &Object::AlignVertically );
     this->Process( &alignVertically, &params );
     
-    // Render it for filling the bounding boxing
+    // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bb_dc( &view, 0, 0 );
     view.SetDoc(doc);
@@ -234,7 +234,7 @@ void Page::LayOutVertically( )
     params.push_back( &staffMargin );
     params.push_back( &interlineSize );
     Functor setAlignmentY( &Object::SetAligmentYPos );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &setAlignmentY );
     this->Process( &setAlignmentY, &params );
     
@@ -244,7 +244,7 @@ void Page::LayOutVertically( )
     int shift = 0;
     params.push_back( &shift );
     Functor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxYShift );
     this->Process( &integrateBoundingBoxYShift, &params );
     
@@ -285,7 +285,7 @@ void Page::JustifyHorizontally( )
     params.push_back( &margin );
     params.push_back( &systemFullWidth );
     Functor justifyX( &Object::JustifyX );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &justifyX );
     this->Process( &justifyX, &params );
 }
