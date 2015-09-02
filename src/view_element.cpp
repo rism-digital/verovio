@@ -1845,13 +1845,27 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by default)
     if ( (keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange) ) {
-        for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
-            data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->m_drawingCancelAccidType, i);
-            y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),
-                                        KeySig::GetOctave( keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));;
+        // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
+        if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
+            for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
+                data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->m_drawingCancelAccidType, i);
+                y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),
+                                            KeySig::GetOctave( keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));;
 
-            DrawSmuflCode ( dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false );   
-            x += step;
+                DrawSmuflCode ( dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false );   
+                x += step;
+            }
+        }
+        // Cancel some of them if more accid before
+        else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
+            for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; i++) {
+                data_PITCHNAME pitch = KeySig::GetAlterationAt( keySig->m_drawingCancelAccidType, i);
+                y = staff->GetDrawingY() + CalculatePitchPosY( staff, pitch, layer->GetClefOffset( element ),
+                                                              KeySig::GetOctave( keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));;
+                
+                DrawSmuflCode ( dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false );
+                x += step;
+            }
         }
     }
     
