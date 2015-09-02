@@ -401,12 +401,16 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     m_xRel += m_xShift + (*shift);
     // cumulate the shift value and the width
     (*shift) += m_xShift;
-    
-    if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
+
+    if ((GetType() <= ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner*>(m_parent);
         assert( aligner );
-        aligner->SetNonJustifiableMargin(m_xRel);
-        (*justifiable_shift) = m_xRel;
+        aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
+    }
+    else if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
+        MeasureAligner *aligner = dynamic_cast<MeasureAligner*>(m_parent);
+        assert( aligner );
+        (*justifiable_shift) = aligner->GetNonJustifiableMargin();
     }
 
     // reset member to 0

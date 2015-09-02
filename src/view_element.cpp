@@ -642,10 +642,8 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    //LogMessage("Measure %d - X %d - RightX %d;", measure->GetIdx(), element->m_drawingX, measure->GetRightBarlineX() );
-    
-    int x = element->GetDrawingX();
-    int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
+    int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
+    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
     int y = element->GetDrawingY();
     
     // move it down according to the number of line in the staff
@@ -810,7 +808,9 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
     
 void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure )
 {
-    int xCentered = x + (measure->GetDrawingX() + measure->GetRightBarlineX() - x)  / 2;
+    int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
+    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin()  + (width / 2);
+    
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
     int y = staff->GetDrawingY();
     int ySymbol = y - staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
