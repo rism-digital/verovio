@@ -16,7 +16,7 @@
                 <score label="feature-example">
                     <scoreDef meter.count="6" meter.unit="8">
                         <staffGrp symbol="bracket">
-                            <staffDef n="1" clef.line="2" clef.shape="G"  meter.count="6" meter.unit="8" lines="5" />
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5" />
                             <staffDef n="2" clef.line="4" clef.shape="F" lines="5" multi.number="false" />
                         </staffGrp>
                     </scoreDef>

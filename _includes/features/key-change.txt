@@ -1,0 +1,63 @@
+<score>
+  <scoreDef key.sig="4f" meter.sym="common">
+    <staffGrp>
+      <staffDef clef.line="2" clef.shape="G" lines="5" n="1" xml:id="sd1"/>
+    </staffGrp>
+  </scoreDef>
+  <section>
+    <measure n="1">
+      <staff n="1">
+        <layer n="1">
+          <chord dur="1">
+            <note pname="a" oct="4" accid.ges="f"/>
+            <note pname="c" oct="5" accid.ges="f"/>
+            <note pname="e" oct="5" accid.ges="f"/>
+          </chord>
+        </layer>
+      </staff>
+    </measure>
+    <scoreDef key.sig="2s" key.sig.showchange="true" meter.sym="cut"/>
+    <measure n="2">
+      <staff n="1">
+        <layer n="1">
+          <chord dur="1">
+            <note pname="b" oct="4"/>
+            <note pname="d" oct="5"/>
+            <note pname="f" oct="5" accid.ges="s"/>
+          </chord>
+        </layer>
+      </staff>
+    </measure>
+    <measure n="3">
+      <staff n="1">
+        <layer n="1">
+          <multiRest num="3"/>
+        </layer>
+      </staff>
+    </measure>
+    <scoreDef key.sig="0" key.sig.show="true"/>
+    <measure n="4">
+      <staff n="1">
+        <layer n="1">
+          <chord dur="1">
+            <note pname="a" oct="4"/>
+            <note pname="c" oct="5"/>
+            <note pname="e" oct="5"/>
+          </chord>
+        </layer>
+      </staff>
+    </measure>
+    <scoreDef key.sig="2f"/>
+    <measure n="5" right="end">
+      <staff n="1">
+        <layer n="1">
+          <chord dur="1">
+            <note pname="g" oct="4"/>
+            <note pname="b" oct="4" accid.ges="f"/>
+            <note pname="d" oct="5"/>
+          </chord>
+        </layer>
+      </staff>
+    </measure>
+  </section>
+</score>

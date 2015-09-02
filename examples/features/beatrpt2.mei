@@ -42,7 +42,6 @@
                         <measure n="2">
                             <staff n="1">
                                 <layer n="1">
-                                    <beatRpt rend="mixed"/>
                                     <beam>
                                         <note pname="f" oct="4" dur="8"/>
                                         <tuplet num="3" numbase="2">

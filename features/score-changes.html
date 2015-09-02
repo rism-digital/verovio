@@ -1,6 +1,6 @@
 ---
 ---
-<h3>Score definition and clef changes</h3>
+<h3>Score definition and changes</h3>
 
 <p>
 	Verovio supports <code>&lt;scoreDef&gt;</code> redefinitions between measures. Any attribute supported by Verovio can be redefined.
@@ -12,6 +12,20 @@
 <div id="code1-xml" style="display: none">
 {% highlight xml %}
 {% include features/scoredef-changes.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
+<p>
+	Verovio take into account the <code>@key.sig.showchange</code> and <code>@key.sig.show</code> values which are assumed to be respectively <code>false</code> and <code>true</code> if not specified.
+</p>
+
+<div id="svg_output-key-change" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-key-change" file="key-change.mei" %}
+<div id="code-key-change-xml" style="display: none">
+{% highlight xml %}
+{% include features/key-change.txt %}
 {% endhighlight %}
 </div>
 <br/>
@@ -45,8 +59,13 @@
 	$.get( "{{ site.baseurl }}/examples/features/scoredef-changes.mei" , function( data ) {
 		load_data( data, $('#svg_output-1') );
 	});
+	
+	$.get( "{{ site.baseurl }}/examples/features/key-change.mei" , function( data ) {
+		load_data( data, $('#svg_output-key-change') );
+	});
     
 	$.get( "{{ site.baseurl }}/examples/features/clef-changes.mei" , function( data ) {
+		spacingStaff = 4;
 		load_data( data, $('#svg_output-2') );
 	});
 //]]>

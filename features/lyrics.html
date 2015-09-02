@@ -53,6 +53,7 @@
 	zoom = 40;
 	pageWidth = 1450;
 	
+	
 	// adjust the zoom for small screens
 	width = $('#feature').width();
 	if ( width < zoom * pageWidth / 100 ) {
@@ -69,6 +70,7 @@
     
 	$.get( "{{ site.baseurl }}/examples/features/lyrics3.mei" , function( data ) {
         pageWidth = 1650;
+		spacingStaff = 2;
 		load_data( data, $('#svg_output-3') );
 	});
 //]]>
