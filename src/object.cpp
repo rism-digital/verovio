@@ -1058,8 +1058,8 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    //int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    int negative_offset = - note->m_contentBB_x1;
+    int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+
     if ( (*min_pos) > 0 ) {
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
@@ -1075,7 +1075,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     }
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin( NOTE ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
     //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
     note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 );
@@ -1110,8 +1110,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
-        // reset it as the minimum position to the step (HARDCODED)
-        (*min_pos) = 30 * doc->GetDrawingUnit(100) / 10;
+        (*min_pos) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1176,7 +1175,6 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
     
-    
     if ((current->Is() == MREST) || (current->Is() == MRPT) || (this->Is() == MRPT2) || (this->Is() == MULTI_RPT)) {
         // With MRest, MRpt, etc., the only thing we want to do is to keep their with as possible measure with (if only MRest in all staves/layers)
         int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR + negative_offset ;
@@ -1184,8 +1182,6 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         (*measure_width) = std::max( (*measure_width), (*min_pos) + width );
         return FUNCTOR_CONTINUE;
     }
-    
-    
     
     // with a grace note, also take into account the full with of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {

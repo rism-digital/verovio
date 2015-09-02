@@ -523,7 +523,8 @@ FontInfo *Doc::GetDrawingSmuflFont( int staffSize, bool graceSize )
     m_drawingSmuflFont.SetPointSize( value );
     return &m_drawingSmuflFont;
 }
-    FontInfo *Doc::GetDrawingLyricFont( int staffSize )
+    
+FontInfo *Doc::GetDrawingLyricFont( int staffSize )
 {
     m_drawingLyricFont.SetPointSize( m_drawingLyricFontSize * staffSize / 100 );
     return &m_drawingLyricFont;
@@ -536,11 +537,15 @@ char Doc::GetLeftMargin( const ClassId classId  )
     else if (classId == BEAT_RPT) return m_style->m_leftMarginBeatRpt;
     else if (classId == CHORD) return m_style->m_leftMarginChord;
     else if (classId == CLEF) return m_style->m_leftMarginClef;
+    else if (classId == KEY_SIG)  return m_style->m_leftMarginKeySig;
+    else if (classId == MENSUR) return m_style->m_leftMarginMensur;
+    else if (classId == METER_SIG) return m_style->m_leftMarginMeterSig;
     else if (classId == MREST) return m_style->m_leftMarginMRest;
-    else if (classId == MRPT) return m_style->m_leftMarginMRest;
     else if (classId == MRPT2) return m_style->m_leftMarginMRpt2;
+    else if (classId == MULTI_REST) return m_style->m_leftMarginMultiRest;
     else if (classId == MULTI_RPT) return m_style->m_leftMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_leftMarginNote;
+    else if (classId == REST) return m_style->m_leftMarginRest;
     return m_style->m_leftMarginDefault;
 }
     
@@ -549,16 +554,23 @@ char Doc::GetRightMargin( const ClassId classId )
     if (classId == BAR_LINE) return m_style->m_rightMarginBarline;
     else if (classId == BAR_LINE_ATTR) return m_style->m_rightMarginBarlineAttr;
     else if (classId == BEAT_RPT) return m_style->m_rightMarginBeatRpt;
+    else if (classId == CHORD) return m_style->m_rightMarginChord;
     else if (classId == CLEF) return m_style->m_rightMarginClef;
     else if (classId == KEY_SIG)  return m_style->m_rightMarginKeySig;
     else if (classId == MENSUR) return m_style->m_rightMarginMensur;
     else if (classId == METER_SIG) return m_style->m_rightMarginMeterSig;
     else if (classId == MREST) return m_style->m_rightMarginMRest;
-    else if (classId == MRPT) return m_style->m_rightMarginMRest;
     else if (classId == MRPT2) return m_style->m_rightMarginMRpt2;
     else if (classId == MULTI_REST) return m_style->m_rightMarginMultiRest;
     else if (classId == MULTI_RPT) return m_style->m_rightMarginMultiRpt;
+    else if (classId == NOTE) return m_style->m_rightMarginNote;
+    else if (classId == REST) return m_style->m_rightMarginRest;
     return m_style->m_rightMarginDefault;
+}
+
+char Doc::GetLeftPosition( )
+{
+    return m_style->m_leftPosition;
 }
     
 void Doc:: SetPageHeight( int pageHeight )
