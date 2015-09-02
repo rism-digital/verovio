@@ -709,7 +709,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     dc->GetSmuflTextExtent( wtext, &w, &h);
     start_offset = (x2 - x1 - w) /  2; // calculate offset to center text
-    DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 5, wtext, false);
+    DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize), wtext, false);
     dc->ResetFont();
     
     dc->EndGraphic(element, this);
