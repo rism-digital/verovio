@@ -50,7 +50,10 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new KeySig(*this); };
     virtual std::string GetClassName( ) { return "KeySig"; };
-    virtual ClassId Is() { return KEY_SIG; };
+    virtual ClassId Is() { return KEYSIG; };
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
     /* Alteration number getter/setter */
     int GetAlterationNumber() { return m_alterationNumber; };

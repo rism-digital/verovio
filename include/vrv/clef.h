@@ -44,6 +44,9 @@ public:
     virtual ClassId Is() { return CLEF; };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
     /**
      * Return the offset of the clef
      */

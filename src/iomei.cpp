@@ -143,15 +143,15 @@ bool MeiOutput::WriteObject( Object *object )
         }
         // Here we could add a <sb> element (but not for the first system of the page?)
     }
-    else if (object->Is() == SCORE_DEF) {
+    else if (object->Is() == SCOREDEF) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef( m_currentNode, dynamic_cast<ScoreDef*>(object) );
     }
-    else if (object->Is() == STAFF_GRP) {
+    else if (object->Is() == STAFFGRP) {
         m_currentNode = m_currentNode.append_child("staffGrp");
         WriteMeiStaffGrp( m_currentNode, dynamic_cast<StaffGrp*>(object) );
     }
-    else if (object->Is() == STAFF_DEF) {
+    else if (object->Is() == STAFFDEF) {
         m_currentNode = m_currentNode.append_child("staffDef");
         WriteMeiStaffDef( m_currentNode, dynamic_cast<StaffDef*>(object) );
     }
@@ -187,7 +187,7 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid( m_currentNode, dynamic_cast<Accid*>(object) );
     }
-    else if (object->Is() == BAR_LINE) {
+    else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child( "barLine" );
         WriteMeiBarline( m_currentNode, dynamic_cast<Barline*>(object) );
     }
@@ -195,7 +195,7 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("beam");
         WriteMeiBeam( m_currentNode, dynamic_cast<Beam*>(object) );
     }
-    else if (object->Is() == BEAT_RPT) {
+    else if (object->Is() == BEATRPT) {
         m_currentNode = m_currentNode.append_child("beatRpt");
         WriteMeiBeatRpt( m_currentNode, dynamic_cast<BeatRpt*>(object) );
     }
@@ -215,7 +215,7 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child( "dot" );
         WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
     }
-    else if (object->Is() == KEY_SIG) {
+    else if (object->Is() == KEYSIG) {
         m_currentNode = m_currentNode.append_child("keySig");
         WriteMeiKeySig( m_currentNode, dynamic_cast<KeySig*>(object) );
     }
@@ -223,7 +223,7 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("mensur");
         WriteMeiMensur( m_currentNode, dynamic_cast<Mensur*>(object) );
     }
-    else if (object->Is() == METER_SIG) {
+    else if (object->Is() == METERSIG) {
         m_currentNode = m_currentNode.append_child("meterSig");
         WriteMeiMeterSig( m_currentNode, dynamic_cast<MeterSig*>(object) );
     }
@@ -239,11 +239,11 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("mRpt2");
         WriteMeiMRpt2( m_currentNode, dynamic_cast<MRpt2*>(object) );
     }
-    else if (object->Is() == MULTI_REST) {
+    else if (object->Is() == MULTIREST) {
         m_currentNode = m_currentNode.append_child("multiRest");
         WriteMeiMultiRest( m_currentNode, dynamic_cast<MultiRest*>(object) );
     }
-    else if (object->Is() == MULTI_RPT) {
+    else if (object->Is() == MULTIRPT) {
         m_currentNode = m_currentNode.append_child("multiRpt");
         WriteMeiMultiRpt( m_currentNode, dynamic_cast<MultiRpt*>(object) );
     }
@@ -1366,7 +1366,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     ReadScoreDefInterface(staffDef, vrvStaffDef);
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
-    if ( parent->Is() == STAFF_GRP ) {
+    if ( parent->Is() == STAFFGRP ) {
         StaffGrp *staffGrp = dynamic_cast<StaffGrp*>( parent );
         assert( staffGrp );
         staffGrp->AddStaffDef(vrvStaffDef);
@@ -2270,10 +2270,10 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp )
         assert( element );
         element->AddStaffGrp( staffGrp );
     }
-    else if ( parent->Is() == SCORE_DEF ) {
+    else if ( parent->Is() == SCOREDEF ) {
         dynamic_cast<ScoreDef*>( parent )->AddStaffGrp( staffGrp );
     }
-    else if ( parent->Is() == STAFF_GRP ) {
+    else if ( parent->Is() == STAFFGRP ) {
         dynamic_cast<StaffGrp*>( parent )->AddStaffGrp( staffGrp );
     }
     else {

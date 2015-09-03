@@ -172,7 +172,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     // we need at least one measure to be able to draw the groups - we need access to the staff elements,
     assert( measure );
     
-    StaffGrp *staffGrp = dynamic_cast<StaffGrp*>(scoreDef->FindChildByType( STAFF_GRP ) );
+    StaffGrp *staffGrp = dynamic_cast<StaffGrp*>(scoreDef->FindChildByType( STAFFGRP ) );
     if ( !staffGrp ) {
         return;
     }
@@ -961,7 +961,7 @@ void View::DrawSystemChildren( DeviceContext *dc, Object *parent, System *system
             DrawSystemEditorialElement( dc , dynamic_cast<EditorialElement*>(current), system );
         }
         // scoreDef are not drawn directly, but anything else should not be possible
-        else if (current->Is() == SCORE_DEF) {
+        else if (current->Is() == SCOREDEF) {
             // nothing to do, then
             // ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(current);
             // assert( scoreDef );

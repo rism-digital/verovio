@@ -170,7 +170,7 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
         if (duration->IsMensural()) return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
         else return duration->GetAlignmentDuration( num, numbase );
     }
-    else if (this->Is() == BEAT_RPT) {
+    else if (this->Is() == BEATRPT) {
         BeatRpt *beatRpt = dynamic_cast<BeatRpt*>(this);
         assert(beatRpt);
         int meterUnit = 4;
@@ -217,7 +217,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
     }
     
     AlignmentType type = ALIGNMENT_DEFAULT;
-    if (this->Is() == BAR_LINE) {
+    if (this->Is() == BARLINE) {
         type = ALIGNMENT_BARLINE;
     }
     else if ( this->Is() == CLEF ) {
@@ -228,7 +228,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_CLEF;
         }
     }
-    else if (this->Is() == KEY_SIG) {
+    else if (this->Is() == KEYSIG) {
         if ( this->GetScoreOrStaffDefAttr() ) {
             type = ALIGNMENT_KEYSIG_ATTR;
         }
@@ -247,7 +247,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_MENSUR;
         }
     }
-    else if (this->Is() == METER_SIG) {
+    else if (this->Is() == METERSIG) {
         if ( this->GetScoreOrStaffDefAttr() ) {
             type = ALIGNMENT_METERSIG_ATTR;
         }
@@ -258,9 +258,11 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_METERSIG;
         }
     }
-    else if ( (this->Is() == MULTI_REST) || (this->Is() == MREST) || (this->Is() == MRPT)
-               || (this->Is() == MRPT2) || (this->Is() == MULTI_RPT) ) {
-        type = ALIGNMENT_MULTIREST;
+    else if ( (this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT) ) {
+        type = ALIGNMENT_FULLMEASURE;
+    }
+    else if ( (this->Is() == MRPT2) || (this->Is() == MULTIRPT) ) {
+        type = ALIGNMENT_FULLMEASURE2;
     }
     else if ( this->IsGraceNote() ) {
         type = ALIGNMENT_GRACENOTE;

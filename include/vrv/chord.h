@@ -47,6 +47,9 @@ public:
     virtual ClassId Is() { return CHORD; };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
     /**
      * Add an element (only note supported) to a chord.
      */

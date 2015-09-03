@@ -34,7 +34,7 @@ public:
     virtual ~BeatRpt();
     virtual void Reset();
     virtual std::string GetClassName( ){ return "BeatRpt"; }; ;
-    virtual ClassId Is() { return BEAT_RPT; };
+    virtual ClassId Is() { return BEATRPT; };
     ///@}
     
     /**
@@ -145,7 +145,7 @@ public:
     virtual ~MultiRpt();
     virtual void Reset();
     virtual std::string GetClassName( ){ return "MultiRpt"; }; ;
-    virtual ClassId Is() { return MULTI_RPT; };
+    virtual ClassId Is() { return MULTIRPT; };
     ///@}
     
 private:

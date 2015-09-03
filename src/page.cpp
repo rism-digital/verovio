@@ -117,10 +117,8 @@ void Page::LayOutHorizontally( )
     params.clear();
     double previousTime = 0.0;
     int previousXRel = 0;
-    int minMeasureWidth = doc->m_drawingMinMeasureWidth;
     params.push_back( &previousTime );
     params.push_back( &previousXRel );
-    params.push_back( &minMeasureWidth );
     Functor setAlignmentX( &Object::SetAligmentXPos );
     // Special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &setAlignmentX );
@@ -168,8 +166,10 @@ void Page::LayOutHorizontally( )
     params.clear();
     int shift = 0;
     int justifiable_shift = 0;
+    int minMeasureWidth = doc->m_drawingMinMeasureWidth;
     params.push_back( &shift );
     params.push_back( &justifiable_shift );
+    params.push_back( &minMeasureWidth );
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
     // special case: because we redirect the functor, pass is a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );

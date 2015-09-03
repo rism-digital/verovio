@@ -38,9 +38,12 @@ public:
     virtual ~MeterSig();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "MeterSig"; };
-    virtual ClassId Is() { return METER_SIG; };
+    virtual ClassId Is() { return METERSIG; };
     virtual Object* Clone() { return new MeterSig(*this); };
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
 
 private:
     

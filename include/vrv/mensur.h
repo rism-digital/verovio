@@ -47,6 +47,9 @@ public:
     virtual Object* Clone() { return new Mensur(*this); };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
 private:
     
 public:

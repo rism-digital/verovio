@@ -38,6 +38,9 @@ public:
     virtual Object* Clone() { return new Proport(*this); };
     ///@}
 
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
 private:
     
 public:

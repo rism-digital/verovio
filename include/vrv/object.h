@@ -85,7 +85,7 @@ public:
     bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
     bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
     bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
-    bool IsScoreDefElement() { return (this->Is() > SCORE_DEF_ELEMENT && this->Is() < SCORE_DEF_ELEMENT_max); };
+    bool IsScoreDefElement() { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); };
     ///@}
     
     /**
@@ -725,6 +725,8 @@ public:
     bool HasContentBB();
     bool HasSelfBB();
     void ResetBB();
+    void SetEmptyBB();
+    bool HasEmptyBB();
     
     /**
      * @name Get and set the X and Y drawing position

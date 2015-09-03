@@ -71,13 +71,13 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     if (element->Is() == ACCID) {
         DrawAccid(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BAR_LINE) {
+    else if (element->Is() == BARLINE) {
         DrawBarline(dc, element, layer, staff, measure);
     }
     else if (element->Is() == BEAM) {
         DrawBeam(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BEAT_RPT) {
+    else if (element->Is() == BEATRPT) {
         DrawBeatRpt(dc, element, layer, staff, measure);
     }
     else if (element->Is() == CHORD) {
@@ -92,13 +92,13 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (element->Is() == DOT) {
         DrawDot(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == KEY_SIG) {
+    else if (element->Is() == KEYSIG) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
     else if (element->Is() == MENSUR) {
         DrawMensur(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == METER_SIG) {
+    else if (element->Is() == METERSIG) {
         DrawMeterSig(dc, element, layer, staff, measure);
     }
     else if (element->Is() == MREST) {
@@ -110,10 +110,10 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (element->Is() == MRPT2) {
         DrawMRpt2(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MULTI_REST) {
+    else if (element->Is() == MULTIREST) {
         DrawMultiRest(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MULTI_RPT) {
+    else if (element->Is() == MULTIRPT) {
         DrawMultiRpt(dc, element, layer, staff, measure);
     }
     else if (element->Is() == NOTE) {
@@ -613,7 +613,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     if (drawingDur > DUR_2)
     {
-		x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
+		//x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
     }
 
     switch (drawingDur)
@@ -670,23 +670,23 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int x = element->GetDrawingX();
+    int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
+    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+
     
     // We do not support more than three chars
-    if (multirest->GetNum() > 999)
-        multirest->SetNum(999);
+    if (multirest->GetNum() > 999) multirest->SetNum(999);
     
     // This is 1/2 the length of th black rectangle
-	length = (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5);
+	length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     
     // Position centered in third line
-    // it would be m_drawingDoubleUnit * 6.5, or m_drawingDoubleUnit / 2 * 13
 	y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 5;
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 	
     // a is the central point, claculate x and x2
-    x1 = x - length;
-    x2 = x + length;
+    x1 = xCentered - length / 2;
+    x2 = xCentered + length / 2;
     
     // Draw the base rect
     // make it 8 pixels smaller than the interline space
@@ -1829,11 +1829,19 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     Clef *c = layer->GetClef(element);
     if (!c) {
+        keySig->SetEmptyBB();
         return;
     }
     
     // hidden key signature
     if (!keySig->m_drawingShow) {
+        keySig->SetEmptyBB();
+        return;
+    }
+    
+    // C major (0) key sig and no cancellation
+    else if ((keySig->GetAlterationNumber() == 0) && (keySig->m_drawingCancelAccidCount == 0)) {
+        keySig->SetEmptyBB();
         return;
     }
     

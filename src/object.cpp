@@ -693,10 +693,28 @@ void DocObject::ResetBB()
     m_selfBB_y1 = 0xFFFFFFF;
     m_selfBB_x2 = -0xFFFFFFF;
     m_selfBB_y2 = -0xFFFFFFF;
-    //m_drawingX = 0;
-    //m_drawingY = 0;
     
     m_updatedBB = false;
+}
+
+void DocObject::SetEmptyBB()
+{
+    m_contentBB_x1 = 0;
+    m_contentBB_y1 = 0;
+    m_contentBB_x2 = 0;
+    m_contentBB_y2 = 0;
+    m_selfBB_x1 = 0;
+    m_selfBB_y1 = 0;
+    m_selfBB_x2 = 0;
+    m_selfBB_y2 = 0;
+    
+    m_updatedBB = true;
+}
+    
+    
+bool DocObject::HasEmptyBB()
+{
+    return ( m_updatedBB && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0) && (m_contentBB_y2 == 0) );
 }
 
 bool DocObject::HasContentBB() 
@@ -938,7 +956,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     }
     
     // starting a new scoreDef
-    if (this->Is() == SCORE_DEF) {
+    if (this->Is() == SCOREDEF) {
         ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
         assert( scoreDef );
         // Replace the current scoreDef with the new one, including its content (staffDef)
@@ -947,7 +965,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     }
 
     // starting a new staffDef
-    if (this->Is() == STAFF_DEF) {
+    if (this->Is() == STAFFDEF) {
         StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
         assert( staffDef );
         currentScoreDef->ReplaceDrawingValues(staffDef);
@@ -990,7 +1008,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     }
     
     // starting a new keysig
-    if (this->Is() == KEY_SIG) {
+    if (this->Is() == KEYSIG) {
         KeySig *keysig = dynamic_cast<KeySig*>(this);
         assert( keysig );
         assert( *currentStaffDef );
@@ -1136,29 +1154,19 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     
     // we should have processed aligned before
     assert( current->GetAlignment() );
-
-    if ( !current->HasUpdatedBB() ) {
-        // if nothing was drawn, do not take it into account
+    
+    if ( !current->HasToBeAligned() ) {
+        // if nothing to do with this type of account
         return FUNCTOR_CONTINUE;
     }
     
-    if (current->Is() == BEAM) {
+    if ( !current->HasUpdatedBB() ) {
+        // if nothing was drawn, do not take it into account
+        assert( false ); // quite drastic but this should never happen. If nothing has to be drawn then the BB should be set to empty with DocObject::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
     
     if ( (current->Is() == NOTE) && current->GetFirstParent( CHORD, MAX_CHORD_DEPTH ) ) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    if (current->Is() == TIE) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    if (current->Is() == TUPLET) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    if ( (current->Is() == VERSE) || (current->Is() == SYL) ) {
         return FUNCTOR_CONTINUE;
     }
     
@@ -1174,15 +1182,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
-    
-    if ((current->Is() == MREST) || (current->Is() == MRPT) || (this->Is() == MRPT2) || (this->Is() == MULTI_RPT)) {
-        // With MRest, MRpt, etc., the only thing we want to do is to keep their with as possible measure with (if only MRest in all staves/layers)
-        int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR + negative_offset ;
-        // Keep it if more than the current measure width
-        (*measure_width) = std::max( (*measure_width), (*min_pos) + width );
-        return FUNCTOR_CONTINUE;
-    }
-    
+
     // with a grace note, also take into account the full with of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {
         negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
@@ -1211,8 +1211,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
+    int width = current->m_contentBB_x2;
+    if (!current->HasEmptyBB()) width += doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    (*min_pos) = current->GetAlignment()->GetXRel() + width;
+    current->GetAlignment()->SetMaxWidth( width );
     
     return FUNCTOR_CONTINUE;
 }

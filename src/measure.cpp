@@ -202,8 +202,9 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift (unused)
     // param 1: the cumulated justifiable shift (unused)
-    // param 2: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(2));
+    // param 2: the minimum measure with (unused)
+    // param 3: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(3));
     
     m_measureAligner.Process( integrateBoundingBoxShift, params );
     
@@ -214,9 +215,8 @@ int Measure::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
-    // param 2: the minimum measure width (unused)
-    // param 3: the functor to be redirected to Aligner
-    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(3));
+    // param 2: the functor to be redirected to Aligner
+    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(2));
     
     m_measureAligner.Process( setAligmnentPosX, params);
     

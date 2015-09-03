@@ -351,7 +351,8 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: the minimum measure with (unused)
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>((*params).at(0));
     int *justifiable_shift = static_cast<int*>((*params).at(1));
     
@@ -393,9 +394,11 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: the minimum measure with
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>((*params).at(0));
     int *justifiable_shift = static_cast<int*>((*params).at(1));
+    int *minMeasureWidth = static_cast<int*>((*params).at(2));
     
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
@@ -413,6 +416,13 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
         (*justifiable_shift) = aligner->GetNonJustifiableMargin();
     }
 
+    if (GetType() == ALIGNMENT_FULLMEASURE2) {
+       (*minMeasureWidth) *= 2;
+    }
+    else if (GetType() == ALIGNMENT_MEASURE_END) {
+        m_xRel = std::max( m_xRel, (*minMeasureWidth) + (*justifiable_shift) );
+    }
+
     // reset member to 0
     m_xShift = 0;
     
@@ -423,8 +433,7 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
-    // param 2: the minimum measure width (unused)
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
     
@@ -458,11 +467,9 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
-    // param 2: the minimum measure width
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
-    int *minMeasureWidth = static_cast<int*>((*params).at(2));
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
@@ -472,10 +479,6 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
     (*previousXRel) = m_xRel;
-    
-    if (this->GetType() == ALIGNMENT_MEASURE_END) {
-        m_xRel = std::max( m_xRel,  (*minMeasureWidth) );
-    }
     
     return FUNCTOR_CONTINUE;
 }
