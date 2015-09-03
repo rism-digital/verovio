@@ -436,6 +436,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 	return;
 }
     
+#define STANDARD_STEMLENGTH 7       // in half staff spaces ??BUT SHOULD BE 6 IF 2-VOICE NOTATION!
+    
 void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
     assert(dynamic_cast<DurationInterface*>(object));
@@ -447,7 +449,7 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     bool drawingCueSize = object->IsCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
     
-    baseStem = m_doc->GetDrawingUnit(staffSize)*7;
+    baseStem = m_doc->GetDrawingUnit(staffSize)*STANDARD_STEMLENGTH;
     flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
     if (drawingCueSize) {
         baseStem = m_doc->GetGraceSize(baseStem);
