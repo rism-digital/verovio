@@ -663,8 +663,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert( staff );
     assert( measure );
     
-    MultiRest *multirest = dynamic_cast<MultiRest*>(element);
-    assert( multirest );
+    MultiRest *multiRest = dynamic_cast<MultiRest*>(element);
+    assert( multiRest );
     
     int x1, x2, y1, y2, length;
 
@@ -675,36 +675,48 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     
     // We do not support more than three chars
-    if (multirest->GetNum() > 999) multirest->SetNum(999);
+    int num = std::min( multiRest->GetNum(), 999);
     
-    // This is 1/2 the length of th black rectangle
-	length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    
-    // Position centered in third line
-	y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 5;
-    y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-	
-    // a is the central point, claculate x and x2
-    x1 = xCentered - length / 2;
-    x2 = xCentered + length / 2;
-    
-    // Draw the base rect
-    // make it 8 pixels smaller than the interline space
-    // these are the two 4 substracted and added
-	DrawFullRectangle(dc, x1, y2 - 4, x2, y1 + 4);
-    
-    //Draw the to lines at beginning and end
-    // make it 8 pixesl longers, and 4 pixels width
-    int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
-    DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
+    if (num > 2 ) {
+        // This is 1/2 the length of th black rectangle
+        length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        
+        // a is the central point, claculate x and x2
+        x1 = xCentered - length / 2;
+        x2 = xCentered + length / 2;
+        
+        // Position centered in third line
+        y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 5;
+        y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        
+        // Draw the base rect
+        // make it 8 pixels smaller than the interline space
+        // these are the two 4 substracted and added
+        DrawFullRectangle(dc, x1, y2, x2, y1);
+        
+        //Draw the to lines at beginning and end
+        // make it 8 pixesl longers, and 4 pixels width
+        int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
+        DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
+    }
+    else {
+        // Draw the base rect
+        x1 = xCentered - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3;
+        x2 = xCentered + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 3 ;
+        
+        // Position centered in third line
+        y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
+        y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        DrawFullRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+    }
     
     // Draw the text above
     int w, h;
     int start_offset = 0; // offset from x to center text
     
     // convert to string
-    std::wstring wtext = IntToTimeSigFigures(multirest->GetNum());
+    std::wstring wtext = IntToTimeSigFigures(num);
     
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     dc->GetSmuflTextExtent( wtext, &w, &h);
