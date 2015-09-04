@@ -51,6 +51,14 @@ Style::Style()
     
     m_minMeasureWidth = (short)(DEFAULT_MEASURE_WIDTH * PARAM_DENOMINATOR);
     
+    /** ties and slurs */
+    m_minTieHeight = DEFAULT_MIN_TIE_HEIGHT * PARAM_DENOMINATOR;
+    m_maxTieHeight =  DEFAULT_MAX_TIE_HEIGHT * PARAM_DENOMINATOR;
+    m_tieThickness = DEFAULT_TIE_THICKNESS * PARAM_DENOMINATOR;
+    m_minSlurHeight = DEFAULT_MIN_SLUR_HEIGHT * PARAM_DENOMINATOR;
+    m_maxSlurHeight =  DEFAULT_MAX_SLUR_HEIGHT * PARAM_DENOMINATOR;;
+    m_slurThickness = DEFAULT_SLUR_THICKNESS * PARAM_DENOMINATOR;
+    
     /** The left spacing */
     m_leftPosition = DEFAULT_LEFT_POSITION * DEFINITON_FACTOR;
     

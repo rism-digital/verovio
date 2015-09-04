@@ -164,6 +164,21 @@ bool Note::IsClusterExtreme()
     else return false;
 }
     
+
+int Note::PositionInChord()
+{
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    // This method should be called only if the note is part of a chord
+    assert( chordParent );
+    int size = (int)chordParent->GetList(chordParent)->size();
+    int position = chordParent->GetListIndex(this);
+    assert( position != -1 );
+    // this is the middle (only if odd)
+    if ((size % 2) && (position == (size - 1 ) / 2)) return 0;
+    if (position < (size / 2)) return -1;
+    return 1;
+}
+
 data_STEMDIRECTION Note::CalcDrawingStemDir()
 {
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));

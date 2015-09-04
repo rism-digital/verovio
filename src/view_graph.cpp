@@ -114,7 +114,6 @@ void View::DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y
 
 }
 
-
 void View::DrawDot ( DeviceContext *dc, int x, int y, int staffSize )
 {
 	int r = std::max( ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staffSize ) / 5 ), 2 );
@@ -203,13 +202,13 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     dc->EndText( );
 }
 
-void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
+void View::DrawTieBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction, int staffSize)
 {
     assert( dc );
     
-    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->GetDrawingDoubleUnit( 100 ) / 3, abs( x1 - x ) / 4 ) );
-    
-    int thickness = std::max( m_doc->GetDrawingDoubleUnit(100) / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
+    int height = std::max(  m_doc->GetTieMinHeight() * m_doc->GetDrawingUnit(staffSize) / DEFINITON_FACTOR, abs( x1 - x ) / 4 );
+    height = std::min( m_doc->GetTieMaxHeight() * m_doc->GetDrawingUnit(staffSize) / DEFINITON_FACTOR, height );
+    int thickness =  m_doc->GetDrawingUnit(staffSize) * m_doc->GetTieThickness() / DEFINITON_FACTOR ;
     
     int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point
@@ -242,7 +241,51 @@ void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, 
     bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
     
     // Actually draw it
-    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(100) / 2 ), AxSOLID );
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(staffSize) / 2 ), AxSOLID );
+    dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
+    dc->ResetPen();
+}
+    
+void View::DrawSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction, int staffSize)
+{
+    assert( dc );
+    
+    int height = std::max(  m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staffSize) / DEFINITON_FACTOR, abs( x1 - x ) / 4 );
+    height = std::min( m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staffSize) / DEFINITON_FACTOR, height );
+    int thickness =  m_doc->GetDrawingUnit(staffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR ;
+    
+    int one, two; // control points at 1/4 and 3/4 of total lenght
+    int bez1[6], bez2[6]; // filled array with control points and end point
+    
+    int top_y, top_y_fill; // Y for control points in both beziers
+    
+    one = (x1 - x) / 4; // point at 1/4
+    two = (x1 - x) / 4 * 3; // point at 3/4
+    
+    if (direction) {
+        // tie goes up
+        top_y = std::min(y, y1) - height;
+        // the second bezier in internal
+        top_y_fill = top_y + thickness;
+    } else {
+        //tie goes down
+        top_y = std::max(y, y1) + height;
+        // second bezier is internal as above
+        top_y_fill = top_y - thickness;
+    }
+    
+    // Points for first bez, they go from xy to x1y1
+    bez1[0] = ToDeviceContextX(x + one); bez1[1] = ToDeviceContextY(top_y);
+    bez1[2] = ToDeviceContextX(x + two); bez1[3] = ToDeviceContextY(top_y);
+    bez1[4] = ToDeviceContextX(x1); bez1[5] = ToDeviceContextY(y1);
+    
+    // second bez. goes back
+    bez2[0] = ToDeviceContextX(x + two); bez2[1] = ToDeviceContextY(top_y_fill);
+    bez2[2] = ToDeviceContextX(x + one); bez2[3] = ToDeviceContextY(top_y_fill);
+    bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
+    
+    // Actually draw it
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(staffSize) / 2 ), AxSOLID );
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
     dc->ResetPen();
 }

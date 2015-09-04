@@ -31,7 +31,6 @@
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "verse.h"

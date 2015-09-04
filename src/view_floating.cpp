@@ -227,7 +227,6 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     else if ( spanningType == SPANNING_END ) {
         y1 = element2->GetDrawingY();
         y2 = y1;
-        x2 = element2->GetDrawingX();
         noteStemDir = element2->GetDrawingStemDir();
     }
     // Finally
@@ -264,7 +263,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
     else dc->StartGraphic(slur, "spanning-slur", "");
     dc->DeactivateGraphic();
-    DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
+    DrawSlurBezier(dc, x1, y1, x2, y2, !up, staff->m_drawingStaffSize);
     dc->ReactivateGraphic();
     
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
@@ -278,23 +277,25 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     assert( tie );
     assert( staff );
     
-    LayerElement *element1 = NULL;
-    LayerElement *element2 = NULL;
+    Note *note1 = NULL;
+    Note *note2 = NULL;
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
     
-    element1 = tie->GetStart();
-    element2 = tie->GetEnd();
+    /************** parent layers **************/
     
-    if ( !element1 || !element2 ) {
+    note1 = dynamic_cast<Note*>(tie->GetStart());
+    note2 = dynamic_cast<Note*>(tie->GetEnd());
+    
+    if ( !note1 || !note2 ) {
         // no note, obviously nothing to do...
         return;
     }
     
-    Layer* layer1 = dynamic_cast<Layer*>(element1->GetFirstParent( LAYER ) );
-    Layer* layer2 = dynamic_cast<Layer*>(element2->GetFirstParent( LAYER ) );
+    Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent( LAYER ) );
+    Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent( LAYER ) );
     assert( layer1 && layer2 );
     
     if ( layer1->GetN() != layer2->GetN() ) {
@@ -303,24 +304,26 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     
     //the normal case
     if ( spanningType == SPANNING_START_END ) {
-        y1 = element1->GetDrawingY();
-        y2 = element2->GetDrawingY();
-        noteStemDir = element1->GetDrawingStemDir();
+        y1 = note1->GetDrawingY();
+        y2 = note2->GetDrawingY();
+        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        noteStemDir = note1->GetDrawingStemDir();
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
-        y1 = element1->GetDrawingY();
+        y1 = note1->GetDrawingY();
         y2 = y1;
-        noteStemDir = element1->GetDrawingStemDir();
+        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        noteStemDir = note1->GetDrawingStemDir();
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
-        y1 = element2->GetDrawingY();
+        y1 = note2->GetDrawingY();
         y2 = y1;
-        x2 = element2->GetDrawingX();
-        noteStemDir = element2->GetDrawingStemDir();
-
+        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        noteStemDir = note2->GetDrawingStemDir();
     }
     // Finally
     else {
@@ -328,9 +331,19 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         return;
     }
     
-    //layer direction trumps note direction
+    /************** direction: **************/
+    
+    // first should be the tie @curvedir
+    // then layer direction trumps note direction
     if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+    }
+    //  the look if in a chord
+    else if (note1->IsChordTone()) {
+        if (note1->PositionInChord() < 0) up = false;
+        else if (note1->PositionInChord() > 0) up = true;
+        // away from the stem if odd number (center note)
+        else up = (noteStemDir != STEMDIRECTION_up);
     }
     else if (noteStemDir == STEMDIRECTION_up) {
         up = false;
@@ -341,22 +354,21 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         up = (y1 > center) ? true : false;
     }
     
-    // FIXME, take in account elements that can be netween notes, eg keys time etc
-    // 20 height nice with 70, not nice with 50
-    // Also remove HARDCODED values!
+    /************** points **************/
+
     if (up) {
-        y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
-        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
+        y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
     else {
-        y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
-        y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
+        y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
     }
     
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
     else dc->StartGraphic(tie, "spanning-tie", "");
     dc->DeactivateGraphic();
-    DrawTieOrSlurBezier(dc, x1, y1, x2, y2, !up);
+    DrawTieBezier(dc, x1, y1, x2, y2, !up, staff->m_drawingStaffSize);
     dc->ReactivateGraphic();
     
     if ( graphic ) dc->EndResumedGraphic(graphic, this);

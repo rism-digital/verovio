@@ -51,9 +51,6 @@ namespace vrv {
 #define MIN_STEM_WIDTH 1.0
 #define MAX_STEM_WIDTH 5.0
     
-#define MIN_TIE_HEIGHT 20
-#define MIN_TIE_THICKNESS 6
-    
 //----------------------------------------------------------------------------
 // Default scaling (%) and spacing (units) values
 //----------------------------------------------------------------------------
@@ -77,6 +74,14 @@ namespace vrv {
 #define DEFAULT_MEASURE_WIDTH 12.0
 #define MIN_MEASURE_WIDTH 1.0
 #define MAX_MEASURE_WIDTH 30.0
+    
+#define DEFAULT_MIN_TIE_HEIGHT 1.5
+#define DEFAULT_MAX_TIE_HEIGHT 3.0
+#define DEFAULT_TIE_THICKNESS 0.8
+    
+#define DEFAULT_MIN_SLUR_HEIGHT 1.5
+#define DEFAULT_MAX_SLUR_HEIGHT 3.0
+#define DEFAULT_SLUR_THICKNESS 0.8
     
 /** The default position at the beginning of a measure */
 #define DEFAULT_LEFT_POSITION 1.3
@@ -184,6 +189,14 @@ public:
     short m_minMeasureWidth;
     /** The lyrics size (in units / PARAM_DENOMINATOR) */
     int m_lyricSize;
+    
+    /** ties and slurs */
+    char m_minTieHeight;
+    char m_maxTieHeight;
+    char m_tieThickness;
+    char m_minSlurHeight;
+    char m_maxSlurHeight;
+    char m_slurThickness;
     
     /** The left position */
     char m_leftPosition;

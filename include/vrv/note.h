@@ -99,6 +99,8 @@ public:
     Chord* IsChordTone( );
     int GetDrawingDur( );
     bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
+    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    int PositionInChord();
     ///@}
 
     /**
