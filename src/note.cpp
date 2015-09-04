@@ -191,7 +191,8 @@ int Note::PrepareTieAttr( ArrayPtrVoid *params )
     Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     AttTiepresent *check = this;
-    if ((*currentChord)) {
+    // Use the parent chord if there is no @tie on the note
+    if (!this->HasTie() && (*currentChord)) {
         check = (*currentChord);
     }
     assert(check);

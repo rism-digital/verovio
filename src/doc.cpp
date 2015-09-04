@@ -164,8 +164,6 @@ void Doc::PrepareDrawing()
             filters.push_back( &matchStaff );
             filters.push_back( &matchLayer );
             
-            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
-            // m_drawingLastNote is set only if the syl has a forward connector
             currentChord = NULL;
             currentNotes.clear();
             ArrayPtrVoid paramsTieAttr;
