@@ -1,9 +1,7 @@
 <score>
   <scoreDef meter.count="4" meter.unit="4">
-    <staffGrp symbol="line">
-      <staffGrp n="1" symbol="bracket">
-        <staffDef clef.line="2" clef.shape="G" key.sig="1f" label="Quinto" lines="5" n="2"/>
-      </staffGrp>
+    <staffGrp n="1" symbol="bracket">
+      <staffDef clef.line="2" clef.shape="G" key.sig="1f" label="Quinto" lines="5" n="2"/>
     </staffGrp>
   </scoreDef>
   <section>
@@ -11,19 +9,15 @@
       <lem/>
       <rdg label="original">
         <scoreDef meter.sym="common">
-          <staffGrp symbol="line">
-            <staffGrp n="1" symbol="bracket">
-              <staffDef clef.line="1" clef.shape="C" n="2"/>
-            </staffGrp>
+          <staffGrp n="1" symbol="bracket">
+            <staffDef clef.line="1" clef.shape="C" n="2"/>
           </staffGrp>
         </scoreDef>
       </rdg>
       <rdg source="1570">
         <scoreDef>
-          <staffGrp symbol="line">
-            <staffGrp n="1" symbol="bracket">
-              <staffDef label="Sextus" n="2"/>
-            </staffGrp>
+          <staffGrp n="1" symbol="bracket">
+            <staffDef label="Sextus" n="2"/>
           </staffGrp>
         </scoreDef>
       </rdg>

@@ -1,177 +1,165 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
-<meiHead>
-	<fileDesc>
-		<titleStmt>
-			<title/>
-			<respStmt>
-				<persName/>
-			</respStmt>
-		</titleStmt>
-	</fileDesc>
-	<workDesc>
-		<work>
-			<titleStmt>
-				<title/>
-				<respStmt/>
-			</titleStmt>
-		</work>
-	</workDesc>
-</meiHead>
-<music>
-	<body>
-		<mdiv>
-			<score>
-			    <scoreDef meter.count="4" meter.unit="4" key.mode="major">
-			        <staffGrp symbol="line">
-			            <staffGrp n="1" barthru="false" symbol="bracket">
-			                <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
-			                <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
-			            </staffGrp>
-			        </staffGrp>
-			    </scoreDef>
-				<section>
-					<pb n="1"/>
-				    <measure n="1" xml:id="d23378e68">
-				        <staff n="1">
-				            <layer n="1">
-				                <note xml:id="d23378e100" pname="a" oct="4" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e114" pname="b" oct="4" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e128" pname="c" oct="5" dur="4" stem.dir="up"/>
-				                <beam>
-				                    <note xml:id="d23378e142" pname="b" oct="4" dur="8" stem.dir="up"/>
-				                    <note xml:id="d23378e158" pname="a" oct="4" dur="8" stem.dir="up"/>
-				                </beam>
-				            </layer>
-				            <layer n="2" label="feature-example">
-				                <note xml:id="d23378e177" pname="e" oct="4" dur="4" stem.dir="down">
-				                    <verse n="1">
-				                        <syl>1. Je-</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>2. Tau-</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>3. Wei-</syl>
-				                    </verse>
-				                </note>
-				                <note xml:id="d23378e206" pname="e" oct="4" dur="4" stem.dir="down">
-				                    <verse n="1">
-				                        <syl>su,</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>send-</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>de</syl>
-				                    </verse>
-				                </note>
-				                <note xml:id="d23378e235" pname="e" oct="4" dur="4" stem.dir="down">
-				                    <verse n="1">
-				                        <syl>mei-</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>mal</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>mich</syl>
-				                    </verse>
-				                </note>
-				                <note xml:id="d23378e265" pname="f" oct="4" dur="4" stem.dir="down">
-				                    <verse n="1">
-				                        <syl>nes</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>ge-</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>und</syl>
-				                    </verse>
-				                </note>
-				            </layer>
-				        </staff>
-				        <staff n="2">
-				            <layer n="1">
-				                <note xml:id="d23378e325" pname="c" oct="4" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e339" pname="b" oct="3" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e353" pname="a" oct="3" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e367" pname="d" oct="4" dur="4" stem.dir="up"/>
-				            </layer>
-				            <layer n="2">
-				                <note xml:id="d23378e384" pname="a" oct="3" dur="4" stem.dir="down"/>
-				                <note xml:id="d23378e398" pname="g" accid="s" oct="3" dur="4" stem.dir="down" accid.ges="s"/>
-				                <note xml:id="d23378e416" pname="a" oct="3" dur="4" stem.dir="down"/>
-				                <note xml:id="d23378e430" pname="d" oct="3" dur="4" stem.dir="down"/>
-				            </layer>
-				        </staff>
-				    </measure>
-				    <measure n="2" xml:id="d23378e444">
-				        <staff n="1">
-				            <layer n="1">
-				                <note xml:id="d23378e446" pname="g" accid="s" oct="4" dur="4" dots="1" stem.dir="up" accid.ges="s"/>
-				                <note xml:id="d23378e465" pname="a" oct="4" dur="8" stem.dir="up"/>
-				                <note xml:id="d23378e487" pname="b" oct="4" dur="2" stem.dir="up"/>
-				            </layer>
-				            <layer n="2">
-				                <note xml:id="d23378e504" pname="e" oct="4" dur="4" dots="1" stem.dir="down">
-				                    <verse n="1">
-				                        <syl>Her-</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>denk</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>mach</syl>
-				                    </verse>
-				                </note>
-				                <note xml:id="d23378e534" pname="f" accid="s" oct="4" dur="8" stem.dir="down" accid.ges="s">
-				                    <verse n="1">
-				                        <syl>zens</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>ich</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>mich</syl>
-				                    </verse>
-				                </note>
-				                <note xml:id="d23378e567" pname="g" accid="s" oct="4" dur="2" stem.dir="down" accid.ges="s">
-				                    <verse n="1">
-				                        <syl>Freud</syl>
-				                    </verse>
-				                    <verse n="2">
-				                        <syl>dein,</syl>
-				                    </verse>
-				                    <verse n="3">
-				                        <syl>satt,</syl>
-				                    </verse>
-				                </note>
-				            </layer>
-				        </staff>
-				        <staff n="2">
-				            <layer n="1">
-				                <note xml:id="d23378e601" pname="b" oct="3" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e615" pname="c" oct="4" dur="4" stem.dir="up"/>
-				                <note xml:id="d23378e629" pname="b" oct="3" dur="2" stem.dir="up"/>
-				            </layer>
-				            <layer n="2">
-				                <note xml:id="d23378e646" pname="e" oct="3" dur="4" stem.dir="down"/>
-				                <note xml:id="d23378e660" pname="a" oct="2" dur="4" stem.dir="down"/>
-				                <note xml:id="d23378e674" pname="e" oct="3" dur="2" stem.dir="down"/>
-				            </layer>
-				        </staff>
-				        <dir tstamp="3" place="above" staff="1">
-				            <rend fontfam="PlainBlackWide" fontsize="18">Jesu, meines Herzens
-				                Freud</rend>
-				        </dir>
-				        <dir tstamp="3" place="above" staff="1">
-				            <rend fontfam="Times New Roman" fontsize="11" fontweight="bold">Johann
-				                Flitner</rend>
-				        </dir>
-				    </measure>
-				</section>
-			</score>
-		</mdiv>
-	</body>
-</music>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Multiple verse example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="4" meter.unit="4" key.mode="major">
+                        <staffGrp n="1" barthru="false" symbol="bracket">
+                            <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
+                            <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <pb n="1"/>
+                        <measure n="1" xml:id="d23378e68">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d23378e100" pname="a" oct="4" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e114" pname="b" oct="4" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e128" pname="c" oct="5" dur="4" stem.dir="up"/>
+                                    <beam>
+                                        <note xml:id="d23378e142" pname="b" oct="4" dur="8" stem.dir="up"/>
+                                        <note xml:id="d23378e158" pname="a" oct="4" dur="8" stem.dir="up"/>
+                                    </beam>
+                                </layer>
+                                <layer n="2" label="feature-example">
+                                    <note xml:id="d23378e177" pname="e" oct="4" dur="4" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>1. Je-</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>2. Tau-</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>3. Wei-</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d23378e206" pname="e" oct="4" dur="4" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>su,</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>send-</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>de</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d23378e235" pname="e" oct="4" dur="4" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>mei-</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>mal</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>mich</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d23378e265" pname="f" oct="4" dur="4" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>nes</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>ge-</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>und</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d23378e325" pname="c" oct="4" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e339" pname="b" oct="3" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e353" pname="a" oct="3" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e367" pname="d" oct="4" dur="4" stem.dir="up"/>
+                                </layer>
+                                <layer n="2">
+                                    <note xml:id="d23378e384" pname="a" oct="3" dur="4" stem.dir="down"/>
+                                    <note xml:id="d23378e398" pname="g" accid="s" oct="3" dur="4" stem.dir="down" accid.ges="s"/>
+                                    <note xml:id="d23378e416" pname="a" oct="3" dur="4" stem.dir="down"/>
+                                    <note xml:id="d23378e430" pname="d" oct="3" dur="4" stem.dir="down"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2" xml:id="d23378e444">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d23378e446" pname="g" accid="s" oct="4" dur="4" dots="1" stem.dir="up" accid.ges="s"/>
+                                    <note xml:id="d23378e465" pname="a" oct="4" dur="8" stem.dir="up"/>
+                                    <note xml:id="d23378e487" pname="b" oct="4" dur="2" stem.dir="up"/>
+                                </layer>
+                                <layer n="2">
+                                    <note xml:id="d23378e504" pname="e" oct="4" dur="4" dots="1" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>Her-</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>denk</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>mach</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d23378e534" pname="f" accid="s" oct="4" dur="8" stem.dir="down" accid.ges="s">
+                                        <verse n="1">
+                                            <syl>zens</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>ich</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>mich</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d23378e567" pname="g" accid="s" oct="4" dur="2" stem.dir="down" accid.ges="s">
+                                        <verse n="1">
+                                            <syl>Freud</syl>
+                                        </verse>
+                                        <verse n="2">
+                                            <syl>dein,</syl>
+                                        </verse>
+                                        <verse n="3">
+                                            <syl>satt,</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d23378e601" pname="b" oct="3" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e615" pname="c" oct="4" dur="4" stem.dir="up"/>
+                                    <note xml:id="d23378e629" pname="b" oct="3" dur="2" stem.dir="up"/>
+                                </layer>
+                                <layer n="2">
+                                    <note xml:id="d23378e646" pname="e" oct="3" dur="4" stem.dir="down"/>
+                                    <note xml:id="d23378e660" pname="a" oct="2" dur="4" stem.dir="down"/>
+                                    <note xml:id="d23378e674" pname="e" oct="3" dur="2" stem.dir="down"/>
+                                </layer>
+                            </staff>
+                            <dir tstamp="3" place="above" staff="1">
+                                <rend fontfam="PlainBlackWide" fontsize="18">Jesu, meines Herzens Freud</rend>
+                            </dir>
+                            <dir tstamp="3" place="above" staff="1">
+                                <rend fontfam="Times New Roman" fontsize="11" fontweight="bold">Johann Flitner</rend>
+                            </dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
 </mei>

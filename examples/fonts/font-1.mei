@@ -1,27 +1,21 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<?xml-model href="./mei-page-based.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title />
+                <title>Font example</title>
             </titleStmt>
-            <pubStmt>
-                <date>31 January 2014</date>
-            </pubStmt>
+            <pubStmt/>
         </fileDesc>
-        <encodingDesc>
-            <projectDesc>
-                <p>Tuplets example</p>
-            </projectDesc>
-        </encodingDesc>
     </meiHead>
     <music>
         <body>
             <mdiv>
                 <score>
                     <scoreDef meter.count="4" meter.unit="4" key.sig="3f" key.mode="major">
-                        <staffGrp symbol="line">
+                        <staffGrp>
                             <staffGrp symbol="bracket" barthru="true">
                                 <staffDef n="1" xml:id="P1" label="upper" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
                                 <staffDef n="2" xml:id="P2" label="lower" lines="5" clef.line="2" clef.shape="G" key.sig="3f" key.mode="major"/>
@@ -30,7 +24,7 @@
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <measure n="1" xml:id="d1e71" width="429.06">
+                        <measure n="1" xml:id="d1e71">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>

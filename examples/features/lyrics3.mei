@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="file:/Users/laurent/Documents/mei/sources/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title>Lyric connectors example</title>
+                <title>Lyric connector example</title>
             </titleStmt>
-            <pubStmt/>
+            <pubStmt></pubStmt>
         </fileDesc>
     </meiHead>
     <music>

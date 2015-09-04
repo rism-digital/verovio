@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="file:/Users/laurent/Documents/mei/sources/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei">
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
                 <title>Score and barlines example</title>
             </titleStmt>
-            <pubStmt></pubStmt>
+            <pubStmt/>
         </fileDesc>
     </meiHead>
     <music>
@@ -16,174 +17,138 @@
                     <scoreDef label="feature-example">
                         <staffGrp>
                             <staffGrp symbol="bracket" barthru="true">
-                                <staffDef n="1" clef.line="2" clef.shape="G" lines="5" />
+                                <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
                                 <staffGrp symbol="brace">
-                                    <staffDef n="2" clef.line="2" clef.shape="G" lines="5" />  
-                                    <staffDef n="3" clef.line="2" clef.shape="G" lines="5" />
+                                    <staffDef n="2" clef.line="2" clef.shape="G" lines="5"/>
+                                    <staffDef n="3" clef.line="2" clef.shape="G" lines="5"/>
                                 </staffGrp>
                             </staffGrp>
-                            <staffDef n="4" clef.line="2" clef.shape="G" lines="5" />
+                            <staffDef n="4" clef.line="2" clef.shape="G" lines="5"/>
                             <staffGrp symbol="brace" barthru="false">
-                                <staffDef n="5" clef.line="2" clef.shape="G" lines="5" /> 
-                                <staffDef n="6" clef.line="4" clef.shape="F" lines="5" />              
+                                <staffDef n="5" clef.line="2" clef.shape="G" lines="5"/>
+                                <staffDef n="6" clef.line="4" clef.shape="F" lines="5"/>
                             </staffGrp>
                         </staffGrp>
                     </scoreDef>
                     <section>
                         <measure n="1">
                             <staff n="1">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="2">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="3">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="4">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="5">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="6">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                         </measure>
                         <measure n="2">
                             <staff n="1">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="2">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="3">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="4">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="5">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="6">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                         </measure>
                         <measure n="3" right="dbl">
                             <staff n="1">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="2">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="3">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="4">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="5">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="6">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                         </measure>
                         <measure n="4" right="rptstart">
                             <staff n="1">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="2">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="3">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="4">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="5">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="6">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                         </measure>
                         <measure n="5" right="rptboth">
                             <staff n="1">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="2">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="3">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="4">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="5">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="6">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                         </measure>
                         <measure n="6" right="rptend">
                             <staff n="1">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="2">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="3">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="4">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="5">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                             <staff n="6">
-                                <layer n="1">                 
-                                </layer>
+                                <layer n="1"> </layer>
                             </staff>
                         </measure>
                     </section>

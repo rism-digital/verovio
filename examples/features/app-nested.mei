@@ -1,31 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<?xml-model href="http://music-encoding.googlecode.com/svn/tags/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title />
+                <title>Critical apparatus example with nested elements</title>
             </titleStmt>
-            <pubStmt>
-                <date>20 April 2015</date>
-            </pubStmt>
+            <pubStmt/>
         </fileDesc>
-        <encodingDesc>
-            <projectDesc>
-                <p>Critical apparatus example with nested elements</p>
-            </projectDesc>
-        </encodingDesc>
     </meiHead>
     <music>
         <body>
             <mdiv>
                 <score>
                     <scoreDef>
-                        <staffGrp symbol="line">
-                            <staffGrp n="1" symbol="bracket">
-                                <staffDef clef.line="2" clef.shape="G" lines="5" n="1"/>
-                            </staffGrp>
+                        <staffGrp n="1" symbol="bracket">
+                            <staffDef clef.line="2" clef.shape="G" lines="5" n="1"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
@@ -34,18 +25,18 @@
                                 <layer n="1" label="feature-example">
                                     <app xml:id="app1">
                                         <rdg source="src1" xml:id="rdg1-1">
-                                            <note dur="1" oct="5" pname="d" />
+                                            <note dur="1" oct="5" pname="d"/>
                                         </rdg>
                                         <rdg source="src2 src3" xml:id="rdg1-2">
-                                            <note dur="2" dots="1" oct="5" pname="d" />
+                                            <note dur="2" dots="1" oct="5" pname="d"/>
                                             <app xml:id="app2">
                                                 <rdg source="src2" xml:id="rdg2-1">
-                                                    <note dur="4" oct="4" pname="b" />
+                                                    <note dur="4" oct="4" pname="b"/>
                                                 </rdg>
                                                 <rdg source="src3" xml:id="rdg2-2">
                                                     <beam>
-                                                        <note dur="8" oct="5" pname="c" />
-                                                        <note dur="8" oct="4" pname="b" />
+                                                        <note dur="8" oct="5" pname="c"/>
+                                                        <note dur="8" oct="4" pname="b"/>
                                                     </beam>
                                                 </rdg>
                                             </app>
@@ -57,11 +48,11 @@
                         <measure n="2" right="invis">
                             <staff n="1">
                                 <layer n="1">
-                                    <note dur="4" oct="5" pname="c" />
+                                    <note dur="4" oct="5" pname="c"/>
                                 </layer>
                             </staff>
                         </measure>
-                    </section> 
+                    </section>
                 </score>
             </mdiv>
         </body>

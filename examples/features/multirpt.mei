@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="http://www.music-encoding.org/schema/2.1.1//mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<?xml-model href="http://www.music-encoding.org/schema/2.1.1//mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei">
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
                 <title>Multi-measure repeat example</title>
             </titleStmt>
-            <pubStmt></pubStmt>
+            <pubStmt/>
         </fileDesc>
     </meiHead>
     <music>
@@ -16,7 +16,7 @@
                 <score>
                     <scoreDef meter.count="2" meter.unit="4">
                         <staffGrp>
-                            <staffDef n="1" clef.line="2" clef.shape="G"  lines="5" />
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
                         </staffGrp>
                     </scoreDef>
                     <section label="feature-example">

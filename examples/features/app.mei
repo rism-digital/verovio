@@ -1,49 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title />
+                <title>Critical apparatus example</title>
             </titleStmt>
-            <pubStmt>
-                <date>12 April 2015</date>
-            </pubStmt>
+            <pubStmt/>
         </fileDesc>
-        <encodingDesc>
-            <projectDesc>
-                <p>Critical apparatus example</p>
-            </projectDesc>
-        </encodingDesc>
     </meiHead>
     <music>
         <body>
             <mdiv>
                 <score label="feature-example">
                     <scoreDef meter.count="4" meter.unit="4">
-                        <staffGrp symbol="line">
-                            <staffGrp n="1" symbol="bracket">
-                                <staffDef clef.line="2" clef.shape="G" key.sig="1f" label="Quinto" lines="5" n="2"/>
-                            </staffGrp>
+                        <staffGrp n="1" symbol="bracket">
+                            <staffDef clef.line="2" clef.shape="G" key.sig="1f" label="Quinto" lines="5" n="2"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
                         <app>
-                            <lem></lem>
+                            <lem/>
                             <rdg label="original">
                                 <scoreDef meter.sym="common">
-                                    <staffGrp symbol="line">
-                                        <staffGrp n="1" symbol="bracket">
-                                            <staffDef clef.line="1" clef.shape="C" n="2"/>
-                                        </staffGrp>
+                                    <staffGrp n="1" symbol="bracket">
+                                        <staffDef clef.line="1" clef.shape="C" n="2"/>
                                     </staffGrp>
                                 </scoreDef>
                             </rdg>
                             <rdg source="1570">
                                 <scoreDef>
-                                    <staffGrp symbol="line">
-                                        <staffGrp n="1" symbol="bracket">
-                                            <staffDef label="Sextus" n="2"/>
-                                        </staffGrp>
+                                    <staffGrp n="1" symbol="bracket">
+                                        <staffDef label="Sextus" n="2"/>
                                     </staffGrp>
                                 </scoreDef>
                             </rdg>
@@ -138,7 +127,7 @@
                             </staff>
                         </measure>
                         <measure n="4">
-                             <staff n="2">
+                            <staff n="2">
                                 <layer n="1">
                                     <app>
                                         <lem>
@@ -163,8 +152,8 @@
                                     </app>
                                 </layer>
                             </staff>
-                        </measure>     
-                    </section> 
+                        </measure>
+                    </section>
                 </score>
             </mdiv>
         </body>

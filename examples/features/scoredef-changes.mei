@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?xml-model href="file:/Users/laurent/Documents/mei/sources/MEI2013_v2.1.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei">
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
                 <title>ScoreDef change example</title>
             </titleStmt>
-            <pubStmt></pubStmt>
+            <pubStmt/>
         </fileDesc>
     </meiHead>
     <music>
@@ -15,7 +16,7 @@
                 <score>
                     <scoreDef>
                         <staffGrp symbol="bracket">
-                            <staffDef n="1" clef.line="2" clef.shape="G" meter.sym="cut" lines="5" />  
+                            <staffDef n="1" clef.line="2" clef.shape="G" meter.sym="cut" lines="5"/>
                         </staffGrp>
                     </scoreDef>
                     <section label="feature-example">
@@ -28,7 +29,7 @@
                         </measure>
                         <scoreDef>
                             <staffGrp>
-                                <staffDef n="1" clef.line="3" clef.shape="C" key.sig="3f" />
+                                <staffDef n="1" clef.line="3" clef.shape="C" key.sig="3f"/>
                             </staffGrp>
                         </scoreDef>
                         <measure n="2" right="dbl">

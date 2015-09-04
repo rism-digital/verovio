@@ -1,31 +1,23 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<?xml-model href="./mei-page-based.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title />
+                <title>Tuplet example</title>
             </titleStmt>
-            <pubStmt>
-                <date>31 January 2014</date>
-            </pubStmt>
+            <pubStmt/>
         </fileDesc>
-        <encodingDesc>
-            <projectDesc>
-                <p>Tuplets example</p>
-            </projectDesc>
-        </encodingDesc>
     </meiHead>
     <music>
         <body>
             <mdiv>
                 <score>
                     <scoreDef clef.shape="G" clef.line="2" meter.count="3" meter.unit="4" key.sig="0">
-                        <staffGrp symbol="line">
-                            <staffGrp xml:id="P1" symbol="brace" barthru="true">
-                                <staffDef n="1" lines="5" clef.line="2" clef.shape="G" key.sig="5s"/>
-                                <staffDef n="2" lines="5" clef.line="4" clef.shape="F" key.sig="5s"/>
-                            </staffGrp>
+                        <staffGrp xml:id="P1" symbol="brace" barthru="true">
+                            <staffDef n="1" lines="5" clef.line="2" clef.shape="G" key.sig="5s"/>
+                            <staffDef n="2" lines="5" clef.line="4" clef.shape="F" key.sig="5s"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
@@ -76,8 +68,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-							<slur startid="n1" endid="n21"/>
-                        </measure>	
+                            <slur startid="n1" endid="n21"/>
+                        </measure>
                         <measure n="2" xml:id="m2" label="feature-example">
                             <staff n="1" xml:id="s3">
                                 <layer n="1" xml:id="l3">
@@ -85,7 +77,7 @@
                                     <note xml:id="n29" pname="a" oct="4" dur="4" dots="1"/>
                                     <beam>
                                         <note xml:id="n30" pname="b" oct="4" dur="8"/>
-                                        <note xml:id="n31" pname="b" oct="4" dur="8" accid="s"/>                                        
+                                        <note xml:id="n31" pname="b" oct="4" dur="8" accid="s"/>
                                     </beam>
                                 </layer>
                             </staff>
@@ -103,7 +95,7 @@
                                     <note xml:id="n37" pname="e" oct="4" dur="4" dots="1" accid="s"/>
                                 </layer>
                             </staff>
-							<slur startid="n28" endid="n29"/>
+                            <slur startid="n28" endid="n29"/>
                         </measure>
                     </section>
                 </score>
