@@ -1466,7 +1466,6 @@ bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
     SetMeiUuid(slur, vrvSlur);
     
     vrvSlur->ReadCurvature(slur);
-    
     ReadTimeSpanningInterface(slur, vrvSlur);
     
     AddFloatingElement(parent, vrvSlur);
