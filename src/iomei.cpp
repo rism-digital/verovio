@@ -1452,6 +1452,7 @@ bool MeiInput::ReadMeiTie( Object *parent, pugi::xml_node tie )
     Tie *vrvTie = new Tie();
     SetMeiUuid(tie, vrvTie);
     
+    vrvTie->ReadCurvature(tie);
     ReadTimeSpanningInterface(tie, vrvTie);
     
     AddFloatingElement(parent, vrvTie);

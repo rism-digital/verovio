@@ -74,10 +74,8 @@ namespace vrv {
 #define DEFAULT_MEASURE_WIDTH 12.0
 #define MIN_MEASURE_WIDTH 1.0
 #define MAX_MEASURE_WIDTH 30.0
-    
-#define DEFAULT_MIN_TIE_HEIGHT 1.5
-#define DEFAULT_MAX_TIE_HEIGHT 3.0
-#define DEFAULT_TIE_THICKNESS 0.8
+
+#define DEFAULT_TIE_THICKNESS 0.6
     
 #define DEFAULT_MIN_SLUR_HEIGHT 1.5
 #define DEFAULT_MAX_SLUR_HEIGHT 3.0
@@ -191,8 +189,6 @@ public:
     int m_lyricSize;
     
     /** ties and slurs */
-    char m_minTieHeight;
-    char m_maxTieHeight;
     char m_tieThickness;
     char m_minSlurHeight;
     char m_maxSlurHeight;

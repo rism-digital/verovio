@@ -1267,7 +1267,7 @@ AttCurvature::~AttCurvature() {
 
 void AttCurvature::ResetCurvature() {
     m_bezier = "";
-    m_bulge = "";
+    m_bulge = 0.0;
     m_curvedir = CURVEDIR_NONE;
 }
 
@@ -1279,7 +1279,7 @@ bool AttCurvature::ReadCurvature(  pugi::xml_node element ) {
         hasAttribute = true;
     }
     if (element.attribute("bulge")) {
-        this->SetBulge(StrToStr(element.attribute("bulge").value()));
+        this->SetBulge(StrToDbl(element.attribute("bulge").value()));
         element.remove_attribute("bulge");
         hasAttribute = true;
     }
@@ -1298,7 +1298,7 @@ bool AttCurvature::WriteCurvature(  pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasBulge()) {
-        element.append_attribute("bulge") = StrToStr(this->GetBulge()).c_str();
+        element.append_attribute("bulge") = DblToStr(this->GetBulge()).c_str();
         wroteAttribute = true;
     }
     if (this->HasCurvedir()) {
@@ -1315,7 +1315,7 @@ bool AttCurvature::HasBezier( )
 
 bool AttCurvature::HasBulge( )
 {
-    return (m_bulge != "");
+    return (m_bulge != 0.0);
 }
 
 bool AttCurvature::HasCurvedir( )
@@ -7201,7 +7201,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
         if (attrType == "bulge") {
-            att->SetBulge(att->StrToStr(attrValue));
+            att->SetBulge(att->StrToDbl(attrValue));
             return true;
         }
         if (attrType == "curvedir") {
@@ -8584,7 +8584,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("bezier", att->StrToStr(att->GetBezier())));
         }
         if (att->HasBulge()) {
-            attributes->push_back(std::make_pair("bulge", att->StrToStr(att->GetBulge())));
+            attributes->push_back(std::make_pair("bulge", att->DblToStr(att->GetBulge())));
         }
         if (att->HasCurvedir()) {
             attributes->push_back(std::make_pair("curvedir", att->CurvedirToStr(att->GetCurvedir())));

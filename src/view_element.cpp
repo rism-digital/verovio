@@ -990,7 +990,7 @@ void View::DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff
     }
 	for (i = 0; i < dots; i++) {
         DrawDot ( dc, x, y, staff->m_drawingStaffSize );
-		x += std::max (6, 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+		x += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 	}
 }
 

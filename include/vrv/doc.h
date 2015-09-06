@@ -114,8 +114,6 @@ public:
      * @name Getters for tie and slur parameters
      */
     ///@{
-    char GetTieMinHeight() { return m_style->m_minTieHeight; };
-    char GetTieMaxHeight() { return m_style->m_maxTieHeight; };
     char GetTieThickness() { return m_style->m_tieThickness; };
     char GetSlurMinHeight() { return m_style->m_minSlurHeight; };
     char GetSlurMaxHeight() { return m_style->m_maxSlurHeight; };

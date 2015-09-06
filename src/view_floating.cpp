@@ -263,6 +263,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
     else dc->StartGraphic(slur, "spanning-slur", "");
     dc->DeactivateGraphic();
+    // Should be change and use DrawThickBezierCurve
     DrawSlurBezier(dc, x1, y1, x2, y2, !up, staff->m_drawingStaffSize);
     dc->ReactivateGraphic();
     
@@ -294,6 +295,8 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         return;
     }
     
+    Chord *chordParent1 = note1->IsChordTone();
+    
     Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent( LAYER ) );
     Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent( LAYER ) );
     assert( layer1 && layer2 );
@@ -302,12 +305,26 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         LogWarning("Ties between different layers may not be fully supported.");
     }
     
-    //the normal case
+    /************** x positions **************/
+    
+    bool isShortTie = false;
+    // shortTie correction cannot be applied for chords
+    if (!chordParent1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) isShortTie = true;
+    
+    // the normal case
     if ( spanningType == SPANNING_START_END ) {
         y1 = note1->GetDrawingY();
         y2 = note2->GetDrawingY();
-        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        if (!isShortTie) {
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+            x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+            if (note1->HasDots()) {
+                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
+            }
+            else if (chordParent1 && chordParent1->HasDots()) {
+                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * chordParent1->GetDots();
+            }
+        }
         noteStemDir = note1->GetDrawingStemDir();
     }
     // This is the case when the tie is split over two system of two pages.
@@ -315,14 +332,18 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     else if ( spanningType == SPANNING_START ) {
         y1 = note1->GetDrawingY();
         y2 = y1;
-        x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        if (!isShortTie) {
+            x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        }
         noteStemDir = note1->GetDrawingStemDir();
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
         y1 = note2->GetDrawingY();
         y2 = y1;
-        x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        if (!isShortTie) {
+            x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+        }
         noteStemDir = note2->GetDrawingStemDir();
     }
     // Finally
@@ -331,11 +352,14 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         return;
     }
     
-    /************** direction: **************/
+    /************** direction **************/
     
     // first should be the tie @curvedir
+    if (tie->HasCurvedir()) {
+        up = (tie->GetCurvedir() == CURVEDIR_above) ? true : false;
+    }
     // then layer direction trumps note direction
-    if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
+    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
     }
     //  the look if in a chord
@@ -354,23 +378,63 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         up = (y1 > center) ? true : false;
     }
     
-    /************** points **************/
+    /************** y position **************/
 
     if (up) {
         y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        if (isShortTie) {
+            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
     }
     else {
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
+        if (isShortTie) {
+            y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
+        
+    }
+    
+    /************** bezier points **************/
+    
+    // the 'height' of the bezier
+    int height;
+    if (tie->HasBulge()){
+        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * tie->GetBulge();
+    }
+    else {
+        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // if the space between the to points is more than two staff height, increase the height
+        if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
+            height +=  m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
+    }
+    int thickness =  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness() / DEFINITON_FACTOR ;
+    
+    // control points
+    Point c1, c2;
+    
+    height = height * 4 / 3;
+    
+    c1.x = x1 + (x2 - x1) / 4; // point at 1/4
+    c2.x = x1 + (x2 - x1) / 4 * 3; // point at 3/4
+    
+    if (up) {
+        c1.y = y1 + height;
+        c2.y = y2 + height;
+    } else {
+        c1.y = y1 - height;
+        c2.y = y2 - height;
     }
     
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
     else dc->StartGraphic(tie, "spanning-tie", "");
     dc->DeactivateGraphic();
-    DrawTieBezier(dc, x1, y1, x2, y2, !up, staff->m_drawingStaffSize);
+    DrawThickBezierCurve(dc, Point(x1, y1), Point(x2, y2), c1, c2, thickness, staff->m_drawingStaffSize );
     dc->ReactivateGraphic();
-    
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
     else dc->EndGraphic(tie, this);
 }

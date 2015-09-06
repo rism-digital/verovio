@@ -21,8 +21,11 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Tie::Tie():
-    FloatingElement("tie-"), TimeSpanningInterface()
+    FloatingElement("tie-"), TimeSpanningInterface(),
+    AttCurvature()
 {
+    RegisterAttClass(ATT_CURVATURE);
+    
     RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
     
     Reset();
@@ -37,6 +40,7 @@ void Tie::Reset()
 {
     FloatingElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetCurvature();
 }
 
 } // namespace vrv
