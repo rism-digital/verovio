@@ -177,7 +177,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
         return;
     }
     
-    if ( barLine == NULL) {
+    if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp( dc, measure, staffGrp, x, true, !scoreDef->DrawLabels() );
         
@@ -185,7 +185,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
         // if this was true (non-abbreviated labels), set it to false for next one
         scoreDef->SetDrawLabels( false );
     }
-    else{
+    else {
         barLine->SetDrawingX( x );
         dc->StartGraphic( barLine, "", barLine->GetUuid() );
         DrawBarlines( dc, measure, staffGrp, barLine );
@@ -606,6 +606,9 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
+    }
+    else {
+        barLine->SetEmptyBB();
     }
 }
 

@@ -1005,6 +1005,11 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     Barline *barLine = dynamic_cast<Barline*>(element);
     assert( barLine );
     
+    if (barLine->GetRend() == BARRENDITION_invis) {
+        barLine->SetEmptyBB();
+        return;
+    }
+    
     dc->StartGraphic( element, "", element->GetUuid() );
     
     int y = staff->GetDrawingY();
