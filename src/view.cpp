@@ -11,6 +11,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <math.h>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -171,5 +172,23 @@ std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
     return str;
 }
     
+Point View::CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
+{
+    float s = sin(rot_alpha);
+    float c = cos(rot_alpha);
+    
+    // translate point back to origin:
+    point.x -= center.x;
+    point.y -= center.y;
+    
+    // rotate point
+    float xnew = point.x * c - point.y * s;
+    float ynew = point.x * s + point.y * c;
+    
+    // translate point back:
+    point.x = xnew + center.x;
+    point.y = ynew + center.y;
+    return point;
+}
 
 } // namespace vrv

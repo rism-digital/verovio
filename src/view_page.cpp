@@ -11,7 +11,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -859,28 +858,6 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	*octave = octaves /*- OCTBIT*/; // LP remove OCTBIT : oct 0 ‡ 7
 
 	return (code);
-}
-
-Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
-{
-    int distCenterX = (point.x - center.x);
-    int distCenterY = (point.y - center.y);
-    // pythagore, distance entre le point d'origine et le centre
-    int distCenter = (int)sqrt( pow( (double)distCenterX, 2 ) + pow( (double)distCenterY, 2 ) );
-	
-	// angle d'origine entre l'axe x et la droite passant par le point et le centre
-    float alpha = atan ( (float)distCenterX / (float)(distCenterY) );
-    
-    Point new_p = center;
-    int new_distCenterX, new_distCenterY;
-
-    new_distCenterX = ( (int)( sin( alpha - rot_alpha ) * distCenter ) );
-	new_p.x += new_distCenterX;
-
-    new_distCenterY = ( (int)( cos( alpha - rot_alpha ) * distCenter ) );
-	new_p.y += new_distCenterY;
-
-    return new_p;
 }
 
 void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure)

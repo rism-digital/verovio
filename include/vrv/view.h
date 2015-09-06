@@ -356,6 +356,11 @@ private:
     static void SwapPoints (Point *x1, Point *x2);
     
     /**
+     * Calculate the position of a point after a rotation of rot_alpha around the center
+     */
+    static Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center);
+    
+    /**
      * Swap values passed as reference.
      * This is useful for example when switching to the device context world.
      */

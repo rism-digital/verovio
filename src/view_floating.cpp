@@ -12,6 +12,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -184,60 +185,76 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     assert( slur );
     assert( staff );
     
-    LayerElement *element1 = NULL;
-    LayerElement *element2 = NULL;
+    Note *note1 = NULL;
+    Note *note2 = NULL;
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
     
-    element1 = slur->GetStart();
-    element2 = slur->GetEnd();
+    /************** parent layers **************/
     
-    if ( !element1 || !element2 ) {
+    note1 = dynamic_cast<Note*>(slur->GetStart());
+    note2 = dynamic_cast<Note*>(slur->GetEnd());
+    
+    if ( !note1 || !note2 ) {
         // no note, obviously nothing to do...
         return;
     }
     
-    Layer* layer1 = dynamic_cast<Layer*>(element1->GetFirstParent( LAYER ) );
-    Layer* layer2 = dynamic_cast<Layer*>(element2->GetFirstParent( LAYER ) );
+    Chord *chordParent1 = note1->IsChordTone();
+    
+    Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent( LAYER ) );
+    Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent( LAYER ) );
     assert( layer1 && layer2 );
     
     if ( layer1->GetN() != layer2->GetN() ) {
-        LogWarning("Slur between different layers may not be fully supported.");
+        LogWarning("Ties between different layers may not be fully supported.");
     }
     
-    //the normal case
+    /************** x positions **************/
+    
+    // the normal case
     if ( spanningType == SPANNING_START_END ) {
-        // Copied from DrawNote
-        // We could use the stamDir information
-        // but then we have to take in account (1) beams (2) stemmed and non stemmed notes tied together
-        y1 = element1->GetDrawingY();
-        y2 = element2->GetDrawingY();
-        noteStemDir = element1->GetDrawingStemDir();
+        y1 = note1->GetDrawingY();
+        y2 = note2->GetDrawingY();
+        noteStemDir = note1->GetDrawingStemDir();
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
-        y1 = element1->GetDrawingY();
+        y1 = note1->GetDrawingY();
         y2 = y1;
-        noteStemDir = element1->GetDrawingStemDir();
+        noteStemDir = note1->GetDrawingStemDir();
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
-        y1 = element2->GetDrawingY();
+        y1 = note2->GetDrawingY();
         y2 = y1;
-        noteStemDir = element2->GetDrawingStemDir();
+        noteStemDir = note2->GetDrawingStemDir();
     }
     // Finally
     else {
-        LogDebug("Slur across an entire system is not supported");
+        LogDebug("Tie across an entire system is not supported");
         return;
     }
     
-    //layer direction trumps note direction
-    if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
+    /************** direction **************/
+    
+    // first should be the tie @curvedir
+    if (slur->HasCurvedir()) {
+        up = (slur->GetCurvedir() == CURVEDIR_above) ? true : false;
+    }
+    // then layer direction trumps note direction
+    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+    }
+    //  the look if in a chord
+    else if (note1->IsChordTone()) {
+        if (note1->PositionInChord() < 0) up = false;
+        else if (note1->PositionInChord() > 0) up = true;
+        // away from the stem if odd number (center note)
+        else up = (noteStemDir != STEMDIRECTION_up);
     }
     else if (noteStemDir == STEMDIRECTION_up) {
         up = false;
@@ -247,24 +264,66 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         up = (y1 > center) ? true : false;
     }
+
+    /************** y position **************/
     
-    // FIXME, take in account elements that can be netween notes, eg keys time etc
-    // 20 height nice with 70, not nice with 50
-    // Also remove HARDCODED values!
     if (up) {
-        y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
-        y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
+        y1 += 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 += 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
-        y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
-        y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 1.6;
+        y1 -= 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 -= 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
+    
+    /************** bezier points **************/
+    
+    float slurAngle = atan2(y2 - y1, x2 - x1);
+    Point center = Point(x1, y1);
+    Point rotatedP2 = View::CalcPositionAfterRotation(Point(x2, y2), -slurAngle, center);
+    //LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
+    
+    
+    
+    // the 'height' of the bezier
+    int height;
+    if (slur->HasBulge()){
+        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slur->GetBulge();
+    }
+    else {
+        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // if the space between the to points is more than two staff height, increase the height
+        if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
+            height +=  m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        }
+    }
+    int thickness =  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR ;
+    
+    // control points
+    Point rotatecC1, rotatedC2;
+    
+    // the height of the control points
+    height = height * 4 / 3;
+    
+    rotatecC1.x = x1 + (rotatedP2.x - x1) / 4; // point at 1/4
+    rotatedC2.x = x1 + (rotatedP2.x - x1) / 4 * 3; // point at 3/4
+    
+    if (up) {
+        rotatecC1.y = y1 + height;
+        rotatedC2.y = rotatedP2.y + height;
+    } else {
+        rotatecC1.y = y1 - height;
+        rotatedC2.y = rotatedP2.y - height;
+    }
+    
+    Point actualP2 = View::CalcPositionAfterRotation(rotatedP2, slurAngle, center);
+    Point actualC1 = View::CalcPositionAfterRotation(rotatecC1, slurAngle, center);
+    Point actualC2 = View::CalcPositionAfterRotation(rotatedC2, slurAngle, center);
     
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
     else dc->StartGraphic(slur, "spanning-slur", "");
     dc->DeactivateGraphic();
-    // Should be change and use DrawThickBezierCurve
-    DrawSlurBezier(dc, x1, y1, x2, y2, !up, staff->m_drawingStaffSize);
+    DrawThickBezierCurve(dc, center, actualP2, actualC1, actualC2, thickness, staff->m_drawingStaffSize );
     dc->ReactivateGraphic();
     
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
@@ -417,6 +476,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     // control points
     Point c1, c2;
     
+    // the height of the control points
     height = height * 4 / 3;
     
     c1.x = x1 + (x2 - x1) / 4; // point at 1/4

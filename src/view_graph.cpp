@@ -214,8 +214,8 @@ void View::DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1,
     bez1[4] = ToDeviceContextX(p2.x); bez1[5] = ToDeviceContextY(p2.y);
     
     // second bez. goes back
-    bez2[0] = ToDeviceContextX(c2.x); bez2[1] = ToDeviceContextY(c1.y - thickness / 2);
-    bez2[2] = ToDeviceContextX(c1.x); bez2[3] = ToDeviceContextY(c2.y - thickness / 2);
+    bez2[0] = ToDeviceContextX(c2.x); bez2[1] = ToDeviceContextY(c2.y - thickness / 2);
+    bez2[2] = ToDeviceContextX(c1.x); bez2[3] = ToDeviceContextY(c1.y - thickness / 2);
     bez2[4] = ToDeviceContextX(p1.x); bez2[5] = ToDeviceContextY(p1.y);
     
     // Actually draw it
