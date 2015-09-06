@@ -246,7 +246,8 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         
         if ( label.length() != 0) {
             // HARDCODED
-            int x_label = x - 4 * m_doc->GetDrawingBeamWidth(100, false);
+            int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+            int x_label = x - space;
             int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
         
             dc->SetBrush( m_currentColour, AxSOLID );
@@ -260,7 +261,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 LogDebug("Staff or System missing in View::DrawStaffDefLabels");
             }
             else {
-                system->SetDrawingLabelsWidth( w );
+                system->SetDrawingLabelsWidth( w + space );
             }
         
             dc->StartText( ToDeviceContextX( x_label ), ToDeviceContextY( y_label ), RIGHT );
@@ -339,7 +340,8 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         }
         
         // HARDCODED
-        int x = system->GetDrawingX() - 3 * m_doc->GetDrawingBeamWidth(100, false);
+        int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
+        int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         
         dc->SetBrush( m_currentColour, AxSOLID );
@@ -347,7 +349,7 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         
         // keep the widest width for the system
         dc->GetTextExtent( label, &w, &h);
-        system->SetDrawingLabelsWidth( w );
+        system->SetDrawingLabelsWidth( w + space );
         
         dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
         dc->DrawText( label );
