@@ -1,0 +1,12 @@
+<measure n="2">
+  <staff n="1">
+    <layer n="1">
+      <chord tie="m" dur="2">
+        <note xml:id="n6" pname="c" oct="4" dur="8"/>
+        <note xml:id="n7" pname="e" oct="4" dur="8"/>
+        <note xml:id="n8" pname="g" oct="4" dur="8"/>
+        <note xml:id="n9" pname="c" oct="5" dur="8" tie="i"/>
+      </chord>
+    </layer>
+  </staff>
+</measure>

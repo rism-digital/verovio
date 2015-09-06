@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Ties on chords example (3)</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest dur="16"/>
+                                    <beam>
+                                        <note xml:id="s2n1" pname="c" oct="5" dur="16"/>
+                                        <note xml:id="s2n2" pname="g" oct="4" dur="16"/>
+                                        <note xml:id="s2n3" pname="e" oct="4" dur="16"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <tie startid="s2n3" endid="s2n7" bulge="1.0" curvedir="below"/>
+                            <tie startid="s2n2" endid="s2n8" bulge="1.0" curvedir="above"/>
+                            <tie startid="s2n1" endid="s2n9" bulge="1.0" curvedir="above"/>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord dur="2">
+                                        <note xml:id="s2n6" pname="c" oct="4" dur="8"/>
+                                        <note xml:id="s2n7" pname="e" oct="4" dur="8"/>
+                                        <note xml:id="s2n8" pname="g" oct="4" dur="8"/>
+                                        <note xml:id="s2n9" pname="c" oct="5" dur="8"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <tie startid="s2n6" endid="s2n11"/>
+                            <tie startid="s2n7" endid="s2n12"/>
+                            <tie startid="s2n8" endid="s2n13"/>
+                            <tie startid="s2n9" endid="s2n14"/>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord dur="2">
+                                        <note xml:id="s2n11" pname="c" oct="4" dur="8"/>
+                                        <note xml:id="s2n12" pname="e" oct="4" dur="8"/>
+                                        <note xml:id="s2n13" pname="g" oct="4" dur="8"/>
+                                        <note xml:id="s2n14" pname="c" oct="5" dur="8"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <tie startid="s2n12" endid="s2n17" bulge="1.0" curvedir="below"/>
+                            <tie startid="s2n13" endid="s2n18" bulge="1.0" curvedir="above"/>
+                            <tie startid="s2n14" endid="s2n19" bulge="1.0" curvedir="above"/>
+                        </measure>
+                        <measure n="4" right="invis">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="s2n17" pname="e" oct="4" dur="16"/>
+                                        <note xml:id="s2n18" pname="g" oct="4" dur="16"/>
+                                        <note xml:id="s2n19" pname="c" oct="5" dur="16"/>
+                                    </beam>
+                                    <rest dur="16"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

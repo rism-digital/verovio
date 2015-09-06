@@ -15,7 +15,7 @@
             <mdiv>
                 <score>
                     <scoreDef meter.count="2" meter.unit="4" key.sig="4f" meter.rend="invis">
-                        <staffGrp xml:id="P1" symbol="brace" label="Part_1">
+                        <staffGrp xml:id="P1" symbol="brace">
                             <staffDef n="1" lines="5" clef.line="2" clef.shape="G" key.sig="4f"/>
                             <staffDef n="2" lines="5" clef.line="4" clef.shape="F" key.sig="4f"/>
                         </staffGrp>

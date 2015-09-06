@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Ties on chords example (2)</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest dur="16"/>
+                                    <beam>
+                                        <note xml:id="n1" pname="c" oct="4" dur="16" tie="i"/>
+                                        <note xml:id="n2" pname="e" oct="4" dur="16" tie="i"/>
+                                        <note xml:id="n3" pname="g" oct="4" dur="16" tie="i"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord tie="m" dur="2">
+                                        <note xml:id="n6" pname="c" oct="4" dur="8"/>
+                                        <note xml:id="n7" pname="e" oct="4" dur="8"/>
+                                        <note xml:id="n8" pname="g" oct="4" dur="8"/>
+                                        <note xml:id="n9" pname="c" oct="5" dur="8" tie="i"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord tie="m" dur="2">
+                                        <note xml:id="n11" pname="c" oct="4" dur="8"/>
+                                        <note xml:id="n12" pname="e" oct="4" dur="8"/>
+                                        <note xml:id="n13" pname="g" oct="4" dur="8"/>
+                                        <note xml:id="n14" pname="c" oct="5" dur="8" tie="t"/>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="4" right="invis">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="n17" pname="g" oct="4" dur="16" tie="t"/>
+                                        <note xml:id="n18" pname="e" oct="4" dur="16" tie="t"/>
+                                        <note xml:id="n19" pname="c" oct="4" dur="16" tie="t"/>
+                                    </beam>
+                                    <rest dur="16"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

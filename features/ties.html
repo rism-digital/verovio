@@ -2,12 +2,62 @@
 ---
 <h3>Ties</h3>
 
-
 <p>
 	Verovio supports both ties encoded with <code>@tie</code> attributes or with <code>&lt;tie&gt;</code> elements. Ties overlapping two measures and interrupted by a system break or a page break are displayed appropriately.
 </p>
 
-<div id="svg_output" style="overflow:auto;"/>
+<div id="svg_output-tie" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-tie" file="tie.mei" %}
+<div id="code-tie-xml" style="display: none">
+{% highlight xml %}
+{% include features/tie.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
+<p>
+	Verovio determines the tie direction looking at the context (layer, stem direction, chord, etc.). Collision with stem is normally avoided except with short ties and when the context does allow do to so.
+</p>
+
+<div id="svg_output-tie-chords1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-tie-chords1" file="tie-chords1.mei" %}
+<div id="code-tie-chords1-xml" style="display: none">
+{% highlight xml %}
+{% include features/tie-chords1.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
+<p>
+	With chords, the <code>@tie</code> attribute can be set in the chord or in the notes. It can also be overwritten in the note if necessary.
+</p>
+
+<div id="svg_output-tie-chords2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-tie-chords2" file="tie-chords2.mei" %}
+<div id="code-tie-chords2-xml" style="display: none">
+{% highlight xml %}
+{% include features/tie-chords2.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
+<p>
+	With <code>&lt;tie&gt;</code> elements, it is possible to specify the direction of the tie and its shape with the <code>@curvedir</code> and <code>@bulge</code> attributes.
+</p>
+
+<div id="svg_output-tie-chords3" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-tie-chords3" file="tie-chords3.mei" %}
+<div id="code-tie-chords3-xml" style="display: none">
+{% highlight xml %}
+{% include features/tie-chords3.txt %}
+{% endhighlight %}
+</div>
+<br/>
+
 <script type="text/javascript">
 //<![CDATA[
 	zoom = 40;
@@ -20,14 +70,19 @@
 	}
 
 	$.get( "{{ site.baseurl }}/examples/features/tie.mei" , function( data ) {
-		load_data( data, $('#svg_output') );
+		load_data( data, $('#svg_output-tie') );
+	});
+	
+	$.get( "{{ site.baseurl }}/examples/features/tie-chords1.mei" , function( data ) {
+		load_data( data, $('#svg_output-tie-chords1') );
+	});
+	
+	$.get( "{{ site.baseurl }}/examples/features/tie-chords2.mei" , function( data ) {
+		load_data( data, $('#svg_output-tie-chords2') );
+	});
+	
+	$.get( "{{ site.baseurl }}/examples/features/tie-chords3.mei" , function( data ) {
+		load_data( data, $('#svg_output-tie-chords3') );
 	});
 //]]>
 </script>
-
-{% include mei-excerpt.html id="code1" file="tie.mei" %}
-<div id="code1-xml" style="display: none">
-{% highlight xml %}
-{% include features/tie.txt %}
-{% endhighlight %}
-</div>

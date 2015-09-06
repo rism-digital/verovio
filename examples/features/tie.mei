@@ -15,15 +15,12 @@
             <mdiv>
                 <score>
                     <scoreDef meter.count="4" meter.unit="4">
-                        <staffGrp>
-                            <staffGrp n="1" symbol="brace" label="Piano">
-                                <staffDef clef.line="2" clef.shape="G" key.mode="major" key.sig="1s" lines="5" n="1" xml:id="sd1"/>
-                                <staffDef clef.line="4" clef.shape="F" key.mode="major" key.sig="1s" lines="5" n="2" xml:id="sd2"/>
-                            </staffGrp>
+                        <staffGrp n="1" symbol="brace" label="Piano">
+                            <staffDef clef.line="2" clef.shape="G" key.mode="major" key.sig="1s" lines="5" n="1" xml:id="sd1"/>
+                            <staffDef clef.line="4" clef.shape="F" key.mode="major" key.sig="1s" lines="5" n="2" xml:id="sd2"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <pb n="1"/>
                         <measure label="feature-example" n="1">
                             <staff n="1">
                                 <layer n="1">

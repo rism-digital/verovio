@@ -1,0 +1,15 @@
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <rest dur="16"/>
+      <beam>
+        <note xml:id="s2n1" pname="c" oct="5" dur="16"/>
+        <note xml:id="s2n2" pname="g" oct="4" dur="16"/>
+        <note xml:id="s2n3" pname="e" oct="4" dur="16"/>
+      </beam>
+    </layer>
+  </staff>
+  <tie startid="s2n3" endid="s2n7" bulge="1.0" curvedir="below"/>
+  <tie startid="s2n2" endid="s2n8" bulge="1.0" curvedir="above"/>
+  <tie startid="s2n1" endid="s2n9" bulge="1.0" curvedir="above"/>
+</measure>

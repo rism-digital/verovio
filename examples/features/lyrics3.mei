@@ -7,7 +7,7 @@
             <titleStmt>
                 <title>Lyric connector example</title>
             </titleStmt>
-            <pubStmt></pubStmt>
+            <pubStmt/>
         </fileDesc>
     </meiHead>
     <music>
@@ -15,10 +15,8 @@
             <mdiv>
                 <score>
                     <scoreDef meter.sym="common">
-                        <staffGrp>
-                            <staffGrp n="1" symbol="bracket">
-                                <staffDef clef.line="2" clef.shape="G" key.sig="1f" lines="5" n="1"/>
-                            </staffGrp>
+                        <staffGrp n="1">
+                            <staffDef clef.line="2" clef.shape="G" key.sig="1f" lines="5" n="1"/>
                         </staffGrp>
                     </scoreDef>
                     <section>

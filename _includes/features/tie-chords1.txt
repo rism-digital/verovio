@@ -1,0 +1,63 @@
+<section>
+  <measure label="1" n="1">
+    <staff n="1">
+      <layer n="1">
+        <rest dur="8"/>
+        <note dur="8" oct="4" pname="b" tie="i"/>
+        <note dur="2" oct="4" pname="b" tie="t"/>
+        <chord dur="4" tie="i">
+          <note dur="4" oct="4" pname="e" tie="i"/>
+          <note dur="4" oct="4" pname="g" tie="i"/>
+          <note dur="4" oct="4" pname="b" tie="i"/>
+          <note dur="4" oct="5" pname="d" tie="i"/>
+          <note dur="4" oct="5" pname="f" tie="i"/>
+        </chord>
+      </layer>
+      <layer n="2">
+        <space dur="8"/>
+        <note dur="8" oct="4" pname="g" tie="i"/>
+        <note dur="2" oct="4" pname="g" tie="t"/>
+        <space dur="4"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <chord dur="2" tie="t">
+          <note dur="4" oct="4" pname="e" tie="t"/>
+          <note dur="4" oct="4" pname="g" tie="t"/>
+          <note dur="4" oct="4" pname="b" tie="t"/>
+          <note dur="4" oct="5" pname="d" tie="t"/>
+          <note dur="4" oct="5" pname="f" tie="t"/>
+        </chord>
+        <chord dur="2">
+          <note dur="4" oct="4" pname="e" xml:id="n01"/>
+          <note dur="4" oct="4" pname="g" xml:id="n02"/>
+          <note dur="4" oct="4" pname="b" xml:id="n03"/>
+          <note dur="4" oct="5" pname="d" xml:id="n04"/>
+          <note dur="4" oct="5" pname="f" xml:id="n05"/>
+        </chord>
+      </layer>
+    </staff>
+    <tie startid="n01" endid="n06"/>
+    <tie startid="n02" endid="n07"/>
+    <tie startid="n03" endid="n08"/>
+    <tie startid="n04" endid="n09"/>
+    <tie startid="n05" endid="n10"/>
+  </measure>
+  <measure n="3" right="end">
+    <staff n="1">
+      <layer n="1">
+        <chord dur="2">
+          <note dur="4" oct="4" pname="e" xml:id="n06"/>
+          <note dur="4" oct="4" pname="g" xml:id="n07"/>
+          <note dur="4" oct="4" pname="b" xml:id="n08"/>
+          <note dur="4" oct="5" pname="d" xml:id="n09"/>
+          <note dur="4" oct="5" pname="f" xml:id="n10"/>
+        </chord>
+        <rest dur="2"/>
+      </layer>
+    </staff>
+  </measure>
+</section>
