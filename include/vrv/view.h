@@ -157,7 +157,6 @@ protected:
 	void DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
     void DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff,  Measure *measure );
     void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId );
-	void DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height = -1);
     ///@}
     
     /**
@@ -312,7 +311,6 @@ protected:
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
     void DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize);
-    void DrawSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction, int staffSize);
     void DrawPartFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
 	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
@@ -333,6 +331,8 @@ private:
     bool OneBeamInTuplet(Tuplet* tuplet);
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
+    
+    void AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
     
     /**
      * @name Used for calculating clustered information/dot position
@@ -358,7 +358,13 @@ private:
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center
      */
-    static Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center);
+    static Point CalcPositionAfterRotation(Point point , float rot_alpha, Point center);
+    
+    /**
+     * Calculate the position of a point after a rotation of rot_alpha around the center
+     */
+    static int CalcBezierAtPosition(Point bezier[], int x);
+    
     
     /**
      * Swap values passed as reference.
@@ -401,7 +407,9 @@ protected:
     ScoreDef m_drawingScoreDef;
     
 private:
-
+    /** buffer for De-Casteljau algorithm */
+    static int s_deCasteljau[4][4];
+    
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
     static int s_drawingLigX[2], s_drawingLigY[2];   

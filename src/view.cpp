@@ -20,6 +20,8 @@
 #include "page.h"
 
 namespace vrv {
+    
+int View::s_deCasteljau[4][4];
 
 //----------------------------------------------------------------------------
 // View
@@ -190,5 +192,23 @@ Point View::CalcPositionAfterRotation( Point point , float rot_alpha, Point cent
     point.y = ynew + center.y;
     return point;
 }
-
+    
+int View::CalcBezierAtPosition(Point bezier[], int x)
+{
+    int i, j;
+    double t = 0.0;
+    // avoid division by 0
+    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x) ;
+    t = std::min(1.0, std::max(0.0, t));
+    int n = 4;
+    
+    for(i = 0; i < n; i++) View::s_deCasteljau[0][i] = bezier[i].y;
+    for(j = 1; j < n; j++) {
+        for(int i = 0; i < 4 - j; i++) {
+            View::s_deCasteljau[j][i] = View::s_deCasteljau[j-1][i] * (1-t) + View::s_deCasteljau[j-1][i+1] * t;
+        }
+    }
+    return View::s_deCasteljau[n-1][0];
+}
+    
 } // namespace vrv

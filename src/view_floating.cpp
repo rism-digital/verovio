@@ -16,36 +16,22 @@
 
 //----------------------------------------------------------------------------
 
-//#include "accid.h"
 #include "att_comparison.h"
-//#include "beam.h"
-//#include "chord.h"
-//#include "custos.h"
+#include "bboxdevicecontext.h"
 #include "devicecontext.h"
 #include "doc.h"
-//#include "dot.h"
 #include "floatingelement.h"
-//#include "keysig.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
-//#include "mensur.h"
-//#include "metersig.h"
-//#include "mrest.h"
-//#include "multirest.h"
 #include "note.h"
-//#include "rest.h"
 #include "slur.h"
-//#include "space.h"
-//#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "tie.h"
 #include "timeinterface.h"
-//#include "tuplet.h"
-//#include "verse.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -202,14 +188,12 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         return;
     }
     
-    Chord *chordParent1 = note1->IsChordTone();
-    
     Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent( LAYER ) );
     Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent( LAYER ) );
     assert( layer1 && layer2 );
     
     if ( layer1->GetN() != layer2->GetN() ) {
-        LogWarning("Ties between different layers may not be fully supported.");
+        LogWarning("Slurs between different layers may not be fully supported.");
     }
     
     /************** x positions **************/
@@ -233,10 +217,11 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         y2 = y1;
         noteStemDir = note2->GetDrawingStemDir();
     }
-    // Finally
+    // Finally, slur accross an entire system; use the staff position and up
     else {
-        LogDebug("Tie across an entire system is not supported");
-        return;
+        y1 = staff->GetDrawingY();
+        y2 = y1;
+        noteStemDir = STEMDIRECTION_down;
     }
     
     /************** direction **************/
@@ -276,14 +261,51 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         y2 -= 2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     
-    /************** bezier points **************/
+    Point points[4];
+    points[0] = Point(x1, y1);
+    points[1] = Point(x2, y2);
     
-    float slurAngle = atan2(y2 - y1, x2 - x1);
-    Point center = Point(x1, y1);
-    Point rotatedP2 = View::CalcPositionAfterRotation(Point(x2, y2), -slurAngle, center);
+    AdjustSlurPosition(slur, staff, layer1->GetN(), up, points);
+    
+    int thickness =  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR ;
+    
+    if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else dc->StartGraphic(slur, "spanning-slur", "");
+    dc->DeactivateGraphic();
+    DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize );
+    dc->ReactivateGraphic();
+    
+    if ( graphic ) dc->EndResumedGraphic(graphic, this);
+    else dc->EndGraphic(slur, this);
+}
+    
+void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[])
+{
+    // For readability makes them p1 and p2
+    Point *p1 = &points[0];
+    Point *p2 = &points[1];
+    
+    /************** angle **************/
+    
+    float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
+    
+    // the slope of the slur is high and needs to be corrected
+    if (fabs(slurAngle) > TEMP_STYLE_MAX_SLUR_SLOPE) {
+        int side = (p2->x - p1->x) * sin(TEMP_STYLE_MAX_SLUR_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_MAX_SLUR_SLOPE);
+        if (p2->y > p1->y) {
+            p1->y = p2->y - side;
+            slurAngle = TEMP_STYLE_MAX_SLUR_SLOPE;
+        }
+        else {
+            p2->y = p1->y - side;
+            slurAngle = -TEMP_STYLE_MAX_SLUR_SLOPE;
+        }
+    }
+    
+    Point rotatedP2 = View::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
     //LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
     
-    
+    /************** height **************/
     
     // the 'height' of the bezier
     int height;
@@ -291,13 +313,11 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slur->GetBulge();
     }
     else {
-        height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        // if the space between the to points is more than two staff height, increase the height
-        if (x2 - x1 > 2 * m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)) {
-            height +=  m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        }
+        //height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        int dist = abs( p2->x - p1->x );
+        height = std::max(  m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
+        height = std::min( m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, height );
     }
-    int thickness =  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR ;
     
     // control points
     Point rotatecC1, rotatedC2;
@@ -305,29 +325,62 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     // the height of the control points
     height = height * 4 / 3;
     
-    rotatecC1.x = x1 + (rotatedP2.x - x1) / 4; // point at 1/4
-    rotatedC2.x = x1 + (rotatedP2.x - x1) / 4 * 3; // point at 3/4
+    int cPos = std::min((rotatedP2.x - p1->x) / TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
+    rotatecC1.x = p1->x + cPos; // point at 1/4
+    rotatedC2.x = p2->x - cPos;; // point at 3/4
     
     if (up) {
-        rotatecC1.y = y1 + height;
+        rotatecC1.y = p1->y + height;
         rotatedC2.y = rotatedP2.y + height;
     } else {
-        rotatecC1.y = y1 - height;
+        rotatecC1.y = p1->y - height;
         rotatedC2.y = rotatedP2.y - height;
     }
     
-    Point actualP2 = View::CalcPositionAfterRotation(rotatedP2, slurAngle, center);
-    Point actualC1 = View::CalcPositionAfterRotation(rotatecC1, slurAngle, center);
-    Point actualC2 = View::CalcPositionAfterRotation(rotatedC2, slurAngle, center);
+    points[1] = View::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+    points[2] = View::CalcPositionAfterRotation(rotatecC1, slurAngle, *p1);
+    points[3] = View::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
     
-    if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
-    else dc->StartGraphic(slur, "spanning-slur", "");
-    dc->DeactivateGraphic();
-    DrawThickBezierCurve(dc, center, actualP2, actualC1, actualC2, thickness, staff->m_drawingStaffSize );
-    dc->ReactivateGraphic();
     
-    if ( graphic ) dc->EndResumedGraphic(graphic, this);
-    else dc->EndGraphic(slur, this);
+    
+    System *system = dynamic_cast<System*>(staff->GetFirstParent(SYSTEM));
+    assert(system);
+    std::vector<LayerElement*>spanningContent;
+    ArrayPtrVoid params;
+    params.push_back(&spanningContent);
+    params.push_back(&p1->x);
+    params.push_back(&p2->x);
+    std::vector<AttComparison*> filters;
+    // Create ad comparison object for each type / @n
+    // For now we only look at one layer (assumed layer1 == layer2)
+    AttCommonNComparison matchStaff( STAFF, staff->GetN() );
+    AttCommonNComparison matchLayer( LAYER, layerN );
+    filters.push_back( &matchStaff );
+    filters.push_back( &matchLayer );
+    
+    //paramsTieAttr.push_back( &currentNotes );
+    //paramsTieAttr.push_back( &currentChord );
+    Functor timeSpanningLayerElements( &Object::TimeSpanningLayerElements );
+    //LogDebug("*** %d - %d", note1->GetDrawingX(), note2->GetDrawingX() ) ;
+    system->Process( &timeSpanningLayerElements, &params, NULL, &filters );
+    if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
+    
+    /*
+     Point bezier[4];
+     bezier[0].x = 100;
+     bezier[1].x = 200;
+     bezier[2].x = 300;
+     bezier[3].x = 400;
+     bezier[0].y = 000;
+     bezier[1].y = 100;
+     bezier[2].y = 100;
+     bezier[3].y = 000;
+     
+     int p = View::CalcBezierAtPosition(bezier, 24550);
+     p;
+     */
+    
+    
 }
     
 void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,

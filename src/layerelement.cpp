@@ -422,4 +422,23 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::TimeSpanningLayerElements( ArrayPtrVoid *params )
+{
+    // param 0: a pointer to the vector of LayerElement pointer to fill
+    // param 1: the minimum position
+    // param 2: the maximum position
+    std::vector<LayerElement*> *spanningContent = static_cast<std::vector<LayerElement*>*>((*params).at(0));
+    int *min_pos = static_cast<int*>((*params).at(1));
+    int *max_pos = static_cast<int*>((*params).at(2));
+    
+    if (this->GetDrawingX() >= (*min_pos) && this->GetDrawingX() <= (*max_pos)) {
+        if (this->Is() == NOTE) spanningContent->push_back(this);
+    }
+    else if (this->GetDrawingX() > (*max_pos) ) {
+        return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_CONTINUE;    
+}
+
 } // namespace vrv

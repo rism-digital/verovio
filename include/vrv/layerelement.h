@@ -121,6 +121,8 @@ public:
      */
     virtual int SetDrawingXY( ArrayPtrVoid *params );
     
+    virtual int TimeSpanningLayerElements( ArrayPtrVoid *params );
+    
 private:
     
 public:
