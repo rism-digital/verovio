@@ -3625,13 +3625,13 @@ AttMultinummeasures::~AttMultinummeasures() {
 }
 
 void AttMultinummeasures::ResetMultinummeasures() {
-    m_multiNumber = "";
+    m_multiNumber = BOOLEAN_NONE;
 }
 
 bool AttMultinummeasures::ReadMultinummeasures(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("multi.number")) {
-        this->SetMultiNumber(StrToStr(element.attribute("multi.number").value()));
+        this->SetMultiNumber(StrToBool(element.attribute("multi.number").value()));
         element.remove_attribute("multi.number");
         hasAttribute = true;
     }
@@ -3641,7 +3641,7 @@ bool AttMultinummeasures::ReadMultinummeasures(  pugi::xml_node element ) {
 bool AttMultinummeasures::WriteMultinummeasures(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasMultiNumber()) {
-        element.append_attribute("multi.number") = StrToStr(this->GetMultiNumber()).c_str();
+        element.append_attribute("multi.number") = BoolToStr(this->GetMultiNumber()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -3649,7 +3649,7 @@ bool AttMultinummeasures::WriteMultinummeasures(  pugi::xml_node element ) {
 
 bool AttMultinummeasures::HasMultiNumber( )
 {
-    return (m_multiNumber != "");
+    return (m_multiNumber != BOOLEAN_NONE);
 }
 
 
@@ -5341,13 +5341,13 @@ AttStaffGrpVis::~AttStaffGrpVis() {
 }
 
 void AttStaffGrpVis::ResetStaffGrpVis() {
-    m_barthru = "";
+    m_barthru = BOOLEAN_NONE;
 }
 
 bool AttStaffGrpVis::ReadStaffGrpVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("barthru")) {
-        this->SetBarthru(StrToStr(element.attribute("barthru").value()));
+        this->SetBarthru(StrToBool(element.attribute("barthru").value()));
         element.remove_attribute("barthru");
         hasAttribute = true;
     }
@@ -5357,7 +5357,7 @@ bool AttStaffGrpVis::ReadStaffGrpVis(  pugi::xml_node element ) {
 bool AttStaffGrpVis::WriteStaffGrpVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasBarthru()) {
-        element.append_attribute("barthru") = StrToStr(this->GetBarthru()).c_str();
+        element.append_attribute("barthru") = BoolToStr(this->GetBarthru()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5365,7 +5365,7 @@ bool AttStaffGrpVis::WriteStaffGrpVis(  pugi::xml_node element ) {
 
 bool AttStaffGrpVis::HasBarthru( )
 {
-    return (m_barthru != "");
+    return (m_barthru != BOOLEAN_NONE);
 }
 
 
@@ -5384,13 +5384,13 @@ AttStaffgroupingsym::~AttStaffgroupingsym() {
 }
 
 void AttStaffgroupingsym::ResetStaffgroupingsym() {
-    m_symbol = "";
+    m_symbol = SYMBOL_NONE;
 }
 
 bool AttStaffgroupingsym::ReadStaffgroupingsym(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("symbol")) {
-        this->SetSymbol(StrToStr(element.attribute("symbol").value()));
+        this->SetSymbol(StrToSymbol(element.attribute("symbol").value()));
         element.remove_attribute("symbol");
         hasAttribute = true;
     }
@@ -5400,7 +5400,7 @@ bool AttStaffgroupingsym::ReadStaffgroupingsym(  pugi::xml_node element ) {
 bool AttStaffgroupingsym::WriteStaffgroupingsym(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasSymbol()) {
-        element.append_attribute("symbol") = StrToStr(this->GetSymbol()).c_str();
+        element.append_attribute("symbol") = SymbolToStr(this->GetSymbol()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5408,7 +5408,7 @@ bool AttStaffgroupingsym::WriteStaffgroupingsym(  pugi::xml_node element ) {
 
 bool AttStaffgroupingsym::HasSymbol( )
 {
-    return (m_symbol != "");
+    return (m_symbol != SYMBOL_NONE);
 }
 
 
@@ -7677,7 +7677,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
         assert( att );
         if (attrType == "multiNumber") {
-            att->SetMultiNumber(att->StrToStr(attrValue));
+            att->SetMultiNumber(att->StrToBool(attrValue));
             return true;
         }
     }
@@ -8041,7 +8041,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttStaffGrpVis *att = dynamic_cast<AttStaffGrpVis*>(element);
         assert( att );
         if (attrType == "barthru") {
-            att->SetBarthru(att->StrToStr(attrValue));
+            att->SetBarthru(att->StrToBool(attrValue));
             return true;
         }
     }
@@ -8049,7 +8049,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttStaffgroupingsym *att = dynamic_cast<AttStaffgroupingsym*>(element);
         assert( att );
         if (attrType == "symbol") {
-            att->SetSymbol(att->StrToStr(attrValue));
+            att->SetSymbol(att->StrToSymbol(attrValue));
             return true;
         }
     }
@@ -8984,7 +8984,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
         assert( att );
         if (att->HasMultiNumber()) {
-            attributes->push_back(std::make_pair("multiNumber", att->StrToStr(att->GetMultiNumber())));
+            attributes->push_back(std::make_pair("multiNumber", att->BoolToStr(att->GetMultiNumber())));
         }
     }
     if (element->HasAttClass( ATT_NAME ) ) {
@@ -9284,14 +9284,14 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttStaffGrpVis *att = dynamic_cast<AttStaffGrpVis*>(element);
         assert( att );
         if (att->HasBarthru()) {
-            attributes->push_back(std::make_pair("barthru", att->StrToStr(att->GetBarthru())));
+            attributes->push_back(std::make_pair("barthru", att->BoolToStr(att->GetBarthru())));
         }
     }
     if (element->HasAttClass( ATT_STAFFGROUPINGSYM ) ) {
         AttStaffgroupingsym *att = dynamic_cast<AttStaffgroupingsym*>(element);
         assert( att );
         if (att->HasSymbol()) {
-            attributes->push_back(std::make_pair("symbol", att->StrToStr(att->GetSymbol())));
+            attributes->push_back(std::make_pair("symbol", att->SymbolToStr(att->GetSymbol())));
         }
     }
     if (element->HasAttClass( ATT_STAFFIDENT ) ) {

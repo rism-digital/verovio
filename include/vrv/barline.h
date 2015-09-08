@@ -35,8 +35,11 @@ public:
     virtual void Reset();
     virtual Object* Clone() { return new Barline(*this); };
     virtual std::string GetClassName( ) { return "Barline"; };
-    virtual ClassId Is() { return BAR_LINE; };
-    ///@}  
+    virtual ClassId Is() { return BARLINE; };
+    ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
     /**
      * Use to set the alignment for the Measure Barline members.
@@ -77,7 +80,7 @@ public:
     virtual ~BarlineAttr();
     virtual Object* Clone() { return new BarlineAttr(*this); };
     virtual std::string GetClassName( ) { return "BarlineAttr"; };
-    virtual ClassId Is() { return BAR_LINE_ATTR; };
+    virtual ClassId Is() { return BARLINE_ATTR; };
     ///@}
 };
     

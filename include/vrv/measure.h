@@ -92,6 +92,11 @@ public:
     ///@}
     
     int GetXRel( );
+
+    /**
+     * Return the non justifiable with for the measure
+     */
+    int GetNonJustifiableLeftMargin() { return m_measureAligner.GetNonJustifiableMargin(); }
     
     /** 
      * Return the X rel position of the right barLine (without its width)

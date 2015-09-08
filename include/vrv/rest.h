@@ -37,6 +37,9 @@ public:
     virtual ClassId Is() { return REST; };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
 private:
     
 public:

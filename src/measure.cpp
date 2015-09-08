@@ -142,13 +142,17 @@ int Measure::AlignHorizontally( ArrayPtrVoid *params )
     // param 1: the time (unused)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
-    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params)[0]);
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params).at(0));
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
     
     // clear the content of the measureAligner
     m_measureAligner.Reset();
+    
+    // here we transfer the @left and @right values to the barLine objects
+    this->SetLeftBarlineType( this->GetLeft() );
+    this->SetRightBarlineType( this->GetRight() );
     
     // point to it
     (*measureAligner) = &m_measureAligner;
@@ -173,7 +177,7 @@ int Measure::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner (unused)
     // param 1: the staffNb
-    int *staffNb = static_cast<int*>((*params)[1]);
+    int *staffNb = static_cast<int*>((*params).at(1));
     
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
@@ -187,7 +191,7 @@ int Measure::AlignVertically( ArrayPtrVoid *params )
 int Measure::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
 {
     // param 0: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxGraceXShift = static_cast<Functor*>((*params)[0]);
+    Functor *integrateBoundingBoxGraceXShift = static_cast<Functor*>((*params).at(0));
     
     m_measureAligner.Process( integrateBoundingBoxGraceXShift, params );
     
@@ -198,8 +202,9 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift (unused)
     // param 1: the cumulated justifiable shift (unused)
-    // param 2: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params)[2]);
+    // param 2: the minimum measure with (unused)
+    // param 3: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(3));
     
     m_measureAligner.Process( integrateBoundingBoxShift, params );
     
@@ -210,9 +215,8 @@ int Measure::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
-    // param 2: the minimum measure width (unused)
-    // param 3: the functor to be redirected to Aligner
-    Functor *setAligmnentPosX = static_cast<Functor*>((*params)[3]);
+    // param 2: the functor to be redirected to Aligner
+    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(2));
     
     m_measureAligner.Process( setAligmnentPosX, params);
     
@@ -226,8 +230,8 @@ int Measure::JustifyX( ArrayPtrVoid *params )
     // param 2: the non justifiable margin (unused)
     // param 3: the system full width (without system margins) (unused)
     // param 4: the functor to be redirected to the MeasureAligner
-    double *ratio = static_cast<double*>((*params)[0]);
-    Functor *justifyX = static_cast<Functor*>((*params)[4]);
+    double *ratio = static_cast<double*>((*params).at(0));
+    Functor *justifyX = static_cast<Functor*>((*params).at(4));
     
     this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
     
@@ -240,7 +244,7 @@ int Measure::JustifyX( ArrayPtrVoid *params )
 int Measure::AlignMeasures( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift
-    int *shift = static_cast<int*>((*params)[0]);
+    int *shift = static_cast<int*>((*params).at(0));
     
     this->m_drawingXRel = (*shift);
     
@@ -264,11 +268,11 @@ int Measure::CastOffSystems( ArrayPtrVoid *params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
     // param 4: the system width
-    System *contentSystem = static_cast<System*>((*params)[0]);
-    Page *page = static_cast<Page*>((*params)[1]);
-    System **currentSystem = static_cast<System**>((*params)[2]);
-    int *shift = static_cast<int*>((*params)[3]);
-    int *systemWidth = static_cast<int*>((*params)[4]);
+    System *contentSystem = static_cast<System*>((*params).at(0));
+    Page *page = static_cast<Page*>((*params).at(1));
+    System **currentSystem = static_cast<System**>((*params).at(2));
+    int *shift = static_cast<int*>((*params).at(3));
+    int *systemWidth = static_cast<int*>((*params).at(4));
     
     if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetWidth() - (*shift) > (*systemWidth) ) ) {
         (*currentSystem) = new System();
@@ -296,10 +300,10 @@ int Measure::SetDrawingXY( ArrayPtrVoid *params )
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
-    Doc *doc = static_cast<Doc*>((*params)[0]);
-    System **currentSystem = static_cast<System**>((*params)[1]);
-    Measure **currentMeasure = static_cast<Measure**>((*params)[2]);
-    bool *processLayerElements = static_cast<bool*>((*params)[6]);
+    Doc *doc = static_cast<Doc*>((*params).at(0));
+    System **currentSystem = static_cast<System**>((*params).at(1));
+    Measure **currentMeasure = static_cast<Measure**>((*params).at(2));
+    bool *processLayerElements = static_cast<bool*>((*params).at(6));
     
     (*currentMeasure) = this;
     

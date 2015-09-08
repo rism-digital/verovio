@@ -60,16 +60,16 @@ enum ClassId {
     DOC,
     DOC_OBJECT,
     GRACE_ALIGNER,
-    KEY_SIG_ATTR,
+    KEYSIG_ATTR,
     LAYER,
     MEASURE,
     MEASURE_ALIGNER,
     MENSUR_ATTR,
-    METER_SIG_ATTR,
+    METERSIG_ATTR,
     PAGE,
     STAFF,
     STAFF_ALIGNMENT,
-    STAFF_GRP,
+    STAFFGRP,
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
@@ -84,18 +84,22 @@ enum ClassId {
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,
-    BAR_LINE,
-    BAR_LINE_ATTR,
+    BARLINE,
+    BARLINE_ATTR,
     BEAM,
+    BEATRPT,
     CHORD,
     CLEF,
     CUSTOS,
     DOT,
-    KEY_SIG,
+    KEYSIG,
     MENSUR,
-    METER_SIG,
+    METERSIG,
     MREST,
-    MULTI_REST,
+    MRPT,
+    MRPT2,
+    MULTIREST,
+    MULTIRPT,
     NOTE,
     PROPORT,
     REST,
@@ -111,10 +115,10 @@ enum ClassId {
     TIE,
     FLOATING_ELEMENT_max,
     // Ids for ScoreDefElement child classes
-    SCORE_DEF_ELEMENT,
-    SCORE_DEF,
-    STAFF_DEF,
-    SCORE_DEF_ELEMENT_max,
+    SCOREDEF_ELEMENT,
+    SCOREDEF,
+    STAFFDEF,
+    SCOREDEF_ELEMENT_max,
     //
     UNSPECIFIED
 };
@@ -222,14 +226,6 @@ enum EditorialLevel {
 
 #define ON 1
 #define OFF 0
-    
-// the maximum is 255 (unsigned char)
-enum StaffGrpSymbol {
-    STAFFGRP_NONE = 0,
-    STAFFGRP_LINE,
-    STAFFGRP_BRACE,
-    STAFFGRP_BRACKET
-};
     
 /* This is used for fast clef offset calculation.
  * It uses 4 bytes with, from right to left

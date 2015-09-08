@@ -127,6 +127,7 @@ public:
     ///@{
     char GetLeftMargin( const ClassId classId  );
     char GetRightMargin( const ClassId classId );
+    char GetLeftPosition( );
     ///@}
 
     /*

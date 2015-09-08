@@ -342,9 +342,16 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSi
 // StaffGrp
 //----------------------------------------------------------------------------
 
-StaffGrp::StaffGrp() :
-    Object(), ObjectListInterface()
+StaffGrp::StaffGrp() : Object(), ObjectListInterface(),
+    AttCommon(),
+    AttLabelsAddl(),
+    AttStaffgroupingsym(),
+    AttStaffGrpVis()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_LABELSADDL);
+    RegisterAttClass(ATT_STAFFGROUPINGSYM);
+    RegisterAttClass(ATT_STAFFGRPVIS);
     Reset();
 }
 
@@ -355,8 +362,10 @@ StaffGrp::~StaffGrp()
 void StaffGrp::Reset()
 {
     Object::Reset();
-    m_symbol = STAFFGRP_NONE;
-    m_barthru = false;
+    ResetCommon();
+    ResetLabelsAddl();
+    ResetStaffgroupingsym();
+    ResetStaffGrpVis();
 }
 
 void StaffGrp::AddStaffDef( StaffDef *staffDef )
@@ -432,8 +441,8 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
-    System *contentSystem = static_cast<System*>((*params)[0]);
-    System **currentSystem = static_cast<System**>((*params)[2]);
+    System *contentSystem = static_cast<System*>((*params).at(0));
+    System **currentSystem = static_cast<System**>((*params).at(2));
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert( dynamic_cast<System*>(this->m_parent));
@@ -458,10 +467,10 @@ int StaffDef::ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params )
     // param 1: KeySig pointer (NULL if none)
     // param 2: Mensur pointer (NULL if none)
     // param 3: MeterSig pointer (NULL if none)
-    Clef *clef = static_cast<Clef*>((*params)[0]);
-    KeySig *keySig = static_cast<KeySig*>((*params)[1]);
-    Mensur *mensur = static_cast<Mensur*>((*params)[2]);
-    MeterSig *meterSig = static_cast<MeterSig*>((*params)[3]);
+    Clef *clef = static_cast<Clef*>((*params).at(0));
+    KeySig *keySig = static_cast<KeySig*>((*params).at(1));
+    Mensur *mensur = static_cast<Mensur*>((*params).at(2));
+    MeterSig *meterSig = static_cast<MeterSig*>((*params).at(3));
     
     if (clef) {
         this->SetCurrentClef(new Clef(*clef));
@@ -486,11 +495,11 @@ int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid *params )
     // param 2: bool mensur flag
     // param 3: bool meterSig flag
     // param 4: bool keySig cancellation flag
-    bool *clef = static_cast<bool*>((*params)[0]);
-    bool *keysig = static_cast<bool*>((*params)[1]);
-    bool *mensur = static_cast<bool*>((*params)[2]);
-    bool *meterSig = static_cast<bool*>((*params)[3]);
-    bool *keySigCancellation = static_cast<bool*>((*params)[4]);
+    bool *clef = static_cast<bool*>((*params).at(0));
+    bool *keysig = static_cast<bool*>((*params).at(1));
+    bool *mensur = static_cast<bool*>((*params).at(2));
+    bool *meterSig = static_cast<bool*>((*params).at(3));
+    bool *keySigCancellation = static_cast<bool*>((*params).at(4));
     
     if ( (*clef) ) {
         this->SetDrawClef( true );

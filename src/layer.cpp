@@ -21,6 +21,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "rpt.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -97,8 +98,17 @@ void Layer::SetDrawingAndCurrentValues(  StaffDef *currentStaffDef )
     // Remove any previous value in the Layer
     this->StaffDefDrawingInterface::Reset();
     
+    // Special case with C-major / A-minor key signature (0) : if key cancellation is false, we are at the beginning
+    // of a new system, and hence we should not draw it. Maybe this can be improved?
+    bool drawKeySig = currentStaffDef->DrawKeySig();
+    if (currentStaffDef->GetCurrentKeySig() && (currentStaffDef->GetCurrentKeySig()->GetAlterationNumber() == 0)) {
+        if (currentStaffDef->DrawKeySigCancellation() == false) {
+            drawKeySig = false;
+        }
+    }
+    
     this->SetDrawClef( currentStaffDef->DrawClef() );
-    this->SetDrawKeySig( currentStaffDef->DrawKeySig() );
+    this->SetDrawKeySig( drawKeySig ); // see above
     this->SetDrawMensur( currentStaffDef->DrawMensur() );
     this->SetDrawMeterSig( currentStaffDef->DrawMeterSig() );
     this->SetDrawKeySigCancellation( currentStaffDef->DrawKeySigCancellation() );
@@ -165,9 +175,9 @@ int Layer::AlignHorizontally( ArrayPtrVoid *params )
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig
-    double *time = static_cast<double*>((*params)[1]);
-    Mensur **currentMensur = static_cast<Mensur**>((*params)[2]);
-    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params)[3]);
+    double *time = static_cast<double*>((*params).at(1));
+    Mensur **currentMensur = static_cast<Mensur**>((*params).at(2));
+    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params).at(3));
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -200,7 +210,7 @@ int Layer::AlignHorizontallyEnd( ArrayPtrVoid *params )
     // param 1: the time  (unused)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
-    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params)[0]);
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params).at(0));
     
     int i;
     for(i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
@@ -217,9 +227,9 @@ int Layer::PrepareProcessingLists( ArrayPtrVoid *params )
 {
     // param 0: the IntTree* for staff/layer/verse (unused)
     // param 1: the IntTree* for staff/layer
-    IntTree *tree = static_cast<IntTree*>((*params)[1]);
+    IntTree *tree = static_cast<IntTree*>((*params).at(1));
     // Alternate solution with StaffN_LayerN_VerseN_t
-    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params)[0]);
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
     
     Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( STAFF ) );
     assert( staff );
@@ -237,9 +247,9 @@ int Layer::SetDrawingXY( ArrayPtrVoid *params )
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
-    Measure **currentMeasure = static_cast<Measure**>((*params)[2]);
-    Layer **currentLayer = static_cast<Layer**>((*params)[4]);
-    bool *processLayerElements = static_cast<bool*>((*params)[6]);
+    Measure **currentMeasure = static_cast<Measure**>((*params).at(2));
+    Layer **currentLayer = static_cast<Layer**>((*params).at(4));
+    bool *processLayerElements = static_cast<bool*>((*params).at(6));
     
     (*currentLayer) = this;
     
@@ -262,6 +272,20 @@ int Layer::SetDrawingXY( ArrayPtrVoid *params )
         this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
     }
     
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::PrepareRpt( ArrayPtrVoid *params )
+{
+    // param 0: a pointer to the current MRpt pointer
+    // param 1: a pointer to the data_BOOLEAN indicating if multiNumber (unused)
+    // param 2: a pointer to the doc scoreDef (unused)
+    MRpt **currentMRpt =  static_cast<MRpt**>((*params).at(0));
+
+    // If we have encountered a mRpt before and there is none is this layer, reset it to NULL
+    if ((*currentMRpt) && !this->FindChildByType(MRPT)) {
+        (*currentMRpt) = NULL;
+    }
     return FUNCTOR_CONTINUE;
 }
 

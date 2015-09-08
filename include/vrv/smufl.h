@@ -57,6 +57,7 @@ enum {
   SMUFL_E0A3_noteheadHalf = 0xE0A3,
   SMUFL_E0A4_noteheadBlack = 0xE0A4,
   SMUFL_E0FA_noteheadWholeFilled = 0xE0FA,
+  SMUFL_E101_noteheadSlashHorizontalEnds = 0xE101,
   SMUFL_E220_tremolo1 = 0xE220,
   SMUFL_E221_tremolo2 = 0xE221,
   SMUFL_E222_tremolo3 = 0xE222,
@@ -91,6 +92,8 @@ enum {
   SMUFL_E4E9_rest64th = 0xE4E9,
   SMUFL_E4EA_rest128th = 0xE4EA,
   SMUFL_E500_repeat1Bar = 0xE500,
+  SMUFL_E501_repeat2Bars = 0xE501,
+  SMUFL_E502_repeat4Bars = 0xE502,
   SMUFL_E520_dynamicPiano = 0xE520,
   SMUFL_E521_dynamicMezzo = 0xE521,
   SMUFL_E522_dynamicForte = 0xE522,
@@ -129,7 +132,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 104
+#define SMUFL_COUNT 107
 
 } // vrv namespace
 

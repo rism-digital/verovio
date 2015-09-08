@@ -62,6 +62,9 @@ public:
     virtual ClassId Is() { return NOTE; };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
     /**
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.

@@ -85,7 +85,7 @@ public:
     bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
     bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
     bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
-    bool IsScoreDefElement() { return (this->Is() > SCORE_DEF_ELEMENT && this->Is() < SCORE_DEF_ELEMENT_max); };
+    bool IsScoreDefElement() { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); };
     ///@}
     
     /**
@@ -581,6 +581,15 @@ public:
     virtual int PrepareLyricsEnd( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
+     * Functor for setting mRpt drawing numbers (if required)
+     * The functor is process by staff/layer using an ArrayOfAttComparisons filter.
+     * param 0: MRpt **currentMRpt
+     * param 1: data_BOOLEAN for indicating if the MRpt::m_drawingNumber has to be set or not
+     * param 2: ScoreDef * doc scoreDef
+     */
+    virtual int PrepareRpt( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
+    
+    /**
      * Goes through all the TimeSpanningInterface element and set them a current to each staff
      * where require. For Note with DrawingTieAttr, the functor is redireted to the tie object
      * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
@@ -716,6 +725,8 @@ public:
     bool HasContentBB();
     bool HasSelfBB();
     void ResetBB();
+    void SetEmptyBB();
+    bool HasEmptyBB();
     
     /**
      * @name Get and set the X and Y drawing position

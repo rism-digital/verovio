@@ -269,7 +269,7 @@
         <slashNoteheads>
             <description>Slash noteheads</description>
             <!--<glyph glyph-code="E100" smufl-name="noteheadSlashVerticalEnds"/>-->
-            <!--<glyph glyph-code="E101" smufl-name="noteheadSlashHorizontalEnds"/>-->
+            <glyph glyph-code="E101" smufl-name="noteheadSlashHorizontalEnds"/>
             <!--<glyph glyph-code="E102" smufl-name="noteheadSlashWhiteWhole"/>-->
             <!--<glyph glyph-code="E103" smufl-name="noteheadSlashWhiteHalf"/>-->
             <!--<glyph glyph-code="E104" smufl-name="noteheadSlashDiamondWhite"/>-->
@@ -1197,8 +1197,8 @@
         <barRepeats>
             <description>Bar repeats</description>
             <glyph glyph-code="E500" smufl-name="repeat1Bar"/>
-            <!--<glyph glyph-code="E501" smufl-name="repeat2Bars"/>-->
-            <!--<glyph glyph-code="E502" smufl-name="repeat4Bars"/>-->
+            <glyph glyph-code="E501" smufl-name="repeat2Bars"/>
+            <glyph glyph-code="E502" smufl-name="repeat4Bars"/>
             <range_end>U+E50F</range_end>
             <range_start>U+E500</range_start>
         </barRepeats>

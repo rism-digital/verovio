@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_SCORE_DEF_H__
-#define __VRV_SCORE_DEF_H__
+#ifndef __VRV_SCOREDEF_H__
+#define __VRV_SCOREDEF_H__
 
 #include "atts_shared.h"
 #include "drawinginterface.h"
@@ -45,7 +45,7 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() { return SCORE_DEF_ELEMENT; };
+    virtual ClassId Is() { return SCOREDEF_ELEMENT; };
     ///@}
     
     /**
@@ -121,7 +121,7 @@ public:
     virtual ~ScoreDef();    
     virtual void Reset();
     virtual std::string GetClassName( ) { return "ScoreDef"; };
-    virtual ClassId Is() { return SCORE_DEF; };
+    virtual ClassId Is() { return SCOREDEF; };
     ///@}
     
 	void AddStaffGrp( StaffGrp *staffGrp );
@@ -194,7 +194,11 @@ private:
  * This class represents a MEI staffGrp.
  * It contains StaffDef objects.
  */
-class StaffGrp: public Object, public ObjectListInterface
+class StaffGrp: public Object, public ObjectListInterface,
+    public AttCommon,
+    public AttLabelsAddl,
+    public AttStaffgroupingsym,
+    public AttStaffGrpVis
 {
 public:
     /**
@@ -207,7 +211,7 @@ public:
     virtual Object* Clone() { return new StaffGrp(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffGrp"; };
-    virtual ClassId Is() { return STAFF_GRP; };
+    virtual ClassId Is() { return STAFFGRP; };
     ///@}
 	
     /**
@@ -216,22 +220,6 @@ public:
     ///@{
 	void AddStaffDef( StaffDef *staffDef );
 	void AddStaffGrp( StaffGrp *staffGrp );
-    ///@}
-    
-    /**
-     * @name Set and get the staffGrp @symbol
-     */
-    ///@{
-    StaffGrpSymbol GetSymbol() const { return m_symbol; };
-    void SetSymbol( StaffGrpSymbol symbol ) { m_symbol = symbol; };
-    ///@}
-    
-    /**
-     * @name Set and get the staffGrp @barthru
-     */
-    ///@{
-    bool GetBarthru() const { return m_barthru; };
-    void SetBarthru( bool barthru ) { m_barthru = barthru; };
     ///@}
     
     //----------//
@@ -250,8 +238,6 @@ private:
 public:
     
 private:
-    StaffGrpSymbol m_symbol;
-    bool m_barthru;
 
 };
 
@@ -280,7 +266,7 @@ public:
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
-    virtual ClassId Is() { return STAFF_DEF; };
+    virtual ClassId Is() { return STAFFDEF; };
     ///@}
     
     //----------//

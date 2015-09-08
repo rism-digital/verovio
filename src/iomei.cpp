@@ -32,6 +32,7 @@
 #include "page.h"
 #include "proport.h"
 #include "rest.h"
+#include "rpt.h"
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
@@ -39,6 +40,7 @@
 #include "system.h"
 #include "textdirective.h"
 #include "tie.h"
+#include "trem.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -141,15 +143,15 @@ bool MeiOutput::WriteObject( Object *object )
         }
         // Here we could add a <sb> element (but not for the first system of the page?)
     }
-    else if (object->Is() == SCORE_DEF) {
+    else if (object->Is() == SCOREDEF) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef( m_currentNode, dynamic_cast<ScoreDef*>(object) );
     }
-    else if (object->Is() == STAFF_GRP) {
+    else if (object->Is() == STAFFGRP) {
         m_currentNode = m_currentNode.append_child("staffGrp");
         WriteMeiStaffGrp( m_currentNode, dynamic_cast<StaffGrp*>(object) );
     }
-    else if (object->Is() == STAFF_DEF) {
+    else if (object->Is() == STAFFDEF) {
         m_currentNode = m_currentNode.append_child("staffDef");
         WriteMeiStaffDef( m_currentNode, dynamic_cast<StaffDef*>(object) );
     }
@@ -185,13 +187,17 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid( m_currentNode, dynamic_cast<Accid*>(object) );
     }
-    else if (object->Is() == BAR_LINE) {
+    else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child( "barLine" );
         WriteMeiBarline( m_currentNode, dynamic_cast<Barline*>(object) );
     }
     else if (object->Is() == BEAM) {
         m_currentNode = m_currentNode.append_child("beam");
         WriteMeiBeam( m_currentNode, dynamic_cast<Beam*>(object) );
+    }
+    else if (object->Is() == BEATRPT) {
+        m_currentNode = m_currentNode.append_child("beatRpt");
+        WriteMeiBeatRpt( m_currentNode, dynamic_cast<BeatRpt*>(object) );
     }
     else if (object->Is() == CHORD) {
         m_currentNode = m_currentNode.append_child( "chord" );
@@ -209,7 +215,7 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child( "dot" );
         WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
     }
-    else if (object->Is() == KEY_SIG) {
+    else if (object->Is() == KEYSIG) {
         m_currentNode = m_currentNode.append_child("keySig");
         WriteMeiKeySig( m_currentNode, dynamic_cast<KeySig*>(object) );
     }
@@ -217,7 +223,7 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("mensur");
         WriteMeiMensur( m_currentNode, dynamic_cast<Mensur*>(object) );
     }
-    else if (object->Is() == METER_SIG) {
+    else if (object->Is() == METERSIG) {
         m_currentNode = m_currentNode.append_child("meterSig");
         WriteMeiMeterSig( m_currentNode, dynamic_cast<MeterSig*>(object) );
     }
@@ -225,9 +231,21 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("mRest");
         WriteMeiMRest( m_currentNode, dynamic_cast<MRest*>(object) );
     }
-    else if (object->Is() == MULTI_REST) {
+    else if (object->Is() == MRPT) {
+        m_currentNode = m_currentNode.append_child("mRpt");
+        WriteMeiMRpt( m_currentNode, dynamic_cast<MRpt*>(object) );
+    }
+    else if (object->Is() == MRPT2) {
+        m_currentNode = m_currentNode.append_child("mRpt2");
+        WriteMeiMRpt2( m_currentNode, dynamic_cast<MRpt2*>(object) );
+    }
+    else if (object->Is() == MULTIREST) {
         m_currentNode = m_currentNode.append_child("multiRest");
         WriteMeiMultiRest( m_currentNode, dynamic_cast<MultiRest*>(object) );
+    }
+    else if (object->Is() == MULTIRPT) {
+        m_currentNode = m_currentNode.append_child("multiRpt");
+        WriteMeiMultiRpt( m_currentNode, dynamic_cast<MultiRpt*>(object) );
     }
     else if (object->Is() == NOTE) {
         m_currentNode = m_currentNode.append_child("note");
@@ -415,12 +433,11 @@ bool MeiOutput::WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp
     assert( staffGrp );
     
     currentNode.append_attribute( "xml:id" ) = UuidToMeiStr( staffGrp ).c_str();
-    if ( staffGrp->GetSymbol() != STAFFGRP_NONE ) {
-        currentNode.append_attribute( "symbol" ) = StaffGrpSymbolToStr( staffGrp->GetSymbol() ).c_str();
-    }
-    if ( staffGrp->GetBarthru() ) {
-        currentNode.append_attribute( "barthru" ) = BoolToStr( staffGrp->GetBarthru() ).c_str();
-    }
+    
+    staffGrp->WriteCommon(currentNode);
+    staffGrp->WriteLabelsAddl(currentNode);
+    staffGrp->WriteStaffgroupingsym(currentNode);
+    staffGrp->WriteStaffGrpVis(currentNode);
     
     return true;
 }
@@ -448,10 +465,6 @@ bool MeiOutput::WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure )
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( measure ).c_str();
 
     measure->WriteCommon(currentNode);
-
-    // here we transfer the barLine object values to @left and @right
-    measure->SetLeft( measure->GetLeftBarlineType() );
-    measure->SetRight( measure->GetRightBarlineType() );
     measure->WriteMeasureLog(currentNode);
     
     return true;
@@ -551,6 +564,14 @@ void MeiOutput::WriteMeiBeam( pugi::xml_node currentNode, Beam *beam )
     WriteLayerElement( currentNode, beam );
     return;
 }
+    
+void MeiOutput::WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt )
+{
+    assert( beatRpt );
+    
+    WriteLayerElement( currentNode, beatRpt );
+    beatRpt->WriteBeatRptVis(currentNode);
+}
 
 void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
 {
@@ -632,6 +653,20 @@ void MeiOutput::WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest )
     WriteLayerElement( currentNode, mRest );
     return;
 }
+    
+void MeiOutput::WriteMeiMRpt( pugi::xml_node currentNode, MRpt *mRpt )
+{
+    assert( mRpt );
+    
+    WriteLayerElement( currentNode, mRpt );
+}
+    
+    void MeiOutput::WriteMeiMRpt2( pugi::xml_node currentNode, MRpt2 *mRpt2 )
+    {
+        assert( mRpt2 );
+        
+        WriteLayerElement( currentNode, mRpt2 );
+    }
 
 void MeiOutput::WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest )
 {
@@ -640,6 +675,14 @@ void MeiOutput::WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiR
     WriteLayerElement( currentNode, multiRest );
     multiRest->WriteNumbered(currentNode);
     return;
+}
+
+void MeiOutput::WriteMeiMultiRpt( pugi::xml_node currentNode, MultiRpt *multiRpt )
+{
+    assert( multiRpt );
+    
+    WriteLayerElement( currentNode, multiRpt );
+    multiRpt->WriteNumbered(currentNode);
 }
 
 void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
@@ -766,6 +809,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteMensuralShared(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
+    interface->WriteMultinummeasures(element);
 }
 
 void MeiOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *interface)
@@ -867,12 +911,6 @@ bool MeiOutput::WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot )
     
     return true;
 };
-    
-std::string MeiOutput::BoolToStr(bool value)
-{
-    if (value) return "true";
-    return "false";
-}
 
 std::string MeiOutput::DocTypeToStr(DocType type)
 {
@@ -888,21 +926,6 @@ std::string MeiOutput::DocTypeToStr(DocType type)
             break;
 	}
 	return value;   
-}
-
-std::string MeiOutput::StaffGrpSymbolToStr(StaffGrpSymbol symbol)
-{
- 	std::string value;
-	switch(symbol)
-	{	case STAFFGRP_LINE : value = "line"; break;
-		case STAFFGRP_BRACE : value = "brace"; break;
-        case STAFFGRP_BRACKET : value = "bracket"; break;
-        default:
-            LogWarning("Unknown staffGrp @symbol  '%d'", symbol);
-            value = "line";
-            break;
-	}
-	return value;
 }
 
 //----------------------------------------------------------------------------
@@ -1281,12 +1304,10 @@ bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
     StaffGrp *vrvStaffGrp = new StaffGrp( );
     SetMeiUuid( staffGrp, vrvStaffGrp );
     
-    if ( staffGrp.attribute( "symbol" ) ) {
-        vrvStaffGrp->SetSymbol( StrToStaffGrpSymbol( staffGrp.attribute( "symbol" ).value() ) );
-    }
-    if ( staffGrp.attribute( "barthru" ) ) {
-        vrvStaffGrp->SetBarthru( StrToBool( staffGrp.attribute( "barthru" ).value() ) );
-    }
+    vrvStaffGrp->ReadCommon(staffGrp);
+    vrvStaffGrp->ReadLabelsAddl(staffGrp);
+    vrvStaffGrp->ReadStaffGrpVis(staffGrp);
+    vrvStaffGrp->ReadStaffgroupingsym(staffGrp);
     
     AddStaffGrp(parent, vrvStaffGrp);
     
@@ -1345,7 +1366,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     ReadScoreDefInterface(staffDef, vrvStaffDef);
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
-    if ( parent->Is() == STAFF_GRP ) {
+    if ( parent->Is() == STAFFGRP ) {
         StaffGrp *staffGrp = dynamic_cast<StaffGrp*>( parent );
         assert( staffGrp );
         staffGrp->AddStaffDef(vrvStaffDef);
@@ -1366,10 +1387,6 @@ bool MeiInput::ReadMeiMeasure( Object *parent, pugi::xml_node measure )
     
     vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
-    
-    // here we transfer the @left and @right values to the barLine objects
-    vrvMeasure->SetLeftBarlineType( vrvMeasure->GetLeft() );
-    vrvMeasure->SetRightBarlineType( vrvMeasure->GetRight() );
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
     if ( parent->Is() == SYSTEM ) {
@@ -1576,6 +1593,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
         }
+        else if ( elementName == "beatRpt" ) {
+            success = ReadMeiBeatRpt( parent, xmlElement);
+        }
         else if ( elementName == "chord" ) {
             success = ReadMeiChord( parent, xmlElement);
         }
@@ -1606,8 +1626,17 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "mRest" ) {
             success = ReadMeiMRest( parent, xmlElement );
         }
+        else if ( elementName == "mRpt" ) {
+            success = ReadMeiMRpt( parent, xmlElement );
+        }
+        else if ( elementName == "mRpt2" ) {
+            success = ReadMeiMRpt2( parent, xmlElement );
+        }
         else if ( elementName == "multiRest" ) {
             success = ReadMeiMultiRest( parent, xmlElement );
+        }
+        else if ( elementName == "multiRpt" ) {
+            success = ReadMeiMultiRpt( parent, xmlElement );
         }
         else if ( elementName == "proport" ) {
             success = ReadMeiProport( parent, xmlElement );
@@ -1686,6 +1715,16 @@ bool MeiInput::ReadMeiBeam( Object *parent, pugi::xml_node beam )
         LogWarning("<beam> with only one note");
     }
     
+    return true;
+}
+    
+bool MeiInput::ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt )
+{
+    BeatRpt *vrvBeatRpt = new BeatRpt();
+    ReadLayerElement(beatRpt, vrvBeatRpt);
+    vrvBeatRpt->ReadBeatRptVis(beatRpt);
+    
+    AddLayerElement(parent, vrvBeatRpt);
     return true;
 }
     
@@ -1791,7 +1830,25 @@ bool MeiInput::ReadMeiMRest( Object *parent, pugi::xml_node mRest )
     AddLayerElement(parent, vrvMRest);
     return true;
 }
+    
+bool MeiInput::ReadMeiMRpt( Object *parent, pugi::xml_node mRpt )
+{
+    MRpt *vrvMRpt = new MRpt();
+    ReadLayerElement(mRpt, vrvMRpt);
+    
+    AddLayerElement(parent, vrvMRpt);
+    return true;
+}
 
+bool MeiInput::ReadMeiMRpt2( Object *parent, pugi::xml_node mRpt2 )
+{
+    MRpt2 *vrvMRpt2 = new MRpt2();
+    ReadLayerElement(mRpt2, vrvMRpt2);
+    
+    AddLayerElement(parent, vrvMRpt2);
+    return true;
+}
+    
 bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
 {
 	MultiRest *vrvMultiRest = new MultiRest( );
@@ -1801,6 +1858,16 @@ bool MeiInput::ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest )
     
     AddLayerElement(parent, vrvMultiRest);
 	return true;
+}
+
+bool MeiInput::ReadMeiMultiRpt( Object *parent, pugi::xml_node multiRpt )
+{
+    MultiRpt *vrvMultiRpt = new MultiRpt();
+    ReadLayerElement(multiRpt, vrvMultiRpt);
+    vrvMultiRpt->ReadNumbered(multiRpt);
+    
+    AddLayerElement(parent, vrvMultiRpt);
+    return true;
 }
 
 bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
@@ -1958,6 +2025,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
+    interface->ReadMultinummeasures(element);
     return true;
 }
     
@@ -2202,10 +2270,10 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp )
         assert( element );
         element->AddStaffGrp( staffGrp );
     }
-    else if ( parent->Is() == SCORE_DEF ) {
+    else if ( parent->Is() == SCOREDEF ) {
         dynamic_cast<ScoreDef*>( parent )->AddStaffGrp( staffGrp );
     }
-    else if ( parent->Is() == STAFF_GRP ) {
+    else if ( parent->Is() == STAFFGRP ) {
         dynamic_cast<StaffGrp*>( parent )->AddStaffGrp( staffGrp );
     }
     else {
@@ -2417,12 +2485,6 @@ void MeiInput::SetMeiUuid( pugi::xml_node element, Object *object )
     object->SetUuid( element.attribute( "xml:id" ).value() );
     element.remove_attribute("xml:id");
 }
-
-bool MeiInput::StrToBool(std::string value)
-{
-    if (value == "false") return false;
-	return true;
-}
    
 DocType MeiInput::StrToDocType(std::string type)
 {
@@ -2434,18 +2496,6 @@ DocType MeiInput::StrToDocType(std::string type)
 	}
     // default
 	return Raw;
-}
-
-StaffGrpSymbol MeiInput::StrToStaffGrpSymbol(std::string symbol)
-{
-    if (symbol == "line") return STAFFGRP_LINE;
-    else if (symbol == "brace") return STAFFGRP_BRACE;
-    else if (symbol == "bracket") return STAFFGRP_BRACKET;
-    else {
-        LogWarning("Unknown staffGrp @symbol '%s'", symbol.c_str() );
-	}
-    // default
-	return STAFFGRP_LINE;
 }
     
 std::string MeiInput::ExtractUuidFragment(std::string refUuid)

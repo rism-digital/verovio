@@ -256,8 +256,8 @@ int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
-    System *contentSystem = static_cast<System*>((*params)[0]);
-    System **currentSystem = static_cast<System**>((*params)[2]);
+    System *contentSystem = static_cast<System*>((*params).at(0));
+    System **currentSystem = static_cast<System**>((*params).at(2));
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert( dynamic_cast<System*>(this->m_parent));

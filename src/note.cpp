@@ -187,8 +187,8 @@ int Note::PrepareTieAttr( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties
     // param 1: Chord** currentChord for the current chord if in a chord
-    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>((*params)[0]);
-    Chord **currentChord = static_cast<Chord**>((*params)[1]);
+    std::vector<Note*> *currentNotes = static_cast<std::vector<Note*>*>((*params).at(0));
+    Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     AttTiepresent *check = this;
     if ((*currentChord)) {
@@ -239,8 +239,8 @@ int Note::PrepareLyrics( ArrayPtrVoid *params )
     // param 0: the current Syl (unused)
     // param 1: the last Note
     // param 2: the last but one Note
-    Note **lastNote = static_cast<Note**>((*params)[1]);
-    Note **lastButOneNote = static_cast<Note**>((*params)[2]);
+    Note **lastNote = static_cast<Note**>((*params).at(1));
+    Note **lastButOneNote = static_cast<Note**>((*params).at(2));
     
     (*lastButOneNote) = (*lastNote);
     (*lastNote) = this;
@@ -251,7 +251,7 @@ int Note::PrepareLyrics( ArrayPtrVoid *params )
 int Note::PreparePointersByLayer( ArrayPtrVoid *params )
 {
     // param 0: the current Note
-    Note **currentNote = static_cast<Note**>((*params)[0]);
+    Note **currentNote = static_cast<Note**>((*params).at(0));
     
     this->ResetDrawingAccid();
     if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {

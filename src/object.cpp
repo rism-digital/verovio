@@ -693,10 +693,28 @@ void DocObject::ResetBB()
     m_selfBB_y1 = 0xFFFFFFF;
     m_selfBB_x2 = -0xFFFFFFF;
     m_selfBB_y2 = -0xFFFFFFF;
-    //m_drawingX = 0;
-    //m_drawingY = 0;
     
     m_updatedBB = false;
+}
+
+void DocObject::SetEmptyBB()
+{
+    m_contentBB_x1 = 0;
+    m_contentBB_y1 = 0;
+    m_contentBB_x2 = 0;
+    m_contentBB_y2 = 0;
+    m_selfBB_x1 = 0;
+    m_selfBB_y1 = 0;
+    m_selfBB_x2 = 0;
+    m_selfBB_y2 = 0;
+    
+    m_updatedBB = true;
+}
+    
+    
+bool DocObject::HasEmptyBB()
+{
+    return ( m_updatedBB && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0) && (m_contentBB_y2 == 0) );
 }
 
 bool DocObject::HasContentBB() 
@@ -851,7 +869,7 @@ void Functor::Call( Object *ptr, ArrayPtrVoid *params )
 int Object::AddLayerElementToFlatList( ArrayPtrVoid *params )
 {
     // param 0: the ListOfObjects
-    ListOfObjects **list = static_cast<ListOfObjects**>((*params)[0]);
+    ListOfObjects **list = static_cast<ListOfObjects**>((*params).at(0));
     //if ( dynamic_cast<LayerElement*>(this ) ) {
         (*list)->push_back( this );
     //}
@@ -862,8 +880,8 @@ int Object::FindByUuid( ArrayPtrVoid *params )
 {
     // param 0: the uuid we are looking for
     // param 1: the pointer to pointer to the Object
-    std::string *uuid = static_cast<std::string*>((*params)[0]);
-    Object **element = static_cast<Object**>((*params)[1]);
+    std::string *uuid = static_cast<std::string*>((*params).at(0));
+    Object **element = static_cast<Object**>((*params).at(1));
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -883,8 +901,8 @@ int Object::FindByAttComparison( ArrayPtrVoid *params )
 {
     // param 0: the type we are looking for
     // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison*>((*params)[0]);
-    Object **element = static_cast<Object**>((*params)[1]);
+    AttComparison *test = static_cast<AttComparison*>((*params).at(0));
+    Object **element = static_cast<Object**>((*params).at(1));
     
     if ( (*element) ) {
         // this should not happen, but just in case
@@ -906,8 +924,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 {
 
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = static_cast<ScoreDef*>((*params)[0]);
-    StaffDef **currentStaffDef = static_cast<StaffDef**>((*params)[1]);
+    ScoreDef *currentScoreDef = static_cast<ScoreDef*>((*params).at(0));
+    StaffDef **currentStaffDef = static_cast<StaffDef**>((*params).at(1));
 
     assert( currentScoreDef );
     
@@ -938,7 +956,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     }
     
     // starting a new scoreDef
-    if (this->Is() == SCORE_DEF) {
+    if (this->Is() == SCOREDEF) {
         ScoreDef *scoreDef= dynamic_cast<ScoreDef*>(this);
         assert( scoreDef );
         // Replace the current scoreDef with the new one, including its content (staffDef)
@@ -947,7 +965,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     }
 
     // starting a new staffDef
-    if (this->Is() == STAFF_DEF) {
+    if (this->Is() == STAFFDEF) {
         StaffDef *staffDef= dynamic_cast<StaffDef*>(this);
         assert( staffDef );
         currentScoreDef->ReplaceDrawingValues(staffDef);
@@ -990,7 +1008,7 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
     }
     
     // starting a new keysig
-    if (this->Is() == KEY_SIG) {
+    if (this->Is() == KEYSIG) {
         KeySig *keysig = dynamic_cast<KeySig*>(this);
         assert( keysig );
         assert( *currentStaffDef );
@@ -1031,8 +1049,8 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the Doc
-    int *min_pos = static_cast<int*>((*params)[0]);
-    Doc *doc = static_cast<Doc*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    Doc *doc = static_cast<Doc*>((*params).at(1));
     
     // starting an new layer
     if (this->Is() == LAYER) {
@@ -1058,8 +1076,8 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    //int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    int negative_offset = - note->m_contentBB_x1;
+    int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+
     if ( (*min_pos) > 0 ) {
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
@@ -1075,7 +1093,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     }
     
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin( NOTE ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2 + doc->GetRightMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
     //note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
     note->GetGraceAlignment()->SetMaxWidth( note->m_contentBB_x2 );
@@ -1089,9 +1107,9 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *measure_width = static_cast<int*>((*params)[1]);
-    Doc *doc = static_cast<Doc*>((*params)[2]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *measure_width = static_cast<int*>((*params).at(1));
+    Doc *doc = static_cast<Doc*>((*params).at(2));
 
     // starting a new measure
     if (this->Is() == MEASURE) {
@@ -1110,8 +1128,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
-        // reset it as the minimum position to the step (HARDCODED)
-        (*min_pos) = 30 * doc->GetDrawingUnit(100) / 10;
+        (*min_pos) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
@@ -1137,29 +1154,19 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     
     // we should have processed aligned before
     assert( current->GetAlignment() );
-
-    if ( !current->HasUpdatedBB() ) {
-        // if nothing was drawn, do not take it into account
+    
+    if ( !current->HasToBeAligned() ) {
+        // if nothing to do with this type of account
         return FUNCTOR_CONTINUE;
     }
     
-    if (current->Is() == BEAM) {
+    if ( !current->HasUpdatedBB() ) {
+        // if nothing was drawn, do not take it into account
+        assert( false ); // quite drastic but this should never happen. If nothing has to be drawn then the BB should be set to empty with DocObject::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
     
     if ( (current->Is() == NOTE) && current->GetFirstParent( CHORD, MAX_CHORD_DEPTH ) ) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    if (current->Is() == TIE) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    if (current->Is() == TUPLET) {
-        return FUNCTOR_CONTINUE;
-    }
-    
-    if ( (current->Is() == VERSE) || (current->Is() == SYL) ) {
         return FUNCTOR_CONTINUE;
     }
     
@@ -1175,16 +1182,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
-    
-    if (current->Is() == MREST) {
-        // With MRest, the only thing we want to do it keep their with as possible measure with (if only MRest in all staves/layers)
-        int width =  current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR + negative_offset ;
-        // Keep it if more than the current measure width
-        (*measure_width) = std::max( (*measure_width), width );
-        (*min_pos) = 0;
-        return FUNCTOR_CONTINUE;
-    }
-    
+
     // with a grace note, also take into account the full with of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {
         negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
@@ -1213,8 +1211,10 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = current->GetAlignment()->GetXRel() + current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    current->GetAlignment()->SetMaxWidth( current->m_contentBB_x2 + doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR );
+    int width = current->m_contentBB_x2;
+    if (!current->HasEmptyBB()) width += doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    (*min_pos) = current->GetAlignment()->GetXRel() + width;
+    current->GetAlignment()->SetMaxWidth( width );
     
     return FUNCTOR_CONTINUE;
 }
@@ -1223,8 +1223,8 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the minimu position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *measure_width = static_cast<int*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *measure_width = static_cast<int*>((*params).at(1));
     
     // ending a measure
     if (this->Is() == MEASURE) {
@@ -1256,8 +1256,8 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *system_height = static_cast<int*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *system_height = static_cast<int*>((*params).at(1));
     
     // starting a new system
     if (this->Is() == SYSTEM) {
@@ -1315,8 +1315,8 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the position of the previous staff
     // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int*>((*params)[0]);
-    int *system_height = static_cast<int*>((*params)[1]);
+    int *min_pos = static_cast<int*>((*params).at(0));
+    int *system_height = static_cast<int*>((*params).at(1));
     
     // ending a measure
     if (this->Is() == MEASURE) {
@@ -1336,7 +1336,7 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 int Object::Save( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params).at(0));
     if (!output->WriteObject( this )) {
         return FUNCTOR_STOP;
     }
@@ -1347,7 +1347,7 @@ int Object::Save( ArrayPtrVoid *params )
 int Object::SaveEnd( ArrayPtrVoid *params )
 {
     // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream*>((*params)[0]);
+    FileOutputStream *output = static_cast<FileOutputStream*>((*params).at(0));
     if (!output->WriteObjectEnd( this )) {
         return FUNCTOR_STOP;
     }

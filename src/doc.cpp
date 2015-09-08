@@ -27,6 +27,7 @@
 #include "multirest.h"
 #include "note.h"
 #include "page.h"
+#include "rpt.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -249,6 +250,32 @@ void Doc::PrepareDrawing()
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if ( !timeSpanningElements.empty() ) {
         LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size() );
+    }
+    
+    // Process by staff for matching mRpt elements and setting the drawing number
+    MRpt *currentMRpt;
+    data_BOOLEAN multiNumber;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff( STAFF, staves->first );
+            AttCommonNComparison matchLayer( LAYER, layers->first );
+            filters.push_back( &matchStaff );
+            filters.push_back( &matchLayer );
+            
+            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // m_drawingLastNote is set only if the syl has a forward connector
+            currentMRpt = NULL;
+            // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
+            multiNumber = BOOLEAN_NONE;
+            ArrayPtrVoid paramsRptAttr;
+            paramsRptAttr.push_back(&currentMRpt);
+            paramsRptAttr.push_back(&multiNumber);
+            paramsRptAttr.push_back(&m_scoreDef);
+            Functor prepareRpt( &Object::PrepareRpt );
+            this->Process( &prepareRpt, &paramsRptAttr, NULL, &filters );
+        }
     }
     
     /*
@@ -497,7 +524,8 @@ FontInfo *Doc::GetDrawingSmuflFont( int staffSize, bool graceSize )
     m_drawingSmuflFont.SetPointSize( value );
     return &m_drawingSmuflFont;
 }
-    FontInfo *Doc::GetDrawingLyricFont( int staffSize )
+    
+FontInfo *Doc::GetDrawingLyricFont( int staffSize )
 {
     m_drawingLyricFont.SetPointSize( m_drawingLyricFontSize * staffSize / 100 );
     return &m_drawingLyricFont;
@@ -505,26 +533,45 @@ FontInfo *Doc::GetDrawingSmuflFont( int staffSize, bool graceSize )
     
 char Doc::GetLeftMargin( const ClassId classId  )
 {
-    if (classId == BAR_LINE) return m_style->m_leftMarginBarline;
-    else if (classId == BAR_LINE_ATTR) return m_style->m_leftMarginBarlineAttr;
+    if (classId == BARLINE) return m_style->m_leftMarginBarline;
+    else if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarlineAttr;
+    else if (classId == BEATRPT) return m_style->m_leftMarginBeatRpt;
     else if (classId == CHORD) return m_style->m_leftMarginChord;
     else if (classId == CLEF) return m_style->m_leftMarginClef;
+    else if (classId == KEYSIG)  return m_style->m_leftMarginKeySig;
+    else if (classId == MENSUR) return m_style->m_leftMarginMensur;
+    else if (classId == METERSIG) return m_style->m_leftMarginMeterSig;
     else if (classId == MREST) return m_style->m_leftMarginMRest;
+    else if (classId == MRPT2) return m_style->m_leftMarginMRpt2;
+    else if (classId == MULTIREST) return m_style->m_leftMarginMultiRest;
+    else if (classId == MULTIRPT) return m_style->m_leftMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_leftMarginNote;
+    else if (classId == REST) return m_style->m_leftMarginRest;
     return m_style->m_leftMarginDefault;
 }
     
 char Doc::GetRightMargin( const ClassId classId )
 {
-    if (classId == BAR_LINE) return m_style->m_rightMarginBarline;
-    else if (classId == BAR_LINE_ATTR) return m_style->m_rightMarginBarlineAttr;
+    if (classId == BARLINE) return m_style->m_rightMarginBarline;
+    else if (classId == BARLINE_ATTR) return m_style->m_rightMarginBarlineAttr;
+    else if (classId == BEATRPT) return m_style->m_rightMarginBeatRpt;
+    else if (classId == CHORD) return m_style->m_rightMarginChord;
     else if (classId == CLEF) return m_style->m_rightMarginClef;
-    else if (classId == KEY_SIG)  return m_style->m_rightMarginKeySig;
+    else if (classId == KEYSIG)  return m_style->m_rightMarginKeySig;
     else if (classId == MENSUR) return m_style->m_rightMarginMensur;
-    else if (classId == METER_SIG) return m_style->m_rightMarginMeterSig;
+    else if (classId == METERSIG) return m_style->m_rightMarginMeterSig;
     else if (classId == MREST) return m_style->m_rightMarginMRest;
-    else if (classId == MULTI_REST) return m_style->m_rightMarginMultiRest;
+    else if (classId == MRPT2) return m_style->m_rightMarginMRpt2;
+    else if (classId == MULTIREST) return m_style->m_rightMarginMultiRest;
+    else if (classId == MULTIRPT) return m_style->m_rightMarginMultiRpt;
+    else if (classId == NOTE) return m_style->m_rightMarginNote;
+    else if (classId == REST) return m_style->m_rightMarginRest;
     return m_style->m_rightMarginDefault;
+}
+
+char Doc::GetLeftPosition( )
+{
+    return m_style->m_leftPosition;
 }
     
 void Doc:: SetPageHeight( int pageHeight )
@@ -681,8 +728,8 @@ int Doc::PrepareLyricsEnd( ArrayPtrVoid *params )
 {
     // param 0: the current Syl
     // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl**>((*params)[0]);
-    Note **lastNote = static_cast<Note**>((*params)[1]);
+    Syl **currentSyl = static_cast<Syl**>((*params).at(0));
+    Note **lastNote = static_cast<Note**>((*params).at(1));
     
     if ( (*currentSyl) && (*lastNote) ) {
         (*currentSyl)->SetEnd(*lastNote);

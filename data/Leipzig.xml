@@ -79,7 +79,7 @@
    <glyph glyph-code="E047" x="1.0" y="1.0" width="410.0" height="512.0" />
    <glyph glyph-code="E048" x="0.0" y="-73.0" width="537.0" height="653.0" />
    <glyph glyph-code="E04B" x="0.0" y="-34.0" width="450.0" height="1192.0" />
-   <glyph glyph-code="E500" x="0.0" y="-212.0" width="508.0" height="424.0" />
+   <glyph glyph-code="E500" x="0.0" y="-242.0" width="508.0" height="484.0" />
    <glyph glyph-code="E220" x="-163.0" y="-124.0" width="326.0" height="249.0" />
    <glyph glyph-code="E222" x="-162.0" y="-258.0" width="324.0" height="516.0" />
    <glyph glyph-code="E223" x="-162.0" y="-325.0" width="324.0" height="651.0" />
@@ -104,4 +104,7 @@
    <glyph glyph-code="E939" x="0.0" y="-192.0" width="312.0" height="386.0" />
    <glyph glyph-code="E93C" x="0.0" y="-192.0" width="312.0" height="386.0" />
    <glyph glyph-code="E93D" x="0.0" y="-192.0" width="312.0" height="386.0" />
+   <glyph glyph-code="E101" x="0.0" y="-242.0" width="508.0" height="484.0" />
+   <glyph glyph-code="E501" x="0.0" y="-242.0" width="750.0" height="484.0" />
+   <glyph glyph-code="E502" x="0.0" y="-242.0" width="1234.0" height="484.0" />
 </bounding-boxes>

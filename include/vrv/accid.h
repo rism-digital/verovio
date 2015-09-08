@@ -35,6 +35,9 @@ public:
     virtual ClassId Is() { return ACCID; };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
     
     //----------//
     // Functors //

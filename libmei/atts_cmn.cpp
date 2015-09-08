@@ -312,14 +312,14 @@ AttBeamrend::~AttBeamrend() {
 }
 
 void AttBeamrend::ResetBeamrend() {
-    m_rend = "";
+    m_rend = BEATRPT_REND_NONE;
     m_slopeDbl = 0.0;
 }
 
 bool AttBeamrend::ReadBeamrend(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("rend")) {
-        this->SetRend(StrToStr(element.attribute("rend").value()));
+        this->SetRend(StrToBeatrptRend(element.attribute("rend").value()));
         element.remove_attribute("rend");
         hasAttribute = true;
     }
@@ -334,7 +334,7 @@ bool AttBeamrend::ReadBeamrend(  pugi::xml_node element ) {
 bool AttBeamrend::WriteBeamrend(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasRend()) {
-        element.append_attribute("rend") = StrToStr(this->GetRend()).c_str();
+        element.append_attribute("rend") = BeatrptRendToStr(this->GetRend()).c_str();
         wroteAttribute = true;
     }
     if (this->HasSlope()) {
@@ -346,7 +346,7 @@ bool AttBeamrend::WriteBeamrend(  pugi::xml_node element ) {
 
 bool AttBeamrend::HasRend( )
 {
-    return (m_rend != "");
+    return (m_rend != BEATRPT_REND_NONE);
 }
 
 bool AttBeamrend::HasSlope( )
@@ -413,13 +413,13 @@ AttBeatRptVis::~AttBeatRptVis() {
 }
 
 void AttBeatRptVis::ResetBeatRptVis() {
-    m_rend = "";
+    m_rend = BEATRPT_REND_NONE;
 }
 
 bool AttBeatRptVis::ReadBeatRptVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("rend")) {
-        this->SetRend(StrToStr(element.attribute("rend").value()));
+        this->SetRend(StrToBeatrptRend(element.attribute("rend").value()));
         element.remove_attribute("rend");
         hasAttribute = true;
     }
@@ -429,7 +429,7 @@ bool AttBeatRptVis::ReadBeatRptVis(  pugi::xml_node element ) {
 bool AttBeatRptVis::WriteBeatRptVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasRend()) {
-        element.append_attribute("rend") = StrToStr(this->GetRend()).c_str();
+        element.append_attribute("rend") = BeatrptRendToStr(this->GetRend()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -437,7 +437,7 @@ bool AttBeatRptVis::WriteBeatRptVis(  pugi::xml_node element ) {
 
 bool AttBeatRptVis::HasRend( )
 {
-    return (m_rend != "");
+    return (m_rend != BEATRPT_REND_NONE);
 }
 
 
@@ -1813,7 +1813,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
         AttBeamrend *att = dynamic_cast<AttBeamrend*>(element);
         assert( att );
         if (attrType == "rend") {
-            att->SetRend(att->StrToStr(attrValue));
+            att->SetRend(att->StrToBeatrptRend(attrValue));
             return true;
         }
         if (attrType == "slopeDbl") {
@@ -1833,7 +1833,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
         AttBeatRptVis *att = dynamic_cast<AttBeatRptVis*>(element);
         assert( att );
         if (attrType == "rend") {
-            att->SetRend(att->StrToStr(attrValue));
+            att->SetRend(att->StrToBeatrptRend(attrValue));
             return true;
         }
     }
@@ -2151,7 +2151,7 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttBeamrend *att = dynamic_cast<AttBeamrend*>(element);
         assert( att );
         if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->StrToStr(att->GetRend())));
+            attributes->push_back(std::make_pair("rend", att->BeatrptRendToStr(att->GetRend())));
         }
         if (att->HasSlope()) {
             attributes->push_back(std::make_pair("slopeDbl", att->DblToStr(att->GetSlope())));
@@ -2168,7 +2168,7 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttBeatRptVis *att = dynamic_cast<AttBeatRptVis*>(element);
         assert( att );
         if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->StrToStr(att->GetRend())));
+            attributes->push_back(std::make_pair("rend", att->BeatrptRendToStr(att->GetRend())));
         }
     }
     if (element->HasAttClass( ATT_BENDGES ) ) {

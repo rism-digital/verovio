@@ -110,6 +110,9 @@ public:
     std::string BarRenditionToStr(data_BARRENDITION data);
     data_BARRENDITION StrToBarRendition(std::string value);
     
+    std::string BeatrptRendToStr(data_BEATRPT_REND data);
+    data_BEATRPT_REND StrToBeatrptRend(std::string value);
+    
     std::string BoolToStr(data_BOOLEAN data);
     data_BOOLEAN StrToBool(std::string value);
     
@@ -190,6 +193,9 @@ public:
     
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
+    
+    std::string SymbolToStr(data_SYMBOL data);
+    data_SYMBOL StrToSymbol(std::string value);
     
     std::string TempusToStr(data_TEMPUS data);
     data_TEMPUS StrToTempus(std::string value);

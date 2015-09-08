@@ -107,8 +107,8 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning( ArrayPtrVoid *params, D
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stack or not
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
-    bool *fillList = static_cast<bool*>((*params)[1]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params).at(0));
+    bool *fillList = static_cast<bool*>((*params).at(1));
     
     if ((*fillList)==false) {
         return FUNCTOR_CONTINUE;
@@ -123,7 +123,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning( ArrayPtrVoid *params, D
 int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning( ArrayPtrVoid *params, DocObject *object  )
 {
     // param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params)[0]);
+    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params).at(0));
     
     if (this->HasStartAndEnd()) {
         if ( GetStart()->GetFirstParent( STAFF ) != GetEnd()->GetFirstParent( STAFF ) ) {

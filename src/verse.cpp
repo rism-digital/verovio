@@ -60,8 +60,8 @@ int Verse::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner
     // param 1: the staffNb
-    SystemAligner **systemAligner = static_cast<SystemAligner**>((*params)[0]);
-    int *staffNb = static_cast<int*>((*params)[1]);
+    SystemAligner **systemAligner = static_cast<SystemAligner**>((*params).at(0));
+    int *staffNb = static_cast<int*>((*params).at(1));
     
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
@@ -81,9 +81,9 @@ int Verse::PrepareProcessingLists( ArrayPtrVoid *params )
 {
     // param 0: the IntTree* for staff/layer/verse
     // param 1: the IntTree* for staff/layer (unused)
-    IntTree *tree = static_cast<IntTree*>((*params)[0]);
+    IntTree *tree = static_cast<IntTree*>((*params).at(0));
     // Alternate solution with StaffN_LayerN_VerseN_t
-    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params)[0]);
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
     
     Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( STAFF ) );
     Layer *layer = dynamic_cast<Layer*>( this->GetFirstParent( LAYER ) );

@@ -94,7 +94,6 @@ python $EMCC $CHATTY \
 	-DUSE_EMSCRIPTEN \
 	$ASM \
 	./emscripten_main.cpp \
-	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/accid.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
 	$VEROVIO_ROOT/src/att.cpp \
@@ -131,15 +130,8 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/pitchinterface.cpp \
 	$VEROVIO_ROOT/src/positioninterface.cpp \
 	$VEROVIO_ROOT/src/proport.cpp \
-	$VEROVIO_ROOT/src/view.cpp \
-	$VEROVIO_ROOT/src/view_beam.cpp \
-	$VEROVIO_ROOT/src/view_element.cpp \
-	$VEROVIO_ROOT/src/view_floating.cpp \
-	$VEROVIO_ROOT/src/view_graph.cpp \
-	$VEROVIO_ROOT/src/view_mensural.cpp \
-	$VEROVIO_ROOT/src/view_page.cpp \
-	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/rest.cpp \
+	$VEROVIO_ROOT/src/rpt.cpp \
 	$VEROVIO_ROOT/src/scoredef.cpp \
 	$VEROVIO_ROOT/src/scoredefinterface.cpp \
 	$VEROVIO_ROOT/src/slur.cpp \
@@ -153,9 +145,19 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/textdirinterface.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/timeinterface.cpp \
+	$VEROVIO_ROOT/src/trem.cpp \
 	$VEROVIO_ROOT/src/toolkit.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/verse.cpp \
+	$VEROVIO_ROOT/src/view.cpp \
+	$VEROVIO_ROOT/src/view_beam.cpp \
+	$VEROVIO_ROOT/src/view_element.cpp \
+	$VEROVIO_ROOT/src/view_floating.cpp \
+	$VEROVIO_ROOT/src/view_graph.cpp \
+	$VEROVIO_ROOT/src/view_mensural.cpp \
+	$VEROVIO_ROOT/src/view_page.cpp \
+	$VEROVIO_ROOT/src/view_tuplet.cpp \
+	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_critapp.cpp \

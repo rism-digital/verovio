@@ -197,6 +197,41 @@ data_BARRENDITION Att::StrToBarRendition(std::string value)
 	}
 	return BARRENDITION_NONE;
 }
+    
+std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
+{
+    std::string value;
+    switch(data)
+    {
+        case BEATRPT_REND_4 : value = "4"; break;
+        case BEATRPT_REND_8 : value = "8"; break;
+        case BEATRPT_REND_16 : value = "16"; break;
+        case BEATRPT_REND_32 : value = "32"; break;
+        case BEATRPT_REND_64 : value = "64"; break;
+        case BEATRPT_REND_128 : value = "128"; break;
+        case BEATRPT_REND_mixed : value = "mixed"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
+{
+    if (value == "4") return BEATRPT_REND_4;
+    else if (value == "8") return BEATRPT_REND_8;
+    else if (value == "16") return BEATRPT_REND_16;
+    else if (value == "32") return BEATRPT_REND_32;
+    else if (value == "64") return BEATRPT_REND_64;
+    else if (value == "128") return BEATRPT_REND_128;
+    else if (value == "mixed") return BEATRPT_REND_mixed;
+    else {
+        LogWarning("Unsupported beatrpt rend '%s'", value.c_str() );
+    }
+    return BEATRPT_REND_NONE;
+}
 
 std::string Att::BoolToStr(data_BOOLEAN data)
 {
@@ -371,7 +406,7 @@ data_DURATION Att::StrToDur(std::string value)
     else if (value == "256") dur = DURATION_256;
     else {
         if ((value.length() > 0) && (value[value.length()-1] == 'p')) {
-            LogWarning("PPQ duration dur_s are not supported");
+            //LogWarning("PPQ duration dur_s are not supported"); // remove it for now
         }
         else {
             LogWarning("Unknown @dur dur '%s'", value.c_str());
@@ -1004,6 +1039,33 @@ data_STEMPOSITION Att::StrToStemPosition(std::string value)
     }
     return STEMPOSITION_NONE;
 }    
+
+std::string Att::SymbolToStr(data_SYMBOL data)
+{
+    std::string value;
+    switch(data)
+    {
+        case SYMBOL_brace : value = "brace"; break;
+        case SYMBOL_bracket: value = "bracket"; break;
+        case SYMBOL_line: value = "line"; break;
+        default:
+            LogWarning("Unknown symbol '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_SYMBOL Att::StrToSymbol(std::string value)
+{
+    if (value == "brace") return SYMBOL_brace;
+    else if (value == "bracket") return SYMBOL_bracket;
+    else if (value == "line") return SYMBOL_line;
+    else {
+        LogWarning("Unsupported symbol '%s'", value.c_str() );
+    }
+    return SYMBOL_NONE;
+}
 
 std::string Att::TieToStr(data_TIE data)
 {

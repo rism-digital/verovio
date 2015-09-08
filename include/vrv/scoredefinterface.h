@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __VRV_SCORE_DEF_INTERFACE_H__
-#define __VRV_SCORE_DEF_INTERFACE_H__
+#ifndef __VRV_SCOREDEF_INTERFACE_H__
+#define __VRV_SCOREDEF_INTERFACE_H__
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
@@ -31,7 +31,8 @@ class ScoreDefInterface: public Interface,
     public AttMensuralLog,
     public AttMensuralShared,
     public AttMeterSigDefaultLog,
-    public AttMeterSigDefaultVis
+    public AttMeterSigDefaultVis,
+    public AttMultinummeasures
 {
 public:
     /**

@@ -23,6 +23,7 @@ class Accid;
 class Annot;
 class Barline;
 class Beam;
+class BeatRpt;
 class Chord;
 class Clef;
 class Custos;
@@ -36,7 +37,10 @@ class Measure;
 class Mensur;
 class MeterSig;
 class MRest;
+class MRpt;
+class MRpt2;
 class MultiRest;
+class MultiRpt;
 class Note;
 class PitchInterface;
 class PositionInterface;
@@ -128,6 +132,7 @@ private:
     void WriteMeiAccid( pugi::xml_node currentNode, Accid *accid );
     void WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine );
     void WriteMeiBeam( pugi::xml_node currentNode, Beam *beam );
+    void WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt );
     void WriteMeiChord( pugi::xml_node currentNode, Chord *chord );
     void WriteMeiClef( pugi::xml_node currentNode, Clef *clef );
     void WriteMeiCustos( pugi::xml_node currentNode, Custos *custos );
@@ -136,7 +141,10 @@ private:
     void WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur );
     void WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig );
     void WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest );
+    void WriteMeiMRpt( pugi::xml_node currentNode, MRpt *mRpt );
+    void WriteMeiMRpt2( pugi::xml_node currentNode, MRpt2 *mRpt2 );
     void WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest );
+    void WriteMeiMultiRpt( pugi::xml_node currentNode, MultiRpt *multiRpt );
     void WriteMeiNote( pugi::xml_node currentNode, Note *note );
     void WriteMeiProport( pugi::xml_node currentNode, Proport *proport );
     void WriteMeiRest( pugi::xml_node currentNode, Rest *rest );
@@ -207,9 +215,7 @@ private:
     /** @name Methods for converting members into MEI attributes. */
     ///@{
     std::string UuidToMeiStr( Object *element );
-    std::string BoolToStr(bool value );
     std::string DocTypeToStr(DocType type);
-    std::string StaffGrpSymbolToStr(StaffGrpSymbol symbol);
     ///@}
 
     
@@ -293,6 +299,7 @@ private:
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
     bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
+    bool ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt );
     bool ReadMeiChord( Object* parent, pugi::xml_node chord );
     bool ReadMeiClef( Object *parent, pugi::xml_node clef );
     bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
@@ -301,7 +308,10 @@ private:
     bool ReadMeiMensur( Object *parent, pugi::xml_node mensur );
     bool ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig );
     bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );
+    bool ReadMeiMRpt( Object *parent, pugi::xml_node mRpt );
+    bool ReadMeiMRpt2( Object *parent, pugi::xml_node mRpt2 );
     bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
+    bool ReadMeiMultiRpt( Object *parent, pugi::xml_node multiRpt );
     bool ReadMeiNote( Object *parent, pugi::xml_node note );
     bool ReadMeiProport( Object *parent, pugi::xml_node proport );
     bool ReadMeiRest( Object *parent, pugi::xml_node rest );
@@ -397,9 +407,7 @@ private:
      */
     ///@{
     void SetMeiUuid( pugi::xml_node element, Object *object );
-    bool StrToBool(std::string value);
     DocType StrToDocType(std::string type);
-    StaffGrpSymbol StrToStaffGrpSymbol(std::string sign);
     /** Extract the uuid for references to uuids with ..#uuid values */
     std::string ExtractUuidFragment(std::string refUuid);
     ///@}

@@ -35,6 +35,7 @@
    <glyph glyph-code="E0A3" x="0.0" y="-135.0" width="316.0" height="270.0" />
    <glyph glyph-code="E0A4" x="0.0" y="-135.0" width="316.0" height="270.0" />
    <glyph glyph-code="E0FA" x="0.0" y="0.0" width="200.0" height="400.0" />
+   <glyph glyph-code="E101" x="0.0" y="-246.0" width="212.0" height="492.0" />
    <glyph glyph-code="E220" x="0.0" y="0.0" width="200.0" height="400.0" />
    <glyph glyph-code="E221" x="0.0" y="0.0" width="200.0" height="400.0" />
    <glyph glyph-code="E222" x="0.0" y="0.0" width="200.0" height="400.0" />
@@ -69,6 +70,8 @@
    <glyph glyph-code="E4E9" x="0.0" y="-712.0" width="472.0" height="1156.0" />
    <glyph glyph-code="E4EA" x="0.0" y="-712.0" width="544.0" height="1400.0" />
    <glyph glyph-code="E500" x="0.0" y="0.0" width="200.0" height="400.0" />
+   <glyph glyph-code="E501" x="0.0" y="0.0" width="200.0" height="400.0" />
+   <glyph glyph-code="E502" x="0.0" y="0.0" width="200.0" height="400.0" />
    <glyph glyph-code="E520" x="-72.0" y="-180.0" width="418.0" height="452.0" />
    <glyph glyph-code="E521" x="-41.0" y="-20.0" width="460.0" height="292.0" />
    <glyph glyph-code="E522" x="-144.0" y="-147.0" width="530.0" height="597.0" />

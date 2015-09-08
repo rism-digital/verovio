@@ -32,7 +32,8 @@ ScoreDefInterface::ScoreDefInterface(): Interface(),
     AttMensuralShared(),
     AttMensuralLog(),
     AttMeterSigDefaultLog(),
-    AttMeterSigDefaultVis()
+    AttMeterSigDefaultVis(),
+    AttMultinummeasures()
 {
     RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
@@ -41,6 +42,7 @@ ScoreDefInterface::ScoreDefInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_MENSURALSHARED);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
+    RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
     Reset();
 }
 
@@ -57,6 +59,7 @@ void ScoreDefInterface::Reset()
     ResetMensuralShared();
     ResetMeterSigDefaultLog();
     ResetMeterSigDefaultVis();
+    ResetMultinummeasures();
 }
     
 } // namespace vrv
