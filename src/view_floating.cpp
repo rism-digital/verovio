@@ -265,21 +265,21 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     points[0] = Point(x1, y1);
     points[1] = Point(x2, y2);
     
-    AdjustSlurPosition(slur, staff, layer1->GetN(), up, points);
+    float angle = AdjustSlurPosition(slur, staff, layer1->GetN(), up, points);
     
     int thickness =  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR ;
     
     if ( graphic ) dc->ResumeGraphic(graphic, graphic->GetUuid());
     else dc->StartGraphic(slur, "spanning-slur", "");
     dc->DeactivateGraphic();
-    DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize );
+    DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
     dc->ReactivateGraphic();
     
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
     else dc->EndGraphic(slur, this);
 }
     
-void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[])
+float View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[])
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];
@@ -293,11 +293,13 @@ void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Po
     if (fabs(slurAngle) > TEMP_STYLE_MAX_SLUR_SLOPE) {
         int side = (p2->x - p1->x) * sin(TEMP_STYLE_MAX_SLUR_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_MAX_SLUR_SLOPE);
         if (p2->y > p1->y) {
-            p1->y = p2->y - side;
+            if (up) p1->y = p2->y - side;
+            else p2->y = p1->y + side;
             slurAngle = TEMP_STYLE_MAX_SLUR_SLOPE;
         }
         else {
-            p2->y = p1->y - side;
+            if (up) p2->y = p1->y - side;
+            else p1->y = p2->y + side;
             slurAngle = -TEMP_STYLE_MAX_SLUR_SLOPE;
         }
     }
@@ -313,21 +315,22 @@ void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Po
         height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * slur->GetBulge();
     }
     else {
-        //height = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         int dist = abs( p2->x - p1->x );
         height = std::max(  m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
         height = std::min( m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, height );
     }
     
-    // control points
-    Point rotatecC1, rotatedC2;
-    
     // the height of the control points
     height = height * 4 / 3;
     
+    /************** rotation **************/
+    
+    // control points
+    Point rotatecC1, rotatedC2;
+    
     int cPos = std::min((rotatedP2.x - p1->x) / TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
     rotatecC1.x = p1->x + cPos; // point at 1/4
-    rotatedC2.x = p2->x - cPos;; // point at 3/4
+    rotatedC2.x = rotatedP2.x - cPos;; // point at 3/4
     
     if (up) {
         rotatecC1.y = p1->y + height;
@@ -337,10 +340,7 @@ void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Po
         rotatedC2.y = rotatedP2.y - height;
     }
     
-    points[1] = View::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
-    points[2] = View::CalcPositionAfterRotation(rotatecC1, slurAngle, *p1);
-    points[3] = View::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
-    
+    /************** content **************/
     
     
     System *system = dynamic_cast<System*>(staff->GetFirstParent(SYSTEM));
@@ -358,12 +358,16 @@ void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Po
     filters.push_back( &matchStaff );
     filters.push_back( &matchLayer );
     
-    //paramsTieAttr.push_back( &currentNotes );
-    //paramsTieAttr.push_back( &currentChord );
     Functor timeSpanningLayerElements( &Object::TimeSpanningLayerElements );
     //LogDebug("*** %d - %d", note1->GetDrawingX(), note2->GetDrawingX() ) ;
     system->Process( &timeSpanningLayerElements, &params, NULL, &filters );
     if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
+    
+    
+    points[1] = View::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+    points[2] = View::CalcPositionAfterRotation(rotatecC1, slurAngle, *p1);
+    points[3] = View::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+    
     
     /*
      Point bezier[4];
@@ -380,7 +384,7 @@ void View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Po
      p;
      */
     
-    
+    return slurAngle;
 }
     
 void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,

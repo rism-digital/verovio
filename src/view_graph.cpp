@@ -202,20 +202,37 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     dc->EndText( );
 }
     
-void View::DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize)
+void View::DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)
 {
     assert( dc );
     
     int bez1[6], bez2[6]; // filled array with control points and end point
+    Point c1Rotated = c1;
+    Point c2Rotated = c2;
+    c1Rotated.y += thickness / 2;
+    c2Rotated.y += thickness / 2;
+    if (angle != 0.0) {
+        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
+        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
+    }
     
     // Points for first bez, they go from xy to x1y1
-    bez1[0] = ToDeviceContextX(c1.x); bez1[1] = ToDeviceContextY(c1.y + thickness / 2);
-    bez1[2] = ToDeviceContextX(c2.x); bez1[3] = ToDeviceContextY(c2.y + thickness / 2);
+    bez1[0] = ToDeviceContextX(c1Rotated.x); bez1[1] = ToDeviceContextY(c1Rotated.y);
+    bez1[2] = ToDeviceContextX(c2Rotated.x); bez1[3] = ToDeviceContextY(c2Rotated.y);
     bez1[4] = ToDeviceContextX(p2.x); bez1[5] = ToDeviceContextY(p2.y);
     
+    c1Rotated = c1;
+    c2Rotated = c2;
+    c1Rotated.y -= thickness / 2;
+    c2Rotated.y -= thickness / 2;
+    if (angle != 0.0) {
+        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
+        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
+    }
+    
     // second bez. goes back
-    bez2[0] = ToDeviceContextX(c2.x); bez2[1] = ToDeviceContextY(c2.y - thickness / 2);
-    bez2[2] = ToDeviceContextX(c1.x); bez2[3] = ToDeviceContextY(c1.y - thickness / 2);
+    bez2[0] = ToDeviceContextX(c2Rotated.x); bez2[1] = ToDeviceContextY(c2Rotated.y);
+    bez2[2] = ToDeviceContextX(c1Rotated.x); bez2[3] = ToDeviceContextY(c1Rotated.y);
     bez2[4] = ToDeviceContextX(p1.x); bez2[5] = ToDeviceContextY(p1.y);
     
     // Actually draw it

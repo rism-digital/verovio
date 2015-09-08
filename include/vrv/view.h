@@ -310,7 +310,7 @@ protected:
 	void DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
-    void DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize);
+    void DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
     void DrawPartFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
 	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
@@ -332,7 +332,7 @@ private:
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
     
-    void AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
+    float AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
     
     /**
      * @name Used for calculating clustered information/dot position

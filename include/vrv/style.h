@@ -75,11 +75,11 @@ namespace vrv {
 #define MIN_MEASURE_WIDTH 1.0
 #define MAX_MEASURE_WIDTH 30.0
 
-#define DEFAULT_TIE_THICKNESS 0.6
+#define DEFAULT_TIE_THICKNESS 0.5
     
 #define DEFAULT_MIN_SLUR_HEIGHT 1.2
 #define DEFAULT_MAX_SLUR_HEIGHT 3.0
-#define DEFAULT_SLUR_THICKNESS 0.7
+#define DEFAULT_SLUR_THICKNESS 0.6
     
 /** The default position at the beginning of a measure */
 #define DEFAULT_LEFT_POSITION 1.3
@@ -137,7 +137,7 @@ namespace vrv {
 #define TEMP_STYLE_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
     
 // the maximum angle of a slur
-#define TEMP_STYLE_MAX_SLUR_SLOPE (30 * M_PI / 180)
+#define TEMP_STYLE_MAX_SLUR_SLOPE (45 * M_PI / 180)
 #define TEMP_STYLE_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
 #define TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
     
