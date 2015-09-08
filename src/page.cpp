@@ -112,19 +112,21 @@ void Page::LayOutHorizontally( )
     Functor alignHorizontallyEnd( &Object::AlignHorizontallyEnd );
     this->Process( &alignHorizontally, &params, &alignHorizontallyEnd );
     
-    // Set the X position of each Alignment
-    // Does a duration-based non linear spacing looking at the duration space between two Alignment objects
-    params.clear();
-    double previousTime = 0.0;
-    int previousXRel = 0;
-    int minMeasureWidth = doc->m_drawingMinMeasureWidth;
-    params.push_back( &previousTime );
-    params.push_back( &previousXRel );
-    params.push_back( &minMeasureWidth );
-    Functor setAlignmentX( &Object::SetAligmentXPos );
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
-    params.push_back( &setAlignmentX );
-    this->Process( &setAlignmentX, &params );
+    // Unless duration-based spacing is disabled, get the X position of each Alignment.
+    // Does non-linear spacing based on the duration space between two Alignment objects.
+    if (!doc->GetEvenSpacing()) {
+        params.clear();
+        double previousTime = 0.0;
+        int previousXRel = 0;
+        int minMeasureWidth = doc->m_drawingMinMeasureWidth;
+        params.push_back( &previousTime );
+        params.push_back( &previousXRel );
+        params.push_back( &minMeasureWidth );
+        Functor setAlignmentX( &Object::SetAligmentXPos );
+        // Special case: because we redirect the functor, pass it a parameter to itself (!)
+        params.push_back( &setAlignmentX );
+        this->Process( &setAlignmentX, &params );
+    }
     
     // Render it for filling the bounding box
     View view;

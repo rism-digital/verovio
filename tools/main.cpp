@@ -73,11 +73,11 @@ void display_usage() {
     cerr << " verovio [-f format] [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
     
     // These need to be kept in alphabetical order:
-    // -short options first
-    // -then long options only
+    // -options with both short and long forms first
+    // -then options with long forms only
     // -then debugging options
 
-    // Options
+    // Options with both short and long forms
     cerr << "Options" << endl;
     
     
@@ -101,13 +101,15 @@ void display_usage() {
 
     cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGE_WIDTH << ")" << endl;
     
-    // long options only
+    // Options with long forms only
     cerr << endl << "Additional options" << endl;
     
     cerr << " --adjust-page-height       Crop the page height to the height of the content" << endl;
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
+    cerr << " --even-note-spacing        Space notes evenly and close together regardless of their durations" << endl;
+
     cerr << " --font=FONT                Select the music font to use (default is Leipzig; Bravura and Gootville are also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
@@ -152,6 +154,7 @@ int main(int argc, char** argv)
     int no_layout = 0;
     int ignore_layout = 0;
     int no_justification = 0;
+    int even_note_spacing = 0;
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
@@ -166,7 +169,7 @@ int main(int argc, char** argv)
     type = pae_file;
     
     if (argc < 2) {
-        cerr << "Expecting one input file." << endl << endl;
+        cerr << "Expected one input file but found none." << endl << endl;
         display_usage();
         exit(1);
     }
@@ -178,6 +181,7 @@ int main(int argc, char** argv)
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"all-pages",           no_argument,        &all_pages, 1},
         {"border",              required_argument,  0, 'b'},
+        {"even-note-spacing",   no_argument,        &even_note_spacing, 1},
         {"font",                required_argument,  0, 0},
         {"format",              required_argument,  0, 'f'},
         {"help",                no_argument,        &show_help, 1},
@@ -301,13 +305,14 @@ int main(int argc, char** argv)
     toolkit.SetNoLayout(no_layout);
     toolkit.SetIgnoreLayout(ignore_layout);
     toolkit.SetNoJustification(no_justification);
+    toolkit.SetEvenNoteSpacing(even_note_spacing);
     toolkit.SetShowBoundingBoxes(show_bounding_boxes);
     
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
     }
     else {
-        cerr << "Incorrect number of arguments: expecting one input file." << endl << endl;
+        cerr << "Incorrect number of arguments: expected one input file but found none." << endl << endl;
         display_usage();
         exit(1);
     }

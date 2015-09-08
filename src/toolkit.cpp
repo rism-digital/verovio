@@ -52,6 +52,7 @@ Toolkit::Toolkit( bool initFont )
     m_ignoreLayout = false;
     m_adjustPageHeight = false;
     m_noJustification = false;
+    m_evenNoteSpacing = true;
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
     
@@ -301,6 +302,11 @@ bool Toolkit::LoadString( const std::string &data )
     // disable justification if no layout or no justification
     if (m_noLayout || m_noJustification) {
         m_doc.SetJustificationX(false);
+    }
+    
+    // disable duration-based spacing if requested
+    if (!m_evenNoteSpacing) {
+        m_doc.SetEvenSpacing(false);
     }
     
     delete input;

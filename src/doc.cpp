@@ -71,6 +71,7 @@ void Doc::Reset( DocType type )
     
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
+    m_drawingEvenSpacing = true;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     

@@ -214,6 +214,12 @@ public:
     int GetAdjustPageHeight() { return m_adjustPageHeight; };
     ///@}
     
+    
+    /**
+     * @name Space notes equally and close together (normally for mensural notation) */
+    void SetEvenNoteSpacing( bool even ) { m_evenNoteSpacing = even; };
+    int GetEvenNoteSpacing() { return m_evenNoteSpacing; };
+    
     /**
      * @name Do not justify the system (for debugging purposes) 
      */
@@ -318,6 +324,7 @@ private:
     bool m_adjustPageHeight;
     std::string m_rdgXPathQuery;
     bool m_scoreBasedMei;
+    bool m_evenNoteSpacing;
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;
