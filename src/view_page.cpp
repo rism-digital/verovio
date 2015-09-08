@@ -742,9 +742,10 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     x2 = x1 + measure->GetWidth();
     
     //dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->m_style->m_staffLineWidth ), AxSOLID );
-    int lineWidth = (int)(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) * MENSURAL_LINEWIDTH_FACTOR);
+    int lineWidth = (int)(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
+    if (true) lineWidth = lineWidth * MENSURAL_LINEWIDTH_FACTOR;            // ??DON'T DO IF NOT MENSURAL NOTATION!
     dc->SetPen( m_currentColour, ToDeviceContextX( lineWidth ), AxSOLID );
-    dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) ), AxSOLID );
+    //dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
     
     for(j = 0;j < staff->m_drawingLines; j++)

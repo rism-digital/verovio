@@ -217,7 +217,6 @@ protected:
     void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSpace( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -274,6 +273,7 @@ protected:
     ///@{
     void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     
     /**
      * @name Methods for drawing parts of mensural LayerElement child classes.
@@ -288,6 +288,7 @@ protected:
     void DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
+    void DrawProportFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     ///@}
     
     /**

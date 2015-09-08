@@ -19,12 +19,26 @@
 #include "layer.h"
 #include "mensur.h"
 #include "note.h"
+#include "proport.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
 
 namespace vrv {    
 
+/* ??THESE #defines PROBABLY BELONG IN style.h . */
+    
+/* Set ratio of mensural notehead size to CMN notehead size for the same staff size */
+#define MENSUR_NOTEHEAD_FACTOR 0.60
+/* Set size of mensuration sign circle relative to space between staff lines. The entire mensuration sign fits
+     easily between two staff lines, so the radius is considerably less than half the distance between them. */
+#define MCIRCLE_RADIUS_FACTOR 0.32
+/* Set vertical position of center of mensuration sign as distance below top of the staff */
+#define MENSURSIGN_STAFFLINES_BELOW_TOP 1.5
+/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
+#define MENSURSIGN_DOTSIZE 0.15
+    
+    
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
@@ -44,12 +58,13 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     assert( note );
     
     int staffSize = staff->m_drawingStaffSize;
+    // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
+    int pseudoStaffSize = (int)(MENSUR_NOTEHEAD_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
     int xLedger, xNote, xStem;
     int drawingDur;
-    bool drawingCueSize;
     int staffY = staff->GetDrawingY();
-    wchar_t fontNo;
+    wchar_t charCode;
     int ledge;
     int verticalCenter = 0;
 
@@ -57,15 +72,14 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     xLedger = xStem;
     
     drawingDur = note->GetDrawingDur();
-    drawingCueSize = note->HasGrace();
     
-    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize);
+    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, pseudoStaffSize, false) / 2;
     
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
+        ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
     }
     else {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
+        ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
         radius += radius/3;
     }
     
@@ -87,7 +101,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     /************** Noteheads: **************/
     
-    // Long, breve and ligatures
+    // Ligature, maxima,longa, brevis, and semibrevis
     if ((note->GetLig()!=LIGATURE_NONE) && (drawingDur <= DUR_1)) {
         DrawLigature ( dc, noteY, element, layer, staff);
     }
@@ -96,24 +110,24 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     }
     else if (drawingDur == DUR_1) {
         if (note->GetColored())
-            fontNo = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
+            charCode = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
         else
-            fontNo = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
+            charCode = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
         
-        DrawSmuflCode( dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize );
+        DrawSmuflCode( dc, xNote, noteY, charCode, pseudoStaffSize, false );
     }
-    // Other values ??WE WANT MENSURAL NOTEHEADS, NOT CMN!!!!!!!!
+    // Shorter values ??WE WANT MENSURAL NOTEHEADS, NOT CMN!!!!!!!!
    else {
         if (note->GetColored()) {
-            if (drawingDur == DUR_2) fontNo = SMUFL_E0A4_noteheadBlack;
-            else fontNo = SMUFL_E0A3_noteheadHalf;
+            if (drawingDur == DUR_2) charCode = SMUFL_E0A3_noteheadHalf;
+            else charCode = SMUFL_E0A4_noteheadBlack;
         }
         else {
-            if (drawingDur > DUR_2) fontNo = SMUFL_E0A4_noteheadBlack;
-            else fontNo = SMUFL_E0A3_noteheadHalf;
+            if (drawingDur > DUR_2) charCode = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            else charCode = SMUFL_E0A3_noteheadHalf;
         }
 
-        DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->m_drawingStaffSize, drawingCueSize );
+        DrawSmuflCode( dc, xNote, noteY, charCode,  pseudoStaffSize, false );
         
         DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
@@ -140,11 +154,12 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     /************** dots **************/
     
     if (note->GetDots()) {
+        int mensDrawingUnit = (int)(MENSUR_NOTEHEAD_FACTOR * m_doc->GetDrawingUnit(staffSize));
         int xDot;
         if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
-            xDot = xStem + m_doc->GetDrawingUnit(staffSize)*7/2;
+            xDot = xStem + mensDrawingUnit*7/2;
         else
-            xDot = xStem + m_doc->GetDrawingUnit(staffSize)*5/2;
+            xDot = xStem + mensDrawingUnit*5/2;
         
         DrawDots( dc, xDot, noteY, note->GetDots(), staff );
     }
@@ -196,29 +211,19 @@ void View::DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, S
             x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
-        DrawMeterSigFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
+        DrawProportFigures ( dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
     }
     
     dc->EndGraphic(element, this );
     
 }
 
-/* Set size of mensuration sign circle relative to space between staff lines. The entire mensuration sign fits easily between two staff lines, so the radius is considerably less than half the distance between them.
-    ??THESE #defines PROBABLY BELONG IN style.h . */
-#define MCIRCLE_RADIUS_FACTOR 0.32
-/* Set default vertical position of mensuration sign circle as distance below the top of the staff for center
- of the circle */
-#define MCIRCLE_STAFFLINES_BELOW_TOP 1.5
-/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
-#define MENSUR_DOTSIZE 0.15
-
-    
 void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
 {
     assert( dc );
     assert( staff );
     
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MCIRCLE_STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MENSURSIGN_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ));
     r = (int)(MCIRCLE_RADIUS_FACTOR*r);
     
@@ -241,13 +246,16 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MCIRCLE_STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MENSURSIGN_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ));
     r = (int)(MCIRCLE_RADIUS_FACTOR*r);
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
     
+    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
+    rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
+    y -= staff->m_drawingStaffSize / 2;
     dc->DrawEllipticArc( x, y, 2*r, 2*r, 45, 315 );
     
     dc->ResetPen();
@@ -284,10 +292,8 @@ void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
     assert( dc );
     assert( staff );
     
-    //int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MCIRCLE_STAFFLINES_BELOW_TOP);
-    //int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MENSUR_DOTSIZE;
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * 2);
-    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MENSURSIGN_STAFFLINES_BELOW_TOP);
+    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MENSURSIGN_DOTSIZE;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -348,24 +354,27 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
     Note *note = dynamic_cast<Note*>(element);
     assert( note );
     
+    // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
+    int pseudoStaffSize = (int)(MENSUR_NOTEHEAD_FACTOR * staff->m_drawingStaffSize);
     int xn, x1, x2, y1, y2, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
     
-    height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2 ;
+    height = m_doc->GetDrawingBeamWidth(pseudoStaffSize, false) / 2 ;
     xn = element->GetDrawingX();
     
-    // calcul des dimensions du rectangle
-    x1 = xn - m_doc->GetDrawingBrevisWidth( staff->m_drawingStaffSize );
-    x2 = xn +  m_doc->GetDrawingBrevisWidth( staff->m_drawingStaffSize );
+    // Calculate size of the rectangle
+    x1 = xn - m_doc->GetDrawingBrevisWidth( pseudoStaffSize );
+    x2 = xn +  m_doc->GetDrawingBrevisWidth( pseudoStaffSize );
     if (note->GetActualDur() == DUR_MX) {
-        x1 -= m_doc->GetDrawingBrevisWidth( staff->m_drawingStaffSize );
-        x2 += m_doc->GetDrawingBrevisWidth( staff->m_drawingStaffSize );
+        // Maxima is three times the width of brevis
+        x1 -= m_doc->GetDrawingBrevisWidth( pseudoStaffSize );
+        x2 += m_doc->GetDrawingBrevisWidth( pseudoStaffSize );
     }
-    y1 = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    y2 = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    y3 = (int)(y1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/2);	// partie d'encadrement qui depasse
-    y4 = (int)(y2 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/2);
+    y1 = y + m_doc->GetDrawingUnit(pseudoStaffSize);
+    y2 = y - m_doc->GetDrawingUnit(pseudoStaffSize);
+    y3 = (int)(y1 + m_doc->GetDrawingUnit(pseudoStaffSize)/2);	// partie d'encadrement qui depasse
+    y4 = (int)(y2 - m_doc->GetDrawingUnit(pseudoStaffSize)/2);
     
     if (note->GetColored()!=BOOLEAN_true) {
         //	double base des carrees
@@ -376,13 +385,13 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
         DrawFullRectangle( dc,x1,y1,x2,y2);
     }
     
-    DrawVerticalLine ( dc, y3, y4, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) );	// corset lateral
-    DrawVerticalLine ( dc, y3, y4, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) );
+    DrawVerticalLine ( dc, y3, y4, x1, m_doc->GetDrawingStemWidth(pseudoStaffSize) );	// corset lateral
+    DrawVerticalLine ( dc, y3, y4, x2, m_doc->GetDrawingStemWidth(pseudoStaffSize) );
 
     // stem
     if (note->GetActualDur() < DUR_BR)
     {
-        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
+        verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(pseudoStaffSize)*2;
         up = (y < verticalCenter) ? true : false;
         if ( note->GetDrawingStemDir() != STEMDIRECTION_NONE ) {
             if ( note->GetDrawingStemDir() == STEMDIRECTION_up) {
@@ -394,14 +403,14 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
         }
         
         if (!up) {
-            y3 = y1 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*8;
+            y3 = y1 - m_doc->GetDrawingUnit(pseudoStaffSize)*8;
             y2 = y1;
         }
         else {
-            y3 = y1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*6;
+            y3 = y1 + m_doc->GetDrawingUnit(pseudoStaffSize)*6;
             y2 = y1;
         }
-        DrawVerticalLine ( dc, y2,y3,x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) );
+        DrawVerticalLine ( dc, y2,y3,x2, m_doc->GetDrawingStemWidth(pseudoStaffSize) );
     }
     
     return;
@@ -549,7 +558,79 @@ void View::DrawLigature ( DeviceContext *dc, int y, LayerElement *element, Layer
     return;
 }
 
+
+void View::DrawProportFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff)
+{
+        assert( dc );
+        assert( staff );
+        
+        int ynum, yden;
+        int textSize = (1.0/2.0)*staff->m_drawingStaffSize;
+        std::wstring wtext;
+        
+        if (numBase)
+        {
+            ynum = y - (m_doc->GetDrawingUnit(textSize)*2);
+            yden = ynum - (m_doc->GetDrawingDoubleUnit(textSize)*2);
+        }
+        else
+            ynum = y - (m_doc->GetDrawingUnit(textSize)*4);
+        
+        if (numBase > 9 || num > 9)	{
+            x += m_doc->GetDrawingUnit(textSize) * 2;
+        }
+        
+        dc->SetFont(m_doc->GetDrawingSmuflFont(textSize, false));
+        
+        wtext = IntToTimeSigFigures(num);
+        DrawSmuflString ( dc, x, ynum, wtext, true, textSize);	// true = center
+        
+        if (numBase)
+        {
+            wtext = IntToTimeSigFigures(numBase);
+            DrawSmuflString ( dc, x, yden, wtext, true, textSize);	// '1' = center
+        }
+        
+        dc->ResetFont();
+        
+        return;
+}
     
+    
+void View::DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+{
+        assert(layer); // Pointer to layer cannot be NULL"
+        assert(staff); // Pointer to staff cannot be NULL"
+        assert(dynamic_cast<Proport*>(element)); // Element must be a Mensur"
+        
+        int x1, x2, y1, y2;
+        
+        Proport *proport = dynamic_cast<Proport*>(element);
+        
+        dc->StartGraphic( element, "", element->GetUuid() );
+        
+        int y = staff->GetDrawingY() - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*4);
+        int x = element->GetDrawingX();
+        
+        x1 = x+120;  x2 = x1+150;					// ??TEST: JUST DRAW AN ARBITRARY RECTANGLE
+        y1 = y;	y2 = y+50+(50*proport->GetNum());
+        //DrawFullRectangle( dc,x1,y1,x2,y2);
+        DrawPartFullRectangle( dc,x1,y1,x2,y2, 0);
+        
+        if (proport->HasNum())
+        {
+            x = element->GetDrawingX();
+            //if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
+            {
+                x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a sign or a meter symbol
+            }
+            int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
+            DrawProportFigures ( dc, x, staff->GetDrawingY(), proport->GetNum(), numbase, staff);
+        }
+        
+        
+        dc->EndGraphic(element, this );
+}
     
 } // namespace vrv    
     
