@@ -178,6 +178,8 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     Chord *endParentChord = NULL;
     Note *startNote = NULL;
     Note *endNote = NULL;
+    Chord *startChord = NULL;
+    Chord *endChord = NULL;
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
@@ -198,10 +200,18 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         assert(startNote);
         startParentChord = startNote->IsChordTone();
     }
+    else if (start->Is() == CHORD) {
+        startChord = dynamic_cast<Chord*>(start);
+        assert(startChord);
+    }
     if (end->Is() == NOTE) {
         endNote = dynamic_cast<Note*>(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
+    }
+    else if (end->Is() == CHORD) {
+        endChord = dynamic_cast<Chord*>(end);
+        assert(endChord);
     }
     
     Layer* layer1 = dynamic_cast<Layer*>(start->GetFirstParent( LAYER ) );
@@ -216,25 +226,20 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     // the normal case
     if ( spanningType == SPANNING_START_END ) {
-        y1 = start->GetDrawingY();
-        y2 = end->GetDrawingY();
         noteStemDir = start->GetDrawingStemDir();
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
-        y1 = start->GetDrawingY();
-        y2 = y1;
         noteStemDir = start->GetDrawingStemDir();
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
-        y1 = end->GetDrawingY();
-        y2 = y1;
         noteStemDir = end->GetDrawingStemDir();
     }
-    // Finally, slur accross an entire system; use the staff position and up
+    // Finally, slur accross an entire system; use the staff position and up (see below)
     else {
+        // To be adjusted
         y1 = staff->GetDrawingY();
         y2 = y1;
         noteStemDir = STEMDIRECTION_down;
@@ -268,52 +273,79 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     /************** adjusting y position **************/
     
+    int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        // first get the min max of the chord (if any)
+        if (startParentChord) startParentChord->GetYExtremes(&yChordMax, &yChordMin);
+        else if (startChord) startChord->GetYExtremes(&yChordMax, &yChordMin);
+        // slur is up
         if (up) {
+            // P(^)
             if (noteStemDir == STEMDIRECTION_down) y1 = start->GetDrawingY();
-             else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
-                y1 = start->m_drawingStemEnd.y;
-            }
-            else {
-                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-                y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-            }
-        }
-        else {
-            if (noteStemDir == STEMDIRECTION_up) y1 = start->GetDrawingY();
+            //  d(^)d
             else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
                 y1 = start->m_drawingStemEnd.y;
             }
+            // d(^)
+            else {
+                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                if (startChord || startParentChord) y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                else y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+            }
+        }
+        // slur is down
+        else {
+            // d(_)
+            if (noteStemDir == STEMDIRECTION_up) y1 = start->GetDrawingY();
+            // P(_)P
+            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+                y1 = start->m_drawingStemEnd.y;
+            }
+            // P(_)
             else {
                 //x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
                 y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                if (startChord || startParentChord) y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                else y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             }
         }
     }
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        // get the min max of the chord if any
+        if (endParentChord) endParentChord->GetYExtremes(&yChordMax, &yChordMin);
+        else if (endChord) endChord->GetYExtremes(&yChordMax, &yChordMin);
+        // get the stem direction of the end
         data_STEMDIRECTION endStemDir = end->GetDrawingStemDir();
+        // slur is up
         if (up) {
+            // (^)P
             if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingY();
+            // d(^)d
             else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsLastInBeam(end)) {
                 y2 = end->m_drawingStemEnd.y;
             }
+            // (^)d
             else {
                 //x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
-                y2 = end->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                if (endChord || endParentChord) y2 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                else y2 = end->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             }
         }
         else {
+            // (_)d
             if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingY();
+            // P(_)P
             else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsLastInBeam(end)) {
                 y2 = end->m_drawingStemEnd.y;
             }
+            // (_)P
             else {
                 x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-                y2 = end->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                if (endChord || endParentChord) y2 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                else y2 = end->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             }
         }
     }
-    
 
     /************** y position **************/
     
@@ -577,7 +609,6 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
             y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
-        
     }
     
     /************** bezier points **************/
