@@ -12,9 +12,7 @@
 #include <assert.h>
 #include <dirent.h>
 #include <cmath>
-#include <stdarg.h>
 #include <stdlib.h>
-#include <vector>
 
 //----------------------------------------------------------------------------
 
