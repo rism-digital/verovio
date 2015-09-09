@@ -183,7 +183,8 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
-    int y1, y2;
+    int y1 = staff->GetDrawingY();
+    int y2 = staff->GetDrawingY();
     
     /************** parent layers **************/
     
@@ -222,26 +223,23 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         LogWarning("Slurs between different layers may not be fully supported.");
     }
     
-    /************** y positions **************/
+    /************** note stem dir **************/
     
     // the normal case
-    if ( spanningType == SPANNING_START_END ) {
+    if (spanningType == SPANNING_START_END) {
         noteStemDir = start->GetDrawingStemDir();
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
-    else if ( spanningType == SPANNING_START ) {
+    else if (spanningType == SPANNING_START) {
         noteStemDir = start->GetDrawingStemDir();
     }
     // Now this is the case when the tie is split but we are drawing the end of it
-    else if ( spanningType == SPANNING_END ) {
+    else if (spanningType == SPANNING_END) {
         noteStemDir = end->GetDrawingStemDir();
     }
     // Finally, slur accross an entire system; use the staff position and up (see below)
     else {
-        // To be adjusted
-        y1 = staff->GetDrawingY();
-        y2 = y1;
         noteStemDir = STEMDIRECTION_down;
     }
     
@@ -268,7 +266,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     else if (noteStemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (y1 > center) ? true : false;
+        up = (start->GetDrawingY() > center) ? true : false;
     }
     
     /************** adjusting y position **************/
@@ -321,7 +319,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
             // (^)P
             if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingY();
             // d(^)d
-            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsLastInBeam(end)) {
+            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
                 y2 = end->m_drawingStemEnd.y;
             }
             // (^)d
@@ -335,7 +333,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
             // (_)d
             if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingY();
             // P(_)P
-            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsLastInBeam(end)) {
+            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
                 y2 = end->m_drawingStemEnd.y;
             }
             // (_)P
@@ -345,6 +343,23 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
                 else y2 = end->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             }
         }
+    }
+    
+    if (spanningType == SPANNING_START) {
+        if (up) y2 = std::max(staff->GetDrawingY(), y1);
+        else y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
+    }
+    // Now this is the case when the tie is split but we are drawing the end of it
+    else if (spanningType == SPANNING_END) {
+        if (up) y1 = std::max(staff->GetDrawingY(), y2);
+        else y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
+    }
+    // Finally, slur accross an entire system; use the staff position and up (see below)
+    else if (spanningType != SPANNING_START_END) {
+        // To be adjusted
+        if (up) y1 = staff->GetDrawingY();
+        else y1 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+        y2 = y1;
     }
 
     /************** y position **************/
