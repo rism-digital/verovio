@@ -107,6 +107,12 @@ bool LayerElement::IsGraceNote()
     Note *note = dynamic_cast<Note*>(this);
     return (note && note->HasGrace());
 }
+    
+Beam* LayerElement::IsInBeam()
+{
+    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return NULL;
+    return dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
+}
 
 data_STEMDIRECTION LayerElement::GetDrawingStemDir()
 {

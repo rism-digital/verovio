@@ -98,7 +98,29 @@ void Beam::FilterList( ListOfObjects *childList )
     
     InitCoords( childList );
 }
-  
+
+bool Beam::IsFirstInBeam(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetListIndex(element);
+    // This method should be called only if the note is part of a beam
+    assert( position != -1 );
+    // this is this first one
+    if (position == 0) return true;
+    return false;
+}
+
+bool Beam::IsLastInBeam(LayerElement *element)
+{
+    int size = (int)this->GetList(this)->size();
+    int position = this->GetListIndex(element);
+    // This method should be called only if the note is part of a beam
+    assert( position != -1 );
+    // this is the last one
+    if (position == (size - 1)) return true;
+    return false;
+}
+
 void Beam::InitCoords( ListOfObjects *childList )
 {
     ClearCoords();

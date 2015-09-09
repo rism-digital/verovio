@@ -15,6 +15,7 @@
 namespace vrv {
 
 class Alignment;
+class Beam;
 class BeamElementCoord;
 class Layer;
 class Mensur;
@@ -81,6 +82,8 @@ public:
     bool IsCueSize();
     /** Return true if the element has to be aligned horizontally */
     virtual bool HasToBeAligned() { return false; };
+    /** Returns the beam parent if in beam */
+    Beam *IsInBeam();
     ///@}
     
     /**

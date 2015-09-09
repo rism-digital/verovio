@@ -165,7 +165,19 @@ void Chord::ResetAccidList()
         }
     }
 }
-    
+
+int Chord::PositionInChord(Note *note)
+{
+    int size = (int)this->GetList(this)->size();
+    int position = this->GetListIndex(note);
+    assert( position != -1 );
+    // this is the middle (only if odd)
+    if ((size % 2) && (position == (size - 1 ) / 2)) return 0;
+    if (position < (size / 2)) return -1;
+    return 1;
+}
+
+
 /**
  * Creates a 2D grid of width (# of accidentals + 1) * 4 and of height (highest accid - lowest accid) / (half a drawing unit)
  */

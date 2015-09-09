@@ -65,6 +65,14 @@ public:
     void ResetAccidList();
     
     /**
+     * Return information about the position in the chord
+     */
+    ///@{
+    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    int PositionInChord(Note *note);
+    ///@}
+    
+    /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
      * Further documentation in chord.cpp comments.
      */

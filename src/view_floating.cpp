@@ -171,8 +171,13 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     assert( slur );
     assert( staff );
     
-    Note *note1 = NULL;
-    Note *note2 = NULL;
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+    Beam *parentBeam = NULL;
+    Chord *startParentChord = NULL;
+    Chord *endParentChord = NULL;
+    Note *startNote = NULL;
+    Note *endNote = NULL;
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
@@ -180,42 +185,53 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     /************** parent layers **************/
     
-    note1 = dynamic_cast<Note*>(slur->GetStart());
-    note2 = dynamic_cast<Note*>(slur->GetEnd());
+    start = dynamic_cast<LayerElement*>(slur->GetStart());
+    end = dynamic_cast<LayerElement*>(slur->GetEnd());
     
-    if ( !note1 || !note2 ) {
+    if ( !start || !end ) {
         // no note, obviously nothing to do...
         return;
     }
     
-    Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent( LAYER ) );
-    Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent( LAYER ) );
+    if (start->Is() == NOTE) {
+        startNote = dynamic_cast<Note*>(start);
+        assert(startNote);
+        startParentChord = startNote->IsChordTone();
+    }
+    if (end->Is() == NOTE) {
+        endNote = dynamic_cast<Note*>(end);
+        assert(endNote);
+        endParentChord = endNote->IsChordTone();
+    }
+    
+    Layer* layer1 = dynamic_cast<Layer*>(start->GetFirstParent( LAYER ) );
+    Layer* layer2 = dynamic_cast<Layer*>(end->GetFirstParent( LAYER ) );
     assert( layer1 && layer2 );
     
     if ( layer1->GetN() != layer2->GetN() ) {
         LogWarning("Slurs between different layers may not be fully supported.");
     }
     
-    /************** x positions **************/
+    /************** y positions **************/
     
     // the normal case
     if ( spanningType == SPANNING_START_END ) {
-        y1 = note1->GetDrawingY();
-        y2 = note2->GetDrawingY();
-        noteStemDir = note1->GetDrawingStemDir();
+        y1 = start->GetDrawingY();
+        y2 = end->GetDrawingY();
+        noteStemDir = start->GetDrawingStemDir();
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if ( spanningType == SPANNING_START ) {
-        y1 = note1->GetDrawingY();
+        y1 = start->GetDrawingY();
         y2 = y1;
-        noteStemDir = note1->GetDrawingStemDir();
+        noteStemDir = start->GetDrawingStemDir();
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if ( spanningType == SPANNING_END ) {
-        y1 = note2->GetDrawingY();
+        y1 = end->GetDrawingY();
         y2 = y1;
-        noteStemDir = note2->GetDrawingStemDir();
+        noteStemDir = end->GetDrawingStemDir();
     }
     // Finally, slur accross an entire system; use the staff position and up
     else {
@@ -235,9 +251,9 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
     }
     //  the look if in a chord
-    else if (note1->IsChordTone()) {
-        if (note1->PositionInChord() < 0) up = false;
-        else if (note1->PositionInChord() > 0) up = true;
+    else if (startParentChord) {
+        if (startParentChord->PositionInChord(startNote) < 0) up = false;
+        else if (startParentChord->PositionInChord(startNote) > 0) up = true;
         // away from the stem if odd number (center note)
         else up = (noteStemDir != STEMDIRECTION_up);
     }
@@ -249,6 +265,55 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         up = (y1 > center) ? true : false;
     }
+    
+    /************** adjusting y position **************/
+    
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        if (up) {
+            if (noteStemDir == STEMDIRECTION_down) y1 = start->GetDrawingY();
+             else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+                y1 = start->m_drawingStemEnd.y;
+            }
+            else {
+                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+            }
+        }
+        else {
+            if (noteStemDir == STEMDIRECTION_up) y1 = start->GetDrawingY();
+            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
+                y1 = start->m_drawingStemEnd.y;
+            }
+            else {
+                //x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+            }
+        }
+    }
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        data_STEMDIRECTION endStemDir = end->GetDrawingStemDir();
+        if (up) {
+            if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingY();
+            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsLastInBeam(end)) {
+                y2 = end->m_drawingStemEnd.y;
+            }
+            else {
+                //x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                y2 = end->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+            }
+        }
+        else {
+            if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingY();
+            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsLastInBeam(end)) {
+                y2 = end->m_drawingStemEnd.y;
+            }
+            else {
+                x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                y2 = end->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+            }
+        }
+    }
+    
 
     /************** y position **************/
     
@@ -396,6 +461,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     
     Note *note1 = NULL;
     Note *note2 = NULL;
+    Chord *parentChord = NULL;
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
@@ -479,9 +545,9 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
     }
     //  the look if in a chord
-    else if (note1->IsChordTone()) {
-        if (note1->PositionInChord() < 0) up = false;
-        else if (note1->PositionInChord() > 0) up = true;
+    else if (parentChord) {
+        if (parentChord->PositionInChord(note1) < 0) up = false;
+        else if (parentChord->PositionInChord(note1) > 0) up = true;
         // away from the stem if odd number (center note)
         else up = (noteStemDir != STEMDIRECTION_up);
     }

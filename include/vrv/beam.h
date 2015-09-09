@@ -52,6 +52,14 @@ public:
     void AddLayerElement(LayerElement *element);
     
     /**
+     * Return information about the position in the beam
+     */
+    ///@{
+    bool IsFirstInBeam(LayerElement *element);
+    bool IsLastInBeam(LayerElement *element);
+    ///@}
+    
+    /**
      * @name Set and get the stem direction of the beam.
      */
     ///@{

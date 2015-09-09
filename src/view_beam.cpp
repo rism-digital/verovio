@@ -365,6 +365,19 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         el->m_drawingStemStart.y = fy2;
         el->m_drawingStemEnd.y = fy1;
         el->m_drawingStemDir = stemDir;
+        
+        if ( (*beamElementCoords).at(i)->m_element->Is() == CHORD ) {
+            Chord *chord = (Chord*)(*beamElementCoords).at(i)->m_element;
+            for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
+            {
+                Note *note = dynamic_cast<Note*>(*it);
+                assert(note);
+                note->m_drawingStemStart.x = el->m_drawingStemEnd.x = (*beamElementCoords).at(i)->m_x;
+                note->m_drawingStemStart.y = fy2;
+                note->m_drawingStemEnd.y = fy1;
+                note->SetDrawingStemDir(stemDir);
+            }
+        }
 	}
     
     

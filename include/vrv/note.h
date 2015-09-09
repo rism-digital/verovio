@@ -92,17 +92,14 @@ public:
     ///@}
     
     /**
-     * Overriding functions to return information from chord parent if 
-     * note is direct child of a chord.
+     * Overriding functions to return information from chord parent if any
      */
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
     bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
-    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
-    int PositionInChord();
     ///@}
-
+    
     /**
      * @name Set and get the stem direction of the note.
      */
