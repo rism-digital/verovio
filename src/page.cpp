@@ -121,7 +121,7 @@ void Page::LayOutHorizontally( )
         int minMeasureWidth = doc->m_drawingMinMeasureWidth;
         params.push_back( &previousTime );
         params.push_back( &previousXRel );
-        params.push_back( &minMeasureWidth );
+        //params.push_back( &minMeasureWidth );
         Functor setAlignmentX( &Object::SetAligmentXPos );
         // Special case: because we redirect the functor, pass it a parameter to itself (!)
         params.push_back( &setAlignmentX );
