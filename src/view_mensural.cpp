@@ -29,15 +29,17 @@ namespace vrv {
 /* ??THESE #defines PROBABLY BELONG IN style.h . */
     
 /* Set ratio of mensural notehead size to CMN notehead size for the same staff size */
-#define MENSUR_NOTEHEAD_FACTOR 0.60
-/* Set size of mensuration sign circle relative to space between staff lines. The entire mensuration sign fits
-     easily between two staff lines, so the radius is considerably less than half the distance between them. */
-#define MCIRCLE_RADIUS_FACTOR 0.32
+#define MNOTEHEAD_SIZE_FACTOR 0.60
+/* Set size of mensuration sign circle relative to space between staff lines. (In early manuscripts,
+the entire mensuration sign fits easily between two staff lines, so the radius is considerably less
+than half the distance between them.) */
+#define MSIGN_CIRCLE_RADIUS_FACTOR 0.32
 /* Set vertical position of center of mensuration sign as distance below top of the staff */
-#define MENSURSIGN_STAFFLINES_BELOW_TOP 1.5
-/* Set size rel. to dist. between staff lines of mensural-notation dot, e.g., within mensuration signs */
-#define MENSURSIGN_DOTSIZE 0.15
-    
+#define MSIGN_STAFFLINES_BELOW_TOP 1.5
+/* Set size rel. to dist. between staff lines of dot inside mensuration signs */
+#define MSIGN_DOTSIZE 0.15
+/* Set relative size of figures in proportions */
+#define PROPRT_SIZE_FACTOR 0.50
     
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
@@ -59,7 +61,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     int staffSize = staff->m_drawingStaffSize;
     // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
-    int pseudoStaffSize = (int)(MENSUR_NOTEHEAD_FACTOR * staff->m_drawingStaffSize);
+    int pseudoStaffSize = (int)(MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
     int xLedger, xNote, xStem;
     int drawingDur;
@@ -154,7 +156,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     /************** dots **************/
     
     if (note->GetDots()) {
-        int mensDrawingUnit = (int)(MENSUR_NOTEHEAD_FACTOR * m_doc->GetDrawingUnit(staffSize));
+        int mensDrawingUnit = (int)(MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staffSize));
         int xDot;
         if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
             xDot = xStem + mensDrawingUnit*7/2;
@@ -223,9 +225,9 @@ void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
     assert( dc );
     assert( staff );
     
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MENSURSIGN_STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MSIGN_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ));
-    r = (int)(MCIRCLE_RADIUS_FACTOR*r);
+    r = (int)(MSIGN_CIRCLE_RADIUS_FACTOR*r);
     
     int lineWidth = (int)(m_doc->GetDrawingStaffLineWidth( staff->m_drawingStaffSize ) * 0.5);
     dc->SetPen( m_currentColour, lineWidth, AxSOLID );
@@ -246,9 +248,9 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MENSURSIGN_STAFFLINES_BELOW_TOP);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MSIGN_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ));
-    r = (int)(MCIRCLE_RADIUS_FACTOR*r);
+    r = (int)(MSIGN_CIRCLE_RADIUS_FACTOR*r);
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
@@ -292,8 +294,8 @@ void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
     assert( dc );
     assert( staff );
     
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MENSURSIGN_STAFFLINES_BELOW_TOP);
-    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MENSURSIGN_DOTSIZE;
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MSIGN_STAFFLINES_BELOW_TOP);
+    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MSIGN_DOTSIZE;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -355,7 +357,7 @@ void View::DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, 
     assert( note );
     
     // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
-    int pseudoStaffSize = (int)(MENSUR_NOTEHEAD_FACTOR * staff->m_drawingStaffSize);
+    int pseudoStaffSize = (int)(MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int xn, x1, x2, y1, y2, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
@@ -565,7 +567,7 @@ void View::DrawProportFigures( DeviceContext *dc, int x, int y, int num, int num
         assert( staff );
         
         int ynum, yden;
-        int textSize = (1.0/2.0)*staff->m_drawingStaffSize;
+        int textSize = PROPRT_SIZE_FACTOR*staff->m_drawingStaffSize;
         std::wstring wtext;
         
         if (numBase)
@@ -599,9 +601,9 @@ void View::DrawProportFigures( DeviceContext *dc, int x, int y, int num, int num
     
 void View::DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
-        assert(layer); // Pointer to layer cannot be NULL"
-        assert(staff); // Pointer to staff cannot be NULL"
-        assert(dynamic_cast<Proport*>(element)); // Element must be a Mensur"
+        assert( layer );
+        assert( staff );
+        assert( dynamic_cast<Proport*>(element) ); // Element must be a Proport"
         
         int x1, x2, y1, y2;
         
