@@ -112,7 +112,7 @@ void Page::LayOutHorizontally( )
     Functor alignHorizontallyEnd( &Object::AlignHorizontallyEnd );
     this->Process( &alignHorizontally, &params, &alignHorizontallyEnd );
     
-    // Unless duration-based spacing is disabled, get the X position of each Alignment.
+    // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetEvenSpacing()) {
         params.clear();
