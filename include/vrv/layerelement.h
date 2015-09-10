@@ -91,6 +91,12 @@ public:
      * (Could one day go in a drawing stem interface)
      */
     data_STEMDIRECTION GetDrawingStemDir();
+    
+    /**
+     * Returns the drawing top and bottom taking into accound stem, etc.
+     */
+    int GetDrawingTop();
+    int GetDrawingBottom();
 
     /**
      * Alignment getter

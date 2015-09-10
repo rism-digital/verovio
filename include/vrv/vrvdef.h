@@ -23,8 +23,10 @@ namespace vrv {
  
 class AttComparison;
 class BeamElementCoord;
+class LayerElement;
 class Note;
 class Object;
+class Point;
 class Staff;
 
 typedef std::vector<Object*> ArrayOfObjects;
@@ -40,6 +42,8 @@ typedef std::vector<Note*> ChordCluster;
 typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
     
 typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
+    
+typedef std::vector<std::pair<LayerElement*, Point> > ArrayOfLayerElementPointPairs;
 
 //----------------------------------------------------------------------------
 // Object defines

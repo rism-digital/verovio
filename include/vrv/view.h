@@ -333,6 +333,8 @@ private:
     ///@}
     
     float AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
+    bool AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
+                         bool up, float angle );
     
     /**
      * @name Used for calculating clustered information/dot position

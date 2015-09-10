@@ -129,6 +129,25 @@ data_STEMDIRECTION LayerElement::GetDrawingStemDir()
     return STEMDIRECTION_NONE;
 }
     
+int LayerElement::GetDrawingTop()
+{
+    if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemEnd.y;
+        else return this->m_drawingStemStart.y;
+    }
+    return this->GetDrawingY();
+}
+
+
+int LayerElement::GetDrawingBottom()
+{
+    if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemStart.y;
+        else return this->m_drawingStemEnd.y;
+    }
+    return this->GetDrawingY();
+}
+    
 bool LayerElement::IsCueSize()
 {
     if ( this->Is() == NOTE ) {
@@ -437,8 +456,8 @@ int LayerElement::TimeSpanningLayerElements( ArrayPtrVoid *params )
     int *min_pos = static_cast<int*>((*params).at(1));
     int *max_pos = static_cast<int*>((*params).at(2));
     
-    if (this->GetDrawingX() >= (*min_pos) && this->GetDrawingX() <= (*max_pos)) {
-        if (this->Is() == NOTE) spanningContent->push_back(this);
+    if (this->GetDrawingX() > (*min_pos) && this->GetDrawingX() < (*max_pos)) {
+        if ((this->Is() == NOTE) || (this->Is() == CHORD)) spanningContent->push_back(this);
     }
     else if (this->GetDrawingX() > (*max_pos) ) {
         return FUNCTOR_STOP;

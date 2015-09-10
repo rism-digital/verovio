@@ -271,6 +271,9 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     /************** adjusting y position **************/
     
+    bool isShortSlur = false;
+    if (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) isShortSlur = true;
+    
     int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
@@ -279,14 +282,15 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         // slur is up
         if (up) {
             // P(^)
-            if (noteStemDir == STEMDIRECTION_down) y1 = start->GetDrawingY();
+            if (noteStemDir == STEMDIRECTION_down) y1 = start->GetDrawingTop();
             //  d(^)d
-            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
-                y1 = start->m_drawingStemEnd.y;
+            else if (isShortSlur || ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start))) {
+                y1 = start->GetDrawingTop();
             }
             // d(^)
             else {
-                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                // put it on the side, move it left
+                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
                 if (startChord || startParentChord) y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 else y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             }
@@ -294,14 +298,14 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         // slur is down
         else {
             // d(_)
-            if (noteStemDir == STEMDIRECTION_up) y1 = start->GetDrawingY();
+            if (noteStemDir == STEMDIRECTION_up) y1 = start->GetDrawingBottom();
             // P(_)P
-            else if ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start)) {
-                y1 = start->m_drawingStemEnd.y;
+            else if (isShortSlur || ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start))) {
+                y1 = start->GetDrawingBottom();
             }
             // P(_)
             else {
-                //x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                // put it on the side, but no need to move it left
                 y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (startChord || startParentChord) y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 else y1 = start->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
@@ -317,27 +321,28 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         // slur is up
         if (up) {
             // (^)P
-            if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingY();
+            if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingTop();
             // d(^)d
-            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
-                y2 = end->m_drawingStemEnd.y;
+            else if (isShortSlur || ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end))) {
+                y2 = end->GetDrawingTop();
             }
             // (^)d
             else {
-                //x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3 / 2;
+                // put it on the side, no need to move it right
                 if (endChord || endParentChord) y2 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 else y2 = end->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
             }
         }
         else {
             // (_)d
-            if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingY();
+            if (endStemDir == STEMDIRECTION_up) y2 = end->GetDrawingBottom();
             // P(_)P
-            else if ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end)) {
-                y2 = end->m_drawingStemEnd.y;
+            else if (isShortSlur || ((parentBeam = end->IsInBeam()) && !parentBeam->IsFirstInBeam(end))) {
+                y2 = end->GetDrawingBottom();
             }
             // (_)P
             else {
+                // put it on the side, move it right
                 x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (endChord || endParentChord) y2 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 else y2 = end->GetDrawingY() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
@@ -345,16 +350,16 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         }
     }
     
+    // Positions not attached to a note
     if (spanningType == SPANNING_START) {
         if (up) y2 = std::max(staff->GetDrawingY(), y1);
         else y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
-    // Now this is the case when the tie is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
         if (up) y1 = std::max(staff->GetDrawingY(), y2);
         else y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
     }
-    // Finally, slur accross an entire system; use the staff position and up (see below)
+    // slur accross an entire system; use the staff position
     else if (spanningType != SPANNING_START_END) {
         // To be adjusted
         if (up) y1 = staff->GetDrawingY();
@@ -377,7 +382,9 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     points[0] = Point(x1, y1);
     points[1] = Point(x2, y2);
     
-    float angle = AdjustSlurPosition(slur, staff, layer1->GetN(), up, points);
+    float angle = 0.0;
+    // We do not want to ajdust the position when calculating bounding boxes (at least for now)
+    if (dynamic_cast<BBoxDeviceContext*>(dc) == NULL) angle = AdjustSlurPosition(slur, staff, layer1->GetN(), up, points);
     
     int thickness =  m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR ;
     
@@ -386,7 +393,6 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     dc->DeactivateGraphic();
     DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
     dc->ReactivateGraphic();
-    
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
     else dc->EndGraphic(slur, this);
 }
@@ -438,17 +444,17 @@ float View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  P
     /************** rotation **************/
     
     // control points
-    Point rotatecC1, rotatedC2;
+    Point rotatedC1, rotatedC2;
     
     int cPos = std::min((rotatedP2.x - p1->x) / TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
-    rotatecC1.x = p1->x + cPos; // point at 1/4
+    rotatedC1.x = p1->x + cPos; // point at 1/4
     rotatedC2.x = rotatedP2.x - cPos;; // point at 3/4
     
     if (up) {
-        rotatecC1.y = p1->y + height;
+        rotatedC1.y = p1->y + height;
         rotatedC2.y = rotatedP2.y + height;
     } else {
-        rotatecC1.y = p1->y - height;
+        rotatedC1.y = p1->y - height;
         rotatedC2.y = rotatedP2.y - height;
     }
     
@@ -475,9 +481,36 @@ float View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  P
     system->Process( &timeSpanningLayerElements, &params, NULL, &filters );
     if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
     
+    LogDebug("--------" ) ;
+    
+    ArrayOfLayerElementPointPairs spanningContentPoints;
+    std::vector<LayerElement*>::iterator it;
+    for (it = spanningContent.begin(); it != spanningContent.end(); it++)
+    {
+        Note *note = NULL;
+        if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;
+        if ((note = dynamic_cast<Note*>(*it)) && note->IsChordTone()) continue;
+        Point p;
+        if (up) {
+            p.y = (*it)->GetDrawingTop();
+        }
+        else {
+            p.y = (*it)->GetDrawingBottom();
+        }
+        p.x = (*it)->GetDrawingX();
+        p = View::CalcPositionAfterRotation(p, -slurAngle, *p1);
+        if (up) p.y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
+        else p.y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
+        spanningContentPoints.push_back(std::make_pair((*it), p));
+    }
+    
+    bool maxHeight = false;
+    while (!spanningContentPoints.empty() && !maxHeight) {
+        maxHeight = AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle );
+    }
     
     points[1] = View::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
-    points[2] = View::CalcPositionAfterRotation(rotatecC1, slurAngle, *p1);
+    points[2] = View::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
     points[3] = View::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
     
     
@@ -497,6 +530,97 @@ float View::AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  P
      */
     
     return slurAngle;
+}
+    
+/*
+bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle)
+{
+    Point bezier[4];
+    bezier[0] = *p1;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
+    bezier[3] = *p2;
+    
+    int dist = abs(p2->x - p1->x);
+    int maxHeight = 0;
+    int step =  m_doc->GetDrawingUnit(100) * 4 / 3;
+    
+    float maxHeightFactor = std::max(0.2, fabs(angle));
+    maxHeight = dist / (maxHeightFactor * 5);
+    
+    ArrayOfLayerElementPointPairs::iterator itPoint;
+    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
+        if (up && (View::CalcBezierAtPosition(bezier, itPoint->second.x) > itPoint->second.y)) {
+            //LogDebug("Removing %d - %d", itPoint->first->GetDrawingX(), itPoint->first->GetDrawingY() ) ;
+            itPoint = spanningPoints->erase( itPoint );
+        }
+        else {
+            //LogDebug("KEEPING %d - %d", itPoint->first->GetDrawingX(), itPoint->first->GetDrawingY() ) ;
+            itPoint++;
+        }
+    }
+    
+    if (abs(c1->y - p1->y) + step > maxHeight) return true;
+    
+    if (!spanningPoints->empty()) {
+        if (up) {
+            c1->y += step;
+            c2->y = c1->y;
+        }
+        else {
+            c1->y -= step;
+            c2->y = c1->y;
+        }
+    }
+    return false;
+}
+*/
+    
+bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle)
+{
+    Point bezier[4];
+    bezier[0] = *p1;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
+    bezier[3] = *p2;
+    
+    int dist = abs(p2->x - p1->x);
+    int currentHeight = abs(c1->y - p1->y);
+    int maxHeight = 0;
+    int step =  m_doc->GetDrawingUnit(100) * 4 / 3;
+    
+    float maxHeightFactor = std::max(0.2, fabs(angle));
+    maxHeight = dist / (maxHeightFactor * 5);
+    
+    int y;
+    float maxRatio = 1.0;
+    ArrayOfLayerElementPointPairs::iterator itPoint;
+    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
+        y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
+        if (up) {
+            if (y < itPoint->second.y) {
+                float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y);
+                maxRatio = ratio > maxRatio ? ratio : maxRatio;
+            }
+        }
+    }
+    
+    int desiredHeight = currentHeight * maxRatio;
+    if (desiredHeight > maxHeight) {
+        maxRatio = (float)maxHeight / (float)currentHeight;
+    }
+    
+    if (!spanningPoints->empty()) {
+        if (up) {
+            c1->y = p1->y + currentHeight * maxRatio;
+            c2->y = c1->y;
+        }
+        else {
+            c1->y = p1->y - currentHeight * maxRatio;
+            c2->y = c1->y;
+        }
+    }
+    return true;
 }
     
 void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
