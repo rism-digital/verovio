@@ -332,8 +332,10 @@ private:
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
     
-    float AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
     bool AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
+                         bool up, float angle );
+    bool AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
                          bool up, float angle );
     
     /**

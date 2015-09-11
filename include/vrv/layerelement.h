@@ -94,9 +94,10 @@ public:
     
     /**
      * Returns the drawing top and bottom taking into accound stem, etc.
+     * We pass the doc as parameter in order to have access to the current drawing parameters.
      */
-    int GetDrawingTop();
-    int GetDrawingBottom();
+    int GetDrawingTop(Doc* doc, int staffSize);
+    int GetDrawingBottom(Doc* doc, int staffSize);
 
     /**
      * Alignment getter

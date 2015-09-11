@@ -129,20 +129,22 @@ data_STEMDIRECTION LayerElement::GetDrawingStemDir()
     return STEMDIRECTION_NONE;
 }
     
-int LayerElement::GetDrawingTop()
+int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        // We should also take into accound the stem shift to the right
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemEnd.y;
-        else return this->m_drawingStemStart.y;
+        else return this->m_drawingStemStart.y + doc->GetDrawingUnit(staffSize);
     }
     return this->GetDrawingY();
 }
 
 
-int LayerElement::GetDrawingBottom()
+int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)){
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemStart.y;
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemStart.y - doc->GetDrawingUnit(staffSize);
+        // We should also take into accound the stem shift to the left
         else return this->m_drawingStemEnd.y;
     }
     return this->GetDrawingY();
@@ -457,7 +459,7 @@ int LayerElement::TimeSpanningLayerElements( ArrayPtrVoid *params )
     int *max_pos = static_cast<int*>((*params).at(2));
     
     if (this->GetDrawingX() > (*min_pos) && this->GetDrawingX() < (*max_pos)) {
-        if ((this->Is() == NOTE) || (this->Is() == CHORD)) spanningContent->push_back(this);
+        spanningContent->push_back(this);
     }
     else if (this->GetDrawingX() > (*max_pos) ) {
         return FUNCTOR_STOP;
