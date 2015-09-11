@@ -1128,7 +1128,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
-        (*min_pos) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        (*min_pos) = 0;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );
