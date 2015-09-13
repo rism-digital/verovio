@@ -29,15 +29,13 @@ namespace vrv {
 /* ??THESE #defines PROBABLY BELONG IN style.h . */
     
 /* Set ratio of mensural notehead size to CMN notehead size for the same staff size */
-#define MNOTEHEAD_SIZE_FACTOR 0.60
-/* Set size of mensuration sign circle relative to space between staff lines. (In early manuscripts,
-the entire mensuration sign fits easily between two staff lines, so the radius is considerably less
-than half the distance between them.) */
-#define MSIGN_CIRCLE_RADIUS_FACTOR 0.32
+#define MNOTEHEAD_SIZE_FACTOR 0.90
+/* Set size of mensuration sign circle relative to space between staff lines */
+#define MSIGN_CIRCLE_DIAM 1.7
 /* Set vertical position of center of mensuration sign as distance below top of the staff */
-#define MSIGN_STAFFLINES_BELOW_TOP 1.5
-/* Set size rel. to dist. between staff lines of dot inside mensuration signs */
-#define MSIGN_DOTSIZE 0.15
+#define MSIGN_STAFFLINES_BELOW_TOP 2.0
+/* Set size of dot inside mensuration signs relative to space between staff lines */
+#define MSIGN_DOT_DIAM 0.5
 /* Set relative size of figures in proportions */
 #define PROPRT_SIZE_FACTOR 0.50
     
@@ -227,9 +225,10 @@ void View::DrawMensurCircle( DeviceContext *dc, int x, int yy, Staff *staff )
     
     int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MSIGN_STAFFLINES_BELOW_TOP);
     int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ));
-    r = (int)(MSIGN_CIRCLE_RADIUS_FACTOR*r);
+    r = (int)(MSIGN_CIRCLE_DIAM/2.0*r);
     
-    int lineWidth = (int)(m_doc->GetDrawingStaffLineWidth( staff->m_drawingStaffSize ) * 0.5);
+    int lineWidth = m_doc->GetDrawingStaffLineWidth( staff->m_drawingStaffSize );
+    lineWidth = lineWidth * 1.0;
     dc->SetPen( m_currentColour, lineWidth, AxSOLID );
     dc->SetPen( m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
@@ -248,16 +247,16 @@ void View::DrawMensurHalfCircle( DeviceContext *dc, int x, int yy, Staff *staff 
     dc->SetPen( m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID );
     dc->SetBrush( m_currentColour, AxTRANSPARENT );
     
-    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MSIGN_STAFFLINES_BELOW_TOP);
+    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
+     rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
+    double halfDistBelowTop = MSIGN_STAFFLINES_BELOW_TOP - (MSIGN_CIRCLE_DIAM/2.0);
+    int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * halfDistBelowTop);
     int r = ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ));
-    r = (int)(MSIGN_CIRCLE_RADIUS_FACTOR*r);
+    r = (int)(MSIGN_CIRCLE_DIAM/2.0*r);
     
     x = ToDeviceContextX (x);
     x -= 3*r/3;
     
-    /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
-    rectangle that contains the ellipse; y is not the center of the circle it's an arc of. */
-    y -= staff->m_drawingStaffSize / 2;
     dc->DrawEllipticArc( x, y, 2*r, 2*r, 45, 315 );
     
     dc->ResetPen();
@@ -295,7 +294,7 @@ void View::DrawMensurDot ( DeviceContext *dc, int x, int yy, Staff *staff )
     assert( staff );
     
     int y =  ToDeviceContextY (yy - m_doc->GetDrawingDoubleUnit( staff->m_drawingStaffSize ) * MSIGN_STAFFLINES_BELOW_TOP);
-    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MSIGN_DOTSIZE;
+    int r = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * MSIGN_DOT_DIAM;
     
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -590,7 +589,7 @@ void View::DrawProportFigures( DeviceContext *dc, int x, int y, int num, int num
         if (numBase)
         {
             wtext = IntToTimeSigFigures(numBase);
-            DrawSmuflString ( dc, x, yden, wtext, true, textSize);	// '1' = center
+            DrawSmuflString ( dc, x, yden, wtext, true, textSize);	// true = center
         }
         
         dc->ResetFont();
