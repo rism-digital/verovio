@@ -449,17 +449,16 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid *params )
 /* Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
 to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
 will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
-is a function of time interval. For mensural notation, we'd want ideal spacing to be zero
-so as to end up with spacing as tight as possible.
+is a function of time interval.
  
-This function needs more flexibility: for example, for some purposes, spacing propoortional
-to duration is desirable. The best solution is probably to get ideal spacing from a user-
-definable table. */
-int Alignment::HorizontalSpaceForDuration(double intervalTime, bool evenSpacing)
+??The power function we currently use is all wrong; see _Behind Bars_, p. 39. We also need more
+flexibility: for example, for some purposes, spacing propoortional to duration is desirable.
+The best solution is probably to get ideal spacing from a user-definable table. */
+
+int Alignment::HorizontalSpaceForDuration(double intervalTime)
 {
-    int intervalXRel = 0;
-    if (!evenSpacing)
-         intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
+    int intervalXRel;
+    intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
     return intervalXRel;
 }
 
@@ -474,7 +473,7 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
     // HARDCODED parameter for HorizontalSpaceForDuration
-    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, false);
+    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime);
     
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
