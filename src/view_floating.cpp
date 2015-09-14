@@ -396,6 +396,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     if ( graphic ) dc->EndResumedGraphic(graphic, this);
     else dc->EndGraphic(slur, this);
 }
+
     
 float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point points[])
 {
@@ -462,18 +463,10 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point poi
         // Also skip notes that are part of a chords since we already have the chord
         if ((note = dynamic_cast<Note*>(*it)) && note->IsChordTone()) continue;
         Point p;
-        if (up) {
-            p.y = (*it)->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
-        }
-        else {
-            p.y = (*it)->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-        }
-        p.x = (*it)->GetDrawingX();
-        p = View::CalcPositionAfterRotation(p, -slurAngle, *p1);
-        if (up) p.y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-        else p.y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
         spanningContentPoints.push_back(std::make_pair((*it), p));
     }
+    
+    GetSpanningPointPositions( &spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
     
     // We need to keep the original control points
     Point adjustedRotatedC1 = rotatedC1;
@@ -488,6 +481,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point poi
         AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle );
         // Now readjust the curvature with the new p1 and p2 with the original control points
         GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
+        GetSpanningPointPositions( &spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
         AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false );
         if (!spanningContentPoints.empty()) {
             // Something went wrong since now all spanning points should be gone...
@@ -544,6 +538,26 @@ void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up,
     }
 }
     
+    
+
+void View::GetSpanningPointPositions( ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize)
+{
+    ArrayOfLayerElementPointPairs::iterator itPoint;
+    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
+        Point p;
+        if (up) {
+            p.y = itPoint->first->GetDrawingTop(m_doc, staffSize);
+        }
+        else {
+            p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize);
+        }
+        p.x = itPoint->first->GetDrawingX();
+        itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
+        if (up) itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 3;
+        else itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 3;
+    }
+}
+
 /*
 bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle)
 {
@@ -604,7 +618,10 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
     int maxHeight = 0;
     
     float maxHeightFactor = std::max(0.2, fabs(angle));
-    maxHeight = dist / (maxHeightFactor * 5); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist / (maxHeightFactor * 15); // 5 is the minimum - can be increased for limiting curvature
+    if (posRatio) {
+        //maxHeight = std::min( maxHeight, m_doc->GetDrawingStaffSize(100) );
+    }
     
     if (maxHeight > currentHeight) {
         float maxRatio = 1.0;
@@ -712,6 +729,7 @@ bool View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
         }
         if (dist != 0) posXRatio = (float)posX / ((float)dist / 2.0);
         
+        shift = 0;
         // Keep the maximum shift on the left and right
         if (up) {
             if (y < itPoint->second.y) {

@@ -339,6 +339,7 @@ private:
                          bool up, float *angle );
     float GetAdjustedSlurAngle(Point *p1, Point *p2, bool up);
     void GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize);
+    void GetSpanningPointPositions( ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
     
     /**
      * @name Used for calculating clustered information/dot position
