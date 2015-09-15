@@ -505,17 +505,17 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
     float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
     
     // the slope of the slur is high and needs to be corrected
-    if (fabs(slurAngle) > TEMP_STYLE_MAX_SLUR_SLOPE) {
-        int side = (p2->x - p1->x) * sin(TEMP_STYLE_MAX_SLUR_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_MAX_SLUR_SLOPE);
+    if (fabs(slurAngle) > TEMP_STYLE_SLUR_MAX_SLOPE) {
+        int side = (p2->x - p1->x) * sin(TEMP_STYLE_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_SLUR_MAX_SLOPE);
         if (p2->y > p1->y) {
             if (up) p1->y = p2->y - side;
             else p2->y = p1->y + side;
-            slurAngle = TEMP_STYLE_MAX_SLUR_SLOPE;
+            slurAngle = TEMP_STYLE_SLUR_MAX_SLOPE;
         }
         else {
             if (up) p2->y = p1->y - side;
             else p1->y = p2->y + side;
-            slurAngle = -TEMP_STYLE_MAX_SLUR_SLOPE;
+            slurAngle = -TEMP_STYLE_SLUR_MAX_SLOPE;
         }
     }
     
@@ -552,56 +552,16 @@ void View::GetSpanningPointPositions( ArrayOfLayerElementPointPairs *spanningPoi
             p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize);
         }
         p.x = itPoint->first->GetDrawingX();
+        // Not sure if it is better to add the margin before or after the rotation...
+        if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 3;
+        else p.y -= m_doc->GetDrawingUnit(staffSize) * 3;
         itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
-        if (up) itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 3;
-        else itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 3;
+        // This would add it after
+        //if (up) itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 3;
+        //else itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 3;
     }
 }
 
-/*
-bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle)
-{
-    Point bezier[4];
-    bezier[0] = *p1;
-    bezier[1] = *c1;
-    bezier[2] = *c2;
-    bezier[3] = *p2;
-    
-    int dist = abs(p2->x - p1->x);
-    int maxHeight = 0;
-    int step =  m_doc->GetDrawingUnit(100) * 4 / 3;
-    
-    float maxHeightFactor = std::max(0.2, fabs(angle));
-    maxHeight = dist / (maxHeightFactor * 5);
-    
-    ArrayOfLayerElementPointPairs::iterator itPoint;
-    for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        if (up && (View::CalcBezierAtPosition(bezier, itPoint->second.x) > itPoint->second.y)) {
-            //LogDebug("Removing %d - %d", itPoint->first->GetDrawingX(), itPoint->first->GetDrawingY() ) ;
-            itPoint = spanningPoints->erase( itPoint );
-        }
-        else {
-            //LogDebug("KEEPING %d - %d", itPoint->first->GetDrawingX(), itPoint->first->GetDrawingY() ) ;
-            itPoint++;
-        }
-    }
-    
-    if (abs(c1->y - p1->y) + step > maxHeight) return true;
-    
-    if (!spanningPoints->empty()) {
-        if (up) {
-            c1->y += step;
-            c2->y = c1->y;
-        }
-        else {
-            c1->y -= step;
-            c2->y = c1->y;
-        }
-    }
-    return false;
-}
-*/
-    
 bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle, bool posRatio)
 {
     Point bezier[4];
@@ -617,9 +577,11 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
     int currentHeight = abs(c1->y - p1->y);
     int maxHeight = 0;
     
+    // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2, fabs(angle));
-    maxHeight = dist / (maxHeightFactor * 15); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist / (maxHeightFactor * (TEMP_STYLE_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
     if (posRatio) {
+        // Do we want to set a max height?
         //maxHeight = std::min( maxHeight, m_doc->GetDrawingStaffSize(100) );
     }
     
@@ -645,6 +607,7 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
                     itPoint++;
                 }
+                // The point is below, we can drop it
                 else {
                     itPoint = spanningPoints->erase(itPoint);
                 }
@@ -655,12 +618,14 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
                     itPoint++;
                 }
+                // the point is above, we can drop it
                 else {
                     itPoint = spanningPoints->erase(itPoint);
                 }
             }
         }
         
+        // We should not adjust it more than the maximum height
         int desiredHeight = currentHeight * maxRatio;
         if (desiredHeight > maxHeight) {
             maxRatio = (float)maxHeight / (float)currentHeight;
@@ -678,7 +643,7 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
         }
     }
     
-    // filter the points
+    // filter the points with the adjusted curve
     bezier[1] = *c1;
     bezier[2] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
