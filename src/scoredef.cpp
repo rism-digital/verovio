@@ -196,6 +196,7 @@ void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
     m_drawLabels = false;
+    m_drawingWidth = 0;
 }
 
 void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )
@@ -336,6 +337,11 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSi
     params.push_back( &keySigCancellation );
     Functor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
     this->Process( &setStaffDefDraw, &params );
+}
+    
+void ScoreDef::SetDrawingWidth(int drawingWidth)
+{
+    m_drawingWidth = drawingWidth;
 }
 
 //----------------------------------------------------------------------------

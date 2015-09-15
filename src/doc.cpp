@@ -343,7 +343,7 @@ void Doc::CastOff( )
     
     System *currentSystem = new System();
     contentPage->AddSystem( currentSystem );
-    int shift = 0;
+    int shift = -contentSystem->GetDrawingLabelsWidth();
     int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
         - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     ArrayPtrVoid params;

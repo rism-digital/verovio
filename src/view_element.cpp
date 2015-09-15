@@ -1866,7 +1866,7 @@ void View::DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     x = element->GetDrawingX();
     // HARDCODED
-    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * 1.3;
+    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_STYLE_KEYSIG_STEP;
     
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by default)
     if ( (keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange) ) {
