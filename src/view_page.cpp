@@ -1106,7 +1106,7 @@ void View::DrawSystemEditorialElement( DeviceContext *dc, EditorialElement *elem
 void View::DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system )
 {
     assert( element );
-    if ( element->Object::Is() == APP ) {
+    if ( element->Is() == APP ) {
         assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_MEASURE );
     }
     
