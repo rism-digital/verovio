@@ -319,6 +319,12 @@ protected:
 	void DrawDot ( DeviceContext *dc, int x, int y, int staffSize );
     ///@}
     
+    /**
+     * Calculate the ScoreDef width by taking into account its widest key signature
+     * This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted system
+     */
+    void SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef);
+    
 private:    
     /**
      * @name Internal methods used for calculating tuplets

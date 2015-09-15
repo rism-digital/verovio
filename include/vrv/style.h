@@ -136,6 +136,9 @@ namespace vrv {
 // the space between each lyric line in units
 #define TEMP_STYLE_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
     
+// the key signature spacing factor
+#define TEMP_STYLE_KEYSIG_STEP 1.3
+    
 // the maximum angle of a slur
 #define TEMP_STYLE_MAX_SLUR_SLOPE (45 * M_PI / 180)
 #define TEMP_STYLE_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs

@@ -61,11 +61,13 @@ public:
     ///@}
     
     /**
-     * @name Set and get the labels drawing width.
+     * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
     int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; };
     void SetDrawingLabelsWidth( int width );
+    int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; };
+    void SetDrawingAbbrLabelsWidth( int width );
     ///@}
 
     /**
@@ -157,7 +159,7 @@ public:
     int m_systemLeftMar;
     /** System right margin (MEI scoredef@system.rightmar). Saved if != 0 */
     int m_systemRightMar;
-	/** 
+    /**
      * The Y absolute position of the staff for facsimile (transcription) encodings.
      * This is the top left corner of the system.
      */
@@ -182,6 +184,8 @@ public:
      * It is used internally when calculating the layout andd it is not stored in the file.
      */
     int m_drawingLabelsWidth;
+    /** The width used by the abbreviated labels */
+    int m_drawingAbbrLabelsWidth;
     /**
      * @name The total width of the system.
      * It is computed during the layout processed and used for calculating the justification ratio.
