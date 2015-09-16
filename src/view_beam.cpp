@@ -359,25 +359,18 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             fy2 = (*beamElementCoords).at(i)->m_yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/4;
         }
         
-        // All notes and chords, including notes within chords, get their stem value stored
-        LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        el->m_drawingStemStart.x = el->m_drawingStemEnd.x = (*beamElementCoords).at(i)->m_x;
-        el->m_drawingStemStart.y = fy2;
-        el->m_drawingStemEnd.y = fy1;
-        el->m_drawingStemDir = stemDir;
-        
-        if ( (*beamElementCoords).at(i)->m_element->Is() == CHORD ) {
-            Chord *chord = (Chord*)(*beamElementCoords).at(i)->m_element;
-            for (ListOfObjects::iterator it = chord->GetList(chord)->begin(); it != chord->GetList(chord)->end(); it++)
-            {
-                Note *note = dynamic_cast<Note*>(*it);
-                assert(note);
-                note->m_drawingStemStart.x = el->m_drawingStemEnd.x = (*beamElementCoords).at(i)->m_x;
-                note->m_drawingStemStart.y = fy2;
-                note->m_drawingStemEnd.y = fy1;
-                note->SetDrawingStemDir(stemDir);
-            }
+        // All notes and chords get their stem value stored
+        if ( (current->Is() == NOTE) || (current->Is() == CHORD) ) {
+            StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(current);
+            assert(interface);
+            
+            interface->SetDrawingStemDir(stemDir);
+            interface->SetDrawingStemStart(Point((*beamElementCoords).at(i)->m_x, fy2));
+            interface->SetDrawingStemEnd(Point((*beamElementCoords).at(i)->m_x, fy1));
+
         }
+        
+
 	}
     
     
@@ -393,7 +386,11 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     {
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
         if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
-            DrawVerticalLine (dc, el->m_drawingStemStart.y, el->m_drawingStemEnd.y, el->m_drawingStemStart.x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+            StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(current);
+            assert(interface);
+            
+            DrawVerticalLine (dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
+                              interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
         }
     }
     

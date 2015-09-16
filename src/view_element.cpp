@@ -501,11 +501,6 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     if (dir == STEMDIRECTION_up) {
         DrawFullRectangle( dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
         
-        object->m_drawingStemStart.x = object->m_drawingStemEnd.x = x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2);
-        object->m_drawingStemStart.y = y1;
-        object->m_drawingStemEnd.y = y2;
-        object->m_drawingStemDir = STEMDIRECTION_up;
-        
         if (drawingDur > DUR_4) {
             DrawSmuflCode( dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), y2, SMUFL_E240_flag8thUp, staff->m_drawingStaffSize, drawingCueSize );
             for (int i=0; i < nbFlags; i++)
@@ -515,17 +510,19 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     else {
         DrawFullRectangle( dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
         
-        object->m_drawingStemStart.x = object->m_drawingStemEnd.x = x2 - (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2);
-        object->m_drawingStemStart.y = y1;
-        object->m_drawingStemEnd.y = y2;
-        object->m_drawingStemDir = STEMDIRECTION_down;
-        
         if (drawingDur > DUR_4) {
             DrawSmuflCode( dc, x2 , y2, SMUFL_E241_flag8thDown , staff->m_drawingStaffSize, drawingCueSize );
             for (int i=0; i < nbFlags; i++)
                 DrawSmuflCode( dc, x2, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,  staff->m_drawingStaffSize, drawingCueSize );
         }
     }
+    
+    // Store the start and end values
+    StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(object);
+    assert(interface);
+    interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
+    interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
+    interface->SetDrawingStemDir(dir);
     
     // cast to note is check when setting drawingCueSize value
     if ( drawingCueSize && ( dynamic_cast<Note*>(object)->GetGrace() == GRACE_acc ) ) {
@@ -607,9 +604,9 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int y = element->GetDrawingY();
     
     // Temporary fix for rest within tuplet because drawing tuplet requires m_drawingStemXXX to be set
-    element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->GetDrawingX() - (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2);
-    element->m_drawingStemEnd.y = element->GetDrawingY();
-    element->m_drawingStemStart.y = element->GetDrawingY();
+    //element->m_drawingStemStart.x = element->m_drawingStemEnd.x = element->GetDrawingX() - (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2);
+    //element->m_drawingStemEnd.y = element->GetDrawingY();
+    //element->m_drawingStemStart.y = element->GetDrawingY();
 
     if (drawingDur > DUR_2)
     {
@@ -1311,8 +1308,8 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // force cue size for intermediate clefs
     if (clef->GetFirstParent( LAYER )) cueSize = true;
     
-    if (!cueSize)
-        a -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    //if (!cueSize)
+    //    a -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     
     DrawSmuflCode ( dc, a, b, sym, staff->m_drawingStaffSize, cueSize );
    
@@ -1593,8 +1590,8 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
             if ( note->GetDrawingY() > y ) {
                 y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
-            if ( (note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->m_drawingStemEnd.y > y )) {
-                y = note->m_drawingStemEnd.y;
+            if ( (note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd().y > y )) {
+                y = note->GetDrawingStemEnd().y;
             }
             
             // adjust the x position so it is centered
@@ -1928,19 +1925,20 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftY1 = positionShift * 2;
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
+    Point startPoint = note->GetDrawingStemStart();
     
     // HARDCODED
-    if (element->m_drawingStemDir == STEMDIRECTION_up) {
+    if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
         dc->DrawLine(
-                     ToDeviceContextX(element->m_drawingStemStart.x - positionShiftX1 ),
-                     ToDeviceContextY(element->m_drawingStemStart.y + positionShiftY1),
-                     ToDeviceContextX(element->m_drawingStemStart.x + positionShiftX2),
-                     ToDeviceContextY(element->m_drawingStemStart.y + positionShiftY2));
+                     ToDeviceContextX(startPoint.x - positionShiftX1 ),
+                     ToDeviceContextY(startPoint.y + positionShiftY1),
+                     ToDeviceContextX(startPoint.x + positionShiftX2),
+                     ToDeviceContextY(note->GetDrawingStemStart().y + positionShiftY2));
     } else {
-        dc->DrawLine(ToDeviceContextX(element->m_drawingStemStart.x - positionShiftX1),
-                     ToDeviceContextY(element->m_drawingStemStart.y - positionShiftY1),
-                     ToDeviceContextX(element->m_drawingStemStart.x + positionShiftX2),
-                     ToDeviceContextY(element->m_drawingStemStart.y - positionShiftY2));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1),
+                     ToDeviceContextY(startPoint.y - positionShiftY1),
+                     ToDeviceContextX(startPoint.x + positionShiftX2),
+                     ToDeviceContextY(startPoint.y - positionShiftY2));
     }
     
     dc->ResetPen();

@@ -10,6 +10,7 @@
 #define __VRV_CHORD_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 
@@ -29,7 +30,7 @@ namespace vrv {
  * It contains notes.
  */
     
-class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, 
+class Chord: public LayerElement, public ObjectListInterface, public StemmedDrawingInterface, public DurationInterface,
     public AttCommon,
     public AttStemmed,
     public AttTiepresent

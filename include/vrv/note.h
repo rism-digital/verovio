@@ -42,7 +42,7 @@ typedef std::vector<Note*> ChordCluster;
 #define EMB_TRILL 1
 #define EMB_MORDENT 2
 
-class Note: public LayerElement, public DurationInterface, public PitchInterface,
+class Note: public LayerElement, public StemmedDrawingInterface, public DurationInterface, public PitchInterface,
     public AttColoration,
     public AttGraced,
     public AttNoteLogMensural,

@@ -71,7 +71,6 @@ void LayerElement::Reset()
     
     m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
-    m_drawingStemDir = STEMDIRECTION_NONE;
     m_beamElementCoord = NULL;
 }
     
@@ -133,8 +132,14 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)){
         // We should also take into accound the stem shift to the right
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemEnd.y;
-        else return this->m_drawingStemStart.y + doc->GetDrawingUnit(staffSize);
+        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface*>(this);
+        assert(stemmedDrawingInterface);
+        if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+        }
+        else {
+            return stemmedDrawingInterface->GetDrawingStemStart().y + doc->GetDrawingUnit(staffSize);
+        }
     }
     return this->GetDrawingY();
 }
@@ -143,9 +148,15 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)){
-        if (this->GetDrawingStemDir() == STEMDIRECTION_up) return this->m_drawingStemStart.y - doc->GetDrawingUnit(staffSize);
-        // We should also take into accound the stem shift to the left
-        else return this->m_drawingStemEnd.y;
+        // We should also take into accound the stem shift to the right
+        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface*>(this);
+        assert(stemmedDrawingInterface);
+        if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            return stemmedDrawingInterface->GetDrawingStemStart().y + doc->GetDrawingUnit(staffSize);
+        }
+        else {
+            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+        }
     }
     return this->GetDrawingY();
 }

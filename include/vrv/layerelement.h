@@ -9,7 +9,6 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
-#include "devicecontextbase.h"
 #include "object.h"
 
 namespace vrv {
@@ -138,15 +137,6 @@ private:
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-    /** 
-     * If this is a note, store here the stem coordinates (useful for ex. tuplets) 
-     */
-    Point m_drawingStemStart; // beginning point, the one near the note
-    Point m_drawingStemEnd; // end point (!), near beam or stem
-    /** 
-     * Stem direction as drawn 
-     */
-    data_STEMDIRECTION m_drawingStemDir;
     /**
      * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
      */

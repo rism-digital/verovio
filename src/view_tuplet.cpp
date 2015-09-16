@@ -17,6 +17,7 @@
 #include "beam.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "note.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -96,20 +97,26 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
     LayerElement *firstNote = dynamic_cast<LayerElement*>(tupletChildren->front());
     LayerElement *lastNote = dynamic_cast<LayerElement*>(tupletChildren->back());
     
+    
+    
     // AllNotesBeamed tries to figure out if all the notes are in the same beam
     if (OneBeamInTuplet(tuplet)) {
 
         // yes they are in a beam
-        // get the x position centered from the STEM so it looks better
-        // NOTE start and end are left to 0, this is the signal that no bracket has to be drawn
-        x = firstNote->m_drawingStemStart.x + (lastNote->m_drawingStemStart.x - firstNote->m_drawingStemStart.x) / 2;
+        x = firstNote->GetDrawingX() + (lastNote->GetDrawingX() - firstNote->GetDrawingX() + lastNote->m_selfBB_x2) / 2;
         
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
-        if (firstNote->m_drawingStemDir == STEMDIRECTION_up)
-            y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 + TUPLET_OFFSET;
-        else 
-            y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 - TUPLET_OFFSET;
+        Note* note = dynamic_cast<Note*>(tuplet->GetFirstChild(NOTE));
+        Note* lastNote = dynamic_cast<Note*>(tuplet->GetLastChild(NOTE));
+        
+        y = firstNote->GetDrawingY();
+        if (note) {
+            if (note->GetDrawingStemDir() == STEMDIRECTION_up)
+                y = note->GetDrawingStemEnd().y + (firstNote->note->GetDrawingStemEnd().y - lastNote->m_drawingStemEnd.y) / 2 + TUPLET_OFFSET;
+            else 
+                y = lastNote->m_drawingStemEnd.y + (firstNote->m_drawingStemEnd.y - lastNote->m_drawingStemEnd.y) / 2 - TUPLET_OFFSET;
+        }
         
         // Copy the generated coordinates
         center->x = x;

@@ -27,7 +27,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface(),
+	LayerElement("note-"), StemmedDrawingInterface(), DurationInterface(), PitchInterface(),
     AttColoration(),
     AttGraced(),
     AttNoteLogMensural(),
@@ -67,6 +67,7 @@ Note::~Note()
 void Note::Reset()
 {
     LayerElement::Reset();
+    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     
