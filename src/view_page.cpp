@@ -123,7 +123,14 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
         delete keySig;
     }
     
-    scoreDef->SetDrawingWidth(100);
+    int width = 0;
+    // G-clef as default width
+    width += m_doc->GetLeftMargin(CLEF) + m_doc->GetGlyphWidth(SMUFL_E050_gClef, 100, false) + m_doc->GetRightMargin(CLEF);
+    if (numAlteration > 0) {
+        width += m_doc->GetLeftMargin(KEYSIG) + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP + m_doc->GetRightMargin(KEYSIG);
+    }
+    
+    scoreDef->SetDrawingWidth(width);
 }
 
 //----------------------------------------------------------------------------
@@ -400,7 +407,7 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         dc->DrawText( label );
         dc->EndText( );
         
-        // also store in the system the maximum width with abbreviations
+        // also store in the system the maximum width with abbreviations for justification
         if (!abbreviations && (abbrLabel.length() > 0)) {
             dc->GetTextExtent( abbrLabel, &w, &h);
             system->SetDrawingAbbrLabelsWidth( w + space );

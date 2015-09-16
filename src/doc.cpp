@@ -346,12 +346,15 @@ void Doc::CastOff( )
     int shift = -contentSystem->GetDrawingLabelsWidth();
     int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
         - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+    // The width of the initial scoreDef is stored in the page scoreDef
+    int scoreDefWidth = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
     ArrayPtrVoid params;
     params.push_back( contentSystem );
     params.push_back( contentPage );
     params.push_back( &currentSystem );
     params.push_back( &shift );
     params.push_back( &systemFullWidth );
+    params.push_back( &scoreDefWidth );
     Functor castOffSystems( &Object::CastOffSystems );
     contentSystem->Process( &castOffSystems, &params );
     delete contentSystem;

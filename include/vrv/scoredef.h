@@ -161,7 +161,7 @@ public:
      * @name Set and get the scoreDef drawing width.
      */
     ///@{
-    bool GetDrawingWidth() const { return m_drawingWidth; };
+    int GetDrawingWidth() const { return m_drawingWidth; };
     void SetDrawingWidth( int drawingWidth );
     ///@}
     
