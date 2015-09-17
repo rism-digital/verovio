@@ -21,6 +21,20 @@
 
 namespace vrv {
  
+//----------------------------------------------------------------------------
+// Version
+//----------------------------------------------------------------------------
+
+#define VERSION_MAJOR 0
+#define VERSION_MINOR 9
+#define VERSION_REVISION 9
+// Adds "-dev" in the version number - should be set to false for releases
+#define VERSION_DEV false
+
+//----------------------------------------------------------------------------
+// Typedefs
+//----------------------------------------------------------------------------
+ 
 class AttComparison;
 class BeamElementCoord;
 class Note;
@@ -143,12 +157,6 @@ enum InterfaceId {
     
 #define DEFINITON_FACTOR 10
 #define PARAM_DENOMINATOR 10
-    
-#define VERSION_MAJOR 0
-#define VERSION_MINOR 9
-#define VERSION_REVISION 9
-// Adds "-dev" in the version number - should be set to false for releases
-#define VERSION_DEV true
     
 #define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
 
