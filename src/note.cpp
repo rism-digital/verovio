@@ -27,7 +27,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface(),
+	LayerElement("note-"), StemmedDrawingInterface(), DurationInterface(), PitchInterface(),
     AttColoration(),
     AttGraced(),
     AttNoteLogMensural(),
@@ -67,6 +67,7 @@ Note::~Note()
 void Note::Reset()
 {
     LayerElement::Reset();
+    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     
@@ -164,19 +165,20 @@ bool Note::IsClusterExtreme()
     else return false;
 }
 
-data_STEMDIRECTION Note::CalcDrawingStemDir()
+bool Note::HasDrawingStemDir()
 {
+    // In chord, the value is set in Chord::SetDrawingStemDir
+    // In beam, the value is tet in View::DrawBeam
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
-    if( chordParent ) {
-        return chordParent->GetDrawingStemDir();
+    if(chordParent || beamParent) {
+        return true;
     }
-    else if( beamParent ) {
-        return beamParent->GetDrawingStemDir();
+    else if (this->HasStemDir()) {
+        this->SetDrawingStemDir(this->GetStemDir());
+        return true;
     }
-    else {
-        return this->GetStemDir();
-    }
+    return false;
 }
     
 //----------------------------------------------------------------------------

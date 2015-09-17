@@ -26,8 +26,6 @@ Beam::Beam():
     LayerElement("beam-"), ObjectListInterface()
 {
     Reset();
-    
-    m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
 

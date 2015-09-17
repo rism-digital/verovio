@@ -60,13 +60,6 @@ public:
     ///@}
     
     /**
-     * @name Set and get the stem direction of the beam.
-     */
-    ///@{
-    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
-    
-    /**
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoords() { return &m_beamElementCoords; };
@@ -95,10 +88,6 @@ private:
 public:
     
 private:
-    /**
-     * The drawing stem direction of the beam
-     **/
-    data_STEMDIRECTION m_drawingStemDir;
     /**
      * An array of the coordinates for each element
      **/

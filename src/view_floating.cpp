@@ -182,7 +182,9 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     Chord *endChord = NULL;
     
     bool up = true;
-    data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
+    data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
+    data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
+    data_STEMDIRECTION stemDir;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
     
@@ -200,19 +202,23 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         startNote = dynamic_cast<Note*>(start);
         assert(startNote);
         startParentChord = startNote->IsChordTone();
+        startStemDir = startNote->GetDrawingStemDir();
     }
     else if (start->Is() == CHORD) {
         startChord = dynamic_cast<Chord*>(start);
         assert(startChord);
+        startStemDir = startChord->GetDrawingStemDir();
     }
     if (end->Is() == NOTE) {
         endNote = dynamic_cast<Note*>(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
+        endStemDir = endNote->GetDrawingStemDir();
     }
     else if (end->Is() == CHORD) {
         endChord = dynamic_cast<Chord*>(end);
         assert(endChord);
+        endStemDir = endChord->GetDrawingStemDir();
     }
     
     Layer* layer1 = dynamic_cast<Layer*>(start->GetFirstParent( LAYER ) );
@@ -227,20 +233,20 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     // the normal case
     if (spanningType == SPANNING_START_END) {
-        noteStemDir = start->GetDrawingStemDir();
+        stemDir = startStemDir;
     }
     // This is the case when the tie is split over two system of two pages.
     // In this case, we are now drawing its beginning to the end of the measure (i.e., the last aligner)
     else if (spanningType == SPANNING_START) {
-        noteStemDir = start->GetDrawingStemDir();
+        stemDir = startStemDir;
     }
     // Now this is the case when the tie is split but we are drawing the end of it
     else if (spanningType == SPANNING_END) {
-        noteStemDir = end->GetDrawingStemDir();
+        stemDir = endStemDir;
     }
     // Finally, slur accross an entire system; use the staff position and up (see below)
     else {
-        noteStemDir = STEMDIRECTION_down;
+        stemDir = STEMDIRECTION_down;
     }
     
     /************** direction **************/
@@ -258,12 +264,12 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         if (startParentChord->PositionInChord(startNote) < 0) up = false;
         else if (startParentChord->PositionInChord(startNote) > 0) up = true;
         // away from the stem if odd number (center note)
-        else up = (noteStemDir != STEMDIRECTION_up);
+        else up = (stemDir != STEMDIRECTION_up);
     }
-    else if (noteStemDir == STEMDIRECTION_up) {
+    else if (stemDir == STEMDIRECTION_up) {
         up = false;
     }
-    else if (noteStemDir == STEMDIRECTION_NONE) {
+    else if (stemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         up = (start->GetDrawingY() > center) ? true : false;
@@ -282,7 +288,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         // slur is up
         if (up) {
             // P(^)
-            if (noteStemDir == STEMDIRECTION_down) y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+            if (startStemDir == STEMDIRECTION_down) y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             //  d(^)d
             else if (isShortSlur || ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start))) {
                 y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
@@ -298,7 +304,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         // slur is down
         else {
             // d(_)
-            if (noteStemDir == STEMDIRECTION_up) y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            if (startStemDir == STEMDIRECTION_up) y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
             // P(_)P
             else if (isShortSlur || ((parentBeam = start->IsInBeam()) && !parentBeam->IsLastInBeam(start))) {
                 y1 = start->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
@@ -317,7 +323,6 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
         if (endParentChord) endParentChord->GetYExtremes(&yChordMax, &yChordMin);
         else if (endChord) endChord->GetYExtremes(&yChordMax, &yChordMin);
         // get the stem direction of the end
-        data_STEMDIRECTION endStemDir = end->GetDrawingStemDir();
         // slur is up
         if (up) {
             // (^)P

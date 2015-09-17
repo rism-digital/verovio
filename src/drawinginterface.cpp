@@ -175,4 +175,56 @@ StaffDefDrawingInterface& StaffDefDrawingInterface::operator=( const StaffDefDra
     return *this;
 }
 
+    
+//----------------------------------------------------------------------------
+// StemmedDrawingInterface
+//----------------------------------------------------------------------------
+
+StemmedDrawingInterface::StemmedDrawingInterface()
+{
+    Reset();
+}
+
+StemmedDrawingInterface::~StemmedDrawingInterface()
+{
+}
+
+void StemmedDrawingInterface::Reset()
+{
+    m_drawingStemDir = STEMDIRECTION_NONE;
+    m_drawingStemStart = Point(0, 0);
+    m_drawingStemEnd = Point(0, 0);
+}
+    
+void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)
+{
+    m_drawingStemDir = stemDir;
+}
+
+data_STEMDIRECTION StemmedDrawingInterface::GetDrawingStemDir()
+{
+    return m_drawingStemDir;
+}
+
+void StemmedDrawingInterface::SetDrawingStemStart(Point stemStart)
+{
+    m_drawingStemStart = stemStart;
+}
+
+Point StemmedDrawingInterface::GetDrawingStemStart()
+{
+    return m_drawingStemStart;
+}
+
+void StemmedDrawingInterface::SetDrawingStemEnd(Point stemEnd)
+{
+    m_drawingStemEnd = stemEnd;
+}
+
+Point StemmedDrawingInterface::GetDrawingStemEnd()
+{
+    return m_drawingStemEnd;
+}
+
+    
 } // namespace vrv
