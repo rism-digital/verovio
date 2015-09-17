@@ -231,6 +231,15 @@
                 </changeDesc>
                 <date isodate="2015-08-28"/>
             </change>
+            <change n="9">
+                <respStmt>
+                    <persName>Laurent Pugin</persName>
+                </respStmt>
+                <changeDesc>
+                    <p>Adding clef changes (instead of staffDef) in the cello part</p>
+                </changeDesc>
+                <date isodate="2015-08-28"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -1045,6 +1054,7 @@
                             <staff n="4">
                                 <layer n="1">
                                     <mRest xml:id="d648110e5013"/>
+                                    <clef shape="F" line="4"/>
                                 </layer>
                             </staff>
                             <slur tstamp="1" tstamp2="0m+3.5" curvedir="below" startid="#d648110e4765" endid="d648110e4802" staff="1"/>
@@ -1054,7 +1064,6 @@
                             <slur tstamp="1" tstamp2="0m+1.75" curvedir="below" startid="#d648110e4918" endid="d648110e4939" staff="3"/>
                             <slur tstamp="2" tstamp2="0m+2.75" curvedir="below" startid="#d648110e4959" endid="d648110e4978" staff="3"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="F"/>
                         <measure n="15" xml:id="d648110e5019">
                             <staff n="1">
                                 <layer n="1">
@@ -1420,6 +1429,7 @@
                                     <note xml:id="d648110e7410" pname="e" oct="2" dur="4" stem.dir="up" accid.ges="f"/>
                                     <note xml:id="d648110e7438" pname="e" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
                                     <note xml:id="d648110e7454" pname="e" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
+                                    <clef shape="C" line="4"/>
                                 </layer>
                             </staff>
                             <slur tstamp="1" tstamp2="0m+3.5" curvedir="below" startid="#d648110e7223" endid="d648110e7273" staff="1"/>
@@ -1431,7 +1441,6 @@
                             <hairpin tstamp="1.042" tstamp2="0m+3.125" form="dim" place="above" staff="4" opening="0" startto="-23" endto="-21"/>
                             <hairpin tstamp="1.042" tstamp2="0m+3.125" form="dim" place="below" staff="4" opening="0" startto="-23" endto="-21"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="C"/>
                         <measure n="22" xml:id="d648110e7482">
                             <staff n="1">
                                 <layer n="1">
@@ -1607,7 +1616,6 @@
                             <slur tstamp="2" tstamp2="0m+2.75" curvedir="above" startid="#d648110e8452" endid="d648110e8473" staff="4"/>
                             <slur tstamp="3" tstamp2="0m+3.5" curvedir="above" startid="#d648110e8493" endid="d648110e8514" staff="4"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="F"/>
                         <measure n="24" xml:id="d648110e8532">
                             <staff n="1">
                                 <layer n="1">
@@ -1739,6 +1747,7 @@
                                 <layer n="1">
                                     <rest xml:id="d648110e9226" dur="4"/>
                                     <rest xml:id="d648110e9234" dur="4"/>
+                                    <clef shape="F" line="4"/>
                                     <tuplet num="3" numbase="2" bracket.visible="false" num.visible="true">
                                         <rest xml:id="d648110e9242" dur="8"/>
                                         <beam>
@@ -3722,6 +3731,7 @@
                                                 <artic artic="stacc" place="above"/>
                                             </note>
                                         </beam>
+                                        <clef shape="C" line="4"/>
                                     </tuplet>
                                 </layer>
                             </staff>
@@ -3750,7 +3760,6 @@
                             <hairpin tstamp="3.292" tstamp2="0m+3.708" form="dim" place="below" staff="4" opening="0" startto="-1" endto="-7"/>
                             <slur tstamp="3.333" tstamp2="0m+3.667" curvedir="above" startid="#d648110e21382" endid="d648110e21411" staff="4"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="C"/>
                         <measure n="39" xml:id="d648110e21443">
                             <staff n="1">
                                 <layer n="1">
@@ -3992,6 +4001,7 @@
                                         <note xml:id="d648110e23099" pname="d" oct="4" dur="8" stem.dir="down"/>
                                         <note xml:id="d648110e23115" pname="c" accid="n" oct="4" dur="8" stem.dir="down"/>
                                     </beam>
+                                    <clef shape="F" line="4"/>
                                 </layer>
                             </staff>
                             <dynam tstamp="1" place="below" staff="1">f</dynam>
@@ -4004,7 +4014,6 @@
                             <slur tstamp="1" tstamp2="0m+3.5" curvedir="above" startid="#d648110e23022" endid="d648110e23115" staff="4"/>
                             <hairpin tstamp="1.292" tstamp2="0m+3.625" form="dim" place="below" staff="4" opening="0" startto="-5" endto="-9"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="F"/>
                         <measure n="41" xml:id="d648110e23140">
                             <staff n="1">
                                 <layer n="1">
@@ -5279,7 +5288,7 @@
                                     <rest xml:id="d648110e31632" dur="4"/>
                                     <rest xml:id="d648110e31640" dur="4"/>
                                     <rest xml:id="d648110e31648" dur="8"/>
-                                    <!--<clefchange shape="C" line="4"/>-->
+                                    <clef shape="C" line="4"/>
                                     <note xml:id="d648110e31662" pname="e" oct="4" dur="8" stem.dir="down" accid.ges="f"/>
                                 </layer>
                             </staff>
@@ -5692,7 +5701,6 @@
                             <hairpin tstamp="1" tstamp2="0m+2.75" form="dim" place="below" staff="4" opening="0" endto="-6"/>
                             <slur tstamp="1" tstamp2="0m+3" curvedir="above" startid="#d648110e34650" endid="d648110e34703" staff="4"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="F"/>
                         <measure n="61" xml:id="d648110e34721">
                             <staff n="1">
                                 <layer n="1">
@@ -5738,6 +5746,7 @@
                                     <note xml:id="d648110e35062" pname="g" oct="3" dur="4" stem.dir="down">
                                         <artic artic="stacc" place="above"/>
                                     </note>
+                                    <clef shape="F" line="4"/>
                                 </layer>
                             </staff>
                             <slur tstamp="3" tstamp2="1m+1" curvedir="below" startid="#d648110e34739" endid="d648110e35088" staff="1"/>
@@ -6210,6 +6219,7 @@
                                     <note xml:id="d648110e38272" pname="e" oct="2" dur="4" stem.dir="up" accid.ges="f"/>
                                     <note xml:id="d648110e38293" pname="e" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
                                     <note xml:id="d648110e38317" pname="e" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
+                                    <clef shape="C" line="4"/>
                                 </layer>
                             </staff>
                             <slur tstamp="1" tstamp2="0m+3.5" curvedir="below" startid="#d648110e38084" endid="d648110e38134" staff="1"/>
@@ -6220,7 +6230,6 @@
                             <hairpin tstamp="1" tstamp2="0m+2.917" form="dim" place="below" staff="4" opening="0" endto="-2"/>
                             <hairpin tstamp="1.042" tstamp2="0m+2.917" form="dim" place="above" staff="4" opening="0" startto="-23" endto="-2"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="C"/>
                         <measure n="70" xml:id="d648110e38333">
                             <staff n="1">
                                 <layer n="1">
@@ -6459,6 +6468,7 @@
                                     <note xml:id="d648110e39910" pname="e" oct="4" dur="4" stem.dir="down" accid.ges="f"/>
                                     <note xml:id="d648110e39928" pname="d" oct="4" dur="4" stem.dir="down" accid.ges="f"/>
                                     <note xml:id="d648110e39944" pname="b" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
+                                    <clef shape="F" line="4"/>
                                 </layer>
                             </staff>
                             <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="1" opening="0" endto="-5"/>
@@ -6469,7 +6479,6 @@
                             <hairpin tstamp="1" tstamp2="0m+3.417" form="dim" place="below" staff="4" opening="0" endto="-14"/>
                             <slur tstamp="1" tstamp2="0m+3" curvedir="above" startid="#d648110e39910" endid="d648110e39944" staff="4"/>
                         </measure>
-                        <staffDef n="6" lines="5" clef.line="4" clef.shape="F"/>
                         <measure n="73" xml:id="d648110e39967">
                             <staff n="1">
                                 <layer n="1">
