@@ -472,20 +472,23 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point poi
     Point adjustedRotatedC1 = rotatedC1;
     Point adjustedRotatedC2 = rotatedC2;
     
-    bool needPositionAdjustment = false;
     if (!spanningContentPoints.empty()) {
-        needPositionAdjustment = AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle );
-    }
-    if (needPositionAdjustment) {
+        AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle );
         // Use the adjusted control points for ajusting the position (p1, p2 and angle will be updated)
-        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle );
+        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, false );
         // Now readjust the curvature with the new p1 and p2 with the original control points
         GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
+        
         GetSpanningPointPositions( &spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
-        AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false );
-        if (!spanningContentPoints.empty()) {
+        int maxHeight = AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false );
+        
+        if (maxHeight) {
             // Something went wrong since now all spanning points should be gone...
-            LogDebug("### %d notes for %s will need position adjustment", spanningContentPoints.size(), slur->GetUuid().c_str());
+            //LogDebug("### %d notes for %s will need position adjustment", spanningContentPoints.size(), slur->GetUuid().c_str());
+            // Use the normal control points for ajusting the position (p1, p2 and angle will be updated)
+            // Move it and forcing both side to move
+            AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, &slurAngle, true );
+            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, maxHeight, staff->m_drawingStaffSize);
         }
     }
     else {
@@ -553,16 +556,16 @@ void View::GetSpanningPointPositions( ArrayOfLayerElementPointPairs *spanningPoi
         }
         p.x = itPoint->first->GetDrawingX();
         // Not sure if it is better to add the margin before or after the rotation...
-        if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 3;
-        else p.y -= m_doc->GetDrawingUnit(staffSize) * 3;
+        //if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
+        //else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
-        //if (up) itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 3;
-        //else itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 3;
+        if (up) itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
+        else itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
     }
 }
 
-bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle, bool posRatio)
+int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle, bool posRatio)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -584,6 +587,8 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
         // Do we want to set a max height?
         //maxHeight = std::min( maxHeight, m_doc->GetDrawingStaffSize(100) );
     }
+    
+    bool hasReachedMaxHeight = false;
     
     if (maxHeight > currentHeight) {
         float maxRatio = 1.0;
@@ -614,7 +619,7 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
             }
             else  {
                 if (y > itPoint->second.y) {
-                    float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y);
+                    float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
                     itPoint++;
                 }
@@ -628,6 +633,7 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
         // We should not adjust it more than the maximum height
         int desiredHeight = currentHeight * maxRatio;
         if (desiredHeight > maxHeight) {
+            hasReachedMaxHeight = true;
             maxRatio = (float)maxHeight / (float)currentHeight;
         }
         
@@ -643,26 +649,32 @@ bool View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPo
         }
     }
     
-    // filter the points with the adjusted curve
+    // Check if we need further adjustment the points with the adjusted curve
+    /*
     bezier[1] = *c1;
     bezier[2] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
         if (up) {
-            if (y > itPoint->second.y) itPoint = spanningPoints->erase( itPoint );
-            else itPoint++;
+            //if (y > itPoint->second.y) itPoint = spanningPoints->erase( itPoint );
+            //else itPoint++;
         }
         else {
-            if (y < itPoint->second.y) itPoint = spanningPoints->erase( itPoint );
-            else itPoint++;
+            //if (y < itPoint->second.y) itPoint = spanningPoints->erase( itPoint );
+            //else itPoint++;
         }
+        itPoint++;
     }
     
     // We will need to adjust the further if the list is not empty
     return (!spanningPoints->empty());
+    */
+    
+    if (hasReachedMaxHeight) return maxHeight;
+    else return 0;
 }
     
-bool View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float *angle)
+void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float *angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -707,19 +719,20 @@ bool View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
             }
         }
         if (shift > 0) {
-            leftShift = leftPoint ? shift : shift * posXRatio;
-            rightShift = !leftPoint ? shift : shift * posXRatio;
+            leftShift = (forceBothSides || leftPoint) ? shift : shift * posXRatio;
+            rightShift = (forceBothSides || !leftPoint) ? shift : shift * posXRatio;
             maxShiftLeft = leftShift > maxShiftLeft ? leftShift : maxShiftLeft;
             maxShiftRight = rightShift > maxShiftRight ? rightShift : maxShiftRight;
             itPoint++;
         }
         else {
-            itPoint = spanningPoints->erase(itPoint);
+            //itPoint = spanningPoints->erase(itPoint);
+            itPoint++;
         }
     }
     
     // Actually nothing to do
-    if (spanningPoints->empty()) return true;
+    if (spanningPoints->empty()) return;
     
     // Unrotated the slur
     *p2 = View::CalcPositionAfterRotation(*p2, (*angle), *p1);
@@ -735,8 +748,6 @@ bool View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 
     *angle = GetAdjustedSlurAngle(p1, p2, up);
     *p2 = View::CalcPositionAfterRotation(*p2, -(*angle), *p1);
-    
-    return false;
 }
     
 void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
