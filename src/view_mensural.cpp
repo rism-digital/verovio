@@ -73,7 +73,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     drawingDur = note->GetDrawingDur();
     
-    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, pseudoStaffSize, false) / 2;
+    int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, pseudoStaffSize, false) / 2;
     
     if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
         ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
@@ -116,15 +116,15 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
         
         DrawSmuflCode( dc, xNote, noteY, charCode, pseudoStaffSize, false );
     }
-    // Shorter values ??WE WANT MENSURAL NOTEHEADS, NOT CMN!!!!!!!!
+    // Shorter values
    else {
         if (note->GetColored()) {
-            if (drawingDur == DUR_2) charCode = SMUFL_E0A3_noteheadHalf;
-            else charCode = SMUFL_E0A4_noteheadBlack;
+            if (drawingDur == DUR_2) charCode = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
+            else charCode = SMUFL_E93C_mensuralNoteheadMinimaWhite;
         }
         else {
-            if (drawingDur > DUR_2) charCode = SMUFL_E93C_mensuralNoteheadMinimaWhite;
-            else charCode = SMUFL_E0A3_noteheadHalf;
+            if (drawingDur == DUR_2) charCode = SMUFL_E93C_mensuralNoteheadMinimaWhite;
+            else charCode = SMUFL_E93D_mensuralNoteheadSemiminimaWhite;
         }
 
         DrawSmuflCode( dc, xNote, noteY, charCode,  pseudoStaffSize, false );
