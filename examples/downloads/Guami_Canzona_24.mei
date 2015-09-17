@@ -1,11 +1,14 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<mei meiversion="2013" xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
 <meiHead>
 	<fileDesc>
 		<titleStmt>
-			<title>CANZ_24-6</title>
+		    <title>Canzon vigesimaquarta</title>
 			<respStmt>
-				<persName/>
+				<persName role="composer">Gioseffo Guami</persName>
+			    <persName role="encoder" xml:id="LP">Laurent Pugin</persName>
 			</respStmt>
 		</titleStmt>
 		<pubStmt>
@@ -24,11 +27,21 @@
 	<workDesc>
 		<work>
 			<titleStmt>
-				<title>CANZ_24-6</title>
+			    <title>Canzon vigesimaquarta</title>
 				<respStmt/>
 			</titleStmt>
 		</work>
 	</workDesc>
+    <revisionDesc>
+        <change n="1" resp="#LP">
+            <changeDesc>
+                <p>Upgrade to version 2013</p>
+                <p>Changing "longa" and "brevis" to "long" and "breve"</p>
+                <p>Extending header content</p>
+            </changeDesc>
+            <date>2015-09-14</date>
+        </change>
+    </revisionDesc>
 </meiHead>
 <music>
 	<body>
@@ -103,22 +116,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b1s5"/>
+								<rest dur="breve" xml:id="p1r0v1b1s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b1s6"/>
+								<rest dur="breve" xml:id="p1r0v1b1s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b1s7"/>
+								<rest dur="breve" xml:id="p1r0v1b1s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b1s8"/>
+								<rest dur="breve" xml:id="p1r0v1b1s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -178,22 +191,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b2s5"/>
+								<rest dur="breve" xml:id="p1r0v1b2s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b2s6"/>
+								<rest dur="breve" xml:id="p1r0v1b2s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b2s7"/>
+								<rest dur="breve" xml:id="p1r0v1b2s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b2s8"/>
+								<rest dur="breve" xml:id="p1r0v1b2s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -302,22 +315,22 @@
 					<measure n="4">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b4s1"/>
+								<rest dur="breve" xml:id="p1r0v1b4s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b4s2"/>
+								<rest dur="breve" xml:id="p1r0v1b4s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b4s3"/>
+								<rest dur="breve" xml:id="p1r0v1b4s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b4s4"/>
+								<rest dur="breve" xml:id="p1r0v1b4s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -573,22 +586,22 @@
 					<measure n="7">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b7s1"/>
+								<rest dur="breve" xml:id="p1r0v1b7s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b7s2"/>
+								<rest dur="breve" xml:id="p1r0v1b7s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b7s3"/>
+								<rest dur="breve" xml:id="p1r0v1b7s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b7s4"/>
+								<rest dur="breve" xml:id="p1r0v1b7s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -1121,22 +1134,22 @@
 					<measure n="13">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b13s1"/>
+								<rest dur="breve" xml:id="p1r0v1b13s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b13s2"/>
+								<rest dur="breve" xml:id="p1r0v1b13s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b13s4"/>
+								<rest dur="breve" xml:id="p1r0v1b13s4"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b13s4"/>
+								<rest dur="breve" xml:id="p1r0v1b13s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -1843,22 +1856,22 @@
 					<measure n="20">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b20s1"/>
+								<rest dur="breve" xml:id="p1r0v1b20s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b20s2"/>
+								<rest dur="breve" xml:id="p1r0v1b20s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b20s3"/>
+								<rest dur="breve" xml:id="p1r0v1b20s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b20s4"/>
+								<rest dur="breve" xml:id="p1r0v1b20s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -2232,22 +2245,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s5"/>
+								<rest dur="breve" xml:id="p1r0v1b25s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s6"/>
+								<rest dur="breve" xml:id="p1r0v1b25s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s7"/>
+								<rest dur="breve" xml:id="p1r0v1b25s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s8"/>
+								<rest dur="breve" xml:id="p1r0v1b25s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -2291,22 +2304,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s5"/>
+								<rest dur="breve" xml:id="p1r0v1b25s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s6"/>
+								<rest dur="breve" xml:id="p1r0v1b25s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s7"/>
+								<rest dur="breve" xml:id="p1r0v1b25s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b25s8"/>
+								<rest dur="breve" xml:id="p1r0v1b25s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -2331,70 +2344,70 @@
 						<staff n="2">
 							<layer n="1">
 								<note dur="1" oct="4" pname="f" colored="true" xml:id="p1cfd4n0v1b27s2"/>
-							    <note dur="brevis" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b27s2"/>
+							    <note dur="breve" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b27s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b27s3"/>
-							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b27s3"/>
+							    <note dur="breve" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b27s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="d" colored="true" xml:id="p1cdd3n0v1b27s4"/>
-							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27s4"/>
+							    <note dur="breve" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b26s5"/>
+								<rest dur="breve" xml:id="p1r0v1b26s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b26s6"/>
+								<rest dur="breve" xml:id="p1r0v1b26s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b26s7"/>
+								<rest dur="breve" xml:id="p1r0v1b26s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b26s8"/>
+								<rest dur="breve" xml:id="p1r0v1b26s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="d" colored="true" xml:id="p1cdd3n0v1b27s9"/>
-							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27s9"/>
+							    <note dur="breve" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b27s9"/>
 							</layer>
 						</staff>
 					</measure>
 					<measure n="27">
 						<staff n="1">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="b" xml:id="p1cbd4n0v1b28s1"/>
+								<note dur="breve" oct="4" pname="b" xml:id="p1cbd4n0v1b28s1"/>
 								<rest dur="1" xml:id="p1r768v1b28s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="f" xml:id="p1cfd4n0v1b28s2"/>
+								<note dur="breve" oct="4" pname="f" xml:id="p1cfd4n0v1b28s2"/>
 								<rest dur="1" xml:id="p1r768v1b28s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="d" xml:id="p1cdd4n0v1b28s3"/>
+								<note dur="breve" oct="4" pname="d" xml:id="p1cdd4n0v1b28s3"/>
 								<rest dur="1" xml:id="p1r768v1b28s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b28s4"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b28s4"/>
 								<rest dur="1" xml:id="p1r768v1b28s4"/>
 							</layer>
 						</staff>
@@ -2428,7 +2441,7 @@
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b28s9"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b28s9"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b28s9"/>
 							</layer>
 						</staff>
@@ -2436,22 +2449,22 @@
 					<measure n="28">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b29s1"/>
+								<rest dur="breve" xml:id="p1r0v1b29s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b29s2"/>
+								<rest dur="breve" xml:id="p1r0v1b29s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b29s3"/>
+								<rest dur="breve" xml:id="p1r0v1b29s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b29s4"/>
+								<rest dur="breve" xml:id="p1r0v1b29s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -2465,7 +2478,7 @@
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="g"  xml:id="p1cgd4n0v1b29s6"/>
+								<note dur="breve" oct="4" pname="g"  xml:id="p1cgd4n0v1b29s6"/>
 								<note dur="1" oct="4" pname="c"  xml:id="p1ccd4n768v1b29s6"/>
 							</layer>
 						</staff>
@@ -2494,22 +2507,22 @@
 					<measure n="29">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b30s1"/>
+								<rest dur="breve" xml:id="p1r0v1b30s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b30s2"/>
+								<rest dur="breve" xml:id="p1r0v1b30s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b30s3"/>
+								<rest dur="breve" xml:id="p1r0v1b30s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b30s4"/>
+								<rest dur="breve" xml:id="p1r0v1b30s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -2524,25 +2537,25 @@
 						<staff n="6">
 							<layer n="1">
 							    <note dur="1" oct="4" pname="f" colored="true" xml:id="p1cfd4n0v1b30s6"/>
-							    <note dur="brevis" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b30s6"/>
+							    <note dur="breve" oct="4" pname="f" colored="true" xml:id="p1cfd4n341v1b30s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b30s7"/>
-							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b30s7"/>
+							    <note dur="breve" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b30s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="d" colored="true" xml:id="p1cdd3n0v1b30s8"/>
-							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b30s8"/>
+							    <note dur="breve" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b30s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="d" colored="true"  xml:id="p1cdd3n0v1b30s9"/>
-							    <note dur="brevis" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b30s9"/>
+							    <note dur="breve" oct="3" pname="f" colored="true" xml:id="p1cfd3n341v1b30s9"/>
 							</layer>
 						</staff>
 					</measure>
@@ -2571,37 +2584,37 @@
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="b" xml:id="p1cbd3n0v1b31s4"/>
+								<note dur="breve" oct="3" pname="b" xml:id="p1cbd3n0v1b31s4"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b31s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="b" xml:id="p1cbd4n0v1b31s5"/>
+								<note dur="breve" oct="4" pname="b" xml:id="p1cbd4n0v1b31s5"/>
 								<rest dur="1" xml:id="p1r768v1b31s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="f" xml:id="p1cfd4n0v1b31s6"/>
+								<note dur="breve" oct="4" pname="f" xml:id="p1cfd4n0v1b31s6"/>
 								<rest dur="1" xml:id="p1r768v1b31s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="d" xml:id="p1cdd4n0v1b31s7"/>
+								<note dur="breve" oct="4" pname="d" xml:id="p1cdd4n0v1b31s7"/>
 								<rest dur="1" xml:id="p1r768v1b31s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b31s8"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b31s8"/>
 								<rest dur="1" xml:id="p1r768v1b31s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b31s9"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b31s9"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b31s9"/>
 							</layer>
 						</staff>
@@ -2609,25 +2622,25 @@
 					<measure n="31">
 						<staff n="1">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="d" xml:id="p1cdd5n0v1b32s1"/>
+								<note dur="breve" oct="5" pname="d" xml:id="p1cdd5n0v1b32s1"/>
 								<rest dur="1" xml:id="p1r768v1b32s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="b" xml:id="p1cbd4n0v1b32s2"/>
+								<note dur="breve" oct="4" pname="b" xml:id="p1cbd4n0v1b32s2"/>
 								<rest dur="1" xml:id="p1r768v1b32s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="f" xml:id="p1cfd4n0v1b32s3"/>
+								<note dur="breve" oct="4" pname="f" xml:id="p1cfd4n0v1b32s3"/>
 								<rest dur="1" xml:id="p1r768v1b32s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b32s4"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b32s4"/>
 								<rest dur="1" xml:id="p1r768v1b32s4"/>
 							</layer>
 						</staff>
@@ -2654,13 +2667,13 @@
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="b" xml:id="p1cbd3n0v1b32s8"/>
+								<note dur="breve" oct="3" pname="b" xml:id="p1cbd3n0v1b32s8"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b32s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b32s9"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b32s9"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b32s9"/>
 							</layer>
 						</staff>
@@ -2682,7 +2695,7 @@
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="b" xml:id="p1cbd3n0v1b33s3"/>
+								<note dur="breve" oct="3" pname="b" xml:id="p1cbd3n0v1b33s3"/>
 								<note dur="1" oct="3" pname="b" xml:id="p1cbd3n768v1b33s3"/>
 							</layer>
 						</staff>
@@ -2696,25 +2709,25 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="d" xml:id="p1cdd5n0v1b33s5"/>
+								<note dur="breve" oct="5" pname="d" xml:id="p1cdd5n0v1b33s5"/>
 								<rest dur="1" xml:id="p1r768v1b33s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="b" xml:id="p1cbd4n0v1b33s6"/>
+								<note dur="breve" oct="4" pname="b" xml:id="p1cbd4n0v1b33s6"/>
 								<rest dur="1" xml:id="p1r768v1b33s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="f" xml:id="p1cfd4n0v1b33s7"/>
+								<note dur="breve" oct="4" pname="f" xml:id="p1cfd4n0v1b33s7"/>
 								<rest dur="1" xml:id="p1r768v1b33s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<note dur="brevis" oct="2" pname="b" xml:id="p1cbd2n0v1b33s8"/>
+								<note dur="breve" oct="2" pname="b" xml:id="p1cbd2n0v1b33s8"/>
 								<rest dur="1" xml:id="p1r768v1b33s8"/>
 							</layer>
 						</staff>
@@ -2753,33 +2766,33 @@
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="f" xml:id="p1cfd3n0v1b34s4"/>
+								<note dur="breve" oct="3" pname="f" xml:id="p1cfd3n0v1b34s4"/>
 								<note dur="1" oct="3" pname="g" xml:id="p1cgd3n768v1b34s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b33s5"/>
+								<rest dur="breve" xml:id="p1r0v1b33s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b33s6"/>
+								<rest dur="breve" xml:id="p1r0v1b33s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b33s7"/>
+								<rest dur="breve" xml:id="p1r0v1b33s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b33s8"/>
+								<rest dur="breve" xml:id="p1r0v1b33s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="f" xml:id="p1cfd3n0v1b34s9"/>
+								<note dur="breve" oct="3" pname="f" xml:id="p1cfd3n0v1b34s9"/>
 								<note dur="1" oct="3" pname="g" xml:id="p1cgd3n768v1b34s9"/>
 							</layer>
 						</staff>
@@ -2789,18 +2802,18 @@
 						<staff n="1">
 							<layer n="1">
 							    <note dur="1" oct="5" pname="c" colored="true"  xml:id="p1ccd5n0v1b35s1"/>
-							    <note dur="brevis" oct="5" pname="d" colored="true" xml:id="p1cdd5n341v1b35s1"/>
+							    <note dur="breve" oct="5" pname="d" colored="true" xml:id="p1cdd5n341v1b35s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="g" colored="true" xml:id="p1cgd3n0v1b35s2"/>
-							    <note dur="brevis" oct="3" pname="a" colored="true" xml:id="p1cad3n341v1b35s2"/>
+							    <note dur="breve" oct="3" pname="a" colored="true" xml:id="p1cad3n341v1b35s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="g" xml:id="p1cgd4n0v1b35s3"/>
+								<note dur="breve" oct="4" pname="g" xml:id="p1cgd4n0v1b35s3"/>
 								<note dur="1" oct="4" pname="f" xml:id="p1cfd4n768v1b35s3">
 									<accid accid="s"/>
 								</note>
@@ -2811,27 +2824,27 @@
 							    <note dur="1" oct="3" pname="e" colored="true" xml:id="p1ced3n0v1b35s4">
 									<accid accid="f"/>
 								</note>
-							    <note dur="brevis" oct="3" pname="d" colored="true" xml:id="p1cdd3n341v1b35s4"/>
+							    <note dur="breve" oct="3" pname="d" colored="true" xml:id="p1cdd3n341v1b35s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b34s5"/>
+								<rest dur="breve" xml:id="p1r0v1b34s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b34s6"/>
+								<rest dur="breve" xml:id="p1r0v1b34s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b34s7"/>
+								<rest dur="breve" xml:id="p1r0v1b34s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b34s8"/>
+								<rest dur="breve" xml:id="p1r0v1b34s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -2839,7 +2852,7 @@
 								<note dur="1" oct="3" pname="e" xml:id="p1ced3n0v1b35s9">
 									<accid accid="f"/>
 								</note>
-								<note dur="brevis" oct="3" pname="d" xml:id="p1cdd3n341v1b35s9"/>
+								<note dur="breve" oct="3" pname="d" xml:id="p1cdd3n341v1b35s9"/>
 							</layer>
 						</staff>
 					</measure>
@@ -3042,22 +3055,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b37s5"/>
+								<rest dur="breve" xml:id="p1r0v1b37s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b37s6"/>
+								<rest dur="breve" xml:id="p1r0v1b37s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b37s7"/>
+								<rest dur="breve" xml:id="p1r0v1b37s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b37s8"/>
+								<rest dur="breve" xml:id="p1r0v1b37s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -3777,22 +3790,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b47s5"/>
+								<rest dur="breve" xml:id="p1r0v1b47s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b47s6"/>
+								<rest dur="breve" xml:id="p1r0v1b47s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b47s7"/>
+								<rest dur="breve" xml:id="p1r0v1b47s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b47s8"/>
+								<rest dur="breve" xml:id="p1r0v1b47s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -3834,33 +3847,33 @@
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="c" xml:id="p1ccd4n0v1b48s4"/>
+								<note dur="breve" oct="4" pname="c" xml:id="p1ccd4n0v1b48s4"/>
 								<note dur="1" oct="4" pname="d" xml:id="p1cdd4n768v1b48s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s5"/>
+								<rest dur="breve" xml:id="p1r0v1b48s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s6"/>
+								<rest dur="breve" xml:id="p1r0v1b48s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s7"/>
+								<rest dur="breve" xml:id="p1r0v1b48s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s8"/>
+								<rest dur="breve" xml:id="p1r0v1b48s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 						    <layer n="1">
-						        <note dur="brevis" oct="4" pname="c" xml:id="p1ccd4fdasn0v1b48s9"/>
+						        <note dur="breve" oct="4" pname="c" xml:id="p1ccd4fdasn0v1b48s9"/>
 						        <note dur="1" oct="4" pname="d" xml:id="p1cdd4n768v1b48s9"/>
 						    </layer>
 						</staff>
@@ -3868,25 +3881,25 @@
 					<measure n="47">
 						<staff n="1">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="e" xml:id="p1ced5n0v1b49s1"/>
+								<note dur="breve" oct="5" pname="e" xml:id="p1ced5n0v1b49s1"/>
 								<rest dur="1" xml:id="p1r768v1b49s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="c" xml:id="p1r640v1b49s2"/>
+								<note dur="breve" oct="5" pname="c" xml:id="p1r640v1b49s2"/>
 								<rest dur="1" xml:id="p1r768v1b49s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="g" xml:id="p1r640v1b49s3"/>
+								<note dur="breve" oct="4" pname="g" xml:id="p1r640v1b49s3"/>
 								<rest dur="1" xml:id="p1r768v1b49s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="c" xml:id="p1r640v1b49s4"/>
+								<note dur="breve" oct="4" pname="c" xml:id="p1r640v1b49s4"/>
 								<rest dur="1" xml:id="p1r768v1b49s4"/>
 							</layer>
 						</staff>
@@ -3932,22 +3945,22 @@
 					<measure n="48">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s1"/>
+								<rest dur="breve" xml:id="p1r0v1b48s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s2"/>
+								<rest dur="breve" xml:id="p1r0v1b48s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s3"/>
+								<rest dur="breve" xml:id="p1r0v1b48s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b48s4"/>
+								<rest dur="breve" xml:id="p1r0v1b48s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -3961,25 +3974,25 @@
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="c" xml:id="p1ccd5n704v1b50s6"/>
+								<note dur="breve" oct="5" pname="c" xml:id="p1ccd5n704v1b50s6"/>
 								<note dur="1" oct="5" pname="c" xml:id="p1ccd5n768v1b50s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="g" xml:id="p1cgd4n0v1b50s7"/>
+								<note dur="breve" oct="4" pname="g" xml:id="p1cgd4n0v1b50s7"/>
 								<note dur="1" oct="4" pname="a" xml:id="p1cad4n768v1b50s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="c" xml:id="p1ccd4n0v1b50s8"/>
+								<note dur="breve" oct="4" pname="c" xml:id="p1ccd4n0v1b50s8"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b50s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="c" xml:id="p1ccd4n0v1b50s9"/>
+								<note dur="breve" oct="4" pname="c" xml:id="p1ccd4n0v1b50s9"/>
 								<note dur="1" oct="3" pname="f" xml:id="p1cfd3n768v1b50s9"/>
 							</layer>
 						</staff>
@@ -3987,52 +4000,52 @@
 					<measure n="49">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b49s1"/>
+								<rest dur="breve" xml:id="p1r0v1b49s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b49s2"/>
+								<rest dur="breve" xml:id="p1r0v1b49s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b49s3"/>
+								<rest dur="breve" xml:id="p1r0v1b49s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b49s4"/>
+								<rest dur="breve" xml:id="p1r0v1b49s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
 							    <note dur="1" oct="5" pname="d" colored="true" xml:id="p1cdd5n0v1b51s5"/>
-							    <note dur="brevis" oct="5" pname="c" colored="true" xml:id="p1ccd5n341v1b51s5"/>
+							    <note dur="breve" oct="5" pname="c" colored="true" xml:id="p1ccd5n341v1b51s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
 							    <note dur="1" oct="4" pname="b" colored="true" xml:id="p1cbd4n0v1b51s6"/>
-							    <note dur="brevis" oct="4" pname="g" colored="true" xml:id="p1cgd4n341v1b51s6"/>
+							    <note dur="breve" oct="4" pname="g" colored="true" xml:id="p1cgd4n341v1b51s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="f" xml:id="p1cfd4n0v1b51s7"/>
+								<note dur="breve" oct="4" pname="f" xml:id="p1cfd4n0v1b51s7"/>
 								<note dur="1" oct="4" pname="e" xml:id="p1ced4n768v1b51s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b51s8"/>
-							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b51s8"/>
+							    <note dur="breve" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b51s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
 							    <note dur="1" oct="3" pname="b" colored="true" xml:id="p1cbd3n0v1b51s9"/>
-							    <note dur="brevis" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b51s9"/>
+							    <note dur="breve" oct="4" pname="c" colored="true" xml:id="p1ccd4n341v1b51s9"/>
 							</layer>
 						</staff>
 					</measure>
@@ -4067,31 +4080,31 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="c" xml:id="p1r640v1b52s5"/>
+								<note dur="breve" oct="5" pname="c" xml:id="p1r640v1b52s5"/>
 								<rest dur="1" xml:id="p1r768v1b52s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="a" xml:id="p1r640v1b52s6"/>
+								<note dur="breve" oct="4" pname="a" xml:id="p1r640v1b52s6"/>
 								<rest dur="1" xml:id="p1r768v1b52s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="f" xml:id="p1r640v1b52s7"/>
+								<note dur="breve" oct="4" pname="f" xml:id="p1r640v1b52s7"/>
 								<rest dur="1" xml:id="p1r768v1b52s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="f" xml:id="p1r640v1b52s8"/>
+								<note dur="breve" oct="3" pname="f" xml:id="p1r640v1b52s8"/>
 								<rest dur="1" xml:id="p1r768v1b52s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="f" xml:id="p1ccd4n704v1b52s9"/>
+								<note dur="breve" oct="3" pname="f" xml:id="p1ccd4n704v1b52s9"/>
 								<note dur="1" oct="4" pname="c" xml:id="p1ccd4n768v1b52s9"/>
 							</layer>
 						</staff>
@@ -4099,7 +4112,7 @@
 					<measure n="51">
 						<staff n="1">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="d" xml:id="p1cdd5n0v1b53s1"/>
+								<note dur="breve" oct="5" pname="d" xml:id="p1cdd5n0v1b53s1"/>
 								<note dur="1" oct="5" pname="c" xml:id="p1ccd5n768v1b53s1">
 									<accid accid="s"/>
 								</note>
@@ -4107,13 +4120,13 @@
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="b" xml:id="p1cbd4n0v1b53s2"/>
+								<note dur="breve" oct="4" pname="b" xml:id="p1cbd4n0v1b53s2"/>
 								<note dur="1" oct="4" pname="a" xml:id="p1cad4n768v1b53s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="g" xml:id="p1cgd4n0v1b53s3"/>
+								<note dur="breve" oct="4" pname="g" xml:id="p1cgd4n0v1b53s3"/>
 								<note dur="1" oct="4" pname="e" xml:id="p1ced4n768v1b53s3"/>
 							</layer>
 						</staff>
@@ -4128,22 +4141,22 @@
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b53s5"/>
+								<rest dur="breve" xml:id="p1r0v1b53s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b53s6"/>
+								<rest dur="breve" xml:id="p1r0v1b53s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b53s7"/>
+								<rest dur="breve" xml:id="p1r0v1b53s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b53s8"/>
+								<rest dur="breve" xml:id="p1r0v1b53s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
@@ -4160,25 +4173,25 @@
 					<measure n="52">
 						<staff n="1">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="d" xml:id="p1r640v1b54s1"/>
+								<note dur="breve" oct="5" pname="d" xml:id="p1r640v1b54s1"/>
 								<rest dur="1" xml:id="p1r768v1b54s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="a" xml:id="p1r640v1b54s2"/>
+								<note dur="breve" oct="4" pname="a" xml:id="p1r640v1b54s2"/>
 								<rest dur="1" xml:id="p1r768v1b54s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="d" xml:id="p1r640v1b54s3"/>
+								<note dur="breve" oct="4" pname="d" xml:id="p1r640v1b54s3"/>
 								<rest dur="1" xml:id="p1r768v1b54s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="brevis" oct="3" pname="d" xml:id="p1r640v1b54s4"/>
+								<note dur="breve" oct="3" pname="d" xml:id="p1r640v1b54s4"/>
 								<rest dur="1" xml:id="p1r768v1b54s4"/>
 							</layer>
 						</staff>
@@ -4221,27 +4234,27 @@
 					<measure n="53">
 						<staff n="1">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b55s1"/>
+								<rest dur="breve" xml:id="p1r0v1b55s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b55s2"/>
+								<rest dur="breve" xml:id="p1r0v1b55s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b55s3"/>
+								<rest dur="breve" xml:id="p1r0v1b55s3"/>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<rest dur="brevis" xml:id="p1r0v1b55s4"/>
+								<rest dur="breve" xml:id="p1r0v1b55s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<note dur="brevis" oct="5" pname="d" xml:id="p1cdd5n0v1b55s5"/>
+								<note dur="breve" oct="5" pname="d" xml:id="p1cdd5n0v1b55s5"/>
 								<note dur="1" oct="5" pname="c" xml:id="p1ccd5n768v1b55s5">
 									<accid accid="s"/>
 								</note>
@@ -4249,13 +4262,13 @@
 						</staff>
 						<staff n="6">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="b" xml:id="p1cbd4n0v1b55s6"/>
+								<note dur="breve" oct="4" pname="b" xml:id="p1cbd4n0v1b55s6"/>
 								<note dur="1" oct="4" pname="a" xml:id="p1cad4n768v1b55s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="brevis" oct="4" pname="g" xml:id="p1cgd4n0v1b55s7"/>
+								<note dur="breve" oct="4" pname="g" xml:id="p1cgd4n0v1b55s7"/>
 								<note dur="1" oct="4" pname="e" xml:id="p1ced4n768v1b55s7"/>
 							</layer>
 						</staff>
@@ -4891,7 +4904,7 @@
 								<note dur="4" oct="5" pname="f" xml:id="p1cfd5n768v1b63s1">
 									<accid accid="s"/>
 								</note>
-								<note dur="brevis" oct="5" pname="g" tie="i" xml:id="p1cgd5n1024v1b63s1"/>
+								<note dur="breve" oct="5" pname="g" tie="i" xml:id="p1cgd5n1024v1b63s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
@@ -4918,7 +4931,7 @@
 						<staff n="4">
 							<layer n="1">
 								<note dur="1" oct="3" pname="d" xml:id="p1cdd3n0v1b63s4"/>
-								<note dur="brevis" oct="3" pname="g" tie="i" xml:id="p1cgd3n1024v1b63s4"/>
+								<note dur="breve" oct="3" pname="g" tie="i" xml:id="p1cgd3n1024v1b63s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
@@ -4949,7 +4962,7 @@
 								<note dur="4" oct="3" pname="a" xml:id="p1cad3n0v1b63s7"/>
 								<note dur="4" oct="3" pname="b" xml:id="p1cbd3n256v1b63s7"/>
 								<note dur="2" oct="3" pname="a" xml:id="p1cad3n512v1b63s7"/>
-								<note dur="brevis" oct="3" pname="g" tie="i" xml:id="p1cgd3n1024v1b63s7"/>
+								<note dur="breve" oct="3" pname="g" tie="i" xml:id="p1cgd3n1024v1b63s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
@@ -4978,51 +4991,51 @@
 					<measure right="end" n="62">
 						<staff n="1">
 							<layer n="1">		
-								<note dur="longa" oct="5" pname="g" tie="t" xml:id="p1cgd5n1024v1b64s1"/>
+								<note dur="long" oct="5" pname="g" tie="t" xml:id="p1cgd5n1024v1b64s1"/>
 							</layer>
 						</staff>
 						<staff n="2">
 							<layer n="1">
-								<note dur="longa" oct="4" pname="g" xml:id="p1cgd4n1024v1b64s2"/>
+								<note dur="long" oct="4" pname="g" xml:id="p1cgd4n1024v1b64s2"/>
 							</layer>
 						</staff>
 						<staff n="3">
 							<layer n="1">
-								<note dur="longa" oct="3" pname="b" xml:id="p1cbd3n1024v1b64s3">
+								<note dur="long" oct="3" pname="b" xml:id="p1cbd3n1024v1b64s3">
 									<accid accid="n"/>
 								</note>
 							</layer>
 						</staff>
 						<staff n="4">
 							<layer n="1">
-								<note dur="longa" oct="3" pname="g" tie="t" xml:id="p1cgd3n1024v1b64s4"/>
+								<note dur="long" oct="3" pname="g" tie="t" xml:id="p1cgd3n1024v1b64s4"/>
 							</layer>
 						</staff>
 						<staff n="5">
 							<layer n="1">
-								<note dur="longa" oct="5" pname="d" xml:id="p1cdd5n1024v1b64s5"/>
+								<note dur="long" oct="5" pname="d" xml:id="p1cdd5n1024v1b64s5"/>
 							</layer>
 						</staff>
 						<staff n="6">
 							<layer n="1">
 								<note dur="2" oct="4" pname="g" tie="t" xml:id="p1cgd4n1024v1b64s6"/>
 								<note dur="2" oct="4" pname="d" xml:id="p1cdd4n1536v1b64s6"/>
-							    <note dur="brevis" dots="1" oct="4" pname="d" xml:id="p1cdd4n0v1b65s6"/>
+							    <note dur="breve" dots="1" oct="4" pname="d" xml:id="p1cdd4n0v1b65s6"/>
 							</layer>
 						</staff>
 						<staff n="7">
 							<layer n="1">
-								<note dur="longa" oct="3" pname="g" xml:id="p1cgd3n1024v1b64s7"/>
+								<note dur="long" oct="3" pname="g" xml:id="p1cgd3n1024v1b64s7"/>
 							</layer>
 						</staff>
 						<staff n="8">
 							<layer n="1">
-								<note dur="longa" oct="2" pname="g" xml:id="p1cgd2n1024v1b64s8"/>
+								<note dur="long" oct="2" pname="g" xml:id="p1cgd2n1024v1b64s8"/>
 							</layer>
 						</staff>
 						<staff n="9">
 							<layer n="1">
-								<note dur="longa" oct="2" pname="g" xml:id="p1cgd2n1024v1b64s9"/>
+								<note dur="long" oct="2" pname="g" xml:id="p1cgd2n1024v1b64s9"/>
 							</layer>
 						</staff>
 					</measure>
