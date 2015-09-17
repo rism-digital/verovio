@@ -475,7 +475,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point poi
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle );
         // Use the adjusted control points for ajusting the position (p1, p2 and angle will be updated)
-        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, false );
+        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, true );
         // Now readjust the curvature with the new p1 and p2 with the original control points
         GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
         

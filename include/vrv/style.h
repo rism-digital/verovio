@@ -141,7 +141,7 @@ namespace vrv {
     
 // the maximum angle of a slur
 #define TEMP_STYLE_SLUR_MAX_SLOPE (45 * M_PI / 180)
-#define TEMP_STYLE_SLUR_CURVE_FACTOR 10 // a factor for allow more (0) or less (100) curved slurs
+#define TEMP_STYLE_SLUR_CURVE_FACTOR 5 // a factor for allow more (0) or less (100) curved slurs
 #define TEMP_STYLE_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
 #define TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
     
