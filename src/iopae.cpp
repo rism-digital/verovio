@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -32,8 +33,9 @@
 
 //----------------------------------------------------------------------------
 
-
+#ifndef NO_PAE_SUPPORT
 #include <regex.h>
+#endif
 
 namespace vrv {
 
@@ -83,24 +85,31 @@ PaeInput::~PaeInput()
 
 bool PaeInput::ImportFile()
 {
-    
+#ifndef NO_PAE_SUPPORT
     std::ifstream infile;
     infile.open(m_filename.c_str());
-    
     parsePlainAndEasy(infile);
-    
     return true;
+#else
+    LogError("Plain and Easy import is not supported in the build.");
+    return false;
+#endif
 }
 
 bool PaeInput::ImportString(std::string pae)
 {
-    
+#ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
-    
     parsePlainAndEasy(in_stream);
-    
     return true;
+#else
+    LogError("Plain and Easy import is not support in the build.");
+    return false;
+#endif
+
 }
+    
+#ifndef NO_PAE_SUPPORT
 
 //////////////////////////////
 //
@@ -361,7 +370,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         m_layer->SetN( 1 );
         
         m_staff->AddLayer(m_layer);
-        m_measure->AddMeasureElement( m_staff );
+        m_measure->AddStaff( m_staff );
         system->AddMeasure( m_measure );
         
         MeasureObject obj = *it;
@@ -375,12 +384,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     staffDef->SetN( 1 );
     staffDef->SetLines(5);
     if (staffDefClef) {
-        ClefAttr clefAttr;
-        clefAttr.SetClefShape(staffDefClef->GetShape());
-        clefAttr.SetClefLine(staffDefClef->GetLine());
-        clefAttr.SetClefDis(staffDefClef->GetDis());
-        clefAttr.SetClefDisPlace(staffDefClef->GetDisPlace());
-        staffDef->ReplaceClef( &clefAttr );
+        staffDef->SetClefShape(staffDefClef->GetShape());
+        staffDef->SetClefLine(staffDefClef->GetLine());
+        staffDef->SetClefDis(staffDefClef->GetDis());
+        staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
         delete staffDefClef;
     }
     staffGrp->AddStaffDef( staffDef );
@@ -760,7 +767,6 @@ int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
     } else if ( is_one_number == 0) {
         int beats = atoi(timesig_str);
         meter->SetCount(beats);
-        meter->SetUnit(1);
     } else if (strcmp(timesig_str, "c") == 0) {
         // C
         meter->SetSym(METERSIGN_common);
@@ -957,8 +963,10 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
     bool end_of_keysig = false;
     while ((i < length) && (!end_of_keysig)) {
         switch (incipit[i]) {
-            case 'b': key->SetAlteration(ACCID_FLAT); break;
-            case 'x': key->SetAlteration(ACCID_SHARP); break;
+            case 'b': key->SetAlterationType(ACCIDENTAL_EXPLICIT_f); break;
+            case 'x': key->SetAlterationType(ACCIDENTAL_EXPLICIT_s); break;
+            case 'n': key->SetAlterationType(ACCIDENTAL_EXPLICIT_n); break;
+            case '[': break;
             case 'F':
             case 'C':
             case 'G':
@@ -974,7 +982,9 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
             i++;
     }
     
-    key->SetAlterationNumber(alt_nr);
+    if (key->GetAlterationType() != ACCIDENTAL_EXPLICIT_n) {
+        key->SetAlterationNumber(alt_nr);
+    }
     
     key->ConvertToMei();
     
@@ -1176,13 +1186,19 @@ void PaeInput::parseNote(NoteObject note) {
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
-    if (note.acciaccatura && dynamic_cast<Note *>(element)) {
-        element->m_cueSize = true;
-        dynamic_cast<Note *>(element)->m_acciaccatura = true;
+    if (note.acciaccatura && (element->Is() == NOTE) ) {
+        Note *note = dynamic_cast<Note*>(element);
+        assert( note );
+        note->SetDur(DURATION_8);
+        note->SetGrace(GRACE_acc);
+        note->SetStemDir(STEMDIRECTION_up);
     }
     
-    if (note.appoggiatura > 0) {
-        element->m_cueSize = true;
+    if ( (note.appoggiatura > 0) && (element->Is() == NOTE) ) {
+        Note *note = dynamic_cast<Note*>(element);
+        assert( note );
+        note->SetGrace(GRACE_unacc);
+        note->SetStemDir(STEMDIRECTION_up);
     }
 
     if (note.beam == BEAM_INITIAL) {
@@ -1230,11 +1246,15 @@ void PaeInput::addLayerElement(LayerElement *element) {
     if (m_nested_objects.size() > 0) {
         LayerElement *bottom = m_nested_objects.back();
         
-        if ( dynamic_cast<Beam*>( bottom ) ) {
-            ((Beam*)bottom)->AddLayerElement( element );
+        if ( bottom->Is() == BEAM ) {
+            Beam *beam = dynamic_cast<Beam*>( bottom );
+            assert( beam );
+            beam->AddLayerElement( element );
         }
-        else if ( dynamic_cast<Tuplet*>( bottom ) ) {
-            ((Tuplet*)bottom)->AddLayerElement( element );
+        else if ( bottom->Is() == TUPLET ) {
+            Tuplet *tuplet = dynamic_cast<Tuplet*>( bottom );
+            assert( tuplet );
+            tuplet->AddLayerElement( element );
         }
         
     } else {
@@ -1324,5 +1344,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
         break;
     }
 }
+
+#endif // NO_PAE_SUPPORT
 
 } // namespace vrv

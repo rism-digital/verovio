@@ -21,6 +21,7 @@
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
+#include "rpt.h"
 #include "staff.h"
 #include "vrv.h"
 
@@ -31,60 +32,25 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer( ):
-	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(),
+	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(),
     AttCommon()
 {
-    // own pointers need to be initialized before Reset()
-    m_currentClef = NULL;
-    m_currentKeySig = NULL;
-    m_currentMensur = NULL;
-    m_currentMeterSig = NULL;
+    RegisterAttClass(ATT_COMMON);
+
     Reset();
 }
 
 Layer::~Layer()
 {
-    if (m_currentClef) {
-        delete m_currentClef;
-    }
-    if (m_currentKeySig) {
-        delete m_currentKeySig;
-    }
-    if (m_currentMensur) {
-        delete m_currentMensur;
-    }
-    if (m_currentMeterSig) {
-        delete m_currentMeterSig;
-    }    
 }
 
 void Layer::Reset()
 {
     DocObject::Reset();
     DrawingListInterface::Reset();
+    StaffDefDrawingInterface::Reset();
     ResetCommon();
-    
-    if (m_currentClef) {
-        delete m_currentClef;
-    }
-    if (m_currentKeySig) {
-        delete m_currentKeySig;
-    }
-    if (m_currentMensur) {
-        delete m_currentMensur;
-    }
-    if (m_currentMeterSig) {
-        delete m_currentMeterSig;
-    }
-    // Have at least a clef by default
-    m_currentClef = new Clef();
-    m_currentKeySig = NULL;
-    m_currentMensur = NULL;
-    m_currentMeterSig = NULL;
-    m_drawClef = false;
-    m_drawKeySig = false;
-    m_drawMensur = false;
-    m_drawMeterSig = false;
+
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
     
@@ -121,175 +87,74 @@ LayerElement *Layer::GetAtPos( int x )
 	}
 	return element;
 }
-    
-void Layer::SetCurrentClef( Clef *clef )
+
+void Layer::SetDrawingAndCurrentValues(  StaffDef *currentStaffDef )
 {
-    if (clef) {
-        if (m_currentClef) delete m_currentClef;
-        m_currentClef = clef;
-    }
-}
-
-void Layer::SetCurrentKeySig( KeySig *keySig )
-{
-    if (keySig) {
-        if (m_currentKeySig) delete m_currentKeySig;
-        m_currentKeySig = keySig;
-    }
-}
-
-void Layer::SetCurrentMensur( Mensur *mensur )
-{
-    if (mensur) {
-        if (m_currentMensur) delete m_currentMensur;
-        m_currentMensur = mensur;
-    }
-}
-
-void Layer::SetCurrentMeterSig( MeterSig *meterSig )
-{
-    if (meterSig) {
-        if (m_currentMeterSig) delete m_currentMeterSig;
-        m_currentMeterSig = meterSig;
-    }
-}
-
-LayerElement *Layer::Insert( LayerElement *element, int x )
-{
-	if ( !element ) { 
-        return NULL;
-    }
-    
-    LayerElement *insertElement = element->GetChildCopy();
-
-    // First we find the element after which we are inserting the element
-    // If not, it will be NULL
-    // We are also updating the section and measure ( TODO, not necessary for now )
-    int idx = 0;
-	LayerElement *next = dynamic_cast<LayerElement*>( this->GetFirst() );
-	while ( next && (next->GetDrawingX() < x) )
-	{
-        idx++;
-        // update section and measure if necessary (no section breaks and measure breaks for now)
-		next = dynamic_cast<LayerElement*>( this->GetNext( ) );
-		if ( !next ) {
-			break;
-        }
-	}
-    
-    // Insert in the logical tree - this works only for facsimile (transcription) encoding
-    insertElement->m_xAbs = x;
-    AddLayerElement( insertElement, idx );
-    
-	Refresh();
-    //
-	return insertElement;
-}
-
-
-void Layer::Insert( LayerElement *layerElement, LayerElement *before )
-{
-    int idx = 0;
-    if ( before ) {
-        idx = this->GetChildIndex( before );
-    }
-    AddLayerElement( layerElement , idx );
-}
-
-void Layer::SetDrawingAndCurrentValues( ScoreDef *currentScoreDef, StaffDef *currentStaffDef )
-{
-    if (!currentStaffDef || !currentScoreDef) {
-        LogDebug("scoreDef and/or staffDef not found");
+    if (!currentStaffDef) {
+        LogDebug("staffDef not found");
         return;
     }
     
+    // Remove any previous value in the Layer
+    this->StaffDefDrawingInterface::Reset();
+    
+    // Special case with C-major / A-minor key signature (0) : if key cancellation is false, we are at the beginning
+    // of a new system, and hence we should not draw it. Maybe this can be improved?
+    bool drawKeySig = currentStaffDef->DrawKeySig();
+    if (currentStaffDef->GetCurrentKeySig() && (currentStaffDef->GetCurrentKeySig()->GetAlterationNumber() == 0)) {
+        if (currentStaffDef->DrawKeySigCancellation() == false) {
+            drawKeySig = false;
+        }
+    }
+    
     this->SetDrawClef( currentStaffDef->DrawClef() );
-    this->SetDrawKeySig( currentStaffDef->DrawKeySig() );
+    this->SetDrawKeySig( drawKeySig ); // see above
     this->SetDrawMensur( currentStaffDef->DrawMensur() );
     this->SetDrawMeterSig( currentStaffDef->DrawMeterSig() );
+    this->SetDrawKeySigCancellation( currentStaffDef->DrawKeySigCancellation() );
     // Don't draw on the next one
     currentStaffDef->SetDrawClef( false );
     currentStaffDef->SetDrawKeySig( false );
     currentStaffDef->SetDrawMensur( false );
     currentStaffDef->SetDrawMeterSig( false );
+    currentStaffDef->SetDrawKeySigCancellation( false );
 
-    if ( currentStaffDef->GetClef() ) {
-        this->SetCurrentClef( currentStaffDef->GetClefCopy() );
+    if ( currentStaffDef->GetCurrentClef() ) {
+        this->SetCurrentClef(new Clef(*currentStaffDef->GetCurrentClef()));
     }
-    else {
-        this->SetCurrentClef( currentScoreDef->GetClefCopy() );
+    if ( currentStaffDef->GetCurrentKeySig() ) {
+        this->SetCurrentKeySig(new KeySig(*currentStaffDef->GetCurrentKeySig()));
     }
-
-    if ( currentStaffDef->GetKeySig() ) {
-        this->SetCurrentKeySig( currentStaffDef->GetKeySigCopy() );
+    if ( currentStaffDef->GetCurrentMensur() ) {
+        this->SetCurrentMensur(new Mensur(*currentStaffDef->GetCurrentMensur()));
     }
-    else {
-        this->SetCurrentKeySig( currentScoreDef->GetKeySigCopy() );
-    }
-
-    if ( currentStaffDef->GetMensur() ) {
-        this->SetCurrentMensur( currentStaffDef->GetMensurCopy() );
-    }
-    else {
-        this->SetCurrentMensur( currentScoreDef->GetMensurCopy() );
-    }
-
-    if ( currentStaffDef->GetMeterSig() ) {
-        this->SetCurrentMeterSig( currentStaffDef->GetMeterSigCopy() );
-    }
-    else {
-        this->SetCurrentMeterSig( currentScoreDef->GetMeterSigCopy() );
+    if ( currentStaffDef->GetCurrentMeterSig() ) {
+        this->SetCurrentMeterSig(new MeterSig(*currentStaffDef->GetCurrentMeterSig()));
     }
 }
-
-
-void Layer::Delete( LayerElement *element )
-{
-	if ( !element ) {
-        return;
-    }
-    
-    bool is_clef = false;
-        
-    if ( element->IsClef() ) {
-        is_clef = true;
-        //m_r->OnBeginEditionClef();
-    }
-	
-    
-    int pos = GetChildIndex( element );
-    RemoveChildAt( pos );
-    Modify();
-
-	if ( is_clef )
-	{
-        //m_r->OnEndEditionClef();
-	}
-    
-    Refresh();
-}
-
 
 Clef* Layer::GetClef( LayerElement *test )
 {
     Object *testObject = test;
     
     if (!test) {
-        return m_currentClef;
+        return GetCurrentClef();
     }
 	
     //make sure list is set
     ResetList(this);
-    if ( !test->IsClef() )
+    if ( test->Is() != CLEF )
     {
-        testObject = GetListFirstBackward(testObject, &typeid(Clef));
+        testObject = GetListFirstBackward(testObject, CLEF );
     }
     
-    if ( dynamic_cast<Clef*>(testObject) ) {
-        return dynamic_cast<Clef*>(testObject);
+    if ( testObject && testObject->Is() == CLEF ) {
+        Clef *clef = dynamic_cast<Clef*>(testObject);
+        assert( clef );
+        return clef;
     }
 
-    return m_currentClef;
+    return GetCurrentClef();
 }
  
 int Layer::GetClefOffset( LayerElement *test )
@@ -299,84 +164,20 @@ int Layer::GetClefOffset( LayerElement *test )
     return clef->GetClefOffset();
     
 }
-
-void Layer::RemoveClefAndCustos()
-{
-    Clef *currentClef = NULL;
-    
-    int i;
-    int elementCount =  this->GetElementCount();
-    for (i = 0; i < elementCount; i++)
-    {
-        LayerElement *element = dynamic_cast<LayerElement*>( m_children[i] );
-        if ( element && element->IsClef() ) {
-            Clef *clef = dynamic_cast<Clef*>( m_children[i] );
-            // we remove the clef because it is the same as the previous one
-            if ( currentClef && ((*currentClef) == (*clef)) ) {
-                // check if it is a F clef with a Longa before
-                LayerElement *previous = dynamic_cast<LayerElement*>(m_children[i - 1]);
-                if ( (i > 0) && previous && previous->IsNote() )
-                {
-                    Note *note = dynamic_cast<Note*>(m_children[i - 1]);
-                    if ( note && (note->GetActualDur() == DUR_LG) )
-                    {
-                        bool removeLonga = false;
-                        // we check only for the pitch, not the octave, but should be enough
-                        if ( (clef->GetClefId() == F3) && ( note->GetPname() == PITCHNAME_g ) )
-                            removeLonga = true;
-                        else if ( (clef->GetClefId() == F4) && ( note->GetPname() == PITCHNAME_b ) )
-                            removeLonga = true;
-                        else if ( (clef->GetClefId() == F5) && ( note->GetPname() == PITCHNAME_d ) )
-                            removeLonga = true;
-                        if ( removeLonga ) {
-                            this->Delete( note );
-                            elementCount--;
-                            i--;
-                        }
-                    }
-                }
-                this->Delete( clef );
-                elementCount--;
-                // now remove alterations (keys)
-                for (; i < elementCount; i++) {
-                    Accid *accid = dynamic_cast<Accid*>(m_children[i]);
-                    if ( accid ) {
-                        this->Delete( accid );
-                        elementCount--;
-                        i--;                        
-                    }
-                    else
-                        break;
-                }
-                i--;
-                
-            }
-            else {
-                currentClef = clef;
-            }
-        }
-        else if ( element && element->IsCustos( ) ) {
-            Custos *custos = dynamic_cast<Custos*>( m_children[i] );
-            this->Delete( custos );
-            elementCount--;
-            i--;
-        }
-    }
-}
-
     
 //----------------------------------------------------------------------------
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-int Layer::AlignHorizontally( ArrayPtrVoid params )
+int Layer::AlignHorizontally( ArrayPtrVoid *params )
 {
     // param 0: the measureAligner (unused)
     // param 1: the time
     // param 2: the current Mensur
-    double *time = static_cast<double*>(params[1]);
-    Mensur **currentMensur = static_cast<Mensur**>(params[2]);
-    MeterSig **currentMeterSig = static_cast<MeterSig**>(params[3]);
+    // param 3: the current MeterSig
+    double *time = static_cast<double*>((*params).at(1));
+    Mensur **currentMensur = static_cast<Mensur**>((*params).at(2));
+    MeterSig **currentMeterSig = static_cast<MeterSig**>((*params).at(3));
     
     // we need to call it because we are overriding Object::AlignHorizontally
     this->ResetHorizontalAlignment();
@@ -384,41 +185,60 @@ int Layer::AlignHorizontally( ArrayPtrVoid params )
     // we are starting a new layer, reset the time;
     (*time) = 0.0;
     
-    (*currentMensur) = m_currentMensur;
-    (*currentMeterSig) = m_currentMeterSig;
+    (*currentMensur) = GetCurrentMensur();
+    (*currentMeterSig) = GetCurrentMeterSig();
     
-    if ( m_drawClef && m_currentClef ) {
-        m_currentClef->AlignHorizontally( params );
+    if ( DrawClef() && GetCurrentClef() ) {
+        GetCurrentClef()->AlignHorizontally( params );
     }
-    if ( m_drawKeySig && m_currentKeySig ) {
-        m_currentKeySig->AlignHorizontally( params );
+    if ( DrawKeySig() && GetCurrentKeySig() ) {
+        GetCurrentKeySig()->AlignHorizontally( params );
     }
-    if ( m_drawMensur && m_currentMensur) {
-        m_currentMensur->AlignHorizontally( params );
+    if ( DrawMensur() && GetCurrentMensur() ) {
+        GetCurrentMensur()->AlignHorizontally( params );
     }
-    if ( m_drawMeterSig && m_currentMeterSig ) {
-        m_currentMeterSig->AlignHorizontally( params );
+    if ( DrawMeterSig() && GetCurrentMeterSig() ) {
+        GetCurrentMeterSig()->AlignHorizontally( params );
     }
 
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::PrepareProcessingLists( ArrayPtrVoid params )
+int Layer::AlignHorizontallyEnd( ArrayPtrVoid *params )
+{
+    // param 0: the measureAligner
+    // param 1: the time  (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
+    MeasureAligner **measureAligner = static_cast<MeasureAligner**>((*params).at(0));
+    
+    int i;
+    for(i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
+        Alignment *alignment = dynamic_cast<Alignment*>((*measureAligner)->m_children.at(i));
+        if (alignment && alignment->HasGraceAligner()) {
+            alignment->GetGraceAligner()->AlignStack();
+        }
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::PrepareProcessingLists( ArrayPtrVoid *params )
 {
     // param 0: the IntTree* for staff/layer/verse (unused)
     // param 1: the IntTree* for staff/layer
-    IntTree *tree = static_cast<IntTree*>(params[1]);
+    IntTree *tree = static_cast<IntTree*>((*params).at(1));
     // Alternate solution with StaffN_LayerN_VerseN_t
-    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>(params[0]);
+    //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
     
-    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( &typeid( Staff ) ) );
+    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( STAFF ) );
     assert( staff );
     tree->child[ staff->GetN() ].child[ this->GetN() ];
     
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::SetDrawingXY( ArrayPtrVoid params )
+int Layer::SetDrawingXY( ArrayPtrVoid *params )
 {
     // param 0: a pointer doc (unused)
     // param 1: a pointer to the current system (unused)
@@ -427,9 +247,9 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
-    Measure **currentMeasure = static_cast<Measure**>(params[2]);
-    Layer **currentLayer = static_cast<Layer**>(params[4]);
-    bool *processLayerElements = static_cast<bool*>(params[6]);
+    Measure **currentMeasure = static_cast<Measure**>((*params).at(2));
+    Layer **currentLayer = static_cast<Layer**>((*params).at(4));
+    bool *processLayerElements = static_cast<bool*>((*params).at(6));
     
     (*currentLayer) = this;
     
@@ -452,6 +272,20 @@ int Layer::SetDrawingXY( ArrayPtrVoid params )
         this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
     }
     
+    return FUNCTOR_CONTINUE;
+}
+    
+int Layer::PrepareRpt( ArrayPtrVoid *params )
+{
+    // param 0: a pointer to the current MRpt pointer
+    // param 1: a pointer to the data_BOOLEAN indicating if multiNumber (unused)
+    // param 2: a pointer to the doc scoreDef (unused)
+    MRpt **currentMRpt =  static_cast<MRpt**>((*params).at(0));
+
+    // If we have encountered a mRpt before and there is none is this layer, reset it to NULL
+    if ((*currentMRpt) && !this->FindChildByType(MRPT)) {
+        (*currentMRpt) = NULL;
+    }
     return FUNCTOR_CONTINUE;
 }
 

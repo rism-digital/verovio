@@ -292,7 +292,7 @@ void XMLOutput::WriteKey(LayerElement *element) {
     
     // Convert the number of alterations to string
     std::stringstream n_alter;
-    if (key->GetAlteration() == ACCID_FLAT)
+    if (key->GetAlterationType() == ACCIDENTAL_EXPLICIT_f)
         // flats are negative numbers
         n_alter << -key->GetAlterationNumber();
     else
@@ -528,7 +528,7 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
         
         
     } else if (dynamic_cast<Rest*>(element)) {
-        Rest *r = dynamic_cast<Rest*>(element);
+        //Rest *r = dynamic_cast<Rest*>(element);
         // rests just link a <rest /> item
         //pugi::xml_node rest = note.append_child("rest");
         
@@ -536,10 +536,10 @@ void XMLOutput::WriteNoteOrRest(LayerElement *element) {
         
         // handle multi measure rest
         // break from the generation of this element
-        if (r->GetActualDur() == VALSilSpec) {
-            WriteMultiMeasureRest(r);
-            return;
-        }
+        //if (r->GetActualDur() == VALSilSpec) {
+        //    WriteMultiMeasureRest(r);
+        //    return;
+        //}
     }
     
     // put the duration

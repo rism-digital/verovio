@@ -16,6 +16,7 @@
 #define __VRV_ATTS_CMN_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -294,8 +295,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() const { return m_rend; };    
+    void SetRend(data_BEATRPT_REND rend_) { m_rend = rend_; };
+    data_BEATRPT_REND GetRend() const { return m_rend; };    
     bool HasRend( );
     
     //
@@ -307,7 +308,7 @@ public:
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_rend;
+    data_BEATRPT_REND m_rend;
     /** Records the slope of the beam. **/
     double m_slopeDbl;
 
@@ -382,15 +383,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRend(std::string rend_) { m_rend = rend_; };
-    std::string GetRend() const { return m_rend; };    
+    void SetRend(data_BEATRPT_REND rend_) { m_rend = rend_; };
+    data_BEATRPT_REND GetRend() const { return m_rend; };    
     bool HasRend( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_rend;
+    data_BEATRPT_REND m_rend;
 
 /* include <attrend> */
 };
@@ -664,8 +665,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGrace(std::string grace_) { m_grace = grace_; };
-    std::string GetGrace() const { return m_grace; };    
+    void SetGrace(data_GRACE grace_) { m_grace = grace_; };
+    data_GRACE GetGrace() const { return m_grace; };    
     bool HasGrace( );
     
     //
@@ -680,7 +681,7 @@ private:
      * Marks a note or chord as a "grace" (without a definitive written duration) and
      * records from which other note/chord it should "steal" time.
      **/
-    std::string m_grace;
+    data_GRACE m_grace;
     /** Records the amount of time to be "stolen" from a non-grace note/chord. **/
     std::string m_graceTime;
 
@@ -1033,22 +1034,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumPlace(std::string numPlace_) { m_numPlace = numPlace_; };
-    std::string GetNumPlace() const { return m_numPlace; };    
+    void SetNumPlace(data_PLACE numPlace_) { m_numPlace = numPlace_; };
+    data_PLACE GetNumPlace() const { return m_numPlace; };    
     bool HasNumPlace( );
     
     //
-    void SetNumVisible(std::string numVisible_) { m_numVisible = numVisible_; };
-    std::string GetNumVisible() const { return m_numVisible; };    
+    void SetNumVisible(data_BOOLEAN numVisible_) { m_numVisible = numVisible_; };
+    data_BOOLEAN GetNumVisible() const { return m_numVisible; };    
     bool HasNumVisible( );
     
     ///@}
 
 private:
     /** States where the tuplet number will be placed in relation to the note heads. **/
-    std::string m_numPlace;
+    data_PLACE m_numPlace;
     /** Determines if the tuplet number is visible. **/
-    std::string m_numVisible;
+    data_BOOLEAN m_numVisible;
 
 /* include <attnum.visible> */
 };
@@ -1478,23 +1479,23 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBracketPlace(std::string bracketPlace_) { m_bracketPlace = bracketPlace_; };
-    std::string GetBracketPlace() const { return m_bracketPlace; };    
+    void SetBracketPlace(data_PLACE bracketPlace_) { m_bracketPlace = bracketPlace_; };
+    data_PLACE GetBracketPlace() const { return m_bracketPlace; };    
     bool HasBracketPlace( );
     
     //
-    void SetBracketVisible(std::string bracketVisible_) { m_bracketVisible = bracketVisible_; };
-    std::string GetBracketVisible() const { return m_bracketVisible; };    
+    void SetBracketVisible(data_BOOLEAN bracketVisible_) { m_bracketVisible = bracketVisible_; };
+    data_BOOLEAN GetBracketVisible() const { return m_bracketVisible; };    
     bool HasBracketVisible( );
     
     //
-    void SetDurVisible(std::string durVisible_) { m_durVisible = durVisible_; };
-    std::string GetDurVisible() const { return m_durVisible; };    
+    void SetDurVisible(data_BOOLEAN durVisible_) { m_durVisible = durVisible_; };
+    data_BOOLEAN GetDurVisible() const { return m_durVisible; };    
     bool HasDurVisible( );
     
     //
-    void SetNumFormat(std::string numFormat_) { m_numFormat = numFormat_; };
-    std::string GetNumFormat() const { return m_numFormat; };    
+    void SetNumFormat(data_NUMFORMAT numFormat_) { m_numFormat = numFormat_; };
+    data_NUMFORMAT GetNumFormat() const { return m_numFormat; };    
     bool HasNumFormat( );
     
     ///@}
@@ -1504,13 +1505,13 @@ private:
      * Used to state where a tuplet bracket will be placed in relation to the note
      * heads.
      **/
-    std::string m_bracketPlace;
+    data_PLACE m_bracketPlace;
     /** States whether a bracket should be rendered with a tuplet. **/
-    std::string m_bracketVisible;
+    data_BOOLEAN m_bracketVisible;
     /** Determines if the tuplet duration is visible. **/
-    std::string m_durVisible;
+    data_BOOLEAN m_durVisible;
     /** Controls how the num:numbase ratio is to be displayed. **/
-    std::string m_numFormat;
+    data_NUMFORMAT m_numFormat;
 
 /* include <attnum.format> */
 };

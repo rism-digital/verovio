@@ -21,9 +21,10 @@ FILES="../src/accid.cpp \
              ../src/devicecontext.cpp \
              ../src/doc.cpp \
              ../src/dot.cpp \
-             ../src/drawinglistinterface.cpp \
+             ../src/drawinginterface.cpp \
              ../src/durationinterface.cpp \
              ../src/editorial.cpp \
+             ../src/floatingelement.cpp \
              ../src/glyph.cpp \
              ../src/io.cpp \
              ../src/iodarms.cpp \
@@ -36,7 +37,6 @@ FILES="../src/accid.cpp \
              ../src/mensur.cpp \
              ../src/metersig.cpp \
              ../src/measure.cpp \
-             ../src/measureelement.cpp \
              ../src/mrest.cpp \
              ../src/multirest.cpp \
              ../src/note.cpp \
@@ -44,15 +44,11 @@ FILES="../src/accid.cpp \
              ../src/page.cpp \
              ../src/pitchinterface.cpp \
              ../src/positioninterface.cpp \
-             ../src/view.cpp \
-             ../src/view_beam.cpp \
-             ../src/view_element.cpp \
-             ../src/view_graph.cpp \
-             ../src/view_mensural.cpp \
-             ../src/view_page.cpp \
-             ../src/view_tuplet.cpp \
+             ../src/proport.cpp \
              ../src/rest.cpp \
+             ../src/rpt.cpp \
              ../src/scoredef.cpp \
+             ../src/scoredefinterface.cpp \
              ../src/slur.cpp \
              ../src/space.cpp \
              ../src/staff.cpp \
@@ -60,11 +56,22 @@ FILES="../src/accid.cpp \
              ../src/svgdevicecontext.cpp \
              ../src/syl.cpp \
              ../src/system.cpp \
+             ../src/textdirective.cpp \
+             ../src/textdirinterface.cpp \
              ../src/tie.cpp \
              ../src/timeinterface.cpp \
+             ../src/trem.cpp \
              ../src/toolkit.cpp \
              ../src/tuplet.cpp \
              ../src/verse.cpp \
+             ../src/view.cpp \
+             ../src/view_beam.cpp \
+             ../src/view_element.cpp \
+             ../src/view_floating.cpp \
+             ../src/view_graph.cpp \
+             ../src/view_mensural.cpp \
+             ../src/view_page.cpp \
+             ../src/view_tuplet.cpp \
              ../src/vrv.cpp \
              ../src/pugixml.cpp \
              ../libmei/atts_shared.cpp \

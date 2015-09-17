@@ -44,6 +44,7 @@ typedef std::vector<Note*> ChordCluster;
 
 class Note: public LayerElement, public DurationInterface, public PitchInterface,
     public AttColoration,
+    public AttGraced,
     public AttNoteLogMensural,
     public AttStemmed,
     public AttTiepresent
@@ -58,7 +59,11 @@ public:
     virtual ~Note();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Note"; };
+    virtual ClassId Is() { return NOTE; };
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
     /**
      * Add an element (a verse or an accid) to a note.
@@ -77,20 +82,37 @@ public:
     ///@}
     
     /**
-     * Overriding functions to return information from chord parent if 
-     * note is direct child of a chord.
+     * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
+     */
+    ///@{
+    Alignment *GetGraceAlignment();
+    void SetGraceAlignment( Alignment *graceAlignment );
+    bool HasGraceAlignment( ) { return (m_graceAlignment != NULL); };
+    void ResetGraceAlignment( ) { m_graceAlignment = NULL; };
+    ///@}
+    
+    /**
+     * Overriding functions to return information from chord parent if any
      */
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
     bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
-    
-    bool HasDrawingStemDir( );
-    data_STEMDIRECTION GetDrawingStemDir( );
-    
-    
     ///@}
     
+    /**
+     * @name Set and get the stem direction of the note.
+     */
+    ///@{
+    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
+    ///@}
+    
+    /**
+     * Calculate the drawing stem direction looking a potential beam or chord parents
+     */
+    data_STEMDIRECTION CalcDrawingStemDir( );
+
     /**
      * Returns a single integer representing pitch and octave.
      */
@@ -103,50 +125,34 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    virtual int PrepareTieAttr( ArrayPtrVoid *params );
     
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareLyrics( ArrayPtrVoid params );
+    virtual int PrepareLyrics( ArrayPtrVoid *params );
  
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid params );
+    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
     
     /**
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid params );
+    virtual int ResetDarwing( ArrayPtrVoid *params );
     
 private:
     
-protected:
-    
-    /**
-     * @name Tie attributes are represented a pointers to Tie objects.
-     * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and take care of deleting it
-     */
-    ///@{
-    Tie *m_drawingTieAttr;
-    ///@}
-    
 public:
-    /** indicates if the appoggiatura is slashed (i.e. it is an acciaccatura)
-     used with cueSize = true */
-    bool m_acciaccatura; // To be changed to Att grace="acc"
     /** embellishment on this note **/
     unsigned int m_embellishment; // To be changed to Att
     
-    /** drawing stem direction */
-    data_STEMDIRECTION m_drawingStemDir;
     /** drawing stem length */
     int d_stemLen;
     
@@ -163,9 +169,19 @@ public:
      */
     bool m_isDrawingAccidAttr;
     
-
-    
 private:
+    /**
+     * Tie attributes are represented a pointers to Tie objects.
+     * There is one pointer for the initial attribute (TIE_i or TIE_m).
+     * The note with the initial attribute owns the Tie object and take care of deleting it
+     */
+    Tie *m_drawingTieAttr;
+    /**
+     * An alignment for grace notes
+     */
+    Alignment *m_graceAlignment;
+    /** drawing stem direction */
+    data_STEMDIRECTION m_drawingStemDir;
     
 };
 

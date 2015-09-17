@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -371,8 +375,9 @@ bool AttTimebase::HasPpq( )
 /* include <attppq> */
 
 bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue ) {
-    if (dynamic_cast<AttChannelized*>(element) ) {
+    if (element->HasAttClass( ATT_CHANNELIZED ) ) {
         AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        assert( att );
         if (attrType == "midiChannel") {
             att->SetMidiChannel(att->StrToStr(attrValue));
             return true;
@@ -390,8 +395,9 @@ bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue 
             return true;
         }
     }
-    if (dynamic_cast<AttMidiinstrument*>(element) ) {
+    if (element->HasAttClass( ATT_MIDIINSTRUMENT ) ) {
         AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        assert( att );
         if (attrType == "midiInstrnum") {
             att->SetMidiInstrnum(att->StrToStr(attrValue));
             return true;
@@ -409,29 +415,33 @@ bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue 
             return true;
         }
     }
-    if (dynamic_cast<AttMidinumber*>(element) ) {
+    if (element->HasAttClass( ATT_MIDINUMBER ) ) {
         AttMidinumber *att = dynamic_cast<AttMidinumber*>(element);
+        assert( att );
         if (attrType == "numInt") {
             att->SetNum(att->StrToInt(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttMiditempo*>(element) ) {
+    if (element->HasAttClass( ATT_MIDITEMPO ) ) {
         AttMiditempo *att = dynamic_cast<AttMiditempo*>(element);
+        assert( att );
         if (attrType == "midiTempo") {
             att->SetMidiTempo(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttMidivalue*>(element) ) {
+    if (element->HasAttClass( ATT_MIDIVALUE ) ) {
         AttMidivalue *att = dynamic_cast<AttMidivalue*>(element);
+        assert( att );
         if (attrType == "val") {
             att->SetVal(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (dynamic_cast<AttTimebase*>(element) ) {
+    if (element->HasAttClass( ATT_TIMEBASE ) ) {
         AttTimebase *att = dynamic_cast<AttTimebase*>(element);
+        assert( att );
         if (attrType == "ppqInt") {
             att->SetPpq(att->StrToInt(attrValue));
             return true;
@@ -442,8 +452,9 @@ bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue 
 }
 
 void Att::GetMidi( Object *element, ArrayOfStrAttr *attributes ) {
-    if (dynamic_cast<AttChannelized*>(element) ) {
+    if (element->HasAttClass( ATT_CHANNELIZED ) ) {
         AttChannelized *att = dynamic_cast<AttChannelized*>(element);
+        assert( att );
         if (att->HasMidiChannel()) {
             attributes->push_back(std::make_pair("midiChannel", att->StrToStr(att->GetMidiChannel())));
         }
@@ -457,8 +468,9 @@ void Att::GetMidi( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("midiTrackInt", att->IntToStr(att->GetMidiTrack())));
         }
     }
-    if (dynamic_cast<AttMidiinstrument*>(element) ) {
+    if (element->HasAttClass( ATT_MIDIINSTRUMENT ) ) {
         AttMidiinstrument *att = dynamic_cast<AttMidiinstrument*>(element);
+        assert( att );
         if (att->HasMidiInstrnum()) {
             attributes->push_back(std::make_pair("midiInstrnum", att->StrToStr(att->GetMidiInstrnum())));
         }
@@ -472,26 +484,30 @@ void Att::GetMidi( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("midiVolume", att->StrToStr(att->GetMidiVolume())));
         }
     }
-    if (dynamic_cast<AttMidinumber*>(element) ) {
+    if (element->HasAttClass( ATT_MIDINUMBER ) ) {
         AttMidinumber *att = dynamic_cast<AttMidinumber*>(element);
+        assert( att );
         if (att->HasNum()) {
             attributes->push_back(std::make_pair("numInt", att->IntToStr(att->GetNum())));
         }
     }
-    if (dynamic_cast<AttMiditempo*>(element) ) {
+    if (element->HasAttClass( ATT_MIDITEMPO ) ) {
         AttMiditempo *att = dynamic_cast<AttMiditempo*>(element);
+        assert( att );
         if (att->HasMidiTempo()) {
             attributes->push_back(std::make_pair("midiTempo", att->StrToStr(att->GetMidiTempo())));
         }
     }
-    if (dynamic_cast<AttMidivalue*>(element) ) {
+    if (element->HasAttClass( ATT_MIDIVALUE ) ) {
         AttMidivalue *att = dynamic_cast<AttMidivalue*>(element);
+        assert( att );
         if (att->HasVal()) {
             attributes->push_back(std::make_pair("val", att->StrToStr(att->GetVal())));
         }
     }
-    if (dynamic_cast<AttTimebase*>(element) ) {
+    if (element->HasAttClass( ATT_TIMEBASE ) ) {
         AttTimebase *att = dynamic_cast<AttTimebase*>(element);
+        assert( att );
         if (att->HasPpq()) {
             attributes->push_back(std::make_pair("ppqInt", att->IntToStr(att->GetPpq())));
         }

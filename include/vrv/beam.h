@@ -10,7 +10,7 @@
 #define __VRV_BEAM_H__
 
 #include "layerelement.h"
-#include "drawinglistinterface.h"
+#include "drawinginterface.h"
 
 namespace vrv {
     
@@ -40,6 +40,7 @@ public:
     virtual ~Beam();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Beam"; };
+    virtual ClassId Is() { return BEAM; };
     ///@}
     
     int GetNoteCount() const { return (int)m_children.size(); };
@@ -49,6 +50,14 @@ public:
      * Only Note or Rest elements will be actually added to the beam.
      */
     void AddLayerElement(LayerElement *element);
+    
+    /**
+     * Return information about the position in the beam
+     */
+    ///@{
+    bool IsFirstInBeam(LayerElement *element);
+    bool IsLastInBeam(LayerElement *element);
+    ///@}
     
     /**
      * @name Set and get the stem direction of the beam.

@@ -15,7 +15,7 @@
 
 namespace vrv {
     
-class KeySigAttr;
+class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
 // KeySig
@@ -43,31 +43,52 @@ public:
      */
     ///@{
     KeySig();
-    KeySig(int num_alter, char alter);
-    KeySig( KeySigAttr *keySigAttr );
+    KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType);
+    KeySig( ScoreDefInterface *keySigAttr );
+    void Init();
     virtual ~KeySig();
     virtual void Reset();
     virtual Object* Clone() { return new KeySig(*this); };
     virtual std::string GetClassName( ) { return "KeySig"; };
+    virtual ClassId Is() { return KEYSIG; };
     
-    unsigned char GetAlterationAt(int pos);
-    int GetOctave(unsigned char pitch, int clefId);
-    
-    /* Alteration number getter/setter */
-    int GetAlterationNumber() { return m_num_alter; };
-    void SetAlterationNumber(int n) { m_num_alter = n; };
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
     /* Alteration number getter/setter */
-    unsigned char GetAlteration() { return m_alteration; };
-    void SetAlteration(int n) { m_alteration = n; };
+    int GetAlterationNumber() { return m_alterationNumber; };
+    void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; };
+    
+    /* Alteration number getter/setter */
+    data_ACCIDENTAL_EXPLICIT GetAlterationType() { return m_alterationType; };
+    void SetAlterationType( data_ACCIDENTAL_EXPLICIT alterationType ) { m_alterationType = alterationType; };
     
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
     void ConvertToMei( );
     void ConvertToInternal( );
     
+    /**
+     * Static methods for calculating position;
+     */
+    static data_PITCHNAME GetAlterationAt( data_ACCIDENTAL_EXPLICIT alterationType, int pos );
+    static int GetOctave( data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
+    
 private:
     
-public:
+public:    
+    /**
+     * Variables for storing cancellation introduced by the key sig.
+     * The values are StaffDefDrawingInterface::ReplaceKeySig
+     */
+    data_ACCIDENTAL_EXPLICIT m_drawingCancelAccidType;
+    char m_drawingCancelAccidCount;
+    /**
+     * Equivalent to @key.sig.show and @showchange, but set for drawing
+     * KeySig has no equivalent in MEI and will be true and false by default
+     * See KeySig::KeySig( KeySigAttr *keySigAttr ) for initialisation
+     */
+    bool m_drawingShow;
+    bool m_drawingShowchange;
     
 private:
     static data_PITCHNAME flats[];
@@ -75,39 +96,8 @@ private:
     static int octave_map[2][9][7];
     
     // This is temporary - it needs to be changed to libMEI atts
-    int m_num_alter;
-    unsigned char m_alteration;
-    
-};
-    
-//----------------------------------------------------------------------------
-// KeySigAttr
-//----------------------------------------------------------------------------
-
-/**
- * This class models the MEI @key attributes in scoreDef or staffDef elements.
- */
-class KeySigAttr: public Object,
-    public AttKeySigDefaultLog
-{
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    KeySigAttr();
-    virtual ~KeySigAttr();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "KeySigAttr"; };
-    virtual Object* Clone() { return new KeySigAttr(*this); };
-    ///@}
-    
-private:
-    
-public:
-    
-private:
+    int m_alterationNumber;
+    data_ACCIDENTAL_EXPLICIT m_alterationType;
     
 };
 

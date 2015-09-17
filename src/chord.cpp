@@ -23,16 +23,21 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Chord::Chord( ):
-LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
+    LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
     AttCommon(),
     AttStemmed(),
     AttTiepresent()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_TIEPRESENT);
+    
+    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
+    
     Reset();
+    
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingLedgerLines.clear();
-    
-    //test[NULL][0][0] = 0;
 }
 
 Chord::~Chord()
@@ -55,19 +60,17 @@ void Chord::ClearClusters()
     std::list<ChordCluster*>::iterator iter;
     for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter)
     {
-        ChordCluster *cluster = dynamic_cast<ChordCluster*>(*iter);
-        for (std::vector<Note*>::iterator clIter = cluster->begin(); clIter != cluster->end(); ++clIter)
+        for (std::vector<Note*>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter)
         {
-            Note *note = dynamic_cast<Note*>(*clIter);
-            note->m_cluster = NULL;
-            note->m_clusterPosition = 0;
+            (*clIter)->m_cluster = NULL;
+            (*clIter)->m_clusterPosition = 0;
         }
         delete *iter;
     }
     m_clusters.clear();
 }
     
-void Chord::AddLayerElement(vrv::LayerElement *element)
+void Chord::AddLayerElement(LayerElement *element)
 {
     assert( dynamic_cast<Note*>(element) );
     element->SetParent( this );
@@ -79,6 +82,7 @@ bool compare_pitch (Object *first, Object *second)
 {
     Note *n1 = dynamic_cast<Note*>(first);
     Note *n2 = dynamic_cast<Note*>(second);
+    assert( n1 && n2 );
     return ( n1->GetDiatonicPitch() < n2->GetDiatonicPitch() );
 }
 
@@ -88,26 +92,19 @@ void Chord::FilterList( ListOfObjects *childList )
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {
-        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
-        if ( !currentElement ) {
+        if ( !(*iter)->IsLayerElement() ) {
             // remove anything that is not an LayerElement
             iter = childList->erase( iter );
+            continue;
         }
-        else if ( !currentElement->HasDurationInterface() )
-        {
+        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
+        assert( currentElement );
+        if ( !currentElement->HasInterface(INTERFACE_DURATION) ) {
             iter = childList->erase( iter );
         }
-        else /*if ( dynamic_cast<EditorialElement*>(currentElement))
-        {
-            Object* object = currentElement->GetFirstChild(&typeid(Note));
-            if (dynamic_cast<Note*>(object))
-            {
-                iter++;
-            }
-        }
-        else */{
+        else {
             Note *n = dynamic_cast<Note*>(currentElement);
-            
+        
             if (n) {
                 iter++;
             } else {
@@ -124,6 +121,7 @@ void Chord::FilterList( ListOfObjects *childList )
     this->ClearClusters();
     
     Note *curNote, *lastNote = dynamic_cast<Note*>(*iter);
+    assert( lastNote );
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster* curCluster = NULL;
     
@@ -131,6 +129,7 @@ void Chord::FilterList( ListOfObjects *childList )
     
     while ( iter != childList->end()) {
         curNote = dynamic_cast<Note*>(*iter);
+        assert( curNote );
         curPitch = curNote->GetDiatonicPitch();
         
         if (curPitch - lastPitch == 1) {
@@ -160,12 +159,25 @@ void Chord::ResetAccidList()
     ListOfObjects* childList = this->GetList(this); //make sure it's initialized
     for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note*>(*it);
+        assert( note );
         if (note->m_drawingAccid != NULL) {
             m_accidList.push_back(note);
         }
     }
 }
-    
+
+int Chord::PositionInChord(Note *note)
+{
+    int size = (int)this->GetList(this)->size();
+    int position = this->GetListIndex(note);
+    assert( position != -1 );
+    // this is the middle (only if odd)
+    if ((size % 2) && (position == (size - 1 ) / 2)) return 0;
+    if (position < (size / 2)) return -1;
+    return 1;
+}
+
+
 /**
  * Creates a 2D grid of width (# of accidentals + 1) * 4 and of height (highest accid - lowest accid) / (half a drawing unit)
  */
@@ -237,11 +249,11 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Chord::PrepareTieAttr( ArrayPtrVoid params )
+int Chord::PrepareTieAttr( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
     // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord**>(params[1]);
+    Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     assert(!(*currentChord));
     (*currentChord) = this;
@@ -249,11 +261,11 @@ int Chord::PrepareTieAttr( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareTieAttrEnd( ArrayPtrVoid params )
+int Chord::PrepareTieAttrEnd( ArrayPtrVoid *params )
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
     // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord**>(params[1]);
+    Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     assert((*currentChord));
     (*currentChord) = NULL;

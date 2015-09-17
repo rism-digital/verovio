@@ -10,6 +10,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "assert.h"
+
+//----------------------------------------------------------------------------
+
 #include "note.h"
 
 namespace vrv {
@@ -29,6 +33,7 @@ Beam::Beam():
 
 Beam::~Beam()
 {
+    ClearCoords();
 }
     
 void Beam::Reset()
@@ -52,12 +57,14 @@ void Beam::FilterList( ListOfObjects *childList )
     ListOfObjects::iterator iter = childList->begin();
     
     while ( iter != childList->end()) {
-        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
-        if ( !currentElement ) {
+        if ( !(*iter)->IsLayerElement() ) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase( iter );           
+            iter = childList->erase( iter );
+            continue;
         }
-        else if ( !currentElement->HasDurationInterface() )
+        LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
+        assert( currentElement );
+        if ( !currentElement->HasInterface(INTERFACE_DURATION) )
         {
             // remove anything that has not a DurationInterface
             iter = childList->erase( iter );
@@ -70,14 +77,14 @@ void Beam::FilterList( ListOfObjects *childList )
                 // and the note is cueSize
                 // assume all the beam is of grace notes
                 if (childList->begin() == iter) {
-                  if (n->m_cueSize)
+                  if (n->HasGrace())
                       firstNoteGrace = true;
                 }
                 
                 // if the first note in beam was NOT a grace
                 // we have grace notes embedded in a beam
                 // drop them
-                if ( !firstNoteGrace && n->m_cueSize == true)
+                if ( !firstNoteGrace && n->HasGrace() == true)
                     iter = childList->erase( iter );
                 else
                     iter++;
@@ -91,10 +98,32 @@ void Beam::FilterList( ListOfObjects *childList )
     
     InitCoords( childList );
 }
-  
+
+bool Beam::IsFirstInBeam(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetListIndex(element);
+    // This method should be called only if the note is part of a beam
+    assert( position != -1 );
+    // this is this first one
+    if (position == 0) return true;
+    return false;
+}
+
+bool Beam::IsLastInBeam(LayerElement *element)
+{
+    int size = (int)this->GetList(this)->size();
+    int position = this->GetListIndex(element);
+    // This method should be called only if the note is part of a beam
+    assert( position != -1 );
+    // this is the last one
+    if (position == (size - 1)) return true;
+    return false;
+}
+
 void Beam::InitCoords( ListOfObjects *childList )
 {
-    this->ClearCoords();
+    ClearCoords();
     m_beamElementCoords.reserve( childList->size() );
     int i;
     for (i = 0; i < childList->size(); i++ ) {

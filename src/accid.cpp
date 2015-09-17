@@ -23,8 +23,14 @@ namespace vrv {
 
 Accid::Accid():
     LayerElement("accid-"), PositionInterface(),
-    AttAccidental()
+    AttAccidental(),
+    AttAccidLog()
 {
+    RegisterAttClass(ATT_ACCIDENTAL);
+    RegisterAttClass(ATT_ACCIDLOG);
+    
+    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    
     Reset();
 }
 
@@ -45,12 +51,12 @@ void Accid::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Accid::PreparePointersByLayer( ArrayPtrVoid params )
+int Accid::PreparePointersByLayer( ArrayPtrVoid *params )
 {
     // param 0: the current Note (not used)
-    //Note **currentNote = static_cast<Note**>(params[0]);
+    //Note **currentNote = static_cast<Note**>((*params).at(0));
     
-    Note *note = dynamic_cast<Note*>( this->GetFirstParent( &typeid(Note) ) );
+    Note *note = dynamic_cast<Note*>( this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
     if ( !note ) {
         return FUNCTOR_CONTINUE;
     }

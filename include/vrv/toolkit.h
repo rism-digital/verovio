@@ -46,6 +46,12 @@ public:
     Toolkit( bool initFont = true );
     virtual ~Toolkit();
     ///@}
+
+    /**
+     * Set the resource path. To be called if the constructor had initFont=false.
+     * This needs refactoring.
+     */
+    bool SetResourcePath( const std::string &path );
     
     /**
      * Load a file with the specified type.
@@ -241,6 +247,14 @@ public:
     void SetRdgXPathQuery( std::string const &rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
     std::string GetRdgXPathQuery() { return m_rdgXPathQuery; };
     ///@}
+    
+    /**
+     * @name Set and get the xPath query for selecting <rdg> (if any)
+     */
+    ///@{
+    void SetScoreBasedMei( bool scoreBasedMei ) { m_scoreBasedMei = scoreBasedMei; };
+    bool GetScoreBasedMei() { return m_scoreBasedMei; };
+    ///@}
 
     /**
      * @name Set a specific font
@@ -303,6 +317,7 @@ private:
     bool m_ignoreLayout;
     bool m_adjustPageHeight;
     std::string m_rdgXPathQuery;
+    bool m_scoreBasedMei;
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;

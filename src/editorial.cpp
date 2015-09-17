@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "floatingelement.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -27,26 +28,38 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 EditorialElement::EditorialElement():
-    DocObject("ee-")
+    DocObject("ee-"),
+    AttCommon()
 {
+    RegisterAttClass(ATT_COMMON);
     Reset();
 }
 
 EditorialElement::EditorialElement(std::string classid):
-    DocObject(classid)
+    DocObject(classid),
+    AttCommon()
 {
+    RegisterAttClass(ATT_COMMON);
     Reset();
 }
 
 void EditorialElement::Reset()
 {
-    Object::Reset();
+    DocObject::Reset();
     ResetCommon();
     m_visibility = Visible;
 }
 
 EditorialElement::~EditorialElement()
 {
+    
+}
+        
+void EditorialElement::AddFloatingElement( FloatingElement *child )
+{
+    child->SetParent( this );
+    m_children.push_back( child );
+    Modify();
     
 }
 
@@ -81,12 +94,12 @@ void EditorialElement::AddScoreDef( ScoreDef *child )
     Modify();
 }
     
-void EditorialElement::AddMeasureElement( MeasureElement *child )
+void EditorialElement::AddStaff( Staff *child )
 {
     child->SetParent( this );
     m_children.push_back( child );
     Modify();
-    if ( dynamic_cast<Staff*>(child) &&  dynamic_cast<Staff*>(child)->GetN() < 1 ) {
+    if ( child->GetN() < 1 ) {
         LogError("Staff without @n is not supported within editorial markup element");
     }
 }
@@ -126,8 +139,7 @@ App::App( EditorialLevel level ):
     
 void App::Reset()
 {
-    Object::Reset();
-    ResetCommon();
+    EditorialElement::Reset();
 }
 
 App::~App()
@@ -137,7 +149,6 @@ App::~App()
 void App::AddLemOrRdg(EditorialElement *child)
 {
     assert( dynamic_cast<Lem*>(child) || dynamic_cast<Rdg*>(child) );
-    
     child->SetParent( this );
     m_children.push_back(child);
     Modify();
@@ -148,8 +159,10 @@ void App::AddLemOrRdg(EditorialElement *child)
 //----------------------------------------------------------------------------
 
 Lem::Lem( ):
-    EditorialElement("lem-")
+    EditorialElement("lem-"),
+    AttSource()
 {
+    RegisterAttClass(ATT_SOURCE);
     Reset();
 }
 
@@ -160,6 +173,7 @@ Lem::~Lem()
 void Lem::Reset()
 {
     EditorialElement::Reset();
+    ResetSource();
 }
 
 //----------------------------------------------------------------------------
@@ -167,8 +181,10 @@ void Lem::Reset()
 //----------------------------------------------------------------------------
 
 Rdg::Rdg( ):
-    EditorialElement("rdg-")
+    EditorialElement("rdg-"),
+    AttSource()
 {
+    RegisterAttClass(ATT_SOURCE);
     Reset();
 }
 
@@ -179,6 +195,29 @@ Rdg::~Rdg()
 void Rdg::Reset()
 {
     EditorialElement::Reset();
+    ResetSource();
+}
+    
+//----------------------------------------------------------------------------
+// Supplied
+//----------------------------------------------------------------------------
+
+Supplied::Supplied( ):
+    EditorialElement("supplied-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Supplied::~Supplied()
+{
+}
+
+void Supplied::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
 }
 
 //----------------------------------------------------------------------------
@@ -190,6 +229,8 @@ Annot::Annot( ):
     AttPlist(),
     AttSource()
 {
+    RegisterAttClass( ATT_PLIST );
+    RegisterAttClass( ATT_SOURCE );
     Reset();
 }
 
@@ -208,15 +249,15 @@ void Annot::Reset()
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::CastOffSystems( ArrayPtrVoid params )
+int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
 {
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to (unused)
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
-    System *contentSystem = static_cast<System*>(params[0]);
-    System **currentSystem = static_cast<System**>(params[2]);
+    System *contentSystem = static_cast<System*>((*params).at(0));
+    System **currentSystem = static_cast<System**>((*params).at(2));
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert( dynamic_cast<System*>(this->m_parent));
@@ -226,6 +267,7 @@ int EditorialElement::CastOffSystems( ArrayPtrVoid params )
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     EditorialElement *editorialElement = dynamic_cast<EditorialElement*>( contentSystem->Relinquish( this->GetIdx()) );
+    assert( editorialElement );
     (*currentSystem)->AddEditorialElement( editorialElement );
     
     return FUNCTOR_SIBLINGS;

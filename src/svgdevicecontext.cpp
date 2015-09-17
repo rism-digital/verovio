@@ -17,6 +17,7 @@
 
 #include "doc.h"
 #include "glyph.h"
+#include "layerelement.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -40,9 +41,6 @@ static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
 SvgDeviceContext::SvgDeviceContext(int width, int height):
     DeviceContext()
 {	
-	
-    m_correctMusicAscent = false; // do not correct the ascent in the music font
-
     m_width = width;
     m_height = height;
     
@@ -194,6 +192,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y2 ) -
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ));
         }
+        
         EndGraphic( object, NULL );
         
         SetPen( AxBLUE, 10, AxDOT_DASH );
@@ -205,6 +204,7 @@ void SvgDeviceContext::EndGraphic(DocObject *object, View *view )
                                 view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y2 ) -
                                 view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ));
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() ), view->ToDeviceContextY( object->GetDrawingY() ), 5, 300);
         }
         EndGraphic( object, NULL );
         
@@ -457,6 +457,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute( "height" ) = height;
     rectChild.append_attribute( "rx" ) = radius;
     rectChild.append_attribute( "style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    //rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empty rectangles with bounding boxes
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignement)

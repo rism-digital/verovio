@@ -53,6 +53,7 @@ Toolkit::Toolkit( bool initFont )
     m_adjustPageHeight = false;
     m_noJustification = false;
     m_showBoundingBoxes = false;
+    m_scoreBasedMei = false;
     
     m_cString = NULL;
     
@@ -68,6 +69,12 @@ Toolkit::~Toolkit()
         free( m_cString );
     }
 }
+    
+bool Toolkit::SetResourcePath( const std::string &path )
+{
+    Resources::SetPath( path );
+    return Resources::InitFonts();
+};
 
 bool Toolkit::SetBorder( int border )
 {
@@ -317,6 +324,7 @@ std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
 bool Toolkit::SaveFile( const std::string &filename )
 {
     MeiOutput meioutput( &m_doc, filename.c_str());
+    meioutput.SetScoreBasedMEI( m_scoreBasedMei );
     if (!meioutput.ExportFile()) {
         LogError( "Unknown error" );
         return false;
@@ -563,12 +571,13 @@ int Toolkit::GetPageCount() {
     return m_doc.GetPageCount();
 }
 
-int Toolkit::GetPageWithElement( const std::string &xmlId ) {
+int Toolkit::GetPageWithElement( const std::string &xmlId )
+{
     Object *element = m_doc.FindChildByUuid(xmlId);
     if (!element) {
         return 0;
     }
-    Page *page = dynamic_cast<Page*>( element->GetFirstParent( &typeid(Page) ) );
+    Page *page = dynamic_cast<Page*>( element->GetFirstParent( PAGE ) );
     if (!page) {
         return 0;
     }
@@ -605,9 +614,10 @@ bool Toolkit::Drag( std::string elementId, int x, int y )
 {
     if ( !m_doc.GetDrawingPage() ) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if ( dynamic_cast<Note*>(element) ) {
+    if ( element->Is() == NOTE ) {
         Note *note = dynamic_cast<Note*>(element);
-        Layer *layer = dynamic_cast<Layer*>(note->GetFirstParent(&typeid(Layer)));
+        assert( note );
+        Layer *layer = dynamic_cast<Layer*>( note->GetFirstParent( LAYER ) );
         if ( !layer ) return false;
         int oct;
         data_PITCHNAME pname = (data_PITCHNAME)m_view.CalculatePitchCode( layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct  );
@@ -639,13 +649,13 @@ bool Toolkit::Insert( std::string elementType, std::string startid, std::string 
         return false;
     }
     
-    Measure *measure = dynamic_cast<Measure*>(start->GetFirstParent(&typeid(Measure)));
+    Measure *measure = dynamic_cast<Measure*>(start->GetFirstParent( MEASURE ) );
     assert( measure );
     if (elementType == "slur" ) {
         Slur *slur = new Slur();
         slur->SetStartid( startid );
         slur->SetEndid( endid );
-        measure->AddMeasureElement(slur);
+        measure->AddFloatingElement(slur);
         m_doc.PrepareDrawing();
         return true;
     }

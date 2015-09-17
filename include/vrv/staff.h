@@ -10,7 +10,7 @@
 #define __VRV_STAFF_H__
 
 #include "atts_shared.h"
-#include "measureelement.h"
+#include "object.h"
 
 namespace vrv {
 
@@ -30,7 +30,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, on single Measure is added for simplifying internal processing
 */
-class Staff: public MeasureElement,
+class Staff: public DocObject,
     public AttCommon
 {
     
@@ -43,10 +43,16 @@ public:
     Staff( int n = -1 );
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Staff"; };	
+    virtual std::string GetClassName( ) { return "Staff"; };
+    virtual ClassId Is() { return STAFF; };
     ///@}
     
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
     void AddLayer( Layer *layer );
+    ///@}
 	
 	int GetLayerCount() const { return (int)m_children.size(); };
     
@@ -77,33 +83,39 @@ public:
     /**
      * Currently unused - kept for "documentation"
      */
-    virtual bool GetPosOnPage( ArrayPtrVoid params );
+    virtual bool GetPosOnPage( ArrayPtrVoid *params );
     
     /**
      * Align the content of a staff vertically.
      */
-    virtual int AlignVertically( ArrayPtrVoid params );
+    virtual int AlignVertically( ArrayPtrVoid *params );
     
     /**
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params );
+    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
 
     /**
      * Functor for setting running lyrics in staves
      * This is necessary for <syl> that starts in one measure and ends in another one
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid params );
+    virtual int FillStaffCurrentLyrics( ArrayPtrVoid *params );
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid params );
+    virtual int ResetDarwing( ArrayPtrVoid *params );
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid params );
+    virtual int SetDrawingXY( ArrayPtrVoid *params );
+    
+    /**
+     * Functor for setting mRpt drawing numbers (if required)
+     * See implementation and Object::PrepareRpt
+     */
+    virtual int PrepareRpt( ArrayPtrVoid *params );
     
 public:
 	/**
@@ -131,7 +143,7 @@ public:
 	/** portee invisible (wolfgang legacy) */
 	char invisible;
 	/** taille. 0 = normale1 = petite (wolfgang legacy) (to be set as scale in staffDef) */
-	unsigned char staffSize;
+	int m_drawingStaffSize;
 
 private:    
     /**

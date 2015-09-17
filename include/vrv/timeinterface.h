@@ -25,7 +25,7 @@ class LayerElement;
  * This class is an interface for elements with duration, such as notes and rests.
  * It is not an abstract class but should not be instanciate directly.
  */
-class TimeSpanningInterface:
+class TimeSpanningInterface: public Interface,
     public AttStartendid,
     public AttStartid,
     public AttTimestampMusical,
@@ -40,6 +40,7 @@ public:
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
     virtual void Reset();
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
     ///@}
     
     /**
@@ -68,9 +69,6 @@ public:
      */
     void SetUuidStr();
     
-   
-protected:
-    
     //-----------------//
     // Pseudo functors //
     //-----------------//
@@ -85,17 +83,17 @@ protected:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid params, DocObject *object );
+    virtual int InterfaceFillStaffCurrentTimeSpanning( ArrayPtrVoid *params, DocObject *object );
     
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid params, DocObject *object );
+    virtual int InterfacePrepareTimeSpanning( ArrayPtrVoid *params, DocObject *object );
     
     /**
      * See Object::ResetDrawing
      */
-    virtual int ResetDrawing( ArrayPtrVoid params, DocObject *object );
+    virtual int InterfaceResetDrawing( ArrayPtrVoid *params, DocObject *object );
     
 private:
     /**

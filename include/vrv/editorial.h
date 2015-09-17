@@ -15,13 +15,14 @@
 
 namespace vrv {
 
+class FloatingElement;
 class Layer;
 class LayerElement;
 class Lem;
 class Measure;
-class MeasureElement;
 class Rdg;
 class ScoreDef;
+class Staff;
 class StaffDef;
 class StaffGrp;
     
@@ -52,17 +53,19 @@ public:
     EditorialElement(std::string classid);
     virtual ~EditorialElement();
     virtual void Reset();
+    virtual ClassId Is() { return EDITORIAL_ELEMENT; };
     ///@}
 
     /**
      * @name Add children to an editorial element.
      */
     ///@{
+    void AddFloatingElement( FloatingElement *child );
     void AddLayerElement( LayerElement *child );
     void AddLayer( Layer *child );
     void AddMeasure( Measure *child );
-    void AddMeasureElement( MeasureElement *child );
     void AddScoreDef( ScoreDef *child );
+    void AddStaff( Staff *child );
     void AddStaffDef( StaffDef *child );
     void AddStaffGrp( StaffGrp *child );
     ///@}
@@ -77,7 +80,7 @@ public:
      * For EditorialElement, this means only moving them since their width is not
      * taken into account. Only system children EditorialElement are processed.
      */
-    virtual int CastOffSystems( ArrayPtrVoid params );
+    virtual int CastOffSystems( ArrayPtrVoid *params );
     
 protected:
     
@@ -107,6 +110,7 @@ public:
     virtual ~App();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "App"; };
+    virtual ClassId Is() { return APP; };
     ///@}
     
     /** Getter for level **/
@@ -134,7 +138,8 @@ private:
 // Lem
 //----------------------------------------------------------------------------
 
-class Lem: public EditorialElement
+class Lem: public EditorialElement,
+    public AttSource
 {
 public:
     /**
@@ -146,6 +151,7 @@ public:
     virtual ~Lem();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Lem"; };
+    virtual ClassId Is() { return LEM; };
     ///@}
     
 protected:
@@ -162,7 +168,8 @@ private:
 // Rdg
 //----------------------------------------------------------------------------
 
-class Rdg: public EditorialElement
+class Rdg: public EditorialElement,
+    public AttSource
 {
 public:
     /**
@@ -174,6 +181,37 @@ public:
     virtual ~Rdg();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Rdg"; };
+    virtual ClassId Is() { return RDG; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};    
+
+//----------------------------------------------------------------------------
+// Supplied
+//----------------------------------------------------------------------------
+
+class Supplied: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Supplied();
+    virtual ~Supplied();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Supplied"; };
+    virtual ClassId Is() { return SUPPLIED; };
     ///@}
     
 protected:

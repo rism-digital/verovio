@@ -24,7 +24,7 @@ namespace vrv {
 
 void View::DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr)
 {
-	assert( dc ); // DC cannot be NULL
+	assert( dc );
 
     dc->SetPen( m_currentColour, std::max( 1, ToDeviceContextX(nbr) ), AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -38,7 +38,7 @@ void View::DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr
 
 void View::DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr)
 {		
-	assert( dc ); // DC cannot be NULL
+	assert( dc );
 
     dc->SetPen( m_currentColour, std::max( 1, ToDeviceContextX(nbr) ), AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -50,9 +50,32 @@ void View::DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int n
 	return;
 }
 
-void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 )	/* dessine rectangle plein */
+    /* Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
+        4=right side; 0=don't fill in any part. ??SO FAR, <fillSection> IS IGNORED.
+     */
+    void View::DrawPartFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection )
+    {
+        assert( dc ); // DC cannot be NULL
+        
+        SwapY( &y1, &y2 );
+        
+        //dc->SetPen( m_currentColour, 0, AxSOLID  );
+        //dc->SetBrush( AxWHITE, AxTRANSPARENT );
+        dc->SetPen( AxBLUE, 0, AxSOLID  );
+        dc->SetBrush( AxRED, AxTRANSPARENT );
+        
+        dc->DrawRectangle( ToDeviceContextX( x1 ), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1) , ToDeviceContextX( y1 - y2 ));
+        
+        dc->ResetPen();
+        dc->ResetBrush();
+        
+        return;
+    }
+    
+
+    void View::DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2 )	/* dessine rectangle plein */
 {	
-	assert( dc ); // DC cannot be NULL
+    assert( dc );
 
 	SwapY( &y1, &y2 );
 
@@ -91,10 +114,9 @@ void View::DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y
 
 }
 
-
-void View::DrawDot ( DeviceContext *dc, int x, int y )
+void View::DrawDot ( DeviceContext *dc, int x, int y, int staffSize )
 {
-	int r = std::max( ToDeviceContextX( m_doc->m_drawingDoubleUnit[0] / 5 ), 2 );
+	int r = std::max( ToDeviceContextX( m_doc->GetDrawingDoubleUnit( staffSize ) / 5 ), 2 );
 	
     dc->SetPen( m_currentColour, 1, AxSOLID );
     dc->SetBrush( m_currentColour, AxSOLID );
@@ -107,61 +129,43 @@ void View::DrawDot ( DeviceContext *dc, int x, int y )
 
 void View::DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code,
 						 int staffSize, bool dimin )
-{  
-	int fontCorr = 0;
+{
+    assert( dc );
+	
+    dc->SetBackground( AxBLUE );
+    dc->SetBackgroundMode( AxTRANSPARENT );
     
-    if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][dimin];
-    }
-
-	assert( dc ); // DC cannot be NULL
+    std::wstring str;
+    str.push_back(code);
     
+    dc->SetBrush( m_currentColour, AxSOLID );
+    dc->SetFont( m_doc->GetDrawingSmuflFont(staffSize, dimin) );
 
-	if ( dc)
-	{	
-		dc->SetBackground( AxBLUE );
-		dc->SetBackgroundMode( AxTRANSPARENT );
-        
-        std::wstring str;
-        str.push_back(code);
-        
-        dc->SetBrush( m_currentColour, AxSOLID );
-        dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][dimin] );
+    dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y) );
 
-		dc->DrawMusicText( str, ToDeviceContextX(x), ToDeviceContextY(y + fontCorr) );
-
-        dc->ResetFont();
-        dc->ResetBrush();
-
-	}
+    dc->ResetFont();
+    dc->ResetBrush();
 
 	return;
 }
 
-void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, int centrer, int staffSize)
+void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize)
 { 
-	assert( dc ); // DC cannot be NULL
-
-    int fontCorr = 0;
+	assert( dc );
     
     int xDC = ToDeviceContextX(x);
-    if (dc->CorrectMusicAscent()) {
-        fontCorr = m_doc->m_drawingFontHeightAscent[staffSize][0];
-    }
     
-	if ( centrer )
+	if ( center )
 	{
-        LogDebug("Centering string not implemented with DeviceContext");
-		
         int w, h;
 		dc->GetSmuflTextExtent( s, &w, &h );
 		xDC -= w / 2;
         
 	}
     dc->SetBrush( m_currentColour, AxSOLID );
-    dc->SetFont( &m_doc->m_drawingSmuflFonts[staffSize][0] );
+    dc->SetFont( m_doc->GetDrawingSmuflFont(staffSize, 0) );
     
-	dc->DrawMusicText( s, xDC, ToDeviceContextY(y + fontCorr ));
+	dc->DrawMusicText( s, xDC, ToDeviceContextY(y) );
     
     dc->ResetFont();
     dc->ResetBrush();
@@ -169,7 +173,7 @@ void View::DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, in
 
 void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize)
 {
-    assert( dc ); // DC cannot be NULL
+    assert( dc );
     
     dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
@@ -184,7 +188,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
-        vrvTxt.SetPointSize( m_doc->m_drawingLyricFonts[staffSize].GetPointSize());
+        vrvTxt.SetPointSize( m_doc->GetDrawingLyricFont(staffSize)->GetPointSize() );
         
         dc->SetFont( &vrvTxt );
         dc->VrvTextFont();
@@ -197,46 +201,43 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     
     dc->EndText( );
 }
-
-void View::DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction)
+    
+void View::DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)
 {
-    int height = std::max( MIN_TIE_HEIGHT * DEFINITON_FACTOR, std::min( 5 * m_doc->m_drawingDoubleUnit[0] / 3, abs( x1 - x ) / 4 ) );
+    assert( dc );
     
-    int thickness = std::max( m_doc->m_drawingDoubleUnit[0] / 3, MIN_TIE_THICKNESS * DEFINITON_FACTOR );
-    
-    int one, two; // control points at 1/4 and 3/4 of total lenght
     int bez1[6], bez2[6]; // filled array with control points and end point
-    
-    int top_y, top_y_fill; // Y for control points in both beziers
-    
-    one = (x1 - x) / 4; // point at 1/4
-    two = (x1 - x) / 4 * 3; // point at 3/4
-    
-    if (direction) {
-        // tie goes up
-        top_y = std::min(y, y1) - height;
-        // the second bezier in internal
-        top_y_fill = top_y + thickness;
-    } else {
-        //tie goes down
-        top_y = std::max(y, y1) + height;
-        // second bezier is internal as above
-        top_y_fill = top_y - thickness;
+    Point c1Rotated = c1;
+    Point c2Rotated = c2;
+    c1Rotated.y += thickness / 2;
+    c2Rotated.y += thickness / 2;
+    if (angle != 0.0) {
+        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
+        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
     }
     
     // Points for first bez, they go from xy to x1y1
-    bez1[0] = ToDeviceContextX(x + one); bez1[1] = ToDeviceContextY(top_y);
-    bez1[2] = ToDeviceContextX(x + two); bez1[3] = ToDeviceContextY(top_y);
-    bez1[4] = ToDeviceContextX(x1); bez1[5] = ToDeviceContextY(y1);
+    bez1[0] = ToDeviceContextX(c1Rotated.x); bez1[1] = ToDeviceContextY(c1Rotated.y);
+    bez1[2] = ToDeviceContextX(c2Rotated.x); bez1[3] = ToDeviceContextY(c2Rotated.y);
+    bez1[4] = ToDeviceContextX(p2.x); bez1[5] = ToDeviceContextY(p2.y);
+    
+    c1Rotated = c1;
+    c2Rotated = c2;
+    c1Rotated.y -= thickness / 2;
+    c2Rotated.y -= thickness / 2;
+    if (angle != 0.0) {
+        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
+        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
+    }
     
     // second bez. goes back
-    bez2[0] = ToDeviceContextX(x + two); bez2[1] = ToDeviceContextY(top_y_fill);
-    bez2[2] = ToDeviceContextX(x + one); bez2[3] = ToDeviceContextY(top_y_fill);
-    bez2[4] = ToDeviceContextX(x); bez2[5] = ToDeviceContextY(y);
+    bez2[0] = ToDeviceContextX(c2Rotated.x); bez2[1] = ToDeviceContextY(c2Rotated.y);
+    bez2[2] = ToDeviceContextX(c1Rotated.x); bez2[3] = ToDeviceContextY(c1Rotated.y);
+    bez2[4] = ToDeviceContextX(p1.x); bez2[5] = ToDeviceContextY(p1.y);
     
     // Actually draw it
-    dc->SetPen( m_currentColour, std::max( 1,  m_doc->m_style->m_stemWidth / 2 ), AxSOLID );
-    dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y), bez1, bez2);
+    dc->SetPen( m_currentColour, std::max( 1,  m_doc->GetDrawingStemWidth(staffSize) / 2 ), AxSOLID );
+    dc->DrawComplexBezierPath(ToDeviceContextX(p1.x), ToDeviceContextY(p1.y), bez1, bez2);
     dc->ResetPen();
 }
 

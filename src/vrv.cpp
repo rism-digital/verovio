@@ -44,17 +44,18 @@ bool Resources::InitFonts()
 {
     // We will need to rethink this for adding the option to add custom fonts
     // Font Bravura first since it is expected to have always all symbols
-    if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded");
+    if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded.");
     // The Leipzig as the default font
-    if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded");
+    if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
     
     if ( m_font.size() < SMUFL_COUNT ) {
-        LogError("All default SMUFL glyphs could not be loaded");
+        LogError("Expected %d default SMUFL glyphs but could load only %d.",
+                 SMUFL_COUNT, m_font.size());
         return false;
     }
     
     if ( !InitTextFont() ) {
-        LogError("Text font could not be initialized");
+        LogError("Text font could not be initialized.");
         return false;
     }
     
@@ -464,7 +465,9 @@ std::string GetFilename( std::string fullpath )
 }
     
 std::string GetVersion() {
-    return StringFormat("%d.%d.%d-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, GIT_COMMIT );
+    std::string dev;
+    if (VERSION_DEV) dev = "-dev";
+    return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT );
 }
 
 } // namespace vrv

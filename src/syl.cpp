@@ -28,6 +28,11 @@ Syl::Syl():
     AttTypography(),
     AttSylLog()
 {
+    RegisterAttClass(ATT_TYPOGRAPHY);
+    RegisterAttClass(ATT_SYLLOG);
+    
+    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
+    
     Reset();
 }
 
@@ -49,21 +54,21 @@ void Syl::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Syl::PrepareLyrics( ArrayPtrVoid params )
+int Syl::PrepareLyrics( ArrayPtrVoid *params )
 {
     // param 0: the current Syl
     // param 1: the last Note
     // param 2: the last but one Note
-    Syl **currentSyl = static_cast<Syl**>(params[0]);
-    Note **lastNote = static_cast<Note**>(params[1]);
-    Note **lastButOneNote = static_cast<Note**>(params[2]);
+    Syl **currentSyl = static_cast<Syl**>((*params).at(0));
+    Note **lastNote = static_cast<Note**>((*params).at(1));
+    Note **lastButOneNote = static_cast<Note**>((*params).at(2));
     
-    Verse *verse = dynamic_cast<Verse*>( this->GetFirstParent( &typeid(Verse), MAX_NOTE_DEPTH ) );
+    Verse *verse = dynamic_cast<Verse*>( this->GetFirstParent( VERSE, MAX_NOTE_DEPTH ) );
     if ( verse ) {
         m_drawingVerse = std::max(verse->GetN(), 1);
     }
     
-    this->SetStart( dynamic_cast<LayerElement*>( this->GetFirstParent( &typeid(Note), MAX_NOTE_DEPTH ) ) );
+    this->SetStart( dynamic_cast<LayerElement*>( this->GetFirstParent( NOTE, MAX_NOTE_DEPTH ) ) );
     
     // At this stage currentSyl is actually the previous one that is ending here
     if ((*currentSyl)) {
@@ -93,16 +98,16 @@ int Syl::PrepareLyrics( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int Syl::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
+int Syl::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
+    return  TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(params, this);
 }
     
-int Syl::ResetDarwing( ArrayPtrVoid params )
+int Syl::ResetDarwing( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::ResetDrawing(params, this);
+    return  TimeSpanningInterface::InterfaceResetDrawing(params, this);
 };
 
 } // namespace vrv

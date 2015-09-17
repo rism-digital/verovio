@@ -30,7 +30,11 @@ public:
     virtual ~Custos();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Custos"; };
+    virtual ClassId Is() { return CUSTOS; };
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
 protected:
 

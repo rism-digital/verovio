@@ -10,129 +10,95 @@
 #define __VRV_SCOREDEF_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "object.h"
+#include "scoredefinterface.h"
 
 namespace vrv {
 
 class Clef;
-class ClefAttr;
 class KeySig;
-class KeySigAttr;
 class Mensur;
-class MensurAttr;
 class MeterSig;
-class MeterSigAttr;
 class StaffGrp;
 class StaffDef;
 
-// unused? LP
-#define STAFFDEF_DRAW_NONE  0
-#define STAFFDEF_DRAW_CLEF  (1<<0)
-#define STAFFDEF_DRAW_KEYSIG  (1<<1)
-#define STAFFDEF_DRAW_MENSUR  (1<<2)
-#define STAFFDEF_DRAW_ALL (1<<3) - 1
-
 //----------------------------------------------------------------------------
-// ScoreOrStaffDefAttrInterface
+// ScoreDefElement
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur.
- * It can either hold element or attribute values. Element values are hold in normal objects
- * (e.g., Clef) and attribute values are hold in dedicated Object classes (e.g., ClefAttr)
- * During rendering, only Element object are used. They are obained by the GetXXXCopy methods
- * that create a copy of the Element object or a corresponding Element object if a attribute value
- * object is hold.
+ * This class is a base class for MEI scoreDef or staffDef elements.
+ * It implements the ScoreDefInterface that implements the attribute classes
+ * for clef, key signature, mensur and meter signature.
+ * It also provides methods for checking if the scoreDef or staffDef has some
+ * information about clef, key signature, etc. This information can be either 
+ * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
-class ScoreOrStaffDefAttrInterface
+class ScoreDefElement: public Object, public ScoreDefInterface
 {
 public:
     /**
-     * @name Constructors, destructors, and other standard methods
+     * @name Constructors, destructors, and other standard methods.
      */
     ///@{
-    ScoreOrStaffDefAttrInterface();
-    virtual ~ScoreOrStaffDefAttrInterface();
+    ScoreDefElement(std::string classid);
+    virtual ~ScoreDefElement();
     virtual void Reset();
-    ScoreOrStaffDefAttrInterface( const ScoreOrStaffDefAttrInterface& interface ); // copy contructor
-    ScoreOrStaffDefAttrInterface& operator=( const ScoreOrStaffDefAttrInterface& interface ); // copy assignement;
+    virtual ClassId Is() { return SCOREDEF_ELEMENT; };
     ///@}
     
     /**
-     * @name Replace the clef, keysig, mensur and meterSig.
-     * The current value (if any) is replaced by the new value (if any).
-     * Values passed and hold can be either a object or attribute value object.
-     * For example, it can be either a Clef or a ClefAttr.
-    ///@{
+     * @name Methods for checking the presence of clef, key signature, etc. information.
+     * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
      */
-    void ReplaceClef( Object *newClef );
-    void ReplaceKeySig( Object *newKeySig );
-    void ReplaceMensur( Object *newMensur );
-    void ReplaceMeterSig( Object *newMeterSig );
+    ///@{
+    bool HasClefInfo();
+    bool HasKeySigInfo();
+    bool HasMensurInfo();
+    bool HasMeterSigInfo();
     ///@}
     
     /**
      * @name Get a copy of the clef, keysig, mensur and meterSig.
-     * These methods creates new objects that need to be deleted.
+     * These methods create new objects (heap) that will need to be deleted.
      * The also convert attribute value object to an object. For example,
-     * if m_clef holds a ClefAttr object, the copy will be a Clef object.
-     * They are used when writing the MEI.
+     * if a staffDef has a @key.sig, the copy will be a KeySig object.
+     * The conversion from attribute to element is performed in the appropriate
+     * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
-    Clef *GetClefCopy() const;
-    KeySig *GetKeySigCopy() const;
-    Mensur *GetMensurCopy() const;
-    MeterSig *GetMeterSigCopy() const;
-    ///@}
-    
-    /**
-     * @name Get the clef, keysig, mensur and meterSig.
-     * They will return a reference only if the value hold is
-     * an element (e.g., Clef) and not a attribute value object (ClefAttr).
-     * They are used when writing the MEI.
-     */
-    ///@{
-    Clef *GetClefElement() const;
-    KeySig *GetKeySigElement() const;
-    Mensur *GetMensurElement() const;
-    MeterSig *GetMeterSigElement() const;
-    ///@}
-    
-    /**
-     * @name Get the clef, keysig, mensur and meterSig attributes.
-     * They will return a reference only if the value hold is
-     * an attibute value object (e.g., ClefAtt) and not an element (Clef).
-     */
-    ///@{
-    ClefAttr *GetClefAttr() const;
-    KeySigAttr *GetKeySigAttr() const;
-    MensurAttr *GetMensurAttr() const;
-    MeterSigAttr *GetMeterSigAttr() const;
-    ///@}
-    
-    /**
-     * @name Get the clef, keysig, mensur and meterSig object.
-     * They will return a reference to the hold object (element or attribute).
-     */
-    ///@{
-    Object *GetClef() const { return m_clef; };
-    Object *GetKeySig() const { return m_keySig; };
-    Object *GetMensur() const { return m_mensur; };
-    Object *GetMeterSig() const { return m_meterSig; };
+    Clef *GetClefCopy();
+    KeySig *GetKeySigCopy();
+    Mensur *GetMensurCopy();
+    MeterSig *GetMeterSigCopy();
     ///@}
     
 protected:
-    /** The clef or clef attributes */
-    Object *m_clef;
-    /** The key signature */
-    Object *m_keySig;
-    /** The mensur */
-    Object *m_mensur;
-    /** The meter signature (time signature) */
-    Object *m_meterSig;
+    
+private:
+    /**
+     * @name Methods for checking if clef info is available at the attribute level.
+     */
+    ///@{
+    bool HasClefAttrInfo();
+    bool HasKeySigAttrInfo();
+    bool HasMensurAttrInfo();
+    bool HasMeterSigAttrInfo();
+    ///@}
 
+    /**
+     * @name Methods for checking if clef info is available at the element level.
+     * To be implemented.
+     */
+    ///@{
+    bool HasClefElementInfo();
+    bool HasKeySigElementInfo();
+    bool HasMensurElementInfo();
+    bool HasMeterSigElementInfo();
+    ///@}
+    
 };
-
 
 
 //----------------------------------------------------------------------------
@@ -143,7 +109,7 @@ protected:
  * This class represents a MEI scoreDef.
  * It contains StaffGrp objects.
 */
-class ScoreDef: public Object, public ScoreOrStaffDefAttrInterface, public ObjectListInterface
+class ScoreDef: public ScoreDefElement, public ObjectListInterface
 {
 public:
     /**
@@ -155,6 +121,7 @@ public:
     virtual ~ScoreDef();    
     virtual void Reset();
     virtual std::string GetClassName( ) { return "ScoreDef"; };
+    virtual ClassId Is() { return SCOREDEF; };
     ///@}
     
 	void AddStaffGrp( StaffGrp *staffGrp );
@@ -162,14 +129,14 @@ public:
     /**
      * Replace the scoreDef with the content of the newScoreDef.
      */
-    void Replace( ScoreDef *newScoreDef );
+    void ReplaceDrawingValues( ScoreDef *newScoreDef );
     
     /**
      * Replace the corresponding staffDef with the content of the newStaffDef.
      * Looks for the staffDef with the same m_n (@n) and replace the attribute set.
-     * Attribute set is provided by the ScoreOrStaffDefAttrInterface.
+     * Attribute set is provided by the ScoreOrStaffDefInterface.
      */
-    void Replace( StaffDef *newStaffDef );
+    void ReplaceDrawingValues( StaffDef *newStaffDef );
     
     /**
      * Get the staffDef with number n (NULL if not found).
@@ -180,7 +147,7 @@ public:
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
      */
-    void SetRedrawFlags( bool clef, bool keysig, bool mensur, bool meterSig );
+    void SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation );
     
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
@@ -199,7 +166,7 @@ public:
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
-    virtual int CastOffSystems( ArrayPtrVoid params );
+    virtual int CastOffSystems( ArrayPtrVoid *params );
     
 protected:
     /**
@@ -227,7 +194,11 @@ private:
  * This class represents a MEI staffGrp.
  * It contains StaffDef objects.
  */
-class StaffGrp: public Object, public ObjectListInterface
+class StaffGrp: public Object, public ObjectListInterface,
+    public AttCommon,
+    public AttLabelsAddl,
+    public AttStaffgroupingsym,
+    public AttStaffGrpVis
 {
 public:
     /**
@@ -240,26 +211,15 @@ public:
     virtual Object* Clone() { return new StaffGrp(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffGrp"; };
+    virtual ClassId Is() { return STAFFGRP; };
     ///@}
 	
+    /**
+     * @name Methods for adding allowed content
+     */
+    ///@{
 	void AddStaffDef( StaffDef *staffDef );
-    
 	void AddStaffGrp( StaffGrp *staffGrp );
-    
-    /**
-     * @name Set and get the staffGrp @symbol
-     */
-    ///@{
-    StaffGrpSymbol GetSymbol() const { return m_symbol; };
-    void SetSymbol( StaffGrpSymbol symbol ) { m_symbol = symbol; };
-    ///@}
-    
-    /**
-     * @name Set and get the staffGrp @barthru
-     */
-    ///@{
-    bool GetBarthru() const { return m_barthru; };
-    void SetBarthru( bool barthru ) { m_barthru = barthru; };
     ///@}
     
     //----------//
@@ -278,8 +238,6 @@ private:
 public:
     
 private:
-    StaffGrpSymbol m_symbol;
-    bool m_barthru;
 
 };
 
@@ -291,9 +249,10 @@ private:
 /**
  * This class represents a MEI staffDef.
  */
-class StaffDef: public Object, public ScoreOrStaffDefAttrInterface,
+class StaffDef: public ScoreDefElement, public StaffDefDrawingInterface,
     public AttCommon,
     public AttLabelsAddl,
+    public AttScalable,
     public AttStaffDefVis
 {
 public:
@@ -307,59 +266,33 @@ public:
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
     virtual std::string GetClassName( ) { return "StaffDef"; };
+    virtual ClassId Is() { return STAFFDEF; };
     ///@}
-    
-    /**
-     * @name Set and get the layer drawing flags for clef, keysig and mensur.
-     * This will be true when starting a new system or when a scoreDef or staffDef changes occurs
-     * This will be true only for the first layer in the staff.
-     */
-    ///@{
-    bool DrawClef() const { return m_drawClef; };
-    void SetDrawClef( bool drawClef ) { m_drawClef = drawClef; };
-    bool DrawKeySig() const { return m_drawKeySig; };
-    void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
-    bool DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawMensur = drawMensur; };
-    bool DrawMeterSig() const { return m_drawMeterSig; };
-    void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
-    ///@}
-
     
     //----------//
     // Functors //
     //----------//
     
     /**
-     * Replace all the staffDefs in a scoreDef.
-     * Calls ScoreDef::Replace.
-     * param 0: a pointer to the scoreDef we are going to replace the staffDefs
+     * Set the current / drawing clef, key signature, etc. to the StaffDef
+     * Called form ScoreDef::ReplaceDrawingValues.
+     * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
      */
-    virtual int ReplaceStaffDefsInScoreDef( ArrayPtrVoid params );
+    virtual int ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params );
     
     /**
-     * Set flags for the staff set for indicating whether clefs, keysig, etc. needs to be redrawn.
-     * This is typically occurs when a new system or a new scoreDef is encountered.
-     * param 0: bool clef flag.
-     * param 1: bool keysig flag.
-     * param 2: bool the mensur flag.
+     * Set drawing flags for the StaffDef for indicating whether clefs, keysig, etc. needs
+     * to be redrawn.
+     * This typically occurs when a new System or a new  ScoreDef is encountered.
+     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
-    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid params );
+    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid *params );
     
 private:
     
 public:
     
 private:
-    /**
-     *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
-     */
-    ///@{
-    bool m_drawClef;
-    bool m_drawKeySig;
-    bool m_drawMensur;
-    bool m_drawMeterSig;
-    ///@}
     
 };
     

@@ -21,8 +21,13 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Tie::Tie():
-    MeasureElement("tie-"), TimeSpanningInterface()
+    FloatingElement("tie-"), TimeSpanningInterface(),
+    AttCurvature()
 {
+    RegisterAttClass(ATT_CURVATURE);
+    
+    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
+    
     Reset();
 }
 
@@ -33,31 +38,9 @@ Tie::~Tie()
     
 void Tie::Reset()
 {
-    MeasureElement::Reset();
+    FloatingElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetCurvature();
 }
-
-//----------------------------------------------------------------------------
-// Tie functor methods
-//----------------------------------------------------------------------------
-
-int Tie::PrepareTimeSpanning( ArrayPtrVoid params )
-{
-    // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::PrepareTimeSpanning(params, this);
-}
-
-
-int Tie::FillStaffCurrentTimeSpanning( ArrayPtrVoid params )
-{
-    // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::FillStaffCurrentTimeSpanning(params, this);
-}
-    
-int Tie::ResetDarwing( ArrayPtrVoid params )
-{
-    // Pass it to the pseudo functor of the interface
-    return  TimeSpanningInterface::ResetDrawing(params, this);
-};
 
 } // namespace vrv

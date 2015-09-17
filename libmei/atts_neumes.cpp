@@ -16,6 +16,10 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "object.h"
 
 /* #include_block */
@@ -139,8 +143,9 @@ bool AttUneumeLog::HasName( )
 /* include <attname> */
 
 bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValue ) {
-    if (dynamic_cast<AttIneumeLog*>(element) ) {
+    if (element->HasAttClass( ATT_INEUMELOG ) ) {
         AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        assert( att );
         if (attrType == "form") {
             att->SetForm(att->StrToStr(attrValue));
             return true;
@@ -150,8 +155,9 @@ bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
-    if (dynamic_cast<AttUneumeLog*>(element) ) {
+    if (element->HasAttClass( ATT_UNEUMELOG ) ) {
         AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        assert( att );
         if (attrType == "form") {
             att->SetForm(att->StrToStr(attrValue));
             return true;
@@ -166,8 +172,9 @@ bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValu
 }
 
 void Att::GetNeumes( Object *element, ArrayOfStrAttr *attributes ) {
-    if (dynamic_cast<AttIneumeLog*>(element) ) {
+    if (element->HasAttClass( ATT_INEUMELOG ) ) {
         AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        assert( att );
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
         }
@@ -175,8 +182,9 @@ void Att::GetNeumes( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("name", att->StrToStr(att->GetName())));
         }
     }
-    if (dynamic_cast<AttUneumeLog*>(element) ) {
+    if (element->HasAttClass( ATT_UNEUMELOG ) ) {
         AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        assert( att );
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
         }

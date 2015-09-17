@@ -22,12 +22,15 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface():
+PitchInterface::PitchInterface(): Interface(),
     AttAccidental(),
     AttOctave(),
     AttPitch()
     
 {
+    RegisterInterfaceAttClass(ATT_ACCIDENTAL);
+    RegisterInterfaceAttClass(ATT_OCTAVE);
+    RegisterInterfaceAttClass(ATT_PITCH);
     Reset();
 }
 

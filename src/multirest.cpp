@@ -18,15 +18,9 @@ MultiRest::MultiRest():
     LayerElement("multirest-"),
     AttNumbered()
 {
+    RegisterAttClass(ATT_NUMBERED);
     Reset();
 }
-
-MultiRest::MultiRest(int number):
-    LayerElement("multirest-")
-{
-    Reset();
-}
-
 
 MultiRest::~MultiRest()
 {

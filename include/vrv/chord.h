@@ -9,10 +9,6 @@
 #ifndef __VRV_CHORD_H__
 #define __VRV_CHORD_H__
 
-#include <typeinfo>
-
-//----------------------------------------------------------------------------
-
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "layerelement.h"
@@ -48,7 +44,11 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Chord"; };
+    virtual ClassId Is() { return CHORD; };
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
     /**
      * Add an element (only note supported) to a chord.
@@ -65,18 +65,25 @@ public:
     void ResetAccidList();
     
     /**
+     * Return information about the position in the chord
+     */
+    ///@{
+    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    int PositionInChord(Note *note);
+    ///@}
+    
+    /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
      * Further documentation in chord.cpp comments.
      */
     void ResetAccidSpace(int fullUnit);
     
     /**
-     * @name Set and get the stem direction of the beam.
+     * @name Set and get the stem direction of the chord.
      */
     ///@{
     void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
     data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
-
     ///@}
     
     //----------//
@@ -86,12 +93,12 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid params );
+    virtual int PrepareTieAttr( ArrayPtrVoid *params );
     
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttrEnd( ArrayPtrVoid params );
+    virtual int PrepareTieAttrEnd( ArrayPtrVoid *params );
     
 protected:
     /**

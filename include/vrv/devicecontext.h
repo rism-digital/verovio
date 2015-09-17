@@ -44,7 +44,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    DeviceContext () { m_correctMusicAscent = true; m_drawingBoundingBoxes = false; m_isDeactivated = false; };
+    DeviceContext () { m_drawingBoundingBoxes = false; m_isDeactivated = false; };
     virtual ~DeviceContext() {};
     ///@}
     
@@ -80,7 +80,6 @@ public:
      */
     ///@{
     virtual Point GetLogicalOrigin( ) = 0;
-    virtual bool CorrectMusicAscent( ) { return m_correctMusicAscent; };
     ///@}
 
     /**
@@ -173,7 +172,6 @@ public:
     
 protected:
     
-    bool m_correctMusicAscent; // specify if the ascent has to be correct when view the music font (true wxDC, false SVG)
     bool m_drawingBoundingBoxes;
     /**
      * Flag for indicating if the VerovioText font is currently used.

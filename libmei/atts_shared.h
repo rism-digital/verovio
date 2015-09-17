@@ -16,6 +16,7 @@
 #define __VRV_ATTS_SHARED_H__
 
 #include "att.h"
+#include "att_classes.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -1117,13 +1118,13 @@ public:
     bool HasBezier( );
     
     //
-    void SetBulge(std::string bulge_) { m_bulge = bulge_; };
-    std::string GetBulge() const { return m_bulge; };    
+    void SetBulge(double bulge_) { m_bulge = bulge_; };
+    double GetBulge() const { return m_bulge; };    
     bool HasBulge( );
     
     //
-    void SetCurvedir(std::string curvedir_) { m_curvedir = curvedir_; };
-    std::string GetCurvedir() const { return m_curvedir; };    
+    void SetCurvedir(data_CURVEDIR curvedir_) { m_curvedir = curvedir_; };
+    data_CURVEDIR GetCurvedir() const { return m_curvedir; };    
     bool HasCurvedir( );
     
     ///@}
@@ -1140,9 +1141,9 @@ private:
      * The bulge attribute must contain one or more decimal values expressed in inter-
      * line units.
      **/
-    std::string m_bulge;
+    double m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
-    std::string m_curvedir;
+    data_CURVEDIR m_curvedir;
 
 /* include <attcurvedir> */
 };
@@ -2145,22 +2146,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetKeySigShow(std::string keySigShow_) { m_keySigShow = keySigShow_; };
-    std::string GetKeySigShow() const { return m_keySigShow; };    
+    void SetKeySigShow(data_BOOLEAN keySigShow_) { m_keySigShow = keySigShow_; };
+    data_BOOLEAN GetKeySigShow() const { return m_keySigShow; };    
     bool HasKeySigShow( );
     
     //
-    void SetKeySigShowchange(std::string keySigShowchange_) { m_keySigShowchange = keySigShowchange_; };
-    std::string GetKeySigShowchange() const { return m_keySigShowchange; };    
+    void SetKeySigShowchange(data_BOOLEAN keySigShowchange_) { m_keySigShowchange = keySigShowchange_; };
+    data_BOOLEAN GetKeySigShowchange() const { return m_keySigShowchange; };    
     bool HasKeySigShowchange( );
     
     ///@}
 
 private:
     /** Indicates whether the key signature should be displayed. **/
-    std::string m_keySigShow;
+    data_BOOLEAN m_keySigShow;
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
-    std::string m_keySigShowchange;
+    data_BOOLEAN m_keySigShowchange;
 
 /* include <attkey.sig.showchange> */
 };
@@ -3138,8 +3139,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMultiNumber(std::string multiNumber_) { m_multiNumber = multiNumber_; };
-    std::string GetMultiNumber() const { return m_multiNumber; };    
+    void SetMultiNumber(data_BOOLEAN multiNumber_) { m_multiNumber = multiNumber_; };
+    data_BOOLEAN GetMultiNumber() const { return m_multiNumber; };    
     bool HasMultiNumber( );
     
     ///@}
@@ -3149,7 +3150,7 @@ private:
      * Indicates whether programmatically calculated counts of multiple measures of
      * rest (mRest) and whole measure repeats (mRpt) in parts should be rendered.
      **/
-    std::string m_multiNumber;
+    data_BOOLEAN m_multiNumber;
 
 /* include <attmulti.number> */
 };
@@ -3604,8 +3605,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPlace(std::string place_) { m_place = place_; };
-    std::string GetPlace() const { return m_place; };    
+    void SetPlace(data_STAFFREL place_) { m_place = place_; };
+    data_STAFFREL GetPlace() const { return m_place; };    
     bool HasPlace( );
     
     ///@}
@@ -3615,7 +3616,7 @@ private:
      * Captures the placement of the item with respect to the staff with which it is
      * associated.
      **/
-    std::string m_place;
+    data_STAFFREL m_place;
 
 /* include <attplace> */
 };
@@ -3893,15 +3894,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetScale(std::string scale_) { m_scale = scale_; };
-    std::string GetScale() const { return m_scale; };    
+    void SetScale(data_PERCENT scale_) { m_scale = scale_; };
+    data_PERCENT GetScale() const { return m_scale; };    
     bool HasScale( );
     
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
-    std::string m_scale;
+    data_PERCENT m_scale;
 
 /* include <attscale> */
 };
@@ -4515,8 +4516,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBarthru(std::string barthru_) { m_barthru = barthru_; };
-    std::string GetBarthru() const { return m_barthru; };    
+    void SetBarthru(data_BOOLEAN barthru_) { m_barthru = barthru_; };
+    data_BOOLEAN GetBarthru() const { return m_barthru; };    
     bool HasBarthru( );
     
     ///@}
@@ -4526,7 +4527,7 @@ private:
      * Indicates whether bar lines go across the space between staves (true) or are
      * only drawn across the lines of each staff (false).
      **/
-    std::string m_barthru;
+    data_BOOLEAN m_barthru;
 
 /* include <attbarthru> */
 };
@@ -4556,15 +4557,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSymbol(std::string symbol_) { m_symbol = symbol_; };
-    std::string GetSymbol() const { return m_symbol; };    
+    void SetSymbol(data_SYMBOL symbol_) { m_symbol = symbol_; };
+    data_SYMBOL GetSymbol() const { return m_symbol; };    
     bool HasSymbol( );
     
     ///@}
 
 private:
     /** Specifies the symbol used to group a set of staves. **/
-    std::string m_symbol;
+    data_SYMBOL m_symbol;
 
 /* include <attsymbol> */
 };

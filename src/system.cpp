@@ -86,25 +86,6 @@ void System::ResetVerticalAlignment()
     m_drawingYRel = 0;
     m_drawingY = 0;
 }
-
-Measure *System::GetAtPos( int x )
-{
-	Measure *measure = dynamic_cast<Measure*>( this->GetFirst( &typeid(Measure) ) );
-	if ( !measure )
-		return NULL;
-    
-    Measure *next = NULL;
-	while ( (next = dynamic_cast<Measure*>( this->GetNext() ) ) )
-	{
-		if ( (int)measure->GetDrawingX() < x )
-		{
-			return measure;
-		}
-		measure = next;
-	}
-
-	return measure;
-}
     
 int System::GetHeight()
 {
@@ -125,11 +106,11 @@ void System::SetDrawingLabelsWidth( int width )
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::AlignVertically( ArrayPtrVoid params )
+int System::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner
     // param 1: the staffNb (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner**>(params[0]);
+    SystemAligner **systemAligner = static_cast<SystemAligner**>((*params).at(0));
     
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
@@ -143,14 +124,14 @@ int System::AlignVertically( ArrayPtrVoid params )
 }
 
 
-int System::SetAligmentYPos( ArrayPtrVoid params )
+int System::SetAligmentYPos( ArrayPtrVoid *params )
 {
     // param 0: the previous staff height
     // param 1: the staff margin (unused)
     // param 2: the staff interline sizes (int[2]) (unused)
     // param 2: the functor to be redirected to SystemAligner
-    int *previousStaffHeight = static_cast<int*>(params[0]);
-    Functor *setAligmnentPosY = static_cast<Functor*>(params[3]);
+    int *previousStaffHeight = static_cast<int*>((*params).at(0));
+    Functor *setAligmnentPosY = static_cast<Functor*>((*params).at(3));
     
     (*previousStaffHeight) = 0;
     
@@ -160,12 +141,12 @@ int System::SetAligmentYPos( ArrayPtrVoid params )
 }
 
 
-int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
+int System::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift
     // param 1: the functor to be redirected to SystemAligner
-    int *shift = static_cast<int*>(params[0]);
-    Functor *integrateBoundingBoxYShift = static_cast<Functor*>(params[1]);
+    int *shift = static_cast<int*>((*params).at(0));
+    Functor *integrateBoundingBoxYShift = static_cast<Functor*>((*params).at(1));
     
     (*shift) = 0;
     m_systemAligner.Process( integrateBoundingBoxYShift, params);
@@ -173,10 +154,10 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid params )
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AlignMeasures( ArrayPtrVoid params )
+int System::AlignMeasures( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift
-    int *shift = static_cast<int*>(params[0]);
+    int *shift = static_cast<int*>((*params).at(0));
     
     m_drawingXRel = this->m_systemLeftMar + this->GetDrawingLabelsWidth();
     (*shift) = 0;
@@ -184,22 +165,22 @@ int System::AlignMeasures( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignMeasuresEnd( ArrayPtrVoid params )
+int System::AlignMeasuresEnd( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift
-    int *shift = static_cast<int*>(params[0]);
+    int *shift = static_cast<int*>((*params).at(0));
     
     m_drawingTotalWidth = (*shift) + this->GetDrawingLabelsWidth();
     
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignSystems( ArrayPtrVoid params )
+int System::AlignSystems( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift
     // param 1: the system margin
-    int *shift = static_cast<int*>(params[0]);
-    int *systemMargin = static_cast<int*>(params[1]);
+    int *shift = static_cast<int*>((*params).at(0));
+    int *systemMargin = static_cast<int*>((*params).at(1));
     
     this->m_drawingYRel = (*shift);
     
@@ -211,24 +192,26 @@ int System::AlignSystems( ArrayPtrVoid params )
 }
 
 
-int System::JustifyX( ArrayPtrVoid params )
+int System::JustifyX( ArrayPtrVoid *params )
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin) (unused)
     // param 2: the non justifiable margin (unused)
     // param 3: the system full width (without system margins)
     // param 4: the functor to be redirected to the MeasureAligner
-    double *ratio = static_cast<double*>(params[0]);
-    int *systemFullWidth = static_cast<int*>(params[3]);
+    double *ratio = static_cast<double*>((*params).at(0));
+    int *systemFullWidth = static_cast<int*>((*params).at(3));
     
     assert( m_parent );
     assert( m_parent->m_parent );
     
     (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar) / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
     
+    //LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
+
     if ((*ratio) < 0.8 ) {
         // Arbitrary value for avoiding over-compressed justification
-        LogWarning("Justification stop because of a ratio smaller the 0.8");
+        LogWarning("Justification stop because of a ratio smaller than 0.8");
         //return FUNCTOR_SIBLINGS;
     }
     
@@ -243,10 +226,10 @@ int System::JustifyX( ArrayPtrVoid params )
     return FUNCTOR_CONTINUE;
 }
     
-int System::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
+int System::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
 {
     // param 0: the height of the previous staff
-    int *system_height = static_cast<int*>(params[1]);
+    int *system_height = static_cast<int*>((*params).at(1));
     
     m_systemAligner.GetBottomAlignment()->SetYShift( (*system_height) );
 
@@ -254,18 +237,18 @@ int System::SetBoundingBoxYShiftEnd( ArrayPtrVoid params )
 }
 
     
-int System::CastOffPages( ArrayPtrVoid params )
+int System::CastOffPages( ArrayPtrVoid *params )
 {
     // param 0: a pointer to the page we are taking the content from
     // param 1: a pointer the document we are adding pages to
     // param 2: a pointer to the current page
     // param 3: the cummulated shift (m_drawingYRel of the first system of the current page)
     // param 4: the page height
-    Page *contentPage = static_cast<Page*>(params[0]);
-    Doc *doc = static_cast<Doc*>(params[1]);
-    Page **currentPage = static_cast<Page**>(params[2]);
-    int *shift = static_cast<int*>(params[3]);
-    int *pageHeight = static_cast<int*>(params[4]);
+    Page *contentPage = static_cast<Page*>((*params).at(0));
+    Doc *doc = static_cast<Doc*>((*params).at(1));
+    Page **currentPage = static_cast<Page**>((*params).at(2));
+    int *shift = static_cast<int*>((*params).at(3));
+    int *pageHeight = static_cast<int*>((*params).at(4));
     
     if ( ( (*currentPage)->GetChildCount() > 0 ) && ( this->m_drawingYRel - this->GetHeight() - (*shift) < 0 )) { //(*pageHeight) ) ) {
         (*currentPage) = new Page();
@@ -283,10 +266,10 @@ int System::CastOffPages( ArrayPtrVoid params )
     return FUNCTOR_SIBLINGS;
 }
 
-int System::UnCastOff( ArrayPtrVoid params )
+int System::UnCastOff( ArrayPtrVoid *params )
 {
     // param 0: a pointer to the system we are adding system to
-    System *currentSystem = static_cast<System*>(params[0]);
+    System *currentSystem = static_cast<System*>((*params).at(0));
     
     // Just move all the content of the system to the continous one (parameter)
     // Use the MoveChildren method that move the and relinquishes them
@@ -297,7 +280,7 @@ int System::UnCastOff( ArrayPtrVoid params )
     return FUNCTOR_SIBLINGS;
 }
     
-int System::SetDrawingXY( ArrayPtrVoid params )
+int System::SetDrawingXY( ArrayPtrVoid *params )
 {
     // param 0: a pointer doc
     // param 1: a pointer to the current system
@@ -306,9 +289,9 @@ int System::SetDrawingXY( ArrayPtrVoid params )
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
-    Doc *doc = static_cast<Doc*>(params[0]);
-    System **currentSystem = static_cast<System**>(params[1]);
-    bool *processLayerElements = static_cast<bool*>(params[6]);
+    Doc *doc = static_cast<Doc*>((*params).at(0));
+    System **currentSystem = static_cast<System**>((*params).at(1));
+    bool *processLayerElements = static_cast<bool*>((*params).at(6));
     
     (*currentSystem) = this;
     

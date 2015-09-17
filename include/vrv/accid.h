@@ -32,7 +32,11 @@ public:
     virtual ~Accid();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Accid"; };
+    virtual ClassId Is() { return ACCID; };
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
     
     
     //----------//
@@ -42,13 +46,18 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid params );
+    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
     
 protected:
 
 private:
     
 public:
+    /**
+     * Indicates if is cue size for accid object created for @accid.
+     * See Note::PreparePointersByLayer and View::DrawAccid
+     */
+    bool m_drawingCueSize;
     
 private:
 
