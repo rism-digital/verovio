@@ -226,8 +226,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     // to see if beamed or not
     Beam *beam_parent = dynamic_cast<Beam*>(note->GetFirstParent( BEAM ));
     
-    // This note is beamed and cue sized
     if (beam_parent != NULL) {
+        // This note is beamed and cue sized
         if (drawingCueSize == true) {
             // Get the Parent of the parent
             // we want to see if we are in a group of
@@ -235,7 +235,6 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             if (beam_parent->GetListIndex(note) > -1) {
                 inBeam = true;
             }
-                        
         }
         else {
             // the note is just in a beam
@@ -667,8 +666,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     
     int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
-
-    
+  
     // We do not support more than three chars
     int num = std::min( multiRest->GetNum(), 999);
     
@@ -1931,7 +1929,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
                      ToDeviceContextX(startPoint.x - positionShiftX1 ),
                      ToDeviceContextY(startPoint.y + positionShiftY1),
                      ToDeviceContextX(startPoint.x + positionShiftX2),
-                     ToDeviceContextY(note->GetDrawingStemStart().y + positionShiftY2));
+                     ToDeviceContextY(startPoint.y + positionShiftY2));
     } else {
         dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1),
                      ToDeviceContextY(startPoint.y - positionShiftY1),

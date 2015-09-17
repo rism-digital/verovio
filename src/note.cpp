@@ -168,10 +168,14 @@ bool Note::IsClusterExtreme()
 bool Note::HasDrawingStemDir()
 {
     // In chord, the value is set in Chord::SetDrawingStemDir
-    // In beam, the value is tet in View::DrawBeam
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    if(chordParent) {
+        return true;
+    }
+    // In beam, the value is tet in View::DrawBeam - however, we need to check that the note is part of the beam
+    // It is not necessary the case with grace notes
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
-    if(chordParent || beamParent) {
+    if (beamParent && (beamParent->GetListIndex(this) > -1)) {
         return true;
     }
     else if (this->HasStemDir()) {

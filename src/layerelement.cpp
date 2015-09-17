@@ -256,7 +256,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_KEYSIG_ATTR;
         }
         else {
-            type = ALIGNMENT_KEYSIG;
+            //type = ALIGNMENT_KEYSIG;
+            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
+            type = ALIGNMENT_KEYSIG_ATTR;
         }
     }
     else if (this->Is() == MENSUR) {
@@ -278,7 +281,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             // replace the current meter signature
             (*currentMeterSig) = dynamic_cast<MeterSig*>(this);
             assert( *currentMeterSig );
-            type = ALIGNMENT_METERSIG;
+            //type = ALIGNMENT_METERSIG
+            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
+            type = ALIGNMENT_METERSIG_ATTR;
         }
     }
     else if ( (this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT) ) {
