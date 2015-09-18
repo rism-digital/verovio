@@ -27,9 +27,9 @@ namespace vrv {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 9
+#define VERSION_REVISION 10
 // Adds "-dev" in the version number - should be set to false for releases
-#define VERSION_DEV false
+#define VERSION_DEV true
 
 //----------------------------------------------------------------------------
 // Typedefs
