@@ -275,6 +275,17 @@ Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deep
     return element;
 }
     
+Object *Object::FindChildExtremeByAttComparison( AttComparison *attComparison, int deepness, bool direction )
+{
+    Functor findExtremeByAttComparison( &Object::FindExtremeByAttComparison );
+    Object *element = NULL;
+    ArrayPtrVoid params;
+    params.push_back( attComparison );
+    params.push_back( &element );
+    this->Process( &findExtremeByAttComparison, &params, NULL, NULL, deepness, direction );
+    return element;
+}
+    
 Object* Object::GetChild( int idx )
 {
     if ( (idx < 0) || (idx >= (int)m_children.size()) ) {
@@ -918,7 +929,21 @@ int Object::FindByAttComparison( ArrayPtrVoid *params )
     //LogDebug("Still looking for the object matching the AttComparison...");
     return FUNCTOR_CONTINUE;
 }
-
+    
+int Object::FindExtremeByAttComparison( ArrayPtrVoid *params )
+{
+    // param 0: the type we are looking for
+    // param 1: the pointer to pointer to the Object
+    AttComparison *test = static_cast<AttComparison*>((*params).at(0));
+    Object **element = static_cast<Object**>((*params).at(1));
+    
+    // evaluate by applying the AttComparison operator()
+    if ((*test)(this)) {
+        (*element) = this;
+    }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
     
 int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 {
