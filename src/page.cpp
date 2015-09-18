@@ -14,10 +14,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "bboxdevicecontext.h"
 #include "doc.h"
 #include "system.h"
 #include "view.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -115,6 +117,15 @@ void Page::LayOutHorizontally( )
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetEvenSpacing()) {
+        // Get the longest duration in the piece
+        AttDurExtreme durExtremeComparison(LONGEST);
+        Object *longestDur = this->FindChildExtremeByAttComparison(&durExtremeComparison);
+        if (longestDur) {
+            DurationInterface *interface = dynamic_cast<DurationInterface*>(longestDur);
+            assert(interface);
+            LogDebug("Longest duration is %d", interface->GetActualDur());
+        }
+
         params.clear();
         double previousTime = 0.0;
         int previousXRel = 0;

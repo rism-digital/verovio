@@ -238,6 +238,13 @@ public:
                                      int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
+     * Return the element matching the extreme value with an AttComparison functor
+     * Deepness allow to limit the depth search (EditorialElements are not count)
+     */
+    Object *FindChildExtremeByAttComparison( AttComparison *attComparison,
+                                     int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
+    
+    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to used only in very particular case where the child
      * object cannot be detached straight away. It is typically the case 
@@ -364,6 +371,14 @@ public:
      * param 1: the pointer to pointer to the Object retrieved (if found).
      */
     virtual int FindByAttComparison( ArrayPtrVoid *params );
+
+    /**
+     * Find a Object with the extreme value with a AttComparison functor .
+     * param 0: the pointer to the AttComparsion we are evaluating.
+     * param 1: the pointer to pointer to the Object retrieved (if found).
+     */
+    virtual int FindExtremeByAttComparison( ArrayPtrVoid *params );
+
     
     /**
      * Save the content of and object by calling the appropriate FileOutputStream method
