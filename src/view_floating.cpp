@@ -764,7 +764,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     
     Note *note1 = NULL;
     Note *note2 = NULL;
-    Chord *parentChord = NULL;
+    Chord *parentChord1 = NULL;
     
     bool up = true;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
@@ -780,7 +780,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         return;
     }
     
-    Chord *chordParent1 = note1->IsChordTone();
+    parentChord1 = note1->IsChordTone();
     
     Layer* layer1 = dynamic_cast<Layer*>(note1->GetFirstParent( LAYER ) );
     Layer* layer2 = dynamic_cast<Layer*>(note2->GetFirstParent( LAYER ) );
@@ -794,7 +794,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     
     bool isShortTie = false;
     // shortTie correction cannot be applied for chords
-    if (!chordParent1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) isShortTie = true;
+    if (!parentChord1 && (x2 - x1 < 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))) isShortTie = true;
     
     // the normal case
     if ( spanningType == SPANNING_START_END ) {
@@ -806,8 +806,8 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
             if (note1->HasDots()) {
                 x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * note1->GetDots();
             }
-            else if (chordParent1 && chordParent1->HasDots()) {
-                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * chordParent1->GetDots();
+            else if (parentChord1 && parentChord1->HasDots()) {
+                x1 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * parentChord1->GetDots();
             }
         }
         noteStemDir = note1->GetDrawingStemDir();
@@ -848,9 +848,9 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
     }
     //  the look if in a chord
-    else if (parentChord) {
-        if (parentChord->PositionInChord(note1) < 0) up = false;
-        else if (parentChord->PositionInChord(note1) > 0) up = true;
+    else if (parentChord1) {
+        if (parentChord1->PositionInChord(note1) < 0) up = false;
+        else if (parentChord1->PositionInChord(note1) > 0) up = true;
         // away from the stem if odd number (center note)
         else up = (noteStemDir != STEMDIRECTION_up);
     }
