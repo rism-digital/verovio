@@ -434,7 +434,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (!inChord) DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->GetFermata() != PLACE_NONE) {
-        DrawFermata(dc, element, staff);
+        DrawFermata(dc, element, layer, staff);
     }
 
     if (note->m_embellishment == EMB_TRILL) {
@@ -620,7 +620,7 @@ void View::DrawRest ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
     
     if(rest->GetFermata() != PLACE_NONE) {
-        DrawFermata(dc, element, staff);
+        DrawFermata(dc, element, layer, staff);
     }
 }
     
@@ -1941,12 +1941,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetBrush();
 }
 
-/** Draws a fermata
- rest - the fermata is always above the stavv
- note - for breves and semibreves, only above the staff
-      - for flagged notes, the fermata is on the side of the notehead
- */
-void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff)
+void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
 {
     int x, y;
     int emb_offset = 0; // if there is and embellishment, offset the note up
@@ -1954,50 +1949,57 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff)
     // We move the fermata position of half of the fermata size
     x = element->GetDrawingX() - m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
     
+    data_PLACE place = PLACE_above;
+    if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? PLACE_above : PLACE_above;
+    }
+    
     // First case, notes
-    if (element->Is() == NOTE) {
-        Note *note = dynamic_cast<Note*>(element);
-        assert( note );
-        
-        /*
-        // stem down or semibreve/longa, fermata up!
-        if (!element->m_drawingStemDir && (note->m_dur != DUR_1 || note->m_dur != DUR_BR)) {
-        */
-            // only for up-fermatas, if there is a trill on the same note
-            if (note->m_embellishment)
+    if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
+        // To be fix once m_embellishment is removed
+        if (element->Is() == NOTE)  {
+            Note *note = dynamic_cast<Note*>(element);
+            assert( note );
+            if (note->m_embellishment) {
                 emb_offset = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            
+            }
+        }
+        
+        if (place == PLACE_above) {
             // check that the notehead is in the staff.
-            if ((element->GetDrawingY()) < staff->GetDrawingY())
+            if (element->GetDrawingTop(m_doc, staff->m_drawingStaffSize) < staff->GetDrawingY()) {
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
                 y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
-            else
+            }
+            else {
                 // out of the staff, place the trill above the notehead
-                y = (element->GetDrawingY()) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
-            
-            // draw the up-fermata
+                y = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
+            }
+            // draw the up-fermata - need cue size support
             DrawSmuflCode ( dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false );
-        /*
-        } else { // stem up fermata down
-            
-            // This works as above, only we check that the note head is not
-            // UNDER the staff
-            if ((element->GetDrawingY()) > (staff->GetDrawingY() - m_doc->m_drawingStaffSize.at(staff->m_drawingStaffSize)))
-                // notehead in staff, set  under
-                y = staff->GetDrawingY() - m_doc->m_drawingStaffSize.at(staff->m_drawingStaffSize) - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            else
-                // notehead under staff, set under notehead
-                y = (element->GetDrawingY()) - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            
-            DrawSmuflCode ( dc, x, y, LEIPZIG_FERMATA_DOWN, staff, false );
         }
-        */
+        else {
+            // This works as above, only we check that the note head is not
+            if (element->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) > (staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
+                // notehead in staff, set  under
+                y = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+            else {
+                // notehead under staff, set under notehead
+                y = element->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            }
+            // draw the down-fermata - need cue size support
+            DrawSmuflCode ( dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false );
+        }
     } else if (element->Is() == REST) {
-        // this is a rest
-        // rests for the moment are always in the staff
-        // so just place the fermata above the staff
-        y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawSmuflCode ( dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false );
+        if (place == PLACE_above) {
+            y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            DrawSmuflCode ( dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false );
+        }
+        else {
+            y = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize) - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            DrawSmuflCode ( dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false );
+        }
     }
 }
 

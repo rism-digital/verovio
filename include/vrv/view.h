@@ -238,7 +238,7 @@ protected:
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
-    void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
