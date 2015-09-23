@@ -3,27 +3,27 @@
 ---
 
 body {
-	margin-top: 65px;
+    margin-top: 65px;
 }
 
 .with-footer {
-	margin-bottom: 35px;
+    margin-bottom: 35px;
 }
 
 svg:not(:root){
-	overflow:inherit
+    overflow:inherit
 }
 
 .navbar-brand {
-	padding: 0px 0px;
-	padding-left: 8px;
+    padding: 0px 0px;
+    padding-left: 8px;
 }
 
 .navbar hr {
-	margin: 0px;
-	color: #464646;
-	background-color: #464646;
-	height: 2px;
+    margin: 0px;
+    color: #464646;
+    background-color: #464646;
+    height: 2px;
 }
 
 /* This is a fix for bootstrap 3.1 to override width: auto; */
@@ -36,33 +36,33 @@ svg:not(:root){
 }
 
 hr.panel {
-	margin: 10px 0px;
+    margin: 10px 0px;
 }
 
 .btn-heading {
-	padding: 0px 4px;
-	margin-left: 4px;
+    padding: 0px 4px;
+    margin-left: 4px;
 }
 
 p a {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 
 .sublist-group a {
-	padding: 4px 15px;
+    padding: 4px 15px;
 }
 
 .panel-option {
-	padding: 4px 8px;
+    padding: 4px 8px;
 }
 
 .panel-supported-mei {
-	padding: 8px 8px;
+    padding: 8px 8px;
 }
 
 code.panel-header {
-	background-color: #464646;
-	color: #f9f2f4;
+    background-color: #464646;
+    color: #f9f2f4;
 }
 
 .footer {
@@ -90,19 +90,19 @@ code.panel-header {
 @media print 
 {
     body {
-		margin: 0px;
-		padding: 0px;
-		width:940px;
-	}
-	.panel {
-		padding: 0px;
-		margin: 0px;
-	}
-	.panel-default {
-		border: 0px;
-		padding: 0px;
-		margin: 0 30px;
-	}
+        margin: 0px;
+        padding: 0px;
+        width:940px;
+    }
+    .panel {
+        padding: 0px;
+        margin: 0px;
+    }
+    .panel-default {
+        border: 0px;
+        padding: 0px;
+        margin: 0 30px;
+    }
     #sidebar {
         display: none;
     }
@@ -132,17 +132,17 @@ span.keyboard-rest,
 span.keyboard-dot,
 span.keyboard-barline
 {
-	top: 3px; 
-	height: 18px;
-	margin: 0px !important;
-	left: -4px;
-	width: 14px !important;
+    top: 3px; 
+    height: 18px;
+    margin: 0px !important;
+    left: -4px;
+    width: 14px !important;
 }
 
 table.keyboard {
-	width: 100%;
+    width: 100%;
 }
 td.keyboard {
-	text-align: center;
-	padding: 10px;
+    text-align: center;
+    padding: 10px;
 }

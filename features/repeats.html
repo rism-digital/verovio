@@ -3,7 +3,7 @@
 <h3>Repeats</h3>
 
 <p>
-	Verovio supports <code>&lt;mRpt&gt;</code>. The number on top of each repeat is calculated by Verovio. The <code>@mutli.number</code> in <code>&lt;scoreDef&gt;</code> or <code>&lt;staffDef&gt;</code> can be set to false for not showing the number. (The value of the <code>@mutli.number</code> will be set for the entire score or staff and cannot be redefined.)
+    Verovio supports <code>&lt;mRpt&gt;</code>. The number on top of each repeat is calculated by Verovio. The <code>@mutli.number</code> in <code>&lt;scoreDef&gt;</code> or <code>&lt;staffDef&gt;</code> can be set to false for not showing the number. (The value of the <code>@mutli.number</code> will be set for the entire score or staff and cannot be redefined.)
 </p>
 
 <div id="svg_output-mrpt" style="overflow:auto;"/>
@@ -17,7 +17,7 @@
 <br/>
 
 <p>
-	Verovio also supports repeats of two or more measures, with <code>&lt;mRpt2&gt;</code> and <code>&lt;multiRpt&gt;</code> respectively. With <code>&lt;multiRpt&gt;</code>, the number of measures to be repeted has to be provided in  <code>@num</code>.
+    Verovio also supports repeats of two or more measures, with <code>&lt;mRpt2&gt;</code> and <code>&lt;multiRpt&gt;</code> respectively. With <code>&lt;multiRpt&gt;</code>, the number of measures to be repeted has to be provided in  <code>@num</code>.
 </p>
 
 <div id="svg_output-mrpt2" style="overflow:auto;"/>
@@ -70,35 +70,35 @@
 
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	pageWidth = 1500;
-	spacingStaff = 4;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    pageWidth = 1500;
+    spacingStaff = 4;
     
-	$.get( "{{ site.baseurl }}/examples/features/mrpt.mei" , function( data ) {
-		load_data( data, $('#svg_output-mrpt') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/mrpt2.mei" , function( data ) {
-		load_data( data, $('#svg_output-mrpt2') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/multirpt.mei" , function( data ) {
-		load_data( data, $('#svg_output-multirpt') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/beatrpt1.mei" , function( data ) {
-		load_data( data, $('#svg_output-beatrpt1') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/beatrpt2.mei" , function( data ) {
-		load_data( data, $('#svg_output-beatrpt2') );
-	});
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/mrpt.mei" , function( data ) {
+        load_data( data, $('#svg_output-mrpt') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/mrpt2.mei" , function( data ) {
+        load_data( data, $('#svg_output-mrpt2') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/multirpt.mei" , function( data ) {
+        load_data( data, $('#svg_output-multirpt') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/beatrpt1.mei" , function( data ) {
+        load_data( data, $('#svg_output-beatrpt1') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/beatrpt2.mei" , function( data ) {
+        load_data( data, $('#svg_output-beatrpt2') );
+    });
 //]]>
 </script>
 

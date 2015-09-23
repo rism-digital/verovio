@@ -3,7 +3,7 @@
 <h3>Score definition and changes</h3>
 
 <p>
-	Verovio supports <code>&lt;scoreDef&gt;</code> redefinitions between measures. Any attribute supported by Verovio can be redefined.
+    Verovio supports <code>&lt;scoreDef&gt;</code> redefinitions between measures. Any attribute supported by Verovio can be redefined.
 </p>
 
 <div id="svg_output-1" style="overflow:auto;"/>
@@ -17,7 +17,7 @@
 <br/>
 
 <p>
-	Verovio take into account the <code>@key.sig.showchange</code> and <code>@key.sig.show</code> values which are assumed to be respectively <code>false</code> and <code>true</code> if not specified.
+    Verovio take into account the <code>@key.sig.showchange</code> and <code>@key.sig.show</code> values which are assumed to be respectively <code>false</code> and <code>true</code> if not specified.
 </p>
 
 <div id="svg_output-key-change" style="overflow:auto;"/>
@@ -33,7 +33,7 @@
 <!-- ***************************** -->
 <h4>Clefs</h4>
 <p>
-	Intermediate clef changes can be encoded with <code>&lt;clef&gt;</code> elements.
+    Intermediate clef changes can be encoded with <code>&lt;clef&gt;</code> elements.
 </p>
 
 <div id="svg_output-2" style="overflow:auto;"/>
@@ -47,27 +47,27 @@
 
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	pageWidth = 1500;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
-
-	$.get( "{{ site.baseurl }}/examples/features/scoredef-changes.mei" , function( data ) {
-		load_data( data, $('#svg_output-1') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/key-change.mei" , function( data ) {
-		load_data( data, $('#svg_output-key-change') );
-	});
+    zoom = 40;
+    pageWidth = 1500;
     
-	$.get( "{{ site.baseurl }}/examples/features/clef-changes.mei" , function( data ) {
-		spacingStaff = 4;
-		load_data( data, $('#svg_output-2') );
-	});
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+
+    $.get( "{{ site.baseurl }}/examples/features/scoredef-changes.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/key-change.mei" , function( data ) {
+        load_data( data, $('#svg_output-key-change') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/clef-changes.mei" , function( data ) {
+        spacingStaff = 4;
+        load_data( data, $('#svg_output-2') );
+    });
 //]]>
 </script>
 

@@ -28,39 +28,39 @@ Verovio includes the Leipzig font, its own SMuFL-compliant music font.
                     Once included, a font can be selected by setting the font option accordingly. For example, the Bravura font can be selected with the <code>--font=Bravura</code> option in the command-line tool or by adding <code>{ font: "Bravura" }</code> in the JavaScript toolkit options.
                 </p>
                 
-				<div class="row">
+                <div class="row">
                     <div class="col-sm-3 text-center">
-    					<table align="center">
-    						<tr>
-    							<td>
-    								<a href="http://www.smufl.org" target="_blank">
-    									<img src="{{ site.baseurl }}/images/smufl.png" style="padding: 30px 0px;" class="img-responsive"/>
-    								</a>
-    							</td>
-    						</tr>
-    					</table>
+                        <table align="center">
+                            <tr>
+                                <td>
+                                    <a href="http://www.smufl.org" target="_blank">
+                                        <img src="{{ site.baseurl }}/images/smufl.png" style="padding: 30px 0px;" class="img-responsive"/>
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                     <div class="col-sm-9 text-center">
-    					<table align="center">
-    						<tr>
-    							<td>
-    								<img src="{{ site.baseurl }}/examples/fonts/Leipzig.png" style="padding: 10px 20px;" class="img-responsive"/>
-    							</td>
-    							<td>
-    								<img src="{{ site.baseurl }}/examples/fonts/Bravura.png" style="padding: 10px 20px;" class="img-responsive"/>
-    							</td>
-    							<td>
-    								<img src="{{ site.baseurl }}/examples/fonts/Gootville.png" style="padding: 10px 20px;" class="img-responsive"/>
-    							</td>
-    						</tr>
-    						<tr>
-    							<td>Leipzig</td>
-    							<td>Bravura</td>
-    							<td>Gootville</td>
-    						</tr>
-    					</table>
+                        <table align="center">
+                            <tr>
+                                <td>
+                                    <img src="{{ site.baseurl }}/examples/fonts/Leipzig.png" style="padding: 10px 20px;" class="img-responsive"/>
+                                </td>
+                                <td>
+                                    <img src="{{ site.baseurl }}/examples/fonts/Bravura.png" style="padding: 10px 20px;" class="img-responsive"/>
+                                </td>
+                                <td>
+                                    <img src="{{ site.baseurl }}/examples/fonts/Gootville.png" style="padding: 10px 20px;" class="img-responsive"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Leipzig</td>
+                                <td>Bravura</td>
+                                <td>Gootville</td>
+                            </tr>
+                        </table>
                     </div>
-				</div>
+                </div>
                 
             </div>
         </div>
@@ -95,17 +95,17 @@ Verovio includes the Leipzig font, its own SMuFL-compliant music font.
         output_div.html(svg);
     }
     
-	function getParameterByName(name) {
-	    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-	    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-	}
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
 
-	$( document ).ready(function() {
-		
-		var font = getParameterByName("font");
-		if (!font) {
-			font = "Leipzig";
-		}
+    $( document ).ready(function() {
+        
+        var font = getParameterByName("font");
+        if (!font) {
+            font = "Leipzig";
+        }
         $('#font_header').html(font);
         $( "#link-" + font ).addClass( "active" );
         

@@ -4,25 +4,25 @@
 
 
 <p>
-	Verovio supports basic cross-staff notation with displacement encoding. This means that the cross-staff elements (i.e., notes) have to be encoded in the logical staff with an additional <code>@staff</code> attribute indicating the cross-staff position. Currently, Verovio does not support the <code>@layer</code> attribute and expects that the same layer number to be present on the cross-staff. Clefs changes in the cross-staff are taken into account.
+    Verovio supports basic cross-staff notation with displacement encoding. This means that the cross-staff elements (i.e., notes) have to be encoded in the logical staff with an additional <code>@staff</code> attribute indicating the cross-staff position. Currently, Verovio does not support the <code>@layer</code> attribute and expects that the same layer number to be present on the cross-staff. Clefs changes in the cross-staff are taken into account.
 </p>
 
 <div id="svg_output" style="overflow:auto;"/>
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	border = 35;
-	pageWidth = 1000;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    border = 35;
+    pageWidth = 1000;
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
 
-	$.get( "{{ site.baseurl }}/examples/features/cross-staff.mei" , function( data ) {
-		load_data( data, $('#svg_output') );
-	});
+    $.get( "{{ site.baseurl }}/examples/features/cross-staff.mei" , function( data ) {
+        load_data( data, $('#svg_output') );
+    });
 //]]>
 </script>
 

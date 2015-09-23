@@ -27,10 +27,10 @@
                 <date>2011</date>
                 <availability>
                     <useRestrict>This encoding is in the public domain. However, the sources used to
-						create it may be under copyright. We believe their use by the MEI project
-						for educational and research purposes is covered by the Fair Use doctrine.
-						However, we will remove any material from the project archive when requested
-						to do so by the copyright owner.</useRestrict>
+                        create it may be under copyright. We believe their use by the MEI project
+                        for educational and research purposes is covered by the Fair Use doctrine.
+                        However, we will remove any material from the project archive when requested
+                        to do so by the copyright owner.</useRestrict>
                 </availability>
             </pubStmt>
             <seriesStmt>
@@ -38,7 +38,7 @@
                 <respStmt>
                     <corpName role="publisher">MEI Project</corpName>
                     <corpName role="funder" dbkey="2007744-0" authURI="http://d-nb.info/gnd" authority="GND">German Research
-						Foundation<address>
+                        Foundation<address>
                             <addrLine>Kennedyallee 40</addrLine>
                             <addrLine>
                                 <geogName dbkey="7005090" authURI="www.getty.edu/research/tools/vocabularies/tgn" authority="TGN">Bonn</geogName>
@@ -49,7 +49,7 @@
                         </address>
                     </corpName>
                     <corpName role="funder" dbkey="18183-3" authURI="http://d-nb.info/gnd/18183-3" authority="Deutsche Nationalbibliothek">National Endowment for the
-						Humanities<address>
+                        Humanities<address>
                             <addrLine>1100 Pennsylvania Avenue N.W.</addrLine>
                             <addrLine>
                                 <geogName dbkey="7013962" authURI="www.getty.edu/research/tools/vocabularies/tgn" authority="TGN">Washington, DC</geogName> 20004</addrLine>
@@ -71,7 +71,7 @@
                         <title type="subtitle">à 2 Claviere è Pedale</title>
                         <respStmt>
                             <persName role="composer" dbkey="123281954" authURI="http://d-nb.info/gnd" authority="GND">Johann Ludwig
-								Krebs</persName>
+                                Krebs</persName>
                             <persName role="editor">Jens Kluge</persName>
                         </respStmt>
                     </titleStmt>

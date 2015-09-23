@@ -4,25 +4,25 @@
 
 
 <p>
-	Verovio supports the score parameters defined <code>&lt;scoreDef&gt;</code>, <code>&lt;staffGrp&gt;</code> and <code>&lt;staffDef&gt;</code>elements with some of their attributes. Vevorio follows the standard MEI practice for score parameters inheritance: <code>&lt;staffDef&gt;</code> elements inherits parameters defined in the parent <code>&lt;scoreDef&gt;</code> unless if they are overriden. Verovio also supports various types of barline for the <code>&lt;measure&gt;</code> elements.
+    Verovio supports the score parameters defined <code>&lt;scoreDef&gt;</code>, <code>&lt;staffGrp&gt;</code> and <code>&lt;staffDef&gt;</code>elements with some of their attributes. Vevorio follows the standard MEI practice for score parameters inheritance: <code>&lt;staffDef&gt;</code> elements inherits parameters defined in the parent <code>&lt;scoreDef&gt;</code> unless if they are overriden. Verovio also supports various types of barline for the <code>&lt;measure&gt;</code> elements.
 </p>
 
 <div id="svg_output" style="overflow:auto;"/>
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	border = 35;
-	pageWidth = 1000;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    border = 35;
+    pageWidth = 1000;
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
 
-	$.get( "{{ site.baseurl }}/examples/features/score.mei" , function( data ) {
-		load_data( data, $('#svg_output') );
-	});
+    $.get( "{{ site.baseurl }}/examples/features/score.mei" , function( data ) {
+        load_data( data, $('#svg_output') );
+    });
 //]]>
 </script>
 

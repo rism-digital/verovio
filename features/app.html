@@ -4,7 +4,7 @@
 
 
 <p>
-	Verovio supports basic <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the <code>--rdg-xpath-query=QUERY</code> option (<code>rdgXPathQuery</code> with the JavaScript toolkit).
+    Verovio supports basic <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the <code>--rdg-xpath-query=QUERY</code> option (<code>rdgXPathQuery</code> with the JavaScript toolkit).
 </p>
 
 <p>
@@ -23,28 +23,28 @@
 <div id="svg_output-3" style="overflow:auto;"/>
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	pageWidth = 1450;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    pageWidth = 1450;
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
 
-	$.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
-		load_data( data, $('#svg_output-1') );
-	});
+    $.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
     
-	$.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
+    $.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
         appXPath = "./rdg[contains(@source, '1570')]"
-		load_data( data, $('#svg_output-2') );
-	});
+        load_data( data, $('#svg_output-2') );
+    });
     
-	$.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
+    $.get( "{{ site.baseurl }}/examples/features/app.mei" , function( data ) {
         appXPath = "./rdg[contains(@label, 'original')]"
-		load_data( data, $('#svg_output-3') );
-	});
+        load_data( data, $('#svg_output-3') );
+    });
 //]]>
 </script>
 
@@ -113,38 +113,38 @@
 <div class="row">
     <div class="col-sm-4">
         <table>
-			<tr>
-				<td><code>@source="src1"</code></td>
+            <tr>
+                <td><code>@source="src1"</code></td>
             </tr>
             <tr>
-				<td>
+                <td>
                     <div id="svg_output-4-1" style="overflow:auto;"/>
-				</td>
-			</tr>
+                </td>
+            </tr>
         </table>
     </div>
     <div class="col-sm-4">
         <table>
-			<tr>
-				<td><code>@source="src2"</code></td>
+            <tr>
+                <td><code>@source="src2"</code></td>
             </tr>
             <tr>
-				<td>
+                <td>
                     <div id="svg_output-4-2" style="overflow:auto;"/>
-				</td>
-			</tr>
+                </td>
+            </tr>
         </table>
     </div>
     <div class="col-sm-4">
         <table>
-			<tr>
-				<td><code>@source="src3"</code></td>
+            <tr>
+                <td><code>@source="src3"</code></td>
             </tr>
             <tr>
-				<td>
+                <td>
                     <div id="svg_output-4-3" style="overflow:auto;"/>
-				</td>
-			</tr>
+                </td>
+            </tr>
         </table>
     </div>
 </div>
@@ -160,31 +160,31 @@
 
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	pageWidth = 1450;
-	spacingStaff = 3;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    pageWidth = 1450;
+    spacingStaff = 3;
     
-	$.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
         appXPath = "";
         noLayout = 1;
-		load_data( data, $('#svg_output-4-1') );
-	});;
-	$.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
+        load_data( data, $('#svg_output-4-1') );
+    });;
+    $.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
         appXPath = "./rdg[contains(@source, 'src2')]";
         noLayout = 1;
-		load_data( data, $('#svg_output-4-2') );
-	});;
-	$.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
+        load_data( data, $('#svg_output-4-2') );
+    });;
+    $.get( "{{ site.baseurl }}/examples/features/app-nested.mei" , function( data ) {
         appXPath = "./rdg[contains(@source, 'src3')]";
         noLayout = 1;
-		load_data( data, $('#svg_output-4-3') );
-	});;
+        load_data( data, $('#svg_output-4-3') );
+    });;
 //]]>
 </script>
 

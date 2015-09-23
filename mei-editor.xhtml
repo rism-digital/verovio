@@ -40,11 +40,11 @@ context-menus:
 <script type="text/javascript">
 //<![CDATA[
     
-	var vrvToolkit = new verovio.toolkit();
-	var page = 1;
-	var zoom = 50;
-	var pageHeight = 2970;
-	var pageWidth = 2100;
+    var vrvToolkit = new verovio.toolkit();
+    var page = 1;
+    var zoom = 50;
+    var pageHeight = 2970;
+    var pageWidth = 2100;
     var show_xml = false;
     var font = 'Leipzig';
     var drag_id = new Array();
@@ -56,44 +56,44 @@ context-menus:
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-		border = 50;
-		options = JSON.stringify({
-					inputFormat: 'mei',
-					pageHeight: pageHeight,
-					pageWidth: pageWidth,
-					border: border,
-					scale: zoom,
+        border = 50;
+        options = JSON.stringify({
+                    inputFormat: 'mei',
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    border: border,
+                    scale: zoom,
                     adjustPageHeight: 1,
-					ignoreLayout: 1,
+                    ignoreLayout: 1,
                     font: font
-				});
-		vrvToolkit.setOptions( options );
+                });
+        vrvToolkit.setOptions( options );
     }
-	
-	function load_data(data) {
-		set_options();
-		vrvToolkit.loadData(data);
-		page = 1;
-		load_page( true );
-	}
+    
+    function load_data(data) {
+        set_options();
+        vrvToolkit.loadData(data);
+        page = 1;
+        load_page( true );
+    }
 
-	function load_page( init_overlay ) {
+    function load_page( init_overlay ) {
         if (show_xml) {
             $('#show_notation').trigger("click");
         }
-		svg = vrvToolkit.renderPage(page, "");
-		$("#svg_output").html(svg);
+        svg = vrvToolkit.renderPage(page, "");
+        $("#svg_output").html(svg);
         //d3.select("#svg_output").select("svg").selectAll(".note").on("mousedown", select);
         //d3.select("#svg_output").selectAll("*").style("opacity", "0.0");
-		adjust_page_height();
+        adjust_page_height();
         if ( init_overlay ) {
             create_overlay( 0 );   
         }
-	};
+    };
     
     function reload_page( id ) {
-		vrvToolkit.redoLayout();
-	    var elementPage = vrvToolkit.getPageWithElement( id );
+        vrvToolkit.redoLayout();
+        var elementPage = vrvToolkit.getPageWithElement( id );
         if (elementPage == 0) {
             console.log( "ID not found" );
             return;
@@ -157,10 +157,10 @@ context-menus:
         }
         var note = midiBase + (parseInt(attr.oct) + 1) * 12;
         //console.log( note );
-		var velocity = 127; // how hard the note hits
-		MIDI.setVolume(0, 127);
-		MIDI.noteOn(0, note, velocity, 0);
-		MIDI.noteOff(0, note, 0.5);
+        var velocity = 127; // how hard the note hits
+        MIDI.setVolume(0, 127);
+        MIDI.noteOn(0, note, velocity, 0);
+        MIDI.noteOff(0, note, 0.5);
     };
     
     function toggle_XML( show ) {
@@ -169,7 +169,7 @@ context-menus:
         }
         show_xml = show;
         if (show_xml) { 
-        	var mei = vrvToolkit.getMEI( page );
+            var mei = vrvToolkit.getMEI( page );
             $("#xml_output").text(mei);
             //prettyPrint is just too slow...
             //$("#xml_output").removeClass("prettyprinted");
@@ -183,66 +183,66 @@ context-menus:
         }
     };
 
-	function next_page() {
-		if (page >= vrvToolkit.getPageCount()) {
-			return;
-		}
-		page = page + 1;
-		load_page( true );
-	};
+    function next_page() {
+        if (page >= vrvToolkit.getPageCount()) {
+            return;
+        }
+        page = page + 1;
+        load_page( true );
+    };
 
-	function prev_page() {
-		if (page <= 1) {
-			return;
-		}
-		page = page - 1;
-		load_page( true );
-	};
+    function prev_page() {
+        if (page <= 1) {
+            return;
+        }
+        page = page - 1;
+        load_page( true );
+    };
 
-	function first_page() {
-		page = 1;
-		load_page( true );
-	};
-	
-	function last_page() {
-		page = vrvToolkit.getPageCount();
-		load_page( true );
-	};
+    function first_page() {
+        page = 1;
+        load_page( true );
+    };
+    
+    function last_page() {
+        page = vrvToolkit.getPageCount();
+        load_page( true );
+    };
 
-	function apply_zoom() {
-		set_options();
+    function apply_zoom() {
+        set_options();
         reset_overlay();
-		vrvToolkit.redoLayout();
-		page = 1;
-		load_page( true );
-	}
+        vrvToolkit.redoLayout();
+        page = 1;
+        load_page( true );
+    }
 
-	function zoom_out() {
-		if (zoom < 20) {
-			return;
-		}
-		zoom = zoom / 2;
-		apply_zoom();
-	}
+    function zoom_out() {
+        if (zoom < 20) {
+            return;
+        }
+        zoom = zoom / 2;
+        apply_zoom();
+    }
 
-	function zoom_in() {
-		if (zoom > 80) {
-			return;
-		}
-		zoom = zoom * 2;
-		apply_zoom();
-	}
-	
-	function adjust_page_height() {
-		// adjust the height of the panel
-		if ( $('#svg_panel svg') ) {
+    function zoom_in() {
+        if (zoom > 80) {
+            return;
+        }
+        zoom = zoom * 2;
+        apply_zoom();
+    }
+    
+    function adjust_page_height() {
+        // adjust the height of the panel
+        if ( $('#svg_panel svg') ) {
             zoomed_height = pageHeight * zoom / 100;
             if ( zoomed_height < $('#svg_panel svg').height() ) {
                 zoomed_height = $('#svg_panel svg').height();
             }
-			$('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar	
-		}
-	}
+            $('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar    
+        }
+    }
     
     function highlight_id( div, id ) {
         d3.select( "#" + div ).select( "#" + id ).style("fill", "#ff0000").style("stroke", "#ff0000").style("fill-opacity", "1.0")
@@ -250,10 +250,10 @@ context-menus:
         
     }
     
-	function set_font( fontname ) {
-		font = fontname
-		apply_zoom();
-	}
+    function set_font( fontname ) {
+        font = fontname
+        apply_zoom();
+    }
     
     /*
     function hide_id( div, id ) {
@@ -266,9 +266,9 @@ context-menus:
         if (drag_id.length == 0) {
             return;
         }
-		editorAction = JSON.stringify({ action: 'set', param: { elementId: drag_id[0],
+        editorAction = JSON.stringify({ action: 'set', param: { elementId: drag_id[0],
             attrType: attr, attrValue: value }   
-	    });
+        });
         var res = vrvToolkit.edit( editorAction );
         reload_page( drag_id[0] );  
     };
@@ -278,9 +278,9 @@ context-menus:
             console.log("Select two (different) notes!")
             return;
         }
-		editorAction = JSON.stringify({ action: 'insert', param: { elementType: elementType,
+        editorAction = JSON.stringify({ action: 'insert', param: { elementType: elementType,
             startid: drag_id[1], endid: drag_id[0] }   
-	    });
+        });
         var res = vrvToolkit.edit( editorAction );
         reload_page( drag_id[0] );  
     };
@@ -305,10 +305,10 @@ context-menus:
         this.__origin__ = [ d3.event.x,  d3.event.y];
         // we use this to distinct from click (selection)
         dragging = true;
-		editorAction = JSON.stringify({ action: 'drag', param: { elementId: drag_id[0], 
+        editorAction = JSON.stringify({ action: 'drag', param: { elementId: drag_id[0], 
                         x: parseInt(drag_start[0] + this.__origin__[0]),
                         y: parseInt(drag_start[1] + this.__origin__[1]) }   
-	    });
+        });
         play_note( drag_id[0], true );
         // do something with the error...
         var res = vrvToolkit.edit( editorAction );
@@ -320,15 +320,15 @@ context-menus:
         if (dragging) {
             delete this.__origin__; 
             reset_overlay();
-    		/*
+            /*
             editorAction = JSON.stringify({
-    					action: 'set',
+                        action: 'set',
                         param: { 
                             elementId: drag_id[0], 
                             attrType: "accid",
                             attrValue: "s" 
                         }   
-    				});
+                    });
             // do something with the error...
             var res = vrvToolkit.edit( editorAction );
             */
@@ -376,27 +376,27 @@ context-menus:
         </label>
     </div>
     <div class="btn-group" role="group">
-			<button onclick="zoom_out()" class="btn btn-sm btn-default" type="button">
-				<span class="glyphicon glyphicon-zoom-out"/>
-			</button>
-			<button onclick="zoom_in()" class="btn btn-sm  btn-default" type="button">
-				<span class="glyphicon glyphicon-zoom-in"/>
-			</button>
-	</div>
+            <button onclick="zoom_out()" class="btn btn-sm btn-default" type="button">
+                <span class="glyphicon glyphicon-zoom-out"/>
+            </button>
+            <button onclick="zoom_in()" class="btn btn-sm  btn-default" type="button">
+                <span class="glyphicon glyphicon-zoom-in"/>
+            </button>
+    </div>
     <div class="btn-group" role="group">
-		<button onclick="first_page()" class="btn btn-sm btn-default" type="button">
-			<span class="glyphicon glyphicon-fast-backward"/>
-		</button>
-		<button onclick="prev_page()" class="btn btn-sm btn-default" type="button">
-			<span class="glyphicon glyphicon-backward"/>
-		</button>
-		<button onclick="next_page()" class="btn btn-sm btn-default" type="button">
-			<span class="glyphicon glyphicon-forward"/>
-		</button>
-		<button onclick="last_page()" class="btn btn-sm btn-default" type="button">
-			<span class="glyphicon glyphicon-fast-forward"/>
-		</button>
-	</div>
+        <button onclick="first_page()" class="btn btn-sm btn-default" type="button">
+            <span class="glyphicon glyphicon-fast-backward"/>
+        </button>
+        <button onclick="prev_page()" class="btn btn-sm btn-default" type="button">
+            <span class="glyphicon glyphicon-backward"/>
+        </button>
+        <button onclick="next_page()" class="btn btn-sm btn-default" type="button">
+            <span class="glyphicon glyphicon-forward"/>
+        </button>
+        <button onclick="last_page()" class="btn btn-sm btn-default" type="button">
+            <span class="glyphicon glyphicon-fast-forward"/>
+        </button>
+    </div>
     <div class="btn-group" data-toggle="buttons">
         <label class="btn btn-default btn-sm  active">
             <input id="mute" type="checkbox" name="mute" value="mude" checked="true"/>
@@ -406,7 +406,7 @@ context-menus:
 </div>
 
 <div id="svg_panel" style="background-color: #fff;">
-	<div id="svg_output" style="overflow: hidden; z-index: 1; position:absolute;" />
+    <div id="svg_output" style="overflow: hidden; z-index: 1; position:absolute;" />
     <div id="svg_overlay" style="overflow: hidden; z-index: 2; position:absolute;" data-toggle="context" data-target="#context-menu"/>
 </div>
 <div id="xml_panel" style="background-color: #fff; display: none;">
@@ -416,67 +416,67 @@ context-menus:
 
 <!-- sidebar -->
 <div class="sidebar-offcanvas" id="sidebar" role="navigation">
-	<div class="sidebar-panel">
-		<div class="row">
-			<div class="col-xs-12">
-				<h4>Examples</h4>
-			</div>
-		</div>
-		<div id="downloads_panel_body">
-			<div class="row">
-				<div class="col-md-12">
-					{% for d in page.downloads %}
-					<p><a href="{{ site.baseurl }}/{{ page.name }}?examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
-						 {{ d.description }}
-					 </p>
-					{% endfor %}
-				</div>
-				<!-- /.col-md-6 -->
-			</div>
-			<!-- /.row -->
-		</div>
-	</div>
+    <div class="sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Examples</h4>
+            </div>
+        </div>
+        <div id="downloads_panel_body">
+            <div class="row">
+                <div class="col-md-12">
+                    {% for d in page.downloads %}
+                    <p><a href="{{ site.baseurl }}/{{ page.name }}?examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+                         {{ d.description }}
+                     </p>
+                    {% endfor %}
+                </div>
+                <!-- /.col-md-6 -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
 </div>
 
 <div id="context-menu">
     <ul class="dropdown-menu" role="menu">
-	    {% for d in page.context-menus %}
+        {% for d in page.context-menus %}
         {% if d.divider  %}<li class="divider"></li>
         {% else %}
-	    <li><a class="ct-menu-{{ d.class }}" tabindex="-1" href="#" onclick="{{ d.action}}; return false;">{% if d.icon %}<span class="glyphicon {{ d.icon }}"/>  {% endif %}{{ d.name }}</a></li>
+        <li><a class="ct-menu-{{ d.class }}" tabindex="-1" href="#" onclick="{{ d.action}}; return false;">{% if d.icon %}<span class="glyphicon {{ d.icon }}"/>  {% endif %}{{ d.name }}</a></li>
         {% endif %}
-	    {% endfor %}
+        {% endfor %}
     </ul>
 </div>
 
 <script type="text/javascript">
 //<![CDATA[
-	$( document ).ready(function() {
-		
-		$(window).keyup(function(event){
-			// We need to make sure not to capture event on text fields
-			if ( $(event.target).hasClass('form-control') ) {
-				return;
-			}
-			if ( event.ctrlKey && (event.keyCode == 37) ) {
-				first_page();
-			}
-			else if ( event.keyCode == 37 ) {
-				prev_page();
-			}
-			else if ( event.ctrlKey && (event.keyCode == 39) ) {
-				last_page();
-			}
-			else if ( event.keyCode == 39 ) {
-				next_page();
-			}
-			else if ( event.keyCode == 107 ) {
-				zoom_in();
-			}
-			else if ( event.keyCode == 109 ) {
-				zoom_out();
-			}
-		});
+    $( document ).ready(function() {
+        
+        $(window).keyup(function(event){
+            // We need to make sure not to capture event on text fields
+            if ( $(event.target).hasClass('form-control') ) {
+                return;
+            }
+            if ( event.ctrlKey && (event.keyCode == 37) ) {
+                first_page();
+            }
+            else if ( event.keyCode == 37 ) {
+                prev_page();
+            }
+            else if ( event.ctrlKey && (event.keyCode == 39) ) {
+                last_page();
+            }
+            else if ( event.keyCode == 39 ) {
+                next_page();
+            }
+            else if ( event.keyCode == 107 ) {
+                zoom_in();
+            }
+            else if ( event.keyCode == 109 ) {
+                zoom_out();
+            }
+        });
         
         $(window).resize(function(){
             apply_zoom();
@@ -506,28 +506,28 @@ context-menus:
                 return true;
             }
           });
-		
-      	MIDI.loadPlugin({
-      		soundfontUrl: "{{ site.baseurl }}/soundfont/",
-      		instrument: "acoustic_grand_piano",
-      		callback: function() {
-      		}
-      	});
         
-		// Adjust the size of the svg_output and the zoom according to the div (screen) size
-		width = $('#svg_panel').width();
-		zoom = Math.min( Math.floor( 100 * width / 2100 ), 40 );
-	
-		// Load the default file or the file passed in the URL
-		var file = location.search.substring(1);
+          MIDI.loadPlugin({
+              soundfontUrl: "{{ site.baseurl }}/soundfont/",
+              instrument: "acoustic_grand_piano",
+              callback: function() {
+              }
+          });
+        
+        // Adjust the size of the svg_output and the zoom according to the div (screen) size
+        width = $('#svg_panel').width();
+        zoom = Math.min( Math.floor( 100 * width / 2100 ), 40 );
+    
+        // Load the default file or the file passed in the URL
+        var file = location.search.substring(1);
         console.log( file );
-		if (file.length == 0) {
+        if (file.length == 0) {
             file = "examples/downloads/Krebs_Trio_Eb_2.mei";
         }
-		$( "#toggle_options" ).click();
-		$.get( file , function( data ) {
-			load_data( data );
-		}, 'text');
-	});
+        $( "#toggle_options" ).click();
+        $.get( file , function( data ) {
+            load_data( data );
+        }, 'text');
+    });
 //]]>
 </script>

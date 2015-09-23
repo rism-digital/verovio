@@ -6,70 +6,70 @@ active: download
 ---
 
 <div class="row">
-	
-	<div class="col-md-7">
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<h4>Building the command-line tool</h4>
-				<p>
-					To build the command-line tool with CMake, run:
-				</p>
+    
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Building the command-line tool</h4>
+                <p>
+                    To build the command-line tool with CMake, run:
+                </p>
 {% highlight bash %}
 $ cd tools
 $ cmake .
 $ make
 $ sudo make install
 {% endhighlight %}
-				<p>
-					For seeing the command-line options, run:
-				</p>
-				{% highlight bash %}$ ./verovio --help{% endhighlight %}
-				
-				<p>
-					For building it without Plain and Easy support (without <code>regex.h</code>), run:
-				</p>
+                <p>
+                    For seeing the command-line options, run:
+                </p>
+                {% highlight bash %}$ ./verovio --help{% endhighlight %}
+                
+                <p>
+                    For building it without Plain and Easy support (without <code>regex.h</code>), run:
+                </p>
 
 {% highlight bash %}
 $ cmake . -DNO_PAE_SUPPORT=OFF
 {% endhighlight %}
 
-				<h5>Building with XCode</h5>
-				<p>
-					For OS X users, there is also an XCode 4 project in the Verovio root directory.
-				</p>
-			</div>
-		</div>
-		
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<h4>Building the JavaScript toolkit</h4>
-				<p>
-					To build the JavaScript toolkit you need to have the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> compiler installed on your machine. Then run:
-				</p>
+                <h5>Building with XCode</h5>
+                <p>
+                    For OS X users, there is also an XCode 4 project in the Verovio root directory.
+                </p>
+            </div>
+        </div>
+        
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Building the JavaScript toolkit</h4>
+                <p>
+                    To build the JavaScript toolkit you need to have the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> compiler installed on your machine. Then run:
+                </p>
 {% highlight bash %}
 $ cd emscripten
 $ ./build.sh
 {% endhighlight %}
-				<p>
-					The toolkit will be written in:
-				</p>
-				{% highlight bash %}./emscripten/build/verovio-toolkit.js{% endhighlight %}
-			</div>
-		</div>
-		
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<h4>Building the Python toolkit</h4>
-				<p>
-					To build the Python toolkit you need to have swig and swig-python installed on your machine (see <a href="http://www.swigg.org" target="_blank">SWIG</a>) and the Python distutils package. Then, to build it in-place, run:
-				</p>
+                <p>
+                    The toolkit will be written in:
+                </p>
+                {% highlight bash %}./emscripten/build/verovio-toolkit.js{% endhighlight %}
+            </div>
+        </div>
+        
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Building the Python toolkit</h4>
+                <p>
+                    To build the Python toolkit you need to have swig and swig-python installed on your machine (see <a href="http://www.swigg.org" target="_blank">SWIG</a>) and the Python distutils package. Then, to build it in-place, run:
+                </p>
 {% highlight bash %}
 $ cd python
 $ python setup.py build_ext --inplace
 {% endhighlight %}
-				<p>
-					If you want to install it, run:
-				</p>
+                <p>
+                    If you want to install it, run:
+                </p>
 
 {% highlight bash %}
 $ cd python
@@ -77,54 +77,66 @@ $ python setup.py build_ext
 $ sudo python setup.py install
 {% endhighlight %}
 
-				<p>
-					For building it without Plain and Easy support (without <code>regex.h</code>), run:
-				</p>
+                <p>
+                    For building it without Plain and Easy support (without <code>regex.h</code>), run:
+                </p>
 
 {% highlight bash %}
 $ python setup.py build_ext --inplace --define NO_PAE_SUPPORT
 {% endhighlight %}
 
-			</div>
-		</div>
+            </div>
+        </div>
 
-	</div>
-	
-	<div class="col-md-5">
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<h4>Source code</h4>
-				<p>
-					Verovio source code is available on GitHub at <a href="https://github.com/rism-ch/verovio">https://github.com/rism-ch/verovio</a> 
-				</p>
-				<p>
-					To obtain the current version (master), run:
-				</p>
-				{% highlight bash %}$ git clone https://github.com/rism-ch/verovio.git -b master verovio{% endhighlight %}
-			</div>
-		</div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h4>Source code</h4>
+                <p>
+                    Verovio source code is available on GitHub at <a href="https://github.com/rism-ch/verovio">https://github.com/rism-ch/verovio</a> 
+                </p>
+                <p>
+                    To obtain the current version (master), run:
+                </p>
+                {% highlight bash %}$ git clone https://github.com/rism-ch/verovio.git -b master verovio{% endhighlight %}
+            </div>
+        </div>
 
-		<div class="panel panel-default">
-			<div class="panel-body">
-				
-				<h4>JavaScript toolkit</h4>
-				<p>
-					The  GitHub repository also provides a compiled version of the JavaScript toolkit for each release at <a href="https://github.com/rism-ch/verovio/releases">https://github.com/rism-ch/verovio/releases</a> 
-				</p>
-				<p>
-					Instructions for using the JavaScript toolkit are given on the <a href="{{ site.baseurl }}/javascript.xhtml">toolkit page</a>.
-				</p>
-			</div>
-		</div>	
-		
-	</div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                
+                <h4>JavaScript toolkit</h4>
+                <p>
+                    The  GitHub repository also provides a compiled version of the JavaScript toolkit for each release at <a href="https://github.com/rism-ch/verovio/releases">https://github.com/rism-ch/verovio/releases</a> 
+                </p>
+                <p>
+                    Instructions for using the JavaScript toolkit are given on the <a href="{{ site.baseurl }}/javascript.xhtml">toolkit page</a>.
+                </p>
+                <p>
+                    The latest release is always available from:
+                </p>
+                {% highlight bash %}http://www.verovio.org/javascript/lastest/verovio-toolkit.js{% endhighlight %}
+                <p>
+                    The latest development version is available from:
+                </p>
+                {% highlight bash %}http://www.verovio.org/javascript/develop/verovio-toolkit.js{% endhighlight %}
+                <p>
+                    Previous releases are available from their corresponding directory, e.g.:
+                </p>
+                {% highlight bash %}http://www.verovio.org/javascript/0.9.9/verovio-toolkit.js{% endhighlight %}
+            </div>
+        </div>    
+        
+    </div>
 
 </div>
 
 <script type="text/javascript">
 //<![CDATA[
-	$( document ).ready(function() {
+    $( document ).ready(function() {
 
-	});
+    });
 //]]>
 </script>

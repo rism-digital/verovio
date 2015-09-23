@@ -38,206 +38,206 @@ downloads:
 
 <script type="text/javascript">
 //<![CDATA[
-	var vrvToolkit = new verovio.toolkit();
-	var page = 1;
-	var zoom = 40;
-	var pageHeight = 2970;
-	var pageWidth = 2100;
-	var swipe_pages = false;
-	var log = false;
+    var vrvToolkit = new verovio.toolkit();
+    var page = 1;
+    var zoom = 40;
+    var pageHeight = 2970;
+    var pageWidth = 2100;
+    var swipe_pages = false;
+    var log = false;
     
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
-		border = 50;
-		options = JSON.stringify({
-					inputFormat: 'mei',
-					pageHeight: pageHeight,
-					pageWidth: pageWidth,
-					border: border,
-					scale: zoom,
+        border = 50;
+        options = JSON.stringify({
+                    inputFormat: 'mei',
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    border: border,
+                    scale: zoom,
                     adjustPageHeight: 1,
-					ignoreLayout: 1
-				});
-		//console.log( options );
-		vrvToolkit.setOptions( options );
+                    ignoreLayout: 1
+                });
+        //console.log( options );
+        vrvToolkit.setOptions( options );
     }
     
-	function upload_file() {
-		
-		$('#submit-btn').popover('hide');
-		var f = $("#mei_files").prop('files')[0];
-		var reader = new FileReader();
-
-		// Closure to capture the file information.
-		reader.onload = (function(theFile) {
-			return function(e) {
-                $('.row-offcanvas').toggleClass('active');
-				load_data(e.target.result);
-			};
-		})(f);
-
-		// Read in the image file as a data URL.
-		reader.readAsText(f);
-	};
-	
-	function load_data(data) {
-		set_options();
+    function upload_file() {
         
-		console.time("loading");
-		vrvToolkit.loadData(data);
-		console.timeEnd("loading");
-		
-		if (log) {
-			str = vrvToolkit.getLog();
-			$("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
-		}
+        $('#submit-btn').popover('hide');
+        var f = $("#mei_files").prop('files')[0];
+        var reader = new FileReader();
 
-		$("#total_text").html(vrvToolkit.getPageCount());
-		page = 1;
-		load_page();
-	}
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+            return function(e) {
+                $('.row-offcanvas').toggleClass('active');
+                load_data(e.target.result);
+            };
+        })(f);
 
-	function load_page() {
-		$("#jump_text").val(page);
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+    };
+    
+    function load_data(data) {
+        set_options();
+        
+        console.time("loading");
+        vrvToolkit.loadData(data);
+        console.timeEnd("loading");
+        
+        if (log) {
+            str = vrvToolkit.getLog();
+            $("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
+        }
 
-		svg = vrvToolkit.renderPage(page, "");
-		$("#svg_output").html(svg);
+        $("#total_text").html(vrvToolkit.getPageCount());
+        page = 1;
+        load_page();
+    }
 
-		adjust_page_height();
-	};
+    function load_page() {
+        $("#jump_text").val(page);
 
-	function next_page() {
-		if (page >= vrvToolkit.getPageCount()) {
-			return;
-		}
+        svg = vrvToolkit.renderPage(page, "");
+        $("#svg_output").html(svg);
 
-		page = page + 1;
-		load_page();
-	};
+        adjust_page_height();
+    };
 
-	function prev_page() {
-		if (page <= 1) {
-			return;
-		}
+    function next_page() {
+        if (page >= vrvToolkit.getPageCount()) {
+            return;
+        }
 
-		page = page - 1;
-		load_page();
-	};
+        page = page + 1;
+        load_page();
+    };
 
-	function first_page() {
-		page = 1;
-		load_page();
-	};
-	
-	function last_page() {
-		page = vrvToolkit.getPageCount();
-		load_page();
-	};
+    function prev_page() {
+        if (page <= 1) {
+            return;
+        }
 
-	function apply_zoom() {
-		set_options();
-		vrvToolkit.redoLayout();
+        page = page - 1;
+        load_page();
+    };
 
-		$("#total_text").html(vrvToolkit.getPageCount());
-		page = 1;
-		load_page();
-	}
+    function first_page() {
+        page = 1;
+        load_page();
+    };
+    
+    function last_page() {
+        page = vrvToolkit.getPageCount();
+        load_page();
+    };
 
-	function zoom_out() {
-		if (zoom < 20) {
-			return;
-		}
+    function apply_zoom() {
+        set_options();
+        vrvToolkit.redoLayout();
 
-		zoom = zoom / 2;
-		apply_zoom();
-	}
+        $("#total_text").html(vrvToolkit.getPageCount());
+        page = 1;
+        load_page();
+    }
 
-	function zoom_in() {
-		if (zoom > 80) {
-			return;
-		}
+    function zoom_out() {
+        if (zoom < 20) {
+            return;
+        }
 
-		zoom = zoom * 2;
-		apply_zoom();
-	}
+        zoom = zoom / 2;
+        apply_zoom();
+    }
 
-	function do_page_enter(e) {
-		key = e.keyCode || e.which;
-		if (key == 13) {
+    function zoom_in() {
+        if (zoom > 80) {
+            return;
+        }
 
-			text = $("#jump_text").val();
+        zoom = zoom * 2;
+        apply_zoom();
+    }
 
-			if (text <= vrvToolkit.getPageCount() && text > 0) {
-				page = Number(text);
-				load_page();
-			} else {
-				$("#jump_text").val(page);
-			}
+    function do_page_enter(e) {
+        key = e.keyCode || e.which;
+        if (key == 13) {
 
-		}
-	}
+            text = $("#jump_text").val();
 
-	function do_zoom_enter(e) {
-		key = e.keyCode || e.which;
-		if (key == 13) {
-			text = $("#zoom_text").val();
-			zoom_val = Number(text.replace("%", ""));
-			if (zoom_val < 10) zoom_val = 10;
-			else if (zoom_val > 160) zoom_val = 160;	
-			zoom = zoom_val;
-			apply_zoom();
-		}
-	}
-	
-	function adjust_page_height() {
-		// adjust the height of the panel
-		if ( $('#svg_panel svg') ) {
+            if (text <= vrvToolkit.getPageCount() && text > 0) {
+                page = Number(text);
+                load_page();
+            } else {
+                $("#jump_text").val(page);
+            }
+
+        }
+    }
+
+    function do_zoom_enter(e) {
+        key = e.keyCode || e.which;
+        if (key == 13) {
+            text = $("#zoom_text").val();
+            zoom_val = Number(text.replace("%", ""));
+            if (zoom_val < 10) zoom_val = 10;
+            else if (zoom_val > 160) zoom_val = 160;    
+            zoom = zoom_val;
+            apply_zoom();
+        }
+    }
+    
+    function adjust_page_height() {
+        // adjust the height of the panel
+        if ( $('#svg_panel svg') ) {
             zoomed_height = pageHeight * zoom / 100;
             if ( zoomed_height < $('#svg_panel svg').height() ) {
                 zoomed_height = $('#svg_panel svg').height();
             }
-			$('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar	
-			//$('#svg_panel svg').height(pageHeight * zoom / 100 );
-			//$('#svg_panel svg').width(pageWidth * zoom / 100 );	
-		}
-		
-		// also update the zoom control
-		$("#zoom_text").val(zoom + "%");
-		
-		// enable the swipe (or not)
-		enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
-	}
-	 
-	function swipe_prev(event, direction, distance, duration, fingerCount) {
-	  	prev_page();
-	 }
+            $('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar    
+            //$('#svg_panel svg').height(pageHeight * zoom / 100 );
+            //$('#svg_panel svg').width(pageWidth * zoom / 100 );    
+        }
+        
+        // also update the zoom control
+        $("#zoom_text").val(zoom + "%");
+        
+        // enable the swipe (or not)
+        enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
+    }
+     
+    function swipe_prev(event, direction, distance, duration, fingerCount) {
+          prev_page();
+     }
 
-	 function swipe_next(event, direction, distance, duration, fingerCount) {
-		 next_page();
-	 }
+     function swipe_next(event, direction, distance, duration, fingerCount) {
+         next_page();
+     }
 
-	 function swipe_zoom_in(event, target) {
-		 zoom_in();
-	 }
-	
-	 function swipe_zoom_out(event, target) {
-		 zoom_out();
-	 }
-	
-	function enable_swipe( pages ) {
-		if ( pages && !swipe_pages ) {
-			$("#svg_output").swipe( "destroy" );
-			$("#svg_output").swipe( { swipeLeft: swipe_next, swipeRight: swipe_prev, tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
-			swipe_pages = true;
-		}
-		// zoom only
-		else if ( !pages && swipe_pages ) {
-			$("#svg_output").swipe( "destroy" );
-			$("#svg_output").swipe( { tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
-			swipe_pages = false;		
-		}
-	}
+     function swipe_zoom_in(event, target) {
+         zoom_in();
+     }
+    
+     function swipe_zoom_out(event, target) {
+         zoom_out();
+     }
+    
+    function enable_swipe( pages ) {
+        if ( pages && !swipe_pages ) {
+            $("#svg_output").swipe( "destroy" );
+            $("#svg_output").swipe( { swipeLeft: swipe_next, swipeRight: swipe_prev, tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+            swipe_pages = true;
+        }
+        // zoom only
+        else if ( !pages && swipe_pages ) {
+            $("#svg_output").swipe( "destroy" );
+            $("#svg_output").swipe( { tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
+            swipe_pages = false;        
+        }
+    }
 
 //]]>
 </script>
@@ -258,131 +258,131 @@ downloads:
 </div>
 
 <div id="svg_panel" style="background-color: #fff;">
-	<div id="svg_output" style="overflow:hidden;" />
+    <div id="svg_output" style="overflow:hidden;" />
 </div>
 
 <!-- sidebar -->
 <div class="sidebar-offcanvas" id="sidebar" role="navigation">
-	<div class="sidebar-panel">
-		<div class="row">
-			<div class="col-xs-12">
-				<h4>Navigation</h4>
-			</div>
-		</div>
-		<div class="row sidebar-row">
-			<div class="col-xs-12">
-				<button class="btn btn-default btn-sm pull-left popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out. On desktops, you can use [ctrl+] left or right arrows and +/- keys.">
-					<span class="glyphicon glyphicon-question-sign"/>
-				</button>
-			</div>
-		</div>
-		<div class="row sidebar-row">
-			<div class="col-md-12">
-				<p>
-					Go to page [1-<span id="total_text">1</span>]:
-				</p>
-				<div class="col-xs-1 input-group input-group-sm">
-					<span class="input-group-btn">
-						<button onclick="first_page()" class="btn btn-default" type="button">
-							<span class="glyphicon glyphicon-fast-backward"/>
-						</button>
-						<button onclick="prev_page()" class="btn btn-default" type="button">
-							<span class="glyphicon glyphicon-backward"/>
-						</button>
-					</span>
-					<input type="text" class="form-control" placeholder="0" id="jump_text" style="width: 45px !important;" onkeypress="do_page_enter(event)"/>
-					<span class="input-group-btn">
-						<button onclick="next_page()" class="btn btn-default" type="button">
-							<span class="glyphicon glyphicon-forward"/>
-						</button>
-						<button onclick="last_page()" class="btn btn-default" type="button">
-							<span class="glyphicon glyphicon-fast-forward"/>
-						</button>
-					</span>
-				</div>
-				<!-- /input-group -->
-			</div>
-			<!-- /.col-lg-6 -->
-		</div>
-		<div class="row sidebar-row">
-			<div class="col-md-6">
-				<p>
-					Zoom:
-				</p>
-				<div class="col-xs-2 input-group input-group-sm">
-					<span class="input-group-btn">
-						<button onclick="zoom_out()" class="btn btn-default" type="button">
-							<span class="glyphicon glyphicon-zoom-out"/>
-						</button>
-					</span>
-					<input type="text" class="form-control" style="width:60px !important;" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
-					<span class="input-group-btn">
-						<button onclick="zoom_in()" class="btn btn-default" type="button">
-							<span class="glyphicon glyphicon-zoom-in"/>
-						</button>
-					</span>
-				</div>
-				<!-- /input-group -->
-			</div>
-			<!-- /.col-md-6 -->
-		</div>
+    <div class="sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Navigation</h4>
+            </div>
+        </div>
+        <div class="row sidebar-row">
+            <div class="col-xs-12">
+                <button class="btn btn-default btn-sm pull-left popover-btn" type="button" data-container="body" data-toggle="popover" data-placement="left" data-content="On mobile devices, you can swipe left or right to change page and tap or double tap to zoom-in or zoom-out. On desktops, you can use [ctrl+] left or right arrows and +/- keys.">
+                    <span class="glyphicon glyphicon-question-sign"/>
+                </button>
+            </div>
+        </div>
+        <div class="row sidebar-row">
+            <div class="col-md-12">
+                <p>
+                    Go to page [1-<span id="total_text">1</span>]:
+                </p>
+                <div class="col-xs-1 input-group input-group-sm">
+                    <span class="input-group-btn">
+                        <button onclick="first_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-fast-backward"/>
+                        </button>
+                        <button onclick="prev_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-backward"/>
+                        </button>
+                    </span>
+                    <input type="text" class="form-control" placeholder="0" id="jump_text" style="width: 45px !important;" onkeypress="do_page_enter(event)"/>
+                    <span class="input-group-btn">
+                        <button onclick="next_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-forward"/>
+                        </button>
+                        <button onclick="last_page()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-fast-forward"/>
+                        </button>
+                    </span>
+                </div>
+                <!-- /input-group -->
+            </div>
+            <!-- /.col-lg-6 -->
+        </div>
+        <div class="row sidebar-row">
+            <div class="col-md-6">
+                <p>
+                    Zoom:
+                </p>
+                <div class="col-xs-2 input-group input-group-sm">
+                    <span class="input-group-btn">
+                        <button onclick="zoom_out()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-zoom-out"/>
+                        </button>
+                    </span>
+                    <input type="text" class="form-control" style="width:60px !important;" placeholder="100%" id="zoom_text" onkeypress="do_zoom_enter(event)"/>
+                    <span class="input-group-btn">
+                        <button onclick="zoom_in()" class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-zoom-in"/>
+                        </button>
+                    </span>
+                </div>
+                <!-- /input-group -->
+            </div>
+            <!-- /.col-md-6 -->
+        </div>
     </div>
     
-	<div class="sidebar-panel">
-		<div class="row">
-			<div class="col-xs-12">
-				<h4>Examples</h4>
-			</div>
-		</div>
-		<div id="downloads_panel_body">
-			<div class="row">
-				<div class="col-md-12">
-					{% for d in page.downloads %}
-					<div {% if d.hidden == true %}class="hidden-sm hidden-xs"{% endif %}>
+    <div class="sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Examples</h4>
+            </div>
+        </div>
+        <div id="downloads_panel_body">
+            <div class="row">
+                <div class="col-md-12">
+                    {% for d in page.downloads %}
+                    <div {% if d.hidden == true %}class="hidden-sm hidden-xs"{% endif %}>
                         <p>
                         <a href="{{ site.baseurl }}/{{ page.name }}?examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
-						 {{ d.description }}
-					    </p>
+                         {{ d.description }}
+                        </p>
                     </div>
-					{% endfor %}
-				</div>
-				<!-- /.col-md-6 -->
-			</div>
-			<!-- /.row -->
-		</div>
-	</div>
+                    {% endfor %}
+                </div>
+                <!-- /.col-md-6 -->
+            </div>
+            <!-- /.row -->
+        </div>
+    </div>
     
-	<div class="hidden-xs hidden-sm sidebar-panel">
-		<div class="row">
-			<div class="col-xs-12">
-				<h4>Select MEI file</h4>
-			</div>
-		</div>
+    <div class="hidden-xs hidden-sm sidebar-panel">
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Select MEI file</h4>
+            </div>
+        </div>
         
-		<div id="options_panel_body">
-			<form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
-				<div class="row">
-					<div class="col-md-12">
-						<input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
-					</div>
-					<div class="col-md-12">
-						<button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to display the MEI file!" data-trigger="manual">Render</button>
-					</div>
-				</div>
+        <div id="options_panel_body">
+            <form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to display the MEI file!" data-trigger="manual">Render</button>
+                    </div>
+                </div>
 
-				<!--><div id="log_panel" style="display: none">
-					<hr class="panel"/>
-					<p id="log_p"></p>
-				</div>
-				-->
-		
-			</form>
-		</div>
-	</div>
+                <!--><div id="log_panel" style="display: none">
+                    <hr class="panel"/>
+                    <p id="log_p"></p>
+                </div>
+                -->
+        
+            </form>
+        </div>
+    </div>
     
-	<div class="sidebar-panel">
-		<p>This viewer uses the latest development version and might be unstable.</p>
-		<p>Do you need the old MEI viewer? It is available <a href="{{ site.baseurl }}/mei-viewer-old.xhtml">here</a>.</p>
+    <div class="sidebar-panel">
+        <p>This viewer uses the latest development version and might be unstable.</p>
+        <p>Do you need the old MEI viewer? It is available <a href="{{ site.baseurl }}/mei-viewer-old.xhtml">here</a>.</p>
     </div>
     
 </div>
@@ -390,59 +390,59 @@ downloads:
 
 <script type="text/javascript">
 //<![CDATA[
-	$( document ).ready(function() {
-		
-		$(window).keyup(function(event){
-			// We need to make sure not to capture event on text fields
-			if ( $(event.target).hasClass('form-control') ) {
-				return;
-			}
-			if ( event.ctrlKey && (event.keyCode == 37) ) {
-				first_page();
-			}
-			else if ( event.keyCode == 37 ) {
-				prev_page();
-			}
-			else if ( event.ctrlKey && (event.keyCode == 39) ) {
-				last_page();
-			}
-			else if ( event.keyCode == 39 ) {
-				next_page();
-			}
-			else if ( event.keyCode == 107 ) {
-				zoom_in();
-			}
-			else if ( event.keyCode == 109 ) {
-				zoom_out();
-			}
-		});
+    $( document ).ready(function() {
+        
+        $(window).keyup(function(event){
+            // We need to make sure not to capture event on text fields
+            if ( $(event.target).hasClass('form-control') ) {
+                return;
+            }
+            if ( event.ctrlKey && (event.keyCode == 37) ) {
+                first_page();
+            }
+            else if ( event.keyCode == 37 ) {
+                prev_page();
+            }
+            else if ( event.ctrlKey && (event.keyCode == 39) ) {
+                last_page();
+            }
+            else if ( event.keyCode == 39 ) {
+                next_page();
+            }
+            else if ( event.keyCode == 107 ) {
+                zoom_in();
+            }
+            else if ( event.keyCode == 109 ) {
+                zoom_out();
+            }
+        });
         
         $(window).resize(function(){
             apply_zoom();
         });
-		
-		$( "#toggle_log" ).click(function() {
-			log = !log;
-			$( "#log_panel_body" ).toggle();
-		  	// toggle icon
-		  	$("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
-		});
-		
-		// Set the popover for the btn
-		$( ".popover-btn" ).popover( );
-		
-		// Adjust the size of the svg_output and the zoom according to the div (screen) size
-		width = $('#svg_panel').width();
-		zoom = Math.min( Math.floor( 100 * width / 2100 ), 40 );
-		//$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
-		
-		// Init the swip
-		enable_swipe( true );
-	
-		// Load the default file or the file passed in the URL
-		var file = location.search.substring(1);
-		//console.log( file );
-		if (file.length == 0) {
+        
+        $( "#toggle_log" ).click(function() {
+            log = !log;
+            $( "#log_panel_body" ).toggle();
+              // toggle icon
+              $("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+        });
+        
+        // Set the popover for the btn
+        $( ".popover-btn" ).popover( );
+        
+        // Adjust the size of the svg_output and the zoom according to the div (screen) size
+        width = $('#svg_panel').width();
+        zoom = Math.min( Math.floor( 100 * width / 2100 ), 40 );
+        //$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
+        
+        // Init the swip
+        enable_swipe( true );
+    
+        // Load the default file or the file passed in the URL
+        var file = location.search.substring(1);
+        //console.log( file );
+        if (file.length == 0) {
             file = "examples/downloads/Krebs_Trio_Eb_2.mei";
         }
         $.ajax({
@@ -452,6 +452,6 @@ downloads:
                 load_data( data );
             }
         });
-	});
+    });
 //]]>
 </script>

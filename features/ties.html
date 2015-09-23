@@ -3,7 +3,7 @@
 <h3>Ties</h3>
 
 <p>
-	Verovio supports both ties encoded with <code>@tie</code> attributes or with <code>&lt;tie&gt;</code> elements. Ties overlapping two measures and interrupted by a system break or a page break are displayed appropriately.
+    Verovio supports both ties encoded with <code>@tie</code> attributes or with <code>&lt;tie&gt;</code> elements. Ties overlapping two measures and interrupted by a system break or a page break are displayed appropriately.
 </p>
 
 <div id="svg_output-tie" style="overflow:auto;"/>
@@ -17,7 +17,7 @@
 <br/>
 
 <p>
-	Verovio determines the tie direction looking at the context (layer, stem direction, chord, etc.). Collision with stem is normally avoided except with short ties and when the context does allow do to so.
+    Verovio determines the tie direction looking at the context (layer, stem direction, chord, etc.). Collision with stem is normally avoided except with short ties and when the context does allow do to so.
 </p>
 
 <div id="svg_output-tie-chords1" style="overflow:auto;"/>
@@ -31,7 +31,7 @@
 <br/>
 
 <p>
-	With chords, the <code>@tie</code> attribute can be set in the chord or in the notes. It can also be overwritten in the note if necessary.
+    With chords, the <code>@tie</code> attribute can be set in the chord or in the notes. It can also be overwritten in the note if necessary.
 </p>
 
 <div id="svg_output-tie-chords2" style="overflow:auto;"/>
@@ -45,7 +45,7 @@
 <br/>
 
 <p>
-	With <code>&lt;tie&gt;</code> elements, it is possible to specify the direction of the tie and its shape with the <code>@curvedir</code> and <code>@bulge</code> attributes.
+    With <code>&lt;tie&gt;</code> elements, it is possible to specify the direction of the tie and its shape with the <code>@curvedir</code> and <code>@bulge</code> attributes.
 </p>
 
 <div id="svg_output-tie-chords3" style="overflow:auto;"/>
@@ -60,29 +60,29 @@
 
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	pageWidth = 1000;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    pageWidth = 1000;
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
 
-	$.get( "{{ site.baseurl }}/examples/features/tie.mei" , function( data ) {
-		load_data( data, $('#svg_output-tie') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/tie-chords1.mei" , function( data ) {
-		load_data( data, $('#svg_output-tie-chords1') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/tie-chords2.mei" , function( data ) {
-		load_data( data, $('#svg_output-tie-chords2') );
-	});
-	
-	$.get( "{{ site.baseurl }}/examples/features/tie-chords3.mei" , function( data ) {
-		load_data( data, $('#svg_output-tie-chords3') );
-	});
+    $.get( "{{ site.baseurl }}/examples/features/tie.mei" , function( data ) {
+        load_data( data, $('#svg_output-tie') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/tie-chords1.mei" , function( data ) {
+        load_data( data, $('#svg_output-tie-chords1') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/tie-chords2.mei" , function( data ) {
+        load_data( data, $('#svg_output-tie-chords2') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/tie-chords3.mei" , function( data ) {
+        load_data( data, $('#svg_output-tie-chords3') );
+    });
 //]]>
 </script>

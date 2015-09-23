@@ -1,52 +1,52 @@
 <div class="panel panel-default">
-	<div class="panel-heading panel-supported-mei">
-		
-		<div class="row">
-			<div class="col-xs-10">
-				<code class="panel-header">&lt;{{ class.id }}&gt;</code>
-			</div>
-			<div class="col-xs-2">
-				{% unless class.no-doc %}
-				<a href="{{ page.mei-doc-root }}{{ class.id }}" target="_blank">
-					<button type="button" class="btn btn-default btn-xs btn-heading pull-right">
-						MEI-doc <span class="glyphicon glyphicon-new-window"></span>
-					</button>
-				</a>
-				{% endunless %}
-			</div>
-		</div>
-	
-	</div>
-	{% if class.attributes or class.comment %}
-	<div class="panel-body panel-option">
-		{% if class.attributes %}
-		<table class="table table-condensed">
-			<colgroup>
-		    	<col class="col-xs-1"/>
-		        <col class="col-xs-6"/>
-				<col class="col-xs-1"/>
-			</colgroup>
-			<thead>
-		        <tr>
-		        	<th>Attribute</th>
-		        	<th>Comment</th>
-					<th>Att-class</th>
-		        </tr>
-			</thead>
-			<tbody>
-			{% for attribute in class.attributes %}
-		        <tr>
-		          	<td><code>@{{ attribute[0] }}</code></td>
-		          	<td>{{ attribute[1] }}</td>
-					<td>{{ attribute[2] }}</td>
-				</tr>
-			{% endfor %}
-			</tbody>
-		</table>
-		{% endif %}
-		{% if class.comment %}
-		<p>{{ class.comment }}</p>
-		{% endif %}
-	</div>
-	{% endif %}
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;{{ class.id }}&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                {% unless class.no-doc %}
+                <a href="{{ page.mei-doc-root }}{{ class.id }}" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                {% endunless %}
+            </div>
+        </div>
+    
+    </div>
+    {% if class.attributes or class.comment %}
+    <div class="panel-body panel-option">
+        {% if class.attributes %}
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for attribute in class.attributes %}
+                <tr>
+                      <td><code>@{{ attribute[0] }}</code></td>
+                      <td>{{ attribute[1] }}</td>
+                    <td>{{ attribute[2] }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        {% if class.comment %}
+        <p>{{ class.comment }}</p>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>

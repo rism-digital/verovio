@@ -35,10 +35,10 @@
             <date>2011</date>
             <availability>
                <useRestrict>This encoding is in the public domain. However, the sources used to
-						create it may be under copyright. We believe their use by the MEI project for
-						educational and research purposes is covered by the Fair Use doctrine. However, we
-						will remove any material from the project archive when requested to do so by the
-						copyright owner.</useRestrict>
+                        create it may be under copyright. We believe their use by the MEI project for
+                        educational and research purposes is covered by the Fair Use doctrine. However, we
+                        will remove any material from the project archive when requested to do so by the
+                        copyright owner.</useRestrict>
             </availability>
          </pubStmt>
          <seriesStmt>
@@ -49,7 +49,7 @@
                          dbkey="2007744-0"
                          authURI="http://d-nb.info/gnd"
                          authority="GND">German Research
-						Foundation<address>
+                        Foundation<address>
                      <addrLine>Kennedyallee 40</addrLine>
                      <addrLine>
                         <geogName dbkey="7005090"
@@ -67,7 +67,7 @@
                          dbkey="18183-3"
                          authURI="http://d-nb.info/gnd/18183-3"
                          authority="Deutsche Nationalbibliothek">National Endowment for the
-						Humanities<address>
+                        Humanities<address>
                      <addrLine>1100 Pennsylvania Avenue N.W.</addrLine>
                      <addrLine>
                         <geogName dbkey="7013962"
@@ -274,7 +274,7 @@
             <respStmt/>
             <changeDesc>
                <p>The original was transcoded from a Humdrum file and validated using Finale 2003
-						for Windows.</p>
+                        for Windows.</p>
             </changeDesc>
             <date notbefore="2003-12-24" notafter="2004"/>
          </change>
@@ -293,7 +293,7 @@
             </respStmt>
             <changeDesc>
                <p> Cleaned up MEI file automatically using <ref target="#xsl_ppq">ppq.xsl</ref>.
-					</p>
+                    </p>
             </changeDesc>
             <date isodate="2011-10-22"/>
          </change>

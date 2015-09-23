@@ -33,88 +33,88 @@ version-footer: true
 ---
 
 <div class="row">
-	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
-		<div class="panel panel-default">
-			{% include how-sidebar.html %}
-		</div>
-		<div class="panel panel-default">
-			<div class="list-group sublist-group">
-				{% for f in page.features %}
-				<a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
-				{% endfor %}
-			</div>
-		</div>
-	</div>
-	
-	<div class="col-md-9">
-		<div class="panel panel-default">
-			<div class="panel-body">
-				<p>
-					This section shows some of the features of Verovio. All the examples are rendered dynamically in the web-browser with its <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version. The page on the <a href="{{ site.baseurl }}/supported-mei.xhtml">supported MEI elements</a> gives detailed information about what is currently supported by Verovio.
-				</p>
-			</div>
-		</div>
-		
-		<div class="panel panel-default">
-			<div class="panel-body" id="feature">
-			</div>
-		</div>
-	</div>
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include how-sidebar.html %}
+        </div>
+        <div class="panel panel-default">
+            <div class="list-group sublist-group">
+                {% for f in page.features %}
+                <a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>
+                    This section shows some of the features of Verovio. All the examples are rendered dynamically in the web-browser with its <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version. The page on the <a href="{{ site.baseurl }}/supported-mei.xhtml">supported MEI elements</a> gives detailed information about what is currently supported by Verovio.
+                </p>
+            </div>
+        </div>
+        
+        <div class="panel panel-default">
+            <div class="panel-body" id="feature">
+            </div>
+        </div>
+    </div>
 </div>
 
 <script type="text/javascript">
 //<![CDATA[
 
-	var zoom = 40;
-	var pageHeight = 2970;
-	var pageWidth = 2100;
-	var adjustPageHeight = 1;
-	var border = 25;
-	var spacingStaff = 4;
-	var appXPath = "";
+    var zoom = 40;
+    var pageHeight = 2970;
+    var pageWidth = 2100;
+    var adjustPageHeight = 1;
+    var border = 25;
+    var spacingStaff = 4;
+    var appXPath = "";
     var noLayout = 0;
-	var vrvToolkit = new verovio.toolkit();
+    var vrvToolkit = new verovio.toolkit();
 
-	function load_data(data, output_div) {
-		options = JSON.stringify({
-					inputFormat: 'mei',
-					pageHeight: pageHeight,
-					pageWidth: pageWidth,
-					adjustPageHeight: adjustPageHeight,
-					border: border,
-					spacingStaff: spacingStaff,
-					rdgXPathQuery: appXPath,
-					noLayout: noLayout,
-					scale: zoom
-				});
-		
-		var svg = vrvToolkit.renderData( data + "\n", options );
-		output_div.html(svg);
-	}
-	
-	function getParameterByName(name) {
-	    var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-	    return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-	}
+    function load_data(data, output_div) {
+        options = JSON.stringify({
+                    inputFormat: 'mei',
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    adjustPageHeight: adjustPageHeight,
+                    border: border,
+                    spacingStaff: spacingStaff,
+                    rdgXPathQuery: appXPath,
+                    noLayout: noLayout,
+                    scale: zoom
+                });
+        
+        var svg = vrvToolkit.renderData( data + "\n", options );
+        output_div.html(svg);
+    }
+    
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
 
-	$( document ).ready(function() {
-		
-		var id = getParameterByName("id");
-		if (!id) {
-			id = "{{ page.features[0].id }}";
-		}
-		var file = "features/" + id + ".html";	
-		// load the file	
-		$( "#feature" ).load( file, function() {		  
-	  		$(".toggle_code").click(function(){
-	  			$( "#" + $(this).attr("id") + "-xml" ).toggle();
-	  		  	$("span", this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
-	  		});
-		  
-		});
-		// activate the link menu
-		$( "#link-" + id ).addClass( "active" );
-				
-	});
+    $( document ).ready(function() {
+        
+        var id = getParameterByName("id");
+        if (!id) {
+            id = "{{ page.features[0].id }}";
+        }
+        var file = "features/" + id + ".html";    
+        // load the file    
+        $( "#feature" ).load( file, function() {          
+              $(".toggle_code").click(function(){
+                  $( "#" + $(this).attr("id") + "-xml" ).toggle();
+                    $("span", this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+              });
+          
+        });
+        // activate the link menu
+        $( "#link-" + id ).addClass( "active" );
+                
+    });
 //]]>
 </script>

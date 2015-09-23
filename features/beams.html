@@ -3,7 +3,7 @@
 <h3>Beam breaks</h3>
 
 <p>
-	Verovio supports <code>@breaksec</code> in <code>&lt;beam&gt;</code> for breaking secondary beams.
+    Verovio supports <code>@breaksec</code> in <code>&lt;beam&gt;</code> for breaking secondary beams.
 </p>
 
 <div id="svg_output-1" style="overflow:auto;"/>
@@ -17,18 +17,18 @@
 
 <script type="text/javascript">
 //<![CDATA[
-	zoom = 40;
-	pageWidth = 1500;
-	
-	// adjust the zoom for small screens
-	width = $('#feature').width();
-	if ( width < zoom * pageWidth / 100 ) {
-		zoom = width * 100 / pageWidth;
-	}
+    zoom = 40;
+    pageWidth = 1500;
     
-	$.get( "{{ site.baseurl }}/examples/features/beam-breaks.mei" , function( data ) {
-		load_data( data, $('#svg_output-1') );
-	});
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/beam-breaks.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
 //]]>
 </script>
 
