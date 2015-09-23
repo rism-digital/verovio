@@ -31,11 +31,17 @@ class Tie;
 class Tuplet;
 class KeySig;
 class Barline;
+    
+//----------------------------------------------------------------------------
+// namespace for local Plain and Easy classes
+//----------------------------------------------------------------------------
 
+namespace pae {
 
-class NoteObject {
+class Note {
+
 public:
-    NoteObject(const NoteObject &old) { // for STL vector
+    Note(const pae::Note &old) { // for STL vector
         //mnote = old.mnote;
         //mrest = old.mrest;         
         tie = old.tie;
@@ -59,7 +65,7 @@ public:
         tuplet_notes = old.tuplet_notes;
         tuplet_note = old.tuplet_note;
     }
-    NoteObject(void) { clear(); };
+    Note(void) { clear(); };
     void   clear(void) {
         appoggiatura = 0;
         acciaccatura = fermata = trill = false;
@@ -81,7 +87,7 @@ public:
         key = NULL;
     };
     
-    NoteObject& operator=(const NoteObject& d){ // for STL vector
+    Note& operator=(const Note& d){ // for STL vector
         //mnote = d.mnote;
         //mrest = d.mrest;         
         tie = d.tie;
@@ -136,10 +142,11 @@ public:
 };
 
 
-class MeasureObject {
+class Measure {
+
 public:
     
-    MeasureObject(const MeasureObject& d){ // for STL vector
+    Measure(const Measure& d){ // for STL vector
         clef = d.clef;
         meter = d.meter;
         notes = d.notes;
@@ -153,9 +160,9 @@ public:
         abbreviation_offset = d.abbreviation_offset;  
         wholerest = d.wholerest;
     } 
-    MeasureObject(void) { clear(); };
+    Measure(void) { clear(); };
     
-    MeasureObject& operator=(const MeasureObject& d){ // for STL vector
+    Measure& operator=(const Measure& d){ // for STL vector
         clef = d.clef;
         meter = d.meter;
         notes = d.notes;
@@ -191,7 +198,7 @@ public:
     MeterSig *meter;
     KeySig *key;
     
-    std::vector<NoteObject> notes;
+    std::vector<pae::Note> notes;
     
     std::vector<data_DURATION> durations;
     std::vector<int> dots; // use the same offset as durations, they are used in parallel
@@ -200,17 +207,8 @@ public:
     int    abbreviation_offset;  
     int    wholerest;   // number of whole rests to process
 };
-
-
-//////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
+    
+} // namespace pae
 
 //----------------------------------------------------------------------------
 // PaeInput
@@ -241,22 +239,22 @@ private:
      int       getBarline          (const char *incipit, data_BARRENDITION *output, int index );
      int       getAccidental       (const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
      int       getOctave           (const char* incipit, char *octave, int index = 0 );
-     int       getDurations        (const char* incipit, MeasureObject *measure, int index = 0);
+     int       getDurations        (const char* incipit, pae::Measure *measure, int index = 0);
      int       getDuration         (const char* incipit, data_DURATION *duration, int *dot, int index );
-     int       getTupletFermata    (const char* incipit, NoteObject *note, int index = 0);
-     int       getTupletFermataEnd (const char* incipit, NoteObject *note, int index = 0);
-     int       getGraceNote        (const char* incipit, NoteObject *note, int index = 0);
+     int       getTupletFermata    (const char* incipit, pae::Note *note, int index = 0);
+     int       getTupletFermataEnd (const char* incipit, pae::Note *note, int index = 0);
+     int       getGraceNote        (const char* incipit, pae::Note *note, int index = 0);
      int       getWholeRest        (const char* incipit, int *wholerest, int index );
-     int       getAbbreviation     (const char* incipit, MeasureObject *measure, int index = 0 ); 
-     int       getNote             (const char* incipit, NoteObject *note, MeasureObject *measure, int index = 0 );
+     int       getAbbreviation     (const char* incipit, pae::Measure *measure, int index = 0 ); 
+     int       getNote             (const char* incipit, pae::Note *note, pae::Measure *measure, int index = 0 );
      
      data_PITCHNAME       getPitch            (char c_note );
      
      // output functions
      void      addLayerElement     (LayerElement *element);
-     void      parseNote           (NoteObject note);
+     void      parseNote           (pae::Note note);
      void      popContainer        ();
-     void      convertMeasure        (MeasureObject *measure);
+     void      convertMeasure        (pae::Measure *measure);
      void      pushContainer       (LayerElement *container);
 
 

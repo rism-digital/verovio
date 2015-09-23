@@ -59,16 +59,13 @@ char data_line[10001] = {0};
 char data_key[MAX_DATA_LEN]; 
 char data_value[MAX_DATA_LEN]; //ditto as above
 
-
-//////////////////////////////////////////////////////////////////////////
-
 //----------------------------------------------------------------------------
 // PaeInput
 //----------------------------------------------------------------------------
 
 PaeInput::PaeInput( Doc *doc, std::string filename ) :
-// This is pretty bad. We open a bad fileoinputstream as we don't use it
-FileInputStream( doc )
+    // This is pretty bad. We open a bad fileoinputstream as we don't use it
+    FileInputStream( doc )
 {
     m_filename = filename;
 	m_staff = NULL;
@@ -127,11 +124,11 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     int in_beam = 0;
     
     std::string s_key;
-    MeasureObject current_measure;
-    NoteObject current_note;
+    pae::Measure current_measure;
+    pae::Note current_note;
     Clef *staffDefClef = NULL;
     
-    std::vector<MeasureObject> staff;
+    std::vector<pae::Measure> staff;
     
     // read values
     while (!infile.eof()) {
@@ -265,7 +262,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         
         // measure repetition
         else if ((incipit[i] == 'i') && staff.size() > 0) {
-            MeasureObject last_measure = staff[staff.size() - 1];
+            pae::Measure last_measure = staff[staff.size() - 1];
             current_measure.notes = last_measure.notes;
             current_measure.wholerest = last_measure.wholerest;
             
@@ -361,7 +358,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     
     int measure_count = 1;
     
-    std::vector<MeasureObject>::iterator it;
+    std::vector<pae::Measure>::iterator it;
     for ( it = staff.begin() ; it < staff.end(); it++ ) {
         
         m_staff = new Staff( 1 );
@@ -373,7 +370,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         m_measure->AddStaff( m_staff );
         system->AddMeasure( m_measure );
         
-        MeasureObject obj = *it;
+        pae::Measure obj = *it;
         convertMeasure( &obj );
         measure_count++;
     }
@@ -480,7 +477,7 @@ int PaeInput::getDuration(const char* incipit, data_DURATION *duration, int *dot
 // getDurations --
 //
 
-int PaeInput::getDurations(const char* incipit, MeasureObject* measure, int index ) {
+int PaeInput::getDurations(const char* incipit, pae::Measure* measure, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
@@ -545,7 +542,7 @@ int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accid
 // getTupletOrFermata --
 //
 
-int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index ) {
+int PaeInput::getTupletFermata(const char* incipit, pae::Note* note, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
@@ -633,7 +630,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
 // getTupletFermataEnd --
 //
 // this can be deleted in the future?
-int PaeInput::getTupletFermataEnd(const char* incipit, NoteObject *note, int index ) {
+int PaeInput::getTupletFermataEnd(const char* incipit, pae::Note *note, int index ) {
     
     int i = index;
     //int length = strlen(incipit);
@@ -651,7 +648,7 @@ int PaeInput::getTupletFermataEnd(const char* incipit, NoteObject *note, int ind
 // getGraceNote --
 //
 
-int PaeInput::getGraceNote(const char* incipit, NoteObject *note, int index ) {
+int PaeInput::getGraceNote(const char* incipit, pae::Note *note, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
@@ -925,7 +922,7 @@ int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int in
 // getAbbreviation -- read abbreviation
 //
 
-int PaeInput::getAbbreviation(const char* incipit, MeasureObject *measure, int index ) {
+int PaeInput::getAbbreviation(const char* incipit, pae::Measure *measure, int index ) {
     
     size_t length = strlen(incipit);
     int i = index;
@@ -998,7 +995,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
 // getNote --
 //
 
-int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *measure, int index ) {
+int PaeInput::getNote( const char* incipit, pae::Note *note, pae::Measure *measure, int index ) {
     
     regex_t re;
     int oct;
@@ -1090,7 +1087,7 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
 // convertMeasure --
 //
 
-void PaeInput::convertMeasure(MeasureObject *measure ) {
+void PaeInput::convertMeasure(pae::Measure *measure ) {
     
     if ( measure->clef != NULL ) {
         m_layer->AddLayerElement(measure->clef);
@@ -1113,7 +1110,7 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
     m_nested_objects.clear();
 
     for (unsigned int i=0; i<measure->notes.size(); i++) {
-        NoteObject note = measure->notes[i];
+        pae::Note note = measure->notes[i];
         parseNote(note);
     }
     
@@ -1124,7 +1121,7 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
 
 }
 
-void PaeInput::parseNote(NoteObject note) {
+void PaeInput::parseNote(pae::Note note) {
     
     LayerElement *element;
     
