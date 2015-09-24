@@ -17,6 +17,7 @@
 #include "iodarms.h"
 #include "iomei.h"
 #include "iopae.h"
+#include "iomusxml.h"
 #include "layer.h"
 #include "page.h"
 #include "measure.h"
@@ -147,8 +148,10 @@ bool Toolkit::SetFormat( std::string const &informat )
         m_format = darms_file;
     else if(informat == "mei")
         m_format = mei_file;
+    else if(informat == "xml")
+        m_format = xml_file;
     else {
-        LogError("Input format can only be: pae mei or darms");
+        LogError("Input format can only be: mei, pae, xml or darms");
         return false;
     }
     return true;
@@ -243,6 +246,9 @@ bool Toolkit::LoadString( const std::string &data )
         input = new DarmsInput( &m_doc, "" );
     } else if (m_format == mei_file) {
         input = new MeiInput( &m_doc, "" );
+    }
+    else if (m_format == xml_file) {
+        input = new XmlInput( &m_doc, "" );
     }
     else {
         LogError( "Unknown format" );

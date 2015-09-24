@@ -27,7 +27,8 @@ namespace vrv {
 typedef enum _file_formats {
     mei_file = 0,
     pae_file,
-    darms_file
+    darms_file,
+    xml_file
 } ConvertFileFormat;
 
 
