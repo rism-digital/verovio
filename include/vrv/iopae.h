@@ -49,6 +49,7 @@ public:
         appoggiatura = old.appoggiatura;
         fermata = old.fermata;
         trill = old.trill;
+        chord = old.chord;
         
         octave = old.octave;
         beam = old.beam;
@@ -68,7 +69,7 @@ public:
     Note(void) { clear(); };
     void   clear(void) {
         appoggiatura = 0;
-        acciaccatura = fermata = trill = false;
+        acciaccatura = fermata = trill = chord = false;
         tie = 0;
         
         octave = 4;
@@ -95,6 +96,7 @@ public:
         appoggiatura = d.appoggiatura;
         fermata = d.fermata;
         trill = d.trill;
+        chord = d.chord;
         
         octave = d.octave;
         beam = d.beam;
@@ -126,6 +128,7 @@ public:
     int    appoggiatura;
     bool   fermata;
     bool   trill;
+    bool   chord;
     
     char octave;
     unsigned char beam;
@@ -270,6 +273,7 @@ private:
     Measure *m_measure;
 	Layer *m_layer;
     Note *m_last_tied_note;
+    bool m_is_in_chord;
 
     std::vector<LayerElement *> m_nested_objects;
 };
