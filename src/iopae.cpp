@@ -1110,7 +1110,7 @@ void PaeInput::convertMeasure(pae::Measure *measure ) {
     m_nested_objects.clear();
 
     for (unsigned int i=0; i<measure->notes.size(); i++) {
-        pae::Note note = measure->notes[i];
+        pae::Note *note = &measure->notes[i];
         parseNote(note);
     }
     
@@ -1121,17 +1121,17 @@ void PaeInput::convertMeasure(pae::Measure *measure ) {
 
 }
 
-void PaeInput::parseNote(pae::Note note) {
+void PaeInput::parseNote(pae::Note *note) {
     
     LayerElement *element;
     
-    if (note.rest) {
+    if (note->rest) {
         Rest *rest =  new Rest();
         
-        rest->SetDots( note.dots );
-        rest->SetDur(note.duration);
+        rest->SetDots( note->dots );
+        rest->SetDur(note->duration);
 
-        if (note.fermata) {
+        if (note->fermata) {
             rest->SetFermata(PLACE_above); // always above for now
         }
         
@@ -1139,18 +1139,18 @@ void PaeInput::parseNote(pae::Note note) {
     } else {
         Note *mnote = new Note();
         
-        mnote->SetPname(note.pitch);
-        mnote->SetOct(note.octave);
-        mnote->SetAccid(note.accidental);
+        mnote->SetPname(note->pitch);
+        mnote->SetOct(note->octave);
+        mnote->SetAccid(note->accidental);
         
-        mnote->SetDots( note.dots );
-        mnote->SetDur(note.duration);
+        mnote->SetDots( note->dots );
+        mnote->SetDur(note->duration);
         
-        if (note.fermata) {
+        if (note->fermata) {
             mnote->SetFermata(PLACE_above); // always above for now
         }
         
-        if (note.trill == true)
+        if (note->trill == true)
             mnote->m_embellishment = EMB_TRILL;
         
         if (m_last_tied_note != NULL) {
@@ -1158,7 +1158,7 @@ void PaeInput::parseNote(pae::Note note) {
             m_last_tied_note = NULL;
         }
         
-        if (note.tie) {
+        if (note->tie) {
             if (mnote->GetTie()==TIE_t) mnote->SetTie(TIE_m);
             else mnote->SetTie(TIE_i);
             m_last_tied_note = mnote;
@@ -1168,46 +1168,46 @@ void PaeInput::parseNote(pae::Note note) {
     }
     
     // Does this note have a clef change? push it before everyting else
-    if (note.clef)
-        addLayerElement(note.clef);
+    if (note->clef)
+        addLayerElement(note->clef);
 
     // Same thing for time changes
     // You can find this sometimes
-    if (note.meter)
-        addLayerElement(note.meter);
+    if (note->meter)
+        addLayerElement(note->meter);
     
     // Handle key change. Evil if done in a beam
-    if (note.key)
-        addLayerElement(note.key);
+    if (note->key)
+        addLayerElement(note->key);
     
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
-    if (note.acciaccatura && (element->Is() == NOTE) ) {
-        Note *note = dynamic_cast<Note*>(element);
-        assert( note );
-        note->SetDur(DURATION_8);
-        note->SetGrace(GRACE_acc);
-        note->SetStemDir(STEMDIRECTION_up);
+    if (note->acciaccatura && (element->Is() == NOTE) ) {
+        Note *mnote = dynamic_cast<Note*>(element);
+        assert( mnote );
+        mnote->SetDur(DURATION_8);
+        mnote->SetGrace(GRACE_acc);
+        mnote->SetStemDir(STEMDIRECTION_up);
     }
     
-    if ( (note.appoggiatura > 0) && (element->Is() == NOTE) ) {
-        Note *note = dynamic_cast<Note*>(element);
-        assert( note );
-        note->SetGrace(GRACE_unacc);
-        note->SetStemDir(STEMDIRECTION_up);
+    if ( (note->appoggiatura > 0) && (element->Is() == NOTE) ) {
+        Note *mnote = dynamic_cast<Note*>(element);
+        assert( mnote );
+        mnote->SetGrace(GRACE_unacc);
+        mnote->SetStemDir(STEMDIRECTION_up);
     }
 
-    if (note.beam == BEAM_INITIAL) {
+    if (note->beam == BEAM_INITIAL) {
         pushContainer(new Beam());
     }
     
     // we have a tuplet, the tuplet_note is > 0
     // which means we are counting a tuplet
-    if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) { // first elem in tuplet
+    if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
         Tuplet *newTuplet = new Tuplet();
-        newTuplet->SetNum(note.tuplet_notes);
-        newTuplet->SetNumbase(note.tuplet_notes);
+        newTuplet->SetNum(note->tuplet_notes);
+        newTuplet->SetNumbase(note->tuplet_notes);
         pushContainer(newTuplet);
     }
     
@@ -1218,10 +1218,10 @@ void PaeInput::parseNote(pae::Note note) {
     // the last note counts always '1'
     // insert the tuplet elem
     // and reset the tuplet counter
-    if (note.tuplet_note == 1)
+    if (note->tuplet_note == 1)
         popContainer();
     
-    if (note.beam == BEAM_TERMINAL)
+    if (note->beam == BEAM_TERMINAL)
         popContainer();
 }
 

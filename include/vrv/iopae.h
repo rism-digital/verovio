@@ -138,7 +138,6 @@ public:
     Clef *clef;
     MeterSig *meter;
     KeySig *key;
-    
 };
 
 
@@ -252,7 +251,7 @@ private:
      
      // output functions
      void      addLayerElement     (LayerElement *element);
-     void      parseNote           (pae::Note note);
+     void      parseNote           (pae::Note *note);
      void      popContainer        ();
      void      convertMeasure        (pae::Measure *measure);
      void      pushContainer       (LayerElement *container);
