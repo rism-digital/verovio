@@ -265,12 +265,6 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
             pae::Measure last_measure = staff[staff.size() - 1];
             current_measure.notes = last_measure.notes;
             current_measure.wholerest = last_measure.wholerest;
-            
-            // if old measure does not end with a tie
-            // force the first note of the newly copied measure to be without tie
-            // this is to prevent copying tie closes which are invalid
-            if (last_measure.notes.size() > 0 && last_measure.notes[last_measure.notes.capacity() - 1].tie == 0)
-                current_measure.notes[0].tie = 0;
         }
         
         //barLine
