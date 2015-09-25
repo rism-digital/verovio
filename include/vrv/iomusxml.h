@@ -19,21 +19,23 @@
 
 namespace vrv {
 
-class Barline;
-class Beam;
-class Clef;
-class Doc;
-class Layer;
-class LayerElement;
-class MeterSig;
-class MRest;
-class MultiRest;
-class Note;
-class Page;
-class Rest;
-class Staff;
+//class Barline;
+//class Beam;
+//class Clef;
+//class Doc;
+//class Layer;
+//class LayerElement;
+class Measure;
+//class MeterSig;
+//class MRest;
+//class MultiRest;
+//class Note;
+//class Page;
+//class Rest;
+//class Staff;
+class StaffGrp;
 class System;
-class Tuplet;
+///class Tuplet;
 
 
 //----------------------------------------------------------------------------
@@ -52,6 +54,15 @@ public:
     
 private:
     bool ReadXml(pugi::xml_node root);
+    
+    bool ReadXmlPart(pugi::xml_node node, System *system);
+    bool ReadXmlMeasure(pugi::xml_node node, Measure *measure);
+
+    bool ReadXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp);
+    
+    bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
+    bool IsElement(pugi::xml_node node, std::string name);
+    bool HasContent(pugi::xml_node node, std::string content);
     
 private:
     std::string m_filename;
