@@ -226,7 +226,7 @@ public:
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
     
 
-    virtual int HorizontalSpaceForDuration(double intervalTime);
+    virtual int HorizontalSpaceForDuration(double intervalTime, int maxActualDur);
 
     /**
      * Set the position of the Alignment.

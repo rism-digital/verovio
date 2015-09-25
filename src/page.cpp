@@ -117,13 +117,15 @@ void Page::LayOutHorizontally( )
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetEvenSpacing()) {
+        int longestActualDur;
         // Get the longest duration in the piece
         AttDurExtreme durExtremeComparison(LONGEST);
         Object *longestDur = this->FindChildExtremeByAttComparison(&durExtremeComparison);
         if (longestDur) {
             DurationInterface *interface = dynamic_cast<DurationInterface*>(longestDur);
             assert(interface);
-            LogDebug("Longest duration is %d", interface->GetActualDur());
+            longestActualDur = interface->GetActualDur();
+            LogDebug("Longest duration is %d", longestActualDur);
         }
 
         params.clear();
@@ -133,6 +135,7 @@ void Page::LayOutHorizontally( )
         params.push_back( &previousTime );
         params.push_back( &previousXRel );
         //params.push_back( &minMeasureWidth );
+        params.push_back( &longestActualDur );
         Functor setAlignmentX( &Object::SetAligmentXPos );
         // Special case: because we redirect the functor, pass it a parameter to itself (!)
         params.push_back( &setAlignmentX );

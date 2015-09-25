@@ -455,7 +455,7 @@ is a function of time interval.
 flexibility: for example, for some purposes, spacing propoortional to duration is desirable.
 The best solution is probably to get ideal spacing from a user-definable table. */
 
-int Alignment::HorizontalSpaceForDuration(double intervalTime)
+int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur)
 {
     int intervalXRel;
     intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
@@ -466,14 +466,16 @@ int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: duration of the longest note
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
+    int *maxActualDur = static_cast<int*>((*params).at(2));
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
     // HARDCODED parameter for HorizontalSpaceForDuration
-    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime);
+    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur);
     
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
