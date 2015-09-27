@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        iomusxml.h
-// Author:      Rodolfo Zitellini
-// Created:     10/08/2012
+// Author:      Laurent Pugin
+// Created:     22/09/2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -14,8 +14,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "attdef.h"
 #include "io.h"
 #include "pugixml.hpp"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -23,8 +25,8 @@ namespace vrv {
 //class Beam;
 //class Clef;
 //class Doc;
-//class Layer;
-//class LayerElement;
+class Layer;
+class LayerElement;
 class Measure;
 //class MeterSig;
 //class MRest;
@@ -32,6 +34,7 @@ class Measure;
 //class Note;
 //class Page;
 //class Rest;
+class Slur;
 //class Staff;
 class StaffGrp;
 class System;
@@ -74,11 +77,24 @@ private:
     
     std::string GetAttributeValue(pugi::xml_node node, std::string attribute);
     std::string GetContent(pugi::xml_node node);
+    std::string GetContentOfChild(pugi::xml_node node, std::string child);
     
     void AddMeasure(System *system, Measure *measure, int i);
+    void AddLayerElement(Layer *layer, LayerElement *element);
+    Layer *SelectLayer(pugi::xml_node node, Measure *measure);
+    void RemoveLastFromStack(ClassId classId);
+    
+    data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
+    data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
+    data_DURATION ConvertTypeToDur(std::string value);
+    data_PITCHNAME ConvertStepToPitchName(std::string value);
     
 private:
     std::string m_filename;
+    
+    std::vector<LayerElement*> m_elementStack;
+    
+    std::vector<std::pair<Slur*, int> > m_slurStack;
 };
 
 } // namespace vrv {
