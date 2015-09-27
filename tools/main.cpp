@@ -145,7 +145,7 @@ int main(int argc, char** argv)
     // Init random number generator for uuids
     std::srand((unsigned int)std::time(0));
     
-    ConvertFileFormat type;
+    FileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
@@ -163,7 +163,7 @@ int main(int argc, char** argv)
     Toolkit toolkit( false );
     
     // read pae by default
-    type = mei_file;
+    type = MEI;
     
     if (argc < 2) {
         cerr << "Expecting one input file." << endl << endl;

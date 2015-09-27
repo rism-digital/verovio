@@ -24,12 +24,12 @@
 
 namespace vrv {
 
-typedef enum _file_formats {
-    mei_file = 0,
-    pae_file,
-    darms_file,
-    xml_file
-} ConvertFileFormat;
+typedef enum {
+    MEI = 0,
+    PAE,
+    DARMS,
+    MUSICXML
+} FileFormat;
 
 
 //----------------------------------------------------------------------------
@@ -232,12 +232,12 @@ public:
     ///@}
     
     /**
-     * @name Get the input file format (defined as ConvertFileFormat)
-     * The SetFormat with ConvertFileFormat does not perform any validation
+     * @name Get the input file format (defined as FileFormat)
+     * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
     bool SetFormat( std::string const &informat );
-    void SetFormat( ConvertFileFormat format ) { m_format = format; };
+    void SetFormat( FileFormat format ) { m_format = format; };
     int GetFormat() { return m_format; };
     ///@}
     
@@ -266,7 +266,7 @@ public:
     
     /**
      * @name Get the pages for a loaded file
-     * The SetFormat with ConvertFileFormat does not perform any validation
+     * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
     int GetPageCount( );
@@ -304,7 +304,7 @@ private:
     Doc m_doc;
     View m_view;
     int m_scale;
-    ConvertFileFormat m_format;
+    FileFormat m_format;
     
     int m_pageHeight;
     int m_pageWidth;
