@@ -433,7 +433,8 @@ int MeasureAligner::SetAligmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: duration of the longest note (unused)
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
     
