@@ -144,7 +144,7 @@ public:
      * Set the position of the Alignment.
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid *params );
+    virtual int SetAlignmentXPos( ArrayPtrVoid *params );
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.

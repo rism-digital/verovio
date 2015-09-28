@@ -211,7 +211,7 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetAligmentXPos( ArrayPtrVoid *params )
+int Measure::SetAlignmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)

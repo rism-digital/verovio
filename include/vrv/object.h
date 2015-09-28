@@ -436,9 +436,9 @@ public:
     
     /**
      * Set the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
+     * Looks at the time difference from the previous Alignment.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
+    virtual int SetAlignmentXPos( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Lay out the X positions of the grace notes looking that the bounding boxes.

@@ -136,7 +136,7 @@ void Page::LayOutHorizontally( )
         params.push_back( &previousXRel );
         //params.push_back( &minMeasureWidth );
         params.push_back( &longestActualDur );
-        Functor setAlignmentX( &Object::SetAligmentXPos );
+        Functor setAlignmentX( &Object::SetAlignmentXPos );
         // Special case: because we redirect the functor, pass it a parameter to itself (!)
         params.push_back( &setAlignmentX );
         this->Process( &setAlignmentX, &params );

@@ -21,8 +21,8 @@ class SystemAligner;
 
 /**
  * Alignment types for aligning types together.
- * For example, we align notes and rests (default) together, clef separately, etc.
- * The container is a generic alignment for tuplet, chords, beams, etc.; we needs
+ * For example, we align notes and rests (default) together, clefs separately, etc.
+ * The container is a generic alignment for tuplet, chords, beams, etc.; we need
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
@@ -232,7 +232,7 @@ public:
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid *params );
+    virtual int SetAlignmentXPos( ArrayPtrVoid *params );
     
     /**
      * Justify the X positions
@@ -247,7 +247,7 @@ public:
 private:
     /**
      * Stores the position relative to the measure.
-     * This is instanciated the Object::SetAligmentXPos functor.
+     * This is instanciated by the Object::SetAlignmentXPos functor.
      * It takes into account a non-linear according to the time interval with
      * the previous Alignement
      */
@@ -255,7 +255,7 @@ private:
     /**
      * Stores temporally the maximum amount we need to shift the element pointing to it for 
      * avoiding collisions. This is set in Object::SetBoundingBoxXShift and then
-     * integrated for all aligment in Aligment::IntegrateBoundingBoxXShift.
+     * integrated for all alignment in Alignment::IntegrateBoundingBoxXShift.
      */
     int m_xShift;
     /**
@@ -271,15 +271,15 @@ private:
     double m_time;
     /**
      * Defines the type of alignment (see the AlignmentType enum).
-     * We have different types because we want events occuring at the same
-     * time to be alignnemt separately. Example: the clef needs to be aligned
-     * togeter, but key signature together and then the notes, even if all
-     * of them occur at time 0.
+     * We have different types because we want some events occuring at the same
+     * time to be aligned separately. Examples: the clefs needs to be aligned
+     * together, key signatures together, and then the notes, even if all of them
+     * occur at time 0.
      */
     AlignmentType m_type;
     /**
      * A pointer to a GraceAligner if any.
-     * The Algnment owns it.
+     * The Alignment owns it.
      */
     GraceAligner *m_graceAligner;
     
@@ -350,7 +350,7 @@ public:
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid *params );
+    virtual int SetAlignmentXPos( ArrayPtrVoid *params );
     
     /**
      * Justify the X positions

@@ -429,7 +429,7 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::SetAligmentXPos( ArrayPtrVoid *params )
+int MeasureAligner::SetAlignmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
@@ -463,7 +463,7 @@ int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur)
     return intervalXRel;
 }
 
-int Alignment::SetAligmentXPos( ArrayPtrVoid *params )
+int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
