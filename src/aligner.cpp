@@ -15,6 +15,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "note.h"
 #include "style.h"
 #include "vrv.h"
@@ -352,13 +353,15 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
     // param 2: the minimum measure with (unused)
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 3: the doc for accessing drawing parameters
+    // param 4: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>((*params).at(0));
     int *justifiable_shift = static_cast<int*>((*params).at(1));
+    Doc *doc = static_cast<Doc*>((*params).at(3));
     
     // We start a new MeasureAligner
     // Reset the accumulated shift to 0;
-    (*shift) = 0;
+    (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;;
     (*justifiable_shift) = -1;
     
     return FUNCTOR_CONTINUE;

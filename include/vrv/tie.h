@@ -20,7 +20,8 @@ namespace vrv {
 // NOTE tie NOTE tie etc
 //----------------------------------------------------------------------------
 
-class Tie: public FloatingElement, public TimeSpanningInterface
+class Tie: public FloatingElement, public TimeSpanningInterface,
+    public AttCurvature
 {
 public:
     /**

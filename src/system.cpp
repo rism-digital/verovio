@@ -52,6 +52,8 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingY = 0;
     m_drawingTotalWidth = 0;
+    m_drawingLabelsWidth = 0;
+    m_drawingAbbrLabelsWidth = 0;
 }
 
 void System::AddMeasure( Measure *measure )
@@ -78,6 +80,7 @@ void System::ResetHorizontalAlignment()
     m_drawingXRel = 0;
 	m_drawingX = 0;
     m_drawingLabelsWidth = 0;
+    m_drawingAbbrLabelsWidth = 0;
 }
 
     
@@ -101,7 +104,14 @@ void System::SetDrawingLabelsWidth( int width )
         m_drawingLabelsWidth = width;
     }
 }
-
+    
+void System::SetDrawingAbbrLabelsWidth( int width )
+{
+    if ( m_drawingAbbrLabelsWidth < width ) {
+        m_drawingAbbrLabelsWidth = width;
+    }
+}
+    
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------

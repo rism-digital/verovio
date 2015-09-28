@@ -273,25 +273,6 @@ public:
     Object *GetLastParentNot( const ClassId classId, int maxSteps = -1 );
     
     /**
-     * Return the first of the specified type.
-     */
-    Object *GetFirstChild( const ClassId classId );
-    
-    /**
-     * Return the previous sibling object of the specified type.
-     * If no type is specified, returns the previous object.
-     * Returns NULL if not found in both cases.
-     */
-    Object *GetPreviousSibling( const ClassId classId = UNSPECIFIED );
-    
-    /**
-     * Return the next sibling object of the specified type.
-     * If no type is specified, returns the next object.
-     * Returns NULL if not found in both cases.
-     */
-    Object *GetNextSibling( const ClassId classId = UNSPECIFIED );
-    
-    /**
      * Fill the list of all the children LayerElement.
      * This is used for navigating in a Layer (See Layer::GetPrevious and Layer::GetNext).
      */  
@@ -661,6 +642,11 @@ public:
     virtual int UnCastOff( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
 
     ///@}
+    
+    /**
+     *
+     */
+    virtual int TimeSpanningLayerElements( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
 protected:
     /**

@@ -31,7 +31,6 @@
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
-#include "style.h"
 #include "syl.h"
 #include "system.h"
 #include "verse.h"
@@ -165,8 +164,6 @@ void Doc::PrepareDrawing()
             filters.push_back( &matchStaff );
             filters.push_back( &matchLayer );
             
-            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
-            // m_drawingLastNote is set only if the syl has a forward connector
             currentChord = NULL;
             currentNotes.clear();
             ArrayPtrVoid paramsTieAttr;
@@ -347,15 +344,18 @@ void Doc::CastOff( )
     
     System *currentSystem = new System();
     contentPage->AddSystem( currentSystem );
-    int shift = 0;
+    int shift = -contentSystem->GetDrawingLabelsWidth();
     int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
         - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+    // The width of the initial scoreDef is stored in the page scoreDef
+    int scoreDefWidth = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
     ArrayPtrVoid params;
     params.push_back( contentSystem );
     params.push_back( contentPage );
     params.push_back( &currentSystem );
     params.push_back( &shift );
     params.push_back( &systemFullWidth );
+    params.push_back( &scoreDefWidth );
     Functor castOffSystems( &Object::CastOffSystems );
     contentSystem->Process( &castOffSystems, &params );
     delete contentSystem;

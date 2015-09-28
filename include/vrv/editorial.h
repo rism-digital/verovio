@@ -242,6 +242,7 @@ public:
     virtual ~Annot();
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Annot"; };
+    virtual ClassId Is() { return ANNOT; };
     ///@}
     
 protected:

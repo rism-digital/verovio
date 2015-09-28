@@ -84,7 +84,7 @@ std::string Att::AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data)
         case ACCIDENTAL_EXPLICIT_nu : value = "nu"; break;
         case ACCIDENTAL_EXPLICIT_nd : value = "nd"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown accidental explicit '%d'", data);
             value = "";
             break;
     }
@@ -111,7 +111,7 @@ data_ACCIDENTAL_EXPLICIT Att::StrToAccidentalExplicit(std::string value)
     else if (value == "nu") return ACCIDENTAL_EXPLICIT_nu;
     else if (value == "nd") return ACCIDENTAL_EXPLICIT_nd;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported accidental explicit '%s'", value.c_str() );
     }
     return ACCIDENTAL_EXPLICIT_NONE;
 }
@@ -131,7 +131,7 @@ std::string Att::AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data)
         case ACCIDENTAL_IMPLICIT_fu : value = "fu"; break;
         case ACCIDENTAL_IMPLICIT_fd : value = "fd"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown accidental implicit '%d'", data);
             value = "";
             break;
     }
@@ -150,7 +150,7 @@ data_ACCIDENTAL_IMPLICIT Att::StrToAccidentalImplicit(std::string value)
 	else if (value == "fu") return ACCIDENTAL_IMPLICIT_fu;
 	else if (value == "fd") return ACCIDENTAL_IMPLICIT_fd;
 	else {
-		LogWarning("Unsupported pitch name '%s'", value.c_str() );
+		LogWarning("Unsupported accidental implicit '%s'", value.c_str() );
 	}
 	return ACCIDENTAL_IMPLICIT_NONE;
 }
@@ -172,7 +172,7 @@ std::string Att::BarRenditionToStr(data_BARRENDITION data)
         case BARRENDITION_rptend : value = "rptend"; break;
         case BARRENDITION_single : value = "single"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown bar rendition '%d'", data);
             value = "";
             break;
     }
@@ -193,7 +193,7 @@ data_BARRENDITION Att::StrToBarRendition(std::string value)
 	else if (value == "rptend") return BARRENDITION_rptend;
 	else if (value == "single") return BARRENDITION_single;
 	else {
-		LogWarning("Unsupported pitch name '%s'", value.c_str() );
+		LogWarning("Unsupported bar rendition '%s'", value.c_str() );
 	}
 	return BARRENDITION_NONE;
 }
@@ -211,7 +211,7 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
         case BEATRPT_REND_128 : value = "128"; break;
         case BEATRPT_REND_mixed : value = "mixed"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown beatrpt rend '%d'", data);
             value = "";
             break;
     }
@@ -241,7 +241,7 @@ std::string Att::BoolToStr(data_BOOLEAN data)
         case BOOLEAN_true : value = "true"; break;
         case BOOLEAN_false : value = "false"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown bool '%d'", data);
             value = "";
             break;
     }
@@ -253,7 +253,7 @@ data_BOOLEAN Att::StrToBool(std::string value)
 	if (value == "true") return BOOLEAN_true;
 	else if (value == "false") return BOOLEAN_false;
 	else {
-		LogWarning("Unsupported pitch name '%s'", value.c_str() );
+		LogWarning("Unsupported bool '%s'", value.c_str() );
 	}
 	return BOOLEAN_NONE;
 }
@@ -286,7 +286,7 @@ data_CLEFSHAPE Att::StrToClefShape( std::string value )
     else if ( value == "perc" ) data = CLEFSHAPE_perc;
     else
     {
-        LogWarning("Unsupported clef with @shape '%s'", value.c_str());
+        LogWarning("Unsupported clef shape '%s'", value.c_str());
     }
     return data;
 }    
@@ -305,7 +305,7 @@ std::string Att::ConToStr(data_CON data)
         case CON_i : value = "i"; break;
         case CON_b : value = "b"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown con '%d'", data);
             value = "";
             break;
     }
@@ -323,7 +323,7 @@ data_CON Att::StrToCon(std::string value)
     else if (value == "i") return CON_i;
     else if (value == "b") return CON_b;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported con '%s'", value.c_str() );
     }
     return CON_NONE;
 }
@@ -376,7 +376,7 @@ std::string Att::DurToStr(data_DURATION data)
     else if (data == DURATION_128) value = "128";
     else if (data == DURATION_256) value = "256";
     else {
-        LogWarning("Unknown duration '%d'", data);
+        LogWarning("Unknown dur '%d'", data);
         value = "4";
     }
     return value;
@@ -409,7 +409,7 @@ data_DURATION Att::StrToDur(std::string value)
             //LogWarning("PPQ duration dur_s are not supported"); // remove it for now
         }
         else {
-            LogWarning("Unknown @dur dur '%s'", value.c_str());
+            LogWarning("Unknown dur '%s'", value.c_str());
         }
         dur = DURATION_NONE;
     }
@@ -425,7 +425,7 @@ std::string Att::FontstyleToStr(data_FONTSTYLE data)
         case FONTSTYLE_normal : value = "normal"; break;
         case FONTSTYLE_oblique : value = "oblique"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown fontstyle '%d'", data);
             value = "";
             break;
     }
@@ -438,7 +438,7 @@ data_FONTSTYLE Att::StrToFontstyle(std::string value)
     else if (value == "normal") return FONTSTYLE_normal;
     else if (value == "oblique") return FONTSTYLE_oblique;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported fontstyle '%s'", value.c_str() );
     }
     return FONTSTYLE_NONE;
 }
@@ -451,7 +451,7 @@ std::string Att::FontweightToStr(data_FONTWEIGHT data)
         case FONTWEIGHT_bold : value = "bold"; break;
         case FONTWEIGHT_normal : value = "normal"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown fontweight '%d'", data);
             value = "";
             break;
     }
@@ -463,7 +463,7 @@ data_FONTWEIGHT Att::StrToFontweight(std::string value)
     if (value == "bold") return FONTWEIGHT_bold;
     else if (value == "normal") return FONTWEIGHT_normal;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported fontweight '%s'", value.c_str() );
     }
     return FONTWEIGHT_NONE;
 }
@@ -476,7 +476,7 @@ std::string Att::FuncToStr(data_FUNC data)
         case FUNC_caution : value = "caution"; break; //
         case FUNC_edit : value = "edit"; break; //
         default:
-            LogWarning("Unknown Func '%d'", data);
+            LogWarning("Unknown func '%d'", data);
             value = "";
             break;
     }
@@ -488,7 +488,7 @@ data_FUNC Att::StrToFunc(std::string value)
     if (value == "caution") return FUNC_caution; //
     else if (value == "edit") return FUNC_edit; //
     else {
-        LogWarning("Unknown Func '%s'", value.c_str() );
+        LogWarning("Unknown func '%s'", value.c_str() );
     }
     return FUNC_NONE;
 }
@@ -502,7 +502,7 @@ std::string Att::GraceToStr(data_GRACE data)
         case GRACE_unacc : value = "unacc"; break;
         case GRACE_unknown : value = "unknown"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown grace '%d'", data);
             value = "";
             break;
     }
@@ -515,7 +515,7 @@ data_GRACE Att::StrToGrace(std::string value)
     else if (value == "unacc") return GRACE_unacc;
     else if (value == "unknown") return GRACE_unknown;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported grace '%s'", value.c_str() );
     }
     return GRACE_NONE;
 }
@@ -542,7 +542,7 @@ std::string Att::KeySignatureToStr(data_KEYSIGNATURE data)
         case KEYSIGNATURE_7s : value = "7s"; break;
         case KEYSIGNATURE_mixed : value = "mixed"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown key signature '%d'", data);
             value = "";
             break;
     }
@@ -568,7 +568,7 @@ data_KEYSIGNATURE Att::StrToKeySignature(std::string value)
 	else if (value == "7s") return KEYSIGNATURE_7s;
 	else if (value == "mixed") return KEYSIGNATURE_mixed;
 	else {
-		LogWarning("Unsupported pitch name '%s'", value.c_str() );
+		LogWarning("Unsupported key signature '%s'", value.c_str() );
 	}
 	return KEYSIGNATURE_NONE;
 }
@@ -584,7 +584,7 @@ std::string Att::LayerschemeToStr(data_LAYERSCHEME data)
         case LAYERSCHEME_3o : value = "3o"; break;
         case LAYERSCHEME_3f : value = "3f"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown layerscheme '%d'", data);
             value = "";
             break;
     }
@@ -599,7 +599,7 @@ data_LAYERSCHEME Att::StrToLayerscheme(std::string value)
     else if (value == "3o") return LAYERSCHEME_3o;
     else if (value == "3f") return LAYERSCHEME_3f;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported layerscheme '%s'", value.c_str() );
     }
     return LAYERSCHEME_NONE;
 }
@@ -612,7 +612,7 @@ std::string Att::LigatureToStr(data_LIGATURE data)
         case LIGATURE_recta : value = "recta"; break;
         case LIGATURE_obliqua : value = "obliqua"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown ligature '%d'", data);
             value = "";
             break;
     }
@@ -624,7 +624,7 @@ data_LIGATURE Att::StrToLigature(std::string value)
     if (value == "recta") return LIGATURE_recta;
     else if (value == "obliqua") return LIGATURE_obliqua;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported ligature '%s'", value.c_str() );
     }
     return LIGATURE_NONE;
 }
@@ -663,7 +663,7 @@ std::string Att::MeterSignToStr(data_METERSIGN data)
         case METERSIGN_common : value = "common"; break;
         case METERSIGN_cut : value = "cut"; break;
         default:
-            LogWarning("Unknown meterSig sym '%d'", data);
+            LogWarning("Unknown meter sign '%d'", data);
             value = "";
             break;
     }
@@ -727,7 +727,7 @@ std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
         case MODUSMAIOR_2 : value = "2"; break;
         case MODUSMAIOR_3 : value = "3"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown modusmaior '%d'", data);
             value = "";
             break;
     }
@@ -739,7 +739,7 @@ data_MODUSMAIOR Att::StrToModusmaior(std::string value)
     if (value == "2") return MODUSMAIOR_2;
     else if (value == "3") return MODUSMAIOR_3;
     else {
-        LogWarning("Unsupported mode '%s'", value.c_str() );
+        LogWarning("Unsupported modusmaior '%s'", value.c_str() );
     }
     // default
     return MODUSMAIOR_NONE;
@@ -753,7 +753,7 @@ std::string Att::ModusminorToStr(data_MODUSMINOR data)
         case MODUSMINOR_2 : value = "2"; break;
         case MODUSMINOR_3 : value = "3"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown modusmaior '%d'", data);
             value = "";
             break;
     }
@@ -765,7 +765,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value)
     if (value == "2") return MODUSMINOR_2;
     else if (value == "3") return MODUSMINOR_3;
     else {
-        LogWarning("Unsupported mode '%s'", value.c_str() );
+        LogWarning("Unsupported modusmaior '%s'", value.c_str() );
     }
     // default
     return MODUSMINOR_NONE;
@@ -853,7 +853,7 @@ std::string Att::OrientationToStr(data_ORIENTATION data)
         case ORIENTATION_90CW : value = "90CW"; break;
         case ORIENTATION_90CCW : value = "90CCW"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown orientation '%d'", data);
             value = "";
             break;
     }
@@ -866,7 +866,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value)
 	else if (value == "90CW") return ORIENTATION_90CW;
 	else if (value == "90CCW") return ORIENTATION_90CCW;
 	else {
-		LogWarning("Unsupported pitch name '%s'", value.c_str() );
+		LogWarning("Unsupported orientation '%s'", value.c_str() );
 	}
 	return ORIENTATION_NONE;
 }
@@ -884,7 +884,7 @@ std::string Att::PitchNameToStr(data_PITCHNAME data)
         case PITCHNAME_a : value = "a"; break;
         case PITCHNAME_b : value = "b"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown pitch name '%d'", data);
             value = "";
             break;
     }
@@ -941,7 +941,7 @@ std::string Att::ProlatioToStr(data_PROLATIO data)
         case PROLATIO_2 : value = "2"; break;
         case PROLATIO_3 : value = "3"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown prolatio '%d'", data);
             value = "";
             break;
     }
@@ -953,7 +953,7 @@ data_PROLATIO Att::StrToProlatio(std::string value)
     if (value == "2") return PROLATIO_2;
     else if (value == "3") return PROLATIO_3;
     else {
-        LogWarning("Unsupported mode '%s'", value.c_str() );
+        LogWarning("Unsupported prolatio '%s'", value.c_str() );
     }
     // default
     return PROLATIO_NONE;
@@ -968,7 +968,7 @@ std::string Att::StaffRelToStr( data_STAFFREL data )
         case STAFFREL_below : value = "below"; break;
         case STAFFREL_within : value = "within"; break;
         default:
-            LogWarning("Unknown staffrel '%d'", data);
+            LogWarning("Unknown staff rel '%d'", data);
             value = "";
             break;
     }
@@ -981,7 +981,7 @@ data_STAFFREL Att::StrToStaffRel(std::string value)
     else if (value == "above") return STAFFREL_above;
     else if (value == "within") return STAFFREL_within;
     else {
-        LogWarning("Unsupported staffrel '%s'", value.c_str() );
+        LogWarning("Unsupported staff rel '%s'", value.c_str() );
     }
     // default
     return STAFFREL_NONE;
@@ -996,7 +996,7 @@ std::string Att::StemDirectionToStr(data_STEMDIRECTION data)
         case STEMDIRECTION_up : value = "up"; break;
         case STEMDIRECTION_down : value = "down"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown stem direction '%d'", data);
             value = "";
             break;
     }
@@ -1008,7 +1008,7 @@ data_STEMDIRECTION Att::StrToStemDirection(std::string value)
     if (value == "up") return STEMDIRECTION_up;
     else if (value == "down") return STEMDIRECTION_down;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported stem direction '%s'", value.c_str() );
     }
     return STEMDIRECTION_NONE;
 }
@@ -1022,7 +1022,7 @@ std::string Att::StemPositionToStr(data_STEMPOSITION data)
         case STEMPOSITION_right : value = "right"; break;
         case STEMPOSITION_center : value = "center"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown stem position '%d'", data);
             value = "";
             break;
     }
@@ -1035,7 +1035,7 @@ data_STEMPOSITION Att::StrToStemPosition(std::string value)
     else if (value == "right") return STEMPOSITION_right;
     else if (value == "center") return STEMPOSITION_center;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported stem position '%s'", value.c_str() );
     }
     return STEMPOSITION_NONE;
 }    
@@ -1076,11 +1076,22 @@ std::string Att::TieToStr(data_TIE data)
         case TIE_m : value = "m"; break;
         case TIE_t : value = "t"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown tie '%d'", data);
             value = "";
             break;
     }
     return value;
+}
+
+data_TIE Att::StrToTie(std::string value)
+{
+    if (value == "i") return TIE_i;
+    else if (value == "m") return TIE_m;
+    else if (value == "t") return TIE_t;
+    else {
+        LogWarning("Unsupported tie '%s'", value.c_str() );
+    }
+    return TIE_NONE;
 }
 
 std::string Att::TempusToStr(data_TEMPUS data)
@@ -1091,7 +1102,7 @@ std::string Att::TempusToStr(data_TEMPUS data)
         case TEMPUS_2 : value = "2"; break;
         case TEMPUS_3 : value = "3"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown tempus '%d'", data);
             value = "";
             break;
     }
@@ -1103,23 +1114,12 @@ data_TEMPUS Att::StrToTempus(std::string value)
     if (value == "2") return TEMPUS_2;
     else if (value == "3") return TEMPUS_3;
     else {
-        LogWarning("Unsupported mode '%s'", value.c_str() );
+        LogWarning("Unsupported tempus '%s'", value.c_str() );
     }
     // default
     return TEMPUS_NONE;
 }
 
-data_TIE Att::StrToTie(std::string value)
-{
-    if (value == "i") return TIE_i;
-    else if (value == "m") return TIE_m;
-    else if (value == "t") return TIE_t;
-    else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
-    }
-    return TIE_NONE;
-}
-    
 std::string Att::Tstamp2ToStr(typedef_TSTAMP2 data)
 {
     return "0m0.0";
@@ -1139,7 +1139,7 @@ std::string Att::WordPosToStr(data_WORDPOS data)
         case WORDPOS_m : value = "m"; break;
         case WORDPOS_t : value = "t"; break;
         default:
-            LogWarning("Unknown mode '%d'", data);
+            LogWarning("Unknown word pos '%d'", data);
             value = "";
             break;
     }
@@ -1152,7 +1152,7 @@ data_WORDPOS Att::StrToWordPos(std::string value)
     else if (value == "m") return WORDPOS_m;
     else if (value == "t") return WORDPOS_t;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported word pos '%s'", value.c_str() );
     }
     return WORDPOS_NONE;
 }

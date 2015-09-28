@@ -71,7 +71,6 @@ void LayerElement::Reset()
     
     m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
-    m_drawingStemDir = STEMDIRECTION_NONE;
     m_beamElementCoord = NULL;
 }
     
@@ -107,20 +106,44 @@ bool LayerElement::IsGraceNote()
     Note *note = dynamic_cast<Note*>(this);
     return (note && note->HasGrace());
 }
-
-data_STEMDIRECTION LayerElement::GetDrawingStemDir()
+    
+Beam* LayerElement::IsInBeam()
 {
-    if (this->Is() == NOTE) {
-        Note *note = dynamic_cast<Note*>(this);
-        assert( note );
-        return note->GetDrawingStemDir();
+    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return NULL;
+    return dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
+}
+    
+int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
+{
+    if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        // We should also take into accound the stem shift to the right
+        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface*>(this);
+        assert(stemmedDrawingInterface);
+        if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+        }
+        else {
+            return stemmedDrawingInterface->GetDrawingStemStart().y + doc->GetDrawingUnit(staffSize);
+        }
     }
-    if (this->Is() == CHORD) {
-        Chord *chord = dynamic_cast<Chord*>(this);
-        assert( chord );
-        return chord->GetDrawingStemDir();
+    return this->GetDrawingY();
+}
+
+
+int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
+{
+    if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        // We should also take into accound the stem shift to the right
+        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface*>(this);
+        assert(stemmedDrawingInterface);
+        if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            return stemmedDrawingInterface->GetDrawingStemStart().y - doc->GetDrawingUnit(staffSize);
+        }
+        else {
+            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+        }
     }
-    return STEMDIRECTION_NONE;
+    return this->GetDrawingY();
 }
     
 bool LayerElement::IsCueSize()
@@ -233,7 +256,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_KEYSIG_ATTR;
         }
         else {
-            type = ALIGNMENT_KEYSIG;
+            //type = ALIGNMENT_KEYSIG;
+            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
+            type = ALIGNMENT_KEYSIG_ATTR;
         }
     }
     else if (this->Is() == MENSUR) {
@@ -255,7 +281,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             // replace the current meter signature
             (*currentMeterSig) = dynamic_cast<MeterSig*>(this);
             assert( *currentMeterSig );
-            type = ALIGNMENT_METERSIG;
+            //type = ALIGNMENT_METERSIG
+            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
+            type = ALIGNMENT_METERSIG_ATTR;
         }
     }
     else if ( (this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT) ) {
@@ -420,6 +449,25 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
     }
     
     return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::TimeSpanningLayerElements( ArrayPtrVoid *params )
+{
+    // param 0: a pointer to the vector of LayerElement pointer to fill
+    // param 1: the minimum position
+    // param 2: the maximum position
+    std::vector<LayerElement*> *spanningContent = static_cast<std::vector<LayerElement*>*>((*params).at(0));
+    int *min_pos = static_cast<int*>((*params).at(1));
+    int *max_pos = static_cast<int*>((*params).at(2));
+    
+    if (this->GetDrawingX() > (*min_pos) && this->GetDrawingX() < (*max_pos)) {
+        spanningContent->push_back(this);
+    }
+    else if (this->GetDrawingX() > (*max_pos) ) {
+        return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_CONTINUE;    
 }
 
 } // namespace vrv

@@ -52,11 +52,12 @@ public:
     void AddLayerElement(LayerElement *element);
     
     /**
-     * @name Set and get the stem direction of the beam.
+     * Return information about the position in the beam
      */
     ///@{
-    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
+    bool IsFirstInBeam(LayerElement *element);
+    bool IsLastInBeam(LayerElement *element);
+    ///@}
     
     /**
      *
@@ -87,10 +88,6 @@ private:
 public:
     
 private:
-    /**
-     * The drawing stem direction of the beam
-     **/
-    data_STEMDIRECTION m_drawingStemDir;
     /**
      * An array of the coordinates for each element
      **/

@@ -51,9 +51,6 @@ namespace vrv {
 #define MIN_STEM_WIDTH 1.0
 #define MAX_STEM_WIDTH 5.0
     
-#define MIN_TIE_HEIGHT 20
-#define MIN_TIE_THICKNESS 6
-    
 //----------------------------------------------------------------------------
 // Default scaling (%) and spacing (units) values
 //----------------------------------------------------------------------------
@@ -77,6 +74,12 @@ namespace vrv {
 #define DEFAULT_MEASURE_WIDTH 12.0
 #define MIN_MEASURE_WIDTH 1.0
 #define MAX_MEASURE_WIDTH 30.0
+
+#define DEFAULT_TIE_THICKNESS 0.5
+    
+#define DEFAULT_MIN_SLUR_HEIGHT 1.2
+#define DEFAULT_MAX_SLUR_HEIGHT 3.0
+#define DEFAULT_SLUR_THICKNESS 0.6
     
 /** The default position at the beginning of a measure */
 #define DEFAULT_LEFT_POSITION 1.3
@@ -132,7 +135,16 @@ namespace vrv {
 
 // the space between each lyric line in units
 #define TEMP_STYLE_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
-
+    
+// the key signature spacing factor
+#define TEMP_STYLE_KEYSIG_STEP 1.3
+    
+// the maximum angle of a slur
+#define TEMP_STYLE_SLUR_MAX_SLOPE (45 * M_PI / 180)
+#define TEMP_STYLE_SLUR_CURVE_FACTOR 5 // a factor for allow more (0) or less (100) curved slurs
+#define TEMP_STYLE_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
+#define TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
+    
 
 /**
  * This class contains the document default environment variables.
@@ -184,6 +196,12 @@ public:
     short m_minMeasureWidth;
     /** The lyrics size (in units / PARAM_DENOMINATOR) */
     int m_lyricSize;
+    
+    /** ties and slurs */
+    char m_tieThickness;
+    char m_minSlurHeight;
+    char m_maxSlurHeight;
+    char m_slurThickness;
     
     /** The left position */
     char m_leftPosition;

@@ -9,12 +9,12 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
-#include "devicecontextbase.h"
 #include "object.h"
 
 namespace vrv {
 
 class Alignment;
+class Beam;
 class BeamElementCoord;
 class Layer;
 class Mensur;
@@ -81,13 +81,16 @@ public:
     bool IsCueSize();
     /** Return true if the element has to be aligned horizontally */
     virtual bool HasToBeAligned() { return false; };
+    /** Returns the beam parent if in beam */
+    Beam *IsInBeam();
     ///@}
     
     /**
-     * Returns the drawing stem direction if the element is a note or a chord.
-     * (Could one day go in a drawing stem interface)
+     * Returns the drawing top and bottom taking into accound stem, etc.
+     * We pass the doc as parameter in order to have access to the current drawing parameters.
      */
-    data_STEMDIRECTION GetDrawingStemDir();
+    int GetDrawingTop(Doc* doc, int staffSize);
+    int GetDrawingBottom(Doc* doc, int staffSize);
 
     /**
      * Alignment getter
@@ -121,20 +124,13 @@ public:
      */
     virtual int SetDrawingXY( ArrayPtrVoid *params );
     
+    virtual int TimeSpanningLayerElements( ArrayPtrVoid *params );
+    
 private:
     
 public:
 	/** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
-    /** 
-     * If this is a note, store here the stem coordinates (useful for ex. tuplets) 
-     */
-    Point m_drawingStemStart; // beginning point, the one near the note
-    Point m_drawingStemEnd; // end point (!), near beam or stem
-    /** 
-     * Stem direction as drawn 
-     */
-    data_STEMDIRECTION m_drawingStemDir;
     /**
      * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
      */

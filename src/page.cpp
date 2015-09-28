@@ -188,6 +188,7 @@ void Page::LayOutHorizontally( )
     params.push_back( &shift );
     params.push_back( &justifiable_shift );
     params.push_back( &minMeasureWidth );
+    params.push_back( doc );
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
     // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );

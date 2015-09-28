@@ -10,6 +10,7 @@
 #define __VRV_CHORD_H__
 
 #include "atts_shared.h"
+#include "drawinginterface.h"
 #include "durationinterface.h"
 #include "layerelement.h"
 
@@ -29,7 +30,7 @@ namespace vrv {
  * It contains notes.
  */
     
-class Chord: public LayerElement, public ObjectListInterface, public DurationInterface, 
+class Chord: public LayerElement, public ObjectListInterface, public StemmedDrawingInterface, public DurationInterface,
     public AttCommon,
     public AttStemmed,
     public AttTiepresent
@@ -65,17 +66,27 @@ public:
     void ResetAccidList();
     
     /**
+     * Return information about the position in the chord
+     */
+    ///@{
+    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    int PositionInChord(Note *note);
+    ///@}
+    
+    /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
      * Further documentation in chord.cpp comments.
      */
     void ResetAccidSpace(int fullUnit);
     
     /**
-     * @name Set and get the stem direction of the chord.
+     * @name Set and get the stem direction and stem positions
+     * The methods are overriding the interface because we want to apply it to child notes
      */
     ///@{
-    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
+    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
+    virtual void SetDrawingStemStart(Point stemStart);
+    virtual void SetDrawingStemEnd(Point stemEnd);
     ///@}
     
     //----------//
@@ -97,9 +108,6 @@ protected:
      * Clear the m_clusters vector and delete all the objects.
      */
     void ClearClusters();
-    
-private:
-    data_STEMDIRECTION m_drawingStemDir;
     
 public:
     std::list<ChordCluster*> m_clusters;

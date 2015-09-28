@@ -157,7 +157,6 @@ protected:
 	void DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
     void DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff,  Measure *measure );
     void DrawLayerList( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId );
-	void DrawSlur( DeviceContext *dc, Layer *layer, int x1, int y1, int x2, int y2, bool up, int height = -1);
     ///@}
     
     /**
@@ -238,7 +237,7 @@ protected:
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
     void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
-    void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
@@ -312,14 +311,20 @@ protected:
 	void DrawVerticalLine ( DeviceContext *dc, int y1, int y2, int x1, int nbr);
 	void DrawHorizontalLine ( DeviceContext *dc, int x1, int x2, int y1, int nbr);
 	void DrawSmuflCode ( DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin );
-    void DrawTieOrSlurBezier(DeviceContext *dc, int x, int y, int x1, int y1, bool direction);
-	void DrawPartFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+    void DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
+    void DrawPartFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
 	void DrawSmuflString ( DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
 	void DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
 	void DrawFullRectangle( DeviceContext *dc, int x1, int y1, int x2, int y2);
 	void DrawObliquePolygon ( DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
 	void DrawDot ( DeviceContext *dc, int x, int y, int staffSize );
     ///@}
+    
+    /**
+     * Calculate the ScoreDef width by taking into account its widest key signature
+     * This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted system
+     */
+    void SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef);
     
 private:    
     /**
@@ -332,6 +337,19 @@ private:
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet* tuplet);
     int GetSylY( Syl* syl, Staff *staff );
+    ///@}
+    
+    /**
+     * @name Internal methods used for calculating slurs
+     */
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
+    int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
+                         bool up, float angle, bool posRatio = true );
+    void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
+                         bool up, float *angle, bool forceBothSides );
+    float GetAdjustedSlurAngle(Point *p1, Point *p2, bool up);
+    void GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize);
+    void GetSpanningPointPositions( ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
     ///@}
     
     /**
@@ -354,6 +372,17 @@ private:
      * This is useful for example when calculating bezier positions.
      */
     static void SwapPoints (Point *x1, Point *x2);
+    
+    /**
+     * Calculate the position of a point after a rotation of rot_alpha around the center
+     */
+    static Point CalcPositionAfterRotation(Point point , float rot_alpha, Point center);
+    
+    /**
+     * Calculate the position of a point after a rotation of rot_alpha around the center
+     */
+    static int CalcBezierAtPosition(Point bezier[], int x);
+    
     
     /**
      * Swap values passed as reference.
@@ -396,7 +425,9 @@ protected:
     ScoreDef m_drawingScoreDef;
     
 private:
-
+    /** buffer for De-Casteljau algorithm */
+    static int s_deCasteljau[4][4];
+    
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
     static int s_drawingLigX[2], s_drawingLigY[2];   

@@ -37,6 +37,9 @@ public:
     virtual ClassId Is() { return BEATRPT; };
     ///@}
     
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+    
     /**
      * Returns the duration (in double) for the element.
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since

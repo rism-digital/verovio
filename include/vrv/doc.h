@@ -11,12 +11,12 @@
 
 #include "devicecontextbase.h"
 #include "scoredef.h"
+#include "style.h"
 
 namespace vrv {
 
 class FontInfo;
 class Page;
-class Style;
     
 enum DocType {
     Raw = 0,
@@ -109,6 +109,17 @@ public:
     void SetSpacingStaff( short spacingStaff );
     void SetSpacingSystem( short spacingSystem );
     ///@}
+    
+    /**
+     * @name Getters for tie and slur parameters
+     */
+    ///@{
+    char GetTieThickness() { return m_style->m_tieThickness; };
+    char GetSlurMinHeight() { return m_style->m_minSlurHeight; };
+    char GetSlurMaxHeight() { return m_style->m_maxSlurHeight; };
+    char GetSlurThickness() { return m_style->m_slurThickness; };
+    ///@}
+     
 
     /**
      * @name Getters for the page dimensions and margins

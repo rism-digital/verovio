@@ -11,7 +11,6 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -71,11 +70,14 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     processLayerElement = true;
     m_currentPage->Process( &setDrawingXY, &params );
     
+    // Keep the width of the initial scoreDef
+    SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
+    
     // Set the current score def to the page one
     // The page one has previously been set by Object::SetCurrentScoreDef
     m_drawingScoreDef = m_currentPage->m_drawingScoreDef;
 
-    if ( background ) dc->DrawRectangle( 0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight );
+    if ( background ) dc->DrawRectangle(0, 0, m_doc->m_drawingPageWidth, m_doc->m_drawingPageHeight);
     
     dc->DrawBackgroundImage( );
     
@@ -93,13 +95,47 @@ void View::DrawCurrentPage( DeviceContext *dc, bool background )
     
     dc->EndPage();
 }
+    
+void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
+{
+    assert(dc);
+    assert(scoreDef);
+    
+    char numAlteration = 0;
+    
+    // key signature of the scoreDef
+    if (scoreDef->HasKeySigInfo()) {
+        KeySig *keySig = scoreDef->GetKeySigCopy();
+        assert(keySig);
+        numAlteration = (keySig->GetAlterationNumber() > numAlteration) ? keySig->GetAlterationNumber() : numAlteration;
+        delete keySig;
+    }
+    
+    // longest key signature of the staffDefs
+    ListOfObjects* scoreDefList = scoreDef->GetList(scoreDef); //make sure it's initialized
+    for (ListOfObjects::iterator it = scoreDefList->begin(); it != scoreDefList->end(); it++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef*>(*it);
+        assert( staffDef) ;
+        if (!staffDef->HasKeySigInfo()) continue;
+        KeySig *keySig = staffDef->GetKeySigCopy();
+        assert(keySig);
+        numAlteration = (keySig->GetAlterationNumber() > numAlteration) ? keySig->GetAlterationNumber() : numAlteration;
+        delete keySig;
+    }
+    
+    int width = 0;
+    // G-clef as default width
+    width += m_doc->GetLeftMargin(CLEF) + m_doc->GetGlyphWidth(SMUFL_E050_gClef, 100, false) + m_doc->GetRightMargin(CLEF);
+    if (numAlteration > 0) {
+        width += m_doc->GetLeftMargin(KEYSIG) + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP + m_doc->GetRightMargin(KEYSIG);
+    }
+    
+    scoreDef->SetDrawingWidth(width);
+}
 
 //----------------------------------------------------------------------------
 // View - System
 //----------------------------------------------------------------------------
-
-
-// drawing
 
 void View::DrawSystem( DeviceContext *dc, System *system ) 
 {
@@ -177,7 +213,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
         return;
     }
     
-    if ( barLine == NULL) {
+    if (barLine == NULL) {
         // Draw the first staffGrp and from there its children recursively
         DrawStaffGrp( dc, measure, staffGrp, x, true, !scoreDef->DrawLabels() );
         
@@ -185,7 +221,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
         // if this was true (non-abbreviated labels), set it to false for next one
         scoreDef->SetDrawLabels( false );
     }
-    else{
+    else {
         barLine->SetDrawingX( x );
         dc->StartGraphic( barLine, "", barLine->GetUuid() );
         DrawBarlines( dc, measure, staffGrp, barLine );
@@ -239,14 +275,20 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 2;
     
     if (staffGrp->HasLabel()) {
+        std::string abbrLabel;
         std::string label = staffGrp->GetLabel();
-        if ( abbreviations ) {
+        if (abbreviations) {
             label = staffGrp->GetLabelAbbr();
+        }
+        // We still store the abbreviated label for calculating max width with abbreviations (see below)
+        else {
+            abbrLabel = staffGrp->GetLabelAbbr();
         }
         
         if ( label.length() != 0) {
             // HARDCODED
-            int x_label = x - 4 * m_doc->GetDrawingBeamWidth(100, false);
+            int space = 4 * m_doc->GetDrawingBeamWidth(100, false);
+            int x_label = x - space;
             int y_label = y_bottom - (y_bottom - y_top) / 2 - m_doc->GetDrawingUnit(100);
         
             dc->SetBrush( m_currentColour, AxSOLID );
@@ -260,12 +302,18 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 LogDebug("Staff or System missing in View::DrawStaffDefLabels");
             }
             else {
-                system->SetDrawingLabelsWidth( w );
+                system->SetDrawingLabelsWidth( w + space );
             }
         
             dc->StartText( ToDeviceContextX( x_label ), ToDeviceContextY( y_label ), RIGHT );
             dc->DrawText( label );
             dc->EndText( );
+            
+            // also store in the system the maximum width with abbreviations
+            if (!abbreviations && (abbrLabel.length() > 0)) {
+                dc->GetTextExtent( abbrLabel, &w, &h);
+                system->SetDrawingAbbrLabelsWidth( w + space );
+            }
         
             dc->ResetFont();
             dc->ResetBrush();
@@ -328,9 +376,14 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
             continue;
         }
         
+        std::string abbrLabel;
         std::string label = staffDef->GetLabel();
-        if ( abbreviations ) {
+        if (abbreviations) {
             label = staffDef->GetLabelAbbr();
+        }
+        // We still store the abbreviated label for calculating max width with abbreviations (see below)
+        else {
+            abbrLabel = staffDef->GetLabelAbbr();
         }
         
         if ( label.length() == 0) {
@@ -339,7 +392,8 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         }
         
         // HARDCODED
-        int x = system->GetDrawingX() - 3 * m_doc->GetDrawingBeamWidth(100, false);
+        int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
+        int x = system->GetDrawingX() - space;
         int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
         
         dc->SetBrush( m_currentColour, AxSOLID );
@@ -347,11 +401,17 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         
         // keep the widest width for the system
         dc->GetTextExtent( label, &w, &h);
-        system->SetDrawingLabelsWidth( w );
+        system->SetDrawingLabelsWidth( w + space );
         
         dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
         dc->DrawText( label );
         dc->EndText( );
+        
+        // also store in the system the maximum width with abbreviations for justification
+        if (!abbreviations && (abbrLabel.length() > 0)) {
+            dc->GetTextExtent( abbrLabel, &w, &h);
+            system->SetDrawingAbbrLabelsWidth( w + space );
+        }
         
         dc->ResetFont();
         dc->ResetBrush();
@@ -607,6 +667,9 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
         DrawVerticalLine( dc , y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
     }
+    else {
+        barLine->SetEmptyBB();
+    }
 }
 
  
@@ -857,28 +920,6 @@ int View::CalculatePitchCode ( Layer *layer, int y_n, int x_pos, int *octave )
 	return (code);
 }
 
-Point CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
-{
-    int distCenterX = (point.x - center.x);
-    int distCenterY = (point.y - center.y);
-    // pythagore, distance entre le point d'origine et le centre
-    int distCenter = (int)sqrt( pow( (double)distCenterX, 2 ) + pow( (double)distCenterY, 2 ) );
-	
-	// angle d'origine entre l'axe x et la droite passant par le point et le centre
-    float alpha = atan ( (float)distCenterX / (float)(distCenterY) );
-    
-    Point new_p = center;
-    int new_distCenterX, new_distCenterY;
-
-    new_distCenterX = ( (int)( sin( alpha - rot_alpha ) * distCenter ) );
-	new_p.x += new_distCenterX;
-
-    new_distCenterY = ( (int)( cos( alpha - rot_alpha ) * distCenter ) );
-	new_p.y += new_distCenterY;
-
-    return new_p;
-}
-
 void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure)
 {
 	assert( dc );
@@ -964,8 +1005,9 @@ void View::DrawSystemChildren( DeviceContext *dc, Object *parent, System *system
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is() == SCOREDEF) {
             // nothing to do, then
-            // ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(current);
-            // assert( scoreDef );
+            ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(current);
+            assert( scoreDef );
+            SetScoreDefDrawingWidth(dc, scoreDef);
         }
         else {
             assert(false);
@@ -1072,7 +1114,7 @@ void View::DrawSystemEditorialElement( DeviceContext *dc, EditorialElement *elem
 void View::DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system )
 {
     assert( element );
-    if ( element->Object::Is() == APP ) {
+    if ( element->Is() == APP ) {
         assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_MEASURE );
     }
     

@@ -409,7 +409,6 @@ Object *Object::GetFirstParent( const ClassId classId, int maxSteps )
         return ( m_parent->GetFirstParent( classId, maxSteps - 1 ) );
     }
 }
-
     
 Object *Object::GetLastParentNot( const ClassId classId, int maxSteps )
 {
@@ -424,83 +423,6 @@ Object *Object::GetLastParentNot( const ClassId classId, int maxSteps )
         return ( m_parent->GetLastParentNot( classId, maxSteps - 1 ) );
     }
 }
-    
-
-Object *Object::GetFirstChild( const ClassId classId )
-{
-    ArrayOfObjects::iterator iter;
-    int i;
-    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++)
-    {
-        Object *o = *iter;
-        if ( o->Is() == classId )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
-Object *Object::GetNextSibling( const ClassId classId )
-{
-    if (!m_parent) {
-        return NULL;
-    }
-    
-    ArrayOfObjects::iterator iter;
-    bool foundCurrent = false;
-    for (iter = this->m_parent->m_children.begin(); iter != this->m_parent->m_children.end(); ++iter)
-    {
-        // we have not found the current object
-        if ( this == *iter ) {
-            foundCurrent = true;
-            // continue to find the next sibling
-            continue;
-        }
-        else if (!foundCurrent) {
-            continue;
-        }
-        if ( classId == UNSPECIFIED ) {
-            return *iter;
-        }
-        if ( (*iter)->Is() == classId )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
-Object *Object::GetPreviousSibling( const ClassId classId )
-{
-    if (!m_parent) {
-        return NULL;
-    }
-    
-    ArrayOfObjects::reverse_iterator iter;
-    bool foundCurrent = false;
-    for (iter = this->m_parent->m_children.rbegin(); iter != this->m_parent->m_children.rend(); ++iter)
-    {
-        // we have not found the current object
-        if ( this == *iter ) {
-            foundCurrent = true;
-            // continue to find the next sibling
-            continue;
-        }
-        else if (!foundCurrent) {
-            continue;
-        }
-        if ( classId == UNSPECIFIED ) {
-            return *iter;
-        }
-        if ( (*iter)->Is() == classId )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
 
 bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
 {
@@ -1153,7 +1075,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
-        (*min_pos) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        (*min_pos) = 0;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );

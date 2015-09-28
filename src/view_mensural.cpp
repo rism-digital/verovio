@@ -86,15 +86,13 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     /************** Stem/notehead direction: **************/
     
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
-    data_STEMDIRECTION noteStemDir = note->CalcDrawingStemDir();
-    if ( noteStemDir != STEMDIRECTION_NONE ) {
-        note->SetDrawingStemDir( noteStemDir );
-    }
-    else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        note->SetDrawingStemDir( layer->GetDrawingStemDir() );
-    }
-    else {
-        note->SetDrawingStemDir((noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up);
+    if  (!note->HasDrawingStemDir()) {
+        if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+            note->SetDrawingStemDir( layer->GetDrawingStemDir() );
+        }
+        else {
+            note->SetDrawingStemDir((noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up);
+        }
     }
     
     xNote = xStem - radius;

@@ -1118,8 +1118,8 @@ public:
     bool HasBezier( );
     
     //
-    void SetBulge(std::string bulge_) { m_bulge = bulge_; };
-    std::string GetBulge() const { return m_bulge; };    
+    void SetBulge(double bulge_) { m_bulge = bulge_; };
+    double GetBulge() const { return m_bulge; };    
     bool HasBulge( );
     
     //
@@ -1141,7 +1141,7 @@ private:
      * The bulge attribute must contain one or more decimal values expressed in inter-
      * line units.
      **/
-    std::string m_bulge;
+    double m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     data_CURVEDIR m_curvedir;
 

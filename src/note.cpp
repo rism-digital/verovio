@@ -27,7 +27,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface(),
+	LayerElement("note-"), StemmedDrawingInterface(), DurationInterface(), PitchInterface(),
     AttColoration(),
     AttGraced(),
     AttNoteLogMensural(),
@@ -67,6 +67,7 @@ Note::~Note()
 void Note::Reset()
 {
     LayerElement::Reset();
+    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     
@@ -163,20 +164,25 @@ bool Note::IsClusterExtreme()
     if (this == cluster->at(cluster->size() - 1)) return true;
     else return false;
 }
-    
-data_STEMDIRECTION Note::CalcDrawingStemDir()
+
+bool Note::HasDrawingStemDir()
 {
+    // In chord, the value is set in Chord::SetDrawingStemDir
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
+    if(chordParent) {
+        return true;
+    }
+    // In beam, the value is tet in View::DrawBeam - however, we need to check that the note is part of the beam
+    // It is not necessary the case with grace notes
     Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
-    if( chordParent ) {
-        return chordParent->GetDrawingStemDir();
+    if (beamParent && (beamParent->GetListIndex(this) > -1)) {
+        return true;
     }
-    else if( beamParent ) {
-        return beamParent->GetDrawingStemDir();
+    else if (this->HasStemDir()) {
+        this->SetDrawingStemDir(this->GetStemDir());
+        return true;
     }
-    else {
-        return this->GetStemDir();
-    }
+    return false;
 }
     
 //----------------------------------------------------------------------------
@@ -191,7 +197,8 @@ int Note::PrepareTieAttr( ArrayPtrVoid *params )
     Chord **currentChord = static_cast<Chord**>((*params).at(1));
     
     AttTiepresent *check = this;
-    if ((*currentChord)) {
+    // Use the parent chord if there is no @tie on the note
+    if (!this->HasTie() && (*currentChord)) {
         check = (*currentChord);
     }
     assert(check);
