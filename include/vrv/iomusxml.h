@@ -25,6 +25,7 @@ namespace vrv {
 //class Beam;
 //class Clef;
 //class Doc;
+class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
@@ -38,8 +39,32 @@ class Slur;
 //class Staff;
 class StaffGrp;
 class System;
+class Tie;
 ///class Tuplet;
+    
+//----------------------------------------------------------------------------
+// namespace for local MusicXml classes
+//----------------------------------------------------------------------------
+    
+namespace musicxml {
 
+class OpenTie
+{
+public:
+    OpenTie(int staffN, int layerN, data_PITCHNAME pname, char oct) {
+        m_staffN = staffN;
+        m_layerN = layerN;
+        m_pname = pname;
+        m_oct = oct;
+    }
+    
+    int m_staffN;
+    int m_layerN;
+    data_PITCHNAME m_pname;
+    char m_oct;
+};
+    
+} // namespace musicxml
 
 //----------------------------------------------------------------------------
 // This class is not up-to-date
@@ -64,11 +89,11 @@ private:
     /** return the number of staves in the part */
     int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset);
     
-    void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure);
-    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure);
-    void ReadMusicXmlBarline(pugi::xml_node, Measure *measure);
-    void ReadMusicXmlForward(pugi::xml_node, Measure *measure);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure);
+    void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlBarline(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
     
     bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
     bool IsElement(pugi::xml_node node, std::string name);
@@ -83,6 +108,8 @@ private:
     void AddLayerElement(Layer *layer, LayerElement *element);
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
     void RemoveLastFromStack(ClassId classId);
+    void OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie);
+    void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
     
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
@@ -95,6 +122,10 @@ private:
     std::vector<LayerElement*> m_elementStack;
     
     std::vector<std::pair<Slur*, int> > m_slurStack;
+    
+    std::vector<std::pair<Tie*, musicxml::OpenTie> > m_tieStack;
+    
+    std::vector<std::pair<int, FloatingElement*> > m_floatingElements;
 };
 
 } // namespace vrv {

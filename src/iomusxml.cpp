@@ -15,9 +15,9 @@
 
 //----------------------------------------------------------------------------
 
-//#include "beam.h"
+#include "att_comparison.h"
+#include "beam.h"
 #include "chord.h"
-//#include "clef.h"
 #include "doc.h"
 #include "layer.h"
 #include "measure.h"
@@ -27,7 +27,7 @@
 #include "rest.h"
 #include "staff.h"
 #include "system.h"
-//#include "tie.h"
+#include "tie.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -222,6 +222,29 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
         }
     }
 }
+    
+void MusicXmlInput::OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie)
+{
+    tie->SetStartid(note->GetUuid());
+    musicxml::OpenTie openTie(staff->GetN(), layer->GetN(), note->GetPname(), note->GetOct());
+    m_tieStack.push_back(std::make_pair(tie, openTie));
+}
+    
+void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie)
+{
+    std::vector<std::pair<Tie*, musicxml::OpenTie> >::iterator iter;
+    for (iter = m_tieStack.begin(); iter != m_tieStack.end(); iter++) {
+        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN()) &&
+            (iter->second.m_pname == note->GetPname()) && iter->second.m_oct == note->GetOct()) {
+            iter->first->SetEndid(note->GetUuid());
+            m_tieStack.erase(iter);
+            if (!isClosingTie) {
+                LogWarning("Closing tie for note '%s' even thought tie /tie@[type='stop'] is missing in the MusicXML", note->GetUuid().c_str());
+            }
+            return;
+        }
+    }
+}
 
 bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
@@ -281,6 +304,23 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         }
     }
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
+    
+    Measure *measure = NULL;
+    std::vector<std::pair<int, FloatingElement*> >::iterator iter;
+    for(iter = m_floatingElements.begin(); iter != m_floatingElements.end(); iter++) {
+        if (!measure || (measure->GetN() != iter->first)) {
+            AttCommonNComparison comparisonMeasure(MEASURE, iter->first);
+            measure = dynamic_cast<Measure*>(system->FindChildByAttComparison(&comparisonMeasure, 1));
+        }
+        if (!measure) {
+            LogWarning("Element '%s' could not be added to measure '%d'",
+                       iter->second->GetClassName().c_str(), iter->first);
+            continue;
+        }
+        measure->AddFloatingElement(iter->second);
+    }
+    
+    //assert(m_tieStack.empty());
     
     page->AddSystem( system );
     m_doc->AddPage( page );
@@ -398,7 +438,8 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nb
     return false;
 }
     
-bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset)
+bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure,
+                                        int nbStaves, int staffOffset)
 {
     assert(node);
     assert(measure);
@@ -425,13 +466,12 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
     m_elementStack.clear();
     
     // read the content of the measure
-    for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it)
-    {
+    for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         if (IsElement(*it, "barline")) {
-            ReadMusicXmlBarline(*it, measure);
+            ReadMusicXmlBarline(*it, measure, measureNb);
         }
         else if (IsElement(*it, "note")) {
-            ReadMusicXmlNote(*it, measure);
+            ReadMusicXmlNote(*it, measure, measureNb);
         }
     }
     
@@ -439,15 +479,15 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
     return true;
 }
     
-void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure, int measureNb)
 {
 }
 
-void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, int measureNb)
 {
 }
 
-void MusicXmlInput::ReadMusicXmlBarline(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlBarline(pugi::xml_node node, Measure *measure, int measureNb)
 {
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
@@ -468,13 +508,20 @@ void MusicXmlInput::ReadMusicXmlBarline(pugi::xml_node node, Measure *measure)
     }
 }
 
-void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, int measureNb)
 {
 }
     
-void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure)
+void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int measureNb)
 {
+    assert(node);
+    assert(measure);
+    
     Layer *layer = SelectLayer(node, measure);
+    assert(layer);
+    
+    Staff *staff = dynamic_cast<Staff*>(layer->GetFirstParent(STAFF));
+    assert(staff);
     
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -504,6 +551,20 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure)
     else {
         Note *note = new Note();
         
+        // Accidental
+        std::string accidentalStr = GetContentOfChild(node, "accidental");
+        if (!accidentalStr.empty()) {
+            Accid *accid = new Accid();
+            accid->SetAccid(ConvertAccidentalToAccid(accidentalStr));
+            note->AddLayerElement(accid);
+        }
+        
+        // Stem direction - taken into account below for the chord or the note
+        data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+        std::string stemDirStr = GetContentOfChild(node, "stem");
+        if (stemDirStr == "down") stemDir = STEMDIRECTION_down;
+        else if (stemDirStr == "up") stemDir = STEMDIRECTION_up;
+        
         // Pitch and octave
         pugi::xpath_node pitch = node.select_single_node("pitch");
         if (pitch) {
@@ -511,6 +572,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure)
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
             std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) note->SetOct(atoi(octaveStr.c_str()));
+            std::string alterStr = GetContentOfChild(node, "atler");
+            //
+            if (accidentalStr.empty() && !alterStr.empty()) {
+                // add accid.ges once supported
+                //note->SetAccidGes(ConvertAlterToAccid(alterStr));
+            }
         }
         
         // Look at the next note to see if we are starting or ending a chord
@@ -523,17 +590,44 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure)
                 Chord *chord = new Chord();
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
+                chord->SetStemDir(stemDir);
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
             }
+        }
+        
+        // Grace notes
+        pugi::xpath_node grace = node.select_single_node("grace");
+        if (grace) {
+            std::string slashStr = GetAttributeValue(grace.node(), "slash");
+            if (slashStr == "yes") note->SetGrace(GRACE_acc);
+            else if (slashStr == "no") note->SetGrace(GRACE_unacc);
+            else note->SetGrace(GRACE_unknown);
         }
         
         // Set the duration to the note if we are not in a chord
         if (m_elementStack.empty() || m_elementStack.back()->Is() != CHORD) {
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
+            note->SetStemDir(stemDir);
         }
         
+        // Ties
+        pugi::xpath_node tie1 = node.select_single_node("tie[1]");
+        pugi::xpath_node tie2 = node.select_single_node("tie[2]");
+        std::string tieStr1, tieStr2;
+        if (tie1) tieStr1 = GetAttributeValue(tie1.node(), "type");
+        if (tie2) tieStr2 = GetAttributeValue(tie2.node(), "type");
+        // First close tie
+        bool isClosingTie = ((tieStr1 == "stop") || (tieStr2 == "stop"));
+        CloseTie(staff, layer, note, isClosingTie);
+        // Then open a new tie
+        if ((tieStr1 == "start") || (tieStr2 == "start")) {
+            Tie *tie = new Tie();
+            m_floatingElements.push_back(std::make_pair(measureNb, tie));
+            OpenTie(staff, layer, note, tie);
+        }
+
         // Add the note to the layer or to the current container
         AddLayerElement(layer, note);
         
@@ -550,46 +644,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure)
     if (beamEnd) {
         RemoveLastFromStack(BEAM);
     }
-
-     /*
-     else:
-     pname = self._get_text(n.xpath("pitch/step"))
-     oct = self._get_text(n.xpath("pitch/octave"))
-     accid = None
-     if n.xpath("boolean(pitch/alter)"):
-     alter = self._get_text(n.xpath("pitch/alter"))
-     accid = MusicXMLtoMei.accidentals[int(alter)]
-     sx = n.xpath("notations/technical/string")
-     string = None
-     if len(sx):
-     string = self._get_text(sx)
-     fret = None
-     fx = n.xpath("notations/technical/fret")
-     if len(fx):
-     fret = self._get_text(fx)
-     
-     next_chord_tag = False
-     # look ahead to next note
-     if i+1 < len(notes):
-     next_chord_tag = notes[i+1].xpath("boolean(chord)")
-     
-     if next_chord_tag:
-     # a chord is beginning or continuing
-     if cur_chord is None:
-     # a chord is beginning
-     cur_chord = self._create_chord(dur, dur_ges)
-     layer.addChild(cur_chord)
-     
-     if cur_chord is not None:
-     note = self._create_note(pname, oct, string, fret, accid)
-     cur_chord.addChild(note)
-     else:
-     note = self._create_note(pname, oct, string, fret, accid, dur=dur, dur_ges=dur_ges)
-     layer.addChild(note)
-     
-     if not next_chord_tag:
-     cur_chord = None
-     */
 }
     
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string value)
