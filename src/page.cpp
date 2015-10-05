@@ -125,7 +125,7 @@ void Page::LayOutHorizontally( )
             DurationInterface *interface = dynamic_cast<DurationInterface*>(longestDur);
             assert(interface);
             longestActualDur = interface->GetActualDur();
-            LogDebug("Longest duration is %d", longestActualDur);
+            LogDebug("Longest duration is DUR_* code %d", longestActualDur);
         }
 
         params.clear();

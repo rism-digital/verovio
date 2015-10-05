@@ -455,14 +455,18 @@ to keep consecutive symbols from overlapping or nearly overlapping: we assume sp
 will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
 is a function of time interval.
  
-??The power function we currently use is all wrong; see _Behind Bars_, p. 39. We also need more
-flexibility: for example, for some purposes, spacing propoortional to duration is desirable.
-The best solution is probably to get ideal spacing from a user-definable table. */
+The power function we currently use is isn't quite right; see _Behind Bars_, p. 39. We also
+need more flexibility: for example, for some purposes, spacing propoortional to duration is
+desirable. The best solution is probably to get ideal spacing from a user-definable table. */
 
 int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur)
 {
+    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
+       that interval gets the space a semibreve would ordinarily get. (maxActualDur is in our
+       internal code format: cf. attdef.h). ??TO BE DONE */
+    if (maxActualDur<DUR_1) intervalTime /= pow( 2.0, DUR_1-maxActualDur);
     int intervalXRel;
-    intervalXRel = pow( intervalTime, 0.60 ) * 2.5; // 2.5 is an arbitrary value; so is 0.60
+    intervalXRel = pow( intervalTime, 0.50 ) * 3.8;     // numbers are experimental constants
     return intervalXRel;
 }
 
@@ -478,9 +482,10 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
-    // HARDCODED parameter for HorizontalSpaceForDuration
-    if ( intervalTime > 0.0 ) intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur);
-    
+    if ( intervalTime > 0.0 ) {
+        intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur);
+        LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+    }
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
     (*previousXRel) = m_xRel;
