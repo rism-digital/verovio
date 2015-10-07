@@ -25,6 +25,7 @@
 #include "mrest.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "staff.h"
 #include "system.h"
 #include "tie.h"
@@ -37,7 +38,6 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 MusicXmlInput::MusicXmlInput(Doc *doc, std::string filename) :
-// This is pretty bad. We open a bad fileoutputstream as we don't use it
     FileInputStream(doc)
 {
     m_filename = filename;
@@ -81,6 +81,9 @@ bool MusicXmlInput::ImportString(const std::string musicxml)
         return false;
     }
 }
+  
+//////////////////////////////////////////////////////////////////////////////
+// XML helpers
     
 bool MusicXmlInput::HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value)
 {
@@ -223,6 +226,9 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
     }
 }
     
+//////////////////////////////////////////////////////////////////////////////
+// Tie and slurs stack management
+    
 void MusicXmlInput::OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie)
 {
     tie->SetStartid(note->GetUuid());
@@ -245,6 +251,31 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
         }
     }
 }
+    
+void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur)
+{
+    slur->SetStartid(element->GetUuid());
+    musicxml::OpenSlur openSlur(staff->GetN(), layer->GetN(), number);
+    m_slurStack.push_back(std::make_pair(slur, openSlur));
+}
+
+void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element)
+{
+    std::vector<std::pair<Slur*, musicxml::OpenSlur> >::iterator iter;
+    for (iter = m_slurStack.begin(); iter != m_slurStack.end(); iter++) {
+        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN()) &&
+            (iter->second.m_number == number)) {
+            iter->first->SetEndid(element->GetUuid());
+            m_slurStack.erase(iter);
+            return;
+        }
+    }
+    LogWarning("Closing slur for element '%s' could not be matched", element->GetUuid().c_str());
+
+}
+    
+//////////////////////////////////////////////////////////////////////////////
+// Parsing methods
 
 bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
@@ -283,7 +314,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
             std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[@number='1']/attributes", partId.c_str());
+            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[@number='1']", partId.c_str());
             pugi::xpath_node partFirstMeasureAttributes = root.select_single_node(xpath.c_str());
             if (!partFirstMeasureAttributes) {
                 LogWarning("Could not find the 'attributes' element in the first measure of part '%s'", partId.c_str());
@@ -334,83 +365,91 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     assert(node);
     assert(staffGrp);
     
-    // First get the number of staves in the part
     int nbStaves = 1;
-    pugi::xpath_node staves = node.select_single_node("staves");
-    if (staves) {
-        if (staves.node().text()) {
-            int values = atoi(staves.node().text().as_string());
-            nbStaves = (values > 0) ? values : 1;
-        }
-    }
     
-    int i;
-    std::string xpath;
-    // Create as many staffDef
-    for (i = 0; i < nbStaves; i++) {
-        StaffDef *staffDef = new StaffDef();
-        staffDef->SetN(i + 1 + staffOffset);
-        // by default five line staves
-        staffDef->SetLines(5);
+    for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it)
+    {
+        // We read all attribute elements until we reach something else
+        if (!IsElement(*it, "attributes")) break;
         
-        // clef sign - first look if we have a clef-sign with the corresponding staff @number
-        pugi::xpath_node clefSign;
-        xpath = StringFormat("clef[@number='%d']/sign", i+1);
-        clefSign = node.select_single_node(xpath.c_str());
-        // if not, look at a common one
-        if (!clefSign) {
-            clefSign = node.select_single_node("clef/sign");
-        }
-        if (clefSign && HasContent(clefSign.node())) {
-            staffDef->SetClefShape(staffDef->AttCleffingLog::StrToClefShape(GetContent(clefSign.node())));
-        }
-        // clef line
-        pugi::xpath_node clefLine;
-        xpath = StringFormat("clef[@number='%d']/line", i+1);
-        clefLine = node.select_single_node(xpath.c_str());
-        if (!clefLine) {
-            clefLine = node.select_single_node("clef/line");
-        }
-        if (clefLine && HasContent(clefLine.node())) {
-            staffDef->SetClefLine(staffDef->AttCleffingLog::StrToInt(clefLine.node().text().as_string()));
-        }
-        // key sig
-        pugi::xpath_node keyFifths;
-        xpath = StringFormat("key[@number='%d']/fifths", i+1);
-        keyFifths = node.select_single_node(xpath.c_str());
-        if (!keyFifths) {
-            keyFifths = node.select_single_node("key/fifths");
-        }
-        if (keyFifths && HasContent(keyFifths.node())) {
-            int key = atoi(keyFifths.node().text().as_string());
-            std::string value;
-            if (key < 0) value = StringFormat("%df", abs(key));
-            else value = StringFormat("%ds", key);
-            staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeySignature(value));
-        }
-        // time
-        pugi::xpath_node time;
-        xpath = StringFormat("time[@number='%d']", i+1);
-        time = node.select_single_node(xpath.c_str());
-        if (!time) {
-            time = node.select_single_node("time");
-        }
-        if (time) {
-            pugi::xpath_node symbol = time.node().select_single_node("symbol");
-            if (symbol && HasContent(symbol.node())) {
-                staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMeterSign(symbol.node().text().as_string()));
-            }
-            pugi::xpath_node beats = time.node().select_single_node("beats");
-            if (beats && HasContent(beats.node())) {
-                staffDef->SetMeterCount(staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string()));
-            }
-            pugi::xpath_node beatType = time.node().select_single_node("beat-type");
-            if (beatType && HasContent(beatType.node())) {
-                staffDef->SetMeterUnit(staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
+        // First get the number of staves in the part
+        pugi::xpath_node staves = it->select_single_node("staves");
+        if (staves) {
+            if (staves.node().text()) {
+                int values = atoi(staves.node().text().as_string());
+                nbStaves = (values > 0) ? values : 1;
             }
         }
-        staffGrp->AddStaffDef(staffDef);
+        
+        int i;
+        std::string xpath;
+        // Create as many staffDef
+        for (i = 0; i < nbStaves; i++) {
+            StaffDef *staffDef = new StaffDef();
+            staffDef->SetN(i + 1 + staffOffset);
+            // by default five line staves
+            staffDef->SetLines(5);
+            
+            // clef sign - first look if we have a clef-sign with the corresponding staff @number
+            pugi::xpath_node clefSign;
+            xpath = StringFormat("clef[@number='%d']/sign", i+1);
+            clefSign = it->select_single_node(xpath.c_str());
+            // if not, look at a common one
+            if (!clefSign) {
+                clefSign = it->select_single_node("clef/sign");
+            }
+            if (clefSign && HasContent(clefSign.node())) {
+                staffDef->SetClefShape(staffDef->AttCleffingLog::StrToClefShape(GetContent(clefSign.node())));
+            }
+            // clef line
+            pugi::xpath_node clefLine;
+            xpath = StringFormat("clef[@number='%d']/line", i+1);
+            clefLine = it->select_single_node(xpath.c_str());
+            if (!clefLine) {
+                clefLine = it->select_single_node("clef/line");
+            }
+            if (clefLine && HasContent(clefLine.node())) {
+                staffDef->SetClefLine(staffDef->AttCleffingLog::StrToInt(clefLine.node().text().as_string()));
+            }
+            // key sig
+            pugi::xpath_node keyFifths;
+            xpath = StringFormat("key[@number='%d']/fifths", i+1);
+            keyFifths = it->select_single_node(xpath.c_str());
+            if (!keyFifths) {
+                keyFifths = it->select_single_node("key/fifths");
+            }
+            if (keyFifths && HasContent(keyFifths.node())) {
+                int key = atoi(keyFifths.node().text().as_string());
+                std::string value;
+                if (key < 0) value = StringFormat("%df", abs(key));
+                else value = StringFormat("%ds", key);
+                staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeySignature(value));
+            }
+            // time
+            pugi::xpath_node time;
+            xpath = StringFormat("time[@number='%d']", i+1);
+            time = it->select_single_node(xpath.c_str());
+            if (!time) {
+                time = it->select_single_node("time");
+            }
+            if (time) {
+                pugi::xpath_node symbol = time.node().select_single_node("symbol");
+                if (symbol && HasContent(symbol.node())) {
+                    staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMeterSign(symbol.node().text().as_string()));
+                }
+                pugi::xpath_node beats = time.node().select_single_node("beats");
+                if (beats && HasContent(beats.node())) {
+                    staffDef->SetMeterCount(staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string()));
+                }
+                pugi::xpath_node beatType = time.node().select_single_node("beat-type");
+                if (beatType && HasContent(beatType.node())) {
+                    staffDef->SetMeterUnit(staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
+                }
+            }
+            staffGrp->AddStaffDef(staffDef);
+        }
     }
+        
     return nbStaves;
 }
     
@@ -474,8 +513,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure,
             ReadMusicXmlNote(*it, measure, measureNb);
         }
     }
-    
-    //LogDebug("Reading measure!");
+
     return true;
 }
     
@@ -523,6 +561,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     Staff *staff = dynamic_cast<Staff*>(layer->GetFirstParent(STAFF));
     assert(staff);
     
+    LayerElement *element = NULL;
+    
+    pugi::xpath_node notations = node.select_single_node("notations");
+    
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
@@ -543,6 +585,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
         else {
             Rest *rest = new Rest();
+            element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
             layer->AddLayerElement(rest);
@@ -550,6 +593,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
     else {
         Note *note = new Note();
+        element = note;
         
         // Accidental
         std::string accidentalStr = GetContentOfChild(node, "accidental");
@@ -639,12 +683,39 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
     }
     
+    // element will be NULL in case of mRest
+    if (!element) return;
+    
+    // slur
+    pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
+    for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it)
+    {
+        pugi::xml_node slur = it->node();
+        int slurNumber = atoi(GetAttributeValue(slur, "number").c_str());
+        slurNumber = (slurNumber < 1) ? 1 : slurNumber;
+        if (HasAttributeWithValue(slur, "type", "start")) {
+            Slur *meiSlur = new Slur();
+            // placement
+            if (HasAttributeWithValue(slur, "placement", "above")) meiSlur->SetCurvedir(CURVEDIR_above);
+            else if (HasAttributeWithValue(slur, "placement", "below")) meiSlur->SetCurvedir(CURVEDIR_below);
+            // add it to the stack
+            m_floatingElements.push_back(std::make_pair(measureNb, meiSlur));
+            OpenSlur(staff, layer, slurNumber, element, meiSlur);
+        }
+        else if (HasAttributeWithValue(slur, "type", "stop")) {
+            CloseSlur(staff, layer, slurNumber, element);
+        }
+    }
+    
     // beam end
     bool beamEnd =  node.select_single_node("beam[@number='1'][text()='end']");
     if (beamEnd) {
         RemoveLastFromStack(BEAM);
     }
 }
+    
+//////////////////////////////////////////////////////////////////////////////
+// String to attribute converters
     
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {

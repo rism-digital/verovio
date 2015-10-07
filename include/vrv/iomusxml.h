@@ -21,22 +21,11 @@
 
 namespace vrv {
 
-//class Barline;
-//class Beam;
-//class Clef;
-//class Doc;
 class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
-//class MeterSig;
-//class MRest;
-//class MultiRest;
-//class Note;
-//class Page;
-//class Rest;
 class Slur;
-//class Staff;
 class StaffGrp;
 class System;
 class Tie;
@@ -64,10 +53,24 @@ public:
     char m_oct;
 };
     
+class OpenSlur
+{
+public:
+    OpenSlur(int staffN, int layerN, int number) {
+        m_staffN = staffN;
+        m_layerN = layerN;
+        m_number = number;
+    }
+    
+    int m_staffN;
+    int m_layerN;
+    int m_number;
+};
+    
 } // namespace musicxml
 
 //----------------------------------------------------------------------------
-// This class is not up-to-date
+// MusicXmlInput
 //----------------------------------------------------------------------------
 
 class MusicXmlInput: public FileInputStream
@@ -108,23 +111,44 @@ private:
     void AddLayerElement(Layer *layer, LayerElement *element);
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
     void RemoveLastFromStack(ClassId classId);
+    
+    /**
+     * @name Methods for openning and closing tie and slurs.
+     * Openned ties and slurs are stacks together with a musicxml::OpenTie
+     * and musicxml::OpenSlur objects.
+     * For now: only slur starting and ending on the same staff/voice are
+     * supported
+     */
+    ///@{
     void OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie);
     void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
+    void OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur);
+    void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
     
+    /**
+     * @name Methods for converting MusicXML string values to MEI attributes.
+     */
+    ///@{
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
+    ///@}
     
 private:
     std::string m_filename;
     
+    /** The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement*> m_elementStack;
-    
-    std::vector<std::pair<Slur*, int> > m_slurStack;
-    
+    /** The stack for open slurs */
+    std::vector<std::pair<Slur*, musicxml::OpenSlur> > m_slurStack;
+    /** The stack for open ties */
     std::vector<std::pair<Tie*, musicxml::OpenTie> > m_tieStack;
     
+    /** 
+     * The stack of floating elements (tie, slur, etc.) to be added at the
+     * end of each measure
+     */
     std::vector<std::pair<int, FloatingElement*> > m_floatingElements;
 };
 
