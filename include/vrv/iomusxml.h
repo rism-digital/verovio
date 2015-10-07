@@ -84,33 +84,78 @@ public:
     virtual bool ImportString(std::string musicxml);
     
 private:
+    /**
+     * Top level method called from ImportFile or ImportString
+     */
     bool ReadMusicXml(pugi::xml_node root);
     
+    /**
+     * @name Top level methods for reading MusicXml part and measure elements.
+     */
+    ///@{
     bool ReadMusicXmlPart(pugi::xml_node node, System *system,  int nbStaves, int staffOffset);
     bool ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset);
+    ///@}
 
-    /** return the number of staves in the part */
+    /** 
+     * Methods for reading the first MusicXml attributes element as MEI staffDef.
+     * Returns the number of staves in the part.
+     */
     int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset);
     
+    /**
+     * @name Methods for reading the content of a MusicXml measure.
+     */
+    ///@{
     void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBarline(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
+    ///@}
     
+    /**
+     * Add a Measure to the system.
+     * If the measure i already exists if will move all the its content.
+     * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
+     */
+    void AddMeasure(System *system, Measure *measure, int i);
+    
+    /**
+     * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
+     */
+    void AddLayerElement(Layer *layer, LayerElement *element);
+    
+    /*
+     * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
+     */
+    Layer *SelectLayer(pugi::xml_node node, Measure *measure);
+    
+    /**
+     * Remove the last ClassId element on top of m_elementStack.
+     * For example, when closing a beam, we need to remove it from the stack, but it is not
+     * necessary the top one (for example we can have an opened chord there).
+     */
+    void RemoveLastFromStack(ClassId classId);
+    
+    /**
+     * @name Helper methods for checking presence of values of attributes or elements
+     */
+    ///@{
     bool HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);
     bool IsElement(pugi::xml_node node, std::string name);
     bool HasContentWithValue(pugi::xml_node node, std::string value);
     bool HasContent(pugi::xml_node);
-    
+    ///@}
+
+    /**
+     * @name Helper methods for retrieving attribute values or element content
+     */
+    ///@{
     std::string GetAttributeValue(pugi::xml_node node, std::string attribute);
     std::string GetContent(pugi::xml_node node);
     std::string GetContentOfChild(pugi::xml_node node, std::string child);
-    
-    void AddMeasure(System *system, Measure *measure, int i);
-    void AddLayerElement(Layer *layer, LayerElement *element);
-    Layer *SelectLayer(pugi::xml_node node, Measure *measure);
-    void RemoveLastFromStack(ClassId classId);
+    ///@}
     
     /**
      * @name Methods for openning and closing tie and slurs.
@@ -136,8 +181,8 @@ private:
     ///@}
     
 private:
+    /** The filename */
     std::string m_filename;
-    
     /** The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement*> m_elementStack;
     /** The stack for open slurs */
