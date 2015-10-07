@@ -26,19 +26,6 @@
 
 namespace vrv {    
 
-/* ??THESE #defines PROBABLY BELONG IN style.h . */
-    
-/* Set ratio of mensural notehead size to CMN notehead size for the same staff size */
-#define MNOTEHEAD_SIZE_FACTOR 0.90
-/* Set size of mensuration sign circle relative to space between staff lines */
-#define MSIGN_CIRCLE_DIAM 1.7
-/* Set vertical position of center of mensuration sign as distance below top of the staff */
-#define MSIGN_STAFFLINES_BELOW_TOP 2.0
-/* Set size of dot inside mensuration signs relative to space between staff lines */
-#define MSIGN_DOT_DIAM 0.5
-/* Set relative size of figures in proportions */
-#define PROPRT_SIZE_FACTOR 0.50
-    
 int View::s_drawingLigX[2], View::s_drawingLigY[2];	// pour garder coord. des ligatures
 bool View::s_drawingLigObliqua = false;	// marque le 1e passage pour une oblique
 
