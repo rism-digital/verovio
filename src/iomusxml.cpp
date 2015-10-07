@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "system.h"
 #include "tie.h"
+#include "tuplet.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -185,16 +186,22 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
     if (m_elementStack.empty()) {
         layer->AddLayerElement(element);
     }
-    else if (m_elementStack.back()->Is() == CHORD) {
-        Chord *chord = dynamic_cast<Chord*>(m_elementStack.back());
-        assert(chord);
-        chord->AddLayerElement(element);
-    }
     else if (m_elementStack.back()->Is() == BEAM) {
         Beam *beam = dynamic_cast<Beam*>(m_elementStack.back());
         assert(beam);
         beam->AddLayerElement(element);
     }
+    else if (m_elementStack.back()->Is() == CHORD) {
+        Chord *chord = dynamic_cast<Chord*>(m_elementStack.back());
+        assert(chord);
+        chord->AddLayerElement(element);
+    }
+    else if (m_elementStack.back()->Is() == TUPLET) {
+        Tuplet *tuplet = dynamic_cast<Tuplet*>(m_elementStack.back());
+        assert(tuplet);
+        tuplet->AddLayerElement(element);
+    }
+
 }
     
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
@@ -577,6 +584,20 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         m_elementStack.push_back(beam);
     }
     
+    // tuplet start
+    pugi::xpath_node tupletStart = notations.node().select_single_node("tuplet[@type='start']");
+    if (tupletStart) {
+        Tuplet  *tuplet = new Tuplet();
+        AddLayerElement(layer, tuplet);
+        m_elementStack.push_back(tuplet);
+        pugi::xpath_node actualNotes = node.select_single_node("time-modification/actual-notes");
+        pugi::xpath_node normalNotes = node.select_single_node("time-modification/normal-notes");
+        if (actualNotes && normalNotes) {
+            tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
+            tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
+        }
+    }
+    
     if (node.select_single_node("rest")) {
         // we assume /note without /type to be mRest
         if (typeStr.empty()) {
@@ -705,6 +726,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         else if (HasAttributeWithValue(slur, "type", "stop")) {
             CloseSlur(staff, layer, slurNumber, element);
         }
+    }
+    
+    // tuplet end
+    pugi::xpath_node tupletEnd = notations.node().select_single_node("tuplet[@type='stop']");
+    if (tupletEnd) {
+        RemoveLastFromStack(TUPLET);
     }
     
     // beam end
