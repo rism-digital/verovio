@@ -377,7 +377,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it)
     {
         // We read all attribute elements until we reach something else
-        if (!IsElement(*it, "attributes")) break;
+        // However, print might be present too. What else? This is not clear
+        // and not robust.
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "print")) break;
         
         // First get the number of staves in the part
         pugi::xpath_node staves = it->select_single_node("staves");
@@ -585,6 +587,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
     
     // tuplet start
+    // For now tuplet with beam if starting at the same time. However, this will quite likely not
+    // work if we have a tuplet over serveral beams. We would need to check which one is ending first
+    // in order to determin which one is on top of the hierarchy. Also, it is not 100% sure that we
+    // can represent them as tuplet and beam elements. 
     pugi::xpath_node tupletStart = notations.node().select_single_node("tuplet[@type='start']");
     if (tupletStart) {
         Tuplet  *tuplet = new Tuplet();
