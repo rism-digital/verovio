@@ -221,6 +221,16 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
     Layer *layer = dynamic_cast<Layer*>(staff->m_children.at(0));
     return layer;
 }
+
+    
+Layer *MusicXmlInput::SelectLayer(int staffNb, vrv::Measure *measure)
+{
+    staffNb--;
+    Staff *staff = dynamic_cast<Staff*>(measure->m_children.at(staffNb));
+    assert(staff);
+    Layer *layer = dynamic_cast<Layer*>(staff->m_children.at(0));
+    return layer;
+}
     
 void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 {
@@ -381,6 +391,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         // and not robust.
         if (!IsElement(*it, "attributes") && !IsElement(*it, "print")) break;
         
+        // we do not want to read it again, just change the name
+        it->set_name("mei-read");
+        
         // First get the number of staves in the part
         pugi::xpath_node staves = it->select_single_node("staves");
         if (staves) {
@@ -515,7 +528,10 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure,
     
     // read the content of the measure
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
-        if (IsElement(*it, "barline")) {
+        if (IsElement(*it, "attributes")) {
+            ReadMusicXmlAttributes(*it, measure, measureNb);
+        }
+        else if (IsElement(*it, "barline")) {
             ReadMusicXmlBarline(*it, measure, measureNb);
         }
         else if (IsElement(*it, "note")) {
@@ -528,6 +544,22 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure,
     
 void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure, int measureNb)
 {
+    // read clef changes as MEI clef
+    pugi::xpath_node clef = node.select_single_node("clef");
+    if (clef) {
+        // check if we have a staff number
+        std::string numberStr = GetAttributeValue(clef.node(), "number");
+        int staffNb = (numberStr.empty()) ? 1 : atoi(numberStr.c_str());
+        Layer *layer = SelectLayer(staffNb, measure);
+        pugi::xpath_node clefSign = clef.node().select_single_node("sign");
+        pugi::xpath_node clefLine = clef.node().select_single_node("line");
+        if (clefSign && clefLine) {
+            Clef *meiClef = new Clef();
+            meiClef->SetShape(meiClef->AttClefshape::StrToClefShape(GetContent(clefSign.node())));
+            meiClef->SetLine(meiClef->AttClefshape::StrToInt(clefLine.node().text().as_string()));
+            AddLayerElement(layer, meiClef);
+        }
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, int measureNb)
@@ -590,7 +622,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     // For now tuplet with beam if starting at the same time. However, this will quite likely not
     // work if we have a tuplet over serveral beams. We would need to check which one is ending first
     // in order to determin which one is on top of the hierarchy. Also, it is not 100% sure that we
-    // can represent them as tuplet and beam elements. 
+    // can represent them as tuplet and beam elements.
     pugi::xpath_node tupletStart = notations.node().select_single_node("tuplet[@type='start']");
     if (tupletStart) {
         Tuplet  *tuplet = new Tuplet();

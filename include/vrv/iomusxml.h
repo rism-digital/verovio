@@ -131,6 +131,11 @@ private:
      */
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
     
+    /*
+     * Returns the appropriate first layer of a staff.
+     */
+    Layer *SelectLayer(int staffNb, Measure *measure);
+    
     /**
      * Remove the last ClassId element on top of m_elementStack.
      * For example, when closing a beam, we need to remove it from the stack, but it is not
