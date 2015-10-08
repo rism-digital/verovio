@@ -184,7 +184,7 @@ int Staff::FillStaffCurrentLyrics( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Staff::ResetDarwing( ArrayPtrVoid *params )
+int Staff::ResetDrawing( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     this->m_timeSpanningElements.clear();

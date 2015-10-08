@@ -137,7 +137,7 @@ public:
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid *params );
+    virtual int ResetDrawing( ArrayPtrVoid *params );
     
 private:
     

@@ -595,7 +595,7 @@ public:
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };    
+    virtual int ResetDrawing( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };    
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects

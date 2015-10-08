@@ -99,7 +99,7 @@ void Doc::PrepareDrawing()
     ArrayPtrVoid params;
     
     if (m_drawingPreparationDone) {
-        Functor resetDrawing( &Object::ResetDarwing );
+        Functor resetDrawing( &Object::ResetDrawing );
         this->Process( &resetDrawing, &params );
     }
     

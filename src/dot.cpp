@@ -54,7 +54,7 @@ int Dot::PreparePointersByLayer( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Dot::ResetDarwing( ArrayPtrVoid *params )
+int Dot::ResetDrawing( ArrayPtrVoid *params )
 {
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;

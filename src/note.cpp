@@ -261,6 +261,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid *params )
     Note **currentNote = static_cast<Note**>((*params).at(0));
     
     this->ResetDrawingAccid();
+    //LogDebug("PreparePointersByLayer: accid=%d ACC_EXP_NONE=%d", this->GetAccid(), ACCIDENTAL_EXPLICIT_NONE);
     if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
         this->m_isDrawingAccidAttr = true;
         this->m_drawingAccid = new Accid();
@@ -276,7 +277,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::ResetDarwing( ArrayPtrVoid *params )
+int Note::ResetDrawing( ArrayPtrVoid *params )
 {
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;

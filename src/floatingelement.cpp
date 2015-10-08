@@ -70,7 +70,7 @@ int FloatingElement::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::ResetDarwing( ArrayPtrVoid *params )
+int FloatingElement::ResetDrawing( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
