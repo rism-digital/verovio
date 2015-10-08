@@ -126,15 +126,21 @@ private:
      */
     void AddLayerElement(Layer *layer, LayerElement *element);
     
-    /*
+    /**
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
      */
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
     
-    /*
+    /**
      * Returns the appropriate first layer of a staff.
      */
     Layer *SelectLayer(int staffNb, Measure *measure);
+    
+    /**
+     * Returns the layer with @n=layerNb on the staff.
+     * Creates lhe layer if not found.
+     */
+    Layer *SelectLayer(int layerNb, Staff *staff);
     
     /**
      * Remove the last ClassId element on top of m_elementStack.

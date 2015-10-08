@@ -218,8 +218,17 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
     staffNb--;
     Staff *staff = dynamic_cast<Staff*>(measure->m_children.at(staffNb));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer*>(staff->m_children.at(0));
-    return layer;
+    // Now look for the layer with the correpsonding voice
+    int layerNb = 1;
+    std::string layerNbStr = GetContentOfChild(node, "voice");
+    if (!layerNbStr.empty()) {
+        layerNb = atoi(layerNbStr.c_str());
+    }
+    if (layerNb < 1) {
+        LogWarning("Staff %d cannot be found", staffNb);
+        layerNb = 1;
+    }
+    return SelectLayer(layerNb, staff);
 }
 
     
@@ -228,7 +237,19 @@ Layer *MusicXmlInput::SelectLayer(int staffNb, vrv::Measure *measure)
     staffNb--;
     Staff *staff = dynamic_cast<Staff*>(measure->m_children.at(staffNb));
     assert(staff);
-    Layer *layer = dynamic_cast<Layer*>(staff->m_children.at(0));
+    return SelectLayer(1, staff);
+}
+    
+Layer *MusicXmlInput::SelectLayer(int layerNb, Staff *staff)
+{
+    AttCommonNComparison comparisonLayer(LAYER, layerNb);
+    Layer *layer = dynamic_cast<Layer*>(staff->FindChildByAttComparison(&comparisonLayer, 1));
+    if (layer) return layer;
+    // else add it
+    // add at least one layer
+    layer = new Layer();
+    layer->SetN(layerNb);
+    staff->AddLayer(layer);
     return layer;
 }
     
@@ -513,12 +534,8 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure,
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        
-        // add at least one layer
-        Layer *layer = new Layer();
-        layer->SetN(1);
-        staff->AddLayer(layer);
         measure->AddStaff(staff);
+        // layers will be added in SelectLayer
     }
     
     //Normally the stack should be empty
