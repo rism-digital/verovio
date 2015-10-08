@@ -428,10 +428,17 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
         std::string xpath;
         // Create as many staffDef
         for (i = 0; i < nbStaves; i++) {
-            StaffDef *staffDef = new StaffDef();
-            staffDef->SetN(i + 1 + staffOffset);
-            // by default five line staves
-            staffDef->SetLines(5);
+            // Find or create the staffDef
+            StaffDef *staffDef = NULL;
+            AttCommonNComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
+            staffDef = dynamic_cast<StaffDef*>(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
+            if (!staffDef) {
+                StaffDef *staffDef = new StaffDef();
+                staffDef->SetN(i + 1 + staffOffset);
+                // by default five line staves
+                staffDef->SetLines(5);
+                staffGrp->AddStaffDef(staffDef);
+            }
             
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
             pugi::xpath_node clefSign;
@@ -489,7 +496,6 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     staffDef->SetMeterUnit(staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
                 }
             }
-            staffGrp->AddStaffDef(staffDef);
         }
     }
         
