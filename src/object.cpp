@@ -126,7 +126,7 @@ void Object::MoveChildren(  Object *object )
     if ( this == object ){
         assert( "Object cannot be copied to itself");
     }
-    if ( &typeid(*this) != &typeid(*object) ) {
+    if ( this->Is() != object->Is() ) {
         assert( "Object must be of the same type");
     }
     
