@@ -189,6 +189,23 @@ public:
     ///@}
     
     /**
+     * @name Space notes equally and close together (normally for mensural notation)
+     */
+    ///@{
+    bool SetSpacingLinear( float spacingLinear );
+    float GetSpacingLinear() { return m_spacingLinear; };
+    ///@}
+    
+    /**
+     * @name Space notes equally and close together (normally for mensural notation)
+     */
+    ///@{
+    bool SetSpacingNonLinear( float spacingNonLinear );
+    float GetSpacingNonLinear() { return m_spacingNonLinear; };
+    ///@}
+    
+    
+    /**
      * @name Ignore all encoded layout information (if any) 
      * and output one single page with one single system
      */
@@ -214,12 +231,14 @@ public:
     int GetAdjustPageHeight() { return m_adjustPageHeight; };
     ///@}
     
-    
     /**
-     * @name Space notes equally and close together (normally for mensural notation) */
+     * @name Space notes equally and close together (normally for mensural notation) 
+     */
+    ///@{
     void SetEvenNoteSpacing( bool even ) { m_evenNoteSpacing = even; };
     int GetEvenNoteSpacing() { return m_evenNoteSpacing; };
-    
+    ///@}
+
     /**
      * @name Do not justify the system (for debugging purposes) 
      */
@@ -325,6 +344,8 @@ private:
     std::string m_rdgXPathQuery;
     bool m_scoreBasedMei;
     bool m_evenNoteSpacing;
+    float m_spacingLinear;
+    float m_spacingNonLinear;
     // for debugging
     bool m_noJustification;
     bool m_showBoundingBoxes;

@@ -124,6 +124,14 @@ void display_usage() {
     
     cerr << " --rdg-xpath-query=QUERY    Set the xPath query for selecting <rdg> elements," << endl;
     cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
+    
+    cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR << ")" << endl;
+    
+    cerr << " --spacing-non-linear=SP    Specify the non linear spacing factor (default is " << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
+    
+    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)," << endl;
+    
+    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)," << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;
@@ -197,6 +205,8 @@ int main(int argc, char** argv)
         {"resources",           required_argument,  0, 'r'},
         {"scale",               required_argument,  0, 's'},
         {"show-bounding-boxes", no_argument,        &show_bounding_boxes, 1},
+        {"spacing-linear",      required_argument,  0, 0},
+        {"spacing-non-linear",  required_argument,  0, 0},
         {"spacing-staff",       required_argument,  0, 0},
         {"spacing-system",      required_argument,  0, 0},
         {"type",                required_argument,  0, 't'},
@@ -221,6 +231,16 @@ int main(int argc, char** argv)
                 else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
                     cout << string(optarg) << endl;
                     toolkit.SetRdgXPathQuery( string(optarg) );
+                }
+                else if (strcmp(long_options[option_index].name,"spacing-linear") == 0) {
+                    if ( !toolkit.SetSpacingLinear( atof(optarg) ) ) {
+                        exit(1);
+                    }
+                }
+                else if (strcmp(long_options[option_index].name,"spacing-non-linear") == 0) {
+                    if ( !toolkit.SetSpacingNonLinear( atof(optarg) ) ) {
+                        exit(1);
+                    }
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {
                     if ( !toolkit.SetSpacingStaff( atoi(optarg) ) ) {

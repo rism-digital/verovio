@@ -50,6 +50,14 @@ namespace vrv {
 #define DEFAULT_STEM_WITDH 2.0
 #define MIN_STEM_WIDTH 1.0
 #define MAX_STEM_WIDTH 5.0
+
+#define DEFAULT_SPACING_LINEAR 0.3
+#define MIN_SPACING_LINEAR 0.0
+#define MAX_SPACING_LINEAR 1.0
+    
+#define DEFAULT_SPACING_NON_LINEAR 0.6
+#define MIN_SPACING_NON_LINEAR 0.0
+#define MAX_SPACING_NON_LINEAR 1.0
     
 //----------------------------------------------------------------------------
 // Default scaling (%) and spacing (units) values

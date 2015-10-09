@@ -45,6 +45,8 @@ Toolkit::Toolkit( bool initFont )
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
     m_pageWidth = DEFAULT_PAGE_WIDTH;
     m_border = DEFAULT_PAGE_LEFT_MAR;
+    m_spacingLinear = DEFAULT_SPACING_LINEAR;
+    m_spacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
     m_spacingStaff = DEFAULT_SPACING_STAFF;
     m_spacingSystem = DEFAULT_SPACING_SYSTEM;
     
@@ -128,7 +130,6 @@ bool Toolkit::SetSpacingStaff( int spacingStaff )
     return true;
 }
 
-
 bool Toolkit::SetSpacingSystem( int spacingSystem )
 {
     if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
@@ -138,7 +139,26 @@ bool Toolkit::SetSpacingSystem( int spacingSystem )
     m_spacingSystem = spacingSystem;
     return true;
 }
-
+    
+bool Toolkit::SetSpacingLinear( float spacingLinear )
+{
+    if (spacingLinear < MIN_SPACING_LINEAR || spacingLinear > MAX_SPACING_LINEAR) {
+        LogError( "Spacing (linear) out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR );
+        return false;
+    }
+    m_spacingLinear = spacingLinear;
+    return true;
+}
+    
+bool Toolkit::SetSpacingNonLinear( float spacingNonLinear )
+{
+    if (spacingNonLinear < MIN_SPACING_NON_LINEAR || spacingNonLinear > MAX_SPACING_NON_LINEAR) {
+        LogError( "Spacing (non linear) out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR );
+        return false;
+    }
+    m_spacingNonLinear = spacingNonLinear;
+    return true;
+}
 
 bool Toolkit::SetFormat( std::string const &informat )
 {

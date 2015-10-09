@@ -217,8 +217,9 @@ int Measure::SetAlignmentXPos( ArrayPtrVoid *params )
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
     // param 2: duration of the longest note (unused)
-    // param 3: the functor to be redirected to Aligner
-    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(3));
+    // param 3: the doc (unused)
+    // param 4: the functor to be redirected to Aligner
+    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(4));
     
     m_measureAligner.Process( setAligmnentPosX, params);
     

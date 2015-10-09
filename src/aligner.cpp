@@ -437,7 +437,8 @@ int MeasureAligner::SetAlignmentXPos( ArrayPtrVoid *params )
     // param 0: the previous time position
     // param 1: the previous x rel position
     // param 2: duration of the longest note (unused)
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 3: the doc (unused)
+    // param 4: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
     
@@ -459,7 +460,7 @@ The power function we currently use is isn't quite right; see _Behind Bars_, p. 
 need more flexibility: for example, for some purposes, spacing propoortional to duration is
 desirable. The best solution is probably to get ideal spacing from a user-definable table. */
 
-int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur)
+int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, float spacingLinear, float spacingNonLinear)
 {
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
        that interval gets the space a semibreve would ordinarily get. (maxActualDur is in our
@@ -475,15 +476,17 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     // param 0: the previous time position
     // param 1: the previous x rel position
     // param 2: duration of the longest note
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 3: the doc (unused)
+    // param 4: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
     int *maxActualDur = static_cast<int*>((*params).at(2));
+    Doc *doc = static_cast<Doc*>((*params).at(3));
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
     if ( intervalTime > 0.0 ) {
-        intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur);
+        intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
         LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;

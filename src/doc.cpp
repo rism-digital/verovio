@@ -66,6 +66,9 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
+    m_drawingSpacingLinear = DEFAULT_SPACING_LINEAR;
+    m_drawingSpacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
+    
     m_spacingStaff = m_style->m_spacingStaff;
     m_spacingSystem = m_style->m_spacingSystem;
     
