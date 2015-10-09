@@ -54,7 +54,7 @@ Toolkit::Toolkit( bool initFont )
     m_ignoreLayout = false;
     m_adjustPageHeight = false;
     m_noJustification = false;
-    m_evenNoteSpacing = true;
+    m_evenNoteSpacing = false;
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
     
