@@ -298,8 +298,11 @@ bool Toolkit::LoadString( const std::string &data )
     m_doc.SetPageRightMar( this->GetBorder() );
     m_doc.SetPageLeftMar( this->GetBorder() );
     m_doc.SetPageTopMar( this->GetBorder() );
+    m_doc.SetSpacingLinear( this->GetSpacingLinear() );
+    m_doc.SetSpacingNonLinear( this->GetSpacingNonLinear() );
     m_doc.SetSpacingStaff( this->GetSpacingStaff() );
     m_doc.SetSpacingSystem( this->GetSpacingSystem() );
+    m_doc.SetEvenSpacing( this->GetEvenNoteSpacing() );
     
     m_doc.PrepareDrawing();
     
@@ -322,11 +325,6 @@ bool Toolkit::LoadString( const std::string &data )
     // disable justification if no layout or no justification
     if (m_noLayout || m_noJustification) {
         m_doc.SetJustificationX(false);
-    }
-    
-    // disable duration-based spacing if requested
-    if (!m_evenNoteSpacing) {
-        m_doc.SetEvenSpacing(false);
     }
     
     delete input;

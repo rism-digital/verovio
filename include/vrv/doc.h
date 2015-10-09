@@ -165,10 +165,10 @@ public:
      * @name Setter and getter linear and non linear spacing parameters
      */
     ///@{
-    void SetSpacingLinear( float drawingSpacingLinear ) { m_drawingSpacingLinear = drawingSpacingLinear; };
-    float GetSpacingLinear( ) { return m_drawingSpacingLinear; };
-    void SetSpacingNonLinear( float drawingSpacingNonLinear ) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
-    float GetSpacingNonLinear( ) { return m_drawingSpacingNonLinear; };
+    void SetSpacingLinear( double drawingSpacingLinear ) { m_drawingSpacingLinear = drawingSpacingLinear; };
+    double GetSpacingLinear( ) { return m_drawingSpacingLinear; };
+    void SetSpacingNonLinear( double drawingSpacingNonLinear ) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
+    double GetSpacingNonLinear( ) { return m_drawingSpacingNonLinear; };
     ///@}
 
     /**
@@ -285,9 +285,9 @@ public:
     /** flag for disabling spacing by duration */
     bool m_drawingEvenSpacing;
     /** value of the linear spacing factor */
-    float m_drawingSpacingLinear;
+    double m_drawingSpacingLinear;
     /** value of the non linear spacing factor */
-    float m_drawingSpacingNonLinear;
+    double m_drawingSpacingNonLinear;
     /** minimum measure width */
     int m_drawingMinMeasureWidth;
     

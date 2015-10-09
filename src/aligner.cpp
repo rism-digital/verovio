@@ -460,14 +460,13 @@ The power function we currently use is isn't quite right; see _Behind Bars_, p. 
 need more flexibility: for example, for some purposes, spacing propoortional to duration is
 desirable. The best solution is probably to get ideal spacing from a user-definable table. */
 
-int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, float spacingLinear, float spacingNonLinear)
+int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
        that interval gets the space a semibreve would ordinarily get. (maxActualDur is in our
        internal code format: cf. attdef.h). ??TO BE DONE */
-    if (maxActualDur<DUR_1) intervalTime /= pow( 2.0, DUR_1-maxActualDur);
-    int intervalXRel;
-    intervalXRel = pow( intervalTime, 0.50 ) * 3.8;     // numbers are experimental constants
+    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
+    int intervalXRel = pow( intervalTime, spacingNonLinear ) * pow( spacingLinear * 5.0, 2 );
     return intervalXRel;
 }
 
@@ -487,7 +486,7 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     double intervalTime = (m_time - (*previousTime));
     if ( intervalTime > 0.0 ) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
-        LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        //LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
