@@ -669,9 +669,6 @@ protected:
     std::string m_uuid;
     std::string m_classid;
     std::wstring m_text;
-    
-    /** A pointer to the parent doc for accessing environment variables when drawing */
-    Doc *m_doc;
 
 private:
     

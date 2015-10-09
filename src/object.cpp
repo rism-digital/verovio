@@ -103,7 +103,6 @@ void Object::Init(std::string classid)
 {
     m_parent = NULL;
     m_isModified = true;
-    m_doc = NULL;
     m_classid = classid;
     this->GenerateUuid();
 }

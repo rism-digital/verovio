@@ -134,7 +134,7 @@ void Page::LayOutHorizontally( )
         params.push_back( &previousTime );
         params.push_back( &previousXRel );
         params.push_back( &longestActualDur );
-        params.push_back( &m_doc );
+        params.push_back( doc );
         Functor setAlignmentX( &Object::SetAlignmentXPos );
         // Special case: because we redirect the functor, pass it a parameter to itself (!)
         params.push_back( &setAlignmentX );

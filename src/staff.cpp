@@ -220,7 +220,7 @@ int Staff::SetDrawingXY( ArrayPtrVoid *params )
     }
     else
     {
-        assert( m_doc->GetType() == Transcription );
+        assert( doc->GetType() == Transcription );
         this->SetDrawingY( this->m_yAbs );
     }
     
