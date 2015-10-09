@@ -385,9 +385,15 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     if (json.has<jsonxx::Number>("pageHeight"))
         SetPageHeight( json.get<jsonxx::Number>("pageHeight") );
     
+    if (json.has<jsonxx::Number>("spacingLinear"))
+        SetSpacingLinear( json.get<jsonxx::Number>("spacingLinear" ) );
+    
+    if (json.has<jsonxx::Number>("spacingNonLinear"))
+        SetSpacingNonLinear( json.get<jsonxx::Number>("spacingNonLinear") );
+    
     if (json.has<jsonxx::Number>("spacingStaff"))
         SetSpacingStaff( json.get<jsonxx::Number>("spacingStaff") );
-    
+
     if (json.has<jsonxx::Number>("spacingSystem"))
         SetSpacingSystem( json.get<jsonxx::Number>("spacingSystem") );
     
