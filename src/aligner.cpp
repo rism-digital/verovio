@@ -484,7 +484,7 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     double intervalTime = (m_time - (*previousTime));
     if ( intervalTime > 0.0 ) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur);
-        LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        //LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;
