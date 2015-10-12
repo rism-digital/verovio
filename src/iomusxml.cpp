@@ -27,9 +27,11 @@
 #include "rest.h"
 #include "slur.h"
 #include "staff.h"
+#include "syl.h"
 #include "system.h"
 #include "tie.h"
 #include "tuplet.h"
+#include "verse.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -433,7 +435,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             AttCommonNComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
             staffDef = dynamic_cast<StaffDef*>(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
-                StaffDef *staffDef = new StaffDef();
+                staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
                 // by default five line staves
                 staffDef->SetLines(5);
@@ -736,6 +738,23 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
+        }
+        
+        // Verse / syl
+        pugi::xpath_node_set lyrics = node.select_nodes("lyric");
+        for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it)
+        {
+            pugi::xml_node lyric = it->node();
+            int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
+            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            std::string textStr = GetContentOfChild(lyric, "text");
+            LogDebug(textStr.c_str());
+            Verse *verse = new Verse();
+            verse->SetN(lyricNumber);
+            Syl *syl = new Syl();
+            syl->SetText(UTF8to16(textStr.c_str()));
+            verse->AddLayerElement(syl);
+            note->AddLayerElement(verse);
         }
         
         // Ties
