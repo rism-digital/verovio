@@ -1574,6 +1574,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if ( accid->m_parent ) {
         accid->SetDrawingY( accid->GetDrawingY() + CalculatePitchPosY( staff, accid->GetPloc(), layer->GetClefOffset( accid ), accid->GetOloc()) );
+        LogDebug("DrawAccid: GetOloc()=%d", accid->GetOloc());
         accid->m_drawingCueSize = accid->IsCueSize();
     }
     
