@@ -9,7 +9,7 @@
 #define __VRV_ATT_COMPARISON_H__
 
 #include "atts_shared.h"
-#include "durationinterface.h"
+#include "object.h"
 
 namespace vrv {
     

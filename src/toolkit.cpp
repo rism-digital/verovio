@@ -17,6 +17,7 @@
 #include "iodarms.h"
 #include "iomei.h"
 #include "iopae.h"
+#include "iomusxml.h"
 #include "layer.h"
 #include "page.h"
 #include "measure.h"
@@ -39,7 +40,7 @@ Toolkit::Toolkit( bool initFont )
 {
     
     m_scale = DEFAULT_SCALE;
-    m_format = mei_file;
+    m_format = MEI;
     
     // default page size
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
@@ -163,13 +164,15 @@ bool Toolkit::SetSpacingNonLinear( float spacingNonLinear )
 bool Toolkit::SetFormat( std::string const &informat )
 {
     if (informat == "pae")
-        m_format = pae_file;
+        m_format = PAE;
     else if(informat == "darms")
-        m_format = darms_file;
+        m_format = DARMS;
     else if(informat == "mei")
-        m_format = mei_file;
+        m_format = MEI;
+    else if(informat == "musicxml")
+        m_format = MUSICXML;
     else {
-        LogError("Input format can only be: pae mei or darms");
+        LogError("Input format can only be: mei, pae, xml or darms");
         return false;
     }
     return true;
@@ -258,12 +261,15 @@ bool Toolkit::LoadUTF16File( const std::string &filename )
 bool Toolkit::LoadString( const std::string &data )
 {
     FileInputStream *input = NULL;
-    if (m_format == pae_file) {
+    if (m_format == PAE) {
         input = new PaeInput( &m_doc, "" );
-    } else if (m_format == darms_file) {
+    } else if (m_format == DARMS) {
         input = new DarmsInput( &m_doc, "" );
-    } else if (m_format == mei_file) {
+    } else if (m_format == MEI) {
         input = new MeiInput( &m_doc, "" );
+    }
+    else if (m_format == MUSICXML) {
+        input = new MusicXmlInput( &m_doc, "" );
     }
     else {
         LogError( "Unknown format" );

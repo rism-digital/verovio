@@ -85,7 +85,7 @@ void display_usage() {
     
     cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
     
-    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae (default is pae)" << endl;
+    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is pae)" << endl;
     
     cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
     
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
     // Init random number generator for uuids
     std::srand((unsigned int)std::time(0));
     
-    ConvertFileFormat type;
+    FileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
     Toolkit toolkit( false );
     
     // read pae by default
-    type = pae_file;
+    type = MEI;
     
     if (argc < 2) {
         cerr << "Expected one input file but found none." << endl << endl;
