@@ -239,13 +239,25 @@ Layer *MusicXmlInput::SelectLayer(int staffNb, vrv::Measure *measure)
     staffNb--;
     Staff *staff = dynamic_cast<Staff*>(measure->m_children.at(staffNb));
     assert(staff);
-    return SelectLayer(1, staff);
+    // layer -1 means the first one
+    return SelectLayer(-1, staff);
 }
     
 Layer *MusicXmlInput::SelectLayer(int layerNb, Staff *staff)
 {
-    AttCommonNComparison comparisonLayer(LAYER, layerNb);
-    Layer *layer = dynamic_cast<Layer*>(staff->FindChildByAttComparison(&comparisonLayer, 1));
+    Layer *layer = NULL;
+    // no layer specified, return the first one (if any)
+    if (layerNb == -1) {
+        if (staff->m_children.size() > 0) {
+            layer = dynamic_cast<Layer*>(staff->m_children.at(0));
+        }
+        // otherwise set @n to 1
+        layerNb = 1;
+    }
+    else {
+        AttCommonNComparison comparisonLayer(LAYER, layerNb);
+        layer = dynamic_cast<Layer*>(staff->FindChildByAttComparison(&comparisonLayer, 1));
+    }
     if (layer) return layer;
     // else add it
     // add at least one layer
@@ -672,7 +684,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
-            layer->AddLayerElement(rest);
+            AddLayerElement(layer, rest);
         }
     }
     else {
@@ -748,10 +760,20 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
             std::string textStr = GetContentOfChild(lyric, "text");
-            LogDebug(textStr.c_str());
             Verse *verse = new Verse();
             verse->SetN(lyricNumber);
             Syl *syl = new Syl();
+            if (lyric.select_single_node("extend")) {
+                syl->SetCon(CON_u);
+            }
+            if (GetContentOfChild(lyric, "syllabic") == "begin") {
+                syl->SetCon(CON_d);
+                syl->SetWordpos(WORDPOS_i);
+            }
+            else if (GetContentOfChild(lyric, "syllabic") == "end") {
+                syl->SetWordpos(WORDPOS_t);
+            }
+            
             syl->SetText(UTF8to16(textStr.c_str()));
             verse->AddLayerElement(syl);
             note->AddLayerElement(verse);
