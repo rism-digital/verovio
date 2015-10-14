@@ -70,6 +70,24 @@ bool MeiOutput::ExportFile( )
         pugi::xml_document meiDoc;
         
         if ( m_page < 0 ) {
+            pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
+            decl.append_attribute("version") = "1.0";
+            decl.append_attribute("encoding") = "UTF-8";
+
+            // schema processing instruction
+            decl = meiDoc.append_child(pugi::node_declaration);
+            decl.set_name("xml-model");
+            decl.append_attribute("href") = "http://music-encoding.org/schema/2.1.1/mei-all.rng";
+            decl.append_attribute("type") = "application/xml";
+            decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
+            
+            // schematron processing instruction
+            decl = meiDoc.append_child(pugi::node_declaration);
+            decl.set_name("xml-model");
+            decl.append_attribute("href") = "http://music-encoding.org/schema/2.1.1/mei-all.rng";
+            decl.append_attribute("type") = "application/xml";
+            decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+            
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute( "xmlns" ) = "http://www.music-encoding.org/ns/mei";
             m_mei.append_attribute( "meiversion" ) = "2013";
