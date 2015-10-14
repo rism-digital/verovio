@@ -345,7 +345,7 @@ std::string MeiOutput::UuidToMeiStr( Object *element )
     //LogDebug("uuid: %s", out.c_str());
     return out;
 }
-
+    
 bool MeiOutput::WriteMeiDoc( Doc *doc )
 {
     assert( doc );
@@ -355,27 +355,31 @@ bool MeiOutput::WriteMeiDoc( Doc *doc )
     
     pugi::xml_node meiHead = m_mei.append_child("meiHead");
     
-    for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling())
-    {
-        meiHead.append_copy(child);
+    if (m_doc->m_header.first_child()) {
+        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling())
+        {
+            meiHead.append_copy(child);
+        }
     }
-    
-    /*
-    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
-    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    titleStmt.append_child("title");
-    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pugi::xml_node date = pubStmt.append_child("date");
-    
-    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-    pugi::xml_node p1 = projectDesc.append_child("p");
-    p1.append_child(pugi::node_pcdata).set_value( StringFormat( "Encoded with Verovio version %s",  GetVersion().c_str() ).c_str() );
-    
-    // date
-    time_t now = time(0);
-    date.append_child(pugi::node_pcdata).set_value( ctime( &now ) );
-    */
+    else {
+        pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+        pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+        titleStmt.append_child("title");
+        pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+        pugi::xml_node date = pubStmt.append_child("date");
+        
+        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.append_child(pugi::node_pcdata).set_value( StringFormat( "Encoded with Verovio version %s",  GetVersion().c_str() ).c_str() );
+        
+        // date
+        time_t t = time(0); // get time now
+        struct tm *now = localtime(&t);
+        std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+                                           now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+        date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
+    }
     
     // ---- music ----
    
