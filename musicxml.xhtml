@@ -1,0 +1,76 @@
+---
+layout: verovio
+verovio-light: true
+title: MusicXML Converter
+active: other-formats
+other-active: musicxml
+version-footer: false
+---
+<div class="row">
+    
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include other-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel panel-default">
+
+            <div class="panel-body">
+                <p>
+                    Verovio supports basic conversion from MusicXML to MEI. You can see <a href="{{ site.baseurl }}/mei-viewer.xhtml?file=examples/musicxml/BeetAnGeSample.xml&amp;musicxml=true">here</a> the <a href="{{ site.baseurl }}/examples/musicxml/BeetAnGeSample.xml">MusicXML example file</a> of a page of a the Beethoven's Lied op. 98 converted on the fly in your browser. 
+                </p>
+                <p>
+                    The resulting MEI file can be saved through the <span class="glyphicon glyphicon-download"></span> MEI button on the top right.
+                </p>
+                <p>
+                    You can also select your own file and try to convert it. You will then be able to save the resulting MEI file. 
+                </p>
+                <form id="upload_form" onsubmit="convert_file( $('#upload_form') ); return false" class="form-inline" role="form">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
+                        </div>
+                        <div class="col-md-12">
+                            <button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to display the MEI file!" data-trigger="manual">Render</button>
+                        </div>
+                    </div>
+                </form>
+                
+                <p>
+                    This feature is highly experimental at this stage. For a more complete conversion from MusicXML to MEI we strongly recommend to use the XSL stylesheet.
+                </p>
+                
+                <p>
+                    Terms of use: the conversion to MEI in performed locally in your browser. This means that the MusicXML data is not uploaded to our server.
+                </p>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+//<![CDATA[
+    function convert_file() {
+        
+        $('#submit-btn').popover('hide');
+        var f = $("#mei_files").prop('files')[0];
+        var reader = new FileReader();
+
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+            return function(e) {
+                $('.row-offcanvas').toggleClass('active');
+                localStorage.setItem("musicxml_file", e.target.result);
+                window.location.href = "{{ site.baseurl }}/mei-viewer.xhtml?musicxml=true&local=true";
+            };
+        })(f);
+
+        // Read in the image file as a data URL.
+        reader.readAsText(f);
+    };
+//]]>
+</script>

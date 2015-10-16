@@ -45,13 +45,14 @@ downloads:
     var pageWidth = 2100;
     var swipe_pages = false;
     var log = false;
+    var format = 'mei';
     
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
         border = 50;
         options = JSON.stringify({
-                    inputFormat: 'mei',
+                    inputFormat: format,
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     border: border,
@@ -239,6 +240,11 @@ downloads:
         }
     }
 
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
 //]]>
 </script>
 
@@ -249,6 +255,9 @@ downloads:
          <span class="icon-bar"></span>
          <span class="icon-bar"></span>
          <span class="icon-bar"></span> 
+    </button>
+    <button type="button" id="mei_download" class="navbar-toggle menu-download" style="display: none;">
+        <span class="glyphicon glyphicon-download"> MEI</span>
     </button>
     <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.xhtml">
         <img src="{{ site.baseurl }}/images/verovio-fadded-50.png" />
@@ -340,7 +349,7 @@ downloads:
                     {% for d in page.downloads %}
                     <div {% if d.hidden == true %}class="hidden-sm hidden-xs"{% endif %}>
                         <p>
-                        <a href="{{ site.baseurl }}/{{ page.name }}?examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
+                        <a href="{{ site.baseurl }}/{{ page.name }}?file=examples/downloads/{{ d.link }}">{{ d.name }}</a><br/>
                          {{ d.description }}
                         </p>
                     </div>
@@ -424,8 +433,12 @@ downloads:
         $( "#toggle_log" ).click(function() {
             log = !log;
             $( "#log_panel_body" ).toggle();
-              // toggle icon
-              $("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+            // toggle icon
+            $("span", this).toggleClass("glyphicon-chevron-down glyphicon-chevron-left");
+        });
+
+        $( "#mei_download" ).click(function() {
+            console.log(vrvToolkit.getMEI());
         });
         
         // Set the popover for the btn
@@ -440,18 +453,31 @@ downloads:
         enable_swipe( true );
     
         // Load the default file or the file passed in the URL
-        var file = location.search.substring(1);
-        //console.log( file );
-        if (file.length == 0) {
-            file = "examples/downloads/Krebs_Trio_Eb_2.mei";
+        var file = getParameterByName("file");
+        var musicxml = getParameterByName("musicxml");
+        var local = getParameterByName("local");
+        
+        if (musicxml == "true") {
+            format = 'musicxml';
+            $("#mei_download").show();
         }
-        $.ajax({
-            url: file
-            , dataType: "text"
-            , success: function(data) {
-                load_data( data );
+
+        if (local == "true") {
+            data = localStorage.getItem("musicxml_file");
+            load_data( data );
+        }
+        else {
+            if (!file || (file.length == 0)) {
+                file = "examples/downloads/Krebs_Trio_Eb_2.mei";
             }
-        });
+            $.ajax({
+                url: file
+                , dataType: "text"
+                , success: function(data) {
+                    load_data( data );
+                }
+            });
+        }
     });
 //]]>
 </script>
