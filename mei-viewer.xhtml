@@ -46,6 +46,7 @@ downloads:
     var swipe_pages = false;
     var log = false;
     var format = 'mei';
+    var outputFilename = 'output.mei'
     
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
@@ -438,7 +439,8 @@ downloads:
         });
 
         $( "#mei_download" ).click(function() {
-            console.log(vrvToolkit.getMEI());
+            outputFilename = outputFilename.replace(/\.[^\.]+$/, '.mei');
+            saveAs(new Blob([vrvToolkit.getMEI(-1, true)], {type: "text/xml;charset=utf-8"}), outputFilename);
         });
         
         // Set the popover for the btn
@@ -464,6 +466,7 @@ downloads:
 
         if (local == "true") {
             data = localStorage.getItem("musicxml_file");
+            outputFilename = localStorage.getItem("musicxml_filename");
             load_data( data );
         }
         else {
@@ -474,6 +477,7 @@ downloads:
                 url: file
                 , dataType: "text"
                 , success: function(data) {
+                    outputFilename = file.replace(/^.*[\\\/]/, '')
                     load_data( data );
                 }
             });

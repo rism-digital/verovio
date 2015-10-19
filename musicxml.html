@@ -30,10 +30,7 @@ version-footer: false
                 <form id="upload_form" onsubmit="convert_file( $('#upload_form') ); return false" class="form-inline" role="form">
                     <div class="row">
                         <div class="col-md-12">
-                            <input type="file" id="mei_files" onchange="$('#submit-btn').popover('show');" name="file" style="margin: 4px 0px 8px 0px;"/>
-                        </div>
-                        <div class="col-md-12">
-                            <button type="submit" id="submit-btn" class="btn btn-default btn-sm popover-btn" data-container="body" data-toggle="popover" data-placement="left" data-content="Click to display the MEI file!" data-trigger="manual">Render</button>
+                            <input type="file" id="mei_files" name="file"></input>
                         </div>
                     </div>
                 </form>
@@ -62,6 +59,7 @@ version-footer: false
 
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
+            localStorage.setItem("musicxml_filename", theFile.name);
             return function(e) {
                 $('.row-offcanvas').toggleClass('active');
                 localStorage.setItem("musicxml_file", e.target.result);
@@ -72,5 +70,15 @@ version-footer: false
         // Read in the image file as a data URL.
         reader.readAsText(f);
     };
+    
+    $( document ).ready(function() {
+        $("#mei_files").fileinput({
+            'initialCaption': 'Select a MusicXML file ...',
+            'showPreview': true, 
+            'previewFileType': 'xml'
+        });
+        $(".fileinput-upload-button span").html('Convert to MEI');
+    });
+    
 //]]>
 </script>
