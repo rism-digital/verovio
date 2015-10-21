@@ -65,6 +65,12 @@ code.panel-header {
     color: #f9f2f4;
 }
 
+.test-xmlfile:not(:first-child) {
+    padding-top: 20px;
+    margin-top: 10px;
+    border-top: 1px solid #ccc;
+}
+
 .footer {
     bottom: 0px;
     width: 100%;

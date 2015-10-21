@@ -1,0 +1,278 @@
+show_all_tests: false
+tests:
+    - id: "01"
+      version-check: "0.9.10-dev-8a635ad"
+      name: "Pitches"
+      files:
+          - name: "01a-Pitches-Pitches.xml"
+            description: "All pitches from G to c”” in ascending steps; First without accidentals, then with a sharp and then with a flat accidental. Double alterations and cautionary accidentals are tested at the end."
+            comment: ""
+            mei: 2
+            verovio: 2
+          - name: "01b-Pitches-Intervals.xml"
+            description: "All pitch intervals in ascending jump size"
+            mei: 0
+            verovio: 0
+          - name: "01c-Pitches-NoVoiceElement.xml"
+            description: "The /voice element of notes is optional in MusicXML (although Dolet always writes it out). Here, there is one note with lyrics, but without a voice assigned. It should still be correctly converted."
+            mei: 2
+            verovio: 2
+          - name: "01d-Pitches-Microtones.xml"
+            description: "Some microtones: c flat-and-a-half, d half-flat, e half-sharp, f sharp-and-a half. Once in the lower and once in the upper region of the staff."
+            mei: 0
+            verovio: 0
+          - name: "01e-Pitches-ParenthesizedAccidentals.xml"
+            description: "Accidentals can be cautionary or editorial. Each measure has a normal accidental, an editorial, a cautionary and an editioal and cautionary accidental."
+            mei: 0
+            verovio: 0
+          - name: "01f-Pitches-ParenthesizedMicrotoneAccidentals.xml"
+            description: "Microtone accidentals can be cautionary or editorial. Each measure has a normal accidental, an editorial, a cautionary and an editioal and cautionary accidental."
+            mei: 0
+            verovio: 0
+            
+    - id: "02"
+      version-check: "0.9.10-dev-8a635ad"
+      name: "Rests"
+      files:
+          - name: "02a-Rests-Durations.xml"
+            description: "All different rest lengths: A two-bar multi-measure rest, a whole rest, a half, etc. until a 128th-rest; Then the same with dotted durations" 
+            comment: "Measure rest needs to be fixed."
+            mei: 1
+            verovio: 2
+          - name: "02b-Rests-PitchedRests.xml"
+            description: "Rests can have explicit pitches, where they are displayed. The first rest uses no explicit position and should use the default position, all others are explicitly positioned somewhere else."
+            mei: 0
+            verovio: 0
+          - name: "02c-Rests-MultiMeasureRests.xml"
+            description: "Four multi-measure rests: 3 measures, 15 measures, 1 measure, and 12 measures."
+            mei: 0
+            verovio: 0
+          - name: "02d-Rests-Multimeasure-TimeSignatures.xml"
+            description: "Four multi-measure rests: 3 measures, 15 measures, 1 measure, and 12 measures."
+            mei: 0
+            verovio: 0
+          - name: "02e-Rests-NoType.xml"
+            description: "In some cases, a rest might not have its type attribute set (this happens, for example, with voices in Finale, where you don’t manually insert a rest)."
+            mei: 0
+            verovio: 0
+            
+    - id: "03"
+      version-check: "0.9.10-dev-8a635ad"
+      name: "Rhythm"
+      files:
+          - name: "03a-Rhythm-Durations.xml"
+            description: "All note durations, from long, brevis, whole until 128th; First with their plain values, then dotted and finally doubly-dotted."
+            comment: "Time signatures are ignored."
+            mei: 2
+            verovio: 2
+          - name: "03b-Rhythm-Backup.xml"
+            description: "Two voices with a backup, that does not jump to the beginning for the measure for voice 2, but somewhere in the middle. Voice 2 thus won’t have any notes or rests for the first beat of the measures."
+            mei: 0
+            verovio: 0
+          - name: "03c-Rhythm-DivisionChange.xml"
+            description: "Although uncommon, the divisions of a quarter note can change somewhere in the middle of a MusicXML file. Here, the first half measure uses a division of 1, which then changes to 8 in the middle of the first measure and to 38 in the middle of the second measure."
+            comment: "Will need to be updated for handling @dur.ges."
+            mei: 1
+            verovio: 2
+          - name: "03d-Rhythm-DottedDurations-Factors.xml"
+            description: "Several durations can be written with dots. For multimeasure rests, we can also have durations that cannot be expressed with dotted notes (like 5/8)."
+            comment: "Will need to be updated for handling @dur.ges."
+            mei: 1
+            verovio: 2
+            
+    - id: "11"
+      name: "Time signatures"
+      files:
+          - name: "11a-TimeSignatures.xml"
+          - name: "11b-TimeSignatures-NoTime.xml"
+          - name: "11c-TimeSignatures-CompoundSimple.xml"
+          - name: "11d-TimeSignatures-CompoundMultiple.xml"
+          - name: "11e-TimeSignatures-CompoundMixed.xml"
+          - name: "11f-TimeSignatures-SymbolMeaning.xml"
+          - name: "11g-TimeSignatures-SingleNumber.xml"
+          - name: "11h-TimeSignatures-SenzaMisura.xml"
+          
+    - id: "12"
+      name: "Clefs"
+      files:
+          - name: "12a-Clefs.xml"
+            description: "Various clefs: G, C, F, percussion, TAB and none; some are also possible with transposition and on other staff lines than their default (e.g. soprano/alto/tenor/baritone C clefs); Each measure shows a different clef (measure 17 has the 'none' clef), only measure 18 has the same treble clef as measure 1."
+            comment: "TAB, percussion and @clef.dis and @clef.dis.place are missing."
+            mei: 1
+            verovio: 1
+          - name: "12b-Clefs-NoKeyOrClef.xml"
+            description: "A score without any key or clef defined. The default (4/4 in treble clef) should be used."
+            comment: "The expected behavior is hard to define. Verovio show the equivalent of C-1 with not clef."
+            mei: 2
+            verovio: 2
+    - id: "13"
+      name: "Key signatures"
+      files:
+          - name: "13a-KeySignatures.xml"
+          - name: "13b-KeySignatures-ChurchModes.xml"
+          - name: "13c-KeySignatures-NonTraditional.xml"
+          - name: "13d-KeySignatures-Microtones.xml"
+    - id: "14"
+      name: "Staff attributes"
+      files:
+          - name: "14a-StaffDetails-LineChanges.xml"
+    - id: "21"
+      name: "Chorded notes"
+      files:
+          - name: "21a-Chord-Basic.xml"
+          - name: "21b-Chords-TwoNotes.xml"
+          - name: "21c-Chords-ThreeNotesDuration.xml"
+          - name: "21d-Chords-SchubertStabatMater.xml"
+          - name: "21e-Chords-PickupMeasures.xml"
+          - name: "21f-Chord-ElementInBetween.xml"
+    - id: "22"
+      name: "Note settings, heads, etc."
+      files:
+          - name: "22a-Noteheads.xml"
+          - name: "22b-Staff-Notestyles.xml"
+          - name: "22c-Noteheads-Chords.xml"
+          - name: "22d-Parenthesized-Noteheads.xml"
+    - id: "23"
+      name: "Triplets, Tuplets"
+      files:
+          - name: "23a-Tuplets.xml"
+          - name: "23b-Tuplets-Styles.xml"
+          - name: "23c-Tuplet-Display-NonStandard.xml"
+          - name: "23d-Tuplets-Nested.xml"
+          - name: "23e-Tuplets-Tremolo.xml"
+          - name: "23f-Tuplets-DurationButNoBracket.xml"
+    - id: "24"
+      name: "Grace notes"
+      files:
+          - name: "24a-GraceNotes.xml"
+          - name: "24b-ChordAsGraceNote.xml"
+          - name: "24c-GraceNote-MeasureEnd.xml"
+          - name: "24d-AfterGrace.xml"
+          - name: "24e-GraceNote-StaffChange.xml"
+          - name: "24f-GraceNote-Slur.xml"
+    - id: "31"
+      name: "Dynamics and other single symbols"
+      files:
+          - name: "31a-Directions.xml"
+          - name: "31c-MetronomeMarks.xml"
+    - id: "32"
+      name: "Notations and Articulations"
+      files:
+          - name: "32a-Notations.xml"
+          - name: "32b-Articulations-Texts.xml"
+          - name: "32c-MultipleNotationChildren.xml"
+          - name: "32d-Arpeggio.xml"
+    - id: "33"
+      name: "Spanners"
+      files:
+          - name: "33a-Spanners.xml"
+          - name: "33b-Spanners-Tie.xml"
+          - name: "33c-Spanners-Slurs.xml"
+          - name: "33d-Spanners-OctaveShifts.xml"
+          - name: "33e-Spanners-OctaveShifts-InvalidSize.xml"
+          - name: "33f-Trill-EndingOnGraceNote.xml"
+          - name: "33g-Slur-ChordedNotes.xml"
+          - name: "33h-Spanners-Glissando.xml"
+          - name: "33i-Ties-NotEnded.xml"
+    - id: "41"
+      name: "Multiple parts (staves)"
+      files:
+          - name: "41a-MultiParts-Partorder.xml"
+          - name: "41b-MultiParts-MoreThan10.xml"
+          - name: "41c-StaffGroups.xml"
+          - name: "41d-StaffGroups-Nested.xml"
+          - name: "41e-StaffGroups-InstrumentNames-Linebroken.xml"
+          - name: "41f-StaffGroups-Overlapping.xml"
+          - name: "41g-PartNoId.xml"
+          - name: "41h-TooManyParts.xml"
+          - name: "41i-PartNameDisplay-Override.xml"
+    - id: "42"
+      name: "Multiple voices per staff"
+      files:
+          - name: "42a-MultiVoice-TwoVoicesOnStaff-Lyrics.xml"
+          - name: "42b-MultiVoice-MidMeasureClefChange.xml"
+    - id: "43"
+      name: "One part on multiple staves"
+      files:
+          - name: "43a-PianoStaff.xml"
+          - name: "43b-MultiStaff-DifferentKeys.xml"
+          - name: "43c-MultiStaff-DifferentKeysAfterBackup.xml"
+          - name: "43d-MultiStaff-StaffChange.xml"
+          - name: "43e-Multistaff-ClefDynamics.xml"
+    - id: "45"
+      name: "Repeats"
+      files:
+          - name: "45a-SimpleRepeat.xml"
+          - name: "45b-RepeatWithAlternatives.xml"
+          - name: "45c-RepeatMultipleTimes.xml"
+          - name: "45d-Repeats-Nested-Alternatives.xml"
+          - name: "45e-Repeats-Nested-Alternatives.xml"
+          - name: "45f-Repeats-InvalidEndings.xml"
+          - name: "45g-Repeats-NotEnded.xml"
+    - id: "46"
+      name: "Barlines, Measures"
+      files:
+          - name: "46a-Barlines.xml"
+          - name: "46b-MidmeasureBarline.xml"
+          - name: "46c-Midmeasure-Clef.xml"
+          - name: "46d-PickupMeasure-ImplicitMeasures.xml"
+          - name: "46e-PickupMeasure-SecondVoiceStartsLater.xml"
+          - name: "46f-IncompleteMeasures.xml"
+          - name: "46g-PickupMeasure-Chordnames-FiguredBass.xml"
+    - id: "51"
+      name: "Header information"
+      files:
+          - name: "51b-Header-Quotes.xml"
+          - name: "51c-MultipleRights.xml"
+          - name: "51d-EmptyTitle.xml"
+    - id: "52"
+      name: "Page layout"
+      files:
+          - name: "52a-PageLayout.xml"
+          - name: "52b-Breaks.xml"
+    - id: "61"
+      name: "Lyrics"
+      files:
+          - name: "61a-Lyrics.xml"
+          - name: "61b-MultipleLyrics.xml"
+          - name: "61c-Lyrics-Pianostaff.xml"
+          - name: "61d-Lyrics-Melisma.xml"
+          - name: "61e-Lyrics-Chords.xml"
+          - name: "61f-Lyrics-GracedNotes.xml"
+          - name: "61g-Lyrics-NameNumber.xml"
+          - name: "61h-Lyrics-BeamsMelismata.xml"
+          - name: "61i-Lyrics-Chords.xml"
+          - name: "61j-Lyrics-Elisions.xml"
+          - name: "61k-Lyrics-SpannersExtenders.xml"
+    - id: "71"
+      name: "Guitar notation"
+      files:
+          - name: "71a-Chordnames.xml"
+          - name: "71c-ChordsFrets.xml"
+          - name: "71d-ChordsFrets-Multistaff.xml"
+          - name: "71e-TabStaves.xml"
+          - name: "71f-AllChordTypes.xml"
+          - name: "71g-MultipleChordnames.xml"
+    - id: "72"
+      name: "Transposing intruments"
+      files:
+          - name: "72a-TransposingInstruments.xml"
+          - name: "72b-TransposingInstruments-Full.xml"
+          - name: "72c-TransposingInstruments-Change.xml"
+    - id: "73"
+      name: "Percussion"
+      files:
+          - name: "73a-Percussion.xml"
+    - id: "74"
+      name: "Figured bass"
+      files:
+          - name: "74a-FiguredBass.xml"
+    - id: "75"
+      name: "Other instrumental notation"
+      files:
+          - name: "75a-AccordionRegistrations.xml"
+    - id: "99"
+      name: "Compatibility with broken MusicXML"
+      files:
+          - name: "99a-Sibelius5-IgnoreBeaming.xml"
+          - name: "99b-Lyrics-BeamsMelismata-IgnoreBeams.xml"

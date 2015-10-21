@@ -1,0 +1,193 @@
+---
+layout: verovio
+verovio-light: false
+title: MusicXML test suite
+active: other-formats
+other-active: musicxml-test-suite
+version-footer: true
+
+show_all_tests: false
+---
+
+<script type="text/javascript">
+//<![CDATA[
+    var vrvToolkit = new verovio.toolkit();
+    var page = 1;
+    var zoom = 40;
+    var pageHeight = 2970;
+    var pageWidth = 2100;
+    var swipe_pages = false;
+    var log = false;
+    var border = 10;
+    var spacingSystem = 0;
+    var spacingStaff = 5;
+    var format = 'musicxml';
+    
+    function set_options( ) {
+        options = JSON.stringify({
+                    inputFormat: format,
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    border: border,
+                    scale: zoom,
+                    adjustPageHeight: 1,
+                    spacingSystem: spacingSystem,
+                    spacingStaff: spacingStaff,
+                    ignoreLayout: 1
+                });
+        //console.log( options );
+        vrvToolkit.setOptions( options );
+    }
+    
+    function load_data(data, div) {
+        
+        pageWidth = ($(div).width()) * 100 / zoom ;
+        
+        set_options();
+        
+        console.time("loading");
+        try {
+            vrvToolkit.loadData(data);
+            $(div + '-meiCode pre').text(vrvToolkit.getMEI(-1, true));
+            $(div + '-meiDiv').show();
+        }
+        catch(err) {
+            $(div + '-errLog pre').html(err);
+            $(div + '-errDiv').show();
+        }
+        console.timeEnd("loading");
+        
+        svg = vrvToolkit.renderPage(page, "");
+        $(div).html(svg);
+    }
+    
+//]]>
+</script>
+
+<div class="row">
+    
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include other-sidebar.html %}
+        </div>
+        
+        <div class="panel panel-default">
+            <div class="list-group sublist-group">
+                {% for t in site.data.musicxml-tests.tests %}
+                    {% if page.show_all_tests == false and t.version-check == null %}{% continue %}{% endif %}
+                    <a class="list-group-item" href="#{{ t.id }}">{{ t.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+        
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel panel-default">
+
+            <div class="panel-body">
+                <p>
+                    This feature is highly experimental at this stage, and only the features supported by Verovio will be converted. Everything else will be lost. For a more complete conversion from MusicXML to MEI we strongly recommend to use the <a href="https://github.com/music-encoding/music-encoding/tree/develop/tools" target="_blank">MEI XSL stylesheets</a>.
+                </p>
+            </div>
+        </div>
+        
+        {% for t in site.data.musicxml-tests.tests %}
+            {% if page.show_all_tests == false and t.version-check == null %}{% continue %}{% endif %}
+        <div class="panel panel-default" id="{{ t.id }}">
+
+            <div class="panel-heading">
+                {{ t.name }}
+            </div>
+
+            <div class="panel-body">
+                
+                {% if t.version-check %}
+                <p><strong>Last verification version:</strong> {{ t.version-check }}</p>
+                {% endif %}
+                
+                {% for f in t.files %}
+                    {% assign id = f.name | remove:'.xml' %}
+                    <h4 class="test-xmlfile">{{ f.name }}</h4>
+                    <p>
+                        {{ f.description }}
+                    </p>
+                    
+                    
+                    {% if f.comment %}
+                    <p><strong>Comment:</strong> {{ f.comment }}</p>
+                    {% endif %}
+                    
+                    <p>
+                    {% if f.mei == 0 %}
+                        <span class="label label-danger">Conversion to MEI</span>
+                    {% elsif f.mei == 1 %}
+                        <span class="label label-warning">Conversion to MEI</span>
+                    {% elsif f.mei == 2 %}
+                        <span class="label label-success">Conversion to MEI</span>
+                    {% else %}
+                        <span class="label label-default">Conversion to MEI</span>
+                    {% endif %}
+                    
+                    {% if f.verovio == 0 %}
+                        <span class="label label-danger">Rendering with Verovio</span>
+                    {% elsif f.verovio == 1 %}
+                        <span class="label label-warning">Rendering with Verovio</span>
+                    {% elsif f.verovio == 2 %}
+                        <span class="label label-success">Rendering with Verovio</span>
+                    {% else %}
+                        <span class="label label-default">Rendering with Verovio</span>
+                    {% endif %}
+                    </p>
+                    
+                    <div id="{{ id }}"></div>
+                    
+                    <div id="{{ id }}-errDiv" style="display: none;">
+                        <p>
+                        <div class="alert alert-danger" role="alert" id="{{ id }}-err">Verovio failed to convert the MusicXML test file.</div>
+                            <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#{{ id }}-errLog" aria-expanded="false" aria-controls="{{ id }}-errLog">Show the error log</button>
+                        </p>
+                        <div class="collapse" id="{{ id }}-errLog">
+                            <pre></pre>
+                        </div>
+                    </div>
+                    
+                    <div id="{{ id }}-meiDiv" style="display: none;">
+                        <p>
+                            <button class="btn btn-primary btn-sm" type="button" data-toggle="collapse" data-target="#{{ id }}-meiCode" aria-expanded="false" aria-controls="{{ id }}-meiCode">Show the MEI</button>
+                        </p>
+                        <div class="collapse" id="{{ id }}-meiCode">
+                            <pre></pre>
+                        </div>
+                    </div>
+                    
+<script type="text/javascript">
+//<![CDATA[
+    $.ajax({
+        url: "examples/lilypond-test-suite/{{ f.name }}"
+        , dataType: "text"
+        , success: function(data) {
+            load_data( data, "#{{ id }}" );
+        }
+    });
+//]]>
+</script>
+
+                {% endfor %}
+            </div>
+            
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+
+<script type="text/javascript">
+//<![CDATA[
+    
+    $( document ).ready(function() {
+
+    });
+    
+//]]>
+</script>

@@ -87,7 +87,13 @@ downloads:
         set_options();
         
         console.time("loading");
-        vrvToolkit.loadData(data);
+        try {
+            vrvToolkit.loadData(data);
+        }
+        catch(err) {
+            $('#err').html(err);
+            $('#errorDialog').modal();
+        }
         console.timeEnd("loading");
         
         if (log) {
@@ -249,6 +255,26 @@ downloads:
 //]]>
 </script>
 
+<!-- modal -->
+<div class="modal fade" id="errorDialog" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true" class="glyphicon glyphicon-remove"> </span></button>
+                <h4 class="modal-title" id="myModalLabel">Error</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert">Sorry, Verovio failed to process the MEI data</div>
+                <p>
+                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#errDiv" aria-expanded="false" aria-controls="errDiv">Show the error log</button>
+                </p>
+                <div class="collapse" id="errDiv">
+                    <pre id="err"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
     
 <!-- top navbar -->
 <div id="navbar" class="navbar navbar-default navbar-with-sidebar">

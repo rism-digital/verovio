@@ -5,6 +5,37 @@ title: MusicXML Converter
 active: other-formats
 other-active: musicxml
 version-footer: false
+examples:
+    - name: "Bach, Brandburg Concerto no. 5 BWV 1050, 1st mvt"
+      size: "3.1Mb"
+      link: "Bach_Brandburg_Concerto_BWV.1050_M1.xml"
+    - name: "Bach, Invention no. 1 BWV 772"
+      size: "197Kb"
+      link: "Bach_Invention_No_1_BVW.772.xml"
+    - name: "Bach, &bdquo;Nun komm der Heiden Heiland&rdquo; (arr.) BWV 659"
+      size: "419Kb"
+      link: "Bach_Nun_komm_der_Heiden_Heiland_BWV.659.xml"
+    - name: "Chopin, Etude op. 10 no. 12"
+      size: "1.3Mb"
+      link: "Chopin_Etude_Op.10_No.12.xml"
+    - name: "Costeley, &bdquo;Je_vois_de_glissantes_eaux&rdquo;"
+      size: "182Kb"
+      link: "Costeley_Je_vois_de_glissantes_eaux.xml"
+    - name: "Hayden, String Quartet in C major op. 74 no. 1, 2nd mvt"
+      size: "908Kb"
+      link: "Hayden_String_Quartet_in_C_Major_Op.74_No.1_M2.xml"
+    - name: "Schubert, &bdquo;An die Sonne&rdquo; D.439"
+      size: "1.2Mb"
+      link: "Schubert_An_die_Sonne_D.439.xml"
+    - name: "Schubert, &bdquo;Sta&#x308;ndchen&rdquo; D.923"
+      size: "583Kb"
+      link: "Schubert_Staendchen_D.923.xml"
+    - name: "Vivaldi, Concerto no. 4 in F minor &bdquo;Winter&rdquo;"
+      size: "3.9Mb"
+      link: "Vivaldi_Concerto_No.4_in_F_Minor_Winter.xml"
+    - name: "Waldteufel, Valse &bdquo;Les Patineurs&rdquo; op.138"
+      size: "1.2Mb"
+      link: "Waldteufel_Op.138_Les_Patineurs.xml"
 ---
 <div class="row">
     
@@ -19,13 +50,45 @@ version-footer: false
 
             <div class="panel-body">
                 <p>
-                    Verovio supports basic conversion from MusicXML to MEI. You can see <a href="{{ site.baseurl }}/mei-viewer.xhtml?file=examples/musicxml/BeetAnGeSample.xml&amp;musicxml=true">here</a> the <a href="{{ site.baseurl }}/examples/musicxml/BeetAnGeSample.xml">MusicXML example file</a> of a page of a the Beethoven's Lied op. 98 converted on the fly in your browser. 
+                    Verovio supports basic conversion from MusicXML to MEI. When converting from this web interface, the resulting MEI data will be displayed directly in the MEI-Viewer. The MEI file can be saved through the 
+                    <button type="button" class="btn btn-default btn-xs">
+                      <span class="glyphicon glyphicon-download" aria-hidden="true"></span> MEI
+                    </button>
+                    button that will be displayed on the top right.
                 </p>
                 <p>
-                    The resulting MEI file can be saved through the <span class="glyphicon glyphicon-download"></span> MEI button on the top right.
+                    This feature is highly experimental at this stage, and only the features supported by Verovio will be converted. Everything else will be lost. For a more complete conversion from MusicXML to MEI we strongly recommend to use the <a href="https://github.com/music-encoding/music-encoding/tree/develop/tools" target="_blank">MEI XSL stylesheets</a>.
                 </p>
                 <p>
-                    You can also select your own file and try to convert it. You will then be able to save the resulting MEI file. 
+                    Example files:
+                </p>
+                <div class="conainer"> 
+                    {% for d in page.examples %}
+                     <div class="row">
+                        <div class="col-xs-7">
+                            <p>
+                            <a href="{{ site.baseurl }}/examples/musicxml/{{ d.link }}">{{ d.name }}</a> ({{ d.size }})
+                            </p>
+                        </div>
+                        <div class="col-xs-5">
+                            <a href="{{ site.baseurl }}/mei-viewer.xhtml?file=examples/musicxml/{{ d.link }}&amp;musicxml=true">
+                                <button type="button" class="btn btn-default btn-xs">
+                                    <span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span> Convert to MEI
+                                </button>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="panel panel-default">
+
+            <div class="panel-body">
+
+                <p>
+                    You can also try to convert your own MusicXML file. If it works, the file will be displayed with Verovio and you will then be able to save the resulting MEI file.
                 </p>
                 <form id="upload_form" onsubmit="convert_file( $('#upload_form') ); return false" class="form-inline" role="form">
                     <div class="row">
@@ -34,14 +97,17 @@ version-footer: false
                         </div>
                     </div>
                 </form>
-                
-                <p>
-                    This feature is highly experimental at this stage. For a more complete conversion from MusicXML to MEI we strongly recommend to use the XSL stylesheet.
-                </p>
-                
                 <p>
                     Terms of use: the conversion to MEI in performed locally in your browser. This means that the MusicXML data is not uploaded to our server.
                 </p>
+                <p>
+                    Important known limitations:
+                </p>
+                <ul>
+                     <li>The MusicXML &lt;backup&gt; element will always go back to the beginning of the measure.</li>
+                     <li>The MusicXML &lt;forward&gt; element is currently ignored.</li>
+                     <li>The file size with this web interface is limited to the size of the local storage of your browser, which is typically 5Mb.</li>
+                </ul>
             </div>
             
         </div>
@@ -78,6 +144,7 @@ version-footer: false
             'previewFileType': 'xml'
         });
         $(".fileinput-upload-button span").html('Convert to MEI');
+        $(".fileinput-upload-button i").removeClass( "glyphicon-download" ).addClass( "glyphicon-circle-arrow-right" );
     });
     
 //]]>
