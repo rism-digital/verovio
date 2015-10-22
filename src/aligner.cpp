@@ -446,7 +446,6 @@ int MeasureAligner::SetAlignmentXPos( ArrayPtrVoid *params )
     // Reset the previous time position and x_rel to 0;
     (*previousTime) = 0.0;
     (*previousXRel) = 0;
-    
     return FUNCTOR_CONTINUE;
 }
 
@@ -456,17 +455,23 @@ to keep consecutive symbols from overlapping or nearly overlapping: we assume sp
 will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
 is a function of time interval.
  
-The power function we currently use is isn't quite right; see _Behind Bars_, p. 39. We also
-need more flexibility: for example, for some purposes, spacing propoortional to duration is
-desirable. The best solution is probably to get ideal spacing from a user-definable table. */
-
-int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+For a discussion of the way engravers determine spacing, see Elaine Gould, _Behind Bars_, 
+p. 39. But we need something more flexible, because for example (1) we're interested in
+music with notes of very long duration: say, music in mensural notation containing longas
+or maximas; such music is usually not spaced by duration, but we support spacing by
+duration if the user wishes, and standard engravers' rules would waste a lot of space; and
+(2) for some purposes, spacing strictly propoortional to duration is desirable. The most
+flexible solution might be to get ideal spacing from a user-definable table, but using a
+ formula with parameters can come close and has other advantages. */
+ 
+int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear,
+                                          double spacingNonLinear)
 {
-    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
-       that interval gets the space a semibreve would ordinarily get. (maxActualDur is in our
-       internal code format: cf. attdef.h). ??TO BE DONE */
+    /* If the longest duration interval in the score is longer than semibreve, adjust spacing
+       so that interval gets the space a semibreve would ordinarily get. (maxActualDur is in
+       our internal code format: cf. attdef.h). */
     if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
-    int intervalXRel = pow( intervalTime, spacingNonLinear ) * pow( spacingLinear * 5.0, 2 );
+    int intervalXRel = pow( intervalTime, spacingNonLinear ) * spacingLinear * 8.0;
     return intervalXRel;
 }
 
