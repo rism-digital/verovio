@@ -127,11 +127,11 @@ void display_usage() {
     
     cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR << ")" << endl;
     
-    cerr << " --spacing-non-linear=SP    Specify the non linear spacing factor (default is " << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
+    cerr << " --spacing-non-linear=SP    Specify the non-linear spacing factor (default is " << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
     
-    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)," << endl;
+    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)" << endl;
     
-    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)," << endl;
+    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)" << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;
