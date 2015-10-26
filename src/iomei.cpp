@@ -217,6 +217,10 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("beatRpt");
         WriteMeiBeatRpt( m_currentNode, dynamic_cast<BeatRpt*>(object) );
     }
+    else if (object->Is() == BTREM) {
+        m_currentNode = m_currentNode.append_child("bTrem");
+        WriteMeiBTrem( m_currentNode, dynamic_cast<BTrem*>(object) );
+    }
     else if (object->Is() == CHORD) {
         m_currentNode = m_currentNode.append_child( "chord" );
         WriteMeiChord( m_currentNode, dynamic_cast<Chord*>(object) );
@@ -232,6 +236,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (object->Is() == DOT) {
         m_currentNode = m_currentNode.append_child( "dot" );
         WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
+    }
+    else if (object->Is() == FTREM) {
+        m_currentNode = m_currentNode.append_child("fTrem");
+        WriteMeiFTrem( m_currentNode, dynamic_cast<FTrem*>(object) );
     }
     else if (object->Is() == KEYSIG) {
         m_currentNode = m_currentNode.append_child("keySig");
@@ -595,6 +603,13 @@ void MeiOutput::WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt )
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
+void MeiOutput::WriteMeiBTrem( pugi::xml_node currentNode, BTrem *bTrem )
+{
+    assert( bTrem );
+    
+    WriteLayerElement( currentNode, bTrem );
+}
+    
 void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
 {
     assert( chord );
@@ -634,6 +649,13 @@ void MeiOutput::WriteMeiDot( pugi::xml_node currentNode, Dot *dot )
     
     WriteLayerElement( currentNode, dot );
     WritePositionInterface(currentNode, dot);
+}
+
+void MeiOutput::WriteMeiFTrem( pugi::xml_node currentNode, FTrem *fTrem )
+{
+    assert( fTrem );
+    
+    WriteLayerElement( currentNode, fTrem );
 }
     
 void MeiOutput::WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig )
@@ -1019,6 +1041,20 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     }
     else if ( element == "supplied" ) {
         return true;
+    }
+    // filter for bTrem
+    else if (filterParent->Is() == BTREM)
+    {
+        if ( element == "chord" ) return true;
+        else if ( element == "note" ) return true;
+        else return false;
+    }
+    // filter for fTrem
+    else if (filterParent->Is() == FTREM)
+    {
+        if ( element == "chord" ) return true;
+        else if ( element == "note" ) return true;
+        else return false;
     }
     // filter for notes
     else if (filterParent->Is()  == NOTE)
@@ -1620,6 +1656,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beatRpt" ) {
             success = ReadMeiBeatRpt( parent, xmlElement);
         }
+        else if ( elementName == "bTrem" ) {
+            success = ReadMeiBTrem( parent, xmlElement );
+        }
         else if ( elementName == "chord" ) {
             success = ReadMeiChord( parent, xmlElement);
         }
@@ -1631,6 +1670,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "dot" ) {
             success = ReadMeiDot( parent, xmlElement );
+        }
+        else if ( elementName == "fTrem" ) {
+            success = ReadMeiFTrem( parent, xmlElement );
         }
         else if ( elementName == "keySig" ) {
             success = ReadMeiKeySig( parent, xmlElement );
@@ -1752,6 +1794,16 @@ bool MeiInput::ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt )
     return true;
 }
     
+bool MeiInput::ReadMeiBTrem( Object *parent, pugi::xml_node bTrem )
+{
+    BTrem *vrvBTrem = new BTrem();
+    ReadLayerElement(bTrem, vrvBTrem);
+    
+    AddLayerElement(parent, vrvBTrem);
+    
+    return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
+}
+    
 bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
 {
     Chord *vrvChord = new Chord();
@@ -1804,6 +1856,16 @@ bool MeiInput::ReadMeiDot( Object *parent, pugi::xml_node dot )
     AddLayerElement(parent, vrvDot);
     
     return true;
+}
+
+bool MeiInput::ReadMeiFTrem( Object *parent, pugi::xml_node fTrem )
+{
+    FTrem *vrvFTrem = new FTrem();
+    ReadLayerElement(fTrem, vrvFTrem);
+    
+    AddLayerElement(parent, vrvFTrem);
+    
+    return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
     
 bool MeiInput::ReadMeiKeySig( Object *parent, pugi::xml_node keySig )
