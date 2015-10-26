@@ -80,6 +80,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     else if (element->Is() == BEATRPT) {
         DrawBeatRpt(dc, element, layer, staff, measure);
     }
+    else if (element->Is() == BTREM) {
+        DrawBTrem(dc, element, layer, staff, measure);
+    }
     else if (element->Is() == CHORD) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
@@ -91,6 +94,9 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
     }
     else if (element->Is() == DOT) {
         DrawDot(dc, element, layer, staff, measure);
+    }
+    else if (element->Is() == FTREM) {
+        DrawFTrem(dc, element, layer, staff, measure);
     }
     else if (element->Is() == KEYSIG) {
         DrawKeySig(dc, element, layer, staff, measure);
@@ -841,7 +847,44 @@ void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bo
         dc->ResetFont();
     }
 }
-
+    
+    
+void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
+    BTrem *bTrem = dynamic_cast<BTrem*>(element);
+    assert( bTrem );
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    DrawLayerChildren(dc, bTrem, layer, staff, measure);
+    
+    dc->EndGraphic(element, this);
+}
+    
+void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
+    FTrem *fTrem = dynamic_cast<FTrem*>(element);
+    assert( fTrem );
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    DrawLayerChildren(dc, fTrem, layer, staff, measure);
+    
+    dc->EndGraphic(element, this);
+}
+    
 void View::DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff)
 {
     int x1, x2, y1, y2;
