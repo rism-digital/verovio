@@ -26,10 +26,12 @@ Chord::Chord( ):
     LayerElement("chord-"), StemmedDrawingInterface(), ObjectListInterface(), DurationInterface(),
     AttCommon(),
     AttStemmed(),
+    AttStemmedCmn(),
     AttTiepresent()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_STEMMEDCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     
     RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
@@ -53,6 +55,7 @@ void Chord::Reset()
     DurationInterface::Reset();
     ResetCommon();
     ResetStemmed();
+    ResetStemmedCmn();
     ResetTiepresent();
 }
     

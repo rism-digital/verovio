@@ -1351,8 +1351,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStemMod(std::string stemMod_) { m_stemMod = stemMod_; };
-    std::string GetStemMod() const { return m_stemMod; };    
+    void SetStemMod(data_STEMMODIFIER stemMod_) { m_stemMod = stemMod_; };
+    data_STEMMODIFIER GetStemMod() const { return m_stemMod; };    
     bool HasStemMod( );
     
     //
@@ -1367,7 +1367,7 @@ private:
      * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
      * tremolo or Sprechstimme indicators.
      **/
-    std::string m_stemMod;
+    data_STEMMODIFIER m_stemMod;
     /**
      * Contains an indication of which staff a note or chord that logically belongs to
      * the current staff should be visually placed on; that is, the one above or the

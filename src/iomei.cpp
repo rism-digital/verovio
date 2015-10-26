@@ -603,6 +603,7 @@ void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
     WriteDurationInterface( currentNode, chord);
     chord->WriteCommon(currentNode);
     chord->WriteStemmed(currentNode);
+    chord->WriteStemmedCmn(currentNode);
     chord->WriteTiepresent(currentNode);
 
     return;
@@ -718,6 +719,7 @@ void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStemmed(currentNode);
+    note->WriteStemmedCmn(currentNode);
     note->WriteTiepresent(currentNode);
     
     return;
@@ -1758,6 +1760,7 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadCommon(chord);
     vrvChord->ReadStemmed(chord);
+    vrvChord->ReadStemmedCmn(chord);
     vrvChord->ReadTiepresent(chord);
     
     AddLayerElement(parent, vrvChord);
@@ -1903,6 +1906,7 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStemmed(note);
+    vrvNote->ReadStemmedCmn(note);
     vrvNote->ReadTiepresent(note);
     
     AddLayerElement(parent, vrvNote);

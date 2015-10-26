@@ -1011,6 +1011,43 @@ data_STEMDIRECTION Att::StrToStemDirection(std::string value)
         LogWarning("Unsupported stem direction '%s'", value.c_str() );
     }
     return STEMDIRECTION_NONE;
+}    
+
+std::string Att::StemModifierToStr(data_STEMMODIFIER data)
+{
+    std::string value;
+    switch(data)
+    {
+        case STEMMODIFIER_1slash : value = "1slash"; break;
+        case STEMMODIFIER_2slash : value = "2slash"; break;
+        case STEMMODIFIER_3slash : value = "3slash"; break;
+        case STEMMODIFIER_4slash : value = "4slash"; break;
+        case STEMMODIFIER_5slash : value = "5slash"; break;
+        case STEMMODIFIER_6slash : value = "6slash"; break;
+        case STEMMODIFIER_sprech : value = "sprech"; break;
+        case STEMMODIFIER_z : value = "z"; break;
+        default:
+            LogWarning("Unknown mode '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMMODIFIER Att::StrToStemModifier(std::string value)
+{
+    if (value == "1slash") return STEMMODIFIER_1slash;
+    else if (value == "2slash") return STEMMODIFIER_2slash;
+    else if (value == "3slash") return STEMMODIFIER_3slash;
+    else if (value == "4slash") return STEMMODIFIER_4slash;
+    else if (value == "5slash") return STEMMODIFIER_5slash;
+    else if (value == "6slash") return STEMMODIFIER_6slash;
+    else if (value == "sprech") return STEMMODIFIER_sprech;
+    else if (value == "z") return STEMMODIFIER_z;
+    else {
+        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+    }
+    return STEMMODIFIER_NONE;
 }
 
 std::string Att::StemPositionToStr(data_STEMPOSITION data)

@@ -32,12 +32,14 @@ Note::Note():
     AttGraced(),
     AttNoteLogMensural(),
     AttStemmed(),
+    AttStemmedCmn(),
     AttTiepresent()
 {
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_STEMMEDCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     
     RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
@@ -75,6 +77,7 @@ void Note::Reset()
     ResetGraced();
     ResetNoteLogMensural();
     ResetStemmed();
+    ResetStemmedCmn();
     ResetTiepresent();
     
     // TO BE REMOVED

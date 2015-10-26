@@ -446,6 +446,21 @@ enum data_STEMPOSITION {
 };
     
 /**
+ * MEI data.STEMPOSITION
+ */
+enum data_STEMMODIFIER {
+    STEMMODIFIER_NONE = 0,
+    STEMMODIFIER_1slash,
+    STEMMODIFIER_2slash,
+    STEMMODIFIER_3slash,
+    STEMMODIFIER_4slash,
+    STEMMODIFIER_5slash,
+    STEMMODIFIER_6slash,
+    STEMMODIFIER_sprech,
+    STEMMODIFIER_z,
+};
+    
+/**
  * MEI data.TEMPUS
  * NONE is -3 for perfect value (abs) by default
  */

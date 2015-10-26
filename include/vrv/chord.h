@@ -33,6 +33,7 @@ namespace vrv {
 class Chord: public LayerElement, public ObjectListInterface, public StemmedDrawingInterface, public DurationInterface,
     public AttCommon,
     public AttStemmed,
+    public AttStemmedCmn,
     public AttTiepresent
 {
 public:
