@@ -56,6 +56,66 @@ private:
 };
     
 //----------------------------------------------------------------------------
+// BTrem
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI <bTrem>
+ */
+class BTrem: public LayerElement
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    BTrem( );
+    virtual ~BTrem();
+    virtual void Reset();
+    virtual std::string GetClassName( ){ return "BTrem"; }; ;
+    virtual ClassId Is() { return BTREM; };
+    ///@}
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// FTrem
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI <fTrem>
+ */
+class FTrem: public LayerElement
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    FTrem( );
+    virtual ~FTrem();
+    virtual void Reset();
+    virtual std::string GetClassName( ){ return "FTrem"; }; ;
+    virtual ClassId Is() { return FTREM; };
+    ///@}
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
 // MRpt
 //----------------------------------------------------------------------------
 
