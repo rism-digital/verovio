@@ -867,24 +867,6 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
     
-void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert( dc );
-    assert( element );
-    assert( layer );
-    assert( staff );
-    assert( measure );
-    
-    FTrem *fTrem = dynamic_cast<FTrem*>(element);
-    assert( fTrem );
-    
-    dc->StartGraphic( element, "", element->GetUuid() );
-    
-    DrawLayerChildren(dc, fTrem, layer, staff, measure);
-    
-    dc->EndGraphic(element, this);
-}
-    
 void View::DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff)
 {
     int x1, x2, y1, y2;

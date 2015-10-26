@@ -23,6 +23,7 @@
 #include "layer.h"
 #include "layerelement.h"
 #include "note.h"
+#include "rpt.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -528,6 +529,24 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     } // end of drawing partial bars
     
     dc->EndGraphic(element, this );
+}
+
+void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert( dc );
+    assert( element );
+    assert( layer );
+    assert( staff );
+    assert( measure );
+    
+    FTrem *fTrem = dynamic_cast<FTrem*>(element);
+    assert( fTrem );
+    
+    dc->StartGraphic( element, "", element->GetUuid() );
+    
+    DrawLayerChildren(dc, fTrem, layer, staff, measure);
+    
+    dc->EndGraphic(element, this);
 }
     
 } // namespace vrv

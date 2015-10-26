@@ -204,7 +204,6 @@ protected:
      */
     ///@{
     void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid = NULL );
-    void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -213,7 +212,6 @@ protected:
     void DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawDot( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMRpt( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -251,10 +249,19 @@ protected:
     ///@}
     
     /**
+     * @name Method for drawing Beam and FTrem.
+     * Defined in view_beam.cpp
+     */
+    ///@{
+    void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    ///@}
+    
+    /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement
      * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
-     * Defined in floating_element.cpp
+     * Defined in view_floating.cpp
      */
     ///@{
     void DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system );
@@ -296,9 +303,9 @@ protected:
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     ///@}
-    
+
     /**
-     * @name Method for drawing Beam.
+     * @name Method for drawing Tuplet.
      * Called from the the layer postponed drawing list.
      * Defined in view_tuplet.cpp
      */
