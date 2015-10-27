@@ -564,11 +564,137 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         return;
     }
     
-    
-    
     dc->StartGraphic( element, "", element->GetUuid() );
     
     DrawLayerChildren(dc, fTrem, layer, staff, measure);
+    
+    data_STEMDIRECTION stemDir1 = STEMDIRECTION_NONE;
+    data_STEMDIRECTION stemDir2 = STEMDIRECTION_NONE;
+    Point stemPoint1, stemPoint2;
+    // for these we look only at the first one since we assume both to be the same
+    int drawingDur;
+    bool drawingCueSize = false;
+    //
+    char slashCount;
+    int x1, y1, x2, y2, yUnused;
+    
+    Chord *childChord1 = NULL;
+    Note *childNote1 = NULL;
+    LayerElement *childElement1 = NULL;
+    Chord *childChord2 = NULL;
+    Note *childNote2 = NULL;
+    LayerElement *childElement2 = NULL;
+    
+    if (firstElement.m_element->Is() == CHORD) {
+        childChord1 = dynamic_cast<Chord*>(firstElement.m_element);
+        childElement1 = childChord1;
+    }
+    else {
+        childNote1 = dynamic_cast<Note*>(firstElement.m_element);
+        childElement1 = childNote1;
+    }
+    assert(childChord1 || childNote1);
+    // end
+    if (secondElement.m_element->Is() == CHORD) {
+        childChord2 = dynamic_cast<Chord*>(secondElement.m_element);
+        childElement2 = childChord2;
+    }
+    else {
+        childNote2 = dynamic_cast<Note*>(secondElement.m_element);
+        childElement2 = childNote2;
+    }
+    assert(childChord2 || childNote2);
+    
+    slashCount = fTrem->GetSlash();
+    
+    // Get from the first chord or note child
+    if (childChord1) {
+        stemDir1 = childChord1->GetDrawingStemDir();
+        stemPoint1 = childChord1->GetDrawingStemStart();
+        // duration of the first note/chord only
+        drawingDur = childChord1->GetDur();
+    }
+    else {
+        drawingCueSize = childNote1->IsCueSize();
+        stemDir1 = childNote1->GetDrawingStemDir();
+        stemPoint1 = childNote1->GetDrawingStemStart();
+        drawingDur = childNote1->GetDur();
+    }
+    
+    // Get from the second chord or note child
+    if (childChord2) {
+        stemDir2 = childChord2->GetDrawingStemDir();
+        stemPoint2 = childChord2->GetDrawingStemStart();
+    }
+    else {
+        stemDir2 = childNote2->GetDrawingStemDir();
+        stemPoint2 = childNote2->GetDrawingStemStart();
+    }
+    
+    int space = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
+    int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
+    int step = height + space;
+    
+    if (stemDir1 == STEMDIRECTION_up) {
+        if (drawingDur > DUR_1) {
+            y1 = childElement1->GetDrawingTop(m_doc, staff->m_drawingStaffSize) - 1 * height;
+            x1 = stemPoint1.x;
+        }
+        else {
+            if (childNote1) y1 = childNote1->GetDrawingY();
+            else childChord1->GetYExtremes(&y1, &yUnused);
+            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            x1 = childElement1->GetDrawingX();
+        }
+        step = -step;
+    }
+    else {
+        if (drawingDur > DUR_1) {
+            y1 = childElement1->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            x1 = stemPoint1.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        }
+        else {
+            if (childNote1) y1 = childNote1->GetDrawingY();
+            else childChord1->GetYExtremes(&yUnused, &y1);
+            y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            x1 = childElement1->GetDrawingX();
+        }
+    }
+    
+    if (stemDir2 == STEMDIRECTION_up) {
+        if (drawingDur > DUR_1) {
+            y2 = childElement2->GetDrawingTop(m_doc, staff->m_drawingStaffSize) - 1 * height;
+            x2 = stemPoint2.x;
+        }
+        else {
+            if (childNote2) y2 = childNote2->GetDrawingY();
+            else childChord2->GetYExtremes(&y2, &yUnused);
+            y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            x2 = childElement2->GetDrawingX();
+        }
+    }
+    else {
+        if (drawingDur > DUR_1) {
+            y2 = childElement2->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+            x2 = stemPoint2.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        }
+        else {
+            if (childNote2) y2 = childNote2->GetDrawingY();
+            else childChord2->GetYExtremes(&yUnused, &y2);
+            y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            x2 = childElement2->GetDrawingX();
+        }
+    }
+    
+    x1 += height;
+    x2 -= height;
+    
+    int s;
+    for (s = 0; s < slashCount; s++) {
+        DrawObliquePolygon (dc, x1, y1, x2, y2, height);
+        y1 += step;
+        y2 += step;
+    }
     
     dc->EndGraphic(element, this);
 }

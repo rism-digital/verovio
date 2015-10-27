@@ -83,8 +83,11 @@ void BTrem::AddLayerElement(LayerElement *element)
 //----------------------------------------------------------------------------
 
 FTrem::FTrem( ):
-    LayerElement("ftrem-"), ObjectListInterface()
+    LayerElement("ftrem-"), ObjectListInterface(),
+    AttSlashcount()
 {
+    RegisterAttClass(ATT_SLASHCOUNT);
+    
     Reset();
 }
 
@@ -95,6 +98,7 @@ FTrem::~FTrem()
 void FTrem::Reset()
 {
     LayerElement::Reset();
+    ResetSlashcount();
 }
     
 void FTrem::AddLayerElement(LayerElement *element)

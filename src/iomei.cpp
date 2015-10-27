@@ -656,6 +656,7 @@ void MeiOutput::WriteMeiFTrem( pugi::xml_node currentNode, FTrem *fTrem )
     assert( fTrem );
     
     WriteLayerElement( currentNode, fTrem );
+    fTrem->WriteSlashcount(currentNode);
 }
     
 void MeiOutput::WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig )
@@ -1862,6 +1863,8 @@ bool MeiInput::ReadMeiFTrem( Object *parent, pugi::xml_node fTrem )
 {
     FTrem *vrvFTrem = new FTrem();
     ReadLayerElement(fTrem, vrvFTrem);
+    
+    vrvFTrem->ReadSlashcount(fTrem);
     
     AddLayerElement(parent, vrvFTrem);
     

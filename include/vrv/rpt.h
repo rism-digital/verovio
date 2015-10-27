@@ -10,6 +10,7 @@
 #define __VRV_RPT_H__
 
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -98,7 +99,8 @@ private:
 /**
  * This class models the MEI <fTrem>
  */
-class FTrem: public LayerElement, public ObjectListInterface
+class FTrem: public LayerElement, public ObjectListInterface,
+    public AttSlashcount
 {
 public:
     /**
