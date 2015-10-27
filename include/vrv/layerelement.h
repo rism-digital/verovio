@@ -75,13 +75,18 @@ public:
      * @name Child type checkers.
      */
     ///@{
-    /** Returns true if the element is a grace note */
+    /** Return true if the element is a grace note */
     bool IsGraceNote();
-    /** Returns true if the element is a note or a note child and the note has a @grace */
+    /** Return true if the element is a note or a note child and the note has a @grace */
     bool IsCueSize();
     /** Return true if the element has to be aligned horizontally */
     virtual bool HasToBeAligned() { return false; };
-    /** Returns the beam parent if in beam */
+    /** 
+     * Return the beam parent if in beam
+     * Look if the note or rest is in a beam.
+     * Look for the fist beam parent and check is the note is in is content list.
+     * Looking in the content list is necessary for grace notes or imbricated beams.
+     */
     Beam *IsInBeam();
     ///@}
     

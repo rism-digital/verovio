@@ -110,7 +110,20 @@ bool LayerElement::IsGraceNote()
 Beam* LayerElement::IsInBeam()
 {
     if ((this->Is() != NOTE) || (this->Is() == CHORD)) return NULL;
-    return dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
+    Beam *beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
+    if (beamParent != NULL) {
+        // This note is beamed and cue sized
+        if (this->IsCueSize()) {
+            // If the note is part of the beam parent, this means we
+            // have a beam of graced notes
+            if (beamParent->GetListIndex(this) > -1) return beamParent;
+            // otherwise it is a non-beamed grace note within a beam - will return false
+        }
+        else {
+            return beamParent;
+        }
+    }
+    return NULL;
 }
     
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize)

@@ -223,30 +223,8 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (note->m_crossStaff) staff = note->m_crossStaff;
     
     Chord *inChord = note->IsChordTone();
-    
+    Beam *inBeam = note->IsInBeam();
     bool drawingCueSize = note->HasGrace();
-    
-    bool inBeam = false;
-    
-    // Get the immediate parent of the note
-    // to see if beamed or not
-    Beam *beam_parent = dynamic_cast<Beam*>(note->GetFirstParent( BEAM ));
-    
-    if (beam_parent != NULL) {
-        // This note is beamed and cue sized
-        if (drawingCueSize == true) {
-            // Get the Parent of the parent
-            // we want to see if we are in a group of
-            // beamed cue notes
-            if (beam_parent->GetListIndex(note) > -1) {
-                inBeam = true;
-            }
-        }
-        else {
-            // the note is just in a beam
-            inBeam = true;
-        }
-    }
     
 	int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
@@ -1056,26 +1034,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
     int fullUnit = m_doc->GetDrawingUnit(staffSize);
     
-    bool inBeam = false;
-    // Get the immadiate parent of the note
-    // to see if beamed or not
-    Beam *beam_parent = dynamic_cast<Beam*>(chord->GetFirstParent( BEAM ));
-    
-    // This note is beamed and cue sized
-    if (beam_parent != NULL) {
-        if (drawingCueSize == true) {
-            // Get the Parent of the parent
-            // we want to see if we are in a group of
-            // beamed cue notes
-            if (beam_parent->GetListIndex(chord) > -1) {
-                inBeam = true;
-            }
-        }
-        else {
-            // the note is just in a beam
-            inBeam = true;
-        }
-    }
+    Beam *inBeam = chord->IsInBeam();
     
     /************ Ledger line reset ************/
     
