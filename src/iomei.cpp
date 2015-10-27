@@ -2382,6 +2382,17 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
         assert( layer );
         layer->AddLayerElement( element );
     }
+    // LayerElements
+    else if ( parent->Is() == BEAM ) {
+        Beam * beam = dynamic_cast<Beam*>( parent );
+        assert( beam );
+        beam->AddLayerElement( element );
+    }
+    else if ( parent->Is() == BTREM ) {
+        BTrem *bTrem = dynamic_cast<BTrem*>( parent );
+        assert( bTrem );
+        bTrem->AddLayerElement( element );
+    }
     else if ( parent->Is() == CHORD ) {
         Chord *chord = dynamic_cast<Chord*>( parent );
         assert( chord );
@@ -2392,10 +2403,10 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
         assert( note );
         note->AddLayerElement( element );
     }
-    else if ( parent->Is() == BEAM ) {
-        Beam * beam = dynamic_cast<Beam*>( parent );
-        assert( beam );
-        beam->AddLayerElement( element );
+    else if ( parent->Is() == FTREM ) {
+        FTrem *fTrem = dynamic_cast<FTrem*>( parent );
+        assert( fTrem );
+        fTrem->AddLayerElement( element );
     }
     else if ( parent->Is() == TUPLET ) {
         Tuplet *tuplet = dynamic_cast<Tuplet*>( parent );

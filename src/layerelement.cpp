@@ -107,6 +107,12 @@ bool LayerElement::IsGraceNote()
     return (note && note->HasGrace());
 }
     
+bool LayerElement::IsInfTrem()
+{
+    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return false;
+    return (this->GetFirstParent( FTREM, MAX_FTREM_DEPTH));
+}
+    
 Beam* LayerElement::IsInBeam()
 {
     if ((this->Is() != NOTE) || (this->Is() == CHORD)) return NULL;
@@ -203,8 +209,16 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
         }
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
         assert( duration );
-        if (duration->IsMensural()) return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
-        else return duration->GetAlignmentDuration( num, numbase );
+        if (duration->IsMensural()) {
+            return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
+        }
+        double durationValue = duration->GetAlignmentDuration( num, numbase );
+        // With fTrem we need to divide the duration by two
+        FTrem *fTrem = dynamic_cast<FTrem*>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
+        if (fTrem) {
+            durationValue /= 2.0;
+        }
+        return durationValue;
     }
     else if (this->Is() == BEATRPT) {
         BeatRpt *beatRpt = dynamic_cast<BeatRpt*>(this);

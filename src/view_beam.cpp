@@ -542,6 +542,30 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     FTrem *fTrem = dynamic_cast<FTrem*>(element);
     assert( fTrem );
     
+    BeamElementCoord firstElement;
+    BeamElementCoord secondElement;
+    
+    ListOfObjects* fTremChildren = fTrem->GetList(fTrem);
+    
+    // Should we assert this at the beginning?
+    if (fTremChildren->empty()) {
+        return;
+    }
+    // current point to the first Note in the layed out layer
+    firstElement.m_element = dynamic_cast<LayerElement*>(fTremChildren->front());
+    // fTrem list should contain only DurationInterface objects
+    assert( dynamic_cast<DurationInterface*>(firstElement.m_element) );
+    // current point to the first Note in the layed out layer
+    secondElement.m_element = dynamic_cast<LayerElement*>(fTremChildren->back());
+    // fTrem list should contain only DurationInterface objects
+    assert( dynamic_cast<DurationInterface*>(secondElement.m_element) );
+        // Should we assert this at the beginning?
+    if (firstElement.m_element == secondElement.m_element) {
+        return;
+    }
+    
+    
+    
     dc->StartGraphic( element, "", element->GetUuid() );
     
     DrawLayerChildren(dc, fTrem, layer, staff, measure);

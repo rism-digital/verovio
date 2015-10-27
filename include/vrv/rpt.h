@@ -77,6 +77,12 @@ public:
     virtual ClassId Is() { return BTREM; };
     ///@}
     
+    /**
+     * Add an element (a note or a chord) to a fTrem.
+     * Only Note or Chord elements will be actually added to the fTrem.
+     */
+    void AddLayerElement(LayerElement *element);
+    
 private:
     
 public:
@@ -92,7 +98,7 @@ private:
 /**
  * This class models the MEI <fTrem>
  */
-class FTrem: public LayerElement
+class FTrem: public LayerElement, public ObjectListInterface
 {
 public:
     /**
@@ -107,7 +113,19 @@ public:
     virtual ClassId Is() { return FTREM; };
     ///@}
     
+    /**
+     * Add an element (a note or a chord) to a fTrem.
+     * Only Note or Chord elements will be actually added to the fTrem.
+     */
+    void AddLayerElement(LayerElement *element);
+    
 private:
+    
+protected:
+    /**
+     * Filter the list for a specific fTrem;
+     */
+    virtual void FilterList( ListOfObjects *childList );
     
 public:
     
