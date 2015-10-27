@@ -110,12 +110,12 @@ show_all_tests: false
                     {% assign id = f.name | remove:'.xml' %}
                     <h4 class="test-xmlfile">{{ f.name }}</h4>
                     <p>
-                        {{ f.description }}
+                        Original LilyPond comment: {{ f.description }}
                     </p>
                     
                     
                     {% if f.comment %}
-                    <p><strong>Comment:</strong> {{ f.comment }}</p>
+                    <p><strong>Additional comment:</strong> {{ f.comment }}</p>
                     {% endif %}
                     
                     <p>
