@@ -837,10 +837,82 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     BTrem *bTrem = dynamic_cast<BTrem*>(element);
     assert( bTrem );
+
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
     DrawLayerChildren(dc, bTrem, layer, staff, measure);
+    
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    data_STEMMODIFIER stemMod;
+    int drawingDur;
+    LayerElement *childElement = NULL;
+    Point stemPoint;
+    bool drawingCueSize = false;
+    int x, y, yUnused;
+    
+    Chord *childChord = dynamic_cast<Chord*>(bTrem->FindChildByType(CHORD));
+    // Get from the chord or note child
+    if (childChord) {
+        stemDir = childChord->GetDrawingStemDir();
+        stemMod = childChord->GetStemMod();
+        stemPoint = childChord->GetDrawingStemStart();
+        drawingDur = childChord->GetDur();
+        childElement = childChord;
+    }
+    else {
+        Note *childNote = dynamic_cast<Note*>(bTrem->FindChildByType(NOTE));
+        if (childNote) {
+            drawingCueSize = childNote->IsCueSize();
+            stemDir = childNote->GetDrawingStemDir();
+            stemMod = childNote->GetStemMod();
+            stemPoint = childNote->GetDrawingStemStart();
+            drawingDur = childNote->GetDur();
+            childElement = childNote;
+        }
+    }
+
+    // nothing we can do...
+    if (stemDir == STEMDIRECTION_NONE) {
+        return;
+    }
+    
+    
+    int width = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
+    int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize) * 7 / 10;
+    int step = height + m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
+
+    if (stemDir == STEMDIRECTION_up) {
+        if (drawingDur > DUR_1) {
+            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize) - 3 * height;
+            x = stemPoint.x;
+        }
+        else {
+            if (childElement->Is() == NOTE) y = childElement->GetDrawingY();
+            else childChord->GetYExtremes(&y, &yUnused);
+            y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            x = childElement->GetDrawingX();
+        }
+        step = -step;
+    }
+    else {
+        if (drawingDur > DUR_1) {
+            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) + 1 * height;
+            x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+        }
+        else {
+            if (childElement->Is() == NOTE) y = childElement->GetDrawingY();
+            else childChord->GetYExtremes(&yUnused, &y);
+            y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            x = childElement->GetDrawingX();
+        }
+    }
+    
+    int s;
+    for (s = 0; s < stemMod; s++) {
+        DrawObliquePolygon (dc, x - width / 2, y, x + width / 2, y + height, height);
+        y += step;
+    }
     
     dc->EndGraphic(element, this);
 }
@@ -1045,8 +1117,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     int drawingDur = chord->GetDur();
     
-    //(unless we're in a beam or whole notes)
-    if (!inBeam && (drawingDur > DUR_1)) {
+    // (unless we're in a beam)
+    if (!inBeam) {
         int yMax, yMin;
         chord->GetYExtremes(&yMax, &yMin);
         
@@ -1060,11 +1132,13 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             chord->SetDrawingStemDir(yMax - verticalCenter >= verticalCenter - yMin ? STEMDIRECTION_down : STEMDIRECTION_up);
         }
         
-        int beamX = chord->GetDrawingX();
-        int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
-        int heightY = yMax - yMin;
-        
-        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+        // (only shorter than whole notes)
+        if (drawingDur > DUR_1) {
+            int beamX = chord->GetDrawingX();
+            int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
+            int heightY = yMax - yMin;
+            DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+        }
     }
     
     /************ Draw children (notes) ************/

@@ -115,7 +115,7 @@ bool LayerElement::IsInfTrem()
     
 Beam* LayerElement::IsInBeam()
 {
-    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return NULL;
+    if ((this->Is() != NOTE) && (this->Is() != CHORD)) return NULL;
     Beam *beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
     if (beamParent != NULL) {
         // This note is beamed and cue sized
