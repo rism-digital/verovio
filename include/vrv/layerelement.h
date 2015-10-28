@@ -80,7 +80,7 @@ public:
     /** Return true if the element is a note or a note child and the note has a @grace */
     bool IsCueSize();
     /** Return true if the element is a note or a chord within a fTrem */
-    bool IsInfTrem();
+    bool IsInFTrem();
     /** Return true if the element has to be aligned horizontally */
     virtual bool HasToBeAligned() { return false; };
     /** 

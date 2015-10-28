@@ -227,7 +227,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         DrawObliquePolygon (dc, x1, y1, x2, y2, polygonHeight);
 		y1 += polygonHeight; y2 += polygonHeight;
 
-        // s_y must == 0 for accelerando beams
+        // dy1 must == 0 for accelerando beams
 		if (!dy1) y1 += (params.m_beamWidthBlack * shiftY) * -1;
 		else y1 += dy1 * params.m_beamWidthWhite;
         
@@ -347,11 +347,28 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert( staff );
     assert( measure );
     
+    
+    // temporary coordinates
+    int x1, x2, y1, y2;
+    
+    // temporary variables
+    int shiftY;
+    int fullBars, polygonHeight;
+    double dy1, dy2;
+    
+    // loop
+    int i, j;
+    
     FTrem *fTrem = dynamic_cast<FTrem*>(element);
     assert( fTrem );
     
+    ArrayOfBeamElementCoords beamElementCoords;
     BeamElementCoord firstElement;
     BeamElementCoord secondElement;
+    beamElementCoords.push_back(&firstElement);
+    beamElementCoords.push_back(&secondElement);
+    
+    int elementCount = 2;
     
     ListOfObjects* fTremChildren = fTrem->GetList(fTrem);
     
@@ -367,14 +384,102 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     secondElement.m_element = dynamic_cast<LayerElement*>(fTremChildren->back());
     // fTrem list should contain only DurationInterface objects
     assert( dynamic_cast<DurationInterface*>(secondElement.m_element) );
-        // Should we assert this at the beginning?
+    // Should we assert this at the beginning?
     if (firstElement.m_element == secondElement.m_element) {
         return;
     }
     
+    BeamParams params;
+    params.m_changingDur = OFF;
+    params.m_beamHasChord = OFF;
+    params.m_hasMultipleStemDir = OFF;
+    params.m_cueSize = OFF;
+    params.m_shortestDur = DUR_8;
+    params.m_stemDir = STEMDIRECTION_NONE;
+    
+    Chord *childChord1 = NULL;
+    Chord *childChord2 = NULL;
+    
+    if (firstElement.m_element->Is() == CHORD) {
+        childChord1 = dynamic_cast<Chord*>(firstElement.m_element);
+        params.m_beamHasChord = ON;
+    }
+    if (secondElement.m_element->Is() == CHORD) {
+        childChord2 = dynamic_cast<Chord*>(secondElement.m_element);
+        params.m_beamHasChord = ON;
+    }
+    
+    firstElement.m_x = firstElement.m_element->GetDrawingX();
+    secondElement.m_x = secondElement.m_element->GetDrawingX();
+    
+    // For now look at the stemDir only on the first note
+    assert( dynamic_cast<AttStemmed*>(firstElement.m_element) );
+    params.m_stemDir =  dynamic_cast<AttStemmed*>(firstElement.m_element)->GetStemDir();
+    
+    // We look only at the first note for checking if cuesized. Somehow arbitrarily
+    params.m_cueSize = firstElement.m_element->IsCueSize();
+    
+    /******************************************************************/
+    // Calculate the beam slope
+    
+    CalcBeam(layer, staff, &beamElementCoords, elementCount, &params);
+    
+    
     dc->StartGraphic( element, "", element->GetUuid() );
     
     DrawLayerChildren(dc, fTrem, layer, staff, measure);
+    
+    
+    /******************************************************************/
+    // Draw the stems and the beam full bars
+    
+    for (i=0; i<elementCount; i++)
+    {
+        LayerElement *el = beamElementCoords.at(i)->m_element;
+        if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
+            StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
+            assert(interface);
+            
+            DrawVerticalLine (dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
+                              interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+        }
+    }
+    
+    // Number of bars to draw - if we do not have changing values, draw
+    // the number of bars according to the shortestDur value. Otherwise draw
+    // only one bar and the others will be drawn separately.
+    fullBars =  1;
+    
+    // Adjust the x position of the first and last element for taking into account the stem width
+    firstElement.m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    secondElement.m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    
+    // Shift direction
+    shiftY = (params.m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
+    
+    y1 = firstElement.m_yBeam;
+    y2 = secondElement.m_yBeam;
+    
+    x1 = firstElement.m_x;
+    x2 = secondElement.m_x;
+    
+    dy1 = shiftY;
+    dy2 = shiftY;
+    
+    // For acc and rit beam (see AttBeamingVis set
+    // s_y = 0 and s_y2 = 0 respectively
+    
+    for (j = 0; j < fullBars ; j++) {
+        polygonHeight = params.m_beamWidthBlack * shiftY;
+        DrawObliquePolygon (dc, x1, y1, x2, y2, polygonHeight);
+        y1 += polygonHeight;
+        y2 += polygonHeight;
+        y1 += dy1 * params.m_beamWidthWhite;
+        y2 += dy2 * params.m_beamWidthWhite;
+    }
+
+    
+    /*
     
     data_STEMDIRECTION stemDir1 = STEMDIRECTION_NONE;
     data_STEMDIRECTION stemDir2 = STEMDIRECTION_NONE;
@@ -385,33 +490,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     //
     char slashCount;
     int x1, y1, x2, y2, yUnused;
-    
-    Chord *childChord1 = NULL;
-    Note *childNote1 = NULL;
-    LayerElement *childElement1 = NULL;
-    Chord *childChord2 = NULL;
-    Note *childNote2 = NULL;
-    LayerElement *childElement2 = NULL;
-    
-    if (firstElement.m_element->Is() == CHORD) {
-        childChord1 = dynamic_cast<Chord*>(firstElement.m_element);
-        childElement1 = childChord1;
-    }
-    else {
-        childNote1 = dynamic_cast<Note*>(firstElement.m_element);
-        childElement1 = childNote1;
-    }
-    assert(childChord1 || childNote1);
-    // end
-    if (secondElement.m_element->Is() == CHORD) {
-        childChord2 = dynamic_cast<Chord*>(secondElement.m_element);
-        childElement2 = childChord2;
-    }
-    else {
-        childNote2 = dynamic_cast<Note*>(secondElement.m_element);
-        childElement2 = childNote2;
-    }
-    assert(childChord2 || childNote2);
     
     slashCount = fTrem->GetSlash();
     
@@ -503,6 +581,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y1 += step;
         y2 += step;
     }
+    */
     
     dc->EndGraphic(element, this);
 }
@@ -617,11 +696,11 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
     // Calculate the slope doing a linear regression
     
     // The vertical shift depends on the shortestDur value we have in the beam
-    verticalShift = ((params->m_shortestDur-DUR_8)*(params->m_beamWidth));
+    verticalShift = ((params->m_shortestDur - DUR_8) * (params->m_beamWidth));
     
     //if the beam has smaller-size notes
     if ((*beamElementCoords).at(last)->m_element->IsCueSize()) {
-        verticalShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*5;
+        verticalShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
     }
     else {
         verticalShift += (params->m_shortestDur > DUR_8) ?

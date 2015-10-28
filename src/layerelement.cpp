@@ -107,7 +107,7 @@ bool LayerElement::IsGraceNote()
     return (note && note->HasGrace());
 }
     
-bool LayerElement::IsInfTrem()
+bool LayerElement::IsInFTrem()
 {
     if ((this->Is() != NOTE) || (this->Is() == CHORD)) return false;
     return (this->GetFirstParent( FTREM, MAX_FTREM_DEPTH));

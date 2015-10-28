@@ -224,6 +224,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     Chord *inChord = note->IsChordTone();
     Beam *inBeam = note->IsInBeam();
+    bool inFTrem = note->IsInFTrem();
     bool drawingCueSize = note->HasGrace();
     
 	int staffSize = staff->m_drawingStaffSize;
@@ -342,7 +343,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         
 		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->m_drawingStaffSize, drawingCueSize );
 
-		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
+		if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
             DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
 
@@ -1107,6 +1108,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int fullUnit = m_doc->GetDrawingUnit(staffSize);
     
     Beam *inBeam = chord->IsInBeam();
+    bool inFTrem = chord->IsInFTrem();
     
     /************ Ledger line reset ************/
     
@@ -1118,7 +1120,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int drawingDur = chord->GetDur();
     
     // (unless we're in a beam)
-    if (!inBeam) {
+    if (!inBeam && !inFTrem) {
         int yMax, yMin;
         chord->GetYExtremes(&yMax, &yMin);
         
