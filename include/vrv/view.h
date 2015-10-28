@@ -17,6 +17,7 @@ namespace vrv {
 
 class Accid;
 class Beam;
+class BeamParams;
 class Barline;
 class Chord;
 class DeviceContext;
@@ -255,6 +256,7 @@ protected:
     ///@{
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, BeamParams *params);
     ///@}
     
     /**
