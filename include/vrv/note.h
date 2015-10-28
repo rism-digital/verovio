@@ -100,11 +100,6 @@ public:
     int GetDrawingDur( );
     bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
     ///@}
-    
-    /**
-     * Calculate the drawing stem direction looking a potential beam or chord parents or the @stem.dir
-     */
-    bool HasDrawingStemDir();
 
     /**
      * Returns a single integer representing pitch and octave.

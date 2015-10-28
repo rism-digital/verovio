@@ -168,7 +168,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     params.m_cueSize = (*beamElementCoords).at(last)->m_element->IsCueSize();
 
     /******************************************************************/
-    // Calculate the beam slope
+    // Calculate the beam slope and position
     
     CalcBeam(layer, staff, beamElementCoords, elementCount, &params);
     
@@ -397,6 +397,12 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     params.m_shortestDur = DUR_8;
     params.m_stemDir = STEMDIRECTION_NONE;
     
+    // We look only at the first one for the duration since both are expected to be the same
+    assert( dynamic_cast<AttDurationMusical*>(firstElement.m_element) );
+    int dur =  dynamic_cast<AttDurationMusical*>(firstElement.m_element)->GetDur();
+    // We should adjust params.m_shortestDur depending on the number of slashes and if we want the
+    // bars to be closer or further away from the note heads
+    
     Chord *childChord1 = NULL;
     Chord *childChord2 = NULL;
     
@@ -408,10 +414,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         childChord2 = dynamic_cast<Chord*>(secondElement.m_element);
         params.m_beamHasChord = ON;
     }
-    
-    firstElement.m_x = firstElement.m_element->GetDrawingX();
-    secondElement.m_x = secondElement.m_element->GetDrawingX();
-    
+
     // For now look at the stemDir only on the first note
     assert( dynamic_cast<AttStemmed*>(firstElement.m_element) );
     params.m_stemDir =  dynamic_cast<AttStemmed*>(firstElement.m_element)->GetStemDir();
@@ -419,36 +422,46 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // We look only at the first note for checking if cuesized. Somehow arbitrarily
     params.m_cueSize = firstElement.m_element->IsCueSize();
     
+    // x positions
+    firstElement.m_x = firstElement.m_element->GetDrawingX();
+    secondElement.m_x = secondElement.m_element->GetDrawingX();
+    
     /******************************************************************/
-    // Calculate the beam slope
+    // Calculate the beam slope and position
     
     CalcBeam(layer, staff, &beamElementCoords, elementCount, &params);
     
     
+    /******************************************************************/
+    // Start the grahic
+    
     dc->StartGraphic( element, "", element->GetUuid() );
+    
+    /******************************************************************/
+    // Draw the children
     
     DrawLayerChildren(dc, fTrem, layer, staff, measure);
     
-    
     /******************************************************************/
-    // Draw the stems and the beam full bars
+    // Draw the stems and the bars
     
-    for (i=0; i<elementCount; i++)
-    {
-        LayerElement *el = beamElementCoords.at(i)->m_element;
-        if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
-            StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
-            assert(interface);
-            
-            DrawVerticalLine (dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
-                              interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    if (dur > DUR_1) {
+        for (i=0; i<elementCount; i++)
+        {
+            LayerElement *el = beamElementCoords.at(i)->m_element;
+            if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
+                StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
+                assert(interface);
+                DrawVerticalLine (dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
+                                  interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+            }
         }
     }
     
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
     // only one bar and the others will be drawn separately.
-    fullBars =  1;
+    fullBars = fTrem->GetSlash();
     
     // Adjust the x position of the first and last element for taking into account the stem width
     firstElement.m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
@@ -456,6 +469,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     // Shift direction
     shiftY = (params.m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
+    polygonHeight = params.m_beamWidthBlack * shiftY;
     
     y1 = firstElement.m_yBeam;
     y2 = secondElement.m_yBeam;
@@ -466,122 +480,26 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dy1 = shiftY;
     dy2 = shiftY;
     
-    // For acc and rit beam (see AttBeamingVis set
-    // s_y = 0 and s_y2 = 0 respectively
+    int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, params.m_cueSize);
+    // for non stem notes the bar should be shortenend
+    if (dur < DUR_2) {
+        x1 += 2 * space;
+        x2 -= 2 * space;
+    }
     
     for (j = 0; j < fullBars ; j++) {
-        polygonHeight = params.m_beamWidthBlack * shiftY;
         DrawObliquePolygon (dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
         y1 += dy1 * params.m_beamWidthWhite;
         y2 += dy2 * params.m_beamWidthWhite;
-    }
-
-    
-    /*
-    
-    data_STEMDIRECTION stemDir1 = STEMDIRECTION_NONE;
-    data_STEMDIRECTION stemDir2 = STEMDIRECTION_NONE;
-    Point stemPoint1, stemPoint2;
-    // for these we look only at the first one since we assume both to be the same
-    int drawingDur;
-    bool drawingCueSize = false;
-    //
-    char slashCount;
-    int x1, y1, x2, y2, yUnused;
-    
-    slashCount = fTrem->GetSlash();
-    
-    // Get from the first chord or note child
-    if (childChord1) {
-        stemDir1 = childChord1->GetDrawingStemDir();
-        stemPoint1 = childChord1->GetDrawingStemStart();
-        // duration of the first note/chord only
-        drawingDur = childChord1->GetDur();
-    }
-    else {
-        drawingCueSize = childNote1->IsCueSize();
-        stemDir1 = childNote1->GetDrawingStemDir();
-        stemPoint1 = childNote1->GetDrawingStemStart();
-        drawingDur = childNote1->GetDur();
-    }
-    
-    // Get from the second chord or note child
-    if (childChord2) {
-        stemDir2 = childChord2->GetDrawingStemDir();
-        stemPoint2 = childChord2->GetDrawingStemStart();
-    }
-    else {
-        stemDir2 = childNote2->GetDrawingStemDir();
-        stemPoint2 = childNote2->GetDrawingStemStart();
-    }
-    
-    int space = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
-    int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
-    int step = height + space;
-    
-    if (stemDir1 == STEMDIRECTION_up) {
-        if (drawingDur > DUR_1) {
-            y1 = childElement1->GetDrawingTop(m_doc, staff->m_drawingStaffSize) - 1 * height;
-            x1 = stemPoint1.x;
-        }
-        else {
-            if (childNote1) y1 = childNote1->GetDrawingY();
-            else childChord1->GetYExtremes(&y1, &yUnused);
-            y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
-            x1 = childElement1->GetDrawingX();
-        }
-        step = -step;
-    }
-    else {
-        if (drawingDur > DUR_1) {
-            y1 = childElement1->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-            x1 = stemPoint1.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-        }
-        else {
-            if (childNote1) y1 = childNote1->GetDrawingY();
-            else childChord1->GetYExtremes(&yUnused, &y1);
-            y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
-            x1 = childElement1->GetDrawingX();
+        
+        // shorten the bar after having drawn the first one (but the first one)
+        if ((j == 0) && (dur > DUR_1)) {
+            x1 += space;
+            x2 -= space;
         }
     }
-    
-    if (stemDir2 == STEMDIRECTION_up) {
-        if (drawingDur > DUR_1) {
-            y2 = childElement2->GetDrawingTop(m_doc, staff->m_drawingStaffSize) - 1 * height;
-            x2 = stemPoint2.x;
-        }
-        else {
-            if (childNote2) y2 = childNote2->GetDrawingY();
-            else childChord2->GetYExtremes(&y2, &yUnused);
-            y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
-            x2 = childElement2->GetDrawingX();
-        }
-    }
-    else {
-        if (drawingDur > DUR_1) {
-            y2 = childElement2->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-            x2 = stemPoint2.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-        }
-        else {
-            if (childNote2) y2 = childNote2->GetDrawingY();
-            else childChord2->GetYExtremes(&yUnused, &y2);
-            y2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
-            x2 = childElement2->GetDrawingX();
-        }
-    }
-    
-    x1 += height;
-    x2 -= height;
-    
-    int s;
-    for (s = 0; s < slashCount; s++) {
-        DrawObliquePolygon (dc, x1, y1, x2, y2, height);
-        y1 += step;
-        y2 += step;
-    }
-    */
     
     dc->EndGraphic(element, this);
 }

@@ -257,8 +257,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     /************** Stem/notehead direction: **************/
     
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
-    if (!note->HasDrawingStemDir()) {
-        if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+    if (!inChord && !inBeam && !inFTrem) {
+        if (note->HasStemDir()) {
+            note->SetDrawingStemDir(note->GetStemDir());
+        }
+        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             note->SetDrawingStemDir( layer->GetDrawingStemDir() );
         }
         else {
@@ -1119,15 +1122,15 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     int drawingDur = chord->GetDur();
     
-    // (unless we're in a beam)
+    // (unless we're in a beam or in an fTrem)
     if (!inBeam && !inFTrem) {
         int yMax, yMin;
         chord->GetYExtremes(&yMax, &yMin);
         
-        if ( chord->HasStemDir() ) {
+        if (chord->HasStemDir()) {
             chord->SetDrawingStemDir(chord->GetStemDir());
         }
-        else if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             chord->SetDrawingStemDir(layer->GetDrawingStemDir());
         }
         else {
