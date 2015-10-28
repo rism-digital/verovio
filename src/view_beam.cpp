@@ -633,7 +633,7 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
         verticalShift = -verticalShift;
     }
     
-    for (i=0; i<elementCount; i++)
+    for (i = 0; i < elementCount; i++)
     {
         //change the stem dir for all objects
         if ( (*beamElementCoords).at(i)->m_element->Is() == NOTE ) {
@@ -674,9 +674,10 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
     /******************************************************************/
     // Calculate the stem lengths
     
+    // first check that the stem length is long enough (to be improved?)
     double oldYPos; //holds y position before calculation to determine if beam needs extra height
     double expectedY;
-    for ( i=0; i<elementCount; i++ ) {
+    for (i = 0; i < elementCount; i++ ) {
         oldYPos = (*beamElementCoords).at(i)->m_yBeam;
         expectedY = params->m_startingY + params->m_verticalBoost + params->m_beamSlope * (*beamElementCoords).at(i)->m_x;
         
@@ -685,21 +686,35 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
             params->m_verticalBoost += oldYPos - expectedY;
         }
     }
-    
-    for (i=0; i<elementCount; i++)
-    {
-        (*beamElementCoords).at(i)->m_yBeam = params->m_startingY + params->m_verticalBoost + params->m_beamSlope * (*beamElementCoords).at(i)->m_x;
+    for (i = 0; i < elementCount; i++) {
+        (*beamElementCoords).at(i)->m_yBeam =  params->m_startingY + params->m_verticalBoost + params->m_beamSlope * (*beamElementCoords).at(i)->m_x;
+    }
+
+    // then check that the stem length reaches the center for the staff
+    double minDistToCenter = -VRV_UNSET;
+    for (i = 0; i < elementCount; i++ ) {
+        if ((params->m_stemDir == STEMDIRECTION_up) && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter) ) {
+            minDistToCenter = (*beamElementCoords).at(i)->m_yBeam - verticalCenter;
+        }
+        else if ((params->m_stemDir == STEMDIRECTION_down) && (verticalCenter - (*beamElementCoords).at(i)->m_yBeam < minDistToCenter) ) {
+            minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
+        }
+    }
+    minDistToCenter += (params->m_beamWidthBlack / 2) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+    if (minDistToCenter < 0) {
+        for (i = 0; i < elementCount; i++) {
+            (*beamElementCoords).at(i)->m_yBeam +=  (params->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
+        }
     }
     
-    for (i=0; i<elementCount; i++)
-    {
+    for (i=0; i<elementCount; i++) {
         if (params->m_stemDir == STEMDIRECTION_up) {
             y1 = (*beamElementCoords).at(i)->m_yBeam - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            y2 = (*beamElementCoords).at(i)->m_yBottom + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/4;
+            y2 = (*beamElementCoords).at(i)->m_yBottom + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
         }
         else {
             y1 = (*beamElementCoords).at(i)->m_yBeam + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            y2 = (*beamElementCoords).at(i)->m_yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize)/4;
+            y2 = (*beamElementCoords).at(i)->m_yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
         }
         
         // All notes and chords get their stem value stored
