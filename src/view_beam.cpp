@@ -394,14 +394,13 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     params.m_beamHasChord = OFF;
     params.m_hasMultipleStemDir = OFF;
     params.m_cueSize = OFF;
-    params.m_shortestDur = DUR_8;
+    // adjust params.m_shortestDur depending on the number of slashes
+    params.m_shortestDur = std::max(DUR_8, DUR_1 + fTrem->GetSlash());
     params.m_stemDir = STEMDIRECTION_NONE;
     
     // We look only at the first one for the duration since both are expected to be the same
     assert( dynamic_cast<AttDurationMusical*>(firstElement.m_element) );
     int dur =  dynamic_cast<AttDurationMusical*>(firstElement.m_element)->GetDur();
-    // We should adjust params.m_shortestDur depending on the number of slashes and if we want the
-    // bars to be closer or further away from the note heads
     
     Chord *childChord1 = NULL;
     Chord *childChord2 = NULL;
@@ -484,8 +483,17 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // for non stem notes the bar should be shortenend
     if (dur < DUR_2) {
         x1 += 2 * space;
+        y1 += 2 * space * params.m_beamSlope;
         x2 -= 2 * space;
+        y2 -= 2 * space * params.m_beamSlope;
     }
+    else if (dur == DUR_4) {
+        x1 += space;
+        y1 += space * params.m_beamSlope;
+        x2 -= space;
+        y2 -= space * params.m_beamSlope;
+    }
+
     
     for (j = 0; j < fullBars ; j++) {
         DrawObliquePolygon (dc, x1, y1, x2, y2, polygonHeight);
@@ -495,9 +503,11 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y2 += dy2 * params.m_beamWidthWhite;
         
         // shorten the bar after having drawn the first one (but the first one)
-        if ((j == 0) && (dur > DUR_1)) {
+        if ((j == 0) && (dur > DUR_1) && (dur != DUR_4)) {
             x1 += space;
+            y1 += space * params.m_beamSlope;
             x2 -= space;
+            y2 -= space * params.m_beamSlope;
         }
     }
     
