@@ -306,50 +306,58 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     BTrem *bTrem = dynamic_cast<BTrem*>(element);
     assert( bTrem );
-
-    
-    dc->StartGraphic( element, "", element->GetUuid() );
-    
-    DrawLayerChildren(dc, bTrem, layer, staff, measure);
     
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STEMMODIFIER stemMod;
     int drawingDur;
     LayerElement *childElement = NULL;
+    Note *childNote = NULL;
+    Chord *childChord = NULL;
     Point stemPoint;
     bool drawingCueSize = false;
     int x, y, yUnused;
     
-    Chord *childChord = dynamic_cast<Chord*>(bTrem->FindChildByType(CHORD));
+    childChord = dynamic_cast<Chord*>(bTrem->FindChildByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
-        stemDir = childChord->GetDrawingStemDir();
-        stemMod = childChord->GetStemMod();
-        stemPoint = childChord->GetDrawingStemStart();
         drawingDur = childChord->GetDur();
         childElement = childChord;
     }
     else {
-        Note *childNote = dynamic_cast<Note*>(bTrem->FindChildByType(NOTE));
+        childNote = dynamic_cast<Note*>(bTrem->FindChildByType(NOTE));
         if (childNote) {
-            drawingCueSize = childNote->IsCueSize();
-            stemDir = childNote->GetDrawingStemDir();
-            stemMod = childNote->GetStemMod();
-            stemPoint = childNote->GetDrawingStemStart();
             drawingDur = childNote->GetDur();
             childElement = childNote;
         }
     }
-
-    // nothing we can do...
-    if (stemDir == STEMDIRECTION_NONE) {
+    
+    if (!childElement) {
+        bTrem->SetEmptyBB();
         return;
     }
     
+    dc->StartGraphic( element, "", element->GetUuid() );
     
+    DrawLayerChildren(dc, bTrem, layer, staff, measure);
+    
+    // Get stem values from the chord or note child
+    if (childChord) {
+        stemDir = childChord->GetDrawingStemDir();
+        stemMod = childChord->GetStemMod();
+        stemPoint = childChord->GetDrawingStemStart();
+    }
+    else {
+        drawingCueSize = childNote->IsCueSize();
+        stemDir = childNote->GetDrawingStemDir();
+        stemMod = childNote->GetStemMod();
+        stemPoint = childNote->GetDrawingStemStart();
+    }
+    
+    int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
+    int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
     int width = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
-    int height = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize) * 7 / 10;
-    int step = height + m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
+    int height = beamWidthBlack * 7 / 10;
+    int step = height + beamWidthWhite;
 
     if (stemDir == STEMDIRECTION_up) {
         if (drawingDur > DUR_1) {
@@ -377,7 +385,15 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         }
     }
     
+    Beam *beam = childElement->IsInBeam();
+    if (beam) {
+        int beamStep = (drawingDur - DUR_8) * (beamWidthBlack + beamWidthWhite) + beamWidthWhite;
+        y += (stemDir == STEMDIRECTION_down) ? beamStep : -beamStep;
+    }
+    
     int s;
+    // by default draw 3 slashes (e.g., for a temolo on a whole note)
+    if (stemMod == STEMMODIFIER_NONE) stemMod = STEMMODIFIER_3slash;
     for (s = 0; s < stemMod; s++) {
         DrawObliquePolygon (dc, x - width / 2, y, x + width / 2, y + height, height);
         y += step;

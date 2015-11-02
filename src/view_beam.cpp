@@ -257,7 +257,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             barY = -barY;
         }
         
-        int fractBeamWidth = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, params.m_cueSize);
+        int fractBeamWidth = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, params.m_cueSize) * 7 / 10;
 
         // loop
         while (testDur <= params.m_shortestDur) {
