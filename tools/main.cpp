@@ -320,7 +320,7 @@ int main(int argc, char** argv)
         exit(0);
     }
     
-    // Set the various flags
+    // Set the various flags in accordance with the options given
     toolkit.SetAdjustPageHeight(adjust_page_height);
     toolkit.SetNoLayout(no_layout);
     toolkit.SetIgnoreLayout(ignore_layout);
@@ -344,7 +344,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // Loaded the music font from the resource diretory
+    // Load the music font from the resource diretory
     if (!Resources::InitFonts()) {
         cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
         exit(1);
