@@ -83,7 +83,7 @@ bool Toolkit::SetBorder( int border )
 {
     // We use left margin values because for now we cannot specify different values for each margin
     if (border < MIN_PAGE_LEFT_MAR || border > MAX_PAGE_LEFT_MAR) {
-        LogError( "Border out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR, MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR );
+        LogError( "Border out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR, MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR );
         return false;
     }
     m_border = border;
@@ -93,7 +93,7 @@ bool Toolkit::SetBorder( int border )
 bool Toolkit::SetScale( int scale )
 {
     if (scale < MIN_SCALE || scale > MAX_SCALE) {
-        LogError( "Scale out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE, MAX_SCALE );
+        LogError( "Scale out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE, MAX_SCALE );
         return false;
     }
     m_scale = scale;
@@ -103,7 +103,7 @@ bool Toolkit::SetScale( int scale )
 bool Toolkit::SetPageHeight( int h )
 {
     if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
-        LogError( "Page height out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT );
+        LogError( "Page height out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT );
         return false;
     }
     m_pageHeight = h;
@@ -113,7 +113,7 @@ bool Toolkit::SetPageHeight( int h )
 bool Toolkit::SetPageWidth( int w )
 {
     if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
-        LogError( "Page width out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_PAGE_WIDTH, MIN_PAGE_WIDTH, MAX_PAGE_WIDTH );
+        LogError( "Page width out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_WIDTH, MIN_PAGE_WIDTH, MAX_PAGE_WIDTH );
         return false;
     }
     m_pageWidth = w;
@@ -123,7 +123,7 @@ bool Toolkit::SetPageWidth( int w )
 bool Toolkit::SetSpacingStaff( int spacingStaff )
 {
     if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
-        LogError( "Spacing staff out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_STAFF, MIN_SPACING_STAFF, MAX_SPACING_STAFF );
+        LogError( "Spacing staff out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_STAFF, MIN_SPACING_STAFF, MAX_SPACING_STAFF );
         return false;
     }
     m_spacingStaff = spacingStaff;
@@ -133,7 +133,7 @@ bool Toolkit::SetSpacingStaff( int spacingStaff )
 bool Toolkit::SetSpacingSystem( int spacingSystem )
 {
     if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
-        LogError( "Spacing system out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM );
+        LogError( "Spacing system out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM );
         return false;
     }
     m_spacingSystem = spacingSystem;
@@ -143,7 +143,7 @@ bool Toolkit::SetSpacingSystem( int spacingSystem )
 bool Toolkit::SetSpacingLinear( float spacingLinear )
 {
     if (spacingLinear < MIN_SPACING_LINEAR || spacingLinear > MAX_SPACING_LINEAR) {
-        LogError( "Spacing (linear) out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR );
+        LogError( "Spacing (linear) out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR );
         return false;
     }
     m_spacingLinear = spacingLinear;
@@ -153,7 +153,7 @@ bool Toolkit::SetSpacingLinear( float spacingLinear )
 bool Toolkit::SetSpacingNonLinear( float spacingNonLinear )
 {
     if (spacingNonLinear < MIN_SPACING_NON_LINEAR || spacingNonLinear > MAX_SPACING_NON_LINEAR) {
-        LogError( "Spacing (non linear) out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR );
+        LogError( "Spacing (non-linear) out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR );
         return false;
     }
     m_spacingNonLinear = spacingNonLinear;
