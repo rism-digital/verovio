@@ -817,9 +817,6 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
 }
     
     
-/* Linewidth for staff lines in mensural notation, relative to the "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 0.5
-
 void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system )
 {
     assert( dc );
@@ -847,7 +844,7 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     //dc->SetPen( m_currentColour, ToDeviceContextX( m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize) ), AxSOLID );
     dc->SetBrush( m_currentColour , AxSOLID );
     
-    for(j = 0;j < staff->m_drawingLines; j++)
+    for (j = 0;j < staff->m_drawingLines; j++)
     {
         dc->DrawLine( ToDeviceContextX (x1) , ToDeviceContextY ( yy ) , ToDeviceContextX (x2) , ToDeviceContextY ( yy ) );
         // For drawing rectangles insteam of line

@@ -154,6 +154,7 @@ namespace vrv {
 #define TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
     
 /* Style parameters for mensural notation */
+
 // Ratio of mensural notehead size to CMN notehead size for the same staff size
 #define MNOTEHEAD_SIZE_FACTOR 0.90
 // Size of mensuration sign circle relative to space between staff lines
@@ -164,7 +165,9 @@ namespace vrv {
 #define MSIGN_DOT_DIAM 0.5
 // Relative size of figures in proportions
 #define PROPRT_SIZE_FACTOR 0.50
-
+// Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
+#define MENSURAL_LINEWIDTH_FACTOR 0.5
+    
 
 /**
  * This class contains the document default environment variables.
