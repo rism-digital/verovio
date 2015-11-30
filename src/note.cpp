@@ -27,17 +27,19 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Note::Note():
-	LayerElement("note-"), DurationInterface(), PitchInterface(),
+	LayerElement("note-"), StemmedDrawingInterface(), DurationInterface(), PitchInterface(),
     AttColoration(),
     AttGraced(),
     AttNoteLogMensural(),
     AttStemmed(),
+    AttStemmedCmn(),
     AttTiepresent()
 {
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_STEMMEDCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     
     RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
@@ -67,6 +69,7 @@ Note::~Note()
 void Note::Reset()
 {
     LayerElement::Reset();
+    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
     
@@ -74,6 +77,7 @@ void Note::Reset()
     ResetGraced();
     ResetNoteLogMensural();
     ResetStemmed();
+    ResetStemmedCmn();
     ResetTiepresent();
     
     // TO BE REMOVED
@@ -163,22 +167,7 @@ bool Note::IsClusterExtreme()
     if (this == cluster->at(cluster->size() - 1)) return true;
     else return false;
 }
-
-data_STEMDIRECTION Note::CalcDrawingStemDir()
-{
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
-    Beam* beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH));
-    if( chordParent ) {
-        return chordParent->GetDrawingStemDir();
-    }
-    else if( beamParent ) {
-        return beamParent->GetDrawingStemDir();
-    }
-    else {
-        return this->GetStemDir();
-    }
-}
-    
+ 
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -255,6 +244,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid *params )
     Note **currentNote = static_cast<Note**>((*params).at(0));
     
     this->ResetDrawingAccid();
+    //LogDebug("PreparePointersByLayer: accid=%d ACC_EXP_NONE=%d", this->GetAccid(), ACCIDENTAL_EXPLICIT_NONE);
     if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
         this->m_isDrawingAccidAttr = true;
         this->m_drawingAccid = new Accid();
@@ -270,7 +260,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::ResetDarwing( ArrayPtrVoid *params )
+int Note::ResetDrawing( ArrayPtrVoid *params )
 {
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;

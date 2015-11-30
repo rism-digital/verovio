@@ -14,10 +14,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "att_comparison.h"
 #include "bboxdevicecontext.h"
 #include "doc.h"
 #include "system.h"
 #include "view.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -112,19 +114,34 @@ void Page::LayOutHorizontally( )
     Functor alignHorizontallyEnd( &Object::AlignHorizontallyEnd );
     this->Process( &alignHorizontally, &params, &alignHorizontallyEnd );
     
-    // Set the X position of each Alignment
-    // Does a duration-based non linear spacing looking at the duration space between two Alignment objects
-    params.clear();
-    double previousTime = 0.0;
-    int previousXRel = 0;
-    params.push_back( &previousTime );
-    params.push_back( &previousXRel );
-    Functor setAlignmentX( &Object::SetAligmentXPos );
-    // Special case: because we redirect the functor, pass is a parameter to itself (!)
-    params.push_back( &setAlignmentX );
-    this->Process( &setAlignmentX, &params );
+    // Unless duration-based spacing is disabled, set the X position of each Alignment.
+    // Does non-linear spacing based on the duration space between two Alignment objects.
+    if (!doc->GetEvenSpacing()) {
+        int longestActualDur;
+        // Get the longest duration in the piece
+        AttDurExtreme durExtremeComparison(LONGEST);
+        Object *longestDur = this->FindChildExtremeByAttComparison(&durExtremeComparison);
+        if (longestDur) {
+            DurationInterface *interface = dynamic_cast<DurationInterface*>(longestDur);
+            assert(interface);
+            longestActualDur = interface->GetActualDur();
+            LogDebug("Longest duration is DUR_* code %d", longestActualDur);
+        }
+
+        params.clear();
+        double previousTime = 0.0;
+        int previousXRel = 0;
+        params.push_back( &previousTime );
+        params.push_back( &previousXRel );
+        params.push_back( &longestActualDur );
+        params.push_back( doc );
+        Functor setAlignmentX( &Object::SetAlignmentXPos );
+        // Special case: because we redirect the functor, pass it a parameter to itself (!)
+        params.push_back( &setAlignmentX );
+        this->Process( &setAlignmentX, &params );
+    }
     
-    // Render it for filling the bounding boxing
+    // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bb_dc( &view, 0, 0 );
     view.SetDoc(doc);
@@ -145,12 +162,12 @@ void Page::LayOutHorizontally( )
     // Once the m_xShift have been calculated, move all positions accordingly
     params.clear();
     Functor integrateBoundingBoxGraceXShift( &Object::IntegrateBoundingBoxGraceXShift );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxGraceXShift );
     this->Process( &integrateBoundingBoxGraceXShift, &params );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
-    // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
+    // Look at each LayerElement and changes the m_xShift if the bounding box is overlapping
     params.clear();
     int min_pos = 0;
     int measure_width = 0;
@@ -170,8 +187,9 @@ void Page::LayOutHorizontally( )
     params.push_back( &shift );
     params.push_back( &justifiable_shift );
     params.push_back( &minMeasureWidth );
+    params.push_back( doc );
     Functor integrateBoundingBoxXShift( &Object::IntegrateBoundingBoxXShift );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxXShift );
     this->Process( &integrateBoundingBoxXShift, &params );
     
@@ -205,7 +223,7 @@ void Page::LayOutVertically( )
     Functor alignVertically( &Object::AlignVertically );
     this->Process( &alignVertically, &params );
     
-    // Render it for filling the bounding boxing
+    // Render it for filling the bounding box
     View view;
     BBoxDeviceContext bb_dc( &view, 0, 0 );
     view.SetDoc(doc);
@@ -234,7 +252,7 @@ void Page::LayOutVertically( )
     params.push_back( &staffMargin );
     params.push_back( &interlineSize );
     Functor setAlignmentY( &Object::SetAligmentYPos );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &setAlignmentY );
     this->Process( &setAlignmentY, &params );
     
@@ -244,7 +262,7 @@ void Page::LayOutVertically( )
     int shift = 0;
     params.push_back( &shift );
     Functor integrateBoundingBoxYShift( &Object::IntegrateBoundingBoxYShift );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &integrateBoundingBoxYShift );
     this->Process( &integrateBoundingBoxYShift, &params );
     
@@ -285,7 +303,7 @@ void Page::JustifyHorizontally( )
     params.push_back( &margin );
     params.push_back( &systemFullWidth );
     Functor justifyX( &Object::JustifyX );
-    // special case: because we redirect the functor, pass is a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
     params.push_back( &justifyX );
     this->Process( &justifyX, &params );
 }

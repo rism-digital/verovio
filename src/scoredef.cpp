@@ -196,6 +196,7 @@ void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
     m_drawLabels = false;
+    m_drawingWidth = 0;
 }
 
 void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )
@@ -337,6 +338,11 @@ void ScoreDef::SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSi
     Functor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
     this->Process( &setStaffDefDraw, &params );
 }
+    
+void ScoreDef::SetDrawingWidth(int drawingWidth)
+{
+    m_drawingWidth = drawingWidth;
+}
 
 //----------------------------------------------------------------------------
 // StaffGrp
@@ -441,8 +447,10 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
+    // param 5: the current scoreDef width
     System *contentSystem = static_cast<System*>((*params).at(0));
     System **currentSystem = static_cast<System**>((*params).at(2));
+    int *currentScoreDefWidth = static_cast<int*>((*params).at(5));
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert( dynamic_cast<System*>(this->m_parent));
@@ -453,6 +461,11 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     ScoreDef *scoreDef = dynamic_cast<ScoreDef*>( contentSystem->Relinquish( this->GetIdx()) );
     (*currentSystem)->AddScoreDef( scoreDef );
+    // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDef (and not
+    // the initial one - for this to be corrected, we would need to parameters, one for the current initial
+    // scoreDef and one for the current that will be the initial one at the next system
+    // Also, the abbr label (width) changes would not be taken into account
+    (*currentScoreDefWidth) = this->GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();;
     
     return FUNCTOR_SIBLINGS;
 }

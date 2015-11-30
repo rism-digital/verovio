@@ -70,6 +70,24 @@ bool MeiOutput::ExportFile( )
         pugi::xml_document meiDoc;
         
         if ( m_page < 0 ) {
+            pugi::xml_node decl = meiDoc.prepend_child(pugi::node_declaration);
+            decl.append_attribute("version") = "1.0";
+            decl.append_attribute("encoding") = "UTF-8";
+
+            // schema processing instruction
+            decl = meiDoc.append_child(pugi::node_declaration);
+            decl.set_name("xml-model");
+            decl.append_attribute("href") = "http://music-encoding.org/schema/2.1.1/mei-all.rng";
+            decl.append_attribute("type") = "application/xml";
+            decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
+            
+            // schematron processing instruction
+            decl = meiDoc.append_child(pugi::node_declaration);
+            decl.set_name("xml-model");
+            decl.append_attribute("href") = "http://music-encoding.org/schema/2.1.1/mei-all.rng";
+            decl.append_attribute("type") = "application/xml";
+            decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
+            
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute( "xmlns" ) = "http://www.music-encoding.org/ns/mei";
             m_mei.append_attribute( "meiversion" ) = "2013";
@@ -199,6 +217,10 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("beatRpt");
         WriteMeiBeatRpt( m_currentNode, dynamic_cast<BeatRpt*>(object) );
     }
+    else if (object->Is() == BTREM) {
+        m_currentNode = m_currentNode.append_child("bTrem");
+        WriteMeiBTrem( m_currentNode, dynamic_cast<BTrem*>(object) );
+    }
     else if (object->Is() == CHORD) {
         m_currentNode = m_currentNode.append_child( "chord" );
         WriteMeiChord( m_currentNode, dynamic_cast<Chord*>(object) );
@@ -214,6 +236,10 @@ bool MeiOutput::WriteObject( Object *object )
     else if (object->Is() == DOT) {
         m_currentNode = m_currentNode.append_child( "dot" );
         WriteMeiDot( m_currentNode, dynamic_cast<Dot*>(object) );
+    }
+    else if (object->Is() == FTREM) {
+        m_currentNode = m_currentNode.append_child("fTrem");
+        WriteMeiFTrem( m_currentNode, dynamic_cast<FTrem*>(object) );
     }
     else if (object->Is() == KEYSIG) {
         m_currentNode = m_currentNode.append_child("keySig");
@@ -327,7 +353,7 @@ std::string MeiOutput::UuidToMeiStr( Object *element )
     //LogDebug("uuid: %s", out.c_str());
     return out;
 }
-
+    
 bool MeiOutput::WriteMeiDoc( Doc *doc )
 {
     assert( doc );
@@ -337,27 +363,31 @@ bool MeiOutput::WriteMeiDoc( Doc *doc )
     
     pugi::xml_node meiHead = m_mei.append_child("meiHead");
     
-    for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling())
-    {
-        meiHead.append_copy(child);
+    if (m_doc->m_header.first_child()) {
+        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling())
+        {
+            meiHead.append_copy(child);
+        }
     }
-    
-    /*
-    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
-    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    titleStmt.append_child("title");
-    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pugi::xml_node date = pubStmt.append_child("date");
-    
-    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
-    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-    pugi::xml_node p1 = projectDesc.append_child("p");
-    p1.append_child(pugi::node_pcdata).set_value( StringFormat( "Encoded with Verovio version %s",  GetVersion().c_str() ).c_str() );
-    
-    // date
-    time_t now = time(0);
-    date.append_child(pugi::node_pcdata).set_value( ctime( &now ) );
-    */
+    else {
+        pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
+        pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+        titleStmt.append_child("title");
+        pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+        pugi::xml_node date = pubStmt.append_child("date");
+        
+        pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
+        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+        pugi::xml_node p1 = projectDesc.append_child("p");
+        p1.append_child(pugi::node_pcdata).set_value( StringFormat( "Encoded with Verovio version %s",  GetVersion().c_str() ).c_str() );
+        
+        // date
+        time_t t = time(0); // get time now
+        struct tm *now = localtime(&t);
+        std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+                                           now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+        date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
+    }
     
     // ---- music ----
    
@@ -573,6 +603,13 @@ void MeiOutput::WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt )
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
+void MeiOutput::WriteMeiBTrem( pugi::xml_node currentNode, BTrem *bTrem )
+{
+    assert( bTrem );
+    
+    WriteLayerElement( currentNode, bTrem );
+}
+    
 void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
 {
     assert( chord );
@@ -581,6 +618,7 @@ void MeiOutput::WriteMeiChord( pugi::xml_node currentNode, Chord *chord )
     WriteDurationInterface( currentNode, chord);
     chord->WriteCommon(currentNode);
     chord->WriteStemmed(currentNode);
+    chord->WriteStemmedCmn(currentNode);
     chord->WriteTiepresent(currentNode);
 
     return;
@@ -611,6 +649,14 @@ void MeiOutput::WriteMeiDot( pugi::xml_node currentNode, Dot *dot )
     
     WriteLayerElement( currentNode, dot );
     WritePositionInterface(currentNode, dot);
+}
+
+void MeiOutput::WriteMeiFTrem( pugi::xml_node currentNode, FTrem *fTrem )
+{
+    assert( fTrem );
+    
+    WriteLayerElement( currentNode, fTrem );
+    fTrem->WriteSlashcount(currentNode);
 }
     
 void MeiOutput::WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig )
@@ -696,6 +742,7 @@ void MeiOutput::WriteMeiNote( pugi::xml_node currentNode, Note *note )
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStemmed(currentNode);
+    note->WriteStemmedCmn(currentNode);
     note->WriteTiepresent(currentNode);
     
     return;
@@ -995,6 +1042,20 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     }
     else if ( element == "supplied" ) {
         return true;
+    }
+    // filter for bTrem
+    else if (filterParent->Is() == BTREM)
+    {
+        if ( element == "chord" ) return true;
+        else if ( element == "note" ) return true;
+        else return false;
+    }
+    // filter for fTrem
+    else if (filterParent->Is() == FTREM)
+    {
+        if ( element == "chord" ) return true;
+        else if ( element == "note" ) return true;
+        else return false;
     }
     // filter for notes
     else if (filterParent->Is()  == NOTE)
@@ -1596,6 +1657,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         else if ( elementName == "beatRpt" ) {
             success = ReadMeiBeatRpt( parent, xmlElement);
         }
+        else if ( elementName == "bTrem" ) {
+            success = ReadMeiBTrem( parent, xmlElement );
+        }
         else if ( elementName == "chord" ) {
             success = ReadMeiChord( parent, xmlElement);
         }
@@ -1607,6 +1671,9 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "dot" ) {
             success = ReadMeiDot( parent, xmlElement );
+        }
+        else if ( elementName == "fTrem" ) {
+            success = ReadMeiFTrem( parent, xmlElement );
         }
         else if ( elementName == "keySig" ) {
             success = ReadMeiKeySig( parent, xmlElement );
@@ -1728,6 +1795,16 @@ bool MeiInput::ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt )
     return true;
 }
     
+bool MeiInput::ReadMeiBTrem( Object *parent, pugi::xml_node bTrem )
+{
+    BTrem *vrvBTrem = new BTrem();
+    ReadLayerElement(bTrem, vrvBTrem);
+    
+    AddLayerElement(parent, vrvBTrem);
+    
+    return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
+}
+    
 bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
 {
     Chord *vrvChord = new Chord();
@@ -1736,6 +1813,7 @@ bool MeiInput::ReadMeiChord( Object *parent, pugi::xml_node chord)
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadCommon(chord);
     vrvChord->ReadStemmed(chord);
+    vrvChord->ReadStemmedCmn(chord);
     vrvChord->ReadTiepresent(chord);
     
     AddLayerElement(parent, vrvChord);
@@ -1779,6 +1857,18 @@ bool MeiInput::ReadMeiDot( Object *parent, pugi::xml_node dot )
     AddLayerElement(parent, vrvDot);
     
     return true;
+}
+
+bool MeiInput::ReadMeiFTrem( Object *parent, pugi::xml_node fTrem )
+{
+    FTrem *vrvFTrem = new FTrem();
+    ReadLayerElement(fTrem, vrvFTrem);
+    
+    vrvFTrem->ReadSlashcount(fTrem);
+    
+    AddLayerElement(parent, vrvFTrem);
+    
+    return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
 }
     
 bool MeiInput::ReadMeiKeySig( Object *parent, pugi::xml_node keySig )
@@ -1881,6 +1971,7 @@ bool MeiInput::ReadMeiNote( Object *parent, pugi::xml_node note )
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStemmed(note);
+    vrvNote->ReadStemmedCmn(note);
     vrvNote->ReadTiepresent(note);
     
     AddLayerElement(parent, vrvNote);
@@ -2294,6 +2385,17 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
         assert( layer );
         layer->AddLayerElement( element );
     }
+    // LayerElements
+    else if ( parent->Is() == BEAM ) {
+        Beam * beam = dynamic_cast<Beam*>( parent );
+        assert( beam );
+        beam->AddLayerElement( element );
+    }
+    else if ( parent->Is() == BTREM ) {
+        BTrem *bTrem = dynamic_cast<BTrem*>( parent );
+        assert( bTrem );
+        bTrem->AddLayerElement( element );
+    }
     else if ( parent->Is() == CHORD ) {
         Chord *chord = dynamic_cast<Chord*>( parent );
         assert( chord );
@@ -2304,10 +2406,10 @@ void MeiInput::AddLayerElement( Object *parent, LayerElement *element )
         assert( note );
         note->AddLayerElement( element );
     }
-    else if ( parent->Is() == BEAM ) {
-        Beam * beam = dynamic_cast<Beam*>( parent );
-        assert( beam );
-        beam->AddLayerElement( element );
+    else if ( parent->Is() == FTREM ) {
+        FTrem *fTrem = dynamic_cast<FTrem*>( parent );
+        assert( fTrem );
+        fTrem->AddLayerElement( element );
     }
     else if ( parent->Is() == TUPLET ) {
         Tuplet *tuplet = dynamic_cast<Tuplet*>( parent );

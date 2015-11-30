@@ -107,4 +107,7 @@
    <glyph glyph-code="E101" x="0.0" y="-242.0" width="508.0" height="484.0" />
    <glyph glyph-code="E501" x="0.0" y="-242.0" width="750.0" height="484.0" />
    <glyph glyph-code="E502" x="0.0" y="-242.0" width="1234.0" height="484.0" />
+   <glyph glyph-code="E901" x="-12.1" y="-176.3" width="461.1" height="935.5" />
+   <glyph glyph-code="E904" x="0.0" y="-883.0" width="677.0" height="1208.0" />
+   <glyph glyph-code="E909" x="0.0" y="-602.0" width="309.0" height="1197.0" />
 </bounding-boxes>

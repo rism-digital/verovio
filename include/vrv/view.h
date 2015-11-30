@@ -17,6 +17,7 @@ namespace vrv {
 
 class Accid;
 class Beam;
+class BeamParams;
 class Barline;
 class Chord;
 class DeviceContext;
@@ -204,9 +205,9 @@ protected:
      */
     ///@{
     void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid = NULL );
-    void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawCustos( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -214,13 +215,12 @@ protected:
     void DrawDurationElement( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawKeySig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMeterSig( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
+    void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMRpt( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMRpt2( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawMRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawMultiRpt( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawNote( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
-    void DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawRest( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSpace( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
@@ -236,24 +236,34 @@ protected:
      */
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
-    void DrawBreveRest ( DeviceContext *dc, int x, int y, Staff *staff );
-    void DrawDots ( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
-    void DrawFermata(DeviceContext *dc, LayerElement *element, Staff *staff);
-    void DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
-    void DrawLongRest ( DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawDots( DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff );
+    void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
+    void DrawLedgerLines( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int x, wchar_t smulfCode, int num, bool line, Staff *staff, Measure *measure );
-    void DrawQuarterRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
+    void DrawRestBreve( DeviceContext *dc, int x, int y, Staff *staff );
+    void DrawRestLong( DeviceContext *dc, int x, int y, Staff *staff);
+    void DrawRestQuarter( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
+    void DrawRestWhole( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
-    void DrawWholeRest ( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
+    ///@}
+    
+    /**
+     * @name Method for drawing Beam and FTrem.
+     * Defined in view_beam.cpp
+     */
+    ///@{
+    void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, BeamParams *params);
     ///@}
     
     /**
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement
      * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
-     * Defined in floating_element.cpp
+     * Defined in view_floating.cpp
      */
     ///@{
     void DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Measure *measure, System *system );
@@ -278,6 +288,7 @@ protected:
     ///@{
     void DrawMensur( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure  );
     void DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawProport( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     
     /**
      * @name Methods for drawing parts of mensural LayerElement child classes.
@@ -292,10 +303,11 @@ protected:
     void DrawMaximaToBrevis( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void DrawLigature( DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff );
     void CalculateLigaturePosX ( LayerElement *element, Layer *layer, Staff *staff);
+    void DrawProportFigures( DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     ///@}
-    
+
     /**
-     * @name Method for drawing Beam.
+     * @name Method for drawing Tuplet.
      * Called from the the layer postponed drawing list.
      * Defined in view_tuplet.cpp
      */
@@ -319,6 +331,12 @@ protected:
 	void DrawDot ( DeviceContext *dc, int x, int y, int staffSize );
     ///@}
     
+    /**
+     * Calculate the ScoreDef width by taking into account its widest key signature
+     * This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted system
+     */
+    void SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef);
+    
 private:    
     /**
      * @name Internal methods used for calculating tuplets
@@ -332,7 +350,18 @@ private:
     int GetSylY( Syl* syl, Staff *staff );
     ///@}
     
-    float AdjustSlurPosition(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
+    /**
+     * @name Internal methods used for calculating slurs
+     */
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point points[]);
+    int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
+                         bool up, float angle, bool posRatio = true );
+    void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2,
+                         bool up, float *angle, bool forceBothSides );
+    float GetAdjustedSlurAngle(Point *p1, Point *p2, bool up);
+    void GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize);
+    void GetSpanningPointPositions( ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
+    ///@}
     
     /**
      * @name Used for calculating clustered information/dot position

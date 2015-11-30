@@ -17,6 +17,7 @@
 #include "iodarms.h"
 #include "iomei.h"
 #include "iopae.h"
+#include "iomusxml.h"
 #include "layer.h"
 #include "page.h"
 #include "measure.h"
@@ -39,12 +40,14 @@ Toolkit::Toolkit( bool initFont )
 {
     
     m_scale = DEFAULT_SCALE;
-    m_format = mei_file;
+    m_format = MEI;
     
     // default page size
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
     m_pageWidth = DEFAULT_PAGE_WIDTH;
     m_border = DEFAULT_PAGE_LEFT_MAR;
+    m_spacingLinear = DEFAULT_SPACING_LINEAR;
+    m_spacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
     m_spacingStaff = DEFAULT_SPACING_STAFF;
     m_spacingSystem = DEFAULT_SPACING_SYSTEM;
     
@@ -52,6 +55,7 @@ Toolkit::Toolkit( bool initFont )
     m_ignoreLayout = false;
     m_adjustPageHeight = false;
     m_noJustification = false;
+    m_evenNoteSpacing = false;
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
     
@@ -127,7 +131,6 @@ bool Toolkit::SetSpacingStaff( int spacingStaff )
     return true;
 }
 
-
 bool Toolkit::SetSpacingSystem( int spacingSystem )
 {
     if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
@@ -137,18 +140,39 @@ bool Toolkit::SetSpacingSystem( int spacingSystem )
     m_spacingSystem = spacingSystem;
     return true;
 }
-
+    
+bool Toolkit::SetSpacingLinear( float spacingLinear )
+{
+    if (spacingLinear < MIN_SPACING_LINEAR || spacingLinear > MAX_SPACING_LINEAR) {
+        LogError( "Spacing (linear) out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR );
+        return false;
+    }
+    m_spacingLinear = spacingLinear;
+    return true;
+}
+    
+bool Toolkit::SetSpacingNonLinear( float spacingNonLinear )
+{
+    if (spacingNonLinear < MIN_SPACING_NON_LINEAR || spacingNonLinear > MAX_SPACING_NON_LINEAR) {
+        LogError( "Spacing (non linear) out of bounds; default is %d, minimun is %d, and maximum is %d", DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR );
+        return false;
+    }
+    m_spacingNonLinear = spacingNonLinear;
+    return true;
+}
 
 bool Toolkit::SetFormat( std::string const &informat )
 {
     if (informat == "pae")
-        m_format = pae_file;
+        m_format = PAE;
     else if(informat == "darms")
-        m_format = darms_file;
+        m_format = DARMS;
     else if(informat == "mei")
-        m_format = mei_file;
+        m_format = MEI;
+    else if(informat == "musicxml")
+        m_format = MUSICXML;
     else {
-        LogError("Input format can only be: pae mei or darms");
+        LogError("Input format can only be: mei, pae, xml or darms");
         return false;
     }
     return true;
@@ -237,12 +261,15 @@ bool Toolkit::LoadUTF16File( const std::string &filename )
 bool Toolkit::LoadString( const std::string &data )
 {
     FileInputStream *input = NULL;
-    if (m_format == pae_file) {
+    if (m_format == PAE) {
         input = new PaeInput( &m_doc, "" );
-    } else if (m_format == darms_file) {
+    } else if (m_format == DARMS) {
         input = new DarmsInput( &m_doc, "" );
-    } else if (m_format == mei_file) {
+    } else if (m_format == MEI) {
         input = new MeiInput( &m_doc, "" );
+    }
+    else if (m_format == MUSICXML) {
+        input = new MusicXmlInput( &m_doc, "" );
     }
     else {
         LogError( "Unknown format" );
@@ -277,8 +304,11 @@ bool Toolkit::LoadString( const std::string &data )
     m_doc.SetPageRightMar( this->GetBorder() );
     m_doc.SetPageLeftMar( this->GetBorder() );
     m_doc.SetPageTopMar( this->GetBorder() );
+    m_doc.SetSpacingLinear( this->GetSpacingLinear() );
+    m_doc.SetSpacingNonLinear( this->GetSpacingNonLinear() );
     m_doc.SetSpacingStaff( this->GetSpacingStaff() );
     m_doc.SetSpacingSystem( this->GetSpacingSystem() );
+    m_doc.SetEvenSpacing( this->GetEvenNoteSpacing() );
     
     m_doc.PrepareDrawing();
     
@@ -361,9 +391,15 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     if (json.has<jsonxx::Number>("pageHeight"))
         SetPageHeight( json.get<jsonxx::Number>("pageHeight") );
     
+    if (json.has<jsonxx::Number>("spacingLinear"))
+        SetSpacingLinear( json.get<jsonxx::Number>("spacingLinear" ) );
+    
+    if (json.has<jsonxx::Number>("spacingNonLinear"))
+        SetSpacingNonLinear( json.get<jsonxx::Number>("spacingNonLinear") );
+    
     if (json.has<jsonxx::Number>("spacingStaff"))
         SetSpacingStaff( json.get<jsonxx::Number>("spacingStaff") );
-    
+
     if (json.has<jsonxx::Number>("spacingSystem"))
         SetSpacingSystem( json.get<jsonxx::Number>("spacingSystem") );
     

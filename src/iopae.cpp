@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "chord.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"
@@ -59,22 +60,20 @@ char data_line[10001] = {0};
 char data_key[MAX_DATA_LEN]; 
 char data_value[MAX_DATA_LEN]; //ditto as above
 
-
-//////////////////////////////////////////////////////////////////////////
-
 //----------------------------------------------------------------------------
 // PaeInput
 //----------------------------------------------------------------------------
 
 PaeInput::PaeInput( Doc *doc, std::string filename ) :
-// This is pretty bad. We open a bad fileoinputstream as we don't use it
-FileInputStream( doc )
+    // This is pretty bad. We open a bad fileoinputstream as we don't use it
+    FileInputStream( doc )
 {
     m_filename = filename;
 	m_staff = NULL;
     m_measure = NULL;
 	m_layer = NULL;
     m_last_tied_note = NULL;
+    m_is_in_chord = false;
 }
 
 PaeInput::~PaeInput()
@@ -127,11 +126,11 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     int in_beam = 0;
     
     std::string s_key;
-    MeasureObject current_measure;
-    NoteObject current_note;
+    pae::Measure current_measure;
+    pae::Note current_note;
     Clef *staffDefClef = NULL;
     
-    std::vector<MeasureObject> staff;
+    std::vector<pae::Measure> staff;
     
     // read values
     while (!infile.eof()) {
@@ -143,17 +142,23 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         getAtRecordKeyValue(data_key, data_value, data_line);
         if (strcmp(data_key,"end")==0) {   
             break;
-        } else if (strcmp(data_key,"clef")==0) { 
+        }
+        else if (strcmp(data_key,"clef")==0) {
             strcpy( c_clef, data_value );
-        } else if (strcmp(data_key,"key")==0) { 
+        }
+        else if (strcmp(data_key,"key")==0) {
             strcpy( c_key, data_value );
-        } else if (strcmp(data_key,"keysig")==0) { 
+        }
+        else if (strcmp(data_key,"keysig")==0) {
             strcpy( c_keysig, data_value );
-        } else if (strcmp(data_key,"timesig")==0) { 
+        }
+        else if (strcmp(data_key,"timesig")==0) {
             strcpy( c_timesig, data_value );
-        } else if (strcmp(data_key,"alttimesig")==0) { 
+        }
+        else if (strcmp(data_key,"alttimesig")==0) {
             strcpy( c_alttimesig, data_value );
-        } else if (strcmp(data_key,"data")==0) { 
+        }
+        else if (strcmp(data_key,"data")==0) {
             strcpy( incipit, data_value );
         }
     }
@@ -265,15 +270,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         
         // measure repetition
         else if ((incipit[i] == 'i') && staff.size() > 0) {
-            MeasureObject last_measure = staff[staff.size() - 1];
+            pae::Measure last_measure = staff[staff.size() - 1];
             current_measure.notes = last_measure.notes;
             current_measure.wholerest = last_measure.wholerest;
-            
-            // if old measure does not end with a tie
-            // force the first note of the newly copied measure to be without tie
-            // this is to prevent copying tie closes which are invalid
-            if (last_measure.notes.size() > 0 && last_measure.notes[last_measure.notes.capacity() - 1].tie == 0)
-                current_measure.notes[0].tie = 0;
         }
         
         //barLine
@@ -361,7 +360,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
     
     int measure_count = 1;
     
-    std::vector<MeasureObject>::iterator it;
+    std::vector<pae::Measure>::iterator it;
     for ( it = staff.begin() ; it < staff.end(); it++ ) {
         
         m_staff = new Staff( 1 );
@@ -373,7 +372,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         m_measure->AddStaff( m_staff );
         system->AddMeasure( m_measure );
         
-        MeasureObject obj = *it;
+        pae::Measure obj = *it;
         convertMeasure( &obj );
         measure_count++;
     }
@@ -480,7 +479,7 @@ int PaeInput::getDuration(const char* incipit, data_DURATION *duration, int *dot
 // getDurations --
 //
 
-int PaeInput::getDurations(const char* incipit, MeasureObject* measure, int index ) {
+int PaeInput::getDurations(const char* incipit, pae::Measure* measure, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
@@ -522,13 +521,15 @@ int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accid
     
     if (incipit[i] == 'n') {
         *accident = ACCIDENTAL_EXPLICIT_n;
-    } else if (incipit[i] == 'x') {
+    }
+    else if (incipit[i] == 'x') {
         *accident = ACCIDENTAL_EXPLICIT_s;
         if ((i+1 < length) && (incipit[i+1] == 'x')) {
             *accident = ACCIDENTAL_EXPLICIT_ss;
             i++;
         }
-    } else if (incipit[i] == 'b') {
+    }
+    else if (incipit[i] == 'b') {
         *accident = ACCIDENTAL_EXPLICIT_f;
         if ((i+1 < length) && (incipit[i+1] == 'b')) {
             *accident = ACCIDENTAL_EXPLICIT_ff;
@@ -545,7 +546,7 @@ int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accid
 // getTupletOrFermata --
 //
 
-int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index ) {
+int PaeInput::getTupletFermata(const char* incipit, pae::Note* note, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
@@ -605,7 +606,8 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
             tuplet_val = atoi(buf);
             free(buf); // dispose of the buffer
         
-        } else { // it is a triplet
+        }
+        else { // it is a triplet
             // don't care to parse all the stuff
             tuplet_val = 3;
         }
@@ -615,7 +617,8 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
         // but also the note counter
         note->tuplet_note =  tuplet_val;
         
-    } else {
+    }
+    else {
         if ( note->tuplet_notes > 0 ) {
             LogWarning("Fermata within a tuplet. Won't be handled correctly");
         }
@@ -633,7 +636,7 @@ int PaeInput::getTupletFermata(const char* incipit, NoteObject* note, int index 
 // getTupletFermataEnd --
 //
 // this can be deleted in the future?
-int PaeInput::getTupletFermataEnd(const char* incipit, NoteObject *note, int index ) {
+int PaeInput::getTupletFermataEnd(const char* incipit, pae::Note *note, int index ) {
     
     int i = index;
     //int length = strlen(incipit);
@@ -651,7 +654,7 @@ int PaeInput::getTupletFermataEnd(const char* incipit, NoteObject *note, int ind
 // getGraceNote --
 //
 
-int PaeInput::getGraceNote(const char* incipit, NoteObject *note, int index ) {
+int PaeInput::getGraceNote(const char* incipit, pae::Note *note, int index ) {
     
     int i = index;
     size_t length = strlen(incipit);
@@ -728,8 +731,9 @@ int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
     int i = index;
     size_t length = strlen(incipit);
     
-    if (!isdigit(incipit[i]) && (incipit[i] != 'c') && (incipit[i] != 'o'))
+    if (!isdigit(incipit[i]) && (incipit[i] != 'c') && (incipit[i] != 'o')) {
         return 0;
+    }
     
     // find the end of time signature end
     i++; // the time signature length is a least 1
@@ -764,25 +768,31 @@ int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
         int note_value = atoi(strtok(NULL, "/")); 
         meter->SetCount(beats);
         meter->SetUnit(note_value);
-    } else if ( is_one_number == 0) {
+    }
+    else if ( is_one_number == 0) {
         int beats = atoi(timesig_str);
         meter->SetCount(beats);
-    } else if (strcmp(timesig_str, "c") == 0) {
+    }
+    else if (strcmp(timesig_str, "c") == 0) {
         // C
         meter->SetSym(METERSIGN_common);
-    } else if (strcmp(timesig_str, "c/") == 0) {
+    }
+    else if (strcmp(timesig_str, "c/") == 0) {
         // C|
         meter->SetSym(METERSIGN_cut);
-    } else if (strcmp(timesig_str, "c3") == 0) {
+    }
+    else if (strcmp(timesig_str, "c3") == 0) {
         // C3
         meter->SetSym(METERSIGN_common);
         meter->SetCount(3);
-    } else if (strcmp(timesig_str, "c3/2") == 0) {
+    }
+    else if (strcmp(timesig_str, "c3/2") == 0) {
         // C3/2
         meter->SetSym(METERSIGN_common); // ??
         meter->SetCount(3);
         meter->SetUnit(2);
-    } else {
+    }
+    else {
         LogWarning("Unknown time signature: %s", timesig_str);
     }
     
@@ -820,18 +830,22 @@ int PaeInput::getClefInfo( const char *incipit, Clef *mclef, int index ) {
     if (clef == 'C' || clef == 'c') {
         mclef->SetShape(CLEFSHAPE_C);
         mclef->SetLine(line - 48);
-    } else if (clef == 'G') {
+    }
+    else if (clef == 'G') {
         mclef->SetShape(CLEFSHAPE_G);
         mclef->SetLine(line - 48);
-    } else if (clef == 'g') {
+    }
+    else if (clef == 'g') {
         mclef->SetShape(CLEFSHAPE_G);
         mclef->SetLine(line - 48);
         mclef->SetDis(OCTAVE_DIS_8);
         mclef->SetDisPlace(PLACE_below);
-    } else if (clef == 'F' || clef == 'f') {
+    }
+    else if (clef == 'F' || clef == 'f') {
         mclef->SetShape(CLEFSHAPE_F);
         mclef->SetLine(line - 48);
-    } else {
+    }
+    else {
         // what the...
         LogDebug("Clef %c is Undefined", clef);
     }
@@ -902,16 +916,20 @@ int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int in
     if (is_barline_rptboth == 0) {
         *output = BARRENDITION_rptboth;
         i = 3;
-    } else if (is_barline_rptstart == 0) {
+    }
+    else if (is_barline_rptstart == 0) {
         *output = BARRENDITION_rptstart;
         i = 2;
-    } else if (is_barline_rptend == 0) {
+    }
+    else if (is_barline_rptend == 0) {
         *output = BARRENDITION_rptend;
         i = 2;
-    } else if (is_barline_dbl == 0) {
+    }
+    else if (is_barline_dbl == 0) {
         *output = BARRENDITION_dbl;
         i = 1;
-    } else {
+    }
+    else {
         *output = BARRENDITION_single;
         i = 0;
     }
@@ -925,7 +943,7 @@ int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int in
 // getAbbreviation -- read abbreviation
 //
 
-int PaeInput::getAbbreviation(const char* incipit, MeasureObject *measure, int index ) {
+int PaeInput::getAbbreviation(const char* incipit, pae::Measure *measure, int index ) {
     
     size_t length = strlen(incipit);
     int i = index;
@@ -933,7 +951,8 @@ int PaeInput::getAbbreviation(const char* incipit, MeasureObject *measure, int i
     
     if (measure->abbreviation_offset == -1) { // start
         measure->abbreviation_offset = (int)measure->notes.size();
-    } else { //
+    }
+    else { //
         int abbreviation_stop = (int)measure->notes.size();
         while ((i+1 < length) && (incipit[i+1]=='f')) {
             i++;
@@ -998,7 +1017,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index ) {
 // getNote --
 //
 
-int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *measure, int index ) {
+int PaeInput::getNote( const char* incipit, pae::Note *note, pae::Measure *measure, int index ) {
     
     regex_t re;
     int oct;
@@ -1011,12 +1030,14 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
         // acciaccaturas are always eights regardless
         // and have no dots
         note->duration = DURATION_8;
-    } else {
+    }
+    else {
         if (measure->durations.size() == 0) {
             note->duration = DURATION_4;
             note->dots = 0;
             LogWarning("Got a note before a duration was specified");
-        } else {
+        }
+        else {
             note->duration = measure->durations[measure->durations_offset];
             note->dots = measure->dots[measure->durations_offset];
         }
@@ -1025,8 +1046,9 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     
     // lookout, hack. If it is a rest (PITCHNAME_NONE val) then create the rest object.
     // it will be added instead of the note
-    if (note->pitch == PITCHNAME_NONE)
+    if (note->pitch == PITCHNAME_NONE) {
         note->rest = true;
+    }
     
     // trills
     regcomp(&re, "^[^ABCDEFG]*t", REG_EXTENDED);
@@ -1045,6 +1067,14 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
             note->tie = 1; // reset 1 for the first note, >1 for next ones is incremented under
     }
     
+    // chord
+    regcomp(&re, "^[^ABCDEFG]*\\^", REG_EXTENDED);
+    int is_chord = regexec(&re, incipit + i + 1, 0, NULL, 0);
+    regfree(&re);
+    if ( is_chord == 0) {
+        note->chord = true;
+    }
+    
     oct = note->octave;
     measure->notes.push_back( *note );
     
@@ -1056,14 +1086,14 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
     note->clear();
     
     // write back the values we need to save
-
     note->octave = oct; // save octave
     
     // tuplets. Decrease the current number is we are in a tuplet
     // i.e. tuplet_num > 0
     // al the other values just need to be in the first note
-    if (tuplet_num > 0)
+    if (tuplet_num > 0) {
         note->tuplet_note = --tuplet_num;
+    }
     
     // grace notes
     note->acciaccatura = false;
@@ -1090,7 +1120,7 @@ int PaeInput::getNote( const char* incipit, NoteObject *note, MeasureObject *mea
 // convertMeasure --
 //
 
-void PaeInput::convertMeasure(MeasureObject *measure ) {
+void PaeInput::convertMeasure(pae::Measure *measure ) {
     
     if ( measure->clef != NULL ) {
         m_layer->AddLayerElement(measure->clef);
@@ -1113,7 +1143,7 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
     m_nested_objects.clear();
 
     for (unsigned int i=0; i<measure->notes.size(); i++) {
-        NoteObject note = measure->notes[i];
+        pae::Note *note = &measure->notes[i];
         parseNote(note);
     }
     
@@ -1124,44 +1154,46 @@ void PaeInput::convertMeasure(MeasureObject *measure ) {
 
 }
 
-void PaeInput::parseNote(NoteObject note) {
+void PaeInput::parseNote(pae::Note *note) {
     
     LayerElement *element;
     
-    if (note.rest) {
+    if (note->rest) {
         Rest *rest =  new Rest();
         
-        rest->SetDots( note.dots );
-        rest->SetDur(note.duration);
+        rest->SetDots( note->dots );
+        rest->SetDur(note->duration);
 
-        if (note.fermata) {
+        if (note->fermata) {
             rest->SetFermata(PLACE_above); // always above for now
         }
         
         element = rest;
-    } else {
+    }
+    else {
         Note *mnote = new Note();
         
-        mnote->SetPname(note.pitch);
-        mnote->SetOct(note.octave);
-        mnote->SetAccid(note.accidental);
+        mnote->SetPname(note->pitch);
+        mnote->SetOct(note->octave);
+        mnote->SetAccid(note->accidental);
         
-        mnote->SetDots( note.dots );
-        mnote->SetDur(note.duration);
+        mnote->SetDots( note->dots );
+        mnote->SetDur(note->duration);
         
-        if (note.fermata) {
+        if (note->fermata) {
             mnote->SetFermata(PLACE_above); // always above for now
         }
         
-        if (note.trill == true)
+        if (note->trill == true) {
             mnote->m_embellishment = EMB_TRILL;
+        }
         
         if (m_last_tied_note != NULL) {
             mnote->SetTie(TIE_t);
             m_last_tied_note = NULL;
         }
         
-        if (note.tie) {
+        if (note->tie) {
             if (mnote->GetTie()==TIE_t) mnote->SetTie(TIE_m);
             else mnote->SetTie(TIE_i);
             m_last_tied_note = mnote;
@@ -1171,61 +1203,84 @@ void PaeInput::parseNote(NoteObject note) {
     }
     
     // Does this note have a clef change? push it before everyting else
-    if (note.clef)
-        addLayerElement(note.clef);
+    if (note->clef) {
+        addLayerElement(note->clef);
+    }
 
     // Same thing for time changes
     // You can find this sometimes
-    if (note.meter)
-        addLayerElement(note.meter);
+    if (note->meter) {
+        addLayerElement(note->meter);
+    }
     
     // Handle key change. Evil if done in a beam
-    if (note.key)
-        addLayerElement(note.key);
+    if (note->key) {
+        addLayerElement(note->key);
+    }
     
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
-    if (note.acciaccatura && (element->Is() == NOTE) ) {
-        Note *note = dynamic_cast<Note*>(element);
-        assert( note );
-        note->SetDur(DURATION_8);
-        note->SetGrace(GRACE_acc);
-        note->SetStemDir(STEMDIRECTION_up);
+    if (note->acciaccatura && (element->Is() == NOTE) ) {
+        Note *mnote = dynamic_cast<Note*>(element);
+        assert( mnote );
+        mnote->SetDur(DURATION_8);
+        mnote->SetGrace(GRACE_acc);
+        mnote->SetStemDir(STEMDIRECTION_up);
     }
     
-    if ( (note.appoggiatura > 0) && (element->Is() == NOTE) ) {
-        Note *note = dynamic_cast<Note*>(element);
-        assert( note );
-        note->SetGrace(GRACE_unacc);
-        note->SetStemDir(STEMDIRECTION_up);
+    if ( (note->appoggiatura > 0) && (element->Is() == NOTE) ) {
+        Note *mnote = dynamic_cast<Note*>(element);
+        assert( mnote );
+        mnote->SetGrace(GRACE_unacc);
+        mnote->SetStemDir(STEMDIRECTION_up);
     }
 
-    if (note.beam == BEAM_INITIAL) {
+    if (note->beam == BEAM_INITIAL) {
         pushContainer(new Beam());
     }
     
     // we have a tuplet, the tuplet_note is > 0
     // which means we are counting a tuplet
-    if (note.tuplet_note > 0 && note.tuplet_notes == note.tuplet_note) { // first elem in tuplet
+    if (note->tuplet_note > 0 && note->tuplet_notes == note->tuplet_note) { // first elem in tuplet
         Tuplet *newTuplet = new Tuplet();
-        newTuplet->SetNum(note.tuplet_notes);
-        newTuplet->SetNumbase(note.tuplet_notes);
+        newTuplet->SetNum(note->tuplet_notes);
+        newTuplet->SetNumbase(note->tuplet_notes);
         pushContainer(newTuplet);
     }
     
-    
+    // note in a chord
+    if ( (note->chord) ) {
+        Note *mnote = dynamic_cast<Note*>(element);
+        assert( mnote );
+        // first note?
+        if (!m_is_in_chord) {
+            Chord *chord = new Chord();
+            chord->SetDur(mnote->GetDur());
+            pushContainer(chord);
+            m_is_in_chord = true;
+        }
+    }
+
     // Add the note to the current container
     addLayerElement(element);
     
     // the last note counts always '1'
     // insert the tuplet elem
     // and reset the tuplet counter
-    if (note.tuplet_note == 1)
+    if (note->tuplet_note == 1) {
         popContainer();
+    }
     
-    if (note.beam == BEAM_TERMINAL)
+    if (note->beam == BEAM_TERMINAL) {
         popContainer();
+    }
+    
+    // last note of a chord
+    if (!note->chord && m_is_in_chord) {
+        popContainer();
+        m_is_in_chord = false;
+    }
 }
 
 void PaeInput::pushContainer(LayerElement *container) {
@@ -1235,10 +1290,13 @@ void PaeInput::pushContainer(LayerElement *container) {
 
 void PaeInput::popContainer() {
     //assert(m_nested_objects.size() > 0);
-    if (m_nested_objects.size() == 0)
+    if (m_nested_objects.size() == 0) {
         LogError("PaeInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, beams) are not supported.");
-    else
+    
+    }
+    else {
         m_nested_objects.pop_back();
+    }
 }
 
 void PaeInput::addLayerElement(LayerElement *element) {
@@ -1256,8 +1314,14 @@ void PaeInput::addLayerElement(LayerElement *element) {
             assert( tuplet );
             tuplet->AddLayerElement( element );
         }
+        else if ( bottom->Is() == CHORD ) {
+            Chord *chord = dynamic_cast<Chord*>( bottom );
+            assert( chord );
+            chord->AddLayerElement( element );
+        }
         
-    } else {
+    }
+    else {
         m_layer->AddLayerElement(element);
     }
 }
@@ -1291,8 +1355,9 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
     memset(value, EMPTY, MAX_DATA_LEN);
 
     
-    if (length == 0)
+    if (length == 0) {
         return;
+    }
     
     char ch;
     int index = 0;
@@ -1314,8 +1379,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
         ch = input[index]; 
         
         // Should never happen
-        if (count >= MAX_DATA_LEN)
-            return;
+        if (count >= MAX_DATA_LEN) return;
         
         key[count] = ch;
         count++;
@@ -1330,8 +1394,8 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
     SKIPSPACE
     
     // Also should never happen
-    if (strlen(&input[index]) > MAX_DATA_LEN)
-        return;
+    if (strlen(&input[index]) > MAX_DATA_LEN) return;
+    
     strcpy(value, &input[index]);
     
     // Thruncate string to first space

@@ -71,7 +71,6 @@ void LayerElement::Reset()
     
     m_isScoreOrStaffDefAttr = false;
     m_alignment = NULL;
-    m_drawingStemDir = STEMDIRECTION_NONE;
     m_beamElementCoord = NULL;
 }
     
@@ -108,25 +107,62 @@ bool LayerElement::IsGraceNote()
     return (note && note->HasGrace());
 }
     
+bool LayerElement::IsInFTrem()
+{
+    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return false;
+    return (this->GetFirstParent( FTREM, MAX_FTREM_DEPTH));
+}
+    
 Beam* LayerElement::IsInBeam()
 {
-    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return NULL;
-    return dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
+    if ((this->Is() != NOTE) && (this->Is() != CHORD)) return NULL;
+    Beam *beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
+    if (beamParent != NULL) {
+        // This note is beamed and cue sized
+        if (this->IsCueSize()) {
+            // If the note is part of the beam parent, this means we
+            // have a beam of graced notes
+            if (beamParent->GetListIndex(this) > -1) return beamParent;
+            // otherwise it is a non-beamed grace note within a beam - will return false
+        }
+        else {
+            return beamParent;
+        }
+    }
+    return NULL;
+}
+    
+int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
+{
+    if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        // We should also take into accound the stem shift to the right
+        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface*>(this);
+        assert(stemmedDrawingInterface);
+        if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+        }
+        else {
+            return stemmedDrawingInterface->GetDrawingStemStart().y + doc->GetDrawingUnit(staffSize);
+        }
+    }
+    return this->GetDrawingY();
 }
 
-data_STEMDIRECTION LayerElement::GetDrawingStemDir()
+
+int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 {
-    if (this->Is() == NOTE) {
-        Note *note = dynamic_cast<Note*>(this);
-        assert( note );
-        return note->GetDrawingStemDir();
+    if ((this->Is() == NOTE) || (this->Is() == CHORD)){
+        // We should also take into accound the stem shift to the right
+        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface*>(this);
+        assert(stemmedDrawingInterface);
+        if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+            return stemmedDrawingInterface->GetDrawingStemStart().y - doc->GetDrawingUnit(staffSize);
+        }
+        else {
+            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+        }
     }
-    if (this->Is() == CHORD) {
-        Chord *chord = dynamic_cast<Chord*>(this);
-        assert( chord );
-        return chord->GetDrawingStemDir();
-    }
-    return STEMDIRECTION_NONE;
+    return this->GetDrawingY();
 }
     
 bool LayerElement::IsCueSize()
@@ -173,8 +209,16 @@ double LayerElement::GetAlignmentDuration( Mensur *mensur, MeterSig *meterSig, b
         }
         DurationInterface *duration = dynamic_cast<DurationInterface*>(this);
         assert( duration );
-        if (duration->IsMensural()) return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
-        else return duration->GetAlignmentDuration( num, numbase );
+        if (duration->IsMensural()) {
+            return duration->GetAlignmentMensuralDuration( num, numbase, mensur );
+        }
+        double durationValue = duration->GetAlignmentDuration( num, numbase );
+        // With fTrem we need to divide the duration by two
+        FTrem *fTrem = dynamic_cast<FTrem*>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
+        if (fTrem) {
+            durationValue /= 2.0;
+        }
+        return durationValue;
     }
     else if (this->Is() == BEATRPT) {
         BeatRpt *beatRpt = dynamic_cast<BeatRpt*>(this);
@@ -239,7 +283,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             type = ALIGNMENT_KEYSIG_ATTR;
         }
         else {
-            type = ALIGNMENT_KEYSIG;
+            //type = ALIGNMENT_KEYSIG;
+            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
+            type = ALIGNMENT_KEYSIG_ATTR;
         }
     }
     else if (this->Is() == MENSUR) {
@@ -261,7 +308,10 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             // replace the current meter signature
             (*currentMeterSig) = dynamic_cast<MeterSig*>(this);
             assert( *currentMeterSig );
-            type = ALIGNMENT_METERSIG;
+            //type = ALIGNMENT_METERSIG
+            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
+            type = ALIGNMENT_METERSIG_ATTR;
         }
     }
     else if ( (this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT) ) {
@@ -437,8 +487,8 @@ int LayerElement::TimeSpanningLayerElements( ArrayPtrVoid *params )
     int *min_pos = static_cast<int*>((*params).at(1));
     int *max_pos = static_cast<int*>((*params).at(2));
     
-    if (this->GetDrawingX() >= (*min_pos) && this->GetDrawingX() <= (*max_pos)) {
-        if (this->Is() == NOTE) spanningContent->push_back(this);
+    if (this->GetDrawingX() > (*min_pos) && this->GetDrawingX() < (*max_pos)) {
+        spanningContent->push_back(this);
     }
     else if (this->GetDrawingX() > (*max_pos) ) {
         return FUNCTOR_STOP;

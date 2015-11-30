@@ -203,20 +203,23 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     // param 0: the cumulated shift (unused)
     // param 1: the cumulated justifiable shift (unused)
     // param 2: the minimum measure with (unused)
-    // param 3: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(3));
+    // param 3: the doc for accessing drawing parameters (unused)
+    // param 4: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(4));
     
     m_measureAligner.Process( integrateBoundingBoxShift, params );
     
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetAligmentXPos( ArrayPtrVoid *params )
+int Measure::SetAlignmentXPos( ArrayPtrVoid *params )
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
-    // param 2: the functor to be redirected to Aligner
-    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(2));
+    // param 2: duration of the longest note (unused)
+    // param 3: the doc (unused)
+    // param 4: the functor to be redirected to Aligner
+    Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(4));
     
     m_measureAligner.Process( setAligmnentPosX, params);
     
@@ -268,13 +271,15 @@ int Measure::CastOffSystems( ArrayPtrVoid *params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
     // param 4: the system width
+    // param 5: the current scoreDef width
     System *contentSystem = static_cast<System*>((*params).at(0));
     Page *page = static_cast<Page*>((*params).at(1));
     System **currentSystem = static_cast<System**>((*params).at(2));
     int *shift = static_cast<int*>((*params).at(3));
     int *systemWidth = static_cast<int*>((*params).at(4));
+    int *currentScoreDefWidth = static_cast<int*>((*params).at(5));
     
-    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetWidth() - (*shift) > (*systemWidth) ) ) {
+    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetWidth() + (*currentScoreDefWidth) - (*shift) > (*systemWidth) ) ) {
         (*currentSystem) = new System();
         page->AddSystem( *currentSystem );
         (*shift) = this->m_drawingXRel;;

@@ -104,7 +104,7 @@ int Syl::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
     return  TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(params, this);
 }
     
-int Syl::ResetDarwing( ArrayPtrVoid *params )
+int Syl::ResetDrawing( ArrayPtrVoid *params )
 {
     // Pass it to the pseudo functor of the interface
     return  TimeSpanningInterface::InterfaceResetDrawing(params, this);

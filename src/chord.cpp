@@ -23,13 +23,15 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Chord::Chord( ):
-    LayerElement("chord-"), ObjectListInterface(), DurationInterface(),
+    LayerElement("chord-"), StemmedDrawingInterface(), ObjectListInterface(), DurationInterface(),
     AttCommon(),
     AttStemmed(),
+    AttStemmedCmn(),
     AttTiepresent()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMMED);
+    RegisterAttClass(ATT_STEMMEDCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     
     RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
@@ -48,10 +50,12 @@ Chord::~Chord()
 void Chord::Reset()
 {
     ClearClusters();
-    DocObject::Reset();
+    LayerElement::Reset();
+    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetCommon();
     ResetStemmed();
+    ResetStemmedCmn();
     ResetTiepresent();
 }
     
@@ -242,6 +246,39 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
             if (y1 > *yMax) *yMax = y1;
             else if (y1 < *yMin) *yMin = y1;
         }
+    }
+}
+    
+void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)
+{
+    m_drawingStemDir = stemDir;
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Note *note = dynamic_cast<Note*>(*it);
+        if (!note) continue;
+        note->SetDrawingStemDir(stemDir);
+    }
+}
+
+void Chord::SetDrawingStemStart(Point stemStart)
+{
+    m_drawingStemStart = stemStart;
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Note *note = dynamic_cast<Note*>(*it);
+        if (!note) continue;
+        note->SetDrawingStemStart(stemStart);
+    }
+}
+
+void Chord::SetDrawingStemEnd(Point stemEnd)
+{
+    m_drawingStemEnd = stemEnd;
+    ListOfObjects* childList = this->GetList(this); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Note *note = dynamic_cast<Note*>(*it);
+        if (!note) continue;
+        note->SetDrawingStemEnd(stemEnd);
     }
 }
 

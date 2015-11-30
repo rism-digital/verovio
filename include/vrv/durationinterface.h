@@ -62,21 +62,14 @@ public:
     virtual double GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
     /**
-     * Look if the note or rest is in a beam.
-     * Look for the fist beam parent and check is the note is in is content list.
-     * Looking in the content list is necessary for grace notes or imbricated beams.
-     */
-    bool IsInBeam( Object *noteOrRest );
-    
-    /**
      * Return true if the note or rest is the first of a beam.
      */
-    bool IsFirstInBeam( Object *noteOrRest );
+    bool IsFirstInBeam( LayerElement *noteOrRest );
     
     /**
      * Return true if the note or rest is the last of a beam.
      */
-    bool IsLastInBeam( Object *noteOrRest );
+    bool IsLastInBeam( LayerElement *noteOrRest );
 
     
     /**

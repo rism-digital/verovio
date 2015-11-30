@@ -10,6 +10,7 @@
 #define __VRV_RPT_H__
 
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -48,6 +49,85 @@ public:
     virtual double GetAlignmentDuration( int meterUnit );
     
 private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// BTrem
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI <bTrem>
+ */
+class BTrem: public LayerElement
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    BTrem( );
+    virtual ~BTrem();
+    virtual void Reset();
+    virtual std::string GetClassName( ){ return "BTrem"; }; ;
+    virtual ClassId Is() { return BTREM; };
+    ///@}
+    
+    /**
+     * Add an element (a note or a chord) to a fTrem.
+     * Only Note or Chord elements will be actually added to the fTrem.
+     */
+    void AddLayerElement(LayerElement *element);
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// FTrem
+//----------------------------------------------------------------------------
+
+/**
+ * This class models the MEI <fTrem>
+ */
+class FTrem: public LayerElement, public ObjectListInterface,
+    public AttSlashcount
+{
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    FTrem( );
+    virtual ~FTrem();
+    virtual void Reset();
+    virtual std::string GetClassName( ){ return "FTrem"; }; ;
+    virtual ClassId Is() { return FTREM; };
+    ///@}
+    
+    /**
+     * Add an element (a note or a chord) to a fTrem.
+     * Only Note or Chord elements will be actually added to the fTrem.
+     */
+    void AddLayerElement(LayerElement *element);
+    
+private:
+    
+protected:
+    /**
+     * Filter the list for a specific fTrem;
+     */
+    virtual void FilterList( ListOfObjects *childList );
     
 public:
     

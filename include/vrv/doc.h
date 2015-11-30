@@ -130,9 +130,9 @@ public:
     ///@}
     
     /**
-     * @name Getters for the object margins (left and right)
-     * The margin are given in x / PARAM_DENOMINATOR * UNIT
-     * With PARAM_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT
+     * @name Getters for the object margins (left and right).
+     * The margins are given in x / PARAM_DENOMINATOR * UNIT
+     * With PARAM_DENOMINATOR == 10, a margin of 25 is 2.5 UNIT.
      * These should eventually be set at parameters.
      */
     ///@{
@@ -143,16 +143,36 @@ public:
 
     /*
      * @name Setter and getter for the justification (x-axis) flag.
-     * Justification is enabled by default. It need to be disable
-     * for drawing all the document on one single system.
+     * Justification is enabled by default. It needs to be disabled
+     * for drawing the entire document on one single system.
      */
     ///@{
     void SetJustificationX( bool drawingJustifyX ) { m_drawingJustifyX = drawingJustifyX; };
     bool GetJustificationX( ) { return m_drawingJustifyX; };
     ///@}
 
+    /*
+     * @name Setter and getter for the duration-based-spacing flag.
+     * Spacing by duration is always used with CMN, and it's enabled by default.
+     * It should be disabled (so we get "even" note spacing) for mensural notation.
+     */
+    ///@{
+    void SetEvenSpacing( bool drawingEvenSpacing ) { m_drawingEvenSpacing = drawingEvenSpacing; };
+    bool GetEvenSpacing( ) { return m_drawingEvenSpacing; };
+    ///@}
+    
+    /*
+     * @name Setter and getter linear and non linear spacing parameters
+     */
+    ///@{
+    void SetSpacingLinear( double drawingSpacingLinear ) { m_drawingSpacingLinear = drawingSpacingLinear; };
+    double GetSpacingLinear( ) { return m_drawingSpacingLinear; };
+    void SetSpacingNonLinear( double drawingSpacingNonLinear ) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
+    double GetSpacingNonLinear( ) { return m_drawingSpacingNonLinear; };
+    ///@}
+
     /**
-     * Set the initial scoreDef of each page
+     * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
@@ -262,6 +282,12 @@ public:
     float m_drawingBeamMaxSlope;
     /** flag for disabling justification */
     bool m_drawingJustifyX;
+    /** flag for disabling spacing by duration */
+    bool m_drawingEvenSpacing;
+    /** value of the linear spacing factor */
+    double m_drawingSpacingLinear;
+    /** value of the non linear spacing factor */
+    double m_drawingSpacingNonLinear;
     /** minimum measure width */
     int m_drawingMinMeasureWidth;
     
@@ -317,14 +343,14 @@ private:
     FontInfo m_drawingLyricFont;
     
     /**
-     * A flag for indicating whether the currentScoreDef has been set or not
+     * A flag to indicate whether the currentScoreDef has been set or not.
      * If yes, SetCurrentScoreDef will not parse the document (again) unless
      * the force parameter is set.
      */
     bool m_currentScoreDefDone;
     
     /**
-     * A flag for indicating if the drawing preparation has been done. If yes,
+     * A flag to indicate if the drawing preparation has been done. If yes,
      * drawing preparation will be reset before being done again.
      */
     bool m_drawingPreparationDone;

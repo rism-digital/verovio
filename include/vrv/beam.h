@@ -60,13 +60,6 @@ public:
     ///@}
     
     /**
-     * @name Set and get the stem direction of the beam.
-     */
-    ///@{
-    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
-    
-    /**
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoords() { return &m_beamElementCoords; };
@@ -96,10 +89,6 @@ public:
     
 private:
     /**
-     * The drawing stem direction of the beam
-     **/
-    data_STEMDIRECTION m_drawingStemDir;
-    /**
      * An array of the coordinates for each element
      **/
     ArrayOfBeamElementCoords m_beamElementCoords;
@@ -109,7 +98,6 @@ private:
 //----------------------------------------------------------------------------
 // BeamElementCoord
 //----------------------------------------------------------------------------
-
 
 class BeamElementCoord
 {
@@ -131,8 +119,44 @@ public:
     char m_partialFlags[MAX_DURATION_PARTIALS];
     LayerElement *m_element;
 };
+
     
+//----------------------------------------------------------------------------
+// BeamParams
+//----------------------------------------------------------------------------
+
+/**
+ * Class for storing drawing parameters when calculating beams.
+ * See View::DrawBeam and View::CalcBeam
+ */
     
+class BeamParams
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    BeamParams() {};
+    virtual ~BeamParams() {};
+    
+    // values to be set before calling CalcBeam
+    bool m_changingDur;
+    bool m_beamHasChord;
+    bool m_hasMultipleStemDir;
+    bool m_cueSize;
+    int m_shortestDur;
+    data_STEMDIRECTION m_stemDir;
+    
+    // values set by CalcBeam
+    int m_beamWidth;
+    int m_beamWidthBlack;
+    int m_beamWidthWhite;
+    double m_startingY; // the initial position of the beam
+    double m_beamSlope; // the slope of the beam
+    double m_verticalBoost; //extra height to ensure the beam clears all the noteheads
+};
+
 } // namespace vrv
 
 #endif

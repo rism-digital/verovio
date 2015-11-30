@@ -13,6 +13,12 @@
 #include <assert.h>
 #include <math.h>
 
+//----------------------------------------------------------------------------
+
+#include "chord.h"
+#include "editorial.h"
+#include "note.h"
+
 namespace vrv {
     
 
@@ -44,6 +50,83 @@ double BeatRpt::GetAlignmentDuration( int meterUnit )
 }
 
 //----------------------------------------------------------------------------
+// BTrem
+//----------------------------------------------------------------------------
+
+BTrem::BTrem( ):
+LayerElement("btrem-")
+{
+    Reset();
+}
+
+BTrem::~BTrem()
+{
+}
+
+void BTrem::Reset()
+{
+    LayerElement::Reset();
+}
+
+void BTrem::AddLayerElement(LayerElement *element)
+{
+    assert(dynamic_cast<Note*>(element)
+           || dynamic_cast<Chord*>(element)
+           || dynamic_cast<EditorialElement*>(element) );
+    element->SetParent( this );
+    m_children.push_back(element);
+    Modify();
+}
+    
+//----------------------------------------------------------------------------
+// FTrem
+//----------------------------------------------------------------------------
+
+FTrem::FTrem( ):
+    LayerElement("ftrem-"), ObjectListInterface(),
+    AttSlashcount()
+{
+    RegisterAttClass(ATT_SLASHCOUNT);
+    
+    Reset();
+}
+
+FTrem::~FTrem()
+{
+}
+
+void FTrem::Reset()
+{
+    LayerElement::Reset();
+    ResetSlashcount();
+}
+    
+void FTrem::AddLayerElement(LayerElement *element)
+{
+    assert(dynamic_cast<Note*>(element)
+           || dynamic_cast<Chord*>(element)
+           || dynamic_cast<EditorialElement*>(element) );
+    element->SetParent( this );
+    m_children.push_back(element);
+    Modify();
+}
+
+void FTrem::FilterList( ListOfObjects *childList )
+{
+    ListOfObjects::iterator iter = childList->begin();
+    
+    while ( iter != childList->end()) {
+        if ( ((*iter)->Is() != NOTE) && ((*iter)->Is() != CHORD) ) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+            iter = childList->erase( iter );
+            continue;
+        }
+        iter++;
+    }
+}
+
+    
+//----------------------------------------------------------------------------
 // MRpt
 //----------------------------------------------------------------------------
 
@@ -64,7 +147,6 @@ void MRpt::Reset()
     m_drawingMeasureCount = 0;
 }
     
-
 //----------------------------------------------------------------------------
 // MRpt2
 //----------------------------------------------------------------------------
@@ -83,7 +165,6 @@ void MRpt2::Reset()
 {
     LayerElement::Reset();
 }
-    
     
 //----------------------------------------------------------------------------
 // MultiRpt

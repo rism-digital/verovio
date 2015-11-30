@@ -73,11 +73,11 @@ void display_usage() {
     cerr << " verovio [-f format] [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
     
     // These need to be kept in alphabetical order:
-    // -short options first
-    // -then long options only
+    // -options with both short and long forms first
+    // -then options with long forms only
     // -then debugging options
 
-    // Options
+    // Options with both short and long forms
     cerr << "Options" << endl;
     
     
@@ -85,7 +85,7 @@ void display_usage() {
     
     cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
     
-    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae (default is pae)" << endl;
+    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is pae)" << endl;
     
     cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
     
@@ -101,13 +101,15 @@ void display_usage() {
 
     cerr << " -w, --page-width=WIDTH     Specify the page width (default is " << DEFAULT_PAGE_WIDTH << ")" << endl;
     
-    // long options only
+    // Options with long forms only
     cerr << endl << "Additional options" << endl;
     
     cerr << " --adjust-page-height       Crop the page height to the height of the content" << endl;
     
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
     
+    cerr << " --even-note-spacing        Space notes evenly and close together regardless of their durations" << endl;
+
     cerr << " --font=FONT                Select the music font to use (default is Leipzig; Bravura and Gootville are also available)" << endl;
     
     cerr << " --help                     Display this message" << endl;
@@ -122,6 +124,14 @@ void display_usage() {
     
     cerr << " --rdg-xpath-query=QUERY    Set the xPath query for selecting <rdg> elements," << endl;
     cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
+    
+    cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR << ")" << endl;
+    
+    cerr << " --spacing-non-linear=SP    Specify the non linear spacing factor (default is " << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
+    
+    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)," << endl;
+    
+    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)," << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;
@@ -145,13 +155,14 @@ int main(int argc, char** argv)
     // Init random number generator for uuids
     std::srand((unsigned int)std::time(0));
     
-    ConvertFileFormat type;
+    FileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
     int no_layout = 0;
     int ignore_layout = 0;
     int no_justification = 0;
+    int even_note_spacing = 0;
     int show_bounding_boxes = 0;
     int page = 1;
     int show_help = 0;
@@ -163,10 +174,10 @@ int main(int argc, char** argv)
     Toolkit toolkit( false );
     
     // read pae by default
-    type = pae_file;
+    type = MEI;
     
     if (argc < 2) {
-        cerr << "Expecting one input file." << endl << endl;
+        cerr << "Expected one input file but found none." << endl << endl;
         display_usage();
         exit(1);
     }
@@ -178,6 +189,7 @@ int main(int argc, char** argv)
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"all-pages",           no_argument,        &all_pages, 1},
         {"border",              required_argument,  0, 'b'},
+        {"even-note-spacing",   no_argument,        &even_note_spacing, 1},
         {"font",                required_argument,  0, 0},
         {"format",              required_argument,  0, 'f'},
         {"help",                no_argument,        &show_help, 1},
@@ -193,6 +205,8 @@ int main(int argc, char** argv)
         {"resources",           required_argument,  0, 'r'},
         {"scale",               required_argument,  0, 's'},
         {"show-bounding-boxes", no_argument,        &show_bounding_boxes, 1},
+        {"spacing-linear",      required_argument,  0, 0},
+        {"spacing-non-linear",  required_argument,  0, 0},
         {"spacing-staff",       required_argument,  0, 0},
         {"spacing-system",      required_argument,  0, 0},
         {"type",                required_argument,  0, 't'},
@@ -217,6 +231,16 @@ int main(int argc, char** argv)
                 else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
                     cout << string(optarg) << endl;
                     toolkit.SetRdgXPathQuery( string(optarg) );
+                }
+                else if (strcmp(long_options[option_index].name,"spacing-linear") == 0) {
+                    if ( !toolkit.SetSpacingLinear( atof(optarg) ) ) {
+                        exit(1);
+                    }
+                }
+                else if (strcmp(long_options[option_index].name,"spacing-non-linear") == 0) {
+                    if ( !toolkit.SetSpacingNonLinear( atof(optarg) ) ) {
+                        exit(1);
+                    }
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {
                     if ( !toolkit.SetSpacingStaff( atoi(optarg) ) ) {
@@ -301,13 +325,14 @@ int main(int argc, char** argv)
     toolkit.SetNoLayout(no_layout);
     toolkit.SetIgnoreLayout(ignore_layout);
     toolkit.SetNoJustification(no_justification);
+    toolkit.SetEvenNoteSpacing(even_note_spacing);
     toolkit.SetShowBoundingBoxes(show_bounding_boxes);
     
     if (optind <= argc - 1) {
         infile = string(argv[optind]);
     }
     else {
-        cerr << "Incorrect number of arguments: expecting one input file." << endl << endl;
+        cerr << "Incorrect number of arguments: expected one input file but found none." << endl << endl;
         display_usage();
         exit(1);
     }

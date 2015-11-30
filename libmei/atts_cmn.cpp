@@ -1537,14 +1537,14 @@ AttStemmedCmn::~AttStemmedCmn() {
 }
 
 void AttStemmedCmn::ResetStemmedCmn() {
-    m_stemMod = "";
+    m_stemMod = STEMMODIFIER_NONE;
     m_stemWith = "";
 }
 
 bool AttStemmedCmn::ReadStemmedCmn(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("stem.mod")) {
-        this->SetStemMod(StrToStr(element.attribute("stem.mod").value()));
+        this->SetStemMod(StrToStemModifier(element.attribute("stem.mod").value()));
         element.remove_attribute("stem.mod");
         hasAttribute = true;
     }
@@ -1559,7 +1559,7 @@ bool AttStemmedCmn::ReadStemmedCmn(  pugi::xml_node element ) {
 bool AttStemmedCmn::WriteStemmedCmn(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasStemMod()) {
-        element.append_attribute("stem.mod") = StrToStr(this->GetStemMod()).c_str();
+        element.append_attribute("stem.mod") = StemModifierToStr(this->GetStemMod()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStemWith()) {
@@ -1571,7 +1571,7 @@ bool AttStemmedCmn::WriteStemmedCmn(  pugi::xml_node element ) {
 
 bool AttStemmedCmn::HasStemMod( )
 {
-    return (m_stemMod != "");
+    return (m_stemMod != STEMMODIFIER_NONE);
 }
 
 bool AttStemmedCmn::HasStemWith( )
@@ -2053,7 +2053,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
         AttStemmedCmn *att = dynamic_cast<AttStemmedCmn*>(element);
         assert( att );
         if (attrType == "stemMod") {
-            att->SetStemMod(att->StrToStr(attrValue));
+            att->SetStemMod(att->StrToStemModifier(attrValue));
             return true;
         }
         if (attrType == "stemWith") {
@@ -2356,7 +2356,7 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttStemmedCmn *att = dynamic_cast<AttStemmedCmn*>(element);
         assert( att );
         if (att->HasStemMod()) {
-            attributes->push_back(std::make_pair("stemMod", att->StrToStr(att->GetStemMod())));
+            attributes->push_back(std::make_pair("stemMod", att->StemModifierToStr(att->GetStemMod())));
         }
         if (att->HasStemWith()) {
             attributes->push_back(std::make_pair("stemWith", att->StrToStr(att->GetStemWith())));

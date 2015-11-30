@@ -103,7 +103,6 @@ void Object::Init(std::string classid)
 {
     m_parent = NULL;
     m_isModified = true;
-    m_doc = NULL;
     m_classid = classid;
     this->GenerateUuid();
 }
@@ -126,7 +125,7 @@ void Object::MoveChildren(  Object *object )
     if ( this == object ){
         assert( "Object cannot be copied to itself");
     }
-    if ( &typeid(*this) != &typeid(*object) ) {
+    if ( this->Is() != object->Is() ) {
         assert( "Object must be of the same type");
     }
     
@@ -275,6 +274,17 @@ Object *Object::FindChildByAttComparison( AttComparison *attComparison, int deep
     return element;
 }
     
+Object *Object::FindChildExtremeByAttComparison( AttComparison *attComparison, int deepness, bool direction )
+{
+    Functor findExtremeByAttComparison( &Object::FindExtremeByAttComparison );
+    Object *element = NULL;
+    ArrayPtrVoid params;
+    params.push_back( attComparison );
+    params.push_back( &element );
+    this->Process( &findExtremeByAttComparison, &params, NULL, NULL, deepness, direction );
+    return element;
+}
+    
 Object* Object::GetChild( int idx )
 {
     if ( (idx < 0) || (idx >= (int)m_children.size()) ) {
@@ -398,7 +408,6 @@ Object *Object::GetFirstParent( const ClassId classId, int maxSteps )
         return ( m_parent->GetFirstParent( classId, maxSteps - 1 ) );
     }
 }
-
     
 Object *Object::GetLastParentNot( const ClassId classId, int maxSteps )
 {
@@ -413,83 +422,6 @@ Object *Object::GetLastParentNot( const ClassId classId, int maxSteps )
         return ( m_parent->GetLastParentNot( classId, maxSteps - 1 ) );
     }
 }
-    
-
-Object *Object::GetFirstChild( const ClassId classId )
-{
-    ArrayOfObjects::iterator iter;
-    int i;
-    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++)
-    {
-        Object *o = *iter;
-        if ( o->Is() == classId )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
-Object *Object::GetNextSibling( const ClassId classId )
-{
-    if (!m_parent) {
-        return NULL;
-    }
-    
-    ArrayOfObjects::iterator iter;
-    bool foundCurrent = false;
-    for (iter = this->m_parent->m_children.begin(); iter != this->m_parent->m_children.end(); ++iter)
-    {
-        // we have not found the current object
-        if ( this == *iter ) {
-            foundCurrent = true;
-            // continue to find the next sibling
-            continue;
-        }
-        else if (!foundCurrent) {
-            continue;
-        }
-        if ( classId == UNSPECIFIED ) {
-            return *iter;
-        }
-        if ( (*iter)->Is() == classId )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
-Object *Object::GetPreviousSibling( const ClassId classId )
-{
-    if (!m_parent) {
-        return NULL;
-    }
-    
-    ArrayOfObjects::reverse_iterator iter;
-    bool foundCurrent = false;
-    for (iter = this->m_parent->m_children.rbegin(); iter != this->m_parent->m_children.rend(); ++iter)
-    {
-        // we have not found the current object
-        if ( this == *iter ) {
-            foundCurrent = true;
-            // continue to find the next sibling
-            continue;
-        }
-        else if (!foundCurrent) {
-            continue;
-        }
-        if ( classId == UNSPECIFIED ) {
-            return *iter;
-        }
-        if ( (*iter)->Is() == classId )
-        {
-            return *iter;
-        }
-    }
-    return NULL;
-}
-
 
 bool Object::GetSameAs( std::string *id, std::string *filename, int idx )
 {
@@ -918,7 +850,21 @@ int Object::FindByAttComparison( ArrayPtrVoid *params )
     //LogDebug("Still looking for the object matching the AttComparison...");
     return FUNCTOR_CONTINUE;
 }
-
+    
+int Object::FindExtremeByAttComparison( ArrayPtrVoid *params )
+{
+    // param 0: the type we are looking for
+    // param 1: the pointer to pointer to the Object
+    AttComparison *test = static_cast<AttComparison*>((*params).at(0));
+    Object **element = static_cast<Object**>((*params).at(1));
+    
+    // evaluate by applying the AttComparison operator()
+    if ((*test)(this)) {
+        (*element) = this;
+    }
+    // continue until the end
+    return FUNCTOR_CONTINUE;
+}
     
 int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 {
@@ -1128,7 +1074,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
-        (*min_pos) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        (*min_pos) = 0;
         // set scoreDef attr
         if (current_layer->GetDrawingClef()) {
             current_layer->GetDrawingClef()->SetBoundingBoxXShift( params );

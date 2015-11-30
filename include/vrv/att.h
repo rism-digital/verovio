@@ -191,6 +191,9 @@ public:
     std::string StemDirectionToStr(data_STEMDIRECTION data);
     data_STEMDIRECTION StrToStemDirection(std::string value);
     
+    std::string StemModifierToStr(data_STEMMODIFIER data);
+    data_STEMMODIFIER StrToStemModifier(std::string value);
+    
     std::string StemPositionToStr(data_STEMPOSITION data);
     data_STEMPOSITION StrToStemPosition(std::string value);
     

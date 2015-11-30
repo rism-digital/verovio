@@ -313,7 +313,7 @@
 		4DF28A041A754DF000BA9F7D /* floatingelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = floatingelement.cpp; path = src/floatingelement.cpp; sourceTree = "<group>"; };
 		4DF2AF7D1A62F6A50016F869 /* drawinginterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = drawinginterface.h; path = include/vrv/drawinginterface.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
-		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; };
+		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
 		8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bboxdevicecontext.cpp; path = src/bboxdevicecontext.cpp; sourceTree = "<group>"; };
 		8F086EBA188539540037FD8E /* beam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = beam.cpp; path = src/beam.cpp; sourceTree = "<group>"; };
@@ -330,12 +330,12 @@
 		8F086EC5188539540037FD8E /* keysig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = keysig.cpp; path = src/keysig.cpp; sourceTree = "<group>"; };
 		8F086EC6188539540037FD8E /* layer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layer.cpp; path = src/layer.cpp; sourceTree = "<group>"; };
 		8F086EC7188539540037FD8E /* layerelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = layerelement.cpp; path = src/layerelement.cpp; sourceTree = "<group>"; };
-		8F086EC9188539540037FD8E /* measure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = measure.cpp; path = src/measure.cpp; sourceTree = "<group>"; };
+		8F086EC9188539540037FD8E /* measure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = measure.cpp; path = src/measure.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086ECA188539540037FD8E /* mensur.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mensur.cpp; path = src/mensur.cpp; sourceTree = "<group>"; };
 		8F086ECB188539540037FD8E /* multirest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = multirest.cpp; path = src/multirest.cpp; sourceTree = "<group>"; };
 		8F086ECC188539540037FD8E /* note.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = note.cpp; path = src/note.cpp; sourceTree = "<group>"; };
 		8F086ECD188539540037FD8E /* object.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = object.cpp; path = src/object.cpp; sourceTree = "<group>"; };
-		8F086ECE188539540037FD8E /* page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = page.cpp; path = src/page.cpp; sourceTree = "<group>"; };
+		8F086ECE188539540037FD8E /* page.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = page.cpp; path = src/page.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086ECF188539540037FD8E /* pitchinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pitchinterface.cpp; path = src/pitchinterface.cpp; sourceTree = "<group>"; };
 		8F086ED0188539540037FD8E /* positioninterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = positioninterface.cpp; path = src/positioninterface.cpp; sourceTree = "<group>"; };
 		8F086ED1188539540037FD8E /* rest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rest.cpp; path = src/rest.cpp; sourceTree = "<group>"; };
@@ -354,7 +354,7 @@
 		8F086EE0188539540037FD8E /* view.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view.cpp; path = src/view.cpp; sourceTree = "<group>"; };
 		8F086EE1188539540037FD8E /* vrv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = vrv.cpp; path = src/vrv.cpp; sourceTree = "<group>"; };
 		8F086F4D18853CA90037FD8E /* liblibverovio.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = liblibverovio.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
-		8F59290D18854BF800FE51AD /* aligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = aligner.h; path = include/vrv/aligner.h; sourceTree = "<group>"; };
+		8F59290D18854BF800FE51AD /* aligner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = aligner.h; path = include/vrv/aligner.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59290F18854BF800FE51AD /* barline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = barline.h; path = include/vrv/barline.h; sourceTree = "<group>"; };
 		8F59291018854BF800FE51AD /* bboxdevicecontext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bboxdevicecontext.h; path = include/vrv/bboxdevicecontext.h; sourceTree = "<group>"; };
 		8F59291118854BF800FE51AD /* beam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = beam.h; path = include/vrv/beam.h; sourceTree = "<group>"; };
@@ -371,11 +371,11 @@
 		8F59291C18854BF800FE51AD /* keysig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = keysig.h; path = include/vrv/keysig.h; sourceTree = "<group>"; };
 		8F59291D18854BF800FE51AD /* layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layer.h; path = include/vrv/layer.h; sourceTree = "<group>"; };
 		8F59291E18854BF800FE51AD /* layerelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = layerelement.h; path = include/vrv/layerelement.h; sourceTree = "<group>"; };
-		8F59292018854BF800FE51AD /* measure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = measure.h; path = include/vrv/measure.h; sourceTree = "<group>"; };
+		8F59292018854BF800FE51AD /* measure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = measure.h; path = include/vrv/measure.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59292118854BF800FE51AD /* mensur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mensur.h; path = include/vrv/mensur.h; sourceTree = "<group>"; };
 		8F59292218854BF800FE51AD /* multirest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = multirest.h; path = include/vrv/multirest.h; sourceTree = "<group>"; };
 		8F59292318854BF800FE51AD /* note.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = note.h; path = include/vrv/note.h; sourceTree = "<group>"; };
-		8F59292418854BF800FE51AD /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = object.h; path = include/vrv/object.h; sourceTree = "<group>"; };
+		8F59292418854BF800FE51AD /* object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = object.h; path = include/vrv/object.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		8F59292518854BF800FE51AD /* page.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = page.h; path = include/vrv/page.h; sourceTree = "<group>"; };
 		8F59292618854BF800FE51AD /* pitchinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pitchinterface.h; path = include/vrv/pitchinterface.h; sourceTree = "<group>"; };
 		8F59292718854BF800FE51AD /* positioninterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = positioninterface.h; path = include/vrv/positioninterface.h; sourceTree = "<group>"; };

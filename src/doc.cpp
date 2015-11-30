@@ -66,11 +66,15 @@ void Doc::Reset( DocType type )
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
     
+    m_drawingSpacingLinear = DEFAULT_SPACING_LINEAR;
+    m_drawingSpacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
+    
     m_spacingStaff = m_style->m_spacingStaff;
     m_spacingSystem = m_style->m_spacingSystem;
     
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
+    m_drawingEvenSpacing = false;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
     
@@ -98,7 +102,7 @@ void Doc::PrepareDrawing()
     ArrayPtrVoid params;
     
     if (m_drawingPreparationDone) {
-        Functor resetDrawing( &Object::ResetDarwing );
+        Functor resetDrawing( &Object::ResetDrawing );
         this->Process( &resetDrawing, &params );
     }
     
@@ -343,15 +347,18 @@ void Doc::CastOff( )
     
     System *currentSystem = new System();
     contentPage->AddSystem( currentSystem );
-    int shift = 0;
+    int shift = -contentSystem->GetDrawingLabelsWidth();
     int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
         - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+    // The width of the initial scoreDef is stored in the page scoreDef
+    int scoreDefWidth = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
     ArrayPtrVoid params;
     params.push_back( contentSystem );
     params.push_back( contentPage );
     params.push_back( &currentSystem );
     params.push_back( &shift );
     params.push_back( &systemFullWidth );
+    params.push_back( &scoreDefWidth );
     Functor castOffSystems( &Object::CastOffSystems );
     contentSystem->Process( &castOffSystems, &params );
     delete contentSystem;

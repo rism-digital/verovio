@@ -256,6 +256,7 @@ int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
     // param 2: a pointer to the current system
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
+    // param 5: the current scoreDef width (unused)
     System *contentSystem = static_cast<System*>((*params).at(0));
     System **currentSystem = static_cast<System**>((*params).at(2));
     

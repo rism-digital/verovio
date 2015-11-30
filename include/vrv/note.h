@@ -42,11 +42,12 @@ typedef std::vector<Note*> ChordCluster;
 #define EMB_TRILL 1
 #define EMB_MORDENT 2
 
-class Note: public LayerElement, public DurationInterface, public PitchInterface,
+class Note: public LayerElement, public StemmedDrawingInterface, public DurationInterface, public PitchInterface,
     public AttColoration,
     public AttGraced,
     public AttNoteLogMensural,
     public AttStemmed,
+    public AttStemmedCmn,
     public AttTiepresent
 {
 public:
@@ -99,19 +100,6 @@ public:
     int GetDrawingDur( );
     bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
     ///@}
-    
-    /**
-     * @name Set and get the stem direction of the note.
-     */
-    ///@{
-    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
-    ///@}
-    
-    /**
-     * Calculate the drawing stem direction looking a potential beam or chord parents
-     */
-    data_STEMDIRECTION CalcDrawingStemDir( );
 
     /**
      * Returns a single integer representing pitch and octave.
@@ -145,7 +133,7 @@ public:
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid *params );
+    virtual int ResetDrawing( ArrayPtrVoid *params );
     
 private:
     
@@ -180,9 +168,6 @@ private:
      * An alignment for grace notes
      */
     Alignment *m_graceAlignment;
-    /** drawing stem direction */
-    data_STEMDIRECTION m_drawingStemDir;
-    
 };
 
 } // namespace vrv

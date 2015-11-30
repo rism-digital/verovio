@@ -9,6 +9,7 @@
 #ifndef __VRV_DRAWING_INTERFACE_H__
 #define __VRV_DRAWING_INTERFACE_H__
 
+#include "devicecontextbase.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -164,6 +165,53 @@ private:
     bool m_drawMensur;
     bool m_drawMeterSig;
     ///@}
+    
+};
+    
+
+//----------------------------------------------------------------------------
+// StemmedDrawingInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for MEI stemmed element.
+ * It stores stem drawing values for notes and chords.
+ */
+class StemmedDrawingInterface
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    StemmedDrawingInterface();
+    virtual ~StemmedDrawingInterface();
+    virtual void Reset();
+    ///@}
+    
+    /**
+     * @name Set and get the stem direction and stem positions
+     * The methods are virtual because they need to be overriden for Chords.
+     */
+    ///@{
+    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
+    virtual data_STEMDIRECTION GetDrawingStemDir();
+    virtual void SetDrawingStemStart(Point stemStart);
+    virtual Point GetDrawingStemStart();
+    virtual void SetDrawingStemEnd(Point stemEnd);
+    virtual Point GetDrawingStemEnd();
+    ///@}
+    
+protected:
+    /**
+     * If this is a note, store here the stem coordinates (useful for ex. tuplets)
+     */
+    Point m_drawingStemStart; // beginning point, the one near the note
+    Point m_drawingStemEnd; // end point (!), near beam or stem
+    /**
+     * Stem direction as drawn
+     */
+    data_STEMDIRECTION m_drawingStemDir;
     
 };
     

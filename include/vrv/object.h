@@ -238,6 +238,13 @@ public:
                                      int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
     
     /**
+     * Return the element matching the extreme value with an AttComparison functor
+     * Deepness allow to limit the depth search (EditorialElements are not count)
+     */
+    Object *FindChildExtremeByAttComparison( AttComparison *attComparison,
+                                     int deepness = UNLIMITED_DEPTH, bool direction = FORWARD );
+    
+    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to used only in very particular case where the child
      * object cannot be detached straight away. It is typically the case 
@@ -264,25 +271,6 @@ public:
      * The maxSteps parameter limit the search to a certain number of level if not -1.
      */
     Object *GetLastParentNot( const ClassId classId, int maxSteps = -1 );
-    
-    /**
-     * Return the first of the specified type.
-     */
-    Object *GetFirstChild( const ClassId classId );
-    
-    /**
-     * Return the previous sibling object of the specified type.
-     * If no type is specified, returns the previous object.
-     * Returns NULL if not found in both cases.
-     */
-    Object *GetPreviousSibling( const ClassId classId = UNSPECIFIED );
-    
-    /**
-     * Return the next sibling object of the specified type.
-     * If no type is specified, returns the next object.
-     * Returns NULL if not found in both cases.
-     */
-    Object *GetNextSibling( const ClassId classId = UNSPECIFIED );
     
     /**
      * Fill the list of all the children LayerElement.
@@ -364,6 +352,14 @@ public:
      * param 1: the pointer to pointer to the Object retrieved (if found).
      */
     virtual int FindByAttComparison( ArrayPtrVoid *params );
+
+    /**
+     * Find a Object with the extreme value with a AttComparison functor .
+     * param 0: the pointer to the AttComparsion we are evaluating.
+     * param 1: the pointer to pointer to the Object retrieved (if found).
+     */
+    virtual int FindExtremeByAttComparison( ArrayPtrVoid *params );
+
     
     /**
      * Save the content of and object by calling the appropriate FileOutputStream method
@@ -421,9 +417,9 @@ public:
     
     /**
      * Set the position of the Alignment.
-     * Looks at the time different with the previous Alignment.
+     * Looks at the time difference from the previous Alignment.
      */
-    virtual int SetAligmentXPos( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
+    virtual int SetAlignmentXPos( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Lay out the X positions of the grace notes looking that the bounding boxes.
@@ -599,7 +595,7 @@ public:
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDarwing( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };    
+    virtual int ResetDrawing( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };    
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
@@ -673,9 +669,6 @@ protected:
     std::string m_uuid;
     std::string m_classid;
     std::wstring m_text;
-    
-    /** A pointer to the parent doc for accessing environment variables when drawing */
-    Doc *m_doc;
 
 private:
     

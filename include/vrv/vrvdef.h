@@ -27,7 +27,7 @@ namespace vrv {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 9
+#define VERSION_REVISION 10
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV false
 
@@ -37,8 +37,10 @@ namespace vrv {
  
 class AttComparison;
 class BeamElementCoord;
+class LayerElement;
 class Note;
 class Object;
+class Point;
 class Staff;
 
 typedef std::vector<Object*> ArrayOfObjects;
@@ -54,6 +56,8 @@ typedef std::vector<Note*> ChordCluster;
 typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
     
 typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
+    
+typedef std::vector<std::pair<LayerElement*, Point> > ArrayOfLayerElementPointPairs;
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -102,10 +106,12 @@ enum ClassId {
     BARLINE_ATTR,
     BEAM,
     BEATRPT,
+    BTREM,
     CHORD,
     CLEF,
     CUSTOS,
     DOT,
+    FTREM,
     KEYSIG,
     MENSUR,
     METERSIG,
@@ -186,6 +192,9 @@ enum FunctorCode {
     
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_CHORD_DEPTH -1
+    
+/** Define the maximum levels between a fTrem and its notes **/
+#define MAX_FTREM_DEPTH -1
     
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1

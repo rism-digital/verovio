@@ -157,6 +157,14 @@ public:
     void SetDrawLabels( bool drawLabels ) { m_drawLabels = drawLabels; };
     ///@}
     
+    /**
+     * @name Set and get the scoreDef drawing width.
+     */
+    ///@{
+    int GetDrawingWidth() const { return m_drawingWidth; };
+    void SetDrawingWidth( int drawingWidth );
+    ///@}
+    
     //----------//
     // Functors //
     //----------//
@@ -182,6 +190,8 @@ public:
 private:
     /** Flags for indicating whether lables needs to be drawn or not */
     bool m_drawLabels;
+    /** Store the drawing width (clef and key sig) of the scoreDef */
+    int m_drawingWidth;
     
 };
 
