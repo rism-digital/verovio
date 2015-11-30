@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Single-note (bowed) temolo example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="4" meter.unit="4" key.sig="1f">
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5"/>
+                            <staffDef n="2" clef.line="3" clef.shape="C" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section label="feature-example">
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <bTrem>
+                                        <chord dur="1" tie="i" stem.mod="3slash">
+                                            <note pname="d" oct="4"/>
+                                            <note pname="f" oct="4"/>
+                                        </chord>
+                                    </bTrem>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <bTrem>
+                                            <note pname="d" oct="4" dur="16" stem.mod="2slash"/>
+                                        </bTrem>
+                                        <bTrem>
+                                            <note pname="f" oct="4" dur="8" stem.mod="2slash"/>
+                                        </bTrem>                                        
+                                    </beam>
+                                    <fTrem slash="3">
+                                        <note pname="d" oct="4" dur="2"/>
+                                        <note pname="f" oct="4" dur="2"/>
+                                    </fTrem>
+                                </layer>
+                                <layer n="2">
+                                    <note pname="d" oct="3" dur="1"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord dur="4" stem.dir="up" tie="t">
+                                        <note pname="d" oct="4"/>
+                                        <note pname="f" oct="4"/>
+                                    </chord>
+                                    <rest dur="4"/>
+                                    <bTrem>
+                                        <chord dur="2" stem.mod="3slash">
+                                            <note pname="f" oct="4"/>
+                                            <note pname="a" oct="4"/>
+                                        </chord>
+                                    </bTrem>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note pname="d" oct="4" dots="1" dur="2"/>
+                                    <note pname="d" oct="4" dur="4"/>
+                                </layer>
+                                <layer n="2">
+                                    <fTrem slash="2">
+                                        <note pname="d" oct="3" dur="1"/>
+                                        <note pname="f" oct="3" dur="1"/>
+                                    </fTrem>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

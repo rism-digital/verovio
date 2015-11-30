@@ -1,0 +1,73 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <fTrem slash="3">
+          <note pname="f" oct="4" dur="2"/>
+          <note pname="a" oct="4" dur="2"/>
+        </fTrem>
+        <fTrem slash="3">
+          <note pname="a" oct="4" dur="4" stem.dir="up"/>
+          <note pname="d" oct="5" dur="4" stem.dir="up"/>
+        </fTrem>
+        <fTrem slash="3">
+          <note pname="d" oct="5" dur="8" stem.dir="up"/>
+          <note pname="a" oct="4" dur="8" stem.dir="up"/>
+        </fTrem>
+        <fTrem slash="3">
+          <note pname="a" oct="4" dur="8"/>
+          <note pname="f" oct="4" dur="8"/>
+        </fTrem>
+      </layer>
+    </staff>
+    <staff n="2">
+      <layer n="1">
+        <fTrem slash="3">
+          <note pname="d" oct="4" dur="2"/>
+          <note pname="f" oct="4" dur="2"/>
+        </fTrem>
+        <fTrem slash="3">
+          <note pname="d" oct="4" dur="2"/>
+          <note pname="f" oct="4" dur="2"/>
+        </fTrem>
+      </layer>
+      <layer n="2">
+        <note pname="d" oct="3" dur="1"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <fTrem slash="2">
+          <note pname="f" oct="5" dur="2"/>
+          <note pname="d" oct="5" dur="2"/>
+        </fTrem>
+        <fTrem slash="2">
+          <note pname="d" oct="5" dur="4" stem.dir="down"/>
+          <note pname="a" oct="4" dur="4" stem.dir="down"/>
+        </fTrem>
+        <fTrem slash="2">
+          <note pname="a" oct="4" dur="8" stem.dir="down"/>
+          <note pname="d" oct="5" dur="8" stem.dir="down"/>
+        </fTrem>
+        <fTrem slash="2">
+          <note pname="d" oct="5" dur="8"/>
+          <note pname="f" oct="5" dur="8"/>
+        </fTrem>
+      </layer>
+    </staff>
+    <staff n="2">
+      <layer n="1">
+        <note pname="d" oct="4" dots="1" dur="2"/>
+        <note pname="d" oct="4" dur="4"/>
+      </layer>
+      <layer n="2">
+        <fTrem slash="2">
+          <note pname="d" oct="3" dur="1"/>
+          <note pname="f" oct="3" dur="1"/>
+        </fTrem>
+      </layer>
+    </staff>
+  </measure>
+</section>

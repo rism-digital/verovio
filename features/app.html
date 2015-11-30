@@ -96,12 +96,55 @@
         </g>
       </g>
     </g>
+    <g class="rdg" id="rdg-001"/>
   </g>
 </g>
 {% endhighlight %}
     </div>
 </div>
 
+
+<div class="row">
+    <div class="col-sm-7">
+{% highlight xml %}
+<layer n="1">
+  <app xml:id="app1">
+    <rdg source="src1" xml:id="rdg1-1">
+      <note dur="1" oct="5" pname="d"/>
+    </rdg>
+    <rdg source="src2 src3" xml:id="rdg1-2">
+      <note dur="2" dots="1" oct="5" pname="d"/>
+      <app xml:id="app2">
+        <rdg source="src2" xml:id="rdg2-1">
+          <note dur="4" oct="4" pname="b"/>
+        </rdg>
+        <rdg source="src3" xml:id="rdg2-2">
+          <beam>
+            <note dur="8" oct="5" pname="c"/>
+            <note dur="8" oct="4" pname="b"/>
+          </beam>
+        </rdg>
+      </app>
+    </rdg>
+  </app>
+</layer>
+{% endhighlight %}
+    </div>
+    
+    <div class="col-sm-5">
+{% highlight xml %}
+<g class="layer">  
+  <g class="app" id="app1">
+    <g class="rdg" id="rdg1-1">
+      <g class="note">
+      </g>
+    </g>
+    <g class="rdg" id="rdg1-2"/>
+  </g>
+</g>
+{% endhighlight %}
+    </div>
+</div>
 
 <!-- ***************************** -->
 <h4>Nested apparati</h4>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title />
+            </titleStmt>
+            <pubStmt>
+                <date>31 January 2014</date>
+            </pubStmt>
+        </fileDesc>
+        <encodingDesc>
+            <projectDesc>
+                <p>Spacing example</p>
+            </projectDesc>
+        </encodingDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f" label="Violino I" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure xml:id="d648110e8532" n="1">
+                            <staff xml:id="staff-000000119844232" n="1">
+                                <layer xml:id="layer-000000047223408" n="1">
+                                    <beam>
+                                        <note pname="e" oct="4" dur="16" />
+                                        <note pname="e" oct="4" dur="16" />
+                                        <note pname="e" oct="4" dur="16" />
+                                        <note pname="e" oct="4" dur="16" />
+                                    </beam>
+                                    <beam>
+                                        <note pname="e" oct="4" dur="8" />
+                                        <note pname="e" oct="4" dur="8" />
+                                    </beam>
+                                    <beam>
+                                        <note pname="e" oct="4" dur="8" dots="1" />
+                                        <note pname="e" oct="4" dur="8" dots="1" />
+                                    </beam>
+                                    <note pname="e" oct="4" dur="4" />
+                                    <note pname="e" oct="4" dur="4" />
+                                    <note pname="e" oct="4" dur="4" dots="1" />
+                                    <note pname="e" oct="4" dur="4" dots="1" />
+                                    <note pname="e" oct="4" dur="2" />
+                                    <note pname="e" oct="4" dur="2" />
+                                    <note pname="e" oct="4" dur="2" dots="1" />
+                                    <note pname="e" oct="4" dur="2" dots="1" />
+                                    <note pname="e" oct="4" dur="1" />
+                                    <note pname="e" oct="4" dur="1" />
+                                </layer>
+                            </staff>
+                        </measure>
+                     </section>      
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

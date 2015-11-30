@@ -49,6 +49,8 @@ examples:
         <div class="panel panel-default">
 
             <div class="panel-body">
+                <h3>MusicXML Converter</h3>
+                
                 <p>
                     Verovio supports basic conversion from MusicXML to MEI. When converting from this web interface, the resulting MEI data will be displayed directly in the MEI-Viewer. The MEI file can be saved through the 
                     <button type="button" class="btn btn-default btn-xs">
@@ -59,9 +61,13 @@ examples:
                 <p>
                     This feature is highly experimental at this stage, and only the features supported by Verovio will be converted. Everything else will be lost. For a more complete conversion from MusicXML to MEI we strongly recommend to use the <a href="https://github.com/music-encoding/music-encoding/tree/develop/tools" target="_blank">MEI XSL stylesheets</a>.
                 </p>
+                
+                
+                <h4>Try it!</h4>
                 <p>
-                    Example files:
+                    The files below are converted to MEI in your browser and directly displayed with Verovio.
                 </p>
+                
                 <div class="conainer"> 
                     {% for d in page.examples %}
                      <div class="row">
