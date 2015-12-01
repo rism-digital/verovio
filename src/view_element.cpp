@@ -284,11 +284,11 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     //if the note is clustered, calculations are different
     if (note->m_cluster) {
         if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-            //stem down/even cluster = noteheads start on left (incorrect side)
+            // stem down/even cluster = noteheads start on left (incorrect side)
             if (note->m_cluster->size() % 2 == 0) {
                 flippedNotehead = (note->m_clusterPosition % 2 != 0);
             }
-            //else they start on normal side
+            // else they start on normal side
             else {
                 flippedNotehead = (note->m_clusterPosition % 2 == 0);
             }
@@ -300,22 +300,22 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             }
         }
         else {
-            //flipped noteheads start on normal side no matter what
+            // flipped noteheads start on normal side no matter what
             flippedNotehead = (note->m_clusterPosition % 2 == 0);
             
-            //if stem goes up, move ledger start to the right and expand it a full radius
+            // if stem goes up, move ledger start to the right and expand it a full radius
             if(!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger += radius;
                 doubleLengthLedger = true;
             }
         }
         
-        //positions notehead
+        // positions notehead
         if (!flippedNotehead) {
             xNote = xStem - radius;
         }
         else {
-            //if we have a flipped notehead, we need to be in a chord
+            // if we have a flipped notehead, we need to be in a chord
             assert(inChord);
             if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
                 xNote = xStem + radius - m_doc->GetDrawingStemWidth(staffSize);
@@ -359,7 +359,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->m_drawingStaffSize, drawingCueSize );
 
 		if (!(inBeam && drawingDur > DUR_4) && !inChord) {
-            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
+            DrawStem(dc, note, staff, false, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
 
 	}
@@ -369,7 +369,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
     int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
     
-    //if the note is not in the staff
+    // if the note is not in the staff
     if (!is_in(noteY,staffTop,staffBot))
     {
         int distance, highestNewLine, numLines;
@@ -391,7 +391,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             std::vector<char> *legerLines = &inChord->m_drawingLedgerLines.at(staff);
             (*legerLines).at(idx) = ledgermax(numLines, (*legerLines).at(idx));
         }
-        //we do want to go ahead and draw if it's not in a chord
+        // we do want to go ahead and draw if it's not in a chord
         else {
             DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
         }
@@ -408,7 +408,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
         note->m_drawingAccid->SetDrawingX( xAccid );
         note->m_drawingAccid->SetDrawingY( noteY );
         
-        //postpone drawing the accidental until later if it's in a chord or if it is not an attribute
+        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
         if (!inChord && note->m_isDrawingAccidAttr) DrawAccid( dc, note->m_drawingAccid, layer, staff, measure );
 	}
 	
@@ -443,8 +443,14 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 }
     
 #define STANDARD_STEMLENGTH 7       // in half staff spaces ??BUT SHOULD BE 6 IF 2-VOICE NOTATION!
+
+/* Draw a stem and, if needed, flags. In mensural notation, stems on the longest duration
+ notes -- maximas and longas -- are always aligned horizontally with the right end of the
+ notehead; stems on other notes -- minims and shorter, since brevis and semibrevis don't
+ have stems -- are always aligned with the center of the notehead. */
     
-void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
+void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural,
+                    data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
     assert(dynamic_cast<DurationInterface*>(object));
     
@@ -461,22 +467,29 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
         baseStem = m_doc->GetGraceSize(baseStem);
         flagStemHeight = m_doc->GetGraceSize(flagStemHeight);
     }
-
+    
     nbFlags = drawingDur - DUR_8;
     totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
     
     if (dir == STEMDIRECTION_down) {
-        // flip all lengths
+        // flip all lengths. Exception: in mensural notation, the stem will never be at left,
+        //   so leave radius as is.
         baseStem = -baseStem;
         totalFlagStemHeight = -totalFlagStemHeight;
-        radius = -radius;
+        if (!isMensural) radius = -radius;
         heightY = -heightY;
     }
     
-    // If we have flags, add them to the height
+    // If we have flags, add them to the height. If duration is longa or maxima and (probably
+    // a redundant test) note is mensural, move stem to the right side of the notehead.
     int y1 = originY;
     int y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    int x2 = xn + radius;
+    int x2;
+    if (isMensural) {
+        if (drawingDur<DUR_BR) x2 = xn + radius;
+        else x2 = xn;
+    }
+    else x2 = xn + radius;
     
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
         y2 = verticalCenter;
@@ -486,13 +499,16 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     }
     
     // shorten the stem at its connection with the note head
-    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + m_doc->GetDrawingUnit(staffSize) / 4 : y1 - m_doc->GetDrawingUnit(staffSize) / 4;
+    int shortening;
+    if (isMensural) shortening = 0.6 * m_doc->GetDrawingUnit(staffSize);
+    else shortening = 0.25*m_doc->GetDrawingUnit(staffSize);
+    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
     int stemY2 = y2;
     if (drawingDur > DUR_4) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
         int shortener = (drawingCueSize) ?
-            m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize)) :
-            m_doc->GetDrawingUnit(staffSize);
+        m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize)) :
+        m_doc->GetDrawingUnit(staffSize);
         stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
     }
     
@@ -529,7 +545,8 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     }
 }
 
-//skips "skip" lines before drawing "n" ledger lines
+
+// skips "skip" lines before drawing "n" ledger lines
 void View::DrawLedgerLines ( DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n)
 {
     //various variables
@@ -1080,7 +1097,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
         int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
         int heightY = yMax - yMin;
         
-        DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+        DrawStem(dc, chord, staff, false, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
     }
     
     /************ Draw children (notes) ************/
