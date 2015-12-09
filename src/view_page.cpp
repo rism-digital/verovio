@@ -635,34 +635,34 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
 	int x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
 	int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
     
-	if (barLine->GetRend() == BARRENDITION_single)
+	if (barLine->GetForm() == BARRENDITION_single)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, barLineWidth);
     }
-    else if (barLine->GetRend() == BARRENDITION_rptboth)
+    else if (barLine->GetForm() == BARRENDITION_rptboth)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
         DrawVerticalLine( dc , y_top, y_bottom, x2, barLineWidth);
     }
-    else if (barLine->GetRend()  == BARRENDITION_rptstart)
+    else if (barLine->GetForm()  == BARRENDITION_rptstart)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
         DrawVerticalLine( dc , y_top, y_bottom, x2, barLineWidth);
     }
-    else if (barLine->GetRend() == BARRENDITION_rptend)
+    else if (barLine->GetForm() == BARRENDITION_rptend)
 	{
         DrawVerticalLine( dc , y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
 	}
-	else if (barLine->GetRend()  == BARRENDITION_dbl)
+	else if (barLine->GetForm()  == BARRENDITION_dbl)
 	{
         // Narrow the bars a little bit - should be centered?
         x1 += barLineWidth;
         DrawVerticalLine( dc , y_top, y_bottom, x, barLineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x1, barLineWidth);
 	}
-	else if (barLine->GetRend()  == BARRENDITION_end)
+	else if (barLine->GetForm()  == BARRENDITION_end)
     {
         DrawVerticalLine( dc , y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine( dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
@@ -687,13 +687,13 @@ void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y_top = y_bottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
  
-    if ((barLine->GetRend()  == BARRENDITION_rptstart) || (barLine->GetRend() == BARRENDITION_rptboth))
+    if ((barLine->GetForm()  == BARRENDITION_rptstart) || (barLine->GetForm() == BARRENDITION_rptboth))
     {
         DrawDot(dc, x2, y_bottom, staff->m_drawingStaffSize);
         DrawDot(dc, x2, y_top, staff->m_drawingStaffSize);
 
     }
-    if ((barLine->GetRend() == BARRENDITION_rptend) || (barLine->GetRend() == BARRENDITION_rptboth))
+    if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth))
 	{
         DrawDot(dc, x1, y_bottom, staff->m_drawingStaffSize);
         DrawDot(dc, x1, y_top, staff->m_drawingStaffSize);

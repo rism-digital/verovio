@@ -125,17 +125,11 @@ AttHarmVis::~AttHarmVis() {
 }
 
 void AttHarmVis::ResetHarmVis() {
-    m_extender = "";
     m_rendgrid = "";
 }
 
 bool AttHarmVis::ReadHarmVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("extender")) {
-        this->SetExtender(StrToStr(element.attribute("extender").value()));
-        element.remove_attribute("extender");
-        hasAttribute = true;
-    }
     if (element.attribute("rendgrid")) {
         this->SetRendgrid(StrToStr(element.attribute("rendgrid").value()));
         element.remove_attribute("rendgrid");
@@ -146,20 +140,11 @@ bool AttHarmVis::ReadHarmVis(  pugi::xml_node element ) {
 
 bool AttHarmVis::WriteHarmVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasExtender()) {
-        element.append_attribute("extender") = StrToStr(this->GetExtender()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasRendgrid()) {
         element.append_attribute("rendgrid") = StrToStr(this->GetRendgrid()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
-}
-
-bool AttHarmVis::HasExtender( )
-{
-    return (m_extender != "");
 }
 
 bool AttHarmVis::HasRendgrid( )
@@ -190,10 +175,6 @@ bool Att::SetHarmony( Object *element, std::string attrType, std::string attrVal
     if (element->HasAttClass( ATT_HARMVIS ) ) {
         AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
         assert( att );
-        if (attrType == "extender") {
-            att->SetExtender(att->StrToStr(attrValue));
-            return true;
-        }
         if (attrType == "rendgrid") {
             att->SetRendgrid(att->StrToStr(attrValue));
             return true;
@@ -221,9 +202,6 @@ void Att::GetHarmony( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_HARMVIS ) ) {
         AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
         assert( att );
-        if (att->HasExtender()) {
-            attributes->push_back(std::make_pair("extender", att->StrToStr(att->GetExtender())));
-        }
         if (att->HasRendgrid()) {
             attributes->push_back(std::make_pair("rendgrid", att->StrToStr(att->GetRendgrid())));
         }

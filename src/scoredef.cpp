@@ -350,11 +350,13 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 
 StaffGrp::StaffGrp() : Object(), ObjectListInterface(),
     AttCommon(),
+    AttCommonPart(),
     AttLabelsAddl(),
     AttStaffgroupingsym(),
     AttStaffGrpVis()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
@@ -369,6 +371,7 @@ void StaffGrp::Reset()
 {
     Object::Reset();
     ResetCommon();
+    ResetCommonPart();
     ResetLabelsAddl();
     ResetStaffgroupingsym();
     ResetStaffGrpVis();
@@ -411,11 +414,13 @@ void StaffGrp::FilterList( ListOfObjects *childList )
 StaffDef::StaffDef() :
     ScoreDefElement("staffdef-"),
     AttCommon(),
+    AttCommonPart(),
     AttLabelsAddl(),
     AttScalable(),
     AttStaffDefVis()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFVIS);
@@ -430,6 +435,7 @@ void StaffDef::Reset()
 {
     ScoreDefElement::Reset();
     ResetCommon();
+    ResetCommonPart();
     ResetLabelsAddl();
     ResetScalable();
     ResetStaffDefVis();

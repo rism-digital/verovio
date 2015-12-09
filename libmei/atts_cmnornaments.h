@@ -62,7 +62,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of the dot. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_form;
     /**
      * When the long attribute is set to 'yes', a double or long mordent, consisting of
@@ -203,7 +203,7 @@ private:
      * See Read, p. 246.
      **/
     std::string m_delayed;
-    /** Records the function of the dot. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_form;
 
 /* include <attform> */

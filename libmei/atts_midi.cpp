@@ -332,6 +332,92 @@ bool AttMidivalue::HasVal( )
 /* include <attval> */
 
 //----------------------------------------------------------------------------
+// AttMidivalue2
+//----------------------------------------------------------------------------
+
+AttMidivalue2::AttMidivalue2(): Att() {
+    ResetMidivalue2();
+}
+
+AttMidivalue2::~AttMidivalue2() {
+
+}
+
+void AttMidivalue2::ResetMidivalue2() {
+    m_val2 = "";
+}
+
+bool AttMidivalue2::ReadMidivalue2(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("val2")) {
+        this->SetVal2(StrToStr(element.attribute("val2").value()));
+        element.remove_attribute("val2");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMidivalue2::WriteMidivalue2(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasVal2()) {
+        element.append_attribute("val2") = StrToStr(this->GetVal2()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMidivalue2::HasVal2( )
+{
+    return (m_val2 != "");
+}
+
+
+/* include <attval2> */
+
+//----------------------------------------------------------------------------
+// AttMidivelocity
+//----------------------------------------------------------------------------
+
+AttMidivelocity::AttMidivelocity(): Att() {
+    ResetMidivelocity();
+}
+
+AttMidivelocity::~AttMidivelocity() {
+
+}
+
+void AttMidivelocity::ResetMidivelocity() {
+    m_vel = "";
+}
+
+bool AttMidivelocity::ReadMidivelocity(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("vel")) {
+        this->SetVel(StrToStr(element.attribute("vel").value()));
+        element.remove_attribute("vel");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMidivelocity::WriteMidivelocity(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasVel()) {
+        element.append_attribute("vel") = StrToStr(this->GetVel()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMidivelocity::HasVel( )
+{
+    return (m_vel != "");
+}
+
+
+/* include <attvel> */
+
+//----------------------------------------------------------------------------
 // AttTimebase
 //----------------------------------------------------------------------------
 
@@ -439,6 +525,22 @@ bool Att::SetMidi( Object *element, std::string attrType, std::string attrValue 
             return true;
         }
     }
+    if (element->HasAttClass( ATT_MIDIVALUE2 ) ) {
+        AttMidivalue2 *att = dynamic_cast<AttMidivalue2*>(element);
+        assert( att );
+        if (attrType == "val2") {
+            att->SetVal2(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_MIDIVELOCITY ) ) {
+        AttMidivelocity *att = dynamic_cast<AttMidivelocity*>(element);
+        assert( att );
+        if (attrType == "vel") {
+            att->SetVel(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_TIMEBASE ) ) {
         AttTimebase *att = dynamic_cast<AttTimebase*>(element);
         assert( att );
@@ -503,6 +605,20 @@ void Att::GetMidi( Object *element, ArrayOfStrAttr *attributes ) {
         assert( att );
         if (att->HasVal()) {
             attributes->push_back(std::make_pair("val", att->StrToStr(att->GetVal())));
+        }
+    }
+    if (element->HasAttClass( ATT_MIDIVALUE2 ) ) {
+        AttMidivalue2 *att = dynamic_cast<AttMidivalue2*>(element);
+        assert( att );
+        if (att->HasVal2()) {
+            attributes->push_back(std::make_pair("val2", att->StrToStr(att->GetVal2())));
+        }
+    }
+    if (element->HasAttClass( ATT_MIDIVELOCITY ) ) {
+        AttMidivelocity *att = dynamic_cast<AttMidivelocity*>(element);
+        assert( att );
+        if (att->HasVel()) {
+            attributes->push_back(std::make_pair("vel", att->StrToStr(att->GetVel())));
         }
     }
     if (element->HasAttClass( ATT_TIMEBASE ) ) {

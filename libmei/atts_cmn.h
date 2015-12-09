@@ -126,15 +126,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
-    /** Records the function of the dot. **/
-    std::string m_form;
+    /** Records the appearance and usually the function of the bar line. **/
+    data_BEATRPT_REND m_form;
 
 /* include <attform> */
 };
@@ -295,9 +295,9 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRend(data_BEATRPT_REND rend_) { m_rend = rend_; };
-    data_BEATRPT_REND GetRend() const { return m_rend; };    
-    bool HasRend( );
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
+    bool HasForm( );
     
     //
     void SetSlope(double slopeDbl_) { m_slopeDbl = slopeDbl_; };
@@ -308,7 +308,7 @@ public:
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_rend;
+    data_BEATRPT_REND m_form;
     /** Records the slope of the beam. **/
     double m_slopeDbl;
 
@@ -359,6 +359,44 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttBeatRptLog
+//----------------------------------------------------------------------------
+
+class AttBeatRptLog: public Att
+{
+public:
+    AttBeatRptLog();
+    virtual ~AttBeatRptLog();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetBeatRptLog();
+    
+    /** Read the values for the attribute class **/
+    bool ReadBeatRptLog( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteBeatRptLog( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetBeatDef(std::string beatDef_) { m_beatDef = beatDef_; };
+    std::string GetBeatDef() const { return m_beatDef; };    
+    bool HasBeatDef( );
+    
+    ///@}
+
+private:
+    /** --- **/
+    std::string m_beatDef;
+
+/* include <attbeatDef> */
+};
+
+//----------------------------------------------------------------------------
 // AttBeatRptVis
 //----------------------------------------------------------------------------
 
@@ -383,17 +421,17 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRend(data_BEATRPT_REND rend_) { m_rend = rend_; };
-    data_BEATRPT_REND GetRend() const { return m_rend; };    
-    bool HasRend( );
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
+    bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_rend;
+    data_BEATRPT_REND m_form;
 
-/* include <attrend> */
+/* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -544,15 +582,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
-    /** Records the function of the dot. **/
-    std::string m_form;
+    /** Records the appearance and usually the function of the bar line. **/
+    data_BEATRPT_REND m_form;
 
 /* include <attform> */
 };
@@ -582,8 +620,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
@@ -594,50 +632,12 @@ public:
     ///@}
 
 private:
-    /** Records the function of the dot. **/
-    std::string m_form;
+    /** Records the appearance and usually the function of the bar line. **/
+    data_BEATRPT_REND m_form;
     /** Describes a clef's shape. **/
     std::string m_shape;
 
 /* include <attshape> */
-};
-
-//----------------------------------------------------------------------------
-// AttGlissVis
-//----------------------------------------------------------------------------
-
-class AttGlissVis: public Att
-{
-public:
-    AttGlissVis();
-    virtual ~AttGlissVis();
-    
-    /** Reset the default values for the attribute class **/
-    void ResetGlissVis();
-    
-    /** Read the values for the attribute class **/
-    bool ReadGlissVis( pugi::xml_node element );
-    
-    /** Write the values for the attribute class **/
-    bool WriteGlissVis( pugi::xml_node element );
-    
-    /**
-     * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
-     * to the default value)
-     **/
-    ///@{
-    void SetText(std::string text_) { m_text = text_; };
-    std::string GetText() const { return m_text; };    
-    bool HasText( );
-    
-    ///@}
-
-private:
-    /** Records a text string, such as 'gliss', that accompanies the glissando mark. **/
-    std::string m_text;
-
-/* include <atttext> */
 };
 
 //----------------------------------------------------------------------------
@@ -713,17 +713,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
     bool HasForm( );
+    
+    //
+    void SetNiente(std::string niente_) { m_niente = niente_; };
+    std::string GetNiente() const { return m_niente; };    
+    bool HasNiente( );
     
     ///@}
 
 private:
-    /** Records the function of the dot. **/
-    std::string m_form;
+    /** Records the appearance and usually the function of the bar line. **/
+    data_BEATRPT_REND m_form;
+    /**
+     * Indicates that the hairpin starts from or ends in silence.
+     * Often rendered as a small circle attached to the closed end of the hairpin. See
+     * Gould, p. 108.
+     **/
+    std::string m_niente;
 
-/* include <attform> */
+/* include <attniente> */
 };
 
 //----------------------------------------------------------------------------
@@ -1161,17 +1172,17 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStyle(std::string style_) { m_style = style_; };
-    std::string GetStyle() const { return m_style; };    
-    bool HasStyle( );
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
+    data_BEATRPT_REND GetForm() const { return m_form; };    
+    bool HasForm( );
     
     ///@}
 
 private:
-    /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
-    std::string m_style;
+    /** Records the appearance and usually the function of the bar line. **/
+    data_BEATRPT_REND m_form;
 
-/* include <attstyle> */
+/* include <attform> */
 };
 
 //----------------------------------------------------------------------------
@@ -1327,23 +1338,23 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttStemmedCmn
+// AttStemsCmn
 //----------------------------------------------------------------------------
 
-class AttStemmedCmn: public Att
+class AttStemsCmn: public Att
 {
 public:
-    AttStemmedCmn();
-    virtual ~AttStemmedCmn();
+    AttStemsCmn();
+    virtual ~AttStemsCmn();
     
     /** Reset the default values for the attribute class **/
-    void ResetStemmedCmn();
+    void ResetStemsCmn();
     
     /** Read the values for the attribute class **/
-    bool ReadStemmedCmn( pugi::xml_node element );
+    bool ReadStemsCmn( pugi::xml_node element );
     
     /** Write the values for the attribute class **/
-    bool WriteStemmedCmn( pugi::xml_node element );
+    bool WriteStemsCmn( pugi::xml_node element );
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -1351,11 +1362,6 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStemMod(data_STEMMODIFIER stemMod_) { m_stemMod = stemMod_; };
-    data_STEMMODIFIER GetStemMod() const { return m_stemMod; };    
-    bool HasStemMod( );
-    
-    //
     void SetStemWith(std::string stemWith_) { m_stemWith = stemWith_; };
     std::string GetStemWith() const { return m_stemWith; };    
     bool HasStemWith( );
@@ -1363,11 +1369,6 @@ public:
     ///@}
 
 private:
-    /**
-     * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
-     * tremolo or Sprechstimme indicators.
-     **/
-    data_STEMMODIFIER m_stemMod;
     /**
      * Contains an indication of which staff a note or chord that logically belongs to
      * the current staff should be visually placed on; that is, the one above or the

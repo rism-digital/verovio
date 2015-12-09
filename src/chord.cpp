@@ -25,13 +25,13 @@ namespace vrv {
 Chord::Chord( ):
     LayerElement("chord-"), StemmedDrawingInterface(), ObjectListInterface(), DurationInterface(),
     AttCommon(),
-    AttStemmed(),
-    AttStemmedCmn(),
+    AttStems(),
+    AttStemsCmn(),
     AttTiepresent()
 {
     RegisterAttClass(ATT_COMMON);
-    RegisterAttClass(ATT_STEMMED);
-    RegisterAttClass(ATT_STEMMEDCMN);
+    RegisterAttClass(ATT_STEMS);
+    RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     
     RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
@@ -54,8 +54,8 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetCommon();
-    ResetStemmed();
-    ResetStemmedCmn();
+    ResetStems();
+    ResetStemsCmn();
     ResetTiepresent();
 }
     

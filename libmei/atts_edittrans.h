@@ -67,23 +67,23 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttEdit
+// AttEvidence
 //----------------------------------------------------------------------------
 
-class AttEdit: public Att
+class AttEvidence: public Att
 {
 public:
-    AttEdit();
-    virtual ~AttEdit();
+    AttEvidence();
+    virtual ~AttEvidence();
     
     /** Reset the default values for the attribute class **/
-    void ResetEdit();
+    void ResetEvidence();
     
     /** Read the values for the attribute class **/
-    bool ReadEdit( pugi::xml_node element );
+    bool ReadEvidence( pugi::xml_node element );
     
     /** Write the values for the attribute class **/
-    bool WriteEdit( pugi::xml_node element );
+    bool WriteEvidence( pugi::xml_node element );
     
     /**
      * @name Setters, getters and presence checker for class members.

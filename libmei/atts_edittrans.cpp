@@ -70,23 +70,23 @@ bool AttAgentident::HasAgent( )
 /* include <attagent> */
 
 //----------------------------------------------------------------------------
-// AttEdit
+// AttEvidence
 //----------------------------------------------------------------------------
 
-AttEdit::AttEdit(): Att() {
-    ResetEdit();
+AttEvidence::AttEvidence(): Att() {
+    ResetEvidence();
 }
 
-AttEdit::~AttEdit() {
+AttEvidence::~AttEvidence() {
 
 }
 
-void AttEdit::ResetEdit() {
+void AttEvidence::ResetEvidence() {
     m_cert = "";
     m_evidence = "";
 }
 
-bool AttEdit::ReadEdit(  pugi::xml_node element ) {
+bool AttEvidence::ReadEvidence(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("cert")) {
         this->SetCert(StrToStr(element.attribute("cert").value()));
@@ -101,7 +101,7 @@ bool AttEdit::ReadEdit(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttEdit::WriteEdit(  pugi::xml_node element ) {
+bool AttEvidence::WriteEvidence(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasCert()) {
         element.append_attribute("cert") = StrToStr(this->GetCert()).c_str();
@@ -114,12 +114,12 @@ bool AttEdit::WriteEdit(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttEdit::HasCert( )
+bool AttEvidence::HasCert( )
 {
     return (m_cert != "");
 }
 
-bool AttEdit::HasEvidence( )
+bool AttEvidence::HasEvidence( )
 {
     return (m_evidence != "");
 }
@@ -222,8 +222,8 @@ bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrV
             return true;
         }
     }
-    if (element->HasAttClass( ATT_EDIT ) ) {
-        AttEdit *att = dynamic_cast<AttEdit*>(element);
+    if (element->HasAttClass( ATT_EVIDENCE ) ) {
+        AttEvidence *att = dynamic_cast<AttEvidence*>(element);
         assert( att );
         if (attrType == "cert") {
             att->SetCert(att->StrToStr(attrValue));
@@ -262,8 +262,8 @@ void Att::GetEdittrans( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("agent", att->StrToStr(att->GetAgent())));
         }
     }
-    if (element->HasAttClass( ATT_EDIT ) ) {
-        AttEdit *att = dynamic_cast<AttEdit*>(element);
+    if (element->HasAttClass( ATT_EVIDENCE ) ) {
+        AttEvidence *att = dynamic_cast<AttEvidence*>(element);
         assert( att );
         if (att->HasCert()) {
             attributes->push_back(std::make_pair("cert", att->StrToStr(att->GetCert())));

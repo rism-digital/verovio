@@ -206,6 +206,7 @@ private:
  */
 class StaffGrp: public Object, public ObjectListInterface,
     public AttCommon,
+    public AttCommonPart,
     public AttLabelsAddl,
     public AttStaffgroupingsym,
     public AttStaffGrpVis
@@ -261,6 +262,7 @@ private:
  */
 class StaffDef: public ScoreDefElement, public StaffDefDrawingInterface,
     public AttCommon,
+    public AttCommonPart,
     public AttLabelsAddl,
     public AttScalable,
     public AttStaffDefVis

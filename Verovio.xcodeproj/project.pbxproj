@@ -86,6 +86,9 @@
 		4DF28A051A754DF000BA9F7D /* floatingelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF28A041A754DF000BA9F7D /* floatingelement.cpp */; };
 		4DF28A061A754DF000BA9F7D /* floatingelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF28A041A754DF000BA9F7D /* floatingelement.cpp */; };
 		4DF2AF7E1A62F6A50016F869 /* drawinginterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF2AF7D1A62F6A50016F869 /* drawinginterface.h */; };
+		4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
+		4DF9D2841C18DC490069E8C8 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
+		4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2821C18DC490069E8C8 /* atts_mei.h */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -293,8 +296,6 @@
 		4DEE28FC1940BCC100C76319 /* atts_harmony.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_harmony.h; path = libmei/atts_harmony.h; sourceTree = "<group>"; };
 		4DEE28FD1940BCC100C76319 /* atts_header.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_header.cpp; path = libmei/atts_header.cpp; sourceTree = "<group>"; };
 		4DEE28FE1940BCC100C76319 /* atts_header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_header.h; path = libmei/atts_header.h; sourceTree = "<group>"; };
-		4DEE28FF1940BCC100C76319 /* atts_linkalign.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_linkalign.cpp; path = libmei/atts_linkalign.cpp; sourceTree = "<group>"; };
-		4DEE29001940BCC100C76319 /* atts_linkalign.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_linkalign.h; path = libmei/atts_linkalign.h; sourceTree = "<group>"; };
 		4DEE29011940BCC100C76319 /* atts_lyrics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_lyrics.cpp; path = libmei/atts_lyrics.cpp; sourceTree = "<group>"; };
 		4DEE29021940BCC100C76319 /* atts_lyrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_lyrics.h; path = libmei/atts_lyrics.h; sourceTree = "<group>"; };
 		4DEE29031940BCC100C76319 /* atts_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_mensural.cpp; path = libmei/atts_mensural.cpp; sourceTree = "<group>"; };
@@ -312,6 +313,12 @@
 		4DF28A021A754DE400BA9F7D /* floatingelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = floatingelement.h; path = include/vrv/floatingelement.h; sourceTree = "<group>"; };
 		4DF28A041A754DF000BA9F7D /* floatingelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = floatingelement.cpp; path = src/floatingelement.cpp; sourceTree = "<group>"; };
 		4DF2AF7D1A62F6A50016F869 /* drawinginterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = drawinginterface.h; path = include/vrv/drawinginterface.h; sourceTree = "<group>"; };
+		4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_mei.cpp; path = libmei/atts_mei.cpp; sourceTree = "<group>"; };
+		4DF9D2821C18DC490069E8C8 /* atts_mei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_mei.h; path = libmei/atts_mei.h; sourceTree = "<group>"; };
+		4DF9D2861C18DE270069E8C8 /* atts_performance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = atts_performance.cpp; path = libmei/atts_performance.cpp; sourceTree = "<group>"; };
+		4DF9D2871C18DE270069E8C8 /* atts_performance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_performance.h; path = libmei/atts_performance.h; sourceTree = "<group>"; };
+		4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = atts_usersymbols.cpp; path = libmei/atts_usersymbols.cpp; sourceTree = "<group>"; };
+		4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_usersymbols.h; path = libmei/atts_usersymbols.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -485,22 +492,26 @@
 				4DEE28FC1940BCC100C76319 /* atts_harmony.h */,
 				4DEE28FD1940BCC100C76319 /* atts_header.cpp */,
 				4DEE28FE1940BCC100C76319 /* atts_header.h */,
-				4DEE28FF1940BCC100C76319 /* atts_linkalign.cpp */,
-				4DEE29001940BCC100C76319 /* atts_linkalign.h */,
 				4DEE29011940BCC100C76319 /* atts_lyrics.cpp */,
 				4DEE29021940BCC100C76319 /* atts_lyrics.h */,
+				4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */,
+				4DF9D2821C18DC490069E8C8 /* atts_mei.h */,
 				4DEE29031940BCC100C76319 /* atts_mensural.cpp */,
 				4DEE29041940BCC100C76319 /* atts_mensural.h */,
 				4DEE29051940BCC100C76319 /* atts_midi.cpp */,
 				4DEE29061940BCC100C76319 /* atts_midi.h */,
 				4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */,
 				4D3FF8DA19BADD7A00B105B5 /* atts_pagebased.h */,
+				4DF9D2861C18DE270069E8C8 /* atts_performance.cpp */,
+				4DF9D2871C18DE270069E8C8 /* atts_performance.h */,
 				4DEE29071940BCC100C76319 /* atts_neumes.cpp */,
 				4DEE29081940BCC100C76319 /* atts_neumes.h */,
 				4DEE29091940BCC100C76319 /* atts_shared.cpp */,
 				4DEE290A1940BCC100C76319 /* atts_shared.h */,
 				4DEE290B1940BCC100C76319 /* atts_tablature.cpp */,
 				4DEE290C1940BCC100C76319 /* atts_tablature.h */,
+				4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */,
+				4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */,
 			);
 			name = libmei;
 			sourceTree = "<group>";
@@ -733,6 +744,7 @@
 				4D9C53131B52E4AE0003C6EC /* unchecked.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* floatingelement.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
+				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
@@ -917,6 +929,7 @@
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingelement.cpp in Sources */,
+				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
 				4DC34BA819BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
@@ -947,6 +960,7 @@
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
 				8F3DD34418854B2E0051330C /* keysig.cpp in Sources */,
 				4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */,
+				4DF9D2841C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,

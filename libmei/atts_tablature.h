@@ -102,7 +102,7 @@ public:
     ///@}
 
 private:
-    /** Provides a *written* pitch and octave for each open string. **/
+    /** Provides a *written* pitch and octave for each open string or course of strings. **/
     std::string m_tabStrings;
 
 /* include <atttab.strings> */

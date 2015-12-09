@@ -267,6 +267,82 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttMidivalue2
+//----------------------------------------------------------------------------
+
+class AttMidivalue2: public Att
+{
+public:
+    AttMidivalue2();
+    virtual ~AttMidivalue2();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetMidivalue2();
+    
+    /** Read the values for the attribute class **/
+    bool ReadMidivalue2( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMidivalue2( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetVal2(std::string val2_) { m_val2 = val2_; };
+    std::string GetVal2() const { return m_val2; };    
+    bool HasVal2( );
+    
+    ///@}
+
+private:
+    /** MIDI number. **/
+    std::string m_val2;
+
+/* include <attval2> */
+};
+
+//----------------------------------------------------------------------------
+// AttMidivelocity
+//----------------------------------------------------------------------------
+
+class AttMidivelocity: public Att
+{
+public:
+    AttMidivelocity();
+    virtual ~AttMidivelocity();
+    
+    /** Reset the default values for the attribute class **/
+    void ResetMidivelocity();
+    
+    /** Read the values for the attribute class **/
+    bool ReadMidivelocity( pugi::xml_node element );
+    
+    /** Write the values for the attribute class **/
+    bool WriteMidivelocity( pugi::xml_node element );
+    
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal 
+     * to the default value)
+     **/
+    ///@{
+    void SetVel(std::string vel_) { m_vel = vel_; };
+    std::string GetVel() const { return m_vel; };    
+    bool HasVel( );
+    
+    ///@}
+
+private:
+    /** MIDI Note-on/off velocity. **/
+    std::string m_vel;
+
+/* include <attvel> */
+};
+
+//----------------------------------------------------------------------------
 // AttTimebase
 //----------------------------------------------------------------------------
 

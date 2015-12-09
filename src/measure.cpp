@@ -59,8 +59,8 @@ void Measure::Reset()
     m_drawingX = 0;
     
     // by default, we have a single barLine on the right (none on the left)
-    m_rightBarline.SetRend( this->GetRight() );
-    m_leftBarline.SetRend( this->GetLeft() );
+    m_rightBarline.SetForm( this->GetRight() );
+    m_leftBarline.SetForm( this->GetLeft() );
     
     if ( !m_measuredMusic ) {
         m_xAbs = 0;
@@ -157,11 +157,11 @@ int Measure::AlignHorizontally( ArrayPtrVoid *params )
     // point to it
     (*measureAligner) = &m_measureAligner;
     
-    if ( m_leftBarline.GetRend() != BARRENDITION_NONE ) {
+    if ( m_leftBarline.GetForm() != BARRENDITION_NONE ) {
         m_leftBarline.SetAlignment( m_measureAligner.GetLeftAlignment() );
     }
     
-    if ( m_rightBarline.GetRend() != BARRENDITION_NONE ) {
+    if ( m_rightBarline.GetForm() != BARRENDITION_NONE ) {
         m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
     

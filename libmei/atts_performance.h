@@ -12,8 +12,8 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ATTS_LINKALIGN_H__
-#define __VRV_ATTS_LINKALIGN_H__
+#ifndef __VRV_ATTS_PERFORMANCE_H__
+#define __VRV_ATTS_PERFORMANCE_H__
 
 #include "att.h"
 #include "att_classes.h"
@@ -59,7 +59,7 @@ public:
 private:
     /**
      * Indicates the point of occurrence of this feature along a time line.
-     * Its value must be the ID of a <when> element.
+     * Its value must be the ID of a
      **/
     std::string m_when;
 
@@ -68,5 +68,5 @@ private:
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_LINKALIGN_H__
+#endif  // __VRV_ATTS_PERFORMANCE_H__
 

@@ -95,11 +95,13 @@ add_executable (verovio
 	../libmei/atts_critapp.cpp
 	#../libmei/atts_facsimile.cpp
 	#../libmei/atts_harmony.cpp
-	#../libmei/atts_linkalign.cpp
+	../libmei/atts_mei.cpp
 	../libmei/atts_mensural.cpp
 	../libmei/atts_pagebased.cpp
+	#../libmei/atts_performance.cpp
 	#../libmei/atts_neumes.cpp
 	#../libmei/atts_tablature.cpp
+	#../libmei/atts_usersymbols.cpp
 	)
 
 install (TARGETS verovio DESTINATION /usr/local/bin)

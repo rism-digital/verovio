@@ -46,8 +46,8 @@ class Note: public LayerElement, public StemmedDrawingInterface, public Duration
     public AttColoration,
     public AttGraced,
     public AttNoteLogMensural,
-    public AttStemmed,
-    public AttStemmedCmn,
+    public AttStems,
+    public AttStemsCmn,
     public AttTiepresent
 {
 public:

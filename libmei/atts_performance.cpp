@@ -12,7 +12,7 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "atts_linkalign.h"
+#include "atts_performance.h"
 
 //----------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ bool AttAlignment::HasWhen( )
 
 /* include <attwhen> */
 
-bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrValue ) {
+bool Att::SetPerformance( Object *element, std::string attrType, std::string attrValue ) {
     if (element->HasAttClass( ATT_ALIGNMENT ) ) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
         assert( att );
@@ -82,7 +82,7 @@ bool Att::SetLinkalign( Object *element, std::string attrType, std::string attrV
     return false;
 }
 
-void Att::GetLinkalign( Object *element, ArrayOfStrAttr *attributes ) {
+void Att::GetPerformance( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_ALIGNMENT ) ) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
         assert( att );

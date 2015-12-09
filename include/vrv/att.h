@@ -53,14 +53,16 @@ public:
     //static bool SetFigtable( Object *element, std::string attrType, std::string attrValue );
     //static bool SetHarmony( Object *element, std::string attrType, std::string attrValue );
     //static bool SetHeader( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetLinkalign( Object *element, std::string attrType, std::string attrValue );
     //static bool SetLyrics( Object *element, std::string attrType, std::string attrValue );
+    static bool SetMei( Object *element, std::string attrType, std::string attrValue );
     static bool SetMensural( Object *element, std::string attrType, std::string attrValue );
     //static bool SetMidi( Object *element, std::string attrType, std::string attrValue );
     static bool SetPagebased( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetPerformance( Object *element, std::string attrType, std::string attrValue );
     //static bool SetNeumes( Object *element, std::string attrType, std::string attrValue );
     static bool SetShared( Object *element, std::string attrType, std::string attrValue );
     //static bool SetTablature( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetUsersymbols( Object *element, std::string attrType, std::string attrValue );
 
     /**
      * Idem for getting attributes as strings
@@ -74,14 +76,16 @@ public:
     //static void GetFigtable( Object *element, ArrayOfStrAttr *attributes );
     //static void GetHarmony( Object *element, ArrayOfStrAttr *attributes );
     //static void GetHeader( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetLinkalign( Object *element, ArrayOfStrAttr *attributes );
     //static void GetLyrics( Object *element, ArrayOfStrAttr *attributes );
+    static void GetMei( Object *element, ArrayOfStrAttr *attributes );
     static void GetMensural( Object *element, ArrayOfStrAttr *attributes );
     //static void GetMidi( Object *element, ArrayOfStrAttr *attributes );
     static void GetPagebased( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetPerformance( Object *element, ArrayOfStrAttr *attributes );
     //static void GetNeumes( Object *element, ArrayOfStrAttr *attributes );
     static void GetShared( Object *element, ArrayOfStrAttr *attributes );
     //static void GetTablature( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetUsersymbols( Object *element, ArrayOfStrAttr *attributes );
     ///@}
     
 public:

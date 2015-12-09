@@ -57,7 +57,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of the dot. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_form;
 
 /* include <attform> */
@@ -100,7 +100,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of the dot. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_form;
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_orient;

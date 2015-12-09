@@ -248,7 +248,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     Barline *barLine = dynamic_cast<Barline*>(element);
     assert( barLine );
     
-    if (barLine->GetRend() == BARRENDITION_invis) {
+    if (barLine->GetForm() == BARRENDITION_invis) {
         barLine->SetEmptyBB();
         return;
     }
@@ -279,12 +279,12 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     int y = element->GetDrawingY();
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     
-    if (beatRpt->GetRend() == BEATRPT_REND_mixed) {
+    if (beatRpt->GetForm() == BEATRPT_REND_mixed) {
         DrawSmuflCode( dc, xSymbol, y, SMUFL_E501_repeat2Bars, staff->m_drawingStaffSize, false );
     }
     else {
         DrawSmuflCode( dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false );
-        int additionalSlash = beatRpt->GetRend() - BEATRPT_REND_8;
+        int additionalSlash = beatRpt->GetForm() - BEATRPT_REND_8;
         int halfWidth = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
         int i;
         for (i = 0; i < additionalSlash; i++) {

@@ -126,11 +126,6 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetExtender(std::string extender_) { m_extender = extender_; };
-    std::string GetExtender() const { return m_extender; };    
-    bool HasExtender( );
-    
-    //
     void SetRendgrid(std::string rendgrid_) { m_rendgrid = rendgrid_; };
     std::string GetRendgrid() const { return m_rendgrid; };    
     bool HasRendgrid( );
@@ -138,12 +133,6 @@ public:
     ///@}
 
 private:
-    /**
-     * Indicates the presence of an extension symbol, typically a dash or underscore,
-     * drawn from the end of the harmonic indication to the point indicated by the dur
-     * attribute.
-     **/
-    std::string m_extender;
     /** Describes how the harmonic indication should be rendered. **/
     std::string m_rendgrid;
 

@@ -74,10 +74,10 @@ public:
      * void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetRend(type); SetLeft(type); };
      */
     ///@{
-    data_BARRENDITION GetLeftBarlineType() const { return m_leftBarline.GetRend(); };
-    void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetRend(type); };
-    data_BARRENDITION GetRightBarlineType() const { return m_rightBarline.GetRend(); };
-    void SetRightBarlineType( data_BARRENDITION type ) { m_rightBarline.SetRend(type); };
+    data_BARRENDITION GetLeftBarlineType() const { return m_leftBarline.GetForm(); };
+    void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetForm(type); };
+    data_BARRENDITION GetRightBarlineType() const { return m_rightBarline.GetForm(); };
+    void SetRightBarlineType( data_BARRENDITION type ) { m_rightBarline.SetForm(type); };
     ///@}
     
     /**

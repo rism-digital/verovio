@@ -156,49 +156,6 @@ bool AttAccidentalPerformed::HasAccidGes( )
 /* include <attaccid.ges> */
 
 //----------------------------------------------------------------------------
-// AttAltsym
-//----------------------------------------------------------------------------
-
-AttAltsym::AttAltsym(): Att() {
-    ResetAltsym();
-}
-
-AttAltsym::~AttAltsym() {
-
-}
-
-void AttAltsym::ResetAltsym() {
-    m_altsym = "";
-}
-
-bool AttAltsym::ReadAltsym(  pugi::xml_node element ) {
-    bool hasAttribute = false;
-    if (element.attribute("altsym")) {
-        this->SetAltsym(StrToStr(element.attribute("altsym").value()));
-        element.remove_attribute("altsym");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttAltsym::WriteAltsym(  pugi::xml_node element ) {
-    bool wroteAttribute = false;
-    if (this->HasAltsym()) {
-        element.append_attribute("altsym") = StrToStr(this->GetAltsym()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttAltsym::HasAltsym( )
-{
-    return (m_altsym != "");
-}
-
-
-/* include <attaltsym> */
-
-//----------------------------------------------------------------------------
 // AttArticulation
 //----------------------------------------------------------------------------
 
@@ -398,14 +355,14 @@ AttBarLineLog::~AttBarLineLog() {
 }
 
 void AttBarLineLog::ResetBarLineLog() {
-    m_rend = BARRENDITION_single;
+    m_form = BARRENDITION_single;
 }
 
 bool AttBarLineLog::ReadBarLineLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("rend")) {
-        this->SetRend(StrToBarRendition(element.attribute("rend").value()));
-        element.remove_attribute("rend");
+    if (element.attribute("form")) {
+        this->SetForm(StrToBarRendition(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -413,20 +370,20 @@ bool AttBarLineLog::ReadBarLineLog(  pugi::xml_node element ) {
 
 bool AttBarLineLog::WriteBarLineLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasRend()) {
-        element.append_attribute("rend") = BarRenditionToStr(this->GetRend()).c_str();
+    if (this->HasForm()) {
+        element.append_attribute("form") = BarRenditionToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttBarLineLog::HasRend( )
+bool AttBarLineLog::HasForm( )
 {
-    return (m_rend != BARRENDITION_single);
+    return (m_form != BARRENDITION_single);
 }
 
 
-/* include <attrend> */
+/* include <attform> */
 
 //----------------------------------------------------------------------------
 // AttBarplacement
@@ -658,14 +615,14 @@ AttCanonical::~AttCanonical() {
 }
 
 void AttCanonical::ResetCanonical() {
-    m_dbkey = "";
+    m_codedval = "";
 }
 
 bool AttCanonical::ReadCanonical(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("dbkey")) {
-        this->SetDbkey(StrToStr(element.attribute("dbkey").value()));
-        element.remove_attribute("dbkey");
+    if (element.attribute("codedval")) {
+        this->SetCodedval(StrToStr(element.attribute("codedval").value()));
+        element.remove_attribute("codedval");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -673,20 +630,20 @@ bool AttCanonical::ReadCanonical(  pugi::xml_node element ) {
 
 bool AttCanonical::WriteCanonical(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasDbkey()) {
-        element.append_attribute("dbkey") = StrToStr(this->GetDbkey()).c_str();
+    if (this->HasCodedval()) {
+        element.append_attribute("codedval") = StrToStr(this->GetCodedval()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttCanonical::HasDbkey( )
+bool AttCanonical::HasCodedval( )
 {
-    return (m_dbkey != "");
+    return (m_codedval != "");
 }
 
 
-/* include <attdbkey> */
+/* include <attcodedval> */
 
 //----------------------------------------------------------------------------
 // AttChordVis
@@ -730,6 +687,49 @@ bool AttChordVis::HasCluster( )
 
 
 /* include <attcluster> */
+
+//----------------------------------------------------------------------------
+// AttClasscodeident
+//----------------------------------------------------------------------------
+
+AttClasscodeident::AttClasscodeident(): Att() {
+    ResetClasscodeident();
+}
+
+AttClasscodeident::~AttClasscodeident() {
+
+}
+
+void AttClasscodeident::ResetClasscodeident() {
+    m_classcode = "";
+}
+
+bool AttClasscodeident::ReadClasscodeident(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("classcode")) {
+        this->SetClasscode(StrToStr(element.attribute("classcode").value()));
+        element.remove_attribute("classcode");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttClasscodeident::WriteClasscodeident(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasClasscode()) {
+        element.append_attribute("classcode") = StrToStr(this->GetClasscode()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttClasscodeident::HasClasscode( )
+{
+    return (m_classcode != "");
+}
+
+
+/* include <attclasscode> */
 
 //----------------------------------------------------------------------------
 // AttClefLog
@@ -964,49 +964,6 @@ bool AttClefshape::HasShape( )
 /* include <attshape> */
 
 //----------------------------------------------------------------------------
-// AttCoded
-//----------------------------------------------------------------------------
-
-AttCoded::AttCoded(): Att() {
-    ResetCoded();
-}
-
-AttCoded::~AttCoded() {
-
-}
-
-void AttCoded::ResetCoded() {
-    m_code = "";
-}
-
-bool AttCoded::ReadCoded(  pugi::xml_node element ) {
-    bool hasAttribute = false;
-    if (element.attribute("code")) {
-        this->SetCode(StrToStr(element.attribute("code").value()));
-        element.remove_attribute("code");
-        hasAttribute = true;
-    }
-    return hasAttribute;
-}
-
-bool AttCoded::WriteCoded(  pugi::xml_node element ) {
-    bool wroteAttribute = false;
-    if (this->HasCode()) {
-        element.append_attribute("code") = StrToStr(this->GetCode()).c_str();
-        wroteAttribute = true;
-    }
-    return wroteAttribute;
-}
-
-bool AttCoded::HasCode( )
-{
-    return (m_code != "");
-}
-
-
-/* include <attcode> */
-
-//----------------------------------------------------------------------------
 // AttColor
 //----------------------------------------------------------------------------
 
@@ -1105,21 +1062,58 @@ AttCommon::~AttCommon() {
 }
 
 void AttCommon::ResetCommon() {
-    m_label = "";
     m_n = 0;
-    m_base = "";
 }
 
 bool AttCommon::ReadCommon(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("label")) {
-        this->SetLabel(StrToStr(element.attribute("label").value()));
-        element.remove_attribute("label");
-        hasAttribute = true;
-    }
     if (element.attribute("n")) {
         this->SetN(StrToInt(element.attribute("n").value()));
         element.remove_attribute("n");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttCommon::WriteCommon(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasN()) {
+        element.append_attribute("n") = IntToStr(this->GetN()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttCommon::HasN( )
+{
+    return (m_n != 0);
+}
+
+
+/* include <attn> */
+
+//----------------------------------------------------------------------------
+// AttCommonPart
+//----------------------------------------------------------------------------
+
+AttCommonPart::AttCommonPart(): Att() {
+    ResetCommonPart();
+}
+
+AttCommonPart::~AttCommonPart() {
+
+}
+
+void AttCommonPart::ResetCommonPart() {
+    m_label = "";
+    m_base = "";
+}
+
+bool AttCommonPart::ReadCommonPart(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("label")) {
+        this->SetLabel(StrToStr(element.attribute("label").value()));
+        element.remove_attribute("label");
         hasAttribute = true;
     }
     if (element.attribute("base")) {
@@ -1130,14 +1124,10 @@ bool AttCommon::ReadCommon(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttCommon::WriteCommon(  pugi::xml_node element ) {
+bool AttCommonPart::WriteCommonPart(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasLabel()) {
         element.append_attribute("label") = StrToStr(this->GetLabel()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasN()) {
-        element.append_attribute("n") = IntToStr(this->GetN()).c_str();
         wroteAttribute = true;
     }
     if (this->HasBase()) {
@@ -1147,17 +1137,12 @@ bool AttCommon::WriteCommon(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttCommon::HasLabel( )
+bool AttCommonPart::HasLabel( )
 {
     return (m_label != "");
 }
 
-bool AttCommon::HasN( )
-{
-    return (m_n != 0);
-}
-
-bool AttCommon::HasBase( )
+bool AttCommonPart::HasBase( )
 {
     return (m_base != "");
 }
@@ -1339,14 +1324,20 @@ AttCurverend::~AttCurverend() {
 }
 
 void AttCurverend::ResetCurverend() {
-    m_rend = BARRENDITION_single;
+    m_lform = "";
+    m_lwidth = "";
 }
 
 bool AttCurverend::ReadCurverend(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("rend")) {
-        this->SetRend(StrToBarRendition(element.attribute("rend").value()));
-        element.remove_attribute("rend");
+    if (element.attribute("lform")) {
+        this->SetLform(StrToStr(element.attribute("lform").value()));
+        element.remove_attribute("lform");
+        hasAttribute = true;
+    }
+    if (element.attribute("lwidth")) {
+        this->SetLwidth(StrToStr(element.attribute("lwidth").value()));
+        element.remove_attribute("lwidth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1354,20 +1345,29 @@ bool AttCurverend::ReadCurverend(  pugi::xml_node element ) {
 
 bool AttCurverend::WriteCurverend(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasRend()) {
-        element.append_attribute("rend") = BarRenditionToStr(this->GetRend()).c_str();
+    if (this->HasLform()) {
+        element.append_attribute("lform") = StrToStr(this->GetLform()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLwidth()) {
+        element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttCurverend::HasRend( )
+bool AttCurverend::HasLform( )
 {
-    return (m_rend != BARRENDITION_single);
+    return (m_lform != "");
+}
+
+bool AttCurverend::HasLwidth( )
+{
+    return (m_lwidth != "");
 }
 
 
-/* include <attrend> */
+/* include <attlwidth> */
 
 //----------------------------------------------------------------------------
 // AttCustosLog
@@ -1687,13 +1687,13 @@ AttDotLog::~AttDotLog() {
 }
 
 void AttDotLog::ResetDotLog() {
-    m_form = "";
+    m_form = BARRENDITION_single;
 }
 
 bool AttDotLog::ReadDotLog(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToStr(element.attribute("form").value()));
+        this->SetForm(StrToBarRendition(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
@@ -1703,7 +1703,7 @@ bool AttDotLog::ReadDotLog(  pugi::xml_node element ) {
 bool AttDotLog::WriteDotLog(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = BarRenditionToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1711,7 +1711,7 @@ bool AttDotLog::WriteDotLog(  pugi::xml_node element ) {
 
 bool AttDotLog::HasForm( )
 {
-    return (m_form != "");
+    return (m_form != BARRENDITION_single);
 }
 
 
@@ -2021,6 +2021,92 @@ bool AttEnclosingchars::HasEnclose( )
 /* include <attenclose> */
 
 //----------------------------------------------------------------------------
+// AttEndings
+//----------------------------------------------------------------------------
+
+AttEndings::AttEndings(): Att() {
+    ResetEndings();
+}
+
+AttEndings::~AttEndings() {
+
+}
+
+void AttEndings::ResetEndings() {
+    m_endingRend = "";
+}
+
+bool AttEndings::ReadEndings(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("ending.rend")) {
+        this->SetEndingRend(StrToStr(element.attribute("ending.rend").value()));
+        element.remove_attribute("ending.rend");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttEndings::WriteEndings(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasEndingRend()) {
+        element.append_attribute("ending.rend") = StrToStr(this->GetEndingRend()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttEndings::HasEndingRend( )
+{
+    return (m_endingRend != "");
+}
+
+
+/* include <attending.rend> */
+
+//----------------------------------------------------------------------------
+// AttExtender
+//----------------------------------------------------------------------------
+
+AttExtender::AttExtender(): Att() {
+    ResetExtender();
+}
+
+AttExtender::~AttExtender() {
+
+}
+
+void AttExtender::ResetExtender() {
+    m_extender = "";
+}
+
+bool AttExtender::ReadExtender(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("extender")) {
+        this->SetExtender(StrToStr(element.attribute("extender").value()));
+        element.remove_attribute("extender");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttExtender::WriteExtender(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasExtender()) {
+        element.append_attribute("extender") = StrToStr(this->GetExtender()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttExtender::HasExtender( )
+{
+    return (m_extender != "");
+}
+
+
+/* include <attextender> */
+
+//----------------------------------------------------------------------------
 // AttFermatapresent
 //----------------------------------------------------------------------------
 
@@ -2064,6 +2150,92 @@ bool AttFermatapresent::HasFermata( )
 /* include <attfermata> */
 
 //----------------------------------------------------------------------------
+// AttFiling
+//----------------------------------------------------------------------------
+
+AttFiling::AttFiling(): Att() {
+    ResetFiling();
+}
+
+AttFiling::~AttFiling() {
+
+}
+
+void AttFiling::ResetFiling() {
+    m_nonfilingInt = 0;
+}
+
+bool AttFiling::ReadFiling(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("nonfiling")) {
+        this->SetNonfiling(StrToInt(element.attribute("nonfiling").value()));
+        element.remove_attribute("nonfiling");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttFiling::WriteFiling(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasNonfiling()) {
+        element.append_attribute("nonfiling") = IntToStr(this->GetNonfiling()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttFiling::HasNonfiling( )
+{
+    return (m_nonfilingInt != 0);
+}
+
+
+/* include <attnonfiling> */
+
+//----------------------------------------------------------------------------
+// AttGrpSymLog
+//----------------------------------------------------------------------------
+
+AttGrpSymLog::AttGrpSymLog(): Att() {
+    ResetGrpSymLog();
+}
+
+AttGrpSymLog::~AttGrpSymLog() {
+
+}
+
+void AttGrpSymLog::ResetGrpSymLog() {
+    m_levelInt = 0;
+}
+
+bool AttGrpSymLog::ReadGrpSymLog(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("level")) {
+        this->SetLevel(StrToInt(element.attribute("level").value()));
+        element.remove_attribute("level");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttGrpSymLog::WriteGrpSymLog(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasLevel()) {
+        element.append_attribute("level") = IntToStr(this->GetLevel()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttGrpSymLog::HasLevel( )
+{
+    return (m_levelInt != 0);
+}
+
+
+/* include <attlevel> */
+
+//----------------------------------------------------------------------------
 // AttHandident
 //----------------------------------------------------------------------------
 
@@ -2105,6 +2277,49 @@ bool AttHandident::HasHand( )
 
 
 /* include <atthand> */
+
+//----------------------------------------------------------------------------
+// AttHeight
+//----------------------------------------------------------------------------
+
+AttHeight::AttHeight(): Att() {
+    ResetHeight();
+}
+
+AttHeight::~AttHeight() {
+
+}
+
+void AttHeight::ResetHeight() {
+    m_height = "";
+}
+
+bool AttHeight::ReadHeight(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("height")) {
+        this->SetHeight(StrToStr(element.attribute("height").value()));
+        element.remove_attribute("height");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttHeight::WriteHeight(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasHeight()) {
+        element.append_attribute("height") = StrToStr(this->GetHeight()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttHeight::HasHeight( )
+{
+    return (m_height != "");
+}
+
+
+/* include <attheight> */
 
 //----------------------------------------------------------------------------
 // AttHorizontalalign
@@ -2539,6 +2754,7 @@ AttLang::~AttLang() {
 
 void AttLang::ResetLang() {
     m_lang = "";
+    m_translit = "";
 }
 
 bool AttLang::ReadLang(  pugi::xml_node element ) {
@@ -2546,6 +2762,11 @@ bool AttLang::ReadLang(  pugi::xml_node element ) {
     if (element.attribute("lang")) {
         this->SetLang(StrToStr(element.attribute("lang").value()));
         element.remove_attribute("lang");
+        hasAttribute = true;
+    }
+    if (element.attribute("translit")) {
+        this->SetTranslit(StrToStr(element.attribute("translit").value()));
+        element.remove_attribute("translit");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2557,6 +2778,10 @@ bool AttLang::WriteLang(  pugi::xml_node element ) {
         element.append_attribute("lang") = StrToStr(this->GetLang()).c_str();
         wroteAttribute = true;
     }
+    if (this->HasTranslit()) {
+        element.append_attribute("translit") = StrToStr(this->GetTranslit()).c_str();
+        wroteAttribute = true;
+    }
     return wroteAttribute;
 }
 
@@ -2565,8 +2790,13 @@ bool AttLang::HasLang( )
     return (m_lang != "");
 }
 
+bool AttLang::HasTranslit( )
+{
+    return (m_translit != "");
+}
 
-/* include <attlang> */
+
+/* include <atttranslit> */
 
 //----------------------------------------------------------------------------
 // AttLayerLog
@@ -2624,13 +2854,13 @@ AttLayerident::~AttLayerident() {
 }
 
 void AttLayerident::ResetLayerident() {
-    m_layer = "";
+    m_layerInt = 0;
 }
 
 bool AttLayerident::ReadLayerident(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("layer")) {
-        this->SetLayer(StrToStr(element.attribute("layer").value()));
+        this->SetLayer(StrToInt(element.attribute("layer").value()));
         element.remove_attribute("layer");
         hasAttribute = true;
     }
@@ -2640,7 +2870,7 @@ bool AttLayerident::ReadLayerident(  pugi::xml_node element ) {
 bool AttLayerident::WriteLayerident(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasLayer()) {
-        element.append_attribute("layer") = StrToStr(this->GetLayer()).c_str();
+        element.append_attribute("layer") = IntToStr(this->GetLayer()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2648,11 +2878,129 @@ bool AttLayerident::WriteLayerident(  pugi::xml_node element ) {
 
 bool AttLayerident::HasLayer( )
 {
-    return (m_layer != "");
+    return (m_layerInt != 0);
 }
 
 
 /* include <attlayer> */
+
+//----------------------------------------------------------------------------
+// AttLineVis
+//----------------------------------------------------------------------------
+
+AttLineVis::AttLineVis(): Att() {
+    ResetLineVis();
+}
+
+AttLineVis::~AttLineVis() {
+
+}
+
+void AttLineVis::ResetLineVis() {
+    m_form = BARRENDITION_single;
+    m_width = "";
+    m_endsym = "";
+    m_endsymsize = "";
+    m_startsym = "";
+    m_startsymsize = "";
+}
+
+bool AttLineVis::ReadLineVis(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("form")) {
+        this->SetForm(StrToBarRendition(element.attribute("form").value()));
+        element.remove_attribute("form");
+        hasAttribute = true;
+    }
+    if (element.attribute("width")) {
+        this->SetWidth(StrToStr(element.attribute("width").value()));
+        element.remove_attribute("width");
+        hasAttribute = true;
+    }
+    if (element.attribute("endsym")) {
+        this->SetEndsym(StrToStr(element.attribute("endsym").value()));
+        element.remove_attribute("endsym");
+        hasAttribute = true;
+    }
+    if (element.attribute("endsymsize")) {
+        this->SetEndsymsize(StrToStr(element.attribute("endsymsize").value()));
+        element.remove_attribute("endsymsize");
+        hasAttribute = true;
+    }
+    if (element.attribute("startsym")) {
+        this->SetStartsym(StrToStr(element.attribute("startsym").value()));
+        element.remove_attribute("startsym");
+        hasAttribute = true;
+    }
+    if (element.attribute("startsymsize")) {
+        this->SetStartsymsize(StrToStr(element.attribute("startsymsize").value()));
+        element.remove_attribute("startsymsize");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttLineVis::WriteLineVis(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasForm()) {
+        element.append_attribute("form") = BarRenditionToStr(this->GetForm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasWidth()) {
+        element.append_attribute("width") = StrToStr(this->GetWidth()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasEndsym()) {
+        element.append_attribute("endsym") = StrToStr(this->GetEndsym()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasEndsymsize()) {
+        element.append_attribute("endsymsize") = StrToStr(this->GetEndsymsize()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasStartsym()) {
+        element.append_attribute("startsym") = StrToStr(this->GetStartsym()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasStartsymsize()) {
+        element.append_attribute("startsymsize") = StrToStr(this->GetStartsymsize()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttLineVis::HasForm( )
+{
+    return (m_form != BARRENDITION_single);
+}
+
+bool AttLineVis::HasWidth( )
+{
+    return (m_width != "");
+}
+
+bool AttLineVis::HasEndsym( )
+{
+    return (m_endsym != "");
+}
+
+bool AttLineVis::HasEndsymsize( )
+{
+    return (m_endsymsize != "");
+}
+
+bool AttLineVis::HasStartsym( )
+{
+    return (m_startsym != "");
+}
+
+bool AttLineVis::HasStartsymsize( )
+{
+    return (m_startsymsize != "");
+}
+
+
+/* include <attstartsymsize> */
 
 //----------------------------------------------------------------------------
 // AttLineloc
@@ -2710,14 +3058,32 @@ AttLinerend::~AttLinerend() {
 }
 
 void AttLinerend::ResetLinerend() {
-    m_rend = BARRENDITION_single;
+    m_lendsym = "";
+    m_lendsymsize = "";
+    m_lstartsym = "";
+    m_lstartsymsize = "";
 }
 
 bool AttLinerend::ReadLinerend(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("rend")) {
-        this->SetRend(StrToBarRendition(element.attribute("rend").value()));
-        element.remove_attribute("rend");
+    if (element.attribute("lendsym")) {
+        this->SetLendsym(StrToStr(element.attribute("lendsym").value()));
+        element.remove_attribute("lendsym");
+        hasAttribute = true;
+    }
+    if (element.attribute("lendsymsize")) {
+        this->SetLendsymsize(StrToStr(element.attribute("lendsymsize").value()));
+        element.remove_attribute("lendsymsize");
+        hasAttribute = true;
+    }
+    if (element.attribute("lstartsym")) {
+        this->SetLstartsym(StrToStr(element.attribute("lstartsym").value()));
+        element.remove_attribute("lstartsym");
+        hasAttribute = true;
+    }
+    if (element.attribute("lstartsymsize")) {
+        this->SetLstartsymsize(StrToStr(element.attribute("lstartsymsize").value()));
+        element.remove_attribute("lstartsymsize");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2725,20 +3091,105 @@ bool AttLinerend::ReadLinerend(  pugi::xml_node element ) {
 
 bool AttLinerend::WriteLinerend(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasRend()) {
-        element.append_attribute("rend") = BarRenditionToStr(this->GetRend()).c_str();
+    if (this->HasLendsym()) {
+        element.append_attribute("lendsym") = StrToStr(this->GetLendsym()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLendsymsize()) {
+        element.append_attribute("lendsymsize") = StrToStr(this->GetLendsymsize()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLstartsym()) {
+        element.append_attribute("lstartsym") = StrToStr(this->GetLstartsym()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLstartsymsize()) {
+        element.append_attribute("lstartsymsize") = StrToStr(this->GetLstartsymsize()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttLinerend::HasRend( )
+bool AttLinerend::HasLendsym( )
 {
-    return (m_rend != BARRENDITION_single);
+    return (m_lendsym != "");
+}
+
+bool AttLinerend::HasLendsymsize( )
+{
+    return (m_lendsymsize != "");
+}
+
+bool AttLinerend::HasLstartsym( )
+{
+    return (m_lstartsym != "");
+}
+
+bool AttLinerend::HasLstartsymsize( )
+{
+    return (m_lstartsymsize != "");
 }
 
 
-/* include <attrend> */
+/* include <attlstartsymsize> */
+
+//----------------------------------------------------------------------------
+// AttLinerendBase
+//----------------------------------------------------------------------------
+
+AttLinerendBase::AttLinerendBase(): Att() {
+    ResetLinerendBase();
+}
+
+AttLinerendBase::~AttLinerendBase() {
+
+}
+
+void AttLinerendBase::ResetLinerendBase() {
+    m_lform = "";
+    m_lwidth = "";
+}
+
+bool AttLinerendBase::ReadLinerendBase(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("lform")) {
+        this->SetLform(StrToStr(element.attribute("lform").value()));
+        element.remove_attribute("lform");
+        hasAttribute = true;
+    }
+    if (element.attribute("lwidth")) {
+        this->SetLwidth(StrToStr(element.attribute("lwidth").value()));
+        element.remove_attribute("lwidth");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttLinerendBase::WriteLinerendBase(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasLform()) {
+        element.append_attribute("lform") = StrToStr(this->GetLform()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasLwidth()) {
+        element.append_attribute("lwidth") = StrToStr(this->GetLwidth()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttLinerendBase::HasLform( )
+{
+    return (m_lform != "");
+}
+
+bool AttLinerendBase::HasLwidth( )
+{
+    return (m_lwidth != "");
+}
+
+
+/* include <attlwidth> */
 
 //----------------------------------------------------------------------------
 // AttLyricstyle
@@ -2960,6 +3411,49 @@ bool AttMeasurement::HasUnit( )
 /* include <attunit> */
 
 //----------------------------------------------------------------------------
+// AttMeasurenumbers
+//----------------------------------------------------------------------------
+
+AttMeasurenumbers::AttMeasurenumbers(): Att() {
+    ResetMeasurenumbers();
+}
+
+AttMeasurenumbers::~AttMeasurenumbers() {
+
+}
+
+void AttMeasurenumbers::ResetMeasurenumbers() {
+    m_mnumVisible = "";
+}
+
+bool AttMeasurenumbers::ReadMeasurenumbers(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("mnum.visible")) {
+        this->SetMnumVisible(StrToStr(element.attribute("mnum.visible").value()));
+        element.remove_attribute("mnum.visible");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMeasurenumbers::WriteMeasurenumbers(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasMnumVisible()) {
+        element.append_attribute("mnum.visible") = StrToStr(this->GetMnumVisible()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMeasurenumbers::HasMnumVisible( )
+{
+    return (m_mnumVisible != "");
+}
+
+
+/* include <attmnum.visible> */
+
+//----------------------------------------------------------------------------
 // AttMediabounds
 //----------------------------------------------------------------------------
 
@@ -3089,7 +3583,6 @@ AttMeiversion::~AttMeiversion() {
 
 void AttMeiversion::ResetMeiversion() {
     m_meiversion = "";
-    m_meiversionNum = "";
 }
 
 bool AttMeiversion::ReadMeiversion(  pugi::xml_node element ) {
@@ -3097,11 +3590,6 @@ bool AttMeiversion::ReadMeiversion(  pugi::xml_node element ) {
     if (element.attribute("meiversion")) {
         this->SetMeiversion(StrToStr(element.attribute("meiversion").value()));
         element.remove_attribute("meiversion");
-        hasAttribute = true;
-    }
-    if (element.attribute("meiversion.num")) {
-        this->SetMeiversionNum(StrToStr(element.attribute("meiversion.num").value()));
-        element.remove_attribute("meiversion.num");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -3113,10 +3601,6 @@ bool AttMeiversion::WriteMeiversion(  pugi::xml_node element ) {
         element.append_attribute("meiversion") = StrToStr(this->GetMeiversion()).c_str();
         wroteAttribute = true;
     }
-    if (this->HasMeiversionNum()) {
-        element.append_attribute("meiversion.num") = StrToStr(this->GetMeiversionNum()).c_str();
-        wroteAttribute = true;
-    }
     return wroteAttribute;
 }
 
@@ -3125,13 +3609,8 @@ bool AttMeiversion::HasMeiversion( )
     return (m_meiversion != "");
 }
 
-bool AttMeiversion::HasMeiversionNum( )
-{
-    return (m_meiversionNum != "");
-}
 
-
-/* include <attmeiversion.num> */
+/* include <attmeiversion> */
 
 //----------------------------------------------------------------------------
 // AttMensurLog
@@ -3277,14 +3756,14 @@ AttMeterSigVis::~AttMeterSigVis() {
 }
 
 void AttMeterSigVis::ResetMeterSigVis() {
-    m_rend = BARRENDITION_single;
+    m_form = BARRENDITION_single;
 }
 
 bool AttMeterSigVis::ReadMeterSigVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("rend")) {
-        this->SetRend(StrToBarRendition(element.attribute("rend").value()));
-        element.remove_attribute("rend");
+    if (element.attribute("form")) {
+        this->SetForm(StrToBarRendition(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -3292,20 +3771,20 @@ bool AttMeterSigVis::ReadMeterSigVis(  pugi::xml_node element ) {
 
 bool AttMeterSigVis::WriteMeterSigVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasRend()) {
-        element.append_attribute("rend") = BarRenditionToStr(this->GetRend()).c_str();
+    if (this->HasForm()) {
+        element.append_attribute("form") = BarRenditionToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttMeterSigVis::HasRend( )
+bool AttMeterSigVis::HasForm( )
 {
-    return (m_rend != BARRENDITION_single);
+    return (m_form != BARRENDITION_single);
 }
 
 
-/* include <attrend> */
+/* include <attform> */
 
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultLog
@@ -3714,6 +4193,64 @@ bool AttName::HasRole( )
 /* include <attrole> */
 
 //----------------------------------------------------------------------------
+// AttNotationstyle
+//----------------------------------------------------------------------------
+
+AttNotationstyle::AttNotationstyle(): Att() {
+    ResetNotationstyle();
+}
+
+AttNotationstyle::~AttNotationstyle() {
+
+}
+
+void AttNotationstyle::ResetNotationstyle() {
+    m_musicName = "";
+    m_musicSize = "";
+}
+
+bool AttNotationstyle::ReadNotationstyle(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("music.name")) {
+        this->SetMusicName(StrToStr(element.attribute("music.name").value()));
+        element.remove_attribute("music.name");
+        hasAttribute = true;
+    }
+    if (element.attribute("music.size")) {
+        this->SetMusicSize(StrToStr(element.attribute("music.size").value()));
+        element.remove_attribute("music.size");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttNotationstyle::WriteNotationstyle(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasMusicName()) {
+        element.append_attribute("music.name") = StrToStr(this->GetMusicName()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMusicSize()) {
+        element.append_attribute("music.size") = StrToStr(this->GetMusicSize()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttNotationstyle::HasMusicName( )
+{
+    return (m_musicName != "");
+}
+
+bool AttNotationstyle::HasMusicSize( )
+{
+    return (m_musicSize != "");
+}
+
+
+/* include <attmusic.size> */
+
+//----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
 
@@ -3787,47 +4324,137 @@ bool AttNoteGes::HasPnum( )
 /* include <attpnum> */
 
 //----------------------------------------------------------------------------
-// AttNoteVis
+// AttNoteheads
 //----------------------------------------------------------------------------
 
-AttNoteVis::AttNoteVis(): Att() {
-    ResetNoteVis();
+AttNoteheads::AttNoteheads(): Att() {
+    ResetNoteheads();
 }
 
-AttNoteVis::~AttNoteVis() {
+AttNoteheads::~AttNoteheads() {
 
 }
 
-void AttNoteVis::ResetNoteVis() {
-    m_headshape = "";
+void AttNoteheads::ResetNoteheads() {
+    m_headColor = "";
+    m_headFill = "";
+    m_headFillcolor = "";
+    m_headMod = "";
+    m_headRotation = "";
+    m_headShape = "";
+    m_headVisible = "";
 }
 
-bool AttNoteVis::ReadNoteVis(  pugi::xml_node element ) {
+bool AttNoteheads::ReadNoteheads(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("headshape")) {
-        this->SetHeadshape(StrToStr(element.attribute("headshape").value()));
-        element.remove_attribute("headshape");
+    if (element.attribute("head.color")) {
+        this->SetHeadColor(StrToStr(element.attribute("head.color").value()));
+        element.remove_attribute("head.color");
+        hasAttribute = true;
+    }
+    if (element.attribute("head.fill")) {
+        this->SetHeadFill(StrToStr(element.attribute("head.fill").value()));
+        element.remove_attribute("head.fill");
+        hasAttribute = true;
+    }
+    if (element.attribute("head.fillcolor")) {
+        this->SetHeadFillcolor(StrToStr(element.attribute("head.fillcolor").value()));
+        element.remove_attribute("head.fillcolor");
+        hasAttribute = true;
+    }
+    if (element.attribute("head.mod")) {
+        this->SetHeadMod(StrToStr(element.attribute("head.mod").value()));
+        element.remove_attribute("head.mod");
+        hasAttribute = true;
+    }
+    if (element.attribute("head.rotation")) {
+        this->SetHeadRotation(StrToStr(element.attribute("head.rotation").value()));
+        element.remove_attribute("head.rotation");
+        hasAttribute = true;
+    }
+    if (element.attribute("head.shape")) {
+        this->SetHeadShape(StrToStr(element.attribute("head.shape").value()));
+        element.remove_attribute("head.shape");
+        hasAttribute = true;
+    }
+    if (element.attribute("head.visible")) {
+        this->SetHeadVisible(StrToStr(element.attribute("head.visible").value()));
+        element.remove_attribute("head.visible");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttNoteVis::WriteNoteVis(  pugi::xml_node element ) {
+bool AttNoteheads::WriteNoteheads(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasHeadshape()) {
-        element.append_attribute("headshape") = StrToStr(this->GetHeadshape()).c_str();
+    if (this->HasHeadColor()) {
+        element.append_attribute("head.color") = StrToStr(this->GetHeadColor()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasHeadFill()) {
+        element.append_attribute("head.fill") = StrToStr(this->GetHeadFill()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasHeadFillcolor()) {
+        element.append_attribute("head.fillcolor") = StrToStr(this->GetHeadFillcolor()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasHeadMod()) {
+        element.append_attribute("head.mod") = StrToStr(this->GetHeadMod()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasHeadRotation()) {
+        element.append_attribute("head.rotation") = StrToStr(this->GetHeadRotation()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasHeadShape()) {
+        element.append_attribute("head.shape") = StrToStr(this->GetHeadShape()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasHeadVisible()) {
+        element.append_attribute("head.visible") = StrToStr(this->GetHeadVisible()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttNoteVis::HasHeadshape( )
+bool AttNoteheads::HasHeadColor( )
 {
-    return (m_headshape != "");
+    return (m_headColor != "");
+}
+
+bool AttNoteheads::HasHeadFill( )
+{
+    return (m_headFill != "");
+}
+
+bool AttNoteheads::HasHeadFillcolor( )
+{
+    return (m_headFillcolor != "");
+}
+
+bool AttNoteheads::HasHeadMod( )
+{
+    return (m_headMod != "");
+}
+
+bool AttNoteheads::HasHeadRotation( )
+{
+    return (m_headRotation != "");
+}
+
+bool AttNoteheads::HasHeadShape( )
+{
+    return (m_headShape != "");
+}
+
+bool AttNoteheads::HasHeadVisible( )
+{
+    return (m_headVisible != "");
 }
 
 
-/* include <attheadshape> */
+/* include <atthead.visible> */
 
 //----------------------------------------------------------------------------
 // AttOctave
@@ -4017,6 +4644,49 @@ bool AttOnelinestaff::HasOntheline( )
 /* include <attontheline> */
 
 //----------------------------------------------------------------------------
+// AttOptimization
+//----------------------------------------------------------------------------
+
+AttOptimization::AttOptimization(): Att() {
+    ResetOptimization();
+}
+
+AttOptimization::~AttOptimization() {
+
+}
+
+void AttOptimization::ResetOptimization() {
+    m_optimize = "";
+}
+
+bool AttOptimization::ReadOptimization(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("optimize")) {
+        this->SetOptimize(StrToStr(element.attribute("optimize").value()));
+        element.remove_attribute("optimize");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttOptimization::WriteOptimization(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasOptimize()) {
+        element.append_attribute("optimize") = StrToStr(this->GetOptimize()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttOptimization::HasOptimize( )
+{
+    return (m_optimize != "");
+}
+
+
+/* include <attoptimize> */
+
+//----------------------------------------------------------------------------
 // AttPadLog
 //----------------------------------------------------------------------------
 
@@ -4060,6 +4730,154 @@ bool AttPadLog::HasNum( )
 /* include <attnum> */
 
 //----------------------------------------------------------------------------
+// AttPages
+//----------------------------------------------------------------------------
+
+AttPages::AttPages(): Att() {
+    ResetPages();
+}
+
+AttPages::~AttPages() {
+
+}
+
+void AttPages::ResetPages() {
+    m_pageHeight = "";
+    m_pageWidth = "";
+    m_pageTopmar = "";
+    m_pageBotmar = "";
+    m_pageLeftmar = "";
+    m_pageRightmar = "";
+    m_pagePanels = "";
+    m_pageScale = "";
+}
+
+bool AttPages::ReadPages(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("page.height")) {
+        this->SetPageHeight(StrToStr(element.attribute("page.height").value()));
+        element.remove_attribute("page.height");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.width")) {
+        this->SetPageWidth(StrToStr(element.attribute("page.width").value()));
+        element.remove_attribute("page.width");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.topmar")) {
+        this->SetPageTopmar(StrToStr(element.attribute("page.topmar").value()));
+        element.remove_attribute("page.topmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.botmar")) {
+        this->SetPageBotmar(StrToStr(element.attribute("page.botmar").value()));
+        element.remove_attribute("page.botmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.leftmar")) {
+        this->SetPageLeftmar(StrToStr(element.attribute("page.leftmar").value()));
+        element.remove_attribute("page.leftmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.rightmar")) {
+        this->SetPageRightmar(StrToStr(element.attribute("page.rightmar").value()));
+        element.remove_attribute("page.rightmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.panels")) {
+        this->SetPagePanels(StrToStr(element.attribute("page.panels").value()));
+        element.remove_attribute("page.panels");
+        hasAttribute = true;
+    }
+    if (element.attribute("page.scale")) {
+        this->SetPageScale(StrToStr(element.attribute("page.scale").value()));
+        element.remove_attribute("page.scale");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttPages::WritePages(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasPageHeight()) {
+        element.append_attribute("page.height") = StrToStr(this->GetPageHeight()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPageWidth()) {
+        element.append_attribute("page.width") = StrToStr(this->GetPageWidth()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPageTopmar()) {
+        element.append_attribute("page.topmar") = StrToStr(this->GetPageTopmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPageBotmar()) {
+        element.append_attribute("page.botmar") = StrToStr(this->GetPageBotmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPageLeftmar()) {
+        element.append_attribute("page.leftmar") = StrToStr(this->GetPageLeftmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPageRightmar()) {
+        element.append_attribute("page.rightmar") = StrToStr(this->GetPageRightmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPagePanels()) {
+        element.append_attribute("page.panels") = StrToStr(this->GetPagePanels()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasPageScale()) {
+        element.append_attribute("page.scale") = StrToStr(this->GetPageScale()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttPages::HasPageHeight( )
+{
+    return (m_pageHeight != "");
+}
+
+bool AttPages::HasPageWidth( )
+{
+    return (m_pageWidth != "");
+}
+
+bool AttPages::HasPageTopmar( )
+{
+    return (m_pageTopmar != "");
+}
+
+bool AttPages::HasPageBotmar( )
+{
+    return (m_pageBotmar != "");
+}
+
+bool AttPages::HasPageLeftmar( )
+{
+    return (m_pageLeftmar != "");
+}
+
+bool AttPages::HasPageRightmar( )
+{
+    return (m_pageRightmar != "");
+}
+
+bool AttPages::HasPagePanels( )
+{
+    return (m_pagePanels != "");
+}
+
+bool AttPages::HasPageScale( )
+{
+    return (m_pageScale != "");
+}
+
+
+/* include <attpage.scale> */
+
+//----------------------------------------------------------------------------
 // AttPbVis
 //----------------------------------------------------------------------------
 
@@ -4072,14 +4890,14 @@ AttPbVis::~AttPbVis() {
 }
 
 void AttPbVis::ResetPbVis() {
-    m_func = FUNC_NONE;
+    m_folium = "";
 }
 
 bool AttPbVis::ReadPbVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("func")) {
-        this->SetFunc(StrToFunc(element.attribute("func").value()));
-        element.remove_attribute("func");
+    if (element.attribute("folium")) {
+        this->SetFolium(StrToStr(element.attribute("folium").value()));
+        element.remove_attribute("folium");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -4087,20 +4905,20 @@ bool AttPbVis::ReadPbVis(  pugi::xml_node element ) {
 
 bool AttPbVis::WritePbVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasFunc()) {
-        element.append_attribute("func") = FuncToStr(this->GetFunc()).c_str();
+    if (this->HasFolium()) {
+        element.append_attribute("folium") = StrToStr(this->GetFolium()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttPbVis::HasFunc( )
+bool AttPbVis::HasFolium( )
 {
-    return (m_func != FUNC_NONE);
+    return (m_folium != "");
 }
 
 
-/* include <attfunc> */
+/* include <attfolium> */
 
 //----------------------------------------------------------------------------
 // AttPitch
@@ -4365,6 +5183,49 @@ bool AttPointing::HasTitle( )
 /* include <atttitle> */
 
 //----------------------------------------------------------------------------
+// AttQuantity
+//----------------------------------------------------------------------------
+
+AttQuantity::AttQuantity(): Att() {
+    ResetQuantity();
+}
+
+AttQuantity::~AttQuantity() {
+
+}
+
+void AttQuantity::ResetQuantity() {
+    m_quantityDbl = 0.0;
+}
+
+bool AttQuantity::ReadQuantity(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("quantity")) {
+        this->SetQuantity(StrToDbl(element.attribute("quantity").value()));
+        element.remove_attribute("quantity");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttQuantity::WriteQuantity(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasQuantity()) {
+        element.append_attribute("quantity") = DblToStr(this->GetQuantity()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttQuantity::HasQuantity( )
+{
+    return (m_quantityDbl != 0.0);
+}
+
+
+/* include <attquantity> */
+
+//----------------------------------------------------------------------------
 // AttRelativesize
 //----------------------------------------------------------------------------
 
@@ -4463,14 +5324,14 @@ AttSbVis::~AttSbVis() {
 }
 
 void AttSbVis::ResetSbVis() {
-    m_rend = BARRENDITION_single;
+    m_form = BARRENDITION_single;
 }
 
 bool AttSbVis::ReadSbVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("rend")) {
-        this->SetRend(StrToBarRendition(element.attribute("rend").value()));
-        element.remove_attribute("rend");
+    if (element.attribute("form")) {
+        this->SetForm(StrToBarRendition(element.attribute("form").value()));
+        element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -4478,20 +5339,20 @@ bool AttSbVis::ReadSbVis(  pugi::xml_node element ) {
 
 bool AttSbVis::WriteSbVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasRend()) {
-        element.append_attribute("rend") = BarRenditionToStr(this->GetRend()).c_str();
+    if (this->HasForm()) {
+        element.append_attribute("form") = BarRenditionToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttSbVis::HasRend( )
+bool AttSbVis::HasForm( )
 {
-    return (m_rend != BARRENDITION_single);
+    return (m_form != BARRENDITION_single);
 }
 
 
-/* include <attrend> */
+/* include <attform> */
 
 //----------------------------------------------------------------------------
 // AttScalable
@@ -4622,131 +5483,11 @@ AttScoreDefVis::~AttScoreDefVis() {
 }
 
 void AttScoreDefVis::ResetScoreDefVis() {
-    m_endingRend = "";
-    m_mnumVisible = "";
-    m_musicName = "";
-    m_musicSize = "";
-    m_optimize = "";
-    m_pageHeight = "";
-    m_pageWidth = "";
-    m_pageTopmar = "";
-    m_pageBotmar = "";
-    m_pageLeftmar = "";
-    m_pageRightmar = "";
-    m_pagePanels = "";
-    m_pageScale = "";
-    m_spacingPackexpDbl = 0.0;
-    m_spacingPackfactDbl = 0.0;
-    m_spacingStaff = "";
-    m_spacingSystem = "";
-    m_systemLeftmar = "";
-    m_systemRightmar = "";
-    m_systemTopmar = "";
     m_vuHeight = "";
 }
 
 bool AttScoreDefVis::ReadScoreDefVis(  pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("ending.rend")) {
-        this->SetEndingRend(StrToStr(element.attribute("ending.rend").value()));
-        element.remove_attribute("ending.rend");
-        hasAttribute = true;
-    }
-    if (element.attribute("mnum.visible")) {
-        this->SetMnumVisible(StrToStr(element.attribute("mnum.visible").value()));
-        element.remove_attribute("mnum.visible");
-        hasAttribute = true;
-    }
-    if (element.attribute("music.name")) {
-        this->SetMusicName(StrToStr(element.attribute("music.name").value()));
-        element.remove_attribute("music.name");
-        hasAttribute = true;
-    }
-    if (element.attribute("music.size")) {
-        this->SetMusicSize(StrToStr(element.attribute("music.size").value()));
-        element.remove_attribute("music.size");
-        hasAttribute = true;
-    }
-    if (element.attribute("optimize")) {
-        this->SetOptimize(StrToStr(element.attribute("optimize").value()));
-        element.remove_attribute("optimize");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.height")) {
-        this->SetPageHeight(StrToStr(element.attribute("page.height").value()));
-        element.remove_attribute("page.height");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.width")) {
-        this->SetPageWidth(StrToStr(element.attribute("page.width").value()));
-        element.remove_attribute("page.width");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.topmar")) {
-        this->SetPageTopmar(StrToStr(element.attribute("page.topmar").value()));
-        element.remove_attribute("page.topmar");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.botmar")) {
-        this->SetPageBotmar(StrToStr(element.attribute("page.botmar").value()));
-        element.remove_attribute("page.botmar");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.leftmar")) {
-        this->SetPageLeftmar(StrToStr(element.attribute("page.leftmar").value()));
-        element.remove_attribute("page.leftmar");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.rightmar")) {
-        this->SetPageRightmar(StrToStr(element.attribute("page.rightmar").value()));
-        element.remove_attribute("page.rightmar");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.panels")) {
-        this->SetPagePanels(StrToStr(element.attribute("page.panels").value()));
-        element.remove_attribute("page.panels");
-        hasAttribute = true;
-    }
-    if (element.attribute("page.scale")) {
-        this->SetPageScale(StrToStr(element.attribute("page.scale").value()));
-        element.remove_attribute("page.scale");
-        hasAttribute = true;
-    }
-    if (element.attribute("spacing.packexp")) {
-        this->SetSpacingPackexp(StrToDbl(element.attribute("spacing.packexp").value()));
-        element.remove_attribute("spacing.packexp");
-        hasAttribute = true;
-    }
-    if (element.attribute("spacing.packfact")) {
-        this->SetSpacingPackfact(StrToDbl(element.attribute("spacing.packfact").value()));
-        element.remove_attribute("spacing.packfact");
-        hasAttribute = true;
-    }
-    if (element.attribute("spacing.staff")) {
-        this->SetSpacingStaff(StrToStr(element.attribute("spacing.staff").value()));
-        element.remove_attribute("spacing.staff");
-        hasAttribute = true;
-    }
-    if (element.attribute("spacing.system")) {
-        this->SetSpacingSystem(StrToStr(element.attribute("spacing.system").value()));
-        element.remove_attribute("spacing.system");
-        hasAttribute = true;
-    }
-    if (element.attribute("system.leftmar")) {
-        this->SetSystemLeftmar(StrToStr(element.attribute("system.leftmar").value()));
-        element.remove_attribute("system.leftmar");
-        hasAttribute = true;
-    }
-    if (element.attribute("system.rightmar")) {
-        this->SetSystemRightmar(StrToStr(element.attribute("system.rightmar").value()));
-        element.remove_attribute("system.rightmar");
-        hasAttribute = true;
-    }
-    if (element.attribute("system.topmar")) {
-        this->SetSystemTopmar(StrToStr(element.attribute("system.topmar").value()));
-        element.remove_attribute("system.topmar");
-        hasAttribute = true;
-    }
     if (element.attribute("vu.height")) {
         this->SetVuHeight(StrToStr(element.attribute("vu.height").value()));
         element.remove_attribute("vu.height");
@@ -4757,191 +5498,11 @@ bool AttScoreDefVis::ReadScoreDefVis(  pugi::xml_node element ) {
 
 bool AttScoreDefVis::WriteScoreDefVis(  pugi::xml_node element ) {
     bool wroteAttribute = false;
-    if (this->HasEndingRend()) {
-        element.append_attribute("ending.rend") = StrToStr(this->GetEndingRend()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMnumVisible()) {
-        element.append_attribute("mnum.visible") = StrToStr(this->GetMnumVisible()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMusicName()) {
-        element.append_attribute("music.name") = StrToStr(this->GetMusicName()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasMusicSize()) {
-        element.append_attribute("music.size") = StrToStr(this->GetMusicSize()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasOptimize()) {
-        element.append_attribute("optimize") = StrToStr(this->GetOptimize()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageHeight()) {
-        element.append_attribute("page.height") = StrToStr(this->GetPageHeight()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageWidth()) {
-        element.append_attribute("page.width") = StrToStr(this->GetPageWidth()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageTopmar()) {
-        element.append_attribute("page.topmar") = StrToStr(this->GetPageTopmar()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageBotmar()) {
-        element.append_attribute("page.botmar") = StrToStr(this->GetPageBotmar()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageLeftmar()) {
-        element.append_attribute("page.leftmar") = StrToStr(this->GetPageLeftmar()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageRightmar()) {
-        element.append_attribute("page.rightmar") = StrToStr(this->GetPageRightmar()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPagePanels()) {
-        element.append_attribute("page.panels") = StrToStr(this->GetPagePanels()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasPageScale()) {
-        element.append_attribute("page.scale") = StrToStr(this->GetPageScale()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSpacingPackexp()) {
-        element.append_attribute("spacing.packexp") = DblToStr(this->GetSpacingPackexp()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSpacingPackfact()) {
-        element.append_attribute("spacing.packfact") = DblToStr(this->GetSpacingPackfact()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSpacingStaff()) {
-        element.append_attribute("spacing.staff") = StrToStr(this->GetSpacingStaff()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSpacingSystem()) {
-        element.append_attribute("spacing.system") = StrToStr(this->GetSpacingSystem()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSystemLeftmar()) {
-        element.append_attribute("system.leftmar") = StrToStr(this->GetSystemLeftmar()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSystemRightmar()) {
-        element.append_attribute("system.rightmar") = StrToStr(this->GetSystemRightmar()).c_str();
-        wroteAttribute = true;
-    }
-    if (this->HasSystemTopmar()) {
-        element.append_attribute("system.topmar") = StrToStr(this->GetSystemTopmar()).c_str();
-        wroteAttribute = true;
-    }
     if (this->HasVuHeight()) {
         element.append_attribute("vu.height") = StrToStr(this->GetVuHeight()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
-}
-
-bool AttScoreDefVis::HasEndingRend( )
-{
-    return (m_endingRend != "");
-}
-
-bool AttScoreDefVis::HasMnumVisible( )
-{
-    return (m_mnumVisible != "");
-}
-
-bool AttScoreDefVis::HasMusicName( )
-{
-    return (m_musicName != "");
-}
-
-bool AttScoreDefVis::HasMusicSize( )
-{
-    return (m_musicSize != "");
-}
-
-bool AttScoreDefVis::HasOptimize( )
-{
-    return (m_optimize != "");
-}
-
-bool AttScoreDefVis::HasPageHeight( )
-{
-    return (m_pageHeight != "");
-}
-
-bool AttScoreDefVis::HasPageWidth( )
-{
-    return (m_pageWidth != "");
-}
-
-bool AttScoreDefVis::HasPageTopmar( )
-{
-    return (m_pageTopmar != "");
-}
-
-bool AttScoreDefVis::HasPageBotmar( )
-{
-    return (m_pageBotmar != "");
-}
-
-bool AttScoreDefVis::HasPageLeftmar( )
-{
-    return (m_pageLeftmar != "");
-}
-
-bool AttScoreDefVis::HasPageRightmar( )
-{
-    return (m_pageRightmar != "");
-}
-
-bool AttScoreDefVis::HasPagePanels( )
-{
-    return (m_pagePanels != "");
-}
-
-bool AttScoreDefVis::HasPageScale( )
-{
-    return (m_pageScale != "");
-}
-
-bool AttScoreDefVis::HasSpacingPackexp( )
-{
-    return (m_spacingPackexpDbl != 0.0);
-}
-
-bool AttScoreDefVis::HasSpacingPackfact( )
-{
-    return (m_spacingPackfactDbl != 0.0);
-}
-
-bool AttScoreDefVis::HasSpacingStaff( )
-{
-    return (m_spacingStaff != "");
-}
-
-bool AttScoreDefVis::HasSpacingSystem( )
-{
-    return (m_spacingSystem != "");
-}
-
-bool AttScoreDefVis::HasSystemLeftmar( )
-{
-    return (m_systemLeftmar != "");
-}
-
-bool AttScoreDefVis::HasSystemRightmar( )
-{
-    return (m_systemRightmar != "");
-}
-
-bool AttScoreDefVis::HasSystemTopmar( )
-{
-    return (m_systemTopmar != "");
 }
 
 bool AttScoreDefVis::HasVuHeight( )
@@ -5166,6 +5727,94 @@ bool AttSpaceVis::HasCompressable( )
 
 
 /* include <attcompressable> */
+
+//----------------------------------------------------------------------------
+// AttSpacing
+//----------------------------------------------------------------------------
+
+AttSpacing::AttSpacing(): Att() {
+    ResetSpacing();
+}
+
+AttSpacing::~AttSpacing() {
+
+}
+
+void AttSpacing::ResetSpacing() {
+    m_spacingPackexpDbl = 0.0;
+    m_spacingPackfactDbl = 0.0;
+    m_spacingStaff = "";
+    m_spacingSystem = "";
+}
+
+bool AttSpacing::ReadSpacing(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("spacing.packexp")) {
+        this->SetSpacingPackexp(StrToDbl(element.attribute("spacing.packexp").value()));
+        element.remove_attribute("spacing.packexp");
+        hasAttribute = true;
+    }
+    if (element.attribute("spacing.packfact")) {
+        this->SetSpacingPackfact(StrToDbl(element.attribute("spacing.packfact").value()));
+        element.remove_attribute("spacing.packfact");
+        hasAttribute = true;
+    }
+    if (element.attribute("spacing.staff")) {
+        this->SetSpacingStaff(StrToStr(element.attribute("spacing.staff").value()));
+        element.remove_attribute("spacing.staff");
+        hasAttribute = true;
+    }
+    if (element.attribute("spacing.system")) {
+        this->SetSpacingSystem(StrToStr(element.attribute("spacing.system").value()));
+        element.remove_attribute("spacing.system");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSpacing::WriteSpacing(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasSpacingPackexp()) {
+        element.append_attribute("spacing.packexp") = DblToStr(this->GetSpacingPackexp()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSpacingPackfact()) {
+        element.append_attribute("spacing.packfact") = DblToStr(this->GetSpacingPackfact()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSpacingStaff()) {
+        element.append_attribute("spacing.staff") = StrToStr(this->GetSpacingStaff()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSpacingSystem()) {
+        element.append_attribute("spacing.system") = StrToStr(this->GetSpacingSystem()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSpacing::HasSpacingPackexp( )
+{
+    return (m_spacingPackexpDbl != 0.0);
+}
+
+bool AttSpacing::HasSpacingPackfact( )
+{
+    return (m_spacingPackfactDbl != 0.0);
+}
+
+bool AttSpacing::HasSpacingStaff( )
+{
+    return (m_spacingStaff != "");
+}
+
+bool AttSpacing::HasSpacingSystem( )
+{
+    return (m_spacingSystem != "");
+}
+
+
+/* include <attspacing.system> */
 
 //----------------------------------------------------------------------------
 // AttStaffLog
@@ -5645,26 +6294,27 @@ bool AttStartid::HasStartid( )
 /* include <attstartid> */
 
 //----------------------------------------------------------------------------
-// AttStemmed
+// AttStems
 //----------------------------------------------------------------------------
 
-AttStemmed::AttStemmed(): Att() {
-    ResetStemmed();
+AttStems::AttStems(): Att() {
+    ResetStems();
 }
 
-AttStemmed::~AttStemmed() {
+AttStems::~AttStems() {
 
 }
 
-void AttStemmed::ResetStemmed() {
+void AttStems::ResetStems() {
     m_stemDir = STEMDIRECTION_NONE;
     m_stemLen = 0;
+    m_stemMod = STEMMODIFIER_NONE;
     m_stemPos = STEMPOSITION_NONE;
     m_stemX = 0;
     m_stemY = 0;
 }
 
-bool AttStemmed::ReadStemmed(  pugi::xml_node element ) {
+bool AttStems::ReadStems(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("stem.dir")) {
         this->SetStemDir(StrToStemDirection(element.attribute("stem.dir").value()));
@@ -5674,6 +6324,11 @@ bool AttStemmed::ReadStemmed(  pugi::xml_node element ) {
     if (element.attribute("stem.len")) {
         this->SetStemLen(StrToInt(element.attribute("stem.len").value()));
         element.remove_attribute("stem.len");
+        hasAttribute = true;
+    }
+    if (element.attribute("stem.mod")) {
+        this->SetStemMod(StrToStemModifier(element.attribute("stem.mod").value()));
+        element.remove_attribute("stem.mod");
         hasAttribute = true;
     }
     if (element.attribute("stem.pos")) {
@@ -5694,7 +6349,7 @@ bool AttStemmed::ReadStemmed(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttStemmed::WriteStemmed(  pugi::xml_node element ) {
+bool AttStems::WriteStems(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasStemDir()) {
         element.append_attribute("stem.dir") = StemDirectionToStr(this->GetStemDir()).c_str();
@@ -5702,6 +6357,10 @@ bool AttStemmed::WriteStemmed(  pugi::xml_node element ) {
     }
     if (this->HasStemLen()) {
         element.append_attribute("stem.len") = IntToStr(this->GetStemLen()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasStemMod()) {
+        element.append_attribute("stem.mod") = StemModifierToStr(this->GetStemMod()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStemPos()) {
@@ -5719,27 +6378,32 @@ bool AttStemmed::WriteStemmed(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttStemmed::HasStemDir( )
+bool AttStems::HasStemDir( )
 {
     return (m_stemDir != STEMDIRECTION_NONE);
 }
 
-bool AttStemmed::HasStemLen( )
+bool AttStems::HasStemLen( )
 {
     return (m_stemLen != 0);
 }
 
-bool AttStemmed::HasStemPos( )
+bool AttStems::HasStemMod( )
+{
+    return (m_stemMod != STEMMODIFIER_NONE);
+}
+
+bool AttStems::HasStemPos( )
 {
     return (m_stemPos != STEMPOSITION_NONE);
 }
 
-bool AttStemmed::HasStemX( )
+bool AttStems::HasStemX( )
 {
     return (m_stemX != 0);
 }
 
-bool AttStemmed::HasStemY( )
+bool AttStems::HasStemY( )
 {
     return (m_stemY != 0);
 }
@@ -5847,6 +6511,94 @@ bool AttSyltext::HasSyl( )
 
 
 /* include <attsyl> */
+
+//----------------------------------------------------------------------------
+// AttSystems
+//----------------------------------------------------------------------------
+
+AttSystems::AttSystems(): Att() {
+    ResetSystems();
+}
+
+AttSystems::~AttSystems() {
+
+}
+
+void AttSystems::ResetSystems() {
+    m_systemLeftline = "";
+    m_systemLeftmar = "";
+    m_systemRightmar = "";
+    m_systemTopmar = "";
+}
+
+bool AttSystems::ReadSystems(  pugi::xml_node element ) {
+    bool hasAttribute = false;
+    if (element.attribute("system.leftline")) {
+        this->SetSystemLeftline(StrToStr(element.attribute("system.leftline").value()));
+        element.remove_attribute("system.leftline");
+        hasAttribute = true;
+    }
+    if (element.attribute("system.leftmar")) {
+        this->SetSystemLeftmar(StrToStr(element.attribute("system.leftmar").value()));
+        element.remove_attribute("system.leftmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("system.rightmar")) {
+        this->SetSystemRightmar(StrToStr(element.attribute("system.rightmar").value()));
+        element.remove_attribute("system.rightmar");
+        hasAttribute = true;
+    }
+    if (element.attribute("system.topmar")) {
+        this->SetSystemTopmar(StrToStr(element.attribute("system.topmar").value()));
+        element.remove_attribute("system.topmar");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttSystems::WriteSystems(  pugi::xml_node element ) {
+    bool wroteAttribute = false;
+    if (this->HasSystemLeftline()) {
+        element.append_attribute("system.leftline") = StrToStr(this->GetSystemLeftline()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSystemLeftmar()) {
+        element.append_attribute("system.leftmar") = StrToStr(this->GetSystemLeftmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSystemRightmar()) {
+        element.append_attribute("system.rightmar") = StrToStr(this->GetSystemRightmar()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSystemTopmar()) {
+        element.append_attribute("system.topmar") = StrToStr(this->GetSystemTopmar()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttSystems::HasSystemLeftline( )
+{
+    return (m_systemLeftline != "");
+}
+
+bool AttSystems::HasSystemLeftmar( )
+{
+    return (m_systemLeftmar != "");
+}
+
+bool AttSystems::HasSystemRightmar( )
+{
+    return (m_systemRightmar != "");
+}
+
+bool AttSystems::HasSystemTopmar( )
+{
+    return (m_systemTopmar != "");
+}
+
+
+/* include <attsystem.topmar> */
 
 //----------------------------------------------------------------------------
 // AttTextstyle
@@ -6050,14 +6802,14 @@ AttTimestampPerformed::~AttTimestampPerformed() {
 }
 
 void AttTimestampPerformed::ResetTimestampPerformed() {
-    m_tstampGesInt = 0;
+    m_tstampGes = "";
     m_tstampReal = "";
 }
 
 bool AttTimestampPerformed::ReadTimestampPerformed(  pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tstamp.ges")) {
-        this->SetTstampGes(StrToInt(element.attribute("tstamp.ges").value()));
+        this->SetTstampGes(StrToStr(element.attribute("tstamp.ges").value()));
         element.remove_attribute("tstamp.ges");
         hasAttribute = true;
     }
@@ -6072,7 +6824,7 @@ bool AttTimestampPerformed::ReadTimestampPerformed(  pugi::xml_node element ) {
 bool AttTimestampPerformed::WriteTimestampPerformed(  pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTstampGes()) {
-        element.append_attribute("tstamp.ges") = IntToStr(this->GetTstampGes()).c_str();
+        element.append_attribute("tstamp.ges") = StrToStr(this->GetTstampGes()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTstampReal()) {
@@ -6084,7 +6836,7 @@ bool AttTimestampPerformed::WriteTimestampPerformed(  pugi::xml_node element ) {
 
 bool AttTimestampPerformed::HasTstampGes( )
 {
-    return (m_tstampGesInt != 0);
+    return (m_tstampGes != "");
 }
 
 bool AttTimestampPerformed::HasTstampReal( )
@@ -6973,14 +7725,6 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
-    if (element->HasAttClass( ATT_ALTSYM ) ) {
-        AttAltsym *att = dynamic_cast<AttAltsym*>(element);
-        assert( att );
-        if (attrType == "altsym") {
-            att->SetAltsym(att->StrToStr(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass( ATT_ARTICULATION ) ) {
         AttArticulation *att = dynamic_cast<AttArticulation*>(element);
         assert( att );
@@ -7020,8 +7764,8 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_BARLINELOG ) ) {
         AttBarLineLog *att = dynamic_cast<AttBarLineLog*>(element);
         assert( att );
-        if (attrType == "rend") {
-            att->SetRend(att->StrToBarRendition(attrValue));
+        if (attrType == "form") {
+            att->SetForm(att->StrToBarRendition(attrValue));
             return true;
         }
     }
@@ -7072,8 +7816,8 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_CANONICAL ) ) {
         AttCanonical *att = dynamic_cast<AttCanonical*>(element);
         assert( att );
-        if (attrType == "dbkey") {
-            att->SetDbkey(att->StrToStr(attrValue));
+        if (attrType == "codedval") {
+            att->SetCodedval(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7082,6 +7826,14 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         assert( att );
         if (attrType == "cluster") {
             att->SetCluster(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_CLASSCODEIDENT ) ) {
+        AttClasscodeident *att = dynamic_cast<AttClasscodeident*>(element);
+        assert( att );
+        if (attrType == "classcode") {
+            att->SetClasscode(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7133,14 +7885,6 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
-    if (element->HasAttClass( ATT_CODED ) ) {
-        AttCoded *att = dynamic_cast<AttCoded*>(element);
-        assert( att );
-        if (attrType == "code") {
-            att->SetCode(att->StrToStr(attrValue));
-            return true;
-        }
-    }
     if (element->HasAttClass( ATT_COLOR ) ) {
         AttColor *att = dynamic_cast<AttColor*>(element);
         assert( att );
@@ -7160,12 +7904,16 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_COMMON ) ) {
         AttCommon *att = dynamic_cast<AttCommon*>(element);
         assert( att );
-        if (attrType == "label") {
-            att->SetLabel(att->StrToStr(attrValue));
-            return true;
-        }
         if (attrType == "n") {
             att->SetN(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_COMMONPART ) ) {
+        AttCommonPart *att = dynamic_cast<AttCommonPart*>(element);
+        assert( att );
+        if (attrType == "label") {
+            att->SetLabel(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "base") {
@@ -7212,8 +7960,12 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_CURVEREND ) ) {
         AttCurverend *att = dynamic_cast<AttCurverend*>(element);
         assert( att );
-        if (attrType == "rend") {
-            att->SetRend(att->StrToBarRendition(attrValue));
+        if (attrType == "lform") {
+            att->SetLform(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lwidth") {
+            att->SetLwidth(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7285,7 +8037,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttDotLog *att = dynamic_cast<AttDotLog*>(element);
         assert( att );
         if (attrType == "form") {
-            att->SetForm(att->StrToStr(attrValue));
+            att->SetForm(att->StrToBarRendition(attrValue));
             return true;
         }
     }
@@ -7349,6 +8101,22 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_ENDINGS ) ) {
+        AttEndings *att = dynamic_cast<AttEndings*>(element);
+        assert( att );
+        if (attrType == "endingRend") {
+            att->SetEndingRend(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_EXTENDER ) ) {
+        AttExtender *att = dynamic_cast<AttExtender*>(element);
+        assert( att );
+        if (attrType == "extender") {
+            att->SetExtender(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_FERMATAPRESENT ) ) {
         AttFermatapresent *att = dynamic_cast<AttFermatapresent*>(element);
         assert( att );
@@ -7357,11 +8125,35 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_FILING ) ) {
+        AttFiling *att = dynamic_cast<AttFiling*>(element);
+        assert( att );
+        if (attrType == "nonfilingInt") {
+            att->SetNonfiling(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_GRPSYMLOG ) ) {
+        AttGrpSymLog *att = dynamic_cast<AttGrpSymLog*>(element);
+        assert( att );
+        if (attrType == "levelInt") {
+            att->SetLevel(att->StrToInt(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_HANDIDENT ) ) {
         AttHandident *att = dynamic_cast<AttHandident*>(element);
         assert( att );
         if (attrType == "hand") {
             att->SetHand(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_HEIGHT ) ) {
+        AttHeight *att = dynamic_cast<AttHeight*>(element);
+        assert( att );
+        if (attrType == "height") {
+            att->SetHeight(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7456,6 +8248,10 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             att->SetLang(att->StrToStr(attrValue));
             return true;
         }
+        if (attrType == "translit") {
+            att->SetTranslit(att->StrToStr(attrValue));
+            return true;
+        }
     }
     if (element->HasAttClass( ATT_LAYERLOG ) ) {
         AttLayerLog *att = dynamic_cast<AttLayerLog*>(element);
@@ -7468,8 +8264,36 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_LAYERIDENT ) ) {
         AttLayerident *att = dynamic_cast<AttLayerident*>(element);
         assert( att );
-        if (attrType == "layer") {
-            att->SetLayer(att->StrToStr(attrValue));
+        if (attrType == "layerInt") {
+            att->SetLayer(att->StrToInt(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_LINEVIS ) ) {
+        AttLineVis *att = dynamic_cast<AttLineVis*>(element);
+        assert( att );
+        if (attrType == "form") {
+            att->SetForm(att->StrToBarRendition(attrValue));
+            return true;
+        }
+        if (attrType == "width") {
+            att->SetWidth(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "endsym") {
+            att->SetEndsym(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "endsymsize") {
+            att->SetEndsymsize(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "startsym") {
+            att->SetStartsym(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "startsymsize") {
+            att->SetStartsymsize(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7484,8 +8308,32 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_LINEREND ) ) {
         AttLinerend *att = dynamic_cast<AttLinerend*>(element);
         assert( att );
-        if (attrType == "rend") {
-            att->SetRend(att->StrToBarRendition(attrValue));
+        if (attrType == "lendsym") {
+            att->SetLendsym(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lendsymsize") {
+            att->SetLendsymsize(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lstartsym") {
+            att->SetLstartsym(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lstartsymsize") {
+            att->SetLstartsymsize(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_LINERENDBASE ) ) {
+        AttLinerendBase *att = dynamic_cast<AttLinerendBase*>(element);
+        assert( att );
+        if (attrType == "lform") {
+            att->SetLform(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "lwidth") {
+            att->SetLwidth(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7537,6 +8385,14 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_MEASURENUMBERS ) ) {
+        AttMeasurenumbers *att = dynamic_cast<AttMeasurenumbers*>(element);
+        assert( att );
+        if (attrType == "mnumVisible") {
+            att->SetMnumVisible(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_MEDIABOUNDS ) ) {
         AttMediabounds *att = dynamic_cast<AttMediabounds*>(element);
         assert( att );
@@ -7566,10 +8422,6 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         assert( att );
         if (attrType == "meiversion") {
             att->SetMeiversion(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "meiversionNum") {
-            att->SetMeiversionNum(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7604,8 +8456,8 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_METERSIGVIS ) ) {
         AttMeterSigVis *att = dynamic_cast<AttMeterSigVis*>(element);
         assert( att );
-        if (attrType == "rend") {
-            att->SetRend(att->StrToBarRendition(attrValue));
+        if (attrType == "form") {
+            att->SetForm(att->StrToBarRendition(attrValue));
             return true;
         }
     }
@@ -7693,6 +8545,18 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_NOTATIONSTYLE ) ) {
+        AttNotationstyle *att = dynamic_cast<AttNotationstyle*>(element);
+        assert( att );
+        if (attrType == "musicName") {
+            att->SetMusicName(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "musicSize") {
+            att->SetMusicSize(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_NOTEGES ) ) {
         AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
         assert( att );
@@ -7709,11 +8573,35 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
-    if (element->HasAttClass( ATT_NOTEVIS ) ) {
-        AttNoteVis *att = dynamic_cast<AttNoteVis*>(element);
+    if (element->HasAttClass( ATT_NOTEHEADS ) ) {
+        AttNoteheads *att = dynamic_cast<AttNoteheads*>(element);
         assert( att );
-        if (attrType == "headshape") {
-            att->SetHeadshape(att->StrToStr(attrValue));
+        if (attrType == "headColor") {
+            att->SetHeadColor(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "headFill") {
+            att->SetHeadFill(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "headFillcolor") {
+            att->SetHeadFillcolor(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "headMod") {
+            att->SetHeadMod(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "headRotation") {
+            att->SetHeadRotation(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "headShape") {
+            att->SetHeadShape(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "headVisible") {
+            att->SetHeadVisible(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7753,6 +8641,14 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_OPTIMIZATION ) ) {
+        AttOptimization *att = dynamic_cast<AttOptimization*>(element);
+        assert( att );
+        if (attrType == "optimize") {
+            att->SetOptimize(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_PADLOG ) ) {
         AttPadLog *att = dynamic_cast<AttPadLog*>(element);
         assert( att );
@@ -7761,11 +8657,47 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_PAGES ) ) {
+        AttPages *att = dynamic_cast<AttPages*>(element);
+        assert( att );
+        if (attrType == "pageHeight") {
+            att->SetPageHeight(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageWidth") {
+            att->SetPageWidth(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageTopmar") {
+            att->SetPageTopmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageBotmar") {
+            att->SetPageBotmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageLeftmar") {
+            att->SetPageLeftmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageRightmar") {
+            att->SetPageRightmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pagePanels") {
+            att->SetPagePanels(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "pageScale") {
+            att->SetPageScale(att->StrToStr(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_PBVIS ) ) {
         AttPbVis *att = dynamic_cast<AttPbVis*>(element);
         assert( att );
-        if (attrType == "func") {
-            att->SetFunc(att->StrToFunc(attrValue));
+        if (attrType == "folium") {
+            att->SetFolium(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -7825,6 +8757,14 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
+    if (element->HasAttClass( ATT_QUANTITY ) ) {
+        AttQuantity *att = dynamic_cast<AttQuantity*>(element);
+        assert( att );
+        if (attrType == "quantityDbl") {
+            att->SetQuantity(att->StrToDbl(attrValue));
+            return true;
+        }
+    }
     if (element->HasAttClass( ATT_RELATIVESIZE ) ) {
         AttRelativesize *att = dynamic_cast<AttRelativesize*>(element);
         assert( att );
@@ -7844,8 +8784,8 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_SBVIS ) ) {
         AttSbVis *att = dynamic_cast<AttSbVis*>(element);
         assert( att );
-        if (attrType == "rend") {
-            att->SetRend(att->StrToBarRendition(attrValue));
+        if (attrType == "form") {
+            att->SetForm(att->StrToBarRendition(attrValue));
             return true;
         }
     }
@@ -7876,86 +8816,6 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_SCOREDEFVIS ) ) {
         AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
         assert( att );
-        if (attrType == "endingRend") {
-            att->SetEndingRend(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "mnumVisible") {
-            att->SetMnumVisible(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "musicName") {
-            att->SetMusicName(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "musicSize") {
-            att->SetMusicSize(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "optimize") {
-            att->SetOptimize(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageHeight") {
-            att->SetPageHeight(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageWidth") {
-            att->SetPageWidth(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageTopmar") {
-            att->SetPageTopmar(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageBotmar") {
-            att->SetPageBotmar(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageLeftmar") {
-            att->SetPageLeftmar(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageRightmar") {
-            att->SetPageRightmar(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pagePanels") {
-            att->SetPagePanels(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "pageScale") {
-            att->SetPageScale(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "spacingPackexpDbl") {
-            att->SetSpacingPackexp(att->StrToDbl(attrValue));
-            return true;
-        }
-        if (attrType == "spacingPackfactDbl") {
-            att->SetSpacingPackfact(att->StrToDbl(attrValue));
-            return true;
-        }
-        if (attrType == "spacingStaff") {
-            att->SetSpacingStaff(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "spacingSystem") {
-            att->SetSpacingSystem(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "systemLeftmar") {
-            att->SetSystemLeftmar(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "systemRightmar") {
-            att->SetSystemRightmar(att->StrToStr(attrValue));
-            return true;
-        }
-        if (attrType == "systemTopmar") {
-            att->SetSystemTopmar(att->StrToStr(attrValue));
-            return true;
-        }
         if (attrType == "vuHeight") {
             att->SetVuHeight(att->StrToStr(attrValue));
             return true;
@@ -7998,6 +8858,26 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         assert( att );
         if (attrType == "compressable") {
             att->SetCompressable(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_SPACING ) ) {
+        AttSpacing *att = dynamic_cast<AttSpacing*>(element);
+        assert( att );
+        if (attrType == "spacingPackexpDbl") {
+            att->SetSpacingPackexp(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "spacingPackfactDbl") {
+            att->SetSpacingPackfact(att->StrToDbl(attrValue));
+            return true;
+        }
+        if (attrType == "spacingStaff") {
+            att->SetSpacingStaff(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "spacingSystem") {
+            att->SetSpacingSystem(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -8097,8 +8977,8 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             return true;
         }
     }
-    if (element->HasAttClass( ATT_STEMMED ) ) {
-        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
+    if (element->HasAttClass( ATT_STEMS ) ) {
+        AttStems *att = dynamic_cast<AttStems*>(element);
         assert( att );
         if (attrType == "stemDir") {
             att->SetStemDir(att->StrToStemDirection(attrValue));
@@ -8106,6 +8986,10 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         }
         if (attrType == "stemLen") {
             att->SetStemLen(att->StrToInt(attrValue));
+            return true;
+        }
+        if (attrType == "stemMod") {
+            att->SetStemMod(att->StrToStemModifier(attrValue));
             return true;
         }
         if (attrType == "stemPos") {
@@ -8138,6 +9022,26 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         assert( att );
         if (attrType == "syl") {
             att->SetSyl(att->StrToStr(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass( ATT_SYSTEMS ) ) {
+        AttSystems *att = dynamic_cast<AttSystems*>(element);
+        assert( att );
+        if (attrType == "systemLeftline") {
+            att->SetSystemLeftline(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "systemLeftmar") {
+            att->SetSystemLeftmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "systemRightmar") {
+            att->SetSystemRightmar(att->StrToStr(attrValue));
+            return true;
+        }
+        if (attrType == "systemTopmar") {
+            att->SetSystemTopmar(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -8184,8 +9088,8 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_TIMESTAMPPERFORMED ) ) {
         AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
         assert( att );
-        if (attrType == "tstampGesInt") {
-            att->SetTstampGes(att->StrToInt(attrValue));
+        if (attrType == "tstampGes") {
+            att->SetTstampGes(att->StrToStr(attrValue));
             return true;
         }
         if (attrType == "tstampReal") {
@@ -8391,13 +9295,6 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("accidGes", att->StrToStr(att->GetAccidGes())));
         }
     }
-    if (element->HasAttClass( ATT_ALTSYM ) ) {
-        AttAltsym *att = dynamic_cast<AttAltsym*>(element);
-        assert( att );
-        if (att->HasAltsym()) {
-            attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));
-        }
-    }
     if (element->HasAttClass( ATT_ARTICULATION ) ) {
         AttArticulation *att = dynamic_cast<AttArticulation*>(element);
         assert( att );
@@ -8432,8 +9329,8 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_BARLINELOG ) ) {
         AttBarLineLog *att = dynamic_cast<AttBarLineLog*>(element);
         assert( att );
-        if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->BarRenditionToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass( ATT_BARPLACEMENT ) ) {
@@ -8476,8 +9373,8 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_CANONICAL ) ) {
         AttCanonical *att = dynamic_cast<AttCanonical*>(element);
         assert( att );
-        if (att->HasDbkey()) {
-            attributes->push_back(std::make_pair("dbkey", att->StrToStr(att->GetDbkey())));
+        if (att->HasCodedval()) {
+            attributes->push_back(std::make_pair("codedval", att->StrToStr(att->GetCodedval())));
         }
     }
     if (element->HasAttClass( ATT_CHORDVIS ) ) {
@@ -8485,6 +9382,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         assert( att );
         if (att->HasCluster()) {
             attributes->push_back(std::make_pair("cluster", att->StrToStr(att->GetCluster())));
+        }
+    }
+    if (element->HasAttClass( ATT_CLASSCODEIDENT ) ) {
+        AttClasscodeident *att = dynamic_cast<AttClasscodeident*>(element);
+        assert( att );
+        if (att->HasClasscode()) {
+            attributes->push_back(std::make_pair("classcode", att->StrToStr(att->GetClasscode())));
         }
     }
     if (element->HasAttClass( ATT_CLEFLOG ) ) {
@@ -8527,13 +9431,6 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("shape", att->ClefShapeToStr(att->GetShape())));
         }
     }
-    if (element->HasAttClass( ATT_CODED ) ) {
-        AttCoded *att = dynamic_cast<AttCoded*>(element);
-        assert( att );
-        if (att->HasCode()) {
-            attributes->push_back(std::make_pair("code", att->StrToStr(att->GetCode())));
-        }
-    }
     if (element->HasAttClass( ATT_COLOR ) ) {
         AttColor *att = dynamic_cast<AttColor*>(element);
         assert( att );
@@ -8551,11 +9448,15 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_COMMON ) ) {
         AttCommon *att = dynamic_cast<AttCommon*>(element);
         assert( att );
-        if (att->HasLabel()) {
-            attributes->push_back(std::make_pair("label", att->StrToStr(att->GetLabel())));
-        }
         if (att->HasN()) {
             attributes->push_back(std::make_pair("n", att->IntToStr(att->GetN())));
+        }
+    }
+    if (element->HasAttClass( ATT_COMMONPART ) ) {
+        AttCommonPart *att = dynamic_cast<AttCommonPart*>(element);
+        assert( att );
+        if (att->HasLabel()) {
+            attributes->push_back(std::make_pair("label", att->StrToStr(att->GetLabel())));
         }
         if (att->HasBase()) {
             attributes->push_back(std::make_pair("base", att->StrToStr(att->GetBase())));
@@ -8593,8 +9494,11 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_CURVEREND ) ) {
         AttCurverend *att = dynamic_cast<AttCurverend*>(element);
         assert( att );
-        if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        if (att->HasLform()) {
+            attributes->push_back(std::make_pair("lform", att->StrToStr(att->GetLform())));
+        }
+        if (att->HasLwidth()) {
+            attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass( ATT_CUSTOSLOG ) ) {
@@ -8654,7 +9558,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttDotLog *att = dynamic_cast<AttDotLog*>(element);
         assert( att );
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+            attributes->push_back(std::make_pair("form", att->BarRenditionToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass( ATT_DURATIONADDITIVE ) ) {
@@ -8708,6 +9612,20 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("enclose", att->StrToStr(att->GetEnclose())));
         }
     }
+    if (element->HasAttClass( ATT_ENDINGS ) ) {
+        AttEndings *att = dynamic_cast<AttEndings*>(element);
+        assert( att );
+        if (att->HasEndingRend()) {
+            attributes->push_back(std::make_pair("endingRend", att->StrToStr(att->GetEndingRend())));
+        }
+    }
+    if (element->HasAttClass( ATT_EXTENDER ) ) {
+        AttExtender *att = dynamic_cast<AttExtender*>(element);
+        assert( att );
+        if (att->HasExtender()) {
+            attributes->push_back(std::make_pair("extender", att->StrToStr(att->GetExtender())));
+        }
+    }
     if (element->HasAttClass( ATT_FERMATAPRESENT ) ) {
         AttFermatapresent *att = dynamic_cast<AttFermatapresent*>(element);
         assert( att );
@@ -8715,11 +9633,32 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("fermata", att->PlaceToStr(att->GetFermata())));
         }
     }
+    if (element->HasAttClass( ATT_FILING ) ) {
+        AttFiling *att = dynamic_cast<AttFiling*>(element);
+        assert( att );
+        if (att->HasNonfiling()) {
+            attributes->push_back(std::make_pair("nonfilingInt", att->IntToStr(att->GetNonfiling())));
+        }
+    }
+    if (element->HasAttClass( ATT_GRPSYMLOG ) ) {
+        AttGrpSymLog *att = dynamic_cast<AttGrpSymLog*>(element);
+        assert( att );
+        if (att->HasLevel()) {
+            attributes->push_back(std::make_pair("levelInt", att->IntToStr(att->GetLevel())));
+        }
+    }
     if (element->HasAttClass( ATT_HANDIDENT ) ) {
         AttHandident *att = dynamic_cast<AttHandident*>(element);
         assert( att );
         if (att->HasHand()) {
             attributes->push_back(std::make_pair("hand", att->StrToStr(att->GetHand())));
+        }
+    }
+    if (element->HasAttClass( ATT_HEIGHT ) ) {
+        AttHeight *att = dynamic_cast<AttHeight*>(element);
+        assert( att );
+        if (att->HasHeight()) {
+            attributes->push_back(std::make_pair("height", att->StrToStr(att->GetHeight())));
         }
     }
     if (element->HasAttClass( ATT_HORIZONTALALIGN ) ) {
@@ -8799,6 +9738,9 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         if (att->HasLang()) {
             attributes->push_back(std::make_pair("lang", att->StrToStr(att->GetLang())));
         }
+        if (att->HasTranslit()) {
+            attributes->push_back(std::make_pair("translit", att->StrToStr(att->GetTranslit())));
+        }
     }
     if (element->HasAttClass( ATT_LAYERLOG ) ) {
         AttLayerLog *att = dynamic_cast<AttLayerLog*>(element);
@@ -8811,7 +9753,29 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttLayerident *att = dynamic_cast<AttLayerident*>(element);
         assert( att );
         if (att->HasLayer()) {
-            attributes->push_back(std::make_pair("layer", att->StrToStr(att->GetLayer())));
+            attributes->push_back(std::make_pair("layerInt", att->IntToStr(att->GetLayer())));
+        }
+    }
+    if (element->HasAttClass( ATT_LINEVIS ) ) {
+        AttLineVis *att = dynamic_cast<AttLineVis*>(element);
+        assert( att );
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->BarRenditionToStr(att->GetForm())));
+        }
+        if (att->HasWidth()) {
+            attributes->push_back(std::make_pair("width", att->StrToStr(att->GetWidth())));
+        }
+        if (att->HasEndsym()) {
+            attributes->push_back(std::make_pair("endsym", att->StrToStr(att->GetEndsym())));
+        }
+        if (att->HasEndsymsize()) {
+            attributes->push_back(std::make_pair("endsymsize", att->StrToStr(att->GetEndsymsize())));
+        }
+        if (att->HasStartsym()) {
+            attributes->push_back(std::make_pair("startsym", att->StrToStr(att->GetStartsym())));
+        }
+        if (att->HasStartsymsize()) {
+            attributes->push_back(std::make_pair("startsymsize", att->StrToStr(att->GetStartsymsize())));
         }
     }
     if (element->HasAttClass( ATT_LINELOC ) ) {
@@ -8824,8 +9788,27 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_LINEREND ) ) {
         AttLinerend *att = dynamic_cast<AttLinerend*>(element);
         assert( att );
-        if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        if (att->HasLendsym()) {
+            attributes->push_back(std::make_pair("lendsym", att->StrToStr(att->GetLendsym())));
+        }
+        if (att->HasLendsymsize()) {
+            attributes->push_back(std::make_pair("lendsymsize", att->StrToStr(att->GetLendsymsize())));
+        }
+        if (att->HasLstartsym()) {
+            attributes->push_back(std::make_pair("lstartsym", att->StrToStr(att->GetLstartsym())));
+        }
+        if (att->HasLstartsymsize()) {
+            attributes->push_back(std::make_pair("lstartsymsize", att->StrToStr(att->GetLstartsymsize())));
+        }
+    }
+    if (element->HasAttClass( ATT_LINERENDBASE ) ) {
+        AttLinerendBase *att = dynamic_cast<AttLinerendBase*>(element);
+        assert( att );
+        if (att->HasLform()) {
+            attributes->push_back(std::make_pair("lform", att->StrToStr(att->GetLform())));
+        }
+        if (att->HasLwidth()) {
+            attributes->push_back(std::make_pair("lwidth", att->StrToStr(att->GetLwidth())));
         }
     }
     if (element->HasAttClass( ATT_LYRICSTYLE ) ) {
@@ -8867,6 +9850,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("unit", att->IntToStr(att->GetUnit())));
         }
     }
+    if (element->HasAttClass( ATT_MEASURENUMBERS ) ) {
+        AttMeasurenumbers *att = dynamic_cast<AttMeasurenumbers*>(element);
+        assert( att );
+        if (att->HasMnumVisible()) {
+            attributes->push_back(std::make_pair("mnumVisible", att->StrToStr(att->GetMnumVisible())));
+        }
+    }
     if (element->HasAttClass( ATT_MEDIABOUNDS ) ) {
         AttMediabounds *att = dynamic_cast<AttMediabounds*>(element);
         assert( att );
@@ -8892,9 +9882,6 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         assert( att );
         if (att->HasMeiversion()) {
             attributes->push_back(std::make_pair("meiversion", att->StrToStr(att->GetMeiversion())));
-        }
-        if (att->HasMeiversionNum()) {
-            attributes->push_back(std::make_pair("meiversionNum", att->StrToStr(att->GetMeiversionNum())));
         }
     }
     if (element->HasAttClass( ATT_MENSURLOG ) ) {
@@ -8923,8 +9910,8 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_METERSIGVIS ) ) {
         AttMeterSigVis *att = dynamic_cast<AttMeterSigVis*>(element);
         assert( att );
-        if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->BarRenditionToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass( ATT_METERSIGDEFAULTLOG ) ) {
@@ -8997,6 +9984,16 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("role", att->StrToStr(att->GetRole())));
         }
     }
+    if (element->HasAttClass( ATT_NOTATIONSTYLE ) ) {
+        AttNotationstyle *att = dynamic_cast<AttNotationstyle*>(element);
+        assert( att );
+        if (att->HasMusicName()) {
+            attributes->push_back(std::make_pair("musicName", att->StrToStr(att->GetMusicName())));
+        }
+        if (att->HasMusicSize()) {
+            attributes->push_back(std::make_pair("musicSize", att->StrToStr(att->GetMusicSize())));
+        }
+    }
     if (element->HasAttClass( ATT_NOTEGES ) ) {
         AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
         assert( att );
@@ -9010,11 +10007,29 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("pnum", att->StrToStr(att->GetPnum())));
         }
     }
-    if (element->HasAttClass( ATT_NOTEVIS ) ) {
-        AttNoteVis *att = dynamic_cast<AttNoteVis*>(element);
+    if (element->HasAttClass( ATT_NOTEHEADS ) ) {
+        AttNoteheads *att = dynamic_cast<AttNoteheads*>(element);
         assert( att );
-        if (att->HasHeadshape()) {
-            attributes->push_back(std::make_pair("headshape", att->StrToStr(att->GetHeadshape())));
+        if (att->HasHeadColor()) {
+            attributes->push_back(std::make_pair("headColor", att->StrToStr(att->GetHeadColor())));
+        }
+        if (att->HasHeadFill()) {
+            attributes->push_back(std::make_pair("headFill", att->StrToStr(att->GetHeadFill())));
+        }
+        if (att->HasHeadFillcolor()) {
+            attributes->push_back(std::make_pair("headFillcolor", att->StrToStr(att->GetHeadFillcolor())));
+        }
+        if (att->HasHeadMod()) {
+            attributes->push_back(std::make_pair("headMod", att->StrToStr(att->GetHeadMod())));
+        }
+        if (att->HasHeadRotation()) {
+            attributes->push_back(std::make_pair("headRotation", att->StrToStr(att->GetHeadRotation())));
+        }
+        if (att->HasHeadShape()) {
+            attributes->push_back(std::make_pair("headShape", att->StrToStr(att->GetHeadShape())));
+        }
+        if (att->HasHeadVisible()) {
+            attributes->push_back(std::make_pair("headVisible", att->StrToStr(att->GetHeadVisible())));
         }
     }
     if (element->HasAttClass( ATT_OCTAVE ) ) {
@@ -9048,6 +10063,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("ontheline", att->StrToStr(att->GetOntheline())));
         }
     }
+    if (element->HasAttClass( ATT_OPTIMIZATION ) ) {
+        AttOptimization *att = dynamic_cast<AttOptimization*>(element);
+        assert( att );
+        if (att->HasOptimize()) {
+            attributes->push_back(std::make_pair("optimize", att->StrToStr(att->GetOptimize())));
+        }
+    }
     if (element->HasAttClass( ATT_PADLOG ) ) {
         AttPadLog *att = dynamic_cast<AttPadLog*>(element);
         assert( att );
@@ -9055,11 +10077,39 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
         }
     }
+    if (element->HasAttClass( ATT_PAGES ) ) {
+        AttPages *att = dynamic_cast<AttPages*>(element);
+        assert( att );
+        if (att->HasPageHeight()) {
+            attributes->push_back(std::make_pair("pageHeight", att->StrToStr(att->GetPageHeight())));
+        }
+        if (att->HasPageWidth()) {
+            attributes->push_back(std::make_pair("pageWidth", att->StrToStr(att->GetPageWidth())));
+        }
+        if (att->HasPageTopmar()) {
+            attributes->push_back(std::make_pair("pageTopmar", att->StrToStr(att->GetPageTopmar())));
+        }
+        if (att->HasPageBotmar()) {
+            attributes->push_back(std::make_pair("pageBotmar", att->StrToStr(att->GetPageBotmar())));
+        }
+        if (att->HasPageLeftmar()) {
+            attributes->push_back(std::make_pair("pageLeftmar", att->StrToStr(att->GetPageLeftmar())));
+        }
+        if (att->HasPageRightmar()) {
+            attributes->push_back(std::make_pair("pageRightmar", att->StrToStr(att->GetPageRightmar())));
+        }
+        if (att->HasPagePanels()) {
+            attributes->push_back(std::make_pair("pagePanels", att->StrToStr(att->GetPagePanels())));
+        }
+        if (att->HasPageScale()) {
+            attributes->push_back(std::make_pair("pageScale", att->StrToStr(att->GetPageScale())));
+        }
+    }
     if (element->HasAttClass( ATT_PBVIS ) ) {
         AttPbVis *att = dynamic_cast<AttPbVis*>(element);
         assert( att );
-        if (att->HasFunc()) {
-            attributes->push_back(std::make_pair("func", att->FuncToStr(att->GetFunc())));
+        if (att->HasFolium()) {
+            attributes->push_back(std::make_pair("folium", att->StrToStr(att->GetFolium())));
         }
     }
     if (element->HasAttClass( ATT_PITCH ) ) {
@@ -9108,6 +10158,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("title", att->StrToStr(att->GetTitle())));
         }
     }
+    if (element->HasAttClass( ATT_QUANTITY ) ) {
+        AttQuantity *att = dynamic_cast<AttQuantity*>(element);
+        assert( att );
+        if (att->HasQuantity()) {
+            attributes->push_back(std::make_pair("quantityDbl", att->DblToStr(att->GetQuantity())));
+        }
+    }
     if (element->HasAttClass( ATT_RELATIVESIZE ) ) {
         AttRelativesize *att = dynamic_cast<AttRelativesize*>(element);
         assert( att );
@@ -9125,8 +10182,8 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_SBVIS ) ) {
         AttSbVis *att = dynamic_cast<AttSbVis*>(element);
         assert( att );
-        if (att->HasRend()) {
-            attributes->push_back(std::make_pair("rend", att->BarRenditionToStr(att->GetRend())));
+        if (att->HasForm()) {
+            attributes->push_back(std::make_pair("form", att->BarRenditionToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass( ATT_SCALABLE ) ) {
@@ -9152,66 +10209,6 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
     if (element->HasAttClass( ATT_SCOREDEFVIS ) ) {
         AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
         assert( att );
-        if (att->HasEndingRend()) {
-            attributes->push_back(std::make_pair("endingRend", att->StrToStr(att->GetEndingRend())));
-        }
-        if (att->HasMnumVisible()) {
-            attributes->push_back(std::make_pair("mnumVisible", att->StrToStr(att->GetMnumVisible())));
-        }
-        if (att->HasMusicName()) {
-            attributes->push_back(std::make_pair("musicName", att->StrToStr(att->GetMusicName())));
-        }
-        if (att->HasMusicSize()) {
-            attributes->push_back(std::make_pair("musicSize", att->StrToStr(att->GetMusicSize())));
-        }
-        if (att->HasOptimize()) {
-            attributes->push_back(std::make_pair("optimize", att->StrToStr(att->GetOptimize())));
-        }
-        if (att->HasPageHeight()) {
-            attributes->push_back(std::make_pair("pageHeight", att->StrToStr(att->GetPageHeight())));
-        }
-        if (att->HasPageWidth()) {
-            attributes->push_back(std::make_pair("pageWidth", att->StrToStr(att->GetPageWidth())));
-        }
-        if (att->HasPageTopmar()) {
-            attributes->push_back(std::make_pair("pageTopmar", att->StrToStr(att->GetPageTopmar())));
-        }
-        if (att->HasPageBotmar()) {
-            attributes->push_back(std::make_pair("pageBotmar", att->StrToStr(att->GetPageBotmar())));
-        }
-        if (att->HasPageLeftmar()) {
-            attributes->push_back(std::make_pair("pageLeftmar", att->StrToStr(att->GetPageLeftmar())));
-        }
-        if (att->HasPageRightmar()) {
-            attributes->push_back(std::make_pair("pageRightmar", att->StrToStr(att->GetPageRightmar())));
-        }
-        if (att->HasPagePanels()) {
-            attributes->push_back(std::make_pair("pagePanels", att->StrToStr(att->GetPagePanels())));
-        }
-        if (att->HasPageScale()) {
-            attributes->push_back(std::make_pair("pageScale", att->StrToStr(att->GetPageScale())));
-        }
-        if (att->HasSpacingPackexp()) {
-            attributes->push_back(std::make_pair("spacingPackexpDbl", att->DblToStr(att->GetSpacingPackexp())));
-        }
-        if (att->HasSpacingPackfact()) {
-            attributes->push_back(std::make_pair("spacingPackfactDbl", att->DblToStr(att->GetSpacingPackfact())));
-        }
-        if (att->HasSpacingStaff()) {
-            attributes->push_back(std::make_pair("spacingStaff", att->StrToStr(att->GetSpacingStaff())));
-        }
-        if (att->HasSpacingSystem()) {
-            attributes->push_back(std::make_pair("spacingSystem", att->StrToStr(att->GetSpacingSystem())));
-        }
-        if (att->HasSystemLeftmar()) {
-            attributes->push_back(std::make_pair("systemLeftmar", att->StrToStr(att->GetSystemLeftmar())));
-        }
-        if (att->HasSystemRightmar()) {
-            attributes->push_back(std::make_pair("systemRightmar", att->StrToStr(att->GetSystemRightmar())));
-        }
-        if (att->HasSystemTopmar()) {
-            attributes->push_back(std::make_pair("systemTopmar", att->StrToStr(att->GetSystemTopmar())));
-        }
         if (att->HasVuHeight()) {
             attributes->push_back(std::make_pair("vuHeight", att->StrToStr(att->GetVuHeight())));
         }
@@ -9249,6 +10246,22 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         assert( att );
         if (att->HasCompressable()) {
             attributes->push_back(std::make_pair("compressable", att->StrToStr(att->GetCompressable())));
+        }
+    }
+    if (element->HasAttClass( ATT_SPACING ) ) {
+        AttSpacing *att = dynamic_cast<AttSpacing*>(element);
+        assert( att );
+        if (att->HasSpacingPackexp()) {
+            attributes->push_back(std::make_pair("spacingPackexpDbl", att->DblToStr(att->GetSpacingPackexp())));
+        }
+        if (att->HasSpacingPackfact()) {
+            attributes->push_back(std::make_pair("spacingPackfactDbl", att->DblToStr(att->GetSpacingPackfact())));
+        }
+        if (att->HasSpacingStaff()) {
+            attributes->push_back(std::make_pair("spacingStaff", att->StrToStr(att->GetSpacingStaff())));
+        }
+        if (att->HasSpacingSystem()) {
+            attributes->push_back(std::make_pair("spacingSystem", att->StrToStr(att->GetSpacingSystem())));
         }
     }
     if (element->HasAttClass( ATT_STAFFLOG ) ) {
@@ -9332,14 +10345,17 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("startid", att->StrToStr(att->GetStartid())));
         }
     }
-    if (element->HasAttClass( ATT_STEMMED ) ) {
-        AttStemmed *att = dynamic_cast<AttStemmed*>(element);
+    if (element->HasAttClass( ATT_STEMS ) ) {
+        AttStems *att = dynamic_cast<AttStems*>(element);
         assert( att );
         if (att->HasStemDir()) {
             attributes->push_back(std::make_pair("stemDir", att->StemDirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
             attributes->push_back(std::make_pair("stemLen", att->IntToStr(att->GetStemLen())));
+        }
+        if (att->HasStemMod()) {
+            attributes->push_back(std::make_pair("stemMod", att->StemModifierToStr(att->GetStemMod())));
         }
         if (att->HasStemPos()) {
             attributes->push_back(std::make_pair("stemPos", att->StemPositionToStr(att->GetStemPos())));
@@ -9366,6 +10382,22 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         assert( att );
         if (att->HasSyl()) {
             attributes->push_back(std::make_pair("syl", att->StrToStr(att->GetSyl())));
+        }
+    }
+    if (element->HasAttClass( ATT_SYSTEMS ) ) {
+        AttSystems *att = dynamic_cast<AttSystems*>(element);
+        assert( att );
+        if (att->HasSystemLeftline()) {
+            attributes->push_back(std::make_pair("systemLeftline", att->StrToStr(att->GetSystemLeftline())));
+        }
+        if (att->HasSystemLeftmar()) {
+            attributes->push_back(std::make_pair("systemLeftmar", att->StrToStr(att->GetSystemLeftmar())));
+        }
+        if (att->HasSystemRightmar()) {
+            attributes->push_back(std::make_pair("systemRightmar", att->StrToStr(att->GetSystemRightmar())));
+        }
+        if (att->HasSystemTopmar()) {
+            attributes->push_back(std::make_pair("systemTopmar", att->StrToStr(att->GetSystemTopmar())));
         }
     }
     if (element->HasAttClass( ATT_TEXTSTYLE ) ) {
@@ -9405,7 +10437,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
         assert( att );
         if (att->HasTstampGes()) {
-            attributes->push_back(std::make_pair("tstampGesInt", att->IntToStr(att->GetTstampGes())));
+            attributes->push_back(std::make_pair("tstampGes", att->StrToStr(att->GetTstampGes())));
         }
         if (att->HasTstampReal()) {
             attributes->push_back(std::make_pair("tstampReal", att->StrToStr(att->GetTstampReal())));

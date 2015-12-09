@@ -62,7 +62,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of the dot. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_form;
     /** Records the name of the neume. **/
     std::string m_name;
@@ -107,7 +107,7 @@ public:
     ///@}
 
 private:
-    /** Records the function of the dot. **/
+    /** Records the appearance and usually the function of the bar line. **/
     std::string m_form;
     /** Records the name of the neume. **/
     std::string m_name;

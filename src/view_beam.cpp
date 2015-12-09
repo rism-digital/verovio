@@ -126,8 +126,8 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             if ( (current->Is() == NOTE) || (current->Is() == CHORD) ) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!params.m_hasMultipleStemDir) {
-                    assert( dynamic_cast<AttStemmed*>(current) );
-                    currentStemDir = dynamic_cast<AttStemmed*>(current)->GetStemDir();
+                    assert( dynamic_cast<AttStems*>(current) );
+                    currentStemDir = dynamic_cast<AttStems*>(current)->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((params.m_stemDir != STEMDIRECTION_NONE) && (params.m_stemDir != currentStemDir)) {
                             params.m_hasMultipleStemDir = ON;
@@ -415,8 +415,8 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // For now look at the stemDir only on the first note
-    assert( dynamic_cast<AttStemmed*>(firstElement.m_element) );
-    params.m_stemDir =  dynamic_cast<AttStemmed*>(firstElement.m_element)->GetStemDir();
+    assert( dynamic_cast<AttStems*>(firstElement.m_element) );
+    params.m_stemDir =  dynamic_cast<AttStems*>(firstElement.m_element)->GetStemDir();
     
     // We look only at the first note for checking if cuesized. Somehow arbitrarily
     params.m_cueSize = firstElement.m_element->IsCueSize();
