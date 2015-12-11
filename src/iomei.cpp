@@ -465,6 +465,7 @@ bool MeiOutput::WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp
     currentNode.append_attribute( "xml:id" ) = UuidToMeiStr( staffGrp ).c_str();
     
     staffGrp->WriteCommon(currentNode);
+    staffGrp->WriteCommonPart(currentNode);
     staffGrp->WriteLabelsAddl(currentNode);
     staffGrp->WriteStaffgroupingsym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
@@ -479,6 +480,7 @@ bool MeiOutput::WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( staffDef ).c_str();
     
     staffDef->WriteCommon(currentNode);
+    staffDef->WriteCommonPart(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
@@ -1366,6 +1368,7 @@ bool MeiInput::ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp )
     SetMeiUuid( staffGrp, vrvStaffGrp );
     
     vrvStaffGrp->ReadCommon(staffGrp);
+    vrvStaffGrp->ReadCommonPart(staffGrp);
     vrvStaffGrp->ReadLabelsAddl(staffGrp);
     vrvStaffGrp->ReadStaffGrpVis(staffGrp);
     vrvStaffGrp->ReadStaffgroupingsym(staffGrp);
@@ -1416,6 +1419,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     SetMeiUuid( staffDef, vrvStaffDef );
     
     vrvStaffDef->ReadCommon(staffDef);
+    vrvStaffDef->ReadCommonPart(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefVis(staffDef);
