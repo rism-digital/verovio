@@ -9,6 +9,7 @@
 #ifndef __VRV_SCOREDEF_H__
 #define __VRV_SCOREDEF_H__
 
+#include "atts_mei.h"
 #include "atts_shared.h"
 #include "drawinginterface.h"
 #include "object.h"
@@ -264,6 +265,7 @@ class StaffDef: public ScoreDefElement, public StaffDefDrawingInterface,
     public AttCommon,
     public AttCommonPart,
     public AttLabelsAddl,
+    public AttNotationtype,
     public AttScalable,
     public AttStaffDefVis
 {

@@ -30,6 +30,7 @@
 		4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
 		4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
 		4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50B5391C1B40C90081D56E /* atttypes.h */; };
+		4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
 		4D543E221B80AACF004B823C /* view_floating.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_floating.cpp */; };
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
@@ -1014,6 +1015,7 @@
 				4D763EEC198BF2D8003FCAB5 /* atts_shared.cpp in Sources */,
 				4D422105199805F800963292 /* att.cpp in Sources */,
 				4D4221071998A8CE00963292 /* atts_mensural.cpp in Sources */,
+				4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */,
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DF28A061A754DF000BA9F7D /* floatingelement.cpp in Sources */,

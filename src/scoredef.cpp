@@ -416,12 +416,14 @@ StaffDef::StaffDef() :
     AttCommon(),
     AttCommonPart(),
     AttLabelsAddl(),
+    AttNotationtype(),
     AttScalable(),
     AttStaffDefVis()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
+    RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFVIS);
     Reset();
@@ -437,6 +439,7 @@ void StaffDef::Reset()
     ResetCommon();
     ResetCommonPart();
     ResetLabelsAddl();
+    ResetNotationtype();
     ResetScalable();
     ResetStaffDefVis();
 }
