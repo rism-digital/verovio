@@ -74,6 +74,7 @@ FILES="../src/accid.cpp \
              ../src/view_tuplet.cpp \
              ../src/vrv.cpp \
              ../src/pugixml.cpp \
+             ../libmei/attconverter.cpp \
              ../libmei/atts_shared.cpp \
              ../libmei/atts_cmn.cpp \
              ../libmei/atts_critapp.cpp \

@@ -159,6 +159,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \
+	$VEROVIO_ROOT/libmei/attconverter.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
 	$VEROVIO_ROOT/libmei/atts_mei.cpp \

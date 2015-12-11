@@ -83,6 +83,7 @@ add_executable (verovio
 	../src/view_tuplet.cpp
 	../src/vrv.cpp
 	../src/pugixml.cpp
+	../libmei/attconverter.cpp
 	#../libmei/atts_analysis.cpp
 	#../libmei/atts_cmnornaments.cpp
 	#../libmei/atts_edittrans.cpp
