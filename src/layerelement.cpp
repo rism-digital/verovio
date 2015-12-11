@@ -15,7 +15,7 @@
 
 #include "accid.h"
 #include "aligner.h"
-#include "att_comparison.h"
+#include "attcomparison.h"
 #include "barline.h"
 #include "beam.h"
 #include "chord.h"

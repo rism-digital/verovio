@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        attdef
+// Name:        attdef.h
 // Author:      Laurent Pugin
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
@@ -15,8 +15,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "libmei_classes.h"
-#include "libmei_def.h"
+#include "attclasses.h"
+#include "atttypes.h"
 
 //----------------------------------------------------------------------------
 

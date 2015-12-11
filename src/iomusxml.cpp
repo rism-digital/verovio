@@ -15,7 +15,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
+#include "attcomparison.h"
 #include "beam.h"
 #include "chord.h"
 #include "doc.h"

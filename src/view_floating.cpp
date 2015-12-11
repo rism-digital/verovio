@@ -16,7 +16,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "att_comparison.h"
+#include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
 #include "doc.h"

@@ -13,7 +13,7 @@
 //----------------------------------------------------------------------------
 
 #include "vrvdef.h"
-#include "libmei_converter.h"
+#include "attconverter.h"
 
 namespace vrv {
 
@@ -28,7 +28,7 @@ class Object;
  * It is not an abstract class but it should not be instanciated directly.
  * The att classes are generated with the libmei parser for Verovio.
 */
-class Att: public LibmeiConverter
+class Att: public AttConverter
 {
 public:
     /** @name Constructors and destructor */

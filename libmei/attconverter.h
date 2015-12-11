@@ -12,22 +12,22 @@
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
     
-#ifndef __VRV_LIBMEI_CONVERTER_H__
-#define __VRV_LIBMEI_CONVERTER_H__
+#ifndef __VRV_ATT_CONVERTER_H__
+#define __VRV_ATT_CONVERTER_H__
 
 #include <string>
 
 //----------------------------------------------------------------------------
 
-#include "libmei_def.h"
+#include "attdef.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// LibmeiConverter
+// AttConverter
 //----------------------------------------------------------------------------
 
-class LibmeiConverter
+class AttConverter
 {
 public:
 
@@ -303,5 +303,5 @@ public:
 
 } // vrv namespace
 
-#endif  // __VRV_LIBMEI_CONVERTER_H__
+#endif  // __VRV_ATT_CONVERTER_H__
 

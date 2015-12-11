@@ -15,7 +15,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "libmei_classes.h"
+#include "attclasses.h"
 #include "vrvdef.h"
 
 namespace vrv {
