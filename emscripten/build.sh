@@ -164,8 +164,8 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
 	$VEROVIO_ROOT/libmei/atts_mei.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
-	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
+	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/ \
 	-s EXPORTED_FUNCTIONS="[\

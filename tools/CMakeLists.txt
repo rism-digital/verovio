@@ -84,25 +84,12 @@ add_executable (verovio
 	../src/vrv.cpp
 	../src/pugixml.cpp
 	../libmei/attconverter.cpp
-	#../libmei/atts_analysis.cpp
-	#../libmei/atts_cmnornaments.cpp
-	#../libmei/atts_edittrans.cpp
-	#../libmei/atts_figtable.cpp
-	#../libmei/atts_header.cpp
-	#../libmei/atts_lyrics.cpp
-	#../libmei/atts_midi.cpp
-	../libmei/atts_shared.cpp
 	../libmei/atts_cmn.cpp
 	../libmei/atts_critapp.cpp
-	#../libmei/atts_facsimile.cpp
-	#../libmei/atts_harmony.cpp
 	../libmei/atts_mei.cpp
 	../libmei/atts_mensural.cpp
 	../libmei/atts_pagebased.cpp
-	#../libmei/atts_performance.cpp
-	#../libmei/atts_neumes.cpp
-	#../libmei/atts_tablature.cpp
-	#../libmei/atts_usersymbols.cpp
+	../libmei/atts_shared.cpp
 	)
 
 install (TARGETS verovio DESTINATION /usr/local/bin)

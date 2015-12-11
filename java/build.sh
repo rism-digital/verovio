@@ -75,12 +75,12 @@ FILES="../src/accid.cpp \
              ../src/vrv.cpp \
              ../src/pugixml.cpp \
              ../libmei/attconverter.cpp \
-             ../libmei/atts_shared.cpp \
              ../libmei/atts_cmn.cpp \
              ../libmei/atts_critapp.cpp \
              ../libmei/atts_mei.cpp \
              ../libmei/atts_mensural.cpp \
-             ../libmei/atts_pagebased.cpp"
+             ../libmei/atts_pagebased.cpp \
+             ../libmei/atts_shared.cpp"
 
 CXXOPTS="-g -fpic -I../include -I../include/vrv -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
 g++ -shared -o target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
