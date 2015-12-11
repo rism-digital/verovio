@@ -21,7 +21,7 @@ namespace vrv {
 class App;
 class Accid;
 class Annot;
-class Barline;
+class BarLine;
 class Beam;
 class BeatRpt;
 class BTrem;
@@ -132,7 +132,7 @@ private:
      */
     ///@{
     void WriteMeiAccid( pugi::xml_node currentNode, Accid *accid );
-    void WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine );
+    void WriteMeiBarLine( pugi::xml_node currentNode, BarLine *barLine );
     void WriteMeiBeam( pugi::xml_node currentNode, Beam *beam );
     void WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt );
     void WriteMeiBTrem( pugi::xml_node currentNode, BTrem *bTrem );
@@ -301,7 +301,7 @@ private:
      */
     ///@{
     bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
-    bool ReadMeiBarline( Object *parent, pugi::xml_node barLine );
+    bool ReadMeiBarLine( Object *parent, pugi::xml_node barLine );
     bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
     bool ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt );
     bool ReadMeiBTrem( Object *parent, pugi::xml_node bTrem );

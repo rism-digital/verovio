@@ -18,7 +18,7 @@ namespace vrv {
 class Accid;
 class Beam;
 class BeamParams;
-class Barline;
+class BarLine;
 class Chord;
 class DeviceContext;
 class Doc;
@@ -145,14 +145,14 @@ protected:
     ///@{
     void DrawSystem( DeviceContext *dc, System *system );
     void DrawSystemList( DeviceContext *dc, System *system, const ClassId classId );
-	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine = NULL );
+	void DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL );
     void DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false, bool abbreviations = false  );
     void DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false );
 	void DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
 	void DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize);
-    void DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine );
-    void DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barLine );
-	void DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barLine );
+    void DrawBarLines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine );
+    void DrawBarLine( DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine );
+	void DrawBarLineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine );
     void DrawMeasure( DeviceContext *dc, Measure *measure, System *system );
     void DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
 	void DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, System *system );
@@ -205,7 +205,7 @@ protected:
      */
     ///@{
     void DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid* prevAccid = NULL );
-    void DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawBarLine( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );
     void DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure );

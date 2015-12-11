@@ -109,7 +109,7 @@ private:
     ///@{
     void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlBarline(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
     ///@}

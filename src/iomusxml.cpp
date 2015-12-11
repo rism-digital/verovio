@@ -587,7 +587,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure,
             ReadMusicXmlAttributes(*it, measure, measureNb);
         }
         else if (IsElement(*it, "barline")) {
-            ReadMusicXmlBarline(*it, measure, measureNb);
+            ReadMusicXmlBarLine(*it, measure, measureNb);
         }
         else if (IsElement(*it, "note")) {
             ReadMusicXmlNote(*it, measure, measureNb);
@@ -621,7 +621,7 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, in
 {
 }
 
-void MusicXmlInput::ReadMusicXmlBarline(pugi::xml_node node, Measure *measure, int measureNb)
+void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, int measureNb)
 {
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");

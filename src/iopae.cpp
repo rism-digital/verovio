@@ -277,7 +277,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         
         //barLine
         else if ((incipit[i] == ':') || (incipit[i] == '/')) {
-            i += getBarline(incipit, &current_measure.barLine, i);
+            i += getBarLine(incipit, &current_measure.barLine, i);
             current_measure.abbreviation_offset = 0; // just in case...
             staff.push_back( current_measure );
             current_measure.reset();
@@ -882,7 +882,7 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
 
 /**********************************
  *
- * getBarline -- read the barLine.
+ * getBarLine -- read the barLine.
  * Translation from PAE to verovio representaion:
  *
  BARRENDITION_single     /
@@ -893,7 +893,7 @@ int PaeInput::getWholeRest( const char *incipit, int *wholerest, int index ) {
  BARRENDITION_dbl        //
  */
 
-int PaeInput::getBarline( const char *incipit, data_BARRENDITION *output, int index ) {
+int PaeInput::getBarLine( const char *incipit, data_BARRENDITION *output, int index ) {
     regex_t re;
     
     regcomp(&re, "^://:", REG_EXTENDED);
@@ -1149,7 +1149,7 @@ void PaeInput::convertMeasure(pae::Measure *measure ) {
     
     // Set barLine
     // FIXME use flags for proper barLine identification
-    Barline *bline = m_measure->GetRightBarline();
+    BarLine *bline = m_measure->GetRightBarLine();
     bline->SetForm( measure->barLine );
 
 }

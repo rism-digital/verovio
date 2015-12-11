@@ -61,8 +61,8 @@ Style::Style()
     m_leftPosition = DEFAULT_LEFT_POSITION * DEFINITON_FACTOR;
     
     /** The layout left margin by element */
-    m_leftMarginBarline = DEFAULT_LEFT_MARGIN_BARLINE * DEFINITON_FACTOR;
-    m_leftMarginBarlineAttr = DEFAULT_LEFT_MARGIN_BARLINE_ATTR * DEFINITON_FACTOR;
+    m_leftMarginBarLine = DEFAULT_LEFT_MARGIN_BARLINE * DEFINITON_FACTOR;
+    m_leftMarginBarLineAttr = DEFAULT_LEFT_MARGIN_BARLINE_ATTR * DEFINITON_FACTOR;
     m_leftMarginBeatRpt = DEFAULT_LEFT_MARGIN_BEATRPT * DEFINITON_FACTOR;
     m_leftMarginChord = DEFAULT_LEFT_MARGIN_CHORD * DEFINITON_FACTOR;
     m_leftMarginClef = DEFAULT_LEFT_MARGIN_CLEF * DEFINITON_FACTOR;
@@ -79,8 +79,8 @@ Style::Style()
     m_leftMarginDefault = DEFAULT_LEFT_MARGIN_DEFAULT * DEFINITON_FACTOR;
     
     /** The layout right margin by element */
-    m_rightMarginBarline = DEFAULT_RIGHT_MARGIN_BARLINE * DEFINITON_FACTOR;
-    m_rightMarginBarlineAttr = DEFAULT_RIGHT_MARGIN_BARLINE_ATTR * DEFINITON_FACTOR;
+    m_rightMarginBarLine = DEFAULT_RIGHT_MARGIN_BARLINE * DEFINITON_FACTOR;
+    m_rightMarginBarLineAttr = DEFAULT_RIGHT_MARGIN_BARLINE_ATTR * DEFINITON_FACTOR;
     m_rightMarginBeatRpt = DEFAULT_RIGHT_MARGIN_BEATRPT * DEFINITON_FACTOR;
     m_rightMarginChord = DEFAULT_RIGHT_MARGIN_CHORD * DEFINITON_FACTOR;
     m_rightMarginClef = DEFAULT_RIGHT_MARGIN_CLEF * DEFINITON_FACTOR;

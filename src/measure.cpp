@@ -59,8 +59,8 @@ void Measure::Reset()
     m_drawingX = 0;
     
     // by default, we have a single barLine on the right (none on the left)
-    m_rightBarline.SetForm( this->GetRight() );
-    m_leftBarline.SetForm( this->GetLeft() );
+    m_rightBarLine.SetForm( this->GetRight() );
+    m_leftBarLine.SetForm( this->GetLeft() );
     
     if ( !m_measuredMusic ) {
         m_xAbs = 0;
@@ -116,7 +116,7 @@ int Measure::GetXRel()
     return 0;
 }
 
-int Measure::GetRightBarlineX()
+int Measure::GetRightBarLineX()
 {
     if ( m_measureAligner.GetRightAlignment() ) {
         return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -127,7 +127,7 @@ int Measure::GetRightBarlineX()
 int Measure::GetWidth()
 {
     if ( m_measureAligner.GetRightAlignment() ) {
-        return GetRightBarlineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
+        return GetRightBarLineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
     }
     return 0;
 }
@@ -151,18 +151,18 @@ int Measure::AlignHorizontally( ArrayPtrVoid *params )
     m_measureAligner.Reset();
     
     // here we transfer the @left and @right values to the barLine objects
-    this->SetLeftBarlineType( this->GetLeft() );
-    this->SetRightBarlineType( this->GetRight() );
+    this->SetLeftBarLineType( this->GetLeft() );
+    this->SetRightBarLineType( this->GetRight() );
     
     // point to it
     (*measureAligner) = &m_measureAligner;
     
-    if ( m_leftBarline.GetForm() != BARRENDITION_NONE ) {
-        m_leftBarline.SetAlignment( m_measureAligner.GetLeftAlignment() );
+    if ( m_leftBarLine.GetForm() != BARRENDITION_NONE ) {
+        m_leftBarLine.SetAlignment( m_measureAligner.GetLeftAlignment() );
     }
     
-    if ( m_rightBarline.GetForm() != BARRENDITION_NONE ) {
-        m_rightBarline.SetAlignment( m_measureAligner.GetRightAlignment() );
+    if ( m_rightBarLine.GetForm() != BARRENDITION_NONE ) {
+        m_rightBarLine.SetAlignment( m_measureAligner.GetRightAlignment() );
     }
     
     //LogDebug("\n ***** Align measure %d", this->GetN() );
@@ -256,9 +256,9 @@ int Measure::AlignMeasures( ArrayPtrVoid *params )
     (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
     
     // We also need to take into account the measure end (right) barLine with here
-    if (GetRightBarlineType() != BARRENDITION_NONE) {
+    if (GetRightBarLineType() != BARRENDITION_NONE) {
         // shift the next measure of the total with
-        (*shift) += GetRightBarline()->GetAlignment()->GetMaxWidth();
+        (*shift) += GetRightBarLine()->GetAlignment()->GetMaxWidth();
     }
     
     return FUNCTOR_SIBLINGS;

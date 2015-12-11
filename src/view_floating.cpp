@@ -94,7 +94,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         if ( !Check( staff ) ) return;
         
         x1 = interface->GetStart()->GetDrawingX();
-        x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        x2 = last->GetDrawingX() + last->GetRightBarLineX();
         graphic = element;
         spanningType = SPANNING_START;
     }
@@ -145,7 +145,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         }
         
         x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : first->GetDrawingX();
-        x2 = last->GetDrawingX() + last->GetRightBarlineX();
+        x2 = last->GetDrawingX() + last->GetRightBarLineX();
         spanningType = SPANNING_MIDDLE;
     }
     

@@ -15,13 +15,13 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Barline
+// BarLine
 //----------------------------------------------------------------------------
 
 /** 
  * This class models the MEI <barLine> element. 
  */
-class Barline: public LayerElement,
+class BarLine: public LayerElement,
     public AttBarLineLog
 {
 public:
@@ -30,11 +30,11 @@ public:
      * Reset method reset all attribute classes.
      */
     ///@{
-    Barline();
-    virtual ~Barline();
+    BarLine();
+    virtual ~BarLine();
     virtual void Reset();
-    virtual Object* Clone() { return new Barline(*this); };
-    virtual std::string GetClassName( ) { return "Barline"; };
+    virtual Object* Clone() { return new BarLine(*this); };
+    virtual std::string GetClassName( ) { return "BarLine"; };
     virtual ClassId Is() { return BARLINE; };
     ///@}
     
@@ -42,7 +42,7 @@ public:
     virtual bool HasToBeAligned() { return true; };
     
     /**
-     * Use to set the alignment for the Measure Barline members.
+     * Use to set the alignment for the Measure BarLine members.
      * This is as special case where we need to add to the measure aligner.
      */
     void SetAlignment( Alignment *alignment ) { m_alignment = alignment; };
@@ -61,13 +61,13 @@ private:
 };
     
 //----------------------------------------------------------------------------
-// BarlineAttr
+// BarLineAttr
 //----------------------------------------------------------------------------
 
 /**
  * This class models the barLine related attributes of a MEI measure.
  */
-class BarlineAttr: public Barline
+class BarLineAttr: public BarLine
 {
 public:
     /**
@@ -76,10 +76,10 @@ public:
      * No Reset() method required.
      */
     ///@{
-    BarlineAttr();
-    virtual ~BarlineAttr();
-    virtual Object* Clone() { return new BarlineAttr(*this); };
-    virtual std::string GetClassName( ) { return "BarlineAttr"; };
+    BarLineAttr();
+    virtual ~BarLineAttr();
+    virtual Object* Clone() { return new BarLineAttr(*this); };
+    virtual std::string GetClassName( ) { return "BarLineAttr"; };
     virtual ClassId Is() { return BARLINE_ATTR; };
     ///@}
 };

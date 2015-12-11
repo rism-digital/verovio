@@ -227,8 +227,8 @@ public:
     char m_leftPosition;
     
     /** The layout left margin by element */
-    char m_leftMarginBarline;
-    char m_leftMarginBarlineAttr;
+    char m_leftMarginBarLine;
+    char m_leftMarginBarLineAttr;
     char m_leftMarginBeatRpt;
     char m_leftMarginChord;
     char m_leftMarginClef;
@@ -245,8 +245,8 @@ public:
     char m_leftMarginDefault;
     
     /** The layout right margin by element */
-    char m_rightMarginBarline;
-    char m_rightMarginBarlineAttr;
+    char m_rightMarginBarLine;
+    char m_rightMarginBarLineAttr;
     char m_rightMarginBeatRpt;
     char m_rightMarginChord;
     char m_rightMarginClef;

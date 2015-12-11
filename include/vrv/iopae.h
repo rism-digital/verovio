@@ -30,7 +30,7 @@ class Staff;
 class Tie;
 class Tuplet;
 class KeySig;
-class Barline;
+class BarLine;
     
 //----------------------------------------------------------------------------
 // namespace for local Plain and Easy classes
@@ -238,7 +238,7 @@ private:
      int       getKeyInfo          (const char* incipit, KeySig *key, int index = 0);
      int       getTimeInfo         (const char* incipit, MeterSig *meter, int index = 0);
      int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
-     int       getBarline          (const char *incipit, data_BARRENDITION *output, int index );
+     int       getBarLine          (const char *incipit, data_BARRENDITION *output, int index );
      int       getAccidental       (const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
      int       getOctave           (const char* incipit, char *octave, int index = 0 );
      int       getDurations        (const char* incipit, pae::Measure *measure, int index = 0);

@@ -1064,8 +1064,8 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         // we reset the measure width and the minimum position
         (*measure_width) = 0;
         (*min_pos) = 0;
-        if (current_measure->GetLeftBarlineType() != BARRENDITION_NONE) {
-            current_measure->GetLeftBarline()->SetBoundingBoxXShift( params );
+        if (current_measure->GetLeftBarLineType() != BARRENDITION_NONE) {
+            current_measure->GetLeftBarLine()->SetBoundingBoxXShift( params );
         }
         return FUNCTOR_CONTINUE;
     }
@@ -1178,8 +1178,8 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
         assert( current_measure );
         // as minimum position of the barLine use the measure width
         (*min_pos) = (*measure_width);
-        if (current_measure->GetRightBarlineType() != BARRENDITION_NONE) {
-            current_measure->GetRightBarline()->SetBoundingBoxXShift( params );
+        if (current_measure->GetRightBarLineType() != BARRENDITION_NONE) {
+            current_measure->GetRightBarLine()->SetBoundingBoxXShift( params );
         }
         return FUNCTOR_CONTINUE;
     }

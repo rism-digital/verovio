@@ -150,7 +150,7 @@ void View::DrawSystem( DeviceContext *dc, System *system )
     // First get the first measure of the system
     Measure *measure  = dynamic_cast<Measure*>(system->FindChildByType( MEASURE ) );
     if ( measure ) {
-        // NULL for the Barline parameters indicates that we are drawing the scoreDef
+        // NULL for the BarLine parameters indicates that we are drawing the scoreDef
         DrawScoreDef( dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL );
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
@@ -201,7 +201,7 @@ void View::DrawSystemList( DeviceContext *dc, System *system, const ClassId clas
     }
 }
 
-void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, Barline *barLine  )
+void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine  )
 {
     assert( dc );
     assert( scoreDef );
@@ -224,7 +224,7 @@ void View::DrawScoreDef( DeviceContext *dc, ScoreDef *scoreDef, Measure *measure
     else {
         barLine->SetDrawingX( x );
         dc->StartGraphic( barLine, "", barLine->GetUuid() );
-        DrawBarlines( dc, measure, staffGrp, barLine );
+        DrawBarLines( dc, measure, staffGrp, barLine );
         dc->EndGraphic( barLine, this );
     }
     
@@ -533,7 +533,7 @@ void View::DrawBrace ( DeviceContext *dc, int x, int y1, int y2, int staffSize)
 }
 
 
-void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, Barline *barLine )
+void View::DrawBarLines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine )
 {
     assert( dc );
     assert( measure );
@@ -549,21 +549,21 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
             childStaffGrp = dynamic_cast<StaffGrp*>(staffGrp->GetChild( i ));
             childStaffDef = dynamic_cast<StaffDef*>(staffGrp->GetChild( i ));
             if ( childStaffGrp ) {
-                DrawBarlines( dc, measure, childStaffGrp, barLine );
+                DrawBarLines( dc, measure, childStaffGrp, barLine );
             }
             else if ( childStaffDef ) {
                 AttCommonNComparison comparison( STAFF, childStaffDef->GetN() );
                 Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1 ) );
                 if (!staff ) {
-                    LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
+                    LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines", childStaffDef->GetN() );
                     continue;
                 }
                 int y_top = staff->GetDrawingY();
                 // for the bottom position we need to take into account the number of lines and the staff size
                 int y_bottom = staff->GetDrawingY() - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-                DrawBarline( dc, y_top, y_bottom, barLine );
+                DrawBarLine( dc, y_top, y_bottom, barLine );
                 if ( barLine->HasRepetitionDots() ) {
-                    DrawBarlineDots( dc, childStaffDef, staff, barLine );
+                    DrawBarLineDots( dc, childStaffDef, staff, barLine );
                 }
             }
         }
@@ -599,7 +599,7 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
         // for the bottom position we need to take into account the number of lines and the staff size
         int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
         
-        DrawBarline( dc, y_top, y_bottom, barLine );
+        DrawBarLine( dc, y_top, y_bottom, barLine );
         
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if ( barLine->HasRepetitionDots() ) {
@@ -611,17 +611,17 @@ void View::DrawBarlines( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                     AttCommonNComparison comparison( STAFF, childStaffDef->GetN() );
                     Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff ) {
-                        LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarlines", childStaffDef->GetN() );
+                        LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines", childStaffDef->GetN() );
                         continue;
                     }
-                    DrawBarlineDots( dc, childStaffDef, staff, barLine );
+                    DrawBarLineDots( dc, childStaffDef, staff, barLine );
                 }
             }
         }
     }
 }
 
-void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *barLine )
+void View::DrawBarLine( DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine )
 {
     assert( dc );
     assert( barLine );
@@ -673,7 +673,7 @@ void View::DrawBarline( DeviceContext *dc, int y_top, int y_bottom, Barline *bar
 }
 
  
-void View::DrawBarlineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, Barline *barLine )
+void View::DrawBarLineDots ( DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine )
 {
     assert( dc );
     assert( staffDef );
@@ -719,11 +719,11 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 
     DrawMeasureChildren(dc, measure, measure, system);
 
-    if ( measure->GetLeftBarlineType() != BARRENDITION_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarline() );
+    if ( measure->GetLeftBarLineType() != BARRENDITION_NONE) {
+        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarLine() );
     }
-    if ( measure->GetRightBarlineType() != BARRENDITION_NONE) {
-        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarlineX(), measure->GetRightBarline() );
+    if ( measure->GetRightBarLineType() != BARRENDITION_NONE) {
+        DrawScoreDef( dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineX(), measure->GetRightBarLine() );
     }
     
     if ( measure->IsMeasuredMusic()) {

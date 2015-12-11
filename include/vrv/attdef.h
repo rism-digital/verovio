@@ -104,7 +104,7 @@ enum data_DURATION {
 /**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)
- * Order for 7f to 7s should not be changes. This is a special case since we use abs()
+ * Order from 7f to 7s should not be changes. This is a special case since we use abs()
  * to get the number of flats or sharps
  */
 enum data_KEYSIGNATURE {
@@ -127,7 +127,9 @@ enum data_KEYSIGNATURE {
     KEYSIGNATURE_mixed
 };
     
-    
+/**
+ * MEI data.MEASUREBEAT
+ */
 typedef std::pair<int, double> data_MEASUREBEAT;
 
 /**

@@ -67,17 +67,17 @@ public:
     /**
      * @name Set and get the left and right barLine types
      * This somehow conflicts with AttMeasureLog, which are transfered from and to the 
-     * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
+     * BarLine object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
-     * data_BARRENDITION GetLeftBarlineType() { m_leftBarline.SetRend( GetRight() ); return m_leftBarline.GetRend(); };
-     * void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetRend(type); SetLeft(type); };
+     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend( GetRight() ); return m_leftBarLine.GetRend(); };
+     * void SetLeftBarLineType( data_BARRENDITION type ) { m_leftBarLine.SetRend(type); SetLeft(type); };
      */
     ///@{
-    data_BARRENDITION GetLeftBarlineType() const { return m_leftBarline.GetForm(); };
-    void SetLeftBarlineType( data_BARRENDITION type ) { m_leftBarline.SetForm(type); };
-    data_BARRENDITION GetRightBarlineType() const { return m_rightBarline.GetForm(); };
-    void SetRightBarlineType( data_BARRENDITION type ) { m_rightBarline.SetForm(type); };
+    data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); };
+    void SetLeftBarLineType( data_BARRENDITION type ) { m_leftBarLine.SetForm(type); };
+    data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); };
+    void SetRightBarLineType( data_BARRENDITION type ) { m_rightBarLine.SetForm(type); };
     ///@}
     
     /**
@@ -87,8 +87,8 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    Barline *GetLeftBarline() { return &m_leftBarline; };
-    Barline *GetRightBarline() { return &m_rightBarline; };
+    BarLine *GetLeftBarLine() { return &m_leftBarLine; };
+    BarLine *GetRightBarLine() { return &m_rightBarLine; };
     ///@}
     
     int GetXRel( );
@@ -101,7 +101,7 @@ public:
     /** 
      * Return the X rel position of the right barLine (without its width)
      */
-    int GetRightBarlineX( );
+    int GetRightBarLineX( );
     
     /**
      * Return the width of the measure, including the barLine width
@@ -191,8 +191,8 @@ private:
      * @name The measure barlines (left and right) used when drawing
      */
     ///@{
-    BarlineAttr m_leftBarline;
-    BarlineAttr m_rightBarline;
+    BarLineAttr m_leftBarLine;
+    BarLineAttr m_rightBarLine;
     ///@}
 };
 

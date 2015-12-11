@@ -68,7 +68,7 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
         DrawAccid(dc, element, layer, staff, measure);
     }
     else if (element->Is() == BARLINE) {
-        DrawBarline(dc, element, layer, staff, measure);
+        DrawBarLine(dc, element, layer, staff, measure);
     }
     else if (element->Is() == BEAM) {
         DrawBeam(dc, element, layer, staff, measure);
@@ -237,7 +237,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this );
 }
 
-void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+void View::DrawBarLine( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert( dc );
     assert( element );
@@ -245,7 +245,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert( staff );
     assert( measure );
     
-    Barline *barLine = dynamic_cast<Barline*>(element);
+    BarLine *barLine = dynamic_cast<BarLine*>(element);
     assert( barLine );
     
     if (barLine->GetForm() == BARRENDITION_invis) {
@@ -256,7 +256,7 @@ void View::DrawBarline( DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->StartGraphic( element, "", element->GetUuid() );
     
     int y = staff->GetDrawingY();
-    DrawBarline( dc, y, y - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), barLine );
+    DrawBarLine( dc, y, y - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), barLine );
     
     dc->EndGraphic(element, this );
 }
@@ -890,7 +890,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
+    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
     int y = element->GetDrawingY();
     
@@ -953,7 +953,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic( element, "", element->GetUuid() );
     
-    int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
+    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
   
     // We do not support more than three chars
@@ -1604,7 +1604,7 @@ void View::DrawMeterSigFigures( DeviceContext *dc, int x, int y, int num, int nu
 
 void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure )
 {
-    int width = measure->GetRightBarlineX() - measure->GetNonJustifiableLeftMargin();
+    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin()  + (width / 2);
     
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;

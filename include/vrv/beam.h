@@ -4,7 +4,7 @@
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
-//
+
 
 #ifndef __VRV_BEAM_H__
 #define __VRV_BEAM_H__

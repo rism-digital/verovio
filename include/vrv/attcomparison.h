@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        att_comparison.h
+// Name:        attcomparison.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.

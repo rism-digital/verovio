@@ -207,7 +207,7 @@ bool MeiOutput::WriteObject( Object *object )
     }
     else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child( "barLine" );
-        WriteMeiBarline( m_currentNode, dynamic_cast<Barline*>(object) );
+        WriteMeiBarLine( m_currentNode, dynamic_cast<BarLine*>(object) );
     }
     else if (object->Is() == BEAM) {
         m_currentNode = m_currentNode.append_child("beam");
@@ -580,7 +580,7 @@ void MeiOutput::WriteMeiAccid( pugi::xml_node currentNode, Accid *accid )
     accid->WriteAccidLog(currentNode);
 }
 
-void MeiOutput::WriteMeiBarline( pugi::xml_node currentNode, Barline *barLine )
+void MeiOutput::WriteMeiBarLine( pugi::xml_node currentNode, BarLine *barLine )
 {
     assert( barLine );
     
@@ -1655,7 +1655,7 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
             success = ReadMeiAnnot( parent, xmlElement);
         }
         else if ( elementName  == "barLine" ) {
-            success = ReadMeiBarline( parent, xmlElement );
+            success = ReadMeiBarLine( parent, xmlElement );
         }
         else if ( elementName == "beam" ) {
             success = ReadMeiBeam( parent, xmlElement);
@@ -1763,14 +1763,14 @@ bool MeiInput::ReadMeiAccid( Object *parent, pugi::xml_node accid )
     return true;
 }
 
-bool MeiInput::ReadMeiBarline( Object *parent, pugi::xml_node barLine )
+bool MeiInput::ReadMeiBarLine( Object *parent, pugi::xml_node barLine )
 {
-    Barline *vrvBarline = new Barline();
-    ReadLayerElement(barLine, vrvBarline);
+    BarLine *vrvBarLine = new BarLine();
+    ReadLayerElement(barLine, vrvBarLine);
     
-    vrvBarline->ReadBarLineLog(barLine);
+    vrvBarLine->ReadBarLineLog(barLine);
     
-    AddLayerElement(parent, vrvBarline);
+    AddLayerElement(parent, vrvBarLine);
     
     return true;
 }

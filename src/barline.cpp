@@ -11,10 +11,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Barline
+// BarLine
 //----------------------------------------------------------------------------
 
-Barline::Barline():
+BarLine::BarLine():
 	LayerElement("bline-"),
     AttBarLineLog()
 {
@@ -22,17 +22,17 @@ Barline::Barline():
     Reset();
 }
 
-Barline::~Barline()
+BarLine::~BarLine()
 {
 }
     
-void Barline::Reset()
+void BarLine::Reset()
 {
     LayerElement::Reset();
     ResetBarLineLog();
 }
 
-bool Barline::HasRepetitionDots()
+bool BarLine::HasRepetitionDots()
 {
     if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
         return true;
@@ -41,15 +41,15 @@ bool Barline::HasRepetitionDots()
 }
     
 //----------------------------------------------------------------------------
-// BarlineAttr
+// BarLineAttr
 //----------------------------------------------------------------------------
 
-BarlineAttr::BarlineAttr():
-    Barline()
+BarLineAttr::BarLineAttr():
+    BarLine()
 {
 }
 
-BarlineAttr::~BarlineAttr()
+BarLineAttr::~BarLineAttr()
 {
 }
 
