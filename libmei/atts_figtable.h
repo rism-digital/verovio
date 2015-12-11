@@ -16,7 +16,7 @@
 #define __VRV_ATTS_FIGTABLE_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,22 +50,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetColspan(int colspanInt_) { m_colspanInt = colspanInt_; };
-    int GetColspan() const { return m_colspanInt; };    
+    void SetColspan(int colspan_) { m_colspan = colspan_; };
+    int GetColspan() const { return m_colspan; };    
     bool HasColspan( );
     
     //
-    void SetRowspan(int rowspanInt_) { m_rowspanInt = rowspanInt_; };
-    int GetRowspan() const { return m_rowspanInt; };    
+    void SetRowspan(int rowspan_) { m_rowspan = rowspan_; };
+    int GetRowspan() const { return m_rowspan; };    
     bool HasRowspan( );
     
     ///@}
 
 private:
     /** The number of columns spanned by this cell. **/
-    int m_colspanInt;
+    int m_colspan;
     /** The number of rows spanned by this cell. **/
-    int m_rowspanInt;
+    int m_rowspan;
 
 /* include <attrowspan> */
 };

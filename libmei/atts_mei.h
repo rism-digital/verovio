@@ -16,7 +16,7 @@
 #define __VRV_ATTS_MEI_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,8 +50,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNotationtype(std::string notationtype_) { m_notationtype = notationtype_; };
-    std::string GetNotationtype() const { return m_notationtype; };    
+    void SetNotationtype(data_NOTATIONTYPE notationtype_) { m_notationtype = notationtype_; };
+    data_NOTATIONTYPE GetNotationtype() const { return m_notationtype; };    
     bool HasNotationtype( );
     
     //
@@ -66,7 +66,7 @@ private:
      * Contains classification of the notation contained or described by the element
      * bearing this attribute.
      **/
-    std::string m_notationtype;
+    data_NOTATIONTYPE m_notationtype;
     /**
      * Provides any sub-classification of the notation contained or described by the
      * element, additional to that given by its notationtype attribute.

@@ -39,33 +39,33 @@ AttIneumeLog::~AttIneumeLog() {
 }
 
 void AttIneumeLog::ResetIneumeLog() {
-    m_form = "";
-    m_name = "";
+    m_form = INEUMEFORM_NONE;
+    m_name = INEUMENAME_NONE;
 }
 
-bool AttIneumeLog::ReadIneumeLog(  pugi::xml_node element ) {
+bool AttIneumeLog::ReadIneumeLog( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToStr(element.attribute("form").value()));
+        this->SetForm(StrToIneumeform(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("name")) {
-        this->SetName(StrToStr(element.attribute("name").value()));
+        this->SetName(StrToIneumename(element.attribute("name").value()));
         element.remove_attribute("name");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttIneumeLog::WriteIneumeLog(  pugi::xml_node element ) {
+bool AttIneumeLog::WriteIneumeLog( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = IneumeformToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasName()) {
-        element.append_attribute("name") = StrToStr(this->GetName()).c_str();
+        element.append_attribute("name") = IneumenameToStr(this->GetName()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -73,12 +73,12 @@ bool AttIneumeLog::WriteIneumeLog(  pugi::xml_node element ) {
 
 bool AttIneumeLog::HasForm( )
 {
-    return (m_form != "");
+    return (m_form != INEUMEFORM_NONE);
 }
 
 bool AttIneumeLog::HasName( )
 {
-    return (m_name != "");
+    return (m_name != INEUMENAME_NONE);
 }
 
 
@@ -97,33 +97,33 @@ AttUneumeLog::~AttUneumeLog() {
 }
 
 void AttUneumeLog::ResetUneumeLog() {
-    m_form = "";
-    m_name = "";
+    m_form = UNEUMEFORM_NONE;
+    m_name = UNEUMENAME_NONE;
 }
 
-bool AttUneumeLog::ReadUneumeLog(  pugi::xml_node element ) {
+bool AttUneumeLog::ReadUneumeLog( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToStr(element.attribute("form").value()));
+        this->SetForm(StrToUneumeform(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("name")) {
-        this->SetName(StrToStr(element.attribute("name").value()));
+        this->SetName(StrToUneumename(element.attribute("name").value()));
         element.remove_attribute("name");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttUneumeLog::WriteUneumeLog(  pugi::xml_node element ) {
+bool AttUneumeLog::WriteUneumeLog( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = UneumeformToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasName()) {
-        element.append_attribute("name") = StrToStr(this->GetName()).c_str();
+        element.append_attribute("name") = UneumenameToStr(this->GetName()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -131,12 +131,12 @@ bool AttUneumeLog::WriteUneumeLog(  pugi::xml_node element ) {
 
 bool AttUneumeLog::HasForm( )
 {
-    return (m_form != "");
+    return (m_form != UNEUMEFORM_NONE);
 }
 
 bool AttUneumeLog::HasName( )
 {
-    return (m_name != "");
+    return (m_name != UNEUMENAME_NONE);
 }
 
 
@@ -147,11 +147,11 @@ bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValu
         AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
         assert( att );
         if (attrType == "form") {
-            att->SetForm(att->StrToStr(attrValue));
+            att->SetForm(att->StrToIneumeform(attrValue));
             return true;
         }
         if (attrType == "name") {
-            att->SetName(att->StrToStr(attrValue));
+            att->SetName(att->StrToIneumename(attrValue));
             return true;
         }
     }
@@ -159,11 +159,11 @@ bool Att::SetNeumes( Object *element, std::string attrType, std::string attrValu
         AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
         assert( att );
         if (attrType == "form") {
-            att->SetForm(att->StrToStr(attrValue));
+            att->SetForm(att->StrToUneumeform(attrValue));
             return true;
         }
         if (attrType == "name") {
-            att->SetName(att->StrToStr(attrValue));
+            att->SetName(att->StrToUneumename(attrValue));
             return true;
         }
     }
@@ -176,20 +176,20 @@ void Att::GetNeumes( Object *element, ArrayOfStrAttr *attributes ) {
         AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
         assert( att );
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+            attributes->push_back(std::make_pair("form", att->IneumeformToStr(att->GetForm())));
         }
         if (att->HasName()) {
-            attributes->push_back(std::make_pair("name", att->StrToStr(att->GetName())));
+            attributes->push_back(std::make_pair("name", att->IneumenameToStr(att->GetName())));
         }
     }
     if (element->HasAttClass( ATT_UNEUMELOG ) ) {
         AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
         assert( att );
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+            attributes->push_back(std::make_pair("form", att->UneumeformToStr(att->GetForm())));
         }
         if (att->HasName()) {
-            attributes->push_back(std::make_pair("name", att->StrToStr(att->GetName())));
+            attributes->push_back(std::make_pair("name", att->UneumenameToStr(att->GetName())));
         }
     }
 

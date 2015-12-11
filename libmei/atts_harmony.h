@@ -16,7 +16,7 @@
 #define __VRV_ATTS_HARMONY_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,15 +50,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFret(std::string fret_) { m_fret = fret_; };
-    std::string GetFret() const { return m_fret; };    
+    void SetFret(data_FRET fret_) { m_fret = fret_; };
+    data_FRET GetFret() const { return m_fret; };    
     bool HasFret( );
     
     ///@}
 
 private:
     /** Records the location at which a string should be stopped against a fret. **/
-    std::string m_fret;
+    data_FRET m_fret;
 
 /* include <attfret> */
 };
@@ -126,15 +126,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRendgrid(std::string rendgrid_) { m_rendgrid = rendgrid_; };
-    std::string GetRendgrid() const { return m_rendgrid; };    
+    void SetRendgrid(harmVis_RENDGRID rendgrid_) { m_rendgrid = rendgrid_; };
+    harmVis_RENDGRID GetRendgrid() const { return m_rendgrid; };    
     bool HasRendgrid( );
     
     ///@}
 
 private:
     /** Describes how the harmonic indication should be rendered. **/
-    std::string m_rendgrid;
+    harmVis_RENDGRID m_rendgrid;
 
 /* include <attrendgrid> */
 };

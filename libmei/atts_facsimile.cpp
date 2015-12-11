@@ -39,23 +39,23 @@ AttFacsimile::~AttFacsimile() {
 }
 
 void AttFacsimile::ResetFacsimile() {
-    m_facs = "";
+    m_facs = URIS_NONE;
 }
 
-bool AttFacsimile::ReadFacsimile(  pugi::xml_node element ) {
+bool AttFacsimile::ReadFacsimile( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("facs")) {
-        this->SetFacs(StrToStr(element.attribute("facs").value()));
+        this->SetFacs(StrToUris(element.attribute("facs").value()));
         element.remove_attribute("facs");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttFacsimile::WriteFacsimile(  pugi::xml_node element ) {
+bool AttFacsimile::WriteFacsimile( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasFacs()) {
-        element.append_attribute("facs") = StrToStr(this->GetFacs()).c_str();
+        element.append_attribute("facs") = UrisToStr(this->GetFacs()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -63,7 +63,7 @@ bool AttFacsimile::WriteFacsimile(  pugi::xml_node element ) {
 
 bool AttFacsimile::HasFacs( )
 {
-    return (m_facs != "");
+    return (m_facs != URIS_NONE);
 }
 
 
@@ -76,7 +76,7 @@ bool Att::SetFacsimile( Object *element, std::string attrType, std::string attrV
         AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
         assert( att );
         if (attrType == "facs") {
-            att->SetFacs(att->StrToStr(attrValue));
+            att->SetFacs(att->StrToUris(attrValue));
             return true;
         }
     }
@@ -89,7 +89,7 @@ void Att::GetFacsimile( Object *element, ArrayOfStrAttr *attributes ) {
         AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
         assert( att );
         if (att->HasFacs()) {
-            attributes->push_back(std::make_pair("facs", att->StrToStr(att->GetFacs())));
+            attributes->push_back(std::make_pair("facs", att->UrisToStr(att->GetFacs())));
         }
     }
 

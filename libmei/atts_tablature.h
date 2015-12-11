@@ -16,7 +16,7 @@
 #define __VRV_ATTS_TABLATURE_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,22 +50,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTabFret(std::string tabFret_) { m_tabFret = tabFret_; };
-    std::string GetTabFret() const { return m_tabFret; };    
+    void SetTabFret(data_FRETNUMBER tabFret_) { m_tabFret = tabFret_; };
+    data_FRETNUMBER GetTabFret() const { return m_tabFret; };    
     bool HasTabFret( );
     
     //
-    void SetTabString(std::string tabString_) { m_tabString = tabString_; };
-    std::string GetTabString() const { return m_tabString; };    
+    void SetTabString(data_STRINGNUMBER tabString_) { m_tabString = tabString_; };
+    data_STRINGNUMBER GetTabString() const { return m_tabString; };    
     bool HasTabString( );
     
     ///@}
 
 private:
     /** Records the fret at which a string should be stopped. **/
-    std::string m_tabFret;
+    data_FRETNUMBER m_tabFret;
     /** Records which string is to be played. **/
-    std::string m_tabString;
+    data_STRINGNUMBER m_tabString;
 
 /* include <atttab.string> */
 };

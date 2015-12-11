@@ -73,21 +73,21 @@ int Syl::PrepareLyrics( ArrayPtrVoid *params )
     // At this stage currentSyl is actually the previous one that is ending here
     if ((*currentSyl)) {
         // The previous syl was an initial or median -> The note we just parsed is the end
-        if (((*currentSyl)->GetWordpos() == WORDPOS_i) || ((*currentSyl)->GetWordpos() == WORDPOS_m)) {
+        if (((*currentSyl)->GetWordpos() == sylLog_WORDPOS_i) || ((*currentSyl)->GetWordpos() == sylLog_WORDPOS_m)) {
             (*currentSyl)->SetEnd(*lastNote);
         }
         // The previous syl was a underscore -> the previous but one was the end
-        else if ((*currentSyl)->GetCon() == CON_u) {
+        else if ((*currentSyl)->GetCon() == sylLog_CON_u) {
             (*currentSyl)->SetEnd(*lastButOneNote);
         }
     }
     
     // Now decide what to do with the starting syl and check if it has a forward connector
-    if ((this->GetWordpos() == WORDPOS_i) || (this->GetWordpos() == WORDPOS_m)) {
+    if ((this->GetWordpos() == sylLog_WORDPOS_i) || (this->GetWordpos() == sylLog_WORDPOS_m)) {
         (*currentSyl) = this;
         return FUNCTOR_CONTINUE;
     }
-    else if (this->GetCon() == CON_u) {
+    else if (this->GetCon() == sylLog_CON_u) {
         (*currentSyl) = this;
         return FUNCTOR_CONTINUE;
     }

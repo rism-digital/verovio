@@ -172,7 +172,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     /************** editorial accidental **************/
     
-    if ( accid->GetFunc() == FUNC_edit ) {
+    if ( accid->GetFunc() == accidLog_FUNC_edit ) {
         // position is currently only above the staff
         int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
@@ -1214,7 +1214,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
 	if (note->m_drawingAccid) {
         xAccid = xNote;
-        if (note->m_drawingAccid->GetFunc() != FUNC_edit) {
+        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
             xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
         }
         

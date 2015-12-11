@@ -16,7 +16,7 @@
 #define __VRV_ATTS_ANALYSIS_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -129,8 +129,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDeg(std::string deg_) { m_deg = deg_; };
-    std::string GetDeg() const { return m_deg; };    
+    void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; };
+    data_SCALEDEGREE GetDeg() const { return m_deg; };    
     bool HasDeg( );
     
     ///@}
@@ -143,7 +143,7 @@ private:
      * 7 = leading tone), and an optional indication of chromatic alteration. The
      * amount of chromatic alternation is not indicated.
      **/
-    std::string m_deg;
+    data_SCALEDEGREE m_deg;
 
 /* include <attdeg> */
 };
@@ -214,8 +214,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetIntm(std::string intm_) { m_intm = intm_; };
-    std::string GetIntm() const { return m_intm; };    
+    void SetIntm(data_INTERVAL_AMOUNT intm_) { m_intm = intm_; };
+    data_INTERVAL_AMOUNT GetIntm() const { return m_intm; };    
     bool HasIntm( );
     
     ///@}
@@ -227,7 +227,7 @@ private:
      * diatonic interval direction, quality, and size, or a precise numeric value in
      * half steps.
      **/
-    std::string m_intm;
+    data_INTERVAL_AMOUNT m_intm;
 
 /* include <attintm> */
 };
@@ -257,15 +257,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMfunc(std::string mfunc_) { m_mfunc = mfunc_; };
-    std::string GetMfunc() const { return m_mfunc; };    
+    void SetMfunc(data_MELODICFUNCTION mfunc_) { m_mfunc = mfunc_; };
+    data_MELODICFUNCTION GetMfunc() const { return m_mfunc; };    
     bool HasMfunc( );
     
     ///@}
 
 private:
     /** Describes melodic function using Humdrum **embel syntax. **/
-    std::string m_mfunc;
+    data_MELODICFUNCTION m_mfunc;
 
 /* include <attmfunc> */
 };
@@ -295,15 +295,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPclass(std::string pclass_) { m_pclass = pclass_; };
-    std::string GetPclass() const { return m_pclass; };    
+    void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; };
+    data_PITCHCLASS GetPclass() const { return m_pclass; };    
     bool HasPclass( );
     
     ///@}
 
 private:
     /** Holds pitch class information. **/
-    std::string m_pclass;
+    data_PITCHCLASS m_pclass;
 
 /* include <attpclass> */
 };

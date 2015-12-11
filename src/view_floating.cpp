@@ -253,7 +253,7 @@ void View::DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff
     
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
-        up = (slur->GetCurvedir() == CURVEDIR_above) ? true : false;
+        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
@@ -841,7 +841,7 @@ void View::DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     
     // first should be the tie @curvedir
     if (tie->HasCurvedir()) {
-        up = (tie->GetCurvedir() == CURVEDIR_above) ? true : false;
+        up = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE){
@@ -971,7 +971,7 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
 
 void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff )
 {
-    if (syl->GetCon() == CON_d) {
+    if (syl->GetCon() == sylLog_CON_d) {
         
         y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
         // x position of the syl is two units back
@@ -1006,7 +1006,7 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
         }
         
     }
-    else if (syl->GetCon() == CON_u) {
+    else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         DrawFullRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     }

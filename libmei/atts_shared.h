@@ -16,7 +16,7 @@
 #define __VRV_ATTS_SHARED_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,15 +50,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(data_FUNC func_) { m_func = func_; };
-    data_FUNC GetFunc() const { return m_func; };    
+    void SetFunc(accidLog_FUNC func_) { m_func = func_; };
+    accidLog_FUNC GetFunc() const { return m_func; };    
     bool HasFunc( );
     
     ///@}
 
 private:
     /** Records the function of an accidental. **/
-    data_FUNC m_func;
+    accidLog_FUNC m_func;
 
 /* include <attfunc> */
 };
@@ -126,15 +126,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAccidGes(std::string accidGes_) { m_accidGes = accidGes_; };
-    std::string GetAccidGes() const { return m_accidGes; };    
+    void SetAccidGes(data_ACCIDENTAL_IMPLICIT accidGes_) { m_accidGes = accidGes_; };
+    data_ACCIDENTAL_IMPLICIT GetAccidGes() const { return m_accidGes; };    
     bool HasAccidGes( );
     
     ///@}
 
 private:
     /** Records the performed pitch inflection. **/
-    std::string m_accidGes;
+    data_ACCIDENTAL_IMPLICIT m_accidGes;
 
 /* include <attaccid.ges> */
 };
@@ -164,8 +164,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArtic(std::string artic_) { m_artic = artic_; };
-    std::string GetArtic() const { return m_artic; };    
+    void SetArtic(data_ARTICULATION artic_) { m_artic = artic_; };
+    data_ARTICULATION GetArtic() const { return m_artic; };    
     bool HasArtic( );
     
     ///@}
@@ -178,7 +178,7 @@ private:
      * should be encoded in the artic attribute; for example, fingerings should be
      * encoded using the <fingering> element.
      **/
-    std::string m_artic;
+    data_ARTICULATION m_artic;
 
 /* include <attartic> */
 };
@@ -208,15 +208,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArticGes(std::string articGes_) { m_articGes = articGes_; };
-    std::string GetArticGes() const { return m_articGes; };    
+    void SetArticGes(data_ARTICULATION articGes_) { m_articGes = articGes_; };
+    data_ARTICULATION GetArticGes() const { return m_articGes; };    
     bool HasArticGes( );
     
     ///@}
 
 private:
     /** Records performed articulation that differs from the written value. **/
-    std::string m_articGes;
+    data_ARTICULATION m_articGes;
 
 /* include <attartic.ges> */
 };
@@ -246,15 +246,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDots(char dots_) { m_dots = dots_; };
-    char GetDots() const { return m_dots; };    
+    void SetDots(int dots_) { m_dots = dots_; };
+    int GetDots() const { return m_dots; };    
     bool HasDots( );
     
     ///@}
 
 private:
     /** Records the number of augmentation dots required by a dotted duration. **/
-    char m_dots;
+    int m_dots;
 
 /* include <attdots> */
 };
@@ -373,20 +373,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBarplace(std::string barplace_) { m_barplace = barplace_; };
-    std::string GetBarplace() const { return m_barplace; };    
+    void SetBarplace(data_BARPLACE barplace_) { m_barplace = barplace_; };
+    data_BARPLACE GetBarplace() const { return m_barplace; };    
     bool HasBarplace( );
     
     //
-    void SetTaktplace(std::string taktplace_) { m_taktplace = taktplace_; };
-    std::string GetTaktplace() const { return m_taktplace; };    
+    void SetTaktplace(int taktplace_) { m_taktplace = taktplace_; };
+    int GetTaktplace() const { return m_taktplace; };    
     bool HasTaktplace( );
     
     ///@}
 
 private:
     /** Records the location of a bar line. **/
-    std::string m_barplace;
+    data_BARPLACE m_barplace;
     /**
      * If takt bar lines are to be used, then the taktplace attribute may be used to
      * denote the staff location of the shortened bar line.
@@ -397,7 +397,7 @@ private:
      * 0,2,4,6,8,10. For example, a value of '9' puts the bar line through the top line
      * of a 5-line staff.
      **/
-    std::string m_taktplace;
+    int m_taktplace;
 
 /* include <atttaktplace> */
 };
@@ -432,13 +432,13 @@ public:
     bool HasBeamColor( );
     
     //
-    void SetBeamRend(std::string beamRend_) { m_beamRend = beamRend_; };
-    std::string GetBeamRend() const { return m_beamRend; };    
+    void SetBeamRend(beamingVis_BEAMREND beamRend_) { m_beamRend = beamRend_; };
+    beamingVis_BEAMREND GetBeamRend() const { return m_beamRend; };    
     bool HasBeamRend( );
     
     //
-    void SetBeamSlope(double beamSlopeDbl_) { m_beamSlopeDbl = beamSlopeDbl_; };
-    double GetBeamSlope() const { return m_beamSlopeDbl; };    
+    void SetBeamSlope(double beamSlope_) { m_beamSlope = beamSlope_; };
+    double GetBeamSlope() const { return m_beamSlope; };    
     bool HasBeamSlope( );
     
     ///@}
@@ -447,9 +447,9 @@ private:
     /** Color of beams, including those associated with tuplets. **/
     std::string m_beamColor;
     /** Encodes whether a beam is "feathered" and in which direction. **/
-    std::string m_beamRend;
+    beamingVis_BEAMREND m_beamRend;
     /** Captures beam slope. **/
-    double m_beamSlopeDbl;
+    double m_beamSlope;
 
 /* include <attbeam.slope> */
 };
@@ -603,8 +603,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCluster(std::string cluster_) { m_cluster = cluster_; };
-    std::string GetCluster() const { return m_cluster; };    
+    void SetCluster(data_CLUSTER cluster_) { m_cluster = cluster_; };
+    data_CLUSTER GetCluster() const { return m_cluster; };    
     bool HasCluster( );
     
     ///@}
@@ -616,7 +616,7 @@ private:
      * The highest and lowest notes of the chord usually indicate the upper and lower
      * boundaries of the cluster note head.
      **/
-    std::string m_cluster;
+    data_CLUSTER m_cluster;
 
 /* include <attcluster> */
 };
@@ -688,8 +688,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCautionary(std::string cautionary_) { m_cautionary = cautionary_; };
-    std::string GetCautionary() const { return m_cautionary; };    
+    void SetCautionary(data_BOOLEAN cautionary_) { m_cautionary = cautionary_; };
+    data_BOOLEAN GetCautionary() const { return m_cautionary; };    
     bool HasCautionary( );
     
     ///@}
@@ -699,7 +699,7 @@ private:
      * Records the function of the clef.
      * A "cautionary" clef does not change the following pitches.
      **/
-    std::string m_cautionary;
+    data_BOOLEAN m_cautionary;
 
 /* include <attcautionary> */
 };
@@ -797,8 +797,8 @@ public:
     bool HasClefColor( );
     
     //
-    void SetClefVisible(std::string clefVisible_) { m_clefVisible = clefVisible_; };
-    std::string GetClefVisible() const { return m_clefVisible; };    
+    void SetClefVisible(data_BOOLEAN clefVisible_) { m_clefVisible = clefVisible_; };
+    data_BOOLEAN GetClefVisible() const { return m_clefVisible; };    
     bool HasClefVisible( );
     
     ///@}
@@ -807,7 +807,7 @@ private:
     /** Describes the color of the clef. **/
     std::string m_clefColor;
     /** Determines whether the clef is to be displayed. **/
-    std::string m_clefVisible;
+    data_BOOLEAN m_clefVisible;
 
 /* include <attclef.visible> */
 };
@@ -1047,36 +1047,36 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetUlx(int ulxInt_) { m_ulxInt = ulxInt_; };
-    int GetUlx() const { return m_ulxInt; };    
+    void SetUlx(int ulx_) { m_ulx = ulx_; };
+    int GetUlx() const { return m_ulx; };    
     bool HasUlx( );
     
     //
-    void SetUly(int ulyInt_) { m_ulyInt = ulyInt_; };
-    int GetUly() const { return m_ulyInt; };    
+    void SetUly(int uly_) { m_uly = uly_; };
+    int GetUly() const { return m_uly; };    
     bool HasUly( );
     
     //
-    void SetLrx(int lrxInt_) { m_lrxInt = lrxInt_; };
-    int GetLrx() const { return m_lrxInt; };    
+    void SetLrx(int lrx_) { m_lrx = lrx_; };
+    int GetLrx() const { return m_lrx; };    
     bool HasLrx( );
     
     //
-    void SetLry(int lryInt_) { m_lryInt = lryInt_; };
-    int GetLry() const { return m_lryInt; };    
+    void SetLry(int lry_) { m_lry = lry_; };
+    int GetLry() const { return m_lry; };    
     bool HasLry( );
     
     ///@}
 
 private:
     /** Indicates the upper-left corner x coordinate. **/
-    int m_ulxInt;
+    int m_ulx;
     /** Indicates the upper-left corner y coordinate. **/
-    int m_ulyInt;
+    int m_uly;
     /** Indicates the lower-right corner x coordinate. **/
-    int m_lrxInt;
+    int m_lrx;
     /** Indicates the lower-left corner x coordinate. **/
-    int m_lryInt;
+    int m_lry;
 
 /* include <attlry> */
 };
@@ -1116,8 +1116,8 @@ public:
     bool HasBulge( );
     
     //
-    void SetCurvedir(data_CURVEDIR curvedir_) { m_curvedir = curvedir_; };
-    data_CURVEDIR GetCurvedir() const { return m_curvedir; };    
+    void SetCurvedir(curvature_CURVEDIR curvedir_) { m_curvedir = curvedir_; };
+    curvature_CURVEDIR GetCurvedir() const { return m_curvedir; };    
     bool HasCurvedir( );
     
     ///@}
@@ -1139,7 +1139,7 @@ private:
      **/
     double m_bulge;
     /** Describes a curve with a generic term indicating the direction of curvature. **/
-    data_CURVEDIR m_curvedir;
+    curvature_CURVEDIR m_curvedir;
 
 /* include <attcurvedir> */
 };
@@ -1169,8 +1169,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLform(std::string lform_) { m_lform = lform_; };
-    std::string GetLform() const { return m_lform; };    
+    void SetLform(data_LINEFORM lform_) { m_lform = lform_; };
+    data_LINEFORM GetLform() const { return m_lform; };    
     bool HasLform( );
     
     //
@@ -1182,7 +1182,7 @@ public:
 
 private:
     /** Describes the line style of a curve. **/
-    std::string m_lform;
+    data_LINEFORM m_lform;
     /** Width of a curved line. **/
     std::string m_lwidth;
 
@@ -1455,15 +1455,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BARRENDITION form_) { m_form = form_; };
-    data_BARRENDITION GetForm() const { return m_form; };    
+    void SetForm(dotLog_FORM form_) { m_form = form_; };
+    dotLog_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BARRENDITION m_form;
+    dotLog_FORM m_form;
 
 /* include <attform> */
 };
@@ -1537,18 +1537,18 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDurDefault(std::string durDefault_) { m_durDefault = durDefault_; };
-    std::string GetDurDefault() const { return m_durDefault; };    
+    void SetDurDefault(data_DURATION durDefault_) { m_durDefault = durDefault_; };
+    data_DURATION GetDurDefault() const { return m_durDefault; };    
     bool HasDurDefault( );
     
     //
-    void SetNumDefault(int numDefaultInt_) { m_numDefaultInt = numDefaultInt_; };
-    int GetNumDefault() const { return m_numDefaultInt; };    
+    void SetNumDefault(int numDefault_) { m_numDefault = numDefault_; };
+    int GetNumDefault() const { return m_numDefault; };    
     bool HasNumDefault( );
     
     //
-    void SetNumbaseDefault(int numbaseDefaultInt_) { m_numbaseDefaultInt = numbaseDefaultInt_; };
-    int GetNumbaseDefault() const { return m_numbaseDefaultInt; };    
+    void SetNumbaseDefault(int numbaseDefault_) { m_numbaseDefault = numbaseDefault_; };
+    int GetNumbaseDefault() const { return m_numbaseDefault; };    
     bool HasNumbaseDefault( );
     
     ///@}
@@ -1559,17 +1559,17 @@ private:
      * chord, etc.
      * in a measure does not have a duration specified.
      **/
-    std::string m_durDefault;
+    data_DURATION m_durDefault;
     /**
      * Along with numbase.default, describes the default duration as a ratio.
      * num.default is the first value in the ratio.
      **/
-    int m_numDefaultInt;
+    int m_numDefault;
     /**
      * Along with num.default, describes the default duration as a ratio.
      * numbase.default is the second value in the ratio.
      **/
-    int m_numbaseDefaultInt;
+    int m_numbaseDefault;
 
 /* include <attnumbase.default> */
 };
@@ -1737,8 +1737,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetEnclose(std::string enclose_) { m_enclose = enclose_; };
-    std::string GetEnclose() const { return m_enclose; };    
+    void SetEnclose(data_ENCLOSURE enclose_) { m_enclose = enclose_; };
+    data_ENCLOSURE GetEnclose() const { return m_enclose; };    
     bool HasEnclose( );
     
     ///@}
@@ -1750,7 +1750,7 @@ private:
      * For an example of cautionary accidentals enclosed in parentheses, see Read, p.
      * 131, ex. 9-14.
      **/
-    std::string m_enclose;
+    data_ENCLOSURE m_enclose;
 
 /* include <attenclose> */
 };
@@ -1780,15 +1780,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetEndingRend(std::string endingRend_) { m_endingRend = endingRend_; };
-    std::string GetEndingRend() const { return m_endingRend; };    
+    void SetEndingRend(endings_ENDINGREND endingRend_) { m_endingRend = endingRend_; };
+    endings_ENDINGREND GetEndingRend() const { return m_endingRend; };    
     bool HasEndingRend( );
     
     ///@}
 
 private:
     /** Describes where ending marks should be displayed. **/
-    std::string m_endingRend;
+    endings_ENDINGREND m_endingRend;
 
 /* include <attending.rend> */
 };
@@ -1818,15 +1818,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetExtender(std::string extender_) { m_extender = extender_; };
-    std::string GetExtender() const { return m_extender; };    
+    void SetExtender(data_BOOLEAN extender_) { m_extender = extender_; };
+    data_BOOLEAN GetExtender() const { return m_extender; };    
     bool HasExtender( );
     
     ///@}
 
 private:
     /** Indicates the presence of an extension symbol, typically a line. **/
-    std::string m_extender;
+    data_BOOLEAN m_extender;
 
 /* include <attextender> */
 };
@@ -1898,8 +1898,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNonfiling(int nonfilingInt_) { m_nonfilingInt = nonfilingInt_; };
-    int GetNonfiling() const { return m_nonfilingInt; };    
+    void SetNonfiling(int nonfiling_) { m_nonfiling = nonfiling_; };
+    int GetNonfiling() const { return m_nonfiling; };    
     bool HasNonfiling( );
     
     ///@}
@@ -1909,7 +1909,7 @@ private:
      * Holds the number of initial characters (such as those constituing an article or
      * preposition) that should not be used for sorting a title or name.
      **/
-    int m_nonfilingInt;
+    int m_nonfiling;
 
 /* include <attnonfiling> */
 };
@@ -1939,15 +1939,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLevel(int levelInt_) { m_levelInt = levelInt_; };
-    int GetLevel() const { return m_levelInt; };    
+    void SetLevel(int level_) { m_level = level_; };
+    int GetLevel() const { return m_level; };    
     bool HasLevel( );
     
     ///@}
 
 private:
     /** Indicates the nesting level of staff grouping symbols. **/
-    int m_levelInt;
+    int m_level;
 
 /* include <attlevel> */
 };
@@ -2056,15 +2056,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetHalign(std::string halign_) { m_halign = halign_; };
-    std::string GetHalign() const { return m_halign; };    
+    void SetHalign(data_HORIZONTALALIGNMENT halign_) { m_halign = halign_; };
+    data_HORIZONTALALIGNMENT GetHalign() const { return m_halign; };    
     bool HasHalign( );
     
     ///@}
 
 private:
     /** Records horizontal alignment. **/
-    std::string m_halign;
+    data_HORIZONTALALIGNMENT m_halign;
 
 /* include <atthalign> */
 };
@@ -2222,15 +2222,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMode(std::string mode_) { m_mode = mode_; };
-    std::string GetMode() const { return m_mode; };    
+    void SetMode(data_MODE mode_) { m_mode = mode_; };
+    data_MODE GetMode() const { return m_mode; };    
     bool HasMode( );
     
     ///@}
 
 private:
     /** Indicates major, minor, or other tonality. **/
-    std::string m_mode;
+    data_MODE m_mode;
 
 /* include <attmode> */
 };
@@ -2511,15 +2511,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLayer(int layerInt_) { m_layerInt = layerInt_; };
-    int GetLayer() const { return m_layerInt; };    
+    void SetLayer(int layer_) { m_layer = layer_; };
+    int GetLayer() const { return m_layer; };    
     bool HasLayer( );
     
     ///@}
 
 private:
     /** Identifies the layer to which a feature applies. **/
-    int m_layerInt;
+    int m_layer;
 
 /* include <attlayer> */
 };
@@ -2549,8 +2549,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BARRENDITION form_) { m_form = form_; };
-    data_BARRENDITION GetForm() const { return m_form; };    
+    void SetForm(data_LINEFORM form_) { m_form = form_; };
+    data_LINEFORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
@@ -2559,8 +2559,8 @@ public:
     bool HasWidth( );
     
     //
-    void SetEndsym(std::string endsym_) { m_endsym = endsym_; };
-    std::string GetEndsym() const { return m_endsym; };    
+    void SetEndsym(data_LINESTARTENDSYMBOL endsym_) { m_endsym = endsym_; };
+    data_LINESTARTENDSYMBOL GetEndsym() const { return m_endsym; };    
     bool HasEndsym( );
     
     //
@@ -2569,8 +2569,8 @@ public:
     bool HasEndsymsize( );
     
     //
-    void SetStartsym(std::string startsym_) { m_startsym = startsym_; };
-    std::string GetStartsym() const { return m_startsym; };    
+    void SetStartsym(data_LINESTARTENDSYMBOL startsym_) { m_startsym = startsym_; };
+    data_LINESTARTENDSYMBOL GetStartsym() const { return m_startsym; };    
     bool HasStartsym( );
     
     //
@@ -2582,15 +2582,15 @@ public:
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BARRENDITION m_form;
+    data_LINEFORM m_form;
     /** Width of the line. **/
     std::string m_width;
     /** Symbol rendered at end of line. **/
-    std::string m_endsym;
+    data_LINESTARTENDSYMBOL m_endsym;
     /** Holds the relative size of the line-end symbol. **/
     std::string m_endsymsize;
     /** Symbol rendered at start of line. **/
-    std::string m_startsym;
+    data_LINESTARTENDSYMBOL m_startsym;
     /** Holds the relative size of the line-start symbol. **/
     std::string m_startsymsize;
 
@@ -2664,8 +2664,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLendsym(std::string lendsym_) { m_lendsym = lendsym_; };
-    std::string GetLendsym() const { return m_lendsym; };    
+    void SetLendsym(data_LINESTARTENDSYMBOL lendsym_) { m_lendsym = lendsym_; };
+    data_LINESTARTENDSYMBOL GetLendsym() const { return m_lendsym; };    
     bool HasLendsym( );
     
     //
@@ -2674,8 +2674,8 @@ public:
     bool HasLendsymsize( );
     
     //
-    void SetLstartsym(std::string lstartsym_) { m_lstartsym = lstartsym_; };
-    std::string GetLstartsym() const { return m_lstartsym; };    
+    void SetLstartsym(data_LINESTARTENDSYMBOL lstartsym_) { m_lstartsym = lstartsym_; };
+    data_LINESTARTENDSYMBOL GetLstartsym() const { return m_lstartsym; };    
     bool HasLstartsym( );
     
     //
@@ -2687,11 +2687,11 @@ public:
 
 private:
     /** Symbol rendered at end of line. **/
-    std::string m_lendsym;
+    data_LINESTARTENDSYMBOL m_lendsym;
     /** Holds the relative size of the line-end symbol. **/
     std::string m_lendsymsize;
     /** Symbol rendered at start of line. **/
-    std::string m_lstartsym;
+    data_LINESTARTENDSYMBOL m_lstartsym;
     /** Holds the relative size of the line-start symbol. **/
     std::string m_lstartsymsize;
 
@@ -2723,8 +2723,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLform(std::string lform_) { m_lform = lform_; };
-    std::string GetLform() const { return m_lform; };    
+    void SetLform(data_LINEFORM lform_) { m_lform = lform_; };
+    data_LINEFORM GetLform() const { return m_lform; };    
     bool HasLform( );
     
     //
@@ -2736,7 +2736,7 @@ public:
 
 private:
     /** Describes the line style of a curve. **/
-    std::string m_lform;
+    data_LINEFORM m_lform;
     /** Width of a curved line. **/
     std::string m_lwidth;
 
@@ -2788,13 +2788,13 @@ public:
     bool HasLyricSize( );
     
     //
-    void SetLyricStyle(std::string lyricStyle_) { m_lyricStyle = lyricStyle_; };
-    std::string GetLyricStyle() const { return m_lyricStyle; };    
+    void SetLyricStyle(data_FONTSTYLE lyricStyle_) { m_lyricStyle = lyricStyle_; };
+    data_FONTSTYLE GetLyricStyle() const { return m_lyricStyle; };    
     bool HasLyricStyle( );
     
     //
-    void SetLyricWeight(std::string lyricWeight_) { m_lyricWeight = lyricWeight_; };
-    std::string GetLyricWeight() const { return m_lyricWeight; };    
+    void SetLyricWeight(data_FONTWEIGHT lyricWeight_) { m_lyricWeight = lyricWeight_; };
+    data_FONTWEIGHT GetLyricWeight() const { return m_lyricWeight; };    
     bool HasLyricWeight( );
     
     ///@}
@@ -2809,9 +2809,9 @@ private:
     /** Sets the default font size value for lyrics. **/
     std::string m_lyricSize;
     /** Sets the default font style value for lyrics. **/
-    std::string m_lyricStyle;
+    data_FONTSTYLE m_lyricStyle;
     /** Sets the default font weight value for lyrics. **/
-    std::string m_lyricWeight;
+    data_FONTWEIGHT m_lyricWeight;
 
 /* include <attlyric.weight> */
 };
@@ -2890,15 +2890,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetUnit(int unit_) { m_unit = unit_; };
-    int GetUnit() const { return m_unit; };    
+    void SetUnit(std::string unit_) { m_unit = unit_; };
+    std::string GetUnit() const { return m_unit; };    
     bool HasUnit( );
     
     ///@}
 
 private:
     /** Indicates the unit of measurement. **/
-    int m_unit;
+    std::string m_unit;
 
 /* include <attunit> */
 };
@@ -2928,15 +2928,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMnumVisible(std::string mnumVisible_) { m_mnumVisible = mnumVisible_; };
-    std::string GetMnumVisible() const { return m_mnumVisible; };    
+    void SetMnumVisible(data_BOOLEAN mnumVisible_) { m_mnumVisible = mnumVisible_; };
+    data_BOOLEAN GetMnumVisible() const { return m_mnumVisible; };    
     bool HasMnumVisible( );
     
     ///@}
 
 private:
     /** Indicates whether measure numbers should be displayed. **/
-    std::string m_mnumVisible;
+    data_BOOLEAN m_mnumVisible;
 
 /* include <attmnum.visible> */
 };
@@ -2976,8 +2976,8 @@ public:
     bool HasEnd( );
     
     //
-    void SetBetype(std::string betype_) { m_betype = betype_; };
-    std::string GetBetype() const { return m_betype; };    
+    void SetBetype(data_BETYPE betype_) { m_betype = betype_; };
+    data_BETYPE GetBetype() const { return m_betype; };    
     bool HasBetype( );
     
     ///@}
@@ -3001,7 +3001,7 @@ private:
      * The begin and end attributes can only be interpreted meaningfully in conjunction
      * with this attribute.
      **/
-    std::string m_betype;
+    data_BETYPE m_betype;
 
 /* include <attbetype> */
 };
@@ -3069,15 +3069,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeiversion(std::string meiversion_) { m_meiversion = meiversion_; };
-    std::string GetMeiversion() const { return m_meiversion; };    
+    void SetMeiversion(meiversion_MEIVERSION meiversion_) { m_meiversion = meiversion_; };
+    meiversion_MEIVERSION GetMeiversion() const { return m_meiversion; };    
     bool HasMeiversion( );
     
     ///@}
 
 private:
     /** Specifies a generic MEI version label. **/
-    std::string m_meiversion;
+    meiversion_MEIVERSION m_meiversion;
 
 /* include <attmeiversion> */
 };
@@ -3212,15 +3212,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BARRENDITION form_) { m_form = form_; };
-    data_BARRENDITION GetForm() const { return m_form; };    
+    void SetForm(meterSigVis_FORM form_) { m_form = form_; };
+    meterSigVis_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BARRENDITION m_form;
+    meterSigVis_FORM m_form;
 
 /* include <attform> */
 };
@@ -3303,13 +3303,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeterRend(std::string meterRend_) { m_meterRend = meterRend_; };
-    std::string GetMeterRend() const { return m_meterRend; };    
+    void SetMeterRend(meterSigDefaultVis_METERREND meterRend_) { m_meterRend = meterRend_; };
+    meterSigDefaultVis_METERREND GetMeterRend() const { return m_meterRend; };    
     bool HasMeterRend( );
     
     //
-    void SetMeterShowchange(std::string meterShowchange_) { m_meterShowchange = meterShowchange_; };
-    std::string GetMeterShowchange() const { return m_meterShowchange; };    
+    void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; };
+    data_BOOLEAN GetMeterShowchange() const { return m_meterShowchange; };    
     bool HasMeterShowchange( );
     
     //
@@ -3321,12 +3321,12 @@ public:
 
 private:
     /** Contains an indication of how the meter signature should be rendered. **/
-    std::string m_meterRend;
+    meterSigDefaultVis_METERREND m_meterRend;
     /**
      * Determines whether a new meter signature should be displayed when the meter
      * signature changes.
      **/
-    std::string m_meterShowchange;
+    data_BOOLEAN m_meterShowchange;
     /**
      * Indicates the use of a meter symbol instead of a numeric meter signature, that
      * is, 'C' for common time or 'C' with a slash for cut time.
@@ -3361,8 +3361,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMetcon(std::string metcon_) { m_metcon = metcon_; };
-    std::string GetMetcon() const { return m_metcon; };    
+    void SetMetcon(meterconformance_METCON metcon_) { m_metcon = metcon_; };
+    meterconformance_METCON GetMetcon() const { return m_metcon; };    
     bool HasMetcon( );
     
     ///@}
@@ -3372,7 +3372,7 @@ private:
      * Indicates the relationship between the content of a staff or layer and the
      * prevailing meter.
      **/
-    std::string m_metcon;
+    meterconformance_METCON m_metcon;
 
 /* include <attmetcon> */
 };
@@ -3402,13 +3402,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMetcon(std::string metcon_) { m_metcon = metcon_; };
-    std::string GetMetcon() const { return m_metcon; };    
+    void SetMetcon(data_BOOLEAN metcon_) { m_metcon = metcon_; };
+    data_BOOLEAN GetMetcon() const { return m_metcon; };    
     bool HasMetcon( );
     
     //
-    void SetControl(std::string control_) { m_control = control_; };
-    std::string GetControl() const { return m_control; };    
+    void SetControl(data_BOOLEAN control_) { m_control = control_; };
+    data_BOOLEAN GetControl() const { return m_control; };    
     bool HasControl( );
     
     ///@}
@@ -3418,7 +3418,7 @@ private:
      * Indicates the relationship between the content of a staff or layer and the
      * prevailing meter.
      **/
-    std::string m_metcon;
+    data_BOOLEAN m_metcon;
     /**
      * Indicates whether or not a bar line is "controlling"; that is, if it indicates a
      * point of alignment across all the parts.
@@ -3426,7 +3426,7 @@ private:
      * lines within parts may or may not be controlling. When applied to <measure>,
      * this attribute indicates the nature of the right barline but not the left.
      **/
-    std::string m_control;
+    data_BOOLEAN m_control;
 
 /* include <attcontrol> */
 };
@@ -3461,13 +3461,13 @@ public:
     bool HasMm( );
     
     //
-    void SetMmUnit(std::string mmUnit_) { m_mmUnit = mmUnit_; };
-    std::string GetMmUnit() const { return m_mmUnit; };    
+    void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; };
+    data_DURATION GetMmUnit() const { return m_mmUnit; };    
     bool HasMmUnit( );
     
     //
-    void SetMmDots(std::string mmDots_) { m_mmDots = mmDots_; };
-    std::string GetMmDots() const { return m_mmDots; };    
+    void SetMmDots(int mmDots_) { m_mmDots = mmDots_; };
+    int GetMmDots() const { return m_mmDots; };    
     bool HasMmDots( );
     
     ///@}
@@ -3480,9 +3480,9 @@ private:
      **/
     std::string m_mm;
     /** Captures the metronomic unit. **/
-    std::string m_mmUnit;
+    data_DURATION m_mmUnit;
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
-    std::string m_mmDots;
+    int m_mmDots;
 
 /* include <attmm.dots> */
 };
@@ -3650,29 +3650,29 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOctGes(std::string octGes_) { m_octGes = octGes_; };
-    std::string GetOctGes() const { return m_octGes; };    
+    void SetOctGes(char octGes_) { m_octGes = octGes_; };
+    char GetOctGes() const { return m_octGes; };    
     bool HasOctGes( );
     
     //
-    void SetPnameGes(std::string pnameGes_) { m_pnameGes = pnameGes_; };
-    std::string GetPnameGes() const { return m_pnameGes; };    
+    void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; };
+    data_PITCHNAME GetPnameGes() const { return m_pnameGes; };    
     bool HasPnameGes( );
     
     //
-    void SetPnum(std::string pnum_) { m_pnum = pnum_; };
-    std::string GetPnum() const { return m_pnum; };    
+    void SetPnum(int pnum_) { m_pnum = pnum_; };
+    int GetPnum() const { return m_pnum; };    
     bool HasPnum( );
     
     ///@}
 
 private:
     /** Records performed octave information that differs from the written value. **/
-    std::string m_octGes;
+    char m_octGes;
     /** Contains a performed pitch name that differs from the written value. **/
-    std::string m_pnameGes;
+    data_PITCHNAME m_pnameGes;
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
-    std::string m_pnum;
+    int m_pnum;
 
 /* include <attpnum> */
 };
@@ -3732,8 +3732,8 @@ public:
     bool HasHeadShape( );
     
     //
-    void SetHeadVisible(std::string headVisible_) { m_headVisible = headVisible_; };
-    std::string GetHeadVisible() const { return m_headVisible; };    
+    void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; };
+    data_BOOLEAN GetHeadVisible() const { return m_headVisible; };    
     bool HasHeadVisible( );
     
     ///@}
@@ -3759,7 +3759,7 @@ private:
      * Indicates if a feature should be rendered when the notation is presented
      * graphically or sounded when it is presented in an aural form.
      **/
-    std::string m_headVisible;
+    data_BOOLEAN m_headVisible;
 
 /* include <atthead.visible> */
 };
@@ -3827,8 +3827,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOctaveDefault(std::string octaveDefault_) { m_octaveDefault = octaveDefault_; };
-    std::string GetOctaveDefault() const { return m_octaveDefault; };    
+    void SetOctaveDefault(char octaveDefault_) { m_octaveDefault = octaveDefault_; };
+    char GetOctaveDefault() const { return m_octaveDefault; };    
     bool HasOctaveDefault( );
     
     ///@}
@@ -3839,7 +3839,7 @@ private:
      * chord, etc.
      * in a measure does not have an octave value specified.
      **/
-    std::string m_octaveDefault;
+    char m_octaveDefault;
 
 /* include <attoctave.default> */
 };
@@ -3914,8 +3914,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOntheline(std::string ontheline_) { m_ontheline = ontheline_; };
-    std::string GetOntheline() const { return m_ontheline; };    
+    void SetOntheline(data_BOOLEAN ontheline_) { m_ontheline = ontheline_; };
+    data_BOOLEAN GetOntheline() const { return m_ontheline; };    
     bool HasOntheline( );
     
     ///@}
@@ -3926,7 +3926,7 @@ private:
      * A value of 'true' places all notes on the line, while a value of 'false' places
      * stems-up notes above the line and stems-down notes below the line.
      **/
-    std::string m_ontheline;
+    data_BOOLEAN m_ontheline;
 
 /* include <attontheline> */
 };
@@ -3956,8 +3956,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOptimize(std::string optimize_) { m_optimize = optimize_; };
-    std::string GetOptimize() const { return m_optimize; };    
+    void SetOptimize(data_BOOLEAN optimize_) { m_optimize = optimize_; };
+    data_BOOLEAN GetOptimize() const { return m_optimize; };    
     bool HasOptimize( );
     
     ///@}
@@ -3967,7 +3967,7 @@ private:
      * Indicates whether staves without notes, rests, etc.
      * should be displayed. When the value is 'true', empty staves are displayed.
      **/
-    std::string m_optimize;
+    data_BOOLEAN m_optimize;
 
 /* include <attoptimize> */
 };
@@ -4131,8 +4131,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFolium(std::string folium_) { m_folium = folium_; };
-    std::string GetFolium() const { return m_folium; };    
+    void SetFolium(pbVis_FOLIUM folium_) { m_folium = folium_; };
+    pbVis_FOLIUM GetFolium() const { return m_folium; };    
     bool HasFolium( );
     
     ///@}
@@ -4142,7 +4142,7 @@ private:
      * States the side of a leaf (as in a manuscript) on which the content following
      * the <pb> element occurs.
      **/
-    std::string m_folium;
+    pbVis_FOLIUM m_folium;
 
 /* include <attfolium> */
 };
@@ -4256,8 +4256,8 @@ public:
     bool HasPlist( );
     
     //
-    void SetEvaluate(std::string evaluate_) { m_evaluate = evaluate_; };
-    std::string GetEvaluate() const { return m_evaluate; };    
+    void SetEvaluate(plist_EVALUATE evaluate_) { m_evaluate = evaluate_; };
+    plist_EVALUATE GetEvaluate() const { return m_evaluate; };    
     bool HasEvaluate( );
     
     ///@}
@@ -4269,7 +4269,7 @@ private:
      **/
     std::string m_plist;
     /** Specifies the intended meaning when the target of a pointer is itself a pointer. **/
-    std::string m_evaluate;
+    plist_EVALUATE m_evaluate;
 
 /* include <attevaluate> */
 };
@@ -4382,8 +4382,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetQuantity(double quantityDbl_) { m_quantityDbl = quantityDbl_; };
-    double GetQuantity() const { return m_quantityDbl; };    
+    void SetQuantity(double quantity_) { m_quantity = quantity_; };
+    double GetQuantity() const { return m_quantity; };    
     bool HasQuantity( );
     
     ///@}
@@ -4393,7 +4393,7 @@ private:
      * Numeric value capturing a measurement or count.
      * Can only be interpreted in combination with the unit or currency attribute.
      **/
-    double m_quantityDbl;
+    double m_quantity;
 
 /* include <attquantity> */
 };
@@ -4423,15 +4423,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSize(std::string size_) { m_size = size_; };
-    std::string GetSize() const { return m_size; };    
+    void SetSize(data_SIZE size_) { m_size = size_; };
+    data_SIZE GetSize() const { return m_size; };    
     bool HasSize( );
     
     ///@}
 
 private:
     /** Describes the relative size of a feature. **/
-    std::string m_size;
+    data_SIZE m_size;
 
 /* include <attsize> */
 };
@@ -4503,15 +4503,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BARRENDITION form_) { m_form = form_; };
-    data_BARRENDITION GetForm() const { return m_form; };    
+    void SetForm(sbVis_FORM form_) { m_form = form_; };
+    sbVis_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BARRENDITION m_form;
+    sbVis_FORM m_form;
 
 /* include <attform> */
 };
@@ -4541,15 +4541,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetScale(data_PERCENT scale_) { m_scale = scale_; };
-    data_PERCENT GetScale() const { return m_scale; };    
+    void SetScale(int scale_) { m_scale = scale_; };
+    int GetScale() const { return m_scale; };    
     bool HasScale( );
     
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
-    data_PERCENT m_scale;
+    int m_scale;
 
 /* include <attscale> */
 };
@@ -4579,29 +4579,29 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTunePname(std::string tunePname_) { m_tunePname = tunePname_; };
-    std::string GetTunePname() const { return m_tunePname; };    
+    void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; };
+    data_PITCHNAME GetTunePname() const { return m_tunePname; };    
     bool HasTunePname( );
     
     //
-    void SetTuneHz(double tuneHzDbl_) { m_tuneHzDbl = tuneHzDbl_; };
-    double GetTuneHz() const { return m_tuneHzDbl; };    
+    void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; };
+    double GetTuneHz() const { return m_tuneHz; };    
     bool HasTuneHz( );
     
     //
-    void SetTuneTemper(std::string tuneTemper_) { m_tuneTemper = tuneTemper_; };
-    std::string GetTuneTemper() const { return m_tuneTemper; };    
+    void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; };
+    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; };    
     bool HasTuneTemper( );
     
     ///@}
 
 private:
     /** Holds the pitch name of a tuning reference pitch. **/
-    std::string m_tunePname;
+    data_PITCHNAME m_tunePname;
     /** Holds a value for cycles per second, i.e., Hertz, for a tuning reference pitch. **/
-    double m_tuneHzDbl;
+    double m_tuneHz;
     /** Provides an indication of the tuning system, 'just', for example. **/
-    std::string m_tuneTemper;
+    data_TEMPERAMENT m_tuneTemper;
 
 /* include <atttune.temper> */
 };
@@ -4673,15 +4673,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRestart(std::string restart_) { m_restart = restart_; };
-    std::string GetRestart() const { return m_restart; };    
+    void SetRestart(data_BOOLEAN restart_) { m_restart = restart_; };
+    data_BOOLEAN GetRestart() const { return m_restart; };    
     bool HasRestart( );
     
     ///@}
 
 private:
     /** Indicates that staves begin again with this section. **/
-    std::string m_restart;
+    data_BOOLEAN m_restart;
 
 /* include <attrestart> */
 };
@@ -4711,8 +4711,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSeq(int seqInt_) { m_seqInt = seqInt_; };
-    int GetSeq() const { return m_seqInt; };    
+    void SetSeq(int seq_) { m_seq = seq_; };
+    int GetSeq() const { return m_seq; };    
     bool HasSeq( );
     
     ///@}
@@ -4722,7 +4722,7 @@ private:
      * Used to assign a sequence number related to the order in which the encoded
      * features carrying this attribute are believed to have occurred.
      **/
-    int m_seqInt;
+    int m_seq;
 
 /* include <attseq> */
 };
@@ -4832,8 +4832,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCompressable(std::string compressable_) { m_compressable = compressable_; };
-    std::string GetCompressable() const { return m_compressable; };    
+    void SetCompressable(data_BOOLEAN compressable_) { m_compressable = compressable_; };
+    data_BOOLEAN GetCompressable() const { return m_compressable; };    
     bool HasCompressable( );
     
     ///@}
@@ -4843,7 +4843,7 @@ private:
      * Indicates whether a space is 'compressible', i.e., if it may be removed at the
      * discretion of processing software.
      **/
-    std::string m_compressable;
+    data_BOOLEAN m_compressable;
 
 /* include <attcompressable> */
 };
@@ -4873,13 +4873,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSpacingPackexp(double spacingPackexpDbl_) { m_spacingPackexpDbl = spacingPackexpDbl_; };
-    double GetSpacingPackexp() const { return m_spacingPackexpDbl; };    
+    void SetSpacingPackexp(double spacingPackexp_) { m_spacingPackexp = spacingPackexp_; };
+    double GetSpacingPackexp() const { return m_spacingPackexp; };    
     bool HasSpacingPackexp( );
     
     //
-    void SetSpacingPackfact(double spacingPackfactDbl_) { m_spacingPackfactDbl = spacingPackfactDbl_; };
-    double GetSpacingPackfact() const { return m_spacingPackfactDbl; };    
+    void SetSpacingPackfact(double spacingPackfact_) { m_spacingPackfact = spacingPackfact_; };
+    double GetSpacingPackfact() const { return m_spacingPackfact; };    
     bool HasSpacingPackfact( );
     
     //
@@ -4896,9 +4896,9 @@ public:
 
 private:
     /** Describes a note's spacing relative to its time value. **/
-    double m_spacingPackexpDbl;
+    double m_spacingPackexp;
     /** Describes the note spacing of output. **/
-    double m_spacingPackfactDbl;
+    double m_spacingPackfact;
     /**
      * Specifies the minimum amount of space between adjacent staves in the same
      * system; measured from the bottom line of the staff above to the top line of the
@@ -4989,8 +4989,8 @@ public:
     bool HasLayerscheme( );
     
     //
-    void SetLines(int linesInt_) { m_linesInt = linesInt_; };
-    int GetLines() const { return m_linesInt; };    
+    void SetLines(int lines_) { m_lines = lines_; };
+    int GetLines() const { return m_lines; };    
     bool HasLines( );
     
     //
@@ -5016,7 +5016,7 @@ private:
     /** Indicates the number of layers and their stem directions. **/
     data_LAYERSCHEME m_layerscheme;
     /** Indicates the number of staff lines. **/
-    int m_linesInt;
+    int m_lines;
     /**
      * Captures the colors of the staff lines.
      * The value is structured; that is, it should have the same number of space-
@@ -5105,15 +5105,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSymbol(data_SYMBOL symbol_) { m_symbol = symbol_; };
-    data_SYMBOL GetSymbol() const { return m_symbol; };    
+    void SetSymbol(staffgroupingsym_SYMBOL symbol_) { m_symbol = symbol_; };
+    staffgroupingsym_SYMBOL GetSymbol() const { return m_symbol; };    
     bool HasSymbol( );
     
     ///@}
 
 private:
     /** Specifies the symbol used to group a set of staves. **/
-    data_SYMBOL m_symbol;
+    staffgroupingsym_SYMBOL m_symbol;
 
 /* include <attsymbol> */
 };
@@ -5185,15 +5185,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLoc(std::string loc_) { m_loc = loc_; };
-    std::string GetLoc() const { return m_loc; };    
+    void SetLoc(int loc_) { m_loc = loc_; };
+    int GetLoc() const { return m_loc; };    
     bool HasLoc( );
     
     ///@}
 
 private:
     /** Holds the staff location of the feature. **/
-    std::string m_loc;
+    int m_loc;
 
 /* include <attloc> */
 };
@@ -5355,8 +5355,8 @@ public:
     bool HasStemDir( );
     
     //
-    void SetStemLen(int stemLen_) { m_stemLen = stemLen_; };
-    int GetStemLen() const { return m_stemLen; };    
+    void SetStemLen(std::string stemLen_) { m_stemLen = stemLen_; };
+    std::string GetStemLen() const { return m_stemLen; };    
     bool HasStemLen( );
     
     //
@@ -5370,13 +5370,13 @@ public:
     bool HasStemPos( );
     
     //
-    void SetStemX(int stemX_) { m_stemX = stemX_; };
-    int GetStemX() const { return m_stemX; };    
+    void SetStemX(double stemX_) { m_stemX = stemX_; };
+    double GetStemX() const { return m_stemX; };    
     bool HasStemX( );
     
     //
-    void SetStemY(int stemY_) { m_stemY = stemY_; };
-    int GetStemY() const { return m_stemY; };    
+    void SetStemY(double stemY_) { m_stemY = stemY_; };
+    double GetStemY() const { return m_stemY; };    
     bool HasStemY( );
     
     ///@}
@@ -5385,7 +5385,7 @@ private:
     /** Describes the direction of a stem. **/
     data_STEMDIRECTION m_stemDir;
     /** Encodes the stem length. **/
-    int m_stemLen;
+    std::string m_stemLen;
     /**
      * Encodes any stem "modifiers"; that is, symbols rendered on the stem, such as
      * tremolo or Sprechstimme indicators.
@@ -5394,9 +5394,9 @@ private:
     /** Records the position of the stem in relation to the note head(s). **/
     data_STEMPOSITION m_stemPos;
     /** Records the output x coordinate of the stem's attachment point. **/
-    int m_stemX;
+    double m_stemX;
     /** Records the output y coordinate of the stem's attachment point. **/
-    int m_stemY;
+    double m_stemY;
 
 /* include <attstem.y> */
 };
@@ -5426,13 +5426,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCon(data_CON con_) { m_con = con_; };
-    data_CON GetCon() const { return m_con; };    
+    void SetCon(sylLog_CON con_) { m_con = con_; };
+    sylLog_CON GetCon() const { return m_con; };    
     bool HasCon( );
     
     //
-    void SetWordpos(data_WORDPOS wordpos_) { m_wordpos = wordpos_; };
-    data_WORDPOS GetWordpos() const { return m_wordpos; };    
+    void SetWordpos(sylLog_WORDPOS wordpos_) { m_wordpos = wordpos_; };
+    sylLog_WORDPOS GetWordpos() const { return m_wordpos; };    
     bool HasWordpos( );
     
     ///@}
@@ -5442,9 +5442,9 @@ private:
      * Describes the symbols typically used to indicate breaks between syllables and
      * their functions.
      **/
-    data_CON m_con;
+    sylLog_CON m_con;
     /** Records the position of a syllable within a word. **/
-    data_WORDPOS m_wordpos;
+    sylLog_WORDPOS m_wordpos;
 
 /* include <attwordpos> */
 };
@@ -5512,8 +5512,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSystemLeftline(std::string systemLeftline_) { m_systemLeftline = systemLeftline_; };
-    std::string GetSystemLeftline() const { return m_systemLeftline; };    
+    void SetSystemLeftline(data_BOOLEAN systemLeftline_) { m_systemLeftline = systemLeftline_; };
+    data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; };    
     bool HasSystemLeftline( );
     
     //
@@ -5539,7 +5539,7 @@ private:
      * The default value is "true". Do not confuse this with the heavy vertical line
      * used as a grouping symbol.
      **/
-    std::string m_systemLeftline;
+    data_BOOLEAN m_systemLeftline;
     /**
      * Describes the amount of whitespace at the left system margin relative to
      * page.leftmar.
@@ -5599,13 +5599,13 @@ public:
     bool HasTextSize( );
     
     //
-    void SetTextStyle(std::string textStyle_) { m_textStyle = textStyle_; };
-    std::string GetTextStyle() const { return m_textStyle; };    
+    void SetTextStyle(data_FONTSTYLE textStyle_) { m_textStyle = textStyle_; };
+    data_FONTSTYLE GetTextStyle() const { return m_textStyle; };    
     bool HasTextStyle( );
     
     //
-    void SetTextWeight(std::string textWeight_) { m_textWeight = textWeight_; };
-    std::string GetTextWeight() const { return m_textWeight; };    
+    void SetTextWeight(data_FONTWEIGHT textWeight_) { m_textWeight = textWeight_; };
+    data_FONTWEIGHT GetTextWeight() const { return m_textWeight; };    
     bool HasTextWeight( );
     
     ///@}
@@ -5630,12 +5630,12 @@ private:
      * Provides a default value for the font style of text (other than lyrics) when
      * this information is not provided on the individual elements.
      **/
-    std::string m_textStyle;
+    data_FONTSTYLE m_textStyle;
     /**
      * Provides a default value for the font weight for text (other than lyrics) when
      * this information is not provided on the individual elements.
      **/
-    std::string m_textWeight;
+    data_FONTWEIGHT m_textWeight;
 
 /* include <atttext.weight> */
 };
@@ -5748,8 +5748,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstampGes(std::string tstampGes_) { m_tstampGes = tstampGes_; };
-    std::string GetTstampGes() const { return m_tstampGes; };    
+    void SetTstampGes(data_DURATION tstampGes_) { m_tstampGes = tstampGes_; };
+    data_DURATION GetTstampGes() const { return m_tstampGes; };    
     bool HasTstampGes( );
     
     //
@@ -5765,7 +5765,7 @@ private:
      * MusicXML 'divisions'), Humdrum **recip values, beats, seconds, or mensural
      * duration values.
      **/
-    std::string m_tstampGes;
+    data_DURATION m_tstampGes;
     /** Used to record the onset time in terms of ISO time. **/
     std::string m_tstampReal;
 
@@ -5797,8 +5797,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTstamp2(typedef_TSTAMP2 tstamp2_) { m_tstamp2 = tstamp2_; };
-    typedef_TSTAMP2 GetTstamp2() const { return m_tstamp2; };    
+    void SetTstamp2(data_MEASUREBEAT tstamp2_) { m_tstamp2 = tstamp2_; };
+    data_MEASUREBEAT GetTstamp2() const { return m_tstamp2; };    
     bool HasTstamp2( );
     
     ///@}
@@ -5808,7 +5808,7 @@ private:
      * Encodes the ending point of an event in terms of musical time, i.e., a count of
      * measures plus a beat location.
      **/
-    typedef_TSTAMP2 m_tstamp2;
+    data_MEASUREBEAT m_tstamp2;
 
 /* include <atttstamp2> */
 };
@@ -5838,13 +5838,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTransDiat(double transDiatDbl_) { m_transDiatDbl = transDiatDbl_; };
-    double GetTransDiat() const { return m_transDiatDbl; };    
+    void SetTransDiat(double transDiat_) { m_transDiat = transDiat_; };
+    double GetTransDiat() const { return m_transDiat; };    
     bool HasTransDiat( );
     
     //
-    void SetTransSemi(double transSemiDbl_) { m_transSemiDbl = transSemiDbl_; };
-    double GetTransSemi() const { return m_transSemiDbl; };    
+    void SetTransSemi(double transSemi_) { m_transSemi = transSemi_; };
+    double GetTransSemi() const { return m_transSemi; };    
     bool HasTransSemi( );
     
     ///@}
@@ -5854,12 +5854,12 @@ private:
      * Records the amount of diatonic pitch shift, e.g., C to C♯ = 0, C to D♭ = 1,
      * necessary to calculate the sounded pitch from the written one.
      **/
-    double m_transDiatDbl;
+    double m_transDiat;
     /**
      * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ =
      * 1, necessary to calculate the sounded pitch from the written one.
      **/
-    double m_transSemiDbl;
+    double m_transSemi;
 
 /* include <atttrans.semi> */
 };
@@ -5992,8 +5992,8 @@ public:
     bool HasFontname( );
     
     //
-    void SetFontsize(double fontsizeDbl_) { m_fontsizeDbl = fontsizeDbl_; };
-    double GetFontsize() const { return m_fontsizeDbl; };    
+    void SetFontsize(double fontsize_) { m_fontsize = fontsize_; };
+    double GetFontsize() const { return m_fontsize; };    
     bool HasFontsize( );
     
     //
@@ -6014,7 +6014,7 @@ private:
     /** Holds the name of a font. **/
     std::string m_fontname;
     /** Indicates the size of a font in printers' points, i.e., 1/72nd of an inch. **/
-    double m_fontsizeDbl;
+    double m_fontsize;
     /** Records the style of a font, i.e, italic, oblique, or normal. **/
     data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/
@@ -6048,8 +6048,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetVisible(std::string visible_) { m_visible = visible_; };
-    std::string GetVisible() const { return m_visible; };    
+    void SetVisible(data_BOOLEAN visible_) { m_visible = visible_; };
+    data_BOOLEAN GetVisible() const { return m_visible; };    
     bool HasVisible( );
     
     ///@}
@@ -6059,7 +6059,7 @@ private:
      * Indicates if a feature should be rendered when the notation is presented
      * graphically or sounded when it is presented in an aural form.
      **/
-    std::string m_visible;
+    data_BOOLEAN m_visible;
 
 /* include <attvisible> */
 };
@@ -6131,8 +6131,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTo(std::string to_) { m_to = to_; };
-    std::string GetTo() const { return m_to; };    
+    void SetTo(double to_) { m_to = to_; };
+    double GetTo() const { return m_to; };    
     bool HasTo( );
     
     ///@}
@@ -6142,7 +6142,7 @@ private:
      * Records a timestamp adjustment of a feature's programmatically-determined
      * location in terms of musical time; that is, beats.
      **/
-    std::string m_to;
+    double m_to;
 
 /* include <attto> */
 };
@@ -6265,13 +6265,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStartto(std::string startto_) { m_startto = startto_; };
-    std::string GetStartto() const { return m_startto; };    
+    void SetStartto(double startto_) { m_startto = startto_; };
+    double GetStartto() const { return m_startto; };    
     bool HasStartto( );
     
     //
-    void SetEndto(std::string endto_) { m_endto = endto_; };
-    std::string GetEndto() const { return m_endto; };    
+    void SetEndto(double endto_) { m_endto = endto_; };
+    double GetEndto() const { return m_endto; };    
     bool HasEndto( );
     
     ///@}
@@ -6281,12 +6281,12 @@ private:
      * Records a timestamp adjustment of a feature's programmatically-determined start
      * point.
      **/
-    std::string m_startto;
+    double m_startto;
     /**
      * Records a timestamp adjustment of a feature's programmatically-determined end
      * point.
      **/
-    std::string m_endto;
+    double m_endto;
 
 /* include <attendto> */
 };
@@ -6443,13 +6443,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetX(double xDbl_) { m_xDbl = xDbl_; };
-    double GetX() const { return m_xDbl; };    
+    void SetX(double x_) { m_x = x_; };
+    double GetX() const { return m_x; };    
     bool HasX( );
     
     //
-    void SetY(double yDbl_) { m_yDbl = yDbl_; };
-    double GetY() const { return m_yDbl; };    
+    void SetY(double y_) { m_y = y_; };
+    double GetY() const { return m_y; };    
     bool HasY( );
     
     ///@}
@@ -6460,13 +6460,13 @@ private:
      * When it is necessary to record the placement of a feature in a facsimile image,
      * use the facs attribute.
      **/
-    double m_xDbl;
+    double m_x;
     /**
      * Encodes an y coordinate for a feature in an output coordinate system.
      * When it is necessary to record the placement of a feature in a facsimile image,
      * use the facs attribute.
      **/
-    double m_yDbl;
+    double m_y;
 
 /* include <atty> */
 };
@@ -6496,22 +6496,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetX2(double x2Dbl_) { m_x2Dbl = x2Dbl_; };
-    double GetX2() const { return m_x2Dbl; };    
+    void SetX2(double x2_) { m_x2 = x2_; };
+    double GetX2() const { return m_x2; };    
     bool HasX2( );
     
     //
-    void SetY2(double y2Dbl_) { m_y2Dbl = y2Dbl_; };
-    double GetY2() const { return m_y2Dbl; };    
+    void SetY2(double y2_) { m_y2 = y2_; };
+    double GetY2() const { return m_y2; };    
     bool HasY2( );
     
     ///@}
 
 private:
     /** Encodes the optional 2nd x coordinate. **/
-    double m_x2Dbl;
+    double m_x2;
     /** Encodes the optional 2nd y coordinate. **/
-    double m_y2Dbl;
+    double m_y2;
 
 /* include <atty2> */
 };

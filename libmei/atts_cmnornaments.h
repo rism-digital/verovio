@@ -16,12 +16,12 @@
 #define __VRV_ATTS_CMNORNAMENTS_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
-#include <string>
+
 
 namespace vrv {
     
@@ -50,25 +50,25 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(mordentLog_FORM form_) { m_form = form_; };
+    mordentLog_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
-    void SetLong(std::string long_) { m_long = long_; };
-    std::string GetLong() const { return m_long; };    
+    void SetLong(data_BOOLEAN long_) { m_long = long_; };
+    data_BOOLEAN GetLong() const { return m_long; };    
     bool HasLong( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_form;
+    mordentLog_FORM m_form;
     /**
      * When the long attribute is set to 'yes', a double or long mordent, consisting of
      * 5 notes, is indicated.
      **/
-    std::string m_long;
+    data_BOOLEAN m_long;
 
 /* include <attlong> */
 };
@@ -98,8 +98,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOrnam(std::string ornam_) { m_ornam = ornam_; };
-    std::string GetOrnam() const { return m_ornam; };    
+    void SetOrnam(data_ORNAM_cmn ornam_) { m_ornam = ornam_; };
+    data_ORNAM_cmn GetOrnam() const { return m_ornam; };    
     bool HasOrnam( );
     
     ///@}
@@ -110,7 +110,7 @@ private:
      * If visual information about the ornament is needed, then one of the elements
      * that represents an ornament (mordent, trill, or turn) should be employed.
      **/
-    std::string m_ornam;
+    data_ORNAM_cmn m_ornam;
 
 /* include <attornam> */
 };
@@ -140,22 +140,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAccidupper(std::string accidupper_) { m_accidupper = accidupper_; };
-    std::string GetAccidupper() const { return m_accidupper; };    
+    void SetAccidupper(data_ACCIDENTAL_EXPLICIT accidupper_) { m_accidupper = accidupper_; };
+    data_ACCIDENTAL_EXPLICIT GetAccidupper() const { return m_accidupper; };    
     bool HasAccidupper( );
     
     //
-    void SetAccidlower(std::string accidlower_) { m_accidlower = accidlower_; };
-    std::string GetAccidlower() const { return m_accidlower; };    
+    void SetAccidlower(data_ACCIDENTAL_EXPLICIT accidlower_) { m_accidlower = accidlower_; };
+    data_ACCIDENTAL_EXPLICIT GetAccidlower() const { return m_accidlower; };    
     bool HasAccidlower( );
     
     ///@}
 
 private:
     /** Records the written accidental associated with an upper neighboring note. **/
-    std::string m_accidupper;
+    data_ACCIDENTAL_EXPLICIT m_accidupper;
     /** Records the written accidental associated with a lower neighboring note. **/
-    std::string m_accidlower;
+    data_ACCIDENTAL_EXPLICIT m_accidlower;
 
 /* include <attaccidlower> */
 };
@@ -185,13 +185,13 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDelayed(std::string delayed_) { m_delayed = delayed_; };
-    std::string GetDelayed() const { return m_delayed; };    
+    void SetDelayed(data_BOOLEAN delayed_) { m_delayed = delayed_; };
+    data_BOOLEAN GetDelayed() const { return m_delayed; };    
     bool HasDelayed( );
     
     //
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(turnLog_FORM form_) { m_form = form_; };
+    turnLog_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
@@ -202,9 +202,9 @@ private:
      * of the beat.
      * See Read, p. 246.
      **/
-    std::string m_delayed;
+    data_BOOLEAN m_delayed;
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_form;
+    turnLog_FORM m_form;
 
 /* include <attform> */
 };

@@ -16,12 +16,12 @@
 #define __VRV_ATTS_FACSIMILE_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
-#include <string>
+
 
 namespace vrv {
     
@@ -50,8 +50,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFacs(std::string facs_) { m_facs = facs_; };
-    std::string GetFacs() const { return m_facs; };    
+    void SetFacs(data_URIS facs_) { m_facs = facs_; };
+    data_URIS GetFacs() const { return m_facs; };    
     bool HasFacs( );
     
     ///@}
@@ -61,7 +61,7 @@ private:
      * Permits the current element to reference a facsimile image or image zone which
      * corresponds to it.
      **/
-    std::string m_facs;
+    data_URIS m_facs;
 
 	/**
 	 * Test

@@ -39,33 +39,33 @@ AttNoteGesTablature::~AttNoteGesTablature() {
 }
 
 void AttNoteGesTablature::ResetNoteGesTablature() {
-    m_tabFret = "";
-    m_tabString = "";
+    m_tabFret = FRETNUMBER_NONE;
+    m_tabString = STRINGNUMBER_NONE;
 }
 
-bool AttNoteGesTablature::ReadNoteGesTablature(  pugi::xml_node element ) {
+bool AttNoteGesTablature::ReadNoteGesTablature( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tab.fret")) {
-        this->SetTabFret(StrToStr(element.attribute("tab.fret").value()));
+        this->SetTabFret(StrToFretnumber(element.attribute("tab.fret").value()));
         element.remove_attribute("tab.fret");
         hasAttribute = true;
     }
     if (element.attribute("tab.string")) {
-        this->SetTabString(StrToStr(element.attribute("tab.string").value()));
+        this->SetTabString(StrToStringnumber(element.attribute("tab.string").value()));
         element.remove_attribute("tab.string");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttNoteGesTablature::WriteNoteGesTablature(  pugi::xml_node element ) {
+bool AttNoteGesTablature::WriteNoteGesTablature( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTabFret()) {
-        element.append_attribute("tab.fret") = StrToStr(this->GetTabFret()).c_str();
+        element.append_attribute("tab.fret") = FretnumberToStr(this->GetTabFret()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTabString()) {
-        element.append_attribute("tab.string") = StrToStr(this->GetTabString()).c_str();
+        element.append_attribute("tab.string") = StringnumberToStr(this->GetTabString()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -73,12 +73,12 @@ bool AttNoteGesTablature::WriteNoteGesTablature(  pugi::xml_node element ) {
 
 bool AttNoteGesTablature::HasTabFret( )
 {
-    return (m_tabFret != "");
+    return (m_tabFret != FRETNUMBER_NONE);
 }
 
 bool AttNoteGesTablature::HasTabString( )
 {
-    return (m_tabString != "");
+    return (m_tabString != STRINGNUMBER_NONE);
 }
 
 
@@ -100,7 +100,7 @@ void AttStaffDefGesTablature::ResetStaffDefGesTablature() {
     m_tabStrings = "";
 }
 
-bool AttStaffDefGesTablature::ReadStaffDefGesTablature(  pugi::xml_node element ) {
+bool AttStaffDefGesTablature::ReadStaffDefGesTablature( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("tab.strings")) {
         this->SetTabStrings(StrToStr(element.attribute("tab.strings").value()));
@@ -110,7 +110,7 @@ bool AttStaffDefGesTablature::ReadStaffDefGesTablature(  pugi::xml_node element 
     return hasAttribute;
 }
 
-bool AttStaffDefGesTablature::WriteStaffDefGesTablature(  pugi::xml_node element ) {
+bool AttStaffDefGesTablature::WriteStaffDefGesTablature( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasTabStrings()) {
         element.append_attribute("tab.strings") = StrToStr(this->GetTabStrings()).c_str();
@@ -132,11 +132,11 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
         assert( att );
         if (attrType == "tabFret") {
-            att->SetTabFret(att->StrToStr(attrValue));
+            att->SetTabFret(att->StrToFretnumber(attrValue));
             return true;
         }
         if (attrType == "tabString") {
-            att->SetTabString(att->StrToStr(attrValue));
+            att->SetTabString(att->StrToStringnumber(attrValue));
             return true;
         }
     }
@@ -157,10 +157,10 @@ void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
         assert( att );
         if (att->HasTabFret()) {
-            attributes->push_back(std::make_pair("tabFret", att->StrToStr(att->GetTabFret())));
+            attributes->push_back(std::make_pair("tabFret", att->FretnumberToStr(att->GetTabFret())));
         }
         if (att->HasTabString()) {
-            attributes->push_back(std::make_pair("tabString", att->StrToStr(att->GetTabString())));
+            attributes->push_back(std::make_pair("tabString", att->StringnumberToStr(att->GetTabString())));
         }
     }
     if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {

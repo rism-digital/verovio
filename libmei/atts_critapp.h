@@ -16,7 +16,7 @@
 #define __VRV_ATTS_CRITAPP_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------

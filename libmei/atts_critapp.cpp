@@ -42,7 +42,7 @@ void AttCrit::ResetCrit() {
     m_cause = "";
 }
 
-bool AttCrit::ReadCrit(  pugi::xml_node element ) {
+bool AttCrit::ReadCrit( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("cause")) {
         this->SetCause(StrToStr(element.attribute("cause").value()));
@@ -52,7 +52,7 @@ bool AttCrit::ReadCrit(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttCrit::WriteCrit(  pugi::xml_node element ) {
+bool AttCrit::WriteCrit( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasCause()) {
         element.append_attribute("cause") = StrToStr(this->GetCause()).c_str();
@@ -85,7 +85,7 @@ void AttSource::ResetSource() {
     m_source = "";
 }
 
-bool AttSource::ReadSource(  pugi::xml_node element ) {
+bool AttSource::ReadSource( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("source")) {
         this->SetSource(StrToStr(element.attribute("source").value()));
@@ -95,7 +95,7 @@ bool AttSource::ReadSource(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttSource::WriteSource(  pugi::xml_node element ) {
+bool AttSource::WriteSource( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasSource()) {
         element.append_attribute("source") = StrToStr(this->GetSource()).c_str();

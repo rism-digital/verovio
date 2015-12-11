@@ -42,7 +42,7 @@ void AttSurface::ResetSurface() {
     m_surface = "";
 }
 
-bool AttSurface::ReadSurface(  pugi::xml_node element ) {
+bool AttSurface::ReadSurface( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("surface")) {
         this->SetSurface(StrToStr(element.attribute("surface").value()));
@@ -52,7 +52,7 @@ bool AttSurface::ReadSurface(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttSurface::WriteSurface(  pugi::xml_node element ) {
+bool AttSurface::WriteSurface( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasSurface()) {
         element.append_attribute("surface") = StrToStr(this->GetSurface()).c_str();

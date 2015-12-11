@@ -42,7 +42,7 @@ void AttAlignment::ResetAlignment() {
     m_when = "";
 }
 
-bool AttAlignment::ReadAlignment(  pugi::xml_node element ) {
+bool AttAlignment::ReadAlignment( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("when")) {
         this->SetWhen(StrToStr(element.attribute("when").value()));
@@ -52,7 +52,7 @@ bool AttAlignment::ReadAlignment(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttAlignment::WriteAlignment(  pugi::xml_node element ) {
+bool AttAlignment::WriteAlignment( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasWhen()) {
         element.append_attribute("when") = StrToStr(this->GetWhen()).c_str();

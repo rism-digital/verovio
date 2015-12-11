@@ -16,7 +16,7 @@
 #define __VRV_ATTS_CMN_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,15 +50,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOrder(std::string order_) { m_order = order_; };
-    std::string GetOrder() const { return m_order; };    
+    void SetOrder(arpegLog_ORDER order_) { m_order = order_; };
+    arpegLog_ORDER GetOrder() const { return m_order; };    
     bool HasOrder( );
     
     ///@}
 
 private:
     /** Describes the direction in which an arpeggio is to be performed. **/
-    std::string m_order;
+    arpegLog_ORDER m_order;
 
 /* include <attorder> */
 };
@@ -88,15 +88,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArrow(std::string arrow_) { m_arrow = arrow_; };
-    std::string GetArrow() const { return m_arrow; };    
+    void SetArrow(data_BOOLEAN arrow_) { m_arrow = arrow_; };
+    data_BOOLEAN GetArrow() const { return m_arrow; };    
     bool HasArrow( );
     
     ///@}
 
 private:
     /** Indicates if an arrowhead is to be drawn as part of the arpeggiation symbol. **/
-    std::string m_arrow;
+    data_BOOLEAN m_arrow;
 
 /* include <attarrow> */
 };
@@ -126,15 +126,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };    
+    void SetForm(bTremLog_FORM form_) { m_form = form_; };
+    bTremLog_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_form;
+    bTremLog_FORM m_form;
 
 /* include <attform> */
 };
@@ -202,8 +202,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeamWith(std::string beamWith_) { m_beamWith = beamWith_; };
-    std::string GetBeamWith() const { return m_beamWith; };    
+    void SetBeamWith(data_OTHERSTAFF beamWith_) { m_beamWith = beamWith_; };
+    data_OTHERSTAFF GetBeamWith() const { return m_beamWith; };    
     bool HasBeamWith( );
     
     ///@}
@@ -214,7 +214,7 @@ private:
      * which staff the beam is connected to; that is, the staff above or the staff
      * below.
      **/
-    std::string m_beamWith;
+    data_OTHERSTAFF m_beamWith;
 
 /* include <attbeam.with> */
 };
@@ -249,8 +249,8 @@ public:
     bool HasBeamGroup( );
     
     //
-    void SetBeamRests(std::string beamRests_) { m_beamRests = beamRests_; };
-    std::string GetBeamRests() const { return m_beamRests; };    
+    void SetBeamRests(data_BOOLEAN beamRests_) { m_beamRests = beamRests_; };
+    data_BOOLEAN GetBeamRests() const { return m_beamRests; };    
     bool HasBeamRests( );
     
     ///@}
@@ -265,7 +265,7 @@ private:
      * Indicates whether automatically-drawn beams should include rests shorter than a
      * quarter note duration.
      **/
-    std::string m_beamRests;
+    data_BOOLEAN m_beamRests;
 
 /* include <attbeam.rests> */
 };
@@ -295,22 +295,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };    
+    void SetForm(beamrend_FORM form_) { m_form = form_; };
+    beamrend_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
-    void SetSlope(double slopeDbl_) { m_slopeDbl = slopeDbl_; };
-    double GetSlope() const { return m_slopeDbl; };    
+    void SetSlope(double slope_) { m_slope = slope_; };
+    double GetSlope() const { return m_slope; };    
     bool HasSlope( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_form;
+    beamrend_FORM m_form;
     /** Records the slope of the beam. **/
-    double m_slopeDbl;
+    double m_slope;
 
 /* include <attslope> */
 };
@@ -340,8 +340,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBreaksec(int breaksecInt_) { m_breaksecInt = breaksecInt_; };
-    int GetBreaksec() const { return m_breaksecInt; };    
+    void SetBreaksec(int breaksec_) { m_breaksec = breaksec_; };
+    int GetBreaksec() const { return m_breaksec; };    
     bool HasBreaksec( );
     
     ///@}
@@ -353,7 +353,7 @@ private:
      * The value of the attribute records the number of beams which should remain
      * unbroken.
      **/
-    int m_breaksecInt;
+    int m_breaksec;
 
 /* include <attbreaksec> */
 };
@@ -383,15 +383,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeatDef(std::string beatDef_) { m_beatDef = beatDef_; };
-    std::string GetBeatDef() const { return m_beatDef; };    
+    void SetBeatDef(data_DURATION beatDef_) { m_beatDef = beatDef_; };
+    data_DURATION GetBeatDef() const { return m_beatDef; };    
     bool HasBeatDef( );
     
     ///@}
 
 private:
     /** --- **/
-    std::string m_beatDef;
+    data_DURATION m_beatDef;
 
 /* include <attbeatDef> */
 };
@@ -501,15 +501,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCutout(std::string cutout_) { m_cutout = cutout_; };
-    std::string GetCutout() const { return m_cutout; };    
+    void SetCutout(cutout_CUTOUT cutout_) { m_cutout = cutout_; };
+    cutout_CUTOUT GetCutout() const { return m_cutout; };    
     bool HasCutout( );
     
     ///@}
 
 private:
     /** "Cut-out" style indicated for this measure. **/
-    std::string m_cutout;
+    cutout_CUTOUT m_cutout;
 
 /* include <attcutout> */
 };
@@ -539,8 +539,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetExpand(std::string expand_) { m_expand = expand_; };
-    std::string GetExpand() const { return m_expand; };    
+    void SetExpand(data_BOOLEAN expand_) { m_expand = expand_; };
+    data_BOOLEAN GetExpand() const { return m_expand; };    
     bool HasExpand( );
     
     ///@}
@@ -552,7 +552,7 @@ private:
      * A value of 'true' renders the source material, while 'false' displays the repeat
      * symbol.
      **/
-    std::string m_expand;
+    data_BOOLEAN m_expand;
 
 /* include <attexpand> */
 };
@@ -582,15 +582,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };    
+    void SetForm(fTremLog_FORM form_) { m_form = form_; };
+    fTremLog_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_form;
+    fTremLog_FORM m_form;
 
 /* include <attform> */
 };
@@ -620,22 +620,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };    
+    void SetForm(fermataVis_FORM form_) { m_form = form_; };
+    fermataVis_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
-    void SetShape(std::string shape_) { m_shape = shape_; };
-    std::string GetShape() const { return m_shape; };    
+    void SetShape(fermataVis_SHAPE shape_) { m_shape = shape_; };
+    fermataVis_SHAPE GetShape() const { return m_shape; };    
     bool HasShape( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_form;
+    fermataVis_FORM m_form;
     /** Describes a clef's shape. **/
-    std::string m_shape;
+    fermataVis_SHAPE m_shape;
 
 /* include <attshape> */
 };
@@ -670,8 +670,8 @@ public:
     bool HasGrace( );
     
     //
-    void SetGraceTime(std::string graceTime_) { m_graceTime = graceTime_; };
-    std::string GetGraceTime() const { return m_graceTime; };    
+    void SetGraceTime(int graceTime_) { m_graceTime = graceTime_; };
+    int GetGraceTime() const { return m_graceTime; };    
     bool HasGraceTime( );
     
     ///@}
@@ -683,7 +683,7 @@ private:
      **/
     data_GRACE m_grace;
     /** Records the amount of time to be "stolen" from a non-grace note/chord. **/
-    std::string m_graceTime;
+    int m_graceTime;
 
 /* include <attgrace.time> */
 };
@@ -713,26 +713,26 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };    
+    void SetForm(hairpinLog_FORM form_) { m_form = form_; };
+    hairpinLog_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
-    void SetNiente(std::string niente_) { m_niente = niente_; };
-    std::string GetNiente() const { return m_niente; };    
+    void SetNiente(data_BOOLEAN niente_) { m_niente = niente_; };
+    data_BOOLEAN GetNiente() const { return m_niente; };    
     bool HasNiente( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_form;
+    hairpinLog_FORM m_form;
     /**
      * Indicates that the hairpin starts from or ends in silence.
      * Often rendered as a small circle attached to the closed end of the hairpin. See
      * Gould, p. 108.
      **/
-    std::string m_niente;
+    data_BOOLEAN m_niente;
 
 /* include <attniente> */
 };
@@ -803,57 +803,57 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetC(std::string c_) { m_c = c_; };
-    std::string GetC() const { return m_c; };    
+    void SetC(harpPedalLog_C c_) { m_c = c_; };
+    harpPedalLog_C GetC() const { return m_c; };    
     bool HasC( );
     
     //
-    void SetD(std::string d_) { m_d = d_; };
-    std::string GetD() const { return m_d; };    
+    void SetD(harpPedalLog_D d_) { m_d = d_; };
+    harpPedalLog_D GetD() const { return m_d; };    
     bool HasD( );
     
     //
-    void SetE(std::string e_) { m_e = e_; };
-    std::string GetE() const { return m_e; };    
+    void SetE(harpPedalLog_E e_) { m_e = e_; };
+    harpPedalLog_E GetE() const { return m_e; };    
     bool HasE( );
     
     //
-    void SetF(std::string f_) { m_f = f_; };
-    std::string GetF() const { return m_f; };    
+    void SetF(harpPedalLog_F f_) { m_f = f_; };
+    harpPedalLog_F GetF() const { return m_f; };    
     bool HasF( );
     
     //
-    void SetG(std::string g_) { m_g = g_; };
-    std::string GetG() const { return m_g; };    
+    void SetG(harpPedalLog_G g_) { m_g = g_; };
+    harpPedalLog_G GetG() const { return m_g; };    
     bool HasG( );
     
     //
-    void SetA(std::string a_) { m_a = a_; };
-    std::string GetA() const { return m_a; };    
+    void SetA(harpPedalLog_A a_) { m_a = a_; };
+    harpPedalLog_A GetA() const { return m_a; };    
     bool HasA( );
     
     //
-    void SetB(std::string b_) { m_b = b_; };
-    std::string GetB() const { return m_b; };    
+    void SetB(harpPedalLog_B b_) { m_b = b_; };
+    harpPedalLog_B GetB() const { return m_b; };    
     bool HasB( );
     
     ///@}
 
 private:
     /** Indicates the pedal setting for the harp's C strings. **/
-    std::string m_c;
+    harpPedalLog_C m_c;
     /** Indicates the pedal setting for the harp's D strings. **/
-    std::string m_d;
+    harpPedalLog_D m_d;
     /** Indicates the pedal setting for the harp's E strings. **/
-    std::string m_e;
+    harpPedalLog_E m_e;
     /** Indicates the pedal setting for the harp's F strings. **/
-    std::string m_f;
+    harpPedalLog_F m_f;
     /** Indicates the pedal setting for the harp's G strings. **/
-    std::string m_g;
+    harpPedalLog_G m_g;
     /** Indicates the pedal setting for the harp's A strings. **/
-    std::string m_a;
+    harpPedalLog_A m_a;
     /** Indicates the pedal setting for the harp's B strings. **/
-    std::string m_b;
+    harpPedalLog_B m_b;
 
 /* include <attb> */
 };
@@ -883,8 +883,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLv(std::string lv_) { m_lv = lv_; };
-    std::string GetLv() const { return m_lv; };    
+    void SetLv(data_BOOLEAN lv_) { m_lv = lv_; };
+    data_BOOLEAN GetLv() const { return m_lv; };    
     bool HasLv( );
     
     ///@}
@@ -894,7 +894,7 @@ private:
      * Indicates the attachment of an l.v.
      * (laissez vibrer) sign to this element.
      **/
-    std::string m_lv;
+    data_BOOLEAN m_lv;
 
 /* include <attlv> */
 };
@@ -924,8 +924,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBlock(std::string block_) { m_block = block_; };
-    std::string GetBlock() const { return m_block; };    
+    void SetBlock(data_BOOLEAN block_) { m_block = block_; };
+    data_BOOLEAN GetBlock() const { return m_block; };    
     bool HasBlock( );
     
     ///@}
@@ -936,7 +936,7 @@ private:
      * forms (Read, p.
      * 104) should be rendered instead of the modern form or an alternative symbol.
      **/
-    std::string m_block;
+    data_BOOLEAN m_block;
 
 /* include <attblock> */
 };
@@ -966,15 +966,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGliss(std::string gliss_) { m_gliss = gliss_; };
-    std::string GetGliss() const { return m_gliss; };    
+    void SetGliss(data_GLISSANDO gliss_) { m_gliss = gliss_; };
+    data_GLISSANDO GetGliss() const { return m_gliss; };    
     bool HasGliss( );
     
     ///@}
 
 private:
     /** Indicates that this element participates in a glissando. **/
-    std::string m_gliss;
+    data_GLISSANDO m_gliss;
 
 /* include <attgliss> */
 };
@@ -1004,8 +1004,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNum(int numInt_) { m_numInt = numInt_; };
-    int GetNum() const { return m_numInt; };    
+    void SetNum(int num_) { m_num = num_; };
+    int GetNum() const { return m_num; };    
     bool HasNum( );
     
     ///@}
@@ -1015,7 +1015,7 @@ private:
      * Along with numbase, describes duration as a ratio.
      * num is the first value in the ratio, while numbase is the second.
      **/
-    int m_numInt;
+    int m_num;
 
 /* include <attnum> */
 };
@@ -1090,8 +1090,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetColl(std::string coll_) { m_coll = coll_; };
-    std::string GetColl() const { return m_coll; };    
+    void SetColl(octaveLog_COLL coll_) { m_coll = coll_; };
+    octaveLog_COLL GetColl() const { return m_coll; };    
     bool HasColl( );
     
     ///@}
@@ -1104,7 +1104,7 @@ private:
      * typically uses an unbroken line or a series of longer broken lines, ending with
      * a short vertical stroke. See Read, p. 47-48.
      **/
-    std::string m_coll;
+    octaveLog_COLL m_coll;
 
 /* include <attcoll> */
 };
@@ -1134,15 +1134,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDir(std::string dir_) { m_dir = dir_; };
-    std::string GetDir() const { return m_dir; };    
+    void SetDir(pedalLog_DIR dir_) { m_dir = dir_; };
+    pedalLog_DIR GetDir() const { return m_dir; };    
     bool HasDir( );
     
     ///@}
 
 private:
     /** Records the position of the piano damper pedal. **/
-    std::string m_dir;
+    pedalLog_DIR m_dir;
 
 /* include <attdir> */
 };
@@ -1172,15 +1172,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };    
+    void SetForm(pedalVis_FORM form_) { m_form = form_; };
+    pedalVis_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    data_BEATRPT_REND m_form;
+    pedalVis_FORM m_form;
 
 /* include <attform> */
 };
@@ -1210,15 +1210,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPedalStyle(std::string pedalStyle_) { m_pedalStyle = pedalStyle_; };
-    std::string GetPedalStyle() const { return m_pedalStyle; };    
+    void SetPedalStyle(pianopedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; };
+    pianopedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; };    
     bool HasPedalStyle( );
     
     ///@}
 
 private:
     /** Determines whether piano pedal marks should be rendered as lines or as terms. **/
-    std::string m_pedalStyle;
+    pianopedals_PEDALSTYLE m_pedalStyle;
 
 /* include <attpedal.style> */
 };
@@ -1248,15 +1248,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRehEnclose(std::string rehEnclose_) { m_rehEnclose = rehEnclose_; };
-    std::string GetRehEnclose() const { return m_rehEnclose; };    
+    void SetRehEnclose(rehearsal_REHENCLOSE rehEnclose_) { m_rehEnclose = rehEnclose_; };
+    rehearsal_REHENCLOSE GetRehEnclose() const { return m_rehEnclose; };    
     bool HasRehEnclose( );
     
     ///@}
 
 private:
     /** Describes the enclosing shape for rehearsal marks. **/
-    std::string m_rehEnclose;
+    rehearsal_REHENCLOSE m_rehEnclose;
 
 /* include <attreh.enclose> */
 };
@@ -1286,15 +1286,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGridShow(std::string gridShow_) { m_gridShow = gridShow_; };
-    std::string GetGridShow() const { return m_gridShow; };    
+    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; };
+    data_BOOLEAN GetGridShow() const { return m_gridShow; };    
     bool HasGridShow( );
     
     ///@}
 
 private:
     /** Determines whether to display guitar chord grids. **/
-    std::string m_gridShow;
+    data_BOOLEAN m_gridShow;
 
 /* include <attgrid.show> */
 };
@@ -1324,15 +1324,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSlurRend(std::string slurRend_) { m_slurRend = slurRend_; };
-    std::string GetSlurRend() const { return m_slurRend; };    
+    void SetSlurRend(data_CURVERENDITION slurRend_) { m_slurRend = slurRend_; };
+    data_CURVERENDITION GetSlurRend() const { return m_slurRend; };    
     bool HasSlurRend( );
     
     ///@}
 
 private:
     /** Describes the line style of the slur. **/
-    std::string m_slurRend;
+    data_CURVERENDITION m_slurRend;
 
 /* include <attslur.rend> */
 };
@@ -1362,8 +1362,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStemWith(std::string stemWith_) { m_stemWith = stemWith_; };
-    std::string GetStemWith() const { return m_stemWith; };    
+    void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; };
+    data_OTHERSTAFF GetStemWith() const { return m_stemWith; };    
     bool HasStemWith( );
     
     ///@}
@@ -1374,7 +1374,7 @@ private:
      * the current staff should be visually placed on; that is, the one above or the
      * one below.
      **/
-    std::string m_stemWith;
+    data_OTHERSTAFF m_stemWith;
 
 /* include <attstem.with> */
 };
@@ -1404,15 +1404,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTieRend(std::string tieRend_) { m_tieRend = tieRend_; };
-    std::string GetTieRend() const { return m_tieRend; };    
+    void SetTieRend(data_CURVERENDITION tieRend_) { m_tieRend = tieRend_; };
+    data_CURVERENDITION GetTieRend() const { return m_tieRend; };    
     bool HasTieRend( );
     
     ///@}
 
 private:
     /** Describes the line style of the tie. **/
-    std::string m_tieRend;
+    data_CURVERENDITION m_tieRend;
 
 /* include <atttie.rend> */
 };
@@ -1442,15 +1442,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeasperf(std::string measperf_) { m_measperf = measperf_; };
-    std::string GetMeasperf() const { return m_measperf; };    
+    void SetMeasperf(data_DURATION measperf_) { m_measperf = measperf_; };
+    data_DURATION GetMeasperf() const { return m_measperf; };    
     bool HasMeasperf( );
     
     ///@}
 
 private:
     /** The performed duration of an individual note in a measured tremolo. **/
-    std::string m_measperf;
+    data_DURATION m_measperf;
 
 /* include <attmeasperf> */
 };
@@ -1495,8 +1495,8 @@ public:
     bool HasDurVisible( );
     
     //
-    void SetNumFormat(data_NUMFORMAT numFormat_) { m_numFormat = numFormat_; };
-    data_NUMFORMAT GetNumFormat() const { return m_numFormat; };    
+    void SetNumFormat(tupletVis_NUMFORMAT numFormat_) { m_numFormat = numFormat_; };
+    tupletVis_NUMFORMAT GetNumFormat() const { return m_numFormat; };    
     bool HasNumFormat( );
     
     ///@}
@@ -1512,7 +1512,7 @@ private:
     /** Determines if the tuplet duration is visible. **/
     data_BOOLEAN m_durVisible;
     /** Controls how the num:numbase ratio is to be displayed. **/
-    data_NUMFORMAT m_numFormat;
+    tupletVis_NUMFORMAT m_numFormat;
 
 /* include <attnum.format> */
 };

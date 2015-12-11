@@ -321,17 +321,17 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     }
     
     // actually draw the line, the brace or the bracket
-    if ( topStaffGrp && ( (firstDef != lastDef) || (staffGrp->GetSymbol() != SYMBOL_NONE) ) ) {
+    if ( topStaffGrp && ( (firstDef != lastDef) || (staffGrp->GetSymbol() != staffgroupingsym_SYMBOL_NONE) ) ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, barLineWidth);
     }
     // this will need to be changed with the next version of MEI will line means additional thick line 
-    if ( staffGrp->GetSymbol() == SYMBOL_line ) {
+    if ( staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_line ) {
         DrawVerticalLine( dc , y_top, y_bottom, x, barLineWidth);
     }
-    else if ( staffGrp->GetSymbol() == SYMBOL_brace ) {
+    else if ( staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_brace ) {
         DrawBrace ( dc, x, y_top, y_bottom, last->m_drawingStaffSize );
     }
-    else if ( staffGrp->GetSymbol() == SYMBOL_bracket ) {
+    else if ( staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_bracket ) {
         DrawBracket( dc, x, y_top, y_bottom, last->m_drawingStaffSize );
         x -= 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBeamWhiteWidth(100, false);
     }

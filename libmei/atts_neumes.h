@@ -16,12 +16,12 @@
 #define __VRV_ATTS_NEUMES_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
-#include <string>
+
 
 namespace vrv {
     
@@ -50,22 +50,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_INEUMEFORM form_) { m_form = form_; };
+    data_INEUMEFORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
-    void SetName(std::string name_) { m_name = name_; };
-    std::string GetName() const { return m_name; };    
+    void SetName(data_INEUMENAME name_) { m_name = name_; };
+    data_INEUMENAME GetName() const { return m_name; };    
     bool HasName( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_form;
+    data_INEUMEFORM m_form;
     /** Records the name of the neume. **/
-    std::string m_name;
+    data_INEUMENAME m_name;
 
 /* include <attname> */
 };
@@ -95,22 +95,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_UNEUMEFORM form_) { m_form = form_; };
+    data_UNEUMEFORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
-    void SetName(std::string name_) { m_name = name_; };
-    std::string GetName() const { return m_name; };    
+    void SetName(data_UNEUMENAME name_) { m_name = name_; };
+    data_UNEUMENAME GetName() const { return m_name; };    
     bool HasName( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_form;
+    data_UNEUMEFORM m_form;
     /** Records the name of the neume. **/
-    std::string m_name;
+    data_UNEUMENAME m_name;
 
 /* include <attname> */
 };

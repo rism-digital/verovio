@@ -16,7 +16,7 @@
 #define __VRV_ATTS_LYRICS_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,8 +50,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRefrain(std::string refrain_) { m_refrain = refrain_; };
-    std::string GetRefrain() const { return m_refrain; };    
+    void SetRefrain(data_BOOLEAN refrain_) { m_refrain = refrain_; };
+    data_BOOLEAN GetRefrain() const { return m_refrain; };    
     bool HasRefrain( );
     
     //
@@ -66,7 +66,7 @@ private:
      * Used to indicate a common, usually centered, refrain (Mup User's Guide, p.
      * 44).
      **/
-    std::string m_refrain;
+    data_BOOLEAN m_refrain;
     /**
      * Used to specify a rhythm for the lyric syllables that differs from that of the
      * notes on the staff, e.g.

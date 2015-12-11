@@ -39,14 +39,14 @@ AttNotationtype::~AttNotationtype() {
 }
 
 void AttNotationtype::ResetNotationtype() {
-    m_notationtype = "";
+    m_notationtype = NOTATIONTYPE_NONE;
     m_notationsubtype = "";
 }
 
-bool AttNotationtype::ReadNotationtype(  pugi::xml_node element ) {
+bool AttNotationtype::ReadNotationtype( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("notationtype")) {
-        this->SetNotationtype(StrToStr(element.attribute("notationtype").value()));
+        this->SetNotationtype(StrToNotationtype(element.attribute("notationtype").value()));
         element.remove_attribute("notationtype");
         hasAttribute = true;
     }
@@ -58,10 +58,10 @@ bool AttNotationtype::ReadNotationtype(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttNotationtype::WriteNotationtype(  pugi::xml_node element ) {
+bool AttNotationtype::WriteNotationtype( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasNotationtype()) {
-        element.append_attribute("notationtype") = StrToStr(this->GetNotationtype()).c_str();
+        element.append_attribute("notationtype") = NotationtypeToStr(this->GetNotationtype()).c_str();
         wroteAttribute = true;
     }
     if (this->HasNotationsubtype()) {
@@ -73,7 +73,7 @@ bool AttNotationtype::WriteNotationtype(  pugi::xml_node element ) {
 
 bool AttNotationtype::HasNotationtype( )
 {
-    return (m_notationtype != "");
+    return (m_notationtype != NOTATIONTYPE_NONE);
 }
 
 bool AttNotationtype::HasNotationsubtype( )
@@ -89,7 +89,7 @@ bool Att::SetMei( Object *element, std::string attrType, std::string attrValue )
         AttNotationtype *att = dynamic_cast<AttNotationtype*>(element);
         assert( att );
         if (attrType == "notationtype") {
-            att->SetNotationtype(att->StrToStr(attrValue));
+            att->SetNotationtype(att->StrToNotationtype(attrValue));
             return true;
         }
         if (attrType == "notationsubtype") {
@@ -106,7 +106,7 @@ void Att::GetMei( Object *element, ArrayOfStrAttr *attributes ) {
         AttNotationtype *att = dynamic_cast<AttNotationtype*>(element);
         assert( att );
         if (att->HasNotationtype()) {
-            attributes->push_back(std::make_pair("notationtype", att->StrToStr(att->GetNotationtype())));
+            attributes->push_back(std::make_pair("notationtype", att->NotationtypeToStr(att->GetNotationtype())));
         }
         if (att->HasNotationsubtype()) {
             attributes->push_back(std::make_pair("notationsubtype", att->StrToStr(att->GetNotationsubtype())));

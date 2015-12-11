@@ -39,14 +39,14 @@ AttVerseLog::~AttVerseLog() {
 }
 
 void AttVerseLog::ResetVerseLog() {
-    m_refrain = "";
+    m_refrain = BOOLEAN_NONE;
     m_rhythm = "";
 }
 
-bool AttVerseLog::ReadVerseLog(  pugi::xml_node element ) {
+bool AttVerseLog::ReadVerseLog( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("refrain")) {
-        this->SetRefrain(StrToStr(element.attribute("refrain").value()));
+        this->SetRefrain(StrToBoolean(element.attribute("refrain").value()));
         element.remove_attribute("refrain");
         hasAttribute = true;
     }
@@ -58,10 +58,10 @@ bool AttVerseLog::ReadVerseLog(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttVerseLog::WriteVerseLog(  pugi::xml_node element ) {
+bool AttVerseLog::WriteVerseLog( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasRefrain()) {
-        element.append_attribute("refrain") = StrToStr(this->GetRefrain()).c_str();
+        element.append_attribute("refrain") = BooleanToStr(this->GetRefrain()).c_str();
         wroteAttribute = true;
     }
     if (this->HasRhythm()) {
@@ -73,7 +73,7 @@ bool AttVerseLog::WriteVerseLog(  pugi::xml_node element ) {
 
 bool AttVerseLog::HasRefrain( )
 {
-    return (m_refrain != "");
+    return (m_refrain != BOOLEAN_NONE);
 }
 
 bool AttVerseLog::HasRhythm( )
@@ -89,7 +89,7 @@ bool Att::SetLyrics( Object *element, std::string attrType, std::string attrValu
         AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
         assert( att );
         if (attrType == "refrain") {
-            att->SetRefrain(att->StrToStr(attrValue));
+            att->SetRefrain(att->StrToBoolean(attrValue));
             return true;
         }
         if (attrType == "rhythm") {
@@ -106,7 +106,7 @@ void Att::GetLyrics( Object *element, ArrayOfStrAttr *attributes ) {
         AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
         assert( att );
         if (att->HasRefrain()) {
-            attributes->push_back(std::make_pair("refrain", att->StrToStr(att->GetRefrain())));
+            attributes->push_back(std::make_pair("refrain", att->BooleanToStr(att->GetRefrain())));
         }
         if (att->HasRhythm()) {
             attributes->push_back(std::make_pair("rhythm", att->StrToStr(att->GetRhythm())));

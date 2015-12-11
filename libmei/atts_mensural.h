@@ -16,7 +16,7 @@
 #define __VRV_ATTS_MENSURAL_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -50,15 +50,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(data_LIGATUREFORM form_) { m_form = form_; };
+    data_LIGATUREFORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_form;
+    data_LIGATUREFORM m_form;
 
 /* include <attform> */
 };
@@ -88,8 +88,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
+    void SetForm(mensurVis_FORM form_) { m_form = form_; };
+    mensurVis_FORM GetForm() const { return m_form; };    
     bool HasForm( );
     
     //
@@ -101,7 +101,7 @@ public:
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
-    std::string m_form;
+    mensurVis_FORM m_form;
     /** Describes the rotation or reflection of the base symbol. **/
     data_ORIENTATION m_orient;
 
@@ -143,8 +143,8 @@ public:
     bool HasMensurSign( );
     
     //
-    void SetMensurSlash(char mensurSlash_) { m_mensurSlash = mensurSlash_; };
-    char GetMensurSlash() const { return m_mensurSlash; };    
+    void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; };
+    int GetMensurSlash() const { return m_mensurSlash; };    
     bool HasMensurSlash( );
     
     //
@@ -168,7 +168,7 @@ private:
      * Indicates the number lines added to the mensuration sign.
      * For example, one slash is added for what we now call 'alla breve'.
      **/
-    char m_mensurSlash;
+    int m_mensurSlash;
     /**
      * Together, proport.num and proport.numbase specify a proportional change as a
      * ratio, e.g., 1:3.
@@ -274,23 +274,23 @@ public:
     bool HasMensurColor( );
     
     //
-    void SetMensurForm(std::string mensurForm_) { m_mensurForm = mensurForm_; };
-    std::string GetMensurForm() const { return m_mensurForm; };    
+    void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; };
+    mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; };    
     bool HasMensurForm( );
     
     //
-    void SetMensurLoc(std::string mensurLoc_) { m_mensurLoc = mensurLoc_; };
-    std::string GetMensurLoc() const { return m_mensurLoc; };    
+    void SetMensurLoc(int mensurLoc_) { m_mensurLoc = mensurLoc_; };
+    int GetMensurLoc() const { return m_mensurLoc; };    
     bool HasMensurLoc( );
     
     //
-    void SetMensurOrient(std::string mensurOrient_) { m_mensurOrient = mensurOrient_; };
-    std::string GetMensurOrient() const { return m_mensurOrient; };    
+    void SetMensurOrient(data_ORIENTATION mensurOrient_) { m_mensurOrient = mensurOrient_; };
+    data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; };    
     bool HasMensurOrient( );
     
     //
-    void SetMensurSize(std::string mensurSize_) { m_mensurSize = mensurSize_; };
-    std::string GetMensurSize() const { return m_mensurSize; };    
+    void SetMensurSize(data_SIZE mensurSize_) { m_mensurSize = mensurSize_; };
+    data_SIZE GetMensurSize() const { return m_mensurSize; };    
     bool HasMensurSize( );
     
     ///@}
@@ -302,13 +302,13 @@ private:
      **/
     std::string m_mensurColor;
     /** Indicates whether the base symbol is written vertically or horizontally. **/
-    std::string m_mensurForm;
+    mensuralVis_MENSURFORM m_mensurForm;
     /** Holds the staff location of the mensuration sign. **/
-    std::string m_mensurLoc;
+    int m_mensurLoc;
     /** Describes the rotation or reflection of the base symbol. **/
-    std::string m_mensurOrient;
+    data_ORIENTATION m_mensurOrient;
     /** Describes the relative size of the mensuration sign. **/
-    std::string m_mensurSize;
+    data_SIZE m_mensurSize;
 
 /* include <attmensur.size> */
 };
@@ -338,15 +338,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLig(data_LIGATURE lig_) { m_lig = lig_; };
-    data_LIGATURE GetLig() const { return m_lig; };    
+    void SetLig(noteLogMensural_LIG lig_) { m_lig = lig_; };
+    noteLogMensural_LIG GetLig() const { return m_lig; };    
     bool HasLig( );
     
     ///@}
 
 private:
     /** Indicates this element's participation in a ligature. **/
-    data_LIGATURE m_lig;
+    noteLogMensural_LIG m_lig;
 
 /* include <attlig> */
 };
@@ -376,15 +376,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSpaces(int spacesInt_) { m_spacesInt = spacesInt_; };
-    int GetSpaces() const { return m_spacesInt; };    
+    void SetSpaces(int spaces_) { m_spaces = spaces_; };
+    int GetSpaces() const { return m_spaces; };    
     bool HasSpaces( );
     
     ///@}
 
 private:
     /** States how many spaces are covered by the rest. **/
-    int m_spacesInt;
+    int m_spaces;
 
 /* include <attspaces> */
 };

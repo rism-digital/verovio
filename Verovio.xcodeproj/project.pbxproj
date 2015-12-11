@@ -89,6 +89,11 @@
 		4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
 		4DF9D2841C18DC490069E8C8 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
 		4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2821C18DC490069E8C8 /* atts_mei.h */; };
+		4DF9D28E1C19C4A10069E8C8 /* libmei_classes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D28C1C19C4A10069E8C8 /* libmei_classes.h */; };
+		4DF9D28F1C19C4A10069E8C8 /* libmei_def.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D28D1C19C4A10069E8C8 /* libmei_def.h */; };
+		4DF9D2921C1ADCC80069E8C8 /* libmei_converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2901C1ADCC80069E8C8 /* libmei_converter.cpp */; };
+		4DF9D2931C1ADCC80069E8C8 /* libmei_converter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2901C1ADCC80069E8C8 /* libmei_converter.cpp */; };
+		4DF9D2941C1ADCC80069E8C8 /* libmei_converter.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2911C1ADCC80069E8C8 /* libmei_converter.h */; };
 		8F086EE2188539540037FD8E /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
 		8F086EE4188539540037FD8E /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
 		8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
@@ -242,7 +247,6 @@
 		4D422103199805F700963292 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = src/att.cpp; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
 		4D543E211B80AACF004B823C /* view_floating.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_floating.cpp; path = src/view_floating.cpp; sourceTree = "<group>"; };
-		4D5B522F1B7DE3FE00179688 /* att_classes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = att_classes.h; path = libmei/att_classes.h; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
@@ -319,6 +323,10 @@
 		4DF9D2871C18DE270069E8C8 /* atts_performance.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_performance.h; path = libmei/atts_performance.h; sourceTree = "<group>"; };
 		4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = atts_usersymbols.cpp; path = libmei/atts_usersymbols.cpp; sourceTree = "<group>"; };
 		4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = atts_usersymbols.h; path = libmei/atts_usersymbols.h; sourceTree = "<group>"; };
+		4DF9D28C1C19C4A10069E8C8 /* libmei_classes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libmei_classes.h; path = libmei/libmei_classes.h; sourceTree = "<group>"; };
+		4DF9D28D1C19C4A10069E8C8 /* libmei_def.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libmei_def.h; path = libmei/libmei_def.h; sourceTree = "<group>"; };
+		4DF9D2901C1ADCC80069E8C8 /* libmei_converter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = libmei_converter.cpp; path = libmei/libmei_converter.cpp; sourceTree = "<group>"; };
+		4DF9D2911C1ADCC80069E8C8 /* libmei_converter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libmei_converter.h; path = libmei/libmei_converter.h; sourceTree = "<group>"; };
 		8F086EA9188534680037FD8E /* Verovio */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Verovio; sourceTree = BUILT_PRODUCTS_DIR; };
 		8F086EB6188539540037FD8E /* aligner.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; lineEnding = 0; name = aligner.cpp; path = src/aligner.cpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		8F086EB8188539540037FD8E /* barline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = barline.cpp; path = src/barline.cpp; sourceTree = "<group>"; };
@@ -473,7 +481,6 @@
 		4DEE28EC1940BCA100C76319 /* libmei */ = {
 			isa = PBXGroup;
 			children = (
-				4D5B522F1B7DE3FE00179688 /* att_classes.h */,
 				4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */,
 				4DEE28EE1940BCC100C76319 /* atts_analysis.h */,
 				4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */,
@@ -512,6 +519,10 @@
 				4DEE290C1940BCC100C76319 /* atts_tablature.h */,
 				4DF9D2881C18DE270069E8C8 /* atts_usersymbols.cpp */,
 				4DF9D2891C18DE270069E8C8 /* atts_usersymbols.h */,
+				4DF9D28C1C19C4A10069E8C8 /* libmei_classes.h */,
+				4DF9D2901C1ADCC80069E8C8 /* libmei_converter.cpp */,
+				4DF9D2911C1ADCC80069E8C8 /* libmei_converter.h */,
+				4DF9D28D1C19C4A10069E8C8 /* libmei_def.h */,
 			);
 			name = libmei;
 			sourceTree = "<group>";
@@ -721,6 +732,7 @@
 				4D1D733E1A1D08CD001E08F6 /* glyph.h in Headers */,
 				8F59293A18854BF800FE51AD /* devicecontext.h in Headers */,
 				8F59293B18854BF800FE51AD /* doc.h in Headers */,
+				4DF9D2941C1ADCC80069E8C8 /* libmei_converter.h in Headers */,
 				8F59293C18854BF800FE51AD /* durationinterface.h in Headers */,
 				8F59293D18854BF800FE51AD /* toolkit.h in Headers */,
 				4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */,
@@ -748,10 +760,12 @@
 				8F59294E18854BF800FE51AD /* positioninterface.h in Headers */,
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
+				4DF9D28E1C19C4A10069E8C8 /* libmei_classes.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
 				4DB726C31B8B9F540040231B /* rpt.h in Headers */,
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
+				4DF9D28F1C19C4A10069E8C8 /* libmei_def.h in Headers */,
 				8F59295318854BF800FE51AD /* svgdevicecontext.h in Headers */,
 				8F59295518854BF800FE51AD /* system.h in Headers */,
 				8F59295618854BF800FE51AD /* tie.h in Headers */,
@@ -900,6 +914,7 @@
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
+				4DF9D2921C1ADCC80069E8C8 /* libmei_converter.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* style.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
@@ -966,6 +981,7 @@
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
 				8F3DD34A18854B2E0051330C /* multirest.cpp in Sources */,
+				4DF9D2931C1ADCC80069E8C8 /* libmei_converter.cpp in Sources */,
 				8F3DD34C18854B2E0051330C /* note.cpp in Sources */,
 				4D8CD8A71B4E927300F0756F /* atts_critapp.cpp in Sources */,
 				8F3DD34E18854B2E0051330C /* pitchinterface.cpp in Sources */,

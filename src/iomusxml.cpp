@@ -351,9 +351,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 StaffGrp *staffGrp = new StaffGrp();
                 // read the group-symbol (MEI @symbol)
                 std::string groupGymbol = GetContentOfChild(xpathNode.node(), "group-symbol");
-                if (groupGymbol == "bracket") staffGrp->SetSymbol(SYMBOL_bracket);
-                else if (groupGymbol == "brace") staffGrp->SetSymbol(SYMBOL_brace);
-                else if (groupGymbol == "line") staffGrp->SetSymbol(SYMBOL_line);
+                if (groupGymbol == "bracket") staffGrp->SetSymbol(staffgroupingsym_SYMBOL_bracket);
+                else if (groupGymbol == "brace") staffGrp->SetSymbol(staffgroupingsym_SYMBOL_brace);
+                else if (groupGymbol == "line") staffGrp->SetSymbol(staffgroupingsym_SYMBOL_line);
                 // now stack it
                 m_staffGrpStack.back()->AddStaffGrp(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
@@ -379,7 +379,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetLabel(partName);
-                partStaffGrp->SetSymbol(SYMBOL_brace);
+                partStaffGrp->SetSymbol(staffgroupingsym_SYMBOL_brace);
                 partStaffGrp->SetBarthru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddStaffGrp(partStaffGrp);
             }
@@ -481,7 +481,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 clefSign = it->select_single_node("clef/sign");
             }
             if (clefSign && HasContent(clefSign.node())) {
-                staffDef->SetClefShape(staffDef->AttCleffingLog::StrToClefShape(GetContent(clefSign.node())));
+                staffDef->SetClefShape(staffDef->AttCleffingLog::StrToClefshape(GetContent(clefSign.node())));
             }
             // clef line
             pugi::xpath_node clefLine;
@@ -505,7 +505,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 std::string value;
                 if (key < 0) value = StringFormat("%df", abs(key));
                 else value = StringFormat("%ds", key);
-                staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeySignature(value));
+                staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeysignature(value));
             }
             // time
             pugi::xpath_node time;
@@ -517,7 +517,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (time) {
                 pugi::xpath_node symbol = time.node().select_single_node("symbol");
                 if (symbol && HasContent(symbol.node())) {
-                    staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMeterSign(symbol.node().text().as_string()));
+                    staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.node().text().as_string()));
                 }
                 pugi::xpath_node beats = time.node().select_single_node("beats");
                 if (beats && HasContent(beats.node())) {
@@ -610,7 +610,7 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure
         pugi::xpath_node clefLine = clef.node().select_single_node("line");
         if (clefSign && clefLine) {
             Clef *meiClef = new Clef();
-            meiClef->SetShape(meiClef->AttClefshape::StrToClefShape(GetContent(clefSign.node())));
+            meiClef->SetShape(meiClef->AttClefshape::StrToClefshape(GetContent(clefSign.node())));
             meiClef->SetLine(meiClef->AttClefshape::StrToInt(clefLine.node().text().as_string()));
             AddLayerElement(layer, meiClef);
         }
@@ -782,14 +782,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             verse->SetN(lyricNumber);
             Syl *syl = new Syl();
             if (lyric.select_single_node("extend")) {
-                syl->SetCon(CON_u);
+                syl->SetCon(sylLog_CON_u);
             }
             if (GetContentOfChild(lyric, "syllabic") == "begin") {
-                syl->SetCon(CON_d);
-                syl->SetWordpos(WORDPOS_i);
+                syl->SetCon(sylLog_CON_d);
+                syl->SetWordpos(sylLog_WORDPOS_i);
             }
             else if (GetContentOfChild(lyric, "syllabic") == "end") {
-                syl->SetWordpos(WORDPOS_t);
+                syl->SetWordpos(sylLog_WORDPOS_t);
             }
             
             syl->SetText(UTF8to16(textStr.c_str()));
@@ -837,8 +837,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         if (HasAttributeWithValue(slur, "type", "start")) {
             Slur *meiSlur = new Slur();
             // placement
-            if (HasAttributeWithValue(slur, "placement", "above")) meiSlur->SetCurvedir(CURVEDIR_above);
-            else if (HasAttributeWithValue(slur, "placement", "below")) meiSlur->SetCurvedir(CURVEDIR_below);
+            if (HasAttributeWithValue(slur, "placement", "above")) meiSlur->SetCurvedir(curvature_CURVEDIR_above);
+            else if (HasAttributeWithValue(slur, "placement", "below")) meiSlur->SetCurvedir(curvature_CURVEDIR_below);
             // add it to the stack
             m_floatingElements.push_back(std::make_pair(measureNb, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);

@@ -42,7 +42,7 @@ void AttAltsym::ResetAltsym() {
     m_altsym = "";
 }
 
-bool AttAltsym::ReadAltsym(  pugi::xml_node element ) {
+bool AttAltsym::ReadAltsym( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("altsym")) {
         this->SetAltsym(StrToStr(element.attribute("altsym").value()));
@@ -52,7 +52,7 @@ bool AttAltsym::ReadAltsym(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttAltsym::WriteAltsym(  pugi::xml_node element ) {
+bool AttAltsym::WriteAltsym( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasAltsym()) {
         element.append_attribute("altsym") = StrToStr(this->GetAltsym()).c_str();

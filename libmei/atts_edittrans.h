@@ -16,7 +16,7 @@
 #define __VRV_ATTS_EDITTRANS_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -91,8 +91,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCert(std::string cert_) { m_cert = cert_; };
-    std::string GetCert() const { return m_cert; };    
+    void SetCert(data_CERTAINTY cert_) { m_cert = cert_; };
+    data_CERTAINTY GetCert() const { return m_cert; };    
     bool HasCert( );
     
     //
@@ -104,7 +104,7 @@ public:
 
 private:
     /** Signifies the degree of certainty or precision associated with a feature. **/
-    std::string m_cert;
+    data_CERTAINTY m_cert;
     /**
      * Indicates the nature of the evidence supporting the reliability or accuracy of
      * the intervention or interpretation.

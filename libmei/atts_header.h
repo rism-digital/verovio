@@ -16,12 +16,12 @@
 #define __VRV_ATTS_HEADER_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
 
-#include <string>
+
 
 namespace vrv {
     
@@ -50,15 +50,15 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMethod(std::string method_) { m_method = method_; };
-    std::string GetMethod() const { return m_method; };    
+    void SetMethod(regularmethod_METHOD method_) { m_method = method_; };
+    regularmethod_METHOD GetMethod() const { return m_method; };    
     bool HasMethod( );
     
     ///@}
 
 private:
     /** Indicates the method employed to mark corrections and normalizations. **/
-    std::string m_method;
+    regularmethod_METHOD m_method;
 
 /* include <attmethod> */
 };
