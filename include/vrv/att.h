@@ -5,6 +5,7 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+
 #ifndef __VRV_ATT_H__
 #define __VRV_ATT_H__
 
@@ -103,10 +104,10 @@ public:
     ///@{
     double StrToDbl(std::string value);
     int StrToInt(std::string value);
+    ///@}
     
     /** @name Converters for writing and reading */
     ///@{
-    
     std::string BeatrptRendToStr(data_BEATRPT_REND data);
     data_BEATRPT_REND StrToBeatrptRend(std::string value);
     
@@ -145,6 +146,7 @@ public:
     
     std::string TieToStr(data_TIE data);
     data_TIE StrToTie(std::string value);
+    ///@}
 };
     
 //----------------------------------------------------------------------------

@@ -6,8 +6,8 @@
 /////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef __ATT_DEF_H__
-#define __ATT_DEF_H__
+#ifndef __VRV_ATT_DEF_H__
+#define __VRV_ATT_DEF_H__
 
 #include <string>
 #include <utility>
@@ -247,4 +247,4 @@ enum data_TEMPUS {
     
 } // namespace vrv
 
-#endif // __ATT_DEF_H__
+#endif // __VRV_ATT_DEF_H__
