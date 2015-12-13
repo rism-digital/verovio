@@ -224,6 +224,9 @@ int Staff::SetDrawingXY( ArrayPtrVoid *params )
         this->SetDrawingY( this->m_yAbs );
     }
     
+    // For avoiding unused variable warning in non debug mode
+    doc = NULL;
+    
     return FUNCTOR_CONTINUE;
 }
     

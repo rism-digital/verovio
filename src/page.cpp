@@ -338,6 +338,10 @@ int Page::GetContentWidth( )
     if (!first ) {
         return 0;
     }
+    
+    // For avoiding unused variable warning in non debug mode
+    doc = NULL;
+    
     // we include the left margin and the right margin
     return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
 }

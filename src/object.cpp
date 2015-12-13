@@ -895,8 +895,6 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
 
     // starting a new system
     if (this->Is() == SYSTEM) {
-        System *system = dynamic_cast<System*>(this);
-        assert( system );
         currentScoreDef->SetRedrawFlags( true, true, false, false, false );
         return FUNCTOR_CONTINUE;
     }
@@ -1186,8 +1184,6 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
     
     // ending a layer
     if (this->Is() == LAYER) {
-        Layer *current_layer = dynamic_cast<Layer*>(this);
-        assert( current_layer );
         // mininimum position is the with the layer
         // we keep it if is higher than what we had so far
         // this will be used for shifting the right barLine
@@ -1207,8 +1203,6 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
     
     // starting a new system
     if (this->Is() == SYSTEM) {
-        System *current_system = dynamic_cast<System*>(this);
-        assert( current_system );
         // we reset the system height
         (*system_height) = 0;
         (*min_pos) = 0;
@@ -1266,8 +1260,6 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
     
     // ending a measure
     if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure*>(this);
-        assert( current_measure );
         // mininimum position is the height for the last (previous) staff
         // we keep it if it is higher than what we had so far
         (*system_height) = std::min( (*system_height), (*min_pos) );
@@ -1275,7 +1267,6 @@ int Object::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
     }
     
     // ending a system: see System::SetBoundingBoxYShiftEnd
-
     return FUNCTOR_CONTINUE;
 }
         

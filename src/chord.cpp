@@ -23,7 +23,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Chord::Chord( ):
-    LayerElement("chord-"), StemmedDrawingInterface(), ObjectListInterface(), DurationInterface(),
+    LayerElement("chord-"), ObjectListInterface(), StemmedDrawingInterface(), DurationInterface(),
     AttCommon(),
     AttStems(),
     AttStemsCmn(),

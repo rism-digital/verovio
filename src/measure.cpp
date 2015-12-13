@@ -328,6 +328,8 @@ int Measure::SetDrawingXY( ArrayPtrVoid *params )
         this->SetDrawingX( this->m_xAbs );
     }
 
+    // For avoiding unused variable warning in non debug mode
+    doc = NULL;
     
     return FUNCTOR_CONTINUE;
 }

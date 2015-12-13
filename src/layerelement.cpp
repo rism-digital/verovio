@@ -475,6 +475,9 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
         }
     }
     
+    // For avoiding unused variable warning in non debug mode
+    doc = NULL;
+    
     return FUNCTOR_CONTINUE;
 }
 

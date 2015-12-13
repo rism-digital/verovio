@@ -936,6 +936,9 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff, measure );
     
     dc->EndGraphic(element, this);
+    
+    // For avoiding unused variable warning in non debug mode
+    mRpt2 = NULL;
 }
 
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1832,6 +1835,9 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
 {
     std::vector< std::vector<bool> > *accidSpace = &chord->m_accidSpace;
     
+    // Declared here for avoiding unused variable warning in non debug mode
+    int listBot, bottomY, accidSpaceSize;
+    
     //global drawing variables
     int fullUnit = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int halfUnit = fullUnit / 2;
@@ -1841,13 +1847,13 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     int xLength = (int)accidSpace->front().size();
     int yHeight = (int)accidSpace->size() - 1;
     int listTop = chord->m_accidSpaceTop;
-    int listBot = chord->m_accidSpaceBot;
+    listBot = chord->m_accidSpaceBot;
     
     //drawing variables for the accidental
     int type = accid->GetAccid();
     int centerY = accid->GetDrawingY();
     int topY = centerY + (accidHeight / 2);
-    int bottomY = centerY - (accidHeight / 2);
+    bottomY = centerY - (accidHeight / 2);
     
     //difference between left end and right end of the accidental
     int accidWidthDiff = ACCID_WIDTH - 1;
@@ -1863,7 +1869,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
     
     // store it for asserts
-    int accidSpaceSize = (int)accidSpace->size();
+    accidSpaceSize = (int)accidSpace->size();
     assert(accidTop >= 0);
     assert(accidTop < accidSpaceSize);
     
