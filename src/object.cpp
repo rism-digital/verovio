@@ -993,7 +993,7 @@ int Object::AlignVertically( ArrayPtrVoid *params )
     
 int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 {
-    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the Doc
     int *min_pos = static_cast<int*>((*params).at(0));
     Doc *doc = static_cast<Doc*>((*params).at(1));
@@ -1050,7 +1050,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 
 int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 {
-    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
     int *min_pos = static_cast<int*>((*params).at(0));
@@ -1167,7 +1167,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 
 int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
 {
-    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     int *min_pos = static_cast<int*>((*params).at(0));
     int *measure_width = static_cast<int*>((*params).at(1));
@@ -1176,7 +1176,7 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
     if (this->Is() == MEASURE) {
         Measure *current_measure = dynamic_cast<Measure*>(this);
         assert( current_measure );
-        // as minimum position of the barLine use the measure width
+        // use the measure width as minimum position of the barLine
         (*min_pos) = (*measure_width);
         if (current_measure->GetRightBarlineType() != BARRENDITION_NONE) {
             current_measure->GetRightBarline()->SetBoundingBoxXShift( params );

@@ -311,11 +311,10 @@ bool Toolkit::LoadString( const std::string &data )
         this->SetNoLayout( true );
     }
     
-    // do the layout? this depends on the options and of the
-    // file. PAE and DARMS of no layout information. MEI files
-    // can have, but this might have been ignored because of the
-    // --ignore-layout option. We won't do it if --no-layout option
-    // was set, though.
+    // Do the layout? this depends on the options and the file. PAE and
+    // DARMS have no layout information. MEI files _can_ have it, but it
+    // might have been ignored because of the --ignore-layout option.
+    // Regardless, we won't do layout if the --no-layout option was set.
     if (!input->HasLayoutInformation() && !m_noLayout) {
         //LogElapsedTimeStart();
         m_doc.CastOff();
@@ -336,7 +335,7 @@ bool Toolkit::LoadString( const std::string &data )
 
 std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
 {
-    // Page number is one-based - correction to 0-based first
+    // Page number is one-based - correct to 0-based first
     pageNo--;
     
     MeiOutput meioutput( &m_doc, "" );
