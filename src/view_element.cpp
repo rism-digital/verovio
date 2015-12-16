@@ -1243,6 +1243,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->ResetBrush();
 }
 
+#define MENSURAL true
+    
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert( dc );
@@ -1256,62 +1258,64 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic( element, "", element->GetUuid() );
 	
-	int b = staff->GetDrawingY();
-	int a = element->GetDrawingX();
-    int sym = SMUFL_E050_gClef;	//sSOL, position d'ordre des cles sol fa ut in fonts
+	int y = staff->GetDrawingY();
+	int x = element->GetDrawingX();
+    int sym; // = SMUFL_E050_gClef;	//sSOL, position d'ordre des cles sol fa ut in fonts
 
     /*  poser sym=no de position sSOL dans la fonte
-     *	au depart; ne faire operation sur b qu'une fois pour cas semblables,
+     *	au depart; ne faire operation sur y qu'une fois pour cas semblables,
      *  et au palier commun superieur, incrementer sym, sans break.
      */
 	switch(clef->GetClefId())
 	{
 		case C1 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
             break;
 		case G1 :
-            b -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+            sym = (MENSURAL? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
+            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
             break;
 		case G2_8va :
             sym = SMUFL_E053_gClef8va;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
         case G2_8vb :
             sym = SMUFL_E052_gClef8vb;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
 		case C2 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
 		case G2 :
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            sym = (MENSURAL? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
 		case F3 :
             sym = SMUFL_E062_fClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
             break;
 		case C3 :
-            sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
+            sym = (MENSURAL? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
             break;
 		case F5 :
-            sym =SMUFL_E062_fClef;
+            sym = SMUFL_E062_fClef;
             break;
 		case F4 :
-            sym = SMUFL_E062_fClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            sym = (MENSURAL? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             break;
 		case C4 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             break;
 		case C5 :
             sym = SMUFL_E05C_cClef;
             break;
 		case perc :
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
             // FIXME
             sym = SMUFL_E05C_cClef;
             break;
@@ -1319,14 +1323,16 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             break;
 	}
 
+
+    LogDebug("sym=%d cClefPet=%d cClef=%d\n", sym, SMUFL_E909_mensuralCclefPetrucciPosMiddle, SMUFL_E05C_cClef);
     bool cueSize = false;
     // force cue size for intermediate clefs
     if (clef->GetFirstParent( LAYER )) cueSize = true;
     
     //if (!cueSize)
-    //    a -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    //    x -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     
-    DrawSmuflCode ( dc, a, b, sym, staff->m_drawingStaffSize, cueSize );
+    DrawSmuflCode ( dc, x, y, sym, staff->m_drawingStaffSize, cueSize );
    
     dc->EndGraphic(element, this );
 }
