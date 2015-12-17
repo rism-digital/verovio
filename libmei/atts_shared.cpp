@@ -1116,9 +1116,9 @@ bool AttCommonPart::ReadCommonPart( pugi::xml_node element ) {
         element.remove_attribute("label");
         hasAttribute = true;
     }
-    if (element.attribute("base")) {
-        this->SetBase(StrToStr(element.attribute("base").value()));
-        element.remove_attribute("base");
+    if (element.attribute("xml:base")) {
+        this->SetBase(StrToStr(element.attribute("xml:base").value()));
+        element.remove_attribute("xml:base");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1131,7 +1131,7 @@ bool AttCommonPart::WriteCommonPart( pugi::xml_node element ) {
         wroteAttribute = true;
     }
     if (this->HasBase()) {
-        element.append_attribute("base") = StrToStr(this->GetBase()).c_str();
+        element.append_attribute("xml:base") = StrToStr(this->GetBase()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2759,14 +2759,14 @@ void AttLang::ResetLang() {
 
 bool AttLang::ReadLang( pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("lang")) {
-        this->SetLang(StrToStr(element.attribute("lang").value()));
-        element.remove_attribute("lang");
+    if (element.attribute("xml:lang")) {
+        this->SetLang(StrToStr(element.attribute("xml:lang").value()));
+        element.remove_attribute("xml:lang");
         hasAttribute = true;
     }
-    if (element.attribute("translit")) {
-        this->SetTranslit(StrToStr(element.attribute("translit").value()));
-        element.remove_attribute("translit");
+    if (element.attribute("xml:translit")) {
+        this->SetTranslit(StrToStr(element.attribute("xml:translit").value()));
+        element.remove_attribute("xml:translit");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -2775,11 +2775,11 @@ bool AttLang::ReadLang( pugi::xml_node element ) {
 bool AttLang::WriteLang( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasLang()) {
-        element.append_attribute("lang") = StrToStr(this->GetLang()).c_str();
+        element.append_attribute("xml:lang") = StrToStr(this->GetLang()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTranslit()) {
-        element.append_attribute("translit") = StrToStr(this->GetTranslit()).c_str();
+        element.append_attribute("xml:translit") = StrToStr(this->GetTranslit()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5087,34 +5087,34 @@ void AttPointing::ResetPointing() {
 
 bool AttPointing::ReadPointing( pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("actuate")) {
-        this->SetActuate(StrToStr(element.attribute("actuate").value()));
-        element.remove_attribute("actuate");
+    if (element.attribute("xlink:actuate")) {
+        this->SetActuate(StrToStr(element.attribute("xlink:actuate").value()));
+        element.remove_attribute("xlink:actuate");
         hasAttribute = true;
     }
-    if (element.attribute("role")) {
-        this->SetRole(StrToStr(element.attribute("role").value()));
-        element.remove_attribute("role");
+    if (element.attribute("xlink:role")) {
+        this->SetRole(StrToStr(element.attribute("xlink:role").value()));
+        element.remove_attribute("xlink:role");
         hasAttribute = true;
     }
-    if (element.attribute("show")) {
-        this->SetShow(StrToStr(element.attribute("show").value()));
-        element.remove_attribute("show");
+    if (element.attribute("xlink:show")) {
+        this->SetShow(StrToStr(element.attribute("xlink:show").value()));
+        element.remove_attribute("xlink:show");
         hasAttribute = true;
     }
-    if (element.attribute("target")) {
-        this->SetTarget(StrToStr(element.attribute("target").value()));
-        element.remove_attribute("target");
+    if (element.attribute("xlink:target")) {
+        this->SetTarget(StrToStr(element.attribute("xlink:target").value()));
+        element.remove_attribute("xlink:target");
         hasAttribute = true;
     }
-    if (element.attribute("targettype")) {
-        this->SetTargettype(StrToStr(element.attribute("targettype").value()));
-        element.remove_attribute("targettype");
+    if (element.attribute("xlink:targettype")) {
+        this->SetTargettype(StrToStr(element.attribute("xlink:targettype").value()));
+        element.remove_attribute("xlink:targettype");
         hasAttribute = true;
     }
-    if (element.attribute("title")) {
-        this->SetTitle(StrToStr(element.attribute("title").value()));
-        element.remove_attribute("title");
+    if (element.attribute("xlink:title")) {
+        this->SetTitle(StrToStr(element.attribute("xlink:title").value()));
+        element.remove_attribute("xlink:title");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -5123,27 +5123,27 @@ bool AttPointing::ReadPointing( pugi::xml_node element ) {
 bool AttPointing::WritePointing( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasActuate()) {
-        element.append_attribute("actuate") = StrToStr(this->GetActuate()).c_str();
+        element.append_attribute("xlink:actuate") = StrToStr(this->GetActuate()).c_str();
         wroteAttribute = true;
     }
     if (this->HasRole()) {
-        element.append_attribute("role") = StrToStr(this->GetRole()).c_str();
+        element.append_attribute("xlink:role") = StrToStr(this->GetRole()).c_str();
         wroteAttribute = true;
     }
     if (this->HasShow()) {
-        element.append_attribute("show") = StrToStr(this->GetShow()).c_str();
+        element.append_attribute("xlink:show") = StrToStr(this->GetShow()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTarget()) {
-        element.append_attribute("target") = StrToStr(this->GetTarget()).c_str();
+        element.append_attribute("xlink:target") = StrToStr(this->GetTarget()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTargettype()) {
-        element.append_attribute("targettype") = StrToStr(this->GetTargettype()).c_str();
+        element.append_attribute("xlink:targettype") = StrToStr(this->GetTargettype()).c_str();
         wroteAttribute = true;
     }
     if (this->HasTitle()) {
-        element.append_attribute("title") = StrToStr(this->GetTitle()).c_str();
+        element.append_attribute("xlink:title") = StrToStr(this->GetTitle()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -7516,9 +7516,9 @@ void AttWhitespace::ResetWhitespace() {
 
 bool AttWhitespace::ReadWhitespace( pugi::xml_node element ) {
     bool hasAttribute = false;
-    if (element.attribute("space")) {
-        this->SetSpace(StrToStr(element.attribute("space").value()));
-        element.remove_attribute("space");
+    if (element.attribute("xml:space")) {
+        this->SetSpace(StrToStr(element.attribute("xml:space").value()));
+        element.remove_attribute("xml:space");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -7527,7 +7527,7 @@ bool AttWhitespace::ReadWhitespace( pugi::xml_node element ) {
 bool AttWhitespace::WriteWhitespace( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasSpace()) {
-        element.append_attribute("space") = StrToStr(this->GetSpace()).c_str();
+        element.append_attribute("xml:space") = StrToStr(this->GetSpace()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
