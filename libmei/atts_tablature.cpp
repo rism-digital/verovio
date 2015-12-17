@@ -131,11 +131,11 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
     if (element->HasAttClass( ATT_NOTEGESTABLATURE ) ) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
         assert( att );
-        if (attrType == "tabFret") {
+        if (attrType == "tab.fret") {
             att->SetTabFret(att->StrToFretnumber(attrValue));
             return true;
         }
-        if (attrType == "tabString") {
+        if (attrType == "tab.string") {
             att->SetTabString(att->StrToStringnumber(attrValue));
             return true;
         }
@@ -143,7 +143,7 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
     if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {
         AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
         assert( att );
-        if (attrType == "tabStrings") {
+        if (attrType == "tab.strings") {
             att->SetTabStrings(att->StrToStr(attrValue));
             return true;
         }
@@ -157,17 +157,17 @@ void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
         assert( att );
         if (att->HasTabFret()) {
-            attributes->push_back(std::make_pair("tabFret", att->FretnumberToStr(att->GetTabFret())));
+            attributes->push_back(std::make_pair("tab.fret", att->FretnumberToStr(att->GetTabFret())));
         }
         if (att->HasTabString()) {
-            attributes->push_back(std::make_pair("tabString", att->StringnumberToStr(att->GetTabString())));
+            attributes->push_back(std::make_pair("tab.string", att->StringnumberToStr(att->GetTabString())));
         }
     }
     if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {
         AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
         assert( att );
         if (att->HasTabStrings()) {
-            attributes->push_back(std::make_pair("tabStrings", att->StrToStr(att->GetTabStrings())));
+            attributes->push_back(std::make_pair("tab.strings", att->StrToStr(att->GetTabStrings())));
         }
     }
 

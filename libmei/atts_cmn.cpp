@@ -1792,7 +1792,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_BEAMEDWITH ) ) {
         AttBeamedwith *att = dynamic_cast<AttBeamedwith*>(element);
         assert( att );
-        if (attrType == "beamWith") {
+        if (attrType == "beam.with") {
             att->SetBeamWith(att->StrToOtherstaff(attrValue));
             return true;
         }
@@ -1800,11 +1800,11 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_BEAMINGLOG ) ) {
         AttBeamingLog *att = dynamic_cast<AttBeamingLog*>(element);
         assert( att );
-        if (attrType == "beamGroup") {
+        if (attrType == "beam.group") {
             att->SetBeamGroup(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "beamRests") {
+        if (attrType == "beam.rests") {
             att->SetBeamRests(att->StrToBoolean(attrValue));
             return true;
         }
@@ -1896,7 +1896,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
             att->SetGrace(att->StrToGrace(attrValue));
             return true;
         }
-        if (attrType == "graceTime") {
+        if (attrType == "grace.time") {
             att->SetGraceTime(att->StrToInt(attrValue));
             return true;
         }
@@ -1988,11 +1988,11 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_NUMBERPLACEMENT ) ) {
         AttNumberplacement *att = dynamic_cast<AttNumberplacement*>(element);
         assert( att );
-        if (attrType == "numPlace") {
+        if (attrType == "num.place") {
             att->SetNumPlace(att->StrToPlace(attrValue));
             return true;
         }
-        if (attrType == "numVisible") {
+        if (attrType == "num.visible") {
             att->SetNumVisible(att->StrToBoolean(attrValue));
             return true;
         }
@@ -2024,7 +2024,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_PIANOPEDALS ) ) {
         AttPianopedals *att = dynamic_cast<AttPianopedals*>(element);
         assert( att );
-        if (attrType == "pedalStyle") {
+        if (attrType == "pedal.style") {
             att->SetPedalStyle(att->StrToPianopedalsPedalstyle(attrValue));
             return true;
         }
@@ -2032,7 +2032,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_REHEARSAL ) ) {
         AttRehearsal *att = dynamic_cast<AttRehearsal*>(element);
         assert( att );
-        if (attrType == "rehEnclose") {
+        if (attrType == "reh.enclose") {
             att->SetRehEnclose(att->StrToRehearsalRehenclose(attrValue));
             return true;
         }
@@ -2040,7 +2040,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_SCOREDEFVISCMN ) ) {
         AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn*>(element);
         assert( att );
-        if (attrType == "gridShow") {
+        if (attrType == "grid.show") {
             att->SetGridShow(att->StrToBoolean(attrValue));
             return true;
         }
@@ -2048,7 +2048,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_SLURREND ) ) {
         AttSlurrend *att = dynamic_cast<AttSlurrend*>(element);
         assert( att );
-        if (attrType == "slurRend") {
+        if (attrType == "slur.rend") {
             att->SetSlurRend(att->StrToCurverendition(attrValue));
             return true;
         }
@@ -2056,7 +2056,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_STEMSCMN ) ) {
         AttStemsCmn *att = dynamic_cast<AttStemsCmn*>(element);
         assert( att );
-        if (attrType == "stemWith") {
+        if (attrType == "stem.with") {
             att->SetStemWith(att->StrToOtherstaff(attrValue));
             return true;
         }
@@ -2064,7 +2064,7 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_TIEREND ) ) {
         AttTierend *att = dynamic_cast<AttTierend*>(element);
         assert( att );
-        if (attrType == "tieRend") {
+        if (attrType == "tie.rend") {
             att->SetTieRend(att->StrToCurverendition(attrValue));
             return true;
         }
@@ -2080,19 +2080,19 @@ bool Att::SetCmn( Object *element, std::string attrType, std::string attrValue )
     if (element->HasAttClass( ATT_TUPLETVIS ) ) {
         AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
         assert( att );
-        if (attrType == "bracketPlace") {
+        if (attrType == "bracket.place") {
             att->SetBracketPlace(att->StrToPlace(attrValue));
             return true;
         }
-        if (attrType == "bracketVisible") {
+        if (attrType == "bracket.visible") {
             att->SetBracketVisible(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "durVisible") {
+        if (attrType == "dur.visible") {
             att->SetDurVisible(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "numFormat") {
+        if (attrType == "num.format") {
             att->SetNumFormat(att->StrToTupletVisNumformat(attrValue));
             return true;
         }
@@ -2134,17 +2134,17 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttBeamedwith *att = dynamic_cast<AttBeamedwith*>(element);
         assert( att );
         if (att->HasBeamWith()) {
-            attributes->push_back(std::make_pair("beamWith", att->OtherstaffToStr(att->GetBeamWith())));
+            attributes->push_back(std::make_pair("beam.with", att->OtherstaffToStr(att->GetBeamWith())));
         }
     }
     if (element->HasAttClass( ATT_BEAMINGLOG ) ) {
         AttBeamingLog *att = dynamic_cast<AttBeamingLog*>(element);
         assert( att );
         if (att->HasBeamGroup()) {
-            attributes->push_back(std::make_pair("beamGroup", att->StrToStr(att->GetBeamGroup())));
+            attributes->push_back(std::make_pair("beam.group", att->StrToStr(att->GetBeamGroup())));
         }
         if (att->HasBeamRests()) {
-            attributes->push_back(std::make_pair("beamRests", att->BooleanToStr(att->GetBeamRests())));
+            attributes->push_back(std::make_pair("beam.rests", att->BooleanToStr(att->GetBeamRests())));
         }
     }
     if (element->HasAttClass( ATT_BEAMREND ) ) {
@@ -2223,7 +2223,7 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("grace", att->GraceToStr(att->GetGrace())));
         }
         if (att->HasGraceTime()) {
-            attributes->push_back(std::make_pair("graceTime", att->IntToStr(att->GetGraceTime())));
+            attributes->push_back(std::make_pair("grace.time", att->IntToStr(att->GetGraceTime())));
         }
     }
     if (element->HasAttClass( ATT_HAIRPINLOG ) ) {
@@ -2300,10 +2300,10 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttNumberplacement *att = dynamic_cast<AttNumberplacement*>(element);
         assert( att );
         if (att->HasNumPlace()) {
-            attributes->push_back(std::make_pair("numPlace", att->PlaceToStr(att->GetNumPlace())));
+            attributes->push_back(std::make_pair("num.place", att->PlaceToStr(att->GetNumPlace())));
         }
         if (att->HasNumVisible()) {
-            attributes->push_back(std::make_pair("numVisible", att->BooleanToStr(att->GetNumVisible())));
+            attributes->push_back(std::make_pair("num.visible", att->BooleanToStr(att->GetNumVisible())));
         }
     }
     if (element->HasAttClass( ATT_OCTAVELOG ) ) {
@@ -2331,42 +2331,42 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttPianopedals *att = dynamic_cast<AttPianopedals*>(element);
         assert( att );
         if (att->HasPedalStyle()) {
-            attributes->push_back(std::make_pair("pedalStyle", att->PianopedalsPedalstyleToStr(att->GetPedalStyle())));
+            attributes->push_back(std::make_pair("pedal.style", att->PianopedalsPedalstyleToStr(att->GetPedalStyle())));
         }
     }
     if (element->HasAttClass( ATT_REHEARSAL ) ) {
         AttRehearsal *att = dynamic_cast<AttRehearsal*>(element);
         assert( att );
         if (att->HasRehEnclose()) {
-            attributes->push_back(std::make_pair("rehEnclose", att->RehearsalRehencloseToStr(att->GetRehEnclose())));
+            attributes->push_back(std::make_pair("reh.enclose", att->RehearsalRehencloseToStr(att->GetRehEnclose())));
         }
     }
     if (element->HasAttClass( ATT_SCOREDEFVISCMN ) ) {
         AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn*>(element);
         assert( att );
         if (att->HasGridShow()) {
-            attributes->push_back(std::make_pair("gridShow", att->BooleanToStr(att->GetGridShow())));
+            attributes->push_back(std::make_pair("grid.show", att->BooleanToStr(att->GetGridShow())));
         }
     }
     if (element->HasAttClass( ATT_SLURREND ) ) {
         AttSlurrend *att = dynamic_cast<AttSlurrend*>(element);
         assert( att );
         if (att->HasSlurRend()) {
-            attributes->push_back(std::make_pair("slurRend", att->CurverenditionToStr(att->GetSlurRend())));
+            attributes->push_back(std::make_pair("slur.rend", att->CurverenditionToStr(att->GetSlurRend())));
         }
     }
     if (element->HasAttClass( ATT_STEMSCMN ) ) {
         AttStemsCmn *att = dynamic_cast<AttStemsCmn*>(element);
         assert( att );
         if (att->HasStemWith()) {
-            attributes->push_back(std::make_pair("stemWith", att->OtherstaffToStr(att->GetStemWith())));
+            attributes->push_back(std::make_pair("stem.with", att->OtherstaffToStr(att->GetStemWith())));
         }
     }
     if (element->HasAttClass( ATT_TIEREND ) ) {
         AttTierend *att = dynamic_cast<AttTierend*>(element);
         assert( att );
         if (att->HasTieRend()) {
-            attributes->push_back(std::make_pair("tieRend", att->CurverenditionToStr(att->GetTieRend())));
+            attributes->push_back(std::make_pair("tie.rend", att->CurverenditionToStr(att->GetTieRend())));
         }
     }
     if (element->HasAttClass( ATT_TREMMEASURED ) ) {
@@ -2380,16 +2380,16 @@ void Att::GetCmn( Object *element, ArrayOfStrAttr *attributes ) {
         AttTupletVis *att = dynamic_cast<AttTupletVis*>(element);
         assert( att );
         if (att->HasBracketPlace()) {
-            attributes->push_back(std::make_pair("bracketPlace", att->PlaceToStr(att->GetBracketPlace())));
+            attributes->push_back(std::make_pair("bracket.place", att->PlaceToStr(att->GetBracketPlace())));
         }
         if (att->HasBracketVisible()) {
-            attributes->push_back(std::make_pair("bracketVisible", att->BooleanToStr(att->GetBracketVisible())));
+            attributes->push_back(std::make_pair("bracket.visible", att->BooleanToStr(att->GetBracketVisible())));
         }
         if (att->HasDurVisible()) {
-            attributes->push_back(std::make_pair("durVisible", att->BooleanToStr(att->GetDurVisible())));
+            attributes->push_back(std::make_pair("dur.visible", att->BooleanToStr(att->GetDurVisible())));
         }
         if (att->HasNumFormat()) {
-            attributes->push_back(std::make_pair("numFormat", att->TupletVisNumformatToStr(att->GetNumFormat())));
+            attributes->push_back(std::make_pair("num.format", att->TupletVisNumformatToStr(att->GetNumFormat())));
         }
     }
 

@@ -531,23 +531,23 @@ bool Att::SetMensural( Object *element, std::string attrType, std::string attrVa
     if (element->HasAttClass( ATT_MENSURALLOG ) ) {
         AttMensuralLog *att = dynamic_cast<AttMensuralLog*>(element);
         assert( att );
-        if (attrType == "mensurDot") {
+        if (attrType == "mensur.dot") {
             att->SetMensurDot(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "mensurSign") {
+        if (attrType == "mensur.sign") {
             att->SetMensurSign(att->StrToMensurationsign(attrValue));
             return true;
         }
-        if (attrType == "mensurSlash") {
+        if (attrType == "mensur.slash") {
             att->SetMensurSlash(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "proportNum") {
+        if (attrType == "proport.num") {
             att->SetProportNum(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "proportNumbase") {
+        if (attrType == "proport.numbase") {
             att->SetProportNumbase(att->StrToInt(attrValue));
             return true;
         }
@@ -575,23 +575,23 @@ bool Att::SetMensural( Object *element, std::string attrType, std::string attrVa
     if (element->HasAttClass( ATT_MENSURALVIS ) ) {
         AttMensuralVis *att = dynamic_cast<AttMensuralVis*>(element);
         assert( att );
-        if (attrType == "mensurColor") {
+        if (attrType == "mensur.color") {
             att->SetMensurColor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "mensurForm") {
+        if (attrType == "mensur.form") {
             att->SetMensurForm(att->StrToMensuralVisMensurform(attrValue));
             return true;
         }
-        if (attrType == "mensurLoc") {
+        if (attrType == "mensur.loc") {
             att->SetMensurLoc(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "mensurOrient") {
+        if (attrType == "mensur.orient") {
             att->SetMensurOrient(att->StrToOrientation(attrValue));
             return true;
         }
-        if (attrType == "mensurSize") {
+        if (attrType == "mensur.size") {
             att->SetMensurSize(att->StrToSize(attrValue));
             return true;
         }
@@ -638,19 +638,19 @@ void Att::GetMensural( Object *element, ArrayOfStrAttr *attributes ) {
         AttMensuralLog *att = dynamic_cast<AttMensuralLog*>(element);
         assert( att );
         if (att->HasMensurDot()) {
-            attributes->push_back(std::make_pair("mensurDot", att->BooleanToStr(att->GetMensurDot())));
+            attributes->push_back(std::make_pair("mensur.dot", att->BooleanToStr(att->GetMensurDot())));
         }
         if (att->HasMensurSign()) {
-            attributes->push_back(std::make_pair("mensurSign", att->MensurationsignToStr(att->GetMensurSign())));
+            attributes->push_back(std::make_pair("mensur.sign", att->MensurationsignToStr(att->GetMensurSign())));
         }
         if (att->HasMensurSlash()) {
-            attributes->push_back(std::make_pair("mensurSlash", att->IntToStr(att->GetMensurSlash())));
+            attributes->push_back(std::make_pair("mensur.slash", att->IntToStr(att->GetMensurSlash())));
         }
         if (att->HasProportNum()) {
-            attributes->push_back(std::make_pair("proportNum", att->IntToStr(att->GetProportNum())));
+            attributes->push_back(std::make_pair("proport.num", att->IntToStr(att->GetProportNum())));
         }
         if (att->HasProportNumbase()) {
-            attributes->push_back(std::make_pair("proportNumbase", att->IntToStr(att->GetProportNumbase())));
+            attributes->push_back(std::make_pair("proport.numbase", att->IntToStr(att->GetProportNumbase())));
         }
     }
     if (element->HasAttClass( ATT_MENSURALSHARED ) ) {
@@ -673,19 +673,19 @@ void Att::GetMensural( Object *element, ArrayOfStrAttr *attributes ) {
         AttMensuralVis *att = dynamic_cast<AttMensuralVis*>(element);
         assert( att );
         if (att->HasMensurColor()) {
-            attributes->push_back(std::make_pair("mensurColor", att->StrToStr(att->GetMensurColor())));
+            attributes->push_back(std::make_pair("mensur.color", att->StrToStr(att->GetMensurColor())));
         }
         if (att->HasMensurForm()) {
-            attributes->push_back(std::make_pair("mensurForm", att->MensuralVisMensurformToStr(att->GetMensurForm())));
+            attributes->push_back(std::make_pair("mensur.form", att->MensuralVisMensurformToStr(att->GetMensurForm())));
         }
         if (att->HasMensurLoc()) {
-            attributes->push_back(std::make_pair("mensurLoc", att->IntToStr(att->GetMensurLoc())));
+            attributes->push_back(std::make_pair("mensur.loc", att->IntToStr(att->GetMensurLoc())));
         }
         if (att->HasMensurOrient()) {
-            attributes->push_back(std::make_pair("mensurOrient", att->OrientationToStr(att->GetMensurOrient())));
+            attributes->push_back(std::make_pair("mensur.orient", att->OrientationToStr(att->GetMensurOrient())));
         }
         if (att->HasMensurSize()) {
-            attributes->push_back(std::make_pair("mensurSize", att->SizeToStr(att->GetMensurSize())));
+            attributes->push_back(std::make_pair("mensur.size", att->SizeToStr(att->GetMensurSize())));
         }
     }
     if (element->HasAttClass( ATT_NOTELOGMENSURAL ) ) {

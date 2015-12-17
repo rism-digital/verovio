@@ -7720,7 +7720,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_ACCIDENTALPERFORMED ) ) {
         AttAccidentalPerformed *att = dynamic_cast<AttAccidentalPerformed*>(element);
         assert( att );
-        if (attrType == "accidGes") {
+        if (attrType == "accid.ges") {
             att->SetAccidGes(att->StrToAccidentalImplicit(attrValue));
             return true;
         }
@@ -7736,7 +7736,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_ARTICULATIONPERFORMED ) ) {
         AttArticulationPerformed *att = dynamic_cast<AttArticulationPerformed*>(element);
         assert( att );
-        if (attrType == "articGes") {
+        if (attrType == "artic.ges") {
             att->SetArticGes(att->StrToArticulation(attrValue));
             return true;
         }
@@ -7784,15 +7784,15 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_BEAMINGVIS ) ) {
         AttBeamingVis *att = dynamic_cast<AttBeamingVis*>(element);
         assert( att );
-        if (attrType == "beamColor") {
+        if (attrType == "beam.color") {
             att->SetBeamColor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "beamRend") {
+        if (attrType == "beam.rend") {
             att->SetBeamRend(att->StrToBeamingVisBeamrend(attrValue));
             return true;
         }
-        if (attrType == "beamSlope") {
+        if (attrType == "beam.slope") {
             att->SetBeamSlope(att->StrToDbl(attrValue));
             return true;
         }
@@ -7848,19 +7848,19 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_CLEFFINGLOG ) ) {
         AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
         assert( att );
-        if (attrType == "clefShape") {
+        if (attrType == "clef.shape") {
             att->SetClefShape(att->StrToClefshape(attrValue));
             return true;
         }
-        if (attrType == "clefLine") {
+        if (attrType == "clef.line") {
             att->SetClefLine(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "clefDis") {
+        if (attrType == "clef.dis") {
             att->SetClefDis(att->StrToOctaveDis(attrValue));
             return true;
         }
-        if (attrType == "clefDisPlace") {
+        if (attrType == "clef.dis.place") {
             att->SetClefDisPlace(att->StrToPlace(attrValue));
             return true;
         }
@@ -7868,11 +7868,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_CLEFFINGVIS ) ) {
         AttCleffingVis *att = dynamic_cast<AttCleffingVis*>(element);
         assert( att );
-        if (attrType == "clefColor") {
+        if (attrType == "clef.color") {
             att->SetClefColor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "clefVisible") {
+        if (attrType == "clef.visible") {
             att->SetClefVisible(att->StrToBoolean(attrValue));
             return true;
         }
@@ -7916,7 +7916,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             att->SetLabel(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "base") {
+        if (attrType == "xml:base") {
             att->SetBase(att->StrToStr(attrValue));
             return true;
         }
@@ -8020,15 +8020,15 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_DISTANCES ) ) {
         AttDistances *att = dynamic_cast<AttDistances*>(element);
         assert( att );
-        if (attrType == "dynamDist") {
+        if (attrType == "dynam.dist") {
             att->SetDynamDist(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "harmDist") {
+        if (attrType == "harm.dist") {
             att->SetHarmDist(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "textDist") {
+        if (attrType == "text.dist") {
             att->SetTextDist(att->StrToStr(attrValue));
             return true;
         }
@@ -8052,15 +8052,15 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_DURATIONDEFAULT ) ) {
         AttDurationDefault *att = dynamic_cast<AttDurationDefault*>(element);
         assert( att );
-        if (attrType == "durDefault") {
+        if (attrType == "dur.default") {
             att->SetDurDefault(att->StrToDuration(attrValue));
             return true;
         }
-        if (attrType == "numDefault") {
+        if (attrType == "num.default") {
             att->SetNumDefault(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "numbaseDefault") {
+        if (attrType == "numbase.default") {
             att->SetNumbaseDefault(att->StrToInt(attrValue));
             return true;
         }
@@ -8076,7 +8076,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_DURATIONPERFORMED ) ) {
         AttDurationPerformed *att = dynamic_cast<AttDurationPerformed*>(element);
         assert( att );
-        if (attrType == "durGes") {
+        if (attrType == "dur.ges") {
             att->SetDurGes(att->StrToDuration(attrValue));
             return true;
         }
@@ -8104,7 +8104,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_ENDINGS ) ) {
         AttEndings *att = dynamic_cast<AttEndings*>(element);
         assert( att );
-        if (attrType == "endingRend") {
+        if (attrType == "ending.rend") {
             att->SetEndingRend(att->StrToEndingsEndingrend(attrValue));
             return true;
         }
@@ -8200,23 +8200,23 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_KEYSIGDEFAULTLOG ) ) {
         AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
         assert( att );
-        if (attrType == "keyAccid") {
+        if (attrType == "key.accid") {
             att->SetKeyAccid(att->StrToAccidentalImplicit(attrValue));
             return true;
         }
-        if (attrType == "keyMode") {
+        if (attrType == "key.mode") {
             att->SetKeyMode(att->StrToMode(attrValue));
             return true;
         }
-        if (attrType == "keyPname") {
+        if (attrType == "key.pname") {
             att->SetKeyPname(att->StrToPitchname(attrValue));
             return true;
         }
-        if (attrType == "keySig") {
+        if (attrType == "key.sig") {
             att->SetKeySig(att->StrToKeysignature(attrValue));
             return true;
         }
-        if (attrType == "keySigMixed") {
+        if (attrType == "key.sig.mixed") {
             att->SetKeySigMixed(att->StrToStr(attrValue));
             return true;
         }
@@ -8224,11 +8224,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_KEYSIGDEFAULTVIS ) ) {
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
         assert( att );
-        if (attrType == "keySigShow") {
+        if (attrType == "key.sig.show") {
             att->SetKeySigShow(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "keySigShowchange") {
+        if (attrType == "key.sig.showchange") {
             att->SetKeySigShowchange(att->StrToBoolean(attrValue));
             return true;
         }
@@ -8236,7 +8236,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_LABELSADDL ) ) {
         AttLabelsAddl *att = dynamic_cast<AttLabelsAddl*>(element);
         assert( att );
-        if (attrType == "labelAbbr") {
+        if (attrType == "label.abbr") {
             att->SetLabelAbbr(att->StrToStr(attrValue));
             return true;
         }
@@ -8244,11 +8244,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_LANG ) ) {
         AttLang *att = dynamic_cast<AttLang*>(element);
         assert( att );
-        if (attrType == "lang") {
+        if (attrType == "xml:lang") {
             att->SetLang(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "translit") {
+        if (attrType == "xml:translit") {
             att->SetTranslit(att->StrToStr(attrValue));
             return true;
         }
@@ -8340,27 +8340,27 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_LYRICSTYLE ) ) {
         AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
         assert( att );
-        if (attrType == "lyricAlign") {
+        if (attrType == "lyric.align") {
             att->SetLyricAlign(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "lyricFam") {
+        if (attrType == "lyric.fam") {
             att->SetLyricFam(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "lyricName") {
+        if (attrType == "lyric.name") {
             att->SetLyricName(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "lyricSize") {
+        if (attrType == "lyric.size") {
             att->SetLyricSize(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "lyricStyle") {
+        if (attrType == "lyric.style") {
             att->SetLyricStyle(att->StrToFontstyle(attrValue));
             return true;
         }
-        if (attrType == "lyricWeight") {
+        if (attrType == "lyric.weight") {
             att->SetLyricWeight(att->StrToFontweight(attrValue));
             return true;
         }
@@ -8388,7 +8388,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_MEASURENUMBERS ) ) {
         AttMeasurenumbers *att = dynamic_cast<AttMeasurenumbers*>(element);
         assert( att );
-        if (attrType == "mnumVisible") {
+        if (attrType == "mnum.visible") {
             att->SetMnumVisible(att->StrToBoolean(attrValue));
             return true;
         }
@@ -8464,11 +8464,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_METERSIGDEFAULTLOG ) ) {
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog*>(element);
         assert( att );
-        if (attrType == "meterCount") {
+        if (attrType == "meter.count") {
             att->SetMeterCount(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "meterUnit") {
+        if (attrType == "meter.unit") {
             att->SetMeterUnit(att->StrToInt(attrValue));
             return true;
         }
@@ -8476,15 +8476,15 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_METERSIGDEFAULTVIS ) ) {
         AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis*>(element);
         assert( att );
-        if (attrType == "meterRend") {
+        if (attrType == "meter.rend") {
             att->SetMeterRend(att->StrToMeterSigDefaultVisMeterrend(attrValue));
             return true;
         }
-        if (attrType == "meterShowchange") {
+        if (attrType == "meter.showchange") {
             att->SetMeterShowchange(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "meterSym") {
+        if (attrType == "meter.sym") {
             att->SetMeterSym(att->StrToMetersign(attrValue));
             return true;
         }
@@ -8516,11 +8516,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             att->SetMm(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "mmUnit") {
+        if (attrType == "mm.unit") {
             att->SetMmUnit(att->StrToDuration(attrValue));
             return true;
         }
-        if (attrType == "mmDots") {
+        if (attrType == "mm.dots") {
             att->SetMmDots(att->StrToInt(attrValue));
             return true;
         }
@@ -8528,7 +8528,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_MULTINUMMEASURES ) ) {
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
         assert( att );
-        if (attrType == "multiNumber") {
+        if (attrType == "multi.number") {
             att->SetMultiNumber(att->StrToBoolean(attrValue));
             return true;
         }
@@ -8548,11 +8548,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_NOTATIONSTYLE ) ) {
         AttNotationstyle *att = dynamic_cast<AttNotationstyle*>(element);
         assert( att );
-        if (attrType == "musicName") {
+        if (attrType == "music.name") {
             att->SetMusicName(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "musicSize") {
+        if (attrType == "music.size") {
             att->SetMusicSize(att->StrToStr(attrValue));
             return true;
         }
@@ -8560,11 +8560,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_NOTEGES ) ) {
         AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
         assert( att );
-        if (attrType == "octGes") {
+        if (attrType == "oct.ges") {
             att->SetOctGes(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "pnameGes") {
+        if (attrType == "pname.ges") {
             att->SetPnameGes(att->StrToPitchname(attrValue));
             return true;
         }
@@ -8576,31 +8576,31 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_NOTEHEADS ) ) {
         AttNoteheads *att = dynamic_cast<AttNoteheads*>(element);
         assert( att );
-        if (attrType == "headColor") {
+        if (attrType == "head.color") {
             att->SetHeadColor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "headFill") {
+        if (attrType == "head.fill") {
             att->SetHeadFill(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "headFillcolor") {
+        if (attrType == "head.fillcolor") {
             att->SetHeadFillcolor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "headMod") {
+        if (attrType == "head.mod") {
             att->SetHeadMod(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "headRotation") {
+        if (attrType == "head.rotation") {
             att->SetHeadRotation(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "headShape") {
+        if (attrType == "head.shape") {
             att->SetHeadShape(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "headVisible") {
+        if (attrType == "head.visible") {
             att->SetHeadVisible(att->StrToBoolean(attrValue));
             return true;
         }
@@ -8616,7 +8616,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_OCTAVEDEFAULT ) ) {
         AttOctavedefault *att = dynamic_cast<AttOctavedefault*>(element);
         assert( att );
-        if (attrType == "octaveDefault") {
+        if (attrType == "octave.default") {
             att->SetOctaveDefault(att->StrToInt(attrValue));
             return true;
         }
@@ -8628,7 +8628,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             att->SetDis(att->StrToOctaveDis(attrValue));
             return true;
         }
-        if (attrType == "disPlace") {
+        if (attrType == "dis.place") {
             att->SetDisPlace(att->StrToPlace(attrValue));
             return true;
         }
@@ -8660,35 +8660,35 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_PAGES ) ) {
         AttPages *att = dynamic_cast<AttPages*>(element);
         assert( att );
-        if (attrType == "pageHeight") {
+        if (attrType == "page.height") {
             att->SetPageHeight(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pageWidth") {
+        if (attrType == "page.width") {
             att->SetPageWidth(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pageTopmar") {
+        if (attrType == "page.topmar") {
             att->SetPageTopmar(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pageBotmar") {
+        if (attrType == "page.botmar") {
             att->SetPageBotmar(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pageLeftmar") {
+        if (attrType == "page.leftmar") {
             att->SetPageLeftmar(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pageRightmar") {
+        if (attrType == "page.rightmar") {
             att->SetPageRightmar(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pagePanels") {
+        if (attrType == "page.panels") {
             att->SetPagePanels(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "pageScale") {
+        if (attrType == "page.scale") {
             att->SetPageScale(att->StrToStr(attrValue));
             return true;
         }
@@ -8732,27 +8732,27 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_POINTING ) ) {
         AttPointing *att = dynamic_cast<AttPointing*>(element);
         assert( att );
-        if (attrType == "actuate") {
+        if (attrType == "xlink:actuate") {
             att->SetActuate(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "role") {
+        if (attrType == "xlink:role") {
             att->SetRole(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "show") {
+        if (attrType == "xlink:show") {
             att->SetShow(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "target") {
+        if (attrType == "xlink:target") {
             att->SetTarget(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "targettype") {
+        if (attrType == "xlink:targettype") {
             att->SetTargettype(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "title") {
+        if (attrType == "xlink:title") {
             att->SetTitle(att->StrToStr(attrValue));
             return true;
         }
@@ -8800,15 +8800,15 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_SCOREDEFGES ) ) {
         AttScoreDefGes *att = dynamic_cast<AttScoreDefGes*>(element);
         assert( att );
-        if (attrType == "tunePname") {
+        if (attrType == "tune.pname") {
             att->SetTunePname(att->StrToPitchname(attrValue));
             return true;
         }
-        if (attrType == "tuneHz") {
+        if (attrType == "tune.Hz") {
             att->SetTuneHz(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "tuneTemper") {
+        if (attrType == "tune.temper") {
             att->SetTuneTemper(att->StrToTemperament(attrValue));
             return true;
         }
@@ -8816,7 +8816,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_SCOREDEFVIS ) ) {
         AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
         assert( att );
-        if (attrType == "vuHeight") {
+        if (attrType == "vu.height") {
             att->SetVuHeight(att->StrToStr(attrValue));
             return true;
         }
@@ -8864,19 +8864,19 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_SPACING ) ) {
         AttSpacing *att = dynamic_cast<AttSpacing*>(element);
         assert( att );
-        if (attrType == "spacingPackexp") {
+        if (attrType == "spacing.packexp") {
             att->SetSpacingPackexp(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "spacingPackfact") {
+        if (attrType == "spacing.packfact") {
             att->SetSpacingPackfact(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "spacingStaff") {
+        if (attrType == "spacing.staff") {
             att->SetSpacingStaff(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "spacingSystem") {
+        if (attrType == "spacing.system") {
             att->SetSpacingSystem(att->StrToStr(attrValue));
             return true;
         }
@@ -8892,7 +8892,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_STAFFDEFVIS ) ) {
         AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
         assert( att );
-        if (attrType == "gridShow") {
+        if (attrType == "grid.show") {
             att->SetGridShow(att->StrToBoolean(attrValue));
             return true;
         }
@@ -8904,11 +8904,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
             att->SetLines(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "linesColor") {
+        if (attrType == "lines.color") {
             att->SetLinesColor(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "linesVisible") {
+        if (attrType == "lines.visible") {
             att->SetLinesVisible(att->StrToBoolean(attrValue));
             return true;
         }
@@ -8980,27 +8980,27 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_STEMS ) ) {
         AttStems *att = dynamic_cast<AttStems*>(element);
         assert( att );
-        if (attrType == "stemDir") {
+        if (attrType == "stem.dir") {
             att->SetStemDir(att->StrToStemdirection(attrValue));
             return true;
         }
-        if (attrType == "stemLen") {
+        if (attrType == "stem.len") {
             att->SetStemLen(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "stemMod") {
+        if (attrType == "stem.mod") {
             att->SetStemMod(att->StrToStemmodifier(attrValue));
             return true;
         }
-        if (attrType == "stemPos") {
+        if (attrType == "stem.pos") {
             att->SetStemPos(att->StrToStemposition(attrValue));
             return true;
         }
-        if (attrType == "stemX") {
+        if (attrType == "stem.x") {
             att->SetStemX(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "stemY") {
+        if (attrType == "stem.y") {
             att->SetStemY(att->StrToDbl(attrValue));
             return true;
         }
@@ -9028,19 +9028,19 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_SYSTEMS ) ) {
         AttSystems *att = dynamic_cast<AttSystems*>(element);
         assert( att );
-        if (attrType == "systemLeftline") {
+        if (attrType == "system.leftline") {
             att->SetSystemLeftline(att->StrToBoolean(attrValue));
             return true;
         }
-        if (attrType == "systemLeftmar") {
+        if (attrType == "system.leftmar") {
             att->SetSystemLeftmar(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "systemRightmar") {
+        if (attrType == "system.rightmar") {
             att->SetSystemRightmar(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "systemTopmar") {
+        if (attrType == "system.topmar") {
             att->SetSystemTopmar(att->StrToStr(attrValue));
             return true;
         }
@@ -9048,23 +9048,23 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_TEXTSTYLE ) ) {
         AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
         assert( att );
-        if (attrType == "textFam") {
+        if (attrType == "text.fam") {
             att->SetTextFam(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "textName") {
+        if (attrType == "text.name") {
             att->SetTextName(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "textSize") {
+        if (attrType == "text.size") {
             att->SetTextSize(att->StrToStr(attrValue));
             return true;
         }
-        if (attrType == "textStyle") {
+        if (attrType == "text.style") {
             att->SetTextStyle(att->StrToFontstyle(attrValue));
             return true;
         }
-        if (attrType == "textWeight") {
+        if (attrType == "text.weight") {
             att->SetTextWeight(att->StrToFontweight(attrValue));
             return true;
         }
@@ -9088,11 +9088,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_TIMESTAMPPERFORMED ) ) {
         AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
         assert( att );
-        if (attrType == "tstampGes") {
+        if (attrType == "tstamp.ges") {
             att->SetTstampGes(att->StrToDuration(attrValue));
             return true;
         }
-        if (attrType == "tstampReal") {
+        if (attrType == "tstamp.real") {
             att->SetTstampReal(att->StrToStr(attrValue));
             return true;
         }
@@ -9108,11 +9108,11 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_TRANSPOSITION ) ) {
         AttTransposition *att = dynamic_cast<AttTransposition*>(element);
         assert( att );
-        if (attrType == "transDiat") {
+        if (attrType == "trans.diat") {
             att->SetTransDiat(att->StrToDbl(attrValue));
             return true;
         }
-        if (attrType == "transSemi") {
+        if (attrType == "trans.semi") {
             att->SetTransSemi(att->StrToDbl(attrValue));
             return true;
         }
@@ -9232,7 +9232,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
     if (element->HasAttClass( ATT_WHITESPACE ) ) {
         AttWhitespace *att = dynamic_cast<AttWhitespace*>(element);
         assert( att );
-        if (attrType == "space") {
+        if (attrType == "xml:space") {
             att->SetSpace(att->StrToStr(attrValue));
             return true;
         }
@@ -9292,7 +9292,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttAccidentalPerformed *att = dynamic_cast<AttAccidentalPerformed*>(element);
         assert( att );
         if (att->HasAccidGes()) {
-            attributes->push_back(std::make_pair("accidGes", att->AccidentalImplicitToStr(att->GetAccidGes())));
+            attributes->push_back(std::make_pair("accid.ges", att->AccidentalImplicitToStr(att->GetAccidGes())));
         }
     }
     if (element->HasAttClass( ATT_ARTICULATION ) ) {
@@ -9306,7 +9306,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttArticulationPerformed *att = dynamic_cast<AttArticulationPerformed*>(element);
         assert( att );
         if (att->HasArticGes()) {
-            attributes->push_back(std::make_pair("articGes", att->ArticulationToStr(att->GetArticGes())));
+            attributes->push_back(std::make_pair("artic.ges", att->ArticulationToStr(att->GetArticGes())));
         }
     }
     if (element->HasAttClass( ATT_AUGMENTDOTS ) ) {
@@ -9347,13 +9347,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttBeamingVis *att = dynamic_cast<AttBeamingVis*>(element);
         assert( att );
         if (att->HasBeamColor()) {
-            attributes->push_back(std::make_pair("beamColor", att->StrToStr(att->GetBeamColor())));
+            attributes->push_back(std::make_pair("beam.color", att->StrToStr(att->GetBeamColor())));
         }
         if (att->HasBeamRend()) {
-            attributes->push_back(std::make_pair("beamRend", att->BeamingVisBeamrendToStr(att->GetBeamRend())));
+            attributes->push_back(std::make_pair("beam.rend", att->BeamingVisBeamrendToStr(att->GetBeamRend())));
         }
         if (att->HasBeamSlope()) {
-            attributes->push_back(std::make_pair("beamSlope", att->DblToStr(att->GetBeamSlope())));
+            attributes->push_back(std::make_pair("beam.slope", att->DblToStr(att->GetBeamSlope())));
         }
     }
     if (element->HasAttClass( ATT_BIBL ) ) {
@@ -9402,26 +9402,26 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttCleffingLog *att = dynamic_cast<AttCleffingLog*>(element);
         assert( att );
         if (att->HasClefShape()) {
-            attributes->push_back(std::make_pair("clefShape", att->ClefshapeToStr(att->GetClefShape())));
+            attributes->push_back(std::make_pair("clef.shape", att->ClefshapeToStr(att->GetClefShape())));
         }
         if (att->HasClefLine()) {
-            attributes->push_back(std::make_pair("clefLine", att->IntToStr(att->GetClefLine())));
+            attributes->push_back(std::make_pair("clef.line", att->IntToStr(att->GetClefLine())));
         }
         if (att->HasClefDis()) {
-            attributes->push_back(std::make_pair("clefDis", att->OctaveDisToStr(att->GetClefDis())));
+            attributes->push_back(std::make_pair("clef.dis", att->OctaveDisToStr(att->GetClefDis())));
         }
         if (att->HasClefDisPlace()) {
-            attributes->push_back(std::make_pair("clefDisPlace", att->PlaceToStr(att->GetClefDisPlace())));
+            attributes->push_back(std::make_pair("clef.dis.place", att->PlaceToStr(att->GetClefDisPlace())));
         }
     }
     if (element->HasAttClass( ATT_CLEFFINGVIS ) ) {
         AttCleffingVis *att = dynamic_cast<AttCleffingVis*>(element);
         assert( att );
         if (att->HasClefColor()) {
-            attributes->push_back(std::make_pair("clefColor", att->StrToStr(att->GetClefColor())));
+            attributes->push_back(std::make_pair("clef.color", att->StrToStr(att->GetClefColor())));
         }
         if (att->HasClefVisible()) {
-            attributes->push_back(std::make_pair("clefVisible", att->BooleanToStr(att->GetClefVisible())));
+            attributes->push_back(std::make_pair("clef.visible", att->BooleanToStr(att->GetClefVisible())));
         }
     }
     if (element->HasAttClass( ATT_CLEFSHAPE ) ) {
@@ -9459,7 +9459,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("label", att->StrToStr(att->GetLabel())));
         }
         if (att->HasBase()) {
-            attributes->push_back(std::make_pair("base", att->StrToStr(att->GetBase())));
+            attributes->push_back(std::make_pair("xml:base", att->StrToStr(att->GetBase())));
         }
     }
     if (element->HasAttClass( ATT_COORDINATED ) ) {
@@ -9545,13 +9545,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttDistances *att = dynamic_cast<AttDistances*>(element);
         assert( att );
         if (att->HasDynamDist()) {
-            attributes->push_back(std::make_pair("dynamDist", att->StrToStr(att->GetDynamDist())));
+            attributes->push_back(std::make_pair("dynam.dist", att->StrToStr(att->GetDynamDist())));
         }
         if (att->HasHarmDist()) {
-            attributes->push_back(std::make_pair("harmDist", att->StrToStr(att->GetHarmDist())));
+            attributes->push_back(std::make_pair("harm.dist", att->StrToStr(att->GetHarmDist())));
         }
         if (att->HasTextDist()) {
-            attributes->push_back(std::make_pair("textDist", att->StrToStr(att->GetTextDist())));
+            attributes->push_back(std::make_pair("text.dist", att->StrToStr(att->GetTextDist())));
         }
     }
     if (element->HasAttClass( ATT_DOTLOG ) ) {
@@ -9572,13 +9572,13 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttDurationDefault *att = dynamic_cast<AttDurationDefault*>(element);
         assert( att );
         if (att->HasDurDefault()) {
-            attributes->push_back(std::make_pair("durDefault", att->DurationToStr(att->GetDurDefault())));
+            attributes->push_back(std::make_pair("dur.default", att->DurationToStr(att->GetDurDefault())));
         }
         if (att->HasNumDefault()) {
-            attributes->push_back(std::make_pair("numDefault", att->IntToStr(att->GetNumDefault())));
+            attributes->push_back(std::make_pair("num.default", att->IntToStr(att->GetNumDefault())));
         }
         if (att->HasNumbaseDefault()) {
-            attributes->push_back(std::make_pair("numbaseDefault", att->IntToStr(att->GetNumbaseDefault())));
+            attributes->push_back(std::make_pair("numbase.default", att->IntToStr(att->GetNumbaseDefault())));
         }
     }
     if (element->HasAttClass( ATT_DURATIONMUSICAL ) ) {
@@ -9592,7 +9592,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttDurationPerformed *att = dynamic_cast<AttDurationPerformed*>(element);
         assert( att );
         if (att->HasDurGes()) {
-            attributes->push_back(std::make_pair("durGes", att->DurationToStr(att->GetDurGes())));
+            attributes->push_back(std::make_pair("dur.ges", att->DurationToStr(att->GetDurGes())));
         }
     }
     if (element->HasAttClass( ATT_DURATIONRATIO ) ) {
@@ -9616,7 +9616,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttEndings *att = dynamic_cast<AttEndings*>(element);
         assert( att );
         if (att->HasEndingRend()) {
-            attributes->push_back(std::make_pair("endingRend", att->EndingsEndingrendToStr(att->GetEndingRend())));
+            attributes->push_back(std::make_pair("ending.rend", att->EndingsEndingrendToStr(att->GetEndingRend())));
         }
     }
     if (element->HasAttClass( ATT_EXTENDER ) ) {
@@ -9700,46 +9700,46 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttKeySigDefaultLog *att = dynamic_cast<AttKeySigDefaultLog*>(element);
         assert( att );
         if (att->HasKeyAccid()) {
-            attributes->push_back(std::make_pair("keyAccid", att->AccidentalImplicitToStr(att->GetKeyAccid())));
+            attributes->push_back(std::make_pair("key.accid", att->AccidentalImplicitToStr(att->GetKeyAccid())));
         }
         if (att->HasKeyMode()) {
-            attributes->push_back(std::make_pair("keyMode", att->ModeToStr(att->GetKeyMode())));
+            attributes->push_back(std::make_pair("key.mode", att->ModeToStr(att->GetKeyMode())));
         }
         if (att->HasKeyPname()) {
-            attributes->push_back(std::make_pair("keyPname", att->PitchnameToStr(att->GetKeyPname())));
+            attributes->push_back(std::make_pair("key.pname", att->PitchnameToStr(att->GetKeyPname())));
         }
         if (att->HasKeySig()) {
-            attributes->push_back(std::make_pair("keySig", att->KeysignatureToStr(att->GetKeySig())));
+            attributes->push_back(std::make_pair("key.sig", att->KeysignatureToStr(att->GetKeySig())));
         }
         if (att->HasKeySigMixed()) {
-            attributes->push_back(std::make_pair("keySigMixed", att->StrToStr(att->GetKeySigMixed())));
+            attributes->push_back(std::make_pair("key.sig.mixed", att->StrToStr(att->GetKeySigMixed())));
         }
     }
     if (element->HasAttClass( ATT_KEYSIGDEFAULTVIS ) ) {
         AttKeySigDefaultVis *att = dynamic_cast<AttKeySigDefaultVis*>(element);
         assert( att );
         if (att->HasKeySigShow()) {
-            attributes->push_back(std::make_pair("keySigShow", att->BooleanToStr(att->GetKeySigShow())));
+            attributes->push_back(std::make_pair("key.sig.show", att->BooleanToStr(att->GetKeySigShow())));
         }
         if (att->HasKeySigShowchange()) {
-            attributes->push_back(std::make_pair("keySigShowchange", att->BooleanToStr(att->GetKeySigShowchange())));
+            attributes->push_back(std::make_pair("key.sig.showchange", att->BooleanToStr(att->GetKeySigShowchange())));
         }
     }
     if (element->HasAttClass( ATT_LABELSADDL ) ) {
         AttLabelsAddl *att = dynamic_cast<AttLabelsAddl*>(element);
         assert( att );
         if (att->HasLabelAbbr()) {
-            attributes->push_back(std::make_pair("labelAbbr", att->StrToStr(att->GetLabelAbbr())));
+            attributes->push_back(std::make_pair("label.abbr", att->StrToStr(att->GetLabelAbbr())));
         }
     }
     if (element->HasAttClass( ATT_LANG ) ) {
         AttLang *att = dynamic_cast<AttLang*>(element);
         assert( att );
         if (att->HasLang()) {
-            attributes->push_back(std::make_pair("lang", att->StrToStr(att->GetLang())));
+            attributes->push_back(std::make_pair("xml:lang", att->StrToStr(att->GetLang())));
         }
         if (att->HasTranslit()) {
-            attributes->push_back(std::make_pair("translit", att->StrToStr(att->GetTranslit())));
+            attributes->push_back(std::make_pair("xml:translit", att->StrToStr(att->GetTranslit())));
         }
     }
     if (element->HasAttClass( ATT_LAYERLOG ) ) {
@@ -9815,22 +9815,22 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttLyricstyle *att = dynamic_cast<AttLyricstyle*>(element);
         assert( att );
         if (att->HasLyricAlign()) {
-            attributes->push_back(std::make_pair("lyricAlign", att->StrToStr(att->GetLyricAlign())));
+            attributes->push_back(std::make_pair("lyric.align", att->StrToStr(att->GetLyricAlign())));
         }
         if (att->HasLyricFam()) {
-            attributes->push_back(std::make_pair("lyricFam", att->StrToStr(att->GetLyricFam())));
+            attributes->push_back(std::make_pair("lyric.fam", att->StrToStr(att->GetLyricFam())));
         }
         if (att->HasLyricName()) {
-            attributes->push_back(std::make_pair("lyricName", att->StrToStr(att->GetLyricName())));
+            attributes->push_back(std::make_pair("lyric.name", att->StrToStr(att->GetLyricName())));
         }
         if (att->HasLyricSize()) {
-            attributes->push_back(std::make_pair("lyricSize", att->StrToStr(att->GetLyricSize())));
+            attributes->push_back(std::make_pair("lyric.size", att->StrToStr(att->GetLyricSize())));
         }
         if (att->HasLyricStyle()) {
-            attributes->push_back(std::make_pair("lyricStyle", att->FontstyleToStr(att->GetLyricStyle())));
+            attributes->push_back(std::make_pair("lyric.style", att->FontstyleToStr(att->GetLyricStyle())));
         }
         if (att->HasLyricWeight()) {
-            attributes->push_back(std::make_pair("lyricWeight", att->FontweightToStr(att->GetLyricWeight())));
+            attributes->push_back(std::make_pair("lyric.weight", att->FontweightToStr(att->GetLyricWeight())));
         }
     }
     if (element->HasAttClass( ATT_MEASURELOG ) ) {
@@ -9854,7 +9854,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttMeasurenumbers *att = dynamic_cast<AttMeasurenumbers*>(element);
         assert( att );
         if (att->HasMnumVisible()) {
-            attributes->push_back(std::make_pair("mnumVisible", att->BooleanToStr(att->GetMnumVisible())));
+            attributes->push_back(std::make_pair("mnum.visible", att->BooleanToStr(att->GetMnumVisible())));
         }
     }
     if (element->HasAttClass( ATT_MEDIABOUNDS ) ) {
@@ -9918,23 +9918,23 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttMeterSigDefaultLog *att = dynamic_cast<AttMeterSigDefaultLog*>(element);
         assert( att );
         if (att->HasMeterCount()) {
-            attributes->push_back(std::make_pair("meterCount", att->IntToStr(att->GetMeterCount())));
+            attributes->push_back(std::make_pair("meter.count", att->IntToStr(att->GetMeterCount())));
         }
         if (att->HasMeterUnit()) {
-            attributes->push_back(std::make_pair("meterUnit", att->IntToStr(att->GetMeterUnit())));
+            attributes->push_back(std::make_pair("meter.unit", att->IntToStr(att->GetMeterUnit())));
         }
     }
     if (element->HasAttClass( ATT_METERSIGDEFAULTVIS ) ) {
         AttMeterSigDefaultVis *att = dynamic_cast<AttMeterSigDefaultVis*>(element);
         assert( att );
         if (att->HasMeterRend()) {
-            attributes->push_back(std::make_pair("meterRend", att->MeterSigDefaultVisMeterrendToStr(att->GetMeterRend())));
+            attributes->push_back(std::make_pair("meter.rend", att->MeterSigDefaultVisMeterrendToStr(att->GetMeterRend())));
         }
         if (att->HasMeterShowchange()) {
-            attributes->push_back(std::make_pair("meterShowchange", att->BooleanToStr(att->GetMeterShowchange())));
+            attributes->push_back(std::make_pair("meter.showchange", att->BooleanToStr(att->GetMeterShowchange())));
         }
         if (att->HasMeterSym()) {
-            attributes->push_back(std::make_pair("meterSym", att->MetersignToStr(att->GetMeterSym())));
+            attributes->push_back(std::make_pair("meter.sym", att->MetersignToStr(att->GetMeterSym())));
         }
     }
     if (element->HasAttClass( ATT_METERCONFORMANCE ) ) {
@@ -9961,17 +9961,17 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("mm", att->StrToStr(att->GetMm())));
         }
         if (att->HasMmUnit()) {
-            attributes->push_back(std::make_pair("mmUnit", att->DurationToStr(att->GetMmUnit())));
+            attributes->push_back(std::make_pair("mm.unit", att->DurationToStr(att->GetMmUnit())));
         }
         if (att->HasMmDots()) {
-            attributes->push_back(std::make_pair("mmDots", att->IntToStr(att->GetMmDots())));
+            attributes->push_back(std::make_pair("mm.dots", att->IntToStr(att->GetMmDots())));
         }
     }
     if (element->HasAttClass( ATT_MULTINUMMEASURES ) ) {
         AttMultinummeasures *att = dynamic_cast<AttMultinummeasures*>(element);
         assert( att );
         if (att->HasMultiNumber()) {
-            attributes->push_back(std::make_pair("multiNumber", att->BooleanToStr(att->GetMultiNumber())));
+            attributes->push_back(std::make_pair("multi.number", att->BooleanToStr(att->GetMultiNumber())));
         }
     }
     if (element->HasAttClass( ATT_NAME ) ) {
@@ -9988,20 +9988,20 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttNotationstyle *att = dynamic_cast<AttNotationstyle*>(element);
         assert( att );
         if (att->HasMusicName()) {
-            attributes->push_back(std::make_pair("musicName", att->StrToStr(att->GetMusicName())));
+            attributes->push_back(std::make_pair("music.name", att->StrToStr(att->GetMusicName())));
         }
         if (att->HasMusicSize()) {
-            attributes->push_back(std::make_pair("musicSize", att->StrToStr(att->GetMusicSize())));
+            attributes->push_back(std::make_pair("music.size", att->StrToStr(att->GetMusicSize())));
         }
     }
     if (element->HasAttClass( ATT_NOTEGES ) ) {
         AttNoteGes *att = dynamic_cast<AttNoteGes*>(element);
         assert( att );
         if (att->HasOctGes()) {
-            attributes->push_back(std::make_pair("octGes", att->IntToStr(att->GetOctGes())));
+            attributes->push_back(std::make_pair("oct.ges", att->IntToStr(att->GetOctGes())));
         }
         if (att->HasPnameGes()) {
-            attributes->push_back(std::make_pair("pnameGes", att->PitchnameToStr(att->GetPnameGes())));
+            attributes->push_back(std::make_pair("pname.ges", att->PitchnameToStr(att->GetPnameGes())));
         }
         if (att->HasPnum()) {
             attributes->push_back(std::make_pair("pnum", att->IntToStr(att->GetPnum())));
@@ -10011,25 +10011,25 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttNoteheads *att = dynamic_cast<AttNoteheads*>(element);
         assert( att );
         if (att->HasHeadColor()) {
-            attributes->push_back(std::make_pair("headColor", att->StrToStr(att->GetHeadColor())));
+            attributes->push_back(std::make_pair("head.color", att->StrToStr(att->GetHeadColor())));
         }
         if (att->HasHeadFill()) {
-            attributes->push_back(std::make_pair("headFill", att->StrToStr(att->GetHeadFill())));
+            attributes->push_back(std::make_pair("head.fill", att->StrToStr(att->GetHeadFill())));
         }
         if (att->HasHeadFillcolor()) {
-            attributes->push_back(std::make_pair("headFillcolor", att->StrToStr(att->GetHeadFillcolor())));
+            attributes->push_back(std::make_pair("head.fillcolor", att->StrToStr(att->GetHeadFillcolor())));
         }
         if (att->HasHeadMod()) {
-            attributes->push_back(std::make_pair("headMod", att->StrToStr(att->GetHeadMod())));
+            attributes->push_back(std::make_pair("head.mod", att->StrToStr(att->GetHeadMod())));
         }
         if (att->HasHeadRotation()) {
-            attributes->push_back(std::make_pair("headRotation", att->StrToStr(att->GetHeadRotation())));
+            attributes->push_back(std::make_pair("head.rotation", att->StrToStr(att->GetHeadRotation())));
         }
         if (att->HasHeadShape()) {
-            attributes->push_back(std::make_pair("headShape", att->StrToStr(att->GetHeadShape())));
+            attributes->push_back(std::make_pair("head.shape", att->StrToStr(att->GetHeadShape())));
         }
         if (att->HasHeadVisible()) {
-            attributes->push_back(std::make_pair("headVisible", att->BooleanToStr(att->GetHeadVisible())));
+            attributes->push_back(std::make_pair("head.visible", att->BooleanToStr(att->GetHeadVisible())));
         }
     }
     if (element->HasAttClass( ATT_OCTAVE ) ) {
@@ -10043,7 +10043,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttOctavedefault *att = dynamic_cast<AttOctavedefault*>(element);
         assert( att );
         if (att->HasOctaveDefault()) {
-            attributes->push_back(std::make_pair("octaveDefault", att->IntToStr(att->GetOctaveDefault())));
+            attributes->push_back(std::make_pair("octave.default", att->IntToStr(att->GetOctaveDefault())));
         }
     }
     if (element->HasAttClass( ATT_OCTAVEDISPLACEMENT ) ) {
@@ -10053,7 +10053,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("dis", att->OctaveDisToStr(att->GetDis())));
         }
         if (att->HasDisPlace()) {
-            attributes->push_back(std::make_pair("disPlace", att->PlaceToStr(att->GetDisPlace())));
+            attributes->push_back(std::make_pair("dis.place", att->PlaceToStr(att->GetDisPlace())));
         }
     }
     if (element->HasAttClass( ATT_ONELINESTAFF ) ) {
@@ -10081,28 +10081,28 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttPages *att = dynamic_cast<AttPages*>(element);
         assert( att );
         if (att->HasPageHeight()) {
-            attributes->push_back(std::make_pair("pageHeight", att->StrToStr(att->GetPageHeight())));
+            attributes->push_back(std::make_pair("page.height", att->StrToStr(att->GetPageHeight())));
         }
         if (att->HasPageWidth()) {
-            attributes->push_back(std::make_pair("pageWidth", att->StrToStr(att->GetPageWidth())));
+            attributes->push_back(std::make_pair("page.width", att->StrToStr(att->GetPageWidth())));
         }
         if (att->HasPageTopmar()) {
-            attributes->push_back(std::make_pair("pageTopmar", att->StrToStr(att->GetPageTopmar())));
+            attributes->push_back(std::make_pair("page.topmar", att->StrToStr(att->GetPageTopmar())));
         }
         if (att->HasPageBotmar()) {
-            attributes->push_back(std::make_pair("pageBotmar", att->StrToStr(att->GetPageBotmar())));
+            attributes->push_back(std::make_pair("page.botmar", att->StrToStr(att->GetPageBotmar())));
         }
         if (att->HasPageLeftmar()) {
-            attributes->push_back(std::make_pair("pageLeftmar", att->StrToStr(att->GetPageLeftmar())));
+            attributes->push_back(std::make_pair("page.leftmar", att->StrToStr(att->GetPageLeftmar())));
         }
         if (att->HasPageRightmar()) {
-            attributes->push_back(std::make_pair("pageRightmar", att->StrToStr(att->GetPageRightmar())));
+            attributes->push_back(std::make_pair("page.rightmar", att->StrToStr(att->GetPageRightmar())));
         }
         if (att->HasPagePanels()) {
-            attributes->push_back(std::make_pair("pagePanels", att->StrToStr(att->GetPagePanels())));
+            attributes->push_back(std::make_pair("page.panels", att->StrToStr(att->GetPagePanels())));
         }
         if (att->HasPageScale()) {
-            attributes->push_back(std::make_pair("pageScale", att->StrToStr(att->GetPageScale())));
+            attributes->push_back(std::make_pair("page.scale", att->StrToStr(att->GetPageScale())));
         }
     }
     if (element->HasAttClass( ATT_PBVIS ) ) {
@@ -10140,22 +10140,22 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttPointing *att = dynamic_cast<AttPointing*>(element);
         assert( att );
         if (att->HasActuate()) {
-            attributes->push_back(std::make_pair("actuate", att->StrToStr(att->GetActuate())));
+            attributes->push_back(std::make_pair("xlink:actuate", att->StrToStr(att->GetActuate())));
         }
         if (att->HasRole()) {
-            attributes->push_back(std::make_pair("role", att->StrToStr(att->GetRole())));
+            attributes->push_back(std::make_pair("xlink:role", att->StrToStr(att->GetRole())));
         }
         if (att->HasShow()) {
-            attributes->push_back(std::make_pair("show", att->StrToStr(att->GetShow())));
+            attributes->push_back(std::make_pair("xlink:show", att->StrToStr(att->GetShow())));
         }
         if (att->HasTarget()) {
-            attributes->push_back(std::make_pair("target", att->StrToStr(att->GetTarget())));
+            attributes->push_back(std::make_pair("xlink:target", att->StrToStr(att->GetTarget())));
         }
         if (att->HasTargettype()) {
-            attributes->push_back(std::make_pair("targettype", att->StrToStr(att->GetTargettype())));
+            attributes->push_back(std::make_pair("xlink:targettype", att->StrToStr(att->GetTargettype())));
         }
         if (att->HasTitle()) {
-            attributes->push_back(std::make_pair("title", att->StrToStr(att->GetTitle())));
+            attributes->push_back(std::make_pair("xlink:title", att->StrToStr(att->GetTitle())));
         }
     }
     if (element->HasAttClass( ATT_QUANTITY ) ) {
@@ -10197,20 +10197,20 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttScoreDefGes *att = dynamic_cast<AttScoreDefGes*>(element);
         assert( att );
         if (att->HasTunePname()) {
-            attributes->push_back(std::make_pair("tunePname", att->PitchnameToStr(att->GetTunePname())));
+            attributes->push_back(std::make_pair("tune.pname", att->PitchnameToStr(att->GetTunePname())));
         }
         if (att->HasTuneHz()) {
-            attributes->push_back(std::make_pair("tuneHz", att->DblToStr(att->GetTuneHz())));
+            attributes->push_back(std::make_pair("tune.Hz", att->DblToStr(att->GetTuneHz())));
         }
         if (att->HasTuneTemper()) {
-            attributes->push_back(std::make_pair("tuneTemper", att->TemperamentToStr(att->GetTuneTemper())));
+            attributes->push_back(std::make_pair("tune.temper", att->TemperamentToStr(att->GetTuneTemper())));
         }
     }
     if (element->HasAttClass( ATT_SCOREDEFVIS ) ) {
         AttScoreDefVis *att = dynamic_cast<AttScoreDefVis*>(element);
         assert( att );
         if (att->HasVuHeight()) {
-            attributes->push_back(std::make_pair("vuHeight", att->StrToStr(att->GetVuHeight())));
+            attributes->push_back(std::make_pair("vu.height", att->StrToStr(att->GetVuHeight())));
         }
     }
     if (element->HasAttClass( ATT_SECTIONVIS ) ) {
@@ -10252,16 +10252,16 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttSpacing *att = dynamic_cast<AttSpacing*>(element);
         assert( att );
         if (att->HasSpacingPackexp()) {
-            attributes->push_back(std::make_pair("spacingPackexp", att->DblToStr(att->GetSpacingPackexp())));
+            attributes->push_back(std::make_pair("spacing.packexp", att->DblToStr(att->GetSpacingPackexp())));
         }
         if (att->HasSpacingPackfact()) {
-            attributes->push_back(std::make_pair("spacingPackfact", att->DblToStr(att->GetSpacingPackfact())));
+            attributes->push_back(std::make_pair("spacing.packfact", att->DblToStr(att->GetSpacingPackfact())));
         }
         if (att->HasSpacingStaff()) {
-            attributes->push_back(std::make_pair("spacingStaff", att->StrToStr(att->GetSpacingStaff())));
+            attributes->push_back(std::make_pair("spacing.staff", att->StrToStr(att->GetSpacingStaff())));
         }
         if (att->HasSpacingSystem()) {
-            attributes->push_back(std::make_pair("spacingSystem", att->StrToStr(att->GetSpacingSystem())));
+            attributes->push_back(std::make_pair("spacing.system", att->StrToStr(att->GetSpacingSystem())));
         }
     }
     if (element->HasAttClass( ATT_STAFFLOG ) ) {
@@ -10275,7 +10275,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttStaffDefVis *att = dynamic_cast<AttStaffDefVis*>(element);
         assert( att );
         if (att->HasGridShow()) {
-            attributes->push_back(std::make_pair("gridShow", att->BooleanToStr(att->GetGridShow())));
+            attributes->push_back(std::make_pair("grid.show", att->BooleanToStr(att->GetGridShow())));
         }
         if (att->HasLayerscheme()) {
             attributes->push_back(std::make_pair("layerscheme", att->LayerschemeToStr(att->GetLayerscheme())));
@@ -10284,10 +10284,10 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("lines", att->IntToStr(att->GetLines())));
         }
         if (att->HasLinesColor()) {
-            attributes->push_back(std::make_pair("linesColor", att->StrToStr(att->GetLinesColor())));
+            attributes->push_back(std::make_pair("lines.color", att->StrToStr(att->GetLinesColor())));
         }
         if (att->HasLinesVisible()) {
-            attributes->push_back(std::make_pair("linesVisible", att->BooleanToStr(att->GetLinesVisible())));
+            attributes->push_back(std::make_pair("lines.visible", att->BooleanToStr(att->GetLinesVisible())));
         }
         if (att->HasSpacing()) {
             attributes->push_back(std::make_pair("spacing", att->StrToStr(att->GetSpacing())));
@@ -10349,22 +10349,22 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttStems *att = dynamic_cast<AttStems*>(element);
         assert( att );
         if (att->HasStemDir()) {
-            attributes->push_back(std::make_pair("stemDir", att->StemdirectionToStr(att->GetStemDir())));
+            attributes->push_back(std::make_pair("stem.dir", att->StemdirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
-            attributes->push_back(std::make_pair("stemLen", att->StrToStr(att->GetStemLen())));
+            attributes->push_back(std::make_pair("stem.len", att->StrToStr(att->GetStemLen())));
         }
         if (att->HasStemMod()) {
-            attributes->push_back(std::make_pair("stemMod", att->StemmodifierToStr(att->GetStemMod())));
+            attributes->push_back(std::make_pair("stem.mod", att->StemmodifierToStr(att->GetStemMod())));
         }
         if (att->HasStemPos()) {
-            attributes->push_back(std::make_pair("stemPos", att->StempositionToStr(att->GetStemPos())));
+            attributes->push_back(std::make_pair("stem.pos", att->StempositionToStr(att->GetStemPos())));
         }
         if (att->HasStemX()) {
-            attributes->push_back(std::make_pair("stemX", att->DblToStr(att->GetStemX())));
+            attributes->push_back(std::make_pair("stem.x", att->DblToStr(att->GetStemX())));
         }
         if (att->HasStemY()) {
-            attributes->push_back(std::make_pair("stemY", att->DblToStr(att->GetStemY())));
+            attributes->push_back(std::make_pair("stem.y", att->DblToStr(att->GetStemY())));
         }
     }
     if (element->HasAttClass( ATT_SYLLOG ) ) {
@@ -10388,35 +10388,35 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttSystems *att = dynamic_cast<AttSystems*>(element);
         assert( att );
         if (att->HasSystemLeftline()) {
-            attributes->push_back(std::make_pair("systemLeftline", att->BooleanToStr(att->GetSystemLeftline())));
+            attributes->push_back(std::make_pair("system.leftline", att->BooleanToStr(att->GetSystemLeftline())));
         }
         if (att->HasSystemLeftmar()) {
-            attributes->push_back(std::make_pair("systemLeftmar", att->StrToStr(att->GetSystemLeftmar())));
+            attributes->push_back(std::make_pair("system.leftmar", att->StrToStr(att->GetSystemLeftmar())));
         }
         if (att->HasSystemRightmar()) {
-            attributes->push_back(std::make_pair("systemRightmar", att->StrToStr(att->GetSystemRightmar())));
+            attributes->push_back(std::make_pair("system.rightmar", att->StrToStr(att->GetSystemRightmar())));
         }
         if (att->HasSystemTopmar()) {
-            attributes->push_back(std::make_pair("systemTopmar", att->StrToStr(att->GetSystemTopmar())));
+            attributes->push_back(std::make_pair("system.topmar", att->StrToStr(att->GetSystemTopmar())));
         }
     }
     if (element->HasAttClass( ATT_TEXTSTYLE ) ) {
         AttTextstyle *att = dynamic_cast<AttTextstyle*>(element);
         assert( att );
         if (att->HasTextFam()) {
-            attributes->push_back(std::make_pair("textFam", att->StrToStr(att->GetTextFam())));
+            attributes->push_back(std::make_pair("text.fam", att->StrToStr(att->GetTextFam())));
         }
         if (att->HasTextName()) {
-            attributes->push_back(std::make_pair("textName", att->StrToStr(att->GetTextName())));
+            attributes->push_back(std::make_pair("text.name", att->StrToStr(att->GetTextName())));
         }
         if (att->HasTextSize()) {
-            attributes->push_back(std::make_pair("textSize", att->StrToStr(att->GetTextSize())));
+            attributes->push_back(std::make_pair("text.size", att->StrToStr(att->GetTextSize())));
         }
         if (att->HasTextStyle()) {
-            attributes->push_back(std::make_pair("textStyle", att->FontstyleToStr(att->GetTextStyle())));
+            attributes->push_back(std::make_pair("text.style", att->FontstyleToStr(att->GetTextStyle())));
         }
         if (att->HasTextWeight()) {
-            attributes->push_back(std::make_pair("textWeight", att->FontweightToStr(att->GetTextWeight())));
+            attributes->push_back(std::make_pair("text.weight", att->FontweightToStr(att->GetTextWeight())));
         }
     }
     if (element->HasAttClass( ATT_TIEPRESENT ) ) {
@@ -10437,10 +10437,10 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttTimestampPerformed *att = dynamic_cast<AttTimestampPerformed*>(element);
         assert( att );
         if (att->HasTstampGes()) {
-            attributes->push_back(std::make_pair("tstampGes", att->DurationToStr(att->GetTstampGes())));
+            attributes->push_back(std::make_pair("tstamp.ges", att->DurationToStr(att->GetTstampGes())));
         }
         if (att->HasTstampReal()) {
-            attributes->push_back(std::make_pair("tstampReal", att->StrToStr(att->GetTstampReal())));
+            attributes->push_back(std::make_pair("tstamp.real", att->StrToStr(att->GetTstampReal())));
         }
     }
     if (element->HasAttClass( ATT_TIMESTAMP2MUSICAL ) ) {
@@ -10454,10 +10454,10 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttTransposition *att = dynamic_cast<AttTransposition*>(element);
         assert( att );
         if (att->HasTransDiat()) {
-            attributes->push_back(std::make_pair("transDiat", att->DblToStr(att->GetTransDiat())));
+            attributes->push_back(std::make_pair("trans.diat", att->DblToStr(att->GetTransDiat())));
         }
         if (att->HasTransSemi()) {
-            attributes->push_back(std::make_pair("transSemi", att->DblToStr(att->GetTransSemi())));
+            attributes->push_back(std::make_pair("trans.semi", att->DblToStr(att->GetTransSemi())));
         }
     }
     if (element->HasAttClass( ATT_TUPLETPRESENT ) ) {
@@ -10558,7 +10558,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttWhitespace *att = dynamic_cast<AttWhitespace*>(element);
         assert( att );
         if (att->HasSpace()) {
-            attributes->push_back(std::make_pair("space", att->StrToStr(att->GetSpace())));
+            attributes->push_back(std::make_pair("xml:space", att->StrToStr(att->GetSpace())));
         }
     }
     if (element->HasAttClass( ATT_WIDTH ) ) {
