@@ -123,6 +123,11 @@ public:
      */
 	int m_drawingLines;
     
+	/**
+     * Notation type (CMN, mensural, black mensural, etc.), from the staffDef
+     */
+	int m_drawingNotationType;
+    
     /**
      * Total drawing height from top of top line to bottom of bottom line
      */

@@ -278,6 +278,16 @@ enum data_LAYERSCHEME {
 };
 
 /**
+ * MEI data.NOTATIONTYPE
+ */
+enum data_NOTATIONTYPE {
+    NOTATIONTYPE_NONE = 0,
+    NOTATIONTYPE_mensural,
+    NOTATIONTYPE_mensural_white,
+    NOTATIONTYPE_mensural_black
+};
+    
+/**
  * MEI values for @lig (no datatype in MEI)
  */
 enum data_LIGATURE {
