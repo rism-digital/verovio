@@ -499,6 +499,7 @@ bool MeiOutput::WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure )
 
     measure->WriteCommon(currentNode);
     measure->WriteMeasureLog(currentNode);
+    measure->WritePointing(currentNode);
     
     return true;
 }    
@@ -1454,6 +1455,7 @@ bool MeiInput::ReadMeiMeasure( Object *parent, pugi::xml_node measure )
     
     vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
+    vrvMeasure->ReadPointing(measure);
     
     // This could me moved to an AddMeasure method for consistency with AddLayerElement
     if ( parent->Is() == SYSTEM ) {
