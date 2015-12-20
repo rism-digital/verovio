@@ -31,10 +31,12 @@ namespace vrv {
 Measure::Measure( bool measureMusic, int logMeasureNb ):
     DocObject("measure-"),
     AttCommon(),
-    AttMeasureLog()
+    AttMeasureLog(),
+    AttPointing()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
+    RegisterAttClass(ATT_POINTING);
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
     // See Object::SetParentDoc()
@@ -51,6 +53,7 @@ void Measure::Reset()
     DocObject::Reset();
     ResetCommon();
     ResetMeasureLog();
+    ResetPointing();
     
     m_parent = NULL;
     m_measuredMusic = true;

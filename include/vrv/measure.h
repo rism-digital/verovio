@@ -30,7 +30,8 @@ class FloatingElement;
  */
 class Measure: public DocObject,
     public AttCommon,
-    public AttMeasureLog
+    public AttMeasureLog,
+    public AttPointing
 {
     
 public:
