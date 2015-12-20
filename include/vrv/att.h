@@ -146,6 +146,9 @@ public:
     
     std::string TieToStr(data_TIE data);
     data_TIE StrToTie(std::string value);
+    
+    std::string XsdPosintlistToStr(xsd_posIntList data);
+    xsd_posIntList StrToXsdPosintlist(std::string value);
     ///@}
 };
     

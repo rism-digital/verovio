@@ -18,7 +18,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 /** 
- * This class is an interface for elements with duration, such as notes and rests.
+ * This class is an interface for elements appearing within measure.
  * It is not an abstract class but should not be instanciate directly.
  */
 class FloatingElement: public DocObject

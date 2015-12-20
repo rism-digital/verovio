@@ -417,10 +417,10 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
     // If we have one, make is available in m_crossStaff
     DurationInterface *durElement = dynamic_cast<DurationInterface*>(this);
     if ( durElement && durElement->HasStaff()) {
-        AttCommonNComparison comparisonFirst( STAFF, durElement->GetStaff() );
+        AttCommonNComparison comparisonFirst( STAFF, durElement->GetStaff().at(0) );
         m_crossStaff = dynamic_cast<Staff*>((*currentMeasure)->FindChildByAttComparison(&comparisonFirst, 1));
         if (m_crossStaff) {
-            if (m_crossStaff == (*currentStaff)) LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff", durElement->GetStaff(), this->GetUuid().c_str());
+            if (m_crossStaff == (*currentStaff)) LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff", durElement->GetStaff().at(0), this->GetUuid().c_str());
             // Now try to get the corresponding layer - for now look for the same layer @n
             int layerN = (*currentLayer)->GetN();
             // When we will have allowed @layer in <note>, we will have to do:
@@ -432,10 +432,10 @@ int LayerElement::SetDrawingXY( ArrayPtrVoid *params )
                 layerElementY = m_crossLayer->GetAtPos( this->GetDrawingX() );
                 
             } else {
-                LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'", durElement->GetStaff(), this->GetUuid().c_str());
+                LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'", durElement->GetStaff().at(0), this->GetUuid().c_str());
             }
         } else {
-            LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff(), this->GetUuid().c_str());
+            LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0), this->GetUuid().c_str());
         }
         // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
     } else {

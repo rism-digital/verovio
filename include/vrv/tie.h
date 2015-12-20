@@ -16,8 +16,6 @@ namespace vrv {
 
 //----------------------------------------------------------------------------
 // Tie
-// A TIE class is a simple slur - it takes in account only two notes, the first and second:
-// NOTE tie NOTE tie etc
 //----------------------------------------------------------------------------
 
 class Tie: public FloatingElement, public TimeSpanningInterface,

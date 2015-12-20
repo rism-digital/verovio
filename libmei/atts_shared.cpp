@@ -6076,13 +6076,13 @@ AttStaffident::~AttStaffident() {
 }
 
 void AttStaffident::ResetStaffident() {
-    m_staff = 0;
+    m_staff = std::vector<int>();
 }
 
 bool AttStaffident::ReadStaffident( pugi::xml_node element ) {
     bool hasAttribute = false;
     if (element.attribute("staff")) {
-        this->SetStaff(StrToInt(element.attribute("staff").value()));
+        this->SetStaff(StrToXsdPosintlist(element.attribute("staff").value()));
         element.remove_attribute("staff");
         hasAttribute = true;
     }
@@ -6092,7 +6092,7 @@ bool AttStaffident::ReadStaffident( pugi::xml_node element ) {
 bool AttStaffident::WriteStaffident( pugi::xml_node element ) {
     bool wroteAttribute = false;
     if (this->HasStaff()) {
-        element.append_attribute("staff") = IntToStr(this->GetStaff()).c_str();
+        element.append_attribute("staff") = XsdPosintlistToStr(this->GetStaff()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -6100,7 +6100,7 @@ bool AttStaffident::WriteStaffident( pugi::xml_node element ) {
 
 bool AttStaffident::HasStaff( )
 {
-    return (m_staff != 0);
+    return (m_staff != std::vector<int>());
 }
 
 
@@ -8937,7 +8937,7 @@ bool Att::SetShared( Object *element, std::string attrType, std::string attrValu
         AttStaffident *att = dynamic_cast<AttStaffident*>(element);
         assert( att );
         if (attrType == "staff") {
-            att->SetStaff(att->StrToInt(attrValue));
+            att->SetStaff(att->StrToXsdPosintlist(attrValue));
             return true;
         }
     }
@@ -10311,7 +10311,7 @@ void Att::GetShared( Object *element, ArrayOfStrAttr *attributes ) {
         AttStaffident *att = dynamic_cast<AttStaffident*>(element);
         assert( att );
         if (att->HasStaff()) {
-            attributes->push_back(std::make_pair("staff", att->IntToStr(att->GetStaff())));
+            attributes->push_back(std::make_pair("staff", att->XsdPosintlistToStr(att->GetStaff())));
         }
     }
     if (element->HasAttClass( ATT_STAFFLOC ) ) {

@@ -23,7 +23,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 FloatingElement::FloatingElement():
-    DocObject("me")
+    DocObject("fe")
 {
     Reset();
 }

@@ -10,6 +10,7 @@
 
 //----------------------------------------------------------------------------
 
+#include <sstream>
 #include <stdlib.h>
 
 //----------------------------------------------------------------------------
@@ -212,6 +213,16 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value)
 		LogWarning("Unsupported key signature '%s'", value.c_str() );
 	}
 	return KEYSIGNATURE_NONE;
+}    
+
+std::string Att::MeasurebeatToStr(data_MEASUREBEAT data)
+{
+    return "0m0.0";
+}
+
+data_MEASUREBEAT Att::StrToMeasurebeat(std::string value)
+{
+    return std::make_pair(0, 1.0);
 }
 
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
@@ -381,6 +392,31 @@ data_PROLATIO Att::StrToProlatio(std::string value)
     }
     // default
     return PROLATIO_NONE;
+}    
+
+std::string Att::StemdirectionToStr(data_STEMDIRECTION data)
+{
+    std::string value;
+    switch(data)
+    {
+        case STEMDIRECTION_up : value = "up"; break;
+        case STEMDIRECTION_down : value = "down"; break;
+        default:
+            LogWarning("Unknown stem direction '%d'", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_STEMDIRECTION Att::StrToStemdirection(std::string value)
+{
+    if (value == "up") return STEMDIRECTION_up;
+    else if (value == "down") return STEMDIRECTION_down;
+    else {
+        LogWarning("Unsupported stem direction '%s'", value.c_str() );
+    }
+    return STEMDIRECTION_NONE;
 }
 
 std::string Att::TempusToStr(data_TEMPUS data)
@@ -437,42 +473,27 @@ data_TIE Att::StrToTie(std::string value)
     return TIE_NONE;
 }
     
-    
-std::string Att::StemdirectionToStr(data_STEMDIRECTION data)
+std::string Att::XsdPosintlistToStr(xsd_posIntList data)
 {
-    std::string value;
-    switch(data)
-    {
-        case STEMDIRECTION_up : value = "up"; break;
-        case STEMDIRECTION_down : value = "down"; break;
-        default:
-            LogWarning("Unknown stem direction '%d'", data);
-            value = "";
-            break;
+    std::stringstream ss;
+    for(size_t i = 0; i < data.size(); ++i) {
+        if(i != 0) ss << " ";
+        ss << data[i];
     }
-    return value;
+    return ss.str();
 }
 
-data_STEMDIRECTION Att::StrToStemdirection(std::string value)
+xsd_posIntList Att::StrToXsdPosintlist(std::string value)
 {
-    if (value == "up") return STEMDIRECTION_up;
-    else if (value == "down") return STEMDIRECTION_down;
-    else {
-        LogWarning("Unsupported stem direction '%s'", value.c_str() );
+    xsd_posIntList list;
+    std::stringstream iss( value );
+    std::string token;
+    while( std::getline( iss, token, ' ' )) {
+        list.push_back(atoi(token.c_str()));
     }
-    return STEMDIRECTION_NONE;
+    return list;
 }
 
-std::string Att::MeasurebeatToStr(data_MEASUREBEAT data)
-{
-    return "0m0.0";
-}
-    
-data_MEASUREBEAT Att::StrToMeasurebeat(std::string value)
-{
-    return std::make_pair(0, 1.0);
-}
-    
 //----------------------------------------------------------------------------
 // AttComparison
 //----------------------------------------------------------------------------

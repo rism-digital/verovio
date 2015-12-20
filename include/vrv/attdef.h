@@ -255,6 +255,12 @@ enum data_TEMPUS {
     TEMPUS_3
 };
 
+/**
+ * A typedef for a list of positive integer.
+ * E.g., list { xsd:positiveInteger+ }
+ */
+typedef std::vector<int> xsd_posIntList;
+    
     
 } // namespace vrv
 

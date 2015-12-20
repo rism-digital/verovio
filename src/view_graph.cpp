@@ -177,7 +177,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
     
     dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
-    std::wistringstream iss( s  );
+    std::wistringstream iss( s );
     std::wstring token;
     while( std::getline( iss, token, L'_' ))
     {

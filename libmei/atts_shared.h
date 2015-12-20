@@ -5143,8 +5143,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStaff(int staff_) { m_staff = staff_; };
-    int GetStaff() const { return m_staff; };    
+    void SetStaff(xsd_posIntList staff_) { m_staff = staff_; };
+    xsd_posIntList GetStaff() const { return m_staff; };    
     bool HasStaff( );
     
     ///@}
@@ -5155,7 +5155,7 @@ private:
      * applies.
      * Mandatory when applicable.
      **/
-    int m_staff;
+    xsd_posIntList m_staff;
 
 /* include <attstaff> */
 };
