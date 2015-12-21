@@ -32,6 +32,7 @@ class Slur;
 class Staff;
 class Syl;
 class System;
+class Tempo;
 class Tie;
 class Tuplet;
 class Verse;
@@ -273,6 +274,7 @@ protected:
     void DrawTimeSpanningElement( DeviceContext *dc, DocObject *object, System *system );
     void DrawSlur( DeviceContext *dc, Slur *slur, int x1, int x2,
                        Staff *staff, char spanningType, DocObject *graphic = NULL );
+    void DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System *system );
     void DrawTie( DeviceContext *dc, Tie *tie, int x1, int x2,
                        Staff *staff, char spanningType, DocObject *graphic = NULL );
 
@@ -348,6 +350,7 @@ private:
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet* tuplet);
     int GetSylY( Syl* syl, Staff *staff );
+    int GetTempoY( Staff *staff );
     ///@}
     
     /**

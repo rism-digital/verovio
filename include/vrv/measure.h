@@ -183,10 +183,13 @@ public:
      */
     int m_drawingXRel;
     
+    /**
+     * The measure aligner that holds the x positions of the content of the measure
+     */
+    MeasureAligner m_measureAligner;
+    
 private:
     bool m_measuredMusic;
-    
-    MeasureAligner m_measureAligner;
     
     /**
      * @name The measure barlines (left and right) used when drawing

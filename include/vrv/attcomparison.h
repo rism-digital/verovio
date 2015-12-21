@@ -8,6 +8,7 @@
 #ifndef __VRV_ATT_COMPARISON_H__
 #define __VRV_ATT_COMPARISON_H__
 
+#include "aligner.h"
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "object.h"
@@ -95,6 +96,37 @@ public:
 private:
     int m_extremeDur;
     DurExtreme m_extremeType;
+    
+};
+    
+//----------------------------------------------------------------------------
+// AttMeasureAlignerType
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is an Alignment of a certain type
+ */
+class AttMeasureAlignerType: public AttComparison
+{
+    
+public:
+    AttMeasureAlignerType( const AlignmentType type ):
+        AttComparison( OBJECT )
+    {
+        m_type = type;
+    };
+    
+    void SetType( AlignmentType type ) { m_type = type; }
+    
+    virtual bool operator() (Object *object)
+    {
+        Alignment *alignment = dynamic_cast<Alignment*>(object);
+        if (!alignment) return false;
+        return (alignment->GetType() == m_type);
+    }
+    
+private:
+    AlignmentType m_type;
     
 };
     

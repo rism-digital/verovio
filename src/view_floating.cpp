@@ -30,6 +30,7 @@
 #include "style.h"
 #include "syl.h"
 #include "system.h"
+#include "textdirective.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -52,6 +53,11 @@ void View::DrawFloatingElement( DeviceContext *dc, FloatingElement *element, Mea
         dc->StartGraphic( element, "", element->GetUuid() );
         dc->EndGraphic( element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is() == TEMPO) {
+        Tempo *tempo = dynamic_cast<Tempo*>(element);
+        assert(tempo);
+        DrawTempo( dc, tempo, measure, system);
     }
 }
 
@@ -1012,6 +1018,63 @@ void View::DrawSylConnectorLines( DeviceContext *dc, int x1, int x2, int y, Syl 
     }
     
 }
+    
+void View::DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)
+{
+    assert( dc );
+    assert( system );
+    assert( measure );
+    assert( tempo );
+    
+    dc->StartGraphic(tempo, "", tempo->GetUuid());
+    
+    // Use Romam bold for tempo
+    FontInfo tempoTxt;
+    tempoTxt.SetFaceName("Roman");
+    tempoTxt.SetWeight(FONTWEIGHT_bold);
+    tempoTxt.SetPointSize( m_doc->GetDrawingLyricFont(100)->GetPointSize() );
+    
+    // If we have not timestamp
+    int x = measure->GetDrawingX();
+    // First try to see if we have a meter sig attribute for this measure
+    AttMeasureAlignerType alignmentComparison( ALIGNMENT_METERSIG_ATTR );
+    Alignment *pos = dynamic_cast<Alignment*>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    if (!pos) {
+        // if not, try to get the first beat element
+        alignmentComparison.SetType( ALIGNMENT_DEFAULT );
+        pos = dynamic_cast<Alignment*>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    }
+    // if we found one, use it
+    if (pos) {
+        x += pos->GetXRel();
+    }
+    
+    std::vector<int>::iterator iter;
+    std::vector<int> staffList = tempo->GetStaff();
+    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+        AttCommonNComparison comparison( STAFF, *iter );
+        Staff *staff = dynamic_cast<Staff*>(measure->FindChildByAttComparison(&comparison, 1));
+        if (!staff) {
+            LogWarning("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
+            continue;
+        }
+        
+        // Basic method that use bounding box
+        int y = GetTempoY( staff );
 
-} // namespace vrv    
+        dc->SetBrush( m_currentColour, AxSOLID );
+        dc->SetFont( &tempoTxt );
+        
+        dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), LEFT );
+        dc->DrawText( UTF16to8( tempo->GetText().c_str() ), tempo->GetText() );
+        dc->EndText( );
+        
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+    
+    dc->EndGraphic(tempo, this);
+}
+
+} // namespace vrv
     

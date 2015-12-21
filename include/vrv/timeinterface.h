@@ -22,7 +22,7 @@ class LayerElement;
 //----------------------------------------------------------------------------
 
 /** 
- * This class is an interface for elements with duration, such as notes and rests.
+ * This class is an interface for spanning elements, such as slur, hairpin, etc..
  * It is not an abstract class but should not be instanciate directly.
  */
 class TimeSpanningInterface: public Interface,

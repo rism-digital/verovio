@@ -2023,6 +2023,16 @@ int View::GetSylY( Syl *syl, Staff *staff )
     }
     return y;
 }
+    
+int View::GetTempoY(Staff *staff )
+{
+    assert( staff );
+    
+    // Temporary basic method for positionning tempo elements
+    int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    y += staff->m_contentBB_y2;
+    return y;
+}
 
 bool View::IsOnStaffLine ( int y, Staff *staff)
 {
