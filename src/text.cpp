@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        textdirective.cpp
+// Name:        text.cpp
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 
-#include "textdirective.h"
+#include "text.h"
 
 //----------------------------------------------------------------------------
 
@@ -15,35 +15,38 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "floatingelement.h"
-#include "text.h"
 
 namespace vrv {
-
+    
 //----------------------------------------------------------------------------
-// Tempo
+// Rend
 //----------------------------------------------------------------------------
 
-Tempo::Tempo():
-    FloatingElement("tempo-"), TextDirInterface()
+Rend::Rend( ):
+    TextElement("rend-"),
+    AttCommon(),
+    AttTypography()
+    
 {
-    RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPOGRAPHY);
     
     Reset();
 }
 
-
-Tempo::~Tempo()
+Rend::~Rend()
 {
-}    
-    
-void Tempo::Reset()
-{
-    FloatingElement::Reset();
-    TextDirInterface::Reset();
 }
-        
-void Tempo::AddTextElement(TextElement *element)
+
+void Rend::Reset()
+{
+    TextElement::Reset();
+    
+    ResetCommon();
+    ResetTypography();
+}
+    
+void Rend::AddTextElement(TextElement *element)
 {
     assert(dynamic_cast<Rend*>(element)
            || dynamic_cast<Text*>(element)
@@ -51,6 +54,25 @@ void Tempo::AddTextElement(TextElement *element)
     element->SetParent( this );
     m_children.push_back(element);
     Modify();
+}
+    
+//----------------------------------------------------------------------------
+// Text
+//----------------------------------------------------------------------------
+    
+Text::Text( ):
+    TextElement("text-")
+{
+    Reset();
+}
+
+Text::~Text()
+{
+}
+
+void Text::Reset()
+{
+    TextElement::Reset();
 }
     
 } // namespace vrv

@@ -138,6 +138,11 @@ enum ClassId {
     SCOREDEF,
     STAFFDEF,
     SCOREDEF_ELEMENT_max,
+    // Ids for TextElement child classes
+    TEXT_ELEMENT,
+    REND,
+    TEXT,
+    TEXT_ELEMENT_max,
     //
     UNSPECIFIED
 };
@@ -231,7 +236,8 @@ enum EditorialLevel {
     EDITORIAL_MEASURE,
     EDITORIAL_STAFF,
     EDITORIAL_LAYER,
-    EDITORIAL_NOTE
+    EDITORIAL_NOTE,
+    EDITORIAL_TEXT
 };
 
 //----------------------------------------------------------------------------

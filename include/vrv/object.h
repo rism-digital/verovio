@@ -86,6 +86,7 @@ public:
     bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
     bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
     bool IsScoreDefElement() { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); };
+    bool IsTextElement() { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); };
     ///@}
     
     /**

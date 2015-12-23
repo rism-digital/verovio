@@ -48,6 +48,7 @@ class PitchInterface;
 class PositionInterface;
 class Proport;
 class Rdg;
+class Rend;
 class Rest;
 class ScoreDef;
 class ScoreDefInterface;
@@ -58,7 +59,9 @@ class Supplied;
 class Syl;
 class System;
 class Tempo;
+class Text;
 class TextDirInterface;
+class TextElement;
 class Tie;
 class TimeSpanningInterface;
 class Tuplet;
@@ -113,7 +116,7 @@ private:
     bool WriteMeiDoc( Doc *doc );
     
     /**
-     * @name Methods for wrinting MEI containers (measures, staff, etc) scoreDef and related.
+     * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     bool WriteMeiPage( pugi::xml_node currentNode, Page *page );
@@ -127,7 +130,7 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting LayerElement children.
+     * @name Methods for writing LayerElement children.
      * Called from WriteLayerElement.
      */
     ///@{
@@ -157,12 +160,20 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrining FloatingElement
+     * @name Methods for writing FloatingElement
      */
     ///@{
     void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
     void WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo );
     void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
+    ///@}
+    
+    /**
+     * @name Methods for writing TextElement
+     */
+    ///@{
+    void WriteMeiRend( pugi::xml_node currentNode, Rend *rend );
+    void WriteMeiText( pugi::xml_node currentNode, Text *text );
     ///@}
     
     /**
@@ -294,6 +305,7 @@ private:
     bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
     bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
     bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
+    bool ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
     ///@}
 
     /**
@@ -334,6 +346,14 @@ private:
     bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
     bool ReadMeiTempo( Object *parent, pugi::xml_node tempo );
     bool ReadMeiTie( Object *parent, pugi::xml_node tie );
+    ///@}
+    
+    /**
+     * @name Methods for reading MEI text elements
+     */
+    ///@{
+    bool ReadMeiRend( Object *parent, pugi::xml_node rend );
+    bool ReadMeiText( Object *parent, pugi::xml_node text );
     ///@}
   
     /**
@@ -399,6 +419,7 @@ private:
     ///@{
     void AddLayerElement( Object *parent, LayerElement *element );
     void AddFloatingElement( Object *parent, FloatingElement *element );
+    void AddTextElement( Object *parent, TextElement *element );
     void AddScoreDef( Object *parent, ScoreDef *element );
     void AddStaffGrp( Object *parent, StaffGrp *element );
     ///@}

@@ -39,8 +39,8 @@
 #include "syl.h"
 #include "system.h"
 #include "textdirective.h"
+#include "text.h"
 #include "tie.h"
-#include "trem.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -289,19 +289,26 @@ bool MeiOutput::WriteObject( Object *object )
         m_currentNode = m_currentNode.append_child("space");
         WriteMeiSpace( m_currentNode, dynamic_cast<Space*>(object) );
     }
+    else if (object->Is() == SYL) {
+        m_currentNode = m_currentNode.append_child("syl");
+        WriteMeiSyl( m_currentNode, dynamic_cast<Syl*>(object) );
+    }
     else if (object->Is() == TUPLET) {
         m_currentNode = m_currentNode.append_child("tuplet");
         WriteMeiTuplet( m_currentNode, dynamic_cast<Tuplet*>(object) );
     }
-    
-    // others
     else if (object->Is() == VERSE) {
         m_currentNode = m_currentNode.append_child("verse");
         WriteMeiVerse( m_currentNode, dynamic_cast<Verse*>(object) );
     }
-    else if (object->Is() == SYL) {
-        m_currentNode = m_currentNode.append_child("syl");
-        WriteMeiSyl( m_currentNode, dynamic_cast<Syl*>(object) );
+    
+    // Text elements
+    else if (object->Is() == REND) {
+        m_currentNode = m_currentNode.append_child("rend");
+        WriteMeiRend( m_currentNode, dynamic_cast<Rend*>(object) );
+    }
+    else if (object->Is() == TEXT) {
+        WriteMeiText( m_currentNode, dynamic_cast<Text*>(object) );
     }
     
     // Editorial markup
@@ -816,8 +823,26 @@ void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo )
     
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tempo ).c_str();
     WriteTextDirInterface( currentNode, tempo);
-    WriteText( currentNode, tempo );
+    //WriteText( currentNode, tempo );
     return;
+}
+
+void MeiOutput::WriteMeiRend( pugi::xml_node currentNode, Rend *rend )
+{
+    assert( rend );
+    
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( rend ).c_str();
+    rend->WriteCommon(currentNode);
+    rend->WriteTypography(currentNode);
+    return;
+}
+
+void MeiOutput::WriteMeiText( pugi::xml_node element, Text *text )
+{
+    if ( !text->GetText().empty() ) {
+        pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
+        nodechild.text() =  UTF16to8(text->GetText().c_str() ).c_str();
+    }
 }
     
 void MeiOutput::WriteDurationInterface(pugi::xml_node element, vrv::DurationInterface *interface)
@@ -2082,11 +2107,11 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     SetMeiUuid(tempo, vrvTempo);
     
     ReadTextDirInterface(tempo, vrvTempo);
-    ReadText( tempo, vrvTempo );
+    //ReadText( tempo, vrvTempo );
     
     AddFloatingElement(parent, vrvTempo);
-    
-    return true;
+
+    return ReadMeiTextChildren(vrvTempo, tempo);
 }
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
@@ -2125,6 +2150,65 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
     interface->ReadMultinummeasures(element);
+    return true;
+}
+    
+    
+bool MeiInput::ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, Object *filter )
+{
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string( xmlElement.name() );
+        if ( !IsAllowed( elementName, filter ) ) {
+            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str() );
+            continue;
+        }
+        else if ( elementName == "rend" ) {
+            success = ReadMeiRend( parent, xmlElement );
+        }
+        else if ( elementName == "app" ) {
+            success = ReadMeiApp( parent, xmlElement, EDITORIAL_TEXT, filter);
+        }
+        else if ( elementName == "supplied" ) {
+            success = ReadMeiSupplied( parent, xmlElement, EDITORIAL_TEXT, filter );
+        }
+        else if ( xmlElement.text() ) {
+            success = ReadMeiText( parent, xmlElement );
+        }
+        // unknown
+        else {
+            LogDebug("Element %s ignored", xmlElement.name() );
+        }
+    }
+    
+    return success;
+}
+    
+bool MeiInput::ReadMeiRend( Object *parent, pugi::xml_node rend )
+{
+    Rend *vrvRend = new Rend();
+    
+    vrvRend->ReadCommon( rend );
+    vrvRend->ReadTypography( rend );
+    
+    AddTextElement(parent, vrvRend);
+    
+    return ReadMeiTextChildren(vrvRend, rend);
+}
+
+bool MeiInput::ReadMeiText( Object *parent, pugi::xml_node text )
+{
+    Text *vrvText = new Text();
+    
+    assert( text.text() );
+    vrvText->SetText(UTF8to16( text.text().as_string() ));
+
+    AddTextElement(parent, vrvText);
     return true;
 }
     
@@ -2316,6 +2400,9 @@ bool MeiInput::ReadMeiEditorialChildren( Object *parent, pugi::xml_node parentNo
     else if (level == EDITORIAL_LAYER) {
         return ReadMeiLayerChildren(parent, parentNode, filter);
     }
+    else if (level == EDITORIAL_TEXT) {
+        return ReadMeiTextChildren(parent, parentNode, filter);
+    }
     else {
         return false;
     }
@@ -2446,6 +2533,34 @@ void MeiInput::AddFloatingElement(Object *parent, FloatingElement *element)
         Measure *measure = dynamic_cast<Measure*>( parent );
         assert( measure );
         measure->AddFloatingElement( element );
+    }
+    else {
+        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
+        delete element;
+    }
+}
+    
+void MeiInput::AddTextElement(Object *parent, TextElement *element)
+{
+    if ( parent->IsEditorialElement() ) {
+        EditorialElement *editorialElement = dynamic_cast<EditorialElement*>( parent );
+        assert( editorialElement );
+        editorialElement->AddTextElement( element );
+    }
+    else if ( parent->Is() == SYL ) {
+        Syl *syl = dynamic_cast<Syl*>( parent );
+        assert( syl );
+        //syl->AddTextElement( element );
+    }
+    else if ( parent->Is() == TEMPO ) {
+        Tempo *tempo = dynamic_cast<Tempo*>( parent );
+        assert( tempo );
+        tempo->AddTextElement( element );
+    }
+    else if ( parent->Is() == REND ) {
+        Rend *rend = dynamic_cast<Rend*>( parent );
+        assert( rend );
+        rend->AddTextElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );

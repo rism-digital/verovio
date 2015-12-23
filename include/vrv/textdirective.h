@@ -14,6 +14,8 @@
 
 namespace vrv {
     
+class TextElement;
+    
 //----------------------------------------------------------------------------
 // Tempo
 //----------------------------------------------------------------------------
@@ -35,6 +37,12 @@ public:
     virtual std::string GetClassName( ) { return "Tempo"; };
     virtual ClassId Is() { return TEMPO; };
     ///@}
+    
+    /**
+     * Add an element (text, rend. etc.) to a tempo.
+     * Only supported elements will be actually added to the child list.
+     */
+    void AddTextElement(TextElement *element);
     
 protected:
     

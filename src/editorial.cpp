@@ -19,6 +19,7 @@
 #include "scoredef.h"
 #include "staff.h"
 #include "system.h"
+#include "textelement.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -61,6 +62,13 @@ void EditorialElement::AddFloatingElement( FloatingElement *child )
     m_children.push_back( child );
     Modify();
     
+}
+
+void EditorialElement::AddTextElement( TextElement *child )
+{
+    child->SetParent( this );
+    m_children.push_back( child );
+    Modify();
 }
 
 void EditorialElement::AddLayer( Layer *child )

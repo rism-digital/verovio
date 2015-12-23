@@ -25,6 +25,7 @@ class ScoreDef;
 class Staff;
 class StaffDef;
 class StaffGrp;
+class TextElement;
     
 enum VisibilityType {
     Hidden = 0,
@@ -62,6 +63,7 @@ public:
     ///@{
     void AddFloatingElement( FloatingElement *child );
     void AddLayerElement( LayerElement *child );
+    void AddTextElement( TextElement *child );
     void AddLayer( Layer *child );
     void AddMeasure( Measure *child );
     void AddScoreDef( ScoreDef *child );
