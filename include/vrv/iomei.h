@@ -353,7 +353,7 @@ private:
      */
     ///@{
     bool ReadMeiRend( Object *parent, pugi::xml_node rend );
-    bool ReadMeiText( Object *parent, pugi::xml_node text );
+    bool ReadMeiText( Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight );
     ///@}
   
     /**
@@ -437,6 +437,8 @@ private:
     DocType StrToDocType(std::string type);
     /** Extract the uuid for references to uuids with ..#uuid values */
     std::string ExtractUuidFragment(std::string refUuid);
+    std::wstring LeftTrim(std::wstring str);
+    std::wstring RightTrim(std::wstring str);
     ///@}
      
 public:

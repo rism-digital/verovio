@@ -141,11 +141,12 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
+	$VEROVIO_ROOT/src/text.cpp \
 	$VEROVIO_ROOT/src/textdirective.cpp \
 	$VEROVIO_ROOT/src/textdirinterface.cpp \
+	$VEROVIO_ROOT/src/textelement.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/timeinterface.cpp \
-	$VEROVIO_ROOT/src/trem.cpp \
 	$VEROVIO_ROOT/src/toolkit.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/verse.cpp \

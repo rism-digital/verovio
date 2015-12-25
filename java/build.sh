@@ -56,8 +56,10 @@ FILES="../src/accid.cpp \
              ../src/svgdevicecontext.cpp \
              ../src/syl.cpp \
              ../src/system.cpp \
+             ../src/text.cpp \
              ../src/textdirective.cpp \
              ../src/textdirinterface.cpp \
+             ../src/textelement.cpp \
              ../src/tie.cpp \
              ../src/timeinterface.cpp \
              ../src/trem.cpp \

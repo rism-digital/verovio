@@ -1027,7 +1027,7 @@ bool MeiInput::ImportFile( )
     try {
         m_doc->Reset( Raw );
         pugi::xml_document doc;
-        pugi::xml_parse_result result = doc.load_file( m_filename.c_str() );
+        pugi::xml_parse_result result = doc.load_file( m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol );
         if (!result)
         { 
             return false;
@@ -1046,7 +1046,7 @@ bool MeiInput::ImportString( const std::string mei )
     try {
         m_doc->Reset( Raw );
         pugi::xml_document doc;
-        doc.load( mei.c_str() );
+        doc.load( mei.c_str(), pugi::parse_default & ~pugi::parse_eol );
         pugi::xml_node root = doc.first_child();
         return ReadMei( root );
     }
@@ -2159,6 +2159,7 @@ bool MeiInput::ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, O
     bool success = true;
     pugi::xml_node xmlElement;
     std::string elementName;
+    int i = 0;
     for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ) {
         if (!success) {
             break;
@@ -2178,12 +2179,15 @@ bool MeiInput::ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, O
             success = ReadMeiSupplied( parent, xmlElement, EDITORIAL_TEXT, filter );
         }
         else if ( xmlElement.text() ) {
-            success = ReadMeiText( parent, xmlElement );
+            bool trimLeft = (i == 0);
+            bool trimRight = (!xmlElement.next_sibling());
+            success = ReadMeiText( parent, xmlElement, trimLeft, trimRight );
         }
         // unknown
         else {
             LogDebug("Element %s ignored", xmlElement.name() );
         }
+        i++;
     }
     
     return success;
@@ -2201,12 +2205,16 @@ bool MeiInput::ReadMeiRend( Object *parent, pugi::xml_node rend )
     return ReadMeiTextChildren(vrvRend, rend);
 }
 
-bool MeiInput::ReadMeiText( Object *parent, pugi::xml_node text )
+bool MeiInput::ReadMeiText( Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight )
 {
     Text *vrvText = new Text();
     
     assert( text.text() );
-    vrvText->SetText(UTF8to16( text.text().as_string() ));
+    std::wstring str = UTF8to16( text.text().as_string() );
+    if (trimLeft) str = this->LeftTrim( str );
+    if (trimRight) str = this->RightTrim( str );
+                                
+    vrvText->SetText( str );
 
     AddTextElement(parent, vrvText);
     return true;
@@ -2731,6 +2739,22 @@ std::string MeiInput::ExtractUuidFragment(std::string refUuid)
     }
     return refUuid;
 }
+    
+std::wstring MeiInput::LeftTrim(std::wstring str)
+{
+    std::wstring::size_type pos = 0;
+    while (pos < str.size() && iswspace(str[pos])) pos++;
+    str.erase(0, pos);
+    return str;
+}
 
+std::wstring MeiInput::RightTrim(std::wstring str)
+{
+    std::wstring::size_type pos = str.size();
+    while (pos > 0 && iswspace(str[pos - 1])) pos--;
+    str.erase(pos);
+    return str;
+}
+    
 } // namespace vrv
 
