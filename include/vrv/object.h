@@ -77,8 +77,8 @@ public:
     ///@}
     
     /**
-     * @name Methods for checking if an object is part of a group of classId.
-     * For example, all LayerElement child class classId is in between LAYER_ELEMENT and LAYER_ELEMENT_max.
+     * @name Methods for checking if an object is part of a group of classId's.
+     * For example, all LayerElement child class classId's are between LAYER_ELEMENT and LAYER_ELEMENT_max.
      * See classId enum.
      */
     ///@{
