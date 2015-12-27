@@ -96,6 +96,11 @@ public:
     virtual void EndText();
     
     /**
+     * Move a text to the specified position, for example when starting a new line.
+     */
+    virtual void MoveTextTo(int x, int y);
+    
+    /**
      * @name Method for starting and ending a graphic
      */
     ///@{
@@ -111,6 +116,15 @@ public:
     virtual void EndResumedGraphic( DocObject *object, View *view  );
     ///@}
     
+    
+    /**
+     * @name Method for starting and ending a text (<tspan>) text graphic.
+     */
+    ///@{
+    virtual void StartTextGraphic( DocObject *object, std::string gClass, std::string gId );
+    virtual void EndTextGraphic( DocObject *object, View *view  );
+    ///@}
+    
     /**
      * @name Method for starting and ending page
      */
@@ -120,12 +134,16 @@ public:
     ///@}
     
 private:
-    
     /**
      * Copy the content of a file to the output stream.
      * This is used for copying <defs> items.
      */
     bool CopyFileToStream(const std::string& filename, std::ostream& dest);
+    
+    /**
+     * Internal method for drawing debug SVG bounding box
+     */
+    void DrawSvgBoundingBox(DocObject *object, View *view);
     
     // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of the page
     // some viewer seem to support to have the <defs> at the end, but some do not (pdf2svg, for example)

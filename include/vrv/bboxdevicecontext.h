@@ -96,6 +96,11 @@ public:
     virtual void EndText();
     
     /**
+     * Move a text to the specified position, for example when starting a new line.
+     */
+    virtual void MoveTextTo(int x, int y);
+    
+    /**
      * @name Method for starting and ending a graphic
      */
     ///@{

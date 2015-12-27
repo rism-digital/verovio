@@ -28,11 +28,14 @@ class Layer;
 class LayerElement;
 class Measure;
 class Page;
+class Rend;
 class Slur;
 class Staff;
 class Syl;
 class System;
 class Tempo;
+class Text;
+class TextElement;
 class Tie;
 class Tuplet;
 class Verse;
@@ -174,6 +177,7 @@ protected:
     void DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system );
     void DrawStaffChildren( DeviceContext *dc, Object *parent, Staff *staff,  Measure *measure );
     void DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTextChildren( DeviceContext *dc, Object *parent, int x, int y, bool setX, bool setY  );
     ///@}
     
     /**
@@ -185,6 +189,7 @@ protected:
     void DrawMeasureEditorialElement( DeviceContext *dc, EditorialElement *element, Measure *measure, System *system );
     void DrawStaffEditorialElement( DeviceContext *dc, EditorialElement *element, Staff *staff,  Measure *measure );
     void DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure );
+    void DrawTextEditorialElement( DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY  );
     ///@}
     
     /** 
@@ -249,6 +254,26 @@ protected:
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
     ///@}
+    
+    /**
+     * @name Top level method for drawing TextElement.
+     * This can be called recursively for text elements containing other text elements.
+     * Defined in view_text.cpp
+     */
+    ///@{
+    void DrawTextElement( DeviceContext *dc, TextElement *element, int x, int y, bool setX, bool setY  );
+    ///@}
+    
+    /**
+     * @name Methods for drawing LayerElement child classes.
+     * They are base drawing methods that are called directly from DrawLayerElement
+     * Because some elements draw their children recursively (e.g., Note) they must all
+     * have the same parameters
+     * Defined in view_element.cpp
+     */
+    ///@{
+    void DrawRend( DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY );
+    void DrawText( DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY  );
     
     /**
      * @name Method for drawing Beam and FTrem.

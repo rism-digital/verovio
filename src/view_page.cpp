@@ -32,6 +32,7 @@
 #include "style.h"
 #include "system.h"
 #include "syl.h"
+#include "text.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -1092,6 +1093,26 @@ void View::DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, S
     }
 }
     
+void View::DrawTextChildren( DeviceContext *dc, Object *parent, int x, int y, bool setX, bool setY  )
+{
+    assert( dc );
+    assert( parent );
+    
+    Object* current;
+    for (current = parent->GetFirst( ); current; current = parent->GetNext( ) )
+    {
+        if (current->IsTextElement()) {
+            DrawTextElement( dc, dynamic_cast<TextElement*>(current), x, y, setX, setY );
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawLayerEditorialElement
+            DrawTextEditorialElement( dc , dynamic_cast<EditorialElement*>(current), x, y, setX, setY);
+        }
+        else {
+            assert(false);
+        }
+    }
+}    
 
 //----------------------------------------------------------------------------
 // View - Editorial
@@ -1151,6 +1172,20 @@ void View::DrawLayerEditorialElement( DeviceContext *dc, EditorialElement *eleme
         DrawLayerChildren(dc, element, layer, staff, measure);
     }
     dc->EndGraphic( element, this );
+}
+    
+void View::DrawTextEditorialElement( DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY  )
+{
+    assert( element );
+    if ( element->Is() == APP ) {
+        assert( dynamic_cast<App*>(element)->GetLevel() == EDITORIAL_TEXT );
+    }
+    
+    dc->StartTextGraphic( element, "", element->GetUuid());
+    if (element->m_visibility == Visible) {
+        DrawTextChildren(dc, element, x, y, setX, setY);
+    }
+    dc->EndTextGraphic( element, this );
 }
     
 } // namespace vrv

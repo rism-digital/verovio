@@ -117,6 +117,12 @@ public:
     virtual void EndText() = 0;
     
     /**
+     * Move a text to the specified position, for example when starting a new line.
+     * This method should be called only between a StartText and EndText call.
+     */
+    virtual void MoveTextTo(int x, int y) = 0;
+    
+    /**
      * @name Temporarily deactivate a graphic
      * This can be used for example for not taking into account the bounding box of parts of the graphic.
      * One example is the connectors in lyrics.
@@ -144,6 +150,15 @@ public:
     ///@{
     virtual void ResumeGraphic( DocObject *object, std::string gId ) = 0;
     virtual void EndResumedGraphic( DocObject *object, View *view  ) = 0;
+    ///@}    
+    
+    /**
+     * @name Method for starting and ending a text graphic when it needs to be different from a normal graphic.
+     * For example, in SVG, a text graphic is a <tspan> (and not a <g>)
+     */
+    ///@{
+    virtual void StartTextGraphic( DocObject *object, std::string gClass, std::string gId ) { StartGraphic(object, gClass, gId); }
+    virtual void EndTextGraphic( DocObject *object, View *view  ) { EndGraphic(object, view); }
     ///@}
  
     /**

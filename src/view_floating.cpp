@@ -1066,7 +1066,7 @@ void View::DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System 
         dc->SetFont( &tempoTxt );
         
         dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), LEFT );
-        dc->DrawText( UTF16to8( tempo->GetText().c_str() ), tempo->GetText() );
+        DrawTextChildren(dc, tempo, x, y, false, false);
         dc->EndText( );
         
         dc->ResetFont();

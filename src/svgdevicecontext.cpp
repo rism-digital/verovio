@@ -148,9 +148,6 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
 
 void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std::string gId )
 {
-    //Pen currentPen = m_penStack.top();
-    //Brush currentBrush = m_brushStack.top();
-    
     std::string baseClass = object->GetClassName();
     std::transform( baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower );
     if (gClass.length() > 0) {
@@ -164,6 +161,20 @@ void SvgDeviceContext::StartGraphic( DocObject *object, std::string gClass, std:
     //m_currentNode.append_attribute( "style" ) = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;", GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
 }
     
+void SvgDeviceContext::StartTextGraphic( DocObject *object, std::string gClass, std::string gId )
+{
+    std::string baseClass = object->GetClassName();
+    std::transform( baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower );
+    if (gClass.length() > 0) {
+        baseClass.append(" " + gClass);
+    }
+    
+    m_currentNode = m_currentNode.append_child("tspan");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute( "class" ) = baseClass.c_str();
+    m_currentNode.append_attribute( "id" ) = gId.c_str();
+}
+    
 void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
 {
     std::string xpath = "//g[@id=\"" + gId + "\"]";
@@ -173,51 +184,22 @@ void SvgDeviceContext::ResumeGraphic( DocObject *object, std::string gId )
     }
     m_svgNodeStack.push_back(m_currentNode);
 }
-  
-      
+    
 void SvgDeviceContext::EndGraphic(DocObject *object, View *view ) 
 {
- 
-    bool drawBoundingBox = false;
-    if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
-    {
-        SetPen( AxRED, 10, AxDOT_DASH );
-        SetBrush( AxWHITE, AxTRANSPARENT );
-        StartGraphic( object, "self-bounding-box", "0");
-        if ( object->HasSelfBB() ) {
-            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
-                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ),
-                                view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x2 ) -
-                                view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
-                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y2 ) -
-                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ));
-        }
-        
-        EndGraphic( object, NULL );
-        
-        SetPen( AxBLUE, 10, AxDOT_DASH );
-        StartGraphic( object, "content-bounding-box", "0");
-        if ( object->HasContentBB() ) {
-            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
-                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ),
-                                view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x2 ) -
-                                view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
-                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y2 ) -
-                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ));
-            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() ), view->ToDeviceContextY( object->GetDrawingY() ), 5, 300);
-        }
-        EndGraphic( object, NULL );
-        
-        SetPen( AxBLACK, 1, AxSOLID);
-        SetBrush(AxBLACK, AxSOLID);
-   
-    }
-
+    DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
     
 void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view )
+{
+    DrawSvgBoundingBox(object, view);
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
+    
+void SvgDeviceContext::EndTextGraphic(DocObject *object, View *view )
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
@@ -486,6 +468,12 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     m_currentNode.append_attribute("font-size") = StringFormat("0px").c_str();
 }
     
+void SvgDeviceContext::MoveTextTo(int x, int y)
+{
+    m_currentNode.append_attribute( "x" ) = x;
+    m_currentNode.append_attribute( "y" ) = y;
+}
+    
 void SvgDeviceContext::EndText()
 {
     m_svgNodeStack.pop_back();
@@ -519,6 +507,7 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
             textChild.append_attribute("font-weight") = "bold";
         }
     }
+    textChild.append_attribute("class") = "text";
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 
@@ -616,6 +605,43 @@ std::string SvgDeviceContext::GetStringSVG( bool xml_declaration )
         Commit( xml_declaration );
     
     return m_outdata.str();
+}
+    
+void SvgDeviceContext::DrawSvgBoundingBox(DocObject *object, View *view)
+{
+    bool drawBoundingBox = false;
+    if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
+    {
+        SetPen( AxRED, 10, AxDOT_DASH );
+        SetBrush( AxWHITE, AxTRANSPARENT );
+        StartGraphic( object, "self-bounding-box", "0");
+        if ( object->HasSelfBB() ) {
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ),
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x2 ) -
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_selfBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y2 ) -
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_selfBB_y1 ));
+        }
+        
+        EndGraphic( object, NULL );
+        
+        SetPen( AxBLUE, 10, AxDOT_DASH );
+        StartGraphic( object, "content-bounding-box", "0");
+        if ( object->HasContentBB() ) {
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ),
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x2 ) -
+                                view->ToDeviceContextX( object->GetDrawingX() + object->m_contentBB_x1 ),
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y2 ) -
+                                view->ToDeviceContextY( object->GetDrawingY() + object->m_contentBB_y1 ));
+            this->DrawRectangle( view->ToDeviceContextX( object->GetDrawingX() ), view->ToDeviceContextY( object->GetDrawingY() ), 5, 300);
+        }
+        EndGraphic( object, NULL );
+        
+        SetPen( AxBLACK, 1, AxSOLID);
+        SetBrush(AxBLACK, AxSOLID);
+    }
 }
 
 } // namespace vrv

@@ -300,6 +300,13 @@ void BBoxDeviceContext::EndText()
 {
     m_drawingText = false;
 }
+    
+void BBoxDeviceContext::MoveTextTo(int x, int y)
+{
+    assert( m_drawingText );
+    m_textX = x;
+    m_textY = y;
+}
         
 void BBoxDeviceContext::DrawText(const std::string& text, const std::wstring wtext)
 {
