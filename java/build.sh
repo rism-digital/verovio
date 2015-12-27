@@ -73,6 +73,7 @@ FILES="../src/accid.cpp \
              ../src/view_graph.cpp \
              ../src/view_mensural.cpp \
              ../src/view_page.cpp \
+             ../src/view_text.cpp \
              ../src/view_tuplet.cpp \
              ../src/vrv.cpp \
              ../src/pugixml.cpp \

@@ -177,7 +177,7 @@ protected:
     void DrawMeasureChildren( DeviceContext *dc, Object *parent, Measure *measure, System *system );
     void DrawStaffChildren( DeviceContext *dc, Object *parent, Staff *staff,  Measure *measure );
     void DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, Staff *staff, Measure *measure );
-    void DrawTextChildren( DeviceContext *dc, Object *parent, int x, int y, bool setX, bool setY  );
+    void DrawTextChildren( DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY  );
     ///@}
     
     /**
@@ -261,7 +261,7 @@ protected:
      * Defined in view_text.cpp
      */
     ///@{
-    void DrawTextElement( DeviceContext *dc, TextElement *element, int x, int y, bool setX, bool setY  );
+    void DrawTextElement( DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY );
     ///@}
     
     /**
@@ -273,7 +273,7 @@ protected:
      */
     ///@{
     void DrawRend( DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY );
-    void DrawText( DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY  );
+    void DrawText( DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY );
     
     /**
      * @name Method for drawing Beam and FTrem.

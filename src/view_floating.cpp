@@ -1049,6 +1049,9 @@ void View::DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System 
         x += pos->GetXRel();
     }
     
+    bool setX = false;
+    bool setY = false;
+    
     std::vector<int>::iterator iter;
     std::vector<int> staffList = tempo->GetStaff();
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
@@ -1066,7 +1069,7 @@ void View::DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System 
         dc->SetFont( &tempoTxt );
         
         dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), LEFT );
-        DrawTextChildren(dc, tempo, x, y, false, false);
+        DrawTextChildren(dc, tempo, x, y, setX, setY);
         dc->EndText( );
         
         dc->ResetFont();

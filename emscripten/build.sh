@@ -157,6 +157,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_graph.cpp \
 	$VEROVIO_ROOT/src/view_mensural.cpp \
 	$VEROVIO_ROOT/src/view_page.cpp \
+	$VEROVIO_ROOT/src/view_text.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
 	$VEROVIO_ROOT/src/pugixml.cpp \

@@ -28,7 +28,7 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
     
-void View::DrawTextElement( DeviceContext *dc, TextElement *element, int x, int y, bool setX, bool setY )
+void View::DrawTextElement( DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY )
 {
     assert( dc );
     assert( element );

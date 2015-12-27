@@ -1093,7 +1093,7 @@ void View::DrawLayerChildren( DeviceContext *dc, Object *parent, Layer *layer, S
     }
 }
     
-void View::DrawTextChildren( DeviceContext *dc, Object *parent, int x, int y, bool setX, bool setY  )
+void View::DrawTextChildren( DeviceContext *dc, Object *parent, int x, int y, bool &setX, bool &setY  )
 {
     assert( dc );
     assert( parent );
