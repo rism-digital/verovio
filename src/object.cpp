@@ -371,14 +371,16 @@ void Object::FillFlatList( ListOfObjects *flatList )
     params.push_back ( &flatList );
     this->Process( &addToFlatList, &params );
 
-    /* // For debuging
+#ifdef DBG_FLATLIST
+    // For debuging
     ListOfObjects::iterator iter;
-    for (iter = list->begin(); iter != list->end(); ++iter)
+    LogDebug( "Object::FillFlatList:" );
+    for (iter = flatList->begin(); iter != flatList->end(); ++iter)
     {
         Object *current = *iter;
-        LogDebug("%s", current->GetClassName().c_str() );
+        LogDebug("  %s", current->GetClassName().c_str() );
     }
-    */
+#endif
 }
 
 void Object::AddSameAs( std::string id, std::string filename )
@@ -930,8 +932,8 @@ int Object::SetCurrentScoreDef( ArrayPtrVoid *params )
         Layer *layer = dynamic_cast<Layer*>(this);
         assert( layer );
         // setting the layer stem direction. Alternatively, this could be done in
-        // View::DrawLayer. If this (and other things) is kept here, renaming the method to something more
-        // generic (PrepareDrawing?) might be a good idea...
+        // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
+        // more generic (PrepareDrawing?) might be a good idea...
         if (layer->m_parent->GetChildCount() > 1) {
             if (layer->m_parent->GetChildIndex(layer)==0) {
                 layer->SetDrawingStemDir(STEMDIRECTION_up);
@@ -1048,6 +1050,40 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 }
 
 
+// ??? THIS SHOULD BE SOMEWHERE WHERE IT CAN BE USED BOTH HERE & IN view_element (AT LEAST)!!!
+
+void ElementTypeStringZ(LayerElement *element, char *str)
+{
+    if (element->Is() == ACCID) { strcpy(str, "ACCID"); }
+    else if (element->Is() == BARLINE) { strcpy(str, "BARLINE"); }
+    else if (element->Is() == BEAM) { strcpy(str, "BEAM"); }
+    else if (element->Is() == BEATRPT) { strcpy(str, "BEATRPT"); }
+    else if (element->Is() == CHORD) { strcpy(str, "CHORD"); }
+    else if (element->Is() == CLEF) { strcpy(str, "CLEF"); }
+    else if (element->Is() == CUSTOS) { strcpy(str, "CUSTOS"); }
+    else if (element->Is() == DOT) { strcpy(str, "DOT"); }
+    else if (element->Is() == KEYSIG) { strcpy(str, "KEYSIG"); }
+    else if (element->Is() == MENSUR) { strcpy(str, "MENSUR"); }
+    else if (element->Is() == METERSIG) { strcpy(str, "METERSIG"); }
+    else if (element->Is() == MREST) { strcpy(str, "MREST"); }
+    else if (element->Is() == MRPT) { strcpy(str, "MRPT"); }
+    else if (element->Is() == MRPT2) { strcpy(str, "MRPT2"); }
+    else if (element->Is() == MULTIREST) { strcpy(str, "MULTIREST"); }
+    else if (element->Is() == MULTIRPT) { strcpy(str, "MULTIRPT"); }
+    else if (element->Is() == NOTE) { strcpy(str, "NOTE"); }
+    else if (element->Is() == PROPORT) { strcpy(str, "PROPORT"); }
+    else if (element->Is() == REST) { strcpy(str, "REST"); }
+    else if (element->Is() == SPACE) { strcpy(str, "SPACE"); }
+    else if (element->Is() == SYL) { strcpy(str, "SYL"); }
+    else if (element->Is() == TUPLET) { strcpy(str, "TUPLET"); }
+    else if (element->Is() == VERSE) { strcpy(str, "VERSE"); }
+    else {
+        // This should never happen
+        strcpy(str, "** UNKNOWN **");
+    }
+}
+    
+
 int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimum position (i.e., the width of the previous element)
@@ -1102,13 +1138,14 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     assert( current->GetAlignment() );
     
     if ( !current->HasToBeAligned() ) {
-        // if nothing to do with this type of account
+        // if nothing to do with this type of element
         return FUNCTOR_CONTINUE;
     }
     
     if ( !current->HasUpdatedBB() ) {
         // if nothing was drawn, do not take it into account
-        assert( false ); // quite drastic but this should never happen. If nothing has to be drawn then the BB should be set to empty with DocObject::SetEmptyBB()
+        assert( false ); // quite drastic but this should never happen. If nothing has to be drawn
+                         // then the BB should be set to empty with DocObject::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
     
@@ -1120,7 +1157,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         return FUNCTOR_CONTINUE;
     }
     
-    // the negative offset it the part of the bounding box that overflows on the left
+    // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = - (current->m_contentBB_x1);
@@ -1129,7 +1166,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if ( negative_offset < 0 ) negative_offset = 0;
 
-    // with a grace note, also take into account the full with of the group given by the GraceAligner
+    // with a grace note, also take into account the full width of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {
         negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
     }
@@ -1148,7 +1185,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         current->GetAlignment()->SetXShift( overlap );
     }
     
-    // do not ajust the min pos and the max width since this is already handled by
+    // do not adjust the min pos and the max width since this is already handled by
     // the GraceAligner
     if ( current->IsGraceNote() ) {
         (*min_pos) = current->GetAlignment()->GetXRel();
@@ -1156,10 +1193,14 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         return FUNCTOR_CONTINUE;
     }
 
-    // the next minimal position if given by the right side of the bounding box + the spacing of the element
+    // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = current->m_contentBB_x2;
     if (!current->HasEmptyBB()) width += doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     (*min_pos) = current->GetAlignment()->GetXRel() + width;
+    char str[40];
+    ElementTypeStringZ( current, str );
+    LogDebug("SetBoundingBoxXShift: type='%s' Alignment=%d width=%d (*min_pos)=%d", str,
+             current->GetAlignment(), width, (*min_pos));
     current->GetAlignment()->SetMaxWidth( width );
     
     return FUNCTOR_CONTINUE;
@@ -1229,10 +1270,10 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
     Staff *current = dynamic_cast<Staff*>(this);
     assert( current );
     
-    // at this stage we assume we have instanciated the alignment pointer
+    // at this stage we assume we have instantiated the alignment pointer
     assert( current->GetAlignment() );
     
-    // This is the value that need to be removed to fit everything
+    // This is the value that needs to be removed to fit everything
     int negative_offset = - current->m_contentBB_y2;
     
     // this will probably never happen
@@ -1240,7 +1281,7 @@ int Object::SetBoundingBoxYShift( ArrayPtrVoid *params )
         negative_offset = 0;
     }
     
-    // check if the staff overlaps with the preceeding one given by (*min_pos)
+    // check if the staff overlaps with the preceding one given by (*min_pos)
     int overlap = 0;
     if ( (current->GetAlignment()->GetYRel() - negative_offset) > (*min_pos) ) {
         overlap = (*min_pos) - current->GetAlignment()->GetYRel() + negative_offset;

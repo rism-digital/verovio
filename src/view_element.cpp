@@ -46,6 +46,38 @@
 #include "vrv.h"
 
 namespace vrv {
+    
+void ElementTypeString(LayerElement *element, char *str)
+{
+    if (element->Is() == ACCID) { strcpy(str, "ACCID"); }
+    else if (element->Is() == BARLINE) { strcpy(str, "BARLINE"); }
+    else if (element->Is() == BEAM) { strcpy(str, "BEAM"); }
+    else if (element->Is() == BEATRPT) { strcpy(str, "BEATRPT"); }
+    else if (element->Is() == CHORD) { strcpy(str, "CHORD"); }
+    else if (element->Is() == CLEF) { strcpy(str, "CLEF"); }
+    else if (element->Is() == CUSTOS) { strcpy(str, "CUSTOS"); }
+    else if (element->Is() == DOT) { strcpy(str, "DOT"); }
+    else if (element->Is() == KEYSIG) { strcpy(str, "KEYSIG"); }
+    else if (element->Is() == MENSUR) { strcpy(str, "MENSUR"); }
+    else if (element->Is() == METERSIG) { strcpy(str, "METERSIG"); }
+    else if (element->Is() == MREST) { strcpy(str, "MREST"); }
+    else if (element->Is() == MRPT) { strcpy(str, "MRPT"); }
+    else if (element->Is() == MRPT2) { strcpy(str, "MRPT2"); }
+    else if (element->Is() == MULTIREST) { strcpy(str, "MULTIREST"); }
+    else if (element->Is() == MULTIRPT) { strcpy(str, "MULTIRPT"); }
+    else if (element->Is() == NOTE) { strcpy(str, "NOTE"); }
+    else if (element->Is() == PROPORT) { strcpy(str, "PROPORT"); }
+    else if (element->Is() == REST) { strcpy(str, "REST"); }
+    else if (element->Is() == SPACE) { strcpy(str, "SPACE"); }
+    else if (element->Is() == SYL) { strcpy(str, "SYL"); }
+    else if (element->Is() == TUPLET) { strcpy(str, "TUPLET"); }
+    else if (element->Is() == VERSE) { strcpy(str, "VERSE"); }
+    else {
+        // This should never happen
+        strcpy(str, "** UNKNOWN **");
+    }
+}
+
 
 //----------------------------------------------------------------------------
 // View - LayerElement
@@ -68,6 +100,10 @@ void View::DrawLayerElement( DeviceContext *dc, LayerElement *element, Layer *la
         m_currentColour = AxBLACK;
     }
 
+    char str[32];
+    int drawX = element->GetDrawingX();
+    ElementTypeString(element, str);
+    LogDebug("DrawLayerElement: type='%s' DrawingX=%d", str, drawX);
     if (element->Is() == ACCID) {
         DrawAccid(dc, element, layer, staff, measure);
     }
@@ -271,6 +307,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     /************** Stem/notehead direction: **************/
     
+    //LogDebug("DrawNote3: xStem=%d", xStem);
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
     if (!note->HasDrawingStemDir()) {
         if ( layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
@@ -335,6 +372,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     /************** Noteheads: **************/
     
+    LogDebug("DrawNote: DrawingX=%d xNote=%d", element->GetDrawingX(), xNote);
     if (drawingDur < DUR_1) {
         DrawMaximaToBrevis( dc, noteY, element, layer, staff);
     }
@@ -1319,12 +1357,12 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // FIXME
             sym = SMUFL_E05C_cClef;
             break;
-		default: 
+		default:
             break;
 	}
 
 
-    LogDebug("sym=%d cClefPet=%d cClef=%d\n", sym, SMUFL_E909_mensuralCclefPetrucciPosMiddle, SMUFL_E05C_cClef);
+    LogDebug("sym=%d cClefPet=%d cClef=%d", sym, SMUFL_E909_mensuralCclefPetrucciPosMiddle, SMUFL_E05C_cClef);
     bool cueSize = false;
     // force cue size for intermediate clefs
     if (clef->GetFirstParent( LAYER )) cueSize = true;

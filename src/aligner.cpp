@@ -397,12 +397,14 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
-    // param 2: the minimum measure with
+    // param 2: the minimum measure width
     // param 3: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int*>((*params).at(0));
     int *justifiable_shift = static_cast<int*>((*params).at(1));
     int *minMeasureWidth = static_cast<int*>((*params).at(2));
     
+    LogDebug( "IntegrateBoundingBoxXShift: *shift=%d", *shift );
+
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
     // cumulate the shift value and the width
@@ -437,8 +439,7 @@ int MeasureAligner::SetAlignmentXPos( ArrayPtrVoid *params )
     // param 0: the previous time position
     // param 1: the previous x rel position
     // param 2: duration of the longest note (unused)
-    // param 3: the doc (unused)
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
     
@@ -446,6 +447,7 @@ int MeasureAligner::SetAlignmentXPos( ArrayPtrVoid *params )
     // Reset the previous time position and x_rel to 0;
     (*previousTime) = 0.0;
     (*previousXRel) = 0;
+    
     return FUNCTOR_CONTINUE;
 }
 
@@ -456,22 +458,23 @@ will be increased as necessary later to avoid that. For modern notation (CMN), i
 is a function of time interval.
  
 For a discussion of the way engravers determine spacing, see Elaine Gould, _Behind Bars_, 
-p. 39. But we need something more flexible, because for example (1) we're interested in
+p. 39. But we need something more flexible, because, for example: (1) We're interested in
 music with notes of very long duration: say, music in mensural notation containing longas
 or maximas; such music is usually not spaced by duration, but we support spacing by
-duration if the user wishes, and standard engravers' rules would waste a lot of space; and
-(2) for some purposes, spacing strictly propoortional to duration is desirable. The most
+duration if the user wishes, and standard engravers' rules would waste a lot of space.
+(2) For some purposes, spacing strictly propoortional to duration is desirable. The most
 flexible solution might be to get ideal spacing from a user-definable table, but using a
- formula with parameters can come close and has other advantages. */
- 
+formula with parameters can come close and has other advantages. */
+
 int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear,
                                           double spacingNonLinear)
 {
-    /* If the longest duration interval in the score is longer than semibreve, adjust spacing
-       so that interval gets the space a semibreve would ordinarily get. (maxActualDur is in
-       our internal code format: cf. attdef.h). */
-    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
-    int intervalXRel = pow( intervalTime, spacingNonLinear ) * spacingLinear * 8.0;
+    /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
+       that interval gets the space a semibreve would ordinarily get. (maxActualDur is in our
+       internal code format: cf. attdef.h). ??TO BE DONE */
+    if (maxActualDur<DUR_1) intervalTime /= pow( 2.0, DUR_1-maxActualDur);
+    int intervalXRel;
+    intervalXRel = pow( intervalTime, 0.50 ) * 3.8;     // numbers are experimental constants
     return intervalXRel;
 }
 
@@ -480,18 +483,16 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     // param 0: the previous time position
     // param 1: the previous x rel position
     // param 2: duration of the longest note
-    // param 3: the doc (unused)
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     double *previousTime = static_cast<double*>((*params).at(0));
     int *previousXRel = static_cast<int*>((*params).at(1));
     int *maxActualDur = static_cast<int*>((*params).at(2));
-    Doc *doc = static_cast<Doc*>((*params).at(3));
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
     if ( intervalTime > 0.0 ) {
-        intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
-        //LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+        intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur, 99, 99);
+        LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
     m_xRel = (*previousXRel) + (intervalXRel) * DEFINITON_FACTOR;
     (*previousTime) = m_time;

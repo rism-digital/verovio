@@ -43,6 +43,7 @@ enum AlignmentType {
     ALIGNMENT_CONTAINER,
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
+    ALIGNMENT_ACCID,
     ALIGNMENT_DEFAULT,
     ALIGNMENT_MEASURE_END
 };
@@ -226,6 +227,10 @@ public:
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
     
 
+#ifdef NOTYET
+    virtual int ConsiderSubdivision(int actualDur, Mensur mensur);
+#endif
+    
     virtual int HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
 
     /**
