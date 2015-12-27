@@ -306,7 +306,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
                 system->SetDrawingLabelsWidth( w + space );
             }
         
-            dc->StartText( ToDeviceContextX( x_label ), ToDeviceContextY( y_label ), RIGHT );
+            dc->StartText( m_doc->GetDrawingLyricFont(100)->GetPointSize(), ToDeviceContextX( x_label ), ToDeviceContextY( y_label ), RIGHT );
             dc->DrawText( label );
             dc->EndText( );
             
@@ -404,7 +404,7 @@ void View::DrawStaffDefLabels( DeviceContext *dc, Measure *measure, ScoreDef *sc
         dc->GetTextExtent( label, &w, &h);
         system->SetDrawingLabelsWidth( w + space );
         
-        dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
+        dc->StartText( m_doc->GetDrawingLyricFont(100)->GetPointSize(), ToDeviceContextX( x ), ToDeviceContextY( y ), RIGHT );
         dc->DrawText( label );
         dc->EndText( );
         

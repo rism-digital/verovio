@@ -52,7 +52,20 @@ void View::DrawRend( DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bo
     
     dc->StartTextGraphic( rend, "", rend->GetUuid());
     
+    FontInfo rendFont;
+    bool customFont = false;
+    if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
+        customFont = true;
+        if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
+        if (rend->HasFontsize()) rendFont.SetPointSize(rend->GetFontsize());
+        if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
+        if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
+    }
+    if (customFont) dc->SetFont(&rendFont);
+    
     DrawTextChildren( dc, rend, x, y, setX, setY);
+    
+    if (customFont) dc->ResetFont();
     
     dc->EndTextGraphic( rend, this );
     

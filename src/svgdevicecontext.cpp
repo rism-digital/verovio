@@ -442,7 +442,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     //rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empty rectangles with bounding boxes
 }
 
-void SvgDeviceContext::StartText(int x, int y, char alignement)
+void SvgDeviceContext::StartText(int pointSize, int x, int y, char alignement)
 {
     std::string s;
     std::string anchor;
@@ -463,9 +463,8 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     if ( !anchor.empty() ) {
         m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
     }
-    // font-size seems to be required in <text> in FireFox - however, we set it to 0px because otherwise we
-    // end up with spaces between tspan because of the linebreaks in the SVG. Needs to be investigated
-    m_currentNode.append_attribute("font-size") = StringFormat("0px").c_str();
+    // font-size seems to be required in <text> in FireFox
+    m_currentNode.append_attribute("font-size") = StringFormat("%dpx", pointSize).c_str();
 }
     
 void SvgDeviceContext::MoveTextTo(int x, int y)
@@ -487,6 +486,7 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
     pugi::xml_node textChild = m_currentNode.append_child( "tspan" );
     if ( !m_fontStack.top()->GetFaceName().empty() ) {
         textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
+        if (m_fontStack.top()->GetFaceName() == "VerovioText") this->VrvTextFont();
     }
     if ( m_fontStack.top()->GetPointSize() != 0 ) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize() ).c_str();

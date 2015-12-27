@@ -175,7 +175,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 {
     assert( dc );
     
-    dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
+    dc->StartText( m_doc->GetDrawingLyricFont(staffSize)->GetPointSize(), ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
     std::wistringstream iss( s );
     std::wstring token;
@@ -188,10 +188,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         
         FontInfo vrvTxt;
         vrvTxt.SetFaceName("VerovioText");
-        vrvTxt.SetPointSize( m_doc->GetDrawingLyricFont(staffSize)->GetPointSize() );
-        
         dc->SetFont( &vrvTxt );
-        dc->VrvTextFont();
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
         dc->DrawText( UTF16to8( str.c_str() ), str );

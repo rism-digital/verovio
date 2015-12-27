@@ -113,7 +113,7 @@ public:
      * Font can be changed between called for DrawText
      */
     ///@{
-    virtual void StartText(int x, int y, char alignement = LEFT ) = 0;
+    virtual void StartText( int pointSize, int x, int y, char alignement = LEFT ) = 0;
     virtual void EndText() = 0;
     
     /**

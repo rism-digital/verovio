@@ -1068,7 +1068,7 @@ void View::DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System 
         dc->SetBrush( m_currentColour, AxSOLID );
         dc->SetFont( &tempoTxt );
         
-        dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ), LEFT );
+        dc->StartText( tempoTxt.GetPointSize(), ToDeviceContextX( x ), ToDeviceContextY( y ), LEFT );
         DrawTextChildren(dc, tempo, x, y, setX, setY);
         dc->EndText( );
         
