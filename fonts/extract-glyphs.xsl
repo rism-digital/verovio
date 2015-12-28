@@ -34,7 +34,7 @@
 
             <!-- redirect to a file for each glyph -->
             <xsl:result-document href="../data/{$fontName}/{$glyphCode}-{$smuflName}.xml">
-                <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit" horiz-adv-x="{$horiz-adv-x}">
+                <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit">
                     <g transform="scale(1,-1)">
                         <path>
                             <xsl:copy-of select="@d"/>
