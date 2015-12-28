@@ -180,20 +180,9 @@ public:
     virtual bool GetDrawBoundingBoxes() {return m_drawingBoundingBoxes;};
     ///@}
     
-    /**
-     * Change the flag for indicating the use of the VerovioText font
-     */
-    void VrvTextFont() { m_vrvTextFont = true; };
-    
 protected:
     
     bool m_drawingBoundingBoxes;
-    /**
-     * Flag for indicating if the VerovioText font is currently used.
-     * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in DeviceContext::VrvTextFont
-     */
-    bool m_vrvTextFont;
-    
     
     std::stack<Pen> m_penStack;
     std::stack<Brush> m_brushStack;

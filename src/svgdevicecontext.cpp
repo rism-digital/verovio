@@ -55,6 +55,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height):
     m_smufl_glyphs.clear();
     
     m_committed = false;
+    m_vrvTextFont = false;
     
     //create the initial SVG element
     //width and height need to be set later; these are taken care of in "commit"
@@ -486,6 +487,7 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
     pugi::xml_node textChild = m_currentNode.append_child( "tspan" );
     if ( !m_fontStack.top()->GetFaceName().empty() ) {
         textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
+        // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
         if (m_fontStack.top()->GetFaceName() == "VerovioText") this->VrvTextFont();
     }
     if ( m_fontStack.top()->GetPointSize() != 0 ) {

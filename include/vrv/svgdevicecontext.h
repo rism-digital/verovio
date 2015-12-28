@@ -145,6 +145,31 @@ private:
      */
     void DrawSvgBoundingBox(DocObject *object, View *view);
     
+    
+    /**
+     * Change the flag for indicating the use of the VerovioText font
+     */
+    void VrvTextFont() { m_vrvTextFont = true; };
+    
+    /**
+     * Flush the data to the internal buffer.
+     * Adds the xml tag if necessary and the <defs> from m_smufl_glyphs
+     */
+    void Commit( bool xml_declaration );
+    
+    void WriteLine( std::string );
+    
+    std::string GetColour( int colour );
+    
+public:
+    
+private:
+    /**
+     * Flag for indicating if the VerovioText font is currently used.
+     * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in DeviceContext::VrvTextFont
+     */
+    bool m_vrvTextFont;
+    
     // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of the page
     // some viewer seem to support to have the <defs> at the end, but some do not (pdf2svg, for example)
     // for this reason, the full svg is finally written a string from the destructor or when Flush() is called
@@ -159,22 +184,11 @@ private:
     // they will be added at the end of the file as <defs>
     std::vector<std::string> m_smufl_glyphs;
     
-    /**
-     * Flush the data to the internal buffer.
-     * Adds the xml tag if necessary and the <defs> from m_smufl_glyphs
-     */
-    void Commit( bool xml_declaration );
-    
-    void WriteLine( std::string );
-    
-    std::string GetColour( int colour );
-    
     //pugixml data
     pugi::xml_document m_svgDoc;
     pugi::xml_node m_svgNode;
     pugi::xml_node m_currentNode;
     std::list<pugi::xml_node> m_svgNodeStack;
-    
 };
 
 } // namespace vrv
