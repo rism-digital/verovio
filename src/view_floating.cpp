@@ -942,7 +942,7 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ( spanningType ==  SPANNING_START_END ) {
         dc->SetFont( m_doc->GetDrawingLyricFont( staff->m_drawingStaffSize ) );
-        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->GetTextExtent(syl->GetText(syl), &w, &h);
         dc->ResetFont();
         // x position of the syl is two units back
         x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
@@ -950,7 +950,7 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else  if ( spanningType ==  SPANNING_START) {
         dc->SetFont( m_doc->GetDrawingLyricFont( staff->m_drawingStaffSize ) );
-        dc->GetTextExtent(syl->GetText(), &w, &h);
+        dc->GetTextExtent(syl->GetText(syl), &w, &h);
         dc->ResetFont();
         // idem
         x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;

@@ -1339,7 +1339,16 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         dc->SetFont( m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize) );
     }
     
-    DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText().c_str(), staff->m_drawingStaffSize );
+    bool setX = false;
+    bool setY = false;
+    int x = syl->GetDrawingX();
+    int y = syl->GetDrawingY();
+    
+    dc->StartText( m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize)->GetPointSize(),
+                  ToDeviceContextX( x ), ToDeviceContextY( y ) );
+    DrawTextChildren(dc, syl, ToDeviceContextX( x ), ToDeviceContextY( y ), setX, setY);
+    dc->EndText();
+    //DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText(syl).c_str(), staff->m_drawingStaffSize );
     
     dc->ResetFont();
     dc->ResetBrush();

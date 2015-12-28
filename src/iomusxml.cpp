@@ -29,6 +29,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "text.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -792,7 +793,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 syl->SetWordpos(sylLog_WORDPOS_t);
             }
             
-            syl->SetText(UTF8to16(textStr.c_str()));
+            Text *text = new Text();
+            text->SetText(UTF8to16(textStr.c_str()));
+            syl->AddTextElement(text);
             verse->AddLayerElement(syl);
             note->AddLayerElement(verse);
         }

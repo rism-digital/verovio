@@ -115,6 +115,9 @@ void DeviceContext::GetTextExtent( const std::wstring& string, int *w, int *h )
         wchar_t c = string[i];
         Glyph *glyph = Resources::GetTextGlyph(c);
         if (!glyph) {
+            glyph = Resources::GetGlyph(c);
+        }
+        if (!glyph) {
             glyph = unkown;
         }
         glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);

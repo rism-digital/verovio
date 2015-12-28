@@ -292,16 +292,6 @@ public:
     bool GetSameAs( std::string *id, std::string *filename, int idx = 0 );
     
     /**
-     * @name Set and get the text content.
-     * The text content is a std::wstring that needs to be converted to UTF16.
-     * See MeiInput::ReadText and MeiInput ::WriteText
-     */
-    ///@{
-    void SetText( std::wstring text ) { m_text = text; };
-    std::wstring GetText() const { return m_text; };
-    ///@}
-    
-    /**
      * Check if the content was modified or not
      */
     bool IsModified( ) { return m_isModified; };
@@ -669,7 +659,6 @@ public:
 protected:
     std::string m_uuid;
     std::string m_classid;
-    std::wstring m_text;
 
 private:
     
@@ -829,6 +818,43 @@ public:
      * As for GetList, we need to pass the object.
      */
     void ResetList( Object *node );
+};
+    
+//----------------------------------------------------------------------------
+// TextListInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an pseudo interface for elements maintaining a flat list of
+ * children LayerElement for processing.
+ * The list is a flatten list of pointers to children elements.
+ * It is not an abstract class but should not be instanciate directly.
+ */
+class TextListInterface: public ObjectListInterface
+{
+public:
+    // constructors and destructors
+    TextListInterface() {};
+    virtual ~TextListInterface() {};
+    
+    /**
+     * Returns a contatenated version of all the text children
+     */
+    std::wstring GetText( Object *node );
+    
+protected:
+    /**
+     * Filter the list for a specific class.
+     * For example, keep only notes in Beam
+     */
+    virtual void FilterList( ListOfObjects *childList );
+    
+private:
+    
+public:
+    
+private:
+    
 };
 
 //----------------------------------------------------------------------------

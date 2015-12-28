@@ -813,7 +813,6 @@ void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( syl ).c_str();
     syl->WriteTypography( currentNode );
     syl->WriteSylLog( currentNode );
-    WriteText( currentNode, syl );
     return;
 }
 
@@ -917,14 +916,6 @@ void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
     ArrayOfStrAttr::iterator iter;
     for (iter = object->m_unsupported.begin(); iter != object->m_unsupported.end(); iter++) {
         element.append_attribute( (*iter).first.c_str() ) = (*iter).second.c_str();
-    }
-}
-    
-    
-void MeiOutput::WriteText( pugi::xml_node element, Object *object )
-{
-    if ( !object->GetText().empty() ) {
-        element.text() =  UTF16to8(object->GetText().c_str() ).c_str();
     }
 }
     
@@ -2062,10 +2053,9 @@ bool MeiInput::ReadMeiSyl( Object *parent, pugi::xml_node syl)
     
     vrvSyl->ReadTypography( syl );
     vrvSyl->ReadSylLog( syl );
-    ReadText( syl, vrvSyl );
     
     AddLayerElement(parent, vrvSyl);
-    return true;
+    return ReadMeiTextChildren(vrvSyl, syl);
 }
 
 bool MeiInput::ReadMeiTuplet( Object *parent, pugi::xml_node tuplet )
@@ -2258,13 +2248,6 @@ void MeiInput::ReadUnsupportedAttr( pugi::xml_node element, Object *object )
     for (pugi::xml_attribute_iterator ait = element.attributes_begin(); ait != element.attributes_end(); ++ait)
     {
         object->m_unsupported.push_back(std::make_pair(ait->name(), ait->value()));
-    }
-}
-    
-void MeiInput::ReadText( pugi::xml_node element, Object *object )
-{
-    if (element.text()) {
-        object->SetText(UTF8to16( element.text().as_string() ));
     }
 }
     
@@ -2558,7 +2541,7 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
     else if ( parent->Is() == SYL ) {
         Syl *syl = dynamic_cast<Syl*>( parent );
         assert( syl );
-        //syl->AddTextElement( element );
+        syl->AddTextElement( element );
     }
     else if ( parent->Is() == TEMPO ) {
         Tempo *tempo = dynamic_cast<Tempo*>( parent );

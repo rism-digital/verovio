@@ -27,6 +27,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "text.h"
 #include "textdirective.h"
 #include "textelement.h"
 #include "vrv.h"
@@ -663,7 +664,6 @@ bool DocObject::HasSelfBB()
     return ( (m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF) );
 }
 
-
 //----------------------------------------------------------------------------
 // ObjectListInterface
 //----------------------------------------------------------------------------
@@ -772,6 +772,37 @@ Object *ObjectListInterface::GetListNext( const Object *listElement )
         
     }
     return NULL;
+}
+
+//----------------------------------------------------------------------------
+// TextListInterface
+//----------------------------------------------------------------------------
+
+std::wstring TextListInterface::GetText( Object *node )
+{
+    // alternatively we could cache the concatString in the interface and instantiate it in FilterList
+    std::wstring concatText;
+    ListOfObjects* childList = this->GetList(node); //make sure it's initialized
+    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        Text *text = dynamic_cast<Text*>(*it);
+        assert(text);
+        concatText += text->GetText();
+    }
+    return concatText;
+}
+
+void TextListInterface::FilterList( ListOfObjects *childList )
+{
+    ListOfObjects::iterator iter = childList->begin();
+    
+    while ( iter != childList->end()) {
+        if ( ((*iter)->Is() != TEXT) ) {
+            // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
+            iter = childList->erase( iter );
+            continue;
+        }
+        iter++;
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -10,12 +10,15 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
 
 //----------------------------------------------------------------------------
 
 #include "note.h"
 #include "verse.h"
 #include "staff.h"
+#include "textelement.h"
+#include "editorial.h"
 
 namespace vrv {
 
@@ -24,7 +27,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Syl::Syl():
-    LayerElement("syl-"), TimeSpanningInterface(),
+    LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(),
     AttTypography(),
     AttSylLog()
 {
@@ -48,6 +51,18 @@ void Syl::Reset()
     ResetSylLog();
     
     m_drawingVerse = 1;
+}
+    
+    
+void Syl::AddTextElement(TextElement *element)
+{
+    assert(
+           dynamic_cast<TextElement*>(element)
+           || dynamic_cast<EditorialElement*>(element)
+           );
+    element->SetParent( this );
+    m_children.push_back(element);
+    Modify();
 }
 
 //----------------------------------------------------------------------------

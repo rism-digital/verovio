@@ -16,6 +16,7 @@
 namespace vrv {
     
 class Note;
+class TextElement;
 
 //----------------------------------------------------------------------------
 // Syl
@@ -27,7 +28,7 @@ class Note;
  * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
  */
     
-class Syl: public LayerElement, public TimeSpanningInterface,
+class Syl: public LayerElement, public TextListInterface, public TimeSpanningInterface,
     public AttTypography,
     public AttSylLog
 {
@@ -43,6 +44,12 @@ public:
     virtual std::string GetClassName( ) { return "Syl"; };
     virtual ClassId Is() { return SYL; };
     ///@}
+    
+    /**
+     * Add an element (text, rend. etc.) to a syl.
+     * Only supported elements will be actually added to the child list.
+     */
+    void AddTextElement(TextElement *element);
     
     //----------//
     // Functors //

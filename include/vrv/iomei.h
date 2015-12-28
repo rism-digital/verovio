@@ -221,11 +221,6 @@ private:
     void WriteTextDirInterface( pugi::xml_node currentNode, TextDirInterface *interface );
     void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
     ///@}
-    
-    /**
-     * @name Methods for wrinting the XML text content
-     */
-    void WriteText( pugi::xml_node currentNode, Object *object );
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
@@ -403,12 +398,6 @@ private:
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
      */
     void ReadUnsupportedAttr( pugi::xml_node element, Object *object );
-    
-    /**
-     * Read the XML text content.
-     * It has to be called explicitly for elements with text (e.g., <syl>).
-     */
-    void ReadText( pugi::xml_node element, Object *object );
     
     /**
      * Method for adding the element to the appropriate parent (e.g., Layer, Beam).
