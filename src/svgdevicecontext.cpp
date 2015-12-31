@@ -443,7 +443,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     //rectChild.append_attribute( "fill-opacity" ) = "0.0"; // for empty rectangles with bounding boxes
 }
 
-void SvgDeviceContext::StartText(int pointSize, int x, int y, char alignement)
+void SvgDeviceContext::StartText(int x, int y, char alignement)
 {
     std::string s;
     std::string anchor;
@@ -464,8 +464,9 @@ void SvgDeviceContext::StartText(int pointSize, int x, int y, char alignement)
     if ( !anchor.empty() ) {
         m_currentNode.append_attribute( "text-anchor" ) = anchor.c_str();
     }
-    // font-size seems to be required in <text> in FireFox
-    m_currentNode.append_attribute("font-size") = StringFormat("%dpx", pointSize).c_str();
+    // font-size seems to be required in <text> in FireFox and also we set it to 0px so space
+    // is not added between tspan elements
+    m_currentNode.append_attribute("font-size") = "0px";
 }
     
 void SvgDeviceContext::MoveTextTo(int x, int y)
@@ -510,6 +511,7 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
         }
     }
     textChild.append_attribute("class") = "text";
+    textChild.append_attribute("xml:space") = "preserve";
     textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
 }
 

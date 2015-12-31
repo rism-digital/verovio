@@ -64,6 +64,11 @@ void DeviceContext::SetBrush( int colour, int opacity )
 
 void DeviceContext::SetFont( FontInfo *font )
 {
+    // If we have a previous font on the stack and the new font has not size,
+    // pass it because we need a font size in all cases
+    if ((m_fontStack.size() > 0) && (font->GetPointSize() == 0)) {
+        font->SetPointSize(m_fontStack.top()->GetPointSize());
+    }
     m_fontStack.push( font );
 }
     

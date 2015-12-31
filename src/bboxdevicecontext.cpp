@@ -286,7 +286,7 @@ void BBoxDeviceContext::DrawPlaceholder( int x, int y )
     UpdateBB( x, y, x, y );
 }
     
-void BBoxDeviceContext::StartText( int pointSize, int x, int y, char alignement)
+void BBoxDeviceContext::StartText(int x, int y, char alignement)
 {
     assert( !m_drawingText );
     m_drawingText = true;

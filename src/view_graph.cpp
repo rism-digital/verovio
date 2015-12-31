@@ -175,7 +175,7 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 {
     assert( dc );
     
-    dc->StartText( m_doc->GetDrawingLyricFont(staffSize)->GetPointSize(), ToDeviceContextX( x ), ToDeviceContextY( y ) );
+    dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     
     std::wistringstream iss( s );
     std::wstring token;

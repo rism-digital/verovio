@@ -92,7 +92,7 @@ public:
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText( int pointSize, int x, int y, char alignement = LEFT );
+    virtual void StartText( int x, int y, char alignement = LEFT );
     virtual void EndText();
     
     /**
