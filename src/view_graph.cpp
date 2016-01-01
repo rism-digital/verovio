@@ -175,8 +175,6 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
 {
     assert( dc );
     
-    dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
-    
     std::wistringstream iss( s );
     std::wstring token;
     while( std::getline( iss, token, L'_' ))
@@ -194,9 +192,6 @@ void View::DrawLyricString ( DeviceContext *dc, int x, int y, std::wstring s, in
         dc->DrawText( UTF16to8( str.c_str() ), str );
         dc->ResetFont();
     }
-    //std::wcout << std::endl;
-    
-    dc->EndText( );
 }
     
 void View::DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)

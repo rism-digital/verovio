@@ -76,7 +76,14 @@ void View::DrawText( DeviceContext *dc, Text *text, int x, int y, bool &setX, bo
     assert( dc );
     assert( text );
     
-    dc->DrawText( UTF16to8( text->GetText().c_str() ), text->GetText() );
+    // special case where we want to replace the '_' with a lyric connector
+    // '_' are produce with the SibMEI plugin
+    if (text->GetFirstParent(SYL)) {
+        DrawLyricString(dc, x, y, text->GetText());
+    }
+    else {
+        dc->DrawText( UTF16to8( text->GetText().c_str() ), text->GetText() );
+    }
 }
 
 } // namespace vrv

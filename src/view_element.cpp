@@ -1347,8 +1347,7 @@ void View::DrawSyl( DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     dc->StartText( ToDeviceContextX( x ), ToDeviceContextY( y ) );
     DrawTextChildren(dc, syl, ToDeviceContextX( x ), ToDeviceContextY( y ), setX, setY);
     dc->EndText();
-    //DrawLyricString(dc, syl->GetDrawingX(), syl->GetDrawingY(), syl->GetText(syl).c_str(), staff->m_drawingStaffSize );
-    
+     
     dc->ResetFont();
     dc->ResetBrush();
     
