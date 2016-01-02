@@ -128,6 +128,76 @@ void EditorialElement::AddStaffGrp( StaffGrp *child )
 }
     
 //----------------------------------------------------------------------------
+// Abbr
+//----------------------------------------------------------------------------
+
+Abbr::Abbr( ):
+    EditorialElement("abbr-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Abbr::~Abbr()
+{
+}
+
+void Abbr::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+//----------------------------------------------------------------------------
+// Add
+//----------------------------------------------------------------------------
+
+Add::Add( ):
+    EditorialElement("add-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Add::~Add()
+{
+}
+
+void Add::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+
+//----------------------------------------------------------------------------
+// Annot
+//----------------------------------------------------------------------------
+
+Annot::Annot( ):
+    EditorialElement("annot-"),
+    AttPlist(),
+    AttSource()
+{
+    RegisterAttClass( ATT_PLIST );
+    RegisterAttClass( ATT_SOURCE );
+    Reset();
+}
+
+Annot::~Annot()
+{
+}
+
+void Annot::Reset()
+{
+    EditorialElement::Reset();
+    ResetPlist();
+    ResetSource();
+}
+    
+//----------------------------------------------------------------------------
 // App
 //----------------------------------------------------------------------------
 
@@ -161,7 +231,95 @@ void App::AddLemOrRdg(EditorialElement *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
+//----------------------------------------------------------------------------
+// Corr
+//----------------------------------------------------------------------------
+
+Corr::Corr( ):
+    EditorialElement("corr-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Corr::~Corr()
+{
+}
+
+void Corr::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+//----------------------------------------------------------------------------
+// Damage
+//----------------------------------------------------------------------------
+
+Damage::Damage( ):
+    EditorialElement("lem-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Damage::~Damage()
+{
+}
+
+void Damage::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+//----------------------------------------------------------------------------
+// Del
+//----------------------------------------------------------------------------
+
+Del::Del( ):
+    EditorialElement("del-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Del::~Del()
+{
+}
+
+void Del::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+//----------------------------------------------------------------------------
+// Expan
+//----------------------------------------------------------------------------
+
+Expan::Expan( ):
+    EditorialElement("expan-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Expan::~Expan()
+{
+}
+
+void Expan::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
 //----------------------------------------------------------------------------
 // Lem
 //----------------------------------------------------------------------------
@@ -185,6 +343,28 @@ void Lem::Reset()
 }
 
 //----------------------------------------------------------------------------
+// Orig
+//----------------------------------------------------------------------------
+
+Orig::Orig( ):
+    EditorialElement("orig-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Orig::~Orig()
+{
+}
+
+void Orig::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+//----------------------------------------------------------------------------
 // Rdg
 //----------------------------------------------------------------------------
 
@@ -201,6 +381,74 @@ Rdg::~Rdg()
 }
 
 void Rdg::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+//----------------------------------------------------------------------------
+// Reg
+//----------------------------------------------------------------------------
+
+Reg::Reg( ):
+    EditorialElement("reg-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Reg::~Reg()
+{
+}
+
+void Reg::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+
+//----------------------------------------------------------------------------
+// Restore
+//----------------------------------------------------------------------------
+
+Restore::Restore( ):
+    EditorialElement("restore-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Restore::~Restore()
+{
+}
+
+void Restore::Reset()
+{
+    EditorialElement::Reset();
+    ResetSource();
+}
+
+
+//----------------------------------------------------------------------------
+// Sic
+//----------------------------------------------------------------------------
+
+Sic::Sic( ):
+    EditorialElement("sic-"),
+    AttSource()
+{
+    RegisterAttClass(ATT_SOURCE);
+    Reset();
+}
+
+Sic::~Sic()
+{
+}
+
+void Sic::Reset()
 {
     EditorialElement::Reset();
     ResetSource();
@@ -229,27 +477,24 @@ void Supplied::Reset()
 }
 
 //----------------------------------------------------------------------------
-// Annot
+// Unclear
 //----------------------------------------------------------------------------
 
-Annot::Annot( ):
-    EditorialElement("annot-"),
-    AttPlist(),
+Unclear::Unclear( ):
+    EditorialElement("unclear-"),
     AttSource()
 {
-    RegisterAttClass( ATT_PLIST );
-    RegisterAttClass( ATT_SOURCE );
+    RegisterAttClass(ATT_SOURCE);
     Reset();
 }
 
-Annot::~Annot()
+Unclear::~Unclear()
 {
 }
 
-void Annot::Reset()
+void Unclear::Reset()
 {
     EditorialElement::Reset();
-    ResetPlist();
     ResetSource();
 }
     

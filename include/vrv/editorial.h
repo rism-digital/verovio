@@ -18,9 +18,7 @@ namespace vrv {
 class FloatingElement;
 class Layer;
 class LayerElement;
-class Lem;
 class Measure;
-class Rdg;
 class ScoreDef;
 class Staff;
 class StaffDef;
@@ -94,6 +92,101 @@ public:
 private:
     
 };
+    
+//----------------------------------------------------------------------------
+// Abbr
+//----------------------------------------------------------------------------
+
+class Abbr: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Abbr();
+    virtual ~Abbr();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Abbr"; };
+    virtual ClassId Is() { return ABBR; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// Add
+//----------------------------------------------------------------------------
+
+class Add: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Add();
+    virtual ~Add();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Add"; };
+    virtual ClassId Is() { return ADD; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// Annot
+//----------------------------------------------------------------------------
+
+class Annot: public EditorialElement,
+    public AttPlist,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Annot();
+    virtual ~Annot();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Annot"; };
+    virtual ClassId Is() { return ANNOT; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    /**
+     * A copy of the annot content tree stored as pugi::xml_document
+     */
+    pugi::xml_document m_content;
+    
+private:
+    
+};
 
 //----------------------------------------------------------------------------
 // App
@@ -137,6 +230,126 @@ private:
 };
     
 //----------------------------------------------------------------------------
+// Corr
+//----------------------------------------------------------------------------
+
+class Corr: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Corr();
+    virtual ~Corr();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Corr"; };
+    virtual ClassId Is() { return CORR; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// Damage
+//----------------------------------------------------------------------------
+
+class Damage: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Damage();
+    virtual ~Damage();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Damage"; };
+    virtual ClassId Is() { return DAMAGE; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+
+//----------------------------------------------------------------------------
+// Del
+//----------------------------------------------------------------------------
+
+class Del: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Del();
+    virtual ~Del();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Del"; };
+    virtual ClassId Is() { return DEL; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+
+//----------------------------------------------------------------------------
+// Expan
+//----------------------------------------------------------------------------
+
+class Expan: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Expan();
+    virtual ~Expan();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Expan"; };
+    virtual ClassId Is() { return EXPAN; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
 // Lem
 //----------------------------------------------------------------------------
 
@@ -154,6 +367,36 @@ public:
     virtual void Reset();
     virtual std::string GetClassName( ) { return "Lem"; };
     virtual ClassId Is() { return LEM; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+    
+//----------------------------------------------------------------------------
+// Orig
+//----------------------------------------------------------------------------
+
+class Orig: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Orig();
+    virtual ~Orig();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Orig"; };
+    virtual ClassId Is() { return ORIG; };
     ///@}
     
 protected:
@@ -194,7 +437,97 @@ public:
     
 private:
     
-};    
+};
+    
+//----------------------------------------------------------------------------
+// Reg
+//----------------------------------------------------------------------------
+
+class Reg: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Reg();
+    virtual ~Reg();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Reg"; };
+    virtual ClassId Is() { return REG; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+
+//----------------------------------------------------------------------------
+// Restore
+//----------------------------------------------------------------------------
+
+class Restore: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Restore();
+    virtual ~Restore();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Restore"; };
+    virtual ClassId Is() { return RESTORE; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+
+//----------------------------------------------------------------------------
+// Sic
+//----------------------------------------------------------------------------
+
+class Sic: public EditorialElement,
+    public AttSource
+{
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Sic();
+    virtual ~Sic();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "Sic"; };
+    virtual ClassId Is() { return SIC; };
+    ///@}
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
 
 //----------------------------------------------------------------------------
 // Supplied
@@ -227,11 +560,10 @@ private:
 };
     
 //----------------------------------------------------------------------------
-// Annot
+// Unclear
 //----------------------------------------------------------------------------
 
-class Annot: public EditorialElement,
-    public AttPlist,
+class Unclear: public EditorialElement,
     public AttSource
 {
 public:
@@ -240,11 +572,11 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Annot();
-    virtual ~Annot();
+    Unclear();
+    virtual ~Unclear();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Annot"; };
-    virtual ClassId Is() { return ANNOT; };
+    virtual std::string GetClassName( ) { return "Unclear"; };
+    virtual ClassId Is() { return UNCLEAR; };
     ///@}
     
 protected:
@@ -252,10 +584,6 @@ protected:
 private:
     
 public:
-    /**
-     * A copy of the annot content tree stored as pugi::xml_document
-     */
-    pugi::xml_document m_content;
     
 private:
     

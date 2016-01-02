@@ -18,18 +18,24 @@
 
 namespace vrv {
 
-class App;
+class Abbr;
 class Accid;
+class Add;
 class Annot;
+class App;
 class BarLine;
 class Beam;
 class BeatRpt;
 class BTrem;
 class Chord;
 class Clef;
+class Corr;
 class Custos;
+class Damage;
+class Del;
 class Dot;
 class DurationInterface;
+class Expan;
 class FloatingElement;
 class FTrem;
 class Layer;
@@ -44,14 +50,18 @@ class MRpt2;
 class MultiRest;
 class MultiRpt;
 class Note;
+class Orig;
 class PitchInterface;
 class PositionInterface;
 class Proport;
 class Rdg;
+class Reg;
 class Rend;
 class Rest;
+class Restore;
 class ScoreDef;
 class ScoreDefInterface;
+class Sic;
 class Slur;
 class Space;
 class Staff;
@@ -65,6 +75,7 @@ class TextElement;
 class Tie;
 class TimeSpanningInterface;
 class Tuplet;
+class Unclear;
 class Verse;
 
 
@@ -180,11 +191,22 @@ private:
      * @name Methods for writing editorial markup
      */
     ///@{
-    bool WriteMeiApp( pugi::xml_node currentNode, App *app );
-    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
-    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
-    bool WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied );
+    bool WriteMeiAbbr( pugi::xml_node currentNode, Abbr *abbr );
+    bool WriteMeiAdd( pugi::xml_node currentNode, Add *add );
     bool WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot );
+    bool WriteMeiApp( pugi::xml_node currentNode, App *app );
+    bool WriteMeiCorr( pugi::xml_node currentNode, Corr *corr );
+    bool WriteMeiDamage( pugi::xml_node currentNode, Damage *damage );
+    bool WriteMeiDel( pugi::xml_node currentNode, Del *del );
+    bool WriteMeiExpan( pugi::xml_node currentNode, Expan *expan );
+    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
+    bool WriteMeiOrig( pugi::xml_node currentNode, Orig *orig );
+    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
+    bool WriteMeiReg( pugi::xml_node currentNode, Reg *Reg );
+    bool WriteMeiRestore( pugi::xml_node currentNode, Restore *restore );
+    bool WriteMeiSic( pugi::xml_node currentNode, Sic *sic );
+    bool WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied );
+    bool WriteMeiUnclear( pugi::xml_node currentNode, Unclear *unclear );
     ///@}
     
     /**
@@ -364,13 +386,24 @@ private:
      */
     ///@{
     bool ReadMeiEditorialElement( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAbbr( Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAdd( Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiCorr( Object *parent, pugi::xml_node corr, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiDamage( Object *parent, pugi::xml_node damage, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiDel( Object *parent, pugi::xml_node del, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiExpan( Object *parent, pugi::xml_node expan, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiOrig( Object *parent, pugi::xml_node orig, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiReg( Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiRestore( Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiSic( Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiUnclear( Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiEditorialChildren( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
     ///@}
     ///@}
     

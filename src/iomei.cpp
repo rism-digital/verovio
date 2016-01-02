@@ -47,8 +47,23 @@
 
 namespace vrv {
 
-#define EDIT_NAMES 3
-std::string MeiInput::s_editorialElementNames[] = {"app", "annot", "supplied"}; // update EDIT_NAMES (above) accordingly
+#define EDIT_NAMES 14
+std::string MeiInput::s_editorialElementNames[] = {
+    "abbr",
+    "add",
+    "app",
+    "annot",
+    "corr",
+    "damage",
+    "del",
+    "expan",
+    "orig",
+    "reg",
+    "restore",
+    "sic",
+    "supplied",
+    "unclear"
+}; // update EDIT_NAMES (above) accordingly
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -317,25 +332,69 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     // Editorial markup
+    else if (object->Is() == ABBR) {
+        m_currentNode = m_currentNode.append_child("abbr");
+        WriteMeiAbbr( m_currentNode, dynamic_cast<Abbr*>(object) );
+    }
+    else if (object->Is() == ADD) {
+        m_currentNode = m_currentNode.append_child("add");
+        WriteMeiAdd( m_currentNode, dynamic_cast<Add*>(object) );
+    }
+    else if (object->Is() == ANNOT) {
+        m_currentNode = m_currentNode.append_child("annot");
+        WriteMeiAnnot( m_currentNode, dynamic_cast<Annot*>(object) );
+    }
     else if (object->Is() == APP) {
         m_currentNode = m_currentNode.append_child("app");
         WriteMeiApp( m_currentNode, dynamic_cast<App*>(object) );
+    }
+    else if (object->Is() == CORR) {
+        m_currentNode = m_currentNode.append_child("corr");
+        WriteMeiCorr( m_currentNode, dynamic_cast<Corr*>(object) );
+    }
+    else if (object->Is() == DAMAGE) {
+        m_currentNode = m_currentNode.append_child("damage");
+        WriteMeiDamage( m_currentNode, dynamic_cast<Damage*>(object) );
+    }
+    else if (object->Is() == DEL) {
+        m_currentNode = m_currentNode.append_child("del");
+        WriteMeiDel( m_currentNode, dynamic_cast<Del*>(object) );
+    }
+    else if (object->Is() == EXPAN) {
+        m_currentNode = m_currentNode.append_child("epxan");
+        WriteMeiExpan( m_currentNode, dynamic_cast<Expan*>(object) );
     }
     else if (object->Is() == LEM) {
         m_currentNode = m_currentNode.append_child("lem");
         WriteMeiLem( m_currentNode, dynamic_cast<Lem*>(object) );
     }
+    else if (object->Is() == ORIG) {
+        m_currentNode = m_currentNode.append_child("orig");
+        WriteMeiOrig( m_currentNode, dynamic_cast<Orig*>(object) );
+    }
     else if (object->Is() == RDG) {
         m_currentNode = m_currentNode.append_child("rdg");
         WriteMeiRdg( m_currentNode, dynamic_cast<Rdg*>(object) );
+    }
+    else if (object->Is() == REG) {
+        m_currentNode = m_currentNode.append_child("reg");
+        WriteMeiReg( m_currentNode, dynamic_cast<Reg*>(object) );
+    }
+    else if (object->Is() == RESTORE) {
+        m_currentNode = m_currentNode.append_child("restore");
+        WriteMeiRestore( m_currentNode, dynamic_cast<Restore*>(object) );
+    }
+    else if (object->Is() == SIC) {
+        m_currentNode = m_currentNode.append_child("sic");
+        WriteMeiSic( m_currentNode, dynamic_cast<Sic*>(object) );
     }
     else if (object->Is() == SUPPLIED) {
         m_currentNode = m_currentNode.append_child("supplied");
         WriteMeiSupplied( m_currentNode, dynamic_cast<Supplied*>(object) );
     }
-    else if (object->Is() == ANNOT) {
-        m_currentNode = m_currentNode.append_child("annot");
-        WriteMeiAnnot( m_currentNode, dynamic_cast<Annot*>(object) );
+    else if (object->Is() == UNCLEAR) {
+        m_currentNode = m_currentNode.append_child("unclear");
+        WriteMeiUnclear( m_currentNode, dynamic_cast<Unclear*>(object) );
     }
     
     else {
@@ -933,42 +992,26 @@ void MeiOutput::WriteEditorialElement( pugi::xml_node currentNode, EditorialElem
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( element ).c_str();
     element->WriteCommon( currentNode );
 }
-
-bool MeiOutput::WriteMeiApp( pugi::xml_node currentNode, App *app )
-{
-    assert( app );
     
-    WriteEditorialElement(currentNode, app);
+bool MeiOutput::WriteMeiAbbr( pugi::xml_node currentNode, Abbr *abbr )
+{
+    assert( abbr );
+    
+    WriteEditorialElement(currentNode, abbr);
+    abbr->WriteSource( currentNode );
     return true;
 };
 
-bool MeiOutput::WriteMeiLem( pugi::xml_node currentNode, Lem *lem )
-{
-    assert( lem );
-    
-    WriteEditorialElement(currentNode, lem);
-    lem->WriteSource( currentNode );
-    return true;
-};
 
-bool MeiOutput::WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg )
+bool MeiOutput::WriteMeiAdd( pugi::xml_node currentNode, Add *add )
 {
-    assert( rdg );
+    assert( add );
     
-    WriteEditorialElement(currentNode, rdg);
-    rdg->WriteSource( currentNode );
+    WriteEditorialElement(currentNode, add);
+    add->WriteSource( currentNode );
     return true;
 };
     
-bool MeiOutput::WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied )
-{
-    assert( supplied );
-    
-    WriteEditorialElement(currentNode, supplied);
-    supplied->WriteSource( currentNode );
-    return true;
-};
-
 bool MeiOutput::WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot )
 {
     assert( annot );
@@ -982,6 +1025,122 @@ bool MeiOutput::WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot )
         currentNode.append_copy(child);
     }
     
+    return true;
+};
+
+bool MeiOutput::WriteMeiApp( pugi::xml_node currentNode, App *app )
+{
+    assert( app );
+    
+    WriteEditorialElement(currentNode, app);
+    return true;
+};
+    
+bool MeiOutput::WriteMeiCorr( pugi::xml_node currentNode, Corr *corr )
+{
+    assert( corr );
+    
+    WriteEditorialElement(currentNode, corr);
+    corr->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiDamage( pugi::xml_node currentNode, Damage *damage )
+{
+    assert( damage );
+    
+    WriteEditorialElement(currentNode, damage);
+    damage->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiDel( pugi::xml_node currentNode, Del *del )
+{
+    assert( del );
+    
+    WriteEditorialElement(currentNode, del);
+    del->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiExpan( pugi::xml_node currentNode, Expan *expan )
+{
+    assert( expan );
+    
+    WriteEditorialElement(currentNode, expan);
+    expan->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiLem( pugi::xml_node currentNode, Lem *lem )
+{
+    assert( lem );
+    
+    WriteEditorialElement(currentNode, lem);
+    lem->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiOrig( pugi::xml_node currentNode, Orig *orig )
+{
+    assert( orig );
+    
+    WriteEditorialElement(currentNode, orig);
+    orig->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg )
+{
+    assert( rdg );
+    
+    WriteEditorialElement(currentNode, rdg);
+    rdg->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiReg( pugi::xml_node currentNode, Reg *reg )
+{
+    assert( reg );
+    
+    WriteEditorialElement(currentNode, reg);
+    reg->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiRestore( pugi::xml_node currentNode, Restore *restore )
+{
+    assert( restore );
+    
+    WriteEditorialElement(currentNode, restore);
+    restore->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiSic( pugi::xml_node currentNode, Sic *sic )
+{
+    assert( sic );
+    
+    WriteEditorialElement(currentNode, sic);
+    sic->WriteSource( currentNode );
+    return true;
+};
+    
+bool MeiOutput::WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied )
+{
+    assert( supplied );
+    
+    WriteEditorialElement(currentNode, supplied);
+    supplied->WriteSource( currentNode );
+    return true;
+};
+
+bool MeiOutput::WriteMeiUnclear( pugi::xml_node currentNode, Unclear *unclear )
+{
+    assert( unclear );
+    
+    WriteEditorialElement(currentNode, unclear);
+    unclear->WriteSource( currentNode );
     return true;
 };
     
@@ -2235,31 +2394,105 @@ void MeiInput::ReadUnsupportedAttr( pugi::xml_node element, Object *object )
     }
 }
     
-bool MeiInput::ReadEditorialElement( pugi::xml_node element, EditorialElement *object )
+bool MeiInput::ReadMeiEditorialElement( Object *parent, pugi::xml_node current, EditorialLevel level, Object *filter )
 {
+    if ( std::string( current.name() ) == "abbr" ) {
+        return ReadMeiAbbr( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "add" ) {
+        return ReadMeiAdd( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "app" ) {
+        return ReadMeiApp( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "annot" ) {
+        return ReadMeiAnnot( parent, current );
+    }
+    else if ( std::string( current.name() ) == "corr" ) {
+        return ReadMeiCorr( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "damage" ) {
+        return ReadMeiDamage( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "del" ) {
+        return ReadMeiDel( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "expan" ) {
+        return ReadMeiExpan( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "orig" ) {
+        return ReadMeiOrig( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "reg" ) {
+        return ReadMeiReg( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "restore" ) {
+        return ReadMeiRestore( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "sic" ) {
+        return ReadMeiSic( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "supplied" ) {
+        return ReadMeiSupplied( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "unclear" ) {
+        return ReadMeiUnclear( parent, current, level, filter );
+    }
+    else {
+        assert(false); // this should never happen, MeiInput::s_editorialElementNames should be updated
+        return false;
+    }
+}
 
+bool MeiInput::ReadEditorialElement( pugi::xml_node element, EditorialElement *object )
+{    
     object->ReadCommon( element );
     ReadSameAsAttr( element, object );
     SetMeiUuid( element, object );
     
     return true;
 }
-    
-bool MeiInput::ReadMeiEditorialElement( Object *parent, pugi::xml_node current, EditorialLevel level, Object *filter )
+
+bool MeiInput::ReadMeiAbbr( Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter )
 {
-    if ( std::string( current.name() ) == "app" ) {
-        return ReadMeiApp( parent, current, level, filter );
+    Abbr *vrvAbbr = new Abbr();
+    
+    ReadEditorialElement( abbr, vrvAbbr );
+    vrvAbbr->ReadSource( abbr );
+    parent->AddEditorialElement(vrvAbbr);
+    
+    return ReadMeiEditorialChildren(vrvAbbr, abbr, level, filter);
+}
+    
+bool MeiInput::ReadMeiAdd( Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter )
+{
+    Add *vrvAdd = new Add();
+    
+    ReadEditorialElement( add, vrvAdd );
+    vrvAdd->ReadSource( add );
+    parent->AddEditorialElement(vrvAdd);
+    
+    return ReadMeiEditorialChildren(vrvAdd, add, level, filter);
+} 
+
+bool MeiInput::ReadMeiAnnot( Object *parent, pugi::xml_node annot )
+{
+    
+    Annot *vrvAnnot = new Annot( );
+    ReadEditorialElement( annot, vrvAnnot );
+    vrvAnnot->ReadPlist(annot);
+    vrvAnnot->ReadSource(annot);
+    
+    vrvAnnot->m_content.reset();
+    //copy all the nodes inside into the document
+    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling())
+    {
+        vrvAnnot->m_content.append_copy(child);
     }
-    else if ( std::string( current.name() ) == "annot" ) {
-        return ReadMeiAnnot( parent, current );
-    }
-    else if ( std::string( current.name() ) == "supplied" ) {
-        return ReadMeiSupplied( parent, current, level, filter );
-    }
-    else {
-        assert(false); // this should never happen, MeiInput::s_editorialElementNames should be updated
-        return false;
-    }
+    
+    parent->AddEditorialElement(vrvAnnot);
+    
+    return true;
 }
 
 bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter )
@@ -2275,7 +2508,6 @@ bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel le
     
     return ReadMeiAppChildren( vrvApp, app, level, filter );
 }
-    
     
 bool MeiInput::ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter )
 {
@@ -2326,6 +2558,53 @@ bool MeiInput::ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, Ed
 
     return success;
 }
+
+bool MeiInput::ReadMeiCorr( Object *parent, pugi::xml_node corr, EditorialLevel level, Object *filter )
+{
+    Corr *vrvCorr = new Corr();
+    
+    ReadEditorialElement( corr, vrvCorr );
+    vrvCorr->ReadSource( corr );
+    parent->AddEditorialElement(vrvCorr);
+    
+    return ReadMeiEditorialChildren(vrvCorr, corr, level, filter);
+}
+
+
+bool MeiInput::ReadMeiDamage( Object *parent, pugi::xml_node damage, EditorialLevel level, Object *filter )
+{
+    Damage *vrvDamage = new Damage();
+    
+    ReadEditorialElement( damage, vrvDamage );
+    vrvDamage->ReadSource( damage );
+    parent->AddEditorialElement(vrvDamage);
+    
+    return ReadMeiEditorialChildren(vrvDamage, damage, level, filter);
+}
+
+
+bool MeiInput::ReadMeiDel( Object *parent, pugi::xml_node del, EditorialLevel level, Object *filter )
+{
+    Del *vrvDel = new Del();
+    
+    ReadEditorialElement( del, vrvDel );
+    vrvDel->ReadSource( del );
+    parent->AddEditorialElement(vrvDel);
+    
+    return ReadMeiEditorialChildren(vrvDel, del, level, filter);
+}
+
+
+bool MeiInput::ReadMeiExpan( Object *parent, pugi::xml_node expan, EditorialLevel level, Object *filter )
+{
+    Expan *vrvExpan = new Expan();
+    
+    ReadEditorialElement( expan, vrvExpan );
+    vrvExpan->ReadSource( expan );
+    parent->AddEditorialElement(vrvExpan);
+    
+    return ReadMeiEditorialChildren(vrvExpan, expan, level, filter);
+}
     
 bool MeiInput::ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter )
 {
@@ -2341,6 +2620,17 @@ bool MeiInput::ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel le
     dynamic_cast<App*>( parent )->AddLemOrRdg( vrvLem );
     
     return ReadMeiEditorialChildren(vrvLem, lem, level, filter);
+}
+
+bool MeiInput::ReadMeiOrig( Object *parent, pugi::xml_node orig, EditorialLevel level, Object *filter )
+{
+    Orig *vrvOrig = new Orig();
+    
+    ReadEditorialElement( orig, vrvOrig );
+    vrvOrig->ReadSource( orig );
+    parent->AddEditorialElement(vrvOrig);
+    
+    return ReadMeiEditorialChildren(vrvOrig, orig, level, filter);
 }
 
 bool MeiInput::ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter )
@@ -2359,15 +2649,59 @@ bool MeiInput::ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel le
     return ReadMeiEditorialChildren(vrvRdg, rdg, level, filter);
 }
     
+bool MeiInput::ReadMeiReg( Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter )
+{
+    Reg *vrvReg = new Reg();
+    
+    ReadEditorialElement( reg, vrvReg );
+    vrvReg->ReadSource( reg );
+    parent->AddEditorialElement(vrvReg);
+    
+    return ReadMeiEditorialChildren(vrvReg, reg, level, filter);
+}
+
+bool MeiInput::ReadMeiRestore( Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter )
+{
+    Restore *vrvRestore = new Restore();
+    
+    ReadEditorialElement( restore, vrvRestore );
+    vrvRestore->ReadSource( restore );
+    parent->AddEditorialElement(vrvRestore);
+    
+    return ReadMeiEditorialChildren(vrvRestore, restore, level, filter);
+}
+
+bool MeiInput::ReadMeiSic( Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter )
+{
+    Sic *vrvSic = new Sic();
+    
+    ReadEditorialElement( sic, vrvSic );
+    vrvSic->ReadSource( sic );
+    parent->AddEditorialElement(vrvSic);
+    
+    return ReadMeiEditorialChildren(vrvSic, sic, level, filter);
+}
+    
 bool MeiInput::ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter )
 {
-    Supplied *vrvSupplied = new Supplied();;
+    Supplied *vrvSupplied = new Supplied();
     
     ReadEditorialElement( supplied, vrvSupplied );
     vrvSupplied->ReadSource( supplied );
     parent->AddEditorialElement(vrvSupplied);
     
     return ReadMeiEditorialChildren(vrvSupplied, supplied, level, filter);
+}
+
+bool MeiInput::ReadMeiUnclear( Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter )
+{
+    Unclear *vrvUnclear = new Unclear();
+    
+    ReadEditorialElement( unclear, vrvUnclear );
+    vrvUnclear->ReadSource( unclear );
+    parent->AddEditorialElement(vrvUnclear);
+    
+    return ReadMeiEditorialChildren(vrvUnclear, unclear, level, filter);
 }
     
 bool MeiInput::ReadMeiEditorialChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter )
@@ -2398,26 +2732,6 @@ bool MeiInput::ReadMeiEditorialChildren( Object *parent, pugi::xml_node parentNo
     else {
         return false;
     }
-}
-    
-bool MeiInput::ReadMeiAnnot( Object *parent, pugi::xml_node annot )
-{
-    
-    Annot *vrvAnnot = new Annot( );
-    ReadEditorialElement( annot, vrvAnnot );
-    vrvAnnot->ReadPlist(annot);
-    vrvAnnot->ReadSource(annot);
-    
-    vrvAnnot->m_content.reset();
-    //copy all the nodes inside into the document
-    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling())
-    {
-        vrvAnnot->m_content.append_copy(child);
-    }
-    
-    parent->AddEditorialElement(vrvAnnot);
-    
-    return true;
 }
     
 void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
