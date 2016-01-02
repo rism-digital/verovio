@@ -115,10 +115,12 @@ bool MeiOutput::ExportFile( )
             page->Save( this );
         }
         if ( m_writeToStreamString ) {
+            //meiDoc.save(m_streamStringOutput, "    ", pugi::format_default | pugi::format_no_escapes);
             meiDoc.save(m_streamStringOutput, "    ");
         }
         else {
-            meiDoc.save_file( m_filename.c_str(), "    " );
+            //meiDoc.save_file( m_filename.c_str(), "    ", pugi::format_default | pugi::format_no_escapes);
+            meiDoc.save_file( m_filename.c_str(), "    ");
         }
     }
     catch( char * str ) {
@@ -840,6 +842,7 @@ void MeiOutput::WriteMeiText( pugi::xml_node element, Text *text )
 {
     if ( !text->GetText().empty() ) {
         pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
+        //nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str() ).c_str();
         nodechild.text() =  UTF16to8(text->GetText().c_str() ).c_str();
     }
 }
@@ -978,6 +981,28 @@ bool MeiOutput::WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot )
     
     return true;
 };
+    
+std::wstring MeiOutput::EscapeSMuFL(std::wstring data)
+{
+    std::wstring buffer;
+    // approximate that we won't have a 1.1 longer string (for optimization)
+    buffer.reserve(data.size() * 1.1);
+    for(size_t pos = 0; pos != data.size(); ++pos) {
+        if (data[pos] == '&') buffer.append(L"&amp;");
+        else if (data[pos] == '\"') buffer.append(L"&quot;");
+        else if (data[pos] == '\'') buffer.append(L"&apos;");
+        else if (data[pos] == '<') buffer.append(L"&lt;");
+        else if (data[pos] == '>') buffer.append(L"&gt;");
+        // Unicode private area for SMuFL characters
+        else if ((data[pos] > 0xE000) && (data[pos] < 0xF8FF)) {
+            std::wostringstream ss;
+            ss << std::hex << (int)data[pos];
+            buffer.append(L"&#x").append(ss.str()).append(L";");
+        }
+        else buffer.append(&data[pos], 1);
+    }
+    return buffer;
+}
 
 std::string MeiOutput::DocTypeToStr(DocType type)
 {

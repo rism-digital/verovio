@@ -221,6 +221,13 @@ private:
     void WriteTextDirInterface( pugi::xml_node currentNode, TextDirInterface *interface );
     void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
     ///@}
+    
+    /**
+     * Escapes SMuFL characters to entities (e.g., &#xe1e7;).
+     * Must me used in conjunction with (pugi::format_default | pugi::format_no_escapes).
+     * Unused for now (see WriteMeiText) because it of un-escaped entities in the header.
+     */
+    std::wstring EscapeSMuFL(std::wstring data);
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
