@@ -47,6 +47,9 @@
 
 namespace vrv {
 
+#define EDIT_NAMES 3
+std::string MeiInput::s_editorialElementNames[] = {"app", "annot", "supplied"}; // update EDIT_NAMES (above) accordingly
+
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
@@ -1079,13 +1082,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     }
     
     // editorial
-    if ( element == "app" ) {
-        return true;
-    }
-    else if ( element == "annot" ) {
-        return true;
-    }
-    else if ( element == "supplied" ) {
+    if ( IsEditorialElementName(element)) {
         return true;
     }
     // filter for bTrem
@@ -1122,7 +1119,6 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         return true;
     }
 }
-
 
 
 bool MeiInput::ReadMei( pugi::xml_node root )
@@ -1298,14 +1294,8 @@ bool MeiInput::ReadMeiSystemChildren( Object *parent, pugi::xml_node parentNode 
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if (!success) break;
         // editorial
-        else if ( std::string( current.name() ) == "app" ) {
-            success = ReadMeiApp( parent, current, EDITORIAL_SYSTEM );
-        }
-        else if ( std::string( current.name() ) == "annot" ) {
-            success = ReadMeiAnnot( parent, current );
-        }
-        else if ( std::string( current.name() ) == "supplied" ) {
-            success = ReadMeiSupplied( parent, current, EDITORIAL_SYSTEM );
+        else if ( IsEditorialElementName( current.name() ) ) {
+            success = ReadMeiEditorialElement( parent, current, EDITORIAL_SYSTEM );
         }
         // content
         else if ( std::string( current.name() ) == "scoreDef" ) {
@@ -1382,14 +1372,8 @@ bool MeiInput::ReadMeiScoreDefChildren( Object *parent, pugi::xml_node parentNod
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if (!success) break;
         // editorial
-        if ( std::string( current.name() ) == "app" ) {
-            success = ReadMeiApp( parent, current, EDITORIAL_SCOREDEF);
-        }
-        else if ( std::string( current.name() ) == "annot" ) {
-            success = ReadMeiAnnot( parent, current );
-        }
-        else if ( std::string( current.name() ) == "supplied" ) {
-            success = ReadMeiSupplied( parent, current, EDITORIAL_SCOREDEF );
+        else if ( IsEditorialElementName( current.name() ) ) {
+            success = ReadMeiEditorialElement( parent, current, EDITORIAL_SCOREDEF );
         }
         // content
         else if ( std::string( current.name() ) == "staffGrp" ) {
@@ -1430,14 +1414,8 @@ bool MeiInput::ReadMeiStaffGrpChildren( Object *parent, pugi::xml_node parentNod
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if (!success) break;
         // editorial
-        if ( std::string( current.name() ) == "app" ) {
-            success = ReadMeiApp( parent, current, EDITORIAL_STAFFGRP );
-        }
-        else if ( std::string( current.name() ) == "annot" ) {
-            success = ReadMeiAnnot( parent, current );
-        }
-        else if ( std::string( current.name() ) == "supplied" ) {
-            success = ReadMeiSupplied( parent, current, EDITORIAL_STAFFGRP );
+        else if ( IsEditorialElementName( current.name() ) ) {
+            success = ReadMeiEditorialElement( parent, current, EDITORIAL_STAFFGRP );
         }
         // content
         else if ( std::string( current.name() ) == "staffGrp" ) {
@@ -1522,14 +1500,8 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if (!success) break;
         // editorial
-        if ( std::string( current.name() ) == "app" ) {
-            success = ReadMeiApp( parent, current, EDITORIAL_MEASURE);
-        }
-        else if ( std::string( current.name() ) == "annot" ) {
-            success = ReadMeiAnnot( parent, current );
-        }
-        else if ( std::string( current.name() ) == "supplied" ) {
-            success = ReadMeiSupplied( parent, current, EDITORIAL_MEASURE );
+        else if ( IsEditorialElementName( current.name() ) ) {
+            success = ReadMeiEditorialElement( parent, current, EDITORIAL_MEASURE );
         }
         // content
         else if ( std::string( current.name() ) == "staff" ) {
@@ -1556,19 +1528,6 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
     
     return success;
 }
-    
-bool MeiInput::ReadMeiTie( Object *parent, pugi::xml_node tie )
-{
-    Tie *vrvTie = new Tie();
-    SetMeiUuid(tie, vrvTie);
-    
-    vrvTie->ReadCurvature(tie);
-    ReadTimeSpanningInterface(tie, vrvTie);
-    
-    AddFloatingElement(parent, vrvTie);
-    
-    return true;
-}
 
 bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
 {
@@ -1579,6 +1538,31 @@ bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )
     ReadTimeSpanningInterface(slur, vrvSlur);
     
     AddFloatingElement(parent, vrvSlur);
+    
+    return true;
+}
+    
+bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
+{
+    Tempo *vrvTempo = new Tempo();
+    SetMeiUuid(tempo, vrvTempo);
+    
+    ReadTextDirInterface(tempo, vrvTempo);
+    
+    AddFloatingElement(parent, vrvTempo);
+    
+    return ReadMeiTextChildren(vrvTempo, tempo);
+}
+    
+bool MeiInput::ReadMeiTie( Object *parent, pugi::xml_node tie )
+{
+    Tie *vrvTie = new Tie();
+    SetMeiUuid(tie, vrvTie);
+    
+    vrvTie->ReadCurvature(tie);
+    ReadTimeSpanningInterface(tie, vrvTie);
+    
+    AddFloatingElement(parent, vrvTie);
     
     return true;
 }
@@ -1627,14 +1611,8 @@ bool MeiInput::ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode )
     for( current = parentNode.first_child( ); current; current = current.next_sibling( ) ) {
         if (!success) break;
         // editorial
-        if ( std::string( current.name() ) == "app" ) {
-            success = ReadMeiApp( parent, current, EDITORIAL_STAFF);
-        }
-        else if ( std::string( current.name() ) == "annot" ) {
-            success = ReadMeiAnnot( parent, current );
-        }
-        else if ( std::string( current.name() ) == "supplied" ) {
-            success = ReadMeiSupplied( parent, current, EDITORIAL_STAFF );
+        else if ( IsEditorialElementName( current.name() ) ) {
+            success = ReadMeiEditorialElement( parent, current, EDITORIAL_STAFF );
         }
         //content
         else if ( std::string( current.name() ) == "layer" ) {
@@ -1688,14 +1666,13 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
             LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str() );
             continue;
         }
+        // editorial
+        else if ( IsEditorialElementName( xmlElement.name() ) ) {
+            success = ReadMeiEditorialElement( parent, xmlElement, EDITORIAL_LAYER, filter);
+        }
+        // content
         else if ( elementName == "accid" ) {
             success = ReadMeiAccid( parent, xmlElement );
-        }
-        else if ( elementName == "app" ) {
-            success = ReadMeiApp( parent, xmlElement, EDITORIAL_LAYER, filter);
-        }
-        else if ( elementName == "annot" ) {
-            success = ReadMeiAnnot( parent, xmlElement);
         }
         else if ( elementName  == "barLine" ) {
             success = ReadMeiBarLine( parent, xmlElement );
@@ -1759,9 +1736,6 @@ bool MeiInput::ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, 
         }
         else if ( elementName == "space" ) {
             success = ReadMeiSpace( parent, xmlElement );
-        }
-        else if ( elementName == "supplied" ) {
-            success = ReadMeiSupplied( parent, xmlElement, EDITORIAL_LAYER, filter );
         }
         else if ( elementName == "syl" ) {
             success = ReadMeiSyl( parent, xmlElement );
@@ -2116,17 +2090,69 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }
     
-bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
+bool MeiInput::ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, Object *filter )
 {
-    Tempo *vrvTempo = new Tempo();
-    SetMeiUuid(tempo, vrvTempo);
+    bool success = true;
+    pugi::xml_node xmlElement;
+    std::string elementName;
+    int i = 0;
+    for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ) {
+        if (!success) {
+            break;
+        }
+        elementName = std::string( xmlElement.name() );
+        if ( !IsAllowed( elementName, filter ) ) {
+            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str() );
+            continue;
+        }
+        // editorial
+        else if ( IsEditorialElementName( xmlElement.name() ) ) {
+            success = ReadMeiEditorialElement( parent, xmlElement, EDITORIAL_TEXT, filter);
+        }
+        // content
+        else if ( elementName == "rend" ) {
+            success = ReadMeiRend( parent, xmlElement );
+        }
+        else if ( xmlElement.text() ) {
+            bool trimLeft = (i == 0);
+            bool trimRight = (!xmlElement.next_sibling());
+            success = ReadMeiText( parent, xmlElement, trimLeft, trimRight );
+        }
+        // unknown
+        else {
+            LogDebug("Element %s ignored", xmlElement.name() );
+        }
+        i++;
+    }
     
-    ReadTextDirInterface(tempo, vrvTempo);
-    //ReadText( tempo, vrvTempo );
-    
-    AddFloatingElement(parent, vrvTempo);
+    return success;
+}
 
-    return ReadMeiTextChildren(vrvTempo, tempo);
+bool MeiInput::ReadMeiRend( Object *parent, pugi::xml_node rend )
+{
+    Rend *vrvRend = new Rend();
+    
+    vrvRend->ReadCommon( rend );
+    vrvRend->ReadTypography( rend );
+    
+    AddTextElement(parent, vrvRend);
+    
+    return ReadMeiTextChildren(vrvRend, rend);
+}
+
+bool MeiInput::ReadMeiText( Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight )
+{
+    Text *vrvText = new Text();
+    
+    assert( text.text() );
+    std::wstring str = UTF8to16( text.text().as_string() );
+    if (trimLeft) str = this->LeftTrim( str );
+    if (trimRight) str = this->RightTrim( str );
+    
+    vrvText->SetText( str );
+    
+    AddTextElement(parent, vrvText);
+    return true;
 }
 
 bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *interface)
@@ -2165,73 +2191,6 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
     interface->ReadMultinummeasures(element);
-    return true;
-}
-    
-    
-bool MeiInput::ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, Object *filter )
-{
-    bool success = true;
-    pugi::xml_node xmlElement;
-    std::string elementName;
-    int i = 0;
-    for( xmlElement = parentNode.first_child( ); xmlElement; xmlElement = xmlElement.next_sibling( ) ) {
-        if (!success) {
-            break;
-        }
-        elementName = std::string( xmlElement.name() );
-        if ( !IsAllowed( elementName, filter ) ) {
-            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str() );
-            continue;
-        }
-        else if ( elementName == "rend" ) {
-            success = ReadMeiRend( parent, xmlElement );
-        }
-        else if ( elementName == "app" ) {
-            success = ReadMeiApp( parent, xmlElement, EDITORIAL_TEXT, filter);
-        }
-        else if ( elementName == "supplied" ) {
-            success = ReadMeiSupplied( parent, xmlElement, EDITORIAL_TEXT, filter );
-        }
-        else if ( xmlElement.text() ) {
-            bool trimLeft = (i == 0);
-            bool trimRight = (!xmlElement.next_sibling());
-            success = ReadMeiText( parent, xmlElement, trimLeft, trimRight );
-        }
-        // unknown
-        else {
-            LogDebug("Element %s ignored", xmlElement.name() );
-        }
-        i++;
-    }
-    
-    return success;
-}
-    
-bool MeiInput::ReadMeiRend( Object *parent, pugi::xml_node rend )
-{
-    Rend *vrvRend = new Rend();
-    
-    vrvRend->ReadCommon( rend );
-    vrvRend->ReadTypography( rend );
-    
-    AddTextElement(parent, vrvRend);
-    
-    return ReadMeiTextChildren(vrvRend, rend);
-}
-
-bool MeiInput::ReadMeiText( Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight )
-{
-    Text *vrvText = new Text();
-    
-    assert( text.text() );
-    std::wstring str = UTF8to16( text.text().as_string() );
-    if (trimLeft) str = this->LeftTrim( str );
-    if (trimRight) str = this->RightTrim( str );
-                                
-    vrvText->SetText( str );
-
-    AddTextElement(parent, vrvText);
     return true;
 }
     
@@ -2284,6 +2243,23 @@ bool MeiInput::ReadEditorialElement( pugi::xml_node element, EditorialElement *o
     SetMeiUuid( element, object );
     
     return true;
+}
+    
+bool MeiInput::ReadMeiEditorialElement( Object *parent, pugi::xml_node current, EditorialLevel level, Object *filter )
+{
+    if ( std::string( current.name() ) == "app" ) {
+        return ReadMeiApp( parent, current, level, filter );
+    }
+    else if ( std::string( current.name() ) == "annot" ) {
+        return ReadMeiAnnot( parent, current );
+    }
+    else if ( std::string( current.name() ) == "supplied" ) {
+        return ReadMeiSupplied( parent, current, level, filter );
+    }
+    else {
+        assert(false); // this should never happen, MeiInput::s_editorialElementNames should be updated
+        return false;
+    }
 }
 
 bool MeiInput::ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter )
@@ -2762,6 +2738,15 @@ std::wstring MeiInput::RightTrim(std::wstring str)
     while (pos > 0 && iswspace(str[pos - 1])) pos--;
     str.erase(pos);
     return str;
+}
+    
+bool MeiInput::IsEditorialElementName(std::string elementName)
+{
+    int i;
+    for (i = 0; i < EDIT_NAMES; i++) {
+        if (std::string(MeiInput::s_editorialElementNames[i]) == elementName) return true;
+    }
+    return false;
 }
     
 } // namespace vrv

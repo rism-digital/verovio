@@ -363,6 +363,7 @@ private:
      * The filter is propagated (if any)
      */
     ///@{
+    bool ReadMeiEditorialElement( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
     bool ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL );
@@ -421,6 +422,11 @@ private:
     ///@}
     
     /**
+     * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
+     */
+    bool IsEditorialElementName( std::string elementName );
+    
+    /**
      * Read score-based MEI
      */
     bool ReadScoreBasedMei( pugi::xml_node element );    
@@ -461,6 +467,11 @@ private:
      * Check if an element is allowed within a given parent
      */
     bool IsAllowed( std::string element, Object *filterParent );
+    
+    /**
+     * A static array for storing the implemented editorial elements
+     */
+    static std::string s_editorialElementNames[];
 };
 
 } // namespace vrv
