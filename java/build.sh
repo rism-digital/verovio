@@ -62,7 +62,6 @@ FILES="../src/accid.cpp \
              ../src/textelement.cpp \
              ../src/tie.cpp \
              ../src/timeinterface.cpp \
-             ../src/trem.cpp \
              ../src/toolkit.cpp \
              ../src/tuplet.cpp \
              ../src/verse.cpp \
