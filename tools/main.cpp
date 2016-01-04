@@ -127,11 +127,11 @@ void display_usage() {
     
     cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR << ")" << endl;
     
-    cerr << " --spacing-non-linear=SP    Specify the non linear spacing factor (default is " << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
+    cerr << " --spacing-non-linear=SP    Specify the non-linear spacing factor (default is " << DEFAULT_SPACING_NON_LINEAR << ")" << endl;
     
-    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)," << endl;
+    cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)" << endl;
     
-    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)," << endl;
+    cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)" << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;
@@ -320,7 +320,7 @@ int main(int argc, char** argv)
         exit(0);
     }
     
-    // Set the various flags
+    // Set the various flags in accordance with the options given
     toolkit.SetAdjustPageHeight(adjust_page_height);
     toolkit.SetNoLayout(no_layout);
     toolkit.SetIgnoreLayout(ignore_layout);
@@ -344,7 +344,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // Loaded the music font from the resource diretory
+    // Load the music font from the resource diretory
     if (!Resources::InitFonts()) {
         cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
         exit(1);

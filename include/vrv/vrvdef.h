@@ -300,6 +300,9 @@ enum ClefId {
 #define FLAT_CORNER_WIDTH_IGNORE .5
 #define NATURAL_CORNER_HEIGHT_IGNORE .25
 #define NATURAL_CORNER_WIDTH_IGNORE .5
+    
+// in half staff spaces (but should be 6 in two-voice notation)
+#define STANDARD_STEMLENGTH 7
 
 } // namespace vrv
 

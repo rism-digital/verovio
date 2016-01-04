@@ -115,7 +115,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
 
         DrawSmuflCode( dc, xNote, noteY, charCode,  pseudoStaffSize, false );
         
-        DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
+        DrawStem(dc, note, staff, true, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
     
     /************** Ledger lines: **************/
@@ -124,8 +124,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
     
     //if the note is not in the staff
-    if (!is_in(noteY,staffTop,staffBot))
-    {
+    if (!is_in(noteY,staffTop,staffBot)) {
         int distance, highestNewLine, numLines;
         bool aboveStaff = (noteY > staffTop);
         
@@ -134,7 +133,6 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
         numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
         
         DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
-
     }
     
     /************** dots **************/

@@ -205,7 +205,7 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the cumulated shift (unused)
     // param 1: the cumulated justifiable shift (unused)
-    // param 2: the minimum measure with (unused)
+    // param 2: the minimum measure width (unused)
     // param 3: the doc for accessing drawing parameters (unused)
     // param 4: the functor to be redirected to Aligner
     Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(4));

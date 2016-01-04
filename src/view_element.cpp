@@ -452,7 +452,7 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
             int beamX = chord->GetDrawingX();
             int originY = ( chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin );
             int heightY = yMax - yMin;
-            DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+            DrawStem(dc, chord, staff, false, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
         }
     }
     
@@ -599,6 +599,8 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->ResetBrush();
 }
 
+#define MENSURAL false
+    
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
     assert( dc );
@@ -609,81 +611,79 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     
     Clef *clef = dynamic_cast<Clef*>(element);
     assert( clef );
-
+    
     dc->StartGraphic( element, "", element->GetUuid() );
-	
-	int b = staff->GetDrawingY();
-	int a = element->GetDrawingX();
-    int sym = SMUFL_E050_gClef;	//sSOL, position d'ordre des cles sol fa ut in fonts
-
-    /*  poser sym=no de position sSOL dans la fonte
-     *	au depart; ne faire operation sur b qu'une fois pour cas semblables,
-     *  et au palier commun superieur, incrementer sym, sans break.
-     */
-	switch(clef->GetClefId())
-	{
-		case C1 :
+    
+    int y = staff->GetDrawingY();
+    int x = element->GetDrawingX();
+    int sym = SMUFL_E050_gClef;
+    
+    switch(clef->GetClefId())
+    {
+        case C1 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
             break;
-		case G1 :
-            b -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+        case G1 :
+            sym = (MENSURAL? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
+            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
             break;
-		case G2_8va :
+        case G2_8va :
             sym = SMUFL_E053_gClef8va;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
         case G2_8vb :
             sym = SMUFL_E052_gClef8vb;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
-		case C2 :
+        case C2 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
-		case G2 :
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
+        case G2 :
+            sym = (MENSURAL? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
-		case F3 :
+        case F3 :
             sym = SMUFL_E062_fClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
             break;
-		case C3 :
-            sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
+        case C3 :
+            sym = (MENSURAL? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
             break;
-		case F5 :
-            sym =SMUFL_E062_fClef;
-            break;
-		case F4 :
+        case F5 :
             sym = SMUFL_E062_fClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             break;
-		case C4 :
+        case F4 :
+            sym = (MENSURAL? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            break;
+        case C4 :
             sym = SMUFL_E05C_cClef;
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             break;
-		case C5 :
+        case C5 :
             sym = SMUFL_E05C_cClef;
             break;
-		case perc :
-            b -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+        case perc :
+            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
             // FIXME
             sym = SMUFL_E05C_cClef;
             break;
-		default: 
+        default:
             break;
-	}
-
+    }
+    
     bool cueSize = false;
     // force cue size for intermediate clefs
     if (clef->GetFirstParent( LAYER )) cueSize = true;
     
     //if (!cueSize)
-    //    a -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    //    x -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     
-    DrawSmuflCode ( dc, a, b, sym, staff->m_drawingStaffSize, cueSize );
-   
+    DrawSmuflCode ( dc, x, y, sym, staff->m_drawingStaffSize, cueSize );
+    
     dc->EndGraphic(element, this );
 }
 
@@ -1100,7 +1100,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     //if the note is clustered, calculations are different
     if (note->m_cluster) {
         if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-            //stem down/even cluster = noteheads start on left (incorrect side)
+            // stem down/even cluster = noteheads start on left (incorrect side)
             if (note->m_cluster->size() % 2 == 0) {
                 flippedNotehead = (note->m_clusterPosition % 2 != 0);
             }
@@ -1175,7 +1175,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
 		DrawSmuflCode( dc, xNote, noteY, fontNo,  staff->m_drawingStaffSize, drawingCueSize );
 
 		if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
-            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
+            DrawStem(dc, note, staff, false, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
 
 	}
@@ -1729,7 +1729,8 @@ void View::DrawRestWhole( DeviceContext *dc, int x, int y, int valeur, unsigned 
     }
 }
 
-void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
+void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural,
+                    data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY)
 {
     assert(dynamic_cast<DurationInterface*>(object));
     
@@ -1740,29 +1741,35 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     bool drawingCueSize = object->IsCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize)*2;
     
-    // baseStem is one octave for now (7 unit) - however, it should be 6 with 2-voice notation
-    baseStem = m_doc->GetDrawingOctaveSize(staffSize);
+    baseStem = m_doc->GetDrawingUnit(staffSize)*STANDARD_STEMLENGTH;
     flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
     if (drawingCueSize) {
         baseStem = m_doc->GetGraceSize(baseStem);
         flagStemHeight = m_doc->GetGraceSize(flagStemHeight);
     }
-
+    
     nbFlags = drawingDur - DUR_8;
     totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
     
     if (dir == STEMDIRECTION_down) {
-        // flip all lengths
+        // flip all lengths. Exception: in mensural notation, the stem will never be at left,
+        //   so leave radius as is.
         baseStem = -baseStem;
         totalFlagStemHeight = -totalFlagStemHeight;
-        radius = -radius;
+        if (!isMensural) radius = -radius;
         heightY = -heightY;
     }
     
-    // If we have flags, add them to the height
+    // If we have flags, add them to the height. If duration is longa or maxima and (probably
+    // a redundant test) note is mensural, move stem to the right side of the notehead.
     int y1 = originY;
     int y2 = ((drawingDur>DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    int x2 = xn + radius;
+    int x2;
+    if (isMensural) {
+        if (drawingDur<DUR_BR) x2 = xn + radius;
+        else x2 = xn;
+    }
+    else x2 = xn + radius;
     
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter) ) {
         y2 = verticalCenter;
@@ -1772,13 +1779,16 @@ void View::DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, data
     }
     
     // shorten the stem at its connection with the note head
-    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + m_doc->GetDrawingUnit(staffSize) / 4 : y1 - m_doc->GetDrawingUnit(staffSize) / 4;
+    int shortening;
+    if (isMensural) shortening = 0.6 * m_doc->GetDrawingUnit(staffSize);
+    else shortening = 0.25*m_doc->GetDrawingUnit(staffSize);
+    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
     int stemY2 = y2;
     if (drawingDur > DUR_4) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
         int shortener = (drawingCueSize) ?
-            m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize)) :
-            m_doc->GetDrawingUnit(staffSize);
+        m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize)) :
+        m_doc->GetDrawingUnit(staffSize);
         stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
     }
     

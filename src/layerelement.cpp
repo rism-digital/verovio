@@ -329,6 +329,9 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
     else if (this->Is() == DOT) {
         type = ALIGNMENT_DOT;
     }
+    else if (this->Is() == ACCID) {
+        type = ALIGNMENT_ACCID;
+    }
     
     // get the duration of the event
     double duration = this->GetAlignmentDuration( *currentMensur );
@@ -342,7 +345,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
         graceAligner->StackNote( dynamic_cast<Note*>(this) );
     }
     
-    //LogDebug("Time %f - %s", (*time), this->GetClassName().c_str() );
+    //LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str() );
     
     // increase the time position
     (*time) += duration;

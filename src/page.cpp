@@ -150,7 +150,7 @@ void Page::LayOutHorizontally( )
     view.DrawCurrentPage(  &bb_dc, false );
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
-    // Look at each LayerElement and changes the m_xShift if the bouding box is overlapping
+    // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     params.clear();
     int grace_min_pos = 0;
     params.push_back( &grace_min_pos );
@@ -167,7 +167,7 @@ void Page::LayOutHorizontally( )
     this->Process( &integrateBoundingBoxGraceXShift, &params );
     
     // Adjust the X shift of the Alignment looking at the bounding boxes
-    // Look at each LayerElement and changes the m_xShift if the bounding box is overlapping
+    // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     params.clear();
     int min_pos = 0;
     int measure_width = 0;
@@ -232,7 +232,7 @@ void Page::LayOutVertically( )
     view.DrawCurrentPage(  &bb_dc, false );
     
     // Adjust the Y shift of the StaffAlignment looking at the bounding boxes
-    // Look at each Staff and changes the m_yShift if the bounding box is overlapping
+    // Look at each Staff and change the m_yShift if the bounding box is overlapping
     params.clear();
     int previous_height = 0;
     int system_height = 0;
@@ -243,7 +243,7 @@ void Page::LayOutVertically( )
     this->Process( &setBoundingBoxYShift, &params, &setBoundingBoxYShiftEnd );
     
     // Set the Y position of each StaffAlignment
-    // Adjusts the Y shift for making sure there is a minimal space (staffMargin) between each staff
+    // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
     int staffMargin = doc->GetSpacingStaff() * doc->GetDrawingDoubleUnit( 100 ); // the minimal space we want to have between each staff
