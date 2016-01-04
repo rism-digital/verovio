@@ -253,7 +253,6 @@ protected:
     void DrawRestWhole( DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem( DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural,
                   data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
-    void DrawMensuralStem( DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff );
     ///@}
     

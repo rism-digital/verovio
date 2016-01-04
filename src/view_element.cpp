@@ -598,8 +598,6 @@ void View::DrawChord( DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->ResetPen();
     dc->ResetBrush();
 }
-
-#define MENSURAL false
     
 void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
 {
@@ -617,6 +615,10 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int y = staff->GetDrawingY();
     int x = element->GetDrawingX();
     int sym = SMUFL_E050_gClef;
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural ||
+                       staff->m_drawingNotationType == NOTATIONTYPE_mensural_white ||
+                       staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) ? true : false;
+                       
     
     switch(clef->GetClefId())
     {
@@ -625,7 +627,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
             break;
         case G1 :
-            sym = (MENSURAL? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
+            sym = (isMensural? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
             y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
             break;
         case G2_8va :
@@ -641,7 +643,7 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
         case G2 :
-            sym = (MENSURAL? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
+            sym = (isMensural? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
             y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
             break;
         case F3 :
@@ -649,14 +651,14 @@ void View::DrawClef( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
             break;
         case C3 :
-            sym = (MENSURAL? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
+            sym = (isMensural? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
             y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)*2;
             break;
         case F5 :
             sym = SMUFL_E062_fClef;
             break;
         case F4 :
-            sym = (MENSURAL? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
+            sym = (isMensural? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
             y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             break;
         case C4 :

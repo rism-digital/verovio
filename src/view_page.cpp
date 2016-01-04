@@ -800,7 +800,7 @@ void View::DrawStaff( DeviceContext *dc, Staff *staff, Measure *measure, System 
     // Doing it here might be problematic with cross-staff, even though the default value will be 5
     if ( StaffDef *staffDef = m_drawingScoreDef.GetStaffDef( staff->GetN() ) ) {
         staff->m_drawingLines = staffDef->GetLines( );
-        //staff->m_notationType = staffDef->GetNotationType( );
+        staff->m_drawingNotationType = staffDef->GetNotationtype();
         if (staffDef->HasScale()) {
             staff->m_drawingStaffSize = staffDef->GetScale();
         }
