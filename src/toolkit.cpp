@@ -288,8 +288,8 @@ bool Toolkit::LoadString( const std::string &data )
     }
     
     // rdg xpath query?
-    if ( m_rdgXPathQuery.length() > 0 ) {
-        input->SetRdgXPathQuery( m_rdgXPathQuery );
+    if ( m_appXPathQuery.length() > 0 ) {
+        input->SetAppXPathQuery( m_appXPathQuery );
     }
     
     // load the file
@@ -403,8 +403,8 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     if (json.has<jsonxx::Number>("spacingSystem"))
         SetSpacingSystem( json.get<jsonxx::Number>("spacingSystem") );
     
-    if (json.has<jsonxx::String>("rdgXPathQuery"))
-        SetRdgXPathQuery( json.get<jsonxx::String>("rdgXPathQuery") );
+    if (json.has<jsonxx::String>("appXPathQuery"))
+        SetAppXPathQuery( json.get<jsonxx::String>("appXPathQuery") );
     
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten

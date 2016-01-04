@@ -2513,10 +2513,10 @@ bool MeiInput::ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, Ed
 {
     assert( dynamic_cast<App*>( parent ) );
     
-    // Check if one child node matches the m_rdgXPathQuery
+    // Check if one child node matches the m_appXPathQuery
     pugi::xml_node selectedLemOrRdg;
-    if ( m_rdgXPathQuery.length() > 0 ) {
-        pugi::xpath_node selection = parentNode.select_single_node( m_rdgXPathQuery.c_str() );
+    if ( m_appXPathQuery.length() > 0 ) {
+        pugi::xpath_node selection = parentNode.select_single_node( m_appXPathQuery.c_str() );
         if ( selection ) selectedLemOrRdg = selection.node();
     }
     

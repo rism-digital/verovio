@@ -98,7 +98,7 @@ public:
     /**
      * Set XPath query for <rdg> (MEI only)
      */
-    virtual void SetRdgXPathQuery( std::string xPathQuery ) {};
+    virtual void SetAppXPathQuery( std::string xPathQuery ) {};
     
 private:
     /**

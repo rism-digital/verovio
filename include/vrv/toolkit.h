@@ -270,8 +270,8 @@ public:
      * @name Set and get the xPath query for selecting <rdg> (if any)
      */
     ///@{
-    void SetRdgXPathQuery( std::string const &rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
-    std::string GetRdgXPathQuery() { return m_rdgXPathQuery; };
+    void SetAppXPathQuery( std::string const &appXPathQuery ) { m_appXPathQuery = appXPathQuery; };
+    std::string GetAppXPathQuery() { return m_appXPathQuery; };
     ///@}
     
     /**
@@ -342,7 +342,7 @@ private:
     bool m_noLayout;
     bool m_ignoreLayout;
     bool m_adjustPageHeight;
-    std::string m_rdgXPathQuery;
+    std::string m_appXPathQuery;
     bool m_scoreBasedMei;
     bool m_evenNoteSpacing;
     float m_spacingLinear;

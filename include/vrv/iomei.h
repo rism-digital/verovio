@@ -299,7 +299,7 @@ public:
      * If a query is provided, the element retieved by the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
-    virtual void SetRdgXPathQuery( std::string rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
+    virtual void SetAppXPathQuery( std::string appXPathQuery ) { m_appXPathQuery = appXPathQuery; };
     
 private:
     bool ReadMei( pugi::xml_node root );
@@ -489,7 +489,7 @@ private:
     /**
      *
      */
-    std::string m_rdgXPathQuery;
+    std::string m_appXPathQuery;
     
     /**
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.

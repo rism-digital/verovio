@@ -230,7 +230,7 @@ int main(int argc, char** argv)
                 }
                 else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
                     cout << string(optarg) << endl;
-                    toolkit.SetRdgXPathQuery( string(optarg) );
+                    toolkit.SetAppXPathQuery( string(optarg) );
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-linear") == 0) {
                     if ( !toolkit.SetSpacingLinear( atof(optarg) ) ) {
