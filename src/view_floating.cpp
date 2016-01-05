@@ -1030,7 +1030,7 @@ void View::DrawTempo( DeviceContext *dc, Tempo *tempo, Measure *measure, System 
     
     // Use Romam bold for tempo
     FontInfo tempoTxt;
-    tempoTxt.SetFaceName("Roman");
+    tempoTxt.SetFaceName("Times");
     tempoTxt.SetWeight(FONTWEIGHT_bold);
     tempoTxt.SetPointSize( m_doc->GetDrawingLyricFont(100)->GetPointSize() );
     
