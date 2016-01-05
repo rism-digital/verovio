@@ -97,7 +97,8 @@ namespace vrv {
 #define DEFAULT_LEFT_MARGIN_DEFAULT 0.0
 #define MIN_LEFT_MARGIN_DEFAULT -10.0
 #define MAX_LEFT_MARGIN_DEFAULT 10.0
-    
+
+#define DEFAULT_LEFT_MARGIN_ACCID 1.0
 #define DEFAULT_LEFT_MARGIN_BARLINE DEFAULT_LEFT_MARGIN_DEFAULT
 #define DEFAULT_LEFT_MARGIN_BARLINE_ATTR 2.0
 #define DEFAULT_LEFT_MARGIN_BEATRPT 2.0
@@ -112,14 +113,14 @@ namespace vrv {
 #define DEFAULT_LEFT_MARGIN_MULTIRPT DEFAULT_LEFT_MARGIN_DEFAULT
 #define DEFAULT_LEFT_MARGIN_NOTE 1.0
 #define DEFAULT_LEFT_MARGIN_REST 1.0
-#define DEFAULT_LEFT_MARGIN_ACCID 1.0
     
 /** Right margins */
 
 #define DEFAULT_RIGHT_MARGIN_DEFAULT 1.0
 #define MIN_RIGHT_MARGIN_DEFAULT 0.0
 #define MAX_RIGHT_MARGIN_DEFAULT 10.0
-    
+  
+#define DEFAULT_RIGHT_MARGIN_ACCID 0.0
 #define DEFAULT_RIGHT_MARGIN_BARLINE 2.0
 #define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR 0.0
 #define DEFAULT_RIGHT_MARGIN_BEATRPT DEFAULT_RIGHT_MARGIN_DEFAULT
@@ -134,7 +135,6 @@ namespace vrv {
 #define DEFAULT_RIGHT_MARGIN_MULTIRPT DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_NOTE 0.0
 #define DEFAULT_RIGHT_MARGIN_REST 0.0
-#define DEFAULT_RIGHT_MARGIN_ACCID 0.0
     
 //----------------------------------------------------------------------------
 // Style
@@ -231,6 +231,7 @@ public:
     char m_leftPosition;
     
     /** The layout left margin by element */
+    char m_leftMarginAccid;
     char m_leftMarginBarLine;
     char m_leftMarginBarLineAttr;
     char m_leftMarginBeatRpt;
@@ -245,11 +246,11 @@ public:
     char m_leftMarginMultiRpt;
     char m_leftMarginNote;
     char m_leftMarginRest;
-    char m_leftMarginAccid;
     /** The default left margin */
     char m_leftMarginDefault;
     
     /** The layout right margin by element */
+    char m_rightMarginAccid;
     char m_rightMarginBarLine;
     char m_rightMarginBarLineAttr;
     char m_rightMarginBeatRpt;
@@ -264,7 +265,6 @@ public:
     char m_rightMarginMultiRpt;
     char m_rightMarginNote;
     char m_rightMarginRest;
-    char m_rightMarginAccid;
 
     /** The default right margin */
     char m_rightMarginDefault;

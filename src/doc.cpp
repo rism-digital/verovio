@@ -536,7 +536,9 @@ FontInfo *Doc::GetDrawingLyricFont( int staffSize )
     
 char Doc::GetLeftMargin( const ClassId classId  )
 {
-    if (classId == BARLINE) return m_style->m_leftMarginBarLine;
+    
+    if (classId == ACCID) return m_style->m_leftMarginAccid;
+    else if (classId == BARLINE) return m_style->m_leftMarginBarLine;
     else if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarLineAttr;
     else if (classId == BEATRPT) return m_style->m_leftMarginBeatRpt;
     else if (classId == CHORD) return m_style->m_leftMarginChord;
@@ -550,13 +552,13 @@ char Doc::GetLeftMargin( const ClassId classId  )
     else if (classId == MULTIRPT) return m_style->m_leftMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_leftMarginNote;
     else if (classId == REST) return m_style->m_leftMarginRest;
-    else if (classId == ACCID) return m_style->m_leftMarginAccid;
     return m_style->m_leftMarginDefault;
 }
     
 char Doc::GetRightMargin( const ClassId classId )
 {
-    if (classId == BARLINE) return m_style->m_rightMarginBarLine;
+    if (classId == ACCID) return m_style->m_rightMarginAccid;
+    else if (classId == BARLINE) return m_style->m_rightMarginBarLine;
     else if (classId == BARLINE_ATTR) return m_style->m_rightMarginBarLineAttr;
     else if (classId == BEATRPT) return m_style->m_rightMarginBeatRpt;
     else if (classId == CHORD) return m_style->m_rightMarginChord;
@@ -570,7 +572,6 @@ char Doc::GetRightMargin( const ClassId classId )
     else if (classId == MULTIRPT) return m_style->m_rightMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_rightMarginNote;
     else if (classId == REST) return m_style->m_rightMarginRest;
-    else if (classId == ACCID) return m_style->m_rightMarginAccid;
     return m_style->m_rightMarginDefault;
 }
 

@@ -61,6 +61,7 @@ Style::Style()
     m_leftPosition = DEFAULT_LEFT_POSITION * DEFINITON_FACTOR;
     
     /** The layout left margin by element */
+    m_leftMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITON_FACTOR;
     m_leftMarginBarLine = DEFAULT_LEFT_MARGIN_BARLINE * DEFINITON_FACTOR;
     m_leftMarginBarLineAttr = DEFAULT_LEFT_MARGIN_BARLINE_ATTR * DEFINITON_FACTOR;
     m_leftMarginBeatRpt = DEFAULT_LEFT_MARGIN_BEATRPT * DEFINITON_FACTOR;
@@ -75,11 +76,11 @@ Style::Style()
     m_leftMarginMultiRpt = DEFAULT_LEFT_MARGIN_MULTIRPT * DEFINITON_FACTOR;
     m_leftMarginNote = DEFAULT_LEFT_MARGIN_NOTE * DEFINITON_FACTOR;
     m_leftMarginRest = DEFAULT_LEFT_MARGIN_REST * DEFINITON_FACTOR;
-    m_leftMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITON_FACTOR;
     /** The default left margin */
     m_leftMarginDefault = DEFAULT_LEFT_MARGIN_DEFAULT * DEFINITON_FACTOR;
     
     /** The layout right margin by element */
+    m_rightMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITON_FACTOR;
     m_rightMarginBarLine = DEFAULT_RIGHT_MARGIN_BARLINE * DEFINITON_FACTOR;
     m_rightMarginBarLineAttr = DEFAULT_RIGHT_MARGIN_BARLINE_ATTR * DEFINITON_FACTOR;
     m_rightMarginBeatRpt = DEFAULT_RIGHT_MARGIN_BEATRPT * DEFINITON_FACTOR;
@@ -94,7 +95,6 @@ Style::Style()
     m_rightMarginMultiRpt = DEFAULT_RIGHT_MARGIN_MULTIRPT * DEFINITON_FACTOR;
     m_rightMarginNote = DEFAULT_RIGHT_MARGIN_NOTE * DEFINITON_FACTOR;
     m_rightMarginRest = DEFAULT_RIGHT_MARGIN_REST * DEFINITON_FACTOR;
-    m_rightMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITON_FACTOR;
     /** The default right margin */
     m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * DEFINITON_FACTOR;
 }
