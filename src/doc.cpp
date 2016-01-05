@@ -550,6 +550,7 @@ char Doc::GetLeftMargin( const ClassId classId  )
     else if (classId == MULTIRPT) return m_style->m_leftMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_leftMarginNote;
     else if (classId == REST) return m_style->m_leftMarginRest;
+    else if (classId == ACCID) return m_style->m_leftMarginAccid;
     return m_style->m_leftMarginDefault;
 }
     
@@ -569,6 +570,7 @@ char Doc::GetRightMargin( const ClassId classId )
     else if (classId == MULTIRPT) return m_style->m_rightMarginMultiRpt;
     else if (classId == NOTE) return m_style->m_rightMarginNote;
     else if (classId == REST) return m_style->m_rightMarginRest;
+    else if (classId == ACCID) return m_style->m_rightMarginAccid;
     return m_style->m_rightMarginDefault;
 }
 

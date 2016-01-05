@@ -75,6 +75,7 @@ Style::Style()
     m_leftMarginMultiRpt = DEFAULT_LEFT_MARGIN_MULTIRPT * DEFINITON_FACTOR;
     m_leftMarginNote = DEFAULT_LEFT_MARGIN_NOTE * DEFINITON_FACTOR;
     m_leftMarginRest = DEFAULT_LEFT_MARGIN_REST * DEFINITON_FACTOR;
+    m_leftMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITON_FACTOR;
     /** The default left margin */
     m_leftMarginDefault = DEFAULT_LEFT_MARGIN_DEFAULT * DEFINITON_FACTOR;
     
@@ -93,6 +94,7 @@ Style::Style()
     m_rightMarginMultiRpt = DEFAULT_RIGHT_MARGIN_MULTIRPT * DEFINITON_FACTOR;
     m_rightMarginNote = DEFAULT_RIGHT_MARGIN_NOTE * DEFINITON_FACTOR;
     m_rightMarginRest = DEFAULT_RIGHT_MARGIN_REST * DEFINITON_FACTOR;
+    m_rightMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITON_FACTOR;
     /** The default right margin */
     m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * DEFINITON_FACTOR;
 }
