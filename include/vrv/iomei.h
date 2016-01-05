@@ -21,6 +21,7 @@ namespace vrv {
 class Abbr;
 class Accid;
 class Add;
+class AnchoredText;
 class Annot;
 class App;
 class BarLine;
@@ -174,6 +175,7 @@ private:
      * @name Methods for writing FloatingElement
      */
     ///@{
+    void WriteMeiAnchoredText( pugi::xml_node currentNode, AnchoredText *anchoredText );
     void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
     void WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo );
     void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
@@ -367,6 +369,7 @@ private:
      * @name Methods for reading MEI floating elements
      */
     ///@{
+    bool ReadMeiAnchoredText( Object *parent, pugi::xml_node anchoredText );
     bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
     bool ReadMeiTempo( Object *parent, pugi::xml_node tempo );
     bool ReadMeiTie( Object *parent, pugi::xml_node tie );

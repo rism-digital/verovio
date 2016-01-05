@@ -207,6 +207,10 @@ bool MeiOutput::WriteObject( Object *object )
     }
     
     // Measure elements
+    else if (object->Is() == ANCHORED_TEXT) {
+        m_currentNode = m_currentNode.append_child("anchoredText");
+        WriteMeiAnchoredText( m_currentNode, dynamic_cast<AnchoredText*>(object) );
+    }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
         WriteMeiSlur( m_currentNode, dynamic_cast<Slur*>(object) );
@@ -573,18 +577,16 @@ bool MeiOutput::WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure )
     measure->WritePointing(currentNode);
     
     return true;
-}    
+}
 
-void MeiOutput::WriteMeiTie( pugi::xml_node currentNode, Tie *tie )
+void MeiOutput::WriteMeiAnchoredText( pugi::xml_node currentNode, AnchoredText *anchoredText )
 {
-    assert( tie );
+    assert( anchoredText );
     
-    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tie ).c_str();
-    
-    WriteTimeSpanningInterface(currentNode, tie);
-    
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( anchoredText ).c_str();
+    WriteTextDirInterface(currentNode, anchoredText);
     return;
-};
+}
 
 void MeiOutput::WriteMeiSlur( pugi::xml_node currentNode, Slur *slur )
 {
@@ -617,6 +619,26 @@ bool MeiOutput::WriteMeiStaff( pugi::xml_node currentNode, Staff *staff )
 
     return true;
 }
+    
+void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo )
+{
+    assert( tempo );
+    
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tempo ).c_str();
+    WriteTextDirInterface( currentNode, tempo);
+    return;
+}
+    
+void MeiOutput::WriteMeiTie( pugi::xml_node currentNode, Tie *tie )
+{
+    assert( tie );
+    
+    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tie ).c_str();
+    
+    WriteTimeSpanningInterface(currentNode, tie);
+    
+    return;
+};
 
 bool MeiOutput::WriteMeiLayer( pugi::xml_node currentNode, Layer *layer )
 {
@@ -877,16 +899,6 @@ void MeiOutput::WriteMeiSyl( pugi::xml_node currentNode, Syl *syl )
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( syl ).c_str();
     syl->WriteTypography( currentNode );
     syl->WriteSylLog( currentNode );
-    return;
-}
-
-void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo )
-{
-    assert( tempo );
-    
-    currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tempo ).c_str();
-    WriteTextDirInterface( currentNode, tempo);
-    //WriteText( currentNode, tempo );
     return;
 }
 
@@ -1663,11 +1675,14 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
             success = ReadMeiEditorialElement( parent, current, EDITORIAL_MEASURE );
         }
         // content
-        else if ( std::string( current.name() ) == "staff" ) {
-            success = ReadMeiStaff( parent, current );
+        else if ( std::string( current.name() ) == "anchoredText" ) {
+            success = ReadMeiAnchoredText( parent, current );
         }
         else if ( std::string( current.name() ) == "slur" ) {
             success = ReadMeiSlur( parent, current );
+        }
+        else if ( std::string( current.name() ) == "staff" ) {
+            success = ReadMeiStaff( parent, current );
         }
         else if ( std::string( current.name() ) == "tempo" ) {
             success = ReadMeiTempo( parent, current );
@@ -1686,6 +1701,18 @@ bool MeiInput::ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode
     }
     
     return success;
+}
+    
+bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
+{
+    AnchoredText *vrvAnchoredText = new AnchoredText();
+    SetMeiUuid(anchoredText, vrvAnchoredText);
+    
+    ReadTextDirInterface(anchoredText, vrvAnchoredText);
+    
+    AddFloatingElement(parent, vrvAnchoredText);
+    
+    return ReadMeiTextChildren(vrvAnchoredText, anchoredText);
 }
 
 bool MeiInput::ReadMeiSlur( Object *parent, pugi::xml_node slur )

@@ -17,6 +17,45 @@ namespace vrv {
 class TextElement;
     
 //----------------------------------------------------------------------------
+// AnchoredText
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for <anchoredText> elements at the measure level
+ */
+class AnchoredText: public FloatingElement, public TextDirInterface
+{
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    AnchoredText();
+    virtual ~AnchoredText();
+    virtual void Reset();
+    virtual std::string GetClassName( ) { return "AnchoredText"; };
+    virtual ClassId Is() { return ANCHORED_TEXT; };
+    ///@}
+    
+    /**
+     * Add an element (text, rend. etc.) to a tempo.
+     * Only supported elements will be actually added to the child list.
+     */
+    void AddTextElement(TextElement *element);
+    
+protected:
+    
+private:
+    
+public:
+    
+private:
+    
+};
+
+    
+//----------------------------------------------------------------------------
 // Tempo
 //----------------------------------------------------------------------------
 

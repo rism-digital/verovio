@@ -140,6 +140,7 @@ enum ClassId {
     LAYER_ELEMENT_max,
     // Ids for FloatingElement child classes
     FLOATING_ELEMENT,
+    ANCHORED_TEXT,
     SLUR,
     TEMPO,
     TIE,

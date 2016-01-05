@@ -21,6 +21,40 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// AnchoredText
+//----------------------------------------------------------------------------
+
+AnchoredText::AnchoredText():
+FloatingElement("anchtext-"), TextDirInterface()
+{
+    RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
+    
+    Reset();
+}
+
+
+AnchoredText::~AnchoredText()
+{
+}
+
+void AnchoredText::Reset()
+{
+    FloatingElement::Reset();
+    TextDirInterface::Reset();
+}
+
+void AnchoredText::AddTextElement(TextElement *element)
+{
+    assert(
+           dynamic_cast<TextElement*>(element)
+           || dynamic_cast<EditorialElement*>(element)
+           );
+    element->SetParent( this );
+    m_children.push_back(element);
+    Modify();
+}
+    
+//----------------------------------------------------------------------------
 // Tempo
 //----------------------------------------------------------------------------
 
