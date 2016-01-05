@@ -485,6 +485,13 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
 {
     assert( m_fontStack.top() );
     
+    std::string svgText = text;
+    // Because IE does not support xml:space="preserve", we need to replace the initial
+    // space with a non breakable space
+    if ((svgText.length() > 0) && (svgText[0] == ' ')) {
+        svgText.replace(0, 1, "\xC2\xA0");
+    }
+    
     pugi::xml_node textChild = m_currentNode.append_child( "tspan" );
     if ( !m_fontStack.top()->GetFaceName().empty() ) {
         textChild.append_attribute( "font-family" ) = m_fontStack.top()->GetFaceName().c_str();
@@ -512,7 +519,7 @@ void SvgDeviceContext::DrawText(const std::string& text, const std::wstring wtex
     }
     textChild.append_attribute("class") = "text";
     textChild.append_attribute("xml:space") = "preserve";
-    textChild.append_child(pugi::node_pcdata).set_value(text.c_str());
+    textChild.append_child(pugi::node_pcdata).set_value(svgText.c_str());
 }
 
 
