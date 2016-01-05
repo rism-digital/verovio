@@ -112,6 +112,7 @@ namespace vrv {
 #define DEFAULT_LEFT_MARGIN_MULTIRPT DEFAULT_LEFT_MARGIN_DEFAULT
 #define DEFAULT_LEFT_MARGIN_NOTE 1.0
 #define DEFAULT_LEFT_MARGIN_REST 1.0
+#define DEFAULT_LEFT_MARGIN_ACCID 1.0
     
 /** Right margins */
 
@@ -133,6 +134,7 @@ namespace vrv {
 #define DEFAULT_RIGHT_MARGIN_MULTIRPT DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_NOTE 0.0
 #define DEFAULT_RIGHT_MARGIN_REST 0.0
+#define DEFAULT_RIGHT_MARGIN_ACCID 0.0
     
 //----------------------------------------------------------------------------
 // Style
@@ -154,7 +156,6 @@ namespace vrv {
 #define TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
     
 /* Style parameters for mensural notation */
-
 // Ratio of mensural notehead size to CMN notehead size for the same staff size
 #define MNOTEHEAD_SIZE_FACTOR 0.90
 // Size of mensuration sign circle relative to space between staff lines
@@ -244,6 +245,7 @@ public:
     char m_leftMarginMultiRpt;
     char m_leftMarginNote;
     char m_leftMarginRest;
+    char m_leftMarginAccid;
     /** The default left margin */
     char m_leftMarginDefault;
     
@@ -262,6 +264,7 @@ public:
     char m_rightMarginMultiRpt;
     char m_rightMarginNote;
     char m_rightMarginRest;
+    char m_rightMarginAccid;
 
     /** The default right margin */
     char m_rightMarginDefault;

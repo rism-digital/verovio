@@ -1049,41 +1049,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-
-// ??? THIS SHOULD BE SOMEWHERE WHERE IT CAN BE USED BOTH HERE & IN view_element (AT LEAST)!!!
-
-void ElementTypeStringZ(LayerElement *element, char *str)
-{
-    if (element->Is() == ACCID) { strcpy(str, "ACCID"); }
-    else if (element->Is() == BARLINE) { strcpy(str, "BARLINE"); }
-    else if (element->Is() == BEAM) { strcpy(str, "BEAM"); }
-    else if (element->Is() == BEATRPT) { strcpy(str, "BEATRPT"); }
-    else if (element->Is() == CHORD) { strcpy(str, "CHORD"); }
-    else if (element->Is() == CLEF) { strcpy(str, "CLEF"); }
-    else if (element->Is() == CUSTOS) { strcpy(str, "CUSTOS"); }
-    else if (element->Is() == DOT) { strcpy(str, "DOT"); }
-    else if (element->Is() == KEYSIG) { strcpy(str, "KEYSIG"); }
-    else if (element->Is() == MENSUR) { strcpy(str, "MENSUR"); }
-    else if (element->Is() == METERSIG) { strcpy(str, "METERSIG"); }
-    else if (element->Is() == MREST) { strcpy(str, "MREST"); }
-    else if (element->Is() == MRPT) { strcpy(str, "MRPT"); }
-    else if (element->Is() == MRPT2) { strcpy(str, "MRPT2"); }
-    else if (element->Is() == MULTIREST) { strcpy(str, "MULTIREST"); }
-    else if (element->Is() == MULTIRPT) { strcpy(str, "MULTIRPT"); }
-    else if (element->Is() == NOTE) { strcpy(str, "NOTE"); }
-    else if (element->Is() == PROPORT) { strcpy(str, "PROPORT"); }
-    else if (element->Is() == REST) { strcpy(str, "REST"); }
-    else if (element->Is() == SPACE) { strcpy(str, "SPACE"); }
-    else if (element->Is() == SYL) { strcpy(str, "SYL"); }
-    else if (element->Is() == TUPLET) { strcpy(str, "TUPLET"); }
-    else if (element->Is() == VERSE) { strcpy(str, "VERSE"); }
-    else {
-        // This should never happen
-        strcpy(str, "** UNKNOWN **");
-    }
-}
     
-
 int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 {
     // param 0: the minimum position (i.e., the width of the previous element)
@@ -1196,10 +1162,12 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = current->m_contentBB_x2;
     if (!current->HasEmptyBB()) width += doc->GetRightMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+
+    // ???TEMPORARY! DEBUGGING!!!!!!!!!!!!!!!!!!!!!!
+    if ( (current->Is() == ACCID) ) width /= 2;
+    
     (*min_pos) = current->GetAlignment()->GetXRel() + width;
-    char str[40];
-    ElementTypeStringZ( current, str );
-    LogDebug("SetBoundingBoxXShift: type='%s' Alignment=%d width=%d (*min_pos)=%d", str,
+    LogDebug("SetBoundingBoxXShift: type='%s' Alignment=%d width=%d (*min_pos)=%d", (current->GetClassName()).c_str(),
              current->GetAlignment(), width, (*min_pos));
     current->GetAlignment()->SetMaxWidth( width );
     
