@@ -131,9 +131,9 @@ bool Resources::LoadFont(std::string fontName)
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    for( current = root.child("glyph"); current; current = current.next_sibling("glyph") ) {
-        if ( current.attribute( "glyph-code" ) ) {
-            wchar_t smuflCode = (wchar_t)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
+    for( current = root.child("g"); current; current = current.next_sibling("g") ) {
+        if ( current.attribute( "c" ) ) {
+            wchar_t smuflCode = (wchar_t)strtol( current.attribute( "c" ).value(), NULL, 16);
             if (!m_font.count(smuflCode)) {
                 LogWarning("Glyph with code '%d' not found.", smuflCode);
                 continue;
@@ -147,8 +147,8 @@ bool Resources::LoadFont(std::string fontName)
             // Not check for missing values...
             if ( current.attribute( "x" ) ) x = atof( current.attribute( "x" ).value() );
             if ( current.attribute( "y" ) ) y = atof( current.attribute( "y" ).value() );
-            if ( current.attribute( "width" ) ) width = atof( current.attribute( "width" ).value() );
-            if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
+            if ( current.attribute( "w" ) ) width = atof( current.attribute( "w" ).value() );
+            if ( current.attribute( "h" ) ) height = atof( current.attribute( "h" ).value() );
             glyph->SetBoundingBox(x, y, width, height);
         }
     }
@@ -178,9 +178,9 @@ bool Resources::InitTextFont()
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    for( current = root.child("glyph"); current; current = current.next_sibling("glyph") ) {
-        if ( current.attribute( "glyph-code" ) ) {
-            wchar_t code = (wchar_t)strtol( current.attribute( "glyph-code" ).value(), NULL, 16);
+    for( current = root.child("g"); current; current = current.next_sibling("g") ) {
+        if ( current.attribute( "c" ) ) {
+            wchar_t code = (wchar_t)strtol( current.attribute( "c" ).value(), NULL, 16);
             // We create a glyph with only the units per em which is the only info we need for
             // the bounding boxes; path and codeStr will remain [unset]
             Glyph glyph( unitsPerEm );
@@ -188,8 +188,8 @@ bool Resources::InitTextFont()
             // Not check for missing values...
             if ( current.attribute( "x" ) ) x = atof( current.attribute( "x" ).value() );
             if ( current.attribute( "y" ) ) y = atof( current.attribute( "y" ).value() );
-            if ( current.attribute( "width" ) ) width = atof( current.attribute( "width" ).value() );
-            if ( current.attribute( "height" ) ) height = atof( current.attribute( "height" ).value() );
+            if ( current.attribute( "w" ) ) width = atof( current.attribute( "w" ).value() );
+            if ( current.attribute( "h" ) ) height = atof( current.attribute( "h" ).value() );
             glyph.SetBoundingBox(x, y, width, height);
             m_textFont[code] = glyph;
         }
