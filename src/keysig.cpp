@@ -113,6 +113,7 @@ void KeySig::Init()
 {
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_PITCH);
+    
     Reset();
 }
 
@@ -125,6 +126,7 @@ void KeySig::Reset()
     LayerElement::Reset();
     ResetAccidental();
     ResetPitch();
+    
     m_alterationNumber = 0;
     m_alterationType = ACCIDENTAL_EXPLICIT_n;
     

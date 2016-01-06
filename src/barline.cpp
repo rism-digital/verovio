@@ -19,6 +19,7 @@ BarLine::BarLine():
     AttBarLineLog()
 {
     RegisterAttClass(ATT_BARLINELOG);
+    
     Reset();
 }
 

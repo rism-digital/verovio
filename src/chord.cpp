@@ -29,12 +29,11 @@ Chord::Chord( ):
     AttStemsCmn(),
     AttTiepresent()
 {
+    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
-    
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
     
     Reset();
     
@@ -49,7 +48,6 @@ Chord::~Chord()
 
 void Chord::Reset()
 {
-    ClearClusters();
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
@@ -57,6 +55,8 @@ void Chord::Reset()
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
+    
+    ClearClusters();
 }
     
 void Chord::ClearClusters()

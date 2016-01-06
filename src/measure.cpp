@@ -37,10 +37,12 @@ Measure::Measure( bool measureMusic, int logMeasureNb ):
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
     RegisterAttClass(ATT_POINTING);
+    
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
     // See Object::SetParentDoc()
     m_measureAligner.SetParent( this );
+    
     Reset();
 }
 

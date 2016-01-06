@@ -33,6 +33,7 @@ EditorialElement::EditorialElement():
     AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
+    
     Reset();
 }
 
@@ -41,6 +42,7 @@ EditorialElement::EditorialElement(std::string classid):
     AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
+    
     Reset();
 }
 
@@ -48,6 +50,7 @@ void EditorialElement::Reset()
 {
     DocObject::Reset();
     ResetCommon();
+    
     m_visibility = Visible;
 }
 
@@ -136,6 +139,7 @@ Abbr::Abbr( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -158,6 +162,7 @@ Add::Add( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -183,6 +188,7 @@ Annot::Annot( ):
 {
     RegisterAttClass( ATT_PLIST );
     RegisterAttClass( ATT_SOURCE );
+    
     Reset();
 }
 
@@ -205,6 +211,7 @@ App::App():
     EditorialElement("app-")
 {
     m_level = EDITORIAL_UNDEFINED;
+    
     Reset();
 }
     
@@ -212,6 +219,7 @@ App::App( EditorialLevel level ):
     EditorialElement("app-")
 {
     m_level = level;
+    
     Reset();
 }
     
@@ -241,6 +249,7 @@ Corr::Corr( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -263,6 +272,7 @@ Damage::Damage( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -285,6 +295,7 @@ Del::Del( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -307,6 +318,7 @@ Expan::Expan( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -329,6 +341,7 @@ Lem::Lem( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -351,6 +364,7 @@ Orig::Orig( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -373,6 +387,7 @@ Rdg::Rdg( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -395,6 +410,7 @@ Reg::Reg( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -418,6 +434,7 @@ Restore::Restore( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -441,6 +458,7 @@ Sic::Sic( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -463,6 +481,7 @@ Supplied::Supplied( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 
@@ -485,6 +504,7 @@ Unclear::Unclear( ):
     AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
+    
     Reset();
 }
 

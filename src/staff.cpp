@@ -32,6 +32,7 @@ Staff::Staff( int n ):
     AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
+    
     Reset();
     SetN(n);
 }
@@ -45,9 +46,7 @@ void Staff::Reset()
 {
     DocObject::Reset();
     ResetCommon();
-    notAnc = false; // LP we want modern notation :))  ??OR DO WE? CHECK!
-    grise = false;
-    invisible = false;
+    
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;

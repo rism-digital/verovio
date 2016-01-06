@@ -40,6 +40,7 @@ Page::~Page()
 void Page::Reset()
 {
     DocObject::Reset();
+    
     m_drawingScoreDef.Reset();
     m_layoutDone = false;
     this->ResetUuid();

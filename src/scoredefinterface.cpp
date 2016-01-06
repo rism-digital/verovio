@@ -43,6 +43,7 @@ ScoreDefInterface::ScoreDefInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
+    
     Reset();
 }
 

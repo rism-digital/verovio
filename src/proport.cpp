@@ -19,6 +19,7 @@ Proport::Proport():
     AttDurationRatio()
 {
     RegisterAttClass(ATT_DURATIONRATIO);
+    
     Reset();
 }
 

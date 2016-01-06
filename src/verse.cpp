@@ -31,6 +31,7 @@ Verse::Verse():
     AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
+    
     Reset();
 }
 

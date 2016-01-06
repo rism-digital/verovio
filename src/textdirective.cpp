@@ -62,9 +62,8 @@ Tempo::Tempo():
     FloatingElement("tempo-"), TextDirInterface(),
     AttTimestampMusical()
 {
-    RegisterAttClass( ATT_TIMESTAMPMUSICAL );
-    
     RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
+    RegisterAttClass( ATT_TIMESTAMPMUSICAL );
     
     Reset();
 }

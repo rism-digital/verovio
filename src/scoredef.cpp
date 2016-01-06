@@ -195,6 +195,7 @@ ScoreDef::~ScoreDef()
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
+    
     m_drawLabels = false;
     m_drawingWidth = 0;
 }
@@ -360,6 +361,7 @@ StaffGrp::StaffGrp() : Object(), ObjectListInterface(),
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
+    
     Reset();
 }
 
@@ -426,6 +428,7 @@ StaffDef::StaffDef() :
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFVIS);
+    
     Reset();
 }
 

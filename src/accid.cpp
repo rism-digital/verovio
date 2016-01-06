@@ -26,10 +26,10 @@ Accid::Accid():
     AttAccidental(),
     AttAccidLog()
 {
-    RegisterAttClass(ATT_ACCIDENTAL);
-    RegisterAttClass(ATT_ACCIDLOG);
     
     RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    RegisterAttClass(ATT_ACCIDENTAL);
+    RegisterAttClass(ATT_ACCIDLOG);
     
     Reset();
 }
@@ -42,7 +42,6 @@ void Accid::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
-    
     ResetAccidental();
     ResetAccidLog();
 }

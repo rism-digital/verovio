@@ -36,6 +36,7 @@ MeterSig::MeterSig( ScoreDefInterface *meterSigAttr ):
 void MeterSig::Init()
 {
     RegisterAttClass(ATT_METERSIGLOG);
+    
     Reset();
 }
 

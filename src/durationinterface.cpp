@@ -43,6 +43,7 @@ DurationInterface::DurationInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_DURATIONRATIO);
     RegisterInterfaceAttClass(ATT_FERMATAPRESENT);
     RegisterInterfaceAttClass(ATT_STAFFIDENT);
+    
     Reset();
 }
 

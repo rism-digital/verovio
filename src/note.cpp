@@ -35,15 +35,14 @@ Note::Note():
     AttStemsCmn(),
     AttTiepresent()
 {
+    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
+    RegisterInterface( PitchInterface::GetAttClasses(), PitchInterface::IsInterface() );
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
-    
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
-    RegisterInterface( PitchInterface::GetAttClasses(), PitchInterface::IsInterface() );
     
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
@@ -72,7 +71,6 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
-    
     ResetColoration();
     ResetGraced();
     ResetNoteLogMensural();

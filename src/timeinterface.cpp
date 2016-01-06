@@ -35,6 +35,7 @@ TimeSpanningInterface::TimeSpanningInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_STARTID);
     RegisterInterfaceAttClass(ATT_TIMESTAMPMUSICAL);
     RegisterInterfaceAttClass(ATT_TIMESTAMP2MUSICAL);
+    
     Reset();
 }
 

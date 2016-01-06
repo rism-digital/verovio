@@ -31,10 +31,9 @@ Syl::Syl():
     AttTypography(),
     AttSylLog()
 {
+    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
     RegisterAttClass(ATT_TYPOGRAPHY);
     RegisterAttClass(ATT_SYLLOG);
-    
-    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
     
     Reset();
 }

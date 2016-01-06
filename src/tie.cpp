@@ -24,9 +24,8 @@ Tie::Tie():
     FloatingElement("tie-"), TimeSpanningInterface(),
     AttCurvature()
 {
-    RegisterAttClass(ATT_CURVATURE);
-    
     RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
+    RegisterAttClass(ATT_CURVATURE);
     
     Reset();
 }

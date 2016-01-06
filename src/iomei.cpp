@@ -610,9 +610,6 @@ bool MeiOutput::WriteMeiStaff( pugi::xml_node currentNode, Staff *staff )
     staff->WriteCommon(currentNode);
     
     // y position
-    if ( staff->notAnc ) {
-        currentNode.append_attribute( "label" ) = "mensural";
-    }
     if ( staff->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute( "uly" ) = StringFormat( "%d", staff->m_yAbs ).c_str();
     }
@@ -1765,10 +1762,6 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
     
     if ( staff.attribute( "uly" ) ) {
         vrvStaff->m_yAbs = atoi ( staff.attribute( "uly" ).value() ) * DEFINITON_FACTOR;
-    }
-    if ( staff.attribute( "label" ) ) {
-        // we use type only for typing mensural notation
-        vrvStaff->notAnc = true;
     }
     
     if ( !vrvStaff->HasN() ) {

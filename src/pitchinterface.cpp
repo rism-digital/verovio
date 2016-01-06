@@ -31,6 +31,7 @@ PitchInterface::PitchInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_ACCIDENTAL);
     RegisterInterfaceAttClass(ATT_OCTAVE);
     RegisterInterfaceAttClass(ATT_PITCH);
+    
     Reset();
 }
 

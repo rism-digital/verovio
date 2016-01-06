@@ -41,7 +41,6 @@ Rend::~Rend()
 void Rend::Reset()
 {
     TextElement::Reset();
-    
     ResetCommon();
     ResetTypography();
 }

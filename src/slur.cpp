@@ -24,10 +24,9 @@ Slur::Slur():
     FloatingElement("slur-"), TimeSpanningInterface(),
     AttCurvature()
 {
-    RegisterAttClass(ATT_CURVATURE);
-    
     RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
-    
+    RegisterAttClass(ATT_CURVATURE);
+
     Reset();
 }
 
@@ -40,7 +39,6 @@ void Slur::Reset()
 {
     FloatingElement::Reset();
     TimeSpanningInterface::Reset();
-    
     ResetCurvature();
 }
     

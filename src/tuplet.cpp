@@ -23,6 +23,7 @@ Tuplet::Tuplet():
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_NUMBERPLACEMENT);
     RegisterAttClass(ATT_TUPLETVIS);
+    
     Reset();
 
 }

@@ -56,6 +56,7 @@ void Mensur::Init()
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
+    
     Reset();
 }
 

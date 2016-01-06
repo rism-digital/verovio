@@ -62,7 +62,7 @@ void View::DrawMensuralNote ( DeviceContext *dc, LayerElement *element, Layer *l
     
     int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, pseudoStaffSize, false) / 2;
     
-    if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
+    if (drawingDur > DUR_1) {
         ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
     }
     else {

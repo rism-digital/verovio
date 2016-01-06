@@ -40,6 +40,7 @@ void Clef::Init()
     RegisterAttClass(ATT_CLEFSHAPE);
     RegisterAttClass(ATT_LINELOC);
     RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
+    
     Reset();
 }
 

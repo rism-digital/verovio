@@ -29,6 +29,7 @@ TextDirInterface::TextDirInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_COMMON);
     RegisterInterfaceAttClass(ATT_PLACEMENT);
     RegisterInterfaceAttClass(ATT_STAFFIDENT);
+    
     Reset();
 }
 

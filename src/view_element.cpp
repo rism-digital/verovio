@@ -200,30 +200,7 @@ void View::DrawAccid( DeviceContext *dc, LayerElement *element, Layer *layer, St
     switch (accid->GetAccid())
     {
         case ACCIDENTAL_EXPLICIT_n :  symc = SMUFL_E261_accidentalNatural; break;
-        
-        /* The ACCID_DOUBLE_SHARP definition is used in two ways:
-         * 1) Antique notation (notAnc == true): it displays the two
-         *    stacked sharps used in key signatures;
-         * 2) Modern notation: is display a double flat
-         *    this poses no particular rendering problems;
-         * Case 1) on the other hand requires that the sharp
-         * is printed two times, the second time shifting it up
-         * (hence no break in the case statement)
-         * Same thing applies to LEIPZIG_ACCID_FLAT, but in this
-         * case it is used ONLY ad stacked flats (no double flat
-         * glyph).
-         */
-        case ACCIDENTAL_EXPLICIT_ss :
-            // This needs to be fixed because it is the old Wolfgang way to handle
-            // mensural notation
-            if (staff->notAnc) {
-                    symc = SMUFL_E262_accidentalSharp;
-                    DrawSmuflCode ( dc, x, y, symc,  staff->m_drawingStaffSize, accid->m_drawingCueSize );
-                    y += 7*m_doc->GetDrawingUnit(staff->m_drawingStaffSize); // LP
-            } else {
-                symc = SMUFL_E263_accidentalDoubleSharp;
-                break;
-            }
+        case ACCIDENTAL_EXPLICIT_ss : symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_EXPLICIT_s : symc = SMUFL_E262_accidentalSharp; break;
         case ACCIDENTAL_EXPLICIT_ff : symc = SMUFL_E264_accidentalDoubleFlat;
         case ACCIDENTAL_EXPLICIT_f : symc = SMUFL_E260_accidentalFlat; break;
@@ -1076,7 +1053,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
     
-    if (drawingDur > DUR_1 || (drawingDur == DUR_1 && staff->notAnc)) {	// annuler provisoirement la modif. des lignes addit.
+    if (drawingDur > DUR_1) {
 		ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
 	}
     else {

@@ -826,9 +826,6 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     assert( measure );
     assert( system );
     
-    if (staff->invisible)
-        return;
-    
     int j, x1, x2, yy;
     
     yy = staff->GetDrawingY();

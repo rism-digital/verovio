@@ -21,6 +21,7 @@ PositionInterface::PositionInterface(): Interface(),
     AttStafflocPitched()
 {
     RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
+    
     Reset();
 }
 

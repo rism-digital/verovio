@@ -131,7 +131,12 @@ public:
     /**
      * Total drawing height from top of top line to bottom of bottom line
      */
-    int m_drawingHeight;
+    int m_drawingHeight;    
+    
+    /** 
+     * The drawing staff size (scale), from the staffDef
+     */
+    int m_drawingStaffSize;
     
     std::vector<DocObject*>m_timeSpanningElements;
 
@@ -140,15 +145,6 @@ public:
      * This is the top left corner of the staff (the X position is the position of the system).
      */
     int m_yAbs;
-    
-	/** portee en notation ancienne (wolfgang legacy) */
-	char notAnc;
-	/** portee grise (wolfgang legacy) */
-	char grise;
-	/** portee invisible (wolfgang legacy) */
-	char invisible;
-	/** taille. 0 = normale1 = petite (wolfgang legacy) (to be set as scale in staffDef) */
-	int m_drawingStaffSize;
 
 private:    
     /**

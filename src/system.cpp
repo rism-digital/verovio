@@ -31,6 +31,7 @@ System::System() :
     // We set parent to it because we want to access the parent doc from the aligners
     // See Object::SetParentDoc()
     m_systemAligner.SetParent( this );
+    
     Reset();
 }
 
