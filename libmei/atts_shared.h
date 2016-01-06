@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -24,150 +24,142 @@
 #include <string>
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttAccidLog
 //----------------------------------------------------------------------------
 
-class AttAccidLog: public Att
-{
+class AttAccidLog : public Att {
 public:
     AttAccidLog();
     virtual ~AttAccidLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetAccidLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadAccidLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteAccidLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetFunc(accidLog_FUNC func_) { m_func = func_; };
-    accidLog_FUNC GetFunc() const { return m_func; };    
+    accidLog_FUNC GetFunc() const { return m_func; };
     bool HasFunc();
-    
     ///@}
 
 private:
     /** Records the function of an accidental. **/
     accidLog_FUNC m_func;
 
-/* include <attfunc> */
+    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
 // AttAccidental
 //----------------------------------------------------------------------------
 
-class AttAccidental: public Att
-{
+class AttAccidental : public Att {
 public:
     AttAccidental();
     virtual ~AttAccidental();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetAccidental();
-    
+
     /** Read the values for the attribute class **/
     bool ReadAccidental(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteAccidental(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetAccid(data_ACCIDENTAL_EXPLICIT accid_) { m_accid = accid_; };
-    data_ACCIDENTAL_EXPLICIT GetAccid() const { return m_accid; };    
+    data_ACCIDENTAL_EXPLICIT GetAccid() const { return m_accid; };
     bool HasAccid();
-    
     ///@}
 
 private:
     /** Captures a written accidental. **/
     data_ACCIDENTAL_EXPLICIT m_accid;
 
-/* include <attaccid> */
+    /* include <attaccid> */
 };
 
 //----------------------------------------------------------------------------
 // AttAccidentalPerformed
 //----------------------------------------------------------------------------
 
-class AttAccidentalPerformed: public Att
-{
+class AttAccidentalPerformed : public Att {
 public:
     AttAccidentalPerformed();
     virtual ~AttAccidentalPerformed();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetAccidentalPerformed();
-    
+
     /** Read the values for the attribute class **/
     bool ReadAccidentalPerformed(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteAccidentalPerformed(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetAccidGes(data_ACCIDENTAL_IMPLICIT accidGes_) { m_accidGes = accidGes_; };
-    data_ACCIDENTAL_IMPLICIT GetAccidGes() const { return m_accidGes; };    
+    data_ACCIDENTAL_IMPLICIT GetAccidGes() const { return m_accidGes; };
     bool HasAccidGes();
-    
     ///@}
 
 private:
     /** Records the performed pitch inflection. **/
     data_ACCIDENTAL_IMPLICIT m_accidGes;
 
-/* include <attaccid.ges> */
+    /* include <attaccid.ges> */
 };
 
 //----------------------------------------------------------------------------
 // AttArticulation
 //----------------------------------------------------------------------------
 
-class AttArticulation: public Att
-{
+class AttArticulation : public Att {
 public:
     AttArticulation();
     virtual ~AttArticulation();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetArticulation();
-    
+
     /** Read the values for the attribute class **/
     bool ReadArticulation(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteArticulation(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetArtic(data_ARTICULATION artic_) { m_artic = artic_; };
-    data_ARTICULATION GetArtic() const { return m_artic; };    
+    data_ARTICULATION GetArtic() const { return m_artic; };
     bool HasArtic();
-    
     ///@}
 
 private:
@@ -180,119 +172,112 @@ private:
      **/
     data_ARTICULATION m_artic;
 
-/* include <attartic> */
+    /* include <attartic> */
 };
 
 //----------------------------------------------------------------------------
 // AttArticulationPerformed
 //----------------------------------------------------------------------------
 
-class AttArticulationPerformed: public Att
-{
+class AttArticulationPerformed : public Att {
 public:
     AttArticulationPerformed();
     virtual ~AttArticulationPerformed();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetArticulationPerformed();
-    
+
     /** Read the values for the attribute class **/
     bool ReadArticulationPerformed(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteArticulationPerformed(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetArticGes(data_ARTICULATION articGes_) { m_articGes = articGes_; };
-    data_ARTICULATION GetArticGes() const { return m_articGes; };    
+    data_ARTICULATION GetArticGes() const { return m_articGes; };
     bool HasArticGes();
-    
     ///@}
 
 private:
     /** Records performed articulation that differs from the written value. **/
     data_ARTICULATION m_articGes;
 
-/* include <attartic.ges> */
+    /* include <attartic.ges> */
 };
 
 //----------------------------------------------------------------------------
 // AttAugmentdots
 //----------------------------------------------------------------------------
 
-class AttAugmentdots: public Att
-{
+class AttAugmentdots : public Att {
 public:
     AttAugmentdots();
     virtual ~AttAugmentdots();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetAugmentdots();
-    
+
     /** Read the values for the attribute class **/
     bool ReadAugmentdots(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteAugmentdots(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDots(int dots_) { m_dots = dots_; };
-    int GetDots() const { return m_dots; };    
+    int GetDots() const { return m_dots; };
     bool HasDots();
-    
     ///@}
 
 private:
     /** Records the number of augmentation dots required by a dotted duration. **/
     int m_dots;
 
-/* include <attdots> */
+    /* include <attdots> */
 };
 
 //----------------------------------------------------------------------------
 // AttAuthorized
 //----------------------------------------------------------------------------
 
-class AttAuthorized: public Att
-{
+class AttAuthorized : public Att {
 public:
     AttAuthorized();
     virtual ~AttAuthorized();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetAuthorized();
-    
+
     /** Read the values for the attribute class **/
     bool ReadAuthorized(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteAuthorized(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetAuthority(std::string authority_) { m_authority = authority_; };
-    std::string GetAuthority() const { return m_authority; };    
+    std::string GetAuthority() const { return m_authority; };
     bool HasAuthority();
-    
     //
     void SetAuthURI(std::string authURI_) { m_authURI = authURI_; };
-    std::string GetAuthURI() const { return m_authURI; };    
+    std::string GetAuthURI() const { return m_authURI; };
     bool HasAuthURI();
-    
     ///@}
 
 private:
@@ -307,81 +292,76 @@ private:
      **/
     std::string m_authURI;
 
-/* include <attauthURI> */
+    /* include <attauthURI> */
 };
 
 //----------------------------------------------------------------------------
 // AttBarLineLog
 //----------------------------------------------------------------------------
 
-class AttBarLineLog: public Att
-{
+class AttBarLineLog : public Att {
 public:
     AttBarLineLog();
     virtual ~AttBarLineLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetBarLineLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadBarLineLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteBarLineLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetForm(data_BARRENDITION form_) { m_form = form_; };
-    data_BARRENDITION GetForm() const { return m_form; };    
+    data_BARRENDITION GetForm() const { return m_form; };
     bool HasForm();
-    
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
     data_BARRENDITION m_form;
 
-/* include <attform> */
+    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
 // AttBarplacement
 //----------------------------------------------------------------------------
 
-class AttBarplacement: public Att
-{
+class AttBarplacement : public Att {
 public:
     AttBarplacement();
     virtual ~AttBarplacement();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetBarplacement();
-    
+
     /** Read the values for the attribute class **/
     bool ReadBarplacement(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteBarplacement(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetBarplace(data_BARPLACE barplace_) { m_barplace = barplace_; };
-    data_BARPLACE GetBarplace() const { return m_barplace; };    
+    data_BARPLACE GetBarplace() const { return m_barplace; };
     bool HasBarplace();
-    
     //
     void SetTaktplace(int taktplace_) { m_taktplace = taktplace_; };
-    int GetTaktplace() const { return m_taktplace; };    
+    int GetTaktplace() const { return m_taktplace; };
     bool HasTaktplace();
-    
     ///@}
 
 private:
@@ -399,48 +379,44 @@ private:
      **/
     int m_taktplace;
 
-/* include <atttaktplace> */
+    /* include <atttaktplace> */
 };
 
 //----------------------------------------------------------------------------
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
-class AttBeamingVis: public Att
-{
+class AttBeamingVis : public Att {
 public:
     AttBeamingVis();
     virtual ~AttBeamingVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetBeamingVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadBeamingVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteBeamingVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetBeamColor(std::string beamColor_) { m_beamColor = beamColor_; };
-    std::string GetBeamColor() const { return m_beamColor; };    
+    std::string GetBeamColor() const { return m_beamColor; };
     bool HasBeamColor();
-    
     //
     void SetBeamRend(beamingVis_BEAMREND beamRend_) { m_beamRend = beamRend_; };
-    beamingVis_BEAMREND GetBeamRend() const { return m_beamRend; };    
+    beamingVis_BEAMREND GetBeamRend() const { return m_beamRend; };
     bool HasBeamRend();
-    
     //
     void SetBeamSlope(double beamSlope_) { m_beamSlope = beamSlope_; };
-    double GetBeamSlope() const { return m_beamSlope; };    
+    double GetBeamSlope() const { return m_beamSlope; };
     bool HasBeamSlope();
-    
     ///@}
 
 private:
@@ -451,38 +427,36 @@ private:
     /** Captures beam slope. **/
     double m_beamSlope;
 
-/* include <attbeam.slope> */
+    /* include <attbeam.slope> */
 };
 
 //----------------------------------------------------------------------------
 // AttBibl
 //----------------------------------------------------------------------------
 
-class AttBibl: public Att
-{
+class AttBibl : public Att {
 public:
     AttBibl();
     virtual ~AttBibl();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetBibl();
-    
+
     /** Read the values for the attribute class **/
     bool ReadBibl(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteBibl(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetAnalog(std::string analog_) { m_analog = analog_; };
-    std::string GetAnalog() const { return m_analog; };    
+    std::string GetAnalog() const { return m_analog; };
     bool HasAnalog();
-    
     ///@}
 
 private:
@@ -492,38 +466,36 @@ private:
      **/
     std::string m_analog;
 
-/* include <attanalog> */
+    /* include <attanalog> */
 };
 
 //----------------------------------------------------------------------------
 // AttCalendared
 //----------------------------------------------------------------------------
 
-class AttCalendared: public Att
-{
+class AttCalendared : public Att {
 public:
     AttCalendared();
     virtual ~AttCalendared();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCalendared();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCalendared(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCalendared(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCalendar(std::string calendar_) { m_calendar = calendar_; };
-    std::string GetCalendar() const { return m_calendar; };    
+    std::string GetCalendar() const { return m_calendar; };
     bool HasCalendar();
-    
     ///@}
 
 private:
@@ -533,38 +505,36 @@ private:
      **/
     std::string m_calendar;
 
-/* include <attcalendar> */
+    /* include <attcalendar> */
 };
 
 //----------------------------------------------------------------------------
 // AttCanonical
 //----------------------------------------------------------------------------
 
-class AttCanonical: public Att
-{
+class AttCanonical : public Att {
 public:
     AttCanonical();
     virtual ~AttCanonical();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCanonical();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCanonical(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCanonical(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCodedval(std::string codedval_) { m_codedval = codedval_; };
-    std::string GetCodedval() const { return m_codedval; };    
+    std::string GetCodedval() const { return m_codedval; };
     bool HasCodedval();
-    
     ///@}
 
 private:
@@ -575,38 +545,36 @@ private:
      **/
     std::string m_codedval;
 
-/* include <attcodedval> */
+    /* include <attcodedval> */
 };
 
 //----------------------------------------------------------------------------
 // AttChordVis
 //----------------------------------------------------------------------------
 
-class AttChordVis: public Att
-{
+class AttChordVis : public Att {
 public:
     AttChordVis();
     virtual ~AttChordVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetChordVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadChordVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteChordVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCluster(data_CLUSTER cluster_) { m_cluster = cluster_; };
-    data_CLUSTER GetCluster() const { return m_cluster; };    
+    data_CLUSTER GetCluster() const { return m_cluster; };
     bool HasCluster();
-    
     ///@}
 
 private:
@@ -618,38 +586,36 @@ private:
      **/
     data_CLUSTER m_cluster;
 
-/* include <attcluster> */
+    /* include <attcluster> */
 };
 
 //----------------------------------------------------------------------------
 // AttClasscodeident
 //----------------------------------------------------------------------------
 
-class AttClasscodeident: public Att
-{
+class AttClasscodeident : public Att {
 public:
     AttClasscodeident();
     virtual ~AttClasscodeident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetClasscodeident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadClasscodeident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteClasscodeident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetClasscode(std::string classcode_) { m_classcode = classcode_; };
-    std::string GetClasscode() const { return m_classcode; };    
+    std::string GetClasscode() const { return m_classcode; };
     bool HasClasscode();
-    
     ///@}
 
 private:
@@ -660,38 +626,36 @@ private:
      **/
     std::string m_classcode;
 
-/* include <attclasscode> */
+    /* include <attclasscode> */
 };
 
 //----------------------------------------------------------------------------
 // AttClefLog
 //----------------------------------------------------------------------------
 
-class AttClefLog: public Att
-{
+class AttClefLog : public Att {
 public:
     AttClefLog();
     virtual ~AttClefLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetClefLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadClefLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteClefLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCautionary(data_BOOLEAN cautionary_) { m_cautionary = cautionary_; };
-    data_BOOLEAN GetCautionary() const { return m_cautionary; };    
+    data_BOOLEAN GetCautionary() const { return m_cautionary; };
     bool HasCautionary();
-    
     ///@}
 
 private:
@@ -701,53 +665,48 @@ private:
      **/
     data_BOOLEAN m_cautionary;
 
-/* include <attcautionary> */
+    /* include <attcautionary> */
 };
 
 //----------------------------------------------------------------------------
 // AttCleffingLog
 //----------------------------------------------------------------------------
 
-class AttCleffingLog: public Att
-{
+class AttCleffingLog : public Att {
 public:
     AttCleffingLog();
     virtual ~AttCleffingLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCleffingLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCleffingLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCleffingLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetClefShape(data_CLEFSHAPE clefShape_) { m_clefShape = clefShape_; };
-    data_CLEFSHAPE GetClefShape() const { return m_clefShape; };    
+    data_CLEFSHAPE GetClefShape() const { return m_clefShape; };
     bool HasClefShape();
-    
     //
     void SetClefLine(char clefLine_) { m_clefLine = clefLine_; };
-    char GetClefLine() const { return m_clefLine; };    
+    char GetClefLine() const { return m_clefLine; };
     bool HasClefLine();
-    
     //
     void SetClefDis(data_OCTAVE_DIS clefDis_) { m_clefDis = clefDis_; };
-    data_OCTAVE_DIS GetClefDis() const { return m_clefDis; };    
+    data_OCTAVE_DIS GetClefDis() const { return m_clefDis; };
     bool HasClefDis();
-    
     //
     void SetClefDisPlace(data_PLACE clefDisPlace_) { m_clefDisPlace = clefDisPlace_; };
-    data_PLACE GetClefDisPlace() const { return m_clefDisPlace; };    
+    data_PLACE GetClefDisPlace() const { return m_clefDisPlace; };
     bool HasClefDisPlace();
-    
     ///@}
 
 private:
@@ -764,43 +723,40 @@ private:
     /** Records the direction of octave displacement to be applied to the clef. **/
     data_PLACE m_clefDisPlace;
 
-/* include <attclef.dis.place> */
+    /* include <attclef.dis.place> */
 };
 
 //----------------------------------------------------------------------------
 // AttCleffingVis
 //----------------------------------------------------------------------------
 
-class AttCleffingVis: public Att
-{
+class AttCleffingVis : public Att {
 public:
     AttCleffingVis();
     virtual ~AttCleffingVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCleffingVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCleffingVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCleffingVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetClefColor(std::string clefColor_) { m_clefColor = clefColor_; };
-    std::string GetClefColor() const { return m_clefColor; };    
+    std::string GetClefColor() const { return m_clefColor; };
     bool HasClefColor();
-    
     //
     void SetClefVisible(data_BOOLEAN clefVisible_) { m_clefVisible = clefVisible_; };
-    data_BOOLEAN GetClefVisible() const { return m_clefVisible; };    
+    data_BOOLEAN GetClefVisible() const { return m_clefVisible; };
     bool HasClefVisible();
-    
     ///@}
 
 private:
@@ -809,76 +765,72 @@ private:
     /** Determines whether the clef is to be displayed. **/
     data_BOOLEAN m_clefVisible;
 
-/* include <attclef.visible> */
+    /* include <attclef.visible> */
 };
 
 //----------------------------------------------------------------------------
 // AttClefshape
 //----------------------------------------------------------------------------
 
-class AttClefshape: public Att
-{
+class AttClefshape : public Att {
 public:
     AttClefshape();
     virtual ~AttClefshape();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetClefshape();
-    
+
     /** Read the values for the attribute class **/
     bool ReadClefshape(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteClefshape(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetShape(data_CLEFSHAPE shape_) { m_shape = shape_; };
-    data_CLEFSHAPE GetShape() const { return m_shape; };    
+    data_CLEFSHAPE GetShape() const { return m_shape; };
     bool HasShape();
-    
     ///@}
 
 private:
     /** Describes a clef's shape. **/
     data_CLEFSHAPE m_shape;
 
-/* include <attshape> */
+    /* include <attshape> */
 };
 
 //----------------------------------------------------------------------------
 // AttColor
 //----------------------------------------------------------------------------
 
-class AttColor: public Att
-{
+class AttColor : public Att {
 public:
     AttColor();
     virtual ~AttColor();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetColor();
-    
+
     /** Read the values for the attribute class **/
     bool ReadColor(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteColor(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetColor(std::string color_) { m_color = color_; };
-    std::string GetColor() const { return m_color; };    
+    std::string GetColor() const { return m_color; };
     bool HasColor();
-    
     ///@}
 
 private:
@@ -888,38 +840,36 @@ private:
      **/
     std::string m_color;
 
-/* include <attcolor> */
+    /* include <attcolor> */
 };
 
 //----------------------------------------------------------------------------
 // AttColoration
 //----------------------------------------------------------------------------
 
-class AttColoration: public Att
-{
+class AttColoration : public Att {
 public:
     AttColoration();
     virtual ~AttColoration();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetColoration();
-    
+
     /** Read the values for the attribute class **/
     bool ReadColoration(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteColoration(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetColored(data_BOOLEAN colored_) { m_colored = colored_; };
-    data_BOOLEAN GetColored() const { return m_colored; };    
+    data_BOOLEAN GetColored() const { return m_colored; };
     bool HasColored();
-    
     ///@}
 
 private:
@@ -933,81 +883,76 @@ private:
      **/
     data_BOOLEAN m_colored;
 
-/* include <attcolored> */
+    /* include <attcolored> */
 };
 
 //----------------------------------------------------------------------------
 // AttCommon
 //----------------------------------------------------------------------------
 
-class AttCommon: public Att
-{
+class AttCommon : public Att {
 public:
     AttCommon();
     virtual ~AttCommon();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCommon();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCommon(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCommon(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetN(int n_) { m_n = n_; };
-    int GetN() const { return m_n; };    
+    int GetN() const { return m_n; };
     bool HasN();
-    
     ///@}
 
 private:
     /** Provides a number-like designation for an element. **/
     int m_n;
 
-/* include <attn> */
+    /* include <attn> */
 };
 
 //----------------------------------------------------------------------------
 // AttCommonPart
 //----------------------------------------------------------------------------
 
-class AttCommonPart: public Att
-{
+class AttCommonPart : public Att {
 public:
     AttCommonPart();
     virtual ~AttCommonPart();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCommonPart();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCommonPart(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCommonPart(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLabel(std::string label_) { m_label = label_; };
-    std::string GetLabel() const { return m_label; };    
+    std::string GetLabel() const { return m_label; };
     bool HasLabel();
-    
     //
     void SetBase(std::string base_) { m_base = base_; };
-    std::string GetBase() const { return m_base; };    
+    std::string GetBase() const { return m_base; };
     bool HasBase();
-    
     ///@}
 
 private:
@@ -1019,53 +964,48 @@ private:
     /** --- **/
     std::string m_base;
 
-/* include <attbase> */
+    /* include <attbase> */
 };
 
 //----------------------------------------------------------------------------
 // AttCoordinated
 //----------------------------------------------------------------------------
 
-class AttCoordinated: public Att
-{
+class AttCoordinated : public Att {
 public:
     AttCoordinated();
     virtual ~AttCoordinated();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCoordinated();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCoordinated(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCoordinated(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetUlx(int ulx_) { m_ulx = ulx_; };
-    int GetUlx() const { return m_ulx; };    
+    int GetUlx() const { return m_ulx; };
     bool HasUlx();
-    
     //
     void SetUly(int uly_) { m_uly = uly_; };
-    int GetUly() const { return m_uly; };    
+    int GetUly() const { return m_uly; };
     bool HasUly();
-    
     //
     void SetLrx(int lrx_) { m_lrx = lrx_; };
-    int GetLrx() const { return m_lrx; };    
+    int GetLrx() const { return m_lrx; };
     bool HasLrx();
-    
     //
     void SetLry(int lry_) { m_lry = lry_; };
-    int GetLry() const { return m_lry; };    
+    int GetLry() const { return m_lry; };
     bool HasLry();
-    
     ///@}
 
 private:
@@ -1078,48 +1018,44 @@ private:
     /** Indicates the lower-left corner x coordinate. **/
     int m_lry;
 
-/* include <attlry> */
+    /* include <attlry> */
 };
 
 //----------------------------------------------------------------------------
 // AttCurvature
 //----------------------------------------------------------------------------
 
-class AttCurvature: public Att
-{
+class AttCurvature : public Att {
 public:
     AttCurvature();
     virtual ~AttCurvature();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCurvature();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCurvature(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCurvature(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetBezier(std::string bezier_) { m_bezier = bezier_; };
-    std::string GetBezier() const { return m_bezier; };    
+    std::string GetBezier() const { return m_bezier; };
     bool HasBezier();
-    
     //
     void SetBulge(double bulge_) { m_bulge = bulge_; };
-    double GetBulge() const { return m_bulge; };    
+    double GetBulge() const { return m_bulge; };
     bool HasBulge();
-    
     //
     void SetCurvedir(curvature_CURVEDIR curvedir_) { m_curvedir = curvedir_; };
-    curvature_CURVEDIR GetCurvedir() const { return m_curvedir; };    
+    curvature_CURVEDIR GetCurvedir() const { return m_curvedir; };
     bool HasCurvedir();
-    
     ///@}
 
 private:
@@ -1141,43 +1077,40 @@ private:
     /** Describes a curve with a generic term indicating the direction of curvature. **/
     curvature_CURVEDIR m_curvedir;
 
-/* include <attcurvedir> */
+    /* include <attcurvedir> */
 };
 
 //----------------------------------------------------------------------------
 // AttCurverend
 //----------------------------------------------------------------------------
 
-class AttCurverend: public Att
-{
+class AttCurverend : public Att {
 public:
     AttCurverend();
     virtual ~AttCurverend();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCurverend();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCurverend(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCurverend(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLform(data_LINEFORM lform_) { m_lform = lform_; };
-    data_LINEFORM GetLform() const { return m_lform; };    
+    data_LINEFORM GetLform() const { return m_lform; };
     bool HasLform();
-    
     //
     void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; };
-    std::string GetLwidth() const { return m_lwidth; };    
+    std::string GetLwidth() const { return m_lwidth; };
     bool HasLwidth();
-    
     ///@}
 
 private:
@@ -1186,38 +1119,36 @@ private:
     /** Width of a curved line. **/
     std::string m_lwidth;
 
-/* include <attlwidth> */
+    /* include <attlwidth> */
 };
 
 //----------------------------------------------------------------------------
 // AttCustosLog
 //----------------------------------------------------------------------------
 
-class AttCustosLog: public Att
-{
+class AttCustosLog : public Att {
 public:
     AttCustosLog();
     virtual ~AttCustosLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCustosLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCustosLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCustosLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTarget(std::string target_) { m_target = target_; };
-    std::string GetTarget() const { return m_target; };    
+    std::string GetTarget() const { return m_target; };
     bool HasTarget();
-    
     ///@}
 
 private:
@@ -1227,58 +1158,52 @@ private:
      **/
     std::string m_target;
 
-/* include <atttarget> */
+    /* include <atttarget> */
 };
 
 //----------------------------------------------------------------------------
 // AttDatable
 //----------------------------------------------------------------------------
 
-class AttDatable: public Att
-{
+class AttDatable : public Att {
 public:
     AttDatable();
     virtual ~AttDatable();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDatable();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDatable(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDatable(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetEnddate(std::string enddate_) { m_enddate = enddate_; };
-    std::string GetEnddate() const { return m_enddate; };    
+    std::string GetEnddate() const { return m_enddate; };
     bool HasEnddate();
-    
     //
     void SetIsodate(std::string isodate_) { m_isodate = isodate_; };
-    std::string GetIsodate() const { return m_isodate; };    
+    std::string GetIsodate() const { return m_isodate; };
     bool HasIsodate();
-    
     //
     void SetNotafter(std::string notafter_) { m_notafter = notafter_; };
-    std::string GetNotafter() const { return m_notafter; };    
+    std::string GetNotafter() const { return m_notafter; };
     bool HasNotafter();
-    
     //
     void SetNotbefore(std::string notbefore_) { m_notbefore = notbefore_; };
-    std::string GetNotbefore() const { return m_notbefore; };    
+    std::string GetNotbefore() const { return m_notbefore; };
     bool HasNotbefore();
-    
     //
     void SetStartdate(std::string startdate_) { m_startdate = startdate_; };
-    std::string GetStartdate() const { return m_startdate; };    
+    std::string GetStartdate() const { return m_startdate; };
     bool HasStartdate();
-    
     ///@}
 
 private:
@@ -1293,76 +1218,72 @@ private:
     /** Contains the starting point of a date range in standard ISO form. **/
     std::string m_startdate;
 
-/* include <attstartdate> */
+    /* include <attstartdate> */
 };
 
 //----------------------------------------------------------------------------
 // AttDatapointing
 //----------------------------------------------------------------------------
 
-class AttDatapointing: public Att
-{
+class AttDatapointing : public Att {
 public:
     AttDatapointing();
     virtual ~AttDatapointing();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDatapointing();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDatapointing(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDatapointing(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetData(std::string data_) { m_data = data_; };
-    std::string GetData() const { return m_data; };    
+    std::string GetData() const { return m_data; };
     bool HasData();
-    
     ///@}
 
 private:
     /** Used to link metadata elements to one or more data-containing elements. **/
     std::string m_data;
 
-/* include <attdata> */
+    /* include <attdata> */
 };
 
 //----------------------------------------------------------------------------
 // AttDeclaring
 //----------------------------------------------------------------------------
 
-class AttDeclaring: public Att
-{
+class AttDeclaring : public Att {
 public:
     AttDeclaring();
     virtual ~AttDeclaring();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDeclaring();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDeclaring(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDeclaring(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDecls(std::string decls_) { m_decls = decls_; };
-    std::string GetDecls() const { return m_decls; };    
+    std::string GetDecls() const { return m_decls; };
     bool HasDecls();
-    
     ///@}
 
 private:
@@ -1372,48 +1293,44 @@ private:
      **/
     std::string m_decls;
 
-/* include <attdecls> */
+    /* include <attdecls> */
 };
 
 //----------------------------------------------------------------------------
 // AttDistances
 //----------------------------------------------------------------------------
 
-class AttDistances: public Att
-{
+class AttDistances : public Att {
 public:
     AttDistances();
     virtual ~AttDistances();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDistances();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDistances(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDistances(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDynamDist(std::string dynamDist_) { m_dynamDist = dynamDist_; };
-    std::string GetDynamDist() const { return m_dynamDist; };    
+    std::string GetDynamDist() const { return m_dynamDist; };
     bool HasDynamDist();
-    
     //
     void SetHarmDist(std::string harmDist_) { m_harmDist = harmDist_; };
-    std::string GetHarmDist() const { return m_harmDist; };    
+    std::string GetHarmDist() const { return m_harmDist; };
     bool HasHarmDist();
-    
     //
     void SetTextDist(std::string textDist_) { m_textDist = textDist_; };
-    std::string GetTextDist() const { return m_textDist; };    
+    std::string GetTextDist() const { return m_textDist; };
     bool HasTextDist();
-    
     ///@}
 
 private:
@@ -1427,76 +1344,72 @@ private:
     /** Determines how far from the staff to render text elements. **/
     std::string m_textDist;
 
-/* include <atttext.dist> */
+    /* include <atttext.dist> */
 };
 
 //----------------------------------------------------------------------------
 // AttDotLog
 //----------------------------------------------------------------------------
 
-class AttDotLog: public Att
-{
+class AttDotLog : public Att {
 public:
     AttDotLog();
     virtual ~AttDotLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDotLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDotLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDotLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetForm(dotLog_FORM form_) { m_form = form_; };
-    dotLog_FORM GetForm() const { return m_form; };    
+    dotLog_FORM GetForm() const { return m_form; };
     bool HasForm();
-    
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
     dotLog_FORM m_form;
 
-/* include <attform> */
+    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
 // AttDurationAdditive
 //----------------------------------------------------------------------------
 
-class AttDurationAdditive: public Att
-{
+class AttDurationAdditive : public Att {
 public:
     AttDurationAdditive();
     virtual ~AttDurationAdditive();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDurationAdditive();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDurationAdditive(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDurationAdditive(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDur(data_DURATION dur_) { m_dur = dur_; };
-    data_DURATION GetDur() const { return m_dur; };    
+    data_DURATION GetDur() const { return m_dur; };
     bool HasDur();
-    
     ///@}
 
 private:
@@ -1509,48 +1422,44 @@ private:
      **/
     data_DURATION m_dur;
 
-/* include <attdur> */
+    /* include <attdur> */
 };
 
 //----------------------------------------------------------------------------
 // AttDurationDefault
 //----------------------------------------------------------------------------
 
-class AttDurationDefault: public Att
-{
+class AttDurationDefault : public Att {
 public:
     AttDurationDefault();
     virtual ~AttDurationDefault();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDurationDefault();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDurationDefault(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDurationDefault(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDurDefault(data_DURATION durDefault_) { m_durDefault = durDefault_; };
-    data_DURATION GetDurDefault() const { return m_durDefault; };    
+    data_DURATION GetDurDefault() const { return m_durDefault; };
     bool HasDurDefault();
-    
     //
     void SetNumDefault(int numDefault_) { m_numDefault = numDefault_; };
-    int GetNumDefault() const { return m_numDefault; };    
+    int GetNumDefault() const { return m_numDefault; };
     bool HasNumDefault();
-    
     //
     void SetNumbaseDefault(int numbaseDefault_) { m_numbaseDefault = numbaseDefault_; };
-    int GetNumbaseDefault() const { return m_numbaseDefault; };    
+    int GetNumbaseDefault() const { return m_numbaseDefault; };
     bool HasNumbaseDefault();
-    
     ///@}
 
 private:
@@ -1571,38 +1480,36 @@ private:
      **/
     int m_numbaseDefault;
 
-/* include <attnumbase.default> */
+    /* include <attnumbase.default> */
 };
 
 //----------------------------------------------------------------------------
 // AttDurationMusical
 //----------------------------------------------------------------------------
 
-class AttDurationMusical: public Att
-{
+class AttDurationMusical : public Att {
 public:
     AttDurationMusical();
     virtual ~AttDurationMusical();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDurationMusical();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDurationMusical(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDurationMusical(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDur(data_DURATION dur_) { m_dur = dur_; };
-    data_DURATION GetDur() const { return m_dur; };    
+    data_DURATION GetDur() const { return m_dur; };
     bool HasDur();
-    
     ///@}
 
 private:
@@ -1615,38 +1522,36 @@ private:
      **/
     data_DURATION m_dur;
 
-/* include <attdur> */
+    /* include <attdur> */
 };
 
 //----------------------------------------------------------------------------
 // AttDurationPerformed
 //----------------------------------------------------------------------------
 
-class AttDurationPerformed: public Att
-{
+class AttDurationPerformed : public Att {
 public:
     AttDurationPerformed();
     virtual ~AttDurationPerformed();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDurationPerformed();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDurationPerformed(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDurationPerformed(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDurGes(data_DURATION durGes_) { m_durGes = durGes_; };
-    data_DURATION GetDurGes() const { return m_durGes; };    
+    data_DURATION GetDurGes() const { return m_durGes; };
     bool HasDurGes();
-    
     ///@}
 
 private:
@@ -1658,43 +1563,40 @@ private:
      **/
     data_DURATION m_durGes;
 
-/* include <attdur.ges> */
+    /* include <attdur.ges> */
 };
 
 //----------------------------------------------------------------------------
 // AttDurationRatio
 //----------------------------------------------------------------------------
 
-class AttDurationRatio: public Att
-{
+class AttDurationRatio : public Att {
 public:
     AttDurationRatio();
     virtual ~AttDurationRatio();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetDurationRatio();
-    
+
     /** Read the values for the attribute class **/
     bool ReadDurationRatio(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteDurationRatio(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetNum(int num_) { m_num = num_; };
-    int GetNum() const { return m_num; };    
+    int GetNum() const { return m_num; };
     bool HasNum();
-    
     //
     void SetNumbase(int numbase_) { m_numbase = numbase_; };
-    int GetNumbase() const { return m_numbase; };    
+    int GetNumbase() const { return m_numbase; };
     bool HasNumbase();
-    
     ///@}
 
 private:
@@ -1709,38 +1611,36 @@ private:
      **/
     int m_numbase;
 
-/* include <attnumbase> */
+    /* include <attnumbase> */
 };
 
 //----------------------------------------------------------------------------
 // AttEnclosingchars
 //----------------------------------------------------------------------------
 
-class AttEnclosingchars: public Att
-{
+class AttEnclosingchars : public Att {
 public:
     AttEnclosingchars();
     virtual ~AttEnclosingchars();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetEnclosingchars();
-    
+
     /** Read the values for the attribute class **/
     bool ReadEnclosingchars(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteEnclosingchars(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetEnclose(data_ENCLOSURE enclose_) { m_enclose = enclose_; };
-    data_ENCLOSURE GetEnclose() const { return m_enclose; };    
+    data_ENCLOSURE GetEnclose() const { return m_enclose; };
     bool HasEnclose();
-    
     ///@}
 
 private:
@@ -1752,114 +1652,108 @@ private:
      **/
     data_ENCLOSURE m_enclose;
 
-/* include <attenclose> */
+    /* include <attenclose> */
 };
 
 //----------------------------------------------------------------------------
 // AttEndings
 //----------------------------------------------------------------------------
 
-class AttEndings: public Att
-{
+class AttEndings : public Att {
 public:
     AttEndings();
     virtual ~AttEndings();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetEndings();
-    
+
     /** Read the values for the attribute class **/
     bool ReadEndings(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteEndings(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetEndingRend(endings_ENDINGREND endingRend_) { m_endingRend = endingRend_; };
-    endings_ENDINGREND GetEndingRend() const { return m_endingRend; };    
+    endings_ENDINGREND GetEndingRend() const { return m_endingRend; };
     bool HasEndingRend();
-    
     ///@}
 
 private:
     /** Describes where ending marks should be displayed. **/
     endings_ENDINGREND m_endingRend;
 
-/* include <attending.rend> */
+    /* include <attending.rend> */
 };
 
 //----------------------------------------------------------------------------
 // AttExtender
 //----------------------------------------------------------------------------
 
-class AttExtender: public Att
-{
+class AttExtender : public Att {
 public:
     AttExtender();
     virtual ~AttExtender();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetExtender();
-    
+
     /** Read the values for the attribute class **/
     bool ReadExtender(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteExtender(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetExtender(data_BOOLEAN extender_) { m_extender = extender_; };
-    data_BOOLEAN GetExtender() const { return m_extender; };    
+    data_BOOLEAN GetExtender() const { return m_extender; };
     bool HasExtender();
-    
     ///@}
 
 private:
     /** Indicates the presence of an extension symbol, typically a line. **/
     data_BOOLEAN m_extender;
 
-/* include <attextender> */
+    /* include <attextender> */
 };
 
 //----------------------------------------------------------------------------
 // AttFermatapresent
 //----------------------------------------------------------------------------
 
-class AttFermatapresent: public Att
-{
+class AttFermatapresent : public Att {
 public:
     AttFermatapresent();
     virtual ~AttFermatapresent();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetFermatapresent();
-    
+
     /** Read the values for the attribute class **/
     bool ReadFermatapresent(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteFermatapresent(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetFermata(data_PLACE fermata_) { m_fermata = fermata_; };
-    data_PLACE GetFermata() const { return m_fermata; };    
+    data_PLACE GetFermata() const { return m_fermata; };
     bool HasFermata();
-    
     ///@}
 
 private:
@@ -1870,38 +1764,36 @@ private:
      **/
     data_PLACE m_fermata;
 
-/* include <attfermata> */
+    /* include <attfermata> */
 };
 
 //----------------------------------------------------------------------------
 // AttFiling
 //----------------------------------------------------------------------------
 
-class AttFiling: public Att
-{
+class AttFiling : public Att {
 public:
     AttFiling();
     virtual ~AttFiling();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetFiling();
-    
+
     /** Read the values for the attribute class **/
     bool ReadFiling(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteFiling(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetNonfiling(int nonfiling_) { m_nonfiling = nonfiling_; };
-    int GetNonfiling() const { return m_nonfiling; };    
+    int GetNonfiling() const { return m_nonfiling; };
     bool HasNonfiling();
-    
     ///@}
 
 private:
@@ -1911,76 +1803,72 @@ private:
      **/
     int m_nonfiling;
 
-/* include <attnonfiling> */
+    /* include <attnonfiling> */
 };
 
 //----------------------------------------------------------------------------
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 
-class AttGrpSymLog: public Att
-{
+class AttGrpSymLog : public Att {
 public:
     AttGrpSymLog();
     virtual ~AttGrpSymLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetGrpSymLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadGrpSymLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteGrpSymLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLevel(int level_) { m_level = level_; };
-    int GetLevel() const { return m_level; };    
+    int GetLevel() const { return m_level; };
     bool HasLevel();
-    
     ///@}
 
 private:
     /** Indicates the nesting level of staff grouping symbols. **/
     int m_level;
 
-/* include <attlevel> */
+    /* include <attlevel> */
 };
 
 //----------------------------------------------------------------------------
 // AttHandident
 //----------------------------------------------------------------------------
 
-class AttHandident: public Att
-{
+class AttHandident : public Att {
 public:
     AttHandident();
     virtual ~AttHandident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetHandident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadHandident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteHandident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetHand(std::string hand_) { m_hand = hand_; };
-    std::string GetHand() const { return m_hand; };    
+    std::string GetHand() const { return m_hand; };
     bool HasHand();
-    
     ///@}
 
 private:
@@ -1990,114 +1878,108 @@ private:
      **/
     std::string m_hand;
 
-/* include <atthand> */
+    /* include <atthand> */
 };
 
 //----------------------------------------------------------------------------
 // AttHeight
 //----------------------------------------------------------------------------
 
-class AttHeight: public Att
-{
+class AttHeight : public Att {
 public:
     AttHeight();
     virtual ~AttHeight();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetHeight();
-    
+
     /** Read the values for the attribute class **/
     bool ReadHeight(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteHeight(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetHeight(std::string height_) { m_height = height_; };
-    std::string GetHeight() const { return m_height; };    
+    std::string GetHeight() const { return m_height; };
     bool HasHeight();
-    
     ///@}
 
 private:
     /** Measurement of the vertical dimension of an entity. **/
     std::string m_height;
 
-/* include <attheight> */
+    /* include <attheight> */
 };
 
 //----------------------------------------------------------------------------
 // AttHorizontalalign
 //----------------------------------------------------------------------------
 
-class AttHorizontalalign: public Att
-{
+class AttHorizontalalign : public Att {
 public:
     AttHorizontalalign();
     virtual ~AttHorizontalalign();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetHorizontalalign();
-    
+
     /** Read the values for the attribute class **/
     bool ReadHorizontalalign(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteHorizontalalign(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetHalign(data_HORIZONTALALIGNMENT halign_) { m_halign = halign_; };
-    data_HORIZONTALALIGNMENT GetHalign() const { return m_halign; };    
+    data_HORIZONTALALIGNMENT GetHalign() const { return m_halign; };
     bool HasHalign();
-    
     ///@}
 
 private:
     /** Records horizontal alignment. **/
     data_HORIZONTALALIGNMENT m_halign;
 
-/* include <atthalign> */
+    /* include <atthalign> */
 };
 
 //----------------------------------------------------------------------------
 // AttInstrumentident
 //----------------------------------------------------------------------------
 
-class AttInstrumentident: public Att
-{
+class AttInstrumentident : public Att {
 public:
     AttInstrumentident();
     virtual ~AttInstrumentident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetInstrumentident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadInstrumentident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteInstrumentident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetInstr(std::string instr_) { m_instr = instr_; };
-    std::string GetInstr() const { return m_instr; };    
+    std::string GetInstr() const { return m_instr; };
     bool HasInstr();
-    
     ///@}
 
 private:
@@ -2107,38 +1989,36 @@ private:
      **/
     std::string m_instr;
 
-/* include <attinstr> */
+    /* include <attinstr> */
 };
 
 //----------------------------------------------------------------------------
 // AttInternetmedia
 //----------------------------------------------------------------------------
 
-class AttInternetmedia: public Att
-{
+class AttInternetmedia : public Att {
 public:
     AttInternetmedia();
     virtual ~AttInternetmedia();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetInternetmedia();
-    
+
     /** Read the values for the attribute class **/
     bool ReadInternetmedia(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteInternetmedia(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMimetype(std::string mimetype_) { m_mimetype = mimetype_; };
-    std::string GetMimetype() const { return m_mimetype; };    
+    std::string GetMimetype() const { return m_mimetype; };
     bool HasMimetype();
-    
     ///@}
 
 private:
@@ -2149,38 +2029,36 @@ private:
      **/
     std::string m_mimetype;
 
-/* include <attmimetype> */
+    /* include <attmimetype> */
 };
 
 //----------------------------------------------------------------------------
 // AttJoined
 //----------------------------------------------------------------------------
 
-class AttJoined: public Att
-{
+class AttJoined : public Att {
 public:
     AttJoined();
     virtual ~AttJoined();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetJoined();
-    
+
     /** Read the values for the attribute class **/
     bool ReadJoined(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteJoined(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetJoin(std::string join_) { m_join = join_; };
-    std::string GetJoin() const { return m_join; };    
+    std::string GetJoin() const { return m_join; };
     bool HasJoin();
-    
     ///@}
 
 private:
@@ -2194,96 +2072,88 @@ private:
      **/
     std::string m_join;
 
-/* include <attjoin> */
+    /* include <attjoin> */
 };
 
 //----------------------------------------------------------------------------
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
-class AttKeySigLog: public Att
-{
+class AttKeySigLog : public Att {
 public:
     AttKeySigLog();
     virtual ~AttKeySigLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetKeySigLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadKeySigLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteKeySigLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMode(data_MODE mode_) { m_mode = mode_; };
-    data_MODE GetMode() const { return m_mode; };    
+    data_MODE GetMode() const { return m_mode; };
     bool HasMode();
-    
     ///@}
 
 private:
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_mode;
 
-/* include <attmode> */
+    /* include <attmode> */
 };
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultLog
 //----------------------------------------------------------------------------
 
-class AttKeySigDefaultLog: public Att
-{
+class AttKeySigDefaultLog : public Att {
 public:
     AttKeySigDefaultLog();
     virtual ~AttKeySigDefaultLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadKeySigDefaultLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteKeySigDefaultLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetKeyAccid(data_ACCIDENTAL_IMPLICIT keyAccid_) { m_keyAccid = keyAccid_; };
-    data_ACCIDENTAL_IMPLICIT GetKeyAccid() const { return m_keyAccid; };    
+    data_ACCIDENTAL_IMPLICIT GetKeyAccid() const { return m_keyAccid; };
     bool HasKeyAccid();
-    
     //
     void SetKeyMode(data_MODE keyMode_) { m_keyMode = keyMode_; };
-    data_MODE GetKeyMode() const { return m_keyMode; };    
+    data_MODE GetKeyMode() const { return m_keyMode; };
     bool HasKeyMode();
-    
     //
     void SetKeyPname(data_PITCHNAME keyPname_) { m_keyPname = keyPname_; };
-    data_PITCHNAME GetKeyPname() const { return m_keyPname; };    
+    data_PITCHNAME GetKeyPname() const { return m_keyPname; };
     bool HasKeyPname();
-    
     //
     void SetKeySig(data_KEYSIGNATURE keySig_) { m_keySig = keySig_; };
-    data_KEYSIGNATURE GetKeySig() const { return m_keySig; };    
+    data_KEYSIGNATURE GetKeySig() const { return m_keySig; };
     bool HasKeySig();
-    
     //
     void SetKeySigMixed(std::string keySigMixed_) { m_keySigMixed = keySigMixed_; };
-    std::string GetKeySigMixed() const { return m_keySigMixed; };    
+    std::string GetKeySigMixed() const { return m_keySigMixed; };
     bool HasKeySigMixed();
-    
     ///@}
 
 private:
@@ -2314,43 +2184,40 @@ private:
      **/
     std::string m_keySigMixed;
 
-/* include <attkey.sig.mixed> */
+    /* include <attkey.sig.mixed> */
 };
 
 //----------------------------------------------------------------------------
 // AttKeySigDefaultVis
 //----------------------------------------------------------------------------
 
-class AttKeySigDefaultVis: public Att
-{
+class AttKeySigDefaultVis : public Att {
 public:
     AttKeySigDefaultVis();
     virtual ~AttKeySigDefaultVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetKeySigDefaultVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadKeySigDefaultVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteKeySigDefaultVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetKeySigShow(data_BOOLEAN keySigShow_) { m_keySigShow = keySigShow_; };
-    data_BOOLEAN GetKeySigShow() const { return m_keySigShow; };    
+    data_BOOLEAN GetKeySigShow() const { return m_keySigShow; };
     bool HasKeySigShow();
-    
     //
     void SetKeySigShowchange(data_BOOLEAN keySigShowchange_) { m_keySigShowchange = keySigShowchange_; };
-    data_BOOLEAN GetKeySigShowchange() const { return m_keySigShowchange; };    
+    data_BOOLEAN GetKeySigShowchange() const { return m_keySigShowchange; };
     bool HasKeySigShowchange();
-    
     ///@}
 
 private:
@@ -2359,38 +2226,36 @@ private:
     /** Determines whether cautionary accidentals should be displayed at a key change. **/
     data_BOOLEAN m_keySigShowchange;
 
-/* include <attkey.sig.showchange> */
+    /* include <attkey.sig.showchange> */
 };
 
 //----------------------------------------------------------------------------
 // AttLabelsAddl
 //----------------------------------------------------------------------------
 
-class AttLabelsAddl: public Att
-{
+class AttLabelsAddl : public Att {
 public:
     AttLabelsAddl();
     virtual ~AttLabelsAddl();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLabelsAddl();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLabelsAddl(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLabelsAddl(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLabelAbbr(std::string labelAbbr_) { m_labelAbbr = labelAbbr_; };
-    std::string GetLabelAbbr() const { return m_labelAbbr; };    
+    std::string GetLabelAbbr() const { return m_labelAbbr; };
     bool HasLabelAbbr();
-    
     ///@}
 
 private:
@@ -2400,43 +2265,40 @@ private:
      **/
     std::string m_labelAbbr;
 
-/* include <attlabel.abbr> */
+    /* include <attlabel.abbr> */
 };
 
 //----------------------------------------------------------------------------
 // AttLang
 //----------------------------------------------------------------------------
 
-class AttLang: public Att
-{
+class AttLang : public Att {
 public:
     AttLang();
     virtual ~AttLang();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLang();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLang(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLang(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLang(std::string lang_) { m_lang = lang_; };
-    std::string GetLang() const { return m_lang; };    
+    std::string GetLang() const { return m_lang; };
     bool HasLang();
-    
     //
     void SetTranslit(std::string translit_) { m_translit = translit_; };
-    std::string GetTranslit() const { return m_translit; };    
+    std::string GetTranslit() const { return m_translit; };
     bool HasTranslit();
-    
     ///@}
 
 private:
@@ -2445,139 +2307,128 @@ private:
     /** Specifies the transliteration technique used. **/
     std::string m_translit;
 
-/* include <atttranslit> */
+    /* include <atttranslit> */
 };
 
 //----------------------------------------------------------------------------
 // AttLayerLog
 //----------------------------------------------------------------------------
 
-class AttLayerLog: public Att
-{
+class AttLayerLog : public Att {
 public:
     AttLayerLog();
     virtual ~AttLayerLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLayerLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLayerLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLayerLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDef(std::string def_) { m_def = def_; };
-    std::string GetDef() const { return m_def; };    
+    std::string GetDef() const { return m_def; };
     bool HasDef();
-    
     ///@}
 
 private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
 
-/* include <attdef> */
+    /* include <attdef> */
 };
 
 //----------------------------------------------------------------------------
 // AttLayerident
 //----------------------------------------------------------------------------
 
-class AttLayerident: public Att
-{
+class AttLayerident : public Att {
 public:
     AttLayerident();
     virtual ~AttLayerident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLayerident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLayerident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLayerident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLayer(int layer_) { m_layer = layer_; };
-    int GetLayer() const { return m_layer; };    
+    int GetLayer() const { return m_layer; };
     bool HasLayer();
-    
     ///@}
 
 private:
     /** Identifies the layer to which a feature applies. **/
     int m_layer;
 
-/* include <attlayer> */
+    /* include <attlayer> */
 };
 
 //----------------------------------------------------------------------------
 // AttLineVis
 //----------------------------------------------------------------------------
 
-class AttLineVis: public Att
-{
+class AttLineVis : public Att {
 public:
     AttLineVis();
     virtual ~AttLineVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLineVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLineVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLineVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetForm(data_LINEFORM form_) { m_form = form_; };
-    data_LINEFORM GetForm() const { return m_form; };    
+    data_LINEFORM GetForm() const { return m_form; };
     bool HasForm();
-    
     //
     void SetWidth(std::string width_) { m_width = width_; };
-    std::string GetWidth() const { return m_width; };    
+    std::string GetWidth() const { return m_width; };
     bool HasWidth();
-    
     //
     void SetEndsym(data_LINESTARTENDSYMBOL endsym_) { m_endsym = endsym_; };
-    data_LINESTARTENDSYMBOL GetEndsym() const { return m_endsym; };    
+    data_LINESTARTENDSYMBOL GetEndsym() const { return m_endsym; };
     bool HasEndsym();
-    
     //
     void SetEndsymsize(std::string endsymsize_) { m_endsymsize = endsymsize_; };
-    std::string GetEndsymsize() const { return m_endsymsize; };    
+    std::string GetEndsymsize() const { return m_endsymsize; };
     bool HasEndsymsize();
-    
     //
     void SetStartsym(data_LINESTARTENDSYMBOL startsym_) { m_startsym = startsym_; };
-    data_LINESTARTENDSYMBOL GetStartsym() const { return m_startsym; };    
+    data_LINESTARTENDSYMBOL GetStartsym() const { return m_startsym; };
     bool HasStartsym();
-    
     //
     void SetStartsymsize(std::string startsymsize_) { m_startsymsize = startsymsize_; };
-    std::string GetStartsymsize() const { return m_startsymsize; };    
+    std::string GetStartsymsize() const { return m_startsymsize; };
     bool HasStartsymsize();
-    
     ///@}
 
 private:
@@ -2594,38 +2445,36 @@ private:
     /** Holds the relative size of the line-start symbol. **/
     std::string m_startsymsize;
 
-/* include <attstartsymsize> */
+    /* include <attstartsymsize> */
 };
 
 //----------------------------------------------------------------------------
 // AttLineloc
 //----------------------------------------------------------------------------
 
-class AttLineloc: public Att
-{
+class AttLineloc : public Att {
 public:
     AttLineloc();
     virtual ~AttLineloc();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLineloc();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLineloc(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLineloc(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLine(char line_) { m_line = line_; };
-    char GetLine() const { return m_line; };    
+    char GetLine() const { return m_line; };
     bool HasLine();
-    
     ///@}
 
 private:
@@ -2636,53 +2485,48 @@ private:
      **/
     char m_line;
 
-/* include <attline> */
+    /* include <attline> */
 };
 
 //----------------------------------------------------------------------------
 // AttLinerend
 //----------------------------------------------------------------------------
 
-class AttLinerend: public Att
-{
+class AttLinerend : public Att {
 public:
     AttLinerend();
     virtual ~AttLinerend();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLinerend();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLinerend(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLinerend(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLendsym(data_LINESTARTENDSYMBOL lendsym_) { m_lendsym = lendsym_; };
-    data_LINESTARTENDSYMBOL GetLendsym() const { return m_lendsym; };    
+    data_LINESTARTENDSYMBOL GetLendsym() const { return m_lendsym; };
     bool HasLendsym();
-    
     //
     void SetLendsymsize(std::string lendsymsize_) { m_lendsymsize = lendsymsize_; };
-    std::string GetLendsymsize() const { return m_lendsymsize; };    
+    std::string GetLendsymsize() const { return m_lendsymsize; };
     bool HasLendsymsize();
-    
     //
     void SetLstartsym(data_LINESTARTENDSYMBOL lstartsym_) { m_lstartsym = lstartsym_; };
-    data_LINESTARTENDSYMBOL GetLstartsym() const { return m_lstartsym; };    
+    data_LINESTARTENDSYMBOL GetLstartsym() const { return m_lstartsym; };
     bool HasLstartsym();
-    
     //
     void SetLstartsymsize(std::string lstartsymsize_) { m_lstartsymsize = lstartsymsize_; };
-    std::string GetLstartsymsize() const { return m_lstartsymsize; };    
+    std::string GetLstartsymsize() const { return m_lstartsymsize; };
     bool HasLstartsymsize();
-    
     ///@}
 
 private:
@@ -2695,43 +2539,40 @@ private:
     /** Holds the relative size of the line-start symbol. **/
     std::string m_lstartsymsize;
 
-/* include <attlstartsymsize> */
+    /* include <attlstartsymsize> */
 };
 
 //----------------------------------------------------------------------------
 // AttLinerendBase
 //----------------------------------------------------------------------------
 
-class AttLinerendBase: public Att
-{
+class AttLinerendBase : public Att {
 public:
     AttLinerendBase();
     virtual ~AttLinerendBase();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLinerendBase();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLinerendBase(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLinerendBase(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLform(data_LINEFORM lform_) { m_lform = lform_; };
-    data_LINEFORM GetLform() const { return m_lform; };    
+    data_LINEFORM GetLform() const { return m_lform; };
     bool HasLform();
-    
     //
     void SetLwidth(std::string lwidth_) { m_lwidth = lwidth_; };
-    std::string GetLwidth() const { return m_lwidth; };    
+    std::string GetLwidth() const { return m_lwidth; };
     bool HasLwidth();
-    
     ///@}
 
 private:
@@ -2740,63 +2581,56 @@ private:
     /** Width of a curved line. **/
     std::string m_lwidth;
 
-/* include <attlwidth> */
+    /* include <attlwidth> */
 };
 
 //----------------------------------------------------------------------------
 // AttLyricstyle
 //----------------------------------------------------------------------------
 
-class AttLyricstyle: public Att
-{
+class AttLyricstyle : public Att {
 public:
     AttLyricstyle();
     virtual ~AttLyricstyle();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetLyricstyle();
-    
+
     /** Read the values for the attribute class **/
     bool ReadLyricstyle(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteLyricstyle(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLyricAlign(std::string lyricAlign_) { m_lyricAlign = lyricAlign_; };
-    std::string GetLyricAlign() const { return m_lyricAlign; };    
+    std::string GetLyricAlign() const { return m_lyricAlign; };
     bool HasLyricAlign();
-    
     //
     void SetLyricFam(std::string lyricFam_) { m_lyricFam = lyricFam_; };
-    std::string GetLyricFam() const { return m_lyricFam; };    
+    std::string GetLyricFam() const { return m_lyricFam; };
     bool HasLyricFam();
-    
     //
     void SetLyricName(std::string lyricName_) { m_lyricName = lyricName_; };
-    std::string GetLyricName() const { return m_lyricName; };    
+    std::string GetLyricName() const { return m_lyricName; };
     bool HasLyricName();
-    
     //
     void SetLyricSize(std::string lyricSize_) { m_lyricSize = lyricSize_; };
-    std::string GetLyricSize() const { return m_lyricSize; };    
+    std::string GetLyricSize() const { return m_lyricSize; };
     bool HasLyricSize();
-    
     //
     void SetLyricStyle(data_FONTSTYLE lyricStyle_) { m_lyricStyle = lyricStyle_; };
-    data_FONTSTYLE GetLyricStyle() const { return m_lyricStyle; };    
+    data_FONTSTYLE GetLyricStyle() const { return m_lyricStyle; };
     bool HasLyricStyle();
-    
     //
     void SetLyricWeight(data_FONTWEIGHT lyricWeight_) { m_lyricWeight = lyricWeight_; };
-    data_FONTWEIGHT GetLyricWeight() const { return m_lyricWeight; };    
+    data_FONTWEIGHT GetLyricWeight() const { return m_lyricWeight; };
     bool HasLyricWeight();
-    
     ///@}
 
 private:
@@ -2813,43 +2647,40 @@ private:
     /** Sets the default font weight value for lyrics. **/
     data_FONTWEIGHT m_lyricWeight;
 
-/* include <attlyric.weight> */
+    /* include <attlyric.weight> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeasureLog
 //----------------------------------------------------------------------------
 
-class AttMeasureLog: public Att
-{
+class AttMeasureLog : public Att {
 public:
     AttMeasureLog();
     virtual ~AttMeasureLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeasureLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeasureLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeasureLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLeft(data_BARRENDITION left_) { m_left = left_; };
-    data_BARRENDITION GetLeft() const { return m_left; };    
+    data_BARRENDITION GetLeft() const { return m_left; };
     bool HasLeft();
-    
     //
     void SetRight(data_BARRENDITION right_) { m_right = right_; };
-    data_BARRENDITION GetRight() const { return m_right; };    
+    data_BARRENDITION GetRight() const { return m_right; };
     bool HasRight();
-    
     ///@}
 
 private:
@@ -2862,124 +2693,116 @@ private:
     /** Indicates the function of the right bar line and is structurally important. **/
     data_BARRENDITION m_right;
 
-/* include <attright> */
+    /* include <attright> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeasurement
 //----------------------------------------------------------------------------
 
-class AttMeasurement: public Att
-{
+class AttMeasurement : public Att {
 public:
     AttMeasurement();
     virtual ~AttMeasurement();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeasurement();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeasurement(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeasurement(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetUnit(std::string unit_) { m_unit = unit_; };
-    std::string GetUnit() const { return m_unit; };    
+    std::string GetUnit() const { return m_unit; };
     bool HasUnit();
-    
     ///@}
 
 private:
     /** Indicates the unit of measurement. **/
     std::string m_unit;
 
-/* include <attunit> */
+    /* include <attunit> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeasurenumbers
 //----------------------------------------------------------------------------
 
-class AttMeasurenumbers: public Att
-{
+class AttMeasurenumbers : public Att {
 public:
     AttMeasurenumbers();
     virtual ~AttMeasurenumbers();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeasurenumbers();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeasurenumbers(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeasurenumbers(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMnumVisible(data_BOOLEAN mnumVisible_) { m_mnumVisible = mnumVisible_; };
-    data_BOOLEAN GetMnumVisible() const { return m_mnumVisible; };    
+    data_BOOLEAN GetMnumVisible() const { return m_mnumVisible; };
     bool HasMnumVisible();
-    
     ///@}
 
 private:
     /** Indicates whether measure numbers should be displayed. **/
     data_BOOLEAN m_mnumVisible;
 
-/* include <attmnum.visible> */
+    /* include <attmnum.visible> */
 };
 
 //----------------------------------------------------------------------------
 // AttMediabounds
 //----------------------------------------------------------------------------
 
-class AttMediabounds: public Att
-{
+class AttMediabounds : public Att {
 public:
     AttMediabounds();
     virtual ~AttMediabounds();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMediabounds();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMediabounds(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMediabounds(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetBegin(std::string begin_) { m_begin = begin_; };
-    std::string GetBegin() const { return m_begin; };    
+    std::string GetBegin() const { return m_begin; };
     bool HasBegin();
-    
     //
     void SetEnd(std::string end_) { m_end = end_; };
-    std::string GetEnd() const { return m_end; };    
+    std::string GetEnd() const { return m_end; };
     bool HasEnd();
-    
     //
     void SetBetype(data_BETYPE betype_) { m_betype = betype_; };
-    data_BETYPE GetBetype() const { return m_betype; };    
+    data_BETYPE GetBetype() const { return m_betype; };
     bool HasBetype();
-    
     ///@}
 
 private:
@@ -3003,119 +2826,112 @@ private:
      **/
     data_BETYPE m_betype;
 
-/* include <attbetype> */
+    /* include <attbetype> */
 };
 
 //----------------------------------------------------------------------------
 // AttMedium
 //----------------------------------------------------------------------------
 
-class AttMedium: public Att
-{
+class AttMedium : public Att {
 public:
     AttMedium();
     virtual ~AttMedium();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMedium();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMedium(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMedium(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMedium(std::string medium_) { m_medium = medium_; };
-    std::string GetMedium() const { return m_medium; };    
+    std::string GetMedium() const { return m_medium; };
     bool HasMedium();
-    
     ///@}
 
 private:
     /** Describes the writing medium. **/
     std::string m_medium;
 
-/* include <attmedium> */
+    /* include <attmedium> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeiversion
 //----------------------------------------------------------------------------
 
-class AttMeiversion: public Att
-{
+class AttMeiversion : public Att {
 public:
     AttMeiversion();
     virtual ~AttMeiversion();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeiversion();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeiversion(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeiversion(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMeiversion(meiversion_MEIVERSION meiversion_) { m_meiversion = meiversion_; };
-    meiversion_MEIVERSION GetMeiversion() const { return m_meiversion; };    
+    meiversion_MEIVERSION GetMeiversion() const { return m_meiversion; };
     bool HasMeiversion();
-    
     ///@}
 
 private:
     /** Specifies a generic MEI version label. **/
     meiversion_MEIVERSION m_meiversion;
 
-/* include <attmeiversion> */
+    /* include <attmeiversion> */
 };
 
 //----------------------------------------------------------------------------
 // AttMensurLog
 //----------------------------------------------------------------------------
 
-class AttMensurLog: public Att
-{
+class AttMensurLog : public Att {
 public:
     AttMensurLog();
     virtual ~AttMensurLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMensurLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMensurLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMensurLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDot(data_BOOLEAN dot_) { m_dot = dot_; };
-    data_BOOLEAN GetDot() const { return m_dot; };    
+    data_BOOLEAN GetDot() const { return m_dot; };
     bool HasDot();
-    
     //
     void SetSign(data_MENSURATIONSIGN sign_) { m_sign = sign_; };
-    data_MENSURATIONSIGN GetSign() const { return m_sign; };    
+    data_MENSURATIONSIGN GetSign() const { return m_sign; };
     bool HasSign();
-    
     ///@}
 
 private:
@@ -3124,48 +2940,44 @@ private:
     /** The base symbol in the mensuration sign/time signature of mensural notation. **/
     data_MENSURATIONSIGN m_sign;
 
-/* include <attsign> */
+    /* include <attsign> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeterSigLog
 //----------------------------------------------------------------------------
 
-class AttMeterSigLog: public Att
-{
+class AttMeterSigLog : public Att {
 public:
     AttMeterSigLog();
     virtual ~AttMeterSigLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeterSigLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeterSigLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeterSigLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCount(int count_) { m_count = count_; };
-    int GetCount() const { return m_count; };    
+    int GetCount() const { return m_count; };
     bool HasCount();
-    
     //
     void SetSym(data_METERSIGN sym_) { m_sym = sym_; };
-    data_METERSIGN GetSym() const { return m_sym; };    
+    data_METERSIGN GetSym() const { return m_sym; };
     bool HasSym();
-    
     //
     void SetUnit(int unit_) { m_unit = unit_; };
-    int GetUnit() const { return m_unit; };    
+    int GetUnit() const { return m_unit; };
     bool HasUnit();
-    
     ///@}
 
 private:
@@ -3184,81 +2996,76 @@ private:
     /** Indicates the unit of measurement. **/
     int m_unit;
 
-/* include <attunit> */
+    /* include <attunit> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeterSigVis
 //----------------------------------------------------------------------------
 
-class AttMeterSigVis: public Att
-{
+class AttMeterSigVis : public Att {
 public:
     AttMeterSigVis();
     virtual ~AttMeterSigVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeterSigVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeterSigVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeterSigVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetForm(meterSigVis_FORM form_) { m_form = form_; };
-    meterSigVis_FORM GetForm() const { return m_form; };    
+    meterSigVis_FORM GetForm() const { return m_form; };
     bool HasForm();
-    
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
     meterSigVis_FORM m_form;
 
-/* include <attform> */
+    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultLog
 //----------------------------------------------------------------------------
 
-class AttMeterSigDefaultLog: public Att
-{
+class AttMeterSigDefaultLog : public Att {
 public:
     AttMeterSigDefaultLog();
     virtual ~AttMeterSigDefaultLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeterSigDefaultLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeterSigDefaultLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeterSigDefaultLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMeterCount(int meterCount_) { m_meterCount = meterCount_; };
-    int GetMeterCount() const { return m_meterCount; };    
+    int GetMeterCount() const { return m_meterCount; };
     bool HasMeterCount();
-    
     //
     void SetMeterUnit(int meterUnit_) { m_meterUnit = meterUnit_; };
-    int GetMeterUnit() const { return m_meterUnit; };    
+    int GetMeterUnit() const { return m_meterUnit; };
     bool HasMeterUnit();
-    
     ///@}
 
 private:
@@ -3275,48 +3082,44 @@ private:
      **/
     int m_meterUnit;
 
-/* include <attmeter.unit> */
+    /* include <attmeter.unit> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeterSigDefaultVis
 //----------------------------------------------------------------------------
 
-class AttMeterSigDefaultVis: public Att
-{
+class AttMeterSigDefaultVis : public Att {
 public:
     AttMeterSigDefaultVis();
     virtual ~AttMeterSigDefaultVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeterSigDefaultVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeterSigDefaultVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeterSigDefaultVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMeterRend(meterSigDefaultVis_METERREND meterRend_) { m_meterRend = meterRend_; };
-    meterSigDefaultVis_METERREND GetMeterRend() const { return m_meterRend; };    
+    meterSigDefaultVis_METERREND GetMeterRend() const { return m_meterRend; };
     bool HasMeterRend();
-    
     //
     void SetMeterShowchange(data_BOOLEAN meterShowchange_) { m_meterShowchange = meterShowchange_; };
-    data_BOOLEAN GetMeterShowchange() const { return m_meterShowchange; };    
+    data_BOOLEAN GetMeterShowchange() const { return m_meterShowchange; };
     bool HasMeterShowchange();
-    
     //
     void SetMeterSym(data_METERSIGN meterSym_) { m_meterSym = meterSym_; };
-    data_METERSIGN GetMeterSym() const { return m_meterSym; };    
+    data_METERSIGN GetMeterSym() const { return m_meterSym; };
     bool HasMeterSym();
-    
     ///@}
 
 private:
@@ -3333,38 +3136,36 @@ private:
      **/
     data_METERSIGN m_meterSym;
 
-/* include <attmeter.sym> */
+    /* include <attmeter.sym> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeterconformance
 //----------------------------------------------------------------------------
 
-class AttMeterconformance: public Att
-{
+class AttMeterconformance : public Att {
 public:
     AttMeterconformance();
     virtual ~AttMeterconformance();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeterconformance();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeterconformance(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeterconformance(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMetcon(meterconformance_METCON metcon_) { m_metcon = metcon_; };
-    meterconformance_METCON GetMetcon() const { return m_metcon; };    
+    meterconformance_METCON GetMetcon() const { return m_metcon; };
     bool HasMetcon();
-    
     ///@}
 
 private:
@@ -3374,43 +3175,40 @@ private:
      **/
     meterconformance_METCON m_metcon;
 
-/* include <attmetcon> */
+    /* include <attmetcon> */
 };
 
 //----------------------------------------------------------------------------
 // AttMeterconformanceBar
 //----------------------------------------------------------------------------
 
-class AttMeterconformanceBar: public Att
-{
+class AttMeterconformanceBar : public Att {
 public:
     AttMeterconformanceBar();
     virtual ~AttMeterconformanceBar();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMeterconformanceBar();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMeterconformanceBar(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMeterconformanceBar(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMetcon(data_BOOLEAN metcon_) { m_metcon = metcon_; };
-    data_BOOLEAN GetMetcon() const { return m_metcon; };    
+    data_BOOLEAN GetMetcon() const { return m_metcon; };
     bool HasMetcon();
-    
     //
     void SetControl(data_BOOLEAN control_) { m_control = control_; };
-    data_BOOLEAN GetControl() const { return m_control; };    
+    data_BOOLEAN GetControl() const { return m_control; };
     bool HasControl();
-    
     ///@}
 
 private:
@@ -3428,48 +3226,44 @@ private:
      **/
     data_BOOLEAN m_control;
 
-/* include <attcontrol> */
+    /* include <attcontrol> */
 };
 
 //----------------------------------------------------------------------------
 // AttMmtempo
 //----------------------------------------------------------------------------
 
-class AttMmtempo: public Att
-{
+class AttMmtempo : public Att {
 public:
     AttMmtempo();
     virtual ~AttMmtempo();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMmtempo();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMmtempo(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMmtempo(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMm(std::string mm_) { m_mm = mm_; };
-    std::string GetMm() const { return m_mm; };    
+    std::string GetMm() const { return m_mm; };
     bool HasMm();
-    
     //
     void SetMmUnit(data_DURATION mmUnit_) { m_mmUnit = mmUnit_; };
-    data_DURATION GetMmUnit() const { return m_mmUnit; };    
+    data_DURATION GetMmUnit() const { return m_mmUnit; };
     bool HasMmUnit();
-    
     //
     void SetMmDots(int mmDots_) { m_mmDots = mmDots_; };
-    int GetMmDots() const { return m_mmDots; };    
+    int GetMmDots() const { return m_mmDots; };
     bool HasMmDots();
-    
     ///@}
 
 private:
@@ -3484,38 +3278,36 @@ private:
     /** Records the number of augmentation dots required by a dotted metronome unit. **/
     int m_mmDots;
 
-/* include <attmm.dots> */
+    /* include <attmm.dots> */
 };
 
 //----------------------------------------------------------------------------
 // AttMultinummeasures
 //----------------------------------------------------------------------------
 
-class AttMultinummeasures: public Att
-{
+class AttMultinummeasures : public Att {
 public:
     AttMultinummeasures();
     virtual ~AttMultinummeasures();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMultinummeasures();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMultinummeasures(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMultinummeasures(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMultiNumber(data_BOOLEAN multiNumber_) { m_multiNumber = multiNumber_; };
-    data_BOOLEAN GetMultiNumber() const { return m_multiNumber; };    
+    data_BOOLEAN GetMultiNumber() const { return m_multiNumber; };
     bool HasMultiNumber();
-    
     ///@}
 
 private:
@@ -3525,43 +3317,40 @@ private:
      **/
     data_BOOLEAN m_multiNumber;
 
-/* include <attmulti.number> */
+    /* include <attmulti.number> */
 };
 
 //----------------------------------------------------------------------------
 // AttName
 //----------------------------------------------------------------------------
 
-class AttName: public Att
-{
+class AttName : public Att {
 public:
     AttName();
     virtual ~AttName();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetName();
-    
+
     /** Read the values for the attribute class **/
     bool ReadName(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteName(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetNymref(std::string nymref_) { m_nymref = nymref_; };
-    std::string GetNymref() const { return m_nymref; };    
+    std::string GetNymref() const { return m_nymref; };
     bool HasNymref();
-    
     //
     void SetRole(std::string role_) { m_role = role_; };
-    std::string GetRole() const { return m_role; };    
+    std::string GetRole() const { return m_role; };
     bool HasRole();
-    
     ///@}
 
 private:
@@ -3577,43 +3366,40 @@ private:
      **/
     std::string m_role;
 
-/* include <attrole> */
+    /* include <attrole> */
 };
 
 //----------------------------------------------------------------------------
 // AttNotationstyle
 //----------------------------------------------------------------------------
 
-class AttNotationstyle: public Att
-{
+class AttNotationstyle : public Att {
 public:
     AttNotationstyle();
     virtual ~AttNotationstyle();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetNotationstyle();
-    
+
     /** Read the values for the attribute class **/
     bool ReadNotationstyle(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteNotationstyle(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMusicName(std::string musicName_) { m_musicName = musicName_; };
-    std::string GetMusicName() const { return m_musicName; };    
+    std::string GetMusicName() const { return m_musicName; };
     bool HasMusicName();
-    
     //
     void SetMusicSize(std::string musicSize_) { m_musicSize = musicSize_; };
-    std::string GetMusicSize() const { return m_musicSize; };    
+    std::string GetMusicSize() const { return m_musicSize; };
     bool HasMusicSize();
-    
     ///@}
 
 private:
@@ -3622,48 +3408,44 @@ private:
     /** Sets the default music font size. **/
     std::string m_musicSize;
 
-/* include <attmusic.size> */
+    /* include <attmusic.size> */
 };
 
 //----------------------------------------------------------------------------
 // AttNoteGes
 //----------------------------------------------------------------------------
 
-class AttNoteGes: public Att
-{
+class AttNoteGes : public Att {
 public:
     AttNoteGes();
     virtual ~AttNoteGes();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetNoteGes();
-    
+
     /** Read the values for the attribute class **/
     bool ReadNoteGes(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteNoteGes(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetOctGes(char octGes_) { m_octGes = octGes_; };
-    char GetOctGes() const { return m_octGes; };    
+    char GetOctGes() const { return m_octGes; };
     bool HasOctGes();
-    
     //
     void SetPnameGes(data_PITCHNAME pnameGes_) { m_pnameGes = pnameGes_; };
-    data_PITCHNAME GetPnameGes() const { return m_pnameGes; };    
+    data_PITCHNAME GetPnameGes() const { return m_pnameGes; };
     bool HasPnameGes();
-    
     //
     void SetPnum(int pnum_) { m_pnum = pnum_; };
-    int GetPnum() const { return m_pnum; };    
+    int GetPnum() const { return m_pnum; };
     bool HasPnum();
-    
     ///@}
 
 private:
@@ -3674,68 +3456,60 @@ private:
     /** Holds a pitch-to-number mapping, a base-40 or MIDI note number, for example. **/
     int m_pnum;
 
-/* include <attpnum> */
+    /* include <attpnum> */
 };
 
 //----------------------------------------------------------------------------
 // AttNoteheads
 //----------------------------------------------------------------------------
 
-class AttNoteheads: public Att
-{
+class AttNoteheads : public Att {
 public:
     AttNoteheads();
     virtual ~AttNoteheads();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetNoteheads();
-    
+
     /** Read the values for the attribute class **/
     bool ReadNoteheads(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteNoteheads(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetHeadColor(std::string headColor_) { m_headColor = headColor_; };
-    std::string GetHeadColor() const { return m_headColor; };    
+    std::string GetHeadColor() const { return m_headColor; };
     bool HasHeadColor();
-    
     //
     void SetHeadFill(std::string headFill_) { m_headFill = headFill_; };
-    std::string GetHeadFill() const { return m_headFill; };    
+    std::string GetHeadFill() const { return m_headFill; };
     bool HasHeadFill();
-    
     //
     void SetHeadFillcolor(std::string headFillcolor_) { m_headFillcolor = headFillcolor_; };
-    std::string GetHeadFillcolor() const { return m_headFillcolor; };    
+    std::string GetHeadFillcolor() const { return m_headFillcolor; };
     bool HasHeadFillcolor();
-    
     //
     void SetHeadMod(std::string headMod_) { m_headMod = headMod_; };
-    std::string GetHeadMod() const { return m_headMod; };    
+    std::string GetHeadMod() const { return m_headMod; };
     bool HasHeadMod();
-    
     //
     void SetHeadRotation(std::string headRotation_) { m_headRotation = headRotation_; };
-    std::string GetHeadRotation() const { return m_headRotation; };    
+    std::string GetHeadRotation() const { return m_headRotation; };
     bool HasHeadRotation();
-    
     //
     void SetHeadShape(std::string headShape_) { m_headShape = headShape_; };
-    std::string GetHeadShape() const { return m_headShape; };    
+    std::string GetHeadShape() const { return m_headShape; };
     bool HasHeadShape();
-    
     //
     void SetHeadVisible(data_BOOLEAN headVisible_) { m_headVisible = headVisible_; };
-    data_BOOLEAN GetHeadVisible() const { return m_headVisible; };    
+    data_BOOLEAN GetHeadVisible() const { return m_headVisible; };
     bool HasHeadVisible();
-    
     ///@}
 
 private:
@@ -3761,76 +3535,72 @@ private:
      **/
     data_BOOLEAN m_headVisible;
 
-/* include <atthead.visible> */
+    /* include <atthead.visible> */
 };
 
 //----------------------------------------------------------------------------
 // AttOctave
 //----------------------------------------------------------------------------
 
-class AttOctave: public Att
-{
+class AttOctave : public Att {
 public:
     AttOctave();
     virtual ~AttOctave();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOctave();
-    
+
     /** Read the values for the attribute class **/
     bool ReadOctave(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteOctave(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetOct(char oct_) { m_oct = oct_; };
-    char GetOct() const { return m_oct; };    
+    char GetOct() const { return m_oct; };
     bool HasOct();
-    
     ///@}
 
 private:
     /** Captures written octave information. **/
     char m_oct;
 
-/* include <attoct> */
+    /* include <attoct> */
 };
 
 //----------------------------------------------------------------------------
 // AttOctavedefault
 //----------------------------------------------------------------------------
 
-class AttOctavedefault: public Att
-{
+class AttOctavedefault : public Att {
 public:
     AttOctavedefault();
     virtual ~AttOctavedefault();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOctavedefault();
-    
+
     /** Read the values for the attribute class **/
     bool ReadOctavedefault(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteOctavedefault(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetOctaveDefault(char octaveDefault_) { m_octaveDefault = octaveDefault_; };
-    char GetOctaveDefault() const { return m_octaveDefault; };    
+    char GetOctaveDefault() const { return m_octaveDefault; };
     bool HasOctaveDefault();
-    
     ///@}
 
 private:
@@ -3841,43 +3611,40 @@ private:
      **/
     char m_octaveDefault;
 
-/* include <attoctave.default> */
+    /* include <attoctave.default> */
 };
 
 //----------------------------------------------------------------------------
 // AttOctavedisplacement
 //----------------------------------------------------------------------------
 
-class AttOctavedisplacement: public Att
-{
+class AttOctavedisplacement : public Att {
 public:
     AttOctavedisplacement();
     virtual ~AttOctavedisplacement();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOctavedisplacement();
-    
+
     /** Read the values for the attribute class **/
     bool ReadOctavedisplacement(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteOctavedisplacement(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDis(data_OCTAVE_DIS dis_) { m_dis = dis_; };
-    data_OCTAVE_DIS GetDis() const { return m_dis; };    
+    data_OCTAVE_DIS GetDis() const { return m_dis; };
     bool HasDis();
-    
     //
     void SetDisPlace(data_PLACE disPlace_) { m_disPlace = disPlace_; };
-    data_PLACE GetDisPlace() const { return m_disPlace; };    
+    data_PLACE GetDisPlace() const { return m_disPlace; };
     bool HasDisPlace();
-    
     ///@}
 
 private:
@@ -3886,38 +3653,36 @@ private:
     /** Records the direction of octave displacement. **/
     data_PLACE m_disPlace;
 
-/* include <attdis.place> */
+    /* include <attdis.place> */
 };
 
 //----------------------------------------------------------------------------
 // AttOnelinestaff
 //----------------------------------------------------------------------------
 
-class AttOnelinestaff: public Att
-{
+class AttOnelinestaff : public Att {
 public:
     AttOnelinestaff();
     virtual ~AttOnelinestaff();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOnelinestaff();
-    
+
     /** Read the values for the attribute class **/
     bool ReadOnelinestaff(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteOnelinestaff(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetOntheline(data_BOOLEAN ontheline_) { m_ontheline = ontheline_; };
-    data_BOOLEAN GetOntheline() const { return m_ontheline; };    
+    data_BOOLEAN GetOntheline() const { return m_ontheline; };
     bool HasOntheline();
-    
     ///@}
 
 private:
@@ -3928,38 +3693,36 @@ private:
      **/
     data_BOOLEAN m_ontheline;
 
-/* include <attontheline> */
+    /* include <attontheline> */
 };
 
 //----------------------------------------------------------------------------
 // AttOptimization
 //----------------------------------------------------------------------------
 
-class AttOptimization: public Att
-{
+class AttOptimization : public Att {
 public:
     AttOptimization();
     virtual ~AttOptimization();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOptimization();
-    
+
     /** Read the values for the attribute class **/
     bool ReadOptimization(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteOptimization(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetOptimize(data_BOOLEAN optimize_) { m_optimize = optimize_; };
-    data_BOOLEAN GetOptimize() const { return m_optimize; };    
+    data_BOOLEAN GetOptimize() const { return m_optimize; };
     bool HasOptimize();
-    
     ///@}
 
 private:
@@ -3969,38 +3732,36 @@ private:
      **/
     data_BOOLEAN m_optimize;
 
-/* include <attoptimize> */
+    /* include <attoptimize> */
 };
 
 //----------------------------------------------------------------------------
 // AttPadLog
 //----------------------------------------------------------------------------
 
-class AttPadLog: public Att
-{
+class AttPadLog : public Att {
 public:
     AttPadLog();
     virtual ~AttPadLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPadLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPadLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePadLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetNum(int num_) { m_num = num_; };
-    int GetNum() const { return m_num; };    
+    int GetNum() const { return m_num; };
     bool HasNum();
-    
     ///@}
 
 private:
@@ -4010,73 +3771,64 @@ private:
      **/
     int m_num;
 
-/* include <attnum> */
+    /* include <attnum> */
 };
 
 //----------------------------------------------------------------------------
 // AttPages
 //----------------------------------------------------------------------------
 
-class AttPages: public Att
-{
+class AttPages : public Att {
 public:
     AttPages();
     virtual ~AttPages();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPages();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPages(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePages(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPageHeight(std::string pageHeight_) { m_pageHeight = pageHeight_; };
-    std::string GetPageHeight() const { return m_pageHeight; };    
+    std::string GetPageHeight() const { return m_pageHeight; };
     bool HasPageHeight();
-    
     //
     void SetPageWidth(std::string pageWidth_) { m_pageWidth = pageWidth_; };
-    std::string GetPageWidth() const { return m_pageWidth; };    
+    std::string GetPageWidth() const { return m_pageWidth; };
     bool HasPageWidth();
-    
     //
     void SetPageTopmar(std::string pageTopmar_) { m_pageTopmar = pageTopmar_; };
-    std::string GetPageTopmar() const { return m_pageTopmar; };    
+    std::string GetPageTopmar() const { return m_pageTopmar; };
     bool HasPageTopmar();
-    
     //
     void SetPageBotmar(std::string pageBotmar_) { m_pageBotmar = pageBotmar_; };
-    std::string GetPageBotmar() const { return m_pageBotmar; };    
+    std::string GetPageBotmar() const { return m_pageBotmar; };
     bool HasPageBotmar();
-    
     //
     void SetPageLeftmar(std::string pageLeftmar_) { m_pageLeftmar = pageLeftmar_; };
-    std::string GetPageLeftmar() const { return m_pageLeftmar; };    
+    std::string GetPageLeftmar() const { return m_pageLeftmar; };
     bool HasPageLeftmar();
-    
     //
     void SetPageRightmar(std::string pageRightmar_) { m_pageRightmar = pageRightmar_; };
-    std::string GetPageRightmar() const { return m_pageRightmar; };    
+    std::string GetPageRightmar() const { return m_pageRightmar; };
     bool HasPageRightmar();
-    
     //
     void SetPagePanels(std::string pagePanels_) { m_pagePanels = pagePanels_; };
-    std::string GetPagePanels() const { return m_pagePanels; };    
+    std::string GetPagePanels() const { return m_pagePanels; };
     bool HasPagePanels();
-    
     //
     void SetPageScale(std::string pageScale_) { m_pageScale = pageScale_; };
-    std::string GetPageScale() const { return m_pageScale; };    
+    std::string GetPageScale() const { return m_pageScale; };
     bool HasPageScale();
-    
     ///@}
 
 private:
@@ -4103,38 +3855,36 @@ private:
     /** Indicates how the page should be scaled when rendered. **/
     std::string m_pageScale;
 
-/* include <attpage.scale> */
+    /* include <attpage.scale> */
 };
 
 //----------------------------------------------------------------------------
 // AttPbVis
 //----------------------------------------------------------------------------
 
-class AttPbVis: public Att
-{
+class AttPbVis : public Att {
 public:
     AttPbVis();
     virtual ~AttPbVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPbVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPbVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePbVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetFolium(pbVis_FOLIUM folium_) { m_folium = folium_; };
-    pbVis_FOLIUM GetFolium() const { return m_folium; };    
+    pbVis_FOLIUM GetFolium() const { return m_folium; };
     bool HasFolium();
-    
     ///@}
 
 private:
@@ -4144,76 +3894,72 @@ private:
      **/
     pbVis_FOLIUM m_folium;
 
-/* include <attfolium> */
+    /* include <attfolium> */
 };
 
 //----------------------------------------------------------------------------
 // AttPitch
 //----------------------------------------------------------------------------
 
-class AttPitch: public Att
-{
+class AttPitch : public Att {
 public:
     AttPitch();
     virtual ~AttPitch();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPitch();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPitch(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePitch(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPname(data_PITCHNAME pname_) { m_pname = pname_; };
-    data_PITCHNAME GetPname() const { return m_pname; };    
+    data_PITCHNAME GetPname() const { return m_pname; };
     bool HasPname();
-    
     ///@}
 
 private:
     /** Contains a written pitch name. **/
     data_PITCHNAME m_pname;
 
-/* include <attpname> */
+    /* include <attpname> */
 };
 
 //----------------------------------------------------------------------------
 // AttPlacement
 //----------------------------------------------------------------------------
 
-class AttPlacement: public Att
-{
+class AttPlacement : public Att {
 public:
     AttPlacement();
     virtual ~AttPlacement();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPlacement();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPlacement(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePlacement(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPlace(data_STAFFREL place_) { m_place = place_; };
-    data_STAFFREL GetPlace() const { return m_place; };    
+    data_STAFFREL GetPlace() const { return m_place; };
     bool HasPlace();
-    
     ///@}
 
 private:
@@ -4223,43 +3969,40 @@ private:
      **/
     data_STAFFREL m_place;
 
-/* include <attplace> */
+    /* include <attplace> */
 };
 
 //----------------------------------------------------------------------------
 // AttPlist
 //----------------------------------------------------------------------------
 
-class AttPlist: public Att
-{
+class AttPlist : public Att {
 public:
     AttPlist();
     virtual ~AttPlist();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPlist();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPlist(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePlist(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPlist(std::string plist_) { m_plist = plist_; };
-    std::string GetPlist() const { return m_plist; };    
+    std::string GetPlist() const { return m_plist; };
     bool HasPlist();
-    
     //
     void SetEvaluate(plist_EVALUATE evaluate_) { m_evaluate = evaluate_; };
-    plist_EVALUATE GetEvaluate() const { return m_evaluate; };    
+    plist_EVALUATE GetEvaluate() const { return m_evaluate; };
     bool HasEvaluate();
-    
     ///@}
 
 private:
@@ -4271,63 +4014,56 @@ private:
     /** Specifies the intended meaning when the target of a pointer is itself a pointer. **/
     plist_EVALUATE m_evaluate;
 
-/* include <attevaluate> */
+    /* include <attevaluate> */
 };
 
 //----------------------------------------------------------------------------
 // AttPointing
 //----------------------------------------------------------------------------
 
-class AttPointing: public Att
-{
+class AttPointing : public Att {
 public:
     AttPointing();
     virtual ~AttPointing();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPointing();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPointing(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePointing(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetActuate(std::string actuate_) { m_actuate = actuate_; };
-    std::string GetActuate() const { return m_actuate; };    
+    std::string GetActuate() const { return m_actuate; };
     bool HasActuate();
-    
     //
     void SetRole(std::string role_) { m_role = role_; };
-    std::string GetRole() const { return m_role; };    
+    std::string GetRole() const { return m_role; };
     bool HasRole();
-    
     //
     void SetShow(std::string show_) { m_show = show_; };
-    std::string GetShow() const { return m_show; };    
+    std::string GetShow() const { return m_show; };
     bool HasShow();
-    
     //
     void SetTarget(std::string target_) { m_target = target_; };
-    std::string GetTarget() const { return m_target; };    
+    std::string GetTarget() const { return m_target; };
     bool HasTarget();
-    
     //
     void SetTargettype(std::string targettype_) { m_targettype = targettype_; };
-    std::string GetTargettype() const { return m_targettype; };    
+    std::string GetTargettype() const { return m_targettype; };
     bool HasTargettype();
-    
     //
     void SetTitle(std::string title_) { m_title = title_; };
-    std::string GetTitle() const { return m_title; };    
+    std::string GetTitle() const { return m_title; };
     bool HasTitle();
-    
     ///@}
 
 private:
@@ -4354,38 +4090,36 @@ private:
     /** --- **/
     std::string m_title;
 
-/* include <atttitle> */
+    /* include <atttitle> */
 };
 
 //----------------------------------------------------------------------------
 // AttQuantity
 //----------------------------------------------------------------------------
 
-class AttQuantity: public Att
-{
+class AttQuantity : public Att {
 public:
     AttQuantity();
     virtual ~AttQuantity();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetQuantity();
-    
+
     /** Read the values for the attribute class **/
     bool ReadQuantity(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteQuantity(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetQuantity(double quantity_) { m_quantity = quantity_; };
-    double GetQuantity() const { return m_quantity; };    
+    double GetQuantity() const { return m_quantity; };
     bool HasQuantity();
-    
     ///@}
 
 private:
@@ -4395,76 +4129,72 @@ private:
      **/
     double m_quantity;
 
-/* include <attquantity> */
+    /* include <attquantity> */
 };
 
 //----------------------------------------------------------------------------
 // AttRelativesize
 //----------------------------------------------------------------------------
 
-class AttRelativesize: public Att
-{
+class AttRelativesize : public Att {
 public:
     AttRelativesize();
     virtual ~AttRelativesize();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetRelativesize();
-    
+
     /** Read the values for the attribute class **/
     bool ReadRelativesize(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteRelativesize(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSize(data_SIZE size_) { m_size = size_; };
-    data_SIZE GetSize() const { return m_size; };    
+    data_SIZE GetSize() const { return m_size; };
     bool HasSize();
-    
     ///@}
 
 private:
     /** Describes the relative size of a feature. **/
     data_SIZE m_size;
 
-/* include <attsize> */
+    /* include <attsize> */
 };
 
 //----------------------------------------------------------------------------
 // AttResponsibility
 //----------------------------------------------------------------------------
 
-class AttResponsibility: public Att
-{
+class AttResponsibility : public Att {
 public:
     AttResponsibility();
     virtual ~AttResponsibility();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetResponsibility();
-    
+
     /** Read the values for the attribute class **/
     bool ReadResponsibility(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteResponsibility(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetResp(std::string resp_) { m_resp = resp_; };
-    std::string GetResp() const { return m_resp; };    
+    std::string GetResp() const { return m_resp; };
     bool HasResp();
-    
     ///@}
 
 private:
@@ -4475,124 +4205,116 @@ private:
      **/
     std::string m_resp;
 
-/* include <attresp> */
+    /* include <attresp> */
 };
 
 //----------------------------------------------------------------------------
 // AttSbVis
 //----------------------------------------------------------------------------
 
-class AttSbVis: public Att
-{
+class AttSbVis : public Att {
 public:
     AttSbVis();
     virtual ~AttSbVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSbVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSbVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSbVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetForm(sbVis_FORM form_) { m_form = form_; };
-    sbVis_FORM GetForm() const { return m_form; };    
+    sbVis_FORM GetForm() const { return m_form; };
     bool HasForm();
-    
     ///@}
 
 private:
     /** Records the appearance and usually the function of the bar line. **/
     sbVis_FORM m_form;
 
-/* include <attform> */
+    /* include <attform> */
 };
 
 //----------------------------------------------------------------------------
 // AttScalable
 //----------------------------------------------------------------------------
 
-class AttScalable: public Att
-{
+class AttScalable : public Att {
 public:
     AttScalable();
     virtual ~AttScalable();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetScalable();
-    
+
     /** Read the values for the attribute class **/
     bool ReadScalable(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteScalable(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetScale(int scale_) { m_scale = scale_; };
-    int GetScale() const { return m_scale; };    
+    int GetScale() const { return m_scale; };
     bool HasScale();
-    
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
     int m_scale;
 
-/* include <attscale> */
+    /* include <attscale> */
 };
 
 //----------------------------------------------------------------------------
 // AttScoreDefGes
 //----------------------------------------------------------------------------
 
-class AttScoreDefGes: public Att
-{
+class AttScoreDefGes : public Att {
 public:
     AttScoreDefGes();
     virtual ~AttScoreDefGes();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetScoreDefGes();
-    
+
     /** Read the values for the attribute class **/
     bool ReadScoreDefGes(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteScoreDefGes(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTunePname(data_PITCHNAME tunePname_) { m_tunePname = tunePname_; };
-    data_PITCHNAME GetTunePname() const { return m_tunePname; };    
+    data_PITCHNAME GetTunePname() const { return m_tunePname; };
     bool HasTunePname();
-    
     //
     void SetTuneHz(double tuneHz_) { m_tuneHz = tuneHz_; };
-    double GetTuneHz() const { return m_tuneHz; };    
+    double GetTuneHz() const { return m_tuneHz; };
     bool HasTuneHz();
-    
     //
     void SetTuneTemper(data_TEMPERAMENT tuneTemper_) { m_tuneTemper = tuneTemper_; };
-    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; };    
+    data_TEMPERAMENT GetTuneTemper() const { return m_tuneTemper; };
     bool HasTuneTemper();
-    
     ///@}
 
 private:
@@ -4603,38 +4325,36 @@ private:
     /** Provides an indication of the tuning system, 'just', for example. **/
     data_TEMPERAMENT m_tuneTemper;
 
-/* include <atttune.temper> */
+    /* include <atttune.temper> */
 };
 
 //----------------------------------------------------------------------------
 // AttScoreDefVis
 //----------------------------------------------------------------------------
 
-class AttScoreDefVis: public Att
-{
+class AttScoreDefVis : public Att {
 public:
     AttScoreDefVis();
     virtual ~AttScoreDefVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetScoreDefVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadScoreDefVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteScoreDefVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetVuHeight(std::string vuHeight_) { m_vuHeight = vuHeight_; };
-    std::string GetVuHeight() const { return m_vuHeight; };    
+    std::string GetVuHeight() const { return m_vuHeight; };
     bool HasVuHeight();
-    
     ///@}
 
 private:
@@ -4645,76 +4365,72 @@ private:
      **/
     std::string m_vuHeight;
 
-/* include <attvu.height> */
+    /* include <attvu.height> */
 };
 
 //----------------------------------------------------------------------------
 // AttSectionVis
 //----------------------------------------------------------------------------
 
-class AttSectionVis: public Att
-{
+class AttSectionVis : public Att {
 public:
     AttSectionVis();
     virtual ~AttSectionVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSectionVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSectionVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSectionVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetRestart(data_BOOLEAN restart_) { m_restart = restart_; };
-    data_BOOLEAN GetRestart() const { return m_restart; };    
+    data_BOOLEAN GetRestart() const { return m_restart; };
     bool HasRestart();
-    
     ///@}
 
 private:
     /** Indicates that staves begin again with this section. **/
     data_BOOLEAN m_restart;
 
-/* include <attrestart> */
+    /* include <attrestart> */
 };
 
 //----------------------------------------------------------------------------
 // AttSequence
 //----------------------------------------------------------------------------
 
-class AttSequence: public Att
-{
+class AttSequence : public Att {
 public:
     AttSequence();
     virtual ~AttSequence();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSequence();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSequence(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSequence(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSeq(int seq_) { m_seq = seq_; };
-    int GetSeq() const { return m_seq; };    
+    int GetSeq() const { return m_seq; };
     bool HasSeq();
-    
     ///@}
 
 private:
@@ -4724,76 +4440,72 @@ private:
      **/
     int m_seq;
 
-/* include <attseq> */
+    /* include <attseq> */
 };
 
 //----------------------------------------------------------------------------
 // AttSlashcount
 //----------------------------------------------------------------------------
 
-class AttSlashcount: public Att
-{
+class AttSlashcount : public Att {
 public:
     AttSlashcount();
     virtual ~AttSlashcount();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSlashcount();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSlashcount(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSlashcount(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSlash(char slash_) { m_slash = slash_; };
-    char GetSlash() const { return m_slash; };    
+    char GetSlash() const { return m_slash; };
     bool HasSlash();
-    
     ///@}
 
 private:
     /** Indicates the number of slashes present. **/
     char m_slash;
 
-/* include <attslash> */
+    /* include <attslash> */
 };
 
 //----------------------------------------------------------------------------
 // AttSlurpresent
 //----------------------------------------------------------------------------
 
-class AttSlurpresent: public Att
-{
+class AttSlurpresent : public Att {
 public:
     AttSlurpresent();
     virtual ~AttSlurpresent();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSlurpresent();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSlurpresent(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSlurpresent(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSlur(std::string slur_) { m_slur = slur_; };
-    std::string GetSlur() const { return m_slur; };    
+    std::string GetSlur() const { return m_slur; };
     bool HasSlur();
-    
     ///@}
 
 private:
@@ -4804,38 +4516,36 @@ private:
      **/
     std::string m_slur;
 
-/* include <attslur> */
+    /* include <attslur> */
 };
 
 //----------------------------------------------------------------------------
 // AttSpaceVis
 //----------------------------------------------------------------------------
 
-class AttSpaceVis: public Att
-{
+class AttSpaceVis : public Att {
 public:
     AttSpaceVis();
     virtual ~AttSpaceVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSpaceVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSpaceVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSpaceVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCompressable(data_BOOLEAN compressable_) { m_compressable = compressable_; };
-    data_BOOLEAN GetCompressable() const { return m_compressable; };    
+    data_BOOLEAN GetCompressable() const { return m_compressable; };
     bool HasCompressable();
-    
     ///@}
 
 private:
@@ -4845,53 +4555,48 @@ private:
      **/
     data_BOOLEAN m_compressable;
 
-/* include <attcompressable> */
+    /* include <attcompressable> */
 };
 
 //----------------------------------------------------------------------------
 // AttSpacing
 //----------------------------------------------------------------------------
 
-class AttSpacing: public Att
-{
+class AttSpacing : public Att {
 public:
     AttSpacing();
     virtual ~AttSpacing();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSpacing();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSpacing(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSpacing(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSpacingPackexp(double spacingPackexp_) { m_spacingPackexp = spacingPackexp_; };
-    double GetSpacingPackexp() const { return m_spacingPackexp; };    
+    double GetSpacingPackexp() const { return m_spacingPackexp; };
     bool HasSpacingPackexp();
-    
     //
     void SetSpacingPackfact(double spacingPackfact_) { m_spacingPackfact = spacingPackfact_; };
-    double GetSpacingPackfact() const { return m_spacingPackfact; };    
+    double GetSpacingPackfact() const { return m_spacingPackfact; };
     bool HasSpacingPackfact();
-    
     //
     void SetSpacingStaff(std::string spacingStaff_) { m_spacingStaff = spacingStaff_; };
-    std::string GetSpacingStaff() const { return m_spacingStaff; };    
+    std::string GetSpacingStaff() const { return m_spacingStaff; };
     bool HasSpacingStaff();
-    
     //
     void SetSpacingSystem(std::string spacingSystem_) { m_spacingSystem = spacingSystem_; };
-    std::string GetSpacingSystem() const { return m_spacingSystem; };    
+    std::string GetSpacingSystem() const { return m_spacingSystem; };
     bool HasSpacingSystem();
-    
     ///@}
 
 private:
@@ -4913,101 +4618,92 @@ private:
      **/
     std::string m_spacingSystem;
 
-/* include <attspacing.system> */
+    /* include <attspacing.system> */
 };
 
 //----------------------------------------------------------------------------
 // AttStaffLog
 //----------------------------------------------------------------------------
 
-class AttStaffLog: public Att
-{
+class AttStaffLog : public Att {
 public:
     AttStaffLog();
     virtual ~AttStaffLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStaffLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStaffLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStaffLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDef(std::string def_) { m_def = def_; };
-    std::string GetDef() const { return m_def; };    
+    std::string GetDef() const { return m_def; };
     bool HasDef();
-    
     ///@}
 
 private:
     /** Provides a mechanism for linking the layer to a layerDef element. **/
     std::string m_def;
 
-/* include <attdef> */
+    /* include <attdef> */
 };
 
 //----------------------------------------------------------------------------
 // AttStaffDefVis
 //----------------------------------------------------------------------------
 
-class AttStaffDefVis: public Att
-{
+class AttStaffDefVis : public Att {
 public:
     AttStaffDefVis();
     virtual ~AttStaffDefVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStaffDefVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStaffDefVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStaffDefVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; };
-    data_BOOLEAN GetGridShow() const { return m_gridShow; };    
+    data_BOOLEAN GetGridShow() const { return m_gridShow; };
     bool HasGridShow();
-    
     //
     void SetLayerscheme(data_LAYERSCHEME layerscheme_) { m_layerscheme = layerscheme_; };
-    data_LAYERSCHEME GetLayerscheme() const { return m_layerscheme; };    
+    data_LAYERSCHEME GetLayerscheme() const { return m_layerscheme; };
     bool HasLayerscheme();
-    
     //
     void SetLines(int lines_) { m_lines = lines_; };
-    int GetLines() const { return m_lines; };    
+    int GetLines() const { return m_lines; };
     bool HasLines();
-    
     //
     void SetLinesColor(std::string linesColor_) { m_linesColor = linesColor_; };
-    std::string GetLinesColor() const { return m_linesColor; };    
+    std::string GetLinesColor() const { return m_linesColor; };
     bool HasLinesColor();
-    
     //
     void SetLinesVisible(data_BOOLEAN linesVisible_) { m_linesVisible = linesVisible_; };
-    data_BOOLEAN GetLinesVisible() const { return m_linesVisible; };    
+    data_BOOLEAN GetLinesVisible() const { return m_linesVisible; };
     bool HasLinesVisible();
-    
     //
     void SetSpacing(std::string spacing_) { m_spacing = spacing_; };
-    std::string GetSpacing() const { return m_spacing; };    
+    std::string GetSpacing() const { return m_spacing; };
     bool HasSpacing();
-    
     ///@}
 
 private:
@@ -5036,38 +4732,36 @@ private:
      **/
     std::string m_spacing;
 
-/* include <attspacing> */
+    /* include <attspacing> */
 };
 
 //----------------------------------------------------------------------------
 // AttStaffGrpVis
 //----------------------------------------------------------------------------
 
-class AttStaffGrpVis: public Att
-{
+class AttStaffGrpVis : public Att {
 public:
     AttStaffGrpVis();
     virtual ~AttStaffGrpVis();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStaffGrpVis();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStaffGrpVis(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStaffGrpVis(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetBarthru(data_BOOLEAN barthru_) { m_barthru = barthru_; };
-    data_BOOLEAN GetBarthru() const { return m_barthru; };    
+    data_BOOLEAN GetBarthru() const { return m_barthru; };
     bool HasBarthru();
-    
     ///@}
 
 private:
@@ -5077,76 +4771,72 @@ private:
      **/
     data_BOOLEAN m_barthru;
 
-/* include <attbarthru> */
+    /* include <attbarthru> */
 };
 
 //----------------------------------------------------------------------------
 // AttStaffgroupingsym
 //----------------------------------------------------------------------------
 
-class AttStaffgroupingsym: public Att
-{
+class AttStaffgroupingsym : public Att {
 public:
     AttStaffgroupingsym();
     virtual ~AttStaffgroupingsym();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStaffgroupingsym();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStaffgroupingsym(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStaffgroupingsym(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSymbol(staffgroupingsym_SYMBOL symbol_) { m_symbol = symbol_; };
-    staffgroupingsym_SYMBOL GetSymbol() const { return m_symbol; };    
+    staffgroupingsym_SYMBOL GetSymbol() const { return m_symbol; };
     bool HasSymbol();
-    
     ///@}
 
 private:
     /** Specifies the symbol used to group a set of staves. **/
     staffgroupingsym_SYMBOL m_symbol;
 
-/* include <attsymbol> */
+    /* include <attsymbol> */
 };
 
 //----------------------------------------------------------------------------
 // AttStaffident
 //----------------------------------------------------------------------------
 
-class AttStaffident: public Att
-{
+class AttStaffident : public Att {
 public:
     AttStaffident();
     virtual ~AttStaffident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStaffident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStaffident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStaffident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetStaff(xsd_posIntList staff_) { m_staff = staff_; };
-    xsd_posIntList GetStaff() const { return m_staff; };    
+    xsd_posIntList GetStaff() const { return m_staff; };
     bool HasStaff();
-    
     ///@}
 
 private:
@@ -5157,81 +4847,76 @@ private:
      **/
     xsd_posIntList m_staff;
 
-/* include <attstaff> */
+    /* include <attstaff> */
 };
 
 //----------------------------------------------------------------------------
 // AttStaffloc
 //----------------------------------------------------------------------------
 
-class AttStaffloc: public Att
-{
+class AttStaffloc : public Att {
 public:
     AttStaffloc();
     virtual ~AttStaffloc();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStaffloc();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStaffloc(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStaffloc(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetLoc(int loc_) { m_loc = loc_; };
-    int GetLoc() const { return m_loc; };    
+    int GetLoc() const { return m_loc; };
     bool HasLoc();
-    
     ///@}
 
 private:
     /** Holds the staff location of the feature. **/
     int m_loc;
 
-/* include <attloc> */
+    /* include <attloc> */
 };
 
 //----------------------------------------------------------------------------
 // AttStafflocPitched
 //----------------------------------------------------------------------------
 
-class AttStafflocPitched: public Att
-{
+class AttStafflocPitched : public Att {
 public:
     AttStafflocPitched();
     virtual ~AttStafflocPitched();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStafflocPitched();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStafflocPitched(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStafflocPitched(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPloc(data_PITCHNAME ploc_) { m_ploc = ploc_; };
-    data_PITCHNAME GetPloc() const { return m_ploc; };    
+    data_PITCHNAME GetPloc() const { return m_ploc; };
     bool HasPloc();
-    
     //
     void SetOloc(char oloc_) { m_oloc = oloc_; };
-    char GetOloc() const { return m_oloc; };    
+    char GetOloc() const { return m_oloc; };
     bool HasOloc();
-    
     ///@}
 
 private:
@@ -5240,38 +4925,36 @@ private:
     /** Records staff location in terms of written octave. **/
     char m_oloc;
 
-/* include <attoloc> */
+    /* include <attoloc> */
 };
 
 //----------------------------------------------------------------------------
 // AttStartendid
 //----------------------------------------------------------------------------
 
-class AttStartendid: public Att
-{
+class AttStartendid : public Att {
 public:
     AttStartendid();
     virtual ~AttStartendid();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStartendid();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStartendid(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStartendid(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetEndid(std::string endid_) { m_endid = endid_; };
-    std::string GetEndid() const { return m_endid; };    
+    std::string GetEndid() const { return m_endid; };
     bool HasEndid();
-    
     ///@}
 
 private:
@@ -5281,38 +4964,36 @@ private:
      **/
     std::string m_endid;
 
-/* include <attendid> */
+    /* include <attendid> */
 };
 
 //----------------------------------------------------------------------------
 // AttStartid
 //----------------------------------------------------------------------------
 
-class AttStartid: public Att
-{
+class AttStartid : public Att {
 public:
     AttStartid();
     virtual ~AttStartid();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStartid();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStartid(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStartid(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetStartid(std::string startid_) { m_startid = startid_; };
-    std::string GetStartid() const { return m_startid; };    
+    std::string GetStartid() const { return m_startid; };
     bool HasStartid();
-    
     ///@}
 
 private:
@@ -5322,63 +5003,56 @@ private:
      **/
     std::string m_startid;
 
-/* include <attstartid> */
+    /* include <attstartid> */
 };
 
 //----------------------------------------------------------------------------
 // AttStems
 //----------------------------------------------------------------------------
 
-class AttStems: public Att
-{
+class AttStems : public Att {
 public:
     AttStems();
     virtual ~AttStems();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetStems();
-    
+
     /** Read the values for the attribute class **/
     bool ReadStems(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteStems(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetStemDir(data_STEMDIRECTION stemDir_) { m_stemDir = stemDir_; };
-    data_STEMDIRECTION GetStemDir() const { return m_stemDir; };    
+    data_STEMDIRECTION GetStemDir() const { return m_stemDir; };
     bool HasStemDir();
-    
     //
     void SetStemLen(std::string stemLen_) { m_stemLen = stemLen_; };
-    std::string GetStemLen() const { return m_stemLen; };    
+    std::string GetStemLen() const { return m_stemLen; };
     bool HasStemLen();
-    
     //
     void SetStemMod(data_STEMMODIFIER stemMod_) { m_stemMod = stemMod_; };
-    data_STEMMODIFIER GetStemMod() const { return m_stemMod; };    
+    data_STEMMODIFIER GetStemMod() const { return m_stemMod; };
     bool HasStemMod();
-    
     //
     void SetStemPos(data_STEMPOSITION stemPos_) { m_stemPos = stemPos_; };
-    data_STEMPOSITION GetStemPos() const { return m_stemPos; };    
+    data_STEMPOSITION GetStemPos() const { return m_stemPos; };
     bool HasStemPos();
-    
     //
     void SetStemX(double stemX_) { m_stemX = stemX_; };
-    double GetStemX() const { return m_stemX; };    
+    double GetStemX() const { return m_stemX; };
     bool HasStemX();
-    
     //
     void SetStemY(double stemY_) { m_stemY = stemY_; };
-    double GetStemY() const { return m_stemY; };    
+    double GetStemY() const { return m_stemY; };
     bool HasStemY();
-    
     ///@}
 
 private:
@@ -5398,43 +5072,40 @@ private:
     /** Records the output y coordinate of the stem's attachment point. **/
     double m_stemY;
 
-/* include <attstem.y> */
+    /* include <attstem.y> */
 };
 
 //----------------------------------------------------------------------------
 // AttSylLog
 //----------------------------------------------------------------------------
 
-class AttSylLog: public Att
-{
+class AttSylLog : public Att {
 public:
     AttSylLog();
     virtual ~AttSylLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSylLog();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSylLog(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSylLog(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCon(sylLog_CON con_) { m_con = con_; };
-    sylLog_CON GetCon() const { return m_con; };    
+    sylLog_CON GetCon() const { return m_con; };
     bool HasCon();
-    
     //
     void SetWordpos(sylLog_WORDPOS wordpos_) { m_wordpos = wordpos_; };
-    sylLog_WORDPOS GetWordpos() const { return m_wordpos; };    
+    sylLog_WORDPOS GetWordpos() const { return m_wordpos; };
     bool HasWordpos();
-    
     ///@}
 
 private:
@@ -5446,91 +5117,84 @@ private:
     /** Records the position of a syllable within a word. **/
     sylLog_WORDPOS m_wordpos;
 
-/* include <attwordpos> */
+    /* include <attwordpos> */
 };
 
 //----------------------------------------------------------------------------
 // AttSyltext
 //----------------------------------------------------------------------------
 
-class AttSyltext: public Att
-{
+class AttSyltext : public Att {
 public:
     AttSyltext();
     virtual ~AttSyltext();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSyltext();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSyltext(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSyltext(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSyl(std::string syl_) { m_syl = syl_; };
-    std::string GetSyl() const { return m_syl; };    
+    std::string GetSyl() const { return m_syl; };
     bool HasSyl();
-    
     ///@}
 
 private:
     /** Holds an associated sung text syllable. **/
     std::string m_syl;
 
-/* include <attsyl> */
+    /* include <attsyl> */
 };
 
 //----------------------------------------------------------------------------
 // AttSystems
 //----------------------------------------------------------------------------
 
-class AttSystems: public Att
-{
+class AttSystems : public Att {
 public:
     AttSystems();
     virtual ~AttSystems();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSystems();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSystems(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSystems(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSystemLeftline(data_BOOLEAN systemLeftline_) { m_systemLeftline = systemLeftline_; };
-    data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; };    
+    data_BOOLEAN GetSystemLeftline() const { return m_systemLeftline; };
     bool HasSystemLeftline();
-    
     //
     void SetSystemLeftmar(std::string systemLeftmar_) { m_systemLeftmar = systemLeftmar_; };
-    std::string GetSystemLeftmar() const { return m_systemLeftmar; };    
+    std::string GetSystemLeftmar() const { return m_systemLeftmar; };
     bool HasSystemLeftmar();
-    
     //
     void SetSystemRightmar(std::string systemRightmar_) { m_systemRightmar = systemRightmar_; };
-    std::string GetSystemRightmar() const { return m_systemRightmar; };    
+    std::string GetSystemRightmar() const { return m_systemRightmar; };
     bool HasSystemRightmar();
-    
     //
     void SetSystemTopmar(std::string systemTopmar_) { m_systemTopmar = systemTopmar_; };
-    std::string GetSystemTopmar() const { return m_systemTopmar; };    
+    std::string GetSystemTopmar() const { return m_systemTopmar; };
     bool HasSystemTopmar();
-    
     ///@}
 
 private:
@@ -5556,58 +5220,52 @@ private:
      **/
     std::string m_systemTopmar;
 
-/* include <attsystem.topmar> */
+    /* include <attsystem.topmar> */
 };
 
 //----------------------------------------------------------------------------
 // AttTextstyle
 //----------------------------------------------------------------------------
 
-class AttTextstyle: public Att
-{
+class AttTextstyle : public Att {
 public:
     AttTextstyle();
     virtual ~AttTextstyle();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTextstyle();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTextstyle(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTextstyle(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTextFam(std::string textFam_) { m_textFam = textFam_; };
-    std::string GetTextFam() const { return m_textFam; };    
+    std::string GetTextFam() const { return m_textFam; };
     bool HasTextFam();
-    
     //
     void SetTextName(std::string textName_) { m_textName = textName_; };
-    std::string GetTextName() const { return m_textName; };    
+    std::string GetTextName() const { return m_textName; };
     bool HasTextName();
-    
     //
     void SetTextSize(std::string textSize_) { m_textSize = textSize_; };
-    std::string GetTextSize() const { return m_textSize; };    
+    std::string GetTextSize() const { return m_textSize; };
     bool HasTextSize();
-    
     //
     void SetTextStyle(data_FONTSTYLE textStyle_) { m_textStyle = textStyle_; };
-    data_FONTSTYLE GetTextStyle() const { return m_textStyle; };    
+    data_FONTSTYLE GetTextStyle() const { return m_textStyle; };
     bool HasTextStyle();
-    
     //
     void SetTextWeight(data_FONTWEIGHT textWeight_) { m_textWeight = textWeight_; };
-    data_FONTWEIGHT GetTextWeight() const { return m_textWeight; };    
+    data_FONTWEIGHT GetTextWeight() const { return m_textWeight; };
     bool HasTextWeight();
-    
     ///@}
 
 private:
@@ -5637,38 +5295,36 @@ private:
      **/
     data_FONTWEIGHT m_textWeight;
 
-/* include <atttext.weight> */
+    /* include <atttext.weight> */
 };
 
 //----------------------------------------------------------------------------
 // AttTiepresent
 //----------------------------------------------------------------------------
 
-class AttTiepresent: public Att
-{
+class AttTiepresent : public Att {
 public:
     AttTiepresent();
     virtual ~AttTiepresent();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTiepresent();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTiepresent(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTiepresent(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTie(data_TIE tie_) { m_tie = tie_; };
-    data_TIE GetTie() const { return m_tie; };    
+    data_TIE GetTie() const { return m_tie; };
     bool HasTie();
-    
     ///@}
 
 private:
@@ -5679,38 +5335,36 @@ private:
      **/
     data_TIE m_tie;
 
-/* include <atttie> */
+    /* include <atttie> */
 };
 
 //----------------------------------------------------------------------------
 // AttTimestampMusical
 //----------------------------------------------------------------------------
 
-class AttTimestampMusical: public Att
-{
+class AttTimestampMusical : public Att {
 public:
     AttTimestampMusical();
     virtual ~AttTimestampMusical();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTimestampMusical();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTimestampMusical(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTimestampMusical(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTstamp(double tstamp_) { m_tstamp = tstamp_; };
-    double GetTstamp() const { return m_tstamp; };    
+    double GetTstamp() const { return m_tstamp; };
     bool HasTstamp();
-    
     ///@}
 
 private:
@@ -5720,43 +5374,40 @@ private:
      **/
     double m_tstamp;
 
-/* include <atttstamp> */
+    /* include <atttstamp> */
 };
 
 //----------------------------------------------------------------------------
 // AttTimestampPerformed
 //----------------------------------------------------------------------------
 
-class AttTimestampPerformed: public Att
-{
+class AttTimestampPerformed : public Att {
 public:
     AttTimestampPerformed();
     virtual ~AttTimestampPerformed();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTimestampPerformed();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTimestampPerformed(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTimestampPerformed(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTstampGes(data_DURATION tstampGes_) { m_tstampGes = tstampGes_; };
-    data_DURATION GetTstampGes() const { return m_tstampGes; };    
+    data_DURATION GetTstampGes() const { return m_tstampGes; };
     bool HasTstampGes();
-    
     //
     void SetTstampReal(std::string tstampReal_) { m_tstampReal = tstampReal_; };
-    std::string GetTstampReal() const { return m_tstampReal; };    
+    std::string GetTstampReal() const { return m_tstampReal; };
     bool HasTstampReal();
-    
     ///@}
 
 private:
@@ -5769,38 +5420,36 @@ private:
     /** Used to record the onset time in terms of ISO time. **/
     std::string m_tstampReal;
 
-/* include <atttstamp.real> */
+    /* include <atttstamp.real> */
 };
 
 //----------------------------------------------------------------------------
 // AttTimestamp2Musical
 //----------------------------------------------------------------------------
 
-class AttTimestamp2Musical: public Att
-{
+class AttTimestamp2Musical : public Att {
 public:
     AttTimestamp2Musical();
     virtual ~AttTimestamp2Musical();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTimestamp2Musical();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTimestamp2Musical(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTimestamp2Musical(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTstamp2(data_MEASUREBEAT tstamp2_) { m_tstamp2 = tstamp2_; };
-    data_MEASUREBEAT GetTstamp2() const { return m_tstamp2; };    
+    data_MEASUREBEAT GetTstamp2() const { return m_tstamp2; };
     bool HasTstamp2();
-    
     ///@}
 
 private:
@@ -5810,43 +5459,40 @@ private:
      **/
     data_MEASUREBEAT m_tstamp2;
 
-/* include <atttstamp2> */
+    /* include <atttstamp2> */
 };
 
 //----------------------------------------------------------------------------
 // AttTransposition
 //----------------------------------------------------------------------------
 
-class AttTransposition: public Att
-{
+class AttTransposition : public Att {
 public:
     AttTransposition();
     virtual ~AttTransposition();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTransposition();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTransposition(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTransposition(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTransDiat(double transDiat_) { m_transDiat = transDiat_; };
-    double GetTransDiat() const { return m_transDiat; };    
+    double GetTransDiat() const { return m_transDiat; };
     bool HasTransDiat();
-    
     //
     void SetTransSemi(double transSemi_) { m_transSemi = transSemi_; };
-    double GetTransSemi() const { return m_transSemi; };    
+    double GetTransSemi() const { return m_transSemi; };
     bool HasTransSemi();
-    
     ///@}
 
 private:
@@ -5861,38 +5507,36 @@ private:
      **/
     double m_transSemi;
 
-/* include <atttrans.semi> */
+    /* include <atttrans.semi> */
 };
 
 //----------------------------------------------------------------------------
 // AttTupletpresent
 //----------------------------------------------------------------------------
 
-class AttTupletpresent: public Att
-{
+class AttTupletpresent : public Att {
 public:
     AttTupletpresent();
     virtual ~AttTupletpresent();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTupletpresent();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTupletpresent(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTupletpresent(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTuplet(std::string tuplet_) { m_tuplet = tuplet_; };
-    std::string GetTuplet() const { return m_tuplet; };    
+    std::string GetTuplet() const { return m_tuplet; };
     bool HasTuplet();
-    
     ///@}
 
 private:
@@ -5903,43 +5547,40 @@ private:
      **/
     std::string m_tuplet;
 
-/* include <atttuplet> */
+    /* include <atttuplet> */
 };
 
 //----------------------------------------------------------------------------
 // AttTyped
 //----------------------------------------------------------------------------
 
-class AttTyped: public Att
-{
+class AttTyped : public Att {
 public:
     AttTyped();
     virtual ~AttTyped();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTyped();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTyped(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTyped(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetType(std::string type_) { m_type = type_; };
-    std::string GetType() const { return m_type; };    
+    std::string GetType() const { return m_type; };
     bool HasType();
-    
     //
     void SetSubtype(std::string subtype_) { m_subtype = subtype_; };
-    std::string GetSubtype() const { return m_subtype; };    
+    std::string GetSubtype() const { return m_subtype; };
     bool HasSubtype();
-    
     ///@}
 
 private:
@@ -5954,58 +5595,52 @@ private:
      **/
     std::string m_subtype;
 
-/* include <attsubtype> */
+    /* include <attsubtype> */
 };
 
 //----------------------------------------------------------------------------
 // AttTypography
 //----------------------------------------------------------------------------
 
-class AttTypography: public Att
-{
+class AttTypography : public Att {
 public:
     AttTypography();
     virtual ~AttTypography();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTypography();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTypography(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTypography(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetFontfam(std::string fontfam_) { m_fontfam = fontfam_; };
-    std::string GetFontfam() const { return m_fontfam; };    
+    std::string GetFontfam() const { return m_fontfam; };
     bool HasFontfam();
-    
     //
     void SetFontname(std::string fontname_) { m_fontname = fontname_; };
-    std::string GetFontname() const { return m_fontname; };    
+    std::string GetFontname() const { return m_fontname; };
     bool HasFontname();
-    
     //
     void SetFontsize(double fontsize_) { m_fontsize = fontsize_; };
-    double GetFontsize() const { return m_fontsize; };    
+    double GetFontsize() const { return m_fontsize; };
     bool HasFontsize();
-    
     //
     void SetFontstyle(data_FONTSTYLE fontstyle_) { m_fontstyle = fontstyle_; };
-    data_FONTSTYLE GetFontstyle() const { return m_fontstyle; };    
+    data_FONTSTYLE GetFontstyle() const { return m_fontstyle; };
     bool HasFontstyle();
-    
     //
     void SetFontweight(data_FONTWEIGHT fontweight_) { m_fontweight = fontweight_; };
-    data_FONTWEIGHT GetFontweight() const { return m_fontweight; };    
+    data_FONTWEIGHT GetFontweight() const { return m_fontweight; };
     bool HasFontweight();
-    
     ///@}
 
 private:
@@ -6020,38 +5655,36 @@ private:
     /** Used to indicate bold type. **/
     data_FONTWEIGHT m_fontweight;
 
-/* include <attfontweight> */
+    /* include <attfontweight> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisibility
 //----------------------------------------------------------------------------
 
-class AttVisibility: public Att
-{
+class AttVisibility : public Att {
 public:
     AttVisibility();
     virtual ~AttVisibility();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisibility();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisibility(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisibility(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetVisible(data_BOOLEAN visible_) { m_visible = visible_; };
-    data_BOOLEAN GetVisible() const { return m_visible; };    
+    data_BOOLEAN GetVisible() const { return m_visible; };
     bool HasVisible();
-    
     ///@}
 
 private:
@@ -6061,38 +5694,36 @@ private:
      **/
     data_BOOLEAN m_visible;
 
-/* include <attvisible> */
+    /* include <attvisible> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisualoffsetHo
 //----------------------------------------------------------------------------
 
-class AttVisualoffsetHo: public Att
-{
+class AttVisualoffsetHo : public Att {
 public:
     AttVisualoffsetHo();
     virtual ~AttVisualoffsetHo();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisualoffsetHo();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisualoffsetHo(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisualoffsetHo(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetHo(std::string ho_) { m_ho = ho_; };
-    std::string GetHo() const { return m_ho; };    
+    std::string GetHo() const { return m_ho; };
     bool HasHo();
-    
     ///@}
 
 private:
@@ -6103,38 +5734,36 @@ private:
      **/
     std::string m_ho;
 
-/* include <attho> */
+    /* include <attho> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisualoffsetTo
 //----------------------------------------------------------------------------
 
-class AttVisualoffsetTo: public Att
-{
+class AttVisualoffsetTo : public Att {
 public:
     AttVisualoffsetTo();
     virtual ~AttVisualoffsetTo();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisualoffsetTo();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisualoffsetTo(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisualoffsetTo(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetTo(double to_) { m_to = to_; };
-    double GetTo() const { return m_to; };    
+    double GetTo() const { return m_to; };
     bool HasTo();
-    
     ///@}
 
 private:
@@ -6144,38 +5773,36 @@ private:
      **/
     double m_to;
 
-/* include <attto> */
+    /* include <attto> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisualoffsetVo
 //----------------------------------------------------------------------------
 
-class AttVisualoffsetVo: public Att
-{
+class AttVisualoffsetVo : public Att {
 public:
     AttVisualoffsetVo();
     virtual ~AttVisualoffsetVo();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisualoffsetVo();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisualoffsetVo(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisualoffsetVo(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetVo(std::string vo_) { m_vo = vo_; };
-    std::string GetVo() const { return m_vo; };    
+    std::string GetVo() const { return m_vo; };
     bool HasVo();
-    
     ///@}
 
 private:
@@ -6186,43 +5813,40 @@ private:
      **/
     std::string m_vo;
 
-/* include <attvo> */
+    /* include <attvo> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisualoffset2Ho
 //----------------------------------------------------------------------------
 
-class AttVisualoffset2Ho: public Att
-{
+class AttVisualoffset2Ho : public Att {
 public:
     AttVisualoffset2Ho();
     virtual ~AttVisualoffset2Ho();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisualoffset2Ho();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisualoffset2Ho(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisualoffset2Ho(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetStartho(std::string startho_) { m_startho = startho_; };
-    std::string GetStartho() const { return m_startho; };    
+    std::string GetStartho() const { return m_startho; };
     bool HasStartho();
-    
     //
     void SetEndho(std::string endho_) { m_endho = endho_; };
-    std::string GetEndho() const { return m_endho; };    
+    std::string GetEndho() const { return m_endho; };
     bool HasEndho();
-    
     ///@}
 
 private:
@@ -6237,43 +5861,40 @@ private:
      **/
     std::string m_endho;
 
-/* include <attendho> */
+    /* include <attendho> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisualoffset2To
 //----------------------------------------------------------------------------
 
-class AttVisualoffset2To: public Att
-{
+class AttVisualoffset2To : public Att {
 public:
     AttVisualoffset2To();
     virtual ~AttVisualoffset2To();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisualoffset2To();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisualoffset2To(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisualoffset2To(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetStartto(double startto_) { m_startto = startto_; };
-    double GetStartto() const { return m_startto; };    
+    double GetStartto() const { return m_startto; };
     bool HasStartto();
-    
     //
     void SetEndto(double endto_) { m_endto = endto_; };
-    double GetEndto() const { return m_endto; };    
+    double GetEndto() const { return m_endto; };
     bool HasEndto();
-    
     ///@}
 
 private:
@@ -6288,43 +5909,40 @@ private:
      **/
     double m_endto;
 
-/* include <attendto> */
+    /* include <attendto> */
 };
 
 //----------------------------------------------------------------------------
 // AttVisualoffset2Vo
 //----------------------------------------------------------------------------
 
-class AttVisualoffset2Vo: public Att
-{
+class AttVisualoffset2Vo : public Att {
 public:
     AttVisualoffset2Vo();
     virtual ~AttVisualoffset2Vo();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetVisualoffset2Vo();
-    
+
     /** Read the values for the attribute class **/
     bool ReadVisualoffset2Vo(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteVisualoffset2Vo(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetStartvo(std::string startvo_) { m_startvo = startvo_; };
-    std::string GetStartvo() const { return m_startvo; };    
+    std::string GetStartvo() const { return m_startvo; };
     bool HasStartvo();
-    
     //
     void SetEndvo(std::string endvo_) { m_endvo = endvo_; };
-    std::string GetEndvo() const { return m_endvo; };    
+    std::string GetEndvo() const { return m_endvo; };
     bool HasEndvo();
-    
     ///@}
 
 private:
@@ -6339,119 +5957,112 @@ private:
      **/
     std::string m_endvo;
 
-/* include <attendvo> */
+    /* include <attendvo> */
 };
 
 //----------------------------------------------------------------------------
 // AttWhitespace
 //----------------------------------------------------------------------------
 
-class AttWhitespace: public Att
-{
+class AttWhitespace : public Att {
 public:
     AttWhitespace();
     virtual ~AttWhitespace();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetWhitespace();
-    
+
     /** Read the values for the attribute class **/
     bool ReadWhitespace(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteWhitespace(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetSpace(std::string space_) { m_space = space_; };
-    std::string GetSpace() const { return m_space; };    
+    std::string GetSpace() const { return m_space; };
     bool HasSpace();
-    
     ///@}
 
 private:
     /** --- **/
     std::string m_space;
 
-/* include <attspace> */
+    /* include <attspace> */
 };
 
 //----------------------------------------------------------------------------
 // AttWidth
 //----------------------------------------------------------------------------
 
-class AttWidth: public Att
-{
+class AttWidth : public Att {
 public:
     AttWidth();
     virtual ~AttWidth();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetWidth();
-    
+
     /** Read the values for the attribute class **/
     bool ReadWidth(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteWidth(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetWidth(std::string width_) { m_width = width_; };
-    std::string GetWidth() const { return m_width; };    
+    std::string GetWidth() const { return m_width; };
     bool HasWidth();
-    
     ///@}
 
 private:
     /** Width of the line. **/
     std::string m_width;
 
-/* include <attwidth> */
+    /* include <attwidth> */
 };
 
 //----------------------------------------------------------------------------
 // AttXy
 //----------------------------------------------------------------------------
 
-class AttXy: public Att
-{
+class AttXy : public Att {
 public:
     AttXy();
     virtual ~AttXy();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetXy();
-    
+
     /** Read the values for the attribute class **/
     bool ReadXy(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteXy(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetX(double x_) { m_x = x_; };
-    double GetX() const { return m_x; };    
+    double GetX() const { return m_x; };
     bool HasX();
-    
     //
     void SetY(double y_) { m_y = y_; };
-    double GetY() const { return m_y; };    
+    double GetY() const { return m_y; };
     bool HasY();
-    
     ///@}
 
 private:
@@ -6468,43 +6079,40 @@ private:
      **/
     double m_y;
 
-/* include <atty> */
+    /* include <atty> */
 };
 
 //----------------------------------------------------------------------------
 // AttXy2
 //----------------------------------------------------------------------------
 
-class AttXy2: public Att
-{
+class AttXy2 : public Att {
 public:
     AttXy2();
     virtual ~AttXy2();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetXy2();
-    
+
     /** Read the values for the attribute class **/
     bool ReadXy2(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteXy2(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetX2(double x2_) { m_x2 = x2_; };
-    double GetX2() const { return m_x2; };    
+    double GetX2() const { return m_x2; };
     bool HasX2();
-    
     //
     void SetY2(double y2_) { m_y2 = y2_; };
-    double GetY2() const { return m_y2; };    
+    double GetY2() const { return m_y2; };
     bool HasY2();
-    
     ///@}
 
 private:
@@ -6513,10 +6121,9 @@ private:
     /** Encodes the optional 2nd y coordinate. **/
     double m_y2;
 
-/* include <atty2> */
+    /* include <atty2> */
 };
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_SHARED_H__
-
+#endif // __VRV_ATTS_SHARED_H__

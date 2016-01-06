@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -21,54 +21,49 @@
 
 //----------------------------------------------------------------------------
 
-
+#include <string>
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttChannelized
 //----------------------------------------------------------------------------
 
-class AttChannelized: public Att
-{
+class AttChannelized : public Att {
 public:
     AttChannelized();
     virtual ~AttChannelized();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetChannelized();
-    
+
     /** Read the values for the attribute class **/
     bool ReadChannelized(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteChannelized(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMidiChannel(data_MIDICHANNEL midiChannel_) { m_midiChannel = midiChannel_; };
-    data_MIDICHANNEL GetMidiChannel() const { return m_midiChannel; };    
+    data_MIDICHANNEL GetMidiChannel() const { return m_midiChannel; };
     bool HasMidiChannel();
-    
     //
     void SetMidiDuty(int midiDuty_) { m_midiDuty = midiDuty_; };
-    int GetMidiDuty() const { return m_midiDuty; };    
+    int GetMidiDuty() const { return m_midiDuty; };
     bool HasMidiDuty();
-    
     //
     void SetMidiPort(data_MIDIVALUE midiPort_) { m_midiPort = midiPort_; };
-    data_MIDIVALUE GetMidiPort() const { return m_midiPort; };    
+    data_MIDIVALUE GetMidiPort() const { return m_midiPort; };
     bool HasMidiPort();
-    
     //
     void SetMidiTrack(int midiTrack_) { m_midiTrack = midiTrack_; };
-    int GetMidiTrack() const { return m_midiTrack; };    
+    int GetMidiTrack() const { return m_midiTrack; };
     bool HasMidiTrack();
-    
     ///@}
 
 private:
@@ -81,53 +76,48 @@ private:
     /** Sets the MIDI track. **/
     int m_midiTrack;
 
-/* include <attmidi.track> */
+    /* include <attmidi.track> */
 };
 
 //----------------------------------------------------------------------------
 // AttMidiinstrument
 //----------------------------------------------------------------------------
 
-class AttMidiinstrument: public Att
-{
+class AttMidiinstrument : public Att {
 public:
     AttMidiinstrument();
     virtual ~AttMidiinstrument();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMidiinstrument();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMidiinstrument(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMidiinstrument(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMidiInstrnum(data_MIDIVALUE midiInstrnum_) { m_midiInstrnum = midiInstrnum_; };
-    data_MIDIVALUE GetMidiInstrnum() const { return m_midiInstrnum; };    
+    data_MIDIVALUE GetMidiInstrnum() const { return m_midiInstrnum; };
     bool HasMidiInstrnum();
-    
     //
     void SetMidiInstrname(data_MIDINAMES midiInstrname_) { m_midiInstrname = midiInstrname_; };
-    data_MIDINAMES GetMidiInstrname() const { return m_midiInstrname; };    
+    data_MIDINAMES GetMidiInstrname() const { return m_midiInstrname; };
     bool HasMidiInstrname();
-    
     //
     void SetMidiPan(data_MIDIVALUE midiPan_) { m_midiPan = midiPan_; };
-    data_MIDIVALUE GetMidiPan() const { return m_midiPan; };    
+    data_MIDIVALUE GetMidiPan() const { return m_midiPan; };
     bool HasMidiPan();
-    
     //
     void SetMidiVolume(data_MIDIVALUE midiVolume_) { m_midiVolume = midiVolume_; };
-    data_MIDIVALUE GetMidiVolume() const { return m_midiVolume; };    
+    data_MIDIVALUE GetMidiVolume() const { return m_midiVolume; };
     bool HasMidiVolume();
-    
     ///@}
 
 private:
@@ -143,38 +133,36 @@ private:
     /** Sets the instrument's volume. **/
     data_MIDIVALUE m_midiVolume;
 
-/* include <attmidi.volume> */
+    /* include <attmidi.volume> */
 };
 
 //----------------------------------------------------------------------------
 // AttMidinumber
 //----------------------------------------------------------------------------
 
-class AttMidinumber: public Att
-{
+class AttMidinumber : public Att {
 public:
     AttMidinumber();
     virtual ~AttMidinumber();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMidinumber();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMidinumber(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMidinumber(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetNum(int num_) { m_num = num_; };
-    int GetNum() const { return m_num; };    
+    int GetNum() const { return m_num; };
     bool HasNum();
-    
     ///@}
 
 private:
@@ -184,38 +172,36 @@ private:
      **/
     int m_num;
 
-/* include <attnum> */
+    /* include <attnum> */
 };
 
 //----------------------------------------------------------------------------
 // AttMiditempo
 //----------------------------------------------------------------------------
 
-class AttMiditempo: public Att
-{
+class AttMiditempo : public Att {
 public:
     AttMiditempo();
     virtual ~AttMiditempo();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMiditempo();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMiditempo(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMiditempo(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMidiTempo(data_MIDITEMPO midiTempo_) { m_midiTempo = midiTempo_; };
-    data_MIDITEMPO GetMidiTempo() const { return m_midiTempo; };    
+    data_MIDITEMPO GetMidiTempo() const { return m_midiTempo; };
     bool HasMidiTempo();
-    
     ///@}
 
 private:
@@ -225,152 +211,144 @@ private:
      **/
     data_MIDITEMPO m_midiTempo;
 
-/* include <attmidi.tempo> */
+    /* include <attmidi.tempo> */
 };
 
 //----------------------------------------------------------------------------
 // AttMidivalue
 //----------------------------------------------------------------------------
 
-class AttMidivalue: public Att
-{
+class AttMidivalue : public Att {
 public:
     AttMidivalue();
     virtual ~AttMidivalue();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMidivalue();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMidivalue(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMidivalue(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetVal(data_MIDIVALUE val_) { m_val = val_; };
-    data_MIDIVALUE GetVal() const { return m_val; };    
+    data_MIDIVALUE GetVal() const { return m_val; };
     bool HasVal();
-    
     ///@}
 
 private:
     /** MIDI number. **/
     data_MIDIVALUE m_val;
 
-/* include <attval> */
+    /* include <attval> */
 };
 
 //----------------------------------------------------------------------------
 // AttMidivalue2
 //----------------------------------------------------------------------------
 
-class AttMidivalue2: public Att
-{
+class AttMidivalue2 : public Att {
 public:
     AttMidivalue2();
     virtual ~AttMidivalue2();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMidivalue2();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMidivalue2(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMidivalue2(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetVal2(data_MIDIVALUE val2_) { m_val2 = val2_; };
-    data_MIDIVALUE GetVal2() const { return m_val2; };    
+    data_MIDIVALUE GetVal2() const { return m_val2; };
     bool HasVal2();
-    
     ///@}
 
 private:
     /** MIDI number. **/
     data_MIDIVALUE m_val2;
 
-/* include <attval2> */
+    /* include <attval2> */
 };
 
 //----------------------------------------------------------------------------
 // AttMidivelocity
 //----------------------------------------------------------------------------
 
-class AttMidivelocity: public Att
-{
+class AttMidivelocity : public Att {
 public:
     AttMidivelocity();
     virtual ~AttMidivelocity();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMidivelocity();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMidivelocity(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMidivelocity(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetVel(data_MIDIVALUE vel_) { m_vel = vel_; };
-    data_MIDIVALUE GetVel() const { return m_vel; };    
+    data_MIDIVALUE GetVel() const { return m_vel; };
     bool HasVel();
-    
     ///@}
 
 private:
     /** MIDI Note-on/off velocity. **/
     data_MIDIVALUE m_vel;
 
-/* include <attvel> */
+    /* include <attvel> */
 };
 
 //----------------------------------------------------------------------------
 // AttTimebase
 //----------------------------------------------------------------------------
 
-class AttTimebase: public Att
-{
+class AttTimebase : public Att {
 public:
     AttTimebase();
     virtual ~AttTimebase();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTimebase();
-    
+
     /** Read the values for the attribute class **/
     bool ReadTimebase(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteTimebase(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPpq(int ppq_) { m_ppq = ppq_; };
-    int GetPpq() const { return m_ppq; };    
+    int GetPpq() const { return m_ppq; };
     bool HasPpq();
-    
     ///@}
 
 private:
@@ -381,10 +359,9 @@ private:
      **/
     int m_ppq;
 
-/* include <attppq> */
+    /* include <attppq> */
 };
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_MIDI_H__
-
+#endif // __VRV_ATTS_MIDI_H__

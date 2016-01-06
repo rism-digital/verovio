@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -24,36 +24,34 @@
 #include <string>
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttAgentident
 //----------------------------------------------------------------------------
 
-class AttAgentident: public Att
-{
+class AttAgentident : public Att {
 public:
     AttAgentident();
     virtual ~AttAgentident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetAgentident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadAgentident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteAgentident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetAgent(std::string agent_) { m_agent = agent_; };
-    std::string GetAgent() const { return m_agent; };    
+    std::string GetAgent() const { return m_agent; };
     bool HasAgent();
-    
     ///@}
 
 private:
@@ -63,43 +61,40 @@ private:
      **/
     std::string m_agent;
 
-/* include <attagent> */
+    /* include <attagent> */
 };
 
 //----------------------------------------------------------------------------
 // AttEvidence
 //----------------------------------------------------------------------------
 
-class AttEvidence: public Att
-{
+class AttEvidence : public Att {
 public:
     AttEvidence();
     virtual ~AttEvidence();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetEvidence();
-    
+
     /** Read the values for the attribute class **/
     bool ReadEvidence(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteEvidence(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCert(data_CERTAINTY cert_) { m_cert = cert_; };
-    data_CERTAINTY GetCert() const { return m_cert; };    
+    data_CERTAINTY GetCert() const { return m_cert; };
     bool HasCert();
-    
     //
     void SetEvidence(std::string evidence_) { m_evidence = evidence_; };
-    std::string GetEvidence() const { return m_evidence; };    
+    std::string GetEvidence() const { return m_evidence; };
     bool HasEvidence();
-    
     ///@}
 
 private:
@@ -112,76 +107,72 @@ private:
      **/
     std::string m_evidence;
 
-/* include <attevidence> */
+    /* include <attevidence> */
 };
 
 //----------------------------------------------------------------------------
 // AttExtent
 //----------------------------------------------------------------------------
 
-class AttExtent: public Att
-{
+class AttExtent : public Att {
 public:
     AttExtent();
     virtual ~AttExtent();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetExtent();
-    
+
     /** Read the values for the attribute class **/
     bool ReadExtent(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteExtent(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetExtent(std::string extent_) { m_extent = extent_; };
-    std::string GetExtent() const { return m_extent; };    
+    std::string GetExtent() const { return m_extent; };
     bool HasExtent();
-    
     ///@}
 
 private:
     /** Indicates the extent of damage or omission. **/
     std::string m_extent;
 
-/* include <attextent> */
+    /* include <attextent> */
 };
 
 //----------------------------------------------------------------------------
 // AttReasonident
 //----------------------------------------------------------------------------
 
-class AttReasonident: public Att
-{
+class AttReasonident : public Att {
 public:
     AttReasonident();
     virtual ~AttReasonident();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetReasonident();
-    
+
     /** Read the values for the attribute class **/
     bool ReadReasonident(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteReasonident(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetReason(std::string reason_) { m_reason = reason_; };
-    std::string GetReason() const { return m_reason; };    
+    std::string GetReason() const { return m_reason; };
     bool HasReason();
-    
     ///@}
 
 private:
@@ -192,10 +183,9 @@ private:
      **/
     std::string m_reason;
 
-/* include <attreason> */
+    /* include <attreason> */
 };
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_EDITTRANS_H__
-
+#endif // __VRV_ATTS_EDITTRANS_H__

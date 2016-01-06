@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -24,61 +24,54 @@
 #include <string>
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttCommonAnl
 //----------------------------------------------------------------------------
 
-class AttCommonAnl: public Att
-{
+class AttCommonAnl : public Att {
 public:
     AttCommonAnl();
     virtual ~AttCommonAnl();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetCommonAnl();
-    
+
     /** Read the values for the attribute class **/
     bool ReadCommonAnl(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteCommonAnl(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetCopyof(std::string copyof_) { m_copyof = copyof_; };
-    std::string GetCopyof() const { return m_copyof; };    
+    std::string GetCopyof() const { return m_copyof; };
     bool HasCopyof();
-    
     //
     void SetCorresp(std::string corresp_) { m_corresp = corresp_; };
-    std::string GetCorresp() const { return m_corresp; };    
+    std::string GetCorresp() const { return m_corresp; };
     bool HasCorresp();
-    
     //
     void SetNext(std::string next_) { m_next = next_; };
-    std::string GetNext() const { return m_next; };    
+    std::string GetNext() const { return m_next; };
     bool HasNext();
-    
     //
     void SetPrev(std::string prev_) { m_prev = prev_; };
-    std::string GetPrev() const { return m_prev; };    
+    std::string GetPrev() const { return m_prev; };
     bool HasPrev();
-    
     //
     void SetSameas(std::string sameas_) { m_sameas = sameas_; };
-    std::string GetSameas() const { return m_sameas; };    
+    std::string GetSameas() const { return m_sameas; };
     bool HasSameas();
-    
     //
     void SetSynch(std::string synch_) { m_synch = synch_; };
-    std::string GetSynch() const { return m_synch; };    
+    std::string GetSynch() const { return m_synch; };
     bool HasSynch();
-    
     ///@}
 
 private:
@@ -101,38 +94,36 @@ private:
     /** Points to elements that are synchronous with the current element. **/
     std::string m_synch;
 
-/* include <attsynch> */
+    /* include <attsynch> */
 };
 
 //----------------------------------------------------------------------------
 // AttHarmonicfunction
 //----------------------------------------------------------------------------
 
-class AttHarmonicfunction: public Att
-{
+class AttHarmonicfunction : public Att {
 public:
     AttHarmonicfunction();
     virtual ~AttHarmonicfunction();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetHarmonicfunction();
-    
+
     /** Read the values for the attribute class **/
     bool ReadHarmonicfunction(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteHarmonicfunction(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; };
-    data_SCALEDEGREE GetDeg() const { return m_deg; };    
+    data_SCALEDEGREE GetDeg() const { return m_deg; };
     bool HasDeg();
-    
     ///@}
 
 private:
@@ -145,38 +136,36 @@ private:
      **/
     data_SCALEDEGREE m_deg;
 
-/* include <attdeg> */
+    /* include <attdeg> */
 };
 
 //----------------------------------------------------------------------------
 // AttIntervalharmonic
 //----------------------------------------------------------------------------
 
-class AttIntervalharmonic: public Att
-{
+class AttIntervalharmonic : public Att {
 public:
     AttIntervalharmonic();
     virtual ~AttIntervalharmonic();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetIntervalharmonic();
-    
+
     /** Read the values for the attribute class **/
     bool ReadIntervalharmonic(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteIntervalharmonic(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetInth(std::string inth_) { m_inth = inth_; };
-    std::string GetInth() const { return m_inth; };    
+    std::string GetInth() const { return m_inth; };
     bool HasInth();
-    
     ///@}
 
 private:
@@ -186,38 +175,36 @@ private:
      **/
     std::string m_inth;
 
-/* include <attinth> */
+    /* include <attinth> */
 };
 
 //----------------------------------------------------------------------------
 // AttIntervallicdesc
 //----------------------------------------------------------------------------
 
-class AttIntervallicdesc: public Att
-{
+class AttIntervallicdesc : public Att {
 public:
     AttIntervallicdesc();
     virtual ~AttIntervallicdesc();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetIntervallicdesc();
-    
+
     /** Read the values for the attribute class **/
     bool ReadIntervallicdesc(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteIntervallicdesc(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetIntm(data_INTERVAL_AMOUNT intm_) { m_intm = intm_; };
-    data_INTERVAL_AMOUNT GetIntm() const { return m_intm; };    
+    data_INTERVAL_AMOUNT GetIntm() const { return m_intm; };
     bool HasIntm();
-    
     ///@}
 
 private:
@@ -229,114 +216,108 @@ private:
      **/
     data_INTERVAL_AMOUNT m_intm;
 
-/* include <attintm> */
+    /* include <attintm> */
 };
 
 //----------------------------------------------------------------------------
 // AttMelodicfunction
 //----------------------------------------------------------------------------
 
-class AttMelodicfunction: public Att
-{
+class AttMelodicfunction : public Att {
 public:
     AttMelodicfunction();
     virtual ~AttMelodicfunction();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMelodicfunction();
-    
+
     /** Read the values for the attribute class **/
     bool ReadMelodicfunction(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteMelodicfunction(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetMfunc(data_MELODICFUNCTION mfunc_) { m_mfunc = mfunc_; };
-    data_MELODICFUNCTION GetMfunc() const { return m_mfunc; };    
+    data_MELODICFUNCTION GetMfunc() const { return m_mfunc; };
     bool HasMfunc();
-    
     ///@}
 
 private:
     /** Describes melodic function using Humdrum **embel syntax. **/
     data_MELODICFUNCTION m_mfunc;
 
-/* include <attmfunc> */
+    /* include <attmfunc> */
 };
 
 //----------------------------------------------------------------------------
 // AttPitchclass
 //----------------------------------------------------------------------------
 
-class AttPitchclass: public Att
-{
+class AttPitchclass : public Att {
 public:
     AttPitchclass();
     virtual ~AttPitchclass();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetPitchclass();
-    
+
     /** Read the values for the attribute class **/
     bool ReadPitchclass(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WritePitchclass(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; };
-    data_PITCHCLASS GetPclass() const { return m_pclass; };    
+    data_PITCHCLASS GetPclass() const { return m_pclass; };
     bool HasPclass();
-    
     ///@}
 
 private:
     /** Holds pitch class information. **/
     data_PITCHCLASS m_pclass;
 
-/* include <attpclass> */
+    /* include <attpclass> */
 };
 
 //----------------------------------------------------------------------------
 // AttSolfa
 //----------------------------------------------------------------------------
 
-class AttSolfa: public Att
-{
+class AttSolfa : public Att {
 public:
     AttSolfa();
     virtual ~AttSolfa();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetSolfa();
-    
+
     /** Read the values for the attribute class **/
     bool ReadSolfa(pugi::xml_node element);
-    
+
     /** Write the values for the attribute class **/
     bool WriteSolfa(pugi::xml_node element);
-    
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
     void SetPsolfa(std::string psolfa_) { m_psolfa = psolfa_; };
-    std::string GetPsolfa() const { return m_psolfa; };    
+    std::string GetPsolfa() const { return m_psolfa; };
     bool HasPsolfa();
-    
     ///@}
 
 private:
@@ -346,10 +327,9 @@ private:
      **/
     std::string m_psolfa;
 
-/* include <attpsolfa> */
+    /* include <attpsolfa> */
 };
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_ANALYSIS_H__
-
+#endif // __VRV_ATTS_ANALYSIS_H__
