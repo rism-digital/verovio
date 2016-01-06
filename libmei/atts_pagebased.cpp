@@ -30,7 +30,7 @@ namespace vrv {
 // AttSurface
 //----------------------------------------------------------------------------
 
-AttSurface::AttSurface(): Att()
+AttSurface::AttSurface() : Att()
 {
     ResetSurface();
 }
@@ -70,13 +70,12 @@ bool AttSurface::HasSurface()
     return (m_surface != "");
 }
 
-
 /* include <attsurface> */
 
 bool Att::SetPagebased(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_SURFACE)) {
-        AttSurface *att = dynamic_cast<AttSurface*>(element);
+        AttSurface *att = dynamic_cast<AttSurface *>(element);
         assert(att);
         if (attrType == "surface") {
             att->SetSurface(att->StrToStr(attrValue));
@@ -90,14 +89,12 @@ bool Att::SetPagebased(Object *element, std::string attrType, std::string attrVa
 void Att::GetPagebased(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_SURFACE)) {
-        AttSurface *att = dynamic_cast<AttSurface*>(element);
+        AttSurface *att = dynamic_cast<AttSurface *>(element);
         assert(att);
         if (att->HasSurface()) {
             attributes->push_back(std::make_pair("surface", att->StrToStr(att->GetSurface())));
         }
     }
-
 }
 
 } // vrv namespace
-

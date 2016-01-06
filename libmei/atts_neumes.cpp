@@ -30,7 +30,7 @@ namespace vrv {
 // AttIneumeLog
 //----------------------------------------------------------------------------
 
-AttIneumeLog::AttIneumeLog(): Att()
+AttIneumeLog::AttIneumeLog() : Att()
 {
     ResetIneumeLog();
 }
@@ -85,14 +85,13 @@ bool AttIneumeLog::HasName()
     return (m_name != INEUMENAME_NONE);
 }
 
-
 /* include <attname> */
 
 //----------------------------------------------------------------------------
 // AttUneumeLog
 //----------------------------------------------------------------------------
 
-AttUneumeLog::AttUneumeLog(): Att()
+AttUneumeLog::AttUneumeLog() : Att()
 {
     ResetUneumeLog();
 }
@@ -147,13 +146,12 @@ bool AttUneumeLog::HasName()
     return (m_name != UNEUMENAME_NONE);
 }
 
-
 /* include <attname> */
 
 bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_INEUMELOG)) {
-        AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToIneumeform(attrValue));
@@ -165,7 +163,7 @@ bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue
         }
     }
     if (element->HasAttClass(ATT_UNEUMELOG)) {
-        AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToUneumeform(attrValue));
@@ -183,7 +181,7 @@ bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue
 void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_INEUMELOG)) {
-        AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->IneumeformToStr(att->GetForm())));
@@ -193,7 +191,7 @@ void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_UNEUMELOG)) {
-        AttUneumeLog *att = dynamic_cast<AttUneumeLog*>(element);
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->UneumeformToStr(att->GetForm())));
@@ -202,8 +200,6 @@ void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("name", att->UneumenameToStr(att->GetName())));
         }
     }
-
 }
 
 } // vrv namespace
-

@@ -30,7 +30,7 @@ namespace vrv {
 // AttRegularmethod
 //----------------------------------------------------------------------------
 
-AttRegularmethod::AttRegularmethod(): Att()
+AttRegularmethod::AttRegularmethod() : Att()
 {
     ResetRegularmethod();
 }
@@ -70,13 +70,12 @@ bool AttRegularmethod::HasMethod()
     return (m_method != regularmethod_METHOD_NONE);
 }
 
-
 /* include <attmethod> */
 
 bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
-        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+        AttRegularmethod *att = dynamic_cast<AttRegularmethod *>(element);
         assert(att);
         if (attrType == "method") {
             att->SetMethod(att->StrToRegularmethodMethod(attrValue));
@@ -90,14 +89,12 @@ bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue
 void Att::GetHeader(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
-        AttRegularmethod *att = dynamic_cast<AttRegularmethod*>(element);
+        AttRegularmethod *att = dynamic_cast<AttRegularmethod *>(element);
         assert(att);
         if (att->HasMethod()) {
             attributes->push_back(std::make_pair("method", att->RegularmethodMethodToStr(att->GetMethod())));
         }
     }
-
 }
 
 } // vrv namespace
-

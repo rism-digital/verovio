@@ -30,7 +30,7 @@ namespace vrv {
 // AttAgentident
 //----------------------------------------------------------------------------
 
-AttAgentident::AttAgentident(): Att()
+AttAgentident::AttAgentident() : Att()
 {
     ResetAgentident();
 }
@@ -70,14 +70,13 @@ bool AttAgentident::HasAgent()
     return (m_agent != "");
 }
 
-
 /* include <attagent> */
 
 //----------------------------------------------------------------------------
 // AttEvidence
 //----------------------------------------------------------------------------
 
-AttEvidence::AttEvidence(): Att()
+AttEvidence::AttEvidence() : Att()
 {
     ResetEvidence();
 }
@@ -132,14 +131,13 @@ bool AttEvidence::HasEvidence()
     return (m_evidence != "");
 }
 
-
 /* include <attevidence> */
 
 //----------------------------------------------------------------------------
 // AttExtent
 //----------------------------------------------------------------------------
 
-AttExtent::AttExtent(): Att()
+AttExtent::AttExtent() : Att()
 {
     ResetExtent();
 }
@@ -179,14 +177,13 @@ bool AttExtent::HasExtent()
     return (m_extent != "");
 }
 
-
 /* include <attextent> */
 
 //----------------------------------------------------------------------------
 // AttReasonident
 //----------------------------------------------------------------------------
 
-AttReasonident::AttReasonident(): Att()
+AttReasonident::AttReasonident() : Att()
 {
     ResetReasonident();
 }
@@ -226,13 +223,12 @@ bool AttReasonident::HasReason()
     return (m_reason != "");
 }
 
-
 /* include <attreason> */
 
 bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_AGENTIDENT)) {
-        AttAgentident *att = dynamic_cast<AttAgentident*>(element);
+        AttAgentident *att = dynamic_cast<AttAgentident *>(element);
         assert(att);
         if (attrType == "agent") {
             att->SetAgent(att->StrToStr(attrValue));
@@ -240,7 +236,7 @@ bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrVa
         }
     }
     if (element->HasAttClass(ATT_EVIDENCE)) {
-        AttEvidence *att = dynamic_cast<AttEvidence*>(element);
+        AttEvidence *att = dynamic_cast<AttEvidence *>(element);
         assert(att);
         if (attrType == "cert") {
             att->SetCert(att->StrToCertainty(attrValue));
@@ -252,7 +248,7 @@ bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrVa
         }
     }
     if (element->HasAttClass(ATT_EXTENT)) {
-        AttExtent *att = dynamic_cast<AttExtent*>(element);
+        AttExtent *att = dynamic_cast<AttExtent *>(element);
         assert(att);
         if (attrType == "extent") {
             att->SetExtent(att->StrToStr(attrValue));
@@ -260,7 +256,7 @@ bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrVa
         }
     }
     if (element->HasAttClass(ATT_REASONIDENT)) {
-        AttReasonident *att = dynamic_cast<AttReasonident*>(element);
+        AttReasonident *att = dynamic_cast<AttReasonident *>(element);
         assert(att);
         if (attrType == "reason") {
             att->SetReason(att->StrToStr(attrValue));
@@ -274,14 +270,14 @@ bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrVa
 void Att::GetEdittrans(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_AGENTIDENT)) {
-        AttAgentident *att = dynamic_cast<AttAgentident*>(element);
+        AttAgentident *att = dynamic_cast<AttAgentident *>(element);
         assert(att);
         if (att->HasAgent()) {
             attributes->push_back(std::make_pair("agent", att->StrToStr(att->GetAgent())));
         }
     }
     if (element->HasAttClass(ATT_EVIDENCE)) {
-        AttEvidence *att = dynamic_cast<AttEvidence*>(element);
+        AttEvidence *att = dynamic_cast<AttEvidence *>(element);
         assert(att);
         if (att->HasCert()) {
             attributes->push_back(std::make_pair("cert", att->CertaintyToStr(att->GetCert())));
@@ -291,21 +287,19 @@ void Att::GetEdittrans(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_EXTENT)) {
-        AttExtent *att = dynamic_cast<AttExtent*>(element);
+        AttExtent *att = dynamic_cast<AttExtent *>(element);
         assert(att);
         if (att->HasExtent()) {
             attributes->push_back(std::make_pair("extent", att->StrToStr(att->GetExtent())));
         }
     }
     if (element->HasAttClass(ATT_REASONIDENT)) {
-        AttReasonident *att = dynamic_cast<AttReasonident*>(element);
+        AttReasonident *att = dynamic_cast<AttReasonident *>(element);
         assert(att);
         if (att->HasReason()) {
             attributes->push_back(std::make_pair("reason", att->StrToStr(att->GetReason())));
         }
     }
-
 }
 
 } // vrv namespace
-

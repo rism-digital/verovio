@@ -30,7 +30,7 @@ namespace vrv {
 // AttFacsimile
 //----------------------------------------------------------------------------
 
-AttFacsimile::AttFacsimile(): Att()
+AttFacsimile::AttFacsimile() : Att()
 {
     ResetFacsimile();
 }
@@ -70,13 +70,12 @@ bool AttFacsimile::HasFacs()
     return (m_facs != URIS_NONE);
 }
 
-
 /* include <attfacs> */
 
 bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_FACSIMILE)) {
-        AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
+        AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);
         assert(att);
         if (attrType == "facs") {
             att->SetFacs(att->StrToUris(attrValue));
@@ -90,14 +89,12 @@ bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrVa
 void Att::GetFacsimile(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FACSIMILE)) {
-        AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
+        AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);
         assert(att);
         if (att->HasFacs()) {
             attributes->push_back(std::make_pair("facs", att->UrisToStr(att->GetFacs())));
         }
     }
-
 }
 
 } // vrv namespace
-

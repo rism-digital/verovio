@@ -30,7 +30,7 @@ namespace vrv {
 // AttCrit
 //----------------------------------------------------------------------------
 
-AttCrit::AttCrit(): Att()
+AttCrit::AttCrit() : Att()
 {
     ResetCrit();
 }
@@ -70,14 +70,13 @@ bool AttCrit::HasCause()
     return (m_cause != "");
 }
 
-
 /* include <attcause> */
 
 //----------------------------------------------------------------------------
 // AttSource
 //----------------------------------------------------------------------------
 
-AttSource::AttSource(): Att()
+AttSource::AttSource() : Att()
 {
     ResetSource();
 }
@@ -117,13 +116,12 @@ bool AttSource::HasSource()
     return (m_source != "");
 }
 
-
 /* include <attsource> */
 
 bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_CRIT)) {
-        AttCrit *att = dynamic_cast<AttCrit*>(element);
+        AttCrit *att = dynamic_cast<AttCrit *>(element);
         assert(att);
         if (attrType == "cause") {
             att->SetCause(att->StrToStr(attrValue));
@@ -131,7 +129,7 @@ bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValu
         }
     }
     if (element->HasAttClass(ATT_SOURCE)) {
-        AttSource *att = dynamic_cast<AttSource*>(element);
+        AttSource *att = dynamic_cast<AttSource *>(element);
         assert(att);
         if (attrType == "source") {
             att->SetSource(att->StrToStr(attrValue));
@@ -145,21 +143,19 @@ bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValu
 void Att::GetCritapp(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_CRIT)) {
-        AttCrit *att = dynamic_cast<AttCrit*>(element);
+        AttCrit *att = dynamic_cast<AttCrit *>(element);
         assert(att);
         if (att->HasCause()) {
             attributes->push_back(std::make_pair("cause", att->StrToStr(att->GetCause())));
         }
     }
     if (element->HasAttClass(ATT_SOURCE)) {
-        AttSource *att = dynamic_cast<AttSource*>(element);
+        AttSource *att = dynamic_cast<AttSource *>(element);
         assert(att);
         if (att->HasSource()) {
             attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));
         }
     }
-
 }
 
 } // vrv namespace
-

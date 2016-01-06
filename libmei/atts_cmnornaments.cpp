@@ -30,7 +30,7 @@ namespace vrv {
 // AttMordentLog
 //----------------------------------------------------------------------------
 
-AttMordentLog::AttMordentLog(): Att()
+AttMordentLog::AttMordentLog() : Att()
 {
     ResetMordentLog();
 }
@@ -85,14 +85,13 @@ bool AttMordentLog::HasLong()
     return (m_long != BOOLEAN_NONE);
 }
 
-
 /* include <attlong> */
 
 //----------------------------------------------------------------------------
 // AttOrnam
 //----------------------------------------------------------------------------
 
-AttOrnam::AttOrnam(): Att()
+AttOrnam::AttOrnam() : Att()
 {
     ResetOrnam();
 }
@@ -132,14 +131,13 @@ bool AttOrnam::HasOrnam()
     return (m_ornam != ORNAM_cmn_NONE);
 }
 
-
 /* include <attornam> */
 
 //----------------------------------------------------------------------------
 // AttOrnamentaccid
 //----------------------------------------------------------------------------
 
-AttOrnamentaccid::AttOrnamentaccid(): Att()
+AttOrnamentaccid::AttOrnamentaccid() : Att()
 {
     ResetOrnamentaccid();
 }
@@ -194,14 +192,13 @@ bool AttOrnamentaccid::HasAccidlower()
     return (m_accidlower != ACCIDENTAL_EXPLICIT_NONE);
 }
 
-
 /* include <attaccidlower> */
 
 //----------------------------------------------------------------------------
 // AttTurnLog
 //----------------------------------------------------------------------------
 
-AttTurnLog::AttTurnLog(): Att()
+AttTurnLog::AttTurnLog() : Att()
 {
     ResetTurnLog();
 }
@@ -256,13 +253,12 @@ bool AttTurnLog::HasForm()
     return (m_form != turnLog_FORM_NONE);
 }
 
-
 /* include <attform> */
 
 bool Att::SetCmnornaments(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_MORDENTLOG)) {
-        AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
+        AttMordentLog *att = dynamic_cast<AttMordentLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToMordentLogForm(attrValue));
@@ -274,7 +270,7 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
         }
     }
     if (element->HasAttClass(ATT_ORNAM)) {
-        AttOrnam *att = dynamic_cast<AttOrnam*>(element);
+        AttOrnam *att = dynamic_cast<AttOrnam *>(element);
         assert(att);
         if (attrType == "ornam") {
             att->SetOrnam(att->StrToOrnamCmn(attrValue));
@@ -282,7 +278,7 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
-        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
+        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid *>(element);
         assert(att);
         if (attrType == "accidupper") {
             att->SetAccidupper(att->StrToAccidentalExplicit(attrValue));
@@ -294,7 +290,7 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
         }
     }
     if (element->HasAttClass(ATT_TURNLOG)) {
-        AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
+        AttTurnLog *att = dynamic_cast<AttTurnLog *>(element);
         assert(att);
         if (attrType == "delayed") {
             att->SetDelayed(att->StrToBoolean(attrValue));
@@ -312,7 +308,7 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
 void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_MORDENTLOG)) {
-        AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
+        AttMordentLog *att = dynamic_cast<AttMordentLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->MordentLogFormToStr(att->GetForm())));
@@ -322,14 +318,14 @@ void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_ORNAM)) {
-        AttOrnam *att = dynamic_cast<AttOrnam*>(element);
+        AttOrnam *att = dynamic_cast<AttOrnam *>(element);
         assert(att);
         if (att->HasOrnam()) {
             attributes->push_back(std::make_pair("ornam", att->OrnamCmnToStr(att->GetOrnam())));
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
-        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
+        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid *>(element);
         assert(att);
         if (att->HasAccidupper()) {
             attributes->push_back(std::make_pair("accidupper", att->AccidentalExplicitToStr(att->GetAccidupper())));
@@ -339,7 +335,7 @@ void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_TURNLOG)) {
-        AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
+        AttTurnLog *att = dynamic_cast<AttTurnLog *>(element);
         assert(att);
         if (att->HasDelayed()) {
             attributes->push_back(std::make_pair("delayed", att->BooleanToStr(att->GetDelayed())));
@@ -348,8 +344,6 @@ void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("form", att->TurnLogFormToStr(att->GetForm())));
         }
     }
-
 }
 
 } // vrv namespace
-

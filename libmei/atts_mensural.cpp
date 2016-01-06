@@ -30,7 +30,7 @@ namespace vrv {
 // AttLigatureLog
 //----------------------------------------------------------------------------
 
-AttLigatureLog::AttLigatureLog(): Att()
+AttLigatureLog::AttLigatureLog() : Att()
 {
     ResetLigatureLog();
 }
@@ -70,14 +70,13 @@ bool AttLigatureLog::HasForm()
     return (m_form != LIGATUREFORM_NONE);
 }
 
-
 /* include <attform> */
 
 //----------------------------------------------------------------------------
 // AttMensurVis
 //----------------------------------------------------------------------------
 
-AttMensurVis::AttMensurVis(): Att()
+AttMensurVis::AttMensurVis() : Att()
 {
     ResetMensurVis();
 }
@@ -132,14 +131,13 @@ bool AttMensurVis::HasOrient()
     return (m_orient != ORIENTATION_NONE);
 }
 
-
 /* include <attorient> */
 
 //----------------------------------------------------------------------------
 // AttMensuralLog
 //----------------------------------------------------------------------------
 
-AttMensuralLog::AttMensuralLog(): Att()
+AttMensuralLog::AttMensuralLog() : Att()
 {
     ResetMensuralLog();
 }
@@ -239,14 +237,13 @@ bool AttMensuralLog::HasProportNumbase()
     return (m_proportNumbase != -1);
 }
 
-
 /* include <attproport.numbase> */
 
 //----------------------------------------------------------------------------
 // AttMensuralShared
 //----------------------------------------------------------------------------
 
-AttMensuralShared::AttMensuralShared(): Att()
+AttMensuralShared::AttMensuralShared() : Att()
 {
     ResetMensuralShared();
 }
@@ -331,14 +328,13 @@ bool AttMensuralShared::HasTempus()
     return (m_tempus != TEMPUS_NONE);
 }
 
-
 /* include <atttempus> */
 
 //----------------------------------------------------------------------------
 // AttMensuralVis
 //----------------------------------------------------------------------------
 
-AttMensuralVis::AttMensuralVis(): Att()
+AttMensuralVis::AttMensuralVis() : Att()
 {
     ResetMensuralVis();
 }
@@ -438,14 +434,13 @@ bool AttMensuralVis::HasMensurSize()
     return (m_mensurSize != SIZE_NONE);
 }
 
-
 /* include <attmensur.size> */
 
 //----------------------------------------------------------------------------
 // AttNoteLogMensural
 //----------------------------------------------------------------------------
 
-AttNoteLogMensural::AttNoteLogMensural(): Att()
+AttNoteLogMensural::AttNoteLogMensural() : Att()
 {
     ResetNoteLogMensural();
 }
@@ -485,14 +480,13 @@ bool AttNoteLogMensural::HasLig()
     return (m_lig != noteLogMensural_LIG_NONE);
 }
 
-
 /* include <attlig> */
 
 //----------------------------------------------------------------------------
 // AttRestVisMensural
 //----------------------------------------------------------------------------
 
-AttRestVisMensural::AttRestVisMensural(): Att()
+AttRestVisMensural::AttRestVisMensural() : Att()
 {
     ResetRestVisMensural();
 }
@@ -532,13 +526,12 @@ bool AttRestVisMensural::HasSpaces()
     return (m_spaces != 0);
 }
 
-
 /* include <attspaces> */
 
 bool Att::SetMensural(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_LIGATURELOG)) {
-        AttLigatureLog *att = dynamic_cast<AttLigatureLog*>(element);
+        AttLigatureLog *att = dynamic_cast<AttLigatureLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToLigatureform(attrValue));
@@ -546,7 +539,7 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_MENSURVIS)) {
-        AttMensurVis *att = dynamic_cast<AttMensurVis*>(element);
+        AttMensurVis *att = dynamic_cast<AttMensurVis *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToMensurVisForm(attrValue));
@@ -558,7 +551,7 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_MENSURALLOG)) {
-        AttMensuralLog *att = dynamic_cast<AttMensuralLog*>(element);
+        AttMensuralLog *att = dynamic_cast<AttMensuralLog *>(element);
         assert(att);
         if (attrType == "mensur.dot") {
             att->SetMensurDot(att->StrToBoolean(attrValue));
@@ -582,7 +575,7 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_MENSURALSHARED)) {
-        AttMensuralShared *att = dynamic_cast<AttMensuralShared*>(element);
+        AttMensuralShared *att = dynamic_cast<AttMensuralShared *>(element);
         assert(att);
         if (attrType == "modusmaior") {
             att->SetModusmaior(att->StrToModusmaior(attrValue));
@@ -602,7 +595,7 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_MENSURALVIS)) {
-        AttMensuralVis *att = dynamic_cast<AttMensuralVis*>(element);
+        AttMensuralVis *att = dynamic_cast<AttMensuralVis *>(element);
         assert(att);
         if (attrType == "mensur.color") {
             att->SetMensurColor(att->StrToStr(attrValue));
@@ -626,7 +619,7 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_NOTELOGMENSURAL)) {
-        AttNoteLogMensural *att = dynamic_cast<AttNoteLogMensural*>(element);
+        AttNoteLogMensural *att = dynamic_cast<AttNoteLogMensural *>(element);
         assert(att);
         if (attrType == "lig") {
             att->SetLig(att->StrToNoteLogMensuralLig(attrValue));
@@ -634,7 +627,7 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_RESTVISMENSURAL)) {
-        AttRestVisMensural *att = dynamic_cast<AttRestVisMensural*>(element);
+        AttRestVisMensural *att = dynamic_cast<AttRestVisMensural *>(element);
         assert(att);
         if (attrType == "spaces") {
             att->SetSpaces(att->StrToInt(attrValue));
@@ -648,14 +641,14 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
 void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_LIGATURELOG)) {
-        AttLigatureLog *att = dynamic_cast<AttLigatureLog*>(element);
+        AttLigatureLog *att = dynamic_cast<AttLigatureLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->LigatureformToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_MENSURVIS)) {
-        AttMensurVis *att = dynamic_cast<AttMensurVis*>(element);
+        AttMensurVis *att = dynamic_cast<AttMensurVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->MensurVisFormToStr(att->GetForm())));
@@ -665,7 +658,7 @@ void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_MENSURALLOG)) {
-        AttMensuralLog *att = dynamic_cast<AttMensuralLog*>(element);
+        AttMensuralLog *att = dynamic_cast<AttMensuralLog *>(element);
         assert(att);
         if (att->HasMensurDot()) {
             attributes->push_back(std::make_pair("mensur.dot", att->BooleanToStr(att->GetMensurDot())));
@@ -684,7 +677,7 @@ void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_MENSURALSHARED)) {
-        AttMensuralShared *att = dynamic_cast<AttMensuralShared*>(element);
+        AttMensuralShared *att = dynamic_cast<AttMensuralShared *>(element);
         assert(att);
         if (att->HasModusmaior()) {
             attributes->push_back(std::make_pair("modusmaior", att->ModusmaiorToStr(att->GetModusmaior())));
@@ -700,7 +693,7 @@ void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_MENSURALVIS)) {
-        AttMensuralVis *att = dynamic_cast<AttMensuralVis*>(element);
+        AttMensuralVis *att = dynamic_cast<AttMensuralVis *>(element);
         assert(att);
         if (att->HasMensurColor()) {
             attributes->push_back(std::make_pair("mensur.color", att->StrToStr(att->GetMensurColor())));
@@ -719,21 +712,19 @@ void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_NOTELOGMENSURAL)) {
-        AttNoteLogMensural *att = dynamic_cast<AttNoteLogMensural*>(element);
+        AttNoteLogMensural *att = dynamic_cast<AttNoteLogMensural *>(element);
         assert(att);
         if (att->HasLig()) {
             attributes->push_back(std::make_pair("lig", att->NoteLogMensuralLigToStr(att->GetLig())));
         }
     }
     if (element->HasAttClass(ATT_RESTVISMENSURAL)) {
-        AttRestVisMensural *att = dynamic_cast<AttRestVisMensural*>(element);
+        AttRestVisMensural *att = dynamic_cast<AttRestVisMensural *>(element);
         assert(att);
         if (att->HasSpaces()) {
             attributes->push_back(std::make_pair("spaces", att->IntToStr(att->GetSpaces())));
         }
     }
-
 }
 
 } // vrv namespace
-

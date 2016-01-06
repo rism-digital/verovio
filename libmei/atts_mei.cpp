@@ -30,7 +30,7 @@ namespace vrv {
 // AttNotationtype
 //----------------------------------------------------------------------------
 
-AttNotationtype::AttNotationtype(): Att()
+AttNotationtype::AttNotationtype() : Att()
 {
     ResetNotationtype();
 }
@@ -85,13 +85,12 @@ bool AttNotationtype::HasNotationsubtype()
     return (m_notationsubtype != "");
 }
 
-
 /* include <attnotationsubtype> */
 
 bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
-        AttNotationtype *att = dynamic_cast<AttNotationtype*>(element);
+        AttNotationtype *att = dynamic_cast<AttNotationtype *>(element);
         assert(att);
         if (attrType == "notationtype") {
             att->SetNotationtype(att->StrToNotationtype(attrValue));
@@ -109,7 +108,7 @@ bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
 void Att::GetMei(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
-        AttNotationtype *att = dynamic_cast<AttNotationtype*>(element);
+        AttNotationtype *att = dynamic_cast<AttNotationtype *>(element);
         assert(att);
         if (att->HasNotationtype()) {
             attributes->push_back(std::make_pair("notationtype", att->NotationtypeToStr(att->GetNotationtype())));
@@ -118,8 +117,6 @@ void Att::GetMei(Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("notationsubtype", att->StrToStr(att->GetNotationsubtype())));
         }
     }
-
 }
 
 } // vrv namespace
-

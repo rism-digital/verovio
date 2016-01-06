@@ -30,7 +30,7 @@ namespace vrv {
 // AttFretlocation
 //----------------------------------------------------------------------------
 
-AttFretlocation::AttFretlocation(): Att()
+AttFretlocation::AttFretlocation() : Att()
 {
     ResetFretlocation();
 }
@@ -70,14 +70,13 @@ bool AttFretlocation::HasFret()
     return (m_fret != FRET_NONE);
 }
 
-
 /* include <attfret> */
 
 //----------------------------------------------------------------------------
 // AttHarmLog
 //----------------------------------------------------------------------------
 
-AttHarmLog::AttHarmLog(): Att()
+AttHarmLog::AttHarmLog() : Att()
 {
     ResetHarmLog();
 }
@@ -117,14 +116,13 @@ bool AttHarmLog::HasChordref()
     return (m_chordref != "");
 }
 
-
 /* include <attchordref> */
 
 //----------------------------------------------------------------------------
 // AttHarmVis
 //----------------------------------------------------------------------------
 
-AttHarmVis::AttHarmVis(): Att()
+AttHarmVis::AttHarmVis() : Att()
 {
     ResetHarmVis();
 }
@@ -164,13 +162,12 @@ bool AttHarmVis::HasRendgrid()
     return (m_rendgrid != harmVis_RENDGRID_NONE);
 }
 
-
 /* include <attrendgrid> */
 
 bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_FRETLOCATION)) {
-        AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
+        AttFretlocation *att = dynamic_cast<AttFretlocation *>(element);
         assert(att);
         if (attrType == "fret") {
             att->SetFret(att->StrToFret(attrValue));
@@ -178,7 +175,7 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
         }
     }
     if (element->HasAttClass(ATT_HARMLOG)) {
-        AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
+        AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);
         assert(att);
         if (attrType == "chordref") {
             att->SetChordref(att->StrToStr(attrValue));
@@ -186,7 +183,7 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
-        AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        AttHarmVis *att = dynamic_cast<AttHarmVis *>(element);
         assert(att);
         if (attrType == "rendgrid") {
             att->SetRendgrid(att->StrToHarmVisRendgrid(attrValue));
@@ -200,28 +197,26 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
 void Att::GetHarmony(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FRETLOCATION)) {
-        AttFretlocation *att = dynamic_cast<AttFretlocation*>(element);
+        AttFretlocation *att = dynamic_cast<AttFretlocation *>(element);
         assert(att);
         if (att->HasFret()) {
             attributes->push_back(std::make_pair("fret", att->FretToStr(att->GetFret())));
         }
     }
     if (element->HasAttClass(ATT_HARMLOG)) {
-        AttHarmLog *att = dynamic_cast<AttHarmLog*>(element);
+        AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);
         assert(att);
         if (att->HasChordref()) {
             attributes->push_back(std::make_pair("chordref", att->StrToStr(att->GetChordref())));
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
-        AttHarmVis *att = dynamic_cast<AttHarmVis*>(element);
+        AttHarmVis *att = dynamic_cast<AttHarmVis *>(element);
         assert(att);
         if (att->HasRendgrid()) {
             attributes->push_back(std::make_pair("rendgrid", att->HarmVisRendgridToStr(att->GetRendgrid())));
         }
     }
-
 }
 
 } // vrv namespace
-

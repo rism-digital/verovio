@@ -30,7 +30,7 @@ namespace vrv {
 // AttTabular
 //----------------------------------------------------------------------------
 
-AttTabular::AttTabular(): Att()
+AttTabular::AttTabular() : Att()
 {
     ResetTabular();
 }
@@ -85,13 +85,12 @@ bool AttTabular::HasRowspan()
     return (m_rowspan != 0);
 }
 
-
 /* include <attrowspan> */
 
 bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
-        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        AttTabular *att = dynamic_cast<AttTabular *>(element);
         assert(att);
         if (attrType == "colspan") {
             att->SetColspan(att->StrToInt(attrValue));
@@ -109,7 +108,7 @@ bool Att::SetFigtable(Object *element, std::string attrType, std::string attrVal
 void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
-        AttTabular *att = dynamic_cast<AttTabular*>(element);
+        AttTabular *att = dynamic_cast<AttTabular *>(element);
         assert(att);
         if (att->HasColspan()) {
             attributes->push_back(std::make_pair("colspan", att->IntToStr(att->GetColspan())));
@@ -118,8 +117,6 @@ void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("rowspan", att->IntToStr(att->GetRowspan())));
         }
     }
-
 }
 
 } // vrv namespace
-

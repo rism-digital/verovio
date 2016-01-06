@@ -30,7 +30,7 @@ namespace vrv {
 // AttVerseLog
 //----------------------------------------------------------------------------
 
-AttVerseLog::AttVerseLog(): Att()
+AttVerseLog::AttVerseLog() : Att()
 {
     ResetVerseLog();
 }
@@ -85,13 +85,12 @@ bool AttVerseLog::HasRhythm()
     return (m_rhythm != "");
 }
 
-
 /* include <attrhythm> */
 
 bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_VERSELOG)) {
-        AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
+        AttVerseLog *att = dynamic_cast<AttVerseLog *>(element);
         assert(att);
         if (attrType == "refrain") {
             att->SetRefrain(att->StrToBoolean(attrValue));
@@ -109,7 +108,7 @@ bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue
 void Att::GetLyrics(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_VERSELOG)) {
-        AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
+        AttVerseLog *att = dynamic_cast<AttVerseLog *>(element);
         assert(att);
         if (att->HasRefrain()) {
             attributes->push_back(std::make_pair("refrain", att->BooleanToStr(att->GetRefrain())));
@@ -118,8 +117,6 @@ void Att::GetLyrics(Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("rhythm", att->StrToStr(att->GetRhythm())));
         }
     }
-
 }
 
 } // vrv namespace
-

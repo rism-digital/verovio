@@ -30,7 +30,7 @@ namespace vrv {
 // AttAlignment
 //----------------------------------------------------------------------------
 
-AttAlignment::AttAlignment(): Att()
+AttAlignment::AttAlignment() : Att()
 {
     ResetAlignment();
 }
@@ -70,13 +70,12 @@ bool AttAlignment::HasWhen()
     return (m_when != "");
 }
 
-
 /* include <attwhen> */
 
 bool Att::SetPerformance(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_ALIGNMENT)) {
-        AttAlignment *att = dynamic_cast<AttAlignment*>(element);
+        AttAlignment *att = dynamic_cast<AttAlignment *>(element);
         assert(att);
         if (attrType == "when") {
             att->SetWhen(att->StrToStr(attrValue));
@@ -90,14 +89,12 @@ bool Att::SetPerformance(Object *element, std::string attrType, std::string attr
 void Att::GetPerformance(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALIGNMENT)) {
-        AttAlignment *att = dynamic_cast<AttAlignment*>(element);
+        AttAlignment *att = dynamic_cast<AttAlignment *>(element);
         assert(att);
         if (att->HasWhen()) {
             attributes->push_back(std::make_pair("when", att->StrToStr(att->GetWhen())));
         }
     }
-
 }
 
 } // vrv namespace
-
