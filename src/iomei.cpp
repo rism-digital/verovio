@@ -2880,6 +2880,16 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         assert( editorialElement );
         editorialElement->AddTextElement( element );
     }
+    else if ( parent->Is() == ANCHORED_TEXT ) {
+        AnchoredText *anchoredText = dynamic_cast<AnchoredText*>( parent );
+        assert( anchoredText );
+        anchoredText->AddTextElement( element );
+    }
+    else if ( parent->Is() == REND ) {
+        Rend *rend = dynamic_cast<Rend*>( parent );
+        assert( rend );
+        rend->AddTextElement( element );
+    }
     else if ( parent->Is() == SYL ) {
         Syl *syl = dynamic_cast<Syl*>( parent );
         assert( syl );
@@ -2889,11 +2899,6 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         Tempo *tempo = dynamic_cast<Tempo*>( parent );
         assert( tempo );
         tempo->AddTextElement( element );
-    }
-    else if ( parent->Is() == REND ) {
-        Rend *rend = dynamic_cast<Rend*>( parent );
-        assert( rend );
-        rend->AddTextElement( element );
     }
     else {
         LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str() );
