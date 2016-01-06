@@ -218,8 +218,7 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
         assert(doc->GetType() == Raw);
         this->SetDrawingY(this->GetYRel() + (*currentSystem)->GetDrawingY());
     }
-    else
-    {
+    else {
         assert(doc->GetType() == Transcription);
         this->SetDrawingY(this->m_yAbs);
     }

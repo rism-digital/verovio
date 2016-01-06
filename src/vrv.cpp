@@ -118,8 +118,7 @@ bool Resources::LoadFont(std::string fontName)
     pugi::xml_document doc;
     std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
-    if (!result)
-    {
+    if (!result) {
         // File not found, default bounding boxes will be used
         LogMessage("Font loaded without bounding boxes");
         return true;
@@ -165,8 +164,7 @@ bool Resources::InitTextFont()
     // For any other char, we currently use 'o' bounding box
     std::string filename = Resources::GetPath() + "/text/Georgia.xml";
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
-    if (!result)
-    {
+    if (!result) {
         // File not found, default bounding boxes will be used
         LogMessage("Cannot load bounding boxes for text font '%s'", filename.c_str());
         return false;
@@ -330,13 +328,15 @@ void AppendLogBuffer(bool checkDuplicate, std::string message)
     if (checkDuplicate) {
         if (!LogBufferContains(message))
             logBuffer.push_back(message);
-    } else {
+    }
+    else {
         logBuffer.push_back(message);
     }
 }
 #endif
     
-bool Check(Object *object) {
+bool Check(Object *object)
+{
     assert(object);
     return (object != NULL);
 }
@@ -373,12 +373,10 @@ std::string UTF16to8(const wchar_t * in)
 {
     std::string out;
     unsigned int codepoint = 0;
-    for (;  *in != 0;  ++in)
-    {
+    for (;  *in != 0;  ++in) {
         if (*in >= 0xd800 && *in <= 0xdbff)
             codepoint = ((*in - 0xd800) << 10) + 0x10000;
-        else
-        {
+        else {
             if (*in >= 0xdc00 && *in <= 0xdfff)
                 codepoint |= *in - 0xdc00;
             else
@@ -386,19 +384,16 @@ std::string UTF16to8(const wchar_t * in)
             
             if (codepoint <= 0x7f)
                 out.append(1, static_cast<char>(codepoint));
-            else if (codepoint <= 0x7ff)
-            {
+            else if (codepoint <= 0x7ff) {
                 out.append(1, static_cast<char>(0xc0 | ((codepoint >> 6) & 0x1f)));
                 out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
             }
-            else if (codepoint <= 0xffff)
-            {
+            else if (codepoint <= 0xffff) {
                 out.append(1, static_cast<char>(0xe0 | ((codepoint >> 12) & 0x0f)));
                 out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
                 out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
             }
-            else
-            {
+            else {
                 out.append(1, static_cast<char>(0xf0 | ((codepoint >> 18) & 0x07)));
                 out.append(1, static_cast<char>(0x80 | ((codepoint >> 12) & 0x3f)));
                 out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
@@ -417,8 +412,7 @@ std::wstring UTF8to16(const char * in)
         return out;
     
     unsigned int codepoint;
-    while (*in != 0)
-    {
+    while (*in != 0) {
         unsigned char ch = static_cast<unsigned char>(*in);
         if (ch <= 0x7f)
             codepoint = ch;
@@ -431,10 +425,8 @@ std::wstring UTF8to16(const char * in)
         else
             codepoint = ch & 0x07;
         ++in;
-        if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff))
-        {
-            if (codepoint > 0xffff)
-            {
+        if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff)) {
+            if (codepoint > 0xffff) {
                 out.append(1, static_cast<wchar_t>(0xd800 + (codepoint >> 10)));
                 out.append(1, static_cast<wchar_t>(0xdc00 + (codepoint & 0x03ff)));
             }

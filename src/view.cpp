@@ -47,8 +47,8 @@ View::~View()
 
 void View::SetDoc(Doc *doc)
 {
-	if (doc == NULL) // unset file
-	{
+    // Unset the doc
+	if (doc == NULL) {
 		m_doc = NULL;
         DoReset();
 	}
@@ -116,7 +116,7 @@ void View::Next(bool forward)
 int View::ToDeviceContextX(int i) { return i; }; // the same
 
 /** x value in the Logical world */
-int View::ToLogicalX(int i)  { return i; };
+int View::ToLogicalX(int i) { return i; };
 
 /** y value in the View */
 int View::ToDeviceContextY(int i)  
@@ -130,14 +130,12 @@ int View::ToDeviceContextY(int i)
 
 /** y value in the Logical world  */
 int View::ToLogicalY(int i)  
-{ 
-    { 
-        if (!m_doc) {
-            return 0;
-        }
-        
-        return m_doc->m_drawingPageHeight - i; // flipped
+{
+    if (!m_doc) {
+        return 0;
     }
+    
+    return m_doc->m_drawingPageHeight - i; // flipped
 }
     
 void View::SwapPoints (Point *x1, Point *x2)

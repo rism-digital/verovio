@@ -246,8 +246,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     utf16line.reserve(wfileSize / 2 + 1);
     
     unsigned short buffer;
-    while(fin.read((char *)&buffer, sizeof(unsigned short)))
-    {
+    while(fin.read((char *)&buffer, sizeof(unsigned short))) {
         utf16line.push_back(buffer);
     }
     //LogDebug("%d %d", wfileSize, utf8line.size());
@@ -263,9 +262,11 @@ bool Toolkit::LoadString(const std::string &data)
     FileInputStream *input = NULL;
     if (m_format == PAE) {
         input = new PaeInput(&m_doc, "");
-    } else if (m_format == DARMS) {
+    }
+    else if (m_format == DARMS) {
         input = new DarmsInput(&m_doc, "");
-    } else if (m_format == MEI) {
+    }
+    else if (m_format == MEI) {
         input = new MeiInput(&m_doc, "");
     }
     else if (m_format == MUSICXML) {
@@ -361,7 +362,8 @@ bool Toolkit::SaveFile(const std::string &filename)
     return true;
 }
 
-bool Toolkit::ParseOptions(const std::string &json_options) {
+bool Toolkit::ParseOptions(const std::string &json_options)
+{
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
@@ -463,7 +465,8 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
 #endif
 }
 
-bool Toolkit::Edit(const std::string &json_editorAction) {
+bool Toolkit::Edit(const std::string &json_editorAction)
+{
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
@@ -509,7 +512,8 @@ bool Toolkit::Edit(const std::string &json_editorAction) {
 }
 
 
-std::string Toolkit::GetLogString() {
+std::string Toolkit::GetLogString()
+{
 #ifdef USE_EMSCRIPTEN
     std::string str;
     std::vector<std::string>::iterator iter;
@@ -523,12 +527,14 @@ std::string Toolkit::GetLogString() {
 #endif
 }
 
-std::string Toolkit::GetVersion() {
+std::string Toolkit::GetVersion()
+{
     return vrv::GetVersion();
 }
 
 
-void  Toolkit::ResetLogBuffer() {
+void  Toolkit::ResetLogBuffer()
+{
 #ifdef USE_EMSCRIPTEN
     vrv::logBuffer.clear();
 #endif
@@ -602,7 +608,8 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 }
 
 
-int Toolkit::GetPageCount() {
+int Toolkit::GetPageCount()
+{
     return m_doc.GetPageCount();
 }
 

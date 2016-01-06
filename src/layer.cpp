@@ -143,8 +143,7 @@ Clef* Layer::GetClef(LayerElement *test)
 	
     //make sure list is set
     ResetList(this);
-    if (test->Is() != CLEF)
-    {
+    if (test->Is() != CLEF) {
         testObject = GetListFirstBackward(testObject, CLEF);
     }
     

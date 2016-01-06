@@ -31,8 +31,7 @@ namespace vrv {
 std::string AttConverter::AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case ACCIDENTAL_EXPLICIT_s : value = "s"; break;
         case ACCIDENTAL_EXPLICIT_f : value = "f"; break;
         case ACCIDENTAL_EXPLICIT_ss : value = "ss"; break;
@@ -92,8 +91,7 @@ data_ACCIDENTAL_EXPLICIT AttConverter::StrToAccidentalExplicit(std::string value
 std::string AttConverter::AccidentalImplicitToStr(data_ACCIDENTAL_IMPLICIT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case ACCIDENTAL_IMPLICIT_s : value = "s"; break;
         case ACCIDENTAL_IMPLICIT_f : value = "f"; break;
         case ACCIDENTAL_IMPLICIT_ss : value = "ss"; break;
@@ -129,8 +127,7 @@ data_ACCIDENTAL_IMPLICIT AttConverter::StrToAccidentalImplicit(std::string value
 std::string AttConverter::ArticulationToStr(data_ARTICULATION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case ARTICULATION_acc : value = "acc"; break;
         case ARTICULATION_stacc : value = "stacc"; break;
         case ARTICULATION_ten : value = "ten"; break;
@@ -218,8 +215,7 @@ data_ARTICULATION AttConverter::StrToArticulation(std::string value)
 std::string AttConverter::BarplaceToStr(data_BARPLACE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case BARPLACE_mensur : value = "mensur"; break;
         case BARPLACE_staff : value = "staff"; break;
         case BARPLACE_takt : value = "takt"; break;
@@ -243,8 +239,7 @@ data_BARPLACE AttConverter::StrToBarplace(std::string value)
 std::string AttConverter::BarrenditionToStr(data_BARRENDITION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case BARRENDITION_dashed : value = "dashed"; break;
         case BARRENDITION_dotted : value = "dotted"; break;
         case BARRENDITION_dbl : value = "dbl"; break;
@@ -284,8 +279,7 @@ data_BARRENDITION AttConverter::StrToBarrendition(std::string value)
 std::string AttConverter::BetypeToStr(data_BETYPE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case BETYPE_byte : value = "byte"; break;
         case BETYPE_smil : value = "smil"; break;
         case BETYPE_midi : value = "midi"; break;
@@ -329,8 +323,7 @@ data_BETYPE AttConverter::StrToBetype(std::string value)
 std::string AttConverter::BooleanToStr(data_BOOLEAN data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case BOOLEAN_true : value = "true"; break;
         case BOOLEAN_false : value = "false"; break;
         default:
@@ -352,8 +345,7 @@ data_BOOLEAN AttConverter::StrToBoolean(std::string value)
 std::string AttConverter::CertaintyToStr(data_CERTAINTY data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case CERTAINTY_high : value = "high"; break;
         case CERTAINTY_medium : value = "medium"; break;
         case CERTAINTY_low : value = "low"; break;
@@ -379,8 +371,7 @@ data_CERTAINTY AttConverter::StrToCertainty(std::string value)
 std::string AttConverter::ClefshapeToStr(data_CLEFSHAPE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case CLEFSHAPE_G : value = "G"; break;
         case CLEFSHAPE_GG : value = "GG"; break;
         case CLEFSHAPE_F : value = "F"; break;
@@ -410,8 +401,7 @@ data_CLEFSHAPE AttConverter::StrToClefshape(std::string value)
 std::string AttConverter::ClusterToStr(data_CLUSTER data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case CLUSTER_white : value = "white"; break;
         case CLUSTER_black : value = "black"; break;
         case CLUSTER_chromatic : value = "chromatic"; break;
@@ -435,8 +425,7 @@ data_CLUSTER AttConverter::StrToCluster(std::string value)
 std::string AttConverter::ColornamesToStr(data_COLORNAMES data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case COLORNAMES_aqua : value = "aqua"; break;
         case COLORNAMES_black : value = "black"; break;
         case COLORNAMES_blue : value = "blue"; break;
@@ -486,8 +475,7 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value)
 std::string AttConverter::CurverenditionToStr(data_CURVERENDITION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case CURVERENDITION_narrow : value = "narrow"; break;
         case CURVERENDITION_medium : value = "medium"; break;
         case CURVERENDITION_wide : value = "wide"; break;
@@ -515,8 +503,7 @@ data_CURVERENDITION AttConverter::StrToCurverendition(std::string value)
 std::string AttConverter::EnclosureToStr(data_ENCLOSURE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case ENCLOSURE_paren : value = "paren"; break;
         case ENCLOSURE_brack : value = "brack"; break;
         default:
@@ -538,8 +525,7 @@ data_ENCLOSURE AttConverter::StrToEnclosure(std::string value)
 std::string AttConverter::FontstyleToStr(data_FONTSTYLE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case FONTSTYLE_italic : value = "italic"; break;
         case FONTSTYLE_normal : value = "normal"; break;
         case FONTSTYLE_oblique : value = "oblique"; break;
@@ -563,8 +549,7 @@ data_FONTSTYLE AttConverter::StrToFontstyle(std::string value)
 std::string AttConverter::FontweightToStr(data_FONTWEIGHT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case FONTWEIGHT_bold : value = "bold"; break;
         case FONTWEIGHT_normal : value = "normal"; break;
         default:
@@ -586,8 +571,7 @@ data_FONTWEIGHT AttConverter::StrToFontweight(std::string value)
 std::string AttConverter::GlissandoToStr(data_GLISSANDO data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case GLISSANDO_i : value = "i"; break;
         case GLISSANDO_m : value = "m"; break;
         case GLISSANDO_t : value = "t"; break;
@@ -611,8 +595,7 @@ data_GLISSANDO AttConverter::StrToGlissando(std::string value)
 std::string AttConverter::GraceToStr(data_GRACE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case GRACE_acc : value = "acc"; break;
         case GRACE_unacc : value = "unacc"; break;
         case GRACE_unknown : value = "unknown"; break;
@@ -636,8 +619,7 @@ data_GRACE AttConverter::StrToGrace(std::string value)
 std::string AttConverter::HorizontalalignmentToStr(data_HORIZONTALALIGNMENT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case HORIZONTALALIGNMENT_left : value = "left"; break;
         case HORIZONTALALIGNMENT_right : value = "right"; break;
         case HORIZONTALALIGNMENT_center : value = "center"; break;
@@ -663,8 +645,7 @@ data_HORIZONTALALIGNMENT AttConverter::StrToHorizontalalignment(std::string valu
 std::string AttConverter::IneumeformToStr(data_INEUMEFORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case INEUMEFORM_liquescent1 : value = "liquescent1"; break;
         case INEUMEFORM_liquescent2 : value = "liquescent2"; break;
         case INEUMEFORM_tied : value = "tied"; break;
@@ -692,8 +673,7 @@ data_INEUMEFORM AttConverter::StrToIneumeform(std::string value)
 std::string AttConverter::IneumenameToStr(data_INEUMENAME data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case INEUMENAME_pessubpunctis : value = "pessubpunctis"; break;
         case INEUMENAME_climacus : value = "climacus"; break;
         case INEUMENAME_scandicus : value = "scandicus"; break;
@@ -725,8 +705,7 @@ data_INEUMENAME AttConverter::StrToIneumename(std::string value)
 std::string AttConverter::LayerschemeToStr(data_LAYERSCHEME data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case LAYERSCHEME_1 : value = "1"; break;
         case LAYERSCHEME_2o : value = "2o"; break;
         case LAYERSCHEME_2f : value = "2f"; break;
@@ -754,8 +733,7 @@ data_LAYERSCHEME AttConverter::StrToLayerscheme(std::string value)
 std::string AttConverter::LigatureformToStr(data_LIGATUREFORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case LIGATUREFORM_recta : value = "recta"; break;
         case LIGATUREFORM_obliqua : value = "obliqua"; break;
         default:
@@ -777,8 +755,7 @@ data_LIGATUREFORM AttConverter::StrToLigatureform(std::string value)
 std::string AttConverter::LineformToStr(data_LINEFORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case LINEFORM_dashed : value = "dashed"; break;
         case LINEFORM_dotted : value = "dotted"; break;
         case LINEFORM_solid : value = "solid"; break;
@@ -804,8 +781,7 @@ data_LINEFORM AttConverter::StrToLineform(std::string value)
 std::string AttConverter::LinestartendsymbolToStr(data_LINESTARTENDSYMBOL data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case LINESTARTENDSYMBOL_angledown : value = "angledown"; break;
         case LINESTARTENDSYMBOL_angleup : value = "angleup"; break;
         case LINESTARTENDSYMBOL_angleright : value = "angleright"; break;
@@ -843,8 +819,7 @@ data_LINESTARTENDSYMBOL AttConverter::StrToLinestartendsymbol(std::string value)
 std::string AttConverter::LinewidthtermToStr(data_LINEWIDTHTERM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case LINEWIDTHTERM_narrow : value = "narrow"; break;
         case LINEWIDTHTERM_medium : value = "medium"; break;
         case LINEWIDTHTERM_wide : value = "wide"; break;
@@ -868,8 +843,7 @@ data_LINEWIDTHTERM AttConverter::StrToLinewidthterm(std::string value)
 std::string AttConverter::MelodicfunctionToStr(data_MELODICFUNCTION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case MELODICFUNCTION_aln : value = "aln"; break;
         case MELODICFUNCTION_ant : value = "ant"; break;
         case MELODICFUNCTION_app : value = "app"; break;
@@ -943,8 +917,7 @@ data_MELODICFUNCTION AttConverter::StrToMelodicfunction(std::string value)
 std::string AttConverter::MensurationsignToStr(data_MENSURATIONSIGN data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case MENSURATIONSIGN_C : value = "C"; break;
         case MENSURATIONSIGN_O : value = "O"; break;
         default:
@@ -966,8 +939,7 @@ data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value)
 std::string AttConverter::MetersignToStr(data_METERSIGN data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case METERSIGN_common : value = "common"; break;
         case METERSIGN_cut : value = "cut"; break;
         default:
@@ -989,8 +961,7 @@ data_METERSIGN AttConverter::StrToMetersign(std::string value)
 std::string AttConverter::MidinamesToStr(data_MIDINAMES data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case MIDINAMES_Acoustic_Grand_Piano : value = "Acoustic_Grand_Piano"; break;
         case MIDINAMES_Bright_Acoustic_Piano : value = "Bright_Acoustic_Piano"; break;
         case MIDINAMES_Electric_Grand_Piano : value = "Electric_Grand_Piano"; break;
@@ -1358,8 +1329,7 @@ data_MIDINAMES AttConverter::StrToMidinames(std::string value)
 std::string AttConverter::ModeToStr(data_MODE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case MODE_major : value = "major"; break;
         case MODE_minor : value = "minor"; break;
         case MODE_dorian : value = "dorian"; break;
@@ -1393,8 +1363,7 @@ data_MODE AttConverter::StrToMode(std::string value)
 std::string AttConverter::NotationtypeToStr(data_NOTATIONTYPE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case NOTATIONTYPE_cmn : value = "cmn"; break;
         case NOTATIONTYPE_mensural : value = "mensural"; break;
         case NOTATIONTYPE_mensural_black : value = "mensural.black"; break;
@@ -1424,8 +1393,7 @@ data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value)
 std::string AttConverter::NoteheadmodifierListToStr(data_NOTEHEADMODIFIER_list data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case NOTEHEADMODIFIER_list_slash : value = "slash"; break;
         case NOTEHEADMODIFIER_list_backslash : value = "backslash"; break;
         case NOTEHEADMODIFIER_list_vline : value = "vline"; break;
@@ -1463,8 +1431,7 @@ data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(std::string v
 std::string AttConverter::OtherstaffToStr(data_OTHERSTAFF data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case OTHERSTAFF_above : value = "above"; break;
         case OTHERSTAFF_below : value = "below"; break;
         default:
@@ -1486,8 +1453,7 @@ data_OTHERSTAFF AttConverter::StrToOtherstaff(std::string value)
 std::string AttConverter::PlaceToStr(data_PLACE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case PLACE_above : value = "above"; break;
         case PLACE_below : value = "below"; break;
         default:
@@ -1509,8 +1475,7 @@ data_PLACE AttConverter::StrToPlace(std::string value)
 std::string AttConverter::RotationdirectionToStr(data_ROTATIONDIRECTION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case ROTATIONDIRECTION_none : value = "none"; break;
         case ROTATIONDIRECTION_down : value = "down"; break;
         case ROTATIONDIRECTION_left : value = "left"; break;
@@ -1542,8 +1507,7 @@ data_ROTATIONDIRECTION AttConverter::StrToRotationdirection(std::string value)
 std::string AttConverter::SizeToStr(data_SIZE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case SIZE_normal : value = "normal"; break;
         case SIZE_cue : value = "cue"; break;
         default:
@@ -1565,8 +1529,7 @@ data_SIZE AttConverter::StrToSize(std::string value)
 std::string AttConverter::StaffrelToStr(data_STAFFREL data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case STAFFREL_above : value = "above"; break;
         case STAFFREL_below : value = "below"; break;
         case STAFFREL_within : value = "within"; break;
@@ -1590,8 +1553,7 @@ data_STAFFREL AttConverter::StrToStaffrel(std::string value)
 std::string AttConverter::StemmodifierToStr(data_STEMMODIFIER data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case STEMMODIFIER_none : value = "none"; break;
         case STEMMODIFIER_1slash : value = "1slash"; break;
         case STEMMODIFIER_2slash : value = "2slash"; break;
@@ -1627,8 +1589,7 @@ data_STEMMODIFIER AttConverter::StrToStemmodifier(std::string value)
 std::string AttConverter::StempositionToStr(data_STEMPOSITION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case STEMPOSITION_left : value = "left"; break;
         case STEMPOSITION_right : value = "right"; break;
         case STEMPOSITION_center : value = "center"; break;
@@ -1652,8 +1613,7 @@ data_STEMPOSITION AttConverter::StrToStemposition(std::string value)
 std::string AttConverter::TemperamentToStr(data_TEMPERAMENT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case TEMPERAMENT_equal : value = "equal"; break;
         case TEMPERAMENT_just : value = "just"; break;
         case TEMPERAMENT_mean : value = "mean"; break;
@@ -1679,8 +1639,7 @@ data_TEMPERAMENT AttConverter::StrToTemperament(std::string value)
 std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case TEXTRENDITIONLIST_xx_small : value = "xx-small"; break;
         case TEXTRENDITIONLIST_x_small : value = "x-small"; break;
         case TEXTRENDITIONLIST_small : value = "small"; break;
@@ -1764,8 +1723,7 @@ data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value)
 std::string AttConverter::UneumeformToStr(data_UNEUMEFORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case UNEUMEFORM_liquescent1 : value = "liquescent1"; break;
         case UNEUMEFORM_liquescent2 : value = "liquescent2"; break;
         case UNEUMEFORM_liquescent3 : value = "liquescent3"; break;
@@ -1797,8 +1755,7 @@ data_UNEUMEFORM AttConverter::StrToUneumeform(std::string value)
 std::string AttConverter::UneumenameToStr(data_UNEUMENAME data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case UNEUMENAME_punctum : value = "punctum"; break;
         case UNEUMENAME_virga : value = "virga"; break;
         case UNEUMENAME_pes : value = "pes"; break;
@@ -1842,8 +1799,7 @@ data_UNEUMENAME AttConverter::StrToUneumename(std::string value)
 std::string AttConverter::AccidLogFuncToStr(accidLog_FUNC data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case accidLog_FUNC_caution : value = "caution"; break;
         case accidLog_FUNC_edit : value = "edit"; break;
         default:
@@ -1865,8 +1821,7 @@ accidLog_FUNC AttConverter::StrToAccidLogFunc(std::string value)
 std::string AttConverter::ArpegLogOrderToStr(arpegLog_ORDER data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case arpegLog_ORDER_up : value = "up"; break;
         case arpegLog_ORDER_down : value = "down"; break;
         case arpegLog_ORDER_nonarp : value = "nonarp"; break;
@@ -1890,8 +1845,7 @@ arpegLog_ORDER AttConverter::StrToArpegLogOrder(std::string value)
 std::string AttConverter::BTremLogFormToStr(bTremLog_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case bTremLog_FORM_meas : value = "meas"; break;
         case bTremLog_FORM_unmeas : value = "unmeas"; break;
         default:
@@ -1913,8 +1867,7 @@ bTremLog_FORM AttConverter::StrToBTremLogForm(std::string value)
 std::string AttConverter::BeamingVisBeamrendToStr(beamingVis_BEAMREND data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case beamingVis_BEAMREND_acc : value = "acc"; break;
         case beamingVis_BEAMREND_rit : value = "rit"; break;
         case beamingVis_BEAMREND_norm : value = "norm"; break;
@@ -1938,8 +1891,7 @@ beamingVis_BEAMREND AttConverter::StrToBeamingVisBeamrend(std::string value)
 std::string AttConverter::BeamrendFormToStr(beamrend_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case beamrend_FORM_acc : value = "acc"; break;
         case beamrend_FORM_mixed : value = "mixed"; break;
         case beamrend_FORM_rit : value = "rit"; break;
@@ -1965,8 +1917,7 @@ beamrend_FORM AttConverter::StrToBeamrendForm(std::string value)
 std::string AttConverter::CurvatureCurvedirToStr(curvature_CURVEDIR data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case curvature_CURVEDIR_above : value = "above"; break;
         case curvature_CURVEDIR_below : value = "below"; break;
         case curvature_CURVEDIR_mixed : value = "mixed"; break;
@@ -1990,8 +1941,7 @@ curvature_CURVEDIR AttConverter::StrToCurvatureCurvedir(std::string value)
 std::string AttConverter::CutoutCutoutToStr(cutout_CUTOUT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case cutout_CUTOUT_cutout : value = "cutout"; break;
         default:
             LogWarning("Unknown value '%d' for att.cutout@cutout", data);
@@ -2011,8 +1961,7 @@ cutout_CUTOUT AttConverter::StrToCutoutCutout(std::string value)
 std::string AttConverter::DotLogFormToStr(dotLog_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case dotLog_FORM_aug : value = "aug"; break;
         case dotLog_FORM_div : value = "div"; break;
         default:
@@ -2034,8 +1983,7 @@ dotLog_FORM AttConverter::StrToDotLogForm(std::string value)
 std::string AttConverter::EndingsEndingrendToStr(endings_ENDINGREND data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case endings_ENDINGREND_top : value = "top"; break;
         case endings_ENDINGREND_barred : value = "barred"; break;
         case endings_ENDINGREND_grouped : value = "grouped"; break;
@@ -2059,8 +2007,7 @@ endings_ENDINGREND AttConverter::StrToEndingsEndingrend(std::string value)
 std::string AttConverter::FTremLogFormToStr(fTremLog_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case fTremLog_FORM_meas : value = "meas"; break;
         case fTremLog_FORM_unmeas : value = "unmeas"; break;
         default:
@@ -2082,8 +2029,7 @@ fTremLog_FORM AttConverter::StrToFTremLogForm(std::string value)
 std::string AttConverter::FermataVisFormToStr(fermataVis_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case fermataVis_FORM_inv : value = "inv"; break;
         case fermataVis_FORM_norm : value = "norm"; break;
         default:
@@ -2105,8 +2051,7 @@ fermataVis_FORM AttConverter::StrToFermataVisForm(std::string value)
 std::string AttConverter::FermataVisShapeToStr(fermataVis_SHAPE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case fermataVis_SHAPE_curved : value = "curved"; break;
         case fermataVis_SHAPE_square : value = "square"; break;
         case fermataVis_SHAPE_angular : value = "angular"; break;
@@ -2130,8 +2075,7 @@ fermataVis_SHAPE AttConverter::StrToFermataVisShape(std::string value)
 std::string AttConverter::HairpinLogFormToStr(hairpinLog_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case hairpinLog_FORM_cres : value = "cres"; break;
         case hairpinLog_FORM_dim : value = "dim"; break;
         default:
@@ -2153,8 +2097,7 @@ hairpinLog_FORM AttConverter::StrToHairpinLogForm(std::string value)
 std::string AttConverter::HarmVisRendgridToStr(harmVis_RENDGRID data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harmVis_RENDGRID_grid : value = "grid"; break;
         case harmVis_RENDGRID_gridtext : value = "gridtext"; break;
         case harmVis_RENDGRID_text : value = "text"; break;
@@ -2178,8 +2121,7 @@ harmVis_RENDGRID AttConverter::StrToHarmVisRendgrid(std::string value)
 std::string AttConverter::HarpPedalLogAToStr(harpPedalLog_A data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_A_f : value = "f"; break;
         case harpPedalLog_A_n : value = "n"; break;
         case harpPedalLog_A_s : value = "s"; break;
@@ -2203,8 +2145,7 @@ harpPedalLog_A AttConverter::StrToHarpPedalLogA(std::string value)
 std::string AttConverter::HarpPedalLogBToStr(harpPedalLog_B data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_B_f : value = "f"; break;
         case harpPedalLog_B_n : value = "n"; break;
         case harpPedalLog_B_s : value = "s"; break;
@@ -2228,8 +2169,7 @@ harpPedalLog_B AttConverter::StrToHarpPedalLogB(std::string value)
 std::string AttConverter::HarpPedalLogCToStr(harpPedalLog_C data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_C_f : value = "f"; break;
         case harpPedalLog_C_n : value = "n"; break;
         case harpPedalLog_C_s : value = "s"; break;
@@ -2253,8 +2193,7 @@ harpPedalLog_C AttConverter::StrToHarpPedalLogC(std::string value)
 std::string AttConverter::HarpPedalLogDToStr(harpPedalLog_D data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_D_f : value = "f"; break;
         case harpPedalLog_D_n : value = "n"; break;
         case harpPedalLog_D_s : value = "s"; break;
@@ -2278,8 +2217,7 @@ harpPedalLog_D AttConverter::StrToHarpPedalLogD(std::string value)
 std::string AttConverter::HarpPedalLogEToStr(harpPedalLog_E data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_E_f : value = "f"; break;
         case harpPedalLog_E_n : value = "n"; break;
         case harpPedalLog_E_s : value = "s"; break;
@@ -2303,8 +2241,7 @@ harpPedalLog_E AttConverter::StrToHarpPedalLogE(std::string value)
 std::string AttConverter::HarpPedalLogFToStr(harpPedalLog_F data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_F_f : value = "f"; break;
         case harpPedalLog_F_n : value = "n"; break;
         case harpPedalLog_F_s : value = "s"; break;
@@ -2328,8 +2265,7 @@ harpPedalLog_F AttConverter::StrToHarpPedalLogF(std::string value)
 std::string AttConverter::HarpPedalLogGToStr(harpPedalLog_G data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case harpPedalLog_G_f : value = "f"; break;
         case harpPedalLog_G_n : value = "n"; break;
         case harpPedalLog_G_s : value = "s"; break;
@@ -2353,8 +2289,7 @@ harpPedalLog_G AttConverter::StrToHarpPedalLogG(std::string value)
 std::string AttConverter::MeiversionMeiversionToStr(meiversion_MEIVERSION data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case meiversion_MEIVERSION_3_0_0 : value = "3.0.0"; break;
         default:
             LogWarning("Unknown value '%d' for att.meiversion@meiversion", data);
@@ -2374,8 +2309,7 @@ meiversion_MEIVERSION AttConverter::StrToMeiversionMeiversion(std::string value)
 std::string AttConverter::MensurVisFormToStr(mensurVis_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case mensurVis_FORM_horizontal : value = "horizontal"; break;
         case mensurVis_FORM_vertical : value = "vertical"; break;
         default:
@@ -2397,8 +2331,7 @@ mensurVis_FORM AttConverter::StrToMensurVisForm(std::string value)
 std::string AttConverter::MensuralVisMensurformToStr(mensuralVis_MENSURFORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case mensuralVis_MENSURFORM_horizontal : value = "horizontal"; break;
         case mensuralVis_MENSURFORM_vertical : value = "vertical"; break;
         default:
@@ -2420,8 +2353,7 @@ mensuralVis_MENSURFORM AttConverter::StrToMensuralVisMensurform(std::string valu
 std::string AttConverter::MeterSigVisFormToStr(meterSigVis_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case meterSigVis_FORM_num : value = "num"; break;
         case meterSigVis_FORM_denomsym : value = "denomsym"; break;
         case meterSigVis_FORM_norm : value = "norm"; break;
@@ -2447,8 +2379,7 @@ meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value)
 std::string AttConverter::MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case meterSigDefaultVis_METERREND_num : value = "num"; break;
         case meterSigDefaultVis_METERREND_denomsym : value = "denomsym"; break;
         case meterSigDefaultVis_METERREND_norm : value = "norm"; break;
@@ -2474,8 +2405,7 @@ meterSigDefaultVis_METERREND AttConverter::StrToMeterSigDefaultVisMeterrend(std:
 std::string AttConverter::MeterconformanceMetconToStr(meterconformance_METCON data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case meterconformance_METCON_c : value = "c"; break;
         case meterconformance_METCON_i : value = "i"; break;
         case meterconformance_METCON_o : value = "o"; break;
@@ -2499,8 +2429,7 @@ meterconformance_METCON AttConverter::StrToMeterconformanceMetcon(std::string va
 std::string AttConverter::MordentLogFormToStr(mordentLog_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case mordentLog_FORM_inv : value = "inv"; break;
         case mordentLog_FORM_norm : value = "norm"; break;
         default:
@@ -2522,8 +2451,7 @@ mordentLog_FORM AttConverter::StrToMordentLogForm(std::string value)
 std::string AttConverter::NoteLogMensuralLigToStr(noteLogMensural_LIG data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case noteLogMensural_LIG_recta : value = "recta"; break;
         case noteLogMensural_LIG_obliqua : value = "obliqua"; break;
         default:
@@ -2545,8 +2473,7 @@ noteLogMensural_LIG AttConverter::StrToNoteLogMensuralLig(std::string value)
 std::string AttConverter::OctaveLogCollToStr(octaveLog_COLL data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case octaveLog_COLL_coll : value = "coll"; break;
         default:
             LogWarning("Unknown value '%d' for att.octave.log@coll", data);
@@ -2566,8 +2493,7 @@ octaveLog_COLL AttConverter::StrToOctaveLogColl(std::string value)
 std::string AttConverter::PbVisFoliumToStr(pbVis_FOLIUM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case pbVis_FOLIUM_verso : value = "verso"; break;
         case pbVis_FOLIUM_recto : value = "recto"; break;
         default:
@@ -2589,8 +2515,7 @@ pbVis_FOLIUM AttConverter::StrToPbVisFolium(std::string value)
 std::string AttConverter::PedalLogDirToStr(pedalLog_DIR data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case pedalLog_DIR_down : value = "down"; break;
         case pedalLog_DIR_up : value = "up"; break;
         case pedalLog_DIR_half : value = "half"; break;
@@ -2616,8 +2541,7 @@ pedalLog_DIR AttConverter::StrToPedalLogDir(std::string value)
 std::string AttConverter::PedalVisFormToStr(pedalVis_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case pedalVis_FORM_line : value = "line"; break;
         case pedalVis_FORM_pedstar : value = "pedstar"; break;
         case pedalVis_FORM_altpedstar : value = "altpedstar"; break;
@@ -2641,8 +2565,7 @@ pedalVis_FORM AttConverter::StrToPedalVisForm(std::string value)
 std::string AttConverter::PianopedalsPedalstyleToStr(pianopedals_PEDALSTYLE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case pianopedals_PEDALSTYLE_line : value = "line"; break;
         case pianopedals_PEDALSTYLE_pedstar : value = "pedstar"; break;
         case pianopedals_PEDALSTYLE_altpedstar : value = "altpedstar"; break;
@@ -2666,8 +2589,7 @@ pianopedals_PEDALSTYLE AttConverter::StrToPianopedalsPedalstyle(std::string valu
 std::string AttConverter::PlistEvaluateToStr(plist_EVALUATE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case plist_EVALUATE_all : value = "all"; break;
         case plist_EVALUATE_one : value = "one"; break;
         case plist_EVALUATE_none : value = "none"; break;
@@ -2691,8 +2613,7 @@ plist_EVALUATE AttConverter::StrToPlistEvaluate(std::string value)
 std::string AttConverter::PointingXlinkactuateToStr(pointing_XLINKACTUATE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case pointing_XLINKACTUATE_onLoad : value = "onLoad"; break;
         case pointing_XLINKACTUATE_onRequest : value = "onRequest"; break;
         case pointing_XLINKACTUATE_none : value = "none"; break;
@@ -2718,8 +2639,7 @@ pointing_XLINKACTUATE AttConverter::StrToPointingXlinkactuate(std::string value)
 std::string AttConverter::PointingXlinkshowToStr(pointing_XLINKSHOW data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case pointing_XLINKSHOW_new : value = "new"; break;
         case pointing_XLINKSHOW_replace : value = "replace"; break;
         case pointing_XLINKSHOW_embed : value = "embed"; break;
@@ -2747,8 +2667,7 @@ pointing_XLINKSHOW AttConverter::StrToPointingXlinkshow(std::string value)
 std::string AttConverter::RegularmethodMethodToStr(regularmethod_METHOD data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case regularmethod_METHOD_silent : value = "silent"; break;
         case regularmethod_METHOD_tags : value = "tags"; break;
         default:
@@ -2770,8 +2689,7 @@ regularmethod_METHOD AttConverter::StrToRegularmethodMethod(std::string value)
 std::string AttConverter::RehearsalRehencloseToStr(rehearsal_REHENCLOSE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case rehearsal_REHENCLOSE_box : value = "box"; break;
         case rehearsal_REHENCLOSE_circle : value = "circle"; break;
         case rehearsal_REHENCLOSE_none : value = "none"; break;
@@ -2795,8 +2713,7 @@ rehearsal_REHENCLOSE AttConverter::StrToRehearsalRehenclose(std::string value)
 std::string AttConverter::SbVisFormToStr(sbVis_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case sbVis_FORM_hash : value = "hash"; break;
         default:
             LogWarning("Unknown value '%d' for att.sb.vis@form", data);
@@ -2816,8 +2733,7 @@ sbVis_FORM AttConverter::StrToSbVisForm(std::string value)
 std::string AttConverter::StaffgroupingsymSymbolToStr(staffgroupingsym_SYMBOL data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case staffgroupingsym_SYMBOL_brace : value = "brace"; break;
         case staffgroupingsym_SYMBOL_bracket : value = "bracket"; break;
         case staffgroupingsym_SYMBOL_bracketsq : value = "bracketsq"; break;
@@ -2845,8 +2761,7 @@ staffgroupingsym_SYMBOL AttConverter::StrToStaffgroupingsymSymbol(std::string va
 std::string AttConverter::SylLogConToStr(sylLog_CON data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case sylLog_CON_s : value = "s"; break;
         case sylLog_CON_d : value = "d"; break;
         case sylLog_CON_u : value = "u"; break;
@@ -2880,8 +2795,7 @@ sylLog_CON AttConverter::StrToSylLogCon(std::string value)
 std::string AttConverter::SylLogWordposToStr(sylLog_WORDPOS data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case sylLog_WORDPOS_i : value = "i"; break;
         case sylLog_WORDPOS_m : value = "m"; break;
         case sylLog_WORDPOS_t : value = "t"; break;
@@ -2905,8 +2819,7 @@ sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value)
 std::string AttConverter::TupletVisNumformatToStr(tupletVis_NUMFORMAT data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case tupletVis_NUMFORMAT_count : value = "count"; break;
         case tupletVis_NUMFORMAT_ratio : value = "ratio"; break;
         default:
@@ -2928,8 +2841,7 @@ tupletVis_NUMFORMAT AttConverter::StrToTupletVisNumformat(std::string value)
 std::string AttConverter::TurnLogFormToStr(turnLog_FORM data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case turnLog_FORM_inv : value = "inv"; break;
         case turnLog_FORM_norm : value = "norm"; break;
         default:
@@ -2951,8 +2863,7 @@ turnLog_FORM AttConverter::StrToTurnLogForm(std::string value)
 std::string AttConverter::WhitespaceXmlspaceToStr(whitespace_XMLSPACE data) 
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case whitespace_XMLSPACE_default : value = "default"; break;
         case whitespace_XMLSPACE_preserve : value = "preserve"; break;
         default:

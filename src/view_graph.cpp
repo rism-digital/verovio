@@ -50,29 +50,28 @@ void View::DrawHorizontalLine (DeviceContext *dc, int x1, int x2, int y1, int nb
 	return;
 }
 
-    /* Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
-        4=right side; 0=don't fill in any part. ??SO FAR, <fillSection> IS IGNORED.
-     */
-    void View::DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
-    {
-        assert(dc); // DC cannot be NULL
-        
-        SwapY(&y1, &y2);
-        
-        //dc->SetPen(m_currentColour, 0, AxSOLID );
-        //dc->SetBrush(AxWHITE, AxTRANSPARENT);
-        dc->SetPen(AxBLUE, 0, AxSOLID );
-        dc->SetBrush(AxRED, AxTRANSPARENT);
-        
-        dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
-        
-        dc->ResetPen();
-        dc->ResetBrush();
-        
-        return;
-    }
+/* Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
+    4=right side; 0=don't fill in any part. ??SO FAR, <fillSection> IS IGNORED.
+ */
+void View::DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
+{
+    assert(dc); // DC cannot be NULL
     
-
+    SwapY(&y1, &y2);
+    
+    //dc->SetPen(m_currentColour, 0, AxSOLID );
+    //dc->SetBrush(AxWHITE, AxTRANSPARENT);
+    dc->SetPen(AxBLUE, 0, AxSOLID );
+    dc->SetBrush(AxRED, AxTRANSPARENT);
+    
+    dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
+    
+    dc->ResetPen();
+    dc->ResetBrush();
+    
+    return;
+}
+    
     void View::DrawFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2)	/* dessine rectangle plein */
 {	
     assert(dc);
@@ -155,8 +154,7 @@ void View::DrawSmuflString (DeviceContext *dc, int x, int y, std::wstring s, boo
     
     int xDC = ToDeviceContextX(x);
     
-	if (center)
-	{
+	if (center) {
         int w, h;
 		dc->GetSmuflTextExtent(s, &w, &h);
 		xDC -= w / 2;
@@ -177,8 +175,7 @@ void View::DrawLyricString (DeviceContext *dc, int x, int y, std::wstring s, int
     
     std::wistringstream iss(s);
     std::wstring token;
-    while(std::getline(iss, token, L'_'))
-    {
+    while(std::getline(iss, token, L'_')) {
         dc->DrawText(UTF16to8(token.c_str()), token);
         // no _
         if (iss.eof())

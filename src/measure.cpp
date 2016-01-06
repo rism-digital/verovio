@@ -327,8 +327,7 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
         assert(doc->GetType() == Raw);
         this->SetDrawingX(this->m_drawingXRel + (*currentSystem)->GetDrawingX());
     }
-    else
-    {
+    else {
         assert(doc->GetType() == Transcription);
         this->SetDrawingX(this->m_xAbs);
     }

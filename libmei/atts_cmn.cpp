@@ -30,19 +30,22 @@ namespace vrv {
 // AttArpegLog
 //----------------------------------------------------------------------------
 
-AttArpegLog::AttArpegLog(): Att() {
+AttArpegLog::AttArpegLog(): Att()
+{
     ResetArpegLog();
 }
 
-AttArpegLog::~AttArpegLog() {
-
+AttArpegLog::~AttArpegLog()
+{
 }
 
-void AttArpegLog::ResetArpegLog() {
+void AttArpegLog::ResetArpegLog()
+{
     m_order = arpegLog_ORDER_NONE;
 }
 
-bool AttArpegLog::ReadArpegLog(pugi::xml_node element) {
+bool AttArpegLog::ReadArpegLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("order")) {
         this->SetOrder(StrToArpegLogOrder(element.attribute("order").value()));
@@ -52,7 +55,8 @@ bool AttArpegLog::ReadArpegLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttArpegLog::WriteArpegLog(pugi::xml_node element) {
+bool AttArpegLog::WriteArpegLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOrder()) {
         element.append_attribute("order") = ArpegLogOrderToStr(this->GetOrder()).c_str();
@@ -73,19 +77,22 @@ bool AttArpegLog::HasOrder()
 // AttArpegVis
 //----------------------------------------------------------------------------
 
-AttArpegVis::AttArpegVis(): Att() {
+AttArpegVis::AttArpegVis(): Att()
+{
     ResetArpegVis();
 }
 
-AttArpegVis::~AttArpegVis() {
-
+AttArpegVis::~AttArpegVis()
+{
 }
 
-void AttArpegVis::ResetArpegVis() {
+void AttArpegVis::ResetArpegVis()
+{
     m_arrow = BOOLEAN_NONE;
 }
 
-bool AttArpegVis::ReadArpegVis(pugi::xml_node element) {
+bool AttArpegVis::ReadArpegVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("arrow")) {
         this->SetArrow(StrToBoolean(element.attribute("arrow").value()));
@@ -95,7 +102,8 @@ bool AttArpegVis::ReadArpegVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttArpegVis::WriteArpegVis(pugi::xml_node element) {
+bool AttArpegVis::WriteArpegVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasArrow()) {
         element.append_attribute("arrow") = BooleanToStr(this->GetArrow()).c_str();
@@ -116,19 +124,22 @@ bool AttArpegVis::HasArrow()
 // AttBTremLog
 //----------------------------------------------------------------------------
 
-AttBTremLog::AttBTremLog(): Att() {
+AttBTremLog::AttBTremLog(): Att()
+{
     ResetBTremLog();
 }
 
-AttBTremLog::~AttBTremLog() {
-
+AttBTremLog::~AttBTremLog()
+{
 }
 
-void AttBTremLog::ResetBTremLog() {
+void AttBTremLog::ResetBTremLog()
+{
     m_form = bTremLog_FORM_NONE;
 }
 
-bool AttBTremLog::ReadBTremLog(pugi::xml_node element) {
+bool AttBTremLog::ReadBTremLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToBTremLogForm(element.attribute("form").value()));
@@ -138,7 +149,8 @@ bool AttBTremLog::ReadBTremLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBTremLog::WriteBTremLog(pugi::xml_node element) {
+bool AttBTremLog::WriteBTremLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = BTremLogFormToStr(this->GetForm()).c_str();
@@ -159,19 +171,22 @@ bool AttBTremLog::HasForm()
 // AttBeamed
 //----------------------------------------------------------------------------
 
-AttBeamed::AttBeamed(): Att() {
+AttBeamed::AttBeamed(): Att()
+{
     ResetBeamed();
 }
 
-AttBeamed::~AttBeamed() {
-
+AttBeamed::~AttBeamed()
+{
 }
 
-void AttBeamed::ResetBeamed() {
+void AttBeamed::ResetBeamed()
+{
     m_beam = "";
 }
 
-bool AttBeamed::ReadBeamed(pugi::xml_node element) {
+bool AttBeamed::ReadBeamed(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("beam")) {
         this->SetBeam(StrToStr(element.attribute("beam").value()));
@@ -181,7 +196,8 @@ bool AttBeamed::ReadBeamed(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeamed::WriteBeamed(pugi::xml_node element) {
+bool AttBeamed::WriteBeamed(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBeam()) {
         element.append_attribute("beam") = StrToStr(this->GetBeam()).c_str();
@@ -202,19 +218,22 @@ bool AttBeamed::HasBeam()
 // AttBeamedwith
 //----------------------------------------------------------------------------
 
-AttBeamedwith::AttBeamedwith(): Att() {
+AttBeamedwith::AttBeamedwith(): Att()
+{
     ResetBeamedwith();
 }
 
-AttBeamedwith::~AttBeamedwith() {
-
+AttBeamedwith::~AttBeamedwith()
+{
 }
 
-void AttBeamedwith::ResetBeamedwith() {
+void AttBeamedwith::ResetBeamedwith()
+{
     m_beamWith = OTHERSTAFF_NONE;
 }
 
-bool AttBeamedwith::ReadBeamedwith(pugi::xml_node element) {
+bool AttBeamedwith::ReadBeamedwith(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("beam.with")) {
         this->SetBeamWith(StrToOtherstaff(element.attribute("beam.with").value()));
@@ -224,7 +243,8 @@ bool AttBeamedwith::ReadBeamedwith(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeamedwith::WriteBeamedwith(pugi::xml_node element) {
+bool AttBeamedwith::WriteBeamedwith(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBeamWith()) {
         element.append_attribute("beam.with") = OtherstaffToStr(this->GetBeamWith()).c_str();
@@ -245,20 +265,23 @@ bool AttBeamedwith::HasBeamWith()
 // AttBeamingLog
 //----------------------------------------------------------------------------
 
-AttBeamingLog::AttBeamingLog(): Att() {
+AttBeamingLog::AttBeamingLog(): Att()
+{
     ResetBeamingLog();
 }
 
-AttBeamingLog::~AttBeamingLog() {
-
+AttBeamingLog::~AttBeamingLog()
+{
 }
 
-void AttBeamingLog::ResetBeamingLog() {
+void AttBeamingLog::ResetBeamingLog()
+{
     m_beamGroup = "";
     m_beamRests = BOOLEAN_NONE;
 }
 
-bool AttBeamingLog::ReadBeamingLog(pugi::xml_node element) {
+bool AttBeamingLog::ReadBeamingLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("beam.group")) {
         this->SetBeamGroup(StrToStr(element.attribute("beam.group").value()));
@@ -273,7 +296,8 @@ bool AttBeamingLog::ReadBeamingLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeamingLog::WriteBeamingLog(pugi::xml_node element) {
+bool AttBeamingLog::WriteBeamingLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBeamGroup()) {
         element.append_attribute("beam.group") = StrToStr(this->GetBeamGroup()).c_str();
@@ -303,20 +327,23 @@ bool AttBeamingLog::HasBeamRests()
 // AttBeamrend
 //----------------------------------------------------------------------------
 
-AttBeamrend::AttBeamrend(): Att() {
+AttBeamrend::AttBeamrend(): Att()
+{
     ResetBeamrend();
 }
 
-AttBeamrend::~AttBeamrend() {
-
+AttBeamrend::~AttBeamrend()
+{
 }
 
-void AttBeamrend::ResetBeamrend() {
+void AttBeamrend::ResetBeamrend()
+{
     m_form = beamrend_FORM_NONE;
     m_slope = 0.0;
 }
 
-bool AttBeamrend::ReadBeamrend(pugi::xml_node element) {
+bool AttBeamrend::ReadBeamrend(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToBeamrendForm(element.attribute("form").value()));
@@ -331,7 +358,8 @@ bool AttBeamrend::ReadBeamrend(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeamrend::WriteBeamrend(pugi::xml_node element) {
+bool AttBeamrend::WriteBeamrend(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = BeamrendFormToStr(this->GetForm()).c_str();
@@ -361,19 +389,22 @@ bool AttBeamrend::HasSlope()
 // AttBeamsecondary
 //----------------------------------------------------------------------------
 
-AttBeamsecondary::AttBeamsecondary(): Att() {
+AttBeamsecondary::AttBeamsecondary(): Att()
+{
     ResetBeamsecondary();
 }
 
-AttBeamsecondary::~AttBeamsecondary() {
-
+AttBeamsecondary::~AttBeamsecondary()
+{
 }
 
-void AttBeamsecondary::ResetBeamsecondary() {
+void AttBeamsecondary::ResetBeamsecondary()
+{
     m_breaksec = 0;
 }
 
-bool AttBeamsecondary::ReadBeamsecondary(pugi::xml_node element) {
+bool AttBeamsecondary::ReadBeamsecondary(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("breaksec")) {
         this->SetBreaksec(StrToInt(element.attribute("breaksec").value()));
@@ -383,7 +414,8 @@ bool AttBeamsecondary::ReadBeamsecondary(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeamsecondary::WriteBeamsecondary(pugi::xml_node element) {
+bool AttBeamsecondary::WriteBeamsecondary(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBreaksec()) {
         element.append_attribute("breaksec") = IntToStr(this->GetBreaksec()).c_str();
@@ -404,19 +436,22 @@ bool AttBeamsecondary::HasBreaksec()
 // AttBeatRptLog
 //----------------------------------------------------------------------------
 
-AttBeatRptLog::AttBeatRptLog(): Att() {
+AttBeatRptLog::AttBeatRptLog(): Att()
+{
     ResetBeatRptLog();
 }
 
-AttBeatRptLog::~AttBeatRptLog() {
-
+AttBeatRptLog::~AttBeatRptLog()
+{
 }
 
-void AttBeatRptLog::ResetBeatRptLog() {
+void AttBeatRptLog::ResetBeatRptLog()
+{
     m_beatDef = DURATION_NONE;
 }
 
-bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element) {
+bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("beatDef")) {
         this->SetBeatDef(StrToDuration(element.attribute("beatDef").value()));
@@ -426,7 +461,8 @@ bool AttBeatRptLog::ReadBeatRptLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeatRptLog::WriteBeatRptLog(pugi::xml_node element) {
+bool AttBeatRptLog::WriteBeatRptLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBeatDef()) {
         element.append_attribute("beatDef") = DurationToStr(this->GetBeatDef()).c_str();
@@ -447,19 +483,22 @@ bool AttBeatRptLog::HasBeatDef()
 // AttBeatRptVis
 //----------------------------------------------------------------------------
 
-AttBeatRptVis::AttBeatRptVis(): Att() {
+AttBeatRptVis::AttBeatRptVis(): Att()
+{
     ResetBeatRptVis();
 }
 
-AttBeatRptVis::~AttBeatRptVis() {
-
+AttBeatRptVis::~AttBeatRptVis()
+{
 }
 
-void AttBeatRptVis::ResetBeatRptVis() {
+void AttBeatRptVis::ResetBeatRptVis()
+{
     m_form = BEATRPT_REND_NONE;
 }
 
-bool AttBeatRptVis::ReadBeatRptVis(pugi::xml_node element) {
+bool AttBeatRptVis::ReadBeatRptVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToBeatrptRend(element.attribute("form").value()));
@@ -469,7 +508,8 @@ bool AttBeatRptVis::ReadBeatRptVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeatRptVis::WriteBeatRptVis(pugi::xml_node element) {
+bool AttBeatRptVis::WriteBeatRptVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = BeatrptRendToStr(this->GetForm()).c_str();
@@ -490,19 +530,22 @@ bool AttBeatRptVis::HasForm()
 // AttBendGes
 //----------------------------------------------------------------------------
 
-AttBendGes::AttBendGes(): Att() {
+AttBendGes::AttBendGes(): Att()
+{
     ResetBendGes();
 }
 
-AttBendGes::~AttBendGes() {
-
+AttBendGes::~AttBendGes()
+{
 }
 
-void AttBendGes::ResetBendGes() {
+void AttBendGes::ResetBendGes()
+{
     m_amount = "";
 }
 
-bool AttBendGes::ReadBendGes(pugi::xml_node element) {
+bool AttBendGes::ReadBendGes(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("amount")) {
         this->SetAmount(StrToStr(element.attribute("amount").value()));
@@ -512,7 +555,8 @@ bool AttBendGes::ReadBendGes(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBendGes::WriteBendGes(pugi::xml_node element) {
+bool AttBendGes::WriteBendGes(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAmount()) {
         element.append_attribute("amount") = StrToStr(this->GetAmount()).c_str();
@@ -533,19 +577,22 @@ bool AttBendGes::HasAmount()
 // AttCutout
 //----------------------------------------------------------------------------
 
-AttCutout::AttCutout(): Att() {
+AttCutout::AttCutout(): Att()
+{
     ResetCutout();
 }
 
-AttCutout::~AttCutout() {
-
+AttCutout::~AttCutout()
+{
 }
 
-void AttCutout::ResetCutout() {
+void AttCutout::ResetCutout()
+{
     m_cutout = cutout_CUTOUT_NONE;
 }
 
-bool AttCutout::ReadCutout(pugi::xml_node element) {
+bool AttCutout::ReadCutout(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("cutout")) {
         this->SetCutout(StrToCutoutCutout(element.attribute("cutout").value()));
@@ -555,7 +602,8 @@ bool AttCutout::ReadCutout(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCutout::WriteCutout(pugi::xml_node element) {
+bool AttCutout::WriteCutout(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCutout()) {
         element.append_attribute("cutout") = CutoutCutoutToStr(this->GetCutout()).c_str();
@@ -576,19 +624,22 @@ bool AttCutout::HasCutout()
 // AttExpandable
 //----------------------------------------------------------------------------
 
-AttExpandable::AttExpandable(): Att() {
+AttExpandable::AttExpandable(): Att()
+{
     ResetExpandable();
 }
 
-AttExpandable::~AttExpandable() {
-
+AttExpandable::~AttExpandable()
+{
 }
 
-void AttExpandable::ResetExpandable() {
+void AttExpandable::ResetExpandable()
+{
     m_expand = BOOLEAN_NONE;
 }
 
-bool AttExpandable::ReadExpandable(pugi::xml_node element) {
+bool AttExpandable::ReadExpandable(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("expand")) {
         this->SetExpand(StrToBoolean(element.attribute("expand").value()));
@@ -598,7 +649,8 @@ bool AttExpandable::ReadExpandable(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttExpandable::WriteExpandable(pugi::xml_node element) {
+bool AttExpandable::WriteExpandable(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasExpand()) {
         element.append_attribute("expand") = BooleanToStr(this->GetExpand()).c_str();
@@ -619,19 +671,22 @@ bool AttExpandable::HasExpand()
 // AttFTremLog
 //----------------------------------------------------------------------------
 
-AttFTremLog::AttFTremLog(): Att() {
+AttFTremLog::AttFTremLog(): Att()
+{
     ResetFTremLog();
 }
 
-AttFTremLog::~AttFTremLog() {
-
+AttFTremLog::~AttFTremLog()
+{
 }
 
-void AttFTremLog::ResetFTremLog() {
+void AttFTremLog::ResetFTremLog()
+{
     m_form = fTremLog_FORM_NONE;
 }
 
-bool AttFTremLog::ReadFTremLog(pugi::xml_node element) {
+bool AttFTremLog::ReadFTremLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToFTremLogForm(element.attribute("form").value()));
@@ -641,7 +696,8 @@ bool AttFTremLog::ReadFTremLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttFTremLog::WriteFTremLog(pugi::xml_node element) {
+bool AttFTremLog::WriteFTremLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = FTremLogFormToStr(this->GetForm()).c_str();
@@ -662,20 +718,23 @@ bool AttFTremLog::HasForm()
 // AttFermataVis
 //----------------------------------------------------------------------------
 
-AttFermataVis::AttFermataVis(): Att() {
+AttFermataVis::AttFermataVis(): Att()
+{
     ResetFermataVis();
 }
 
-AttFermataVis::~AttFermataVis() {
-
+AttFermataVis::~AttFermataVis()
+{
 }
 
-void AttFermataVis::ResetFermataVis() {
+void AttFermataVis::ResetFermataVis()
+{
     m_form = fermataVis_FORM_NONE;
     m_shape = fermataVis_SHAPE_NONE;
 }
 
-bool AttFermataVis::ReadFermataVis(pugi::xml_node element) {
+bool AttFermataVis::ReadFermataVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToFermataVisForm(element.attribute("form").value()));
@@ -690,7 +749,8 @@ bool AttFermataVis::ReadFermataVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttFermataVis::WriteFermataVis(pugi::xml_node element) {
+bool AttFermataVis::WriteFermataVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = FermataVisFormToStr(this->GetForm()).c_str();
@@ -720,20 +780,23 @@ bool AttFermataVis::HasShape()
 // AttGraced
 //----------------------------------------------------------------------------
 
-AttGraced::AttGraced(): Att() {
+AttGraced::AttGraced(): Att()
+{
     ResetGraced();
 }
 
-AttGraced::~AttGraced() {
-
+AttGraced::~AttGraced()
+{
 }
 
-void AttGraced::ResetGraced() {
+void AttGraced::ResetGraced()
+{
     m_grace = GRACE_NONE;
     m_graceTime = 0;
 }
 
-bool AttGraced::ReadGraced(pugi::xml_node element) {
+bool AttGraced::ReadGraced(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("grace")) {
         this->SetGrace(StrToGrace(element.attribute("grace").value()));
@@ -748,7 +811,8 @@ bool AttGraced::ReadGraced(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttGraced::WriteGraced(pugi::xml_node element) {
+bool AttGraced::WriteGraced(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasGrace()) {
         element.append_attribute("grace") = GraceToStr(this->GetGrace()).c_str();
@@ -778,20 +842,23 @@ bool AttGraced::HasGraceTime()
 // AttHairpinLog
 //----------------------------------------------------------------------------
 
-AttHairpinLog::AttHairpinLog(): Att() {
+AttHairpinLog::AttHairpinLog(): Att()
+{
     ResetHairpinLog();
 }
 
-AttHairpinLog::~AttHairpinLog() {
-
+AttHairpinLog::~AttHairpinLog()
+{
 }
 
-void AttHairpinLog::ResetHairpinLog() {
+void AttHairpinLog::ResetHairpinLog()
+{
     m_form = hairpinLog_FORM_NONE;
     m_niente = BOOLEAN_NONE;
 }
 
-bool AttHairpinLog::ReadHairpinLog(pugi::xml_node element) {
+bool AttHairpinLog::ReadHairpinLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToHairpinLogForm(element.attribute("form").value()));
@@ -806,7 +873,8 @@ bool AttHairpinLog::ReadHairpinLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttHairpinLog::WriteHairpinLog(pugi::xml_node element) {
+bool AttHairpinLog::WriteHairpinLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = HairpinLogFormToStr(this->GetForm()).c_str();
@@ -836,19 +904,22 @@ bool AttHairpinLog::HasNiente()
 // AttHairpinVis
 //----------------------------------------------------------------------------
 
-AttHairpinVis::AttHairpinVis(): Att() {
+AttHairpinVis::AttHairpinVis(): Att()
+{
     ResetHairpinVis();
 }
 
-AttHairpinVis::~AttHairpinVis() {
-
+AttHairpinVis::~AttHairpinVis()
+{
 }
 
-void AttHairpinVis::ResetHairpinVis() {
+void AttHairpinVis::ResetHairpinVis()
+{
     m_opening = "";
 }
 
-bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element) {
+bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("opening")) {
         this->SetOpening(StrToStr(element.attribute("opening").value()));
@@ -858,7 +929,8 @@ bool AttHairpinVis::ReadHairpinVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element) {
+bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOpening()) {
         element.append_attribute("opening") = StrToStr(this->GetOpening()).c_str();
@@ -879,15 +951,17 @@ bool AttHairpinVis::HasOpening()
 // AttHarpPedalLog
 //----------------------------------------------------------------------------
 
-AttHarpPedalLog::AttHarpPedalLog(): Att() {
+AttHarpPedalLog::AttHarpPedalLog(): Att()
+{
     ResetHarpPedalLog();
 }
 
-AttHarpPedalLog::~AttHarpPedalLog() {
-
+AttHarpPedalLog::~AttHarpPedalLog()
+{
 }
 
-void AttHarpPedalLog::ResetHarpPedalLog() {
+void AttHarpPedalLog::ResetHarpPedalLog()
+{
     m_c = harpPedalLog_C_NONE;
     m_d = harpPedalLog_D_NONE;
     m_e = harpPedalLog_E_NONE;
@@ -897,7 +971,8 @@ void AttHarpPedalLog::ResetHarpPedalLog() {
     m_b = harpPedalLog_B_NONE;
 }
 
-bool AttHarpPedalLog::ReadHarpPedalLog(pugi::xml_node element) {
+bool AttHarpPedalLog::ReadHarpPedalLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("c")) {
         this->SetC(StrToHarpPedalLogC(element.attribute("c").value()));
@@ -937,7 +1012,8 @@ bool AttHarpPedalLog::ReadHarpPedalLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttHarpPedalLog::WriteHarpPedalLog(pugi::xml_node element) {
+bool AttHarpPedalLog::WriteHarpPedalLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasC()) {
         element.append_attribute("c") = HarpPedalLogCToStr(this->GetC()).c_str();
@@ -1012,19 +1088,22 @@ bool AttHarpPedalLog::HasB()
 // AttLvpresent
 //----------------------------------------------------------------------------
 
-AttLvpresent::AttLvpresent(): Att() {
+AttLvpresent::AttLvpresent(): Att()
+{
     ResetLvpresent();
 }
 
-AttLvpresent::~AttLvpresent() {
-
+AttLvpresent::~AttLvpresent()
+{
 }
 
-void AttLvpresent::ResetLvpresent() {
+void AttLvpresent::ResetLvpresent()
+{
     m_lv = BOOLEAN_NONE;
 }
 
-bool AttLvpresent::ReadLvpresent(pugi::xml_node element) {
+bool AttLvpresent::ReadLvpresent(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("lv")) {
         this->SetLv(StrToBoolean(element.attribute("lv").value()));
@@ -1034,7 +1113,8 @@ bool AttLvpresent::ReadLvpresent(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLvpresent::WriteLvpresent(pugi::xml_node element) {
+bool AttLvpresent::WriteLvpresent(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLv()) {
         element.append_attribute("lv") = BooleanToStr(this->GetLv()).c_str();
@@ -1055,19 +1135,22 @@ bool AttLvpresent::HasLv()
 // AttMultiRestVis
 //----------------------------------------------------------------------------
 
-AttMultiRestVis::AttMultiRestVis(): Att() {
+AttMultiRestVis::AttMultiRestVis(): Att()
+{
     ResetMultiRestVis();
 }
 
-AttMultiRestVis::~AttMultiRestVis() {
-
+AttMultiRestVis::~AttMultiRestVis()
+{
 }
 
-void AttMultiRestVis::ResetMultiRestVis() {
+void AttMultiRestVis::ResetMultiRestVis()
+{
     m_block = BOOLEAN_NONE;
 }
 
-bool AttMultiRestVis::ReadMultiRestVis(pugi::xml_node element) {
+bool AttMultiRestVis::ReadMultiRestVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("block")) {
         this->SetBlock(StrToBoolean(element.attribute("block").value()));
@@ -1077,7 +1160,8 @@ bool AttMultiRestVis::ReadMultiRestVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMultiRestVis::WriteMultiRestVis(pugi::xml_node element) {
+bool AttMultiRestVis::WriteMultiRestVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBlock()) {
         element.append_attribute("block") = BooleanToStr(this->GetBlock()).c_str();
@@ -1098,19 +1182,22 @@ bool AttMultiRestVis::HasBlock()
 // AttNoteGesCmn
 //----------------------------------------------------------------------------
 
-AttNoteGesCmn::AttNoteGesCmn(): Att() {
+AttNoteGesCmn::AttNoteGesCmn(): Att()
+{
     ResetNoteGesCmn();
 }
 
-AttNoteGesCmn::~AttNoteGesCmn() {
-
+AttNoteGesCmn::~AttNoteGesCmn()
+{
 }
 
-void AttNoteGesCmn::ResetNoteGesCmn() {
+void AttNoteGesCmn::ResetNoteGesCmn()
+{
     m_gliss = GLISSANDO_NONE;
 }
 
-bool AttNoteGesCmn::ReadNoteGesCmn(pugi::xml_node element) {
+bool AttNoteGesCmn::ReadNoteGesCmn(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("gliss")) {
         this->SetGliss(StrToGlissando(element.attribute("gliss").value()));
@@ -1120,7 +1207,8 @@ bool AttNoteGesCmn::ReadNoteGesCmn(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNoteGesCmn::WriteNoteGesCmn(pugi::xml_node element) {
+bool AttNoteGesCmn::WriteNoteGesCmn(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasGliss()) {
         element.append_attribute("gliss") = GlissandoToStr(this->GetGliss()).c_str();
@@ -1141,19 +1229,22 @@ bool AttNoteGesCmn::HasGliss()
 // AttNumbered
 //----------------------------------------------------------------------------
 
-AttNumbered::AttNumbered(): Att() {
+AttNumbered::AttNumbered(): Att()
+{
     ResetNumbered();
 }
 
-AttNumbered::~AttNumbered() {
-
+AttNumbered::~AttNumbered()
+{
 }
 
-void AttNumbered::ResetNumbered() {
+void AttNumbered::ResetNumbered()
+{
     m_num = 0;
 }
 
-bool AttNumbered::ReadNumbered(pugi::xml_node element) {
+bool AttNumbered::ReadNumbered(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
@@ -1163,7 +1254,8 @@ bool AttNumbered::ReadNumbered(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNumbered::WriteNumbered(pugi::xml_node element) {
+bool AttNumbered::WriteNumbered(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNum()) {
         element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
@@ -1184,20 +1276,23 @@ bool AttNumbered::HasNum()
 // AttNumberplacement
 //----------------------------------------------------------------------------
 
-AttNumberplacement::AttNumberplacement(): Att() {
+AttNumberplacement::AttNumberplacement(): Att()
+{
     ResetNumberplacement();
 }
 
-AttNumberplacement::~AttNumberplacement() {
-
+AttNumberplacement::~AttNumberplacement()
+{
 }
 
-void AttNumberplacement::ResetNumberplacement() {
+void AttNumberplacement::ResetNumberplacement()
+{
     m_numPlace = PLACE_NONE;
     m_numVisible = BOOLEAN_NONE;
 }
 
-bool AttNumberplacement::ReadNumberplacement(pugi::xml_node element) {
+bool AttNumberplacement::ReadNumberplacement(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("num.place")) {
         this->SetNumPlace(StrToPlace(element.attribute("num.place").value()));
@@ -1212,7 +1307,8 @@ bool AttNumberplacement::ReadNumberplacement(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNumberplacement::WriteNumberplacement(pugi::xml_node element) {
+bool AttNumberplacement::WriteNumberplacement(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNumPlace()) {
         element.append_attribute("num.place") = PlaceToStr(this->GetNumPlace()).c_str();
@@ -1242,19 +1338,22 @@ bool AttNumberplacement::HasNumVisible()
 // AttOctaveLog
 //----------------------------------------------------------------------------
 
-AttOctaveLog::AttOctaveLog(): Att() {
+AttOctaveLog::AttOctaveLog(): Att()
+{
     ResetOctaveLog();
 }
 
-AttOctaveLog::~AttOctaveLog() {
-
+AttOctaveLog::~AttOctaveLog()
+{
 }
 
-void AttOctaveLog::ResetOctaveLog() {
+void AttOctaveLog::ResetOctaveLog()
+{
     m_coll = octaveLog_COLL_NONE;
 }
 
-bool AttOctaveLog::ReadOctaveLog(pugi::xml_node element) {
+bool AttOctaveLog::ReadOctaveLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("coll")) {
         this->SetColl(StrToOctaveLogColl(element.attribute("coll").value()));
@@ -1264,7 +1363,8 @@ bool AttOctaveLog::ReadOctaveLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOctaveLog::WriteOctaveLog(pugi::xml_node element) {
+bool AttOctaveLog::WriteOctaveLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasColl()) {
         element.append_attribute("coll") = OctaveLogCollToStr(this->GetColl()).c_str();
@@ -1285,19 +1385,22 @@ bool AttOctaveLog::HasColl()
 // AttPedalLog
 //----------------------------------------------------------------------------
 
-AttPedalLog::AttPedalLog(): Att() {
+AttPedalLog::AttPedalLog(): Att()
+{
     ResetPedalLog();
 }
 
-AttPedalLog::~AttPedalLog() {
-
+AttPedalLog::~AttPedalLog()
+{
 }
 
-void AttPedalLog::ResetPedalLog() {
+void AttPedalLog::ResetPedalLog()
+{
     m_dir = pedalLog_DIR_NONE;
 }
 
-bool AttPedalLog::ReadPedalLog(pugi::xml_node element) {
+bool AttPedalLog::ReadPedalLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dir")) {
         this->SetDir(StrToPedalLogDir(element.attribute("dir").value()));
@@ -1307,7 +1410,8 @@ bool AttPedalLog::ReadPedalLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPedalLog::WritePedalLog(pugi::xml_node element) {
+bool AttPedalLog::WritePedalLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDir()) {
         element.append_attribute("dir") = PedalLogDirToStr(this->GetDir()).c_str();
@@ -1328,19 +1432,22 @@ bool AttPedalLog::HasDir()
 // AttPedalVis
 //----------------------------------------------------------------------------
 
-AttPedalVis::AttPedalVis(): Att() {
+AttPedalVis::AttPedalVis(): Att()
+{
     ResetPedalVis();
 }
 
-AttPedalVis::~AttPedalVis() {
-
+AttPedalVis::~AttPedalVis()
+{
 }
 
-void AttPedalVis::ResetPedalVis() {
+void AttPedalVis::ResetPedalVis()
+{
     m_form = pedalVis_FORM_NONE;
 }
 
-bool AttPedalVis::ReadPedalVis(pugi::xml_node element) {
+bool AttPedalVis::ReadPedalVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToPedalVisForm(element.attribute("form").value()));
@@ -1350,7 +1457,8 @@ bool AttPedalVis::ReadPedalVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPedalVis::WritePedalVis(pugi::xml_node element) {
+bool AttPedalVis::WritePedalVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = PedalVisFormToStr(this->GetForm()).c_str();
@@ -1371,19 +1479,22 @@ bool AttPedalVis::HasForm()
 // AttPianopedals
 //----------------------------------------------------------------------------
 
-AttPianopedals::AttPianopedals(): Att() {
+AttPianopedals::AttPianopedals(): Att()
+{
     ResetPianopedals();
 }
 
-AttPianopedals::~AttPianopedals() {
-
+AttPianopedals::~AttPianopedals()
+{
 }
 
-void AttPianopedals::ResetPianopedals() {
+void AttPianopedals::ResetPianopedals()
+{
     m_pedalStyle = pianopedals_PEDALSTYLE_NONE;
 }
 
-bool AttPianopedals::ReadPianopedals(pugi::xml_node element) {
+bool AttPianopedals::ReadPianopedals(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("pedal.style")) {
         this->SetPedalStyle(StrToPianopedalsPedalstyle(element.attribute("pedal.style").value()));
@@ -1393,7 +1504,8 @@ bool AttPianopedals::ReadPianopedals(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPianopedals::WritePianopedals(pugi::xml_node element) {
+bool AttPianopedals::WritePianopedals(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPedalStyle()) {
         element.append_attribute("pedal.style") = PianopedalsPedalstyleToStr(this->GetPedalStyle()).c_str();
@@ -1414,19 +1526,22 @@ bool AttPianopedals::HasPedalStyle()
 // AttRehearsal
 //----------------------------------------------------------------------------
 
-AttRehearsal::AttRehearsal(): Att() {
+AttRehearsal::AttRehearsal(): Att()
+{
     ResetRehearsal();
 }
 
-AttRehearsal::~AttRehearsal() {
-
+AttRehearsal::~AttRehearsal()
+{
 }
 
-void AttRehearsal::ResetRehearsal() {
+void AttRehearsal::ResetRehearsal()
+{
     m_rehEnclose = rehearsal_REHENCLOSE_NONE;
 }
 
-bool AttRehearsal::ReadRehearsal(pugi::xml_node element) {
+bool AttRehearsal::ReadRehearsal(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("reh.enclose")) {
         this->SetRehEnclose(StrToRehearsalRehenclose(element.attribute("reh.enclose").value()));
@@ -1436,7 +1551,8 @@ bool AttRehearsal::ReadRehearsal(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttRehearsal::WriteRehearsal(pugi::xml_node element) {
+bool AttRehearsal::WriteRehearsal(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasRehEnclose()) {
         element.append_attribute("reh.enclose") = RehearsalRehencloseToStr(this->GetRehEnclose()).c_str();
@@ -1457,19 +1573,22 @@ bool AttRehearsal::HasRehEnclose()
 // AttScoreDefVisCmn
 //----------------------------------------------------------------------------
 
-AttScoreDefVisCmn::AttScoreDefVisCmn(): Att() {
+AttScoreDefVisCmn::AttScoreDefVisCmn(): Att()
+{
     ResetScoreDefVisCmn();
 }
 
-AttScoreDefVisCmn::~AttScoreDefVisCmn() {
-
+AttScoreDefVisCmn::~AttScoreDefVisCmn()
+{
 }
 
-void AttScoreDefVisCmn::ResetScoreDefVisCmn() {
+void AttScoreDefVisCmn::ResetScoreDefVisCmn()
+{
     m_gridShow = BOOLEAN_NONE;
 }
 
-bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element) {
+bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("grid.show")) {
         this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
@@ -1479,7 +1598,8 @@ bool AttScoreDefVisCmn::ReadScoreDefVisCmn(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttScoreDefVisCmn::WriteScoreDefVisCmn(pugi::xml_node element) {
+bool AttScoreDefVisCmn::WriteScoreDefVisCmn(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasGridShow()) {
         element.append_attribute("grid.show") = BooleanToStr(this->GetGridShow()).c_str();
@@ -1500,19 +1620,22 @@ bool AttScoreDefVisCmn::HasGridShow()
 // AttSlurrend
 //----------------------------------------------------------------------------
 
-AttSlurrend::AttSlurrend(): Att() {
+AttSlurrend::AttSlurrend(): Att()
+{
     ResetSlurrend();
 }
 
-AttSlurrend::~AttSlurrend() {
-
+AttSlurrend::~AttSlurrend()
+{
 }
 
-void AttSlurrend::ResetSlurrend() {
+void AttSlurrend::ResetSlurrend()
+{
     m_slurRend = CURVERENDITION_NONE;
 }
 
-bool AttSlurrend::ReadSlurrend(pugi::xml_node element) {
+bool AttSlurrend::ReadSlurrend(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("slur.rend")) {
         this->SetSlurRend(StrToCurverendition(element.attribute("slur.rend").value()));
@@ -1522,7 +1645,8 @@ bool AttSlurrend::ReadSlurrend(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSlurrend::WriteSlurrend(pugi::xml_node element) {
+bool AttSlurrend::WriteSlurrend(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSlurRend()) {
         element.append_attribute("slur.rend") = CurverenditionToStr(this->GetSlurRend()).c_str();
@@ -1543,19 +1667,22 @@ bool AttSlurrend::HasSlurRend()
 // AttStemsCmn
 //----------------------------------------------------------------------------
 
-AttStemsCmn::AttStemsCmn(): Att() {
+AttStemsCmn::AttStemsCmn(): Att()
+{
     ResetStemsCmn();
 }
 
-AttStemsCmn::~AttStemsCmn() {
-
+AttStemsCmn::~AttStemsCmn()
+{
 }
 
-void AttStemsCmn::ResetStemsCmn() {
+void AttStemsCmn::ResetStemsCmn()
+{
     m_stemWith = OTHERSTAFF_NONE;
 }
 
-bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element) {
+bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("stem.with")) {
         this->SetStemWith(StrToOtherstaff(element.attribute("stem.with").value()));
@@ -1565,7 +1692,8 @@ bool AttStemsCmn::ReadStemsCmn(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element) {
+bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStemWith()) {
         element.append_attribute("stem.with") = OtherstaffToStr(this->GetStemWith()).c_str();
@@ -1586,19 +1714,22 @@ bool AttStemsCmn::HasStemWith()
 // AttTierend
 //----------------------------------------------------------------------------
 
-AttTierend::AttTierend(): Att() {
+AttTierend::AttTierend(): Att()
+{
     ResetTierend();
 }
 
-AttTierend::~AttTierend() {
-
+AttTierend::~AttTierend()
+{
 }
 
-void AttTierend::ResetTierend() {
+void AttTierend::ResetTierend()
+{
     m_tieRend = CURVERENDITION_NONE;
 }
 
-bool AttTierend::ReadTierend(pugi::xml_node element) {
+bool AttTierend::ReadTierend(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tie.rend")) {
         this->SetTieRend(StrToCurverendition(element.attribute("tie.rend").value()));
@@ -1608,7 +1739,8 @@ bool AttTierend::ReadTierend(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTierend::WriteTierend(pugi::xml_node element) {
+bool AttTierend::WriteTierend(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTieRend()) {
         element.append_attribute("tie.rend") = CurverenditionToStr(this->GetTieRend()).c_str();
@@ -1629,19 +1761,22 @@ bool AttTierend::HasTieRend()
 // AttTremmeasured
 //----------------------------------------------------------------------------
 
-AttTremmeasured::AttTremmeasured(): Att() {
+AttTremmeasured::AttTremmeasured(): Att()
+{
     ResetTremmeasured();
 }
 
-AttTremmeasured::~AttTremmeasured() {
-
+AttTremmeasured::~AttTremmeasured()
+{
 }
 
-void AttTremmeasured::ResetTremmeasured() {
+void AttTremmeasured::ResetTremmeasured()
+{
     m_measperf = DURATION_NONE;
 }
 
-bool AttTremmeasured::ReadTremmeasured(pugi::xml_node element) {
+bool AttTremmeasured::ReadTremmeasured(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("measperf")) {
         this->SetMeasperf(StrToDuration(element.attribute("measperf").value()));
@@ -1651,7 +1786,8 @@ bool AttTremmeasured::ReadTremmeasured(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTremmeasured::WriteTremmeasured(pugi::xml_node element) {
+bool AttTremmeasured::WriteTremmeasured(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMeasperf()) {
         element.append_attribute("measperf") = DurationToStr(this->GetMeasperf()).c_str();
@@ -1672,22 +1808,25 @@ bool AttTremmeasured::HasMeasperf()
 // AttTupletVis
 //----------------------------------------------------------------------------
 
-AttTupletVis::AttTupletVis(): Att() {
+AttTupletVis::AttTupletVis(): Att()
+{
     ResetTupletVis();
 }
 
-AttTupletVis::~AttTupletVis() {
-
+AttTupletVis::~AttTupletVis()
+{
 }
 
-void AttTupletVis::ResetTupletVis() {
+void AttTupletVis::ResetTupletVis()
+{
     m_bracketPlace = PLACE_NONE;
     m_bracketVisible = BOOLEAN_NONE;
     m_durVisible = BOOLEAN_NONE;
     m_numFormat = tupletVis_NUMFORMAT_NONE;
 }
 
-bool AttTupletVis::ReadTupletVis(pugi::xml_node element) {
+bool AttTupletVis::ReadTupletVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("bracket.place")) {
         this->SetBracketPlace(StrToPlace(element.attribute("bracket.place").value()));
@@ -1712,7 +1851,8 @@ bool AttTupletVis::ReadTupletVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTupletVis::WriteTupletVis(pugi::xml_node element) {
+bool AttTupletVis::WriteTupletVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBracketPlace()) {
         element.append_attribute("bracket.place") = PlaceToStr(this->GetBracketPlace()).c_str();
@@ -1756,7 +1896,8 @@ bool AttTupletVis::HasNumFormat()
 
 /* include <attnum.format> */
 
-bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_ARPEGLOG)) {
         AttArpegLog *att = dynamic_cast<AttArpegLog*>(element);
         assert(att);
@@ -2101,7 +2242,8 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue) {
     return false;
 }
 
-void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_ARPEGLOG)) {
         AttArpegLog *att = dynamic_cast<AttArpegLog*>(element);
         assert(att);

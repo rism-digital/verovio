@@ -122,7 +122,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
         center->x = x;
         center->y = y;
         direction =  firstNote->GetDrawingStemDir(); // stem direction is same for all notes
-    } else {
+    }
+    else {
         
         // There are unbeamed notes of two different beams
         // treat all the notes as unbeames
@@ -166,7 +167,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
                     y = lastNote->GetDrawingStemEnd().y + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
                     start->y = firstNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
                     end->y = lastNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
-                } else {
+                }
+                else {
                     y = lastNote->GetDrawingStemEnd().y + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
                     start->y = firstNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
                     end->y = lastNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
@@ -192,7 +194,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
                             end->y -= offset;
                             start->y -= offset;
                         }
-                    } else {
+                    }
+                    else {
                         if (currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET < y) {
                             int offset = y - (currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET);
                             y -= offset;
@@ -205,7 +208,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
             }
             
             
-        } else {
+        }
+        else {
             // two directional beams
             // this case is similar to the above, but the bracket is only orizontal
             // y is 0 because the final y pos is above the tallest stem
@@ -222,11 +226,13 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
                         if (direction == STEMDIRECTION_up) {
                             if (y == 0 || currentNote->GetDrawingStemEnd().y + TUPLET_OFFSET >= y)
                                 y = currentNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
-                        } else {
+                        }
+                        else {
                             if (y == 0 || currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET <= y)
                                 y = currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
                         }
-                    } else {
+                    }
+                    else {
                         // do none for now
                         // but if a notehead with a reversed stem is taller that the last
                         // calculated y, we need to offset
@@ -329,7 +335,8 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
         if (direction == STEMDIRECTION_up) {
             dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y - verticalLine));
             dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y - verticalLine));
-        } else {
+        }
+        else {
             dc->DrawLine(start.x, ToDeviceContextY(start.y), start.x, ToDeviceContextY(start.y + verticalLine));
             dc->DrawLine(end.x, ToDeviceContextY(end.y), end.x, ToDeviceContextY(end.y + verticalLine));
         }

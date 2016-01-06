@@ -115,7 +115,8 @@ bool PaeInput::ImportString(std::string pae)
 // parsePlainAndEasy --
 //
 
-void PaeInput::parsePlainAndEasy(std::istream &infile) {
+void PaeInput::parsePlainAndEasy(std::istream &infile)
+{
     // buffers
     char c_clef[1024] = {0};
     char c_key[1024] = {0};
@@ -299,7 +300,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
                     delete current_measure.clef;
                 
                 current_measure.clef = c;
-            } else {
+            }
+            else {
                 // as above
                 if (current_note.clef)
                     delete current_note.clef;
@@ -318,7 +320,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
                 }
                 // When will this be deleted? Potential memory leak? LP
                 current_measure.meter = meter;
-            } else {
+            }
+            else {
                 if (current_note.meter) {
                     delete current_note.meter;
                 }
@@ -335,7 +338,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
                     delete current_measure.key;
                 
                 current_measure.key = k;
-            } else {
+            }
+            else {
                 if (current_note.key)
                     delete current_note.key;
                 
@@ -403,8 +407,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
 // getOctave --
 //
 #define BASE_OCT 4
-int PaeInput::getOctave (const char* incipit, char *octave, int index) {
-    
+int PaeInput::getOctave (const char* incipit, char *octave, int index)
+{
     int i = index;
     size_t length = strlen(incipit);
     if (incipit[i] == '\'') {
@@ -413,7 +417,8 @@ int PaeInput::getOctave (const char* incipit, char *octave, int index) {
             (*octave)++;
             i++;
         }
-    } else if (incipit[i] == ',') {
+    }
+    else if (incipit[i] == ',') {
         //negative octave
         *octave = BASE_OCT - 1;
         while ((i+1 < length) && (incipit[i+1] == ',')) {
@@ -432,7 +437,8 @@ int PaeInput::getOctave (const char* incipit, char *octave, int index) {
 // getDuration --
 //
 
-int PaeInput::getDuration(const char* incipit, data_DURATION *duration, int *dot, int index) {
+int PaeInput::getDuration(const char* incipit, data_DURATION *duration, int *dot, int index)
+{
     
     int i = index;
     size_t length = strlen(incipit);
@@ -479,8 +485,8 @@ int PaeInput::getDuration(const char* incipit, data_DURATION *duration, int *dot
 // getDurations --
 //
 
-int PaeInput::getDurations(const char* incipit, pae::Measure* measure, int index) {
-    
+int PaeInput::getDurations(const char* incipit, pae::Measure* measure, int index)
+{
     int i = index;
     size_t length = strlen(incipit);
     
@@ -499,7 +505,8 @@ int PaeInput::getDurations(const char* incipit, pae::Measure* measure, int index
         //j++;
         if ((i+1 < length) && isdigit(incipit[i+1])) {
             i++;
-        } else {
+        }
+        else {
             break;
         }
     } while (1);
@@ -514,8 +521,8 @@ int PaeInput::getDurations(const char* incipit, pae::Measure* measure, int index
 // getAccidental --
 //
 
-int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index) {
-    
+int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index)
+{
     int i = index;
     size_t length = strlen(incipit);
     
@@ -546,8 +553,8 @@ int PaeInput::getAccidental(const char* incipit, data_ACCIDENTAL_EXPLICIT *accid
 // getTupletOrFermata --
 //
 
-int PaeInput::getTupletFermata(const char* incipit, pae::Note* note, int index) {
-    
+int PaeInput::getTupletFermata(const char* incipit, pae::Note* note, int index)
+{
     int i = index;
     size_t length = strlen(incipit);
     
@@ -636,8 +643,8 @@ int PaeInput::getTupletFermata(const char* incipit, pae::Note* note, int index) 
 // getTupletFermataEnd --
 //
 // this can be deleted in the future?
-int PaeInput::getTupletFermataEnd(const char* incipit, pae::Note *note, int index) {
-    
+int PaeInput::getTupletFermataEnd(const char* incipit, pae::Note *note, int index)
+{
     int i = index;
     //int length = strlen(incipit);
         
@@ -654,8 +661,8 @@ int PaeInput::getTupletFermataEnd(const char* incipit, pae::Note *note, int inde
 // getGraceNote --
 //
 
-int PaeInput::getGraceNote(const char* incipit, pae::Note *note, int index) {
-    
+int PaeInput::getGraceNote(const char* incipit, pae::Note *note, int index)
+{
     int i = index;
     size_t length = strlen(incipit);
     
@@ -687,8 +694,8 @@ int PaeInput::getGraceNote(const char* incipit, pae::Note *note, int index) {
 // getPitch --
 //
 
-data_PITCHNAME PaeInput::getPitch(char c_note) {
-    
+data_PITCHNAME PaeInput::getPitch(char c_note)
+{
     data_PITCHNAME pitch = PITCHNAME_c;
     
     switch (c_note) {
@@ -726,8 +733,8 @@ data_PITCHNAME PaeInput::getPitch(char c_note) {
 // getTimeInfo -- read the key signature.
 //
 
-int PaeInput::getTimeInfo(const char* incipit, MeterSig *meter, int index) {
-    
+int PaeInput::getTimeInfo(const char* incipit, MeterSig *meter, int index)
+{
     int i = index;
     size_t length = strlen(incipit);
     
@@ -806,8 +813,8 @@ int PaeInput::getTimeInfo(const char* incipit, MeterSig *meter, int index) {
 // getClefInfo -- read the key signature.
 //
 
-int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index) {
-    
+int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
+{
     // a clef is maximum 3 character length
     // go through the 3 character and retrieve the letter (clef) and the line
     // mensural clef (with + in between) currently ignored
@@ -819,7 +826,8 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index) {
     while ((index < length) && (i < 3)) {
         if (i == 0) {
             clef = incipit[index];
-        } else if (i == 2) {
+        }
+        else if (i == 2) {
             line = incipit[index];
         }
         i++;
@@ -862,8 +870,8 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index) {
 // getWholeRest -- read the getWholeRest.
 //
 
-int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index) {
-    
+int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
+{
     size_t length = strlen(incipit);
     int i = index;
     
@@ -893,7 +901,8 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index) {
  BARRENDITION_dbl        //
  */
 
-int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index) {
+int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
+{
     regex_t re;
     
     regcomp(&re, "^://:", REG_EXTENDED);
@@ -943,8 +952,8 @@ int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int ind
 // getAbbreviation -- read abbreviation
 //
 
-int PaeInput::getAbbreviation(const char* incipit, pae::Measure *measure, int index) {
-    
+int PaeInput::getAbbreviation(const char* incipit, pae::Measure *measure, int index)
+{
     size_t length = strlen(incipit);
     int i = index;
     int j;
@@ -973,7 +982,8 @@ int PaeInput::getAbbreviation(const char* incipit, pae::Measure *measure, int in
 // getKeyInfo -- read the key signature.
 //
 
-int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index) {
+int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
+{
     int alt_nr = 0;
 
     // at the key information line, extract data
@@ -1017,8 +1027,8 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index) {
 // getNote --
 //
 
-int PaeInput::getNote(const char* incipit, pae::Note *note, pae::Measure *measure, int index) {
-    
+int PaeInput::getNote(const char* incipit, pae::Note *note, pae::Measure *measure, int index)
+{
     regex_t re;
     int oct;
     int i = index;
@@ -1120,8 +1130,8 @@ int PaeInput::getNote(const char* incipit, pae::Note *note, pae::Measure *measur
 // convertMeasure --
 //
 
-void PaeInput::convertMeasure(pae::Measure *measure) {
-    
+void PaeInput::convertMeasure(pae::Measure *measure)
+{
     if (measure->clef != NULL) {
         m_layer->AddLayerElement(measure->clef);
     }
@@ -1154,7 +1164,8 @@ void PaeInput::convertMeasure(pae::Measure *measure) {
 
 }
 
-void PaeInput::parseNote(pae::Note *note) {
+void PaeInput::parseNote(pae::Note *note)
+{
     
     LayerElement *element;
     
@@ -1283,12 +1294,14 @@ void PaeInput::parseNote(pae::Note *note) {
     }
 }
 
-void PaeInput::pushContainer(LayerElement *container) {
+void PaeInput::pushContainer(LayerElement *container)
+{
     addLayerElement(container);
     m_nested_objects.push_back(container);
 }
 
-void PaeInput::popContainer() {
+void PaeInput::popContainer()
+{
     //assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
         LogError("PaeInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, beams) are not supported.");
@@ -1299,8 +1312,8 @@ void PaeInput::popContainer() {
     }
 }
 
-void PaeInput::addLayerElement(LayerElement *element) {
-    
+void PaeInput::addLayerElement(LayerElement *element)
+{    
     if (m_nested_objects.size() > 0) {
         LayerElement *bottom = m_nested_objects.back();
         

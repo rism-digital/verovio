@@ -30,20 +30,23 @@ namespace vrv {
 // AttMordentLog
 //----------------------------------------------------------------------------
 
-AttMordentLog::AttMordentLog(): Att() {
+AttMordentLog::AttMordentLog(): Att()
+{
     ResetMordentLog();
 }
 
-AttMordentLog::~AttMordentLog() {
-
+AttMordentLog::~AttMordentLog()
+{
 }
 
-void AttMordentLog::ResetMordentLog() {
+void AttMordentLog::ResetMordentLog()
+{
     m_form = mordentLog_FORM_NONE;
     m_long = BOOLEAN_NONE;
 }
 
-bool AttMordentLog::ReadMordentLog(pugi::xml_node element) {
+bool AttMordentLog::ReadMordentLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToMordentLogForm(element.attribute("form").value()));
@@ -58,7 +61,8 @@ bool AttMordentLog::ReadMordentLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMordentLog::WriteMordentLog(pugi::xml_node element) {
+bool AttMordentLog::WriteMordentLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = MordentLogFormToStr(this->GetForm()).c_str();
@@ -88,19 +92,22 @@ bool AttMordentLog::HasLong()
 // AttOrnam
 //----------------------------------------------------------------------------
 
-AttOrnam::AttOrnam(): Att() {
+AttOrnam::AttOrnam(): Att()
+{
     ResetOrnam();
 }
 
-AttOrnam::~AttOrnam() {
-
+AttOrnam::~AttOrnam()
+{
 }
 
-void AttOrnam::ResetOrnam() {
+void AttOrnam::ResetOrnam()
+{
     m_ornam = ORNAM_cmn_NONE;
 }
 
-bool AttOrnam::ReadOrnam(pugi::xml_node element) {
+bool AttOrnam::ReadOrnam(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ornam")) {
         this->SetOrnam(StrToOrnamCmn(element.attribute("ornam").value()));
@@ -110,7 +117,8 @@ bool AttOrnam::ReadOrnam(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOrnam::WriteOrnam(pugi::xml_node element) {
+bool AttOrnam::WriteOrnam(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOrnam()) {
         element.append_attribute("ornam") = OrnamCmnToStr(this->GetOrnam()).c_str();
@@ -131,20 +139,23 @@ bool AttOrnam::HasOrnam()
 // AttOrnamentaccid
 //----------------------------------------------------------------------------
 
-AttOrnamentaccid::AttOrnamentaccid(): Att() {
+AttOrnamentaccid::AttOrnamentaccid(): Att()
+{
     ResetOrnamentaccid();
 }
 
-AttOrnamentaccid::~AttOrnamentaccid() {
-
+AttOrnamentaccid::~AttOrnamentaccid()
+{
 }
 
-void AttOrnamentaccid::ResetOrnamentaccid() {
+void AttOrnamentaccid::ResetOrnamentaccid()
+{
     m_accidupper = ACCIDENTAL_EXPLICIT_NONE;
     m_accidlower = ACCIDENTAL_EXPLICIT_NONE;
 }
 
-bool AttOrnamentaccid::ReadOrnamentaccid(pugi::xml_node element) {
+bool AttOrnamentaccid::ReadOrnamentaccid(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("accidupper")) {
         this->SetAccidupper(StrToAccidentalExplicit(element.attribute("accidupper").value()));
@@ -159,7 +170,8 @@ bool AttOrnamentaccid::ReadOrnamentaccid(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOrnamentaccid::WriteOrnamentaccid(pugi::xml_node element) {
+bool AttOrnamentaccid::WriteOrnamentaccid(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAccidupper()) {
         element.append_attribute("accidupper") = AccidentalExplicitToStr(this->GetAccidupper()).c_str();
@@ -189,20 +201,23 @@ bool AttOrnamentaccid::HasAccidlower()
 // AttTurnLog
 //----------------------------------------------------------------------------
 
-AttTurnLog::AttTurnLog(): Att() {
+AttTurnLog::AttTurnLog(): Att()
+{
     ResetTurnLog();
 }
 
-AttTurnLog::~AttTurnLog() {
-
+AttTurnLog::~AttTurnLog()
+{
 }
 
-void AttTurnLog::ResetTurnLog() {
+void AttTurnLog::ResetTurnLog()
+{
     m_delayed = BOOLEAN_NONE;
     m_form = turnLog_FORM_NONE;
 }
 
-bool AttTurnLog::ReadTurnLog(pugi::xml_node element) {
+bool AttTurnLog::ReadTurnLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("delayed")) {
         this->SetDelayed(StrToBoolean(element.attribute("delayed").value()));
@@ -217,7 +232,8 @@ bool AttTurnLog::ReadTurnLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTurnLog::WriteTurnLog(pugi::xml_node element) {
+bool AttTurnLog::WriteTurnLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDelayed()) {
         element.append_attribute("delayed") = BooleanToStr(this->GetDelayed()).c_str();
@@ -243,7 +259,8 @@ bool AttTurnLog::HasForm()
 
 /* include <attform> */
 
-bool Att::SetCmnornaments(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetCmnornaments(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_MORDENTLOG)) {
         AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
         assert(att);
@@ -292,7 +309,8 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
     return false;
 }
 
-void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_MORDENTLOG)) {
         AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
         assert(att);

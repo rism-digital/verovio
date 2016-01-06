@@ -186,8 +186,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // Draw the stems and the beam full bars
     
-    for (i=0; i<elementCount; i++)
-    {
+    for (i=0; i<elementCount; i++) {
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
         if(((el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD)) {
             StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
@@ -445,8 +444,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Draw the stems and the bars
     
     if (dur > DUR_1) {
-        for (i=0; i<elementCount; i++)
-        {
+        for (i=0; i<elementCount; i++) {
             LayerElement *el = beamElementCoords.at(i)->m_element;
             if(((el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD)) {
                 StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
@@ -643,8 +641,7 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
         verticalShift = -verticalShift;
     }
     
-    for (i = 0; i < elementCount; i++)
-    {
+    for (i = 0; i < elementCount; i++) {
         //change the stem dir for all objects
         if ((*beamElementCoords).at(i)->m_element->Is() == NOTE) {
             ((Note*)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(params->m_stemDir);

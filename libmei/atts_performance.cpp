@@ -30,19 +30,22 @@ namespace vrv {
 // AttAlignment
 //----------------------------------------------------------------------------
 
-AttAlignment::AttAlignment(): Att() {
+AttAlignment::AttAlignment(): Att()
+{
     ResetAlignment();
 }
 
-AttAlignment::~AttAlignment() {
-
+AttAlignment::~AttAlignment()
+{
 }
 
-void AttAlignment::ResetAlignment() {
+void AttAlignment::ResetAlignment()
+{
     m_when = "";
 }
 
-bool AttAlignment::ReadAlignment(pugi::xml_node element) {
+bool AttAlignment::ReadAlignment(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("when")) {
         this->SetWhen(StrToStr(element.attribute("when").value()));
@@ -52,7 +55,8 @@ bool AttAlignment::ReadAlignment(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAlignment::WriteAlignment(pugi::xml_node element) {
+bool AttAlignment::WriteAlignment(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasWhen()) {
         element.append_attribute("when") = StrToStr(this->GetWhen()).c_str();
@@ -69,7 +73,8 @@ bool AttAlignment::HasWhen()
 
 /* include <attwhen> */
 
-bool Att::SetPerformance(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetPerformance(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_ALIGNMENT)) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
         assert(att);
@@ -82,7 +87,8 @@ bool Att::SetPerformance(Object *element, std::string attrType, std::string attr
     return false;
 }
 
-void Att::GetPerformance(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetPerformance(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_ALIGNMENT)) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
         assert(att);

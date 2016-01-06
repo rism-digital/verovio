@@ -66,8 +66,7 @@ int Att::StrToInt(std::string value)
 std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case BEATRPT_REND_4 : value = "4"; break;
         case BEATRPT_REND_8 : value = "8"; break;
         case BEATRPT_REND_16 : value = "16"; break;
@@ -165,8 +164,7 @@ data_DURATION Att::StrToDuration(std::string value)
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case KEYSIGNATURE_7f : value = "7f"; break;
         case KEYSIGNATURE_6f : value = "6f"; break;
         case KEYSIGNATURE_5f : value = "5f"; break;
@@ -228,8 +226,7 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value)
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case MODUSMAIOR_2 : value = "2"; break;
         case MODUSMAIOR_3 : value = "3"; break;
         default:
@@ -254,8 +251,7 @@ data_MODUSMAIOR Att::StrToModusmaior(std::string value)
 std::string Att::ModusminorToStr(data_MODUSMINOR data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case MODUSMINOR_2 : value = "2"; break;
         case MODUSMINOR_3 : value = "3"; break;
         default:
@@ -280,8 +276,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value)
 std::string Att::PitchnameToStr(data_PITCHNAME data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case PITCHNAME_c : value = "c"; break;
         case PITCHNAME_d : value = "d"; break;
         case PITCHNAME_e : value = "e"; break;
@@ -316,8 +311,7 @@ data_PITCHNAME Att::StrToPitchname(std::string value)
 std::string Att::OctaveDisToStr(data_OCTAVE_DIS data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case OCTAVE_DIS_8 : value = "8"; break;
         case OCTAVE_DIS_15 : value = "15"; break;
         case OCTAVE_DIS_22 : value = "22"; break;
@@ -344,8 +338,7 @@ data_OCTAVE_DIS Att::StrToOctaveDis(std::string value)
 std::string Att::OrientationToStr(data_ORIENTATION data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case ORIENTATION_reversed : value = "reversed"; break;
         case ORIENTATION_90CW : value = "90CW"; break;
         case ORIENTATION_90CCW : value = "90CCW"; break;
@@ -371,8 +364,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value)
 std::string Att::ProlatioToStr(data_PROLATIO data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case PROLATIO_2 : value = "2"; break;
         case PROLATIO_3 : value = "3"; break;
         default:
@@ -397,8 +389,7 @@ data_PROLATIO Att::StrToProlatio(std::string value)
 std::string Att::StemdirectionToStr(data_STEMDIRECTION data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case STEMDIRECTION_up : value = "up"; break;
         case STEMDIRECTION_down : value = "down"; break;
         default:
@@ -422,8 +413,7 @@ data_STEMDIRECTION Att::StrToStemdirection(std::string value)
 std::string Att::TempusToStr(data_TEMPUS data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case TEMPUS_2 : value = "2"; break;
         case TEMPUS_3 : value = "3"; break;
         default:
@@ -449,8 +439,7 @@ data_TEMPUS Att::StrToTempus(std::string value)
 std::string Att::TieToStr(data_TIE data)
 {
     std::string value;
-    switch(data)
-    {
+    switch(data) {
         case TIE_i : value = "i"; break;
         case TIE_m : value = "m"; break;
         case TIE_t : value = "t"; break;

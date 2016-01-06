@@ -63,11 +63,7 @@ private:
      **/
     data_URIS m_facs;
 
-	/**
-	 * Test
-	 **/
-    void getCoords();
-
+/* include <attfacs> */
 };
 
 } // vrv namespace

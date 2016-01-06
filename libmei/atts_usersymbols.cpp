@@ -30,19 +30,22 @@ namespace vrv {
 // AttAltsym
 //----------------------------------------------------------------------------
 
-AttAltsym::AttAltsym(): Att() {
+AttAltsym::AttAltsym(): Att()
+{
     ResetAltsym();
 }
 
-AttAltsym::~AttAltsym() {
-
+AttAltsym::~AttAltsym()
+{
 }
 
-void AttAltsym::ResetAltsym() {
+void AttAltsym::ResetAltsym()
+{
     m_altsym = "";
 }
 
-bool AttAltsym::ReadAltsym(pugi::xml_node element) {
+bool AttAltsym::ReadAltsym(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("altsym")) {
         this->SetAltsym(StrToStr(element.attribute("altsym").value()));
@@ -52,7 +55,8 @@ bool AttAltsym::ReadAltsym(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAltsym::WriteAltsym(pugi::xml_node element) {
+bool AttAltsym::WriteAltsym(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAltsym()) {
         element.append_attribute("altsym") = StrToStr(this->GetAltsym()).c_str();
@@ -69,7 +73,8 @@ bool AttAltsym::HasAltsym()
 
 /* include <attaltsym> */
 
-bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_ALTSYM)) {
         AttAltsym *att = dynamic_cast<AttAltsym*>(element);
         assert(att);
@@ -82,7 +87,8 @@ bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attr
     return false;
 }
 
-void Att::GetUsersymbols(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetUsersymbols(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_ALTSYM)) {
         AttAltsym *att = dynamic_cast<AttAltsym*>(element);
         assert(att);

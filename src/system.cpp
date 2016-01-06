@@ -317,8 +317,7 @@ int System::SetDrawingXY(ArrayPtrVoid *params)
         this->SetDrawingX(this->m_drawingXRel);
         this->SetDrawingY(this->m_drawingYRel);
     }
-    else
-    {
+    else {
         assert(doc->GetType() == Transcription);
         this->SetDrawingX(this->m_xAbs);
         this->SetDrawingY(this->m_yAbs);

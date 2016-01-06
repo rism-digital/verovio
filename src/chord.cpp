@@ -62,10 +62,8 @@ void Chord::Reset()
 void Chord::ClearClusters()
 {
     std::list<ChordCluster*>::iterator iter;
-    for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter)
-    {
-        for (std::vector<Note*>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter)
-        {
+    for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter) {
+        for (std::vector<Note*>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter) {
             (*clIter)->m_cluster = NULL;
             (*clIter)->m_clusterPosition = 0;
         }
@@ -111,7 +109,8 @@ void Chord::FilterList(ListOfObjects *childList)
         
             if (n) {
                 iter++;
-            } else {
+            }
+            else {
                 // if it is not a note, drop it
                 iter = childList->erase(iter);
             }
@@ -137,8 +136,7 @@ void Chord::FilterList(ListOfObjects *childList)
         curPitch = curNote->GetDiatonicPitch();
         
         if (curPitch - lastPitch == 1) {
-            if(!lastNote->m_cluster)
-            {
+            if(!lastNote->m_cluster) {
                 curCluster = new ChordCluster();
                 m_clusters.push_back(curCluster);
                 curCluster->push_back(lastNote);
@@ -220,8 +218,7 @@ void Chord::ResetAccidSpace(int fullUnit)
     
     //Resize each row in m_accidSpace to be the proper length; set all the bools to false
     std::vector<bool> *accidLine;
-    for(idx = 0; idx < m_accidSpace.size(); idx++)
-    {
+    for(idx = 0; idx < m_accidSpace.size(); idx++) {
         accidLine = &m_accidSpace.at(idx);
         accidLine->resize(accidLineLength);
         for(setIdx = 0; setIdx < accidLineLength; setIdx++) accidLine->at(setIdx) = false;

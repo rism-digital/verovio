@@ -30,19 +30,22 @@ namespace vrv {
 // AttSurface
 //----------------------------------------------------------------------------
 
-AttSurface::AttSurface(): Att() {
+AttSurface::AttSurface(): Att()
+{
     ResetSurface();
 }
 
-AttSurface::~AttSurface() {
-
+AttSurface::~AttSurface()
+{
 }
 
-void AttSurface::ResetSurface() {
+void AttSurface::ResetSurface()
+{
     m_surface = "";
 }
 
-bool AttSurface::ReadSurface(pugi::xml_node element) {
+bool AttSurface::ReadSurface(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("surface")) {
         this->SetSurface(StrToStr(element.attribute("surface").value()));
@@ -52,7 +55,8 @@ bool AttSurface::ReadSurface(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSurface::WriteSurface(pugi::xml_node element) {
+bool AttSurface::WriteSurface(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSurface()) {
         element.append_attribute("surface") = StrToStr(this->GetSurface()).c_str();
@@ -69,7 +73,8 @@ bool AttSurface::HasSurface()
 
 /* include <attsurface> */
 
-bool Att::SetPagebased(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetPagebased(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_SURFACE)) {
         AttSurface *att = dynamic_cast<AttSurface*>(element);
         assert(att);
@@ -82,7 +87,8 @@ bool Att::SetPagebased(Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetPagebased(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetPagebased(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_SURFACE)) {
         AttSurface *att = dynamic_cast<AttSurface*>(element);
         assert(att);

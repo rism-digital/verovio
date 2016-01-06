@@ -126,7 +126,8 @@ bool MeiOutput::ExportFile()
                 m_nodeStack.push_back(m_currentNode);
                 // First save the main scoreDef
                 m_doc->m_scoreDef.Save(this);
-            } else {
+            }
+            else {
                 m_currentNode = meiDoc.append_child("pages");
             }
             
@@ -439,8 +440,7 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
     pugi::xml_node meiHead = m_mei.append_child("meiHead");
     
     if (m_doc->m_header.first_child()) {
-        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling())
-        {
+        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling()) {
             meiHead.append_copy(child);
         }
     }
@@ -476,7 +476,8 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
         m_nodeStack.push_back(m_currentNode);
         // First save the main scoreDef
         m_doc->m_scoreDef.Save(this);
-    } else {
+    }
+    else {
         // element to place the pages
         m_currentNode = mdiv.append_child("pages");
         m_currentNode.append_attribute("type") = DocTypeToStr(m_doc->GetType()).c_str();
@@ -803,12 +804,12 @@ void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
     WriteLayerElement(currentNode, mRpt);
 }
     
-    void MeiOutput::WriteMeiMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
-    {
-        assert(mRpt2);
-        
-        WriteLayerElement(currentNode, mRpt2);
-    }
+void MeiOutput::WriteMeiMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2)
+{
+    assert(mRpt2);
+    
+    WriteLayerElement(currentNode, mRpt2);
+}
 
 void MeiOutput::WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRest)
 {
@@ -1031,8 +1032,7 @@ bool MeiOutput::WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot)
     annot->WritePlist(currentNode);
     annot->WriteSource(currentNode);
     
-    for (pugi::xml_node child = annot->m_content.first_child(); child; child = child.next_sibling())
-    {
+    for (pugi::xml_node child = annot->m_content.first_child(); child; child = child.next_sibling()) {
         currentNode.append_copy(child);
     }
     
@@ -1180,8 +1180,7 @@ std::wstring MeiOutput::EscapeSMuFL(std::wstring data)
 std::string MeiOutput::DocTypeToStr(DocType type)
 {
  	std::string value; 
-	switch(type)
-	{	
+	switch(type) {	
         case Raw : value = "raw"; break;
         case Rendering : value = "rendering"; break;
 		case Transcription : value = "transcription"; break;		
@@ -1217,13 +1216,12 @@ bool MeiInput::ImportFile()
         m_doc->Reset(Raw);
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol);
-        if (!result)
-        { 
+        if (!result) {
             return false;
         }
         pugi::xml_node root = doc.first_child();
         return ReadMei(root);
-        }
+    }
     catch(char * str) {
         LogError("%s", str);
         return false;
@@ -1256,35 +1254,30 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         return true;
     }
     // filter for bTrem
-    else if (filterParent->Is() == BTREM)
-    {
+    else if (filterParent->Is() == BTREM) {
         if (element == "chord") return true;
         else if (element == "note") return true;
         else return false;
     }
     // filter for fTrem
-    else if (filterParent->Is() == FTREM)
-    {
+    else if (filterParent->Is() == FTREM) {
         if (element == "chord") return true;
         else if (element == "note") return true;
         else return false;
     }
     // filter for notes
-    else if (filterParent->Is()  == NOTE)
-    {
+    else if (filterParent->Is()  == NOTE) {
         if (element == "accid") return true;
         else if (element == "syl") return true;
         else if (element == "verse") return true;
         else return false;
     }
     // filter for Verse
-    else if (filterParent->Is() == VERSE)
-    {
+    else if (filterParent->Is() == VERSE) {
         if (element == "syl") return true;
         else return false;
     }
-    else
-    {
+    else {
         LogDebug("Unknow filter for '%s'", filterParent->GetClassName().c_str());
         return true;
     }
@@ -1296,8 +1289,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     pugi::xml_node current;
     bool success = true;
     
-    if (!root.empty() && (current = root.child("meiHead")))
-    {
+    if (!root.empty() && (current = root.child("meiHead"))) {
         ReadMeiHeader(current);
     }
     // music
@@ -1355,8 +1347,7 @@ bool MeiInput::ReadMeiHeader(pugi::xml_node meiHead)
 {
     m_doc->m_header.reset();
     //copy all the nodes inside into the master document
-    for (pugi::xml_node child = meiHead.first_child(); child; child = child.next_sibling())
-    {
+    for (pugi::xml_node child = meiHead.first_child(); child; child = child.next_sibling()) {
         m_doc->m_header.append_copy(child);
     }
     
@@ -2411,8 +2402,7 @@ void MeiInput::ReadSameAsAttr(pugi::xml_node element, Object *object)
     
 void MeiInput::ReadUnsupportedAttr(pugi::xml_node element, Object *object)
 {
-    for (pugi::xml_attribute_iterator ait = element.attributes_begin(); ait != element.attributes_end(); ++ait)
-    {
+    for (pugi::xml_attribute_iterator ait = element.attributes_begin(); ait != element.attributes_end(); ++ait) {
         object->m_unsupported.push_back(std::make_pair(ait->name(), ait->value()));
     }
 }
@@ -2508,8 +2498,7 @@ bool MeiInput::ReadMeiAnnot(Object *parent, pugi::xml_node annot)
     
     vrvAnnot->m_content.reset();
     //copy all the nodes inside into the document
-    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling())
-    {
+    for (pugi::xml_node child = annot.first_child(); child; child = child.next_sibling()) {
         vrvAnnot->m_content.append_copy(child);
     }
     

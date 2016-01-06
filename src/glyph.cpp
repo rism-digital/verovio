@@ -47,16 +47,14 @@ Glyph::Glyph(std::string path, std::string codeStr)
     
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());
-    if (!result)
-    {
+    if (!result) {
         LogError("Font file '%s' could not be loaded", path.c_str());
         return;
     }
     pugi::xml_node root = doc.first_child();
     
     // look at the viewBox attribute for getting the units per em
-    if (!root.attribute("viewBox"))
-    {
+    if (!root.attribute("viewBox")) {
         LogMessage("Font file '%s' does not contain a viewBox attribute", path.c_str());
         return;
     }
@@ -64,8 +62,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     std::string viewBox(root.attribute("viewBox").value());
     // the viewBox attribute is expected to be the for "0 0 2048 2048"
     // we are looking for the last value
-    if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3)
-    {
+    if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3) {
         LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
         return;
     }

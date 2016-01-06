@@ -108,23 +108,20 @@ void SvgDeviceContext::Commit(bool xml_declaration) {
     }
 
     // header
-    if (m_smufl_glyphs.size() > 0)
-    {
+    if (m_smufl_glyphs.size() > 0) {
         
         pugi::xml_node defs = m_svgNode.prepend_child("defs");
         pugi::xml_document sourceDoc;
         
         //for each needed glyph
         std::vector<std::string>::const_iterator it;
-        for(it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it)
-        {
+        for(it = m_smufl_glyphs.begin(); it != m_smufl_glyphs.end(); ++it) {
             //load the XML file that contains it as a pugi::xml_document
             std::ifstream source((*it).c_str());
             sourceDoc.load(source);
             
             //copy all the nodes inside into the master document
-            for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling())
-            {
+            for (pugi::xml_node child = sourceDoc.first_child(); child; child = child.next_sibling()) {
                 defs.append_copy(child);
             }
         }
@@ -405,8 +402,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
     polygonChild.append_attribute("stroke-width") = StringFormat("%d", m_penStack.top().GetWidth()).c_str();
     
     std::string pointsString;
-    for (int i = 0; i < n;  i++)
-    {
+    for (int i = 0; i < n;  i++) {
         pointsString += StringFormat("%d,%d ", points [i].x+xoffset, points[i].y+yoffset);
     }
     polygonChild.append_attribute("points") = pointsString.c_str();
@@ -541,12 +537,10 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
     int w, h, gx, gy;
         
     // print chars one by one
-    for (unsigned int i = 0; i < text.length(); i++)
-    {
+    for (unsigned int i = 0; i < text.length(); i++) {
         wchar_t c = text[i];
         Glyph *glyph = Resources::GetGlyph(c);
-        if (!glyph)
-        {
+        if (!glyph) {
             continue;
         }
         
@@ -554,8 +548,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
         
         // Add the glyph to the array for the <defs>
         std::vector<std::string>::const_iterator it = std::find(m_smufl_glyphs.begin(), m_smufl_glyphs.end(), path);
-        if (it == m_smufl_glyphs.end())
-        {
+        if (it == m_smufl_glyphs.end()) {
             m_smufl_glyphs.push_back(path);
         }
         
@@ -591,22 +584,21 @@ std::string SvgDeviceContext::GetColour(int colour)
     std::stringstream ss;
     ss << std::hex;
 
-    switch (colour)
-    {
-    case (AxBLACK): return "000000";
-    case (AxWHITE): return "FFFFFF";
-    case (AxRED): return "FF0000";
-    case (AxGREEN): return "00FF00";
-    case (AxBLUE): return "0000FF";
-    case (AxCYAN): return "00FFFF";
-    case (AxLIGHT_GREY): return "777777";
-    default:
-        int blue =  (colour & 255);
-        int green = (colour >> 8) & 255;
-        int red = (colour >> 16) & 255;
-        ss << red << green << blue;
-        //std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
-        return ss.str();
+    switch (colour) {
+        case (AxBLACK): return "000000";
+        case (AxWHITE): return "FFFFFF";
+        case (AxRED): return "FF0000";
+        case (AxGREEN): return "00FF00";
+        case (AxBLUE): return "0000FF";
+        case (AxCYAN): return "00FFFF";
+        case (AxLIGHT_GREY): return "777777";
+        default:
+            int blue =  (colour & 255);
+            int green = (colour >> 8) & 255;
+            int red = (colour >> 16) & 255;
+            ss << red << green << blue;
+            //std::strin = wxDecToHex(char(red)) + wxDecToHex(char(green)) + wxDecToHex(char(blue)) ;  // ax3
+            return ss.str();
     }
 }
 
@@ -621,8 +613,7 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
 void SvgDeviceContext::DrawSvgBoundingBox(DocObject *object, View *view)
 {
     bool drawBoundingBox = false;
-    if (drawBoundingBox && view) // && view->DrawBoundingBoxes()) // DrawBoundingBoxes is not defined
-    {
+    if (drawBoundingBox && view) {
         SetPen(AxRED, 10, AxDOT_DASH);
         SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");

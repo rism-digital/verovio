@@ -95,16 +95,14 @@ StaffAlignment::~StaffAlignment()
 
 void StaffAlignment::SetYShift(int yShift)
 {
-    if (yShift < m_yShift)
-    {
+    if (yShift < m_yShift) {
         m_yShift = yShift;
     }
 }
 
 void StaffAlignment::SetMaxHeight(int max_height)
 {
-    if (max_height < m_maxHeight)
-    {
+    if (max_height < m_maxHeight) {
         m_maxHeight = max_height;
     }
 }
@@ -114,8 +112,7 @@ void StaffAlignment::SetVerseCount(int verse_count)
 {
     // if 0, then assume 1;
     verse_count = std::max(verse_count, 1);
-    if (verse_count > m_verseCount)
-    {
+    if (verse_count > m_verseCount) {
         m_verseCount = verse_count;
     }
 }
@@ -162,8 +159,7 @@ Alignment* MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, b
     int idx = -1; // the index if we reach the end.
     Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
-    for (i = 0; i < GetAlignmentCount(); i++)
-    {
+    for (i = 0; i < GetAlignmentCount(); i++) {
         alignment = dynamic_cast<Alignment*>(m_children.at(i));
         assert(alignment);
         

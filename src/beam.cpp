@@ -62,11 +62,11 @@ void Beam::FilterList(ListOfObjects *childList)
         }
         LayerElement *currentElement = dynamic_cast<LayerElement*>(*iter);
         assert(currentElement);
-        if (!currentElement->HasInterface(INTERFACE_DURATION))
-        {
+        if (!currentElement->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
             iter = childList->erase(iter);
-        } else {
+        }
+        else {
             // Drop notes that are signaled as grace notes
             Note *n = dynamic_cast<Note*>(currentElement);
             
@@ -87,7 +87,8 @@ void Beam::FilterList(ListOfObjects *childList)
                 else
                     iter++;
                 
-            } else {
+            }
+            else {
                 // if it is a Rest, do not drop
                 iter++;
             }
@@ -132,8 +133,7 @@ void Beam::InitCoords(ListOfObjects *childList)
 void Beam::ClearCoords()
 {
     ArrayOfBeamElementCoords::iterator iter;
-    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter)
-    {
+    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
         delete *iter;
     }
     m_beamElementCoords.clear();

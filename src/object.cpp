@@ -64,8 +64,7 @@ Object::Object(const Object& object)
     m_isModified = true;
     
     int i;
-    for (i = 0; i < (int)object.m_children.size(); i++)
-    {
+    for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
         Object* copy = current->Clone();
         copy->Modify();
@@ -76,8 +75,8 @@ Object::Object(const Object& object)
 
 Object& Object::operator=(const Object& object)
 {
-	if (this != &object) // not self assignement
-	{
+    // not self assignement
+	if (this != &object) {
         ClearChildren();
         m_parent = NULL;
         m_classid = object.m_classid;
@@ -85,8 +84,7 @@ Object& Object::operator=(const Object& object)
         m_isModified = true;
         
         int i;
-        for (i = 0; i < (int)object.m_children.size(); i++)
-        {
+        for (i = 0; i < (int)object.m_children.size(); i++) {
             Object *current = object.m_children.at(i);
             Object* copy = current->Clone();
             copy->Modify();
@@ -133,8 +131,7 @@ void Object::MoveChildren( Object *object)
     }
     
     int i;
-    for (i = 0; i < (int)object->m_children.size(); i++)
-    {
+    for (i = 0; i < (int)object->m_children.size(); i++) {
         this->m_children.push_back(object->Relinquish(i));
         object->m_children.at(i)->m_parent = this;
     }
@@ -148,8 +145,7 @@ void Object::SetUuid(std::string uuid)
 void Object::ClearChildren()
 {
     ArrayOfObjects::iterator iter;
-    for (iter = m_children.begin(); iter != m_children.end(); ++iter)
-    {
+    for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         // we need to check if the this is the parent
         // ownership might have been given up with Relinquish
         if ((*iter)->m_parent == this) {
@@ -350,8 +346,7 @@ int Object::GetChildIndex(const Object *child)
 {
     ArrayOfObjects::iterator iter;
     int i;
-    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++)
-    {
+    for (iter = m_children.begin(), i = 0; iter != m_children.end(); ++iter, i++) {
         if (child == *iter) {
             return i;
         }
@@ -425,8 +420,7 @@ bool Object::GetSameAs(std::string *id, std::string *filename, int idx)
     
     std::istringstream iss(m_sameAs);
     std::string token;
-    while(getline(iss, token, ' '))
-    {
+    while(getline(iss, token, ' ')) {
         if (i == idx) {
             size_t pos = token.find("#");
             if (pos != std::string::npos) {
@@ -486,8 +480,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
         std::reverse(reversed.begin(), reversed.end());
         children = &reversed;
     }
-    for (iter = children->begin(); iter != children->end(); ++iter)
-    {
+    for (iter = children->begin(); iter != children->end(); ++iter) {
         if (filters && !filters->empty()) {
             bool hasAttComparison = false;
             // first we look if there is a comparison object for the object type (e.g., a Staff)
@@ -699,8 +692,7 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++)
-    {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
         if (listElement == *iter) {
             return i;
         }
@@ -731,8 +723,7 @@ Object *ObjectListInterface::GetListPrevious(const Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
-    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++)
-    {
+    for (iter = m_list.begin(), i = 0; iter != m_list.end(); ++iter, i++) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);
@@ -750,8 +741,7 @@ Object *ObjectListInterface::GetListNext(const Object *listElement)
 {
     ListOfObjects::reverse_iterator iter;
     int i;
-    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, i++)
-    {
+    for (iter = m_list.rbegin(), i = 0; iter != m_list.rend(); ++iter, i++) {
         if (listElement == *iter) {
             if (i > 0) {
                 return *(--iter);

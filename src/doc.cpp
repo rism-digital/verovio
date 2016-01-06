@@ -633,24 +633,21 @@ Page *Doc::SetDrawingPage(int pageIdx)
     int glyph_size;
     
     // we use the page members only if set (!= -1) 
-    if (m_drawingPage->m_pageHeight != -1)
-    {
+    if (m_drawingPage->m_pageHeight != -1) {
         m_drawingPageHeight = m_drawingPage->m_pageHeight;
         m_drawingPageWidth = m_drawingPage->m_pageWidth;
         m_drawingPageLeftMar = m_drawingPage->m_pageLeftMar;
         m_drawingPageRightMar = m_drawingPage->m_pageRightMar;
         m_drawingPageTopMar = m_drawingPage->m_pageTopMar;
 	}
-	else if (this->m_pageHeight != -1)
-	{
+	else if (this->m_pageHeight != -1) {
         m_drawingPageHeight = this->m_pageHeight;
         m_drawingPageWidth = this->m_pageWidth;
         m_drawingPageLeftMar = this->m_pageLeftMar;
         m_drawingPageRightMar = this->m_pageRightMar;
         m_drawingPageTopMar = this->m_pageTopMar;
     }
-    else
-    {
+    else {
         m_drawingPageHeight = m_style->m_pageHeight;
         m_drawingPageWidth = m_style->m_pageWidth;
         m_drawingPageLeftMar = m_style->m_pageLeftMar;
@@ -658,8 +655,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageTopMar = m_style->m_pageTopMar;
     }
     
-    if (this->m_style->m_landscape)
-    {	
+    if (this->m_style->m_landscape) {	
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
         m_drawingPageHeight = pageHeight;

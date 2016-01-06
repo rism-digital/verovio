@@ -30,20 +30,23 @@ namespace vrv {
 // AttVerseLog
 //----------------------------------------------------------------------------
 
-AttVerseLog::AttVerseLog(): Att() {
+AttVerseLog::AttVerseLog(): Att()
+{
     ResetVerseLog();
 }
 
-AttVerseLog::~AttVerseLog() {
-
+AttVerseLog::~AttVerseLog()
+{
 }
 
-void AttVerseLog::ResetVerseLog() {
+void AttVerseLog::ResetVerseLog()
+{
     m_refrain = BOOLEAN_NONE;
     m_rhythm = "";
 }
 
-bool AttVerseLog::ReadVerseLog(pugi::xml_node element) {
+bool AttVerseLog::ReadVerseLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("refrain")) {
         this->SetRefrain(StrToBoolean(element.attribute("refrain").value()));
@@ -58,7 +61,8 @@ bool AttVerseLog::ReadVerseLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVerseLog::WriteVerseLog(pugi::xml_node element) {
+bool AttVerseLog::WriteVerseLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasRefrain()) {
         element.append_attribute("refrain") = BooleanToStr(this->GetRefrain()).c_str();
@@ -84,7 +88,8 @@ bool AttVerseLog::HasRhythm()
 
 /* include <attrhythm> */
 
-bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_VERSELOG)) {
         AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
         assert(att);
@@ -101,7 +106,8 @@ bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue
     return false;
 }
 
-void Att::GetLyrics(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetLyrics(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_VERSELOG)) {
         AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
         assert(att);

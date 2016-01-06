@@ -40,7 +40,8 @@ void Tuplet::Reset()
     ResetTupletVis();
 }
 
-void Tuplet::AddLayerElement(LayerElement *element) {
+void Tuplet::AddLayerElement(LayerElement *element)
+{
     
     //if (!element->HasInterface(INTERFACE_DURATION)()) {
     //    return;
@@ -58,10 +59,10 @@ void Tuplet::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
     
     while (iter != childList->end()) {
-        if (!(*iter)->IsLayerElement() || !(*iter)->HasInterface(INTERFACE_DURATION))
-        {
+        if (!(*iter)->IsLayerElement() || !(*iter)->HasInterface(INTERFACE_DURATION)) {
             iter = childList->erase(iter);
-        } else {
+        }
+        else {
             iter++;
         }
     }

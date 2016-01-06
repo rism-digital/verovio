@@ -58,8 +58,7 @@ bool MusicXmlInput::ImportFile()
         m_doc->Reset(Raw);
         pugi::xml_document xmlDoc;
         pugi::xml_parse_result result = xmlDoc.load_file(m_filename.c_str());
-        if (!result)
-        {
+        if (!result) {
             return false;
         }
         pugi::xml_node root = xmlDoc.first_child();
@@ -344,8 +343,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     System *system = new System();
     
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
-    for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it)
-    {
+    for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
         pugi::xpath_node xpathNode = *it;
         if (IsElement(xpathNode.node(), "part-group")) {
             if (HasAttributeWithValue(xpathNode.node(), "type", "start")) {
@@ -438,8 +436,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     
     int nbStaves = 1;
     
-    for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it)
-    {
+    for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // We read all attribute elements until we reach something else
         // However, print might be present too. What else? This is not clear
         // and not robust.
@@ -547,8 +544,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nb
     }
 
     int i = 0;
-    for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it)
-    {
+    for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
@@ -773,8 +769,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         
         // Verse / syl
         pugi::xpath_node_set lyrics = node.select_nodes("lyric");
-        for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it)
-        {
+        for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
             pugi::xml_node lyric = it->node();
             int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
@@ -832,8 +827,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     
     // slur
     pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
-    for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it)
-    {
+    for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
         int slurNumber = atoi(GetAttributeValue(slur, "number").c_str());
         slurNumber = (slurNumber < 1) ? 1 : slurNumber;

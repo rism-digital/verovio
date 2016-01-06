@@ -30,22 +30,25 @@ namespace vrv {
 // AttChannelized
 //----------------------------------------------------------------------------
 
-AttChannelized::AttChannelized(): Att() {
+AttChannelized::AttChannelized(): Att()
+{
     ResetChannelized();
 }
 
-AttChannelized::~AttChannelized() {
-
+AttChannelized::~AttChannelized()
+{
 }
 
-void AttChannelized::ResetChannelized() {
+void AttChannelized::ResetChannelized()
+{
     m_midiChannel = MIDICHANNEL_NONE;
     m_midiDuty = 0;
     m_midiPort = MIDIVALUE_NONE;
     m_midiTrack = 0;
 }
 
-bool AttChannelized::ReadChannelized(pugi::xml_node element) {
+bool AttChannelized::ReadChannelized(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("midi.channel")) {
         this->SetMidiChannel(StrToMidichannel(element.attribute("midi.channel").value()));
@@ -70,7 +73,8 @@ bool AttChannelized::ReadChannelized(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttChannelized::WriteChannelized(pugi::xml_node element) {
+bool AttChannelized::WriteChannelized(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMidiChannel()) {
         element.append_attribute("midi.channel") = MidichannelToStr(this->GetMidiChannel()).c_str();
@@ -118,22 +122,25 @@ bool AttChannelized::HasMidiTrack()
 // AttMidiinstrument
 //----------------------------------------------------------------------------
 
-AttMidiinstrument::AttMidiinstrument(): Att() {
+AttMidiinstrument::AttMidiinstrument(): Att()
+{
     ResetMidiinstrument();
 }
 
-AttMidiinstrument::~AttMidiinstrument() {
-
+AttMidiinstrument::~AttMidiinstrument()
+{
 }
 
-void AttMidiinstrument::ResetMidiinstrument() {
+void AttMidiinstrument::ResetMidiinstrument()
+{
     m_midiInstrnum = MIDIVALUE_NONE;
     m_midiInstrname = MIDINAMES_NONE;
     m_midiPan = MIDIVALUE_NONE;
     m_midiVolume = MIDIVALUE_NONE;
 }
 
-bool AttMidiinstrument::ReadMidiinstrument(pugi::xml_node element) {
+bool AttMidiinstrument::ReadMidiinstrument(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("midi.instrnum")) {
         this->SetMidiInstrnum(StrToMidivalue(element.attribute("midi.instrnum").value()));
@@ -158,7 +165,8 @@ bool AttMidiinstrument::ReadMidiinstrument(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMidiinstrument::WriteMidiinstrument(pugi::xml_node element) {
+bool AttMidiinstrument::WriteMidiinstrument(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMidiInstrnum()) {
         element.append_attribute("midi.instrnum") = MidivalueToStr(this->GetMidiInstrnum()).c_str();
@@ -206,19 +214,22 @@ bool AttMidiinstrument::HasMidiVolume()
 // AttMidinumber
 //----------------------------------------------------------------------------
 
-AttMidinumber::AttMidinumber(): Att() {
+AttMidinumber::AttMidinumber(): Att()
+{
     ResetMidinumber();
 }
 
-AttMidinumber::~AttMidinumber() {
-
+AttMidinumber::~AttMidinumber()
+{
 }
 
-void AttMidinumber::ResetMidinumber() {
+void AttMidinumber::ResetMidinumber()
+{
     m_num = 0;
 }
 
-bool AttMidinumber::ReadMidinumber(pugi::xml_node element) {
+bool AttMidinumber::ReadMidinumber(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
@@ -228,7 +239,8 @@ bool AttMidinumber::ReadMidinumber(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMidinumber::WriteMidinumber(pugi::xml_node element) {
+bool AttMidinumber::WriteMidinumber(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNum()) {
         element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
@@ -249,19 +261,22 @@ bool AttMidinumber::HasNum()
 // AttMiditempo
 //----------------------------------------------------------------------------
 
-AttMiditempo::AttMiditempo(): Att() {
+AttMiditempo::AttMiditempo(): Att()
+{
     ResetMiditempo();
 }
 
-AttMiditempo::~AttMiditempo() {
-
+AttMiditempo::~AttMiditempo()
+{
 }
 
-void AttMiditempo::ResetMiditempo() {
+void AttMiditempo::ResetMiditempo()
+{
     m_midiTempo = MIDITEMPO_NONE;
 }
 
-bool AttMiditempo::ReadMiditempo(pugi::xml_node element) {
+bool AttMiditempo::ReadMiditempo(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("midi.tempo")) {
         this->SetMidiTempo(StrToMiditempo(element.attribute("midi.tempo").value()));
@@ -271,7 +286,8 @@ bool AttMiditempo::ReadMiditempo(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMiditempo::WriteMiditempo(pugi::xml_node element) {
+bool AttMiditempo::WriteMiditempo(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMidiTempo()) {
         element.append_attribute("midi.tempo") = MiditempoToStr(this->GetMidiTempo()).c_str();
@@ -292,19 +308,22 @@ bool AttMiditempo::HasMidiTempo()
 // AttMidivalue
 //----------------------------------------------------------------------------
 
-AttMidivalue::AttMidivalue(): Att() {
+AttMidivalue::AttMidivalue(): Att()
+{
     ResetMidivalue();
 }
 
-AttMidivalue::~AttMidivalue() {
-
+AttMidivalue::~AttMidivalue()
+{
 }
 
-void AttMidivalue::ResetMidivalue() {
+void AttMidivalue::ResetMidivalue()
+{
     m_val = MIDIVALUE_NONE;
 }
 
-bool AttMidivalue::ReadMidivalue(pugi::xml_node element) {
+bool AttMidivalue::ReadMidivalue(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("val")) {
         this->SetVal(StrToMidivalue(element.attribute("val").value()));
@@ -314,7 +333,8 @@ bool AttMidivalue::ReadMidivalue(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMidivalue::WriteMidivalue(pugi::xml_node element) {
+bool AttMidivalue::WriteMidivalue(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasVal()) {
         element.append_attribute("val") = MidivalueToStr(this->GetVal()).c_str();
@@ -335,19 +355,22 @@ bool AttMidivalue::HasVal()
 // AttMidivalue2
 //----------------------------------------------------------------------------
 
-AttMidivalue2::AttMidivalue2(): Att() {
+AttMidivalue2::AttMidivalue2(): Att()
+{
     ResetMidivalue2();
 }
 
-AttMidivalue2::~AttMidivalue2() {
-
+AttMidivalue2::~AttMidivalue2()
+{
 }
 
-void AttMidivalue2::ResetMidivalue2() {
+void AttMidivalue2::ResetMidivalue2()
+{
     m_val2 = MIDIVALUE_NONE;
 }
 
-bool AttMidivalue2::ReadMidivalue2(pugi::xml_node element) {
+bool AttMidivalue2::ReadMidivalue2(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("val2")) {
         this->SetVal2(StrToMidivalue(element.attribute("val2").value()));
@@ -357,7 +380,8 @@ bool AttMidivalue2::ReadMidivalue2(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMidivalue2::WriteMidivalue2(pugi::xml_node element) {
+bool AttMidivalue2::WriteMidivalue2(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasVal2()) {
         element.append_attribute("val2") = MidivalueToStr(this->GetVal2()).c_str();
@@ -378,19 +402,22 @@ bool AttMidivalue2::HasVal2()
 // AttMidivelocity
 //----------------------------------------------------------------------------
 
-AttMidivelocity::AttMidivelocity(): Att() {
+AttMidivelocity::AttMidivelocity(): Att()
+{
     ResetMidivelocity();
 }
 
-AttMidivelocity::~AttMidivelocity() {
-
+AttMidivelocity::~AttMidivelocity()
+{
 }
 
-void AttMidivelocity::ResetMidivelocity() {
+void AttMidivelocity::ResetMidivelocity()
+{
     m_vel = MIDIVALUE_NONE;
 }
 
-bool AttMidivelocity::ReadMidivelocity(pugi::xml_node element) {
+bool AttMidivelocity::ReadMidivelocity(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("vel")) {
         this->SetVel(StrToMidivalue(element.attribute("vel").value()));
@@ -400,7 +427,8 @@ bool AttMidivelocity::ReadMidivelocity(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMidivelocity::WriteMidivelocity(pugi::xml_node element) {
+bool AttMidivelocity::WriteMidivelocity(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasVel()) {
         element.append_attribute("vel") = MidivalueToStr(this->GetVel()).c_str();
@@ -421,19 +449,22 @@ bool AttMidivelocity::HasVel()
 // AttTimebase
 //----------------------------------------------------------------------------
 
-AttTimebase::AttTimebase(): Att() {
+AttTimebase::AttTimebase(): Att()
+{
     ResetTimebase();
 }
 
-AttTimebase::~AttTimebase() {
-
+AttTimebase::~AttTimebase()
+{
 }
 
-void AttTimebase::ResetTimebase() {
+void AttTimebase::ResetTimebase()
+{
     m_ppq = 0;
 }
 
-bool AttTimebase::ReadTimebase(pugi::xml_node element) {
+bool AttTimebase::ReadTimebase(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ppq")) {
         this->SetPpq(StrToInt(element.attribute("ppq").value()));
@@ -443,7 +474,8 @@ bool AttTimebase::ReadTimebase(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTimebase::WriteTimebase(pugi::xml_node element) {
+bool AttTimebase::WriteTimebase(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPpq()) {
         element.append_attribute("ppq") = IntToStr(this->GetPpq()).c_str();
@@ -460,7 +492,8 @@ bool AttTimebase::HasPpq()
 
 /* include <attppq> */
 
-bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_CHANNELIZED)) {
         AttChannelized *att = dynamic_cast<AttChannelized*>(element);
         assert(att);
@@ -553,7 +586,8 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue) 
     return false;
 }
 
-void Att::GetMidi(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetMidi(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_CHANNELIZED)) {
         AttChannelized *att = dynamic_cast<AttChannelized*>(element);
         assert(att);

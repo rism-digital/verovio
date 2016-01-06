@@ -65,8 +65,7 @@ int Clef::GetClefOffset ()
 {
     int clefCode = GetClefId();
     int offset = 0;		// case 5: UT 1e ligne par default, valable pour PERC
-    switch(clefCode)
-    {
+    switch(clefCode) {
         case G1 : offset = -4; break;
         case G2 : offset = -2; break;
         case G2_8va : offset = -9; break;

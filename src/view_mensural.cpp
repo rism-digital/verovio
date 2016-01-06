@@ -165,33 +165,28 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     
     int x;
     
-    if ((mensur->GetSign()==MENSURATIONSIGN_O) || (mensur->GetTempus() == TEMPUS_3))
-    {
+    if ((mensur->GetSign()==MENSURATIONSIGN_O) || (mensur->GetTempus() == TEMPUS_3)) {
         DrawMensurCircle (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
     else if (((mensur->GetSign()==MENSURATIONSIGN_C) && (mensur->GetOrient()!=ORIENTATION_reversed))
-             || (mensur->GetTempus() == TEMPUS_2))
-    {
+             || (mensur->GetTempus() == TEMPUS_2)) {
         DrawMensurHalfCircle (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    else if (mensur->GetSign()==MENSURATIONSIGN_C && mensur->GetOrient()==ORIENTATION_reversed)
-    {
+    else if (mensur->GetSign()==MENSURATIONSIGN_C && mensur->GetOrient()==ORIENTATION_reversed) {
         DrawMensurReversedHalfCircle (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    if (mensur->HasSlash()) // we handle only one single slash
-    {
+    // we handle only one single slash
+    if (mensur->HasSlash()) {
         DrawMensurSlash (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    if (mensur->HasDot() || (mensur->GetProlatio() == PROLATIO_3)) // we handle only one single dot
-    {
+    // we handle only one single dot
+    if (mensur->HasDot() || (mensur->GetProlatio() == PROLATIO_3)) {
         DrawMensurDot (dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
     
-    if (mensur->HasNum())
-    {
+    if (mensur->HasNum()) {
         x = element->GetDrawingX();
-        if (mensur->GetSign() || mensur->HasTempus())
-        {
+        if (mensur->GetSign() || mensur->HasTempus()) {
             x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
@@ -374,8 +369,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     DrawVerticalLine (dc, y3, y4, x2, m_doc->GetDrawingStemWidth(pseudoStaffSize));
 
     // stem
-    if (note->GetActualDur() < DUR_BR)
-    {
+    if (note->GetActualDur() < DUR_BR) {
         verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(pseudoStaffSize) * 2;
         up = (y < verticalCenter) ? true : false;
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
@@ -438,8 +432,7 @@ void View::DrawLigature (DeviceContext *dc, int y, LayerElement *element, Layer 
     
     //if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
     {
-        if (note->GetColored()!=BOOLEAN_true)
-        {				//	double base des carrees
+        if (note->GetColored()!=BOOLEAN_true) {				//	double base des carrees
             DrawObliquePolygon (dc, x1,  y1,  x2,  y1, -epaisseur);
             DrawObliquePolygon (dc, x1,  y2,  x2,  y2, epaisseur);
         }
@@ -513,8 +506,7 @@ void View::DrawLigature (DeviceContext *dc, int y, LayerElement *element, Layer 
      }
      else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
      */
-    if (note->GetActualDur() == DUR_LG)
-    {
+    if (note->GetActualDur() == DUR_LG) {
         verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         // ENZ
         up = (y < verticalCenter) ? ON : OFF;
@@ -528,8 +520,7 @@ void View::DrawLigature (DeviceContext *dc, int y, LayerElement *element, Layer 
             }
         }
         
-        if (!up)
-        {
+        if (!up) {
             y3 = y1 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 8;
             y2 = y1;
         }
@@ -553,15 +544,14 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
         int textSize = PROPRT_SIZE_FACTOR*staff->m_drawingStaffSize;
         std::wstring wtext;
         
-        if (numBase)
-        {
+        if (numBase) {
             ynum = y - (m_doc->GetDrawingUnit(textSize) * 2);
             yden = ynum - (m_doc->GetDrawingDoubleUnit(textSize) * 2);
         }
         else
             ynum = y - (m_doc->GetDrawingUnit(textSize) * 4);
         
-        if (numBase > 9 || num > 9)	{
+        if (numBase > 9 || num > 9) {
             x += m_doc->GetDrawingUnit(textSize) * 2;
         }
         
@@ -570,8 +560,7 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
         wtext = IntToTimeSigFigures(num);
         DrawSmuflString (dc, x, ynum, wtext, true, textSize);	// true = center
         
-        if (numBase)
-        {
+        if (numBase) {
             wtext = IntToTimeSigFigures(numBase);
             DrawSmuflString (dc, x, yden, wtext, true, textSize);	// true = center
         }
@@ -603,8 +592,7 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
         //DrawFullRectangle(dc,x1,y1,x2,y2);
         DrawPartFullRectangle(dc, x1, y1, x2, y2, 0);
         
-        if (proport->HasNum())
-        {
+        if (proport->HasNum()) {
             x = element->GetDrawingX();
             //if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
             {

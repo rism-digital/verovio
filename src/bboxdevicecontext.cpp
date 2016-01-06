@@ -244,8 +244,7 @@ void BBoxDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoff
     int y1 = points[0].y + yoffset;
     int y2 = y1;
     
-    for (int i = 0; i < n;  i++)
-    {
+    for (int i = 0; i < n;  i++) {
         if (points[i].x + xoffset < x1) x1 = points[i].x + xoffset;
         if (points[i].x + xoffset > x2) x2 = points[i].x + xoffset;
         if (points[i].y + yoffset < y1) y1 = points[i].y + yoffset;
@@ -339,8 +338,7 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring& text, int x, int y)
     int g_x, g_y, g_w, g_h;
     int lastCharWidth = 0;
     
-    for (unsigned int i = 0; i < text.length(); i++)
-    {
+    for (unsigned int i = 0; i < text.length(); i++) {
         wchar_t c = text[i];
         Glyph *glyph = Resources::GetGlyph(c);
         if (!glyph) {
@@ -407,8 +405,7 @@ void BBoxDeviceContext::FindPointsForBounds(Point P0, Point P1, Point P2, Point 
     float xMax = 0;
     float yMax = 0;
     
-    for (float t = 0.0f; t <= 1.0f; t += 0.01f)
-    {
+    for (float t = 0.0f; t <= 1.0f; t += 0.01f) {
         x = A * t * t * t + B * t * t + C * t + D;
         if (x < xMin)
             xMin = x;

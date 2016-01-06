@@ -30,20 +30,23 @@ namespace vrv {
 // AttNotationtype
 //----------------------------------------------------------------------------
 
-AttNotationtype::AttNotationtype(): Att() {
+AttNotationtype::AttNotationtype(): Att()
+{
     ResetNotationtype();
 }
 
-AttNotationtype::~AttNotationtype() {
-
+AttNotationtype::~AttNotationtype()
+{
 }
 
-void AttNotationtype::ResetNotationtype() {
+void AttNotationtype::ResetNotationtype()
+{
     m_notationtype = NOTATIONTYPE_NONE;
     m_notationsubtype = "";
 }
 
-bool AttNotationtype::ReadNotationtype(pugi::xml_node element) {
+bool AttNotationtype::ReadNotationtype(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("notationtype")) {
         this->SetNotationtype(StrToNotationtype(element.attribute("notationtype").value()));
@@ -58,7 +61,8 @@ bool AttNotationtype::ReadNotationtype(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNotationtype::WriteNotationtype(pugi::xml_node element) {
+bool AttNotationtype::WriteNotationtype(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNotationtype()) {
         element.append_attribute("notationtype") = NotationtypeToStr(this->GetNotationtype()).c_str();
@@ -84,7 +88,8 @@ bool AttNotationtype::HasNotationsubtype()
 
 /* include <attnotationsubtype> */
 
-bool Att::SetMei(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
         AttNotationtype *att = dynamic_cast<AttNotationtype*>(element);
         assert(att);
@@ -101,7 +106,8 @@ bool Att::SetMei(Object *element, std::string attrType, std::string attrValue) {
     return false;
 }
 
-void Att::GetMei(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetMei(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
         AttNotationtype *att = dynamic_cast<AttNotationtype*>(element);
         assert(att);

@@ -466,8 +466,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up,  Point poi
     
     ArrayOfLayerElementPointPairs spanningContentPoints;
     std::vector<LayerElement*>::iterator it;
-    for (it = spanningContent.begin(); it != spanningContent.end(); it++)
-    {
+    for (it = spanningContent.begin(); it != spanningContent.end(); it++) {
         Note *note = NULL;
         // We keep only notes and chords for now
         if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;
@@ -546,7 +545,8 @@ void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up,
     if (up) {
         c1->y = p1->y + height;
         c2->y = p2->y + height;
-    } else {
+    }
+    else {
         c1->y = p1->y - height;
         c2->y = p2->y - height;
     }
@@ -628,7 +628,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
                     itPoint = spanningPoints->erase(itPoint);
                 }
             }
-            else  {
+            else {
                 if (y > itPoint->second.y) {
                     float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
@@ -916,7 +916,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff,
     if (up) {
         c1.y = y1 + height;
         c2.y = y2 + height;
-    } else {
+    }
+    else {
         c1.y = y1 - height;
         c2.y = y2 - height;
     }

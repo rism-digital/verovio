@@ -30,19 +30,22 @@ namespace vrv {
 // AttAgentident
 //----------------------------------------------------------------------------
 
-AttAgentident::AttAgentident(): Att() {
+AttAgentident::AttAgentident(): Att()
+{
     ResetAgentident();
 }
 
-AttAgentident::~AttAgentident() {
-
+AttAgentident::~AttAgentident()
+{
 }
 
-void AttAgentident::ResetAgentident() {
+void AttAgentident::ResetAgentident()
+{
     m_agent = "";
 }
 
-bool AttAgentident::ReadAgentident(pugi::xml_node element) {
+bool AttAgentident::ReadAgentident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("agent")) {
         this->SetAgent(StrToStr(element.attribute("agent").value()));
@@ -52,7 +55,8 @@ bool AttAgentident::ReadAgentident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAgentident::WriteAgentident(pugi::xml_node element) {
+bool AttAgentident::WriteAgentident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAgent()) {
         element.append_attribute("agent") = StrToStr(this->GetAgent()).c_str();
@@ -73,20 +77,23 @@ bool AttAgentident::HasAgent()
 // AttEvidence
 //----------------------------------------------------------------------------
 
-AttEvidence::AttEvidence(): Att() {
+AttEvidence::AttEvidence(): Att()
+{
     ResetEvidence();
 }
 
-AttEvidence::~AttEvidence() {
-
+AttEvidence::~AttEvidence()
+{
 }
 
-void AttEvidence::ResetEvidence() {
+void AttEvidence::ResetEvidence()
+{
     m_cert = CERTAINTY_NONE;
     m_evidence = "";
 }
 
-bool AttEvidence::ReadEvidence(pugi::xml_node element) {
+bool AttEvidence::ReadEvidence(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("cert")) {
         this->SetCert(StrToCertainty(element.attribute("cert").value()));
@@ -101,7 +108,8 @@ bool AttEvidence::ReadEvidence(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttEvidence::WriteEvidence(pugi::xml_node element) {
+bool AttEvidence::WriteEvidence(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCert()) {
         element.append_attribute("cert") = CertaintyToStr(this->GetCert()).c_str();
@@ -131,19 +139,22 @@ bool AttEvidence::HasEvidence()
 // AttExtent
 //----------------------------------------------------------------------------
 
-AttExtent::AttExtent(): Att() {
+AttExtent::AttExtent(): Att()
+{
     ResetExtent();
 }
 
-AttExtent::~AttExtent() {
-
+AttExtent::~AttExtent()
+{
 }
 
-void AttExtent::ResetExtent() {
+void AttExtent::ResetExtent()
+{
     m_extent = "";
 }
 
-bool AttExtent::ReadExtent(pugi::xml_node element) {
+bool AttExtent::ReadExtent(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("extent")) {
         this->SetExtent(StrToStr(element.attribute("extent").value()));
@@ -153,7 +164,8 @@ bool AttExtent::ReadExtent(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttExtent::WriteExtent(pugi::xml_node element) {
+bool AttExtent::WriteExtent(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasExtent()) {
         element.append_attribute("extent") = StrToStr(this->GetExtent()).c_str();
@@ -174,19 +186,22 @@ bool AttExtent::HasExtent()
 // AttReasonident
 //----------------------------------------------------------------------------
 
-AttReasonident::AttReasonident(): Att() {
+AttReasonident::AttReasonident(): Att()
+{
     ResetReasonident();
 }
 
-AttReasonident::~AttReasonident() {
-
+AttReasonident::~AttReasonident()
+{
 }
 
-void AttReasonident::ResetReasonident() {
+void AttReasonident::ResetReasonident()
+{
     m_reason = "";
 }
 
-bool AttReasonident::ReadReasonident(pugi::xml_node element) {
+bool AttReasonident::ReadReasonident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("reason")) {
         this->SetReason(StrToStr(element.attribute("reason").value()));
@@ -196,7 +211,8 @@ bool AttReasonident::ReadReasonident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttReasonident::WriteReasonident(pugi::xml_node element) {
+bool AttReasonident::WriteReasonident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasReason()) {
         element.append_attribute("reason") = StrToStr(this->GetReason()).c_str();
@@ -213,7 +229,8 @@ bool AttReasonident::HasReason()
 
 /* include <attreason> */
 
-bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_AGENTIDENT)) {
         AttAgentident *att = dynamic_cast<AttAgentident*>(element);
         assert(att);
@@ -254,7 +271,8 @@ bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetEdittrans(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetEdittrans(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_AGENTIDENT)) {
         AttAgentident *att = dynamic_cast<AttAgentident*>(element);
         assert(att);

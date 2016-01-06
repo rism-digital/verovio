@@ -57,7 +57,8 @@ bool dir_exists (string dir) {
     struct stat st;
     if ((stat(dir.c_str(), &st) == 0) && (((st.st_mode) & S_IFMT) == S_IFDIR)) {
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -185,7 +186,6 @@ int main(int argc, char** argv)
         
     static struct option long_options[] =
     {
-        
         {"adjust-page-height",  no_argument,        &adjust_page_height, 1},
         {"all-pages",           no_argument,        &all_pages, 1},
         {"border",              required_argument,  0, 'b'},
@@ -215,10 +215,8 @@ int main(int argc, char** argv)
     };
     
     int option_index = 0;
-    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1)
-    {                
-        switch (c)
-        {
+    while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
+        switch (c) {
             case 0:
                 if (long_options[option_index].flag != 0)
                     break;

@@ -197,8 +197,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int y = accid->GetDrawingY();
     
     int symc = SMUFL_E261_accidentalNatural;
-    switch (accid->GetAccid())
-    {
+    switch (accid->GetAccid()) {
         case ACCIDENTAL_EXPLICIT_n :  symc = SMUFL_E261_accidentalNatural; break;
         case ACCIDENTAL_EXPLICIT_ss : symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_EXPLICIT_s : symc = SMUFL_E262_accidentalSharp; break;
@@ -459,8 +458,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_up) && (chord->m_clusters.size() > 0)) dotsX += (radius * 2);
         
         //Prep where the dots will go by preventing overlaps and using space efficiently
-        for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin(); rit != chord->GetList(chord)->rend(); rit++)
-        {
+        for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin(); rit != chord->GetList(chord)->rend(); rit++) {
             Note *note = dynamic_cast<Note*>(*rit);
             PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), numDots, staff);
         }
@@ -478,14 +476,12 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     chord->ResetAccidList();
     std::vector<Note*> noteList = chord->m_accidList;
     int size = (int)noteList.size();
-    if (size > 0)
-    {
+    if (size > 0) {
         //set the default x position
         int xAccid = chord->GetDrawingX() - (radius * 2);
 
         //if chord is a down-stemmed non-cluster, it needs one more note diameter of space
-        if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0))
-        {
+        if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0)) {
             xAccid -= (radius * 2);
         }
 
@@ -496,13 +492,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         std::vector<int> accidClusterStarts;
         
         //iterate through the list of notes with accidentals
-        for(idx = 0; idx < size; idx++)
-        {
+        for(idx = 0; idx < size; idx++) {
             Accid *curAccid = noteList.at(idx)->m_drawingAccid;
 
             //if the note does not need to be moved, save a new cluster start position
-            if (CalculateAccidX(staff, curAccid, chord, false))
-            {
+            if (CalculateAccidX(staff, curAccid, chord, false)) {
                 accidClusterStarts.push_back(idx);
             }
         }
@@ -511,8 +505,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         int accidSize = (int)accidClusterStarts.size();
         
         //for each note that conflicts
-        for(idx = 0; idx < accidSize; idx++)
-        {
+        for(idx = 0; idx < accidSize; idx++) {
             //set fwIdx to the start of the cluster
             fwIdx = accidClusterStarts.at(idx);
             //if this is the last cluster, set bwIdx to the last note in the chord
@@ -521,8 +514,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             else bwIdx = accidClusterStarts.at(idx + 1) - 1;
             
             //if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
-            while (fwIdx <= bwIdx)
-            {
+            while (fwIdx <= bwIdx) {
                 Accid *accidFwd = noteList.at(fwIdx)->m_drawingAccid;
                 Accid *accidBwd = noteList.at(bwIdx)->m_drawingAccid;
                 
@@ -597,8 +589,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                        staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) ? true : false;
                        
     
-    switch(clef->GetClefId())
-    {
+    switch(clef->GetClefId()) {
         case C1 :
             sym = SMUFL_E05C_cClef;
             y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
@@ -849,8 +840,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
         DrawSmuflCode(dc, element->GetDrawingX(), y, SMUFL_E08B_timeSigCutCommon, staff->m_drawingStaffSize, false);
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a symbol
     }
-    else if (meterSig->GetCount())
-    {	
+    else if (meterSig->GetCount()) {
         DrawMeterSigFigures (dc, x, staff->GetDrawingY(), meterSig->GetCount(), meterSig->GetUnit(), staff);
     }
     
@@ -1123,8 +1113,7 @@ void View::DrawNote (DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             }
         }
     }
-    else
-    {
+    else {
         xNote = xStem - radius;
     }
 
@@ -1165,8 +1154,7 @@ void View::DrawNote (DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
     
     //if the note is not in the staff
-    if (!is_in(noteY,staffTop,staffBot))
-    {
+    if (!is_in(noteY,staffTop,staffBot)) {
         int distance, highestNewLine, numLines;
         
         bool aboveStaff = (noteY > staffTop);
@@ -1260,13 +1248,11 @@ void View::DrawRest (DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     //element->m_drawingStemEnd.y = element->GetDrawingY();
     //element->m_drawingStemStart.y = element->GetDrawingY();
 
-    if (drawingDur > DUR_2)
-    {
+    if (drawingDur > DUR_2) {
 		//x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize);
     }
 
-    switch (drawingDur)
-    {	
+    switch (drawingDur) {
         case DUR_LG: DrawRestLong(dc, x, y, staff); break;
         case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
         case DUR_1:
@@ -1417,7 +1403,8 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
                      ToDeviceContextY(startPoint.y + positionShiftY1),
                      ToDeviceContextX(startPoint.x + positionShiftX2),
                      ToDeviceContextY(startPoint.y + positionShiftY2));
-    } else {
+    }
+    else {
         dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1),
                      ToDeviceContextY(startPoint.y - positionShiftY1),
                      ToDeviceContextX(startPoint.x + positionShiftX2),
@@ -1456,7 +1443,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
     // First case, notes
     if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
         // To be fix once m_embellishment is removed
-        if (element->Is() == NOTE)  {
+        if (element->Is() == NOTE) {
             Note *note = dynamic_cast<Note*>(element);
             assert(note);
             if (note->m_embellishment) {
@@ -1490,7 +1477,8 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
             // draw the down-fermata - need cue size support
             DrawSmuflCode (dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
-    } else if (element->Is() == REST) {
+    }
+    else if (element->Is() == REST) {
         if (place == PLACE_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode (dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
@@ -1573,7 +1561,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     else
         ynum = y - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
     
-    if (numBase > 9 || num > 9)	{
+    if (numBase > 9 || num > 9) {
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     }
     
@@ -1662,8 +1650,8 @@ void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned
     int y2 = y + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 	DrawSmuflCode(dc, x, y2, SMUFL_E4E5_restQuarter + (valeur-DUR_4), staff->m_drawingStaffSize, cueSize);
     
-	if (dots)
-	{	if (valeur < DUR_16) y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+	if (dots) {
+        if (valeur < DUR_16) y += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 		DrawDots(dc, (x + 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)), y, dots, staff);
 	}
 }
@@ -1683,8 +1671,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
 		vertic = -vertic;
 
     // look if one line or between line
-	if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize))
-	{
+	if ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)) {
 		if (valeur == DUR_2)
 			y1 -= vertic;
 		else
@@ -1942,8 +1929,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     
     //If the accidental is lined up with the one above it, move it left by a halfunit to avoid visual confusion
     //This doesn't need to be done with accidentals that are as far left or up as possible
-    if ((currentX < xLength - 1) && (accidTop > 1))
-    {
+    if ((currentX < xLength - 1) && (accidTop > 1)) {
         int yComp = accidTop - alignmentThreshold;
         assert(yComp < accidSpaceSize);
         assert(yComp >= 0);
@@ -1952,8 +1938,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     
     //If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
     //This doesn't need to be done with accidentals that are as far left or down as possible
-    if ((currentX < xLength - 1) && (accidBot < (yHeight - 1)) && accidBot > 1)
-    {
+    if ((currentX < xLength - 1) && (accidBot < (yHeight - 1)) && accidBot > 1) {
         int yComp = accidBot;
         assert(yComp < accidSpaceSize);
         assert(yComp >= 0);
@@ -1964,33 +1949,28 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     assert(currentX <= xLength);
     
     //If we need to move the accidental horizontally, move it by currentX half-units.
-    if (adjustHorizontally)
-    {
+    if (adjustHorizontally) {
         int xShift = currentX * halfUnit;
         accid->SetDrawingX(accid->GetDrawingX() - xShift);
         
         //mark the spaces as taken (true in accidSpace)
-        for(int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--)
-        {
-            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
-            {
+        for(int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--) {
+            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++) {
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
         }
     }
     //Otherwise, just mark its vertical position so we can see if there are any vertical conflicts
-    else
-    {
-        for(int xIdx = 0; xIdx < ACCID_WIDTH; xIdx++) //x from 0 to 4, base position
-        {
-            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++)
-            {
+    else {
+        //x from 0 to 4, base position
+        for(int xIdx = 0; xIdx < ACCID_WIDTH; xIdx++)  {
+            for(int yIdx = accidTop; yIdx < accidBot + 1; yIdx++) {
                 accidSpace->at(yIdx).at(xIdx) = true;
             }
         }
     }
     
-    //For debugging; leaving this in temporarily
+//For debugging; leaving this in temporarily
 //    for (int vIdx = 0; vIdx < accidSpace->size(); vIdx++)
 //    {
 //        std::cout << "|";

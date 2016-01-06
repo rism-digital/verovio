@@ -40,7 +40,7 @@ pitchmap DarmsInput::PitchMap[] = {
 };
 
 DarmsInput::DarmsInput(Doc *doc, std::string filename) :
-FileInputStream(doc)
+    FileInputStream(doc)
 {	
     m_layer = NULL;
     m_measure = NULL;
@@ -49,8 +49,8 @@ FileInputStream(doc)
     m_filename = filename;
 }
 
-DarmsInput::~DarmsInput() {
-    
+DarmsInput::~DarmsInput()
+{
 }
 
 void DarmsInput::UnrollKeysig(int quantity, char alter) {
@@ -64,7 +64,8 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
     if (alter == '-') {
         alteration_set = flats;
         accid = ACCIDENTAL_EXPLICIT_f;
-    } else {
+    }
+    else {
         alteration_set = sharps;
         accid = ACCIDENTAL_EXPLICIT_s;
     }
@@ -87,7 +88,8 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
 /*
  Read the meter
  */
-int DarmsInput::parseMeter(int pos, const char* data) {
+int DarmsInput::parseMeter(int pos, const char* data)
+{
  
     Mensur *meter = new Mensur;
     
@@ -99,7 +101,8 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             meter->SetSlash(1);
         }
         pos++;
-    } else if (data[pos] == 'O') {
+    }
+    else if (data[pos] == 'O') {
         if (data[pos + 1] == '/') {
             pos++;
             LogWarning("DarmsInput: O/ not supported");
@@ -123,7 +126,8 @@ int DarmsInput::parseMeter(int pos, const char* data) {
         if (data[pos + 1] != ':' && data[pos + 1] != '-') {
             pos++;
             meter->SetNumbase(1);
-        } else {
+        }
+        else {
             pos++;
             if (data[pos] == '-') LogWarning("DarmsInput: Time sig numbers should be divided with ':'.");
             // same as above, get one or two nums
@@ -145,7 +149,8 @@ int DarmsInput::parseMeter(int pos, const char* data) {
 /*
  Process the various headings: !I, !K, !N, !M
 */
-int DarmsInput::do_globalSpec(int pos, const char* data) {
+int DarmsInput::do_globalSpec(int pos, const char* data)
+{
     char digit = data[++pos];
     int quantity = 0;
     
@@ -166,7 +171,8 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
             pos++;
             if (data[pos] == '-' || data[pos] == '#') {
                 UnrollKeysig(quantity, data[pos]);
-            } else {
+            }
+            else {
                 LogWarning("DarmsInput: Invalid char for K: %c", data[pos]);
             }
             break;
@@ -189,7 +195,8 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
              */
             if (!isdigit(data[++pos])) {
                 LogWarning("DarmsInput: Expected number after N");
-            } else { // we honor only notehead 7, diamond
+            }
+            else { // we honor only notehead 7, diamond
                 if (data[pos] == 0x07 + ASCII_NUMBER_OFFSET)
                     m_antique_notation = true;
             }
@@ -202,7 +209,8 @@ int DarmsInput::do_globalSpec(int pos, const char* data) {
     return pos;
 }
 
-int DarmsInput::do_Clef(int pos, const char* data) {
+int DarmsInput::do_Clef(int pos, const char* data)
+{
     int position = data[pos] - ASCII_NUMBER_OFFSET; // manual conversion from ASCII to int
     
     pos = pos + 2; // skip the '!' 3!F
@@ -219,7 +227,8 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             default: LogWarning("DarmsInput: Invalid C clef on line %i", position); break;
         }
         m_clef_offset = 21 - position; // 21 is the position in the array, position is of the clef
-    } else if (data[pos] == 'G') {
+    }
+    else if (data[pos] == 'G') {
         mclef->SetShape(CLEFSHAPE_G);
         switch (position) {
             case 1: mclef->SetLine(1); break;
@@ -227,7 +236,8 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             default: LogWarning("DarmsInput: Invalid G clef on line %i", position); break;
         }
         m_clef_offset = 25 - position;
-    } else if (data[pos] == 'F') {
+    }
+    else if (data[pos] == 'F') {
         mclef->SetShape(CLEFSHAPE_F);
         switch (position) {
             case 3: mclef->SetLine(3); break;
@@ -236,7 +246,8 @@ int DarmsInput::do_Clef(int pos, const char* data) {
             default: LogWarning("DarmsInput: Invalid F clef on line %i", position); break;
         }
         m_clef_offset = 15 - position;
-    } else {
+    }
+    else {
         // what the...
         LogWarning("DarmsInput: Invalid clef specification: %c", data[pos]);
         return 0; // fail
@@ -246,7 +257,8 @@ int DarmsInput::do_Clef(int pos, const char* data) {
     return pos;
 }
 
-int DarmsInput::do_Note(int pos, const char* data, bool rest) {
+int DarmsInput::do_Note(int pos, const char* data, bool rest)
+{
     int position;
     data_ACCIDENTAL_EXPLICIT accidental = ACCIDENTAL_EXPLICIT_NONE;
     data_DURATION duration;
@@ -261,7 +273,8 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         // be sure following char is a number
         if (!isdigit(data[pos + 1])) return 0;
         position = -(data[++pos] - ASCII_NUMBER_OFFSET);
-    } else {
+    }
+    else {
         // as above
         if (!isdigit(data[pos]) && data[pos] != 'R') return 0; // this should not happen, as it is checked in the caller
         // positive number
@@ -276,10 +289,12 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     if (data[pos + 1] == '-') {
         accidental = ACCIDENTAL_EXPLICIT_f;
         pos++;
-    } else if (data[pos + 1] == '#') {
+    }
+    else if (data[pos + 1] == '#') {
         accidental = ACCIDENTAL_EXPLICIT_s;
         pos++;
-    } else if (data[pos + 1] == '*') {
+    }
+    else if (data[pos + 1] == '*') {
         accidental = ACCIDENTAL_EXPLICIT_n;
         pos++;
     }
@@ -329,7 +344,8 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         rest->SetDurGes(DURATION_8);
         rest->SetDots(dot);
         m_layer->AddLayerElement(rest);
-    } else {
+    }
+    else {
         
         if ((position + m_clef_offset) > sizeof(PitchMap))
             position = 0;
@@ -357,7 +373,8 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
             // create a new mus tie with this note
             m_current_tie = new Tie;
             m_current_tie->SetStart(note);
-        } else {
+        }
+        else {
             // no tie (L or J) specified for not
             // but if cur tie !NULL we need to close the tie
             // and set cur tie to NULL
@@ -372,7 +389,8 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
     return pos;
 }
 
-bool DarmsInput::ImportFile() {
+bool DarmsInput::ImportFile()
+{
     char data[10000];
     size_t len;
     
@@ -392,7 +410,8 @@ bool DarmsInput::ImportFile() {
     return ImportString(data);
 }
     
-bool DarmsInput::ImportString(std::string data_str) {
+bool DarmsInput::ImportString(std::string data_str)
+{
     size_t len;
     int res;
     int pos = 0;
@@ -422,19 +441,23 @@ bool DarmsInput::ImportString(std::string data_str) {
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
             // m_staff->notAnc = m_antique_notation;
-        } else if (isdigit(c) || c == '-') { // check for '-' too as note positions can be negative
+        }
+        else if (isdigit(c) || c == '-') { // check for '-' too as note positions can be negative
             //is number followed by '!' ? it is a clef
             if (data[pos + 1] == '!') {
                 res = do_Clef(pos, data);
                 if (res) pos = res;
-            } else { // we assume it is a note
+            }
+            else { // we assume it is a note
                 res = do_Note(pos, data, false);
                 if (res) pos = res;
             }
-        } else if (c == 'R') {
+        }
+        else if (c == 'R') {
             res = do_Note(pos, data, true);
             if (res) pos = res;
-        } else {
+        }
+        else {
             //if (!isspace(c))
                 //LogMessage("Other %c", c);
         }

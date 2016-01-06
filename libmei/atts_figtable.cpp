@@ -30,20 +30,23 @@ namespace vrv {
 // AttTabular
 //----------------------------------------------------------------------------
 
-AttTabular::AttTabular(): Att() {
+AttTabular::AttTabular(): Att()
+{
     ResetTabular();
 }
 
-AttTabular::~AttTabular() {
-
+AttTabular::~AttTabular()
+{
 }
 
-void AttTabular::ResetTabular() {
+void AttTabular::ResetTabular()
+{
     m_colspan = 0;
     m_rowspan = 0;
 }
 
-bool AttTabular::ReadTabular(pugi::xml_node element) {
+bool AttTabular::ReadTabular(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("colspan")) {
         this->SetColspan(StrToInt(element.attribute("colspan").value()));
@@ -58,7 +61,8 @@ bool AttTabular::ReadTabular(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTabular::WriteTabular(pugi::xml_node element) {
+bool AttTabular::WriteTabular(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasColspan()) {
         element.append_attribute("colspan") = IntToStr(this->GetColspan()).c_str();
@@ -84,7 +88,8 @@ bool AttTabular::HasRowspan()
 
 /* include <attrowspan> */
 
-bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_TABULAR)) {
         AttTabular *att = dynamic_cast<AttTabular*>(element);
         assert(att);
@@ -101,7 +106,8 @@ bool Att::SetFigtable(Object *element, std::string attrType, std::string attrVal
     return false;
 }
 
-void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_TABULAR)) {
         AttTabular *att = dynamic_cast<AttTabular*>(element);
         assert(att);

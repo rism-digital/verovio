@@ -152,8 +152,8 @@ StaffDefDrawingInterface::StaffDefDrawingInterface(const StaffDefDrawingInterfac
 
 StaffDefDrawingInterface& StaffDefDrawingInterface::operator=(const StaffDefDrawingInterface& interface)
 {
-    if (this != &interface) // not self assignement
-    {
+    // not self assignement
+    if (this != &interface) {
         if (m_currentClef) {
             delete m_currentClef;
             m_currentClef = NULL;

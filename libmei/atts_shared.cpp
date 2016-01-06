@@ -30,19 +30,22 @@ namespace vrv {
 // AttAccidLog
 //----------------------------------------------------------------------------
 
-AttAccidLog::AttAccidLog(): Att() {
+AttAccidLog::AttAccidLog(): Att()
+{
     ResetAccidLog();
 }
 
-AttAccidLog::~AttAccidLog() {
-
+AttAccidLog::~AttAccidLog()
+{
 }
 
-void AttAccidLog::ResetAccidLog() {
+void AttAccidLog::ResetAccidLog()
+{
     m_func = accidLog_FUNC_NONE;
 }
 
-bool AttAccidLog::ReadAccidLog(pugi::xml_node element) {
+bool AttAccidLog::ReadAccidLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("func")) {
         this->SetFunc(StrToAccidLogFunc(element.attribute("func").value()));
@@ -52,7 +55,8 @@ bool AttAccidLog::ReadAccidLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAccidLog::WriteAccidLog(pugi::xml_node element) {
+bool AttAccidLog::WriteAccidLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasFunc()) {
         element.append_attribute("func") = AccidLogFuncToStr(this->GetFunc()).c_str();
@@ -73,19 +77,22 @@ bool AttAccidLog::HasFunc()
 // AttAccidental
 //----------------------------------------------------------------------------
 
-AttAccidental::AttAccidental(): Att() {
+AttAccidental::AttAccidental(): Att()
+{
     ResetAccidental();
 }
 
-AttAccidental::~AttAccidental() {
-
+AttAccidental::~AttAccidental()
+{
 }
 
-void AttAccidental::ResetAccidental() {
+void AttAccidental::ResetAccidental()
+{
     m_accid = ACCIDENTAL_EXPLICIT_NONE;
 }
 
-bool AttAccidental::ReadAccidental(pugi::xml_node element) {
+bool AttAccidental::ReadAccidental(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("accid")) {
         this->SetAccid(StrToAccidentalExplicit(element.attribute("accid").value()));
@@ -95,7 +102,8 @@ bool AttAccidental::ReadAccidental(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAccidental::WriteAccidental(pugi::xml_node element) {
+bool AttAccidental::WriteAccidental(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAccid()) {
         element.append_attribute("accid") = AccidentalExplicitToStr(this->GetAccid()).c_str();
@@ -116,19 +124,22 @@ bool AttAccidental::HasAccid()
 // AttAccidentalPerformed
 //----------------------------------------------------------------------------
 
-AttAccidentalPerformed::AttAccidentalPerformed(): Att() {
+AttAccidentalPerformed::AttAccidentalPerformed(): Att()
+{
     ResetAccidentalPerformed();
 }
 
-AttAccidentalPerformed::~AttAccidentalPerformed() {
-
+AttAccidentalPerformed::~AttAccidentalPerformed()
+{
 }
 
-void AttAccidentalPerformed::ResetAccidentalPerformed() {
+void AttAccidentalPerformed::ResetAccidentalPerformed()
+{
     m_accidGes = ACCIDENTAL_IMPLICIT_NONE;
 }
 
-bool AttAccidentalPerformed::ReadAccidentalPerformed(pugi::xml_node element) {
+bool AttAccidentalPerformed::ReadAccidentalPerformed(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("accid.ges")) {
         this->SetAccidGes(StrToAccidentalImplicit(element.attribute("accid.ges").value()));
@@ -138,7 +149,8 @@ bool AttAccidentalPerformed::ReadAccidentalPerformed(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAccidentalPerformed::WriteAccidentalPerformed(pugi::xml_node element) {
+bool AttAccidentalPerformed::WriteAccidentalPerformed(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAccidGes()) {
         element.append_attribute("accid.ges") = AccidentalImplicitToStr(this->GetAccidGes()).c_str();
@@ -159,19 +171,22 @@ bool AttAccidentalPerformed::HasAccidGes()
 // AttArticulation
 //----------------------------------------------------------------------------
 
-AttArticulation::AttArticulation(): Att() {
+AttArticulation::AttArticulation(): Att()
+{
     ResetArticulation();
 }
 
-AttArticulation::~AttArticulation() {
-
+AttArticulation::~AttArticulation()
+{
 }
 
-void AttArticulation::ResetArticulation() {
+void AttArticulation::ResetArticulation()
+{
     m_artic = ARTICULATION_NONE;
 }
 
-bool AttArticulation::ReadArticulation(pugi::xml_node element) {
+bool AttArticulation::ReadArticulation(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("artic")) {
         this->SetArtic(StrToArticulation(element.attribute("artic").value()));
@@ -181,7 +196,8 @@ bool AttArticulation::ReadArticulation(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttArticulation::WriteArticulation(pugi::xml_node element) {
+bool AttArticulation::WriteArticulation(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasArtic()) {
         element.append_attribute("artic") = ArticulationToStr(this->GetArtic()).c_str();
@@ -202,19 +218,22 @@ bool AttArticulation::HasArtic()
 // AttArticulationPerformed
 //----------------------------------------------------------------------------
 
-AttArticulationPerformed::AttArticulationPerformed(): Att() {
+AttArticulationPerformed::AttArticulationPerformed(): Att()
+{
     ResetArticulationPerformed();
 }
 
-AttArticulationPerformed::~AttArticulationPerformed() {
-
+AttArticulationPerformed::~AttArticulationPerformed()
+{
 }
 
-void AttArticulationPerformed::ResetArticulationPerformed() {
+void AttArticulationPerformed::ResetArticulationPerformed()
+{
     m_articGes = ARTICULATION_NONE;
 }
 
-bool AttArticulationPerformed::ReadArticulationPerformed(pugi::xml_node element) {
+bool AttArticulationPerformed::ReadArticulationPerformed(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("artic.ges")) {
         this->SetArticGes(StrToArticulation(element.attribute("artic.ges").value()));
@@ -224,7 +243,8 @@ bool AttArticulationPerformed::ReadArticulationPerformed(pugi::xml_node element)
     return hasAttribute;
 }
 
-bool AttArticulationPerformed::WriteArticulationPerformed(pugi::xml_node element) {
+bool AttArticulationPerformed::WriteArticulationPerformed(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasArticGes()) {
         element.append_attribute("artic.ges") = ArticulationToStr(this->GetArticGes()).c_str();
@@ -245,19 +265,22 @@ bool AttArticulationPerformed::HasArticGes()
 // AttAugmentdots
 //----------------------------------------------------------------------------
 
-AttAugmentdots::AttAugmentdots(): Att() {
+AttAugmentdots::AttAugmentdots(): Att()
+{
     ResetAugmentdots();
 }
 
-AttAugmentdots::~AttAugmentdots() {
-
+AttAugmentdots::~AttAugmentdots()
+{
 }
 
-void AttAugmentdots::ResetAugmentdots() {
+void AttAugmentdots::ResetAugmentdots()
+{
     m_dots = 0;
 }
 
-bool AttAugmentdots::ReadAugmentdots(pugi::xml_node element) {
+bool AttAugmentdots::ReadAugmentdots(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dots")) {
         this->SetDots(StrToInt(element.attribute("dots").value()));
@@ -267,7 +290,8 @@ bool AttAugmentdots::ReadAugmentdots(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAugmentdots::WriteAugmentdots(pugi::xml_node element) {
+bool AttAugmentdots::WriteAugmentdots(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDots()) {
         element.append_attribute("dots") = IntToStr(this->GetDots()).c_str();
@@ -288,20 +312,23 @@ bool AttAugmentdots::HasDots()
 // AttAuthorized
 //----------------------------------------------------------------------------
 
-AttAuthorized::AttAuthorized(): Att() {
+AttAuthorized::AttAuthorized(): Att()
+{
     ResetAuthorized();
 }
 
-AttAuthorized::~AttAuthorized() {
-
+AttAuthorized::~AttAuthorized()
+{
 }
 
-void AttAuthorized::ResetAuthorized() {
+void AttAuthorized::ResetAuthorized()
+{
     m_authority = "";
     m_authURI = "";
 }
 
-bool AttAuthorized::ReadAuthorized(pugi::xml_node element) {
+bool AttAuthorized::ReadAuthorized(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("authority")) {
         this->SetAuthority(StrToStr(element.attribute("authority").value()));
@@ -316,7 +343,8 @@ bool AttAuthorized::ReadAuthorized(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttAuthorized::WriteAuthorized(pugi::xml_node element) {
+bool AttAuthorized::WriteAuthorized(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAuthority()) {
         element.append_attribute("authority") = StrToStr(this->GetAuthority()).c_str();
@@ -346,19 +374,22 @@ bool AttAuthorized::HasAuthURI()
 // AttBarLineLog
 //----------------------------------------------------------------------------
 
-AttBarLineLog::AttBarLineLog(): Att() {
+AttBarLineLog::AttBarLineLog(): Att()
+{
     ResetBarLineLog();
 }
 
-AttBarLineLog::~AttBarLineLog() {
-
+AttBarLineLog::~AttBarLineLog()
+{
 }
 
-void AttBarLineLog::ResetBarLineLog() {
+void AttBarLineLog::ResetBarLineLog()
+{
     m_form = BARRENDITION_single;
 }
 
-bool AttBarLineLog::ReadBarLineLog(pugi::xml_node element) {
+bool AttBarLineLog::ReadBarLineLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToBarrendition(element.attribute("form").value()));
@@ -368,7 +399,8 @@ bool AttBarLineLog::ReadBarLineLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBarLineLog::WriteBarLineLog(pugi::xml_node element) {
+bool AttBarLineLog::WriteBarLineLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = BarrenditionToStr(this->GetForm()).c_str();
@@ -389,20 +421,23 @@ bool AttBarLineLog::HasForm()
 // AttBarplacement
 //----------------------------------------------------------------------------
 
-AttBarplacement::AttBarplacement(): Att() {
+AttBarplacement::AttBarplacement(): Att()
+{
     ResetBarplacement();
 }
 
-AttBarplacement::~AttBarplacement() {
-
+AttBarplacement::~AttBarplacement()
+{
 }
 
-void AttBarplacement::ResetBarplacement() {
+void AttBarplacement::ResetBarplacement()
+{
     m_barplace = BARPLACE_NONE;
     m_taktplace = 0;
 }
 
-bool AttBarplacement::ReadBarplacement(pugi::xml_node element) {
+bool AttBarplacement::ReadBarplacement(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("barplace")) {
         this->SetBarplace(StrToBarplace(element.attribute("barplace").value()));
@@ -417,7 +452,8 @@ bool AttBarplacement::ReadBarplacement(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBarplacement::WriteBarplacement(pugi::xml_node element) {
+bool AttBarplacement::WriteBarplacement(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBarplace()) {
         element.append_attribute("barplace") = BarplaceToStr(this->GetBarplace()).c_str();
@@ -447,21 +483,24 @@ bool AttBarplacement::HasTaktplace()
 // AttBeamingVis
 //----------------------------------------------------------------------------
 
-AttBeamingVis::AttBeamingVis(): Att() {
+AttBeamingVis::AttBeamingVis(): Att()
+{
     ResetBeamingVis();
 }
 
-AttBeamingVis::~AttBeamingVis() {
-
+AttBeamingVis::~AttBeamingVis()
+{
 }
 
-void AttBeamingVis::ResetBeamingVis() {
+void AttBeamingVis::ResetBeamingVis()
+{
     m_beamColor = "";
     m_beamRend = beamingVis_BEAMREND_NONE;
     m_beamSlope = 0.0;
 }
 
-bool AttBeamingVis::ReadBeamingVis(pugi::xml_node element) {
+bool AttBeamingVis::ReadBeamingVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("beam.color")) {
         this->SetBeamColor(StrToStr(element.attribute("beam.color").value()));
@@ -481,7 +520,8 @@ bool AttBeamingVis::ReadBeamingVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBeamingVis::WriteBeamingVis(pugi::xml_node element) {
+bool AttBeamingVis::WriteBeamingVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBeamColor()) {
         element.append_attribute("beam.color") = StrToStr(this->GetBeamColor()).c_str();
@@ -520,19 +560,22 @@ bool AttBeamingVis::HasBeamSlope()
 // AttBibl
 //----------------------------------------------------------------------------
 
-AttBibl::AttBibl(): Att() {
+AttBibl::AttBibl(): Att()
+{
     ResetBibl();
 }
 
-AttBibl::~AttBibl() {
-
+AttBibl::~AttBibl()
+{
 }
 
-void AttBibl::ResetBibl() {
+void AttBibl::ResetBibl()
+{
     m_analog = "";
 }
 
-bool AttBibl::ReadBibl(pugi::xml_node element) {
+bool AttBibl::ReadBibl(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("analog")) {
         this->SetAnalog(StrToStr(element.attribute("analog").value()));
@@ -542,7 +585,8 @@ bool AttBibl::ReadBibl(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttBibl::WriteBibl(pugi::xml_node element) {
+bool AttBibl::WriteBibl(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAnalog()) {
         element.append_attribute("analog") = StrToStr(this->GetAnalog()).c_str();
@@ -563,19 +607,22 @@ bool AttBibl::HasAnalog()
 // AttCalendared
 //----------------------------------------------------------------------------
 
-AttCalendared::AttCalendared(): Att() {
+AttCalendared::AttCalendared(): Att()
+{
     ResetCalendared();
 }
 
-AttCalendared::~AttCalendared() {
-
+AttCalendared::~AttCalendared()
+{
 }
 
-void AttCalendared::ResetCalendared() {
+void AttCalendared::ResetCalendared()
+{
     m_calendar = "";
 }
 
-bool AttCalendared::ReadCalendared(pugi::xml_node element) {
+bool AttCalendared::ReadCalendared(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("calendar")) {
         this->SetCalendar(StrToStr(element.attribute("calendar").value()));
@@ -585,7 +632,8 @@ bool AttCalendared::ReadCalendared(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCalendared::WriteCalendared(pugi::xml_node element) {
+bool AttCalendared::WriteCalendared(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCalendar()) {
         element.append_attribute("calendar") = StrToStr(this->GetCalendar()).c_str();
@@ -606,19 +654,22 @@ bool AttCalendared::HasCalendar()
 // AttCanonical
 //----------------------------------------------------------------------------
 
-AttCanonical::AttCanonical(): Att() {
+AttCanonical::AttCanonical(): Att()
+{
     ResetCanonical();
 }
 
-AttCanonical::~AttCanonical() {
-
+AttCanonical::~AttCanonical()
+{
 }
 
-void AttCanonical::ResetCanonical() {
+void AttCanonical::ResetCanonical()
+{
     m_codedval = "";
 }
 
-bool AttCanonical::ReadCanonical(pugi::xml_node element) {
+bool AttCanonical::ReadCanonical(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("codedval")) {
         this->SetCodedval(StrToStr(element.attribute("codedval").value()));
@@ -628,7 +679,8 @@ bool AttCanonical::ReadCanonical(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCanonical::WriteCanonical(pugi::xml_node element) {
+bool AttCanonical::WriteCanonical(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCodedval()) {
         element.append_attribute("codedval") = StrToStr(this->GetCodedval()).c_str();
@@ -649,19 +701,22 @@ bool AttCanonical::HasCodedval()
 // AttChordVis
 //----------------------------------------------------------------------------
 
-AttChordVis::AttChordVis(): Att() {
+AttChordVis::AttChordVis(): Att()
+{
     ResetChordVis();
 }
 
-AttChordVis::~AttChordVis() {
-
+AttChordVis::~AttChordVis()
+{
 }
 
-void AttChordVis::ResetChordVis() {
+void AttChordVis::ResetChordVis()
+{
     m_cluster = CLUSTER_NONE;
 }
 
-bool AttChordVis::ReadChordVis(pugi::xml_node element) {
+bool AttChordVis::ReadChordVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("cluster")) {
         this->SetCluster(StrToCluster(element.attribute("cluster").value()));
@@ -671,7 +726,8 @@ bool AttChordVis::ReadChordVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttChordVis::WriteChordVis(pugi::xml_node element) {
+bool AttChordVis::WriteChordVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCluster()) {
         element.append_attribute("cluster") = ClusterToStr(this->GetCluster()).c_str();
@@ -692,19 +748,22 @@ bool AttChordVis::HasCluster()
 // AttClasscodeident
 //----------------------------------------------------------------------------
 
-AttClasscodeident::AttClasscodeident(): Att() {
+AttClasscodeident::AttClasscodeident(): Att()
+{
     ResetClasscodeident();
 }
 
-AttClasscodeident::~AttClasscodeident() {
-
+AttClasscodeident::~AttClasscodeident()
+{
 }
 
-void AttClasscodeident::ResetClasscodeident() {
+void AttClasscodeident::ResetClasscodeident()
+{
     m_classcode = "";
 }
 
-bool AttClasscodeident::ReadClasscodeident(pugi::xml_node element) {
+bool AttClasscodeident::ReadClasscodeident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("classcode")) {
         this->SetClasscode(StrToStr(element.attribute("classcode").value()));
@@ -714,7 +773,8 @@ bool AttClasscodeident::ReadClasscodeident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttClasscodeident::WriteClasscodeident(pugi::xml_node element) {
+bool AttClasscodeident::WriteClasscodeident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasClasscode()) {
         element.append_attribute("classcode") = StrToStr(this->GetClasscode()).c_str();
@@ -735,19 +795,22 @@ bool AttClasscodeident::HasClasscode()
 // AttClefLog
 //----------------------------------------------------------------------------
 
-AttClefLog::AttClefLog(): Att() {
+AttClefLog::AttClefLog(): Att()
+{
     ResetClefLog();
 }
 
-AttClefLog::~AttClefLog() {
-
+AttClefLog::~AttClefLog()
+{
 }
 
-void AttClefLog::ResetClefLog() {
+void AttClefLog::ResetClefLog()
+{
     m_cautionary = BOOLEAN_NONE;
 }
 
-bool AttClefLog::ReadClefLog(pugi::xml_node element) {
+bool AttClefLog::ReadClefLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("cautionary")) {
         this->SetCautionary(StrToBoolean(element.attribute("cautionary").value()));
@@ -757,7 +820,8 @@ bool AttClefLog::ReadClefLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttClefLog::WriteClefLog(pugi::xml_node element) {
+bool AttClefLog::WriteClefLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCautionary()) {
         element.append_attribute("cautionary") = BooleanToStr(this->GetCautionary()).c_str();
@@ -778,22 +842,25 @@ bool AttClefLog::HasCautionary()
 // AttCleffingLog
 //----------------------------------------------------------------------------
 
-AttCleffingLog::AttCleffingLog(): Att() {
+AttCleffingLog::AttCleffingLog(): Att()
+{
     ResetCleffingLog();
 }
 
-AttCleffingLog::~AttCleffingLog() {
-
+AttCleffingLog::~AttCleffingLog()
+{
 }
 
-void AttCleffingLog::ResetCleffingLog() {
+void AttCleffingLog::ResetCleffingLog()
+{
     m_clefShape = CLEFSHAPE_NONE;
     m_clefLine = 0;
     m_clefDis = OCTAVE_DIS_NONE;
     m_clefDisPlace = PLACE_NONE;
 }
 
-bool AttCleffingLog::ReadCleffingLog(pugi::xml_node element) {
+bool AttCleffingLog::ReadCleffingLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("clef.shape")) {
         this->SetClefShape(StrToClefshape(element.attribute("clef.shape").value()));
@@ -818,7 +885,8 @@ bool AttCleffingLog::ReadCleffingLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCleffingLog::WriteCleffingLog(pugi::xml_node element) {
+bool AttCleffingLog::WriteCleffingLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasClefShape()) {
         element.append_attribute("clef.shape") = ClefshapeToStr(this->GetClefShape()).c_str();
@@ -866,20 +934,23 @@ bool AttCleffingLog::HasClefDisPlace()
 // AttCleffingVis
 //----------------------------------------------------------------------------
 
-AttCleffingVis::AttCleffingVis(): Att() {
+AttCleffingVis::AttCleffingVis(): Att()
+{
     ResetCleffingVis();
 }
 
-AttCleffingVis::~AttCleffingVis() {
-
+AttCleffingVis::~AttCleffingVis()
+{
 }
 
-void AttCleffingVis::ResetCleffingVis() {
+void AttCleffingVis::ResetCleffingVis()
+{
     m_clefColor = "";
     m_clefVisible = BOOLEAN_NONE;
 }
 
-bool AttCleffingVis::ReadCleffingVis(pugi::xml_node element) {
+bool AttCleffingVis::ReadCleffingVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("clef.color")) {
         this->SetClefColor(StrToStr(element.attribute("clef.color").value()));
@@ -894,7 +965,8 @@ bool AttCleffingVis::ReadCleffingVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCleffingVis::WriteCleffingVis(pugi::xml_node element) {
+bool AttCleffingVis::WriteCleffingVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasClefColor()) {
         element.append_attribute("clef.color") = StrToStr(this->GetClefColor()).c_str();
@@ -924,19 +996,22 @@ bool AttCleffingVis::HasClefVisible()
 // AttClefshape
 //----------------------------------------------------------------------------
 
-AttClefshape::AttClefshape(): Att() {
+AttClefshape::AttClefshape(): Att()
+{
     ResetClefshape();
 }
 
-AttClefshape::~AttClefshape() {
-
+AttClefshape::~AttClefshape()
+{
 }
 
-void AttClefshape::ResetClefshape() {
+void AttClefshape::ResetClefshape()
+{
     m_shape = CLEFSHAPE_NONE;
 }
 
-bool AttClefshape::ReadClefshape(pugi::xml_node element) {
+bool AttClefshape::ReadClefshape(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("shape")) {
         this->SetShape(StrToClefshape(element.attribute("shape").value()));
@@ -946,7 +1021,8 @@ bool AttClefshape::ReadClefshape(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttClefshape::WriteClefshape(pugi::xml_node element) {
+bool AttClefshape::WriteClefshape(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasShape()) {
         element.append_attribute("shape") = ClefshapeToStr(this->GetShape()).c_str();
@@ -967,19 +1043,22 @@ bool AttClefshape::HasShape()
 // AttColor
 //----------------------------------------------------------------------------
 
-AttColor::AttColor(): Att() {
+AttColor::AttColor(): Att()
+{
     ResetColor();
 }
 
-AttColor::~AttColor() {
-
+AttColor::~AttColor()
+{
 }
 
-void AttColor::ResetColor() {
+void AttColor::ResetColor()
+{
     m_color = "";
 }
 
-bool AttColor::ReadColor(pugi::xml_node element) {
+bool AttColor::ReadColor(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("color")) {
         this->SetColor(StrToStr(element.attribute("color").value()));
@@ -989,7 +1068,8 @@ bool AttColor::ReadColor(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttColor::WriteColor(pugi::xml_node element) {
+bool AttColor::WriteColor(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasColor()) {
         element.append_attribute("color") = StrToStr(this->GetColor()).c_str();
@@ -1010,19 +1090,22 @@ bool AttColor::HasColor()
 // AttColoration
 //----------------------------------------------------------------------------
 
-AttColoration::AttColoration(): Att() {
+AttColoration::AttColoration(): Att()
+{
     ResetColoration();
 }
 
-AttColoration::~AttColoration() {
-
+AttColoration::~AttColoration()
+{
 }
 
-void AttColoration::ResetColoration() {
+void AttColoration::ResetColoration()
+{
     m_colored = BOOLEAN_NONE;
 }
 
-bool AttColoration::ReadColoration(pugi::xml_node element) {
+bool AttColoration::ReadColoration(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("colored")) {
         this->SetColored(StrToBoolean(element.attribute("colored").value()));
@@ -1032,7 +1115,8 @@ bool AttColoration::ReadColoration(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttColoration::WriteColoration(pugi::xml_node element) {
+bool AttColoration::WriteColoration(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasColored()) {
         element.append_attribute("colored") = BooleanToStr(this->GetColored()).c_str();
@@ -1053,19 +1137,22 @@ bool AttColoration::HasColored()
 // AttCommon
 //----------------------------------------------------------------------------
 
-AttCommon::AttCommon(): Att() {
+AttCommon::AttCommon(): Att()
+{
     ResetCommon();
 }
 
-AttCommon::~AttCommon() {
-
+AttCommon::~AttCommon()
+{
 }
 
-void AttCommon::ResetCommon() {
+void AttCommon::ResetCommon()
+{
     m_n = 0;
 }
 
-bool AttCommon::ReadCommon(pugi::xml_node element) {
+bool AttCommon::ReadCommon(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("n")) {
         this->SetN(StrToInt(element.attribute("n").value()));
@@ -1075,7 +1162,8 @@ bool AttCommon::ReadCommon(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCommon::WriteCommon(pugi::xml_node element) {
+bool AttCommon::WriteCommon(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasN()) {
         element.append_attribute("n") = IntToStr(this->GetN()).c_str();
@@ -1096,20 +1184,23 @@ bool AttCommon::HasN()
 // AttCommonPart
 //----------------------------------------------------------------------------
 
-AttCommonPart::AttCommonPart(): Att() {
+AttCommonPart::AttCommonPart(): Att()
+{
     ResetCommonPart();
 }
 
-AttCommonPart::~AttCommonPart() {
-
+AttCommonPart::~AttCommonPart()
+{
 }
 
-void AttCommonPart::ResetCommonPart() {
+void AttCommonPart::ResetCommonPart()
+{
     m_label = "";
     m_base = "";
 }
 
-bool AttCommonPart::ReadCommonPart(pugi::xml_node element) {
+bool AttCommonPart::ReadCommonPart(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("label")) {
         this->SetLabel(StrToStr(element.attribute("label").value()));
@@ -1124,7 +1215,8 @@ bool AttCommonPart::ReadCommonPart(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCommonPart::WriteCommonPart(pugi::xml_node element) {
+bool AttCommonPart::WriteCommonPart(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLabel()) {
         element.append_attribute("label") = StrToStr(this->GetLabel()).c_str();
@@ -1154,22 +1246,25 @@ bool AttCommonPart::HasBase()
 // AttCoordinated
 //----------------------------------------------------------------------------
 
-AttCoordinated::AttCoordinated(): Att() {
+AttCoordinated::AttCoordinated(): Att()
+{
     ResetCoordinated();
 }
 
-AttCoordinated::~AttCoordinated() {
-
+AttCoordinated::~AttCoordinated()
+{
 }
 
-void AttCoordinated::ResetCoordinated() {
+void AttCoordinated::ResetCoordinated()
+{
     m_ulx = 0;
     m_uly = 0;
     m_lrx = 0;
     m_lry = 0;
 }
 
-bool AttCoordinated::ReadCoordinated(pugi::xml_node element) {
+bool AttCoordinated::ReadCoordinated(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ulx")) {
         this->SetUlx(StrToInt(element.attribute("ulx").value()));
@@ -1194,7 +1289,8 @@ bool AttCoordinated::ReadCoordinated(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCoordinated::WriteCoordinated(pugi::xml_node element) {
+bool AttCoordinated::WriteCoordinated(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasUlx()) {
         element.append_attribute("ulx") = IntToStr(this->GetUlx()).c_str();
@@ -1242,21 +1338,24 @@ bool AttCoordinated::HasLry()
 // AttCurvature
 //----------------------------------------------------------------------------
 
-AttCurvature::AttCurvature(): Att() {
+AttCurvature::AttCurvature(): Att()
+{
     ResetCurvature();
 }
 
-AttCurvature::~AttCurvature() {
-
+AttCurvature::~AttCurvature()
+{
 }
 
-void AttCurvature::ResetCurvature() {
+void AttCurvature::ResetCurvature()
+{
     m_bezier = "";
     m_bulge = 0.0;
     m_curvedir = curvature_CURVEDIR_NONE;
 }
 
-bool AttCurvature::ReadCurvature(pugi::xml_node element) {
+bool AttCurvature::ReadCurvature(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("bezier")) {
         this->SetBezier(StrToStr(element.attribute("bezier").value()));
@@ -1276,7 +1375,8 @@ bool AttCurvature::ReadCurvature(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCurvature::WriteCurvature(pugi::xml_node element) {
+bool AttCurvature::WriteCurvature(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBezier()) {
         element.append_attribute("bezier") = StrToStr(this->GetBezier()).c_str();
@@ -1315,20 +1415,23 @@ bool AttCurvature::HasCurvedir()
 // AttCurverend
 //----------------------------------------------------------------------------
 
-AttCurverend::AttCurverend(): Att() {
+AttCurverend::AttCurverend(): Att()
+{
     ResetCurverend();
 }
 
-AttCurverend::~AttCurverend() {
-
+AttCurverend::~AttCurverend()
+{
 }
 
-void AttCurverend::ResetCurverend() {
+void AttCurverend::ResetCurverend()
+{
     m_lform = LINEFORM_NONE;
     m_lwidth = "";
 }
 
-bool AttCurverend::ReadCurverend(pugi::xml_node element) {
+bool AttCurverend::ReadCurverend(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("lform")) {
         this->SetLform(StrToLineform(element.attribute("lform").value()));
@@ -1343,7 +1446,8 @@ bool AttCurverend::ReadCurverend(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCurverend::WriteCurverend(pugi::xml_node element) {
+bool AttCurverend::WriteCurverend(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLform()) {
         element.append_attribute("lform") = LineformToStr(this->GetLform()).c_str();
@@ -1373,19 +1477,22 @@ bool AttCurverend::HasLwidth()
 // AttCustosLog
 //----------------------------------------------------------------------------
 
-AttCustosLog::AttCustosLog(): Att() {
+AttCustosLog::AttCustosLog(): Att()
+{
     ResetCustosLog();
 }
 
-AttCustosLog::~AttCustosLog() {
-
+AttCustosLog::~AttCustosLog()
+{
 }
 
-void AttCustosLog::ResetCustosLog() {
+void AttCustosLog::ResetCustosLog()
+{
     m_target = "";
 }
 
-bool AttCustosLog::ReadCustosLog(pugi::xml_node element) {
+bool AttCustosLog::ReadCustosLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("target")) {
         this->SetTarget(StrToStr(element.attribute("target").value()));
@@ -1395,7 +1502,8 @@ bool AttCustosLog::ReadCustosLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttCustosLog::WriteCustosLog(pugi::xml_node element) {
+bool AttCustosLog::WriteCustosLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTarget()) {
         element.append_attribute("target") = StrToStr(this->GetTarget()).c_str();
@@ -1416,15 +1524,17 @@ bool AttCustosLog::HasTarget()
 // AttDatable
 //----------------------------------------------------------------------------
 
-AttDatable::AttDatable(): Att() {
+AttDatable::AttDatable(): Att()
+{
     ResetDatable();
 }
 
-AttDatable::~AttDatable() {
-
+AttDatable::~AttDatable()
+{
 }
 
-void AttDatable::ResetDatable() {
+void AttDatable::ResetDatable()
+{
     m_enddate = "";
     m_isodate = "";
     m_notafter = "";
@@ -1432,7 +1542,8 @@ void AttDatable::ResetDatable() {
     m_startdate = "";
 }
 
-bool AttDatable::ReadDatable(pugi::xml_node element) {
+bool AttDatable::ReadDatable(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("enddate")) {
         this->SetEnddate(StrToStr(element.attribute("enddate").value()));
@@ -1462,7 +1573,8 @@ bool AttDatable::ReadDatable(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDatable::WriteDatable(pugi::xml_node element) {
+bool AttDatable::WriteDatable(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasEnddate()) {
         element.append_attribute("enddate") = StrToStr(this->GetEnddate()).c_str();
@@ -1519,19 +1631,22 @@ bool AttDatable::HasStartdate()
 // AttDatapointing
 //----------------------------------------------------------------------------
 
-AttDatapointing::AttDatapointing(): Att() {
+AttDatapointing::AttDatapointing(): Att()
+{
     ResetDatapointing();
 }
 
-AttDatapointing::~AttDatapointing() {
-
+AttDatapointing::~AttDatapointing()
+{
 }
 
-void AttDatapointing::ResetDatapointing() {
+void AttDatapointing::ResetDatapointing()
+{
     m_data = "";
 }
 
-bool AttDatapointing::ReadDatapointing(pugi::xml_node element) {
+bool AttDatapointing::ReadDatapointing(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("data")) {
         this->SetData(StrToStr(element.attribute("data").value()));
@@ -1541,7 +1656,8 @@ bool AttDatapointing::ReadDatapointing(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDatapointing::WriteDatapointing(pugi::xml_node element) {
+bool AttDatapointing::WriteDatapointing(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasData()) {
         element.append_attribute("data") = StrToStr(this->GetData()).c_str();
@@ -1562,19 +1678,22 @@ bool AttDatapointing::HasData()
 // AttDeclaring
 //----------------------------------------------------------------------------
 
-AttDeclaring::AttDeclaring(): Att() {
+AttDeclaring::AttDeclaring(): Att()
+{
     ResetDeclaring();
 }
 
-AttDeclaring::~AttDeclaring() {
-
+AttDeclaring::~AttDeclaring()
+{
 }
 
-void AttDeclaring::ResetDeclaring() {
+void AttDeclaring::ResetDeclaring()
+{
     m_decls = "";
 }
 
-bool AttDeclaring::ReadDeclaring(pugi::xml_node element) {
+bool AttDeclaring::ReadDeclaring(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("decls")) {
         this->SetDecls(StrToStr(element.attribute("decls").value()));
@@ -1584,7 +1703,8 @@ bool AttDeclaring::ReadDeclaring(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDeclaring::WriteDeclaring(pugi::xml_node element) {
+bool AttDeclaring::WriteDeclaring(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDecls()) {
         element.append_attribute("decls") = StrToStr(this->GetDecls()).c_str();
@@ -1605,21 +1725,24 @@ bool AttDeclaring::HasDecls()
 // AttDistances
 //----------------------------------------------------------------------------
 
-AttDistances::AttDistances(): Att() {
+AttDistances::AttDistances(): Att()
+{
     ResetDistances();
 }
 
-AttDistances::~AttDistances() {
-
+AttDistances::~AttDistances()
+{
 }
 
-void AttDistances::ResetDistances() {
+void AttDistances::ResetDistances()
+{
     m_dynamDist = "";
     m_harmDist = "";
     m_textDist = "";
 }
 
-bool AttDistances::ReadDistances(pugi::xml_node element) {
+bool AttDistances::ReadDistances(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dynam.dist")) {
         this->SetDynamDist(StrToStr(element.attribute("dynam.dist").value()));
@@ -1639,7 +1762,8 @@ bool AttDistances::ReadDistances(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDistances::WriteDistances(pugi::xml_node element) {
+bool AttDistances::WriteDistances(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDynamDist()) {
         element.append_attribute("dynam.dist") = StrToStr(this->GetDynamDist()).c_str();
@@ -1678,19 +1802,22 @@ bool AttDistances::HasTextDist()
 // AttDotLog
 //----------------------------------------------------------------------------
 
-AttDotLog::AttDotLog(): Att() {
+AttDotLog::AttDotLog(): Att()
+{
     ResetDotLog();
 }
 
-AttDotLog::~AttDotLog() {
-
+AttDotLog::~AttDotLog()
+{
 }
 
-void AttDotLog::ResetDotLog() {
+void AttDotLog::ResetDotLog()
+{
     m_form = dotLog_FORM_NONE;
 }
 
-bool AttDotLog::ReadDotLog(pugi::xml_node element) {
+bool AttDotLog::ReadDotLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToDotLogForm(element.attribute("form").value()));
@@ -1700,7 +1827,8 @@ bool AttDotLog::ReadDotLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDotLog::WriteDotLog(pugi::xml_node element) {
+bool AttDotLog::WriteDotLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = DotLogFormToStr(this->GetForm()).c_str();
@@ -1721,19 +1849,22 @@ bool AttDotLog::HasForm()
 // AttDurationAdditive
 //----------------------------------------------------------------------------
 
-AttDurationAdditive::AttDurationAdditive(): Att() {
+AttDurationAdditive::AttDurationAdditive(): Att()
+{
     ResetDurationAdditive();
 }
 
-AttDurationAdditive::~AttDurationAdditive() {
-
+AttDurationAdditive::~AttDurationAdditive()
+{
 }
 
-void AttDurationAdditive::ResetDurationAdditive() {
+void AttDurationAdditive::ResetDurationAdditive()
+{
     m_dur = DURATION_NONE;
 }
 
-bool AttDurationAdditive::ReadDurationAdditive(pugi::xml_node element) {
+bool AttDurationAdditive::ReadDurationAdditive(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dur")) {
         this->SetDur(StrToDuration(element.attribute("dur").value()));
@@ -1743,7 +1874,8 @@ bool AttDurationAdditive::ReadDurationAdditive(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDurationAdditive::WriteDurationAdditive(pugi::xml_node element) {
+bool AttDurationAdditive::WriteDurationAdditive(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDur()) {
         element.append_attribute("dur") = DurationToStr(this->GetDur()).c_str();
@@ -1764,21 +1896,24 @@ bool AttDurationAdditive::HasDur()
 // AttDurationDefault
 //----------------------------------------------------------------------------
 
-AttDurationDefault::AttDurationDefault(): Att() {
+AttDurationDefault::AttDurationDefault(): Att()
+{
     ResetDurationDefault();
 }
 
-AttDurationDefault::~AttDurationDefault() {
-
+AttDurationDefault::~AttDurationDefault()
+{
 }
 
-void AttDurationDefault::ResetDurationDefault() {
+void AttDurationDefault::ResetDurationDefault()
+{
     m_durDefault = DURATION_NONE;
     m_numDefault = 0;
     m_numbaseDefault = 0;
 }
 
-bool AttDurationDefault::ReadDurationDefault(pugi::xml_node element) {
+bool AttDurationDefault::ReadDurationDefault(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dur.default")) {
         this->SetDurDefault(StrToDuration(element.attribute("dur.default").value()));
@@ -1798,7 +1933,8 @@ bool AttDurationDefault::ReadDurationDefault(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDurationDefault::WriteDurationDefault(pugi::xml_node element) {
+bool AttDurationDefault::WriteDurationDefault(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDurDefault()) {
         element.append_attribute("dur.default") = DurationToStr(this->GetDurDefault()).c_str();
@@ -1837,19 +1973,22 @@ bool AttDurationDefault::HasNumbaseDefault()
 // AttDurationMusical
 //----------------------------------------------------------------------------
 
-AttDurationMusical::AttDurationMusical(): Att() {
+AttDurationMusical::AttDurationMusical(): Att()
+{
     ResetDurationMusical();
 }
 
-AttDurationMusical::~AttDurationMusical() {
-
+AttDurationMusical::~AttDurationMusical()
+{
 }
 
-void AttDurationMusical::ResetDurationMusical() {
+void AttDurationMusical::ResetDurationMusical()
+{
     m_dur = DURATION_NONE;
 }
 
-bool AttDurationMusical::ReadDurationMusical(pugi::xml_node element) {
+bool AttDurationMusical::ReadDurationMusical(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dur")) {
         this->SetDur(StrToDuration(element.attribute("dur").value()));
@@ -1859,7 +1998,8 @@ bool AttDurationMusical::ReadDurationMusical(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDurationMusical::WriteDurationMusical(pugi::xml_node element) {
+bool AttDurationMusical::WriteDurationMusical(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDur()) {
         element.append_attribute("dur") = DurationToStr(this->GetDur()).c_str();
@@ -1880,19 +2020,22 @@ bool AttDurationMusical::HasDur()
 // AttDurationPerformed
 //----------------------------------------------------------------------------
 
-AttDurationPerformed::AttDurationPerformed(): Att() {
+AttDurationPerformed::AttDurationPerformed(): Att()
+{
     ResetDurationPerformed();
 }
 
-AttDurationPerformed::~AttDurationPerformed() {
-
+AttDurationPerformed::~AttDurationPerformed()
+{
 }
 
-void AttDurationPerformed::ResetDurationPerformed() {
+void AttDurationPerformed::ResetDurationPerformed()
+{
     m_durGes = DURATION_NONE;
 }
 
-bool AttDurationPerformed::ReadDurationPerformed(pugi::xml_node element) {
+bool AttDurationPerformed::ReadDurationPerformed(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dur.ges")) {
         this->SetDurGes(StrToDuration(element.attribute("dur.ges").value()));
@@ -1902,7 +2045,8 @@ bool AttDurationPerformed::ReadDurationPerformed(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDurationPerformed::WriteDurationPerformed(pugi::xml_node element) {
+bool AttDurationPerformed::WriteDurationPerformed(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDurGes()) {
         element.append_attribute("dur.ges") = DurationToStr(this->GetDurGes()).c_str();
@@ -1923,20 +2067,23 @@ bool AttDurationPerformed::HasDurGes()
 // AttDurationRatio
 //----------------------------------------------------------------------------
 
-AttDurationRatio::AttDurationRatio(): Att() {
+AttDurationRatio::AttDurationRatio(): Att()
+{
     ResetDurationRatio();
 }
 
-AttDurationRatio::~AttDurationRatio() {
-
+AttDurationRatio::~AttDurationRatio()
+{
 }
 
-void AttDurationRatio::ResetDurationRatio() {
+void AttDurationRatio::ResetDurationRatio()
+{
     m_num = -1;
     m_numbase = -1;
 }
 
-bool AttDurationRatio::ReadDurationRatio(pugi::xml_node element) {
+bool AttDurationRatio::ReadDurationRatio(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
@@ -1951,7 +2098,8 @@ bool AttDurationRatio::ReadDurationRatio(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttDurationRatio::WriteDurationRatio(pugi::xml_node element) {
+bool AttDurationRatio::WriteDurationRatio(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNum()) {
         element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
@@ -1981,19 +2129,22 @@ bool AttDurationRatio::HasNumbase()
 // AttEnclosingchars
 //----------------------------------------------------------------------------
 
-AttEnclosingchars::AttEnclosingchars(): Att() {
+AttEnclosingchars::AttEnclosingchars(): Att()
+{
     ResetEnclosingchars();
 }
 
-AttEnclosingchars::~AttEnclosingchars() {
-
+AttEnclosingchars::~AttEnclosingchars()
+{
 }
 
-void AttEnclosingchars::ResetEnclosingchars() {
+void AttEnclosingchars::ResetEnclosingchars()
+{
     m_enclose = ENCLOSURE_NONE;
 }
 
-bool AttEnclosingchars::ReadEnclosingchars(pugi::xml_node element) {
+bool AttEnclosingchars::ReadEnclosingchars(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("enclose")) {
         this->SetEnclose(StrToEnclosure(element.attribute("enclose").value()));
@@ -2003,7 +2154,8 @@ bool AttEnclosingchars::ReadEnclosingchars(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttEnclosingchars::WriteEnclosingchars(pugi::xml_node element) {
+bool AttEnclosingchars::WriteEnclosingchars(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasEnclose()) {
         element.append_attribute("enclose") = EnclosureToStr(this->GetEnclose()).c_str();
@@ -2024,19 +2176,22 @@ bool AttEnclosingchars::HasEnclose()
 // AttEndings
 //----------------------------------------------------------------------------
 
-AttEndings::AttEndings(): Att() {
+AttEndings::AttEndings(): Att()
+{
     ResetEndings();
 }
 
-AttEndings::~AttEndings() {
-
+AttEndings::~AttEndings()
+{
 }
 
-void AttEndings::ResetEndings() {
+void AttEndings::ResetEndings()
+{
     m_endingRend = endings_ENDINGREND_NONE;
 }
 
-bool AttEndings::ReadEndings(pugi::xml_node element) {
+bool AttEndings::ReadEndings(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ending.rend")) {
         this->SetEndingRend(StrToEndingsEndingrend(element.attribute("ending.rend").value()));
@@ -2046,7 +2201,8 @@ bool AttEndings::ReadEndings(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttEndings::WriteEndings(pugi::xml_node element) {
+bool AttEndings::WriteEndings(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasEndingRend()) {
         element.append_attribute("ending.rend") = EndingsEndingrendToStr(this->GetEndingRend()).c_str();
@@ -2067,19 +2223,22 @@ bool AttEndings::HasEndingRend()
 // AttExtender
 //----------------------------------------------------------------------------
 
-AttExtender::AttExtender(): Att() {
+AttExtender::AttExtender(): Att()
+{
     ResetExtender();
 }
 
-AttExtender::~AttExtender() {
-
+AttExtender::~AttExtender()
+{
 }
 
-void AttExtender::ResetExtender() {
+void AttExtender::ResetExtender()
+{
     m_extender = BOOLEAN_NONE;
 }
 
-bool AttExtender::ReadExtender(pugi::xml_node element) {
+bool AttExtender::ReadExtender(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("extender")) {
         this->SetExtender(StrToBoolean(element.attribute("extender").value()));
@@ -2089,7 +2248,8 @@ bool AttExtender::ReadExtender(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttExtender::WriteExtender(pugi::xml_node element) {
+bool AttExtender::WriteExtender(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasExtender()) {
         element.append_attribute("extender") = BooleanToStr(this->GetExtender()).c_str();
@@ -2110,19 +2270,22 @@ bool AttExtender::HasExtender()
 // AttFermatapresent
 //----------------------------------------------------------------------------
 
-AttFermatapresent::AttFermatapresent(): Att() {
+AttFermatapresent::AttFermatapresent(): Att()
+{
     ResetFermatapresent();
 }
 
-AttFermatapresent::~AttFermatapresent() {
-
+AttFermatapresent::~AttFermatapresent()
+{
 }
 
-void AttFermatapresent::ResetFermatapresent() {
+void AttFermatapresent::ResetFermatapresent()
+{
     m_fermata = PLACE_NONE;
 }
 
-bool AttFermatapresent::ReadFermatapresent(pugi::xml_node element) {
+bool AttFermatapresent::ReadFermatapresent(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("fermata")) {
         this->SetFermata(StrToPlace(element.attribute("fermata").value()));
@@ -2132,7 +2295,8 @@ bool AttFermatapresent::ReadFermatapresent(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttFermatapresent::WriteFermatapresent(pugi::xml_node element) {
+bool AttFermatapresent::WriteFermatapresent(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasFermata()) {
         element.append_attribute("fermata") = PlaceToStr(this->GetFermata()).c_str();
@@ -2153,19 +2317,22 @@ bool AttFermatapresent::HasFermata()
 // AttFiling
 //----------------------------------------------------------------------------
 
-AttFiling::AttFiling(): Att() {
+AttFiling::AttFiling(): Att()
+{
     ResetFiling();
 }
 
-AttFiling::~AttFiling() {
-
+AttFiling::~AttFiling()
+{
 }
 
-void AttFiling::ResetFiling() {
+void AttFiling::ResetFiling()
+{
     m_nonfiling = 0;
 }
 
-bool AttFiling::ReadFiling(pugi::xml_node element) {
+bool AttFiling::ReadFiling(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("nonfiling")) {
         this->SetNonfiling(StrToInt(element.attribute("nonfiling").value()));
@@ -2175,7 +2342,8 @@ bool AttFiling::ReadFiling(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttFiling::WriteFiling(pugi::xml_node element) {
+bool AttFiling::WriteFiling(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNonfiling()) {
         element.append_attribute("nonfiling") = IntToStr(this->GetNonfiling()).c_str();
@@ -2196,19 +2364,22 @@ bool AttFiling::HasNonfiling()
 // AttGrpSymLog
 //----------------------------------------------------------------------------
 
-AttGrpSymLog::AttGrpSymLog(): Att() {
+AttGrpSymLog::AttGrpSymLog(): Att()
+{
     ResetGrpSymLog();
 }
 
-AttGrpSymLog::~AttGrpSymLog() {
-
+AttGrpSymLog::~AttGrpSymLog()
+{
 }
 
-void AttGrpSymLog::ResetGrpSymLog() {
+void AttGrpSymLog::ResetGrpSymLog()
+{
     m_level = 0;
 }
 
-bool AttGrpSymLog::ReadGrpSymLog(pugi::xml_node element) {
+bool AttGrpSymLog::ReadGrpSymLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("level")) {
         this->SetLevel(StrToInt(element.attribute("level").value()));
@@ -2218,7 +2389,8 @@ bool AttGrpSymLog::ReadGrpSymLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttGrpSymLog::WriteGrpSymLog(pugi::xml_node element) {
+bool AttGrpSymLog::WriteGrpSymLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLevel()) {
         element.append_attribute("level") = IntToStr(this->GetLevel()).c_str();
@@ -2239,19 +2411,22 @@ bool AttGrpSymLog::HasLevel()
 // AttHandident
 //----------------------------------------------------------------------------
 
-AttHandident::AttHandident(): Att() {
+AttHandident::AttHandident(): Att()
+{
     ResetHandident();
 }
 
-AttHandident::~AttHandident() {
-
+AttHandident::~AttHandident()
+{
 }
 
-void AttHandident::ResetHandident() {
+void AttHandident::ResetHandident()
+{
     m_hand = "";
 }
 
-bool AttHandident::ReadHandident(pugi::xml_node element) {
+bool AttHandident::ReadHandident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("hand")) {
         this->SetHand(StrToStr(element.attribute("hand").value()));
@@ -2261,7 +2436,8 @@ bool AttHandident::ReadHandident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttHandident::WriteHandident(pugi::xml_node element) {
+bool AttHandident::WriteHandident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasHand()) {
         element.append_attribute("hand") = StrToStr(this->GetHand()).c_str();
@@ -2282,19 +2458,22 @@ bool AttHandident::HasHand()
 // AttHeight
 //----------------------------------------------------------------------------
 
-AttHeight::AttHeight(): Att() {
+AttHeight::AttHeight(): Att()
+{
     ResetHeight();
 }
 
-AttHeight::~AttHeight() {
-
+AttHeight::~AttHeight()
+{
 }
 
-void AttHeight::ResetHeight() {
+void AttHeight::ResetHeight()
+{
     m_height = "";
 }
 
-bool AttHeight::ReadHeight(pugi::xml_node element) {
+bool AttHeight::ReadHeight(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("height")) {
         this->SetHeight(StrToStr(element.attribute("height").value()));
@@ -2304,7 +2483,8 @@ bool AttHeight::ReadHeight(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttHeight::WriteHeight(pugi::xml_node element) {
+bool AttHeight::WriteHeight(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasHeight()) {
         element.append_attribute("height") = StrToStr(this->GetHeight()).c_str();
@@ -2325,19 +2505,22 @@ bool AttHeight::HasHeight()
 // AttHorizontalalign
 //----------------------------------------------------------------------------
 
-AttHorizontalalign::AttHorizontalalign(): Att() {
+AttHorizontalalign::AttHorizontalalign(): Att()
+{
     ResetHorizontalalign();
 }
 
-AttHorizontalalign::~AttHorizontalalign() {
-
+AttHorizontalalign::~AttHorizontalalign()
+{
 }
 
-void AttHorizontalalign::ResetHorizontalalign() {
+void AttHorizontalalign::ResetHorizontalalign()
+{
     m_halign = HORIZONTALALIGNMENT_NONE;
 }
 
-bool AttHorizontalalign::ReadHorizontalalign(pugi::xml_node element) {
+bool AttHorizontalalign::ReadHorizontalalign(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("halign")) {
         this->SetHalign(StrToHorizontalalignment(element.attribute("halign").value()));
@@ -2347,7 +2530,8 @@ bool AttHorizontalalign::ReadHorizontalalign(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttHorizontalalign::WriteHorizontalalign(pugi::xml_node element) {
+bool AttHorizontalalign::WriteHorizontalalign(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasHalign()) {
         element.append_attribute("halign") = HorizontalalignmentToStr(this->GetHalign()).c_str();
@@ -2368,19 +2552,22 @@ bool AttHorizontalalign::HasHalign()
 // AttInstrumentident
 //----------------------------------------------------------------------------
 
-AttInstrumentident::AttInstrumentident(): Att() {
+AttInstrumentident::AttInstrumentident(): Att()
+{
     ResetInstrumentident();
 }
 
-AttInstrumentident::~AttInstrumentident() {
-
+AttInstrumentident::~AttInstrumentident()
+{
 }
 
-void AttInstrumentident::ResetInstrumentident() {
+void AttInstrumentident::ResetInstrumentident()
+{
     m_instr = "";
 }
 
-bool AttInstrumentident::ReadInstrumentident(pugi::xml_node element) {
+bool AttInstrumentident::ReadInstrumentident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("instr")) {
         this->SetInstr(StrToStr(element.attribute("instr").value()));
@@ -2390,7 +2577,8 @@ bool AttInstrumentident::ReadInstrumentident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttInstrumentident::WriteInstrumentident(pugi::xml_node element) {
+bool AttInstrumentident::WriteInstrumentident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasInstr()) {
         element.append_attribute("instr") = StrToStr(this->GetInstr()).c_str();
@@ -2411,19 +2599,22 @@ bool AttInstrumentident::HasInstr()
 // AttInternetmedia
 //----------------------------------------------------------------------------
 
-AttInternetmedia::AttInternetmedia(): Att() {
+AttInternetmedia::AttInternetmedia(): Att()
+{
     ResetInternetmedia();
 }
 
-AttInternetmedia::~AttInternetmedia() {
-
+AttInternetmedia::~AttInternetmedia()
+{
 }
 
-void AttInternetmedia::ResetInternetmedia() {
+void AttInternetmedia::ResetInternetmedia()
+{
     m_mimetype = "";
 }
 
-bool AttInternetmedia::ReadInternetmedia(pugi::xml_node element) {
+bool AttInternetmedia::ReadInternetmedia(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mimetype")) {
         this->SetMimetype(StrToStr(element.attribute("mimetype").value()));
@@ -2433,7 +2624,8 @@ bool AttInternetmedia::ReadInternetmedia(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttInternetmedia::WriteInternetmedia(pugi::xml_node element) {
+bool AttInternetmedia::WriteInternetmedia(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMimetype()) {
         element.append_attribute("mimetype") = StrToStr(this->GetMimetype()).c_str();
@@ -2454,19 +2646,22 @@ bool AttInternetmedia::HasMimetype()
 // AttJoined
 //----------------------------------------------------------------------------
 
-AttJoined::AttJoined(): Att() {
+AttJoined::AttJoined(): Att()
+{
     ResetJoined();
 }
 
-AttJoined::~AttJoined() {
-
+AttJoined::~AttJoined()
+{
 }
 
-void AttJoined::ResetJoined() {
+void AttJoined::ResetJoined()
+{
     m_join = "";
 }
 
-bool AttJoined::ReadJoined(pugi::xml_node element) {
+bool AttJoined::ReadJoined(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("join")) {
         this->SetJoin(StrToStr(element.attribute("join").value()));
@@ -2476,7 +2671,8 @@ bool AttJoined::ReadJoined(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttJoined::WriteJoined(pugi::xml_node element) {
+bool AttJoined::WriteJoined(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasJoin()) {
         element.append_attribute("join") = StrToStr(this->GetJoin()).c_str();
@@ -2497,19 +2693,22 @@ bool AttJoined::HasJoin()
 // AttKeySigLog
 //----------------------------------------------------------------------------
 
-AttKeySigLog::AttKeySigLog(): Att() {
+AttKeySigLog::AttKeySigLog(): Att()
+{
     ResetKeySigLog();
 }
 
-AttKeySigLog::~AttKeySigLog() {
-
+AttKeySigLog::~AttKeySigLog()
+{
 }
 
-void AttKeySigLog::ResetKeySigLog() {
+void AttKeySigLog::ResetKeySigLog()
+{
     m_mode = MODE_NONE;
 }
 
-bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element) {
+bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mode")) {
         this->SetMode(StrToMode(element.attribute("mode").value()));
@@ -2519,7 +2718,8 @@ bool AttKeySigLog::ReadKeySigLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element) {
+bool AttKeySigLog::WriteKeySigLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMode()) {
         element.append_attribute("mode") = ModeToStr(this->GetMode()).c_str();
@@ -2540,15 +2740,17 @@ bool AttKeySigLog::HasMode()
 // AttKeySigDefaultLog
 //----------------------------------------------------------------------------
 
-AttKeySigDefaultLog::AttKeySigDefaultLog(): Att() {
+AttKeySigDefaultLog::AttKeySigDefaultLog(): Att()
+{
     ResetKeySigDefaultLog();
 }
 
-AttKeySigDefaultLog::~AttKeySigDefaultLog() {
-
+AttKeySigDefaultLog::~AttKeySigDefaultLog()
+{
 }
 
-void AttKeySigDefaultLog::ResetKeySigDefaultLog() {
+void AttKeySigDefaultLog::ResetKeySigDefaultLog()
+{
     m_keyAccid = ACCIDENTAL_IMPLICIT_NONE;
     m_keyMode = MODE_NONE;
     m_keyPname = PITCHNAME_NONE;
@@ -2556,7 +2758,8 @@ void AttKeySigDefaultLog::ResetKeySigDefaultLog() {
     m_keySigMixed = "";
 }
 
-bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element) {
+bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("key.accid")) {
         this->SetKeyAccid(StrToAccidentalImplicit(element.attribute("key.accid").value()));
@@ -2586,7 +2789,8 @@ bool AttKeySigDefaultLog::ReadKeySigDefaultLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element) {
+bool AttKeySigDefaultLog::WriteKeySigDefaultLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasKeyAccid()) {
         element.append_attribute("key.accid") = AccidentalImplicitToStr(this->GetKeyAccid()).c_str();
@@ -2643,20 +2847,23 @@ bool AttKeySigDefaultLog::HasKeySigMixed()
 // AttKeySigDefaultVis
 //----------------------------------------------------------------------------
 
-AttKeySigDefaultVis::AttKeySigDefaultVis(): Att() {
+AttKeySigDefaultVis::AttKeySigDefaultVis(): Att()
+{
     ResetKeySigDefaultVis();
 }
 
-AttKeySigDefaultVis::~AttKeySigDefaultVis() {
-
+AttKeySigDefaultVis::~AttKeySigDefaultVis()
+{
 }
 
-void AttKeySigDefaultVis::ResetKeySigDefaultVis() {
+void AttKeySigDefaultVis::ResetKeySigDefaultVis()
+{
     m_keySigShow = BOOLEAN_NONE;
     m_keySigShowchange = BOOLEAN_NONE;
 }
 
-bool AttKeySigDefaultVis::ReadKeySigDefaultVis(pugi::xml_node element) {
+bool AttKeySigDefaultVis::ReadKeySigDefaultVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("key.sig.show")) {
         this->SetKeySigShow(StrToBoolean(element.attribute("key.sig.show").value()));
@@ -2671,7 +2878,8 @@ bool AttKeySigDefaultVis::ReadKeySigDefaultVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttKeySigDefaultVis::WriteKeySigDefaultVis(pugi::xml_node element) {
+bool AttKeySigDefaultVis::WriteKeySigDefaultVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasKeySigShow()) {
         element.append_attribute("key.sig.show") = BooleanToStr(this->GetKeySigShow()).c_str();
@@ -2701,19 +2909,22 @@ bool AttKeySigDefaultVis::HasKeySigShowchange()
 // AttLabelsAddl
 //----------------------------------------------------------------------------
 
-AttLabelsAddl::AttLabelsAddl(): Att() {
+AttLabelsAddl::AttLabelsAddl(): Att()
+{
     ResetLabelsAddl();
 }
 
-AttLabelsAddl::~AttLabelsAddl() {
-
+AttLabelsAddl::~AttLabelsAddl()
+{
 }
 
-void AttLabelsAddl::ResetLabelsAddl() {
+void AttLabelsAddl::ResetLabelsAddl()
+{
     m_labelAbbr = "";
 }
 
-bool AttLabelsAddl::ReadLabelsAddl(pugi::xml_node element) {
+bool AttLabelsAddl::ReadLabelsAddl(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("label.abbr")) {
         this->SetLabelAbbr(StrToStr(element.attribute("label.abbr").value()));
@@ -2723,7 +2934,8 @@ bool AttLabelsAddl::ReadLabelsAddl(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLabelsAddl::WriteLabelsAddl(pugi::xml_node element) {
+bool AttLabelsAddl::WriteLabelsAddl(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLabelAbbr()) {
         element.append_attribute("label.abbr") = StrToStr(this->GetLabelAbbr()).c_str();
@@ -2744,20 +2956,23 @@ bool AttLabelsAddl::HasLabelAbbr()
 // AttLang
 //----------------------------------------------------------------------------
 
-AttLang::AttLang(): Att() {
+AttLang::AttLang(): Att()
+{
     ResetLang();
 }
 
-AttLang::~AttLang() {
-
+AttLang::~AttLang()
+{
 }
 
-void AttLang::ResetLang() {
+void AttLang::ResetLang()
+{
     m_lang = "";
     m_translit = "";
 }
 
-bool AttLang::ReadLang(pugi::xml_node element) {
+bool AttLang::ReadLang(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("xml:lang")) {
         this->SetLang(StrToStr(element.attribute("xml:lang").value()));
@@ -2772,7 +2987,8 @@ bool AttLang::ReadLang(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLang::WriteLang(pugi::xml_node element) {
+bool AttLang::WriteLang(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLang()) {
         element.append_attribute("xml:lang") = StrToStr(this->GetLang()).c_str();
@@ -2802,19 +3018,22 @@ bool AttLang::HasTranslit()
 // AttLayerLog
 //----------------------------------------------------------------------------
 
-AttLayerLog::AttLayerLog(): Att() {
+AttLayerLog::AttLayerLog(): Att()
+{
     ResetLayerLog();
 }
 
-AttLayerLog::~AttLayerLog() {
-
+AttLayerLog::~AttLayerLog()
+{
 }
 
-void AttLayerLog::ResetLayerLog() {
+void AttLayerLog::ResetLayerLog()
+{
     m_def = "";
 }
 
-bool AttLayerLog::ReadLayerLog(pugi::xml_node element) {
+bool AttLayerLog::ReadLayerLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("def")) {
         this->SetDef(StrToStr(element.attribute("def").value()));
@@ -2824,7 +3043,8 @@ bool AttLayerLog::ReadLayerLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLayerLog::WriteLayerLog(pugi::xml_node element) {
+bool AttLayerLog::WriteLayerLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDef()) {
         element.append_attribute("def") = StrToStr(this->GetDef()).c_str();
@@ -2845,19 +3065,22 @@ bool AttLayerLog::HasDef()
 // AttLayerident
 //----------------------------------------------------------------------------
 
-AttLayerident::AttLayerident(): Att() {
+AttLayerident::AttLayerident(): Att()
+{
     ResetLayerident();
 }
 
-AttLayerident::~AttLayerident() {
-
+AttLayerident::~AttLayerident()
+{
 }
 
-void AttLayerident::ResetLayerident() {
+void AttLayerident::ResetLayerident()
+{
     m_layer = 0;
 }
 
-bool AttLayerident::ReadLayerident(pugi::xml_node element) {
+bool AttLayerident::ReadLayerident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("layer")) {
         this->SetLayer(StrToInt(element.attribute("layer").value()));
@@ -2867,7 +3090,8 @@ bool AttLayerident::ReadLayerident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLayerident::WriteLayerident(pugi::xml_node element) {
+bool AttLayerident::WriteLayerident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLayer()) {
         element.append_attribute("layer") = IntToStr(this->GetLayer()).c_str();
@@ -2888,15 +3112,17 @@ bool AttLayerident::HasLayer()
 // AttLineVis
 //----------------------------------------------------------------------------
 
-AttLineVis::AttLineVis(): Att() {
+AttLineVis::AttLineVis(): Att()
+{
     ResetLineVis();
 }
 
-AttLineVis::~AttLineVis() {
-
+AttLineVis::~AttLineVis()
+{
 }
 
-void AttLineVis::ResetLineVis() {
+void AttLineVis::ResetLineVis()
+{
     m_form = LINEFORM_NONE;
     m_width = "";
     m_endsym = LINESTARTENDSYMBOL_NONE;
@@ -2905,7 +3131,8 @@ void AttLineVis::ResetLineVis() {
     m_startsymsize = "";
 }
 
-bool AttLineVis::ReadLineVis(pugi::xml_node element) {
+bool AttLineVis::ReadLineVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToLineform(element.attribute("form").value()));
@@ -2940,7 +3167,8 @@ bool AttLineVis::ReadLineVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLineVis::WriteLineVis(pugi::xml_node element) {
+bool AttLineVis::WriteLineVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = LineformToStr(this->GetForm()).c_str();
@@ -3006,19 +3234,22 @@ bool AttLineVis::HasStartsymsize()
 // AttLineloc
 //----------------------------------------------------------------------------
 
-AttLineloc::AttLineloc(): Att() {
+AttLineloc::AttLineloc(): Att()
+{
     ResetLineloc();
 }
 
-AttLineloc::~AttLineloc() {
-
+AttLineloc::~AttLineloc()
+{
 }
 
-void AttLineloc::ResetLineloc() {
+void AttLineloc::ResetLineloc()
+{
     m_line = 0;
 }
 
-bool AttLineloc::ReadLineloc(pugi::xml_node element) {
+bool AttLineloc::ReadLineloc(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("line")) {
         this->SetLine(StrToInt(element.attribute("line").value()));
@@ -3028,7 +3259,8 @@ bool AttLineloc::ReadLineloc(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLineloc::WriteLineloc(pugi::xml_node element) {
+bool AttLineloc::WriteLineloc(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLine()) {
         element.append_attribute("line") = IntToStr(this->GetLine()).c_str();
@@ -3049,22 +3281,25 @@ bool AttLineloc::HasLine()
 // AttLinerend
 //----------------------------------------------------------------------------
 
-AttLinerend::AttLinerend(): Att() {
+AttLinerend::AttLinerend(): Att()
+{
     ResetLinerend();
 }
 
-AttLinerend::~AttLinerend() {
-
+AttLinerend::~AttLinerend()
+{
 }
 
-void AttLinerend::ResetLinerend() {
+void AttLinerend::ResetLinerend()
+{
     m_lendsym = LINESTARTENDSYMBOL_NONE;
     m_lendsymsize = "";
     m_lstartsym = LINESTARTENDSYMBOL_NONE;
     m_lstartsymsize = "";
 }
 
-bool AttLinerend::ReadLinerend(pugi::xml_node element) {
+bool AttLinerend::ReadLinerend(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("lendsym")) {
         this->SetLendsym(StrToLinestartendsymbol(element.attribute("lendsym").value()));
@@ -3089,7 +3324,8 @@ bool AttLinerend::ReadLinerend(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLinerend::WriteLinerend(pugi::xml_node element) {
+bool AttLinerend::WriteLinerend(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLendsym()) {
         element.append_attribute("lendsym") = LinestartendsymbolToStr(this->GetLendsym()).c_str();
@@ -3137,20 +3373,23 @@ bool AttLinerend::HasLstartsymsize()
 // AttLinerendBase
 //----------------------------------------------------------------------------
 
-AttLinerendBase::AttLinerendBase(): Att() {
+AttLinerendBase::AttLinerendBase(): Att()
+{
     ResetLinerendBase();
 }
 
-AttLinerendBase::~AttLinerendBase() {
-
+AttLinerendBase::~AttLinerendBase()
+{
 }
 
-void AttLinerendBase::ResetLinerendBase() {
+void AttLinerendBase::ResetLinerendBase()
+{
     m_lform = LINEFORM_NONE;
     m_lwidth = "";
 }
 
-bool AttLinerendBase::ReadLinerendBase(pugi::xml_node element) {
+bool AttLinerendBase::ReadLinerendBase(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("lform")) {
         this->SetLform(StrToLineform(element.attribute("lform").value()));
@@ -3165,7 +3404,8 @@ bool AttLinerendBase::ReadLinerendBase(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLinerendBase::WriteLinerendBase(pugi::xml_node element) {
+bool AttLinerendBase::WriteLinerendBase(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLform()) {
         element.append_attribute("lform") = LineformToStr(this->GetLform()).c_str();
@@ -3195,15 +3435,17 @@ bool AttLinerendBase::HasLwidth()
 // AttLyricstyle
 //----------------------------------------------------------------------------
 
-AttLyricstyle::AttLyricstyle(): Att() {
+AttLyricstyle::AttLyricstyle(): Att()
+{
     ResetLyricstyle();
 }
 
-AttLyricstyle::~AttLyricstyle() {
-
+AttLyricstyle::~AttLyricstyle()
+{
 }
 
-void AttLyricstyle::ResetLyricstyle() {
+void AttLyricstyle::ResetLyricstyle()
+{
     m_lyricAlign = "";
     m_lyricFam = "";
     m_lyricName = "";
@@ -3212,7 +3454,8 @@ void AttLyricstyle::ResetLyricstyle() {
     m_lyricWeight = FONTWEIGHT_NONE;
 }
 
-bool AttLyricstyle::ReadLyricstyle(pugi::xml_node element) {
+bool AttLyricstyle::ReadLyricstyle(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("lyric.align")) {
         this->SetLyricAlign(StrToStr(element.attribute("lyric.align").value()));
@@ -3247,7 +3490,8 @@ bool AttLyricstyle::ReadLyricstyle(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLyricstyle::WriteLyricstyle(pugi::xml_node element) {
+bool AttLyricstyle::WriteLyricstyle(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLyricAlign()) {
         element.append_attribute("lyric.align") = StrToStr(this->GetLyricAlign()).c_str();
@@ -3313,20 +3557,23 @@ bool AttLyricstyle::HasLyricWeight()
 // AttMeasureLog
 //----------------------------------------------------------------------------
 
-AttMeasureLog::AttMeasureLog(): Att() {
+AttMeasureLog::AttMeasureLog(): Att()
+{
     ResetMeasureLog();
 }
 
-AttMeasureLog::~AttMeasureLog() {
-
+AttMeasureLog::~AttMeasureLog()
+{
 }
 
-void AttMeasureLog::ResetMeasureLog() {
+void AttMeasureLog::ResetMeasureLog()
+{
     m_left = BARRENDITION_NONE;
     m_right = BARRENDITION_single;
 }
 
-bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element) {
+bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("left")) {
         this->SetLeft(StrToBarrendition(element.attribute("left").value()));
@@ -3341,7 +3588,8 @@ bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeasureLog::WriteMeasureLog(pugi::xml_node element) {
+bool AttMeasureLog::WriteMeasureLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLeft()) {
         element.append_attribute("left") = BarrenditionToStr(this->GetLeft()).c_str();
@@ -3371,19 +3619,22 @@ bool AttMeasureLog::HasRight()
 // AttMeasurement
 //----------------------------------------------------------------------------
 
-AttMeasurement::AttMeasurement(): Att() {
+AttMeasurement::AttMeasurement(): Att()
+{
     ResetMeasurement();
 }
 
-AttMeasurement::~AttMeasurement() {
-
+AttMeasurement::~AttMeasurement()
+{
 }
 
-void AttMeasurement::ResetMeasurement() {
+void AttMeasurement::ResetMeasurement()
+{
     m_unit = "";
 }
 
-bool AttMeasurement::ReadMeasurement(pugi::xml_node element) {
+bool AttMeasurement::ReadMeasurement(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("unit")) {
         this->SetUnit(StrToStr(element.attribute("unit").value()));
@@ -3393,7 +3644,8 @@ bool AttMeasurement::ReadMeasurement(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeasurement::WriteMeasurement(pugi::xml_node element) {
+bool AttMeasurement::WriteMeasurement(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasUnit()) {
         element.append_attribute("unit") = StrToStr(this->GetUnit()).c_str();
@@ -3414,19 +3666,22 @@ bool AttMeasurement::HasUnit()
 // AttMeasurenumbers
 //----------------------------------------------------------------------------
 
-AttMeasurenumbers::AttMeasurenumbers(): Att() {
+AttMeasurenumbers::AttMeasurenumbers(): Att()
+{
     ResetMeasurenumbers();
 }
 
-AttMeasurenumbers::~AttMeasurenumbers() {
-
+AttMeasurenumbers::~AttMeasurenumbers()
+{
 }
 
-void AttMeasurenumbers::ResetMeasurenumbers() {
+void AttMeasurenumbers::ResetMeasurenumbers()
+{
     m_mnumVisible = BOOLEAN_NONE;
 }
 
-bool AttMeasurenumbers::ReadMeasurenumbers(pugi::xml_node element) {
+bool AttMeasurenumbers::ReadMeasurenumbers(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mnum.visible")) {
         this->SetMnumVisible(StrToBoolean(element.attribute("mnum.visible").value()));
@@ -3436,7 +3691,8 @@ bool AttMeasurenumbers::ReadMeasurenumbers(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeasurenumbers::WriteMeasurenumbers(pugi::xml_node element) {
+bool AttMeasurenumbers::WriteMeasurenumbers(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMnumVisible()) {
         element.append_attribute("mnum.visible") = BooleanToStr(this->GetMnumVisible()).c_str();
@@ -3457,21 +3713,24 @@ bool AttMeasurenumbers::HasMnumVisible()
 // AttMediabounds
 //----------------------------------------------------------------------------
 
-AttMediabounds::AttMediabounds(): Att() {
+AttMediabounds::AttMediabounds(): Att()
+{
     ResetMediabounds();
 }
 
-AttMediabounds::~AttMediabounds() {
-
+AttMediabounds::~AttMediabounds()
+{
 }
 
-void AttMediabounds::ResetMediabounds() {
+void AttMediabounds::ResetMediabounds()
+{
     m_begin = "";
     m_end = "";
     m_betype = BETYPE_NONE;
 }
 
-bool AttMediabounds::ReadMediabounds(pugi::xml_node element) {
+bool AttMediabounds::ReadMediabounds(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("begin")) {
         this->SetBegin(StrToStr(element.attribute("begin").value()));
@@ -3491,7 +3750,8 @@ bool AttMediabounds::ReadMediabounds(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMediabounds::WriteMediabounds(pugi::xml_node element) {
+bool AttMediabounds::WriteMediabounds(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBegin()) {
         element.append_attribute("begin") = StrToStr(this->GetBegin()).c_str();
@@ -3530,19 +3790,22 @@ bool AttMediabounds::HasBetype()
 // AttMedium
 //----------------------------------------------------------------------------
 
-AttMedium::AttMedium(): Att() {
+AttMedium::AttMedium(): Att()
+{
     ResetMedium();
 }
 
-AttMedium::~AttMedium() {
-
+AttMedium::~AttMedium()
+{
 }
 
-void AttMedium::ResetMedium() {
+void AttMedium::ResetMedium()
+{
     m_medium = "";
 }
 
-bool AttMedium::ReadMedium(pugi::xml_node element) {
+bool AttMedium::ReadMedium(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("medium")) {
         this->SetMedium(StrToStr(element.attribute("medium").value()));
@@ -3552,7 +3815,8 @@ bool AttMedium::ReadMedium(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMedium::WriteMedium(pugi::xml_node element) {
+bool AttMedium::WriteMedium(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMedium()) {
         element.append_attribute("medium") = StrToStr(this->GetMedium()).c_str();
@@ -3573,19 +3837,22 @@ bool AttMedium::HasMedium()
 // AttMeiversion
 //----------------------------------------------------------------------------
 
-AttMeiversion::AttMeiversion(): Att() {
+AttMeiversion::AttMeiversion(): Att()
+{
     ResetMeiversion();
 }
 
-AttMeiversion::~AttMeiversion() {
-
+AttMeiversion::~AttMeiversion()
+{
 }
 
-void AttMeiversion::ResetMeiversion() {
+void AttMeiversion::ResetMeiversion()
+{
     m_meiversion = meiversion_MEIVERSION_NONE;
 }
 
-bool AttMeiversion::ReadMeiversion(pugi::xml_node element) {
+bool AttMeiversion::ReadMeiversion(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("meiversion")) {
         this->SetMeiversion(StrToMeiversionMeiversion(element.attribute("meiversion").value()));
@@ -3595,7 +3862,8 @@ bool AttMeiversion::ReadMeiversion(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeiversion::WriteMeiversion(pugi::xml_node element) {
+bool AttMeiversion::WriteMeiversion(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMeiversion()) {
         element.append_attribute("meiversion") = MeiversionMeiversionToStr(this->GetMeiversion()).c_str();
@@ -3616,20 +3884,23 @@ bool AttMeiversion::HasMeiversion()
 // AttMensurLog
 //----------------------------------------------------------------------------
 
-AttMensurLog::AttMensurLog(): Att() {
+AttMensurLog::AttMensurLog(): Att()
+{
     ResetMensurLog();
 }
 
-AttMensurLog::~AttMensurLog() {
-
+AttMensurLog::~AttMensurLog()
+{
 }
 
-void AttMensurLog::ResetMensurLog() {
+void AttMensurLog::ResetMensurLog()
+{
     m_dot = BOOLEAN_NONE;
     m_sign = MENSURATIONSIGN_NONE;
 }
 
-bool AttMensurLog::ReadMensurLog(pugi::xml_node element) {
+bool AttMensurLog::ReadMensurLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dot")) {
         this->SetDot(StrToBoolean(element.attribute("dot").value()));
@@ -3644,7 +3915,8 @@ bool AttMensurLog::ReadMensurLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMensurLog::WriteMensurLog(pugi::xml_node element) {
+bool AttMensurLog::WriteMensurLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDot()) {
         element.append_attribute("dot") = BooleanToStr(this->GetDot()).c_str();
@@ -3674,21 +3946,24 @@ bool AttMensurLog::HasSign()
 // AttMeterSigLog
 //----------------------------------------------------------------------------
 
-AttMeterSigLog::AttMeterSigLog(): Att() {
+AttMeterSigLog::AttMeterSigLog(): Att()
+{
     ResetMeterSigLog();
 }
 
-AttMeterSigLog::~AttMeterSigLog() {
-
+AttMeterSigLog::~AttMeterSigLog()
+{
 }
 
-void AttMeterSigLog::ResetMeterSigLog() {
+void AttMeterSigLog::ResetMeterSigLog()
+{
     m_count = 0;
     m_sym = METERSIGN_NONE;
     m_unit = 0;
 }
 
-bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element) {
+bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("count")) {
         this->SetCount(StrToInt(element.attribute("count").value()));
@@ -3708,7 +3983,8 @@ bool AttMeterSigLog::ReadMeterSigLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element) {
+bool AttMeterSigLog::WriteMeterSigLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCount()) {
         element.append_attribute("count") = IntToStr(this->GetCount()).c_str();
@@ -3747,19 +4023,22 @@ bool AttMeterSigLog::HasUnit()
 // AttMeterSigVis
 //----------------------------------------------------------------------------
 
-AttMeterSigVis::AttMeterSigVis(): Att() {
+AttMeterSigVis::AttMeterSigVis(): Att()
+{
     ResetMeterSigVis();
 }
 
-AttMeterSigVis::~AttMeterSigVis() {
-
+AttMeterSigVis::~AttMeterSigVis()
+{
 }
 
-void AttMeterSigVis::ResetMeterSigVis() {
+void AttMeterSigVis::ResetMeterSigVis()
+{
     m_form = meterSigVis_FORM_NONE;
 }
 
-bool AttMeterSigVis::ReadMeterSigVis(pugi::xml_node element) {
+bool AttMeterSigVis::ReadMeterSigVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToMeterSigVisForm(element.attribute("form").value()));
@@ -3769,7 +4048,8 @@ bool AttMeterSigVis::ReadMeterSigVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeterSigVis::WriteMeterSigVis(pugi::xml_node element) {
+bool AttMeterSigVis::WriteMeterSigVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = MeterSigVisFormToStr(this->GetForm()).c_str();
@@ -3790,20 +4070,23 @@ bool AttMeterSigVis::HasForm()
 // AttMeterSigDefaultLog
 //----------------------------------------------------------------------------
 
-AttMeterSigDefaultLog::AttMeterSigDefaultLog(): Att() {
+AttMeterSigDefaultLog::AttMeterSigDefaultLog(): Att()
+{
     ResetMeterSigDefaultLog();
 }
 
-AttMeterSigDefaultLog::~AttMeterSigDefaultLog() {
-
+AttMeterSigDefaultLog::~AttMeterSigDefaultLog()
+{
 }
 
-void AttMeterSigDefaultLog::ResetMeterSigDefaultLog() {
+void AttMeterSigDefaultLog::ResetMeterSigDefaultLog()
+{
     m_meterCount = 0;
     m_meterUnit = 0;
 }
 
-bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element) {
+bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("meter.count")) {
         this->SetMeterCount(StrToInt(element.attribute("meter.count").value()));
@@ -3818,7 +4101,8 @@ bool AttMeterSigDefaultLog::ReadMeterSigDefaultLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element) {
+bool AttMeterSigDefaultLog::WriteMeterSigDefaultLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMeterCount()) {
         element.append_attribute("meter.count") = IntToStr(this->GetMeterCount()).c_str();
@@ -3848,21 +4132,24 @@ bool AttMeterSigDefaultLog::HasMeterUnit()
 // AttMeterSigDefaultVis
 //----------------------------------------------------------------------------
 
-AttMeterSigDefaultVis::AttMeterSigDefaultVis(): Att() {
+AttMeterSigDefaultVis::AttMeterSigDefaultVis(): Att()
+{
     ResetMeterSigDefaultVis();
 }
 
-AttMeterSigDefaultVis::~AttMeterSigDefaultVis() {
-
+AttMeterSigDefaultVis::~AttMeterSigDefaultVis()
+{
 }
 
-void AttMeterSigDefaultVis::ResetMeterSigDefaultVis() {
+void AttMeterSigDefaultVis::ResetMeterSigDefaultVis()
+{
     m_meterRend = meterSigDefaultVis_METERREND_NONE;
     m_meterShowchange = BOOLEAN_NONE;
     m_meterSym = METERSIGN_NONE;
 }
 
-bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element) {
+bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("meter.rend")) {
         this->SetMeterRend(StrToMeterSigDefaultVisMeterrend(element.attribute("meter.rend").value()));
@@ -3882,7 +4169,8 @@ bool AttMeterSigDefaultVis::ReadMeterSigDefaultVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element) {
+bool AttMeterSigDefaultVis::WriteMeterSigDefaultVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMeterRend()) {
         element.append_attribute("meter.rend") = MeterSigDefaultVisMeterrendToStr(this->GetMeterRend()).c_str();
@@ -3921,19 +4209,22 @@ bool AttMeterSigDefaultVis::HasMeterSym()
 // AttMeterconformance
 //----------------------------------------------------------------------------
 
-AttMeterconformance::AttMeterconformance(): Att() {
+AttMeterconformance::AttMeterconformance(): Att()
+{
     ResetMeterconformance();
 }
 
-AttMeterconformance::~AttMeterconformance() {
-
+AttMeterconformance::~AttMeterconformance()
+{
 }
 
-void AttMeterconformance::ResetMeterconformance() {
+void AttMeterconformance::ResetMeterconformance()
+{
     m_metcon = meterconformance_METCON_NONE;
 }
 
-bool AttMeterconformance::ReadMeterconformance(pugi::xml_node element) {
+bool AttMeterconformance::ReadMeterconformance(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("metcon")) {
         this->SetMetcon(StrToMeterconformanceMetcon(element.attribute("metcon").value()));
@@ -3943,7 +4234,8 @@ bool AttMeterconformance::ReadMeterconformance(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeterconformance::WriteMeterconformance(pugi::xml_node element) {
+bool AttMeterconformance::WriteMeterconformance(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMetcon()) {
         element.append_attribute("metcon") = MeterconformanceMetconToStr(this->GetMetcon()).c_str();
@@ -3964,20 +4256,23 @@ bool AttMeterconformance::HasMetcon()
 // AttMeterconformanceBar
 //----------------------------------------------------------------------------
 
-AttMeterconformanceBar::AttMeterconformanceBar(): Att() {
+AttMeterconformanceBar::AttMeterconformanceBar(): Att()
+{
     ResetMeterconformanceBar();
 }
 
-AttMeterconformanceBar::~AttMeterconformanceBar() {
-
+AttMeterconformanceBar::~AttMeterconformanceBar()
+{
 }
 
-void AttMeterconformanceBar::ResetMeterconformanceBar() {
+void AttMeterconformanceBar::ResetMeterconformanceBar()
+{
     m_metcon = BOOLEAN_NONE;
     m_control = BOOLEAN_NONE;
 }
 
-bool AttMeterconformanceBar::ReadMeterconformanceBar(pugi::xml_node element) {
+bool AttMeterconformanceBar::ReadMeterconformanceBar(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("metcon")) {
         this->SetMetcon(StrToBoolean(element.attribute("metcon").value()));
@@ -3992,7 +4287,8 @@ bool AttMeterconformanceBar::ReadMeterconformanceBar(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMeterconformanceBar::WriteMeterconformanceBar(pugi::xml_node element) {
+bool AttMeterconformanceBar::WriteMeterconformanceBar(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMetcon()) {
         element.append_attribute("metcon") = BooleanToStr(this->GetMetcon()).c_str();
@@ -4022,21 +4318,24 @@ bool AttMeterconformanceBar::HasControl()
 // AttMmtempo
 //----------------------------------------------------------------------------
 
-AttMmtempo::AttMmtempo(): Att() {
+AttMmtempo::AttMmtempo(): Att()
+{
     ResetMmtempo();
 }
 
-AttMmtempo::~AttMmtempo() {
-
+AttMmtempo::~AttMmtempo()
+{
 }
 
-void AttMmtempo::ResetMmtempo() {
+void AttMmtempo::ResetMmtempo()
+{
     m_mm = "";
     m_mmUnit = DURATION_NONE;
     m_mmDots = 0;
 }
 
-bool AttMmtempo::ReadMmtempo(pugi::xml_node element) {
+bool AttMmtempo::ReadMmtempo(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mm")) {
         this->SetMm(StrToStr(element.attribute("mm").value()));
@@ -4056,7 +4355,8 @@ bool AttMmtempo::ReadMmtempo(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMmtempo::WriteMmtempo(pugi::xml_node element) {
+bool AttMmtempo::WriteMmtempo(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMm()) {
         element.append_attribute("mm") = StrToStr(this->GetMm()).c_str();
@@ -4095,19 +4395,22 @@ bool AttMmtempo::HasMmDots()
 // AttMultinummeasures
 //----------------------------------------------------------------------------
 
-AttMultinummeasures::AttMultinummeasures(): Att() {
+AttMultinummeasures::AttMultinummeasures(): Att()
+{
     ResetMultinummeasures();
 }
 
-AttMultinummeasures::~AttMultinummeasures() {
-
+AttMultinummeasures::~AttMultinummeasures()
+{
 }
 
-void AttMultinummeasures::ResetMultinummeasures() {
+void AttMultinummeasures::ResetMultinummeasures()
+{
     m_multiNumber = BOOLEAN_NONE;
 }
 
-bool AttMultinummeasures::ReadMultinummeasures(pugi::xml_node element) {
+bool AttMultinummeasures::ReadMultinummeasures(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("multi.number")) {
         this->SetMultiNumber(StrToBoolean(element.attribute("multi.number").value()));
@@ -4117,7 +4420,8 @@ bool AttMultinummeasures::ReadMultinummeasures(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMultinummeasures::WriteMultinummeasures(pugi::xml_node element) {
+bool AttMultinummeasures::WriteMultinummeasures(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMultiNumber()) {
         element.append_attribute("multi.number") = BooleanToStr(this->GetMultiNumber()).c_str();
@@ -4138,20 +4442,23 @@ bool AttMultinummeasures::HasMultiNumber()
 // AttName
 //----------------------------------------------------------------------------
 
-AttName::AttName(): Att() {
+AttName::AttName(): Att()
+{
     ResetName();
 }
 
-AttName::~AttName() {
-
+AttName::~AttName()
+{
 }
 
-void AttName::ResetName() {
+void AttName::ResetName()
+{
     m_nymref = "";
     m_role = "";
 }
 
-bool AttName::ReadName(pugi::xml_node element) {
+bool AttName::ReadName(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("nymref")) {
         this->SetNymref(StrToStr(element.attribute("nymref").value()));
@@ -4166,7 +4473,8 @@ bool AttName::ReadName(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttName::WriteName(pugi::xml_node element) {
+bool AttName::WriteName(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNymref()) {
         element.append_attribute("nymref") = StrToStr(this->GetNymref()).c_str();
@@ -4196,20 +4504,23 @@ bool AttName::HasRole()
 // AttNotationstyle
 //----------------------------------------------------------------------------
 
-AttNotationstyle::AttNotationstyle(): Att() {
+AttNotationstyle::AttNotationstyle(): Att()
+{
     ResetNotationstyle();
 }
 
-AttNotationstyle::~AttNotationstyle() {
-
+AttNotationstyle::~AttNotationstyle()
+{
 }
 
-void AttNotationstyle::ResetNotationstyle() {
+void AttNotationstyle::ResetNotationstyle()
+{
     m_musicName = "";
     m_musicSize = "";
 }
 
-bool AttNotationstyle::ReadNotationstyle(pugi::xml_node element) {
+bool AttNotationstyle::ReadNotationstyle(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("music.name")) {
         this->SetMusicName(StrToStr(element.attribute("music.name").value()));
@@ -4224,7 +4535,8 @@ bool AttNotationstyle::ReadNotationstyle(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNotationstyle::WriteNotationstyle(pugi::xml_node element) {
+bool AttNotationstyle::WriteNotationstyle(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMusicName()) {
         element.append_attribute("music.name") = StrToStr(this->GetMusicName()).c_str();
@@ -4254,21 +4566,24 @@ bool AttNotationstyle::HasMusicSize()
 // AttNoteGes
 //----------------------------------------------------------------------------
 
-AttNoteGes::AttNoteGes(): Att() {
+AttNoteGes::AttNoteGes(): Att()
+{
     ResetNoteGes();
 }
 
-AttNoteGes::~AttNoteGes() {
-
+AttNoteGes::~AttNoteGes()
+{
 }
 
-void AttNoteGes::ResetNoteGes() {
+void AttNoteGes::ResetNoteGes()
+{
     m_octGes = 0;
     m_pnameGes = PITCHNAME_NONE;
     m_pnum = 0;
 }
 
-bool AttNoteGes::ReadNoteGes(pugi::xml_node element) {
+bool AttNoteGes::ReadNoteGes(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("oct.ges")) {
         this->SetOctGes(StrToInt(element.attribute("oct.ges").value()));
@@ -4288,7 +4603,8 @@ bool AttNoteGes::ReadNoteGes(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNoteGes::WriteNoteGes(pugi::xml_node element) {
+bool AttNoteGes::WriteNoteGes(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOctGes()) {
         element.append_attribute("oct.ges") = IntToStr(this->GetOctGes()).c_str();
@@ -4327,15 +4643,17 @@ bool AttNoteGes::HasPnum()
 // AttNoteheads
 //----------------------------------------------------------------------------
 
-AttNoteheads::AttNoteheads(): Att() {
+AttNoteheads::AttNoteheads(): Att()
+{
     ResetNoteheads();
 }
 
-AttNoteheads::~AttNoteheads() {
-
+AttNoteheads::~AttNoteheads()
+{
 }
 
-void AttNoteheads::ResetNoteheads() {
+void AttNoteheads::ResetNoteheads()
+{
     m_headColor = "";
     m_headFill = "";
     m_headFillcolor = "";
@@ -4345,7 +4663,8 @@ void AttNoteheads::ResetNoteheads() {
     m_headVisible = BOOLEAN_NONE;
 }
 
-bool AttNoteheads::ReadNoteheads(pugi::xml_node element) {
+bool AttNoteheads::ReadNoteheads(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("head.color")) {
         this->SetHeadColor(StrToStr(element.attribute("head.color").value()));
@@ -4385,7 +4704,8 @@ bool AttNoteheads::ReadNoteheads(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNoteheads::WriteNoteheads(pugi::xml_node element) {
+bool AttNoteheads::WriteNoteheads(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasHeadColor()) {
         element.append_attribute("head.color") = StrToStr(this->GetHeadColor()).c_str();
@@ -4460,19 +4780,22 @@ bool AttNoteheads::HasHeadVisible()
 // AttOctave
 //----------------------------------------------------------------------------
 
-AttOctave::AttOctave(): Att() {
+AttOctave::AttOctave(): Att()
+{
     ResetOctave();
 }
 
-AttOctave::~AttOctave() {
-
+AttOctave::~AttOctave()
+{
 }
 
-void AttOctave::ResetOctave() {
+void AttOctave::ResetOctave()
+{
     m_oct = 0;
 }
 
-bool AttOctave::ReadOctave(pugi::xml_node element) {
+bool AttOctave::ReadOctave(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("oct")) {
         this->SetOct(StrToInt(element.attribute("oct").value()));
@@ -4482,7 +4805,8 @@ bool AttOctave::ReadOctave(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOctave::WriteOctave(pugi::xml_node element) {
+bool AttOctave::WriteOctave(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOct()) {
         element.append_attribute("oct") = IntToStr(this->GetOct()).c_str();
@@ -4503,19 +4827,22 @@ bool AttOctave::HasOct()
 // AttOctavedefault
 //----------------------------------------------------------------------------
 
-AttOctavedefault::AttOctavedefault(): Att() {
+AttOctavedefault::AttOctavedefault(): Att()
+{
     ResetOctavedefault();
 }
 
-AttOctavedefault::~AttOctavedefault() {
-
+AttOctavedefault::~AttOctavedefault()
+{
 }
 
-void AttOctavedefault::ResetOctavedefault() {
+void AttOctavedefault::ResetOctavedefault()
+{
     m_octaveDefault = 0;
 }
 
-bool AttOctavedefault::ReadOctavedefault(pugi::xml_node element) {
+bool AttOctavedefault::ReadOctavedefault(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("octave.default")) {
         this->SetOctaveDefault(StrToInt(element.attribute("octave.default").value()));
@@ -4525,7 +4852,8 @@ bool AttOctavedefault::ReadOctavedefault(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOctavedefault::WriteOctavedefault(pugi::xml_node element) {
+bool AttOctavedefault::WriteOctavedefault(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOctaveDefault()) {
         element.append_attribute("octave.default") = IntToStr(this->GetOctaveDefault()).c_str();
@@ -4546,20 +4874,23 @@ bool AttOctavedefault::HasOctaveDefault()
 // AttOctavedisplacement
 //----------------------------------------------------------------------------
 
-AttOctavedisplacement::AttOctavedisplacement(): Att() {
+AttOctavedisplacement::AttOctavedisplacement(): Att()
+{
     ResetOctavedisplacement();
 }
 
-AttOctavedisplacement::~AttOctavedisplacement() {
-
+AttOctavedisplacement::~AttOctavedisplacement()
+{
 }
 
-void AttOctavedisplacement::ResetOctavedisplacement() {
+void AttOctavedisplacement::ResetOctavedisplacement()
+{
     m_dis = OCTAVE_DIS_NONE;
     m_disPlace = PLACE_NONE;
 }
 
-bool AttOctavedisplacement::ReadOctavedisplacement(pugi::xml_node element) {
+bool AttOctavedisplacement::ReadOctavedisplacement(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("dis")) {
         this->SetDis(StrToOctaveDis(element.attribute("dis").value()));
@@ -4574,7 +4905,8 @@ bool AttOctavedisplacement::ReadOctavedisplacement(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOctavedisplacement::WriteOctavedisplacement(pugi::xml_node element) {
+bool AttOctavedisplacement::WriteOctavedisplacement(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDis()) {
         element.append_attribute("dis") = OctaveDisToStr(this->GetDis()).c_str();
@@ -4604,19 +4936,22 @@ bool AttOctavedisplacement::HasDisPlace()
 // AttOnelinestaff
 //----------------------------------------------------------------------------
 
-AttOnelinestaff::AttOnelinestaff(): Att() {
+AttOnelinestaff::AttOnelinestaff(): Att()
+{
     ResetOnelinestaff();
 }
 
-AttOnelinestaff::~AttOnelinestaff() {
-
+AttOnelinestaff::~AttOnelinestaff()
+{
 }
 
-void AttOnelinestaff::ResetOnelinestaff() {
+void AttOnelinestaff::ResetOnelinestaff()
+{
     m_ontheline = BOOLEAN_NONE;
 }
 
-bool AttOnelinestaff::ReadOnelinestaff(pugi::xml_node element) {
+bool AttOnelinestaff::ReadOnelinestaff(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ontheline")) {
         this->SetOntheline(StrToBoolean(element.attribute("ontheline").value()));
@@ -4626,7 +4961,8 @@ bool AttOnelinestaff::ReadOnelinestaff(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOnelinestaff::WriteOnelinestaff(pugi::xml_node element) {
+bool AttOnelinestaff::WriteOnelinestaff(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOntheline()) {
         element.append_attribute("ontheline") = BooleanToStr(this->GetOntheline()).c_str();
@@ -4647,19 +4983,22 @@ bool AttOnelinestaff::HasOntheline()
 // AttOptimization
 //----------------------------------------------------------------------------
 
-AttOptimization::AttOptimization(): Att() {
+AttOptimization::AttOptimization(): Att()
+{
     ResetOptimization();
 }
 
-AttOptimization::~AttOptimization() {
-
+AttOptimization::~AttOptimization()
+{
 }
 
-void AttOptimization::ResetOptimization() {
+void AttOptimization::ResetOptimization()
+{
     m_optimize = BOOLEAN_NONE;
 }
 
-bool AttOptimization::ReadOptimization(pugi::xml_node element) {
+bool AttOptimization::ReadOptimization(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("optimize")) {
         this->SetOptimize(StrToBoolean(element.attribute("optimize").value()));
@@ -4669,7 +5008,8 @@ bool AttOptimization::ReadOptimization(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttOptimization::WriteOptimization(pugi::xml_node element) {
+bool AttOptimization::WriteOptimization(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOptimize()) {
         element.append_attribute("optimize") = BooleanToStr(this->GetOptimize()).c_str();
@@ -4690,19 +5030,22 @@ bool AttOptimization::HasOptimize()
 // AttPadLog
 //----------------------------------------------------------------------------
 
-AttPadLog::AttPadLog(): Att() {
+AttPadLog::AttPadLog(): Att()
+{
     ResetPadLog();
 }
 
-AttPadLog::~AttPadLog() {
-
+AttPadLog::~AttPadLog()
+{
 }
 
-void AttPadLog::ResetPadLog() {
+void AttPadLog::ResetPadLog()
+{
     m_num = 0;
 }
 
-bool AttPadLog::ReadPadLog(pugi::xml_node element) {
+bool AttPadLog::ReadPadLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("num")) {
         this->SetNum(StrToInt(element.attribute("num").value()));
@@ -4712,7 +5055,8 @@ bool AttPadLog::ReadPadLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPadLog::WritePadLog(pugi::xml_node element) {
+bool AttPadLog::WritePadLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasNum()) {
         element.append_attribute("num") = IntToStr(this->GetNum()).c_str();
@@ -4733,15 +5077,17 @@ bool AttPadLog::HasNum()
 // AttPages
 //----------------------------------------------------------------------------
 
-AttPages::AttPages(): Att() {
+AttPages::AttPages(): Att()
+{
     ResetPages();
 }
 
-AttPages::~AttPages() {
-
+AttPages::~AttPages()
+{
 }
 
-void AttPages::ResetPages() {
+void AttPages::ResetPages()
+{
     m_pageHeight = "";
     m_pageWidth = "";
     m_pageTopmar = "";
@@ -4752,7 +5098,8 @@ void AttPages::ResetPages() {
     m_pageScale = "";
 }
 
-bool AttPages::ReadPages(pugi::xml_node element) {
+bool AttPages::ReadPages(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("page.height")) {
         this->SetPageHeight(StrToStr(element.attribute("page.height").value()));
@@ -4797,7 +5144,8 @@ bool AttPages::ReadPages(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPages::WritePages(pugi::xml_node element) {
+bool AttPages::WritePages(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPageHeight()) {
         element.append_attribute("page.height") = StrToStr(this->GetPageHeight()).c_str();
@@ -4881,19 +5229,22 @@ bool AttPages::HasPageScale()
 // AttPbVis
 //----------------------------------------------------------------------------
 
-AttPbVis::AttPbVis(): Att() {
+AttPbVis::AttPbVis(): Att()
+{
     ResetPbVis();
 }
 
-AttPbVis::~AttPbVis() {
-
+AttPbVis::~AttPbVis()
+{
 }
 
-void AttPbVis::ResetPbVis() {
+void AttPbVis::ResetPbVis()
+{
     m_folium = pbVis_FOLIUM_NONE;
 }
 
-bool AttPbVis::ReadPbVis(pugi::xml_node element) {
+bool AttPbVis::ReadPbVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("folium")) {
         this->SetFolium(StrToPbVisFolium(element.attribute("folium").value()));
@@ -4903,7 +5254,8 @@ bool AttPbVis::ReadPbVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPbVis::WritePbVis(pugi::xml_node element) {
+bool AttPbVis::WritePbVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasFolium()) {
         element.append_attribute("folium") = PbVisFoliumToStr(this->GetFolium()).c_str();
@@ -4924,19 +5276,22 @@ bool AttPbVis::HasFolium()
 // AttPitch
 //----------------------------------------------------------------------------
 
-AttPitch::AttPitch(): Att() {
+AttPitch::AttPitch(): Att()
+{
     ResetPitch();
 }
 
-AttPitch::~AttPitch() {
-
+AttPitch::~AttPitch()
+{
 }
 
-void AttPitch::ResetPitch() {
+void AttPitch::ResetPitch()
+{
     m_pname = PITCHNAME_NONE;
 }
 
-bool AttPitch::ReadPitch(pugi::xml_node element) {
+bool AttPitch::ReadPitch(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("pname")) {
         this->SetPname(StrToPitchname(element.attribute("pname").value()));
@@ -4946,7 +5301,8 @@ bool AttPitch::ReadPitch(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPitch::WritePitch(pugi::xml_node element) {
+bool AttPitch::WritePitch(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPname()) {
         element.append_attribute("pname") = PitchnameToStr(this->GetPname()).c_str();
@@ -4967,19 +5323,22 @@ bool AttPitch::HasPname()
 // AttPlacement
 //----------------------------------------------------------------------------
 
-AttPlacement::AttPlacement(): Att() {
+AttPlacement::AttPlacement(): Att()
+{
     ResetPlacement();
 }
 
-AttPlacement::~AttPlacement() {
-
+AttPlacement::~AttPlacement()
+{
 }
 
-void AttPlacement::ResetPlacement() {
+void AttPlacement::ResetPlacement()
+{
     m_place = STAFFREL_NONE;
 }
 
-bool AttPlacement::ReadPlacement(pugi::xml_node element) {
+bool AttPlacement::ReadPlacement(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("place")) {
         this->SetPlace(StrToStaffrel(element.attribute("place").value()));
@@ -4989,7 +5348,8 @@ bool AttPlacement::ReadPlacement(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPlacement::WritePlacement(pugi::xml_node element) {
+bool AttPlacement::WritePlacement(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPlace()) {
         element.append_attribute("place") = StaffrelToStr(this->GetPlace()).c_str();
@@ -5010,20 +5370,23 @@ bool AttPlacement::HasPlace()
 // AttPlist
 //----------------------------------------------------------------------------
 
-AttPlist::AttPlist(): Att() {
+AttPlist::AttPlist(): Att()
+{
     ResetPlist();
 }
 
-AttPlist::~AttPlist() {
-
+AttPlist::~AttPlist()
+{
 }
 
-void AttPlist::ResetPlist() {
+void AttPlist::ResetPlist()
+{
     m_plist = "";
     m_evaluate = plist_EVALUATE_NONE;
 }
 
-bool AttPlist::ReadPlist(pugi::xml_node element) {
+bool AttPlist::ReadPlist(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("plist")) {
         this->SetPlist(StrToStr(element.attribute("plist").value()));
@@ -5038,7 +5401,8 @@ bool AttPlist::ReadPlist(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPlist::WritePlist(pugi::xml_node element) {
+bool AttPlist::WritePlist(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPlist()) {
         element.append_attribute("plist") = StrToStr(this->GetPlist()).c_str();
@@ -5068,15 +5432,17 @@ bool AttPlist::HasEvaluate()
 // AttPointing
 //----------------------------------------------------------------------------
 
-AttPointing::AttPointing(): Att() {
+AttPointing::AttPointing(): Att()
+{
     ResetPointing();
 }
 
-AttPointing::~AttPointing() {
-
+AttPointing::~AttPointing()
+{
 }
 
-void AttPointing::ResetPointing() {
+void AttPointing::ResetPointing()
+{
     m_actuate = "";
     m_role = "";
     m_show = "";
@@ -5085,7 +5451,8 @@ void AttPointing::ResetPointing() {
     m_title = "";
 }
 
-bool AttPointing::ReadPointing(pugi::xml_node element) {
+bool AttPointing::ReadPointing(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("xlink:actuate")) {
         this->SetActuate(StrToStr(element.attribute("xlink:actuate").value()));
@@ -5120,7 +5487,8 @@ bool AttPointing::ReadPointing(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttPointing::WritePointing(pugi::xml_node element) {
+bool AttPointing::WritePointing(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasActuate()) {
         element.append_attribute("xlink:actuate") = StrToStr(this->GetActuate()).c_str();
@@ -5186,19 +5554,22 @@ bool AttPointing::HasTitle()
 // AttQuantity
 //----------------------------------------------------------------------------
 
-AttQuantity::AttQuantity(): Att() {
+AttQuantity::AttQuantity(): Att()
+{
     ResetQuantity();
 }
 
-AttQuantity::~AttQuantity() {
-
+AttQuantity::~AttQuantity()
+{
 }
 
-void AttQuantity::ResetQuantity() {
+void AttQuantity::ResetQuantity()
+{
     m_quantity = 0.0;
 }
 
-bool AttQuantity::ReadQuantity(pugi::xml_node element) {
+bool AttQuantity::ReadQuantity(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("quantity")) {
         this->SetQuantity(StrToDbl(element.attribute("quantity").value()));
@@ -5208,7 +5579,8 @@ bool AttQuantity::ReadQuantity(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttQuantity::WriteQuantity(pugi::xml_node element) {
+bool AttQuantity::WriteQuantity(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasQuantity()) {
         element.append_attribute("quantity") = DblToStr(this->GetQuantity()).c_str();
@@ -5229,19 +5601,22 @@ bool AttQuantity::HasQuantity()
 // AttRelativesize
 //----------------------------------------------------------------------------
 
-AttRelativesize::AttRelativesize(): Att() {
+AttRelativesize::AttRelativesize(): Att()
+{
     ResetRelativesize();
 }
 
-AttRelativesize::~AttRelativesize() {
-
+AttRelativesize::~AttRelativesize()
+{
 }
 
-void AttRelativesize::ResetRelativesize() {
+void AttRelativesize::ResetRelativesize()
+{
     m_size = SIZE_NONE;
 }
 
-bool AttRelativesize::ReadRelativesize(pugi::xml_node element) {
+bool AttRelativesize::ReadRelativesize(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("size")) {
         this->SetSize(StrToSize(element.attribute("size").value()));
@@ -5251,7 +5626,8 @@ bool AttRelativesize::ReadRelativesize(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttRelativesize::WriteRelativesize(pugi::xml_node element) {
+bool AttRelativesize::WriteRelativesize(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSize()) {
         element.append_attribute("size") = SizeToStr(this->GetSize()).c_str();
@@ -5272,19 +5648,22 @@ bool AttRelativesize::HasSize()
 // AttResponsibility
 //----------------------------------------------------------------------------
 
-AttResponsibility::AttResponsibility(): Att() {
+AttResponsibility::AttResponsibility(): Att()
+{
     ResetResponsibility();
 }
 
-AttResponsibility::~AttResponsibility() {
-
+AttResponsibility::~AttResponsibility()
+{
 }
 
-void AttResponsibility::ResetResponsibility() {
+void AttResponsibility::ResetResponsibility()
+{
     m_resp = "";
 }
 
-bool AttResponsibility::ReadResponsibility(pugi::xml_node element) {
+bool AttResponsibility::ReadResponsibility(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("resp")) {
         this->SetResp(StrToStr(element.attribute("resp").value()));
@@ -5294,7 +5673,8 @@ bool AttResponsibility::ReadResponsibility(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttResponsibility::WriteResponsibility(pugi::xml_node element) {
+bool AttResponsibility::WriteResponsibility(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasResp()) {
         element.append_attribute("resp") = StrToStr(this->GetResp()).c_str();
@@ -5315,19 +5695,22 @@ bool AttResponsibility::HasResp()
 // AttSbVis
 //----------------------------------------------------------------------------
 
-AttSbVis::AttSbVis(): Att() {
+AttSbVis::AttSbVis(): Att()
+{
     ResetSbVis();
 }
 
-AttSbVis::~AttSbVis() {
-
+AttSbVis::~AttSbVis()
+{
 }
 
-void AttSbVis::ResetSbVis() {
+void AttSbVis::ResetSbVis()
+{
     m_form = sbVis_FORM_NONE;
 }
 
-bool AttSbVis::ReadSbVis(pugi::xml_node element) {
+bool AttSbVis::ReadSbVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToSbVisForm(element.attribute("form").value()));
@@ -5337,7 +5720,8 @@ bool AttSbVis::ReadSbVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSbVis::WriteSbVis(pugi::xml_node element) {
+bool AttSbVis::WriteSbVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = SbVisFormToStr(this->GetForm()).c_str();
@@ -5358,19 +5742,22 @@ bool AttSbVis::HasForm()
 // AttScalable
 //----------------------------------------------------------------------------
 
-AttScalable::AttScalable(): Att() {
+AttScalable::AttScalable(): Att()
+{
     ResetScalable();
 }
 
-AttScalable::~AttScalable() {
-
+AttScalable::~AttScalable()
+{
 }
 
-void AttScalable::ResetScalable() {
+void AttScalable::ResetScalable()
+{
     m_scale = 0;
 }
 
-bool AttScalable::ReadScalable(pugi::xml_node element) {
+bool AttScalable::ReadScalable(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("scale")) {
         this->SetScale(StrToInt(element.attribute("scale").value()));
@@ -5380,7 +5767,8 @@ bool AttScalable::ReadScalable(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttScalable::WriteScalable(pugi::xml_node element) {
+bool AttScalable::WriteScalable(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasScale()) {
         element.append_attribute("scale") = IntToStr(this->GetScale()).c_str();
@@ -5401,21 +5789,24 @@ bool AttScalable::HasScale()
 // AttScoreDefGes
 //----------------------------------------------------------------------------
 
-AttScoreDefGes::AttScoreDefGes(): Att() {
+AttScoreDefGes::AttScoreDefGes(): Att()
+{
     ResetScoreDefGes();
 }
 
-AttScoreDefGes::~AttScoreDefGes() {
-
+AttScoreDefGes::~AttScoreDefGes()
+{
 }
 
-void AttScoreDefGes::ResetScoreDefGes() {
+void AttScoreDefGes::ResetScoreDefGes()
+{
     m_tunePname = PITCHNAME_NONE;
     m_tuneHz = 0.0;
     m_tuneTemper = TEMPERAMENT_NONE;
 }
 
-bool AttScoreDefGes::ReadScoreDefGes(pugi::xml_node element) {
+bool AttScoreDefGes::ReadScoreDefGes(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tune.pname")) {
         this->SetTunePname(StrToPitchname(element.attribute("tune.pname").value()));
@@ -5435,7 +5826,8 @@ bool AttScoreDefGes::ReadScoreDefGes(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttScoreDefGes::WriteScoreDefGes(pugi::xml_node element) {
+bool AttScoreDefGes::WriteScoreDefGes(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTunePname()) {
         element.append_attribute("tune.pname") = PitchnameToStr(this->GetTunePname()).c_str();
@@ -5474,19 +5866,22 @@ bool AttScoreDefGes::HasTuneTemper()
 // AttScoreDefVis
 //----------------------------------------------------------------------------
 
-AttScoreDefVis::AttScoreDefVis(): Att() {
+AttScoreDefVis::AttScoreDefVis(): Att()
+{
     ResetScoreDefVis();
 }
 
-AttScoreDefVis::~AttScoreDefVis() {
-
+AttScoreDefVis::~AttScoreDefVis()
+{
 }
 
-void AttScoreDefVis::ResetScoreDefVis() {
+void AttScoreDefVis::ResetScoreDefVis()
+{
     m_vuHeight = "";
 }
 
-bool AttScoreDefVis::ReadScoreDefVis(pugi::xml_node element) {
+bool AttScoreDefVis::ReadScoreDefVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("vu.height")) {
         this->SetVuHeight(StrToStr(element.attribute("vu.height").value()));
@@ -5496,7 +5891,8 @@ bool AttScoreDefVis::ReadScoreDefVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttScoreDefVis::WriteScoreDefVis(pugi::xml_node element) {
+bool AttScoreDefVis::WriteScoreDefVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasVuHeight()) {
         element.append_attribute("vu.height") = StrToStr(this->GetVuHeight()).c_str();
@@ -5517,19 +5913,22 @@ bool AttScoreDefVis::HasVuHeight()
 // AttSectionVis
 //----------------------------------------------------------------------------
 
-AttSectionVis::AttSectionVis(): Att() {
+AttSectionVis::AttSectionVis(): Att()
+{
     ResetSectionVis();
 }
 
-AttSectionVis::~AttSectionVis() {
-
+AttSectionVis::~AttSectionVis()
+{
 }
 
-void AttSectionVis::ResetSectionVis() {
+void AttSectionVis::ResetSectionVis()
+{
     m_restart = BOOLEAN_NONE;
 }
 
-bool AttSectionVis::ReadSectionVis(pugi::xml_node element) {
+bool AttSectionVis::ReadSectionVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("restart")) {
         this->SetRestart(StrToBoolean(element.attribute("restart").value()));
@@ -5539,7 +5938,8 @@ bool AttSectionVis::ReadSectionVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSectionVis::WriteSectionVis(pugi::xml_node element) {
+bool AttSectionVis::WriteSectionVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasRestart()) {
         element.append_attribute("restart") = BooleanToStr(this->GetRestart()).c_str();
@@ -5560,19 +5960,22 @@ bool AttSectionVis::HasRestart()
 // AttSequence
 //----------------------------------------------------------------------------
 
-AttSequence::AttSequence(): Att() {
+AttSequence::AttSequence(): Att()
+{
     ResetSequence();
 }
 
-AttSequence::~AttSequence() {
-
+AttSequence::~AttSequence()
+{
 }
 
-void AttSequence::ResetSequence() {
+void AttSequence::ResetSequence()
+{
     m_seq = 0;
 }
 
-bool AttSequence::ReadSequence(pugi::xml_node element) {
+bool AttSequence::ReadSequence(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("seq")) {
         this->SetSeq(StrToInt(element.attribute("seq").value()));
@@ -5582,7 +5985,8 @@ bool AttSequence::ReadSequence(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSequence::WriteSequence(pugi::xml_node element) {
+bool AttSequence::WriteSequence(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSeq()) {
         element.append_attribute("seq") = IntToStr(this->GetSeq()).c_str();
@@ -5603,19 +6007,22 @@ bool AttSequence::HasSeq()
 // AttSlashcount
 //----------------------------------------------------------------------------
 
-AttSlashcount::AttSlashcount(): Att() {
+AttSlashcount::AttSlashcount(): Att()
+{
     ResetSlashcount();
 }
 
-AttSlashcount::~AttSlashcount() {
-
+AttSlashcount::~AttSlashcount()
+{
 }
 
-void AttSlashcount::ResetSlashcount() {
+void AttSlashcount::ResetSlashcount()
+{
     m_slash = 0;
 }
 
-bool AttSlashcount::ReadSlashcount(pugi::xml_node element) {
+bool AttSlashcount::ReadSlashcount(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("slash")) {
         this->SetSlash(StrToInt(element.attribute("slash").value()));
@@ -5625,7 +6032,8 @@ bool AttSlashcount::ReadSlashcount(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSlashcount::WriteSlashcount(pugi::xml_node element) {
+bool AttSlashcount::WriteSlashcount(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSlash()) {
         element.append_attribute("slash") = IntToStr(this->GetSlash()).c_str();
@@ -5646,19 +6054,22 @@ bool AttSlashcount::HasSlash()
 // AttSlurpresent
 //----------------------------------------------------------------------------
 
-AttSlurpresent::AttSlurpresent(): Att() {
+AttSlurpresent::AttSlurpresent(): Att()
+{
     ResetSlurpresent();
 }
 
-AttSlurpresent::~AttSlurpresent() {
-
+AttSlurpresent::~AttSlurpresent()
+{
 }
 
-void AttSlurpresent::ResetSlurpresent() {
+void AttSlurpresent::ResetSlurpresent()
+{
     m_slur = "";
 }
 
-bool AttSlurpresent::ReadSlurpresent(pugi::xml_node element) {
+bool AttSlurpresent::ReadSlurpresent(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("slur")) {
         this->SetSlur(StrToStr(element.attribute("slur").value()));
@@ -5668,7 +6079,8 @@ bool AttSlurpresent::ReadSlurpresent(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSlurpresent::WriteSlurpresent(pugi::xml_node element) {
+bool AttSlurpresent::WriteSlurpresent(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSlur()) {
         element.append_attribute("slur") = StrToStr(this->GetSlur()).c_str();
@@ -5689,19 +6101,22 @@ bool AttSlurpresent::HasSlur()
 // AttSpaceVis
 //----------------------------------------------------------------------------
 
-AttSpaceVis::AttSpaceVis(): Att() {
+AttSpaceVis::AttSpaceVis(): Att()
+{
     ResetSpaceVis();
 }
 
-AttSpaceVis::~AttSpaceVis() {
-
+AttSpaceVis::~AttSpaceVis()
+{
 }
 
-void AttSpaceVis::ResetSpaceVis() {
+void AttSpaceVis::ResetSpaceVis()
+{
     m_compressable = BOOLEAN_NONE;
 }
 
-bool AttSpaceVis::ReadSpaceVis(pugi::xml_node element) {
+bool AttSpaceVis::ReadSpaceVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("compressable")) {
         this->SetCompressable(StrToBoolean(element.attribute("compressable").value()));
@@ -5711,7 +6126,8 @@ bool AttSpaceVis::ReadSpaceVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSpaceVis::WriteSpaceVis(pugi::xml_node element) {
+bool AttSpaceVis::WriteSpaceVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCompressable()) {
         element.append_attribute("compressable") = BooleanToStr(this->GetCompressable()).c_str();
@@ -5732,22 +6148,25 @@ bool AttSpaceVis::HasCompressable()
 // AttSpacing
 //----------------------------------------------------------------------------
 
-AttSpacing::AttSpacing(): Att() {
+AttSpacing::AttSpacing(): Att()
+{
     ResetSpacing();
 }
 
-AttSpacing::~AttSpacing() {
-
+AttSpacing::~AttSpacing()
+{
 }
 
-void AttSpacing::ResetSpacing() {
+void AttSpacing::ResetSpacing()
+{
     m_spacingPackexp = 0.0;
     m_spacingPackfact = 0.0;
     m_spacingStaff = "";
     m_spacingSystem = "";
 }
 
-bool AttSpacing::ReadSpacing(pugi::xml_node element) {
+bool AttSpacing::ReadSpacing(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("spacing.packexp")) {
         this->SetSpacingPackexp(StrToDbl(element.attribute("spacing.packexp").value()));
@@ -5772,7 +6191,8 @@ bool AttSpacing::ReadSpacing(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSpacing::WriteSpacing(pugi::xml_node element) {
+bool AttSpacing::WriteSpacing(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSpacingPackexp()) {
         element.append_attribute("spacing.packexp") = DblToStr(this->GetSpacingPackexp()).c_str();
@@ -5820,19 +6240,22 @@ bool AttSpacing::HasSpacingSystem()
 // AttStaffLog
 //----------------------------------------------------------------------------
 
-AttStaffLog::AttStaffLog(): Att() {
+AttStaffLog::AttStaffLog(): Att()
+{
     ResetStaffLog();
 }
 
-AttStaffLog::~AttStaffLog() {
-
+AttStaffLog::~AttStaffLog()
+{
 }
 
-void AttStaffLog::ResetStaffLog() {
+void AttStaffLog::ResetStaffLog()
+{
     m_def = "";
 }
 
-bool AttStaffLog::ReadStaffLog(pugi::xml_node element) {
+bool AttStaffLog::ReadStaffLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("def")) {
         this->SetDef(StrToStr(element.attribute("def").value()));
@@ -5842,7 +6265,8 @@ bool AttStaffLog::ReadStaffLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffLog::WriteStaffLog(pugi::xml_node element) {
+bool AttStaffLog::WriteStaffLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDef()) {
         element.append_attribute("def") = StrToStr(this->GetDef()).c_str();
@@ -5863,15 +6287,17 @@ bool AttStaffLog::HasDef()
 // AttStaffDefVis
 //----------------------------------------------------------------------------
 
-AttStaffDefVis::AttStaffDefVis(): Att() {
+AttStaffDefVis::AttStaffDefVis(): Att()
+{
     ResetStaffDefVis();
 }
 
-AttStaffDefVis::~AttStaffDefVis() {
-
+AttStaffDefVis::~AttStaffDefVis()
+{
 }
 
-void AttStaffDefVis::ResetStaffDefVis() {
+void AttStaffDefVis::ResetStaffDefVis()
+{
     m_gridShow = BOOLEAN_NONE;
     m_layerscheme = LAYERSCHEME_NONE;
     m_lines = 0;
@@ -5880,7 +6306,8 @@ void AttStaffDefVis::ResetStaffDefVis() {
     m_spacing = "";
 }
 
-bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element) {
+bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("grid.show")) {
         this->SetGridShow(StrToBoolean(element.attribute("grid.show").value()));
@@ -5915,7 +6342,8 @@ bool AttStaffDefVis::ReadStaffDefVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element) {
+bool AttStaffDefVis::WriteStaffDefVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasGridShow()) {
         element.append_attribute("grid.show") = BooleanToStr(this->GetGridShow()).c_str();
@@ -5981,19 +6409,22 @@ bool AttStaffDefVis::HasSpacing()
 // AttStaffGrpVis
 //----------------------------------------------------------------------------
 
-AttStaffGrpVis::AttStaffGrpVis(): Att() {
+AttStaffGrpVis::AttStaffGrpVis(): Att()
+{
     ResetStaffGrpVis();
 }
 
-AttStaffGrpVis::~AttStaffGrpVis() {
-
+AttStaffGrpVis::~AttStaffGrpVis()
+{
 }
 
-void AttStaffGrpVis::ResetStaffGrpVis() {
+void AttStaffGrpVis::ResetStaffGrpVis()
+{
     m_barthru = BOOLEAN_NONE;
 }
 
-bool AttStaffGrpVis::ReadStaffGrpVis(pugi::xml_node element) {
+bool AttStaffGrpVis::ReadStaffGrpVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("barthru")) {
         this->SetBarthru(StrToBoolean(element.attribute("barthru").value()));
@@ -6003,7 +6434,8 @@ bool AttStaffGrpVis::ReadStaffGrpVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffGrpVis::WriteStaffGrpVis(pugi::xml_node element) {
+bool AttStaffGrpVis::WriteStaffGrpVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasBarthru()) {
         element.append_attribute("barthru") = BooleanToStr(this->GetBarthru()).c_str();
@@ -6024,19 +6456,22 @@ bool AttStaffGrpVis::HasBarthru()
 // AttStaffgroupingsym
 //----------------------------------------------------------------------------
 
-AttStaffgroupingsym::AttStaffgroupingsym(): Att() {
+AttStaffgroupingsym::AttStaffgroupingsym(): Att()
+{
     ResetStaffgroupingsym();
 }
 
-AttStaffgroupingsym::~AttStaffgroupingsym() {
-
+AttStaffgroupingsym::~AttStaffgroupingsym()
+{
 }
 
-void AttStaffgroupingsym::ResetStaffgroupingsym() {
+void AttStaffgroupingsym::ResetStaffgroupingsym()
+{
     m_symbol = staffgroupingsym_SYMBOL_NONE;
 }
 
-bool AttStaffgroupingsym::ReadStaffgroupingsym(pugi::xml_node element) {
+bool AttStaffgroupingsym::ReadStaffgroupingsym(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("symbol")) {
         this->SetSymbol(StrToStaffgroupingsymSymbol(element.attribute("symbol").value()));
@@ -6046,7 +6481,8 @@ bool AttStaffgroupingsym::ReadStaffgroupingsym(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffgroupingsym::WriteStaffgroupingsym(pugi::xml_node element) {
+bool AttStaffgroupingsym::WriteStaffgroupingsym(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSymbol()) {
         element.append_attribute("symbol") = StaffgroupingsymSymbolToStr(this->GetSymbol()).c_str();
@@ -6067,19 +6503,22 @@ bool AttStaffgroupingsym::HasSymbol()
 // AttStaffident
 //----------------------------------------------------------------------------
 
-AttStaffident::AttStaffident(): Att() {
+AttStaffident::AttStaffident(): Att()
+{
     ResetStaffident();
 }
 
-AttStaffident::~AttStaffident() {
-
+AttStaffident::~AttStaffident()
+{
 }
 
-void AttStaffident::ResetStaffident() {
+void AttStaffident::ResetStaffident()
+{
     m_staff = std::vector<int>();
 }
 
-bool AttStaffident::ReadStaffident(pugi::xml_node element) {
+bool AttStaffident::ReadStaffident(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("staff")) {
         this->SetStaff(StrToXsdPosintlist(element.attribute("staff").value()));
@@ -6089,7 +6528,8 @@ bool AttStaffident::ReadStaffident(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffident::WriteStaffident(pugi::xml_node element) {
+bool AttStaffident::WriteStaffident(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStaff()) {
         element.append_attribute("staff") = XsdPosintlistToStr(this->GetStaff()).c_str();
@@ -6110,19 +6550,22 @@ bool AttStaffident::HasStaff()
 // AttStaffloc
 //----------------------------------------------------------------------------
 
-AttStaffloc::AttStaffloc(): Att() {
+AttStaffloc::AttStaffloc(): Att()
+{
     ResetStaffloc();
 }
 
-AttStaffloc::~AttStaffloc() {
-
+AttStaffloc::~AttStaffloc()
+{
 }
 
-void AttStaffloc::ResetStaffloc() {
+void AttStaffloc::ResetStaffloc()
+{
     m_loc = 0;
 }
 
-bool AttStaffloc::ReadStaffloc(pugi::xml_node element) {
+bool AttStaffloc::ReadStaffloc(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("loc")) {
         this->SetLoc(StrToInt(element.attribute("loc").value()));
@@ -6132,7 +6575,8 @@ bool AttStaffloc::ReadStaffloc(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffloc::WriteStaffloc(pugi::xml_node element) {
+bool AttStaffloc::WriteStaffloc(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLoc()) {
         element.append_attribute("loc") = IntToStr(this->GetLoc()).c_str();
@@ -6153,20 +6597,23 @@ bool AttStaffloc::HasLoc()
 // AttStafflocPitched
 //----------------------------------------------------------------------------
 
-AttStafflocPitched::AttStafflocPitched(): Att() {
+AttStafflocPitched::AttStafflocPitched(): Att()
+{
     ResetStafflocPitched();
 }
 
-AttStafflocPitched::~AttStafflocPitched() {
-
+AttStafflocPitched::~AttStafflocPitched()
+{
 }
 
-void AttStafflocPitched::ResetStafflocPitched() {
+void AttStafflocPitched::ResetStafflocPitched()
+{
     m_ploc = PITCHNAME_NONE;
     m_oloc = 0;
 }
 
-bool AttStafflocPitched::ReadStafflocPitched(pugi::xml_node element) {
+bool AttStafflocPitched::ReadStafflocPitched(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ploc")) {
         this->SetPloc(StrToPitchname(element.attribute("ploc").value()));
@@ -6181,7 +6628,8 @@ bool AttStafflocPitched::ReadStafflocPitched(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStafflocPitched::WriteStafflocPitched(pugi::xml_node element) {
+bool AttStafflocPitched::WriteStafflocPitched(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPloc()) {
         element.append_attribute("ploc") = PitchnameToStr(this->GetPloc()).c_str();
@@ -6211,19 +6659,22 @@ bool AttStafflocPitched::HasOloc()
 // AttStartendid
 //----------------------------------------------------------------------------
 
-AttStartendid::AttStartendid(): Att() {
+AttStartendid::AttStartendid(): Att()
+{
     ResetStartendid();
 }
 
-AttStartendid::~AttStartendid() {
-
+AttStartendid::~AttStartendid()
+{
 }
 
-void AttStartendid::ResetStartendid() {
+void AttStartendid::ResetStartendid()
+{
     m_endid = "";
 }
 
-bool AttStartendid::ReadStartendid(pugi::xml_node element) {
+bool AttStartendid::ReadStartendid(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("endid")) {
         this->SetEndid(StrToStr(element.attribute("endid").value()));
@@ -6233,7 +6684,8 @@ bool AttStartendid::ReadStartendid(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStartendid::WriteStartendid(pugi::xml_node element) {
+bool AttStartendid::WriteStartendid(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasEndid()) {
         element.append_attribute("endid") = StrToStr(this->GetEndid()).c_str();
@@ -6254,19 +6706,22 @@ bool AttStartendid::HasEndid()
 // AttStartid
 //----------------------------------------------------------------------------
 
-AttStartid::AttStartid(): Att() {
+AttStartid::AttStartid(): Att()
+{
     ResetStartid();
 }
 
-AttStartid::~AttStartid() {
-
+AttStartid::~AttStartid()
+{
 }
 
-void AttStartid::ResetStartid() {
+void AttStartid::ResetStartid()
+{
     m_startid = "";
 }
 
-bool AttStartid::ReadStartid(pugi::xml_node element) {
+bool AttStartid::ReadStartid(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("startid")) {
         this->SetStartid(StrToStr(element.attribute("startid").value()));
@@ -6276,7 +6731,8 @@ bool AttStartid::ReadStartid(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStartid::WriteStartid(pugi::xml_node element) {
+bool AttStartid::WriteStartid(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStartid()) {
         element.append_attribute("startid") = StrToStr(this->GetStartid()).c_str();
@@ -6297,15 +6753,17 @@ bool AttStartid::HasStartid()
 // AttStems
 //----------------------------------------------------------------------------
 
-AttStems::AttStems(): Att() {
+AttStems::AttStems(): Att()
+{
     ResetStems();
 }
 
-AttStems::~AttStems() {
-
+AttStems::~AttStems()
+{
 }
 
-void AttStems::ResetStems() {
+void AttStems::ResetStems()
+{
     m_stemDir = STEMDIRECTION_NONE;
     m_stemLen = "";
     m_stemMod = STEMMODIFIER_NONE;
@@ -6314,7 +6772,8 @@ void AttStems::ResetStems() {
     m_stemY = 0.0;
 }
 
-bool AttStems::ReadStems(pugi::xml_node element) {
+bool AttStems::ReadStems(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("stem.dir")) {
         this->SetStemDir(StrToStemdirection(element.attribute("stem.dir").value()));
@@ -6349,7 +6808,8 @@ bool AttStems::ReadStems(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStems::WriteStems(pugi::xml_node element) {
+bool AttStems::WriteStems(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStemDir()) {
         element.append_attribute("stem.dir") = StemdirectionToStr(this->GetStemDir()).c_str();
@@ -6415,20 +6875,23 @@ bool AttStems::HasStemY()
 // AttSylLog
 //----------------------------------------------------------------------------
 
-AttSylLog::AttSylLog(): Att() {
+AttSylLog::AttSylLog(): Att()
+{
     ResetSylLog();
 }
 
-AttSylLog::~AttSylLog() {
-
+AttSylLog::~AttSylLog()
+{
 }
 
-void AttSylLog::ResetSylLog() {
+void AttSylLog::ResetSylLog()
+{
     m_con = sylLog_CON_NONE;
     m_wordpos = sylLog_WORDPOS_NONE;
 }
 
-bool AttSylLog::ReadSylLog(pugi::xml_node element) {
+bool AttSylLog::ReadSylLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("con")) {
         this->SetCon(StrToSylLogCon(element.attribute("con").value()));
@@ -6443,7 +6906,8 @@ bool AttSylLog::ReadSylLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSylLog::WriteSylLog(pugi::xml_node element) {
+bool AttSylLog::WriteSylLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCon()) {
         element.append_attribute("con") = SylLogConToStr(this->GetCon()).c_str();
@@ -6473,19 +6937,22 @@ bool AttSylLog::HasWordpos()
 // AttSyltext
 //----------------------------------------------------------------------------
 
-AttSyltext::AttSyltext(): Att() {
+AttSyltext::AttSyltext(): Att()
+{
     ResetSyltext();
 }
 
-AttSyltext::~AttSyltext() {
-
+AttSyltext::~AttSyltext()
+{
 }
 
-void AttSyltext::ResetSyltext() {
+void AttSyltext::ResetSyltext()
+{
     m_syl = "";
 }
 
-bool AttSyltext::ReadSyltext(pugi::xml_node element) {
+bool AttSyltext::ReadSyltext(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("syl")) {
         this->SetSyl(StrToStr(element.attribute("syl").value()));
@@ -6495,7 +6962,8 @@ bool AttSyltext::ReadSyltext(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSyltext::WriteSyltext(pugi::xml_node element) {
+bool AttSyltext::WriteSyltext(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSyl()) {
         element.append_attribute("syl") = StrToStr(this->GetSyl()).c_str();
@@ -6516,22 +6984,25 @@ bool AttSyltext::HasSyl()
 // AttSystems
 //----------------------------------------------------------------------------
 
-AttSystems::AttSystems(): Att() {
+AttSystems::AttSystems(): Att()
+{
     ResetSystems();
 }
 
-AttSystems::~AttSystems() {
-
+AttSystems::~AttSystems()
+{
 }
 
-void AttSystems::ResetSystems() {
+void AttSystems::ResetSystems()
+{
     m_systemLeftline = BOOLEAN_NONE;
     m_systemLeftmar = "";
     m_systemRightmar = "";
     m_systemTopmar = "";
 }
 
-bool AttSystems::ReadSystems(pugi::xml_node element) {
+bool AttSystems::ReadSystems(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("system.leftline")) {
         this->SetSystemLeftline(StrToBoolean(element.attribute("system.leftline").value()));
@@ -6556,7 +7027,8 @@ bool AttSystems::ReadSystems(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttSystems::WriteSystems(pugi::xml_node element) {
+bool AttSystems::WriteSystems(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSystemLeftline()) {
         element.append_attribute("system.leftline") = BooleanToStr(this->GetSystemLeftline()).c_str();
@@ -6604,15 +7076,17 @@ bool AttSystems::HasSystemTopmar()
 // AttTextstyle
 //----------------------------------------------------------------------------
 
-AttTextstyle::AttTextstyle(): Att() {
+AttTextstyle::AttTextstyle(): Att()
+{
     ResetTextstyle();
 }
 
-AttTextstyle::~AttTextstyle() {
-
+AttTextstyle::~AttTextstyle()
+{
 }
 
-void AttTextstyle::ResetTextstyle() {
+void AttTextstyle::ResetTextstyle()
+{
     m_textFam = "";
     m_textName = "";
     m_textSize = "";
@@ -6620,7 +7094,8 @@ void AttTextstyle::ResetTextstyle() {
     m_textWeight = FONTWEIGHT_NONE;
 }
 
-bool AttTextstyle::ReadTextstyle(pugi::xml_node element) {
+bool AttTextstyle::ReadTextstyle(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("text.fam")) {
         this->SetTextFam(StrToStr(element.attribute("text.fam").value()));
@@ -6650,7 +7125,8 @@ bool AttTextstyle::ReadTextstyle(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTextstyle::WriteTextstyle(pugi::xml_node element) {
+bool AttTextstyle::WriteTextstyle(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTextFam()) {
         element.append_attribute("text.fam") = StrToStr(this->GetTextFam()).c_str();
@@ -6707,19 +7183,22 @@ bool AttTextstyle::HasTextWeight()
 // AttTiepresent
 //----------------------------------------------------------------------------
 
-AttTiepresent::AttTiepresent(): Att() {
+AttTiepresent::AttTiepresent(): Att()
+{
     ResetTiepresent();
 }
 
-AttTiepresent::~AttTiepresent() {
-
+AttTiepresent::~AttTiepresent()
+{
 }
 
-void AttTiepresent::ResetTiepresent() {
+void AttTiepresent::ResetTiepresent()
+{
     m_tie = TIE_NONE;
 }
 
-bool AttTiepresent::ReadTiepresent(pugi::xml_node element) {
+bool AttTiepresent::ReadTiepresent(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tie")) {
         this->SetTie(StrToTie(element.attribute("tie").value()));
@@ -6729,7 +7208,8 @@ bool AttTiepresent::ReadTiepresent(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTiepresent::WriteTiepresent(pugi::xml_node element) {
+bool AttTiepresent::WriteTiepresent(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTie()) {
         element.append_attribute("tie") = TieToStr(this->GetTie()).c_str();
@@ -6750,19 +7230,22 @@ bool AttTiepresent::HasTie()
 // AttTimestampMusical
 //----------------------------------------------------------------------------
 
-AttTimestampMusical::AttTimestampMusical(): Att() {
+AttTimestampMusical::AttTimestampMusical(): Att()
+{
     ResetTimestampMusical();
 }
 
-AttTimestampMusical::~AttTimestampMusical() {
-
+AttTimestampMusical::~AttTimestampMusical()
+{
 }
 
-void AttTimestampMusical::ResetTimestampMusical() {
+void AttTimestampMusical::ResetTimestampMusical()
+{
     m_tstamp = -1.0;
 }
 
-bool AttTimestampMusical::ReadTimestampMusical(pugi::xml_node element) {
+bool AttTimestampMusical::ReadTimestampMusical(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tstamp")) {
         this->SetTstamp(StrToDbl(element.attribute("tstamp").value()));
@@ -6772,7 +7255,8 @@ bool AttTimestampMusical::ReadTimestampMusical(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTimestampMusical::WriteTimestampMusical(pugi::xml_node element) {
+bool AttTimestampMusical::WriteTimestampMusical(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTstamp()) {
         element.append_attribute("tstamp") = DblToStr(this->GetTstamp()).c_str();
@@ -6793,20 +7277,23 @@ bool AttTimestampMusical::HasTstamp()
 // AttTimestampPerformed
 //----------------------------------------------------------------------------
 
-AttTimestampPerformed::AttTimestampPerformed(): Att() {
+AttTimestampPerformed::AttTimestampPerformed(): Att()
+{
     ResetTimestampPerformed();
 }
 
-AttTimestampPerformed::~AttTimestampPerformed() {
-
+AttTimestampPerformed::~AttTimestampPerformed()
+{
 }
 
-void AttTimestampPerformed::ResetTimestampPerformed() {
+void AttTimestampPerformed::ResetTimestampPerformed()
+{
     m_tstampGes = DURATION_NONE;
     m_tstampReal = "";
 }
 
-bool AttTimestampPerformed::ReadTimestampPerformed(pugi::xml_node element) {
+bool AttTimestampPerformed::ReadTimestampPerformed(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tstamp.ges")) {
         this->SetTstampGes(StrToDuration(element.attribute("tstamp.ges").value()));
@@ -6821,7 +7308,8 @@ bool AttTimestampPerformed::ReadTimestampPerformed(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTimestampPerformed::WriteTimestampPerformed(pugi::xml_node element) {
+bool AttTimestampPerformed::WriteTimestampPerformed(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTstampGes()) {
         element.append_attribute("tstamp.ges") = DurationToStr(this->GetTstampGes()).c_str();
@@ -6851,19 +7339,22 @@ bool AttTimestampPerformed::HasTstampReal()
 // AttTimestamp2Musical
 //----------------------------------------------------------------------------
 
-AttTimestamp2Musical::AttTimestamp2Musical(): Att() {
+AttTimestamp2Musical::AttTimestamp2Musical(): Att()
+{
     ResetTimestamp2Musical();
 }
 
-AttTimestamp2Musical::~AttTimestamp2Musical() {
-
+AttTimestamp2Musical::~AttTimestamp2Musical()
+{
 }
 
-void AttTimestamp2Musical::ResetTimestamp2Musical() {
+void AttTimestamp2Musical::ResetTimestamp2Musical()
+{
     m_tstamp2 = std::make_pair(-1,-1.0);
 }
 
-bool AttTimestamp2Musical::ReadTimestamp2Musical(pugi::xml_node element) {
+bool AttTimestamp2Musical::ReadTimestamp2Musical(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tstamp2")) {
         this->SetTstamp2(StrToMeasurebeat(element.attribute("tstamp2").value()));
@@ -6873,7 +7364,8 @@ bool AttTimestamp2Musical::ReadTimestamp2Musical(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTimestamp2Musical::WriteTimestamp2Musical(pugi::xml_node element) {
+bool AttTimestamp2Musical::WriteTimestamp2Musical(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTstamp2()) {
         element.append_attribute("tstamp2") = MeasurebeatToStr(this->GetTstamp2()).c_str();
@@ -6894,20 +7386,23 @@ bool AttTimestamp2Musical::HasTstamp2()
 // AttTransposition
 //----------------------------------------------------------------------------
 
-AttTransposition::AttTransposition(): Att() {
+AttTransposition::AttTransposition(): Att()
+{
     ResetTransposition();
 }
 
-AttTransposition::~AttTransposition() {
-
+AttTransposition::~AttTransposition()
+{
 }
 
-void AttTransposition::ResetTransposition() {
+void AttTransposition::ResetTransposition()
+{
     m_transDiat = 0.0;
     m_transSemi = 0.0;
 }
 
-bool AttTransposition::ReadTransposition(pugi::xml_node element) {
+bool AttTransposition::ReadTransposition(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("trans.diat")) {
         this->SetTransDiat(StrToDbl(element.attribute("trans.diat").value()));
@@ -6922,7 +7417,8 @@ bool AttTransposition::ReadTransposition(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTransposition::WriteTransposition(pugi::xml_node element) {
+bool AttTransposition::WriteTransposition(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTransDiat()) {
         element.append_attribute("trans.diat") = DblToStr(this->GetTransDiat()).c_str();
@@ -6952,19 +7448,22 @@ bool AttTransposition::HasTransSemi()
 // AttTupletpresent
 //----------------------------------------------------------------------------
 
-AttTupletpresent::AttTupletpresent(): Att() {
+AttTupletpresent::AttTupletpresent(): Att()
+{
     ResetTupletpresent();
 }
 
-AttTupletpresent::~AttTupletpresent() {
-
+AttTupletpresent::~AttTupletpresent()
+{
 }
 
-void AttTupletpresent::ResetTupletpresent() {
+void AttTupletpresent::ResetTupletpresent()
+{
     m_tuplet = "";
 }
 
-bool AttTupletpresent::ReadTupletpresent(pugi::xml_node element) {
+bool AttTupletpresent::ReadTupletpresent(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tuplet")) {
         this->SetTuplet(StrToStr(element.attribute("tuplet").value()));
@@ -6974,7 +7473,8 @@ bool AttTupletpresent::ReadTupletpresent(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTupletpresent::WriteTupletpresent(pugi::xml_node element) {
+bool AttTupletpresent::WriteTupletpresent(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTuplet()) {
         element.append_attribute("tuplet") = StrToStr(this->GetTuplet()).c_str();
@@ -6995,20 +7495,23 @@ bool AttTupletpresent::HasTuplet()
 // AttTyped
 //----------------------------------------------------------------------------
 
-AttTyped::AttTyped(): Att() {
+AttTyped::AttTyped(): Att()
+{
     ResetTyped();
 }
 
-AttTyped::~AttTyped() {
-
+AttTyped::~AttTyped()
+{
 }
 
-void AttTyped::ResetTyped() {
+void AttTyped::ResetTyped()
+{
     m_type = "";
     m_subtype = "";
 }
 
-bool AttTyped::ReadTyped(pugi::xml_node element) {
+bool AttTyped::ReadTyped(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("type")) {
         this->SetType(StrToStr(element.attribute("type").value()));
@@ -7023,7 +7526,8 @@ bool AttTyped::ReadTyped(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTyped::WriteTyped(pugi::xml_node element) {
+bool AttTyped::WriteTyped(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasType()) {
         element.append_attribute("type") = StrToStr(this->GetType()).c_str();
@@ -7053,15 +7557,17 @@ bool AttTyped::HasSubtype()
 // AttTypography
 //----------------------------------------------------------------------------
 
-AttTypography::AttTypography(): Att() {
+AttTypography::AttTypography(): Att()
+{
     ResetTypography();
 }
 
-AttTypography::~AttTypography() {
-
+AttTypography::~AttTypography()
+{
 }
 
-void AttTypography::ResetTypography() {
+void AttTypography::ResetTypography()
+{
     m_fontfam = "";
     m_fontname = "";
     m_fontsize = 0.0;
@@ -7069,7 +7575,8 @@ void AttTypography::ResetTypography() {
     m_fontweight = FONTWEIGHT_NONE;
 }
 
-bool AttTypography::ReadTypography(pugi::xml_node element) {
+bool AttTypography::ReadTypography(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("fontfam")) {
         this->SetFontfam(StrToStr(element.attribute("fontfam").value()));
@@ -7099,7 +7606,8 @@ bool AttTypography::ReadTypography(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttTypography::WriteTypography(pugi::xml_node element) {
+bool AttTypography::WriteTypography(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasFontfam()) {
         element.append_attribute("fontfam") = StrToStr(this->GetFontfam()).c_str();
@@ -7156,19 +7664,22 @@ bool AttTypography::HasFontweight()
 // AttVisibility
 //----------------------------------------------------------------------------
 
-AttVisibility::AttVisibility(): Att() {
+AttVisibility::AttVisibility(): Att()
+{
     ResetVisibility();
 }
 
-AttVisibility::~AttVisibility() {
-
+AttVisibility::~AttVisibility()
+{
 }
 
-void AttVisibility::ResetVisibility() {
+void AttVisibility::ResetVisibility()
+{
     m_visible = BOOLEAN_NONE;
 }
 
-bool AttVisibility::ReadVisibility(pugi::xml_node element) {
+bool AttVisibility::ReadVisibility(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("visible")) {
         this->SetVisible(StrToBoolean(element.attribute("visible").value()));
@@ -7178,7 +7689,8 @@ bool AttVisibility::ReadVisibility(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisibility::WriteVisibility(pugi::xml_node element) {
+bool AttVisibility::WriteVisibility(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasVisible()) {
         element.append_attribute("visible") = BooleanToStr(this->GetVisible()).c_str();
@@ -7199,19 +7711,22 @@ bool AttVisibility::HasVisible()
 // AttVisualoffsetHo
 //----------------------------------------------------------------------------
 
-AttVisualoffsetHo::AttVisualoffsetHo(): Att() {
+AttVisualoffsetHo::AttVisualoffsetHo(): Att()
+{
     ResetVisualoffsetHo();
 }
 
-AttVisualoffsetHo::~AttVisualoffsetHo() {
-
+AttVisualoffsetHo::~AttVisualoffsetHo()
+{
 }
 
-void AttVisualoffsetHo::ResetVisualoffsetHo() {
+void AttVisualoffsetHo::ResetVisualoffsetHo()
+{
     m_ho = "";
 }
 
-bool AttVisualoffsetHo::ReadVisualoffsetHo(pugi::xml_node element) {
+bool AttVisualoffsetHo::ReadVisualoffsetHo(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ho")) {
         this->SetHo(StrToStr(element.attribute("ho").value()));
@@ -7221,7 +7736,8 @@ bool AttVisualoffsetHo::ReadVisualoffsetHo(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisualoffsetHo::WriteVisualoffsetHo(pugi::xml_node element) {
+bool AttVisualoffsetHo::WriteVisualoffsetHo(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasHo()) {
         element.append_attribute("ho") = StrToStr(this->GetHo()).c_str();
@@ -7242,19 +7758,22 @@ bool AttVisualoffsetHo::HasHo()
 // AttVisualoffsetTo
 //----------------------------------------------------------------------------
 
-AttVisualoffsetTo::AttVisualoffsetTo(): Att() {
+AttVisualoffsetTo::AttVisualoffsetTo(): Att()
+{
     ResetVisualoffsetTo();
 }
 
-AttVisualoffsetTo::~AttVisualoffsetTo() {
-
+AttVisualoffsetTo::~AttVisualoffsetTo()
+{
 }
 
-void AttVisualoffsetTo::ResetVisualoffsetTo() {
+void AttVisualoffsetTo::ResetVisualoffsetTo()
+{
     m_to = 0.0;
 }
 
-bool AttVisualoffsetTo::ReadVisualoffsetTo(pugi::xml_node element) {
+bool AttVisualoffsetTo::ReadVisualoffsetTo(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("to")) {
         this->SetTo(StrToDbl(element.attribute("to").value()));
@@ -7264,7 +7783,8 @@ bool AttVisualoffsetTo::ReadVisualoffsetTo(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisualoffsetTo::WriteVisualoffsetTo(pugi::xml_node element) {
+bool AttVisualoffsetTo::WriteVisualoffsetTo(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTo()) {
         element.append_attribute("to") = DblToStr(this->GetTo()).c_str();
@@ -7285,19 +7805,22 @@ bool AttVisualoffsetTo::HasTo()
 // AttVisualoffsetVo
 //----------------------------------------------------------------------------
 
-AttVisualoffsetVo::AttVisualoffsetVo(): Att() {
+AttVisualoffsetVo::AttVisualoffsetVo(): Att()
+{
     ResetVisualoffsetVo();
 }
 
-AttVisualoffsetVo::~AttVisualoffsetVo() {
-
+AttVisualoffsetVo::~AttVisualoffsetVo()
+{
 }
 
-void AttVisualoffsetVo::ResetVisualoffsetVo() {
+void AttVisualoffsetVo::ResetVisualoffsetVo()
+{
     m_vo = "";
 }
 
-bool AttVisualoffsetVo::ReadVisualoffsetVo(pugi::xml_node element) {
+bool AttVisualoffsetVo::ReadVisualoffsetVo(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("vo")) {
         this->SetVo(StrToStr(element.attribute("vo").value()));
@@ -7307,7 +7830,8 @@ bool AttVisualoffsetVo::ReadVisualoffsetVo(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisualoffsetVo::WriteVisualoffsetVo(pugi::xml_node element) {
+bool AttVisualoffsetVo::WriteVisualoffsetVo(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasVo()) {
         element.append_attribute("vo") = StrToStr(this->GetVo()).c_str();
@@ -7328,20 +7852,23 @@ bool AttVisualoffsetVo::HasVo()
 // AttVisualoffset2Ho
 //----------------------------------------------------------------------------
 
-AttVisualoffset2Ho::AttVisualoffset2Ho(): Att() {
+AttVisualoffset2Ho::AttVisualoffset2Ho(): Att()
+{
     ResetVisualoffset2Ho();
 }
 
-AttVisualoffset2Ho::~AttVisualoffset2Ho() {
-
+AttVisualoffset2Ho::~AttVisualoffset2Ho()
+{
 }
 
-void AttVisualoffset2Ho::ResetVisualoffset2Ho() {
+void AttVisualoffset2Ho::ResetVisualoffset2Ho()
+{
     m_startho = "";
     m_endho = "";
 }
 
-bool AttVisualoffset2Ho::ReadVisualoffset2Ho(pugi::xml_node element) {
+bool AttVisualoffset2Ho::ReadVisualoffset2Ho(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("startho")) {
         this->SetStartho(StrToStr(element.attribute("startho").value()));
@@ -7356,7 +7883,8 @@ bool AttVisualoffset2Ho::ReadVisualoffset2Ho(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisualoffset2Ho::WriteVisualoffset2Ho(pugi::xml_node element) {
+bool AttVisualoffset2Ho::WriteVisualoffset2Ho(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStartho()) {
         element.append_attribute("startho") = StrToStr(this->GetStartho()).c_str();
@@ -7386,20 +7914,23 @@ bool AttVisualoffset2Ho::HasEndho()
 // AttVisualoffset2To
 //----------------------------------------------------------------------------
 
-AttVisualoffset2To::AttVisualoffset2To(): Att() {
+AttVisualoffset2To::AttVisualoffset2To(): Att()
+{
     ResetVisualoffset2To();
 }
 
-AttVisualoffset2To::~AttVisualoffset2To() {
-
+AttVisualoffset2To::~AttVisualoffset2To()
+{
 }
 
-void AttVisualoffset2To::ResetVisualoffset2To() {
+void AttVisualoffset2To::ResetVisualoffset2To()
+{
     m_startto = 0.0;
     m_endto = 0.0;
 }
 
-bool AttVisualoffset2To::ReadVisualoffset2To(pugi::xml_node element) {
+bool AttVisualoffset2To::ReadVisualoffset2To(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("startto")) {
         this->SetStartto(StrToDbl(element.attribute("startto").value()));
@@ -7414,7 +7945,8 @@ bool AttVisualoffset2To::ReadVisualoffset2To(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisualoffset2To::WriteVisualoffset2To(pugi::xml_node element) {
+bool AttVisualoffset2To::WriteVisualoffset2To(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStartto()) {
         element.append_attribute("startto") = DblToStr(this->GetStartto()).c_str();
@@ -7444,20 +7976,23 @@ bool AttVisualoffset2To::HasEndto()
 // AttVisualoffset2Vo
 //----------------------------------------------------------------------------
 
-AttVisualoffset2Vo::AttVisualoffset2Vo(): Att() {
+AttVisualoffset2Vo::AttVisualoffset2Vo(): Att()
+{
     ResetVisualoffset2Vo();
 }
 
-AttVisualoffset2Vo::~AttVisualoffset2Vo() {
-
+AttVisualoffset2Vo::~AttVisualoffset2Vo()
+{
 }
 
-void AttVisualoffset2Vo::ResetVisualoffset2Vo() {
+void AttVisualoffset2Vo::ResetVisualoffset2Vo()
+{
     m_startvo = "";
     m_endvo = "";
 }
 
-bool AttVisualoffset2Vo::ReadVisualoffset2Vo(pugi::xml_node element) {
+bool AttVisualoffset2Vo::ReadVisualoffset2Vo(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("startvo")) {
         this->SetStartvo(StrToStr(element.attribute("startvo").value()));
@@ -7472,7 +8007,8 @@ bool AttVisualoffset2Vo::ReadVisualoffset2Vo(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttVisualoffset2Vo::WriteVisualoffset2Vo(pugi::xml_node element) {
+bool AttVisualoffset2Vo::WriteVisualoffset2Vo(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasStartvo()) {
         element.append_attribute("startvo") = StrToStr(this->GetStartvo()).c_str();
@@ -7502,19 +8038,22 @@ bool AttVisualoffset2Vo::HasEndvo()
 // AttWhitespace
 //----------------------------------------------------------------------------
 
-AttWhitespace::AttWhitespace(): Att() {
+AttWhitespace::AttWhitespace(): Att()
+{
     ResetWhitespace();
 }
 
-AttWhitespace::~AttWhitespace() {
-
+AttWhitespace::~AttWhitespace()
+{
 }
 
-void AttWhitespace::ResetWhitespace() {
+void AttWhitespace::ResetWhitespace()
+{
     m_space = "";
 }
 
-bool AttWhitespace::ReadWhitespace(pugi::xml_node element) {
+bool AttWhitespace::ReadWhitespace(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("xml:space")) {
         this->SetSpace(StrToStr(element.attribute("xml:space").value()));
@@ -7524,7 +8063,8 @@ bool AttWhitespace::ReadWhitespace(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttWhitespace::WriteWhitespace(pugi::xml_node element) {
+bool AttWhitespace::WriteWhitespace(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSpace()) {
         element.append_attribute("xml:space") = StrToStr(this->GetSpace()).c_str();
@@ -7545,19 +8085,22 @@ bool AttWhitespace::HasSpace()
 // AttWidth
 //----------------------------------------------------------------------------
 
-AttWidth::AttWidth(): Att() {
+AttWidth::AttWidth(): Att()
+{
     ResetWidth();
 }
 
-AttWidth::~AttWidth() {
-
+AttWidth::~AttWidth()
+{
 }
 
-void AttWidth::ResetWidth() {
+void AttWidth::ResetWidth()
+{
     m_width = "";
 }
 
-bool AttWidth::ReadWidth(pugi::xml_node element) {
+bool AttWidth::ReadWidth(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("width")) {
         this->SetWidth(StrToStr(element.attribute("width").value()));
@@ -7567,7 +8110,8 @@ bool AttWidth::ReadWidth(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttWidth::WriteWidth(pugi::xml_node element) {
+bool AttWidth::WriteWidth(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasWidth()) {
         element.append_attribute("width") = StrToStr(this->GetWidth()).c_str();
@@ -7588,20 +8132,23 @@ bool AttWidth::HasWidth()
 // AttXy
 //----------------------------------------------------------------------------
 
-AttXy::AttXy(): Att() {
+AttXy::AttXy(): Att()
+{
     ResetXy();
 }
 
-AttXy::~AttXy() {
-
+AttXy::~AttXy()
+{
 }
 
-void AttXy::ResetXy() {
+void AttXy::ResetXy()
+{
     m_x = 0.0;
     m_y = 0.0;
 }
 
-bool AttXy::ReadXy(pugi::xml_node element) {
+bool AttXy::ReadXy(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("x")) {
         this->SetX(StrToDbl(element.attribute("x").value()));
@@ -7616,7 +8163,8 @@ bool AttXy::ReadXy(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttXy::WriteXy(pugi::xml_node element) {
+bool AttXy::WriteXy(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasX()) {
         element.append_attribute("x") = DblToStr(this->GetX()).c_str();
@@ -7646,20 +8194,23 @@ bool AttXy::HasY()
 // AttXy2
 //----------------------------------------------------------------------------
 
-AttXy2::AttXy2(): Att() {
+AttXy2::AttXy2(): Att()
+{
     ResetXy2();
 }
 
-AttXy2::~AttXy2() {
-
+AttXy2::~AttXy2()
+{
 }
 
-void AttXy2::ResetXy2() {
+void AttXy2::ResetXy2()
+{
     m_x2 = 0.0;
     m_y2 = 0.0;
 }
 
-bool AttXy2::ReadXy2(pugi::xml_node element) {
+bool AttXy2::ReadXy2(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("x2")) {
         this->SetX2(StrToDbl(element.attribute("x2").value()));
@@ -7674,7 +8225,8 @@ bool AttXy2::ReadXy2(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttXy2::WriteXy2(pugi::xml_node element) {
+bool AttXy2::WriteXy2(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasX2()) {
         element.append_attribute("x2") = DblToStr(this->GetX2()).c_str();
@@ -7700,7 +8252,8 @@ bool AttXy2::HasY2()
 
 /* include <atty2> */
 
-bool Att::SetShared(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetShared(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_ACCIDLOG)) {
         AttAccidLog *att = dynamic_cast<AttAccidLog*>(element);
         assert(att);
@@ -9273,7 +9826,8 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
     return false;
 }
 
-void Att::GetShared(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetShared(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_ACCIDLOG)) {
         AttAccidLog *att = dynamic_cast<AttAccidLog*>(element);
         assert(att);

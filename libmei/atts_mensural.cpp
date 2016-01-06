@@ -30,19 +30,22 @@ namespace vrv {
 // AttLigatureLog
 //----------------------------------------------------------------------------
 
-AttLigatureLog::AttLigatureLog(): Att() {
+AttLigatureLog::AttLigatureLog(): Att()
+{
     ResetLigatureLog();
 }
 
-AttLigatureLog::~AttLigatureLog() {
-
+AttLigatureLog::~AttLigatureLog()
+{
 }
 
-void AttLigatureLog::ResetLigatureLog() {
+void AttLigatureLog::ResetLigatureLog()
+{
     m_form = LIGATUREFORM_NONE;
 }
 
-bool AttLigatureLog::ReadLigatureLog(pugi::xml_node element) {
+bool AttLigatureLog::ReadLigatureLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToLigatureform(element.attribute("form").value()));
@@ -52,7 +55,8 @@ bool AttLigatureLog::ReadLigatureLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttLigatureLog::WriteLigatureLog(pugi::xml_node element) {
+bool AttLigatureLog::WriteLigatureLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = LigatureformToStr(this->GetForm()).c_str();
@@ -73,20 +77,23 @@ bool AttLigatureLog::HasForm()
 // AttMensurVis
 //----------------------------------------------------------------------------
 
-AttMensurVis::AttMensurVis(): Att() {
+AttMensurVis::AttMensurVis(): Att()
+{
     ResetMensurVis();
 }
 
-AttMensurVis::~AttMensurVis() {
-
+AttMensurVis::~AttMensurVis()
+{
 }
 
-void AttMensurVis::ResetMensurVis() {
+void AttMensurVis::ResetMensurVis()
+{
     m_form = mensurVis_FORM_NONE;
     m_orient = ORIENTATION_NONE;
 }
 
-bool AttMensurVis::ReadMensurVis(pugi::xml_node element) {
+bool AttMensurVis::ReadMensurVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToMensurVisForm(element.attribute("form").value()));
@@ -101,7 +108,8 @@ bool AttMensurVis::ReadMensurVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMensurVis::WriteMensurVis(pugi::xml_node element) {
+bool AttMensurVis::WriteMensurVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = MensurVisFormToStr(this->GetForm()).c_str();
@@ -131,15 +139,17 @@ bool AttMensurVis::HasOrient()
 // AttMensuralLog
 //----------------------------------------------------------------------------
 
-AttMensuralLog::AttMensuralLog(): Att() {
+AttMensuralLog::AttMensuralLog(): Att()
+{
     ResetMensuralLog();
 }
 
-AttMensuralLog::~AttMensuralLog() {
-
+AttMensuralLog::~AttMensuralLog()
+{
 }
 
-void AttMensuralLog::ResetMensuralLog() {
+void AttMensuralLog::ResetMensuralLog()
+{
     m_mensurDot = BOOLEAN_NONE;
     m_mensurSign = MENSURATIONSIGN_NONE;
     m_mensurSlash = 0;
@@ -147,7 +157,8 @@ void AttMensuralLog::ResetMensuralLog() {
     m_proportNumbase = -1;
 }
 
-bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element) {
+bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mensur.dot")) {
         this->SetMensurDot(StrToBoolean(element.attribute("mensur.dot").value()));
@@ -177,7 +188,8 @@ bool AttMensuralLog::ReadMensuralLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMensuralLog::WriteMensuralLog(pugi::xml_node element) {
+bool AttMensuralLog::WriteMensuralLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMensurDot()) {
         element.append_attribute("mensur.dot") = BooleanToStr(this->GetMensurDot()).c_str();
@@ -234,22 +246,25 @@ bool AttMensuralLog::HasProportNumbase()
 // AttMensuralShared
 //----------------------------------------------------------------------------
 
-AttMensuralShared::AttMensuralShared(): Att() {
+AttMensuralShared::AttMensuralShared(): Att()
+{
     ResetMensuralShared();
 }
 
-AttMensuralShared::~AttMensuralShared() {
-
+AttMensuralShared::~AttMensuralShared()
+{
 }
 
-void AttMensuralShared::ResetMensuralShared() {
+void AttMensuralShared::ResetMensuralShared()
+{
     m_modusmaior = MODUSMAIOR_NONE;
     m_modusminor = MODUSMINOR_NONE;
     m_prolatio = PROLATIO_NONE;
     m_tempus = TEMPUS_NONE;
 }
 
-bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element) {
+bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("modusmaior")) {
         this->SetModusmaior(StrToModusmaior(element.attribute("modusmaior").value()));
@@ -274,7 +289,8 @@ bool AttMensuralShared::ReadMensuralShared(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMensuralShared::WriteMensuralShared(pugi::xml_node element) {
+bool AttMensuralShared::WriteMensuralShared(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasModusmaior()) {
         element.append_attribute("modusmaior") = ModusmaiorToStr(this->GetModusmaior()).c_str();
@@ -322,15 +338,17 @@ bool AttMensuralShared::HasTempus()
 // AttMensuralVis
 //----------------------------------------------------------------------------
 
-AttMensuralVis::AttMensuralVis(): Att() {
+AttMensuralVis::AttMensuralVis(): Att()
+{
     ResetMensuralVis();
 }
 
-AttMensuralVis::~AttMensuralVis() {
-
+AttMensuralVis::~AttMensuralVis()
+{
 }
 
-void AttMensuralVis::ResetMensuralVis() {
+void AttMensuralVis::ResetMensuralVis()
+{
     m_mensurColor = "";
     m_mensurForm = mensuralVis_MENSURFORM_NONE;
     m_mensurLoc = 0;
@@ -338,7 +356,8 @@ void AttMensuralVis::ResetMensuralVis() {
     m_mensurSize = SIZE_NONE;
 }
 
-bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element) {
+bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mensur.color")) {
         this->SetMensurColor(StrToStr(element.attribute("mensur.color").value()));
@@ -368,7 +387,8 @@ bool AttMensuralVis::ReadMensuralVis(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element) {
+bool AttMensuralVis::WriteMensuralVis(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMensurColor()) {
         element.append_attribute("mensur.color") = StrToStr(this->GetMensurColor()).c_str();
@@ -425,19 +445,22 @@ bool AttMensuralVis::HasMensurSize()
 // AttNoteLogMensural
 //----------------------------------------------------------------------------
 
-AttNoteLogMensural::AttNoteLogMensural(): Att() {
+AttNoteLogMensural::AttNoteLogMensural(): Att()
+{
     ResetNoteLogMensural();
 }
 
-AttNoteLogMensural::~AttNoteLogMensural() {
-
+AttNoteLogMensural::~AttNoteLogMensural()
+{
 }
 
-void AttNoteLogMensural::ResetNoteLogMensural() {
+void AttNoteLogMensural::ResetNoteLogMensural()
+{
     m_lig = noteLogMensural_LIG_NONE;
 }
 
-bool AttNoteLogMensural::ReadNoteLogMensural(pugi::xml_node element) {
+bool AttNoteLogMensural::ReadNoteLogMensural(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("lig")) {
         this->SetLig(StrToNoteLogMensuralLig(element.attribute("lig").value()));
@@ -447,7 +470,8 @@ bool AttNoteLogMensural::ReadNoteLogMensural(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNoteLogMensural::WriteNoteLogMensural(pugi::xml_node element) {
+bool AttNoteLogMensural::WriteNoteLogMensural(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasLig()) {
         element.append_attribute("lig") = NoteLogMensuralLigToStr(this->GetLig()).c_str();
@@ -468,19 +492,22 @@ bool AttNoteLogMensural::HasLig()
 // AttRestVisMensural
 //----------------------------------------------------------------------------
 
-AttRestVisMensural::AttRestVisMensural(): Att() {
+AttRestVisMensural::AttRestVisMensural(): Att()
+{
     ResetRestVisMensural();
 }
 
-AttRestVisMensural::~AttRestVisMensural() {
-
+AttRestVisMensural::~AttRestVisMensural()
+{
 }
 
-void AttRestVisMensural::ResetRestVisMensural() {
+void AttRestVisMensural::ResetRestVisMensural()
+{
     m_spaces = 0;
 }
 
-bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element) {
+bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("spaces")) {
         this->SetSpaces(StrToInt(element.attribute("spaces").value()));
@@ -490,7 +517,8 @@ bool AttRestVisMensural::ReadRestVisMensural(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttRestVisMensural::WriteRestVisMensural(pugi::xml_node element) {
+bool AttRestVisMensural::WriteRestVisMensural(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasSpaces()) {
         element.append_attribute("spaces") = IntToStr(this->GetSpaces()).c_str();
@@ -507,7 +535,8 @@ bool AttRestVisMensural::HasSpaces()
 
 /* include <attspaces> */
 
-bool Att::SetMensural(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetMensural(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_LIGATURELOG)) {
         AttLigatureLog *att = dynamic_cast<AttLigatureLog*>(element);
         assert(att);
@@ -616,7 +645,8 @@ bool Att::SetMensural(Object *element, std::string attrType, std::string attrVal
     return false;
 }
 
-void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetMensural(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_LIGATURELOG)) {
         AttLigatureLog *att = dynamic_cast<AttLigatureLog*>(element);
         assert(att);

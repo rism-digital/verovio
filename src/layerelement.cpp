@@ -81,8 +81,8 @@ LayerElement::~LayerElement()
 
 LayerElement& LayerElement::operator=(const LayerElement& element)
 {
-	if (this != &element) // not self assignement
-	{
+    // not self assignement
+	if (this != &element) {
         // pointers have to be NULL
         m_parent = NULL;
         m_alignment = NULL;
@@ -178,15 +178,13 @@ bool LayerElement::IsCueSize()
     
 void LayerElement::AdjustPname(int *pname, int *oct)
 {
-	if ((*pname) < PITCHNAME_c)
-	{
+	if ((*pname) < PITCHNAME_c) {
 		if ((*oct) > 0)
 			(*oct)-- ;
         (*pname) = PITCHNAME_b;
         
 	}
-	else if ((*pname) > PITCHNAME_b)
-	{
+	else if ((*pname) > PITCHNAME_b) {
 		if ((*oct) < 7)
 			(*oct)++;
         (*pname) = PITCHNAME_c;
@@ -260,8 +258,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     
     
     Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
-    if(chordParent)
-    {
+    if(chordParent) {
         m_alignment = chordParent->GetAlignment();
         return FUNCTOR_CONTINUE;
     }
@@ -406,8 +403,7 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
                                   + note->GetGraceAlignment()->GetXRel());
             }
         }
-        else
-        {
+        else {
             assert(doc->GetType() == Transcription);
             this->SetDrawingX(this->m_xAbs);
         }
@@ -434,14 +430,17 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
                 // Now we need to yet the element at the same position in the cross-staff layer of getting the right clef
                 layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
                 
-            } else {
+            }
+            else {
                 LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'", durElement->GetStaff().at(0), this->GetUuid().c_str());
             }
-        } else {
+        }
+        else {
             LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0), this->GetUuid().c_str());
         }
         // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
-    } else {
+    }
+    else {
         m_crossStaff = NULL;
         m_crossLayer = NULL;
     }
@@ -454,15 +453,13 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
         assert(doc->GetType() == Raw);
         this->SetDrawingY(staffY->GetDrawingY());
     }
-    else
-    {
+    else {
         assert(doc->GetType() == Transcription);
         this->SetDrawingY(staffY->GetDrawingY());
     }
     
     // Finally, adjust Y for notes and rests
-    if (this->Is() == NOTE)
-    {
+    if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note*>(this);
         assert(note);
         this->SetDrawingY(this->GetDrawingY() + view->CalculatePitchPosY(staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
@@ -473,7 +470,8 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE) {
             this->SetDrawingY(this->GetDrawingY() + view->CalculateRestPosY(staffY, rest->GetActualDur()));
-        } else {
+        }
+        else {
             this->SetDrawingY(this->GetDrawingY() + view->CalculatePitchPosY(staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
         }
     }

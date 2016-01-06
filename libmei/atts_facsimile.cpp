@@ -30,19 +30,22 @@ namespace vrv {
 // AttFacsimile
 //----------------------------------------------------------------------------
 
-AttFacsimile::AttFacsimile(): Att() {
+AttFacsimile::AttFacsimile(): Att()
+{
     ResetFacsimile();
 }
 
-AttFacsimile::~AttFacsimile() {
-
+AttFacsimile::~AttFacsimile()
+{
 }
 
-void AttFacsimile::ResetFacsimile() {
+void AttFacsimile::ResetFacsimile()
+{
     m_facs = URIS_NONE;
 }
 
-bool AttFacsimile::ReadFacsimile(pugi::xml_node element) {
+bool AttFacsimile::ReadFacsimile(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("facs")) {
         this->SetFacs(StrToUris(element.attribute("facs").value()));
@@ -52,7 +55,8 @@ bool AttFacsimile::ReadFacsimile(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttFacsimile::WriteFacsimile(pugi::xml_node element) {
+bool AttFacsimile::WriteFacsimile(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasFacs()) {
         element.append_attribute("facs") = UrisToStr(this->GetFacs()).c_str();
@@ -67,11 +71,10 @@ bool AttFacsimile::HasFacs()
 }
 
 
-void AttFacsimile::getCoords() {
-    return;
-}
+/* include <attfacs> */
 
-bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_FACSIMILE)) {
         AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
         assert(att);
@@ -84,7 +87,8 @@ bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetFacsimile(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetFacsimile(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_FACSIMILE)) {
         AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
         assert(att);

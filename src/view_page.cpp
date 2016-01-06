@@ -87,8 +87,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     dc->StartPage();
 
-    for (i = 0; i < m_currentPage->GetSystemCount(); i++) 
-	{
+    for (i = 0; i < m_currentPage->GetSystemCount(); i++) {
         // cast to System check in DrawSystem
 		system = dynamic_cast<System*>(m_currentPage->m_children.at(i));
         DrawSystem(dc, system);
@@ -184,8 +183,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     
     ListOfObjects::iterator iter;
     
-    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
-    {
+    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         // We need to cast to DocObject for calling DrawTimeSpanningElement
         element = dynamic_cast<DocObject*>(*iter);
         if (!element) continue;
@@ -636,35 +634,29 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
 	int x1 = x - m_doc->GetDrawingBeamWidth(100, false) - barLineWidth;
 	int x2 = x + m_doc->GetDrawingBeamWidth(100, false) + barLineWidth;
     
-	if (barLine->GetForm() == BARRENDITION_single)
-    {
+	if (barLine->GetForm() == BARRENDITION_single) {
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_rptboth)
-    {
+    else if (barLine->GetForm() == BARRENDITION_rptboth) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
         DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
-    else if (barLine->GetForm()  == BARRENDITION_rptstart)
-    {
+    else if (barLine->GetForm()  == BARRENDITION_rptstart) {
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
         DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
-    else if (barLine->GetForm() == BARRENDITION_rptend)
-	{
+    else if (barLine->GetForm() == BARRENDITION_rptend) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
 	}
-	else if (barLine->GetForm()  == BARRENDITION_dbl)
-	{
+	else if (barLine->GetForm()  == BARRENDITION_dbl) {
         // Narrow the bars a little bit - should be centered?
         x1 += barLineWidth;
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
 	}
-	else if (barLine->GetForm()  == BARRENDITION_end)
-    {
+	else if (barLine->GetForm()  == BARRENDITION_end) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
         DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
     }
@@ -688,14 +680,12 @@ void View::DrawBarLineDots (DeviceContext *dc, StaffDef *staffDef, Staff *staff,
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines()  * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y_top = y_bottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
  
-    if ((barLine->GetForm()  == BARRENDITION_rptstart) || (barLine->GetForm() == BARRENDITION_rptboth))
-    {
+    if ((barLine->GetForm()  == BARRENDITION_rptstart) || (barLine->GetForm() == BARRENDITION_rptboth)) {
         DrawDot(dc, x2, y_bottom, staff->m_drawingStaffSize);
         DrawDot(dc, x2, y_top, staff->m_drawingStaffSize);
 
     }
-    if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth))
-	{
+    if ((barLine->GetForm() == BARRENDITION_rptend) || (barLine->GetForm() == BARRENDITION_rptboth)) {
         DrawDot(dc, x1, y_bottom, staff->m_drawingStaffSize);
         DrawDot(dc, x1, y_top, staff->m_drawingStaffSize);
 	}
@@ -843,8 +833,7 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     //dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
     
-    for (j = 0;j < staff->m_drawingLines; j++)
-    {
+    for (j = 0;j < staff->m_drawingLines; j++) {
         dc->DrawLine(ToDeviceContextX (x1), ToDeviceContextY (yy), ToDeviceContextX (x2), ToDeviceContextY (yy));
         // For drawing rectangles insteam of line
         yy -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -961,8 +950,7 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
     ListOfObjects *drawingList = layer->GetDrawingList();
     ListOfObjects::iterator iter;
     
-    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter)
-    {
+    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if (((*iter)->Is() == classId) &&  (classId == TUPLET)) {
             Tuplet *tuplet = dynamic_cast<Tuplet*>((*iter));
             assert(tuplet);
@@ -988,8 +976,7 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     assert(system);
     
     Object* current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext())
-    {
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure*>(current), system);
@@ -1019,8 +1006,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
     assert(system);
     
     Object* current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext())
-    {
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         if (current->Is() == STAFF) {
             // cast to Staff check in DrawStaff
             DrawStaff(dc,  dynamic_cast<Staff*>(current), measure, system);
@@ -1048,8 +1034,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff,  M
     assert(measure);
     
     Object* current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext())
-    {
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         if (current->Is() == LAYER) {
             // cast to Layer check in DrawLayer
             DrawLayer(dc, dynamic_cast<Layer*>(current), staff, measure);
@@ -1073,8 +1058,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
     assert(measure);
     
     Object* current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext())
-    {
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         if (current->IsLayerElement()) {
             DrawLayerElement(dc, dynamic_cast<LayerElement*>(current), layer, staff, measure);
         }
@@ -1094,8 +1078,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
     assert(parent);
     
     Object* current;
-    for (current = parent->GetFirst(); current; current = parent->GetNext())
-    {
+    for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         if (current->IsTextElement()) {
             DrawTextElement(dc, dynamic_cast<TextElement*>(current), x, y, setX, setY);
         }

@@ -30,20 +30,23 @@ namespace vrv {
 // AttIneumeLog
 //----------------------------------------------------------------------------
 
-AttIneumeLog::AttIneumeLog(): Att() {
+AttIneumeLog::AttIneumeLog(): Att()
+{
     ResetIneumeLog();
 }
 
-AttIneumeLog::~AttIneumeLog() {
-
+AttIneumeLog::~AttIneumeLog()
+{
 }
 
-void AttIneumeLog::ResetIneumeLog() {
+void AttIneumeLog::ResetIneumeLog()
+{
     m_form = INEUMEFORM_NONE;
     m_name = INEUMENAME_NONE;
 }
 
-bool AttIneumeLog::ReadIneumeLog(pugi::xml_node element) {
+bool AttIneumeLog::ReadIneumeLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToIneumeform(element.attribute("form").value()));
@@ -58,7 +61,8 @@ bool AttIneumeLog::ReadIneumeLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttIneumeLog::WriteIneumeLog(pugi::xml_node element) {
+bool AttIneumeLog::WriteIneumeLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = IneumeformToStr(this->GetForm()).c_str();
@@ -88,20 +92,23 @@ bool AttIneumeLog::HasName()
 // AttUneumeLog
 //----------------------------------------------------------------------------
 
-AttUneumeLog::AttUneumeLog(): Att() {
+AttUneumeLog::AttUneumeLog(): Att()
+{
     ResetUneumeLog();
 }
 
-AttUneumeLog::~AttUneumeLog() {
-
+AttUneumeLog::~AttUneumeLog()
+{
 }
 
-void AttUneumeLog::ResetUneumeLog() {
+void AttUneumeLog::ResetUneumeLog()
+{
     m_form = UNEUMEFORM_NONE;
     m_name = UNEUMENAME_NONE;
 }
 
-bool AttUneumeLog::ReadUneumeLog(pugi::xml_node element) {
+bool AttUneumeLog::ReadUneumeLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
         this->SetForm(StrToUneumeform(element.attribute("form").value()));
@@ -116,7 +123,8 @@ bool AttUneumeLog::ReadUneumeLog(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttUneumeLog::WriteUneumeLog(pugi::xml_node element) {
+bool AttUneumeLog::WriteUneumeLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
         element.append_attribute("form") = UneumeformToStr(this->GetForm()).c_str();
@@ -142,7 +150,8 @@ bool AttUneumeLog::HasName()
 
 /* include <attname> */
 
-bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_INEUMELOG)) {
         AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
         assert(att);
@@ -171,7 +180,8 @@ bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue
     return false;
 }
 
-void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_INEUMELOG)) {
         AttIneumeLog *att = dynamic_cast<AttIneumeLog*>(element);
         assert(att);

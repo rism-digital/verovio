@@ -30,20 +30,23 @@ namespace vrv {
 // AttNoteGesTablature
 //----------------------------------------------------------------------------
 
-AttNoteGesTablature::AttNoteGesTablature(): Att() {
+AttNoteGesTablature::AttNoteGesTablature(): Att()
+{
     ResetNoteGesTablature();
 }
 
-AttNoteGesTablature::~AttNoteGesTablature() {
-
+AttNoteGesTablature::~AttNoteGesTablature()
+{
 }
 
-void AttNoteGesTablature::ResetNoteGesTablature() {
+void AttNoteGesTablature::ResetNoteGesTablature()
+{
     m_tabFret = FRETNUMBER_NONE;
     m_tabString = STRINGNUMBER_NONE;
 }
 
-bool AttNoteGesTablature::ReadNoteGesTablature(pugi::xml_node element) {
+bool AttNoteGesTablature::ReadNoteGesTablature(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tab.fret")) {
         this->SetTabFret(StrToFretnumber(element.attribute("tab.fret").value()));
@@ -58,7 +61,8 @@ bool AttNoteGesTablature::ReadNoteGesTablature(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttNoteGesTablature::WriteNoteGesTablature(pugi::xml_node element) {
+bool AttNoteGesTablature::WriteNoteGesTablature(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTabFret()) {
         element.append_attribute("tab.fret") = FretnumberToStr(this->GetTabFret()).c_str();
@@ -88,19 +92,22 @@ bool AttNoteGesTablature::HasTabString()
 // AttStaffDefGesTablature
 //----------------------------------------------------------------------------
 
-AttStaffDefGesTablature::AttStaffDefGesTablature(): Att() {
+AttStaffDefGesTablature::AttStaffDefGesTablature(): Att()
+{
     ResetStaffDefGesTablature();
 }
 
-AttStaffDefGesTablature::~AttStaffDefGesTablature() {
-
+AttStaffDefGesTablature::~AttStaffDefGesTablature()
+{
 }
 
-void AttStaffDefGesTablature::ResetStaffDefGesTablature() {
+void AttStaffDefGesTablature::ResetStaffDefGesTablature()
+{
     m_tabStrings = "";
 }
 
-bool AttStaffDefGesTablature::ReadStaffDefGesTablature(pugi::xml_node element) {
+bool AttStaffDefGesTablature::ReadStaffDefGesTablature(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("tab.strings")) {
         this->SetTabStrings(StrToStr(element.attribute("tab.strings").value()));
@@ -110,7 +117,8 @@ bool AttStaffDefGesTablature::ReadStaffDefGesTablature(pugi::xml_node element) {
     return hasAttribute;
 }
 
-bool AttStaffDefGesTablature::WriteStaffDefGesTablature(pugi::xml_node element) {
+bool AttStaffDefGesTablature::WriteStaffDefGesTablature(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasTabStrings()) {
         element.append_attribute("tab.strings") = StrToStr(this->GetTabStrings()).c_str();
@@ -127,7 +135,8 @@ bool AttStaffDefGesTablature::HasTabStrings()
 
 /* include <atttab.strings> */
 
-bool Att::SetTablature(Object *element, std::string attrType, std::string attrValue) {
+bool Att::SetTablature(Object *element, std::string attrType, std::string attrValue)
+{
     if (element->HasAttClass(ATT_NOTEGESTABLATURE)) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
         assert(att);
@@ -152,7 +161,8 @@ bool Att::SetTablature(Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetTablature(Object *element, ArrayOfStrAttr *attributes) {
+void Att::GetTablature(Object *element, ArrayOfStrAttr *attributes)
+{
     if (element->HasAttClass(ATT_NOTEGESTABLATURE)) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
         assert(att);

@@ -298,10 +298,10 @@ void ScoreDef::FilterList(ListOfObjects *childList)
     
     while (iter != childList->end()) {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
-        if (!currentStaffDef)
-        {
+        if (!currentStaffDef) {
             iter = childList->erase(iter);
-        } else {
+        }
+        else {
             iter++;
         }
     }
@@ -316,8 +316,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter;
 
-    for (iter = childList->begin(); iter != childList->end(); ++iter)
-    {
+    for (iter = childList->begin(); iter != childList->end(); ++iter) {
         staffDef = dynamic_cast<StaffDef*>(*iter);
         if (staffDef && (staffDef->GetN() == n)) {
             return staffDef;
@@ -400,10 +399,10 @@ void StaffGrp::FilterList(ListOfObjects *childList)
     
     while (iter != childList->end()) {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
-        if (!currentStaffDef)
-        {
+        if (!currentStaffDef) {
             iter = childList->erase(iter);
-        } else {
+        }
+        else {
             iter++;
         }
     }

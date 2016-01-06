@@ -28,8 +28,7 @@ void DeviceContext::SetPen(int colour, int width, int opacity)
 {
     float opacityValue;
     
-    switch (opacity)
-    {
+    switch (opacity) {
         case AxSOLID :
             opacityValue = 1.0;
             break ;
@@ -47,8 +46,7 @@ void DeviceContext::SetBrush(int colour, int opacity)
 {
     float opacityValue;
     
-    switch (opacity)
-    {
+    switch (opacity) {
         case AxSOLID :
             opacityValue = 1.0;
             break ;
@@ -115,8 +113,7 @@ void DeviceContext::GetTextExtent(const std::wstring& string, int *w, int *h)
     
     Glyph *unkown = Resources::GetTextGlyph(L'o');
     
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
+    for (unsigned int i = 0; i < string.length(); i++) {
         wchar_t c = string[i];
         Glyph *glyph = Resources::GetTextGlyph(c);
         if (!glyph) {
@@ -145,8 +142,7 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring& string, int *w, int *
     (*w) = 0;
     (*h) = 0;
     
-    for (unsigned int i = 0; i < string.length(); i++)
-    {
+    for (unsigned int i = 0; i < string.length(); i++) {
         wchar_t c = string[i];
         Glyph *glyph = Resources::GetGlyph(c);
         if (!glyph) {
