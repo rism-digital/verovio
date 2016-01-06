@@ -24,11 +24,11 @@ namespace vrv {
 // DeviceContext
 //----------------------------------------------------------------------------
 
-void DeviceContext::SetPen( int colour, int width, int opacity )
+void DeviceContext::SetPen(int colour, int width, int opacity)
 {
     float opacityValue;
     
-    switch ( opacity )
+    switch (opacity)
     {
         case AxSOLID :
             opacityValue = 1.0;
@@ -43,11 +43,11 @@ void DeviceContext::SetPen( int colour, int width, int opacity )
     m_penStack.push(Pen(colour, width, opacityValue));
 }
 
-void DeviceContext::SetBrush( int colour, int opacity )
+void DeviceContext::SetBrush(int colour, int opacity)
 {
     float opacityValue;
     
-    switch ( opacity )
+    switch (opacity)
     {
         case AxSOLID :
             opacityValue = 1.0;
@@ -62,52 +62,52 @@ void DeviceContext::SetBrush( int colour, int opacity )
     m_brushStack.push(Brush(colour, opacityValue));
 }
 
-void DeviceContext::SetFont( FontInfo *font )
+void DeviceContext::SetFont(FontInfo *font)
 {
     // If we have a previous font on the stack and the new font has not size,
     // pass it because we need a font size in all cases
     if ((m_fontStack.size() > 0) && (font->GetPointSize() == 0)) {
         font->SetPointSize(m_fontStack.top()->GetPointSize());
     }
-    m_fontStack.push( font );
+    m_fontStack.push(font);
 }
     
-void DeviceContext::ResetPen( )
+void DeviceContext::ResetPen()
 {
     m_penStack.pop();
 }
 
-void DeviceContext::ResetBrush( )
+void DeviceContext::ResetBrush()
 {
     m_brushStack.pop();
 }
     
-void DeviceContext::ResetFont( )
+void DeviceContext::ResetFont()
 {
     m_fontStack.pop();
 }
 
 void DeviceContext::DeactivateGraphic()
 {
-    assert( !m_isDeactivated );
+    assert(!m_isDeactivated);
     m_isDeactivated = true;
 }
     
-void DeviceContext::ReactivateGraphic( )
+void DeviceContext::ReactivateGraphic()
 {
-    assert( m_isDeactivated );
+    assert(m_isDeactivated);
     m_isDeactivated = false;
 }
 
-void DeviceContext::GetTextExtent( const std::string& string, int *w, int *h )
+void DeviceContext::GetTextExtent(const std::string& string, int *w, int *h)
 {
     std::wstring wtext(string.begin(), string.end());
     GetTextExtent(wtext, w, h);
 }
     
-void DeviceContext::GetTextExtent( const std::wstring& string, int *w, int *h )
+void DeviceContext::GetTextExtent(const std::wstring& string, int *w, int *h)
 {
-    assert( m_fontStack.top() );
+    assert(m_fontStack.top());
     
     int x, y, partial_w, partial_h;
     (*w) = 0;
@@ -137,9 +137,9 @@ void DeviceContext::GetTextExtent( const std::wstring& string, int *w, int *h )
     }
 }
 
-void DeviceContext::GetSmuflTextExtent( const std::wstring& string, int *w, int *h )
+void DeviceContext::GetSmuflTextExtent(const std::wstring& string, int *w, int *h)
 {
-    assert( m_fontStack.top() );
+    assert(m_fontStack.top());
     
     int x, y, partial_w, partial_h;
     (*w) = 0;

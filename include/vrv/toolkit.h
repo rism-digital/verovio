@@ -44,7 +44,7 @@ public:
      */
     ///@{
     /** If initFont is set to false, Resources::InitFonts will have to be called explicitely */
-    Toolkit( bool initFont = true );
+    Toolkit(bool initFont = true);
     virtual ~Toolkit();
     ///@}
 
@@ -52,47 +52,47 @@ public:
      * Set the resource path. To be called if the constructor had initFont=false.
      * This needs refactoring.
      */
-    bool SetResourcePath( const std::string &path );
+    bool SetResourcePath(const std::string &path);
     
     /**
      * Load a file with the specified type.
      */
-    bool LoadFile( const std::string &filename );
+    bool LoadFile(const std::string &filename);
     
     /**
      * Load a string data witht he specified type.
      */
-    bool LoadString( const std::string &data );
+    bool LoadString(const std::string &data);
     
     /**
      * Save an MEI file.
      */
-    bool SaveFile( const std::string &filename );
+    bool SaveFile(const std::string &filename);
     
     /**
      * Parse the options passed as JSON string
      * only available for Emscripten based compiles
      **/
-    bool ParseOptions( const std::string &json_options );
+    bool ParseOptions(const std::string &json_options);
     
     /**
      * Parse the editor actions passed as JSON string
      * only available for Emscripten based compiles
      **/
-    bool Edit( const std::string &json_editorAction );
+    bool Edit(const std::string &json_editorAction);
     
     /**
      * Concatenates the vrv::logBuffer into a string an returns it.
      * This is used only for Emscripten based compilation.
      * The vrv::logBuffer is filled by the vrv::LogXXX functions.
      */
-    std::string GetLogString( );
+    std::string GetLogString();
     
     /**
      * Returns the version number as a string.
      * This is used only for Emscripten based compilation.
      */
-    std::string GetVersion( );
+    std::string GetVersion();
     
     /**
      * Resets the vrv::logBuffer.
@@ -104,24 +104,24 @@ public:
      * Render the page in SVG and returns it as a string
      * Page number is 1-based
      */
-    std::string RenderToSvg( int pageNo =  1, bool xml_declaration = false );
+    std::string RenderToSvg(int pageNo =  1, bool xml_declaration = false);
 
     /**
      * Render the page in SVG and save it to the file.
      * Page number is 1-based.
      */
-    bool RenderToSvgFile( const std::string &filename, int pageNo =  1 );
+    bool RenderToSvgFile(const std::string &filename, int pageNo =  1);
     
     /**
      * Get the MEI as a string.
      * Get all the pages unless a page number (1-based) is specified
      */
-    std::string GetMEI( int pageNo =  0, bool scoreBased = false );
+    std::string GetMEI(int pageNo =  0, bool scoreBased = false);
     
     /**
      * Return element attributes as a JSON string
      */
-    std::string GetElementAttr( const std::string &xmlId );
+    std::string GetElementAttr(const std::string &xmlId);
     
     /**
      * Redo the layout of the loaded data
@@ -135,7 +135,7 @@ public:
      * This takes into account the current layout options.
      * Retruns 0 if the element is not found.
      */
-    int GetPageWithElement( const std::string &xmlId );
+    int GetPageWithElement(const std::string &xmlId);
     
 	/**
 	* @name Set and get a std::string into a char * buffer.
@@ -143,15 +143,15 @@ public:
 	* The buffer is freed when reset or in MusController destructor.
 	*/
 	///@{
-	void SetCString( const std::string &data );
-	const char *GetCString( );
+	void SetCString(const std::string &data);
+	const char *GetCString();
 	///@}
 
     /**
      * @name Set and get the border
      */
     ///@{
-    bool SetBorder( int border );
+    bool SetBorder(int border);
     int GetBorder() { return m_border; };
     ///@}
     
@@ -159,7 +159,7 @@ public:
      * @name Set and get the scale
      */
     ///@{
-    bool SetScale( int scale );
+    bool SetScale(int scale);
     int GetScale() { return m_scale; };
     ///@}
     
@@ -167,7 +167,7 @@ public:
      * @name Set and get the page height (in pixels)
      */
     ///@{
-    bool SetPageHeight( int h );
+    bool SetPageHeight(int h);
     int GetPageHeight() { return m_pageHeight; };
     ///@}
     
@@ -175,7 +175,7 @@ public:
      * @name Set and get the page width (in pixels)
      */
     ///@{
-    bool SetPageWidth( int w );
+    bool SetPageWidth(int w);
     int GetPageWidth() { return m_pageWidth; };
     ///@}
     
@@ -183,8 +183,8 @@ public:
      * @name Set and get the spacing staff and system
      */
     ///@{
-    bool SetSpacingStaff( int spacingStaff );
-    bool SetSpacingSystem( int spacingSystem );
+    bool SetSpacingStaff(int spacingStaff);
+    bool SetSpacingSystem(int spacingSystem);
     int GetSpacingStaff() { return m_spacingStaff; };
     int GetSpacingSystem() { return m_spacingSystem; };
     ///@}
@@ -193,7 +193,7 @@ public:
      * @name Space notes equally and close together (normally for mensural notation)
      */
     ///@{
-    bool SetSpacingLinear( float spacingLinear );
+    bool SetSpacingLinear(float spacingLinear);
     float GetSpacingLinear() { return m_spacingLinear; };
     ///@}
     
@@ -201,7 +201,7 @@ public:
      * @name Space notes equally and close together (normally for mensural notation)
      */
     ///@{
-    bool SetSpacingNonLinear( float spacingNonLinear );
+    bool SetSpacingNonLinear(float spacingNonLinear);
     float GetSpacingNonLinear() { return m_spacingNonLinear; };
     ///@}
     
@@ -211,7 +211,7 @@ public:
      * and output one single page with one single system
      */
     ///@{
-    void SetNoLayout( bool l ) { m_noLayout = l; };
+    void SetNoLayout(bool l) { m_noLayout = l; };
     int GetNoLayout() { return m_noLayout; };
     ///@}
     
@@ -220,7 +220,7 @@ public:
      * and fully recalculate the layout 
      */
     ///@{
-    void SetIgnoreLayout( bool l ) { m_ignoreLayout = l; };
+    void SetIgnoreLayout(bool l) { m_ignoreLayout = l; };
     int GetIgnoreLayout() { return m_ignoreLayout; };
     ///@}
     
@@ -228,7 +228,7 @@ public:
      * @name Crop the page height to the height of the content 
      */
     ///@{
-    void SetAdjustPageHeight( bool a ) { m_adjustPageHeight = a; };
+    void SetAdjustPageHeight(bool a) { m_adjustPageHeight = a; };
     int GetAdjustPageHeight() { return m_adjustPageHeight; };
     ///@}
     
@@ -236,7 +236,7 @@ public:
      * @name Space notes equally and close together (normally for mensural notation) 
      */
     ///@{
-    void SetEvenNoteSpacing( bool even ) { m_evenNoteSpacing = even; };
+    void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; };
     int GetEvenNoteSpacing() { return m_evenNoteSpacing; };
     ///@}
 
@@ -244,7 +244,7 @@ public:
      * @name Do not justify the system (for debugging purposes) 
      */
     ///@{
-    void SetNoJustification( bool j ) { m_noJustification = j; };
+    void SetNoJustification(bool j) { m_noJustification = j; };
     int GetNoJustification() { return m_noJustification; };
     ///@}
     
@@ -252,7 +252,7 @@ public:
      * @name Do not justify the system (for debugging purposes) 
      */
     ///@{
-    void SetShowBoundingBoxes( bool b ) { m_showBoundingBoxes = b; };
+    void SetShowBoundingBoxes(bool b) { m_showBoundingBoxes = b; };
     int GetShowBoundingBoxes() { return m_showBoundingBoxes; };
     ///@}
     
@@ -261,8 +261,8 @@ public:
      * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
-    bool SetFormat( std::string const &informat );
-    void SetFormat( FileFormat format ) { m_format = format; };
+    bool SetFormat(std::string const &informat);
+    void SetFormat(FileFormat format) { m_format = format; };
     int GetFormat() { return m_format; };
     ///@}
     
@@ -270,7 +270,7 @@ public:
      * @name Set and get the xPath query for selecting <rdg> (if any)
      */
     ///@{
-    void SetAppXPathQuery( std::string const &appXPathQuery ) { m_appXPathQuery = appXPathQuery; };
+    void SetAppXPathQuery(std::string const &appXPathQuery) { m_appXPathQuery = appXPathQuery; };
     std::string GetAppXPathQuery() { return m_appXPathQuery; };
     ///@}
     
@@ -278,7 +278,7 @@ public:
      * @name Set and get the xPath query for selecting <rdg> (if any)
      */
     ///@{
-    void SetScoreBasedMei( bool scoreBasedMei ) { m_scoreBasedMei = scoreBasedMei; };
+    void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; };
     bool GetScoreBasedMei() { return m_scoreBasedMei; };
     ///@}
 
@@ -286,7 +286,7 @@ public:
      * @name Set a specific font
      */
     ///@{
-    bool SetFont( std::string const &font );
+    bool SetFont(std::string const &font);
     ///@}
     
     /**
@@ -294,21 +294,21 @@ public:
      * The SetFormat with FileFormat does not perform any validation
      */
     ///@{
-    int GetPageCount( );
+    int GetPageCount();
     ///@}
     
     /**
      * Experimental editor method
      */
     ///@{
-    bool Drag( std::string elementId, int x, int y );
-    bool Insert( std::string elementType, std::string startId, std::string endId );
-    bool Set( std::string elementId, std::string attrType, std::string attrValue );
+    bool Drag(std::string elementId, int x, int y);
+    bool Insert(std::string elementType, std::string startId, std::string endId);
+    bool Set(std::string elementId, std::string attrType, std::string attrValue);
     ///@}
 
 private:
-    bool IsUTF16( const std::string &filename );
-    bool LoadUTF16File( const std::string &filename );
+    bool IsUTF16(const std::string &filename);
+    bool LoadUTF16File(const std::string &filename);
     
     
 protected:
@@ -317,9 +317,9 @@ protected:
      * Experimental editor method
      */
     ///@{
-    bool ParseDragAction( jsonxx::Object param, std::string *elementId, int *x, int *y );
-    bool ParseInsertAction( jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid );
-    bool ParseSetAction( jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue );
+    bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);
+    bool ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid);
+    bool ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);
     ///@}
 #endif
     

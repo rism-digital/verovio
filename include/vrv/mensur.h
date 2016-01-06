@@ -38,11 +38,11 @@ public:
      */
     ///@{
     Mensur();
-    Mensur( ScoreDefInterface *mensurAttr );
+    Mensur(ScoreDefInterface *mensurAttr);
     void Init();
     virtual ~Mensur();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Mensur"; };
+    virtual std::string GetClassName() { return "Mensur"; };
     virtual ClassId Is() { return MENSUR; };
     virtual Object* Clone() { return new Mensur(*this); };
     ///@}

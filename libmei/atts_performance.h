@@ -39,10 +39,10 @@ public:
     void ResetAlignment();
     
     /** Read the values for the attribute class **/
-    bool ReadAlignment( pugi::xml_node element );
+    bool ReadAlignment(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteAlignment( pugi::xml_node element );
+    bool WriteAlignment(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetWhen(std::string when_) { m_when = when_; };
     std::string GetWhen() const { return m_when; };    
-    bool HasWhen( );
+    bool HasWhen();
     
     ///@}
 

@@ -39,10 +39,10 @@ public:
     void ResetRegularmethod();
     
     /** Read the values for the attribute class **/
-    bool ReadRegularmethod( pugi::xml_node element );
+    bool ReadRegularmethod(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteRegularmethod( pugi::xml_node element );
+    bool WriteRegularmethod(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetMethod(regularmethod_METHOD method_) { m_method = method_; };
     regularmethod_METHOD GetMethod() const { return m_method; };    
-    bool HasMethod( );
+    bool HasMethod();
     
     ///@}
 

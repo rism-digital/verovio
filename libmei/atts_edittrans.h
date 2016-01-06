@@ -39,10 +39,10 @@ public:
     void ResetAgentident();
     
     /** Read the values for the attribute class **/
-    bool ReadAgentident( pugi::xml_node element );
+    bool ReadAgentident(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteAgentident( pugi::xml_node element );
+    bool WriteAgentident(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetAgent(std::string agent_) { m_agent = agent_; };
     std::string GetAgent() const { return m_agent; };    
-    bool HasAgent( );
+    bool HasAgent();
     
     ///@}
 
@@ -80,10 +80,10 @@ public:
     void ResetEvidence();
     
     /** Read the values for the attribute class **/
-    bool ReadEvidence( pugi::xml_node element );
+    bool ReadEvidence(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteEvidence( pugi::xml_node element );
+    bool WriteEvidence(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -93,12 +93,12 @@ public:
     ///@{
     void SetCert(data_CERTAINTY cert_) { m_cert = cert_; };
     data_CERTAINTY GetCert() const { return m_cert; };    
-    bool HasCert( );
+    bool HasCert();
     
     //
     void SetEvidence(std::string evidence_) { m_evidence = evidence_; };
     std::string GetEvidence() const { return m_evidence; };    
-    bool HasEvidence( );
+    bool HasEvidence();
     
     ///@}
 
@@ -129,10 +129,10 @@ public:
     void ResetExtent();
     
     /** Read the values for the attribute class **/
-    bool ReadExtent( pugi::xml_node element );
+    bool ReadExtent(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteExtent( pugi::xml_node element );
+    bool WriteExtent(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -142,7 +142,7 @@ public:
     ///@{
     void SetExtent(std::string extent_) { m_extent = extent_; };
     std::string GetExtent() const { return m_extent; };    
-    bool HasExtent( );
+    bool HasExtent();
     
     ///@}
 
@@ -167,10 +167,10 @@ public:
     void ResetReasonident();
     
     /** Read the values for the attribute class **/
-    bool ReadReasonident( pugi::xml_node element );
+    bool ReadReasonident(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteReasonident( pugi::xml_node element );
+    bool WriteReasonident(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -180,7 +180,7 @@ public:
     ///@{
     void SetReason(std::string reason_) { m_reason = reason_; };
     std::string GetReason() const { return m_reason; };    
-    bool HasReason( );
+    bool HasReason();
     
     ///@}
 

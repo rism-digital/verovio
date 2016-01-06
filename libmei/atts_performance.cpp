@@ -42,7 +42,7 @@ void AttAlignment::ResetAlignment() {
     m_when = "";
 }
 
-bool AttAlignment::ReadAlignment( pugi::xml_node element ) {
+bool AttAlignment::ReadAlignment(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("when")) {
         this->SetWhen(StrToStr(element.attribute("when").value()));
@@ -52,7 +52,7 @@ bool AttAlignment::ReadAlignment( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttAlignment::WriteAlignment( pugi::xml_node element ) {
+bool AttAlignment::WriteAlignment(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasWhen()) {
         element.append_attribute("when") = StrToStr(this->GetWhen()).c_str();
@@ -61,7 +61,7 @@ bool AttAlignment::WriteAlignment( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttAlignment::HasWhen( )
+bool AttAlignment::HasWhen()
 {
     return (m_when != "");
 }
@@ -69,10 +69,10 @@ bool AttAlignment::HasWhen( )
 
 /* include <attwhen> */
 
-bool Att::SetPerformance( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_ALIGNMENT ) ) {
+bool Att::SetPerformance(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_ALIGNMENT)) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "when") {
             att->SetWhen(att->StrToStr(attrValue));
             return true;
@@ -82,10 +82,10 @@ bool Att::SetPerformance( Object *element, std::string attrType, std::string att
     return false;
 }
 
-void Att::GetPerformance( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_ALIGNMENT ) ) {
+void Att::GetPerformance(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_ALIGNMENT)) {
         AttAlignment *att = dynamic_cast<AttAlignment*>(element);
-        assert( att );
+        assert(att);
         if (att->HasWhen()) {
             attributes->push_back(std::make_pair("when", att->StrToStr(att->GetWhen())));
         }

@@ -27,7 +27,7 @@ int View::s_deCasteljau[4][4];
 // View
 //----------------------------------------------------------------------------
 
-View::View( )
+View::View()
 {
 	m_doc = NULL;
 	m_pageIdx = 0;
@@ -45,9 +45,9 @@ View::~View()
 {
 }
 
-void View::SetDoc( Doc *doc )
+void View::SetDoc(Doc *doc)
 {
-	if ( doc == NULL ) // unset file
+	if (doc == NULL) // unset file
 	{
 		m_doc = NULL;
         DoReset();
@@ -65,19 +65,19 @@ void View::SetDoc( Doc *doc )
 }
 
 
-void View::SetPage( int pageIdx, bool doLayout )
+void View::SetPage(int pageIdx, bool doLayout)
 {
-	assert( m_doc ); // Page cannot be NULL
-    assert( m_doc->HasPage( pageIdx ) );
+	assert(m_doc); // Page cannot be NULL
+    assert(m_doc->HasPage(pageIdx));
     
     m_pageIdx = pageIdx;
-    m_currentPage = m_doc->SetDrawingPage( pageIdx );
+    m_currentPage = m_doc->SetDrawingPage(pageIdx);
     
     if (doLayout) {
         m_doc->SetCurrentScoreDef();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
-        m_currentPage->LayOut( );
+        m_currentPage->LayOut();
     }
 
     m_currentElement = NULL;
@@ -90,36 +90,36 @@ void View::SetPage( int pageIdx, bool doLayout )
     DoRefresh();
 }
 
-bool View::HasNext( bool forward ) 
+bool View::HasNext(bool forward) 
 { 
-	if ( forward )
-		return ( m_doc && ( m_doc->HasPage( m_pageIdx + 1 ) ) );
+	if (forward)
+		return (m_doc && (m_doc->HasPage(m_pageIdx + 1)));
 	else
-		return ( m_doc && ( m_doc->HasPage( m_pageIdx - 1 ) ) );
+		return (m_doc && (m_doc->HasPage(m_pageIdx - 1)));
     return false;
 		
 }
 
-void View::Next( bool forward ) 
+void View::Next(bool forward) 
 { 
-	if ( !m_doc )
+	if (!m_doc)
         return;
 
-	if ( forward && this->HasNext( true ) )
+	if (forward && this->HasNext(true))
 		m_pageIdx++;
-	else if ( !forward && this->HasNext( false ) )
+	else if (!forward && this->HasNext(false))
 		m_pageIdx--;
 
-	SetPage( m_pageIdx );
+	SetPage(m_pageIdx);
 }
 
-int View::ToDeviceContextX( int i ) { return i; }; // the same
+int View::ToDeviceContextX(int i) { return i; }; // the same
 
 /** x value in the Logical world */
-int View::ToLogicalX( int i )  { return i; };
+int View::ToLogicalX(int i)  { return i; };
 
 /** y value in the View */
-int View::ToDeviceContextY( int i )  
+int View::ToDeviceContextY(int i)  
 { 
     if (!m_doc) {
         return 0;
@@ -129,7 +129,7 @@ int View::ToDeviceContextY( int i )
 }
 
 /** y value in the Logical world  */
-int View::ToLogicalY( int i )  
+int View::ToLogicalY(int i)  
 { 
     { 
         if (!m_doc) {
@@ -174,7 +174,7 @@ std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
     return str;
 }
     
-Point View::CalcPositionAfterRotation( Point point , float rot_alpha, Point center)
+Point View::CalcPositionAfterRotation(Point point , float rot_alpha, Point center)
 {
     float s = sin(rot_alpha);
     float c = cos(rot_alpha);

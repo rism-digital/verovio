@@ -27,25 +27,25 @@ class FileOutputStream: public std::ofstream
 {
 public:
     // constructors and destructors
-    FileOutputStream( Doc *doc, std::string filename );
-	FileOutputStream( Doc *doc );
+    FileOutputStream(Doc *doc, std::string filename);
+	FileOutputStream(Doc *doc);
     FileOutputStream() {};
     virtual ~FileOutputStream();
     
     /**
      * Writing start export method that must be overriden in child class.
      */
-    virtual bool ExportFile( ) { return true; }
+    virtual bool ExportFile() { return true; }
     
     /**
      * Writing object method that must be overriden in child class.
      */
-    virtual bool WriteObject( Object *object ) { return true; };
+    virtual bool WriteObject(Object *object) { return true; };
     
     /**
      * Writing object method that must be overriden in child class.
      */
-    virtual bool WriteObjectEnd( Object *object ) { return true; };
+    virtual bool WriteObjectEnd(Object *object) { return true; };
     
 public:
     
@@ -68,15 +68,15 @@ class FileInputStream: public std::ifstream
 {
 public:
     // constructors and destructors
-    FileInputStream( Doc *doc, std::string filename );
-    FileInputStream( Doc *doc );
+    FileInputStream(Doc *doc, std::string filename);
+    FileInputStream(Doc *doc);
     virtual ~FileInputStream();
     
     
     
     // read
-    virtual bool ImportFile( ) { return true; }
-    virtual bool ImportString( std::string data ) { return true; }
+    virtual bool ImportFile() { return true; }
+    virtual bool ImportString(std::string data) { return true; }
     
     /**
      * Setter for the layoutInformation ignore flag
@@ -98,7 +98,7 @@ public:
     /**
      * Set XPath query for <rdg> (MEI only)
      */
-    virtual void SetAppXPathQuery( std::string xPathQuery ) {};
+    virtual void SetAppXPathQuery(std::string xPathQuery) {};
     
 private:
     /**

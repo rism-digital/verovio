@@ -41,7 +41,7 @@ public:
     Syl();
     virtual ~Syl();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Syl"; };
+    virtual std::string GetClassName() { return "Syl"; };
     virtual ClassId Is() { return SYL; };
     ///@}
     
@@ -60,17 +60,17 @@ public:
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
      * See PrepareDarwing
      */
-    virtual int PrepareLyrics( ArrayPtrVoid *params );
+    virtual int PrepareLyrics(ArrayPtrVoid *params);
     
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
+    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing( ArrayPtrVoid *params );
+    virtual int ResetDrawing(ArrayPtrVoid *params);
     
 private:
     

@@ -39,10 +39,10 @@ public:
     void ResetTabular();
     
     /** Read the values for the attribute class **/
-    bool ReadTabular( pugi::xml_node element );
+    bool ReadTabular(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteTabular( pugi::xml_node element );
+    bool WriteTabular(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,12 +52,12 @@ public:
     ///@{
     void SetColspan(int colspan_) { m_colspan = colspan_; };
     int GetColspan() const { return m_colspan; };    
-    bool HasColspan( );
+    bool HasColspan();
     
     //
     void SetRowspan(int rowspan_) { m_rowspan = rowspan_; };
     int GetRowspan() const { return m_rowspan; };    
-    bool HasRowspan( );
+    bool HasRowspan();
     
     ///@}
 

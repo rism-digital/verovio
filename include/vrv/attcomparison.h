@@ -31,21 +31,21 @@ class AttCommonNComparison: public AttComparison
 {
 
 public:
-    AttCommonNComparison( ClassId AttClassId, const int n ):
-        AttComparison( AttClassId )
+    AttCommonNComparison(ClassId AttClassId, const int n):
+        AttComparison(AttClassId)
     {
         m_n = n;
     };
     
-    void SetN( int n ) { m_n = n; }
+    void SetN(int n) { m_n = n; }
     
     virtual bool operator() (Object *object)
     {
         if (!MatchesType(object)) return false;
         // This should not happen but, but just in case
-        if (!object->HasAttClass( ATT_COMMON )) return false;
+        if (!object->HasAttClass(ATT_COMMON)) return false;
         AttCommon *element = dynamic_cast<AttCommon*>(object);
-        assert( element );
+        assert(element);
         return (element->GetN() == m_n);
     }
     
@@ -79,7 +79,7 @@ public:
     {
         if (!object->HasInterface(INTERFACE_DURATION)) return false;
         DurationInterface *interface = dynamic_cast<DurationInterface*>(object);
-        assert( interface );
+        assert(interface);
         if (interface->HasDur()) {
             if ((m_extremeType == LONGEST) && (interface->GetActualDur() < m_extremeDur)) {
                 m_extremeDur = interface->GetActualDur();
@@ -110,13 +110,13 @@ class AttMeasureAlignerType: public AttComparison
 {
     
 public:
-    AttMeasureAlignerType( const AlignmentType type ):
-        AttComparison( OBJECT )
+    AttMeasureAlignerType(const AlignmentType type):
+        AttComparison(OBJECT)
     {
         m_type = type;
     };
     
-    void SetType( AlignmentType type ) { m_type = type; }
+    void SetType(AlignmentType type) { m_type = type; }
     
     virtual bool operator() (Object *object)
     {

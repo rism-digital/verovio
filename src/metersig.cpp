@@ -22,7 +22,7 @@ MeterSig::MeterSig():
     Init();
 }
     
-MeterSig::MeterSig( ScoreDefInterface *meterSigAttr ):
+MeterSig::MeterSig(ScoreDefInterface *meterSigAttr):
     LayerElement("msig-"),
     AttMeterSigLog()
 {

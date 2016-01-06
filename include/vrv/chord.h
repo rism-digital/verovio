@@ -42,10 +42,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Chord( );
+    Chord();
     virtual ~Chord();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Chord"; };
+    virtual std::string GetClassName() { return "Chord"; };
     virtual ClassId Is() { return CHORD; };
     ///@}
     
@@ -57,7 +57,7 @@ public:
      */
     void AddLayerElement(LayerElement *element);
 
-    virtual void FilterList( ListOfObjects *childlist );
+    virtual void FilterList(ListOfObjects *childlist);
     
     void GetYExtremes(int *yMax, int *yMin);
     
@@ -97,12 +97,12 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid *params );
+    virtual int PrepareTieAttr(ArrayPtrVoid *params);
     
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttrEnd( ArrayPtrVoid *params );
+    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
     
 protected:
     /**

@@ -31,7 +31,7 @@ public:
     Dot();
     virtual ~Dot();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Dot"; };
+    virtual std::string GetClassName() { return "Dot"; };
     virtual ClassId Is() { return DOT; };
     ///@}
     
@@ -45,12 +45,12 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
+    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing( ArrayPtrVoid *params );
+    virtual int ResetDrawing(ArrayPtrVoid *params);
     
 protected:
 

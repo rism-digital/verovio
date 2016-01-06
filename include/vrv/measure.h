@@ -40,10 +40,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Measure( bool measuredMusic = true, int logMeasureNb = -1 );
+    Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Measure"; };
+    virtual std::string GetClassName() { return "Measure"; };
     virtual ClassId Is() { return MEASURE; };
     ///@}
     
@@ -56,8 +56,8 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddStaff( Staff *staff );
-    void AddFloatingElement( FloatingElement *element );
+	void AddStaff(Staff *staff);
+    void AddFloatingElement(FloatingElement *element);
     ///@}
 	    
     /**
@@ -71,14 +71,14 @@ public:
      * BarLine object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
-     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend( GetRight() ); return m_leftBarLine.GetRend(); };
-     * void SetLeftBarLineType( data_BARRENDITION type ) { m_leftBarLine.SetRend(type); SetLeft(type); };
+     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); };
+     * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); };
      */
     ///@{
     data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); };
-    void SetLeftBarLineType( data_BARRENDITION type ) { m_leftBarLine.SetForm(type); };
+    void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetForm(type); };
     data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); };
-    void SetRightBarLineType( data_BARRENDITION type ) { m_rightBarLine.SetForm(type); };
+    void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); };
     ///@}
     
     /**
@@ -92,7 +92,7 @@ public:
     BarLine *GetRightBarLine() { return &m_rightBarLine; };
     ///@}
     
-    int GetXRel( );
+    int GetXRel();
 
     /**
      * Return the non justifiable with for the measure
@@ -102,12 +102,12 @@ public:
     /** 
      * Return the X rel position of the right barLine (without its width)
      */
-    int GetRightBarLineX( );
+    int GetRightBarLineX();
     
     /**
      * Return the width of the measure, including the barLine width
      */
-    int GetWidth( );
+    int GetWidth();
     
     //----------//
     // Functors //
@@ -117,58 +117,58 @@ public:
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
      * Called by AlignHorizontally
      */
-    virtual void ResetHorizontalAlignment( );
+    virtual void ResetHorizontalAlignment();
     
     /**
      * AlignHorizontally the content of a measure.
      */
-    virtual int AlignHorizontally( ArrayPtrVoid *params );
+    virtual int AlignHorizontally(ArrayPtrVoid *params);
 
     /**
      * AlignVertically the content of a measure.
      */
-    virtual int AlignVertically( ArrayPtrVoid *params );
+    virtual int AlignVertically(ArrayPtrVoid *params);
 
     /**
      * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
-    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params );
+    virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
+    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
     
     /**
      * Set the position of the Alignment.
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int SetAlignmentXPos( ArrayPtrVoid *params );
+    virtual int SetAlignmentXPos(ArrayPtrVoid *params);
     
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * This method also moves the end position of the measure according to the barLine width.
      */
-    virtual int AlignMeasures( ArrayPtrVoid *params );
+    virtual int AlignMeasures(ArrayPtrVoid *params);
     
     /**
      * Justify the X positions
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int JustifyX( ArrayPtrVoid *params );
+    virtual int JustifyX(ArrayPtrVoid *params);
     
     /**
      * Fill a page by adding systems with the appropriate length
      *
      */
-    virtual int CastOffSystems( ArrayPtrVoid *params );
+    virtual int CastOffSystems(ArrayPtrVoid *params);
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid *params );
+    virtual int SetDrawingXY(ArrayPtrVoid *params);
     
         
 public:

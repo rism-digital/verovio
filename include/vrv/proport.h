@@ -33,7 +33,7 @@ public:
     Proport();
     virtual ~Proport();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Proport"; };
+    virtual std::string GetClassName() { return "Proport"; };
     virtual ClassId Is() { return PROPORT; };
     virtual Object* Clone() { return new Proport(*this); };
     ///@}

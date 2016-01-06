@@ -39,10 +39,10 @@ public:
     void ResetLigatureLog();
     
     /** Read the values for the attribute class **/
-    bool ReadLigatureLog( pugi::xml_node element );
+    bool ReadLigatureLog(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteLigatureLog( pugi::xml_node element );
+    bool WriteLigatureLog(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetForm(data_LIGATUREFORM form_) { m_form = form_; };
     data_LIGATUREFORM GetForm() const { return m_form; };    
-    bool HasForm( );
+    bool HasForm();
     
     ///@}
 
@@ -77,10 +77,10 @@ public:
     void ResetMensurVis();
     
     /** Read the values for the attribute class **/
-    bool ReadMensurVis( pugi::xml_node element );
+    bool ReadMensurVis(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMensurVis( pugi::xml_node element );
+    bool WriteMensurVis(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -90,12 +90,12 @@ public:
     ///@{
     void SetForm(mensurVis_FORM form_) { m_form = form_; };
     mensurVis_FORM GetForm() const { return m_form; };    
-    bool HasForm( );
+    bool HasForm();
     
     //
     void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; };
     data_ORIENTATION GetOrient() const { return m_orient; };    
-    bool HasOrient( );
+    bool HasOrient();
     
     ///@}
 
@@ -122,10 +122,10 @@ public:
     void ResetMensuralLog();
     
     /** Read the values for the attribute class **/
-    bool ReadMensuralLog( pugi::xml_node element );
+    bool ReadMensuralLog(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMensuralLog( pugi::xml_node element );
+    bool WriteMensuralLog(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -135,27 +135,27 @@ public:
     ///@{
     void SetMensurDot(data_BOOLEAN mensurDot_) { m_mensurDot = mensurDot_; };
     data_BOOLEAN GetMensurDot() const { return m_mensurDot; };    
-    bool HasMensurDot( );
+    bool HasMensurDot();
     
     //
     void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; };
     data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; };    
-    bool HasMensurSign( );
+    bool HasMensurSign();
     
     //
     void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; };
     int GetMensurSlash() const { return m_mensurSlash; };    
-    bool HasMensurSlash( );
+    bool HasMensurSlash();
     
     //
     void SetProportNum(int proportNum_) { m_proportNum = proportNum_; };
     int GetProportNum() const { return m_proportNum; };    
-    bool HasProportNum( );
+    bool HasProportNum();
     
     //
     void SetProportNumbase(int proportNumbase_) { m_proportNumbase = proportNumbase_; };
     int GetProportNumbase() const { return m_proportNumbase; };    
-    bool HasProportNumbase( );
+    bool HasProportNumbase();
     
     ///@}
 
@@ -199,10 +199,10 @@ public:
     void ResetMensuralShared();
     
     /** Read the values for the attribute class **/
-    bool ReadMensuralShared( pugi::xml_node element );
+    bool ReadMensuralShared(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMensuralShared( pugi::xml_node element );
+    bool WriteMensuralShared(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -212,22 +212,22 @@ public:
     ///@{
     void SetModusmaior(data_MODUSMAIOR modusmaior_) { m_modusmaior = modusmaior_; };
     data_MODUSMAIOR GetModusmaior() const { return m_modusmaior; };    
-    bool HasModusmaior( );
+    bool HasModusmaior();
     
     //
     void SetModusminor(data_MODUSMINOR modusminor_) { m_modusminor = modusminor_; };
     data_MODUSMINOR GetModusminor() const { return m_modusminor; };    
-    bool HasModusminor( );
+    bool HasModusminor();
     
     //
     void SetProlatio(data_PROLATIO prolatio_) { m_prolatio = prolatio_; };
     data_PROLATIO GetProlatio() const { return m_prolatio; };    
-    bool HasProlatio( );
+    bool HasProlatio();
     
     //
     void SetTempus(data_TEMPUS tempus_) { m_tempus = tempus_; };
     data_TEMPUS GetTempus() const { return m_tempus; };    
-    bool HasTempus( );
+    bool HasTempus();
     
     ///@}
 
@@ -258,10 +258,10 @@ public:
     void ResetMensuralVis();
     
     /** Read the values for the attribute class **/
-    bool ReadMensuralVis( pugi::xml_node element );
+    bool ReadMensuralVis(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMensuralVis( pugi::xml_node element );
+    bool WriteMensuralVis(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -271,27 +271,27 @@ public:
     ///@{
     void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; };
     std::string GetMensurColor() const { return m_mensurColor; };    
-    bool HasMensurColor( );
+    bool HasMensurColor();
     
     //
     void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; };
     mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; };    
-    bool HasMensurForm( );
+    bool HasMensurForm();
     
     //
     void SetMensurLoc(int mensurLoc_) { m_mensurLoc = mensurLoc_; };
     int GetMensurLoc() const { return m_mensurLoc; };    
-    bool HasMensurLoc( );
+    bool HasMensurLoc();
     
     //
     void SetMensurOrient(data_ORIENTATION mensurOrient_) { m_mensurOrient = mensurOrient_; };
     data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; };    
-    bool HasMensurOrient( );
+    bool HasMensurOrient();
     
     //
     void SetMensurSize(data_SIZE mensurSize_) { m_mensurSize = mensurSize_; };
     data_SIZE GetMensurSize() const { return m_mensurSize; };    
-    bool HasMensurSize( );
+    bool HasMensurSize();
     
     ///@}
 
@@ -327,10 +327,10 @@ public:
     void ResetNoteLogMensural();
     
     /** Read the values for the attribute class **/
-    bool ReadNoteLogMensural( pugi::xml_node element );
+    bool ReadNoteLogMensural(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteNoteLogMensural( pugi::xml_node element );
+    bool WriteNoteLogMensural(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -340,7 +340,7 @@ public:
     ///@{
     void SetLig(noteLogMensural_LIG lig_) { m_lig = lig_; };
     noteLogMensural_LIG GetLig() const { return m_lig; };    
-    bool HasLig( );
+    bool HasLig();
     
     ///@}
 
@@ -365,10 +365,10 @@ public:
     void ResetRestVisMensural();
     
     /** Read the values for the attribute class **/
-    bool ReadRestVisMensural( pugi::xml_node element );
+    bool ReadRestVisMensural(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteRestVisMensural( pugi::xml_node element );
+    bool WriteRestVisMensural(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -378,7 +378,7 @@ public:
     ///@{
     void SetSpaces(int spaces_) { m_spaces = spaces_; };
     int GetSpaces() const { return m_spaces; };    
-    bool HasSpaces( );
+    bool HasSpaces();
     
     ///@}
 

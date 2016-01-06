@@ -74,7 +74,7 @@ bool MusicXmlInput::ImportFile()
 bool MusicXmlInput::ImportString(const std::string musicxml)
 {
     try {
-        m_doc->Reset( Raw );
+        m_doc->Reset(Raw);
         pugi::xml_document xmlDoc;
         xmlDoc.load(musicxml.c_str());
         pugi::xml_node root = xmlDoc.first_child();
@@ -170,7 +170,7 @@ void MusicXmlInput::AddMeasure(System *system, Measure *measure, int i)
         assert(existingMeasure);
         ArrayOfObjects::iterator sIter = measure->m_children.begin();
         for (sIter = measure->m_children.begin(); sIter != measure->m_children.end(); sIter++) {
-            Staff *staff = dynamic_cast<Staff*>( measure->Relinquish( (*sIter)->GetIdx()) );
+            Staff *staff = dynamic_cast<Staff*>(measure->Relinquish((*sIter)->GetIdx()));
             assert(staff);
             existingMeasure->AddStaff(staff);
         }
@@ -424,8 +424,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     
     //assert(m_tieStack.empty());
     
-    page->AddSystem( system );
-    m_doc->AddPage( page );
+    page->AddSystem(system);
+    m_doc->AddPage(page);
     
     return true;
 }
@@ -877,7 +877,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string val
     else if (value == "double-flat") return ACCIDENTAL_EXPLICIT_ff;
     else if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
     else {
-        LogWarning("Unsupported accidental value '%s'", value.c_str() );
+        LogWarning("Unsupported accidental value '%s'", value.c_str());
     }
     return ACCIDENTAL_EXPLICIT_NONE;
 }
@@ -890,7 +890,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
     else if (value == "-2") return ACCIDENTAL_EXPLICIT_ff;
     else if (value == "0") return ACCIDENTAL_EXPLICIT_n;
     else {
-        LogWarning("Unsupported alter value '%s'", value.c_str() );
+        LogWarning("Unsupported alter value '%s'", value.c_str());
     }
     return ACCIDENTAL_EXPLICIT_NONE;
 }
@@ -925,7 +925,7 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
     else if (value == "A") return PITCHNAME_a;
     else if (value == "B") return PITCHNAME_b;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported pitch name '%s'", value.c_str());
     }
     // default
     return PITCHNAME_NONE;

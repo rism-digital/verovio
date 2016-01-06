@@ -39,7 +39,7 @@ public:
     Page();
     virtual ~Page();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Page"; };
+    virtual std::string GetClassName() { return "Page"; };
     virtual ClassId Is() { return PAGE; };
     ///@}
 
@@ -47,7 +47,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddSystem( System *system );
+	void AddSystem(System *system);
     ///@}
 	
 	int GetSystemCount() const { return (int)m_children.size(); };
@@ -60,41 +60,41 @@ public:
     /**
      * Return the position of the staff on the page, from top to bottom
      */
-    int GetStaffPosOnPage( Staff *staff );
+    int GetStaffPosOnPage(Staff *staff);
     
     /**
      * Do the layout of the page, whichi means aligning is content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
      */
-    void LayOut( bool force = false );
+    void LayOut(bool force = false);
     
     /**
      * Lay out the content of the page (measures and their content) horizontally
      */
-    void LayOutHorizontally( );
+    void LayOutHorizontally();
     
     /**
      * Justifiy the content of the page (measures and their content) horizontally
      */
-    void JustifyHorizontally( );
+    void JustifyHorizontally();
 
     /**
      * Lay out the content of the page (system/staves) vertically.
      */
-    void LayOutVertically(  );
+    void LayOutVertically();
     
     /**
      * Justifiy the content of the page (system/staves) vertically
      */
-    void JustifyVertically( );
+    void JustifyVertically();
     
     /**
      * Return the height of the content by looking at the last system of the page.
      * This is used for adjusting the page height when this is the expected behaviour,
      * typically with the --adjust-page-height option in the commandline tool
      */
-    int GetContentHeight( );
+    int GetContentHeight();
 
     /**
      * Return the width of the content by looking at the first system of the page.
@@ -102,7 +102,7 @@ public:
      * typically with the --no_layout option in the commandline tool
      * 
      */
-    int GetContentWidth( );
+    int GetContentWidth();
 
     //----------//
     // Functors //

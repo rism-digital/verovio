@@ -28,29 +28,29 @@ namespace vrv {
 // View - TextElement
 //----------------------------------------------------------------------------
     
-void View::DrawTextElement( DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY )
+void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
 {
-    assert( dc );
-    assert( element );
+    assert(dc);
+    assert(element);
     
     if (element->Is() == REND) {
         Rend *rend = dynamic_cast<Rend*>(element);
         assert(rend);
-        DrawRend( dc, rend, x, y, setX, setY );
+        DrawRend(dc, rend, x, y, setX, setY);
     }
     else if (element->Is() == TEXT) {
         Text *text = dynamic_cast<Text*>(element);
         assert(text);
-        DrawText( dc, text, x, y, setX, setY );
+        DrawText(dc, text, x, y, setX, setY);
     }
 }
     
-void View::DrawRend( DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY )
+void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY)
 {
-    assert( dc );
-    assert( rend );
+    assert(dc);
+    assert(rend);
     
-    dc->StartTextGraphic( rend, "", rend->GetUuid());
+    dc->StartTextGraphic(rend, "", rend->GetUuid());
     
     FontInfo rendFont;
     bool customFont = false;
@@ -63,18 +63,18 @@ void View::DrawRend( DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bo
     }
     if (customFont) dc->SetFont(&rendFont);
     
-    DrawTextChildren( dc, rend, x, y, setX, setY);
+    DrawTextChildren(dc, rend, x, y, setX, setY);
     
     if (customFont) dc->ResetFont();
     
-    dc->EndTextGraphic( rend, this );
+    dc->EndTextGraphic(rend, this);
     
 }
 
-void View::DrawText( DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY )
+void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY)
 {
-    assert( dc );
-    assert( text );
+    assert(dc);
+    assert(text);
     
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
@@ -82,7 +82,7 @@ void View::DrawText( DeviceContext *dc, Text *text, int x, int y, bool &setX, bo
         DrawLyricString(dc, x, y, text->GetText());
     }
     else {
-        dc->DrawText( UTF16to8( text->GetText().c_str() ), text->GetText() );
+        dc->DrawText(UTF16to8(text->GetText().c_str()), text->GetText());
     }
 }
 

@@ -39,7 +39,7 @@ public:
     Beam();
     virtual ~Beam();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Beam"; };
+    virtual std::string GetClassName() { return "Beam"; };
     virtual ClassId Is() { return BEAM; };
     ///@}
     
@@ -70,12 +70,12 @@ protected:
      * For example, keep only notes in Beam
      * This also initializes the m_beamElementCoords vector
      */
-    virtual void FilterList( ListOfObjects *childList );
+    virtual void FilterList(ListOfObjects *childList);
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
-    void InitCoords( ListOfObjects *childList );
+    void InitCoords(ListOfObjects *childList);
     
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.

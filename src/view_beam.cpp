@@ -32,15 +32,15 @@
 namespace vrv {
 
 
-void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure )
+void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
-    assert( dc );
-    assert( layer );
-    assert( staff );
-    assert( measure );
+    assert(dc);
+    assert(layer);
+    assert(staff);
+    assert(measure);
     
     Beam *beam = dynamic_cast<Beam*>(element);
-    assert( beam );
+    assert(beam);
     
     LayerElement *current;
 
@@ -85,7 +85,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // current point to the first Note in the layed out layer
     current = dynamic_cast<LayerElement*>(beamChildren->front());
     // Beam list should contain only DurationInterface objects
-    assert( dynamic_cast<DurationInterface*>(current) );
+    assert(dynamic_cast<DurationInterface*>(current));
     
     lastDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
 
@@ -100,7 +100,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     ListOfObjects::iterator iter = beamChildren->begin();
 	do {
         // Beam list should contain only DurationInterface objects
-        assert( dynamic_cast<DurationInterface*>(current) );
+        assert(dynamic_cast<DurationInterface*>(current));
         currentDur = dynamic_cast<DurationInterface*>(current)->GetActualDur();
         
         if (current->Is() == CHORD) {
@@ -117,16 +117,16 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Look at beam breaks
             (*beamElementCoords).at(elementCount)->m_breaksec = 0;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary*>(current);
-            if ( elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
+            if (elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
                 if (!params.m_changingDur) params.m_changingDur = ON;
                 (*beamElementCoords).at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
             }
             
             // Skip rests
-            if ( (current->Is() == NOTE) || (current->Is() == CHORD) ) {
+            if ((current->Is() == NOTE) || (current->Is() == CHORD)) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!params.m_hasMultipleStemDir) {
-                    assert( dynamic_cast<AttStems*>(current) );
+                    assert(dynamic_cast<AttStems*>(current));
                     currentStemDir = dynamic_cast<AttStems*>(current)->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((params.m_stemDir != STEMDIRECTION_NONE) && (params.m_stemDir != currentStemDir)) {
@@ -175,7 +175,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Start the Beam graphic and draw the children
     
-    dc->StartGraphic( element, "", element->GetUuid() );
+    dc->StartGraphic(element, "", element->GetUuid());
     
     
     /******************************************************************/
@@ -189,7 +189,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     for (i=0; i<elementCount; i++)
     {
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
+        if(((el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD)) {
             StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
             assert(interface);
             
@@ -308,7 +308,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             for (i = 0; i < elementCount; i++) {
                 if ((*beamElementCoords).at(i)->m_partialFlags[testDur-DUR_8] == PARTIAL_THROUGH) {
                     // through should never be set on the last one
-                    assert( i < elementCount - 1);
+                    assert(i < elementCount - 1);
                     if (i >= elementCount - 1) continue; // assert for debug and skip otherwise
                     y1 = (*beamElementCoords).at(i)->m_yBeam + barY;
                     y2 = (*beamElementCoords).at(i+1)->m_yBeam + barY;
@@ -336,16 +336,16 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         } // end of while
     } // end of drawing partial bars
     
-    dc->EndGraphic(element, this );
+    dc->EndGraphic(element, this);
 }
 
 void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
-    assert( dc );
-    assert( element );
-    assert( layer );
-    assert( staff );
-    assert( measure );
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
     
     
     // temporary coordinates
@@ -360,7 +360,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int i, j;
     
     FTrem *fTrem = dynamic_cast<FTrem*>(element);
-    assert( fTrem );
+    assert(fTrem);
     
     ArrayOfBeamElementCoords beamElementCoords;
     BeamElementCoord firstElement;
@@ -379,11 +379,11 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // current point to the first Note in the layed out layer
     firstElement.m_element = dynamic_cast<LayerElement*>(fTremChildren->front());
     // fTrem list should contain only DurationInterface objects
-    assert( dynamic_cast<DurationInterface*>(firstElement.m_element) );
+    assert(dynamic_cast<DurationInterface*>(firstElement.m_element));
     // current point to the first Note in the layed out layer
     secondElement.m_element = dynamic_cast<LayerElement*>(fTremChildren->back());
     // fTrem list should contain only DurationInterface objects
-    assert( dynamic_cast<DurationInterface*>(secondElement.m_element) );
+    assert(dynamic_cast<DurationInterface*>(secondElement.m_element));
     // Should we assert this at the beginning?
     if (firstElement.m_element == secondElement.m_element) {
         return;
@@ -399,7 +399,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     params.m_stemDir = STEMDIRECTION_NONE;
     
     // We look only at the first one for the duration since both are expected to be the same
-    assert( dynamic_cast<AttDurationMusical*>(firstElement.m_element) );
+    assert(dynamic_cast<AttDurationMusical*>(firstElement.m_element));
     int dur =  dynamic_cast<AttDurationMusical*>(firstElement.m_element)->GetDur();
     
     Chord *childChord1 = NULL;
@@ -415,7 +415,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     // For now look at the stemDir only on the first note
-    assert( dynamic_cast<AttStems*>(firstElement.m_element) );
+    assert(dynamic_cast<AttStems*>(firstElement.m_element));
     params.m_stemDir =  dynamic_cast<AttStems*>(firstElement.m_element)->GetStemDir();
     
     // We look only at the first note for checking if cuesized. Somehow arbitrarily
@@ -434,7 +434,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Start the grahic
     
-    dc->StartGraphic( element, "", element->GetUuid() );
+    dc->StartGraphic(element, "", element->GetUuid());
     
     /******************************************************************/
     // Draw the children
@@ -448,7 +448,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         for (i=0; i<elementCount; i++)
         {
             LayerElement *el = beamElementCoords.at(i)->m_element;
-            if( ( (el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD) ) {
+            if(((el->Is() == NOTE) && !dynamic_cast<Note*>(el)->IsChordTone()) || (el->Is() == CHORD)) {
                 StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
                 assert(interface);
                 DrawVerticalLine (dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
@@ -564,7 +564,7 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
         
         if ((*beamElementCoords).at(i)->m_element->Is() == CHORD) {
             Chord *chord = dynamic_cast<Chord*>((*beamElementCoords).at(i)->m_element);
-            assert( chord );
+            assert(chord);
             chord->GetYExtremes(&yMax, &yMin);
             (*beamElementCoords).at(i)->m_yTop = yMax;
             (*beamElementCoords).at(i)->m_yBottom = yMin;
@@ -646,10 +646,10 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
     for (i = 0; i < elementCount; i++)
     {
         //change the stem dir for all objects
-        if ( (*beamElementCoords).at(i)->m_element->Is() == NOTE ) {
+        if ((*beamElementCoords).at(i)->m_element->Is() == NOTE) {
             ((Note*)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(params->m_stemDir);
         }
-        else if ( (*beamElementCoords).at(i)->m_element->Is() == CHORD ) {
+        else if ((*beamElementCoords).at(i)->m_element->Is() == CHORD) {
             ((Chord*)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(params->m_stemDir);
         }
         
@@ -675,8 +675,8 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
     }
     
     /* Correction esthetique : */
-    if (fabs(params->m_beamSlope) < m_doc->m_drawingBeamMinSlope ) params->m_beamSlope = 0.0;
-    if (fabs(params->m_beamSlope) > m_doc->m_drawingBeamMaxSlope ) params->m_beamSlope = (params->m_beamSlope > 0) ? m_doc->m_drawingBeamMaxSlope : - m_doc->m_drawingBeamMaxSlope;
+    if (fabs(params->m_beamSlope) < m_doc->m_drawingBeamMinSlope) params->m_beamSlope = 0.0;
+    if (fabs(params->m_beamSlope) > m_doc->m_drawingBeamMaxSlope) params->m_beamSlope = (params->m_beamSlope > 0) ? m_doc->m_drawingBeamMaxSlope : - m_doc->m_drawingBeamMaxSlope;
     /* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
     
     params->m_startingY = (s_y - params->m_beamSlope * s_x) / elementCount;
@@ -687,7 +687,7 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
     // first check that the stem length is long enough (to be improved?)
     double oldYPos; //holds y position before calculation to determine if beam needs extra height
     double expectedY;
-    for (i = 0; i < elementCount; i++ ) {
+    for (i = 0; i < elementCount; i++) {
         oldYPos = (*beamElementCoords).at(i)->m_yBeam;
         expectedY = params->m_startingY + params->m_verticalBoost + params->m_beamSlope * (*beamElementCoords).at(i)->m_x;
         
@@ -702,11 +702,11 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
 
     // then check that the stem length reaches the center for the staff
     double minDistToCenter = -VRV_UNSET;
-    for (i = 0; i < elementCount; i++ ) {
-        if ((params->m_stemDir == STEMDIRECTION_up) && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter) ) {
+    for (i = 0; i < elementCount; i++) {
+        if ((params->m_stemDir == STEMDIRECTION_up) && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
             minDistToCenter = (*beamElementCoords).at(i)->m_yBeam - verticalCenter;
         }
-        else if ((params->m_stemDir == STEMDIRECTION_down) && (verticalCenter - (*beamElementCoords).at(i)->m_yBeam < minDistToCenter) ) {
+        else if ((params->m_stemDir == STEMDIRECTION_down) && (verticalCenter - (*beamElementCoords).at(i)->m_yBeam < minDistToCenter)) {
             minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
         }
     }
@@ -729,7 +729,7 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
         
         // All notes and chords get their stem value stored
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        if ( (el->Is() == NOTE) || (el->Is() == CHORD) ) {
+        if ((el->Is() == NOTE) || (el->Is() == CHORD)) {
             StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface*>(el);
             assert(interface);
             

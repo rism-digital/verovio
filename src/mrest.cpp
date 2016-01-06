@@ -14,7 +14,7 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest( ):
+MRest::MRest():
     LayerElement("mrest-")
 {
     Reset();

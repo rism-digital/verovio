@@ -28,10 +28,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MRest( );
+    MRest();
     virtual ~MRest();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "MRest"; }; ;
+    virtual std::string GetClassName(){ return "MRest"; }; ;
     virtual ClassId Is() { return MREST; };
     ///@}
 

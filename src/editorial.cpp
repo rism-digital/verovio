@@ -59,74 +59,74 @@ EditorialElement::~EditorialElement()
     
 }
         
-void EditorialElement::AddFloatingElement( FloatingElement *child )
+void EditorialElement::AddFloatingElement(FloatingElement *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
     
 }
 
-void EditorialElement::AddTextElement( TextElement *child )
+void EditorialElement::AddTextElement(TextElement *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
-void EditorialElement::AddLayer( Layer *child )
+void EditorialElement::AddLayer(Layer *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
-    if ( child->GetN() < 1 ) {
+    if (child->GetN() < 1) {
         LogError("Layer without @n is not supported within editorial markup element");
     }
 }
 
-void EditorialElement::AddLayerElement( LayerElement *child )
+void EditorialElement::AddLayerElement(LayerElement *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
     
-void EditorialElement::AddMeasure( Measure *child )
+void EditorialElement::AddMeasure(Measure *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
-void EditorialElement::AddScoreDef( ScoreDef *child )
+void EditorialElement::AddScoreDef(ScoreDef *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
     
-void EditorialElement::AddStaff( Staff *child )
+void EditorialElement::AddStaff(Staff *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
-    if ( child->GetN() < 1 ) {
+    if (child->GetN() < 1) {
         LogError("Staff without @n is not supported within editorial markup element");
     }
 }
     
-void EditorialElement::AddStaffDef( StaffDef *child )
+void EditorialElement::AddStaffDef(StaffDef *child)
 {
-    child->SetParent( this );
-    m_children.push_back( child );
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
     
-void EditorialElement::AddStaffGrp( StaffGrp *child )
+void EditorialElement::AddStaffGrp(StaffGrp *child)
 {
-    //assert( m_children.empty() );
-    child->SetParent( this );
-    m_children.push_back( child );
+    //assert(m_children.empty());
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
     
@@ -134,7 +134,7 @@ void EditorialElement::AddStaffGrp( StaffGrp *child )
 // Abbr
 //----------------------------------------------------------------------------
 
-Abbr::Abbr( ):
+Abbr::Abbr():
     EditorialElement("abbr-"),
     AttSource()
 {
@@ -157,7 +157,7 @@ void Abbr::Reset()
 // Add
 //----------------------------------------------------------------------------
 
-Add::Add( ):
+Add::Add():
     EditorialElement("add-"),
     AttSource()
 {
@@ -181,13 +181,13 @@ void Add::Reset()
 // Annot
 //----------------------------------------------------------------------------
 
-Annot::Annot( ):
+Annot::Annot():
     EditorialElement("annot-"),
     AttPlist(),
     AttSource()
 {
-    RegisterAttClass( ATT_PLIST );
-    RegisterAttClass( ATT_SOURCE );
+    RegisterAttClass(ATT_PLIST);
+    RegisterAttClass(ATT_SOURCE);
     
     Reset();
 }
@@ -215,7 +215,7 @@ App::App():
     Reset();
 }
     
-App::App( EditorialLevel level ):
+App::App(EditorialLevel level):
     EditorialElement("app-")
 {
     m_level = level;
@@ -234,8 +234,8 @@ App::~App()
 
 void App::AddLemOrRdg(EditorialElement *child)
 {
-    assert( dynamic_cast<Lem*>(child) || dynamic_cast<Rdg*>(child) );
-    child->SetParent( this );
+    assert(dynamic_cast<Lem*>(child) || dynamic_cast<Rdg*>(child));
+    child->SetParent(this);
     m_children.push_back(child);
     Modify();
 }
@@ -244,7 +244,7 @@ void App::AddLemOrRdg(EditorialElement *child)
 // Corr
 //----------------------------------------------------------------------------
 
-Corr::Corr( ):
+Corr::Corr():
     EditorialElement("corr-"),
     AttSource()
 {
@@ -267,7 +267,7 @@ void Corr::Reset()
 // Damage
 //----------------------------------------------------------------------------
 
-Damage::Damage( ):
+Damage::Damage():
     EditorialElement("lem-"),
     AttSource()
 {
@@ -290,7 +290,7 @@ void Damage::Reset()
 // Del
 //----------------------------------------------------------------------------
 
-Del::Del( ):
+Del::Del():
     EditorialElement("del-"),
     AttSource()
 {
@@ -313,7 +313,7 @@ void Del::Reset()
 // Expan
 //----------------------------------------------------------------------------
 
-Expan::Expan( ):
+Expan::Expan():
     EditorialElement("expan-"),
     AttSource()
 {
@@ -336,7 +336,7 @@ void Expan::Reset()
 // Lem
 //----------------------------------------------------------------------------
 
-Lem::Lem( ):
+Lem::Lem():
     EditorialElement("lem-"),
     AttSource()
 {
@@ -359,7 +359,7 @@ void Lem::Reset()
 // Orig
 //----------------------------------------------------------------------------
 
-Orig::Orig( ):
+Orig::Orig():
     EditorialElement("orig-"),
     AttSource()
 {
@@ -382,7 +382,7 @@ void Orig::Reset()
 // Rdg
 //----------------------------------------------------------------------------
 
-Rdg::Rdg( ):
+Rdg::Rdg():
     EditorialElement("rdg-"),
     AttSource()
 {
@@ -405,7 +405,7 @@ void Rdg::Reset()
 // Reg
 //----------------------------------------------------------------------------
 
-Reg::Reg( ):
+Reg::Reg():
     EditorialElement("reg-"),
     AttSource()
 {
@@ -429,7 +429,7 @@ void Reg::Reset()
 // Restore
 //----------------------------------------------------------------------------
 
-Restore::Restore( ):
+Restore::Restore():
     EditorialElement("restore-"),
     AttSource()
 {
@@ -453,7 +453,7 @@ void Restore::Reset()
 // Sic
 //----------------------------------------------------------------------------
 
-Sic::Sic( ):
+Sic::Sic():
     EditorialElement("sic-"),
     AttSource()
 {
@@ -476,7 +476,7 @@ void Sic::Reset()
 // Supplied
 //----------------------------------------------------------------------------
 
-Supplied::Supplied( ):
+Supplied::Supplied():
     EditorialElement("supplied-"),
     AttSource()
 {
@@ -499,7 +499,7 @@ void Supplied::Reset()
 // Unclear
 //----------------------------------------------------------------------------
 
-Unclear::Unclear( ):
+Unclear::Unclear():
     EditorialElement("unclear-"),
     AttSource()
 {
@@ -522,7 +522,7 @@ void Unclear::Reset()
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
+int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to (unused)
@@ -534,15 +534,15 @@ int EditorialElement::CastOffSystems( ArrayPtrVoid *params )
     System **currentSystem = static_cast<System**>((*params).at(2));
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert( dynamic_cast<System*>(this->m_parent));
+    assert(dynamic_cast<System*>(this->m_parent));
     
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement = dynamic_cast<EditorialElement*>( contentSystem->Relinquish( this->GetIdx()) );
-    assert( editorialElement );
-    (*currentSystem)->AddEditorialElement( editorialElement );
+    EditorialElement *editorialElement = dynamic_cast<EditorialElement*>(contentSystem->Relinquish(this->GetIdx()));
+    assert(editorialElement);
+    (*currentSystem)->AddEditorialElement(editorialElement);
     
     return FUNCTOR_SIBLINGS;
 }

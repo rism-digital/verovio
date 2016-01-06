@@ -34,7 +34,7 @@ class Att: public AttConverter
 public:
     /** @name Constructors and destructor */
     ///@{
-    Att( );
+    Att();
     virtual ~Att();
     ///@}
     
@@ -46,48 +46,48 @@ public:
      * Files to be uncommented according to the inclusion of the corresponding LibMEI files
      */
     ///@{
-    //static bool SetAnalysis( Object *element, std::string attrType, std::string attrValue );
-    static bool SetCmn( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetCmnornaments( Object *element, std::string attrType, std::string attrValue );
-    static bool SetCritapp( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetEdittrans( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetFacsimile( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetFigtable( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetHarmony( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetHeader( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetLyrics( Object *element, std::string attrType, std::string attrValue );
-    static bool SetMei( Object *element, std::string attrType, std::string attrValue );
-    static bool SetMensural( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetMidi( Object *element, std::string attrType, std::string attrValue );
-    static bool SetPagebased( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetPerformance( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetNeumes( Object *element, std::string attrType, std::string attrValue );
-    static bool SetShared( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetTablature( Object *element, std::string attrType, std::string attrValue );
-    //static bool SetUsersymbols( Object *element, std::string attrType, std::string attrValue );
+    //static bool SetAnalysis(Object *element, std::string attrType, std::string attrValue);
+    static bool SetCmn(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
+    static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetHeader(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetLyrics(Object *element, std::string attrType, std::string attrValue);
+    static bool SetMei(Object *element, std::string attrType, std::string attrValue);
+    static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
+    static bool SetShared(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetTablature(Object *element, std::string attrType, std::string attrValue);
+    //static bool SetUsersymbols(Object *element, std::string attrType, std::string attrValue);
 
     /**
      * Idem for getting attributes as strings
      */
-    //static void GetAnalysis( Object *element, ArrayOfStrAttr *attributes );
-    static void GetCmn( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetCmnornaments( Object *element, ArrayOfStrAttr *attributes );
-    static void GetCritapp( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetEdittrans( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetFacsimile( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetFigtable( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetHarmony( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetHeader( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetLyrics( Object *element, ArrayOfStrAttr *attributes );
-    static void GetMei( Object *element, ArrayOfStrAttr *attributes );
-    static void GetMensural( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetMidi( Object *element, ArrayOfStrAttr *attributes );
-    static void GetPagebased( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetPerformance( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetNeumes( Object *element, ArrayOfStrAttr *attributes );
-    static void GetShared( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetTablature( Object *element, ArrayOfStrAttr *attributes );
-    //static void GetUsersymbols( Object *element, ArrayOfStrAttr *attributes );
+    //static void GetAnalysis(Object *element, ArrayOfStrAttr *attributes);
+    static void GetCmn(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetCmnornaments(Object *element, ArrayOfStrAttr *attributes);
+    static void GetCritapp(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetEdittrans(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetFacsimile(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetFigtable(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetHarmony(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetHeader(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetLyrics(Object *element, ArrayOfStrAttr *attributes);
+    static void GetMei(Object *element, ArrayOfStrAttr *attributes);
+    static void GetMensural(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetMidi(Object *element, ArrayOfStrAttr *attributes);
+    static void GetPagebased(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetPerformance(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetNeumes(Object *element, ArrayOfStrAttr *attributes);
+    static void GetShared(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetTablature(Object *element, ArrayOfStrAttr *attributes);
+    //static void GetUsersymbols(Object *element, ArrayOfStrAttr *attributes);
     ///@}
     
 public:
@@ -179,7 +179,7 @@ public:
     /**
      * Method for registering an MEI att classes in the interface.
      */
-    void RegisterInterfaceAttClass( AttClassId attClassId ) { m_interfaceAttClasses.push_back( attClassId ); };
+    void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); };
     
     /**
      * Method for obtaining a pointer to the attribute class vector of the interface
@@ -208,7 +208,7 @@ class AttComparison
 {
     
 public:
-    AttComparison( ClassId classId ) {
+    AttComparison(ClassId classId) {
         m_classId = classId;
     };
     
@@ -216,7 +216,7 @@ public:
     
     ClassId GetType() { return m_classId; };
     
-    bool MatchesType( Object *object );
+    bool MatchesType(Object *object);
     
 protected:
     ClassId m_classId;

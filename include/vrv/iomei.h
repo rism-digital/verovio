@@ -94,51 +94,51 @@ class MeiOutput: public FileOutputStream
 public:
     /** @name Constructors and destructor */
     ///@{
-    MeiOutput( Doc *doc, std::string filename );
+    MeiOutput(Doc *doc, std::string filename);
     virtual ~MeiOutput();
     ///@}
     
     /**
      * The main method for exporting the file to MEI.
      */ 
-    virtual bool ExportFile( );
+    virtual bool ExportFile();
 
     /**
      * The main method for write objects.
      */
-    virtual bool WriteObject( Object *object );
+    virtual bool WriteObject(Object *object);
     
     /**
      * Writing object method that must be overriden in child class.
      */
-    virtual bool WriteObjectEnd( Object *object );
+    virtual bool WriteObjectEnd(Object *object);
     
     /**
      * Return the output as a string by writing it to the stringstream member.
      */
-    std::string GetOutput( int page = -1 );
+    std::string GetOutput(int page = -1);
     
     /**
      * Setter for score-based MEI output (non implemented)
      */
-    void SetScoreBasedMEI( bool scoreBasedMEI ) { m_scoreBasedMEI = scoreBasedMEI; };
+    void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; };
 
 private:
     
-    bool WriteMeiDoc( Doc *doc );
+    bool WriteMeiDoc(Doc *doc);
     
     /**
      * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
-    bool WriteMeiPage( pugi::xml_node currentNode, Page *page );
-    bool WriteMeiSystem( pugi::xml_node currentNode, System *system );
-    bool WriteMeiScoreDef( pugi::xml_node currentNode, ScoreDef *scoreDef );
-    bool WriteMeiStaffGrp( pugi::xml_node currentNode, StaffGrp *staffGrp );
-    bool WriteMeiStaffDef( pugi::xml_node currentNode, StaffDef *staffDef );
-    bool WriteMeiMeasure( pugi::xml_node currentNode, Measure *measure );
-    bool WriteMeiStaff( pugi::xml_node currentNode, Staff *staff );
-    bool WriteMeiLayer( pugi::xml_node currentNode, Layer *layer );
+    bool WriteMeiPage(pugi::xml_node currentNode, Page *page);
+    bool WriteMeiSystem(pugi::xml_node currentNode, System *system);
+    bool WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
+    bool WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
+    bool WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
+    bool WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
+    bool WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
+    bool WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
     ///@}
     
     /**
@@ -146,77 +146,77 @@ private:
      * Called from WriteLayerElement.
      */
     ///@{
-    void WriteMeiAccid( pugi::xml_node currentNode, Accid *accid );
-    void WriteMeiBarLine( pugi::xml_node currentNode, BarLine *barLine );
-    void WriteMeiBeam( pugi::xml_node currentNode, Beam *beam );
-    void WriteMeiBeatRpt( pugi::xml_node currentNode, BeatRpt *beatRpt );
-    void WriteMeiBTrem( pugi::xml_node currentNode, BTrem *bTrem );
-    void WriteMeiChord( pugi::xml_node currentNode, Chord *chord );
-    void WriteMeiClef( pugi::xml_node currentNode, Clef *clef );
-    void WriteMeiCustos( pugi::xml_node currentNode, Custos *custos );
-    void WriteMeiDot( pugi::xml_node currentNode, Dot *dot );
-    void WriteMeiFTrem( pugi::xml_node currentNode, FTrem *fTrem );
-    void WriteMeiKeySig( pugi::xml_node currentNode, KeySig *keySig );
-    void WriteMeiMensur( pugi::xml_node currentNode, Mensur *mensur );
-    void WriteMeiMeterSig( pugi::xml_node currentNode, MeterSig *meterSig );
-    void WriteMeiMRest( pugi::xml_node currentNode, MRest *mRest );
-    void WriteMeiMRpt( pugi::xml_node currentNode, MRpt *mRpt );
-    void WriteMeiMRpt2( pugi::xml_node currentNode, MRpt2 *mRpt2 );
-    void WriteMeiMultiRest( pugi::xml_node currentNode, MultiRest *multiRest );
-    void WriteMeiMultiRpt( pugi::xml_node currentNode, MultiRpt *multiRpt );
-    void WriteMeiNote( pugi::xml_node currentNode, Note *note );
-    void WriteMeiProport( pugi::xml_node currentNode, Proport *proport );
-    void WriteMeiRest( pugi::xml_node currentNode, Rest *rest );
-    void WriteMeiSpace( pugi::xml_node currentNode, Space *space );
-    void WriteMeiTuplet( pugi::xml_node currentNode, Tuplet *tuplet );
+    void WriteMeiAccid(pugi::xml_node currentNode, Accid *accid);
+    void WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine);
+    void WriteMeiBeam(pugi::xml_node currentNode, Beam *beam);
+    void WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt);
+    void WriteMeiBTrem(pugi::xml_node currentNode, BTrem *bTrem);
+    void WriteMeiChord(pugi::xml_node currentNode, Chord *chord);
+    void WriteMeiClef(pugi::xml_node currentNode, Clef *clef);
+    void WriteMeiCustos(pugi::xml_node currentNode, Custos *custos);
+    void WriteMeiDot(pugi::xml_node currentNode, Dot *dot);
+    void WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem);
+    void WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig);
+    void WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur);
+    void WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig);
+    void WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest);
+    void WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt);
+    void WriteMeiMRpt2(pugi::xml_node currentNode, MRpt2 *mRpt2);
+    void WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
+    void WriteMeiMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
+    void WriteMeiNote(pugi::xml_node currentNode, Note *note);
+    void WriteMeiProport(pugi::xml_node currentNode, Proport *proport);
+    void WriteMeiRest(pugi::xml_node currentNode, Rest *rest);
+    void WriteMeiSpace(pugi::xml_node currentNode, Space *space);
+    void WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
     
     /**
      * @name Methods for writing FloatingElement
      */
     ///@{
-    void WriteMeiAnchoredText( pugi::xml_node currentNode, AnchoredText *anchoredText );
-    void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
-    void WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo );
-    void WriteMeiTie( pugi::xml_node currentNode, Tie *tie );
+    void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
+    void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
+    void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
     ///@}
     
     /**
      * @name Methods for writing TextElement
      */
     ///@{
-    void WriteMeiRend( pugi::xml_node currentNode, Rend *rend );
-    void WriteMeiText( pugi::xml_node currentNode, Text *text );
+    void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
+    void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
     
     /**
      * @name Methods for writing editorial markup
      */
     ///@{
-    bool WriteMeiAbbr( pugi::xml_node currentNode, Abbr *abbr );
-    bool WriteMeiAdd( pugi::xml_node currentNode, Add *add );
-    bool WriteMeiAnnot( pugi::xml_node currentNode, Annot *annot );
-    bool WriteMeiApp( pugi::xml_node currentNode, App *app );
-    bool WriteMeiCorr( pugi::xml_node currentNode, Corr *corr );
-    bool WriteMeiDamage( pugi::xml_node currentNode, Damage *damage );
-    bool WriteMeiDel( pugi::xml_node currentNode, Del *del );
-    bool WriteMeiExpan( pugi::xml_node currentNode, Expan *expan );
-    bool WriteMeiLem( pugi::xml_node currentNode, Lem *lem );
-    bool WriteMeiOrig( pugi::xml_node currentNode, Orig *orig );
-    bool WriteMeiRdg( pugi::xml_node currentNode, Rdg *rdg );
-    bool WriteMeiReg( pugi::xml_node currentNode, Reg *Reg );
-    bool WriteMeiRestore( pugi::xml_node currentNode, Restore *restore );
-    bool WriteMeiSic( pugi::xml_node currentNode, Sic *sic );
-    bool WriteMeiSupplied( pugi::xml_node currentNode, Supplied *supplied );
-    bool WriteMeiUnclear( pugi::xml_node currentNode, Unclear *unclear );
+    bool WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr);
+    bool WriteMeiAdd(pugi::xml_node currentNode, Add *add);
+    bool WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
+    bool WriteMeiApp(pugi::xml_node currentNode, App *app);
+    bool WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
+    bool WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
+    bool WriteMeiDel(pugi::xml_node currentNode, Del *del);
+    bool WriteMeiExpan(pugi::xml_node currentNode, Expan *expan);
+    bool WriteMeiLem(pugi::xml_node currentNode, Lem *lem);
+    bool WriteMeiOrig(pugi::xml_node currentNode, Orig *orig);
+    bool WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg);
+    bool WriteMeiReg(pugi::xml_node currentNode, Reg *Reg);
+    bool WriteMeiRestore(pugi::xml_node currentNode, Restore *restore);
+    bool WriteMeiSic(pugi::xml_node currentNode, Sic *sic);
+    bool WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied);
+    bool WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear);
     ///@}
     
     /**
      * @name Methods for wrinting other mei elements
      */
     ///@{
-    void WriteMeiVerse( pugi::xml_node currentNode, Verse *verse );
-    void WriteMeiSyl( pugi::xml_node currentNode, Syl *syl );
+    void WriteMeiVerse(pugi::xml_node currentNode, Verse *verse);
+    void WriteMeiSyl(pugi::xml_node currentNode, Syl *syl);
     ///@}
     
     /**
@@ -224,26 +224,26 @@ private:
      * The method has to be called by classed that support it (e.g., LayerElement)
      * To be changed to Att
      */
-    void WriteSameAsAttr( pugi::xml_node currentNode, Object *object );
+    void WriteSameAsAttr(pugi::xml_node currentNode, Object *object);
     
     /**
      * Write unsupported attributes stored in Object::m_unsupported (not tested)
      */
-    void WriteUnsupportedAttr( pugi::xml_node currentNode, Object *object );
+    void WriteUnsupportedAttr(pugi::xml_node currentNode, Object *object);
     
     /**
      * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
-    void WriteLayerElement( pugi::xml_node currentNode, LayerElement *element );
-    void WriteEditorialElement( pugi::xml_node currentNode, EditorialElement *element );
-    void WriteDurationInterface( pugi::xml_node currentNode, DurationInterface *interface );
-    void WritePitchInterface( pugi::xml_node currentNode, PitchInterface *interface );
-    void WritePositionInterface( pugi::xml_node currentNode, PositionInterface *interface );
-    void WriteScoreDefInterface( pugi::xml_node currentNode, ScoreDefInterface *interface );
-    void WriteTextDirInterface( pugi::xml_node currentNode, TextDirInterface *interface );
-    void WriteTimeSpanningInterface( pugi::xml_node currentNode, TimeSpanningInterface *interface );
+    void WriteLayerElement(pugi::xml_node currentNode, LayerElement *element);
+    void WriteEditorialElement(pugi::xml_node currentNode, EditorialElement *element);
+    void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
+    void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
+    void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
+    void WriteScoreDefInterface(pugi::xml_node currentNode, ScoreDefInterface *interface);
+    void WriteTextDirInterface(pugi::xml_node currentNode, TextDirInterface *interface);
+    void WriteTimeSpanningInterface(pugi::xml_node currentNode, TimeSpanningInterface *interface);
     ///@}
     
     /**
@@ -255,7 +255,7 @@ private:
 	
     /** @name Methods for converting members into MEI attributes. */
     ///@{
-    std::string UuidToMeiStr( Object *element );
+    std::string UuidToMeiStr(Object *element);
     std::string DocTypeToStr(DocType type);
     ///@}
 
@@ -289,10 +289,10 @@ class MeiInput: public FileInputStream
 {
 public:
     // constructors and destructors
-    MeiInput( Doc *doc, std::string filename );
+    MeiInput(Doc *doc, std::string filename);
     virtual ~MeiInput();
     
-    virtual bool ImportFile( );
+    virtual bool ImportFile();
     virtual bool ImportString(std::string mei);
     
     /**
@@ -301,11 +301,11 @@ public:
      * If a query is provided, the element retieved by the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
-    virtual void SetAppXPathQuery( std::string appXPathQuery ) { m_appXPathQuery = appXPathQuery; };
+    virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; };
     
 private:
-    bool ReadMei( pugi::xml_node root );
-    bool ReadMeiHeader( pugi::xml_node meihead );
+    bool ReadMei(pugi::xml_node root);
+    bool ReadMeiHeader(pugi::xml_node meihead);
     
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related. 
@@ -316,71 +316,71 @@ private:
      * children (see MeiInput::IsAllowed)
      */
     ///@{
-    bool ReadMeiPage( pugi::xml_node page );
-    bool ReadMeiPageChildren( Object* parent, pugi::xml_node parentNode );
-    bool ReadMeiSystem( Object* parent, pugi::xml_node system );
-    bool ReadMeiSystemChildren( Object* parent, pugi::xml_node parentNode );
-    bool ReadMeiScoreDef( Object *parent, pugi::xml_node scoreDef );
-    bool ReadMeiScoreDefChildren( Object *parent, pugi::xml_node parentNode );
-    bool ReadMeiStaffGrp( Object *parent, pugi::xml_node staffGrp );
-    bool ReadMeiStaffGrpChildren( Object *parent, pugi::xml_node parentNode );
-    bool ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef );
-    bool ReadMeiMeasure( Object *parent, pugi::xml_node measure );
-    bool ReadMeiMeasureChildren( Object *parent, pugi::xml_node parentNode );
-    bool ReadMeiStaff( Object *parent, pugi::xml_node staff );
-    bool ReadMeiStaffChildren( Object *parent, pugi::xml_node parentNode );
-    bool ReadMeiLayer( Object *parent, pugi::xml_node layer );
-    bool ReadMeiLayerChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
-    bool ReadMeiTextChildren( Object *parent, pugi::xml_node parentNode, Object *filter = NULL );
+    bool ReadMeiPage(pugi::xml_node page);
+    bool ReadMeiPageChildren(Object* parent, pugi::xml_node parentNode);
+    bool ReadMeiSystem(Object* parent, pugi::xml_node system);
+    bool ReadMeiSystemChildren(Object* parent, pugi::xml_node parentNode);
+    bool ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef);
+    bool ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
+    bool ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef);
+    bool ReadMeiMeasure(Object *parent, pugi::xml_node measure);
+    bool ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiStaff(Object *parent, pugi::xml_node staff);
+    bool ReadMeiStaffChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiLayer(Object *parent, pugi::xml_node layer);
+    bool ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
+    bool ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Object *filter = NULL);
     ///@}
 
     /**
      * @name Methods for reading MEI layer elements
      */
     ///@{
-    bool ReadMeiAccid( Object *parent, pugi::xml_node accid );
-    bool ReadMeiBarLine( Object *parent, pugi::xml_node barLine );
-    bool ReadMeiBeam( Object *parent, pugi::xml_node beam );
-    bool ReadMeiBeatRpt( Object *parent, pugi::xml_node beatRpt );
-    bool ReadMeiBTrem( Object *parent, pugi::xml_node bTrem );
-    bool ReadMeiChord( Object* parent, pugi::xml_node chord );
-    bool ReadMeiClef( Object *parent, pugi::xml_node clef );
-    bool ReadMeiCustos( Object *parent, pugi::xml_node custos );
-    bool ReadMeiDot( Object *parent, pugi::xml_node dot );
-    bool ReadMeiFTrem( Object *parent, pugi::xml_node fTrem );
-    bool ReadMeiKeySig( Object *parent, pugi::xml_node keySig );
-    bool ReadMeiMensur( Object *parent, pugi::xml_node mensur );
-    bool ReadMeiMeterSig( Object *parent, pugi::xml_node meterSig );
-    bool ReadMeiMRest( Object *parent, pugi::xml_node mRest );
-    bool ReadMeiMRpt( Object *parent, pugi::xml_node mRpt );
-    bool ReadMeiMRpt2( Object *parent, pugi::xml_node mRpt2 );
-    bool ReadMeiMultiRest( Object *parent, pugi::xml_node multiRest );
-    bool ReadMeiMultiRpt( Object *parent, pugi::xml_node multiRpt );
-    bool ReadMeiNote( Object *parent, pugi::xml_node note );
-    bool ReadMeiProport( Object *parent, pugi::xml_node proport );
-    bool ReadMeiRest( Object *parent, pugi::xml_node rest );
-    bool ReadMeiSpace( Object *parent, pugi::xml_node space );
-    bool ReadMeiSyl( Object *parent, pugi::xml_node syl );
-    bool ReadMeiTuplet( Object *parent, pugi::xml_node tuplet );
-    bool ReadMeiVerse( Object *parent, pugi::xml_node verse );
+    bool ReadMeiAccid(Object *parent, pugi::xml_node accid);
+    bool ReadMeiBarLine(Object *parent, pugi::xml_node barLine);
+    bool ReadMeiBeam(Object *parent, pugi::xml_node beam);
+    bool ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt);
+    bool ReadMeiBTrem(Object *parent, pugi::xml_node bTrem);
+    bool ReadMeiChord(Object* parent, pugi::xml_node chord);
+    bool ReadMeiClef(Object *parent, pugi::xml_node clef);
+    bool ReadMeiCustos(Object *parent, pugi::xml_node custos);
+    bool ReadMeiDot(Object *parent, pugi::xml_node dot);
+    bool ReadMeiFTrem(Object *parent, pugi::xml_node fTrem);
+    bool ReadMeiKeySig(Object *parent, pugi::xml_node keySig);
+    bool ReadMeiMensur(Object *parent, pugi::xml_node mensur);
+    bool ReadMeiMeterSig(Object *parent, pugi::xml_node meterSig);
+    bool ReadMeiMRest(Object *parent, pugi::xml_node mRest);
+    bool ReadMeiMRpt(Object *parent, pugi::xml_node mRpt);
+    bool ReadMeiMRpt2(Object *parent, pugi::xml_node mRpt2);
+    bool ReadMeiMultiRest(Object *parent, pugi::xml_node multiRest);
+    bool ReadMeiMultiRpt(Object *parent, pugi::xml_node multiRpt);
+    bool ReadMeiNote(Object *parent, pugi::xml_node note);
+    bool ReadMeiProport(Object *parent, pugi::xml_node proport);
+    bool ReadMeiRest(Object *parent, pugi::xml_node rest);
+    bool ReadMeiSpace(Object *parent, pugi::xml_node space);
+    bool ReadMeiSyl(Object *parent, pugi::xml_node syl);
+    bool ReadMeiTuplet(Object *parent, pugi::xml_node tuplet);
+    bool ReadMeiVerse(Object *parent, pugi::xml_node verse);
     ///@}
     
     /**
      * @name Methods for reading MEI floating elements
      */
     ///@{
-    bool ReadMeiAnchoredText( Object *parent, pugi::xml_node anchoredText );
-    bool ReadMeiSlur( Object *parent, pugi::xml_node slur );
-    bool ReadMeiTempo( Object *parent, pugi::xml_node tempo );
-    bool ReadMeiTie( Object *parent, pugi::xml_node tie );
+    bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
+    bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
+    bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
+    bool ReadMeiTie(Object *parent, pugi::xml_node tie);
     ///@}
     
     /**
      * @name Methods for reading MEI text elements
      */
     ///@{
-    bool ReadMeiRend( Object *parent, pugi::xml_node rend );
-    bool ReadMeiText( Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight );
+    bool ReadMeiRend(Object *parent, pugi::xml_node rend);
+    bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
   
     /**
@@ -388,25 +388,25 @@ private:
      * The filter is propagated (if any)
      */
     ///@{
-    bool ReadMeiEditorialElement( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAbbr( Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAdd( Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAnnot( Object *parent, pugi::xml_node annot );
-    bool ReadMeiApp( Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiAppChildren( Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiCorr( Object *parent, pugi::xml_node corr, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiDamage( Object *parent, pugi::xml_node damage, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiDel( Object *parent, pugi::xml_node del, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiExpan( Object *parent, pugi::xml_node expan, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiLem( Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiOrig( Object *parent, pugi::xml_node orig, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiRdg( Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiReg( Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiRestore( Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiSic( Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiSupplied( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiUnclear( Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter = NULL );
-    bool ReadMeiEditorialChildren( Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL );
+    bool ReadMeiEditorialElement(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiAbbr(Object *parent, pugi::xml_node abbr, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiAdd(Object *parent, pugi::xml_node add, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiAnnot(Object *parent, pugi::xml_node annot);
+    bool ReadMeiApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiCorr(Object *parent, pugi::xml_node corr, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiDamage(Object *parent, pugi::xml_node damage, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiDel(Object *parent, pugi::xml_node del, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiExpan(Object *parent, pugi::xml_node expan, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiLem(Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiOrig(Object *parent, pugi::xml_node orig, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiReg(Object *parent, pugi::xml_node reg, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiRestore(Object *parent, pugi::xml_node restore, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiSic(Object *parent, pugi::xml_node sic, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiSupplied(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiUnclear(Object *parent, pugi::xml_node unclear, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiEditorialChildren(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
     ///@}
     ///@}
     
@@ -414,34 +414,34 @@ private:
      * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
      */
     ///@{
-    bool ReadLayerElement( pugi::xml_node element, LayerElement *object );
-    bool ReadEditorialElement( pugi::xml_node element, EditorialElement *object );
-    bool ReadDurationInterface( pugi::xml_node element, DurationInterface *interface );
-    bool ReadPitchInterface( pugi::xml_node element, PitchInterface *interface );
-    bool ReadPositionInterface( pugi::xml_node element, PositionInterface *interface );
-    bool ReadScoreDefInterface( pugi::xml_node element, ScoreDefInterface *interface );
-    bool ReadTextDirInterface( pugi::xml_node element, TextDirInterface *interface );
-    bool ReadTimeSpanningInterface( pugi::xml_node element, TimeSpanningInterface *interface );
+    bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
+    bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
+    bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
+    bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
+    bool ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface);
+    bool ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface);
+    bool ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface);
     ///@}
 
     /**
      * @name Methods for reading other MEI elements.
      */
     ///@{
-    bool ReadAccidAsAttr( Note *note, pugi::xml_node verse );
-    bool ReadTupletSpanAsTuplet( Measure *measure, pugi::xml_node tupletSpan );
+    bool ReadAccidAsAttr(Note *note, pugi::xml_node verse);
+    bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     ///@}
     
     /**
      * Read a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
-    void ReadSameAsAttr( pugi::xml_node element, Object *object );
+    void ReadSameAsAttr(pugi::xml_node element, Object *object);
     
     /**
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
      */
-    void ReadUnsupportedAttr( pugi::xml_node element, Object *object );
+    void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
     
     /**
      * Method for adding the element to the appropriate parent (e.g., Layer, Beam).
@@ -450,28 +450,28 @@ private:
      * These methods dynamically case the parent to the appropriate class.
      */
     ///@{
-    void AddLayerElement( Object *parent, LayerElement *element );
-    void AddFloatingElement( Object *parent, FloatingElement *element );
-    void AddTextElement( Object *parent, TextElement *element );
-    void AddScoreDef( Object *parent, ScoreDef *element );
-    void AddStaffGrp( Object *parent, StaffGrp *element );
+    void AddLayerElement(Object *parent, LayerElement *element);
+    void AddFloatingElement(Object *parent, FloatingElement *element);
+    void AddTextElement(Object *parent, TextElement *element);
+    void AddScoreDef(Object *parent, ScoreDef *element);
+    void AddStaffGrp(Object *parent, StaffGrp *element);
     ///@}
     
     /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
      */
-    bool IsEditorialElementName( std::string elementName );
+    bool IsEditorialElementName(std::string elementName);
     
     /**
      * Read score-based MEI
      */
-    bool ReadScoreBasedMei( pugi::xml_node element );    
+    bool ReadScoreBasedMei(pugi::xml_node element);    
     
     /**
      * @name Various methods for reading / converting values.
      */
     ///@{
-    void SetMeiUuid( pugi::xml_node element, Object *object );
+    void SetMeiUuid(pugi::xml_node element, Object *object);
     DocType StrToDocType(std::string type);
     /** Extract the uuid for references to uuids with ..#uuid values */
     std::string ExtractUuidFragment(std::string refUuid);
@@ -502,7 +502,7 @@ private:
     /**
      * Check if an element is allowed within a given parent
      */
-    bool IsAllowed( std::string element, Object *filterParent );
+    bool IsAllowed(std::string element, Object *filterParent);
     
     /**
      * A static array for storing the implemented editorial elements

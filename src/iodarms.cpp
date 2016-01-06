@@ -39,8 +39,8 @@ pitchmap DarmsInput::PitchMap[] = {
     /* 49 */ {8, PITCHNAME_c}, {8, PITCHNAME_d}, {8, PITCHNAME_e}, {8, PITCHNAME_f}, {8, PITCHNAME_g}, {8, PITCHNAME_a}, {8, PITCHNAME_b},
 };
 
-DarmsInput::DarmsInput( Doc *doc, std::string filename ) :
-FileInputStream( doc )
+DarmsInput::DarmsInput(Doc *doc, std::string filename) :
+FileInputStream(doc)
 {	
     m_layer = NULL;
     m_measure = NULL;
@@ -93,7 +93,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
     
     pos++;
     if (data[pos] == 'C') {
-        meter->SetSign( MENSURATIONSIGN_C );
+        meter->SetSign(MENSURATIONSIGN_C);
         if (data[pos + 1] == '/') {
             pos++;
             meter->SetSlash(1);
@@ -104,7 +104,7 @@ int DarmsInput::parseMeter(int pos, const char* data) {
             pos++;
             LogWarning("DarmsInput: O/ not supported");
         }
-        meter->SetSign( MENSURATIONSIGN_O );
+        meter->SetSign(MENSURATIONSIGN_O);
         pos++;
     }
     
@@ -327,7 +327,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         Rest *rest =  new Rest;
         rest->SetDur(duration);
         rest->SetDurGes(DURATION_8);
-        rest->SetDots( dot );
+        rest->SetDots(dot);
         m_layer->AddLayerElement(rest);
     } else {
         
@@ -338,9 +338,9 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         note->SetDur(duration);
         note->SetDurGes(DURATION_8);
         note->SetAccid(accidental);
-        note->SetOct( PitchMap[position + m_clef_offset].oct );
-        note->SetPname( PitchMap[position + m_clef_offset].pitch );
-        note->SetDots( dot );
+        note->SetOct(PitchMap[position + m_clef_offset].oct);
+        note->SetPname(PitchMap[position + m_clef_offset].pitch);
+        note->SetDots(dot);
         m_layer->AddLayerElement(note);
         
         // Ties are between two notes and have a reference to the two notes
@@ -352,17 +352,17 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest) {
         if (tie) {
             // cur tie !NULL, so we add this note as second note there
             if (m_current_tie) {
-                m_current_tie->SetEnd( note );
+                m_current_tie->SetEnd(note);
             }
             // create a new mus tie with this note
             m_current_tie = new Tie;
-            m_current_tie->SetStart( note );
+            m_current_tie->SetStart(note);
         } else {
             // no tie (L or J) specified for not
             // but if cur tie !NULL we need to close the tie
             // and set cur tie to NULL
             if (m_current_tie) {
-                m_current_tie->SetEnd( note );
+                m_current_tie->SetEnd(note);
                 m_current_tie = NULL;
             }
         }
@@ -399,18 +399,18 @@ bool DarmsInput::ImportString(std::string data_str) {
     const char *data = data_str.c_str();
     len = data_str.length();
     
-    m_doc->Reset( Raw );
+    m_doc->Reset(Raw);
     System *system = new System();
     Page *page = new Page();
-    m_staff = new Staff( 1 );
-    m_measure = new Measure( true, 1 );
-    m_layer = new Layer( );
-    m_layer->SetN( 1 );
+    m_staff = new Staff(1);
+    m_measure = new Measure(true, 1);
+    m_layer = new Layer();
+    m_layer->SetN(1);
     
     m_current_tie = NULL;
     m_staff->AddLayer(m_layer);
-    m_measure->AddStaff( m_staff );
-    system->AddMeasure( m_measure );
+    m_measure->AddStaff(m_staff);
+    system->AddMeasure(m_measure);
     
     // do this the C style, char by char
     while (pos < len) {
@@ -422,7 +422,7 @@ bool DarmsInput::ImportString(std::string data_str) {
             if (res) pos = res;
             // if notehead type was specified in the !Nx option preserve it
             // m_staff->notAnc = m_antique_notation;
-        } else if (isdigit(c) || c == '-' ) { // check for '-' too as note positions can be negative
+        } else if (isdigit(c) || c == '-') { // check for '-' too as note positions can be negative
             //is number followed by '!' ? it is a clef
             if (data[pos + 1] == '!') {
                 res = do_Clef(pos, data);
@@ -445,12 +445,12 @@ bool DarmsInput::ImportString(std::string data_str) {
     // add miniaml scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
-    staffDef->SetN( 1 );
-    staffGrp->AddStaffDef( staffDef );
-    m_doc->m_scoreDef.AddStaffGrp( staffGrp );
+    staffDef->SetN(1);
+    staffGrp->AddStaffDef(staffDef);
+    m_doc->m_scoreDef.AddStaffGrp(staffGrp);
     
-    page->AddSystem( system );
-    m_doc->AddPage( page );
+    page->AddSystem(system);
+    m_doc->AddPage(page);
     
     return true;
 }

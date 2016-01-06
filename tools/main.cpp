@@ -29,28 +29,28 @@ using namespace vrv;
 // possible that it is not in std??
 struct MatchPathSeparator
 {
-    bool operator()( char ch ) const
+    bool operator()(char ch) const
     {
         return ch == '\\' || ch == '/';
     }
 };
 
-std::string basename( std::string const& pathname )
+std::string basename(std::string const& pathname)
 {
-    return std::string( 
-                       std::find_if( pathname.rbegin(), pathname.rend(),
-                                    MatchPathSeparator() ).base(),
-                       pathname.end() );
+    return std::string(
+                       std::find_if(pathname.rbegin(), pathname.rend(),
+                                    MatchPathSeparator()).base(),
+                       pathname.end());
 }
 
-std::string removeExtension( std::string const& filename )
+std::string removeExtension(std::string const& filename)
 {
     std::string::const_reverse_iterator
     pivot
-    = std::find( filename.rbegin(), filename.rend(), '.' );
+    = std::find(filename.rbegin(), filename.rend(), '.');
     return pivot == filename.rend()
     ? filename
-    : std::string( filename.begin(), pivot.base() - 1 );
+    : std::string(filename.begin(), pivot.base() - 1);
 }
 
 bool dir_exists (string dir) {
@@ -171,7 +171,7 @@ int main(int argc, char** argv)
     // Create the toolkit instance without loading the font because
     // the resource path might be specified in the parameters
     // The fonts will be loaded later with Resources::InitFonts()
-    Toolkit toolkit( false );
+    Toolkit toolkit(false);
     
     // read pae by default
     type = MEI;
@@ -230,44 +230,44 @@ int main(int argc, char** argv)
                 }
                 else if (strcmp(long_options[option_index].name,"rdg-xpath-query") == 0) {
                     cout << string(optarg) << endl;
-                    toolkit.SetAppXPathQuery( string(optarg) );
+                    toolkit.SetAppXPathQuery(string(optarg));
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-linear") == 0) {
-                    if ( !toolkit.SetSpacingLinear( atof(optarg) ) ) {
+                    if (!toolkit.SetSpacingLinear(atof(optarg))) {
                         exit(1);
                     }
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-non-linear") == 0) {
-                    if ( !toolkit.SetSpacingNonLinear( atof(optarg) ) ) {
+                    if (!toolkit.SetSpacingNonLinear(atof(optarg))) {
                         exit(1);
                     }
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-staff") == 0) {
-                    if ( !toolkit.SetSpacingStaff( atoi(optarg) ) ) {
+                    if (!toolkit.SetSpacingStaff(atoi(optarg))) {
                         exit(1);
                     }
                 }
                 else if (strcmp(long_options[option_index].name,"spacing-system") == 0) {
-                    if ( !toolkit.SetSpacingSystem( atoi(optarg) ) ) {
+                    if (!toolkit.SetSpacingSystem(atoi(optarg))) {
                         exit(1);
                     }
                 }
                 break;
                 
             case 'b':
-                if ( !toolkit.SetBorder( atoi(optarg) ) ) {
+                if (!toolkit.SetBorder(atoi(optarg))) {
                     exit(1);
                 }
                 break;
             
             case 'f':
-                if ( !toolkit.SetFormat ( string(optarg) ) ) {
+                if (!toolkit.SetFormat (string(optarg))) {
                     exit(1);
                 };
                 break;
                 
             case 'h':
-                if ( !toolkit.SetPageHeight( atoi(optarg) ) ) {
+                if (!toolkit.SetPageHeight(atoi(optarg))) {
                     exit(1);
                 };
                 break;
@@ -285,7 +285,7 @@ int main(int argc, char** argv)
                 break;
                 
             case 's':
-                if( !toolkit.SetScale( atoi(optarg) ) ) {
+                if(!toolkit.SetScale(atoi(optarg))) {
                      exit(1);
                 }
                 break;
@@ -295,7 +295,7 @@ int main(int argc, char** argv)
                 break;
             
             case 'w':
-                if ( !toolkit.SetPageWidth( atoi(optarg) ) ) {
+                if (!toolkit.SetPageWidth(atoi(optarg))) {
                     exit(1);
                 }
                 break;
@@ -380,18 +380,18 @@ int main(int argc, char** argv)
     }
     
     // Load the std input or load the file
-    if ( infile == "-" ) {
+    if (infile == "-") {
         stringstream data_stream;
         for (string line; getline(cin, line);) {
             data_stream << line << endl;
         }
-        if ( !toolkit.LoadString( data_stream.str() ) ) {
+        if (!toolkit.LoadString(data_stream.str())) {
             cerr << "The input could not be loaded." << endl;
             exit(1);
         }
     }
     else {
-        if ( !toolkit.LoadFile( infile ) ) {
+        if (!toolkit.LoadFile(infile)) {
             cerr << "The file '" << infile << "' could not be opened." << endl;
             exit(1);
         }
@@ -422,9 +422,9 @@ int main(int argc, char** argv)
             }
             cur_outfile += ".svg";
             if (std_output) {
-                cout << toolkit.RenderToSvg( p );
+                cout << toolkit.RenderToSvg(p);
             }
-            else if ( !toolkit.RenderToSvgFile( cur_outfile, p) ) {
+            else if (!toolkit.RenderToSvgFile(cur_outfile, p)) {
                 cerr << "Unable to write SVG to " << cur_outfile << "." << endl;
                 exit(1);
             }
@@ -435,14 +435,14 @@ int main(int argc, char** argv)
     }
     else {
         if (all_pages) {
-            toolkit.SetScoreBasedMei( true );
+            toolkit.SetScoreBasedMei(true);
             outfile += ".mei";
             if (std_output) {
                 cerr << "MEI output of all pages to standard output is not possible." << endl;
                 exit(1);
 
             }
-            else if ( !toolkit.SaveFile( outfile ) ) {
+            else if (!toolkit.SaveFile(outfile)) {
                 cerr << "Unable to write MEI to " << outfile << "." << endl;
                 exit(1);
             }
@@ -452,7 +452,7 @@ int main(int argc, char** argv)
         }
         else {
             if (std_output) {
-                cout << toolkit.GetMEI( page );
+                cout << toolkit.GetMEI(page);
             }
             else {
                 cerr << "MEI output of one page is available only to standard output." << endl;

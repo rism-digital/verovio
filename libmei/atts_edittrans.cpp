@@ -42,7 +42,7 @@ void AttAgentident::ResetAgentident() {
     m_agent = "";
 }
 
-bool AttAgentident::ReadAgentident( pugi::xml_node element ) {
+bool AttAgentident::ReadAgentident(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("agent")) {
         this->SetAgent(StrToStr(element.attribute("agent").value()));
@@ -52,7 +52,7 @@ bool AttAgentident::ReadAgentident( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttAgentident::WriteAgentident( pugi::xml_node element ) {
+bool AttAgentident::WriteAgentident(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasAgent()) {
         element.append_attribute("agent") = StrToStr(this->GetAgent()).c_str();
@@ -61,7 +61,7 @@ bool AttAgentident::WriteAgentident( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttAgentident::HasAgent( )
+bool AttAgentident::HasAgent()
 {
     return (m_agent != "");
 }
@@ -86,7 +86,7 @@ void AttEvidence::ResetEvidence() {
     m_evidence = "";
 }
 
-bool AttEvidence::ReadEvidence( pugi::xml_node element ) {
+bool AttEvidence::ReadEvidence(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("cert")) {
         this->SetCert(StrToCertainty(element.attribute("cert").value()));
@@ -101,7 +101,7 @@ bool AttEvidence::ReadEvidence( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttEvidence::WriteEvidence( pugi::xml_node element ) {
+bool AttEvidence::WriteEvidence(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasCert()) {
         element.append_attribute("cert") = CertaintyToStr(this->GetCert()).c_str();
@@ -114,12 +114,12 @@ bool AttEvidence::WriteEvidence( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttEvidence::HasCert( )
+bool AttEvidence::HasCert()
 {
     return (m_cert != CERTAINTY_NONE);
 }
 
-bool AttEvidence::HasEvidence( )
+bool AttEvidence::HasEvidence()
 {
     return (m_evidence != "");
 }
@@ -143,7 +143,7 @@ void AttExtent::ResetExtent() {
     m_extent = "";
 }
 
-bool AttExtent::ReadExtent( pugi::xml_node element ) {
+bool AttExtent::ReadExtent(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("extent")) {
         this->SetExtent(StrToStr(element.attribute("extent").value()));
@@ -153,7 +153,7 @@ bool AttExtent::ReadExtent( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttExtent::WriteExtent( pugi::xml_node element ) {
+bool AttExtent::WriteExtent(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasExtent()) {
         element.append_attribute("extent") = StrToStr(this->GetExtent()).c_str();
@@ -162,7 +162,7 @@ bool AttExtent::WriteExtent( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttExtent::HasExtent( )
+bool AttExtent::HasExtent()
 {
     return (m_extent != "");
 }
@@ -186,7 +186,7 @@ void AttReasonident::ResetReasonident() {
     m_reason = "";
 }
 
-bool AttReasonident::ReadReasonident( pugi::xml_node element ) {
+bool AttReasonident::ReadReasonident(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("reason")) {
         this->SetReason(StrToStr(element.attribute("reason").value()));
@@ -196,7 +196,7 @@ bool AttReasonident::ReadReasonident( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttReasonident::WriteReasonident( pugi::xml_node element ) {
+bool AttReasonident::WriteReasonident(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasReason()) {
         element.append_attribute("reason") = StrToStr(this->GetReason()).c_str();
@@ -205,7 +205,7 @@ bool AttReasonident::WriteReasonident( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttReasonident::HasReason( )
+bool AttReasonident::HasReason()
 {
     return (m_reason != "");
 }
@@ -213,18 +213,18 @@ bool AttReasonident::HasReason( )
 
 /* include <attreason> */
 
-bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_AGENTIDENT ) ) {
+bool Att::SetEdittrans(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_AGENTIDENT)) {
         AttAgentident *att = dynamic_cast<AttAgentident*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "agent") {
             att->SetAgent(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_EVIDENCE ) ) {
+    if (element->HasAttClass(ATT_EVIDENCE)) {
         AttEvidence *att = dynamic_cast<AttEvidence*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "cert") {
             att->SetCert(att->StrToCertainty(attrValue));
             return true;
@@ -234,17 +234,17 @@ bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrV
             return true;
         }
     }
-    if (element->HasAttClass( ATT_EXTENT ) ) {
+    if (element->HasAttClass(ATT_EXTENT)) {
         AttExtent *att = dynamic_cast<AttExtent*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "extent") {
             att->SetExtent(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_REASONIDENT ) ) {
+    if (element->HasAttClass(ATT_REASONIDENT)) {
         AttReasonident *att = dynamic_cast<AttReasonident*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "reason") {
             att->SetReason(att->StrToStr(attrValue));
             return true;
@@ -254,17 +254,17 @@ bool Att::SetEdittrans( Object *element, std::string attrType, std::string attrV
     return false;
 }
 
-void Att::GetEdittrans( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_AGENTIDENT ) ) {
+void Att::GetEdittrans(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_AGENTIDENT)) {
         AttAgentident *att = dynamic_cast<AttAgentident*>(element);
-        assert( att );
+        assert(att);
         if (att->HasAgent()) {
             attributes->push_back(std::make_pair("agent", att->StrToStr(att->GetAgent())));
         }
     }
-    if (element->HasAttClass( ATT_EVIDENCE ) ) {
+    if (element->HasAttClass(ATT_EVIDENCE)) {
         AttEvidence *att = dynamic_cast<AttEvidence*>(element);
-        assert( att );
+        assert(att);
         if (att->HasCert()) {
             attributes->push_back(std::make_pair("cert", att->CertaintyToStr(att->GetCert())));
         }
@@ -272,16 +272,16 @@ void Att::GetEdittrans( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("evidence", att->StrToStr(att->GetEvidence())));
         }
     }
-    if (element->HasAttClass( ATT_EXTENT ) ) {
+    if (element->HasAttClass(ATT_EXTENT)) {
         AttExtent *att = dynamic_cast<AttExtent*>(element);
-        assert( att );
+        assert(att);
         if (att->HasExtent()) {
             attributes->push_back(std::make_pair("extent", att->StrToStr(att->GetExtent())));
         }
     }
-    if (element->HasAttClass( ATT_REASONIDENT ) ) {
+    if (element->HasAttClass(ATT_REASONIDENT)) {
         AttReasonident *att = dynamic_cast<AttReasonident*>(element);
-        assert( att );
+        assert(att);
         if (att->HasReason()) {
             attributes->push_back(std::make_pair("reason", att->StrToStr(att->GetReason())));
         }

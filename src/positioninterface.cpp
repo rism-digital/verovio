@@ -35,15 +35,15 @@ void PositionInterface::Reset()
     ResetStafflocPitched();
 }
     
-bool PositionInterface::HasIdenticalPositionInterface( PositionInterface *otherPositionInterface )
+bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPositionInterface)
 {
-    if ( !otherPositionInterface ) {
+    if (!otherPositionInterface) {
         return false;
     }
-    if ( this->GetOloc() != otherPositionInterface->GetOloc() ) {
+    if (this->GetOloc() != otherPositionInterface->GetOloc()) {
         return false;
     }
-    if ( this->GetPloc() != otherPositionInterface->GetPloc() ) {
+    if (this->GetPloc() != otherPositionInterface->GetPloc()) {
         return false;
     }
     return true;

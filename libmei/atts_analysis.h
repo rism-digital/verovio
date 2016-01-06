@@ -39,10 +39,10 @@ public:
     void ResetCommonAnl();
     
     /** Read the values for the attribute class **/
-    bool ReadCommonAnl( pugi::xml_node element );
+    bool ReadCommonAnl(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteCommonAnl( pugi::xml_node element );
+    bool WriteCommonAnl(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,32 +52,32 @@ public:
     ///@{
     void SetCopyof(std::string copyof_) { m_copyof = copyof_; };
     std::string GetCopyof() const { return m_copyof; };    
-    bool HasCopyof( );
+    bool HasCopyof();
     
     //
     void SetCorresp(std::string corresp_) { m_corresp = corresp_; };
     std::string GetCorresp() const { return m_corresp; };    
-    bool HasCorresp( );
+    bool HasCorresp();
     
     //
     void SetNext(std::string next_) { m_next = next_; };
     std::string GetNext() const { return m_next; };    
-    bool HasNext( );
+    bool HasNext();
     
     //
     void SetPrev(std::string prev_) { m_prev = prev_; };
     std::string GetPrev() const { return m_prev; };    
-    bool HasPrev( );
+    bool HasPrev();
     
     //
     void SetSameas(std::string sameas_) { m_sameas = sameas_; };
     std::string GetSameas() const { return m_sameas; };    
-    bool HasSameas( );
+    bool HasSameas();
     
     //
     void SetSynch(std::string synch_) { m_synch = synch_; };
     std::string GetSynch() const { return m_synch; };    
-    bool HasSynch( );
+    bool HasSynch();
     
     ///@}
 
@@ -118,10 +118,10 @@ public:
     void ResetHarmonicfunction();
     
     /** Read the values for the attribute class **/
-    bool ReadHarmonicfunction( pugi::xml_node element );
+    bool ReadHarmonicfunction(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteHarmonicfunction( pugi::xml_node element );
+    bool WriteHarmonicfunction(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -131,7 +131,7 @@ public:
     ///@{
     void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; };
     data_SCALEDEGREE GetDeg() const { return m_deg; };    
-    bool HasDeg( );
+    bool HasDeg();
     
     ///@}
 
@@ -162,10 +162,10 @@ public:
     void ResetIntervalharmonic();
     
     /** Read the values for the attribute class **/
-    bool ReadIntervalharmonic( pugi::xml_node element );
+    bool ReadIntervalharmonic(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteIntervalharmonic( pugi::xml_node element );
+    bool WriteIntervalharmonic(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -175,7 +175,7 @@ public:
     ///@{
     void SetInth(std::string inth_) { m_inth = inth_; };
     std::string GetInth() const { return m_inth; };    
-    bool HasInth( );
+    bool HasInth();
     
     ///@}
 
@@ -203,10 +203,10 @@ public:
     void ResetIntervallicdesc();
     
     /** Read the values for the attribute class **/
-    bool ReadIntervallicdesc( pugi::xml_node element );
+    bool ReadIntervallicdesc(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteIntervallicdesc( pugi::xml_node element );
+    bool WriteIntervallicdesc(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -216,7 +216,7 @@ public:
     ///@{
     void SetIntm(data_INTERVAL_AMOUNT intm_) { m_intm = intm_; };
     data_INTERVAL_AMOUNT GetIntm() const { return m_intm; };    
-    bool HasIntm( );
+    bool HasIntm();
     
     ///@}
 
@@ -246,10 +246,10 @@ public:
     void ResetMelodicfunction();
     
     /** Read the values for the attribute class **/
-    bool ReadMelodicfunction( pugi::xml_node element );
+    bool ReadMelodicfunction(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMelodicfunction( pugi::xml_node element );
+    bool WriteMelodicfunction(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -259,7 +259,7 @@ public:
     ///@{
     void SetMfunc(data_MELODICFUNCTION mfunc_) { m_mfunc = mfunc_; };
     data_MELODICFUNCTION GetMfunc() const { return m_mfunc; };    
-    bool HasMfunc( );
+    bool HasMfunc();
     
     ///@}
 
@@ -284,10 +284,10 @@ public:
     void ResetPitchclass();
     
     /** Read the values for the attribute class **/
-    bool ReadPitchclass( pugi::xml_node element );
+    bool ReadPitchclass(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WritePitchclass( pugi::xml_node element );
+    bool WritePitchclass(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -297,7 +297,7 @@ public:
     ///@{
     void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; };
     data_PITCHCLASS GetPclass() const { return m_pclass; };    
-    bool HasPclass( );
+    bool HasPclass();
     
     ///@}
 
@@ -322,10 +322,10 @@ public:
     void ResetSolfa();
     
     /** Read the values for the attribute class **/
-    bool ReadSolfa( pugi::xml_node element );
+    bool ReadSolfa(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteSolfa( pugi::xml_node element );
+    bool WriteSolfa(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -335,7 +335,7 @@ public:
     ///@{
     void SetPsolfa(std::string psolfa_) { m_psolfa = psolfa_; };
     std::string GetPsolfa() const { return m_psolfa; };    
-    bool HasPsolfa( );
+    bool HasPsolfa();
     
     ///@}
 

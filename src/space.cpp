@@ -14,10 +14,10 @@ namespace vrv {
 // Space
 //----------------------------------------------------------------------------
 
-Space::Space( ):
+Space::Space():
     LayerElement("space-"), DurationInterface()
 {
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     
     Reset();
 }

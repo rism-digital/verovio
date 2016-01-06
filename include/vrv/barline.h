@@ -34,7 +34,7 @@ public:
     virtual ~BarLine();
     virtual void Reset();
     virtual Object* Clone() { return new BarLine(*this); };
-    virtual std::string GetClassName( ) { return "BarLine"; };
+    virtual std::string GetClassName() { return "BarLine"; };
     virtual ClassId Is() { return BARLINE; };
     ///@}
     
@@ -45,12 +45,12 @@ public:
      * Use to set the alignment for the Measure BarLine members.
      * This is as special case where we need to add to the measure aligner.
      */
-    void SetAlignment( Alignment *alignment ) { m_alignment = alignment; };
+    void SetAlignment(Alignment *alignment) { m_alignment = alignment; };
     
     /*
      * Return true if the barLine type requires repetition dots to be drawn.
      */
-    bool HasRepetitionDots( );
+    bool HasRepetitionDots();
     
 private:
     
@@ -79,7 +79,7 @@ public:
     BarLineAttr();
     virtual ~BarLineAttr();
     virtual Object* Clone() { return new BarLineAttr(*this); };
-    virtual std::string GetClassName( ) { return "BarLineAttr"; };
+    virtual std::string GetClassName() { return "BarLineAttr"; };
     virtual ClassId Is() { return BARLINE_ATTR; };
     ///@}
 };

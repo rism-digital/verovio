@@ -48,8 +48,8 @@ public:
      * The setter asserts that no LayerElement was previously set.
      */
     ///@{
-    void SetStart( LayerElement *start );
-    void SetEnd( LayerElement *end );
+    void SetStart(LayerElement *start);
+    void SetEnd(LayerElement *end);
     LayerElement *GetStart() { return m_start; };
     LayerElement *GetEnd() { return m_end; };
     ///@}
@@ -57,12 +57,12 @@ public:
     /**
      *
      */
-    bool SetStartAndEnd( LayerElement *element );
+    bool SetStartAndEnd(LayerElement *element);
     
     /**
      *
      */
-    bool HasStartAndEnd( ) { return ( m_start && m_end ); };
+    bool HasStartAndEnd() { return (m_start && m_end); };
     
     /**
      *
@@ -83,17 +83,17 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning( ArrayPtrVoid *params, DocObject *object );
+    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, DocObject *object);
     
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning( ArrayPtrVoid *params, DocObject *object );
+    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params, DocObject *object);
     
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing( ArrayPtrVoid *params, DocObject *object );
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
     
 private:
     /**

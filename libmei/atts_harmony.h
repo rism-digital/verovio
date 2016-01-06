@@ -39,10 +39,10 @@ public:
     void ResetFretlocation();
     
     /** Read the values for the attribute class **/
-    bool ReadFretlocation( pugi::xml_node element );
+    bool ReadFretlocation(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteFretlocation( pugi::xml_node element );
+    bool WriteFretlocation(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetFret(data_FRET fret_) { m_fret = fret_; };
     data_FRET GetFret() const { return m_fret; };    
-    bool HasFret( );
+    bool HasFret();
     
     ///@}
 
@@ -77,10 +77,10 @@ public:
     void ResetHarmLog();
     
     /** Read the values for the attribute class **/
-    bool ReadHarmLog( pugi::xml_node element );
+    bool ReadHarmLog(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteHarmLog( pugi::xml_node element );
+    bool WriteHarmLog(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -90,7 +90,7 @@ public:
     ///@{
     void SetChordref(std::string chordref_) { m_chordref = chordref_; };
     std::string GetChordref() const { return m_chordref; };    
-    bool HasChordref( );
+    bool HasChordref();
     
     ///@}
 
@@ -115,10 +115,10 @@ public:
     void ResetHarmVis();
     
     /** Read the values for the attribute class **/
-    bool ReadHarmVis( pugi::xml_node element );
+    bool ReadHarmVis(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteHarmVis( pugi::xml_node element );
+    bool WriteHarmVis(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -128,7 +128,7 @@ public:
     ///@{
     void SetRendgrid(harmVis_RENDGRID rendgrid_) { m_rendgrid = rendgrid_; };
     harmVis_RENDGRID GetRendgrid() const { return m_rendgrid; };    
-    bool HasRendgrid( );
+    bool HasRendgrid();
     
     ///@}
 

@@ -33,13 +33,13 @@ namespace vrv {
  */
 bool View::OneBeamInTuplet(Tuplet* tuplet)
 {
-    assert( tuplet );
+    assert(tuplet);
     
     Beam *currentBeam = NULL;
     ArrayOfObjects elems;
     
     // Are we contained in a beam?
-    if (tuplet->GetFirstParent( BEAM, MAX_BEAM_DEPTH ) && !tuplet->m_children.empty()) return true;
+    if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH) && !tuplet->m_children.empty()) return true;
     
     // No we contain a beam? Go on and search for it in the children
     for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {        
@@ -83,11 +83,11 @@ bool View::OneBeamInTuplet(Tuplet* tuplet)
 
 data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Point* start, Point* end, Point *center)
 {
-    assert( tuplet );
-    assert( layer );
-    assert( start );
-    assert( end );
-    assert( center );
+    assert(tuplet);
+    assert(layer);
+    assert(start);
+    assert(end);
+    assert(center);
     
     Point first, last;
     int x, y;
@@ -246,12 +246,12 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet* tuplet, Layer *layer, Poin
 }
 
 
-void View::DrawTupletPostponed( DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff)
+void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, Staff *staff)
 {
-    assert( dc );
-    assert( tuplet );
-    assert( layer );
-    assert( staff );
+    assert(dc);
+    assert(tuplet);
+    assert(layer);
+    assert(staff);
     
     if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
         return;

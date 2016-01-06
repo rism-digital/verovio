@@ -24,7 +24,7 @@ Clef::Clef():
     Init();
 }
     
-Clef::Clef( ScoreDefInterface *clefAttr ):
+Clef::Clef(ScoreDefInterface *clefAttr):
     LayerElement("clef-")
 {
     Init();

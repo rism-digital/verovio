@@ -39,7 +39,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    SvgDeviceContext ( int width, int height );
+    SvgDeviceContext (int width, int height);
     virtual ~SvgDeviceContext();
     ///@}
     
@@ -47,27 +47,27 @@ public:
      * @name Setters
      */
     ///@{
-    virtual void SetBackground( int colour, int style = AxSOLID );
-    virtual void SetBackgroundImage( void *image, double opacity = 1.0 );
-    virtual void SetBackgroundMode( int mode );
-    virtual void SetTextForeground( int colour );
-    virtual void SetTextBackground( int colour );
-    virtual void SetLogicalOrigin( int x, int y );
-    virtual void SetUserScale( double xScale, double yScale );
+    virtual void SetBackground(int colour, int style = AxSOLID);
+    virtual void SetBackgroundImage(void *image, double opacity = 1.0);
+    virtual void SetBackgroundMode(int mode);
+    virtual void SetTextForeground(int colour);
+    virtual void SetTextBackground(int colour);
+    virtual void SetLogicalOrigin(int x, int y);
+    virtual void SetUserScale(double xScale, double yScale);
     ///@}
     
     /**
      * @name Getters
      */
     ///@{
-    virtual Point GetLogicalOrigin( );
+    virtual Point GetLogicalOrigin();
     ///}
 
     /**
      * Get the the SVG into a string
      * Add the xml tag if necessary.
      */
-    std::string GetStringSVG( bool xml_declaration = false );
+    std::string GetStringSVG(bool xml_declaration = false);
     
     /**
      * @name Drawing methods
@@ -85,14 +85,14 @@ public:
     virtual void DrawText(const std::string& text, const std::wstring wtext = L"");
     virtual void DrawMusicText(const std::wstring& text, int x, int y);
     virtual void DrawSpline(int n, Point points[]);
-    virtual void DrawBackgroundImage( int x = 0, int y = 0 );
+    virtual void DrawBackgroundImage(int x = 0, int y = 0);
     ///@}
     
     /**
      * @name Method for starting and ending a text
      */
     ///@{
-    virtual void StartText( int x, int y, char alignement = LEFT );
+    virtual void StartText(int x, int y, char alignement = LEFT);
     virtual void EndText();
     
     /**
@@ -104,16 +104,16 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId );
-    virtual void EndGraphic( DocObject *object, View *view  );
+    virtual void StartGraphic(DocObject *object, std::string gClass, std::string gId);
+    virtual void EndGraphic(DocObject *object, View *view );
     ///@}
     
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic( DocObject *object, std::string gId );
-    virtual void EndResumedGraphic( DocObject *object, View *view  );
+    virtual void ResumeGraphic(DocObject *object, std::string gId);
+    virtual void EndResumedGraphic(DocObject *object, View *view );
     ///@}
     
     
@@ -121,8 +121,8 @@ public:
      * @name Method for starting and ending a text (<tspan>) text graphic.
      */
     ///@{
-    virtual void StartTextGraphic( DocObject *object, std::string gClass, std::string gId );
-    virtual void EndTextGraphic( DocObject *object, View *view  );
+    virtual void StartTextGraphic(DocObject *object, std::string gClass, std::string gId);
+    virtual void EndTextGraphic(DocObject *object, View *view );
     ///@}
     
     /**
@@ -155,11 +155,11 @@ private:
      * Flush the data to the internal buffer.
      * Adds the xml tag if necessary and the <defs> from m_smufl_glyphs
      */
-    void Commit( bool xml_declaration );
+    void Commit(bool xml_declaration);
     
-    void WriteLine( std::string );
+    void WriteLine(std::string);
     
-    std::string GetColour( int colour );
+    std::string GetColour(int colour);
     
 public:
     

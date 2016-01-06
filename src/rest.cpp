@@ -17,8 +17,8 @@ namespace vrv {
 Rest::Rest():
 	LayerElement("rest-"), DurationInterface(), PositionInterface()
 {
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
-    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     
     Reset();
 }

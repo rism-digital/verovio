@@ -40,10 +40,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Staff( int n = -1 );
+    Staff(int n = -1);
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Staff"; };
+    virtual std::string GetClassName() { return "Staff"; };
     virtual ClassId Is() { return STAFF; };
     ///@}
     
@@ -51,7 +51,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddLayer( Layer *layer );
+    void AddLayer(Layer *layer);
     ///@}
 	
 	int GetLayerCount() const { return (int)m_children.size(); };
@@ -70,7 +70,7 @@ public:
      * Reset the alignment values (m_drawingY, m_drawingYRel, etc.)
      * Called by  AlignVertically
      */
-    virtual void ResetVerticalAlignment( );
+    virtual void ResetVerticalAlignment();
     
     StaffAlignment *GetAlignment() { return m_staffAlignment; };
     
@@ -83,39 +83,39 @@ public:
     /**
      * Currently unused - kept for "documentation"
      */
-    virtual bool GetPosOnPage( ArrayPtrVoid *params );
+    virtual bool GetPosOnPage(ArrayPtrVoid *params);
     
     /**
      * Align the content of a staff vertically.
      */
-    virtual int AlignVertically( ArrayPtrVoid *params );
+    virtual int AlignVertically(ArrayPtrVoid *params);
     
     /**
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
+    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
 
     /**
      * Functor for setting running lyrics in staves
      * This is necessary for <syl> that starts in one measure and ends in another one
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int FillStaffCurrentLyrics( ArrayPtrVoid *params );
+    virtual int FillStaffCurrentLyrics(ArrayPtrVoid *params);
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing( ArrayPtrVoid *params );
+    virtual int ResetDrawing(ArrayPtrVoid *params);
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid *params );
+    virtual int SetDrawingXY(ArrayPtrVoid *params);
     
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt( ArrayPtrVoid *params );
+    virtual int PrepareRpt(ArrayPtrVoid *params);
     
 public:
 	/**

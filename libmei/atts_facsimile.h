@@ -39,10 +39,10 @@ public:
     void ResetFacsimile();
     
     /** Read the values for the attribute class **/
-    bool ReadFacsimile( pugi::xml_node element );
+    bool ReadFacsimile(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteFacsimile( pugi::xml_node element );
+    bool WriteFacsimile(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetFacs(data_URIS facs_) { m_facs = facs_; };
     data_URIS GetFacs() const { return m_facs; };    
-    bool HasFacs( );
+    bool HasFacs();
     
     ///@}
 

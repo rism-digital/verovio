@@ -31,7 +31,7 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer( ):
+Layer::Layer():
 	DocObject("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(),
     AttCommon()
 {
@@ -54,41 +54,41 @@ void Layer::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
     
-void Layer::AddLayerElement( LayerElement *element, int idx )
+void Layer::AddLayerElement(LayerElement *element, int idx)
 {
-	element->SetParent( this );
-    if ( idx == -1 ) {
-        m_children.push_back( element );
+	element->SetParent(this);
+    if (idx == -1) {
+        m_children.push_back(element);
     }
     else {
-        InsertChild( element, idx );
+        InsertChild(element, idx);
     }
     Modify();
 }
     
-LayerElement *Layer::GetPrevious( LayerElement *element )
+LayerElement *Layer::GetPrevious(LayerElement *element)
 {
-    this->ResetList( this );
-    if ( !element || this->GetList(this)->empty() )
+    this->ResetList(this);
+    if (!element || this->GetList(this)->empty())
         return NULL;
     
-    return dynamic_cast<LayerElement*>( GetListPrevious( element ) );
+    return dynamic_cast<LayerElement*>(GetListPrevious(element));
 }
 
-LayerElement *Layer::GetAtPos( int x )
+LayerElement *Layer::GetAtPos(int x)
 {
-	LayerElement *element = dynamic_cast<LayerElement*>( this->GetFirst() );
-	if ( !element || element->GetDrawingX() > x ) return NULL;
+	LayerElement *element = dynamic_cast<LayerElement*>(this->GetFirst());
+	if (!element || element->GetDrawingX() > x) return NULL;
     
     LayerElement *next = NULL;
-	while ( (next = dynamic_cast<LayerElement*>( this->GetNext() ) ) ) {
-		if ( next->GetDrawingX() > x ) return element;
+	while ((next = dynamic_cast<LayerElement*>(this->GetNext()))) {
+		if (next->GetDrawingX() > x) return element;
         element = next;
 	}
 	return element;
 }
 
-void Layer::SetDrawingAndCurrentValues(  StaffDef *currentStaffDef )
+void Layer::SetDrawingAndCurrentValues( StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
         LogDebug("staffDef not found");
@@ -107,33 +107,33 @@ void Layer::SetDrawingAndCurrentValues(  StaffDef *currentStaffDef )
         }
     }
     
-    this->SetDrawClef( currentStaffDef->DrawClef() );
-    this->SetDrawKeySig( drawKeySig ); // see above
-    this->SetDrawMensur( currentStaffDef->DrawMensur() );
-    this->SetDrawMeterSig( currentStaffDef->DrawMeterSig() );
-    this->SetDrawKeySigCancellation( currentStaffDef->DrawKeySigCancellation() );
+    this->SetDrawClef(currentStaffDef->DrawClef());
+    this->SetDrawKeySig(drawKeySig); // see above
+    this->SetDrawMensur(currentStaffDef->DrawMensur());
+    this->SetDrawMeterSig(currentStaffDef->DrawMeterSig());
+    this->SetDrawKeySigCancellation(currentStaffDef->DrawKeySigCancellation());
     // Don't draw on the next one
-    currentStaffDef->SetDrawClef( false );
-    currentStaffDef->SetDrawKeySig( false );
-    currentStaffDef->SetDrawMensur( false );
-    currentStaffDef->SetDrawMeterSig( false );
-    currentStaffDef->SetDrawKeySigCancellation( false );
+    currentStaffDef->SetDrawClef(false);
+    currentStaffDef->SetDrawKeySig(false);
+    currentStaffDef->SetDrawMensur(false);
+    currentStaffDef->SetDrawMeterSig(false);
+    currentStaffDef->SetDrawKeySigCancellation(false);
 
-    if ( currentStaffDef->GetCurrentClef() ) {
+    if (currentStaffDef->GetCurrentClef()) {
         this->SetCurrentClef(new Clef(*currentStaffDef->GetCurrentClef()));
     }
-    if ( currentStaffDef->GetCurrentKeySig() ) {
+    if (currentStaffDef->GetCurrentKeySig()) {
         this->SetCurrentKeySig(new KeySig(*currentStaffDef->GetCurrentKeySig()));
     }
-    if ( currentStaffDef->GetCurrentMensur() ) {
+    if (currentStaffDef->GetCurrentMensur()) {
         this->SetCurrentMensur(new Mensur(*currentStaffDef->GetCurrentMensur()));
     }
-    if ( currentStaffDef->GetCurrentMeterSig() ) {
+    if (currentStaffDef->GetCurrentMeterSig()) {
         this->SetCurrentMeterSig(new MeterSig(*currentStaffDef->GetCurrentMeterSig()));
     }
 }
 
-Clef* Layer::GetClef( LayerElement *test )
+Clef* Layer::GetClef(LayerElement *test)
 {
     Object *testObject = test;
     
@@ -143,21 +143,21 @@ Clef* Layer::GetClef( LayerElement *test )
 	
     //make sure list is set
     ResetList(this);
-    if ( test->Is() != CLEF )
+    if (test->Is() != CLEF)
     {
-        testObject = GetListFirstBackward(testObject, CLEF );
+        testObject = GetListFirstBackward(testObject, CLEF);
     }
     
-    if ( testObject && testObject->Is() == CLEF ) {
+    if (testObject && testObject->Is() == CLEF) {
         Clef *clef = dynamic_cast<Clef*>(testObject);
-        assert( clef );
+        assert(clef);
         return clef;
     }
 
     return GetCurrentClef();
 }
  
-int Layer::GetClefOffset( LayerElement *test )
+int Layer::GetClefOffset(LayerElement *test)
 {
     Clef *clef = GetClef(test);
     if (!clef) return 0;
@@ -169,7 +169,7 @@ int Layer::GetClefOffset( LayerElement *test )
 // Layer functor methods
 //----------------------------------------------------------------------------
 
-int Layer::AlignHorizontally( ArrayPtrVoid *params )
+int Layer::AlignHorizontally(ArrayPtrVoid *params)
 {
     // param 0: the measureAligner (unused)
     // param 1: the time
@@ -188,23 +188,23 @@ int Layer::AlignHorizontally( ArrayPtrVoid *params )
     (*currentMensur) = GetCurrentMensur();
     (*currentMeterSig) = GetCurrentMeterSig();
     
-    if ( DrawClef() && GetCurrentClef() ) {
-        GetCurrentClef()->AlignHorizontally( params );
+    if (DrawClef() && GetCurrentClef()) {
+        GetCurrentClef()->AlignHorizontally(params);
     }
-    if ( DrawKeySig() && GetCurrentKeySig() ) {
-        GetCurrentKeySig()->AlignHorizontally( params );
+    if (DrawKeySig() && GetCurrentKeySig()) {
+        GetCurrentKeySig()->AlignHorizontally(params);
     }
-    if ( DrawMensur() && GetCurrentMensur() ) {
-        GetCurrentMensur()->AlignHorizontally( params );
+    if (DrawMensur() && GetCurrentMensur()) {
+        GetCurrentMensur()->AlignHorizontally(params);
     }
-    if ( DrawMeterSig() && GetCurrentMeterSig() ) {
-        GetCurrentMeterSig()->AlignHorizontally( params );
+    if (DrawMeterSig() && GetCurrentMeterSig()) {
+        GetCurrentMeterSig()->AlignHorizontally(params);
     }
 
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::AlignHorizontallyEnd( ArrayPtrVoid *params )
+int Layer::AlignHorizontallyEnd(ArrayPtrVoid *params)
 {
     // param 0: the measureAligner
     // param 1: the time  (unused)
@@ -223,7 +223,7 @@ int Layer::AlignHorizontallyEnd( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::PrepareProcessingLists( ArrayPtrVoid *params )
+int Layer::PrepareProcessingLists(ArrayPtrVoid *params)
 {
     // param 0: the IntTree* for staff/layer/verse (unused)
     // param 1: the IntTree* for staff/layer
@@ -231,14 +231,14 @@ int Layer::PrepareProcessingLists( ArrayPtrVoid *params )
     // Alternate solution with StaffN_LayerN_VerseN_t
     //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
     
-    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( STAFF ) );
-    assert( staff );
+    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    assert(staff);
     tree->child[ staff->GetN() ].child[ this->GetN() ];
     
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::SetDrawingXY( ArrayPtrVoid *params )
+int Layer::SetDrawingXY(ArrayPtrVoid *params)
 {
     // param 0: a pointer doc (unused)
     // param 1: a pointer to the current system (unused)
@@ -260,22 +260,22 @@ int Layer::SetDrawingXY( ArrayPtrVoid *params )
     
     // set the values for the scoreDef elements when required
     if (this->GetDrawingClef()) {
-        this->GetDrawingClef()->SetDrawingX( this->GetDrawingClef()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+        this->GetDrawingClef()->SetDrawingX(this->GetDrawingClef()->GetXRel() + (*currentMeasure)->GetDrawingX());
     }
     if (this->GetDrawingKeySig()) {
-        this->GetDrawingKeySig()->SetDrawingX( this->GetDrawingKeySig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+        this->GetDrawingKeySig()->SetDrawingX(this->GetDrawingKeySig()->GetXRel() + (*currentMeasure)->GetDrawingX());
     }
     if (this->GetDrawingMensur()) {
-        this->GetDrawingMensur()->SetDrawingX( this->GetDrawingMensur()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+        this->GetDrawingMensur()->SetDrawingX(this->GetDrawingMensur()->GetXRel() + (*currentMeasure)->GetDrawingX());
     }
     if (this->GetDrawingMeterSig()) {
-        this->GetDrawingMeterSig()->SetDrawingX( this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX() );
+        this->GetDrawingMeterSig()->SetDrawingX(this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX());
     }
     
     return FUNCTOR_CONTINUE;
 }
     
-int Layer::PrepareRpt( ArrayPtrVoid *params )
+int Layer::PrepareRpt(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the current MRpt pointer
     // param 1: a pointer to the data_BOOLEAN indicating if multiNumber (unused)

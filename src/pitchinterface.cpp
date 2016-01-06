@@ -47,14 +47,14 @@ void PitchInterface::Reset()
     ResetPitch();
 }
 
-bool PitchInterface::HasIdenticalPitchInterface( PitchInterface *otherPitchInterface )
+bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterface)
 {
     // This should never happen because it is fully implemented
-    LogError( "PitchInterface::HasIdenticalPitchInterface missing" );
-    assert( false );
+    LogError("PitchInterface::HasIdenticalPitchInterface missing");
+    assert(false);
     return false;
     /*
-    if ( !otherPitchInterface ) {
+    if (!otherPitchInterface) {
         return false;
     }
     */

@@ -221,10 +221,10 @@ class PaeInput: public FileInputStream
 {
 public:
     // constructors and destructors
-    PaeInput( Doc *doc, std::string filename );
+    PaeInput(Doc *doc, std::string filename);
     virtual ~PaeInput();
     
-    virtual bool ImportFile( );
+    virtual bool ImportFile();
     virtual bool ImportString(std::string pae);
 
 #ifndef NO_PAE_SUPPORT
@@ -232,25 +232,25 @@ public:
 private:
     // function declarations:
     
-     void      parsePlainAndEasy( std::istream &infile );
+     void      parsePlainAndEasy(std::istream &infile);
      
      // parsing functions
      int       getKeyInfo          (const char* incipit, KeySig *key, int index = 0);
      int       getTimeInfo         (const char* incipit, MeterSig *meter, int index = 0);
-     int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0 );
-     int       getBarLine          (const char *incipit, data_BARRENDITION *output, int index );
+     int       getClefInfo         (const char* incipit, Clef *mus_clef, int index = 0);
+     int       getBarLine          (const char *incipit, data_BARRENDITION *output, int index);
      int       getAccidental       (const char* incipit, data_ACCIDENTAL_EXPLICIT *accident, int index = 0);
-     int       getOctave           (const char* incipit, char *octave, int index = 0 );
+     int       getOctave           (const char* incipit, char *octave, int index = 0);
      int       getDurations        (const char* incipit, pae::Measure *measure, int index = 0);
-     int       getDuration         (const char* incipit, data_DURATION *duration, int *dot, int index );
+     int       getDuration         (const char* incipit, data_DURATION *duration, int *dot, int index);
      int       getTupletFermata    (const char* incipit, pae::Note *note, int index = 0);
      int       getTupletFermataEnd (const char* incipit, pae::Note *note, int index = 0);
      int       getGraceNote        (const char* incipit, pae::Note *note, int index = 0);
-     int       getWholeRest        (const char* incipit, int *wholerest, int index );
-     int       getAbbreviation     (const char* incipit, pae::Measure *measure, int index = 0 ); 
-     int       getNote             (const char* incipit, pae::Note *note, pae::Measure *measure, int index = 0 );
+     int       getWholeRest        (const char* incipit, int *wholerest, int index);
+     int       getAbbreviation     (const char* incipit, pae::Measure *measure, int index = 0); 
+     int       getNote             (const char* incipit, pae::Note *note, pae::Measure *measure, int index = 0);
      
-     data_PITCHNAME       getPitch            (char c_note );
+     data_PITCHNAME       getPitch            (char c_note);
      
      // output functions
      void      addLayerElement     (LayerElement *element);

@@ -46,10 +46,10 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_codeStr = codeStr;
     
     pugi::xml_document doc;
-    pugi::xml_parse_result result = doc.load_file( path.c_str() );
+    pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (!result)
     {
-        LogError("Font file '%s' could not be loaded", path.c_str() );
+        LogError("Font file '%s' could not be loaded", path.c_str());
         return;
     }
     pugi::xml_node root = doc.first_child();
@@ -57,7 +57,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     // look at the viewBox attribute for getting the units per em
     if (!root.attribute("viewBox"))
     {
-        LogMessage("Font file '%s' does not contain a viewBox attribute", path.c_str() );
+        LogMessage("Font file '%s' does not contain a viewBox attribute", path.c_str());
         return;
     }
     
@@ -66,11 +66,11 @@ Glyph::Glyph(std::string path, std::string codeStr)
     // we are looking for the last value
     if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3)
     {
-        LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str() );
+        LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
         return;
     }
     
-    m_unitsPerEm = atoi( viewBox.substr( viewBox.find_last_of(' ') ).c_str() ) * 10;
+    m_unitsPerEm = atoi(viewBox.substr(viewBox.find_last_of(' ')).c_str()) * 10;
 }
     
 Glyph::Glyph(int unitsPerEm)

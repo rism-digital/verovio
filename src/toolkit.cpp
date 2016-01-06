@@ -36,7 +36,7 @@ const char *UTF_16_LE_BOM = "\xFF\xFE";
 // Toolkit
 //----------------------------------------------------------------------------
 
-Toolkit::Toolkit( bool initFont )
+Toolkit::Toolkit(bool initFont)
 {
     
     m_scale = DEFAULT_SCALE;
@@ -61,7 +61,7 @@ Toolkit::Toolkit( bool initFont )
     
     m_cString = NULL;
     
-    if ( initFont ) {
+    if (initFont) {
         Resources::InitFonts();
     }
 }
@@ -70,98 +70,98 @@ Toolkit::Toolkit( bool initFont )
 Toolkit::~Toolkit()
 {
     if (m_cString) {
-        free( m_cString );
+        free(m_cString);
     }
 }
     
-bool Toolkit::SetResourcePath( const std::string &path )
+bool Toolkit::SetResourcePath(const std::string &path)
 {
-    Resources::SetPath( path );
+    Resources::SetPath(path);
     return Resources::InitFonts();
 };
 
-bool Toolkit::SetBorder( int border )
+bool Toolkit::SetBorder(int border)
 {
     // We use left margin values because for now we cannot specify different values for each margin
     if (border < MIN_PAGE_LEFT_MAR || border > MAX_PAGE_LEFT_MAR) {
-        LogError( "Border out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR, MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR );
+        LogError("Border out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_LEFT_MAR, MIN_PAGE_LEFT_MAR, MAX_PAGE_LEFT_MAR);
         return false;
     }
     m_border = border;
     return true;
 }
 
-bool Toolkit::SetScale( int scale )
+bool Toolkit::SetScale(int scale)
 {
     if (scale < MIN_SCALE || scale > MAX_SCALE) {
-        LogError( "Scale out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE, MAX_SCALE );
+        LogError("Scale out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SCALE, MIN_SCALE, MAX_SCALE);
         return false;
     }
     m_scale = scale;
     return true;
 }
 
-bool Toolkit::SetPageHeight( int h )
+bool Toolkit::SetPageHeight(int h)
 {
     if (h < MIN_PAGE_HEIGHT || h > MAX_PAGE_HEIGHT) {
-        LogError( "Page height out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT );
+        LogError("Page height out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_HEIGHT, MIN_PAGE_HEIGHT, MAX_PAGE_HEIGHT);
         return false;
     }
     m_pageHeight = h;
     return true;
 }
 
-bool Toolkit::SetPageWidth( int w )
+bool Toolkit::SetPageWidth(int w)
 {
     if (w < MIN_PAGE_WIDTH || w > MAX_PAGE_WIDTH) {
-        LogError( "Page width out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_WIDTH, MIN_PAGE_WIDTH, MAX_PAGE_WIDTH );
+        LogError("Page width out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_PAGE_WIDTH, MIN_PAGE_WIDTH, MAX_PAGE_WIDTH);
         return false;
     }
     m_pageWidth = w;
     return true;
 };
 
-bool Toolkit::SetSpacingStaff( int spacingStaff )
+bool Toolkit::SetSpacingStaff(int spacingStaff)
 {
     if (spacingStaff < MIN_SPACING_STAFF || spacingStaff > MAX_SPACING_STAFF) {
-        LogError( "Spacing staff out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_STAFF, MIN_SPACING_STAFF, MAX_SPACING_STAFF );
+        LogError("Spacing staff out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_STAFF, MIN_SPACING_STAFF, MAX_SPACING_STAFF);
         return false;
     }
     m_spacingStaff = spacingStaff;
     return true;
 }
 
-bool Toolkit::SetSpacingSystem( int spacingSystem )
+bool Toolkit::SetSpacingSystem(int spacingSystem)
 {
     if (spacingSystem < MIN_SPACING_SYSTEM || spacingSystem > MAX_SPACING_SYSTEM) {
-        LogError( "Spacing system out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM );
+        LogError("Spacing system out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_SYSTEM, MIN_SPACING_SYSTEM, MAX_SPACING_SYSTEM);
         return false;
     }
     m_spacingSystem = spacingSystem;
     return true;
 }
     
-bool Toolkit::SetSpacingLinear( float spacingLinear )
+bool Toolkit::SetSpacingLinear(float spacingLinear)
 {
     if (spacingLinear < MIN_SPACING_LINEAR || spacingLinear > MAX_SPACING_LINEAR) {
-        LogError( "Spacing (linear) out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR );
+        LogError("Spacing (linear) out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_LINEAR, MIN_SPACING_LINEAR, MAX_SPACING_LINEAR);
         return false;
     }
     m_spacingLinear = spacingLinear;
     return true;
 }
     
-bool Toolkit::SetSpacingNonLinear( float spacingNonLinear )
+bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
 {
     if (spacingNonLinear < MIN_SPACING_NON_LINEAR || spacingNonLinear > MAX_SPACING_NON_LINEAR) {
-        LogError( "Spacing (non-linear) out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR );
+        LogError("Spacing (non-linear) out of bounds; default is %d, minimum is %d, and maximum is %d", DEFAULT_SPACING_NON_LINEAR, MIN_SPACING_NON_LINEAR, MAX_SPACING_NON_LINEAR);
         return false;
     }
     m_spacingNonLinear = spacingNonLinear;
     return true;
 }
 
-bool Toolkit::SetFormat( std::string const &informat )
+bool Toolkit::SetFormat(std::string const &informat)
 {
     if (informat == "pae")
         m_format = PAE;
@@ -179,18 +179,18 @@ bool Toolkit::SetFormat( std::string const &informat )
 };
 
 
-bool Toolkit::SetFont( std::string const &font )
+bool Toolkit::SetFont(std::string const &font)
 {
     return Resources::SetFont(font);
 };
 
-bool Toolkit::LoadFile( const std::string &filename )
+bool Toolkit::LoadFile(const std::string &filename)
 {
-    if ( IsUTF16( filename ) ) {
-        return LoadUTF16File( filename );
+    if (IsUTF16(filename)) {
+        return LoadUTF16File(filename);
     }
     
-    std::ifstream in( filename.c_str() );
+    std::ifstream in(filename.c_str());
     if (!in.is_open()) {
         return false;
     }
@@ -201,13 +201,13 @@ bool Toolkit::LoadFile( const std::string &filename )
     in.seekg(0, std::ios::beg);
     
     // read the file into the string:
-    std::string content( fileSize, 0 );
+    std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
     
-    return LoadString( content );
+    return LoadString(content);
 }
  
-bool Toolkit::IsUTF16( const std::string &filename )
+bool Toolkit::IsUTF16(const std::string &filename)
 {
     std::ifstream fin(filename.c_str(), std::ios::in | std::ios::binary);
     if (!fin.is_open()) {
@@ -215,8 +215,8 @@ bool Toolkit::IsUTF16( const std::string &filename )
     }
     
     char data[2];
-    memset( data, 0, 2 );
-    fin.read( data, 2 );
+    memset(data, 0, 2);
+    fin.read(data, 2);
     fin.close();
     
     if (memcmp(data, UTF_16_LE_BOM, 2) == 0) return true;
@@ -225,7 +225,7 @@ bool Toolkit::IsUTF16( const std::string &filename )
     return false;
 }
     
-bool Toolkit::LoadUTF16File( const std::string &filename )
+bool Toolkit::LoadUTF16File(const std::string &filename)
 {
     /// Loading a UTF-16 file with basic conversion ot UTF-8
     /// This is called after checking if the file has a UTF-16 BOM
@@ -255,66 +255,66 @@ bool Toolkit::LoadUTF16File( const std::string &filename )
     std::string utf8line;
     utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
     
-    return LoadString( utf8line );
+    return LoadString(utf8line);
 }
 
-bool Toolkit::LoadString( const std::string &data )
+bool Toolkit::LoadString(const std::string &data)
 {
     FileInputStream *input = NULL;
     if (m_format == PAE) {
-        input = new PaeInput( &m_doc, "" );
+        input = new PaeInput(&m_doc, "");
     } else if (m_format == DARMS) {
-        input = new DarmsInput( &m_doc, "" );
+        input = new DarmsInput(&m_doc, "");
     } else if (m_format == MEI) {
-        input = new MeiInput( &m_doc, "" );
+        input = new MeiInput(&m_doc, "");
     }
     else if (m_format == MUSICXML) {
-        input = new MusicXmlInput( &m_doc, "" );
+        input = new MusicXmlInput(&m_doc, "");
     }
     else {
-        LogError( "Unknown format" );
+        LogError("Unknown format");
         return false;
     }
     
     // something went wrong
-    if ( !input ) {
-        LogError( "Unknown error" );
+    if (!input) {
+        LogError("Unknown error");
         return false;
     }
     
     // ignore layout?
-    if ( m_ignoreLayout || m_noLayout ) {
+    if (m_ignoreLayout || m_noLayout) {
         input->IgnoreLayoutInformation();
     }
     
     // rdg xpath query?
-    if ( m_appXPathQuery.length() > 0 ) {
-        input->SetAppXPathQuery( m_appXPathQuery );
+    if (m_appXPathQuery.length() > 0) {
+        input->SetAppXPathQuery(m_appXPathQuery);
     }
     
     // load the file
-    if ( !input->ImportString( data )) {
-        LogError( "Error importing data" );
+    if (!input->ImportString(data)) {
+        LogError("Error importing data");
         delete input;
         return false;
     }
     
-    m_doc.SetPageHeight( this->GetPageHeight() );
-    m_doc.SetPageWidth( this->GetPageWidth() );
-    m_doc.SetPageRightMar( this->GetBorder() );
-    m_doc.SetPageLeftMar( this->GetBorder() );
-    m_doc.SetPageTopMar( this->GetBorder() );
-    m_doc.SetSpacingLinear( this->GetSpacingLinear() );
-    m_doc.SetSpacingNonLinear( this->GetSpacingNonLinear() );
-    m_doc.SetSpacingStaff( this->GetSpacingStaff() );
-    m_doc.SetSpacingSystem( this->GetSpacingSystem() );
-    m_doc.SetEvenSpacing( this->GetEvenNoteSpacing() );
+    m_doc.SetPageHeight(this->GetPageHeight());
+    m_doc.SetPageWidth(this->GetPageWidth());
+    m_doc.SetPageRightMar(this->GetBorder());
+    m_doc.SetPageLeftMar(this->GetBorder());
+    m_doc.SetPageTopMar(this->GetBorder());
+    m_doc.SetSpacingLinear(this->GetSpacingLinear());
+    m_doc.SetSpacingNonLinear(this->GetSpacingNonLinear());
+    m_doc.SetSpacingStaff(this->GetSpacingStaff());
+    m_doc.SetSpacingSystem(this->GetSpacingSystem());
+    m_doc.SetEvenSpacing(this->GetEvenNoteSpacing());
     
     m_doc.PrepareDrawing();
     
     if (input->HasMeasureWithinEditoMarkup() && !m_noLayout) {
-        LogWarning( "Only continous layout is possible with <measure> within editorial markup, switching to --no-layout" );
-        this->SetNoLayout( true );
+        LogWarning("Only continous layout is possible with <measure> within editorial markup, switching to --no-layout");
+        this->SetNoLayout(true);
     }
     
     // Do the layout? this depends on the options and the file. PAE and
@@ -333,77 +333,77 @@ bool Toolkit::LoadString( const std::string &data )
     }
     
     delete input;
-    m_view.SetDoc( &m_doc );
+    m_view.SetDoc(&m_doc);
     
     return true;
 }
 
 
-std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
+std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 {
     // Page number is one-based - correct to 0-based first
     pageNo--;
     
-    MeiOutput meioutput( &m_doc, "" );
-    meioutput.SetScoreBasedMEI( scoreBased );
-    return meioutput.GetOutput( pageNo );
+    MeiOutput meioutput(&m_doc, "");
+    meioutput.SetScoreBasedMEI(scoreBased);
+    return meioutput.GetOutput(pageNo);
 }
 
 
-bool Toolkit::SaveFile( const std::string &filename )
+bool Toolkit::SaveFile(const std::string &filename)
 {
-    MeiOutput meioutput( &m_doc, filename.c_str());
-    meioutput.SetScoreBasedMEI( m_scoreBasedMei );
+    MeiOutput meioutput(&m_doc, filename.c_str());
+    meioutput.SetScoreBasedMEI(m_scoreBasedMei);
     if (!meioutput.ExportFile()) {
-        LogError( "Unknown error" );
+        LogError("Unknown error");
         return false;
     }
     return true;
 }
 
-bool Toolkit::ParseOptions( const std::string &json_options ) {
+bool Toolkit::ParseOptions(const std::string &json_options) {
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
     
     // Read JSON options
     if (!json.parse(json_options)) {
-        LogError( "Can not parse JSON string." );
+        LogError("Can not parse JSON string.");
         return false;
     }
     
     if (json.has<jsonxx::String>("inputFormat"))
-        SetFormat( json.get<jsonxx::String>("inputFormat") );
+        SetFormat(json.get<jsonxx::String>("inputFormat"));
     
     if (json.has<jsonxx::Number>("scale"))
-        SetScale( json.get<jsonxx::Number>("scale") );
+        SetScale(json.get<jsonxx::Number>("scale"));
     
     if (json.has<jsonxx::Number>("border"))
-        SetBorder( json.get<jsonxx::Number>("border") );
+        SetBorder(json.get<jsonxx::Number>("border"));
     
     if (json.has<jsonxx::String>("font"))
         SetFont(json.get<jsonxx::String>("font"));
     
     if (json.has<jsonxx::Number>("pageWidth"))
-        SetPageWidth( json.get<jsonxx::Number>("pageWidth") );
+        SetPageWidth(json.get<jsonxx::Number>("pageWidth"));
     
     if (json.has<jsonxx::Number>("pageHeight"))
-        SetPageHeight( json.get<jsonxx::Number>("pageHeight") );
+        SetPageHeight(json.get<jsonxx::Number>("pageHeight"));
     
     if (json.has<jsonxx::Number>("spacingLinear"))
-        SetSpacingLinear( json.get<jsonxx::Number>("spacingLinear" ) );
+        SetSpacingLinear(json.get<jsonxx::Number>("spacingLinear"));
     
     if (json.has<jsonxx::Number>("spacingNonLinear"))
-        SetSpacingNonLinear( json.get<jsonxx::Number>("spacingNonLinear") );
+        SetSpacingNonLinear(json.get<jsonxx::Number>("spacingNonLinear"));
     
     if (json.has<jsonxx::Number>("spacingStaff"))
-        SetSpacingStaff( json.get<jsonxx::Number>("spacingStaff") );
+        SetSpacingStaff(json.get<jsonxx::Number>("spacingStaff"));
 
     if (json.has<jsonxx::Number>("spacingSystem"))
-        SetSpacingSystem( json.get<jsonxx::Number>("spacingSystem") );
+        SetSpacingSystem(json.get<jsonxx::Number>("spacingSystem"));
     
     if (json.has<jsonxx::String>("appXPathQuery"))
-        SetAppXPathQuery( json.get<jsonxx::String>("appXPathQuery") );
+        SetAppXPathQuery(json.get<jsonxx::String>("appXPathQuery"));
     
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten
@@ -433,15 +433,15 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
 }
     
     
-std::string Toolkit::GetElementAttr( const std::string &xmlId )
+std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
 #ifdef USE_EMSCRIPTEN
     jsonxx::Object o;
     
-    if ( !m_doc.GetDrawingPage() ) return o.json();
+    if (!m_doc.GetDrawingPage()) return o.json();
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
     if (!element) {
-        LogMessage("Element with id '%s' could not be found", xmlId.c_str() );
+        LogMessage("Element with id '%s' could not be found", xmlId.c_str());
         return o.json();
     }
     
@@ -453,7 +453,7 @@ std::string Toolkit::GetElementAttr( const std::string &xmlId )
     ArrayOfStrAttr::iterator iter;
     for (iter = attributes.begin(); iter != attributes.end(); iter++) {
         o << (*iter).first << (*iter).second;
-        //LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str() );
+        //LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
     }
     return o.json();
     
@@ -463,43 +463,43 @@ std::string Toolkit::GetElementAttr( const std::string &xmlId )
 #endif
 }
 
-bool Toolkit::Edit( const std::string &json_editorAction ) {
+bool Toolkit::Edit(const std::string &json_editorAction) {
 #ifdef USE_EMSCRIPTEN
     
     jsonxx::Object json;
     
     // Read JSON actions
     if (!json.parse(json_editorAction)) {
-        LogError( "Can not parse JSON string." );
+        LogError("Can not parse JSON string.");
         return false;
     }
     
     if (json.has<jsonxx::String>("action") && json.has<jsonxx::Object>("param")) {
-        if ( json.get<jsonxx::String>("action") == "drag" ) {
+        if (json.get<jsonxx::String>("action") == "drag") {
             std::string elementId;
             int x, y;
-            if (this->ParseDragAction( json.get<jsonxx::Object>("param"), &elementId, &x, &y )) {
-                return this->Drag( elementId, x, y );
+            if (this->ParseDragAction(json.get<jsonxx::Object>("param"), &elementId, &x, &y)) {
+                return this->Drag(elementId, x, y);
             }
         }
-        else if ( json.get<jsonxx::String>("action") == "insert" ) {
+        else if (json.get<jsonxx::String>("action") == "insert") {
             LogMessage("insert...");
             std::string elementType, startid, endid;
-            if (this->ParseInsertAction( json.get<jsonxx::Object>("param"), &elementType, &startid, &endid )) {
-                return this->Insert( elementType, startid, endid );
+            if (this->ParseInsertAction(json.get<jsonxx::Object>("param"), &elementType, &startid, &endid)) {
+                return this->Insert(elementType, startid, endid);
             }
             else {
-                LogMessage("Insert!!!! %s %s %s", elementType.c_str(), startid.c_str(), endid.c_str() );
+                LogMessage("Insert!!!! %s %s %s", elementType.c_str(), startid.c_str(), endid.c_str());
             }
         }
-        else if ( json.get<jsonxx::String>("action") == "set" ) {
+        else if (json.get<jsonxx::String>("action") == "set") {
             std::string elementId, attrType, attrValue;
-            if (this->ParseSetAction( json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue )) {
-                return this->Set( elementId, attrType, attrValue );
+            if (this->ParseSetAction(json.get<jsonxx::Object>("param"), &elementId, &attrType, &attrValue)) {
+                return this->Set(elementId, attrType, attrValue);
             }
         }
     }
-    LogError( "Does not understand action." );
+    LogError("Does not understand action.");
     return false;
     
 #else
@@ -534,28 +534,28 @@ void  Toolkit::ResetLogBuffer() {
 #endif
 }
 
-std::string Toolkit::RenderToSvg( int pageNo, bool xml_declaration )
+std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 {
     // Page number is one-based - correction to 0-based first
     pageNo--;
     
     // Get the current system for the SVG clipping size
-    m_view.SetPage( pageNo );
+    m_view.SetPage(pageNo);
     
     // Adjusting page width and height according to the options
     int width = m_pageWidth;
-    if ( m_noLayout ) {
+    if (m_noLayout) {
         width = m_doc.GetAdjustedDrawingPageWidth();
     }
     
     int height = m_pageHeight;
-    if ( m_adjustPageHeight || m_noLayout ) {
+    if (m_adjustPageHeight || m_noLayout) {
         height = m_doc.GetAdjustedDrawingPageHeight();
     }
     
     // Create the SVG object, h & w come from the system
     // We will need to set the size of the page after having drawn it depending on the options
-    SvgDeviceContext svg( width, height );
+    SvgDeviceContext svg(width, height);
     
     // set scale and border from user options
     svg.SetUserScale((double)m_scale / 100, (double)m_scale / 100);
@@ -564,34 +564,34 @@ std::string Toolkit::RenderToSvg( int pageNo, bool xml_declaration )
     svg.SetDrawBoundingBoxes(m_showBoundingBoxes);
     
     // render the page
-    m_view.DrawCurrentPage( &svg, false );
+    m_view.DrawCurrentPage(&svg, false);
     
-    std::string out_str = svg.GetStringSVG( xml_declaration );
+    std::string out_str = svg.GetStringSVG(xml_declaration);
     return out_str;
 }
 
 void Toolkit::RedoLayout()
 {
-    m_doc.SetPageHeight( this->GetPageHeight() );
-    m_doc.SetPageWidth( this->GetPageWidth() );
-    m_doc.SetPageRightMar( this->GetBorder() );
-    m_doc.SetPageLeftMar( this->GetBorder() );
-    m_doc.SetPageTopMar( this->GetBorder() );
-    m_doc.SetSpacingStaff( this->GetSpacingStaff() );
-    m_doc.SetSpacingSystem( this->GetSpacingSystem() );
+    m_doc.SetPageHeight(this->GetPageHeight());
+    m_doc.SetPageWidth(this->GetPageWidth());
+    m_doc.SetPageRightMar(this->GetBorder());
+    m_doc.SetPageLeftMar(this->GetBorder());
+    m_doc.SetPageTopMar(this->GetBorder());
+    m_doc.SetSpacingStaff(this->GetSpacingStaff());
+    m_doc.SetSpacingSystem(this->GetSpacingSystem());
     
     m_doc.UnCastOff();
     m_doc.CastOff();
 }
 
-bool Toolkit::RenderToSvgFile( const std::string &filename, int pageNo )
+bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 {
-    std::string output = RenderToSvg( pageNo, true );
+    std::string output = RenderToSvg(pageNo, true);
     
     std::ofstream outfile;
-    outfile.open ( filename.c_str() );
+    outfile.open (filename.c_str());
     
-    if ( !outfile.is_open() ) {
+    if (!outfile.is_open()) {
         // add message?
         return false;
     }
@@ -606,20 +606,20 @@ int Toolkit::GetPageCount() {
     return m_doc.GetPageCount();
 }
 
-int Toolkit::GetPageWithElement( const std::string &xmlId )
+int Toolkit::GetPageWithElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
     if (!element) {
         return 0;
     }
-    Page *page = dynamic_cast<Page*>( element->GetFirstParent( PAGE ) );
+    Page *page = dynamic_cast<Page*>(element->GetFirstParent(PAGE));
     if (!page) {
         return 0;
     }
     return page->GetIdx() + 1;
 }
 
-void Toolkit::SetCString( const std::string &data )
+void Toolkit::SetCString(const std::string &data)
 {
     if (m_cString) {
         free(m_cString);
@@ -635,7 +635,7 @@ void Toolkit::SetCString( const std::string &data )
     strcpy(m_cString, data.c_str());
 }
 
-const char *Toolkit::GetCString( )
+const char *Toolkit::GetCString()
 {
     if (m_cString) {
         return m_cString;
@@ -645,17 +645,17 @@ const char *Toolkit::GetCString( )
     }
 }
     
-bool Toolkit::Drag( std::string elementId, int x, int y )
+bool Toolkit::Drag(std::string elementId, int x, int y)
 {
-    if ( !m_doc.GetDrawingPage() ) return false;
+    if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if ( element->Is() == NOTE ) {
+    if (element->Is() == NOTE) {
         Note *note = dynamic_cast<Note*>(element);
-        assert( note );
-        Layer *layer = dynamic_cast<Layer*>( note->GetFirstParent( LAYER ) );
-        if ( !layer ) return false;
+        assert(note);
+        Layer *layer = dynamic_cast<Layer*>(note->GetFirstParent(LAYER));
+        if (!layer) return false;
         int oct;
-        data_PITCHNAME pname = (data_PITCHNAME)m_view.CalculatePitchCode( layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct  );
+        data_PITCHNAME pname = (data_PITCHNAME)m_view.CalculatePitchCode(layer, m_view.ToLogicalY(y), note->GetDrawingX(), &oct );
         note->SetPname(pname);
         note->SetOct(oct);
         return true;
@@ -663,33 +663,33 @@ bool Toolkit::Drag( std::string elementId, int x, int y )
     return false;
 }
     
-bool Toolkit::Insert( std::string elementType, std::string startid, std::string endid )
+bool Toolkit::Insert(std::string elementType, std::string startid, std::string endid)
 {
     LogMessage("Insert!");
-    if ( !m_doc.GetDrawingPage() ) return false;
+    if (!m_doc.GetDrawingPage()) return false;
     Object *start = m_doc.GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc.GetDrawingPage()->FindChildByUuid(endid);
     // Check that start and end element exists
-    if ( !start || !end ) {
-        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str() );
+    if (!start || !end) {
+        LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
         return false;
     }
     // Check that it is a LayerElement
-    if ( !dynamic_cast<LayerElement*>(start) ) {
-        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str() );
+    if (!dynamic_cast<LayerElement*>(start)) {
+        LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
-    if ( !dynamic_cast<LayerElement*>(end) ) {
-        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str() );
+    if (!dynamic_cast<LayerElement*>(end)) {
+        LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
         return false;
     }
     
-    Measure *measure = dynamic_cast<Measure*>(start->GetFirstParent( MEASURE ) );
-    assert( measure );
-    if (elementType == "slur" ) {
+    Measure *measure = dynamic_cast<Measure*>(start->GetFirstParent(MEASURE));
+    assert(measure);
+    if (elementType == "slur") {
         Slur *slur = new Slur();
-        slur->SetStartid( startid );
-        slur->SetEndid( endid );
+        slur->SetStartid(startid);
+        slur->SetEndid(endid);
         measure->AddFloatingElement(slur);
         m_doc.PrepareDrawing();
         return true;
@@ -697,20 +697,20 @@ bool Toolkit::Insert( std::string elementType, std::string startid, std::string 
     return false;
 }
 
-bool Toolkit::Set( std::string elementId, std::string attrType, std::string attrValue )
+bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrValue)
 {
-    if ( !m_doc.GetDrawingPage() ) return false;
+    if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if ( Att::SetCmn(element, attrType, attrValue )) return true;
-    if ( Att::SetCritapp(element, attrType, attrValue )) return true;
-    if ( Att::SetMensural(element, attrType, attrValue )) return true;
-    if ( Att::SetPagebased(element, attrType, attrValue )) return true;
-    if ( Att::SetShared(element, attrType, attrValue )) return true;
+    if (Att::SetCmn(element, attrType, attrValue)) return true;
+    if (Att::SetCritapp(element, attrType, attrValue)) return true;
+    if (Att::SetMensural(element, attrType, attrValue)) return true;
+    if (Att::SetPagebased(element, attrType, attrValue)) return true;
+    if (Att::SetShared(element, attrType, attrValue)) return true;
     return false;
 }
     
 #ifdef USE_EMSCRIPTEN
-bool Toolkit::ParseDragAction( jsonxx::Object param, std::string *elementId, int *x, int *y )
+bool Toolkit::ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");
@@ -721,7 +721,7 @@ bool Toolkit::ParseDragAction( jsonxx::Object param, std::string *elementId, int
     return true;
 }
     
-bool Toolkit::ParseInsertAction( jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid )
+bool Toolkit::ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid)
 {
     if (!param.has<jsonxx::String>("elementType")) return false;
     (*elementType) = param.get<jsonxx::String>("elementType");
@@ -732,7 +732,7 @@ bool Toolkit::ParseInsertAction( jsonxx::Object param, std::string *elementType,
     return true;
 }
     
-bool Toolkit::ParseSetAction( jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue )
+bool Toolkit::ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue)
 {
     if (!param.has<jsonxx::String>("elementId")) return false;
     (*elementId) = param.get<jsonxx::String>("elementId");

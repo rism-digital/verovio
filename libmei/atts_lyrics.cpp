@@ -43,7 +43,7 @@ void AttVerseLog::ResetVerseLog() {
     m_rhythm = "";
 }
 
-bool AttVerseLog::ReadVerseLog( pugi::xml_node element ) {
+bool AttVerseLog::ReadVerseLog(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("refrain")) {
         this->SetRefrain(StrToBoolean(element.attribute("refrain").value()));
@@ -58,7 +58,7 @@ bool AttVerseLog::ReadVerseLog( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttVerseLog::WriteVerseLog( pugi::xml_node element ) {
+bool AttVerseLog::WriteVerseLog(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasRefrain()) {
         element.append_attribute("refrain") = BooleanToStr(this->GetRefrain()).c_str();
@@ -71,12 +71,12 @@ bool AttVerseLog::WriteVerseLog( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttVerseLog::HasRefrain( )
+bool AttVerseLog::HasRefrain()
 {
     return (m_refrain != BOOLEAN_NONE);
 }
 
-bool AttVerseLog::HasRhythm( )
+bool AttVerseLog::HasRhythm()
 {
     return (m_rhythm != "");
 }
@@ -84,10 +84,10 @@ bool AttVerseLog::HasRhythm( )
 
 /* include <attrhythm> */
 
-bool Att::SetLyrics( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_VERSELOG ) ) {
+bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_VERSELOG)) {
         AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "refrain") {
             att->SetRefrain(att->StrToBoolean(attrValue));
             return true;
@@ -101,10 +101,10 @@ bool Att::SetLyrics( Object *element, std::string attrType, std::string attrValu
     return false;
 }
 
-void Att::GetLyrics( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_VERSELOG ) ) {
+void Att::GetLyrics(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_VERSELOG)) {
         AttVerseLog *att = dynamic_cast<AttVerseLog*>(element);
-        assert( att );
+        assert(att);
         if (att->HasRefrain()) {
             attributes->push_back(std::make_pair("refrain", att->BooleanToStr(att->GetRefrain())));
         }

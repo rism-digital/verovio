@@ -35,8 +35,8 @@ Note::Note():
     AttStemsCmn(),
     AttTiepresent()
 {
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
-    RegisterInterface( PitchInterface::GetAttClasses(), PitchInterface::IsInterface() );
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
@@ -96,61 +96,61 @@ void Note::AddLayerElement(vrv::LayerElement *element)
 {
     assert(dynamic_cast<Accid*>(element)
         || dynamic_cast<Verse*>(element)
-        || dynamic_cast<EditorialElement*>(element) );
-    element->SetParent( this );
+        || dynamic_cast<EditorialElement*>(element));
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
 
-Alignment* Note::GetGraceAlignment(  )
+Alignment* Note::GetGraceAlignment()
 {
     assert(m_graceAlignment);
     return m_graceAlignment;
 }
 
-void Note::SetGraceAlignment( Alignment *graceAlignment )
+void Note::SetGraceAlignment(Alignment *graceAlignment)
 {
     assert(!m_graceAlignment && graceAlignment);
     m_graceAlignment = graceAlignment;
 }
     
-void Note::SetDrawingTieAttr(  )
+void Note::SetDrawingTieAttr()
 {
     assert(!this->m_drawingTieAttr);
-    if ( m_drawingTieAttr ) return;
+    if (m_drawingTieAttr) return;
     m_drawingTieAttr = new Tie();
-    m_drawingTieAttr->SetStart( this );
+    m_drawingTieAttr->SetStart(this);
 }
 
-void Note::ResetDrawingTieAttr( )
+void Note::ResetDrawingTieAttr()
 {
-    if ( m_drawingTieAttr ) {
+    if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
         m_drawingTieAttr = NULL;
     }
 }
   
-void Note::ResetDrawingAccid( )
+void Note::ResetDrawingAccid()
 {
-    if ( m_drawingAccid ) {
+    if (m_drawingAccid) {
         // We delete it only if it is an attribute - otherwise we do not own it
         if (m_isDrawingAccidAttr) delete m_drawingAccid;
         m_drawingAccid = NULL;
         m_isDrawingAccidAttr = false;
     }
     // we should never have no m_drawingAccid but have the attr flag to true
-    assert( !m_isDrawingAccidAttr );
+    assert(!m_isDrawingAccidAttr);
 }
     
 Chord* Note::IsChordTone()
 {
-    return dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH) );
+    return dynamic_cast<Chord*>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
 }
     
-int Note::GetDrawingDur( )
+int Note::GetDrawingDur()
 {
-    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent( CHORD, MAX_CHORD_DEPTH));
-    if( chordParent ) {
+    Chord* chordParent = dynamic_cast<Chord*>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    if(chordParent) {
         return chordParent->GetActualDur();
     }
     else {
@@ -170,7 +170,7 @@ bool Note::IsClusterExtreme()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::PrepareTieAttr( ArrayPtrVoid *params )
+int Note::PrepareTieAttr(ArrayPtrVoid *params)
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties
     // param 1: Chord** currentChord for the current chord if in a chord
@@ -185,19 +185,19 @@ int Note::PrepareTieAttr( ArrayPtrVoid *params )
     assert(check);
     
     std::vector<Note*>::iterator iter = currentNotes->begin();
-    while ( iter != currentNotes->end()) {
+    while (iter != currentNotes->end()) {
         // same octave and same pitch - this is the one!
         if ((this->GetOct()==(*iter)->GetOct()) && (this->GetPname()==(*iter)->GetPname())) {
             // right flag
             if ((check->GetTie()==TIE_m) || (check->GetTie()==TIE_t)) {
-                assert( (*iter)->GetDrawingTieAttr() );
+                assert((*iter)->GetDrawingTieAttr());
                 (*iter)->GetDrawingTieAttr()->SetEnd(this);
             }
             else {
                 LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
                 (*iter)->ResetDrawingTieAttr();
             }
-            iter = currentNotes->erase( iter );
+            iter = currentNotes->erase(iter);
             // we are done for this note
             break;
         }
@@ -213,7 +213,7 @@ int Note::PrepareTieAttr( ArrayPtrVoid *params )
 }
     
 
-int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
+int Note::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
     if (this->m_drawingTieAttr) {
@@ -222,7 +222,7 @@ int Note::FillStaffCurrentTimeSpanning( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::PrepareLyrics( ArrayPtrVoid *params )
+int Note::PrepareLyrics(ArrayPtrVoid *params)
 {
     // param 0: the current Syl (unused)
     // param 1: the last Note
@@ -236,7 +236,7 @@ int Note::PrepareLyrics( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::PreparePointersByLayer( ArrayPtrVoid *params )
+int Note::PreparePointersByLayer(ArrayPtrVoid *params)
 {
     // param 0: the current Note
     Note **currentNote = static_cast<Note**>((*params).at(0));
@@ -258,7 +258,7 @@ int Note::PreparePointersByLayer( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Note::ResetDrawing( ArrayPtrVoid *params )
+int Note::ResetDrawing(ArrayPtrVoid *params)
 {
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;

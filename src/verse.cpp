@@ -47,8 +47,8 @@ void Verse::Reset()
 
 void Verse::AddLayerElement(vrv::LayerElement *element)
 {
-    assert( dynamic_cast<Syl*>(element) || dynamic_cast<EditorialElement*>(element) );
-    element->SetParent( this );
+    assert(dynamic_cast<Syl*>(element) || dynamic_cast<EditorialElement*>(element));
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
@@ -57,7 +57,7 @@ void Verse::AddLayerElement(vrv::LayerElement *element)
 // Verse functor methods
 //----------------------------------------------------------------------------
 
-int Verse::AlignVertically( ArrayPtrVoid *params )
+int Verse::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
     // param 1: the staffNb
@@ -68,9 +68,9 @@ int Verse::AlignVertically( ArrayPtrVoid *params )
     this->ResetVerticalAlignment();
     
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment( *staffNb );
+    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
     
-    assert( alignment );
+    assert(alignment);
     
     // Add the number count
     alignment->SetVerseCount(this->GetN());
@@ -78,7 +78,7 @@ int Verse::AlignVertically( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int Verse::PrepareProcessingLists( ArrayPtrVoid *params )
+int Verse::PrepareProcessingLists(ArrayPtrVoid *params)
 {
     // param 0: the IntTree* for staff/layer/verse
     // param 1: the IntTree* for staff/layer (unused)
@@ -86,9 +86,9 @@ int Verse::PrepareProcessingLists( ArrayPtrVoid *params )
     // Alternate solution with StaffN_LayerN_VerseN_t
     //StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
     
-    Staff *staff = dynamic_cast<Staff*>( this->GetFirstParent( STAFF ) );
-    Layer *layer = dynamic_cast<Layer*>( this->GetFirstParent( LAYER ) );
-    assert( staff && layer );
+    Staff *staff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    Layer *layer = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+    assert(staff && layer);
     
     tree->child[ staff->GetN() ].child[ layer->GetN() ].child[ this->GetN() ];
     // Alternate solution with StaffN_LayerN_VerseN_t

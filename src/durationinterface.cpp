@@ -64,7 +64,7 @@ void DurationInterface::Reset()
     ResetStaffident();
 }
 
-double DurationInterface::GetAlignmentDuration( int num, int numbase )
+double DurationInterface::GetAlignmentDuration(int num, int numbase)
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
     
@@ -72,19 +72,19 @@ double DurationInterface::GetAlignmentDuration( int num, int numbase )
     if (this->HasNumbase()) numbase *=this->GetNumbase();
     
     double duration = DUR_MAX / pow (2.0, (double)(note_dur - 2.0)) * numbase / num;
-    if ( GetDots() > 0 ) {
+    if (GetDots() > 0) {
         duration = 2 * duration - (duration / pow(2, GetDots()));
     }
-    //LogDebug("Duration %d; Dot %d; Alignement %f", note_dur, GetDots(), duration );
+    //LogDebug("Duration %d; Dot %d; Alignement %f", note_dur, GetDots(), duration);
     return duration;
 }
     
-double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur )
+double DurationInterface::GetAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
     
     if (!currentMensur) {
-        LogWarning("No current mensur for calculating duration" );
+        LogWarning("No current mensur for calculating duration");
         return DUR_MENSURAL_REF;
     }
     
@@ -106,33 +106,33 @@ double DurationInterface::GetAlignmentMensuralDuration( int num, int numbase, Me
             break;
     }
     duration *= (double)numbase / (double)num;
-    //LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio );
+    //LogDebug("Duration %d; %d/%d; Alignement %f; Ratio %f", note_dur, num, numbase, duration, ratio);
     return duration;
 }
 
-bool DurationInterface::IsFirstInBeam( LayerElement *noteOrRest )
+bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( BEAM, MAX_BEAM_DEPTH ) );
-    if ( !beam ) {
+    Beam *beam = dynamic_cast<Beam*>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    if (!beam) {
         return false;
     }
-    ListOfObjects *notesOrRests = beam->GetList( beam );
+    ListOfObjects *notesOrRests = beam->GetList(beam);
     ListOfObjects::iterator iter = notesOrRests->begin();
-    if ( *iter == noteOrRest ) {
+    if (*iter == noteOrRest) {
         return true;
     }
     return false;    
 }
 
-bool DurationInterface::IsLastInBeam( LayerElement *noteOrRest )
+bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam*>( noteOrRest->GetFirstParent( BEAM, MAX_BEAM_DEPTH ) );
-    if ( !beam ) {
+    Beam *beam = dynamic_cast<Beam*>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    if (!beam) {
         return false;
     }
-    ListOfObjects *notesOrRests = beam->GetList( beam );
+    ListOfObjects *notesOrRests = beam->GetList(beam);
     ListOfObjects::reverse_iterator iter = notesOrRests->rbegin();
-    if ( *iter == noteOrRest ) {
+    if (*iter == noteOrRest) {
         return true;
     }
     return false;    
@@ -153,14 +153,14 @@ bool DurationInterface::IsMensural()
     return (this->GetDur() > DUR_MENSURAL_MASK);
 }
 
-bool DurationInterface::HasIdenticalDurationInterface( DurationInterface *otherDurationInterface )
+bool DurationInterface::HasIdenticalDurationInterface(DurationInterface *otherDurationInterface)
 {
     // This should never happen because it is fully implemented
-    LogError( "DurationInterface::HasIdenticalDurationInterface missing" );
-    assert( false );
+    LogError("DurationInterface::HasIdenticalDurationInterface missing");
+    assert(false);
     return false;
     /*
-    if ( !otherDurationInterface ) {
+    if (!otherDurationInterface) {
         return false;
     }
     */

@@ -39,10 +39,10 @@ public:
     void ResetVerseLog();
     
     /** Read the values for the attribute class **/
-    bool ReadVerseLog( pugi::xml_node element );
+    bool ReadVerseLog(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteVerseLog( pugi::xml_node element );
+    bool WriteVerseLog(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,12 +52,12 @@ public:
     ///@{
     void SetRefrain(data_BOOLEAN refrain_) { m_refrain = refrain_; };
     data_BOOLEAN GetRefrain() const { return m_refrain; };    
-    bool HasRefrain( );
+    bool HasRefrain();
     
     //
     void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; };
     std::string GetRhythm() const { return m_rhythm; };    
-    bool HasRhythm( );
+    bool HasRhythm();
     
     ///@}
 

@@ -60,7 +60,7 @@ public:
     Note();
     virtual ~Note();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Note"; };
+    virtual std::string GetClassName() { return "Note"; };
     virtual ClassId Is() { return NOTE; };
     ///@}
     
@@ -77,10 +77,10 @@ public:
      * @name Setter and getter for tie attribute and other pointers
      */
     ///@{
-    void ResetDrawingAccid( );
-    void ResetDrawingTieAttr( );
-    void SetDrawingTieAttr( );
-    Tie *GetDrawingTieAttr( ) { return m_drawingTieAttr; };
+    void ResetDrawingAccid();
+    void ResetDrawingTieAttr();
+    void SetDrawingTieAttr();
+    Tie *GetDrawingTieAttr() { return m_drawingTieAttr; };
     ///@}
     
     /**
@@ -88,24 +88,24 @@ public:
      */
     ///@{
     Alignment *GetGraceAlignment();
-    void SetGraceAlignment( Alignment *graceAlignment );
-    bool HasGraceAlignment( ) { return (m_graceAlignment != NULL); };
-    void ResetGraceAlignment( ) { m_graceAlignment = NULL; };
+    void SetGraceAlignment(Alignment *graceAlignment);
+    bool HasGraceAlignment() { return (m_graceAlignment != NULL); };
+    void ResetGraceAlignment() { m_graceAlignment = NULL; };
     ///@}
     
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord* IsChordTone( );
-    int GetDrawingDur( );
-    bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
+    Chord* IsChordTone();
+    int GetDrawingDur();
+    bool IsClusterExtreme(); //used to find if is the highest or lowest note in a cluster
     ///@}
 
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch( ) { return this->GetPname() + (int)this->GetOct() * 7; };
+    int GetDiatonicPitch() { return this->GetPname() + (int)this->GetOct() * 7; };
     
     //----------//
     // Functors //
@@ -114,27 +114,27 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid *params );
+    virtual int PrepareTieAttr(ArrayPtrVoid *params);
     
     /**
      * Functor for setting wordpos and connector ends
      * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareLyrics( ArrayPtrVoid *params );
+    virtual int PrepareLyrics(ArrayPtrVoid *params);
  
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
+    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
     
     /**
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
+    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
     
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing( ArrayPtrVoid *params );
+    virtual int ResetDrawing(ArrayPtrVoid *params);
     
 private:
     

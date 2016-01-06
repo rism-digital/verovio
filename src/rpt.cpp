@@ -26,7 +26,7 @@ namespace vrv {
 // BeatRpt
 //----------------------------------------------------------------------------
 
-BeatRpt::BeatRpt( ):
+BeatRpt::BeatRpt():
     LayerElement("beatrpt-"),
     AttBeatRptVis()
 {
@@ -44,7 +44,7 @@ void BeatRpt::Reset()
     ResetBeatRptVis();
 }
     
-double BeatRpt::GetAlignmentDuration( int meterUnit )
+double BeatRpt::GetAlignmentDuration(int meterUnit)
 {
     return  DUR_MAX / meterUnit;
 }
@@ -53,7 +53,7 @@ double BeatRpt::GetAlignmentDuration( int meterUnit )
 // BTrem
 //----------------------------------------------------------------------------
 
-BTrem::BTrem( ):
+BTrem::BTrem():
 LayerElement("btrem-")
 {
     Reset();
@@ -72,8 +72,8 @@ void BTrem::AddLayerElement(LayerElement *element)
 {
     assert(dynamic_cast<Note*>(element)
            || dynamic_cast<Chord*>(element)
-           || dynamic_cast<EditorialElement*>(element) );
-    element->SetParent( this );
+           || dynamic_cast<EditorialElement*>(element));
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
@@ -82,7 +82,7 @@ void BTrem::AddLayerElement(LayerElement *element)
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem( ):
+FTrem::FTrem():
     LayerElement("ftrem-"), ObjectListInterface(),
     AttSlashcount()
 {
@@ -105,20 +105,20 @@ void FTrem::AddLayerElement(LayerElement *element)
 {
     assert(dynamic_cast<Note*>(element)
            || dynamic_cast<Chord*>(element)
-           || dynamic_cast<EditorialElement*>(element) );
-    element->SetParent( this );
+           || dynamic_cast<EditorialElement*>(element));
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
 
-void FTrem::FilterList( ListOfObjects *childList )
+void FTrem::FilterList(ListOfObjects *childList)
 {
     ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != childList->end()) {
-        if ( ((*iter)->Is() != NOTE) && ((*iter)->Is() != CHORD) ) {
+    while (iter != childList->end()) {
+        if (((*iter)->Is() != NOTE) && ((*iter)->Is() != CHORD)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
-            iter = childList->erase( iter );
+            iter = childList->erase(iter);
             continue;
         }
         iter++;
@@ -130,7 +130,7 @@ void FTrem::FilterList( ListOfObjects *childList )
 // MRpt
 //----------------------------------------------------------------------------
 
-MRpt::MRpt( ):
+MRpt::MRpt():
     LayerElement("mrpt-")
 {
     Reset();
@@ -151,7 +151,7 @@ void MRpt::Reset()
 // MRpt2
 //----------------------------------------------------------------------------
 
-MRpt2::MRpt2( ):
+MRpt2::MRpt2():
     LayerElement("mrpt2-")
 {
     Reset();
@@ -170,7 +170,7 @@ void MRpt2::Reset()
 // MultiRpt
 //----------------------------------------------------------------------------
 
-MultiRpt::MultiRpt( ):
+MultiRpt::MultiRpt():
     LayerElement("multirpt-"),
     AttNumbered()
 {
@@ -192,7 +192,7 @@ void MultiRpt::Reset()
 // MRpt functor methods
 //----------------------------------------------------------------------------
 
-int MRpt::PrepareRpt( ArrayPtrVoid *params )
+int MRpt::PrepareRpt(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the current MRpt pointer
     // param 1: a pointer to the data_BOOLEAN indicating if multiNumber

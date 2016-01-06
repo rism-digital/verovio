@@ -41,12 +41,12 @@ public:
     virtual ~Doc();
     virtual ClassId Is() { return DOC; }
 	
-	void AddPage( Page *page );
+	void AddPage(Page *page);
     
     /*
      * Clear the content of the document.
      */ 
-    void Reset( DocType type );
+    void Reset(DocType type);
     
     /**
      * Refreshes the views from Doc.
@@ -62,52 +62,52 @@ public:
     /**
      * Check if the document has a page with the specified value
      */
-    bool HasPage( int pageIdx );
+    bool HasPage(int pageIdx);
     
 	/**
 	* Get the total page count
 	*/
-	int GetPageCount( );
+	int GetPageCount();
     
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes  
      */
     ///@{
-    int GetGlyphHeight( wchar_t smuflCode, int staffSize, bool graceSize );
-    int GetGlyphWidth( wchar_t smuflCode, int staffSize, bool graceSize );
-    int GetDrawingUnit( int staffSize );
-    int GetDrawingDoubleUnit( int staffSize );
-    int GetDrawingStaffSize( int staffSize );
-    int GetDrawingOctaveSize( int staffSize );
-    int GetDrawingBrevisWidth( int staffSize );
-    int GetDrawingBarLineWidth( int staffSize );
-    int GetDrawingStaffLineWidth( int staffSize );
-    int GetDrawingStemWidth( int staffSize );
-    int GetDrawingBeamWidth( int staffSize, bool graceSize );
-    int GetDrawingBeamWhiteWidth( int staffSize, bool graceSize );
-    int GetDrawingLedgerLineLength( int staffSize, bool graceSize );
-    int GetGraceSize( int value );
+    int GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize);
+    int GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize);
+    int GetDrawingUnit(int staffSize);
+    int GetDrawingDoubleUnit(int staffSize);
+    int GetDrawingStaffSize(int staffSize);
+    int GetDrawingOctaveSize(int staffSize);
+    int GetDrawingBrevisWidth(int staffSize);
+    int GetDrawingBarLineWidth(int staffSize);
+    int GetDrawingStaffLineWidth(int staffSize);
+    int GetDrawingStemWidth(int staffSize);
+    int GetDrawingBeamWidth(int staffSize, bool graceSize);
+    int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize);
+    int GetDrawingLedgerLineLength(int staffSize, bool graceSize);
+    int GetGraceSize(int value);
     ///@}
     
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes  
      */
     ///@{
-    FontInfo *GetDrawingSmuflFont( int staffSize, bool graceSize );
-    FontInfo *GetDrawingLyricFont( int staffSize );
+    FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
+    FontInfo *GetDrawingLyricFont(int staffSize);
     ///@}
 
     /**
      * @name Setters for the page dimensions and margins
      */
     ///@{
-    void SetPageHeight( int pageHeight );
-    void SetPageWidth( int pageWidth );
-    void SetPageLeftMar( short pageLeftMar );
-    void SetPageRightMar( short pageRightMar );
-    void SetPageTopMar( short pageTopMar );
-    void SetSpacingStaff( short spacingStaff );
-    void SetSpacingSystem( short spacingSystem );
+    void SetPageHeight(int pageHeight);
+    void SetPageWidth(int pageWidth);
+    void SetPageLeftMar(short pageLeftMar);
+    void SetPageRightMar(short pageRightMar);
+    void SetPageTopMar(short pageTopMar);
+    void SetSpacingStaff(short spacingStaff);
+    void SetSpacingSystem(short spacingSystem);
     ///@}
     
     /**
@@ -125,8 +125,8 @@ public:
      * @name Getters for the page dimensions and margins
      */
     ///@{
-    short GetSpacingStaff( ) { return m_spacingStaff; };
-    short GetSpacingSystem( ) { return m_spacingSystem; };
+    short GetSpacingStaff() { return m_spacingStaff; };
+    short GetSpacingSystem() { return m_spacingSystem; };
     ///@}
     
     /**
@@ -136,9 +136,9 @@ public:
      * These should eventually be set at parameters.
      */
     ///@{
-    char GetLeftMargin( const ClassId classId  );
-    char GetRightMargin( const ClassId classId );
-    char GetLeftPosition( );
+    char GetLeftMargin(const ClassId classId );
+    char GetRightMargin(const ClassId classId);
+    char GetLeftPosition();
     ///@}
 
     /*
@@ -147,8 +147,8 @@ public:
      * for drawing the entire document on one single system.
      */
     ///@{
-    void SetJustificationX( bool drawingJustifyX ) { m_drawingJustifyX = drawingJustifyX; };
-    bool GetJustificationX( ) { return m_drawingJustifyX; };
+    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; };
+    bool GetJustificationX() { return m_drawingJustifyX; };
     ///@}
 
     /*
@@ -157,18 +157,18 @@ public:
      * It should be disabled (so we get "even" note spacing) for mensural notation.
      */
     ///@{
-    void SetEvenSpacing( bool drawingEvenSpacing ) { m_drawingEvenSpacing = drawingEvenSpacing; };
-    bool GetEvenSpacing( ) { return m_drawingEvenSpacing; };
+    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; };
+    bool GetEvenSpacing() { return m_drawingEvenSpacing; };
     ///@}
     
     /*
      * @name Setter and getter linear and non linear spacing parameters
      */
     ///@{
-    void SetSpacingLinear( double drawingSpacingLinear ) { m_drawingSpacingLinear = drawingSpacingLinear; };
-    double GetSpacingLinear( ) { return m_drawingSpacingLinear; };
-    void SetSpacingNonLinear( double drawingSpacingNonLinear ) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
-    double GetSpacingNonLinear( ) { return m_drawingSpacingNonLinear; };
+    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; };
+    double GetSpacingLinear() { return m_drawingSpacingLinear; };
+    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
+    double GetSpacingNonLinear() { return m_drawingSpacingNonLinear; };
     ///@}
 
     /**
@@ -177,31 +177,31 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-     void SetCurrentScoreDef( bool force = false );
+     void SetCurrentScoreDef(bool force = false);
     
     /**
      * Prepare the document for drawing.
      * This sets drawing pointers and value and needs to be done after loading and any editing.
      * For example, it sets the approriate values for the lyrics connectors
      */
-    void PrepareDrawing( );
+    void PrepareDrawing();
     
     /**
      * Casts off the entire document.
      * Starting from a single system, create and fill pages and systems.
      */
-    void CastOff( );
+    void CastOff();
     
     /**
      * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void UnCastOff( );
+    void UnCastOff();
     
     /**
      * To be implemented.
      */
-    void RefreshViews( ) {};
+    void RefreshViews() {};
 	
 	/**
      * Set drawing values (page size, etc) when drawing a page.
@@ -209,7 +209,7 @@ public:
      * If a page is given, the size of the page is taken.
      * calculFormatPapier() in Wolfgang
      */
-	Page *SetDrawingPage( int pageIdx );
+	Page *SetDrawingPage(int pageIdx);
     
 	/**
      * Reset drawing page to NULL.
@@ -217,26 +217,26 @@ public:
      * We need to call this because otherwise looking at the page idx will fail.
      * See Doc::LayOut for an example.
      */
-	void ResetDrawingPage( ) { m_drawingPage = NULL; };
+	void ResetDrawingPage() { m_drawingPage = NULL; };
     
     /**
      * Getter to the drawPage. Normally, getting the page should 
      * be done with Doc::SetDrawingPage. This is only a method for 
      * asserting that currently have the right page.
      */
-    Page *GetDrawingPage( ) { return m_drawingPage; };
+    Page *GetDrawingPage() { return m_drawingPage; };
     
     /**
      * Return the width adjusted to the content of the current drawing page.
      * This includes the appropriate left and right margins.
      */
-    int GetAdjustedDrawingPageWidth( );
+    int GetAdjustedDrawingPageWidth();
 
     /**
      * Return the height adjusted to the content of the current drawing page.
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
-    int GetAdjustedDrawingPageHeight( );
+    int GetAdjustedDrawingPageHeight();
         
     //----------//
     // Functors //
@@ -246,13 +246,13 @@ public:
      * Functor for setting wordpos and connector ends
      * The functor is process by doc at the end of a document of closing opened syl.
      */
-    virtual int PrepareLyricsEnd( ArrayPtrVoid *params );
+    virtual int PrepareLyricsEnd(ArrayPtrVoid *params);
 
 private:
     /**
      * Calculates the music font size according to the m_interlDefin reference value.
      */
-    int CalcMusicFontSize( );
+    int CalcMusicFontSize();
     
 public:
     /**

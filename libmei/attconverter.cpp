@@ -85,7 +85,7 @@ data_ACCIDENTAL_EXPLICIT AttConverter::StrToAccidentalExplicit(std::string value
     if (value == "3qf") return ACCIDENTAL_EXPLICIT_3qf;
     if (value == "1qs") return ACCIDENTAL_EXPLICIT_1qs;
     if (value == "3qs") return ACCIDENTAL_EXPLICIT_3qs;
-    LogWarning("Unsupported value '%s' for data.ACCIDENTAL.EXPLICIT", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.ACCIDENTAL.EXPLICIT", value.c_str());
     return ACCIDENTAL_EXPLICIT_NONE;
 }
 
@@ -122,7 +122,7 @@ data_ACCIDENTAL_IMPLICIT AttConverter::StrToAccidentalImplicit(std::string value
     if (value == "sd") return ACCIDENTAL_IMPLICIT_sd;
     if (value == "fu") return ACCIDENTAL_IMPLICIT_fu;
     if (value == "fd") return ACCIDENTAL_IMPLICIT_fd;
-    LogWarning("Unsupported value '%s' for data.ACCIDENTAL.IMPLICIT", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.ACCIDENTAL.IMPLICIT", value.c_str());
     return ACCIDENTAL_IMPLICIT_NONE;
 }
 
@@ -211,7 +211,7 @@ data_ARTICULATION AttConverter::StrToArticulation(std::string value)
     if (value == "lhpizz") return ARTICULATION_lhpizz;
     if (value == "dot") return ARTICULATION_dot;
     if (value == "stroke") return ARTICULATION_stroke;
-    LogWarning("Unsupported value '%s' for data.ARTICULATION", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.ARTICULATION", value.c_str());
     return ARTICULATION_NONE;
 }
 
@@ -236,7 +236,7 @@ data_BARPLACE AttConverter::StrToBarplace(std::string value)
     if (value == "mensur") return BARPLACE_mensur;
     if (value == "staff") return BARPLACE_staff;
     if (value == "takt") return BARPLACE_takt;
-    LogWarning("Unsupported value '%s' for data.BARPLACE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.BARPLACE", value.c_str());
     return BARPLACE_NONE;
 }
 
@@ -277,7 +277,7 @@ data_BARRENDITION AttConverter::StrToBarrendition(std::string value)
     if (value == "rptboth") return BARRENDITION_rptboth;
     if (value == "rptend") return BARRENDITION_rptend;
     if (value == "single") return BARRENDITION_single;
-    LogWarning("Unsupported value '%s' for data.BARRENDITION", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.BARRENDITION", value.c_str());
     return BARRENDITION_NONE;
 }
 
@@ -322,7 +322,7 @@ data_BETYPE AttConverter::StrToBetype(std::string value)
     if (value == "smpte-ndf29.97") return BETYPE_smpte_ndf29_97;
     if (value == "tcf") return BETYPE_tcf;
     if (value == "time") return BETYPE_time;
-    LogWarning("Unsupported value '%s' for data.BETYPE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.BETYPE", value.c_str());
     return BETYPE_NONE;
 }
 
@@ -345,7 +345,7 @@ data_BOOLEAN AttConverter::StrToBoolean(std::string value)
 {
     if (value == "true") return BOOLEAN_true;
     if (value == "false") return BOOLEAN_false;
-    LogWarning("Unsupported value '%s' for data.BOOLEAN", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.BOOLEAN", value.c_str());
     return BOOLEAN_NONE;
 }
 
@@ -372,7 +372,7 @@ data_CERTAINTY AttConverter::StrToCertainty(std::string value)
     if (value == "medium") return CERTAINTY_medium;
     if (value == "low") return CERTAINTY_low;
     if (value == "unknown") return CERTAINTY_unknown;
-    LogWarning("Unsupported value '%s' for data.CERTAINTY", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.CERTAINTY", value.c_str());
     return CERTAINTY_NONE;
 }
 
@@ -403,7 +403,7 @@ data_CLEFSHAPE AttConverter::StrToClefshape(std::string value)
     if (value == "C") return CLEFSHAPE_C;
     if (value == "perc") return CLEFSHAPE_perc;
     if (value == "TAB") return CLEFSHAPE_TAB;
-    LogWarning("Unsupported value '%s' for data.CLEFSHAPE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.CLEFSHAPE", value.c_str());
     return CLEFSHAPE_NONE;
 }
 
@@ -428,7 +428,7 @@ data_CLUSTER AttConverter::StrToCluster(std::string value)
     if (value == "white") return CLUSTER_white;
     if (value == "black") return CLUSTER_black;
     if (value == "chromatic") return CLUSTER_chromatic;
-    LogWarning("Unsupported value '%s' for data.CLUSTER", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.CLUSTER", value.c_str());
     return CLUSTER_NONE;
 }
 
@@ -479,7 +479,7 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value)
     if (value == "teal") return COLORNAMES_teal;
     if (value == "white") return COLORNAMES_white;
     if (value == "yellow") return COLORNAMES_yellow;
-    LogWarning("Unsupported value '%s' for data.COLORNAMES", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.COLORNAMES", value.c_str());
     return COLORNAMES_NONE;
 }
 
@@ -508,7 +508,7 @@ data_CURVERENDITION AttConverter::StrToCurverendition(std::string value)
     if (value == "wide") return CURVERENDITION_wide;
     if (value == "dashed") return CURVERENDITION_dashed;
     if (value == "dotted") return CURVERENDITION_dotted;
-    LogWarning("Unsupported value '%s' for data.CURVERENDITION", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.CURVERENDITION", value.c_str());
     return CURVERENDITION_NONE;
 }
 
@@ -531,7 +531,7 @@ data_ENCLOSURE AttConverter::StrToEnclosure(std::string value)
 {
     if (value == "paren") return ENCLOSURE_paren;
     if (value == "brack") return ENCLOSURE_brack;
-    LogWarning("Unsupported value '%s' for data.ENCLOSURE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.ENCLOSURE", value.c_str());
     return ENCLOSURE_NONE;
 }
 
@@ -556,7 +556,7 @@ data_FONTSTYLE AttConverter::StrToFontstyle(std::string value)
     if (value == "italic") return FONTSTYLE_italic;
     if (value == "normal") return FONTSTYLE_normal;
     if (value == "oblique") return FONTSTYLE_oblique;
-    LogWarning("Unsupported value '%s' for data.FONTSTYLE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.FONTSTYLE", value.c_str());
     return FONTSTYLE_NONE;
 }
 
@@ -579,7 +579,7 @@ data_FONTWEIGHT AttConverter::StrToFontweight(std::string value)
 {
     if (value == "bold") return FONTWEIGHT_bold;
     if (value == "normal") return FONTWEIGHT_normal;
-    LogWarning("Unsupported value '%s' for data.FONTWEIGHT", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.FONTWEIGHT", value.c_str());
     return FONTWEIGHT_NONE;
 }
 
@@ -604,7 +604,7 @@ data_GLISSANDO AttConverter::StrToGlissando(std::string value)
     if (value == "i") return GLISSANDO_i;
     if (value == "m") return GLISSANDO_m;
     if (value == "t") return GLISSANDO_t;
-    LogWarning("Unsupported value '%s' for data.GLISSANDO", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.GLISSANDO", value.c_str());
     return GLISSANDO_NONE;
 }
 
@@ -629,7 +629,7 @@ data_GRACE AttConverter::StrToGrace(std::string value)
     if (value == "acc") return GRACE_acc;
     if (value == "unacc") return GRACE_unacc;
     if (value == "unknown") return GRACE_unknown;
-    LogWarning("Unsupported value '%s' for data.GRACE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.GRACE", value.c_str());
     return GRACE_NONE;
 }
 
@@ -656,7 +656,7 @@ data_HORIZONTALALIGNMENT AttConverter::StrToHorizontalalignment(std::string valu
     if (value == "right") return HORIZONTALALIGNMENT_right;
     if (value == "center") return HORIZONTALALIGNMENT_center;
     if (value == "justify") return HORIZONTALALIGNMENT_justify;
-    LogWarning("Unsupported value '%s' for data.HORIZONTALALIGNMENT", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.HORIZONTALALIGNMENT", value.c_str());
     return HORIZONTALALIGNMENT_NONE;
 }
 
@@ -685,7 +685,7 @@ data_INEUMEFORM AttConverter::StrToIneumeform(std::string value)
     if (value == "tied") return INEUMEFORM_tied;
     if (value == "tiedliquescent1") return INEUMEFORM_tiedliquescent1;
     if (value == "tiedliquescent2") return INEUMEFORM_tiedliquescent2;
-    LogWarning("Unsupported value '%s' for data.INEUMEFORM", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.INEUMEFORM", value.c_str());
     return INEUMEFORM_NONE;
 }
 
@@ -718,7 +718,7 @@ data_INEUMENAME AttConverter::StrToIneumename(std::string value)
     if (value == "tristropha") return INEUMENAME_tristropha;
     if (value == "pressusminor") return INEUMENAME_pressusminor;
     if (value == "pressusmaior") return INEUMENAME_pressusmaior;
-    LogWarning("Unsupported value '%s' for data.INEUMENAME", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.INEUMENAME", value.c_str());
     return INEUMENAME_NONE;
 }
 
@@ -747,7 +747,7 @@ data_LAYERSCHEME AttConverter::StrToLayerscheme(std::string value)
     if (value == "2f") return LAYERSCHEME_2f;
     if (value == "3o") return LAYERSCHEME_3o;
     if (value == "3f") return LAYERSCHEME_3f;
-    LogWarning("Unsupported value '%s' for data.LAYERSCHEME", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.LAYERSCHEME", value.c_str());
     return LAYERSCHEME_NONE;
 }
 
@@ -770,7 +770,7 @@ data_LIGATUREFORM AttConverter::StrToLigatureform(std::string value)
 {
     if (value == "recta") return LIGATUREFORM_recta;
     if (value == "obliqua") return LIGATUREFORM_obliqua;
-    LogWarning("Unsupported value '%s' for data.LIGATUREFORM", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.LIGATUREFORM", value.c_str());
     return LIGATUREFORM_NONE;
 }
 
@@ -797,7 +797,7 @@ data_LINEFORM AttConverter::StrToLineform(std::string value)
     if (value == "dotted") return LINEFORM_dotted;
     if (value == "solid") return LINEFORM_solid;
     if (value == "wavy") return LINEFORM_wavy;
-    LogWarning("Unsupported value '%s' for data.LINEFORM", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.LINEFORM", value.c_str());
     return LINEFORM_NONE;
 }
 
@@ -836,7 +836,7 @@ data_LINESTARTENDSYMBOL AttConverter::StrToLinestartendsymbol(std::string value)
     if (value == "harpoonleft") return LINESTARTENDSYMBOL_harpoonleft;
     if (value == "harpoonright") return LINESTARTENDSYMBOL_harpoonright;
     if (value == "none") return LINESTARTENDSYMBOL_none;
-    LogWarning("Unsupported value '%s' for data.LINESTARTENDSYMBOL", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.LINESTARTENDSYMBOL", value.c_str());
     return LINESTARTENDSYMBOL_NONE;
 }
 
@@ -861,7 +861,7 @@ data_LINEWIDTHTERM AttConverter::StrToLinewidthterm(std::string value)
     if (value == "narrow") return LINEWIDTHTERM_narrow;
     if (value == "medium") return LINEWIDTHTERM_medium;
     if (value == "wide") return LINEWIDTHTERM_wide;
-    LogWarning("Unsupported value '%s' for data.LINEWIDTHTERM", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.LINEWIDTHTERM", value.c_str());
     return LINEWIDTHTERM_NONE;
 }
 
@@ -936,7 +936,7 @@ data_MELODICFUNCTION AttConverter::StrToMelodicfunction(std::string value)
     if (value == "un7") return MELODICFUNCTION_un7;
     if (value == "upt") return MELODICFUNCTION_upt;
     if (value == "upt7") return MELODICFUNCTION_upt7;
-    LogWarning("Unsupported value '%s' for data.MELODICFUNCTION", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.MELODICFUNCTION", value.c_str());
     return MELODICFUNCTION_NONE;
 }
 
@@ -959,7 +959,7 @@ data_MENSURATIONSIGN AttConverter::StrToMensurationsign(std::string value)
 {
     if (value == "C") return MENSURATIONSIGN_C;
     if (value == "O") return MENSURATIONSIGN_O;
-    LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.MENSURATIONSIGN", value.c_str());
     return MENSURATIONSIGN_NONE;
 }
 
@@ -982,7 +982,7 @@ data_METERSIGN AttConverter::StrToMetersign(std::string value)
 {
     if (value == "common") return METERSIGN_common;
     if (value == "cut") return METERSIGN_cut;
-    LogWarning("Unsupported value '%s' for data.METERSIGN", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.METERSIGN", value.c_str());
     return METERSIGN_NONE;
 }
 
@@ -1351,7 +1351,7 @@ data_MIDINAMES AttConverter::StrToMidinames(std::string value)
     if (value == "Open_Cuica") return MIDINAMES_Open_Cuica;
     if (value == "Mute_Triangle") return MIDINAMES_Mute_Triangle;
     if (value == "Open_Triangle") return MIDINAMES_Open_Triangle;
-    LogWarning("Unsupported value '%s' for data.MIDINAMES", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.MIDINAMES", value.c_str());
     return MIDINAMES_NONE;
 }
 
@@ -1386,7 +1386,7 @@ data_MODE AttConverter::StrToMode(std::string value)
     if (value == "mixolydian") return MODE_mixolydian;
     if (value == "aeolian") return MODE_aeolian;
     if (value == "locrian") return MODE_locrian;
-    LogWarning("Unsupported value '%s' for data.MODE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.MODE", value.c_str());
     return MODE_NONE;
 }
 
@@ -1417,7 +1417,7 @@ data_NOTATIONTYPE AttConverter::StrToNotationtype(std::string value)
     if (value == "mensural.white") return NOTATIONTYPE_mensural_white;
     if (value == "neume") return NOTATIONTYPE_neume;
     if (value == "tab") return NOTATIONTYPE_tab;
-    LogWarning("Unsupported value '%s' for data.NOTATIONTYPE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.NOTATIONTYPE", value.c_str());
     return NOTATIONTYPE_NONE;
 }
 
@@ -1456,7 +1456,7 @@ data_NOTEHEADMODIFIER_list AttConverter::StrToNoteheadmodifierList(std::string v
     if (value == "box") return NOTEHEADMODIFIER_list_box;
     if (value == "circle") return NOTEHEADMODIFIER_list_circle;
     if (value == "dblwhole") return NOTEHEADMODIFIER_list_dblwhole;
-    LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER.list", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.NOTEHEADMODIFIER.list", value.c_str());
     return NOTEHEADMODIFIER_list_NONE;
 }
 
@@ -1479,7 +1479,7 @@ data_OTHERSTAFF AttConverter::StrToOtherstaff(std::string value)
 {
     if (value == "above") return OTHERSTAFF_above;
     if (value == "below") return OTHERSTAFF_below;
-    LogWarning("Unsupported value '%s' for data.OTHERSTAFF", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.OTHERSTAFF", value.c_str());
     return OTHERSTAFF_NONE;
 }
 
@@ -1502,7 +1502,7 @@ data_PLACE AttConverter::StrToPlace(std::string value)
 {
     if (value == "above") return PLACE_above;
     if (value == "below") return PLACE_below;
-    LogWarning("Unsupported value '%s' for data.PLACE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.PLACE", value.c_str());
     return PLACE_NONE;
 }
 
@@ -1535,7 +1535,7 @@ data_ROTATIONDIRECTION AttConverter::StrToRotationdirection(std::string value)
     if (value == "nw") return ROTATIONDIRECTION_nw;
     if (value == "se") return ROTATIONDIRECTION_se;
     if (value == "sw") return ROTATIONDIRECTION_sw;
-    LogWarning("Unsupported value '%s' for data.ROTATIONDIRECTION", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.ROTATIONDIRECTION", value.c_str());
     return ROTATIONDIRECTION_NONE;
 }
 
@@ -1558,7 +1558,7 @@ data_SIZE AttConverter::StrToSize(std::string value)
 {
     if (value == "normal") return SIZE_normal;
     if (value == "cue") return SIZE_cue;
-    LogWarning("Unsupported value '%s' for data.SIZE", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.SIZE", value.c_str());
     return SIZE_NONE;
 }
 
@@ -1583,7 +1583,7 @@ data_STAFFREL AttConverter::StrToStaffrel(std::string value)
     if (value == "above") return STAFFREL_above;
     if (value == "below") return STAFFREL_below;
     if (value == "within") return STAFFREL_within;
-    LogWarning("Unsupported value '%s' for data.STAFFREL", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.STAFFREL", value.c_str());
     return STAFFREL_NONE;
 }
 
@@ -1620,7 +1620,7 @@ data_STEMMODIFIER AttConverter::StrToStemmodifier(std::string value)
     if (value == "6slash") return STEMMODIFIER_6slash;
     if (value == "sprech") return STEMMODIFIER_sprech;
     if (value == "z") return STEMMODIFIER_z;
-    LogWarning("Unsupported value '%s' for data.STEMMODIFIER", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.STEMMODIFIER", value.c_str());
     return STEMMODIFIER_NONE;
 }
 
@@ -1645,7 +1645,7 @@ data_STEMPOSITION AttConverter::StrToStemposition(std::string value)
     if (value == "left") return STEMPOSITION_left;
     if (value == "right") return STEMPOSITION_right;
     if (value == "center") return STEMPOSITION_center;
-    LogWarning("Unsupported value '%s' for data.STEMPOSITION", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.STEMPOSITION", value.c_str());
     return STEMPOSITION_NONE;
 }
 
@@ -1672,7 +1672,7 @@ data_TEMPERAMENT AttConverter::StrToTemperament(std::string value)
     if (value == "just") return TEMPERAMENT_just;
     if (value == "mean") return TEMPERAMENT_mean;
     if (value == "pythagorean") return TEMPERAMENT_pythagorean;
-    LogWarning("Unsupported value '%s' for data.TEMPERAMENT", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.TEMPERAMENT", value.c_str());
     return TEMPERAMENT_NONE;
 }
 
@@ -1757,7 +1757,7 @@ data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value)
     if (value == "rtl") return TEXTRENDITIONLIST_rtl;
     if (value == "lro") return TEXTRENDITIONLIST_lro;
     if (value == "rlo") return TEXTRENDITIONLIST_rlo;
-    LogWarning("Unsupported value '%s' for data.TEXTRENDITIONLIST", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.TEXTRENDITIONLIST", value.c_str());
     return TEXTRENDITIONLIST_NONE;
 }
 
@@ -1790,7 +1790,7 @@ data_UNEUMEFORM AttConverter::StrToUneumeform(std::string value)
     if (value == "rectangular") return UNEUMEFORM_rectangular;
     if (value == "rhombic") return UNEUMEFORM_rhombic;
     if (value == "tied") return UNEUMEFORM_tied;
-    LogWarning("Unsupported value '%s' for data.UNEUMEFORM", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.UNEUMEFORM", value.c_str());
     return UNEUMEFORM_NONE;
 }
 
@@ -1835,7 +1835,7 @@ data_UNEUMENAME AttConverter::StrToUneumename(std::string value)
     if (value == "pressusmaior") return UNEUMENAME_pressusmaior;
     if (value == "pressusminor") return UNEUMENAME_pressusminor;
     if (value == "virgastrata") return UNEUMENAME_virgastrata;
-    LogWarning("Unsupported value '%s' for data.UNEUMENAME", value.c_str() );
+    LogWarning("Unsupported value '%s' for data.UNEUMENAME", value.c_str());
     return UNEUMENAME_NONE;
 }
 
@@ -1858,7 +1858,7 @@ accidLog_FUNC AttConverter::StrToAccidLogFunc(std::string value)
 {
     if (value == "caution") return accidLog_FUNC_caution;
     if (value == "edit") return accidLog_FUNC_edit;
-    LogWarning("Unsupported value '%s' for att.accid.log@func", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.accid.log@func", value.c_str());
     return accidLog_FUNC_NONE;
 }
 
@@ -1883,7 +1883,7 @@ arpegLog_ORDER AttConverter::StrToArpegLogOrder(std::string value)
     if (value == "up") return arpegLog_ORDER_up;
     if (value == "down") return arpegLog_ORDER_down;
     if (value == "nonarp") return arpegLog_ORDER_nonarp;
-    LogWarning("Unsupported value '%s' for att.arpeg.log@order", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.arpeg.log@order", value.c_str());
     return arpegLog_ORDER_NONE;
 }
 
@@ -1906,7 +1906,7 @@ bTremLog_FORM AttConverter::StrToBTremLogForm(std::string value)
 {
     if (value == "meas") return bTremLog_FORM_meas;
     if (value == "unmeas") return bTremLog_FORM_unmeas;
-    LogWarning("Unsupported value '%s' for att.bTrem.log@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.bTrem.log@form", value.c_str());
     return bTremLog_FORM_NONE;
 }
 
@@ -1931,7 +1931,7 @@ beamingVis_BEAMREND AttConverter::StrToBeamingVisBeamrend(std::string value)
     if (value == "acc") return beamingVis_BEAMREND_acc;
     if (value == "rit") return beamingVis_BEAMREND_rit;
     if (value == "norm") return beamingVis_BEAMREND_norm;
-    LogWarning("Unsupported value '%s' for att.beaming.vis@beam.rend", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.beaming.vis@beam.rend", value.c_str());
     return beamingVis_BEAMREND_NONE;
 }
 
@@ -1958,7 +1958,7 @@ beamrend_FORM AttConverter::StrToBeamrendForm(std::string value)
     if (value == "mixed") return beamrend_FORM_mixed;
     if (value == "rit") return beamrend_FORM_rit;
     if (value == "norm") return beamrend_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.beamrend@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.beamrend@form", value.c_str());
     return beamrend_FORM_NONE;
 }
 
@@ -1983,7 +1983,7 @@ curvature_CURVEDIR AttConverter::StrToCurvatureCurvedir(std::string value)
     if (value == "above") return curvature_CURVEDIR_above;
     if (value == "below") return curvature_CURVEDIR_below;
     if (value == "mixed") return curvature_CURVEDIR_mixed;
-    LogWarning("Unsupported value '%s' for att.curvature@curvedir", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.curvature@curvedir", value.c_str());
     return curvature_CURVEDIR_NONE;
 }
 
@@ -2004,7 +2004,7 @@ std::string AttConverter::CutoutCutoutToStr(cutout_CUTOUT data)
 cutout_CUTOUT AttConverter::StrToCutoutCutout(std::string value)
 {
     if (value == "cutout") return cutout_CUTOUT_cutout;
-    LogWarning("Unsupported value '%s' for att.cutout@cutout", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.cutout@cutout", value.c_str());
     return cutout_CUTOUT_NONE;
 }
 
@@ -2027,7 +2027,7 @@ dotLog_FORM AttConverter::StrToDotLogForm(std::string value)
 {
     if (value == "aug") return dotLog_FORM_aug;
     if (value == "div") return dotLog_FORM_div;
-    LogWarning("Unsupported value '%s' for att.dot.log@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.dot.log@form", value.c_str());
     return dotLog_FORM_NONE;
 }
 
@@ -2052,7 +2052,7 @@ endings_ENDINGREND AttConverter::StrToEndingsEndingrend(std::string value)
     if (value == "top") return endings_ENDINGREND_top;
     if (value == "barred") return endings_ENDINGREND_barred;
     if (value == "grouped") return endings_ENDINGREND_grouped;
-    LogWarning("Unsupported value '%s' for att.endings@ending.rend", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.endings@ending.rend", value.c_str());
     return endings_ENDINGREND_NONE;
 }
 
@@ -2075,7 +2075,7 @@ fTremLog_FORM AttConverter::StrToFTremLogForm(std::string value)
 {
     if (value == "meas") return fTremLog_FORM_meas;
     if (value == "unmeas") return fTremLog_FORM_unmeas;
-    LogWarning("Unsupported value '%s' for att.fTrem.log@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.fTrem.log@form", value.c_str());
     return fTremLog_FORM_NONE;
 }
 
@@ -2098,7 +2098,7 @@ fermataVis_FORM AttConverter::StrToFermataVisForm(std::string value)
 {
     if (value == "inv") return fermataVis_FORM_inv;
     if (value == "norm") return fermataVis_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.fermata.vis@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.fermata.vis@form", value.c_str());
     return fermataVis_FORM_NONE;
 }
 
@@ -2123,7 +2123,7 @@ fermataVis_SHAPE AttConverter::StrToFermataVisShape(std::string value)
     if (value == "curved") return fermataVis_SHAPE_curved;
     if (value == "square") return fermataVis_SHAPE_square;
     if (value == "angular") return fermataVis_SHAPE_angular;
-    LogWarning("Unsupported value '%s' for att.fermata.vis@shape", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.fermata.vis@shape", value.c_str());
     return fermataVis_SHAPE_NONE;
 }
 
@@ -2146,7 +2146,7 @@ hairpinLog_FORM AttConverter::StrToHairpinLogForm(std::string value)
 {
     if (value == "cres") return hairpinLog_FORM_cres;
     if (value == "dim") return hairpinLog_FORM_dim;
-    LogWarning("Unsupported value '%s' for att.hairpin.log@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.hairpin.log@form", value.c_str());
     return hairpinLog_FORM_NONE;
 }
 
@@ -2171,7 +2171,7 @@ harmVis_RENDGRID AttConverter::StrToHarmVisRendgrid(std::string value)
     if (value == "grid") return harmVis_RENDGRID_grid;
     if (value == "gridtext") return harmVis_RENDGRID_gridtext;
     if (value == "text") return harmVis_RENDGRID_text;
-    LogWarning("Unsupported value '%s' for att.harm.vis@rendgrid", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harm.vis@rendgrid", value.c_str());
     return harmVis_RENDGRID_NONE;
 }
 
@@ -2196,7 +2196,7 @@ harpPedalLog_A AttConverter::StrToHarpPedalLogA(std::string value)
     if (value == "f") return harpPedalLog_A_f;
     if (value == "n") return harpPedalLog_A_n;
     if (value == "s") return harpPedalLog_A_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@a", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@a", value.c_str());
     return harpPedalLog_A_NONE;
 }
 
@@ -2221,7 +2221,7 @@ harpPedalLog_B AttConverter::StrToHarpPedalLogB(std::string value)
     if (value == "f") return harpPedalLog_B_f;
     if (value == "n") return harpPedalLog_B_n;
     if (value == "s") return harpPedalLog_B_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@b", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@b", value.c_str());
     return harpPedalLog_B_NONE;
 }
 
@@ -2246,7 +2246,7 @@ harpPedalLog_C AttConverter::StrToHarpPedalLogC(std::string value)
     if (value == "f") return harpPedalLog_C_f;
     if (value == "n") return harpPedalLog_C_n;
     if (value == "s") return harpPedalLog_C_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@c", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@c", value.c_str());
     return harpPedalLog_C_NONE;
 }
 
@@ -2271,7 +2271,7 @@ harpPedalLog_D AttConverter::StrToHarpPedalLogD(std::string value)
     if (value == "f") return harpPedalLog_D_f;
     if (value == "n") return harpPedalLog_D_n;
     if (value == "s") return harpPedalLog_D_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@d", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@d", value.c_str());
     return harpPedalLog_D_NONE;
 }
 
@@ -2296,7 +2296,7 @@ harpPedalLog_E AttConverter::StrToHarpPedalLogE(std::string value)
     if (value == "f") return harpPedalLog_E_f;
     if (value == "n") return harpPedalLog_E_n;
     if (value == "s") return harpPedalLog_E_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@e", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@e", value.c_str());
     return harpPedalLog_E_NONE;
 }
 
@@ -2321,7 +2321,7 @@ harpPedalLog_F AttConverter::StrToHarpPedalLogF(std::string value)
     if (value == "f") return harpPedalLog_F_f;
     if (value == "n") return harpPedalLog_F_n;
     if (value == "s") return harpPedalLog_F_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@f", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@f", value.c_str());
     return harpPedalLog_F_NONE;
 }
 
@@ -2346,7 +2346,7 @@ harpPedalLog_G AttConverter::StrToHarpPedalLogG(std::string value)
     if (value == "f") return harpPedalLog_G_f;
     if (value == "n") return harpPedalLog_G_n;
     if (value == "s") return harpPedalLog_G_s;
-    LogWarning("Unsupported value '%s' for att.harpPedal.log@g", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.harpPedal.log@g", value.c_str());
     return harpPedalLog_G_NONE;
 }
 
@@ -2367,7 +2367,7 @@ std::string AttConverter::MeiversionMeiversionToStr(meiversion_MEIVERSION data)
 meiversion_MEIVERSION AttConverter::StrToMeiversionMeiversion(std::string value)
 {
     if (value == "3.0.0") return meiversion_MEIVERSION_3_0_0;
-    LogWarning("Unsupported value '%s' for att.meiversion@meiversion", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.meiversion@meiversion", value.c_str());
     return meiversion_MEIVERSION_NONE;
 }
 
@@ -2390,7 +2390,7 @@ mensurVis_FORM AttConverter::StrToMensurVisForm(std::string value)
 {
     if (value == "horizontal") return mensurVis_FORM_horizontal;
     if (value == "vertical") return mensurVis_FORM_vertical;
-    LogWarning("Unsupported value '%s' for att.mensur.vis@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.mensur.vis@form", value.c_str());
     return mensurVis_FORM_NONE;
 }
 
@@ -2413,7 +2413,7 @@ mensuralVis_MENSURFORM AttConverter::StrToMensuralVisMensurform(std::string valu
 {
     if (value == "horizontal") return mensuralVis_MENSURFORM_horizontal;
     if (value == "vertical") return mensuralVis_MENSURFORM_vertical;
-    LogWarning("Unsupported value '%s' for att.mensural.vis@mensur.form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.mensural.vis@mensur.form", value.c_str());
     return mensuralVis_MENSURFORM_NONE;
 }
 
@@ -2440,7 +2440,7 @@ meterSigVis_FORM AttConverter::StrToMeterSigVisForm(std::string value)
     if (value == "denomsym") return meterSigVis_FORM_denomsym;
     if (value == "norm") return meterSigVis_FORM_norm;
     if (value == "invis") return meterSigVis_FORM_invis;
-    LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.meterSig.vis@form", value.c_str());
     return meterSigVis_FORM_NONE;
 }
 
@@ -2467,7 +2467,7 @@ meterSigDefaultVis_METERREND AttConverter::StrToMeterSigDefaultVisMeterrend(std:
     if (value == "denomsym") return meterSigDefaultVis_METERREND_denomsym;
     if (value == "norm") return meterSigDefaultVis_METERREND_norm;
     if (value == "invis") return meterSigDefaultVis_METERREND_invis;
-    LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.rend", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.meterSigDefault.vis@meter.rend", value.c_str());
     return meterSigDefaultVis_METERREND_NONE;
 }
 
@@ -2492,7 +2492,7 @@ meterconformance_METCON AttConverter::StrToMeterconformanceMetcon(std::string va
     if (value == "c") return meterconformance_METCON_c;
     if (value == "i") return meterconformance_METCON_i;
     if (value == "o") return meterconformance_METCON_o;
-    LogWarning("Unsupported value '%s' for att.meterconformance@metcon", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.meterconformance@metcon", value.c_str());
     return meterconformance_METCON_NONE;
 }
 
@@ -2515,7 +2515,7 @@ mordentLog_FORM AttConverter::StrToMordentLogForm(std::string value)
 {
     if (value == "inv") return mordentLog_FORM_inv;
     if (value == "norm") return mordentLog_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.mordent.log@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.mordent.log@form", value.c_str());
     return mordentLog_FORM_NONE;
 }
 
@@ -2538,7 +2538,7 @@ noteLogMensural_LIG AttConverter::StrToNoteLogMensuralLig(std::string value)
 {
     if (value == "recta") return noteLogMensural_LIG_recta;
     if (value == "obliqua") return noteLogMensural_LIG_obliqua;
-    LogWarning("Unsupported value '%s' for att.note.log.mensural@lig", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.note.log.mensural@lig", value.c_str());
     return noteLogMensural_LIG_NONE;
 }
 
@@ -2559,7 +2559,7 @@ std::string AttConverter::OctaveLogCollToStr(octaveLog_COLL data)
 octaveLog_COLL AttConverter::StrToOctaveLogColl(std::string value)
 {
     if (value == "coll") return octaveLog_COLL_coll;
-    LogWarning("Unsupported value '%s' for att.octave.log@coll", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.octave.log@coll", value.c_str());
     return octaveLog_COLL_NONE;
 }
 
@@ -2582,7 +2582,7 @@ pbVis_FOLIUM AttConverter::StrToPbVisFolium(std::string value)
 {
     if (value == "verso") return pbVis_FOLIUM_verso;
     if (value == "recto") return pbVis_FOLIUM_recto;
-    LogWarning("Unsupported value '%s' for att.pb.vis@folium", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.pb.vis@folium", value.c_str());
     return pbVis_FOLIUM_NONE;
 }
 
@@ -2609,7 +2609,7 @@ pedalLog_DIR AttConverter::StrToPedalLogDir(std::string value)
     if (value == "up") return pedalLog_DIR_up;
     if (value == "half") return pedalLog_DIR_half;
     if (value == "bounce") return pedalLog_DIR_bounce;
-    LogWarning("Unsupported value '%s' for att.pedal.log@dir", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.pedal.log@dir", value.c_str());
     return pedalLog_DIR_NONE;
 }
 
@@ -2634,7 +2634,7 @@ pedalVis_FORM AttConverter::StrToPedalVisForm(std::string value)
     if (value == "line") return pedalVis_FORM_line;
     if (value == "pedstar") return pedalVis_FORM_pedstar;
     if (value == "altpedstar") return pedalVis_FORM_altpedstar;
-    LogWarning("Unsupported value '%s' for att.pedal.vis@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.pedal.vis@form", value.c_str());
     return pedalVis_FORM_NONE;
 }
 
@@ -2659,7 +2659,7 @@ pianopedals_PEDALSTYLE AttConverter::StrToPianopedalsPedalstyle(std::string valu
     if (value == "line") return pianopedals_PEDALSTYLE_line;
     if (value == "pedstar") return pianopedals_PEDALSTYLE_pedstar;
     if (value == "altpedstar") return pianopedals_PEDALSTYLE_altpedstar;
-    LogWarning("Unsupported value '%s' for att.pianopedals@pedal.style", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.pianopedals@pedal.style", value.c_str());
     return pianopedals_PEDALSTYLE_NONE;
 }
 
@@ -2684,7 +2684,7 @@ plist_EVALUATE AttConverter::StrToPlistEvaluate(std::string value)
     if (value == "all") return plist_EVALUATE_all;
     if (value == "one") return plist_EVALUATE_one;
     if (value == "none") return plist_EVALUATE_none;
-    LogWarning("Unsupported value '%s' for att.plist@evaluate", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.plist@evaluate", value.c_str());
     return plist_EVALUATE_NONE;
 }
 
@@ -2711,7 +2711,7 @@ pointing_XLINKACTUATE AttConverter::StrToPointingXlinkactuate(std::string value)
     if (value == "onRequest") return pointing_XLINKACTUATE_onRequest;
     if (value == "none") return pointing_XLINKACTUATE_none;
     if (value == "other") return pointing_XLINKACTUATE_other;
-    LogWarning("Unsupported value '%s' for att.pointing@xlink:actuate", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.pointing@xlink:actuate", value.c_str());
     return pointing_XLINKACTUATE_NONE;
 }
 
@@ -2740,7 +2740,7 @@ pointing_XLINKSHOW AttConverter::StrToPointingXlinkshow(std::string value)
     if (value == "embed") return pointing_XLINKSHOW_embed;
     if (value == "none") return pointing_XLINKSHOW_none;
     if (value == "other") return pointing_XLINKSHOW_other;
-    LogWarning("Unsupported value '%s' for att.pointing@xlink:show", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.pointing@xlink:show", value.c_str());
     return pointing_XLINKSHOW_NONE;
 }
 
@@ -2763,7 +2763,7 @@ regularmethod_METHOD AttConverter::StrToRegularmethodMethod(std::string value)
 {
     if (value == "silent") return regularmethod_METHOD_silent;
     if (value == "tags") return regularmethod_METHOD_tags;
-    LogWarning("Unsupported value '%s' for att.regularmethod@method", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.regularmethod@method", value.c_str());
     return regularmethod_METHOD_NONE;
 }
 
@@ -2788,7 +2788,7 @@ rehearsal_REHENCLOSE AttConverter::StrToRehearsalRehenclose(std::string value)
     if (value == "box") return rehearsal_REHENCLOSE_box;
     if (value == "circle") return rehearsal_REHENCLOSE_circle;
     if (value == "none") return rehearsal_REHENCLOSE_none;
-    LogWarning("Unsupported value '%s' for att.rehearsal@reh.enclose", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.rehearsal@reh.enclose", value.c_str());
     return rehearsal_REHENCLOSE_NONE;
 }
 
@@ -2809,7 +2809,7 @@ std::string AttConverter::SbVisFormToStr(sbVis_FORM data)
 sbVis_FORM AttConverter::StrToSbVisForm(std::string value)
 {
     if (value == "hash") return sbVis_FORM_hash;
-    LogWarning("Unsupported value '%s' for att.sb.vis@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.sb.vis@form", value.c_str());
     return sbVis_FORM_NONE;
 }
 
@@ -2838,7 +2838,7 @@ staffgroupingsym_SYMBOL AttConverter::StrToStaffgroupingsymSymbol(std::string va
     if (value == "bracketsq") return staffgroupingsym_SYMBOL_bracketsq;
     if (value == "line") return staffgroupingsym_SYMBOL_line;
     if (value == "none") return staffgroupingsym_SYMBOL_none;
-    LogWarning("Unsupported value '%s' for att.staffgroupingsym@symbol", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.staffgroupingsym@symbol", value.c_str());
     return staffgroupingsym_SYMBOL_NONE;
 }
 
@@ -2873,7 +2873,7 @@ sylLog_CON AttConverter::StrToSylLogCon(std::string value)
     if (value == "v") return sylLog_CON_v;
     if (value == "i") return sylLog_CON_i;
     if (value == "b") return sylLog_CON_b;
-    LogWarning("Unsupported value '%s' for att.syl.log@con", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.syl.log@con", value.c_str());
     return sylLog_CON_NONE;
 }
 
@@ -2898,7 +2898,7 @@ sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value)
     if (value == "i") return sylLog_WORDPOS_i;
     if (value == "m") return sylLog_WORDPOS_m;
     if (value == "t") return sylLog_WORDPOS_t;
-    LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());
     return sylLog_WORDPOS_NONE;
 }
 
@@ -2921,7 +2921,7 @@ tupletVis_NUMFORMAT AttConverter::StrToTupletVisNumformat(std::string value)
 {
     if (value == "count") return tupletVis_NUMFORMAT_count;
     if (value == "ratio") return tupletVis_NUMFORMAT_ratio;
-    LogWarning("Unsupported value '%s' for att.tuplet.vis@num.format", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.tuplet.vis@num.format", value.c_str());
     return tupletVis_NUMFORMAT_NONE;
 }
 
@@ -2944,7 +2944,7 @@ turnLog_FORM AttConverter::StrToTurnLogForm(std::string value)
 {
     if (value == "inv") return turnLog_FORM_inv;
     if (value == "norm") return turnLog_FORM_norm;
-    LogWarning("Unsupported value '%s' for att.turn.log@form", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.turn.log@form", value.c_str());
     return turnLog_FORM_NONE;
 }
 
@@ -2967,7 +2967,7 @@ whitespace_XMLSPACE AttConverter::StrToWhitespaceXmlspace(std::string value)
 {
     if (value == "default") return whitespace_XMLSPACE_default;
     if (value == "preserve") return whitespace_XMLSPACE_preserve;
-    LogWarning("Unsupported value '%s' for att.whitespace@xml:space", value.c_str() );
+    LogWarning("Unsupported value '%s' for att.whitespace@xml:space", value.c_str());
     return whitespace_XMLSPACE_NONE;
 }
 

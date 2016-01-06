@@ -53,33 +53,33 @@ public:
      * Non virtual methods cannot be overriden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
-    void SetBrush( int colour, int opacity );
-    void SetPen( int colour, int width, int opacity );
-    void SetFont( FontInfo *font );
-    void ResetBrush( );
-    void ResetPen( );
-    void ResetFont( );
-    virtual void SetBackground( int colour, int style = AxSOLID ) = 0;
-    virtual void SetBackgroundImage( void *image, double opacity = 1.0 ) = 0;
-    virtual void SetBackgroundMode( int mode ) = 0;
-    virtual void SetTextForeground( int colour ) = 0;
-    virtual void SetTextBackground( int colour ) = 0;
-    virtual void SetLogicalOrigin( int x, int y ) = 0;
+    void SetBrush(int colour, int opacity);
+    void SetPen(int colour, int width, int opacity);
+    void SetFont(FontInfo *font);
+    void ResetBrush();
+    void ResetPen();
+    void ResetFont();
+    virtual void SetBackground(int colour, int style = AxSOLID) = 0;
+    virtual void SetBackgroundImage(void *image, double opacity = 1.0) = 0;
+    virtual void SetBackgroundMode(int mode) = 0;
+    virtual void SetTextForeground(int colour) = 0;
+    virtual void SetTextBackground(int colour) = 0;
+    virtual void SetLogicalOrigin(int x, int y) = 0;
     ///}
 
     /**
      * @name Getters for text extend (non virtual)
      */
     ///@{
-    virtual void GetTextExtent( const std::string& string, int *w, int *h );
-    virtual void GetTextExtent( const std::wstring& string, int *w, int *h );
-    virtual void GetSmuflTextExtent( const std::wstring& string, int *w, int *h );
+    virtual void GetTextExtent(const std::string& string, int *w, int *h);
+    virtual void GetTextExtent(const std::wstring& string, int *w, int *h);
+    virtual void GetSmuflTextExtent(const std::wstring& string, int *w, int *h);
     
     /**
      * @name Getters
      */
     ///@{
-    virtual Point GetLogicalOrigin( ) = 0;
+    virtual Point GetLogicalOrigin() = 0;
     ///@}
 
     /**
@@ -98,14 +98,14 @@ public:
     virtual void DrawText(const std::string& text, const std::wstring wtext = L"") = 0;
     virtual void DrawMusicText(const std::wstring& text, int x, int y) = 0;
     virtual void DrawSpline(int n, Point points[]) = 0;
-    virtual void DrawBackgroundImage( int x = 0, int y = 0 ) = 0;
+    virtual void DrawBackgroundImage(int x = 0, int y = 0) = 0;
     ///@}
     
     /**
      * Special method for forcing bounding boxes to be updated
      * Used for invisible elements (e.g. <space>) that needs to be take into account in spacing
      */
-    virtual void DrawPlaceholder( int x, int y ) {};
+    virtual void DrawPlaceholder(int x, int y) {};
 
     /**
      * @name Method for starting and ending a text
@@ -113,7 +113,7 @@ public:
      * Font can be changed between called for DrawText
      */
     ///@{
-    virtual void StartText( int x, int y, char alignement = LEFT ) = 0;
+    virtual void StartText(int x, int y, char alignement = LEFT) = 0;
     virtual void EndText() = 0;
     
     /**
@@ -130,8 +130,8 @@ public:
      * has to be defined in the child class. It should not be call twice in a row.
      */
     ///@{
-    void DeactivateGraphic( );
-    void ReactivateGraphic( );
+    void DeactivateGraphic();
+    void ReactivateGraphic();
     ///@}
     
     /**
@@ -139,8 +139,8 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartGraphic( DocObject *object, std::string gClass, std::string gId ) = 0;
-    virtual void EndGraphic( DocObject *object, View *view  ) = 0;
+    virtual void StartGraphic(DocObject *object, std::string gClass, std::string gId) = 0;
+    virtual void EndGraphic(DocObject *object, View *view ) = 0;
     ///@}
     
     /**
@@ -148,8 +148,8 @@ public:
      * The methods can be used to the output together, for example for a Beam
      */
     ///@{
-    virtual void ResumeGraphic( DocObject *object, std::string gId ) = 0;
-    virtual void EndResumedGraphic( DocObject *object, View *view  ) = 0;
+    virtual void ResumeGraphic(DocObject *object, std::string gId) = 0;
+    virtual void EndResumedGraphic(DocObject *object, View *view ) = 0;
     ///@}    
     
     /**
@@ -157,20 +157,20 @@ public:
      * For example, in SVG, a text graphic is a <tspan> (and not a <g>)
      */
     ///@{
-    virtual void StartTextGraphic( DocObject *object, std::string gClass, std::string gId ) { StartGraphic(object, gClass, gId); }
-    virtual void EndTextGraphic( DocObject *object, View *view  ) { EndGraphic(object, view); }
+    virtual void StartTextGraphic(DocObject *object, std::string gClass, std::string gId) { StartGraphic(object, gClass, gId); }
+    virtual void EndTextGraphic(DocObject *object, View *view ) { EndGraphic(object, view); }
     ///@}
  
     /**
      * @name Method for starting and ending page
      */
     ///@{
-    virtual void StartPage( ) = 0;
-    virtual void EndPage( ) = 0;
+    virtual void StartPage() = 0;
+    virtual void EndPage() = 0;
     ///@}
     
     /** Colour conversion method **/
-    static int RGB2Int( char red, char green, char blue ) { return (red << 16 | green << 8 | blue); };
+    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); };
 
     /**
      * @name Getter and setter for drawing bounding box option (debug)

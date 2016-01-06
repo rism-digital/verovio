@@ -34,7 +34,7 @@ public:
     Rend();
     virtual ~Rend();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "Rend"; }; ;
+    virtual std::string GetClassName(){ return "Rend"; }; ;
     virtual ClassId Is() { return REND; };
     ///@}
     
@@ -67,10 +67,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Text( );
+    Text();
     virtual ~Text();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "Text"; }; ;
+    virtual std::string GetClassName(){ return "Text"; }; ;
     virtual ClassId Is() { return TEXT; };
     ///@}
     
@@ -80,7 +80,7 @@ public:
      * See MeiInput::ReadText and MeiInput ::WriteText
      */
     ///@{
-    void SetText( std::wstring text ) { m_text = text; };
+    void SetText(std::wstring text) { m_text = text; };
     std::wstring GetText() const { return m_text; };
     ///@}
     

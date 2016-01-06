@@ -47,19 +47,19 @@ public:
      * that need to be drawn in a particular order.
      * For example, we need to draw beams before tuplets
      */
-    void AddToDrawingList( DocObject *element );
+    void AddToDrawingList(DocObject *element);
     
     /**
      * Return the drawing list.
      * This is used when actually drawing the list (see View::DrawLayerList)
      */
-    ListOfObjects *GetDrawingList( );
+    ListOfObjects *GetDrawingList();
     
     /**
      * Reset the drawing list.
      * Clears the list - called when the layer starts to be drawn
      */
-    void ResetDrawingList( );
+    void ResetDrawingList();
     
 private:
     
@@ -92,8 +92,8 @@ public:
     StaffDefDrawingInterface();
     virtual ~StaffDefDrawingInterface();
     virtual void Reset();
-    StaffDefDrawingInterface( const StaffDefDrawingInterface& interface ); // copy contructor
-    StaffDefDrawingInterface& operator=( const StaffDefDrawingInterface& interface ); // copy assignement;
+    StaffDefDrawingInterface(const StaffDefDrawingInterface& interface); // copy contructor
+    StaffDefDrawingInterface& operator=(const StaffDefDrawingInterface& interface); // copy assignement;
     ///@}
     
     /**
@@ -103,35 +103,35 @@ public:
      */
     ///@{
     bool DrawClef() const { return m_drawClef; };
-    void SetDrawClef( bool drawClef ) { m_drawClef = drawClef; };
+    void SetDrawClef(bool drawClef) { m_drawClef = drawClef; };
     bool DrawKeySig() const { return m_drawKeySig; };
-    void SetDrawKeySig( bool drawKeySig ) { m_drawKeySig = drawKeySig; };
+    void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; };
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
-    void SetDrawKeySigCancellation( bool drawKeySigCancellation ) { m_drawKeySigCancellation = drawKeySigCancellation; };
+    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
     bool DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur( bool drawMensur ) { m_drawMensur = drawMensur; };
+    void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; };
     bool DrawMeterSig() const { return m_drawMeterSig; };
-    void SetDrawMeterSig( bool drawMeterSig ) { m_drawMeterSig = drawMeterSig; };
+    void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; };
     ///@}
     
     /**
      * @name Set the current clef, keySig, mensur and meterSig.
      */
     ///@{
-    void SetCurrentClef( Clef *clef );
-    void SetCurrentKeySig( KeySig *keySig );
-    void SetCurrentMensur( Mensur *mensur );
-    void SetCurrentMeterSig( MeterSig *meterSig );
+    void SetCurrentClef(Clef *clef);
+    void SetCurrentKeySig(KeySig *keySig);
+    void SetCurrentMensur(Mensur *mensur);
+    void SetCurrentMeterSig(MeterSig *meterSig);
     ///@}
     
     /**
      * @name Get the clef, keySig, mensur and meterSig to be drawn.
      */
     ///@{
-    Clef *GetDrawingClef( ) { if (m_drawClef) return m_currentClef; return NULL; };
-    KeySig *GetDrawingKeySig( ) { if (m_drawKeySig) return m_currentKeySig; return NULL; };
-    Mensur *GetDrawingMensur( ) { if (m_drawMensur) return m_currentMensur; return NULL; };
-    MeterSig *GetDrawingMeterSig( ) { if (m_drawMeterSig) return m_currentMeterSig; return NULL; };
+    Clef *GetDrawingClef() { if (m_drawClef) return m_currentClef; return NULL; };
+    KeySig *GetDrawingKeySig() { if (m_drawKeySig) return m_currentKeySig; return NULL; };
+    Mensur *GetDrawingMensur() { if (m_drawMensur) return m_currentMensur; return NULL; };
+    MeterSig *GetDrawingMeterSig() { if (m_drawMeterSig) return m_currentMeterSig; return NULL; };
     ///@}
     
     /**

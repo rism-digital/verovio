@@ -35,7 +35,7 @@ public:
     Tuplet();
     virtual ~Tuplet();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Tuplet"; };
+    virtual std::string GetClassName() { return "Tuplet"; };
     virtual ClassId Is() { return TUPLET; };
     ///@}
 
@@ -52,7 +52,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList( ListOfObjects *childList );
+    virtual void FilterList(ListOfObjects *childList);
     
 private:
     

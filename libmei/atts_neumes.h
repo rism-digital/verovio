@@ -39,10 +39,10 @@ public:
     void ResetIneumeLog();
     
     /** Read the values for the attribute class **/
-    bool ReadIneumeLog( pugi::xml_node element );
+    bool ReadIneumeLog(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteIneumeLog( pugi::xml_node element );
+    bool WriteIneumeLog(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,12 +52,12 @@ public:
     ///@{
     void SetForm(data_INEUMEFORM form_) { m_form = form_; };
     data_INEUMEFORM GetForm() const { return m_form; };    
-    bool HasForm( );
+    bool HasForm();
     
     //
     void SetName(data_INEUMENAME name_) { m_name = name_; };
     data_INEUMENAME GetName() const { return m_name; };    
-    bool HasName( );
+    bool HasName();
     
     ///@}
 
@@ -84,10 +84,10 @@ public:
     void ResetUneumeLog();
     
     /** Read the values for the attribute class **/
-    bool ReadUneumeLog( pugi::xml_node element );
+    bool ReadUneumeLog(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteUneumeLog( pugi::xml_node element );
+    bool WriteUneumeLog(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -97,12 +97,12 @@ public:
     ///@{
     void SetForm(data_UNEUMEFORM form_) { m_form = form_; };
     data_UNEUMEFORM GetForm() const { return m_form; };    
-    bool HasForm( );
+    bool HasForm();
     
     //
     void SetName(data_UNEUMENAME name_) { m_name = name_; };
     data_UNEUMENAME GetName() const { return m_name; };    
-    bool HasName( );
+    bool HasName();
     
     ///@}
 

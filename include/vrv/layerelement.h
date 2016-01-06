@@ -47,18 +47,18 @@ public:
     /**
      * Copy assignment for resetting pointers
      */
-    LayerElement& operator=( const LayerElement& element );
+    LayerElement& operator=(const LayerElement& element);
     
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
      * Called by AlignHorizontally
      */
-    virtual void ResetHorizontalAlignment( );
+    virtual void ResetHorizontalAlignment();
     
     /** 
      * Adjust the pname and the octave for values outside the range
      */
-    static void AdjustPname( int *pname, int *oct );
+    static void AdjustPname(int *pname, int *oct);
     
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -68,7 +68,7 @@ public:
      */
     ///@{
     bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
-    void SetScoreOrStaffDefAttr( bool isScoreOrStaffDefAttr ) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; };
+    void SetScoreOrStaffDefAttr(bool isScoreOrStaffDefAttr) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; };
     ///@}
 
     /**
@@ -110,7 +110,7 @@ public:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    virtual double GetAlignmentDuration( Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true );
+    virtual double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true);
     
     //----------//
     // Functors //
@@ -119,19 +119,19 @@ public:
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally( ArrayPtrVoid *params );
+    virtual int AlignHorizontally(ArrayPtrVoid *params);
     
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning( ArrayPtrVoid *params );
+    virtual int PrepareTimeSpanning(ArrayPtrVoid *params);
     
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid *params );
+    virtual int SetDrawingXY(ArrayPtrVoid *params);
     
-    virtual int TimeSpanningLayerElements( ArrayPtrVoid *params );
+    virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
     
 private:
     

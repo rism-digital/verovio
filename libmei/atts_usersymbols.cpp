@@ -42,7 +42,7 @@ void AttAltsym::ResetAltsym() {
     m_altsym = "";
 }
 
-bool AttAltsym::ReadAltsym( pugi::xml_node element ) {
+bool AttAltsym::ReadAltsym(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("altsym")) {
         this->SetAltsym(StrToStr(element.attribute("altsym").value()));
@@ -52,7 +52,7 @@ bool AttAltsym::ReadAltsym( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttAltsym::WriteAltsym( pugi::xml_node element ) {
+bool AttAltsym::WriteAltsym(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasAltsym()) {
         element.append_attribute("altsym") = StrToStr(this->GetAltsym()).c_str();
@@ -61,7 +61,7 @@ bool AttAltsym::WriteAltsym( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttAltsym::HasAltsym( )
+bool AttAltsym::HasAltsym()
 {
     return (m_altsym != "");
 }
@@ -69,10 +69,10 @@ bool AttAltsym::HasAltsym( )
 
 /* include <attaltsym> */
 
-bool Att::SetUsersymbols( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_ALTSYM ) ) {
+bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_ALTSYM)) {
         AttAltsym *att = dynamic_cast<AttAltsym*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "altsym") {
             att->SetAltsym(att->StrToStr(attrValue));
             return true;
@@ -82,10 +82,10 @@ bool Att::SetUsersymbols( Object *element, std::string attrType, std::string att
     return false;
 }
 
-void Att::GetUsersymbols( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_ALTSYM ) ) {
+void Att::GetUsersymbols(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_ALTSYM)) {
         AttAltsym *att = dynamic_cast<AttAltsym*>(element);
-        assert( att );
+        assert(att);
         if (att->HasAltsym()) {
             attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));
         }

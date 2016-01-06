@@ -34,7 +34,7 @@ public:
     AnchoredText();
     virtual ~AnchoredText();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "AnchoredText"; };
+    virtual std::string GetClassName() { return "AnchoredText"; };
     virtual ClassId Is() { return ANCHORED_TEXT; };
     ///@}
     
@@ -73,7 +73,7 @@ public:
     Tempo();
     virtual ~Tempo();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Tempo"; };
+    virtual std::string GetClassName() { return "Tempo"; };
     virtual ClassId Is() { return TEMPO; };
     ///@}
     

@@ -27,7 +27,7 @@ namespace vrv {
 AnchoredText::AnchoredText():
 FloatingElement("anchtext-"), TextDirInterface()
 {
-    RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
+    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     
     Reset();
 }
@@ -48,8 +48,8 @@ void AnchoredText::AddTextElement(TextElement *element)
     assert(
            dynamic_cast<TextElement*>(element)
            || dynamic_cast<EditorialElement*>(element)
-           );
-    element->SetParent( this );
+          );
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
@@ -62,8 +62,8 @@ Tempo::Tempo():
     FloatingElement("tempo-"), TextDirInterface(),
     AttTimestampMusical()
 {
-    RegisterInterface( TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface() );
-    RegisterAttClass( ATT_TIMESTAMPMUSICAL );
+    RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
+    RegisterAttClass(ATT_TIMESTAMPMUSICAL);
     
     Reset();
 }
@@ -86,8 +86,8 @@ void Tempo::AddTextElement(TextElement *element)
     assert(
               dynamic_cast<TextElement*>(element)
            || dynamic_cast<EditorialElement*>(element)
-    );
-    element->SetParent( this );
+   );
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }

@@ -43,7 +43,7 @@ void AttNoteGesTablature::ResetNoteGesTablature() {
     m_tabString = STRINGNUMBER_NONE;
 }
 
-bool AttNoteGesTablature::ReadNoteGesTablature( pugi::xml_node element ) {
+bool AttNoteGesTablature::ReadNoteGesTablature(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("tab.fret")) {
         this->SetTabFret(StrToFretnumber(element.attribute("tab.fret").value()));
@@ -58,7 +58,7 @@ bool AttNoteGesTablature::ReadNoteGesTablature( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttNoteGesTablature::WriteNoteGesTablature( pugi::xml_node element ) {
+bool AttNoteGesTablature::WriteNoteGesTablature(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasTabFret()) {
         element.append_attribute("tab.fret") = FretnumberToStr(this->GetTabFret()).c_str();
@@ -71,12 +71,12 @@ bool AttNoteGesTablature::WriteNoteGesTablature( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttNoteGesTablature::HasTabFret( )
+bool AttNoteGesTablature::HasTabFret()
 {
     return (m_tabFret != FRETNUMBER_NONE);
 }
 
-bool AttNoteGesTablature::HasTabString( )
+bool AttNoteGesTablature::HasTabString()
 {
     return (m_tabString != STRINGNUMBER_NONE);
 }
@@ -100,7 +100,7 @@ void AttStaffDefGesTablature::ResetStaffDefGesTablature() {
     m_tabStrings = "";
 }
 
-bool AttStaffDefGesTablature::ReadStaffDefGesTablature( pugi::xml_node element ) {
+bool AttStaffDefGesTablature::ReadStaffDefGesTablature(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("tab.strings")) {
         this->SetTabStrings(StrToStr(element.attribute("tab.strings").value()));
@@ -110,7 +110,7 @@ bool AttStaffDefGesTablature::ReadStaffDefGesTablature( pugi::xml_node element )
     return hasAttribute;
 }
 
-bool AttStaffDefGesTablature::WriteStaffDefGesTablature( pugi::xml_node element ) {
+bool AttStaffDefGesTablature::WriteStaffDefGesTablature(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasTabStrings()) {
         element.append_attribute("tab.strings") = StrToStr(this->GetTabStrings()).c_str();
@@ -119,7 +119,7 @@ bool AttStaffDefGesTablature::WriteStaffDefGesTablature( pugi::xml_node element 
     return wroteAttribute;
 }
 
-bool AttStaffDefGesTablature::HasTabStrings( )
+bool AttStaffDefGesTablature::HasTabStrings()
 {
     return (m_tabStrings != "");
 }
@@ -127,10 +127,10 @@ bool AttStaffDefGesTablature::HasTabStrings( )
 
 /* include <atttab.strings> */
 
-bool Att::SetTablature( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_NOTEGESTABLATURE ) ) {
+bool Att::SetTablature(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_NOTEGESTABLATURE)) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "tab.fret") {
             att->SetTabFret(att->StrToFretnumber(attrValue));
             return true;
@@ -140,9 +140,9 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
             return true;
         }
     }
-    if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {
+    if (element->HasAttClass(ATT_STAFFDEFGESTABLATURE)) {
         AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "tab.strings") {
             att->SetTabStrings(att->StrToStr(attrValue));
             return true;
@@ -152,10 +152,10 @@ bool Att::SetTablature( Object *element, std::string attrType, std::string attrV
     return false;
 }
 
-void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_NOTEGESTABLATURE ) ) {
+void Att::GetTablature(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_NOTEGESTABLATURE)) {
         AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature*>(element);
-        assert( att );
+        assert(att);
         if (att->HasTabFret()) {
             attributes->push_back(std::make_pair("tab.fret", att->FretnumberToStr(att->GetTabFret())));
         }
@@ -163,9 +163,9 @@ void Att::GetTablature( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("tab.string", att->StringnumberToStr(att->GetTabString())));
         }
     }
-    if (element->HasAttClass( ATT_STAFFDEFGESTABLATURE ) ) {
+    if (element->HasAttClass(ATT_STAFFDEFGESTABLATURE)) {
         AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature*>(element);
-        assert( att );
+        assert(att);
         if (att->HasTabStrings()) {
             attributes->push_back(std::make_pair("tab.strings", att->StrToStr(att->GetTabStrings())));
         }

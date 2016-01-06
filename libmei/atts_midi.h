@@ -39,10 +39,10 @@ public:
     void ResetChannelized();
     
     /** Read the values for the attribute class **/
-    bool ReadChannelized( pugi::xml_node element );
+    bool ReadChannelized(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteChannelized( pugi::xml_node element );
+    bool WriteChannelized(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,22 +52,22 @@ public:
     ///@{
     void SetMidiChannel(data_MIDICHANNEL midiChannel_) { m_midiChannel = midiChannel_; };
     data_MIDICHANNEL GetMidiChannel() const { return m_midiChannel; };    
-    bool HasMidiChannel( );
+    bool HasMidiChannel();
     
     //
     void SetMidiDuty(int midiDuty_) { m_midiDuty = midiDuty_; };
     int GetMidiDuty() const { return m_midiDuty; };    
-    bool HasMidiDuty( );
+    bool HasMidiDuty();
     
     //
     void SetMidiPort(data_MIDIVALUE midiPort_) { m_midiPort = midiPort_; };
     data_MIDIVALUE GetMidiPort() const { return m_midiPort; };    
-    bool HasMidiPort( );
+    bool HasMidiPort();
     
     //
     void SetMidiTrack(int midiTrack_) { m_midiTrack = midiTrack_; };
     int GetMidiTrack() const { return m_midiTrack; };    
-    bool HasMidiTrack( );
+    bool HasMidiTrack();
     
     ///@}
 
@@ -98,10 +98,10 @@ public:
     void ResetMidiinstrument();
     
     /** Read the values for the attribute class **/
-    bool ReadMidiinstrument( pugi::xml_node element );
+    bool ReadMidiinstrument(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMidiinstrument( pugi::xml_node element );
+    bool WriteMidiinstrument(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -111,22 +111,22 @@ public:
     ///@{
     void SetMidiInstrnum(data_MIDIVALUE midiInstrnum_) { m_midiInstrnum = midiInstrnum_; };
     data_MIDIVALUE GetMidiInstrnum() const { return m_midiInstrnum; };    
-    bool HasMidiInstrnum( );
+    bool HasMidiInstrnum();
     
     //
     void SetMidiInstrname(data_MIDINAMES midiInstrname_) { m_midiInstrname = midiInstrname_; };
     data_MIDINAMES GetMidiInstrname() const { return m_midiInstrname; };    
-    bool HasMidiInstrname( );
+    bool HasMidiInstrname();
     
     //
     void SetMidiPan(data_MIDIVALUE midiPan_) { m_midiPan = midiPan_; };
     data_MIDIVALUE GetMidiPan() const { return m_midiPan; };    
-    bool HasMidiPan( );
+    bool HasMidiPan();
     
     //
     void SetMidiVolume(data_MIDIVALUE midiVolume_) { m_midiVolume = midiVolume_; };
     data_MIDIVALUE GetMidiVolume() const { return m_midiVolume; };    
-    bool HasMidiVolume( );
+    bool HasMidiVolume();
     
     ///@}
 
@@ -160,10 +160,10 @@ public:
     void ResetMidinumber();
     
     /** Read the values for the attribute class **/
-    bool ReadMidinumber( pugi::xml_node element );
+    bool ReadMidinumber(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMidinumber( pugi::xml_node element );
+    bool WriteMidinumber(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -173,7 +173,7 @@ public:
     ///@{
     void SetNum(int num_) { m_num = num_; };
     int GetNum() const { return m_num; };    
-    bool HasNum( );
+    bool HasNum();
     
     ///@}
 
@@ -201,10 +201,10 @@ public:
     void ResetMiditempo();
     
     /** Read the values for the attribute class **/
-    bool ReadMiditempo( pugi::xml_node element );
+    bool ReadMiditempo(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMiditempo( pugi::xml_node element );
+    bool WriteMiditempo(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -214,7 +214,7 @@ public:
     ///@{
     void SetMidiTempo(data_MIDITEMPO midiTempo_) { m_midiTempo = midiTempo_; };
     data_MIDITEMPO GetMidiTempo() const { return m_midiTempo; };    
-    bool HasMidiTempo( );
+    bool HasMidiTempo();
     
     ///@}
 
@@ -242,10 +242,10 @@ public:
     void ResetMidivalue();
     
     /** Read the values for the attribute class **/
-    bool ReadMidivalue( pugi::xml_node element );
+    bool ReadMidivalue(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMidivalue( pugi::xml_node element );
+    bool WriteMidivalue(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -255,7 +255,7 @@ public:
     ///@{
     void SetVal(data_MIDIVALUE val_) { m_val = val_; };
     data_MIDIVALUE GetVal() const { return m_val; };    
-    bool HasVal( );
+    bool HasVal();
     
     ///@}
 
@@ -280,10 +280,10 @@ public:
     void ResetMidivalue2();
     
     /** Read the values for the attribute class **/
-    bool ReadMidivalue2( pugi::xml_node element );
+    bool ReadMidivalue2(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMidivalue2( pugi::xml_node element );
+    bool WriteMidivalue2(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -293,7 +293,7 @@ public:
     ///@{
     void SetVal2(data_MIDIVALUE val2_) { m_val2 = val2_; };
     data_MIDIVALUE GetVal2() const { return m_val2; };    
-    bool HasVal2( );
+    bool HasVal2();
     
     ///@}
 
@@ -318,10 +318,10 @@ public:
     void ResetMidivelocity();
     
     /** Read the values for the attribute class **/
-    bool ReadMidivelocity( pugi::xml_node element );
+    bool ReadMidivelocity(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteMidivelocity( pugi::xml_node element );
+    bool WriteMidivelocity(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -331,7 +331,7 @@ public:
     ///@{
     void SetVel(data_MIDIVALUE vel_) { m_vel = vel_; };
     data_MIDIVALUE GetVel() const { return m_vel; };    
-    bool HasVel( );
+    bool HasVel();
     
     ///@}
 
@@ -356,10 +356,10 @@ public:
     void ResetTimebase();
     
     /** Read the values for the attribute class **/
-    bool ReadTimebase( pugi::xml_node element );
+    bool ReadTimebase(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteTimebase( pugi::xml_node element );
+    bool WriteTimebase(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -369,7 +369,7 @@ public:
     ///@{
     void SetPpq(int ppq_) { m_ppq = ppq_; };
     int GetPpq() const { return m_ppq; };    
-    bool HasPpq( );
+    bool HasPpq();
     
     ///@}
 

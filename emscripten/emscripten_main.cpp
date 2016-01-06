@@ -60,16 +60,16 @@ extern "C" {
 	}
     
     int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId) {
-        return tk->GetPageWithElement( xmlId );
+        return tk->GetPageWithElement(xmlId);
     }
 
 	bool vrvToolkit_loadData(Toolkit *tk, const char *data) {
 		tk->ResetLogBuffer();
-        return tk->LoadString( data );
+        return tk->LoadString(data);
 	}
 
     const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based) {
-        tk->SetCString(tk->GetMEI( page_no, score_based ));
+        tk->SetCString(tk->GetMEI(page_no, score_based));
         return tk->GetCString();
     }
     
@@ -80,8 +80,8 @@ extern "C" {
 	}
 	
 	void vrvToolkit_setOptions(Toolkit *tk, const char *options) {		
-        if (!tk->ParseOptions( options )) {
-            vrv::LogError( "Could not load JSON options." );
+        if (!tk->ParseOptions(options)) {
+            vrv::LogError("Could not load JSON options.");
         }
 	}
     
@@ -98,15 +98,15 @@ extern "C" {
 	}
     
     bool vrvToolkit_edit(Toolkit *tk, const char *editorAction) {
-        if (!tk->Edit( editorAction )) {
-            vrv::LogError( "Could not perform editor action." );
+        if (!tk->Edit(editorAction)) {
+            vrv::LogError("Could not perform editor action.");
             return false;
         }
         return true;
     }
     
     const char* vrvToolkit_getElementAttr(Toolkit *tk, const char *xmlId) {
-        tk->SetCString(tk->GetElementAttr( xmlId ));
+        tk->SetCString(tk->GetElementAttr(xmlId));
         return tk->GetCString();
     }
 }

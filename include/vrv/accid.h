@@ -31,7 +31,7 @@ public:
     Accid();
     virtual ~Accid();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Accid"; };
+    virtual std::string GetClassName() { return "Accid"; };
     virtual ClassId Is() { return ACCID; };
     ///@}
     
@@ -46,7 +46,7 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
+    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
     
 protected:
 

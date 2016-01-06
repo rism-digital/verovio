@@ -42,7 +42,7 @@ void AttFacsimile::ResetFacsimile() {
     m_facs = URIS_NONE;
 }
 
-bool AttFacsimile::ReadFacsimile( pugi::xml_node element ) {
+bool AttFacsimile::ReadFacsimile(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("facs")) {
         this->SetFacs(StrToUris(element.attribute("facs").value()));
@@ -52,7 +52,7 @@ bool AttFacsimile::ReadFacsimile( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttFacsimile::WriteFacsimile( pugi::xml_node element ) {
+bool AttFacsimile::WriteFacsimile(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasFacs()) {
         element.append_attribute("facs") = UrisToStr(this->GetFacs()).c_str();
@@ -61,7 +61,7 @@ bool AttFacsimile::WriteFacsimile( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttFacsimile::HasFacs( )
+bool AttFacsimile::HasFacs()
 {
     return (m_facs != URIS_NONE);
 }
@@ -71,10 +71,10 @@ void AttFacsimile::getCoords() {
     return;
 }
 
-bool Att::SetFacsimile( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_FACSIMILE ) ) {
+bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_FACSIMILE)) {
         AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "facs") {
             att->SetFacs(att->StrToUris(attrValue));
             return true;
@@ -84,10 +84,10 @@ bool Att::SetFacsimile( Object *element, std::string attrType, std::string attrV
     return false;
 }
 
-void Att::GetFacsimile( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_FACSIMILE ) ) {
+void Att::GetFacsimile(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_FACSIMILE)) {
         AttFacsimile *att = dynamic_cast<AttFacsimile*>(element);
-        assert( att );
+        assert(att);
         if (att->HasFacs()) {
             attributes->push_back(std::make_pair("facs", att->UrisToStr(att->GetFacs())));
         }

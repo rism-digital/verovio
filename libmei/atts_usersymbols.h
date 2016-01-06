@@ -39,10 +39,10 @@ public:
     void ResetAltsym();
     
     /** Read the values for the attribute class **/
-    bool ReadAltsym( pugi::xml_node element );
+    bool ReadAltsym(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteAltsym( pugi::xml_node element );
+    bool WriteAltsym(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetAltsym(std::string altsym_) { m_altsym = altsym_; };
     std::string GetAltsym() const { return m_altsym; };    
-    bool HasAltsym( );
+    bool HasAltsym();
     
     ///@}
 

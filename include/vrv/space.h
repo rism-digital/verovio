@@ -29,10 +29,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Space( );
+    Space();
     virtual ~Space();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "Space"; }; ;
+    virtual std::string GetClassName(){ return "Space"; }; ;
     virtual ClassId Is() { return SPACE; };
     ///@}
 

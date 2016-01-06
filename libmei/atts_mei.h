@@ -39,10 +39,10 @@ public:
     void ResetNotationtype();
     
     /** Read the values for the attribute class **/
-    bool ReadNotationtype( pugi::xml_node element );
+    bool ReadNotationtype(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteNotationtype( pugi::xml_node element );
+    bool WriteNotationtype(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,12 +52,12 @@ public:
     ///@{
     void SetNotationtype(data_NOTATIONTYPE notationtype_) { m_notationtype = notationtype_; };
     data_NOTATIONTYPE GetNotationtype() const { return m_notationtype; };    
-    bool HasNotationtype( );
+    bool HasNotationtype();
     
     //
     void SetNotationsubtype(std::string notationsubtype_) { m_notationsubtype = notationsubtype_; };
     std::string GetNotationsubtype() const { return m_notationsubtype; };    
-    bool HasNotationsubtype( );
+    bool HasNotationsubtype();
     
     ///@}
 

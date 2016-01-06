@@ -44,12 +44,12 @@ public:
     ///@{
     KeySig();
     KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType);
-    KeySig( ScoreDefInterface *keySigAttr );
+    KeySig(ScoreDefInterface *keySigAttr);
     void Init();
     virtual ~KeySig();
     virtual void Reset();
     virtual Object* Clone() { return new KeySig(*this); };
-    virtual std::string GetClassName( ) { return "KeySig"; };
+    virtual std::string GetClassName() { return "KeySig"; };
     virtual ClassId Is() { return KEYSIG; };
     
     /** Override the method since alignment is required */
@@ -61,17 +61,17 @@ public:
     
     /* Alteration number getter/setter */
     data_ACCIDENTAL_EXPLICIT GetAlterationType() { return m_alterationType; };
-    void SetAlterationType( data_ACCIDENTAL_EXPLICIT alterationType ) { m_alterationType = alterationType; };
+    void SetAlterationType(data_ACCIDENTAL_EXPLICIT alterationType) { m_alterationType = alterationType; };
     
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
-    void ConvertToMei( );
-    void ConvertToInternal( );
+    void ConvertToMei();
+    void ConvertToInternal();
     
     /**
      * Static methods for calculating position;
      */
-    static data_PITCHNAME GetAlterationAt( data_ACCIDENTAL_EXPLICIT alterationType, int pos );
-    static int GetOctave( data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
+    static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos);
+    static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
     
 private:
     
@@ -85,7 +85,7 @@ public:
     /**
      * Equivalent to @key.sig.show and @showchange, but set for drawing
      * KeySig has no equivalent in MEI and will be true and false by default
-     * See KeySig::KeySig( KeySigAttr *keySigAttr ) for initialisation
+     * See KeySig::KeySig(KeySigAttr *keySigAttr) for initialisation
      */
     bool m_drawingShow;
     bool m_drawingShowchange;

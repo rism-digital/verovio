@@ -40,10 +40,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    Layer( );
+    Layer();
     virtual ~Layer();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Layer"; };
+    virtual std::string GetClassName() { return "Layer"; };
     virtual ClassId Is() { return LAYER; };
     ///@}
 	
@@ -51,7 +51,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddLayerElement( LayerElement *element, int idx = -1 );
+	void AddLayerElement(LayerElement *element, int idx = -1);
     ///@}
     	    
     /**
@@ -60,9 +60,9 @@ public:
      */
     int GetLayerIdx() const { return Object::GetIdx(); };
     
-	LayerElement *GetPrevious( LayerElement *element );
-	LayerElement *GetAtPos( int x );
-	LayerElement *Insert( LayerElement *element, int x ); // return a pointer on the inserted element
+	LayerElement *GetPrevious(LayerElement *element);
+	LayerElement *GetAtPos(int x);
+	LayerElement *Insert(LayerElement *element, int x); // return a pointer on the inserted element
     
     /** 
      * Get the current clef for the test element.
@@ -70,26 +70,26 @@ public:
      * This is used when inserting a note by passing a y position because we need
      * to know the clef in order to get the pitch.
      */
-	Clef *GetClef ( LayerElement *test );
+	Clef *GetClef (LayerElement *test);
     
     /** 
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
-    int GetClefOffset( LayerElement *test  );
+    int GetClefOffset(LayerElement *test );
     
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.
      * Also set the current clef.
      */
-    void SetDrawingAndCurrentValues( StaffDef *currentStaffDef );
+    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
     
     /**
      * @name Set and get the stem direction of the layer.
      * This stays STEMDIRECTION_NONE with on single layer in the staff. 
      */
     ///@{
-    void SetDrawingStemDir( data_STEMDIRECTION stemDirection ) { m_drawingStemDir = stemDirection; };
+    void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; };
     data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
     ///@}
     
@@ -101,29 +101,29 @@ public:
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontally( ArrayPtrVoid *params );
+    virtual int AlignHorizontally(ArrayPtrVoid *params);
 
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontallyEnd( ArrayPtrVoid *params );
+    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
     
     /**
      * Builds a tree of int (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists( ArrayPtrVoid *params );
+    virtual int PrepareProcessingLists(ArrayPtrVoid *params);
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY( ArrayPtrVoid *params );
+    virtual int SetDrawingXY(ArrayPtrVoid *params);
     
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt( ArrayPtrVoid *params );
+    virtual int PrepareRpt(ArrayPtrVoid *params);
     
 private:
     

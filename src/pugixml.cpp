@@ -1188,7 +1188,7 @@ PUGI__NS_BEGIN
 		if (n->header & impl::xml_memory_page_value_allocated_mask)
 			alloc.deallocate_string(n->value);
 
-		for (xml_attribute_struct* attr = n->first_attribute; attr; )
+		for (xml_attribute_struct* attr = n->first_attribute; attr;)
 		{
 			xml_attribute_struct* next = attr->next_attribute;
 
@@ -1197,7 +1197,7 @@ PUGI__NS_BEGIN
 			attr = next;
 		}
 
-		for (xml_node_struct* child = n->first_child; child; )
+		for (xml_node_struct* child = n->first_child; child;)
 		{
 			xml_node_struct* next = child->next_sibling;
 
@@ -2494,7 +2494,7 @@ PUGI__NS_BEGIN
 	// Parser utilities
 	#define PUGI__ENDSWITH(c, e)        ((c) == (e) || ((c) == 0 && endch == (e)))
 	#define PUGI__SKIPWS()              { while (PUGI__IS_CHARTYPE(*s, ct_space)) ++s; }
-	#define PUGI__OPTSET(OPT)           ( optmsk & (OPT) )
+	#define PUGI__OPTSET(OPT)           (optmsk & (OPT))
 	#define PUGI__PUSHNODE(TYPE)        { cursor = append_new_node(cursor, alloc, TYPE); if (!cursor) PUGI__THROW_ERROR(status_out_of_memory, s); }
 	#define PUGI__POPNODE()             { cursor = cursor->parent; }
 	#define PUGI__SCANFOR(X)            { while (*s != 0 && !(X)) ++s; }
@@ -6737,7 +6737,7 @@ namespace pugi
 		assert(root_page && !root_page->prev);
 		assert(reinterpret_cast<char*>(root_page) >= _memory && reinterpret_cast<char*>(root_page) < _memory + sizeof(_memory));
 
-		for (impl::xml_memory_page* page = root_page->next; page; )
+		for (impl::xml_memory_page* page = root_page->next; page;)
 		{
 			impl::xml_memory_page* next = page->next;
 
@@ -8169,7 +8169,7 @@ PUGI__NS_BEGIN
 	{
 		char_t* write = buffer;
 
-		for (char_t* it = buffer; *it; )
+		for (char_t* it = buffer; *it;)
 		{
 			char_t ch = *it++;
 

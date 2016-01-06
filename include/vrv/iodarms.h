@@ -37,10 +37,10 @@ class DarmsInput: public FileInputStream
 {
 public:
     // constructors and destructors
-    DarmsInput( Doc *doc, std::string filename );
+    DarmsInput(Doc *doc, std::string filename);
     virtual ~DarmsInput();
     
-    virtual bool ImportFile( );
+    virtual bool ImportFile();
     virtual bool ImportString(std::string data);
     
 private:

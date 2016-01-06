@@ -42,33 +42,33 @@ void SystemAligner::Reset()
 {
     Object::Reset();
     m_bottomAlignment = NULL;
-    m_bottomAlignment = GetStaffAlignment( 0 );
+    m_bottomAlignment = GetStaffAlignment(0);
 }
 
-StaffAlignment* SystemAligner::GetStaffAlignment( int idx )
+StaffAlignment* SystemAligner::GetStaffAlignment(int idx)
 {
     // The last one is always the bottomAlignment (unless if not created)
-    if ( m_bottomAlignment ) {
+    if (m_bottomAlignment) {
         // remove it temporarily
         this->m_children.pop_back();
     }
     
     if (idx < GetStaffAlignmentCount()) {
-        this->m_children.push_back( m_bottomAlignment );
+        this->m_children.push_back(m_bottomAlignment);
         return dynamic_cast<StaffAlignment*>(m_children.at(idx));
     }
     // check that we are searching for the next one (not gap)
-    assert( idx == GetStaffAlignmentCount() );
+    assert(idx == GetStaffAlignmentCount());
     //LogDebug("Creating staff alignment");
     
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
     StaffAlignment *alignment = new StaffAlignment();
-    alignment->SetParent( this );
-    m_children.push_back( alignment );
+    alignment->SetParent(this);
+    m_children.push_back(alignment);
     
-    if ( m_bottomAlignment ) {
-        this->m_children.push_back( m_bottomAlignment );
+    if (m_bottomAlignment) {
+        this->m_children.push_back(m_bottomAlignment);
     }
     
     return alignment;
@@ -93,17 +93,17 @@ StaffAlignment::~StaffAlignment()
     
 }
 
-void StaffAlignment::SetYShift( int yShift )
+void StaffAlignment::SetYShift(int yShift)
 {
-    if ( yShift < m_yShift )
+    if (yShift < m_yShift)
     {
         m_yShift = yShift;
     }
 }
 
-void StaffAlignment::SetMaxHeight( int max_height )
+void StaffAlignment::SetMaxHeight(int max_height)
 {
-    if ( max_height < m_maxHeight )
+    if (max_height < m_maxHeight)
     {
         m_maxHeight = max_height;
     }
@@ -114,7 +114,7 @@ void StaffAlignment::SetVerseCount(int verse_count)
 {
     // if 0, then assume 1;
     verse_count = std::max(verse_count, 1);
-    if ( verse_count > m_verseCount )
+    if (verse_count > m_verseCount)
     {
         m_verseCount = verse_count;
     }
@@ -139,24 +139,24 @@ MeasureAligner::~MeasureAligner()
 void MeasureAligner::Reset()
 {
     Object::Reset();
-    m_leftAlignment = new Alignment( 0.0, ALIGNMENT_MEASURE_START );
-    AddAlignment( m_leftAlignment );
-    m_rightAlignment = new Alignment( 0.0, ALIGNMENT_MEASURE_END );
-    AddAlignment( m_rightAlignment );
+    m_leftAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_START);
+    AddAlignment(m_leftAlignment);
+    m_rightAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_END);
+    AddAlignment(m_rightAlignment);
 }
 
-void MeasureAligner::AddAlignment( Alignment *alignment, int idx )
+void MeasureAligner::AddAlignment(Alignment *alignment, int idx)
 {
-	alignment->SetParent( this );
-    if ( idx == -1 ) {
-        m_children.push_back( alignment );
+	alignment->SetParent(this);
+    if (idx == -1) {
+        m_children.push_back(alignment);
     }
     else {
-        InsertChild( alignment, idx );
+        InsertChild(alignment, idx);
     }
 }
 
-Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type, bool hasEndAlignment )
+Alignment* MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, bool hasEndAlignment)
 {
     int i;
     int idx = -1; // the index if we reach the end.
@@ -165,14 +165,14 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type, 
     for (i = 0; i < GetAlignmentCount(); i++)
     {
         alignment = dynamic_cast<Alignment*>(m_children.at(i));
-        assert( alignment );
+        assert(alignment);
         
         double alignment_time = alignment->GetTime();
-        if ( vrv::AreEqual( alignment_time, time ) ) {
+        if (vrv::AreEqual(alignment_time, time)) {
             if (alignment->GetType() == type) {
                 return alignment;
             }
-            else if ( alignment->GetType() > type ) {
+            else if (alignment->GetType() > type) {
                 idx = i;
                 break;
             }
@@ -184,21 +184,21 @@ Alignment* MeasureAligner::GetAlignmentAtTime( double time, AlignmentType type, 
         }
     }
     // nothing found
-    if ( idx == -1 ) {
+    if (idx == -1) {
         // this is tricky! Because we want m_rightAlignment to always stay at the end (with hasEndAlignment),
         // we always to insert _before_ the last one - m_rightAlignment is added in Reset()
-        if ( hasEndAlignment ) idx = GetAlignmentCount() - 1;
+        if (hasEndAlignment) idx = GetAlignmentCount() - 1;
         else idx = GetAlignmentCount();
     }
-    Alignment *newAlignment = new Alignment( time, type );
-    AddAlignment( newAlignment, idx );
+    Alignment *newAlignment = new Alignment(time, type);
+    AddAlignment(newAlignment, idx);
     return newAlignment;
 }
 
-void MeasureAligner::SetMaxTime( double time )
+void MeasureAligner::SetMaxTime(double time)
 {
-    if ( m_rightAlignment->GetTime() < time ) {
-        m_rightAlignment->SetTime( time );
+    if (m_rightAlignment->GetTime() < time) {
+        m_rightAlignment->SetTime(time);
     }
 }
     
@@ -217,24 +217,24 @@ GraceAligner::~GraceAligner()
     
 }
     
-void GraceAligner::StackNote( Note *note )
+void GraceAligner::StackNote(Note *note)
 {
-    m_noteStack.push_back( note );
+    m_noteStack.push_back(note);
 }
     
-void GraceAligner::AlignStack( )
+void GraceAligner::AlignStack()
 {
     int i;
     double time = 0.0;
     for (i = (int)m_noteStack.size(); i > 0; i--) {
-        Note *note = dynamic_cast<Note*>( m_noteStack.at(i-1) );
-        assert( note );
+        Note *note = dynamic_cast<Note*>(m_noteStack.at(i-1));
+        assert(note);
         // get the duration of the event
-        double duration = note->LayerElement::GetAlignmentDuration( NULL, NULL, false );
+        double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
         // Time goes backward with grace notes
         time -= duration;
         // Set the hasEndAlignment to false with grace notes because we don't have an end-measure alignment
-        note->SetGraceAlignment( this->GetAlignmentAtTime( time, ALIGNMENT_DEFAULT, false ) );
+        note->SetGraceAlignment(this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT, false));
     }
     m_noteStack.clear();
 }
@@ -243,7 +243,7 @@ void GraceAligner::AlignStack( )
 // Alignment
 //----------------------------------------------------------------------------
 
-Alignment::Alignment( ):
+Alignment::Alignment():
     Object()
 {
     m_xRel = 0;
@@ -254,7 +254,7 @@ Alignment::Alignment( ):
     m_graceAligner = NULL;
 }
 
-Alignment::Alignment( double time, AlignmentType type ):
+Alignment::Alignment(double time, AlignmentType type):
     Object()
 {
     m_xRel = 0;
@@ -273,29 +273,29 @@ Alignment::~Alignment()
     
 }
 
-void Alignment::SetXRel( int x_rel )
+void Alignment::SetXRel(int x_rel)
 {
     m_xRel = x_rel;
 }
 
-void Alignment::SetXShift( int xShift )
+void Alignment::SetXShift(int xShift)
 {
-    if ( xShift > m_xShift ) {
+    if (xShift > m_xShift) {
         m_xShift = xShift;
     }
 }
 
-void Alignment::SetMaxWidth( int maxWidth )
+void Alignment::SetMaxWidth(int maxWidth)
 {
-    if ( maxWidth > m_maxWidth ) {
+    if (maxWidth > m_maxWidth) {
         m_maxWidth = maxWidth;
     }
 }
     
-GraceAligner *Alignment::GetGraceAligner( )
+GraceAligner *Alignment::GetGraceAligner()
 {
     if (!m_graceAligner) {
-        m_graceAligner = new GraceAligner( );
+        m_graceAligner = new GraceAligner();
     }
     return m_graceAligner;
 }
@@ -304,7 +304,7 @@ GraceAligner *Alignment::GetGraceAligner( )
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
+int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
     // param 1: the staff margin
@@ -322,7 +322,7 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
     
-    if ( m_yShift > -min_shift) {
+    if (m_yShift > -min_shift) {
         m_yShift = -min_shift;
     }
     
@@ -332,7 +332,7 @@ int StaffAlignment::SetAligmentYPos( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
+int StaffAlignment::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the functor to be redirected to the SystemAligner (unused)
@@ -348,7 +348,7 @@ int StaffAlignment::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
+int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
@@ -367,7 +367,7 @@ int MeasureAligner::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Alignment::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
+int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     if (!m_graceAligner) {
         return FUNCTOR_CONTINUE;
@@ -377,23 +377,23 @@ int Alignment::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
     int shift = 0;
     for (i = 0; i < (int)m_graceAligner->m_children.size(); i++) {
         Alignment *alignment = dynamic_cast<Alignment*>(m_graceAligner->m_children.at(i));
-        assert( alignment );
-        alignment->SetXRel( alignment->GetXShift() + shift );
+        assert(alignment);
+        alignment->SetXRel(alignment->GetXShift() + shift);
         shift += alignment->GetXShift();
     }
     
     // Set the total width by looking at the position and maximum width of the last alignment
-    if ( m_graceAligner->m_children.empty() ) {
+    if (m_graceAligner->m_children.empty()) {
         return FUNCTOR_CONTINUE;
     }
     Alignment *alignment = dynamic_cast<Alignment*>(m_graceAligner->m_children.back());
-    assert( alignment );
-    m_graceAligner->SetWidth( alignment->GetXRel() + alignment->GetMaxWidth() );
+    assert(alignment);
+    m_graceAligner->SetWidth(alignment->GetXRel() + alignment->GetMaxWidth());
     
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
+int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
@@ -410,12 +410,12 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
 
     if ((GetType() <= ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner*>(m_parent);
-        assert( aligner );
+        assert(aligner);
         aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
     }
     else if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner*>(m_parent);
-        assert( aligner );
+        assert(aligner);
         (*justifiable_shift) = aligner->GetNonJustifiableMargin();
     }
 
@@ -423,7 +423,7 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
        (*minMeasureWidth) *= 2;
     }
     else if (GetType() == ALIGNMENT_MEASURE_END) {
-        m_xRel = std::max( m_xRel, (*minMeasureWidth) + (*justifiable_shift) );
+        m_xRel = std::max(m_xRel, (*minMeasureWidth) + (*justifiable_shift));
     }
 
     // reset member to 0
@@ -432,7 +432,7 @@ int Alignment::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::SetAlignmentXPos( ArrayPtrVoid *params )
+int MeasureAligner::SetAlignmentXPos(ArrayPtrVoid *params)
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
@@ -469,13 +469,13 @@ int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur,
 {
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
        that interval gets the space a semibreve would ordinarily get. */
-    if ( maxActualDur < DUR_1 ) intervalTime /= pow( 2.0, DUR_1 - maxActualDur);
+    if (maxActualDur < DUR_1) intervalTime /= pow(2.0, DUR_1 - maxActualDur);
     int intervalXRel;
-    intervalXRel = pow( intervalTime, spacingNonLinear ) * spacingLinear * 10.0;     // numbers are experimental constants
+    intervalXRel = pow(intervalTime, spacingNonLinear) * spacingLinear * 10.0;     // numbers are experimental constants
     return intervalXRel;
 }
 
-int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
+int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
 {
     // param 0: the previous time position
     // param 1: the previous x rel position
@@ -488,7 +488,7 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
-    if ( intervalTime > 0.0 ) {
+    if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
         //LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
@@ -499,7 +499,7 @@ int Alignment::SetAlignmentXPos( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int MeasureAligner::JustifyX( ArrayPtrVoid *params )
+int MeasureAligner::JustifyX(ArrayPtrVoid *params)
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin)
@@ -525,7 +525,7 @@ int MeasureAligner::JustifyX( ArrayPtrVoid *params )
 }
 
 
-int Alignment::JustifyX( ArrayPtrVoid *params )
+int Alignment::JustifyX(ArrayPtrVoid *params)
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin)

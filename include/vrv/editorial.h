@@ -59,15 +59,15 @@ public:
      * @name Add children to an editorial element.
      */
     ///@{
-    void AddFloatingElement( FloatingElement *child );
-    void AddLayerElement( LayerElement *child );
-    void AddTextElement( TextElement *child );
-    void AddLayer( Layer *child );
-    void AddMeasure( Measure *child );
-    void AddScoreDef( ScoreDef *child );
-    void AddStaff( Staff *child );
-    void AddStaffDef( StaffDef *child );
-    void AddStaffGrp( StaffGrp *child );
+    void AddFloatingElement(FloatingElement *child);
+    void AddLayerElement(LayerElement *child);
+    void AddTextElement(TextElement *child);
+    void AddLayer(Layer *child);
+    void AddMeasure(Measure *child);
+    void AddScoreDef(ScoreDef *child);
+    void AddStaff(Staff *child);
+    void AddStaffDef(StaffDef *child);
+    void AddStaffGrp(StaffGrp *child);
     ///@}
     
     
@@ -80,7 +80,7 @@ public:
      * For EditorialElement, this means only moving them since their width is not
      * taken into account. Only system children EditorialElement are processed.
      */
-    virtual int CastOffSystems( ArrayPtrVoid *params );
+    virtual int CastOffSystems(ArrayPtrVoid *params);
     
 protected:
     
@@ -109,7 +109,7 @@ public:
     Abbr();
     virtual ~Abbr();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Abbr"; };
+    virtual std::string GetClassName() { return "Abbr"; };
     virtual ClassId Is() { return ABBR; };
     ///@}
     
@@ -139,7 +139,7 @@ public:
     Add();
     virtual ~Add();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Add"; };
+    virtual std::string GetClassName() { return "Add"; };
     virtual ClassId Is() { return ADD; };
     ///@}
     
@@ -170,7 +170,7 @@ public:
     Annot();
     virtual ~Annot();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Annot"; };
+    virtual std::string GetClassName() { return "Annot"; };
     virtual ClassId Is() { return ANNOT; };
     ///@}
     
@@ -201,10 +201,10 @@ public:
      */
     ///@{
     App();
-    App( EditorialLevel level );
+    App(EditorialLevel level);
     virtual ~App();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "App"; };
+    virtual std::string GetClassName() { return "App"; };
     virtual ClassId Is() { return APP; };
     ///@}
     
@@ -245,7 +245,7 @@ public:
     Corr();
     virtual ~Corr();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Corr"; };
+    virtual std::string GetClassName() { return "Corr"; };
     virtual ClassId Is() { return CORR; };
     ///@}
     
@@ -275,7 +275,7 @@ public:
     Damage();
     virtual ~Damage();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Damage"; };
+    virtual std::string GetClassName() { return "Damage"; };
     virtual ClassId Is() { return DAMAGE; };
     ///@}
     
@@ -305,7 +305,7 @@ public:
     Del();
     virtual ~Del();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Del"; };
+    virtual std::string GetClassName() { return "Del"; };
     virtual ClassId Is() { return DEL; };
     ///@}
     
@@ -335,7 +335,7 @@ public:
     Expan();
     virtual ~Expan();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Expan"; };
+    virtual std::string GetClassName() { return "Expan"; };
     virtual ClassId Is() { return EXPAN; };
     ///@}
     
@@ -365,7 +365,7 @@ public:
     Lem();
     virtual ~Lem();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Lem"; };
+    virtual std::string GetClassName() { return "Lem"; };
     virtual ClassId Is() { return LEM; };
     ///@}
     
@@ -395,7 +395,7 @@ public:
     Orig();
     virtual ~Orig();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Orig"; };
+    virtual std::string GetClassName() { return "Orig"; };
     virtual ClassId Is() { return ORIG; };
     ///@}
     
@@ -425,7 +425,7 @@ public:
     Rdg();
     virtual ~Rdg();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Rdg"; };
+    virtual std::string GetClassName() { return "Rdg"; };
     virtual ClassId Is() { return RDG; };
     ///@}
     
@@ -455,7 +455,7 @@ public:
     Reg();
     virtual ~Reg();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Reg"; };
+    virtual std::string GetClassName() { return "Reg"; };
     virtual ClassId Is() { return REG; };
     ///@}
     
@@ -485,7 +485,7 @@ public:
     Restore();
     virtual ~Restore();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Restore"; };
+    virtual std::string GetClassName() { return "Restore"; };
     virtual ClassId Is() { return RESTORE; };
     ///@}
     
@@ -515,7 +515,7 @@ public:
     Sic();
     virtual ~Sic();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Sic"; };
+    virtual std::string GetClassName() { return "Sic"; };
     virtual ClassId Is() { return SIC; };
     ///@}
     
@@ -545,7 +545,7 @@ public:
     Supplied();
     virtual ~Supplied();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Supplied"; };
+    virtual std::string GetClassName() { return "Supplied"; };
     virtual ClassId Is() { return SUPPLIED; };
     ///@}
     
@@ -575,7 +575,7 @@ public:
     Unclear();
     virtual ~Unclear();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Unclear"; };
+    virtual std::string GetClassName() { return "Unclear"; };
     virtual ClassId Is() { return UNCLEAR; };
     ///@}
     

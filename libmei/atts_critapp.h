@@ -39,10 +39,10 @@ public:
     void ResetCrit();
     
     /** Read the values for the attribute class **/
-    bool ReadCrit( pugi::xml_node element );
+    bool ReadCrit(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteCrit( pugi::xml_node element );
+    bool WriteCrit(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetCause(std::string cause_) { m_cause = cause_; };
     std::string GetCause() const { return m_cause; };    
-    bool HasCause( );
+    bool HasCause();
     
     ///@}
 
@@ -80,10 +80,10 @@ public:
     void ResetSource();
     
     /** Read the values for the attribute class **/
-    bool ReadSource( pugi::xml_node element );
+    bool ReadSource(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteSource( pugi::xml_node element );
+    bool WriteSource(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -93,7 +93,7 @@ public:
     ///@{
     void SetSource(std::string source_) { m_source = source_; };
     std::string GetSource() const { return m_source; };    
-    bool HasSource( );
+    bool HasSource();
     
     ///@}
 

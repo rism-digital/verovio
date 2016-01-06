@@ -30,7 +30,7 @@ System::System() :
 {
     // We set parent to it because we want to access the parent doc from the aligners
     // See Object::SetParentDoc()
-    m_systemAligner.SetParent( this );
+    m_systemAligner.SetParent(this);
     
     Reset();
 }
@@ -57,17 +57,17 @@ void System::Reset()
     m_drawingAbbrLabelsWidth = 0;
 }
 
-void System::AddMeasure( Measure *measure )
+void System::AddMeasure(Measure *measure)
 {
-	measure->SetParent( this );
-	m_children.push_back( measure );
+	measure->SetParent(this);
+	m_children.push_back(measure);
     Modify();
 }
 
-void System::AddScoreDef( ScoreDef *scoreDef )
+void System::AddScoreDef(ScoreDef *scoreDef)
 {
-    scoreDef->SetParent( this );
-    m_children.push_back( scoreDef );
+    scoreDef->SetParent(this);
+    m_children.push_back(scoreDef);
     Modify();
 }
 
@@ -93,22 +93,22 @@ void System::ResetVerticalAlignment()
     
 int System::GetHeight()
 {
-    if ( m_systemAligner.GetBottomAlignment() ) {
+    if (m_systemAligner.GetBottomAlignment()) {
         return -m_systemAligner.GetBottomAlignment()->GetYRel();
     }
     return 0;
 }
     
-void System::SetDrawingLabelsWidth( int width )
+void System::SetDrawingLabelsWidth(int width)
 {
-    if ( m_drawingLabelsWidth < width ) {
+    if (m_drawingLabelsWidth < width) {
         m_drawingLabelsWidth = width;
     }
 }
     
-void System::SetDrawingAbbrLabelsWidth( int width )
+void System::SetDrawingAbbrLabelsWidth(int width)
 {
-    if ( m_drawingAbbrLabelsWidth < width ) {
+    if (m_drawingAbbrLabelsWidth < width) {
         m_drawingAbbrLabelsWidth = width;
     }
 }
@@ -117,7 +117,7 @@ void System::SetDrawingAbbrLabelsWidth( int width )
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::AlignVertically( ArrayPtrVoid *params )
+int System::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
     // param 1: the staffNb (unused)
@@ -135,7 +135,7 @@ int System::AlignVertically( ArrayPtrVoid *params )
 }
 
 
-int System::SetAligmentYPos( ArrayPtrVoid *params )
+int System::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
     // param 1: the staff margin (unused)
@@ -146,13 +146,13 @@ int System::SetAligmentYPos( ArrayPtrVoid *params )
     
     (*previousStaffHeight) = 0;
     
-    m_systemAligner.Process( setAligmnentPosY, params);
+    m_systemAligner.Process(setAligmnentPosY, params);
     
     return FUNCTOR_SIBLINGS;
 }
 
 
-int System::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
+int System::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
     // param 1: the functor to be redirected to SystemAligner
@@ -160,12 +160,12 @@ int System::IntegrateBoundingBoxYShift( ArrayPtrVoid *params )
     Functor *integrateBoundingBoxYShift = static_cast<Functor*>((*params).at(1));
     
     (*shift) = 0;
-    m_systemAligner.Process( integrateBoundingBoxYShift, params);
+    m_systemAligner.Process(integrateBoundingBoxYShift, params);
     
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AlignMeasures( ArrayPtrVoid *params )
+int System::AlignMeasures(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
     int *shift = static_cast<int*>((*params).at(0));
@@ -176,7 +176,7 @@ int System::AlignMeasures( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignMeasuresEnd( ArrayPtrVoid *params )
+int System::AlignMeasuresEnd(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
     int *shift = static_cast<int*>((*params).at(0));
@@ -186,7 +186,7 @@ int System::AlignMeasuresEnd( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignSystems( ArrayPtrVoid *params )
+int System::AlignSystems(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
     // param 1: the system margin
@@ -195,7 +195,7 @@ int System::AlignSystems( ArrayPtrVoid *params )
     
     this->m_drawingYRel = (*shift);
     
-    assert( m_systemAligner.GetBottomAlignment() );
+    assert(m_systemAligner.GetBottomAlignment());
     
     (*shift) += m_systemAligner.GetBottomAlignment()->GetYRel() - (*systemMargin);
     
@@ -203,7 +203,7 @@ int System::AlignSystems( ArrayPtrVoid *params )
 }
 
 
-int System::JustifyX( ArrayPtrVoid *params )
+int System::JustifyX(ArrayPtrVoid *params)
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin) (unused)
@@ -213,23 +213,23 @@ int System::JustifyX( ArrayPtrVoid *params )
     double *ratio = static_cast<double*>((*params).at(0));
     int *systemFullWidth = static_cast<int*>((*params).at(3));
     
-    assert( m_parent );
-    assert( m_parent->m_parent );
+    assert(m_parent);
+    assert(m_parent->m_parent);
     
     (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar) / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
     
     //LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
 
-    if ((*ratio) < 0.8 ) {
+    if ((*ratio) < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
         LogWarning("Justification stop because of a ratio smaller than 0.8");
         //return FUNCTOR_SIBLINGS;
     }
     
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.0
-    if ( (m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
-        && (this->GetIdx() == m_parent->GetChildCount() - 1) ) {
-        if ( (*ratio) > 1.0 ) {
+    if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
+        && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
+        if ((*ratio) > 1.0) {
             return FUNCTOR_STOP;
         }
     }
@@ -237,18 +237,18 @@ int System::JustifyX( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int System::SetBoundingBoxYShiftEnd( ArrayPtrVoid *params )
+int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
 {
     // param 0: the height of the previous staff
     int *system_height = static_cast<int*>((*params).at(1));
     
-    m_systemAligner.GetBottomAlignment()->SetYShift( (*system_height) );
+    m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
 
     return FUNCTOR_CONTINUE;
 }
 
     
-int System::CastOffPages( ArrayPtrVoid *params )
+int System::CastOffPages(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the page we are taking the content from
     // param 1: a pointer the document we are adding pages to
@@ -261,9 +261,9 @@ int System::CastOffPages( ArrayPtrVoid *params )
     int *shift = static_cast<int*>((*params).at(3));
     int *pageHeight = static_cast<int*>((*params).at(4));
     
-    if ( ( (*currentPage)->GetChildCount() > 0 ) && ( this->m_drawingYRel - this->GetHeight() - (*shift) < 0 )) { //(*pageHeight) ) ) {
+    if (((*currentPage)->GetChildCount() > 0) && (this->m_drawingYRel - this->GetHeight() - (*shift) < 0)) { //(*pageHeight))) {
         (*currentPage) = new Page();
-        doc->AddPage( *currentPage );
+        doc->AddPage(*currentPage);
         (*shift) = this->m_drawingYRel - (*pageHeight);
     }
     
@@ -271,13 +271,13 @@ int System::CastOffPages( ArrayPtrVoid *params )
     // We want to move the system to the currentPage. However, we cannot use DetachChild
     // from the contentPage because this screws up the iterator. Relinquish gives up
     // the ownership of the system - the contentPage itself will be deleted afterwards.
-    System *system = dynamic_cast<System*>( contentPage->Relinquish( this->GetIdx()) );
-    (*currentPage)->AddSystem( system );
+    System *system = dynamic_cast<System*>(contentPage->Relinquish(this->GetIdx()));
+    (*currentPage)->AddSystem(system);
     
     return FUNCTOR_SIBLINGS;
 }
 
-int System::UnCastOff( ArrayPtrVoid *params )
+int System::UnCastOff(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the system we are adding system to
     System *currentSystem = static_cast<System*>((*params).at(0));
@@ -285,13 +285,13 @@ int System::UnCastOff( ArrayPtrVoid *params )
     // Just move all the content of the system to the continous one (parameter)
     // Use the MoveChildren method that move the and relinquishes them
     // See Object::Relinquish
-    currentSystem->MoveChildren( this );
+    currentSystem->MoveChildren(this);
     
     // No need to go deeper
     return FUNCTOR_SIBLINGS;
 }
     
-int System::SetDrawingXY( ArrayPtrVoid *params )
+int System::SetDrawingXY(ArrayPtrVoid *params)
 {
     // param 0: a pointer doc
     // param 1: a pointer to the current system
@@ -312,16 +312,16 @@ int System::SetDrawingXY( ArrayPtrVoid *params )
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs
-    if ( this->m_yAbs == VRV_UNSET ) {
-        assert( doc->GetType() == Raw );
-        this->SetDrawingX( this->m_drawingXRel );
-        this->SetDrawingY( this->m_drawingYRel );
+    if (this->m_yAbs == VRV_UNSET) {
+        assert(doc->GetType() == Raw);
+        this->SetDrawingX(this->m_drawingXRel);
+        this->SetDrawingY(this->m_drawingYRel);
     }
     else
     {
-        assert( doc->GetType() == Transcription );
-        this->SetDrawingX( this->m_xAbs );
-        this->SetDrawingY( this->m_yAbs );
+        assert(doc->GetType() == Transcription);
+        this->SetDrawingX(this->m_xAbs);
+        this->SetDrawingY(this->m_yAbs);
     }
     
     // For avoiding unused variable warning in non debug mode

@@ -28,7 +28,7 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-Measure::Measure( bool measureMusic, int logMeasureNb ):
+Measure::Measure(bool measureMusic, int logMeasureNb):
     DocObject("measure-"),
     AttCommon(),
     AttMeasureLog(),
@@ -41,7 +41,7 @@ Measure::Measure( bool measureMusic, int logMeasureNb ):
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
     // See Object::SetParentDoc()
-    m_measureAligner.SetParent( this );
+    m_measureAligner.SetParent(this);
     
     Reset();
 }
@@ -64,39 +64,39 @@ void Measure::Reset()
     m_drawingX = 0;
     
     // by default, we have a single barLine on the right (none on the left)
-    m_rightBarLine.SetForm( this->GetRight() );
-    m_leftBarLine.SetForm( this->GetLeft() );
+    m_rightBarLine.SetForm(this->GetRight());
+    m_leftBarLine.SetForm(this->GetLeft());
     
-    if ( !m_measuredMusic ) {
+    if (!m_measuredMusic) {
         m_xAbs = 0;
     }
 }
 
-void Measure::AddFloatingElement( FloatingElement *element )
+void Measure::AddFloatingElement(FloatingElement *element)
 {    
-	element->SetParent( this );
-	m_children.push_back( element );
+	element->SetParent(this);
+	m_children.push_back(element);
     
     if (element->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff*>(element);
-        assert( staff );
-        if ( staff->GetN() < 1) {
+        assert(staff);
+        if (staff->GetN() < 1) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
             // one staff as a previous child.
-            staff->SetN( this->GetChildCount() );
+            staff->SetN(this->GetChildCount());
         }
     }
 }
     
-void Measure::AddStaff( Staff *staff )
+void Measure::AddStaff(Staff *staff)
 {
-    staff->SetParent( this );
-    m_children.push_back( staff );
+    staff->SetParent(this);
+    m_children.push_back(staff);
     
-    if ( staff->GetN() < 1) {
+    if (staff->GetN() < 1) {
         // This is not 100% safe if we have a <app> and <rdg> with more than
         // one staff as a previous child.
-        staff->SetN( this->GetChildCount() );
+        staff->SetN(this->GetChildCount());
     }
 }
     
@@ -104,18 +104,18 @@ void Measure::ResetHorizontalAlignment()
 {
     m_drawingXRel = 0;
     m_drawingX = 0;
-    if ( m_measureAligner.GetLeftAlignment() ) {
-        m_measureAligner.GetLeftAlignment()->SetXRel( 0 );
+    if (m_measureAligner.GetLeftAlignment()) {
+        m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
-    if ( m_measureAligner.GetRightAlignment() ) {
-        m_measureAligner.GetRightAlignment()->SetXRel( 0 );
+    if (m_measureAligner.GetRightAlignment()) {
+        m_measureAligner.GetRightAlignment()->SetXRel(0);
     }
 }
 
 
 int Measure::GetXRel()
 {
-    if ( m_measureAligner.GetLeftAlignment() ) {
+    if (m_measureAligner.GetLeftAlignment()) {
         return m_measureAligner.GetLeftAlignment()->GetXRel();
     }
     return 0;
@@ -123,7 +123,7 @@ int Measure::GetXRel()
 
 int Measure::GetRightBarLineX()
 {
-    if ( m_measureAligner.GetRightAlignment() ) {
+    if (m_measureAligner.GetRightAlignment()) {
         return m_measureAligner.GetRightAlignment()->GetXRel();
     }
     return 0;
@@ -131,7 +131,7 @@ int Measure::GetRightBarLineX()
 
 int Measure::GetWidth()
 {
-    if ( m_measureAligner.GetRightAlignment() ) {
+    if (m_measureAligner.GetRightAlignment()) {
         return GetRightBarLineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
     }
     return 0;
@@ -141,7 +141,7 @@ int Measure::GetWidth()
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::AlignHorizontally( ArrayPtrVoid *params )
+int Measure::AlignHorizontally(ArrayPtrVoid *params)
 {
     // param 0: the measureAligner
     // param 1: the time (unused)
@@ -156,29 +156,29 @@ int Measure::AlignHorizontally( ArrayPtrVoid *params )
     m_measureAligner.Reset();
     
     // here we transfer the @left and @right values to the barLine objects
-    this->SetLeftBarLineType( this->GetLeft() );
-    this->SetRightBarLineType( this->GetRight() );
+    this->SetLeftBarLineType(this->GetLeft());
+    this->SetRightBarLineType(this->GetRight());
     
     // point to it
     (*measureAligner) = &m_measureAligner;
     
-    if ( m_leftBarLine.GetForm() != BARRENDITION_NONE ) {
-        m_leftBarLine.SetAlignment( m_measureAligner.GetLeftAlignment() );
+    if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
+        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
     }
     
-    if ( m_rightBarLine.GetForm() != BARRENDITION_NONE ) {
-        m_rightBarLine.SetAlignment( m_measureAligner.GetRightAlignment() );
+    if (m_rightBarLine.GetForm() != BARRENDITION_NONE) {
+        m_rightBarLine.SetAlignment(m_measureAligner.GetRightAlignment());
     }
     
-    //LogDebug("\n ***** Align measure %d", this->GetN() );
+    //LogDebug("\n ***** Align measure %d", this->GetN());
     
-    assert( *measureAligner );
+    assert(*measureAligner);
         
     return FUNCTOR_CONTINUE;
 }
 
     
-int Measure::AlignVertically( ArrayPtrVoid *params )
+int Measure::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner (unused)
     // param 1: the staffNb
@@ -193,17 +193,17 @@ int Measure::AlignVertically( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
     
-int Measure::IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params )
+int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the functor to be redirected to Aligner
     Functor *integrateBoundingBoxGraceXShift = static_cast<Functor*>((*params).at(0));
     
-    m_measureAligner.Process( integrateBoundingBoxGraceXShift, params );
+    m_measureAligner.Process(integrateBoundingBoxGraceXShift, params);
     
     return FUNCTOR_SIBLINGS;
 }
     
-int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
+int Measure::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift (unused)
     // param 1: the cumulated justifiable shift (unused)
@@ -212,12 +212,12 @@ int Measure::IntegrateBoundingBoxXShift( ArrayPtrVoid *params )
     // param 4: the functor to be redirected to Aligner
     Functor *integrateBoundingBoxShift = static_cast<Functor*>((*params).at(4));
     
-    m_measureAligner.Process( integrateBoundingBoxShift, params );
+    m_measureAligner.Process(integrateBoundingBoxShift, params);
     
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetAlignmentXPos( ArrayPtrVoid *params )
+int Measure::SetAlignmentXPos(ArrayPtrVoid *params)
 {
     // param 0: the previous time position (unused)
     // param 1: the previous x rel position (unused)
@@ -226,12 +226,12 @@ int Measure::SetAlignmentXPos( ArrayPtrVoid *params )
     // param 4: the functor to be redirected to Aligner
     Functor *setAligmnentPosX = static_cast<Functor*>((*params).at(4));
     
-    m_measureAligner.Process( setAligmnentPosX, params);
+    m_measureAligner.Process(setAligmnentPosX, params);
     
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::JustifyX( ArrayPtrVoid *params )
+int Measure::JustifyX(ArrayPtrVoid *params)
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin) (unused)
@@ -243,20 +243,20 @@ int Measure::JustifyX( ArrayPtrVoid *params )
     
     this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
     
-    m_measureAligner.Process( justifyX, params );
+    m_measureAligner.Process(justifyX, params);
     
     return FUNCTOR_SIBLINGS;
 }
 
 
-int Measure::AlignMeasures( ArrayPtrVoid *params )
+int Measure::AlignMeasures(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
     int *shift = static_cast<int*>((*params).at(0));
     
     this->m_drawingXRel = (*shift);
     
-    assert( m_measureAligner.GetRightAlignment() );
+    assert(m_measureAligner.GetRightAlignment());
     
     (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
     
@@ -269,7 +269,7 @@ int Measure::AlignMeasures( ArrayPtrVoid *params )
     return FUNCTOR_SIBLINGS;
 }
     
-int Measure::CastOffSystems( ArrayPtrVoid *params )
+int Measure::CastOffSystems(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to
@@ -284,9 +284,9 @@ int Measure::CastOffSystems( ArrayPtrVoid *params )
     int *systemWidth = static_cast<int*>((*params).at(4));
     int *currentScoreDefWidth = static_cast<int*>((*params).at(5));
     
-    if ( ( (*currentSystem)->GetChildCount() > 0 ) && ( this->m_drawingXRel + this->GetWidth() + (*currentScoreDefWidth) - (*shift) > (*systemWidth) ) ) {
+    if (((*currentSystem)->GetChildCount() > 0) && (this->m_drawingXRel + this->GetWidth() + (*currentScoreDefWidth) - (*shift) > (*systemWidth))) {
         (*currentSystem) = new System();
-        page->AddSystem( *currentSystem );
+        page->AddSystem(*currentSystem);
         (*shift) = this->m_drawingXRel;;
     }
     
@@ -294,14 +294,14 @@ int Measure::CastOffSystems( ArrayPtrVoid *params )
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    Measure *measure = dynamic_cast<Measure*>( contentSystem->Relinquish( this->GetIdx()) );
-    assert( measure );
-    (*currentSystem)->AddMeasure( measure );
+    Measure *measure = dynamic_cast<Measure*>(contentSystem->Relinquish(this->GetIdx()));
+    assert(measure);
+    (*currentSystem)->AddMeasure(measure);
     
     return FUNCTOR_SIBLINGS;
 }
    
-int Measure::SetDrawingXY( ArrayPtrVoid *params )
+int Measure::SetDrawingXY(ArrayPtrVoid *params)
 {
     // param 0: a pointer doc
     // param 1: a pointer to the current system
@@ -323,14 +323,14 @@ int Measure::SetDrawingXY( ArrayPtrVoid *params )
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_xAbs
-    if ( this->m_xAbs == VRV_UNSET ) {
-        assert( doc->GetType() == Raw );
-        this->SetDrawingX( this->m_drawingXRel + (*currentSystem)->GetDrawingX() );
+    if (this->m_xAbs == VRV_UNSET) {
+        assert(doc->GetType() == Raw);
+        this->SetDrawingX(this->m_drawingXRel + (*currentSystem)->GetDrawingX());
     }
     else
     {
-        assert( doc->GetType() == Transcription );
-        this->SetDrawingX( this->m_xAbs );
+        assert(doc->GetType() == Transcription);
+        this->SetDrawingX(this->m_xAbs);
     }
 
     // For avoiding unused variable warning in non debug mode

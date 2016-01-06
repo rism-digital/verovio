@@ -54,11 +54,11 @@ std::string Att::IntToStr(int data)
 
 double Att::StrToDbl(std::string value)
 {
-    return atof( value.c_str() );
+    return atof(value.c_str());
 }
 int Att::StrToInt(std::string value)
 {
-    return atoi( value.c_str() );
+    return atoi(value.c_str());
 }
 
 // Converters for writing and reading
@@ -93,7 +93,7 @@ data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
     else if (value == "128") return BEATRPT_REND_128;
     else if (value == "mixed") return BEATRPT_REND_mixed;
     else {
-        LogWarning("Unsupported beatrpt rend '%s'", value.c_str() );
+        LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     }
     return BEATRPT_REND_NONE;
 }
@@ -210,7 +210,7 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value)
 	else if (value == "7s") return KEYSIGNATURE_7s;
 	else if (value == "mixed") return KEYSIGNATURE_mixed;
 	else {
-		LogWarning("Unsupported key signature '%s'", value.c_str() );
+		LogWarning("Unsupported key signature '%s'", value.c_str());
 	}
 	return KEYSIGNATURE_NONE;
 }    
@@ -245,7 +245,7 @@ data_MODUSMAIOR Att::StrToModusmaior(std::string value)
     if (value == "2") return MODUSMAIOR_2;
     else if (value == "3") return MODUSMAIOR_3;
     else {
-        LogWarning("Unsupported modusmaior '%s'", value.c_str() );
+        LogWarning("Unsupported modusmaior '%s'", value.c_str());
     }
     // default
     return MODUSMAIOR_NONE;
@@ -271,7 +271,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value)
     if (value == "2") return MODUSMINOR_2;
     else if (value == "3") return MODUSMINOR_3;
     else {
-        LogWarning("Unsupported modusmaior '%s'", value.c_str() );
+        LogWarning("Unsupported modusmaior '%s'", value.c_str());
     }
     // default
     return MODUSMINOR_NONE;
@@ -307,13 +307,13 @@ data_PITCHNAME Att::StrToPitchname(std::string value)
     else if (value == "a") return PITCHNAME_a;
     else if (value == "b") return PITCHNAME_b;
     else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str() );
+        LogWarning("Unsupported pitch name '%s'", value.c_str());
     }
     // default
     return PITCHNAME_NONE;
 }
     
-std::string Att::OctaveDisToStr( data_OCTAVE_DIS data )
+std::string Att::OctaveDisToStr(data_OCTAVE_DIS data)
 {
     std::string value;
     switch(data)
@@ -335,7 +335,7 @@ data_OCTAVE_DIS Att::StrToOctaveDis(std::string value)
     else if (value == "15") return OCTAVE_DIS_15;
     else if (value == "22") return OCTAVE_DIS_22;
     else {
-        LogWarning("Unsupported octave dis '%s'", value.c_str() );
+        LogWarning("Unsupported octave dis '%s'", value.c_str());
     }
     // default
     return OCTAVE_DIS_NONE;
@@ -363,7 +363,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value)
     else if (value == "90CW") return ORIENTATION_90CW;
     else if (value == "90CCW") return ORIENTATION_90CCW;
     else {
-        LogWarning("Unsupported orientation '%s'", value.c_str() );
+        LogWarning("Unsupported orientation '%s'", value.c_str());
     }
     return ORIENTATION_NONE;
 }
@@ -388,7 +388,7 @@ data_PROLATIO Att::StrToProlatio(std::string value)
     if (value == "2") return PROLATIO_2;
     else if (value == "3") return PROLATIO_3;
     else {
-        LogWarning("Unsupported prolatio '%s'", value.c_str() );
+        LogWarning("Unsupported prolatio '%s'", value.c_str());
     }
     // default
     return PROLATIO_NONE;
@@ -414,7 +414,7 @@ data_STEMDIRECTION Att::StrToStemdirection(std::string value)
     if (value == "up") return STEMDIRECTION_up;
     else if (value == "down") return STEMDIRECTION_down;
     else {
-        LogWarning("Unsupported stem direction '%s'", value.c_str() );
+        LogWarning("Unsupported stem direction '%s'", value.c_str());
     }
     return STEMDIRECTION_NONE;
 }
@@ -439,7 +439,7 @@ data_TEMPUS Att::StrToTempus(std::string value)
     if (value == "2") return TEMPUS_2;
     else if (value == "3") return TEMPUS_3;
     else {
-        LogWarning("Unsupported tempus '%s'", value.c_str() );
+        LogWarning("Unsupported tempus '%s'", value.c_str());
     }
     // default
     return TEMPUS_NONE;
@@ -468,7 +468,7 @@ data_TIE Att::StrToTie(std::string value)
     else if (value == "m") return TIE_m;
     else if (value == "t") return TIE_t;
     else {
-        LogWarning("Unsupported tie '%s'", value.c_str() );
+        LogWarning("Unsupported tie '%s'", value.c_str());
     }
     return TIE_NONE;
 }
@@ -486,9 +486,9 @@ std::string Att::XsdPosintlistToStr(xsd_posIntList data)
 xsd_posIntList Att::StrToXsdPosintlist(std::string value)
 {
     xsd_posIntList list;
-    std::stringstream iss( value );
+    std::stringstream iss(value);
     std::string token;
-    while( std::getline( iss, token, ' ' )) {
+    while(std::getline(iss, token, ' ')) {
         list.push_back(atoi(token.c_str()));
     }
     return list;
@@ -500,7 +500,7 @@ xsd_posIntList Att::StrToXsdPosintlist(std::string value)
 
 bool AttComparison::operator()(Object *object)
 {
-    if  ( object->Is() == m_classId ) {
+    if  (object->Is() == m_classId) {
         return true;
     }
     return false;
@@ -508,7 +508,7 @@ bool AttComparison::operator()(Object *object)
     
 bool AttComparison::MatchesType(Object *object)
 {
-    if  ( object->Is() == m_classId ) {
+    if  (object->Is() == m_classId) {
         return true;
     }
     return false;

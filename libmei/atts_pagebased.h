@@ -39,10 +39,10 @@ public:
     void ResetSurface();
     
     /** Read the values for the attribute class **/
-    bool ReadSurface( pugi::xml_node element );
+    bool ReadSurface(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteSurface( pugi::xml_node element );
+    bool WriteSurface(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,7 +52,7 @@ public:
     ///@{
     void SetSurface(std::string surface_) { m_surface = surface_; };
     std::string GetSurface() const { return m_surface; };    
-    bool HasSurface( );
+    bool HasSurface();
     
     ///@}
 

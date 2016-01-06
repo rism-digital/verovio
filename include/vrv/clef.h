@@ -35,12 +35,12 @@ public:
      */
     ///@{
     Clef();
-    Clef( ScoreDefInterface *clefAttr );
+    Clef(ScoreDefInterface *clefAttr);
     void Init();
     virtual ~Clef();
     virtual void Reset();
     virtual Object* Clone() { return new Clef(*this); };
-    virtual std::string GetClassName( ) { return "Clef"; };
+    virtual std::string GetClassName() { return "Clef"; };
     virtual ClassId Is() { return CLEF; };
     ///@}
     

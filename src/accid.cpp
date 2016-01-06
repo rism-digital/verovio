@@ -27,7 +27,7 @@ Accid::Accid():
     AttAccidLog()
 {
     
-    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_ACCIDLOG);
     
@@ -50,17 +50,17 @@ void Accid::Reset()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Accid::PreparePointersByLayer( ArrayPtrVoid *params )
+int Accid::PreparePointersByLayer(ArrayPtrVoid *params)
 {
     // param 0: the current Note (not used)
     //Note **currentNote = static_cast<Note**>((*params).at(0));
     
-    Note *note = dynamic_cast<Note*>( this->GetFirstParent( NOTE, MAX_ACCID_DEPTH ) );
-    if ( !note ) {
+    Note *note = dynamic_cast<Note*>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+    if (!note) {
         return FUNCTOR_CONTINUE;
     }
     
-    if ( note->m_drawingAccid != NULL ) {
+    if (note->m_drawingAccid != NULL) {
         note->ResetDrawingAccid();
     }
     note->m_drawingAccid = this;

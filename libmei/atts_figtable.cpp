@@ -43,7 +43,7 @@ void AttTabular::ResetTabular() {
     m_rowspan = 0;
 }
 
-bool AttTabular::ReadTabular( pugi::xml_node element ) {
+bool AttTabular::ReadTabular(pugi::xml_node element) {
     bool hasAttribute = false;
     if (element.attribute("colspan")) {
         this->SetColspan(StrToInt(element.attribute("colspan").value()));
@@ -58,7 +58,7 @@ bool AttTabular::ReadTabular( pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttTabular::WriteTabular( pugi::xml_node element ) {
+bool AttTabular::WriteTabular(pugi::xml_node element) {
     bool wroteAttribute = false;
     if (this->HasColspan()) {
         element.append_attribute("colspan") = IntToStr(this->GetColspan()).c_str();
@@ -71,12 +71,12 @@ bool AttTabular::WriteTabular( pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttTabular::HasColspan( )
+bool AttTabular::HasColspan()
 {
     return (m_colspan != 0);
 }
 
-bool AttTabular::HasRowspan( )
+bool AttTabular::HasRowspan()
 {
     return (m_rowspan != 0);
 }
@@ -84,10 +84,10 @@ bool AttTabular::HasRowspan( )
 
 /* include <attrowspan> */
 
-bool Att::SetFigtable( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_TABULAR ) ) {
+bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue) {
+    if (element->HasAttClass(ATT_TABULAR)) {
         AttTabular *att = dynamic_cast<AttTabular*>(element);
-        assert( att );
+        assert(att);
         if (attrType == "colspan") {
             att->SetColspan(att->StrToInt(attrValue));
             return true;
@@ -101,10 +101,10 @@ bool Att::SetFigtable( Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetFigtable( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_TABULAR ) ) {
+void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes) {
+    if (element->HasAttClass(ATT_TABULAR)) {
         AttTabular *att = dynamic_cast<AttTabular*>(element);
-        assert( att );
+        assert(att);
         if (att->HasColspan()) {
             attributes->push_back(std::make_pair("colspan", att->IntToStr(att->GetColspan())));
         }

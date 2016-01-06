@@ -121,41 +121,41 @@ public:
     ScoreDef();
     virtual ~ScoreDef();    
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "ScoreDef"; };
+    virtual std::string GetClassName() { return "ScoreDef"; };
     virtual ClassId Is() { return SCOREDEF; };
     ///@}
     
-	void AddStaffGrp( StaffGrp *staffGrp );
+	void AddStaffGrp(StaffGrp *staffGrp);
     
     /**
      * Replace the scoreDef with the content of the newScoreDef.
      */
-    void ReplaceDrawingValues( ScoreDef *newScoreDef );
+    void ReplaceDrawingValues(ScoreDef *newScoreDef);
     
     /**
      * Replace the corresponding staffDef with the content of the newStaffDef.
      * Looks for the staffDef with the same m_n (@n) and replace the attribute set.
      * Attribute set is provided by the ScoreOrStaffDefInterface.
      */
-    void ReplaceDrawingValues( StaffDef *newStaffDef );
+    void ReplaceDrawingValues(StaffDef *newStaffDef);
     
     /**
      * Get the staffDef with number n (NULL if not found).
      */
-    StaffDef *GetStaffDef( int n );
+    StaffDef *GetStaffDef(int n);
     
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
      */
-    void SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation );
+    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation);
     
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
      */
     ///@{
     bool DrawLabels() const { return m_drawLabels; };
-    void SetDrawLabels( bool drawLabels ) { m_drawLabels = drawLabels; };
+    void SetDrawLabels(bool drawLabels) { m_drawLabels = drawLabels; };
     ///@}
     
     /**
@@ -163,7 +163,7 @@ public:
      */
     ///@{
     int GetDrawingWidth() const { return m_drawingWidth; };
-    void SetDrawingWidth( int drawingWidth );
+    void SetDrawingWidth(int drawingWidth);
     ///@}
     
     //----------//
@@ -175,14 +175,14 @@ public:
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
-    virtual int CastOffSystems( ArrayPtrVoid *params );
+    virtual int CastOffSystems(ArrayPtrVoid *params);
     
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep staffGrp for fast access.
      */
-    virtual void FilterList( ListOfObjects *childList );
+    virtual void FilterList(ListOfObjects *childList);
     
 private:
     
@@ -222,7 +222,7 @@ public:
     virtual ~StaffGrp();
     virtual Object* Clone() { return new StaffGrp(*this); };
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "StaffGrp"; };
+    virtual std::string GetClassName() { return "StaffGrp"; };
     virtual ClassId Is() { return STAFFGRP; };
     ///@}
 	
@@ -230,8 +230,8 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddStaffDef( StaffDef *staffDef );
-	void AddStaffGrp( StaffGrp *staffGrp );
+	void AddStaffDef(StaffDef *staffDef);
+	void AddStaffGrp(StaffGrp *staffGrp);
     ///@}
     
     //----------//
@@ -243,7 +243,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep staffDef for fast access.
      */
-    virtual void FilterList( ListOfObjects *childList );
+    virtual void FilterList(ListOfObjects *childList);
     
 private:
     
@@ -279,7 +279,7 @@ public:
     virtual ~StaffDef();
     virtual Object* Clone() { return new StaffDef(*this); };
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "StaffDef"; };
+    virtual std::string GetClassName() { return "StaffDef"; };
     virtual ClassId Is() { return STAFFDEF; };
     ///@}
     
@@ -292,7 +292,7 @@ public:
      * Called form ScoreDef::ReplaceDrawingValues.
      * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
      */
-    virtual int ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params );
+    virtual int ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params);
     
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysig, etc. needs
@@ -300,7 +300,7 @@ public:
      * This typically occurs when a new System or a new  ScoreDef is encountered.
      * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
-    virtual int SetStaffDefRedrawFlags( ArrayPtrVoid *params );
+    virtual int SetStaffDefRedrawFlags(ArrayPtrVoid *params);
     
 private:
     

@@ -50,13 +50,13 @@ bool Resources::InitFonts()
     // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
     
-    if ( m_font.size() < SMUFL_COUNT ) {
+    if (m_font.size() < SMUFL_COUNT) {
         LogError("Expected %d default SMUFL glyphs but could load only %d.",
                  SMUFL_COUNT, m_font.size());
         return false;
     }
     
-    if ( !InitTextFont() ) {
+    if (!InitTextFont()) {
         LogError("Text font could not be initialized.");
         return false;
     }
@@ -97,16 +97,16 @@ bool Resources::LoadFont(std::string fontName)
     // Since the filename starts with the Unicode code, it is used
     // to assign the glyph to the corresponding position in m_fonts
     while ((pdir = readdir(dir))) {
-        if ( strstr( pdir->d_name, ".xml" )) {
+        if (strstr(pdir->d_name, ".xml")) {
             // E.g, : E053-gClef8va.xml => strtol extracts E053 as hex
-            wchar_t smuflCode = (wchar_t)strtol( pdir->d_name, NULL, 16);
+            wchar_t smuflCode = (wchar_t)strtol(pdir->d_name, NULL, 16);
             if (smuflCode == 0) {
                 LogError("Invalid SMUFL code (0)");
                 continue;
             }
             std::string codeStr = pdir->d_name;
             codeStr = codeStr.substr(0, 4);
-            Glyph glyph( Resources::GetPath() + "/" + fontName + "/" + pdir->d_name , codeStr );
+            Glyph glyph(Resources::GetPath() + "/" + fontName + "/" + pdir->d_name , codeStr);
             m_font[smuflCode] = glyph;
         }
     }
@@ -117,7 +117,7 @@ bool Resources::LoadFont(std::string fontName)
     // Then load the bounding boxes (if bounding box file is provided)
     pugi::xml_document doc;
     std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
-    pugi::xml_parse_result result = doc.load_file( filename.c_str() );
+    pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result)
     {
         // File not found, default bounding boxes will be used
@@ -131,9 +131,9 @@ bool Resources::LoadFont(std::string fontName)
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    for( current = root.child("g"); current; current = current.next_sibling("g") ) {
-        if ( current.attribute( "c" ) ) {
-            wchar_t smuflCode = (wchar_t)strtol( current.attribute( "c" ).value(), NULL, 16);
+    for(current = root.child("g"); current; current = current.next_sibling("g")) {
+        if (current.attribute("c")) {
+            wchar_t smuflCode = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
             if (!m_font.count(smuflCode)) {
                 LogWarning("Glyph with code '%d' not found.", smuflCode);
                 continue;
@@ -145,10 +145,10 @@ bool Resources::LoadFont(std::string fontName)
             }
             double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...
-            if ( current.attribute( "x" ) ) x = atof( current.attribute( "x" ).value() );
-            if ( current.attribute( "y" ) ) y = atof( current.attribute( "y" ).value() );
-            if ( current.attribute( "w" ) ) width = atof( current.attribute( "w" ).value() );
-            if ( current.attribute( "h" ) ) height = atof( current.attribute( "h" ).value() );
+            if (current.attribute("x")) x = atof(current.attribute("x").value());
+            if (current.attribute("y")) y = atof(current.attribute("y").value());
+            if (current.attribute("w")) width = atof(current.attribute("w").value());
+            if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph->SetBoundingBox(x, y, width, height);
         }
     }
@@ -164,7 +164,7 @@ bool Resources::InitTextFont()
     // For now, we have only Georgia.xml bounding boxes for ASCII chars
     // For any other char, we currently use 'o' bounding box
     std::string filename = Resources::GetPath() + "/text/Georgia.xml";
-    pugi::xml_parse_result result = doc.load_file( filename.c_str() );
+    pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result)
     {
         // File not found, default bounding boxes will be used
@@ -178,18 +178,18 @@ bool Resources::InitTextFont()
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    for( current = root.child("g"); current; current = current.next_sibling("g") ) {
-        if ( current.attribute( "c" ) ) {
-            wchar_t code = (wchar_t)strtol( current.attribute( "c" ).value(), NULL, 16);
+    for(current = root.child("g"); current; current = current.next_sibling("g")) {
+        if (current.attribute("c")) {
+            wchar_t code = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
             // We create a glyph with only the units per em which is the only info we need for
             // the bounding boxes; path and codeStr will remain [unset]
-            Glyph glyph( unitsPerEm );
+            Glyph glyph(unitsPerEm);
             double x = 0.0, y = 0.0, width = 0.0, height = 0.0;
             // Not check for missing values...
-            if ( current.attribute( "x" ) ) x = atof( current.attribute( "x" ).value() );
-            if ( current.attribute( "y" ) ) y = atof( current.attribute( "y" ).value() );
-            if ( current.attribute( "w" ) ) width = atof( current.attribute( "w" ).value() );
-            if ( current.attribute( "h" ) ) height = atof( current.attribute( "h" ).value() );
+            if (current.attribute("x")) x = atof(current.attribute("x").value());
+            if (current.attribute("y")) y = atof(current.attribute("y").value());
+            if (current.attribute("w")) width = atof(current.attribute("w").value());
+            if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
             m_textFont[code] = glyph;
         }
@@ -211,19 +211,19 @@ bool noLog = false;
 std::vector<std::string> logBuffer;
 #endif
 
-void LogElapsedTimeStart( )
+void LogElapsedTimeStart()
 {
     gettimeofday(&start, NULL);
 }
     
-void LogElapsedTimeEnd( const char *msg )
+void LogElapsedTimeEnd(const char *msg)
 {
     double elapsedTime;
     struct timeval end;
     gettimeofday(&end, NULL);
     elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;  // sec to ms
     elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
-    LogMessage("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000 );
+    LogMessage("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
 }
     
 void LogDebug(const char *fmt, ...)
@@ -233,17 +233,17 @@ void LogDebug(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end ( args );
+    va_end (args);
 #else
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     printf("[Debug] ");
-    vprintf( fmt, args );
+    vprintf(fmt, args);
     printf("\n");
-    va_end ( args );
+    va_end (args);
 #endif
 #endif
 }
@@ -254,17 +254,17 @@ void LogError(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end ( args );
+    va_end (args);
 #else
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     printf("[Error] ");
-    vprintf( fmt, args );
+    vprintf(fmt, args);
     printf("\n");
-    va_end ( args );
+    va_end (args);
 #endif
 }
 
@@ -274,17 +274,17 @@ void LogMessage(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end ( args );
+    va_end (args);
 #else
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     printf("[Message] ");
-    vprintf( fmt, args );
+    vprintf(fmt, args);
     printf("\n");
-    va_end ( args );
+    va_end (args);
 #endif
 }
 
@@ -294,21 +294,21 @@ void LogWarning(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end ( args );
+    va_end (args);
 #else
     va_list args;
-    va_start ( args, fmt );
+    va_start (args, fmt);
     printf("[Warning] ");
-    vprintf( fmt, args );
+    vprintf(fmt, args);
     printf("\n");
-    va_end ( args );
+    va_end (args);
 #endif
 }
     
-void DisableLog( )
+void DisableLog()
 {
     noLog = true;
 }
@@ -336,9 +336,9 @@ void AppendLogBuffer(bool checkDuplicate, std::string message)
 }
 #endif
     
-bool Check( Object *object ) {
-    assert( object );
-    return ( object != NULL );
+bool Check(Object *object) {
+    assert(object);
+    return (object != NULL);
 }
     
 //----------------------------------------------------------------------------
@@ -347,20 +347,20 @@ bool Check( Object *object ) {
 
 std::string StringFormat(const char *fmt, ...)
 {
-    std::string str( STRING_FORMAT_MAX_LEN, 0 );
+    std::string str(STRING_FORMAT_MAX_LEN, 0);
     va_list args;
-    va_start ( args, fmt );
-    vsnprintf ( &str[0], STRING_FORMAT_MAX_LEN,fmt, args );
-    va_end ( args );
-    str.resize( strlen( str.data() ) );
+    va_start (args, fmt);
+    vsnprintf (&str[0], STRING_FORMAT_MAX_LEN,fmt, args);
+    va_end (args);
+    str.resize(strlen(str.data()));
     return str;
 }
 
 std::string StringFormatVariable(const char * format, va_list arg)
 {
-    std::string str( STRING_FORMAT_MAX_LEN, 0 );
-    vsnprintf ( &str[0], STRING_FORMAT_MAX_LEN, format, arg );
-    str.resize( strlen( str.data() ) );
+    std::string str(STRING_FORMAT_MAX_LEN, 0);
+    vsnprintf (&str[0], STRING_FORMAT_MAX_LEN, format, arg);
+    str.resize(strlen(str.data()));
     return str;
 }
     
@@ -447,11 +447,11 @@ std::wstring UTF8to16(const char * in)
     
     
 std::string GetFileVersion(int vmaj, int vmin, int vrev) {
-    return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev );
+    return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev);
 }
     
     
-std::string GetFilename( std::string fullpath )
+std::string GetFilename(std::string fullpath)
 {
     // remove extension
     std::string name = fullpath;
@@ -469,7 +469,7 @@ std::string GetFilename( std::string fullpath )
 std::string GetVersion() {
     std::string dev;
     if (VERSION_DEV) dev = "-dev";
-    return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT );
+    return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);
 }
 
 } // namespace vrv

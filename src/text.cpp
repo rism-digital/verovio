@@ -22,7 +22,7 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend( ):
+Rend::Rend():
     TextElement("rend-"),
     AttCommon(),
     AttTypography()
@@ -49,8 +49,8 @@ void Rend::AddTextElement(TextElement *element)
 {
     assert(dynamic_cast<Rend*>(element)
            || dynamic_cast<Text*>(element)
-           || dynamic_cast<EditorialElement*>(element) );
-    element->SetParent( this );
+           || dynamic_cast<EditorialElement*>(element));
+    element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
@@ -59,7 +59,7 @@ void Rend::AddTextElement(TextElement *element)
 // Text
 //----------------------------------------------------------------------------
     
-Text::Text( ):
+Text::Text():
     TextElement("text-")
 {
     Reset();

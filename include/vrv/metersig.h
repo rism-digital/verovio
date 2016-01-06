@@ -33,11 +33,11 @@ public:
      */
     ///@{
     MeterSig();
-    MeterSig( ScoreDefInterface *meterSigAttr );
+    MeterSig(ScoreDefInterface *meterSigAttr);
     void Init();
     virtual ~MeterSig();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "MeterSig"; };
+    virtual std::string GetClassName() { return "MeterSig"; };
     virtual ClassId Is() { return METERSIG; };
     virtual Object* Clone() { return new MeterSig(*this); };
     ///@}

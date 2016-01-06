@@ -93,7 +93,7 @@ bool ScoreDefElement::HasMensurAttrInfo()
 
 bool ScoreDefElement::HasMeterSigAttrInfo()
 {
-    return ( this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
+    return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
 }
 
 bool ScoreDefElement::HasClefElementInfo()
@@ -122,7 +122,7 @@ Clef *ScoreDefElement::GetClefCopy()
 {
     Clef *copy = NULL;
     if (this->HasClefAttrInfo()) {
-        copy = new Clef( this );
+        copy = new Clef(this);
     }
     else if (this->HasClefElementInfo()) {
         // Eventually return a copy of the child element;
@@ -200,15 +200,15 @@ void ScoreDef::Reset()
     m_drawingWidth = 0;
 }
 
-void ScoreDef::AddStaffGrp( StaffGrp *staffGrp )
+void ScoreDef::AddStaffGrp(StaffGrp *staffGrp)
 {
-    assert( m_children.empty() );
-	staffGrp->SetParent( this );
-	m_children.push_back( staffGrp );
+    assert(m_children.empty());
+	staffGrp->SetParent(this);
+	m_children.push_back(staffGrp);
     Modify();
 }
 
-void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
+void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
     
@@ -239,12 +239,12 @@ void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
     }
 
     ArrayPtrVoid params;
-	params.push_back( clef );
-	params.push_back( keySig );
-	params.push_back( mensur );
-	params.push_back( meterSig );
-    Functor replaceDrawingValuesInScoreDef( &Object::ReplaceDrawingValuesInStaffDef );
-    this->Process( &replaceDrawingValuesInScoreDef, &params );
+	params.push_back(clef);
+	params.push_back(keySig);
+	params.push_back(mensur);
+	params.push_back(meterSig);
+    Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
+    this->Process(&replaceDrawingValuesInScoreDef, &params);
     
     if (clef) delete clef;
     if (keySig) delete keySig;
@@ -252,27 +252,27 @@ void ScoreDef::ReplaceDrawingValues( ScoreDef *newScoreDef )
     if (meterSig) delete meterSig;
     
     // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
-    this->SetRedrawFlags( drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig );
+    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig);
 
 }
 
-void ScoreDef::ReplaceDrawingValues( StaffDef *newStaffDef )
+void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
 {
     assert(newStaffDef);
     
     // first find the staffDef with the same @n
-    StaffDef *staffDef = this->GetStaffDef( newStaffDef->GetN() );
+    StaffDef *staffDef = this->GetStaffDef(newStaffDef->GetN());
     
     // if found, replace attributes
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
-            staffDef->SetCurrentClef( newStaffDef->GetClefCopy() );
+            staffDef->SetCurrentClef(newStaffDef->GetClefCopy());
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
             staffDef->SetDrawKeySigCancellation(true);
-            staffDef->SetCurrentKeySig( newStaffDef->GetKeySigCopy() );
+            staffDef->SetCurrentKeySig(newStaffDef->GetKeySigCopy());
         }
         if (newStaffDef->HasMensurInfo()) {
             staffDef->SetDrawMensur(true);
@@ -283,24 +283,24 @@ void ScoreDef::ReplaceDrawingValues( StaffDef *newStaffDef )
             staffDef->SetCurrentMeterSig(newStaffDef->GetMeterSigCopy());
         }
         // copy other attributes if present
-        if ( newStaffDef->HasLabel() ) staffDef->SetLabel( newStaffDef->GetLabel() );
-        if ( newStaffDef->HasLabelAbbr() ) staffDef->SetLabelAbbr( newStaffDef->GetLabelAbbr() );
+        if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
+        if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
     }
     else {
         LogWarning("StaffDef with xml:id '%s' could not be found", newStaffDef->GetUuid().c_str());
     }
 }
 
-void ScoreDef::FilterList( ListOfObjects *childList )
+void ScoreDef::FilterList(ListOfObjects *childList)
 {
     // We want to keep only staffDef
     ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != childList->end()) {
+    while (iter != childList->end()) {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
-        if ( !currentStaffDef )
+        if (!currentStaffDef)
         {
-            iter = childList->erase( iter );
+            iter = childList->erase(iter);
         } else {
             iter++;
         }
@@ -308,18 +308,18 @@ void ScoreDef::FilterList( ListOfObjects *childList )
 }
 
 
-StaffDef *ScoreDef::GetStaffDef( int n )
+StaffDef *ScoreDef::GetStaffDef(int n)
 {
     StaffDef *staffDef = NULL;
     
-    this->ResetList( this );
+    this->ResetList(this);
     ListOfObjects* childList = this->GetList(this);
     ListOfObjects::iterator iter;
 
     for (iter = childList->begin(); iter != childList->end(); ++iter)
     {
         staffDef = dynamic_cast<StaffDef*>(*iter);
-        if (staffDef && (staffDef->GetN() == n) ) {
+        if (staffDef && (staffDef->GetN() == n)) {
             return staffDef;
         }
     }
@@ -328,16 +328,16 @@ StaffDef *ScoreDef::GetStaffDef( int n )
 }
 
 
-void ScoreDef::SetRedrawFlags( bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation )
+void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation)
 {
     ArrayPtrVoid params;
-	params.push_back( &clef );
-    params.push_back( &keySig );
-	params.push_back( &mensur );
-    params.push_back( &meterSig );
-    params.push_back( &keySigCancellation );
-    Functor setStaffDefDraw( &Object::SetStaffDefRedrawFlags );
-    this->Process( &setStaffDefDraw, &params );
+	params.push_back(&clef);
+    params.push_back(&keySig);
+	params.push_back(&mensur);
+    params.push_back(&meterSig);
+    params.push_back(&keySigCancellation);
+    Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
+    this->Process(&setStaffDefDraw, &params);
 }
     
 void ScoreDef::SetDrawingWidth(int drawingWidth)
@@ -379,30 +379,30 @@ void StaffGrp::Reset()
     ResetStaffGrpVis();
 }
 
-void StaffGrp::AddStaffDef( StaffDef *staffDef )
+void StaffGrp::AddStaffDef(StaffDef *staffDef)
 {
-	staffDef->SetParent( this );
-	m_children.push_back( staffDef );
+	staffDef->SetParent(this);
+	m_children.push_back(staffDef);
     Modify();
 }
 
-void StaffGrp::AddStaffGrp( StaffGrp *staffGrp )
+void StaffGrp::AddStaffGrp(StaffGrp *staffGrp)
 {
-	staffGrp->SetParent( this );
-	m_children.push_back( staffGrp );
+	staffGrp->SetParent(this);
+	m_children.push_back(staffGrp);
     Modify();
 }
 
-void StaffGrp::FilterList( ListOfObjects *childList )
+void StaffGrp::FilterList(ListOfObjects *childList)
 {
     // We want to keep only staffDef
     ListOfObjects::iterator iter = childList->begin();
     
-    while ( iter != childList->end()) {
+    while (iter != childList->end()) {
         StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
-        if ( !currentStaffDef )
+        if (!currentStaffDef)
         {
-            iter = childList->erase( iter );
+            iter = childList->erase(iter);
         } else {
             iter++;
         }
@@ -452,7 +452,7 @@ void StaffDef::Reset()
 // ScoreDef functor methods
 //----------------------------------------------------------------------------
 
-int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
+int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the system we are taking the content from
     // param 1: a pointer the page we are adding system to (unused)
@@ -465,14 +465,14 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
     int *currentScoreDefWidth = static_cast<int*>((*params).at(5));
     
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert( dynamic_cast<System*>(this->m_parent));
+    assert(dynamic_cast<System*>(this->m_parent));
     
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    ScoreDef *scoreDef = dynamic_cast<ScoreDef*>( contentSystem->Relinquish( this->GetIdx()) );
-    (*currentSystem)->AddScoreDef( scoreDef );
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(contentSystem->Relinquish(this->GetIdx()));
+    (*currentSystem)->AddScoreDef(scoreDef);
     // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDef (and not
     // the initial one - for this to be corrected, we would need to parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system
@@ -486,7 +486,7 @@ int ScoreDef::CastOffSystems( ArrayPtrVoid *params )
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params )
+int StaffDef::ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params)
 {
     // param 0: Clef pointer (NULL if none)
     // param 1: KeySig pointer (NULL if none)
@@ -513,7 +513,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef( ArrayPtrVoid *params )
     return FUNCTOR_CONTINUE;
 }
 
-int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid *params )
+int StaffDef::SetStaffDefRedrawFlags(ArrayPtrVoid *params)
 {
     // param 0: bool clef flag
     // param 1: bool keysig flag
@@ -526,20 +526,20 @@ int StaffDef::SetStaffDefRedrawFlags( ArrayPtrVoid *params )
     bool *meterSig = static_cast<bool*>((*params).at(3));
     bool *keySigCancellation = static_cast<bool*>((*params).at(4));
     
-    if ( (*clef) ) {
-        this->SetDrawClef( true );
+    if ((*clef)) {
+        this->SetDrawClef(true);
     }
-    if ( (*keysig) ) {
-        this->SetDrawKeySig( true );
+    if ((*keysig)) {
+        this->SetDrawKeySig(true);
     }
-    if ( (*mensur) ) {
-        this->SetDrawMensur( true );
+    if ((*mensur)) {
+        this->SetDrawMensur(true);
     }
-    if ( (*meterSig) ) {
-        this->SetDrawMeterSig( true );
+    if ((*meterSig)) {
+        this->SetDrawMeterSig(true);
     }
-    if ( (*keySigCancellation) ) {
-        this->SetDrawKeySigCancellation( true );
+    if ((*keySigCancellation)) {
+        this->SetDrawKeySigCancellation(true);
     }
     
     return FUNCTOR_CONTINUE;

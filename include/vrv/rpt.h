@@ -31,10 +31,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    BeatRpt( );
+    BeatRpt();
     virtual ~BeatRpt();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "BeatRpt"; }; ;
+    virtual std::string GetClassName(){ return "BeatRpt"; }; ;
     virtual ClassId Is() { return BEATRPT; };
     ///@}
     
@@ -46,7 +46,7 @@ public:
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    virtual double GetAlignmentDuration( int meterUnit );
+    virtual double GetAlignmentDuration(int meterUnit);
     
 private:
     
@@ -71,10 +71,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    BTrem( );
+    BTrem();
     virtual ~BTrem();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "BTrem"; }; ;
+    virtual std::string GetClassName(){ return "BTrem"; }; ;
     virtual ClassId Is() { return BTREM; };
     ///@}
     
@@ -108,10 +108,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    FTrem( );
+    FTrem();
     virtual ~FTrem();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "FTrem"; }; ;
+    virtual std::string GetClassName(){ return "FTrem"; }; ;
     virtual ClassId Is() { return FTREM; };
     ///@}
     
@@ -127,7 +127,7 @@ protected:
     /**
      * Filter the list for a specific fTrem;
      */
-    virtual void FilterList( ListOfObjects *childList );
+    virtual void FilterList(ListOfObjects *childList);
     
 public:
     
@@ -150,10 +150,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MRpt( );
+    MRpt();
     virtual ~MRpt();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "MRpt"; }; ;
+    virtual std::string GetClassName(){ return "MRpt"; }; ;
     virtual ClassId Is() { return MRPT; };
     ///@}
     
@@ -165,7 +165,7 @@ public:
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt( ArrayPtrVoid *params );
+    virtual int PrepareRpt(ArrayPtrVoid *params);
 
 private:
     
@@ -192,10 +192,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MRpt2( );
+    MRpt2();
     virtual ~MRpt2();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "MRpt2"; }; ;
+    virtual std::string GetClassName(){ return "MRpt2"; }; ;
     virtual ClassId Is() { return MRPT2; };
     ///@}
     
@@ -224,10 +224,10 @@ public:
      * Reset method reset all attribute classes
      */
     ///@{
-    MultiRpt( );
+    MultiRpt();
     virtual ~MultiRpt();
     virtual void Reset();
-    virtual std::string GetClassName( ){ return "MultiRpt"; }; ;
+    virtual std::string GetClassName(){ return "MultiRpt"; }; ;
     virtual ClassId Is() { return MULTIRPT; };
     ///@}
     

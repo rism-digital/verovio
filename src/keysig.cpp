@@ -73,7 +73,7 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType):
     m_alterationType = alterationType;
 }
     
-KeySig::KeySig( ScoreDefInterface *keySigAttr ):
+KeySig::KeySig(ScoreDefInterface *keySigAttr):
     LayerElement("ksig-"),
     AttAccidental(),
     AttPitch()
@@ -101,10 +101,10 @@ KeySig::KeySig( ScoreDefInterface *keySigAttr ):
     }
     m_alterationNumber = abs(key);
     
-    if ( keySigAttr->GetKeySigShow() == BOOLEAN_false ) {
+    if (keySigAttr->GetKeySigShow() == BOOLEAN_false) {
         m_drawingShow = false;
     }
-    if ( keySigAttr->GetKeySigShowchange() == BOOLEAN_true ) {
+    if (keySigAttr->GetKeySigShowchange() == BOOLEAN_true) {
         m_drawingShowchange = true;
     }
 }
@@ -138,7 +138,7 @@ void KeySig::Reset()
 }
     
     
-void KeySig::ConvertToInternal( )
+void KeySig::ConvertToInternal()
 {
     int i;
     if (this->GetAccid() == ACCIDENTAL_EXPLICIT_s) {
@@ -168,11 +168,11 @@ void KeySig::ConvertToMei()
     if ((m_alterationNumber < 1) || (m_alterationNumber > 7)) return;
     
     if (m_alterationType == ACCIDENTAL_EXPLICIT_s) {
-        this->SetAccid( ACCIDENTAL_EXPLICIT_s);
+        this->SetAccid(ACCIDENTAL_EXPLICIT_s);
         this->SetPname(KeySig::sharps[m_alterationNumber - 1]);
     }
     else if (m_alterationType == ACCIDENTAL_EXPLICIT_f) {
-        this->SetAccid( ACCIDENTAL_EXPLICIT_f);
+        this->SetAccid(ACCIDENTAL_EXPLICIT_f);
         this->SetPname(KeySig::flats[m_alterationNumber - 1]);
     }
     else return;

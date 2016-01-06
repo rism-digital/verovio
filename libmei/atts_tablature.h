@@ -39,10 +39,10 @@ public:
     void ResetNoteGesTablature();
     
     /** Read the values for the attribute class **/
-    bool ReadNoteGesTablature( pugi::xml_node element );
+    bool ReadNoteGesTablature(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteNoteGesTablature( pugi::xml_node element );
+    bool WriteNoteGesTablature(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -52,12 +52,12 @@ public:
     ///@{
     void SetTabFret(data_FRETNUMBER tabFret_) { m_tabFret = tabFret_; };
     data_FRETNUMBER GetTabFret() const { return m_tabFret; };    
-    bool HasTabFret( );
+    bool HasTabFret();
     
     //
     void SetTabString(data_STRINGNUMBER tabString_) { m_tabString = tabString_; };
     data_STRINGNUMBER GetTabString() const { return m_tabString; };    
-    bool HasTabString( );
+    bool HasTabString();
     
     ///@}
 
@@ -84,10 +84,10 @@ public:
     void ResetStaffDefGesTablature();
     
     /** Read the values for the attribute class **/
-    bool ReadStaffDefGesTablature( pugi::xml_node element );
+    bool ReadStaffDefGesTablature(pugi::xml_node element);
     
     /** Write the values for the attribute class **/
-    bool WriteStaffDefGesTablature( pugi::xml_node element );
+    bool WriteStaffDefGesTablature(pugi::xml_node element);
     
     /**
      * @name Setters, getters and presence checker for class members.
@@ -97,7 +97,7 @@ public:
     ///@{
     void SetTabStrings(std::string tabStrings_) { m_tabStrings = tabStrings_; };
     std::string GetTabStrings() const { return m_tabStrings; };    
-    bool HasTabStrings( );
+    bool HasTabStrings();
     
     ///@}
 

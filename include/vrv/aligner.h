@@ -75,14 +75,14 @@ public:
      * Get bottom StaffAlignment for the system.
      * For each SystemAligner, we keep a StaffAlignment for the bottom position.
      */
-    StaffAlignment *GetBottomAlignment( ) { return m_bottomAlignment; };
+    StaffAlignment *GetBottomAlignment() { return m_bottomAlignment; };
     
     /**
      * Get the StaffAlignment at index idx.
      * Creates the StaffAlignment if not there yet.
      * Checks the they are created incrementally (without gap).
      */
-    StaffAlignment* GetStaffAlignment( int idx );
+    StaffAlignment* GetStaffAlignment(int idx);
     
 private:
     
@@ -111,13 +111,13 @@ public:
     virtual ~StaffAlignment();
     virtual ClassId Is() { return STAFF_ALIGNMENT; }
     
-    void SetYRel( int yRel ) { m_yRel = yRel; };
+    void SetYRel(int yRel) { m_yRel = yRel; };
     int GetYRel() { return m_yRel; };
     
-    void SetYShift( int yShift );
+    void SetYShift(int yShift);
     int GetYShift() { return m_yShift; };
     
-    void SetMaxHeight( int max_height );
+    void SetMaxHeight(int max_height);
     int GetMaxHeight() { return m_maxHeight; };
     
     /**
@@ -126,20 +126,20 @@ public:
      * Typically with one single verse and no @n in <verse>
      */
     ///@{
-    void SetVerseCount( int verse_count );
+    void SetVerseCount(int verse_count);
     int GetVerseCount() { return m_verseCount; };
     
     /**
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
      */
-    virtual int SetAligmentYPos( ArrayPtrVoid *params );
+    virtual int SetAligmentYPos(ArrayPtrVoid *params);
     
     /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from System.
      */
-    virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid *params );
+    virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
     
 private:
     
@@ -173,25 +173,25 @@ class Alignment: public Object
 {
 public:
     // constructors and destructors
-    Alignment( );
-    Alignment( double time, AlignmentType type = ALIGNMENT_DEFAULT );
+    Alignment();
+    Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
     virtual ClassId Is() { return ALIGNMENT; }
     
-    void SetXRel( int x_rel );
+    void SetXRel(int x_rel);
     int GetXRel() { return m_xRel; };
     
-    void SetXShift( int xShift );
+    void SetXShift(int xShift);
     int GetXShift() { return m_xShift; };
     
-    void SetMaxWidth( int maxWidth );
+    void SetMaxWidth(int maxWidth);
     int GetMaxWidth() { return m_maxWidth; };
     
     /**
      * @name Set and get the time value of the alignment
      */
     ///@{
-    void SetTime( double time ) { m_time = time; };
+    void SetTime(double time) { m_time = time; };
     double GetTime() { return m_time; };
     ///@}
     
@@ -199,7 +199,7 @@ public:
      * @name Set and get the type of the alignment
      */
     ///@{
-    void SetType( AlignmentType type ) { m_type = type; };
+    void SetType(AlignmentType type) { m_type = type; };
     AlignmentType GetType() { return m_type; };
     ///@}
     
@@ -207,24 +207,24 @@ public:
      * Returns the GraceAligner for the Alignment.
      * Creates it if necessary.
      */
-    GraceAligner *GetGraceAligner( );
+    GraceAligner *GetGraceAligner();
     
     /**
      * Returns true if the aligner has a GraceAligner
      */
-    bool HasGraceAligner( ) { return (m_graceAligner != NULL); };
+    bool HasGraceAligner() { return (m_graceAligner != NULL); };
     
     /**
      * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
-    virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params );
+    virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
+    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
     
 
     virtual int HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
@@ -233,13 +233,13 @@ public:
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    virtual int SetAlignmentXPos( ArrayPtrVoid *params );
+    virtual int SetAlignmentXPos(ArrayPtrVoid *params);
     
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX( ArrayPtrVoid *params );
+    virtual int JustifyX(ArrayPtrVoid *params);
     
 private:
     
@@ -309,20 +309,20 @@ public:
      */
     virtual void Reset();
     
-    Alignment* GetAlignmentAtTime( double time, AlignmentType type, bool hasEndAlignment = true );
+    Alignment* GetAlignmentAtTime(double time, AlignmentType type, bool hasEndAlignment = true);
     
     /**
      * Keep the maximum time of the measure.
      * This correspond to the whole duration of the measure and 
      * should be the same for all staves/layers.
      */
-    void SetMaxTime( double time );
+    void SetMaxTime(double time);
     
     /**
      * @name Set and get the non justifiable margin
      */
     ///@{
-    void SetNonJustifiableMargin( int margin ) { m_nonJustifiableLeftMargin = margin; };
+    void SetNonJustifiableMargin(int margin) { m_nonJustifiableLeftMargin = margin; };
     int GetNonJustifiableMargin() { return m_nonJustifiableLeftMargin; };
     ///@}
     
@@ -331,36 +331,36 @@ public:
      * For each MeasureAligner, we keep and Alignment for the left position.
      * The Alignment time will be always stay 0.0 and be the first in the list.
      */
-    Alignment *GetLeftAlignment( ) { return m_leftAlignment; };
+    Alignment *GetLeftAlignment() { return m_leftAlignment; };
     
     /**
      * Get right Alignment for the measure.
      * For each MeasureAligner, we keep and Alignment for the right position.
      * The Alignment time will be increased whenever necessary when values are added.
      */
-    Alignment *GetRightAlignment( ) { return m_rightAlignment; };
+    Alignment *GetRightAlignment() { return m_rightAlignment; };
     
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
-    virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
+    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
     
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    virtual int SetAlignmentXPos( ArrayPtrVoid *params );
+    virtual int SetAlignmentXPos(ArrayPtrVoid *params);
     
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX( ArrayPtrVoid *params );
+    virtual int JustifyX(ArrayPtrVoid *params);
     
 private:
-    void AddAlignment( Alignment *alignment, int idx = -1 );
+    void AddAlignment(Alignment *alignment, int idx = -1);
     
 public:
     
@@ -393,7 +393,7 @@ class GraceAligner: public MeasureAligner
 {
 public:
     // constructors and destructors
-    GraceAligner( );
+    GraceAligner();
     virtual ~GraceAligner();
     virtual ClassId Is() { return GRACE_ALIGNER; }
     
@@ -403,19 +403,19 @@ public:
      * when we have all of them. This is done by GraceAligner::AlignNote called 
      * at the end of each Layer in
      */
-    void StackNote( Note *note );
+    void StackNote(Note *note);
     
     /**
      * Align the notes in the reverse order
      */
-    void AlignStack( );
+    void AlignStack();
     
     /**
      * @name Setter and getter for the width ofthe group of grace notes
      */
     ///@{
-    void SetWidth( int totalWidth ) { m_totalWidth = totalWidth; };
-    int GetWidth( ) { return m_totalWidth; };
+    void SetWidth(int totalWidth) { m_totalWidth = totalWidth; };
+    int GetWidth() { return m_totalWidth; };
     ///@}
     
 private:
