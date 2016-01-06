@@ -53,7 +53,6 @@ public:
 private:
     
 };
-
     
 //----------------------------------------------------------------------------
 // Tempo
@@ -62,7 +61,8 @@ private:
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo: public FloatingElement, public TextDirInterface
+class Tempo: public FloatingElement, public TextDirInterface,
+    public AttTimestampMusical
 {
 public:
     /**

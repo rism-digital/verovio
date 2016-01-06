@@ -625,6 +625,8 @@ void MeiOutput::WriteMeiTempo( pugi::xml_node currentNode, Tempo *tempo )
     assert( tempo );
     
     currentNode.append_attribute( "xml:id" ) =  UuidToMeiStr( tempo ).c_str();
+    
+    tempo->WriteTimestampMusical(currentNode);
     WriteTextDirInterface( currentNode, tempo);
     return;
 }
@@ -1733,6 +1735,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     Tempo *vrvTempo = new Tempo();
     SetMeiUuid(tempo, vrvTempo);
     
+    vrvTempo->ReadTimestampMusical(tempo);
     ReadTextDirInterface(tempo, vrvTempo);
     
     AddFloatingElement(parent, vrvTempo);
