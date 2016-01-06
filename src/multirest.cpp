@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "multirest.h"
 
 namespace vrv {
@@ -14,9 +13,7 @@ namespace vrv {
 // MultiRest
 //----------------------------------------------------------------------------
 
-MultiRest::MultiRest():
-    LayerElement("multirest-"),
-    AttNumbered()
+MultiRest::MultiRest() : LayerElement("multirest-"), AttNumbered()
 {
     RegisterAttClass(ATT_NUMBERED);
     Reset();

@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "view.h"
 
 //----------------------------------------------------------------------------
@@ -27,31 +26,31 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // View - TextElement
 //----------------------------------------------------------------------------
-    
+
 void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);
     assert(element);
-    
+
     if (element->Is() == REND) {
-        Rend *rend = dynamic_cast<Rend*>(element);
+        Rend *rend = dynamic_cast<Rend *>(element);
         assert(rend);
         DrawRend(dc, rend, x, y, setX, setY);
     }
     else if (element->Is() == TEXT) {
-        Text *text = dynamic_cast<Text*>(element);
+        Text *text = dynamic_cast<Text *>(element);
         assert(text);
         DrawText(dc, text, x, y, setX, setY);
     }
 }
-    
+
 void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);
     assert(rend);
-    
+
     dc->StartTextGraphic(rend, "", rend->GetUuid());
-    
+
     FontInfo rendFont;
     bool customFont = false;
     if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
@@ -62,20 +61,19 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, boo
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }
     if (customFont) dc->SetFont(&rendFont);
-    
+
     DrawTextChildren(dc, rend, x, y, setX, setY);
-    
+
     if (customFont) dc->ResetFont();
-    
+
     dc->EndTextGraphic(rend, this);
-    
 }
 
 void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, bool &setY)
 {
     assert(dc);
     assert(text);
-    
+
     // special case where we want to replace the '_' with a lyric connector
     // '_' are produce with the SibMEI plugin
     if (text->GetFirstParent(SYL)) {
@@ -87,4 +85,3 @@ void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, boo
 }
 
 } // namespace vrv
-    

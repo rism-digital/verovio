@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "proport.h"
 
 namespace vrv {
@@ -14,19 +13,17 @@ namespace vrv {
 // Proport
 //----------------------------------------------------------------------------
 
-Proport::Proport():
-	LayerElement("prop-"),
-    AttDurationRatio()
+Proport::Proport() : LayerElement("prop-"), AttDurationRatio()
 {
     RegisterAttClass(ATT_DURATIONRATIO);
-    
+
     Reset();
 }
 
 Proport::~Proport()
 {
 }
-    
+
 void Proport::Reset()
 {
     LayerElement::Reset();

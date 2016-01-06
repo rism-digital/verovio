@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "tie.h"
 
 //----------------------------------------------------------------------------
@@ -15,26 +14,23 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // Tie
 //----------------------------------------------------------------------------
 
-Tie::Tie():
-    FloatingElement("tie-"), TimeSpanningInterface(),
-    AttCurvature()
+Tie::Tie() : FloatingElement("tie-"), TimeSpanningInterface(), AttCurvature()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_CURVATURE);
-    
+
     Reset();
 }
-
 
 Tie::~Tie()
 {
 }
-    
+
 void Tie::Reset()
 {
     FloatingElement::Reset();

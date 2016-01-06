@@ -28,21 +28,17 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement():
-    DocObject("ee-"),
-    AttCommon()
+EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
-    
+
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid):
-    DocObject(classid),
-    AttCommon()
+EditorialElement::EditorialElement(std::string classid) : DocObject(classid), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
-    
+
     Reset();
 }
 
@@ -50,21 +46,19 @@ void EditorialElement::Reset()
 {
     DocObject::Reset();
     ResetCommon();
-    
+
     m_visibility = Visible;
 }
 
 EditorialElement::~EditorialElement()
 {
-    
 }
-        
+
 void EditorialElement::AddFloatingElement(FloatingElement *child)
 {
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
-    
 }
 
 void EditorialElement::AddTextElement(TextElement *child)
@@ -90,7 +84,7 @@ void EditorialElement::AddLayerElement(LayerElement *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 void EditorialElement::AddMeasure(Measure *child)
 {
     child->SetParent(this);
@@ -104,7 +98,7 @@ void EditorialElement::AddScoreDef(ScoreDef *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 void EditorialElement::AddStaff(Staff *child)
 {
     child->SetParent(this);
@@ -114,32 +108,30 @@ void EditorialElement::AddStaff(Staff *child)
         LogError("Staff without @n is not supported within editorial markup element");
     }
 }
-    
+
 void EditorialElement::AddStaffDef(StaffDef *child)
 {
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
 }
-    
+
 void EditorialElement::AddStaffGrp(StaffGrp *child)
 {
-    //assert(m_children.empty());
+    // assert(m_children.empty());
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
 }
-    
+
 //----------------------------------------------------------------------------
 // Abbr
 //----------------------------------------------------------------------------
 
-Abbr::Abbr():
-    EditorialElement("abbr-"),
-    AttSource()
+Abbr::Abbr() : EditorialElement("abbr-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -157,12 +149,10 @@ void Abbr::Reset()
 // Add
 //----------------------------------------------------------------------------
 
-Add::Add():
-    EditorialElement("add-"),
-    AttSource()
+Add::Add() : EditorialElement("add-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -176,19 +166,15 @@ void Add::Reset()
     ResetSource();
 }
 
-
 //----------------------------------------------------------------------------
 // Annot
 //----------------------------------------------------------------------------
 
-Annot::Annot():
-    EditorialElement("annot-"),
-    AttPlist(),
-    AttSource()
+Annot::Annot() : EditorialElement("annot-"), AttPlist(), AttSource()
 {
     RegisterAttClass(ATT_PLIST);
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -202,27 +188,25 @@ void Annot::Reset()
     ResetPlist();
     ResetSource();
 }
-    
+
 //----------------------------------------------------------------------------
 // App
 //----------------------------------------------------------------------------
 
-App::App():
-    EditorialElement("app-")
+App::App() : EditorialElement("app-")
 {
     m_level = EDITORIAL_UNDEFINED;
-    
+
     Reset();
 }
-    
-App::App(EditorialLevel level):
-    EditorialElement("app-")
+
+App::App(EditorialLevel level) : EditorialElement("app-")
 {
     m_level = level;
-    
+
     Reset();
 }
-    
+
 void App::Reset()
 {
     EditorialElement::Reset();
@@ -234,7 +218,7 @@ App::~App()
 
 void App::AddLemOrRdg(EditorialElement *child)
 {
-    assert(dynamic_cast<Lem*>(child) || dynamic_cast<Rdg*>(child));
+    assert(dynamic_cast<Lem *>(child) || dynamic_cast<Rdg *>(child));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -244,12 +228,10 @@ void App::AddLemOrRdg(EditorialElement *child)
 // Corr
 //----------------------------------------------------------------------------
 
-Corr::Corr():
-    EditorialElement("corr-"),
-    AttSource()
+Corr::Corr() : EditorialElement("corr-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -267,12 +249,10 @@ void Corr::Reset()
 // Damage
 //----------------------------------------------------------------------------
 
-Damage::Damage():
-    EditorialElement("lem-"),
-    AttSource()
+Damage::Damage() : EditorialElement("lem-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -290,12 +270,10 @@ void Damage::Reset()
 // Del
 //----------------------------------------------------------------------------
 
-Del::Del():
-    EditorialElement("del-"),
-    AttSource()
+Del::Del() : EditorialElement("del-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -313,12 +291,10 @@ void Del::Reset()
 // Expan
 //----------------------------------------------------------------------------
 
-Expan::Expan():
-    EditorialElement("expan-"),
-    AttSource()
+Expan::Expan() : EditorialElement("expan-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -336,12 +312,10 @@ void Expan::Reset()
 // Lem
 //----------------------------------------------------------------------------
 
-Lem::Lem():
-    EditorialElement("lem-"),
-    AttSource()
+Lem::Lem() : EditorialElement("lem-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -359,12 +333,10 @@ void Lem::Reset()
 // Orig
 //----------------------------------------------------------------------------
 
-Orig::Orig():
-    EditorialElement("orig-"),
-    AttSource()
+Orig::Orig() : EditorialElement("orig-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -382,12 +354,10 @@ void Orig::Reset()
 // Rdg
 //----------------------------------------------------------------------------
 
-Rdg::Rdg():
-    EditorialElement("rdg-"),
-    AttSource()
+Rdg::Rdg() : EditorialElement("rdg-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -405,12 +375,10 @@ void Rdg::Reset()
 // Reg
 //----------------------------------------------------------------------------
 
-Reg::Reg():
-    EditorialElement("reg-"),
-    AttSource()
+Reg::Reg() : EditorialElement("reg-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -424,17 +392,14 @@ void Reg::Reset()
     ResetSource();
 }
 
-
 //----------------------------------------------------------------------------
 // Restore
 //----------------------------------------------------------------------------
 
-Restore::Restore():
-    EditorialElement("restore-"),
-    AttSource()
+Restore::Restore() : EditorialElement("restore-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -448,17 +413,14 @@ void Restore::Reset()
     ResetSource();
 }
 
-
 //----------------------------------------------------------------------------
 // Sic
 //----------------------------------------------------------------------------
 
-Sic::Sic():
-    EditorialElement("sic-"),
-    AttSource()
+Sic::Sic() : EditorialElement("sic-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -471,17 +433,15 @@ void Sic::Reset()
     EditorialElement::Reset();
     ResetSource();
 }
-    
+
 //----------------------------------------------------------------------------
 // Supplied
 //----------------------------------------------------------------------------
 
-Supplied::Supplied():
-    EditorialElement("supplied-"),
-    AttSource()
+Supplied::Supplied() : EditorialElement("supplied-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -499,12 +459,10 @@ void Supplied::Reset()
 // Unclear
 //----------------------------------------------------------------------------
 
-Unclear::Unclear():
-    EditorialElement("unclear-"),
-    AttSource()
+Unclear::Unclear() : EditorialElement("unclear-"), AttSource()
 {
     RegisterAttClass(ATT_SOURCE);
-    
+
     Reset();
 }
 
@@ -517,7 +475,7 @@ void Unclear::Reset()
     EditorialElement::Reset();
     ResetSource();
 }
-    
+
 //----------------------------------------------------------------------------
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
@@ -530,22 +488,21 @@ int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
     // param 5: the current scoreDef width (unused)
-    System *contentSystem = static_cast<System*>((*params).at(0));
-    System **currentSystem = static_cast<System**>((*params).at(2));
-    
+    System *contentSystem = static_cast<System *>((*params).at(0));
+    System **currentSystem = static_cast<System **>((*params).at(2));
+
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System*>(this->m_parent));
-    
+    assert(dynamic_cast<System *>(this->m_parent));
+
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement = dynamic_cast<EditorialElement*>(contentSystem->Relinquish(this->GetIdx()));
+    EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
     (*currentSystem)->AddEditorialElement(editorialElement);
-    
+
     return FUNCTOR_SIBLINGS;
 }
-
 
 } // namespace vrv

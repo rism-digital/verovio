@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "textdirinterface.h"
 
 //----------------------------------------------------------------------------
@@ -14,35 +13,30 @@
 
 //----------------------------------------------------------------------------
 
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
 // TextDirInterface
 //----------------------------------------------------------------------------
 
-TextDirInterface::TextDirInterface(): Interface(),
-    AttCommon(),
-    AttPlacement(),
-    AttStaffident()
+TextDirInterface::TextDirInterface() : Interface(), AttCommon(), AttPlacement(), AttStaffident()
 {
     RegisterInterfaceAttClass(ATT_COMMON);
     RegisterInterfaceAttClass(ATT_PLACEMENT);
     RegisterInterfaceAttClass(ATT_STAFFIDENT);
-    
+
     Reset();
 }
 
-
 TextDirInterface::~TextDirInterface()
 {
-}    
-    
+}
+
 void TextDirInterface::Reset()
 {
     ResetCommon();
     ResetPlacement();
     ResetStaffident();
 }
-    
+
 } // namespace vrv

@@ -5,7 +5,6 @@
 // Copyright (c) Laurent Pugin. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "io.h"
 
 //----------------------------------------------------------------------------
@@ -18,18 +17,16 @@ namespace vrv {
 // FileOutputStream
 //----------------------------------------------------------------------------
 
-FileOutputStream::FileOutputStream(Doc *doc, std::string filename) :
-    std::ofstream(filename.c_str())
+FileOutputStream::FileOutputStream(Doc *doc, std::string filename) : std::ofstream(filename.c_str())
 {
-	assert(doc);
-	m_doc = doc;
+    assert(doc);
+    m_doc = doc;
 }
 
-FileOutputStream::FileOutputStream(Doc *doc) :
-    std::ofstream()
+FileOutputStream::FileOutputStream(Doc *doc) : std::ofstream()
 {
-	assert(doc);
-	m_doc = doc;
+    assert(doc);
+    m_doc = doc;
 }
 
 FileOutputStream::~FileOutputStream()
@@ -39,27 +36,21 @@ FileOutputStream::~FileOutputStream()
     }
 }
 
-
-
 //----------------------------------------------------------------------------
 // FileInputStream
 //----------------------------------------------------------------------------
 
-FileInputStream::FileInputStream(Doc *doc, std::string filename ) :
-    std::ifstream(filename.c_str())
+FileInputStream::FileInputStream(Doc *doc, std::string filename) : std::ifstream(filename.c_str())
 {
-	assert(doc);
+    assert(doc);
     m_doc = doc;
     Init();
-    
 }
 
-
-FileInputStream::FileInputStream(Doc *doc) :
-    std::ifstream()
+FileInputStream::FileInputStream(Doc *doc) : std::ifstream()
 {
-	assert(doc);
-	m_doc = doc;
+    assert(doc);
+    m_doc = doc;
     Init();
 }
 
@@ -69,7 +60,7 @@ void FileInputStream::Init()
     m_hasMeasureWithinEditMarkup = false;
     m_ignoreLayoutInformation = false;
 }
-    
+
 FileInputStream::~FileInputStream()
 {
     if (this->is_open()) {

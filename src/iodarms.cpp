@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "iodarms.h"
 
 //----------------------------------------------------------------------------
@@ -29,23 +28,30 @@ namespace vrv {
 
 // Ok, this is ugly, but since this is static data, why not?
 pitchmap DarmsInput::PitchMap[] = {
-    /* 00 */ {1, PITCHNAME_c}, {1, PITCHNAME_d}, {1, PITCHNAME_e}, {1, PITCHNAME_f}, {1, PITCHNAME_g}, {1, PITCHNAME_a}, {1, PITCHNAME_b},
-    /* 07 */ {2, PITCHNAME_c}, {2, PITCHNAME_d}, {2, PITCHNAME_e}, {2, PITCHNAME_f}, {2, PITCHNAME_g}, {2, PITCHNAME_a}, {2, PITCHNAME_b},
-    /* 14 */ {3, PITCHNAME_c}, {3, PITCHNAME_d}, {3, PITCHNAME_e}, {3, PITCHNAME_f}, {3, PITCHNAME_g}, {3, PITCHNAME_a}, {3, PITCHNAME_b},
-    /* 21 */ {4, PITCHNAME_c}, {4, PITCHNAME_d}, {4, PITCHNAME_e}, {4, PITCHNAME_f}, {4, PITCHNAME_g}, {4, PITCHNAME_a}, {4, PITCHNAME_b},
-    /* 28 */ {5, PITCHNAME_c}, {5, PITCHNAME_d}, {5, PITCHNAME_e}, {5, PITCHNAME_f}, {5, PITCHNAME_g}, {5, PITCHNAME_a}, {5, PITCHNAME_b},
-    /* 35 */ {6, PITCHNAME_c}, {6, PITCHNAME_d}, {6, PITCHNAME_e}, {6, PITCHNAME_f}, {6, PITCHNAME_g}, {6, PITCHNAME_a}, {6, PITCHNAME_b},
-    /* 42 */ {7, PITCHNAME_c}, {7, PITCHNAME_d}, {7, PITCHNAME_e}, {7, PITCHNAME_f}, {7, PITCHNAME_g}, {7, PITCHNAME_a}, {7, PITCHNAME_b},
-    /* 49 */ {8, PITCHNAME_c}, {8, PITCHNAME_d}, {8, PITCHNAME_e}, {8, PITCHNAME_f}, {8, PITCHNAME_g}, {8, PITCHNAME_a}, {8, PITCHNAME_b},
+    /* 00 */ { 1, PITCHNAME_c }, { 1, PITCHNAME_d }, { 1, PITCHNAME_e }, { 1, PITCHNAME_f }, { 1, PITCHNAME_g }, { 1, PITCHNAME_a },
+    { 1, PITCHNAME_b },
+    /* 07 */ { 2, PITCHNAME_c }, { 2, PITCHNAME_d }, { 2, PITCHNAME_e }, { 2, PITCHNAME_f }, { 2, PITCHNAME_g }, { 2, PITCHNAME_a },
+    { 2, PITCHNAME_b },
+    /* 14 */ { 3, PITCHNAME_c }, { 3, PITCHNAME_d }, { 3, PITCHNAME_e }, { 3, PITCHNAME_f }, { 3, PITCHNAME_g }, { 3, PITCHNAME_a },
+    { 3, PITCHNAME_b },
+    /* 21 */ { 4, PITCHNAME_c }, { 4, PITCHNAME_d }, { 4, PITCHNAME_e }, { 4, PITCHNAME_f }, { 4, PITCHNAME_g }, { 4, PITCHNAME_a },
+    { 4, PITCHNAME_b },
+    /* 28 */ { 5, PITCHNAME_c }, { 5, PITCHNAME_d }, { 5, PITCHNAME_e }, { 5, PITCHNAME_f }, { 5, PITCHNAME_g }, { 5, PITCHNAME_a },
+    { 5, PITCHNAME_b },
+    /* 35 */ { 6, PITCHNAME_c }, { 6, PITCHNAME_d }, { 6, PITCHNAME_e }, { 6, PITCHNAME_f }, { 6, PITCHNAME_g }, { 6, PITCHNAME_a },
+    { 6, PITCHNAME_b },
+    /* 42 */ { 7, PITCHNAME_c }, { 7, PITCHNAME_d }, { 7, PITCHNAME_e }, { 7, PITCHNAME_f }, { 7, PITCHNAME_g }, { 7, PITCHNAME_a },
+    { 7, PITCHNAME_b },
+    /* 49 */ { 8, PITCHNAME_c }, { 8, PITCHNAME_d }, { 8, PITCHNAME_e }, { 8, PITCHNAME_f }, { 8, PITCHNAME_g }, { 8, PITCHNAME_a },
+    { 8, PITCHNAME_b },
 };
 
-DarmsInput::DarmsInput(Doc *doc, std::string filename) :
-    FileInputStream(doc)
-{	
+DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
+{
     m_layer = NULL;
     m_measure = NULL;
     m_staff = NULL;
-    
+
     m_filename = filename;
 }
 
@@ -53,14 +59,15 @@ DarmsInput::~DarmsInput()
 {
 }
 
-void DarmsInput::UnrollKeysig(int quantity, char alter) {
-    data_PITCHNAME flats[] = {PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f};
-    data_PITCHNAME sharps[] = {PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b};
+void DarmsInput::UnrollKeysig(int quantity, char alter)
+{
+    data_PITCHNAME flats[] = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
+    data_PITCHNAME sharps[] = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
     data_PITCHNAME *alteration_set;
     data_ACCIDENTAL_EXPLICIT accid = ACCIDENTAL_EXPLICIT_NONE;
-    
+
     if (quantity == 0) quantity++;
-    
+
     if (alter == '-') {
         alteration_set = flats;
         accid = ACCIDENTAL_EXPLICIT_f;
@@ -69,7 +76,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
         alteration_set = sharps;
         accid = ACCIDENTAL_EXPLICIT_s;
     }
-    
+
     KeySig *k = new KeySig(quantity, accid);
     m_layer->AddLayerElement(k);
     return;
@@ -88,11 +95,11 @@ void DarmsInput::UnrollKeysig(int quantity, char alter) {
 /*
  Read the meter
  */
-int DarmsInput::parseMeter(int pos, const char* data)
+int DarmsInput::parseMeter(int pos, const char *data)
 {
- 
+
     Mensur *meter = new Mensur;
-    
+
     pos++;
     if (data[pos] == 'C') {
         meter->SetSign(MENSURATIONSIGN_C);
@@ -110,7 +117,7 @@ int DarmsInput::parseMeter(int pos, const char* data)
         meter->SetSign(MENSURATIONSIGN_O);
         pos++;
     }
-    
+
     // See if followed by numerical meter
     if (isdigit(data[pos])) { // Coupound meter
         int n1, n2;
@@ -120,7 +127,7 @@ int DarmsInput::parseMeter(int pos, const char* data)
             n1 = (n1 * 10) + n2;
         }
         meter->SetNumbase(n1);
-        
+
         // we expect the next char a ':', or make a single digit meter
         // mini-hack in some cases it is a '-'...
         if (data[pos + 1] != ':' && data[pos + 1] != '-') {
@@ -136,12 +143,12 @@ int DarmsInput::parseMeter(int pos, const char* data)
                 n2 = data[++pos] - ASCII_NUMBER_OFFSET; // idem
                 n1 = (n1 * 10) + n2;
             }
-            
+
             meter->SetNumbase(n1);
         }
         LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
     }
-    
+
     m_layer->AddLayerElement(meter);
     return pos;
 }
@@ -149,19 +156,19 @@ int DarmsInput::parseMeter(int pos, const char* data)
 /*
  Process the various headings: !I, !K, !N, !M
 */
-int DarmsInput::do_globalSpec(int pos, const char* data)
+int DarmsInput::do_globalSpec(int pos, const char *data)
 {
     char digit = data[++pos];
     int quantity = 0;
-    
+
     switch (digit) {
         case 'I': // Voice nr.
-            //the next digit should be a number, but we do not care what
+            // the next digit should be a number, but we do not care what
             if (!isdigit(data[++pos])) {
                 LogWarning("DarmsInput: Expected number after I");
             }
             break;
-            
+
         case 'K': // key sig, !K2- = two flats
             if (isdigit(data[pos + 1])) { // is followed by number?
                 pos++; // move forward
@@ -176,11 +183,11 @@ int DarmsInput::do_globalSpec(int pos, const char* data)
                 LogWarning("DarmsInput: Invalid char for K: %c", data[pos]);
             }
             break;
-            
+
         case 'M': // meter
             pos = parseMeter(pos, data);
             break;
-            
+
         case 'N': // notehead type:
             /*
              N0	notehead missing
@@ -197,26 +204,24 @@ int DarmsInput::do_globalSpec(int pos, const char* data)
                 LogWarning("DarmsInput: Expected number after N");
             }
             else { // we honor only notehead 7, diamond
-                if (data[pos] == 0x07 + ASCII_NUMBER_OFFSET)
-                    m_antique_notation = true;
+                if (data[pos] == 0x07 + ASCII_NUMBER_OFFSET) m_antique_notation = true;
             }
             break;
-        
-        default:
-            break;
+
+        default: break;
     }
-    
+
     return pos;
 }
 
-int DarmsInput::do_Clef(int pos, const char* data)
+int DarmsInput::do_Clef(int pos, const char *data)
 {
     int position = data[pos] - ASCII_NUMBER_OFFSET; // manual conversion from ASCII to int
-    
+
     pos = pos + 2; // skip the '!' 3!F
-    
+
     Clef *mclef = new Clef();
-    
+
     if (data[pos] == 'C') {
         mclef->SetShape(CLEFSHAPE_C);
         switch (position) {
@@ -241,7 +246,10 @@ int DarmsInput::do_Clef(int pos, const char* data)
         mclef->SetShape(CLEFSHAPE_F);
         switch (position) {
             case 3: mclef->SetLine(3); break;
-            case 5: mclef->SetLine(4);; break;
+            case 5:
+                mclef->SetLine(4);
+                ;
+                break;
             case 7: mclef->SetLine(5); break;
             default: LogWarning("DarmsInput: Invalid F clef on line %i", position); break;
         }
@@ -252,22 +260,22 @@ int DarmsInput::do_Clef(int pos, const char* data)
         LogWarning("DarmsInput: Invalid clef specification: %c", data[pos]);
         return 0; // fail
     }
-    
+
     m_layer->AddLayerElement(mclef);
     return pos;
 }
 
-int DarmsInput::do_Note(int pos, const char* data, bool rest)
+int DarmsInput::do_Note(int pos, const char *data, bool rest)
 {
     int position;
     data_ACCIDENTAL_EXPLICIT accidental = ACCIDENTAL_EXPLICIT_NONE;
     data_DURATION duration;
     int dot = 0;
     int tie = 0;
-    
-    //pos points to the first digit of the note
+
+    // pos points to the first digit of the note
     // it can be 5W, 12W, -1W
-    
+
     // Negative number, only '-' and one digit
     if (data[pos] == '-') {
         // be sure following char is a number
@@ -279,13 +287,13 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest)
         if (!isdigit(data[pos]) && data[pos] != 'R') return 0; // this should not happen, as it is checked in the caller
         // positive number
         position = data[pos] - ASCII_NUMBER_OFFSET;
-        //check for second digit
+        // check for second digit
         if (isdigit(data[pos + 1])) {
             pos++;
             position = (position * 10) + (data[pos] - ASCII_NUMBER_OFFSET);
         }
     }
-    
+
     if (data[pos + 1] == '-') {
         accidental = ACCIDENTAL_EXPLICIT_f;
         pos++;
@@ -298,7 +306,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest)
         accidental = ACCIDENTAL_EXPLICIT_n;
         pos++;
     }
-    
+
     switch (data[++pos]) {
         case 'W':
             duration = DURATION_1;
@@ -320,36 +328,35 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest)
         case 'X': duration = DURATION_64; break;
         case 'Y': duration = DURATION_128; break;
         case 'Z': duration = DURATION_256; break;
-            
+
         default:
             LogWarning("DarmsInput: Unkown note duration: %c", data[pos]);
             return 0;
             break;
     }
-    
-    if (data[pos + 1] =='.') {
+
+    if (data[pos + 1] == '.') {
         pos++;
         dot = 1;
     }
-    
+
     // tie with following note
-    if (data[pos + 1] =='L' || data[pos + 1] =='J') {
+    if (data[pos + 1] == 'L' || data[pos + 1] == 'J') {
         pos++;
         tie = 1;
     }
-    
+
     if (rest) {
-        Rest *rest =  new Rest;
+        Rest *rest = new Rest;
         rest->SetDur(duration);
         rest->SetDurGes(DURATION_8);
         rest->SetDots(dot);
         m_layer->AddLayerElement(rest);
     }
     else {
-        
-        if ((position + m_clef_offset) > sizeof(PitchMap))
-            position = 0;
-        
+
+        if ((position + m_clef_offset) > sizeof(PitchMap)) position = 0;
+
         Note *note = new Note;
         note->SetDur(duration);
         note->SetDurGes(DURATION_8);
@@ -358,7 +365,7 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest)
         note->SetPname(PitchMap[position + m_clef_offset].pitch);
         note->SetDots(dot);
         m_layer->AddLayerElement(note);
-        
+
         // Ties are between two notes and have a reference to the two notes
         // if more than two notes are ties, the m_second note of the first
         // tie will containn the same note as the m_first in the second tie:
@@ -383,9 +390,8 @@ int DarmsInput::do_Note(int pos, const char* data, bool rest)
                 m_current_tie = NULL;
             }
         }
-        
     }
-    
+
     return pos;
 }
 
@@ -393,23 +399,23 @@ bool DarmsInput::ImportFile()
 {
     char data[10000];
     size_t len;
-    
+
     std::ifstream infile;
-    
+
     infile.open(m_filename.c_str());
-    
+
     if (infile.eof()) {
         infile.close();
         return false;
     }
-    
+
     infile.getline(data, sizeof(data), '\n');
     len = strlen(data);
     infile.close();
-    
+
     return ImportString(data);
 }
-    
+
 bool DarmsInput::ImportString(std::string data_str)
 {
     size_t len;
@@ -417,7 +423,7 @@ bool DarmsInput::ImportString(std::string data_str)
     int pos = 0;
     const char *data = data_str.c_str();
     len = data_str.length();
-    
+
     m_doc->Reset(Raw);
     System *system = new System();
     Page *page = new Page();
@@ -425,16 +431,16 @@ bool DarmsInput::ImportString(std::string data_str)
     m_measure = new Measure(true, 1);
     m_layer = new Layer();
     m_layer->SetN(1);
-    
+
     m_current_tie = NULL;
     m_staff->AddLayer(m_layer);
     m_measure->AddStaff(m_staff);
     system->AddMeasure(m_measure);
-    
+
     // do this the C style, char by char
     while (pos < len) {
         char c = data[pos];
-        
+
         if (c == '!') {
             LogDebug("DarmsInput: Global spec. at %i", pos);
             res = do_globalSpec(pos, data);
@@ -443,7 +449,7 @@ bool DarmsInput::ImportString(std::string data_str)
             // m_staff->notAnc = m_antique_notation;
         }
         else if (isdigit(c) || c == '-') { // check for '-' too as note positions can be negative
-            //is number followed by '!' ? it is a clef
+            // is number followed by '!' ? it is a clef
             if (data[pos + 1] == '!') {
                 res = do_Clef(pos, data);
                 if (res) pos = res;
@@ -458,23 +464,23 @@ bool DarmsInput::ImportString(std::string data_str)
             if (res) pos = res;
         }
         else {
-            //if (!isspace(c))
-                //LogMessage("Other %c", c);
+            // if (!isspace(c))
+            // LogMessage("Other %c", c);
         }
- 
+
         pos++;
     }
-    
+
     // add miniaml scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
     staffGrp->AddStaffDef(staffDef);
     m_doc->m_scoreDef.AddStaffGrp(staffGrp);
-    
+
     page->AddSystem(system);
     m_doc->AddPage(page);
-    
+
     return true;
 }
 

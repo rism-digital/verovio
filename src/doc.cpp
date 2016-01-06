@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "doc.h"
 
 //----------------------------------------------------------------------------
@@ -42,8 +41,7 @@ namespace vrv {
 // Doc
 //----------------------------------------------------------------------------
 
-Doc::Doc() :
-    Object("doc-")
+Doc::Doc() : Object("doc-")
 {
     m_style = new Style();
     Reset(Raw);
@@ -52,34 +50,33 @@ Doc::Doc() :
 Doc::~Doc()
 {
     delete m_style;
-    
 }
 
 void Doc::Reset(DocType type)
 {
     Object::Reset();
-    
+
     m_type = type;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
     m_pageLeftMar = 0;
     m_pageTopMar = 0;
-    
+
     m_drawingSpacingLinear = DEFAULT_SPACING_LINEAR;
     m_drawingSpacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
-    
+
     m_spacingStaff = m_style->m_spacingStaff;
     m_spacingSystem = m_style->m_spacingSystem;
-    
+
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
     m_drawingEvenSpacing = false;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
-    
+
     m_scoreDef.Reset();
-    
+
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
     m_drawingLyricFont.SetFaceName("Garamond");
@@ -87,8 +84,8 @@ void Doc::Reset(DocType type)
 
 void Doc::AddPage(Page *page)
 {
-	page->SetParent(this);
-	m_children.push_back(page);
+    page->SetParent(this);
+    m_children.push_back(page);
     Modify();
 }
 
@@ -96,24 +93,24 @@ void Doc::Refresh()
 {
     RefreshViews();
 }
-    
+
 void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
-    
+
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
         this->Process(&resetDrawing, &params);
     }
-    
+
     // Try to match all spanning elements (slur, tie, etc) by processing backward
-    std::vector<DocObject*> timeSpanningElements;
+    std::vector<DocObject *> timeSpanningElements;
     bool fillList = true;
     params.push_back(&timeSpanningElements);
     params.push_back(&fillList);
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
     this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
-    
+
     // First we tried backward because nomrally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
@@ -123,12 +120,12 @@ void Doc::PrepareDrawing()
         fillList = false;
         this->Process(&prepareTimeSpanning, &params);
     }
-    
+
     // If some are still there, then it is probably an issue in the encoding
     if (!timeSpanningElements.empty()) {
         LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size());
     }
-    
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     params.clear();
@@ -137,27 +134,27 @@ void Doc::PrepareDrawing()
     params.push_back(&verseTree);
     params.push_back(&layerTree);
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
-    //StaffN_LayerN_VerseN_t staffLayerVerseTree;
-    //params.push_back(&staffLayerVerseTree);
-    
+    // StaffN_LayerN_VerseN_t staffLayerVerseTree;
+    // params.push_back(&staffLayerVerseTree);
+
     // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
-    //LogElapsedTimeStart();
+    // LogElapsedTimeStart();
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &params);
-    
+
     // The tree is used to process each staff/layer/verse separatly
     // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
     // and with @n specified
-    
+
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
-    
+
     // Process by layer for matching @tie attribute - we process notes and chords, looking at
     // GetTie values and pitch and oct for matching notes
     Chord *currentChord;
-    std::vector<Note*> currentNotes;
-    std::vector<AttComparison*> filters;
+    std::vector<Note *> currentNotes;
+    std::vector<AttComparison *> filters;
     for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
@@ -166,7 +163,7 @@ void Doc::PrepareDrawing()
             AttCommonNComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
-            
+
             currentChord = NULL;
             currentNotes.clear();
             ArrayPtrVoid paramsTieAttr;
@@ -175,11 +172,11 @@ void Doc::PrepareDrawing()
             Functor prepareTieAttr(&Object::PrepareTieAttr);
             Functor prepareTieAttrEnd(&Object::PrepareTieAttrEnd);
             this->Process(&prepareTieAttr, &paramsTieAttr, &prepareTieAttrEnd, &filters);
-        
+
             // After having processed one layer, we check if we have open ties - if yes, we
             // must reset them and they will be ignored.
             if (!currentNotes.empty()) {
-                std::vector<Note*>::iterator iter;
+                std::vector<Note *>::iterator iter;
                 for (iter = currentNotes.begin(); iter != currentNotes.end(); iter++) {
                     LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
                     (*iter)->ResetDrawingTieAttr();
@@ -187,7 +184,7 @@ void Doc::PrepareDrawing()
             }
         }
     }
-    
+
     Note *currentNote = NULL;
     for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -204,15 +201,15 @@ void Doc::PrepareDrawing()
             this->Process(&preparePointersByLayer, &paramsPointers, NULL, &filters);
         }
     }
-    
+
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     Syl *currentSyl;
     Note *lastNote;
     Note *lastButOneNote;
     for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            for (verses= layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
-                //std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
+            for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
+                // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
                 filters.clear();
                 // Create ad comparison object for each type / @n
                 AttCommonNComparison matchStaff(STAFF, staves->first);
@@ -221,7 +218,7 @@ void Doc::PrepareDrawing()
                 filters.push_back(&matchStaff);
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
-                
+
                 // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
                 currentSyl = NULL;
@@ -237,7 +234,7 @@ void Doc::PrepareDrawing()
             }
         }
     }
-    
+
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running TimeSpanningInterface
     // to each staff they are extended. This does not need to be done staff by staff because we can just check the
     // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
@@ -246,12 +243,12 @@ void Doc::PrepareDrawing()
     params.push_back(&timeSpanningElements);
     Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
     this->Process(&fillStaffCurrentTimeSpanning, &params);
-    
+
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if (!timeSpanningElements.empty()) {
         LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size());
     }
-    
+
     // Process by staff for matching mRpt elements and setting the drawing number
     MRpt *currentMRpt;
     data_BOOLEAN multiNumber;
@@ -263,7 +260,7 @@ void Doc::PrepareDrawing()
             AttCommonNComparison matchLayer(LAYER, layers->first);
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
-            
+
             // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
             // m_drawingLastNote is set only if the syl has a forward connector
             currentMRpt = NULL;
@@ -277,7 +274,7 @@ void Doc::PrepareDrawing()
             this->Process(&prepareRpt, &paramsRptAttr, NULL, &filters);
         }
     }
-    
+
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
     StaffN_LayerN_VerseN_t::iterator staves;
@@ -303,18 +300,18 @@ void Doc::PrepareDrawing()
         }
     }
     */
-    
-    //LogElapsedTimeEnd ("Preparing drawing");
-    
+
+    // LogElapsedTimeEnd ("Preparing drawing");
+
     m_drawingPreparationDone = true;
 }
-    
+
 void Doc::SetCurrentScoreDef(bool force)
 {
     if (m_currentScoreDefDone && !force) {
         return;
     }
-    
+
     ScoreDef currentScoreDef;
     currentScoreDef = m_scoreDef;
     StaffDef *staffDef = NULL;
@@ -322,34 +319,34 @@ void Doc::SetCurrentScoreDef(bool force)
     params.push_back(&currentScoreDef);
     params.push_back(&staffDef);
     Functor setCurrentScoreDef(&Object::SetCurrentScoreDef);
-    
+
     // First process the current scoreDef in order to fill the staffDef with
     // the appropriate drawing values
     currentScoreDef.Process(&setCurrentScoreDef, &params);
-    
-    //LogElapsedTimeStart();
+
+    // LogElapsedTimeStart();
     this->Process(&setCurrentScoreDef, &params);
-    //LogElapsedTimeEnd ("Setting scoreDefs");
-    
+    // LogElapsedTimeEnd ("Setting scoreDefs");
+
     m_currentScoreDefDone = true;
 }
 
 void Doc::CastOff()
 {
     this->SetCurrentScoreDef();
-    
+
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
     contentPage->LayOutHorizontally();
-    
-    System *contentSystem = dynamic_cast<System*>(contentPage->DetachChild(0));
+
+    System *contentSystem = dynamic_cast<System *>(contentPage->DetachChild(0));
     assert(contentSystem);
-    
+
     System *currentSystem = new System();
     contentPage->AddSystem(currentSystem);
     int shift = -contentSystem->GetDrawingLabelsWidth();
-    int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
-        - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+    int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar
+        - currentSystem->m_systemRightMar;
     // The width of the initial scoreDef is stored in the page scoreDef
     int scoreDefWidth = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
     ArrayPtrVoid params;
@@ -362,15 +359,15 @@ void Doc::CastOff()
     Functor castOffSystems(&Object::CastOffSystems);
     contentSystem->Process(&castOffSystems, &params);
     delete contentSystem;
-    
+
     // Reset the scoreDef at the beginning of each system
     this->SetCurrentScoreDef(true);
     contentPage->LayOutVertically();
-    
+
     // Detach the contentPage
     this->DetachChild(0);
     assert(contentPage && !contentPage->m_parent);
-    
+
     Page *currentPage = new Page();
     this->AddPage(currentPage);
     shift = 0;
@@ -384,17 +381,17 @@ void Doc::CastOff()
     Functor castOffPages(&Object::CastOffPages);
     contentPage->Process(&castOffPages, &params);
     delete contentPage;
-    
-    //LogDebug("Layout: %d pages", this->GetChildCount());
+
+    // LogDebug("Layout: %d pages", this->GetChildCount());
 
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->SetCurrentScoreDef(true);
 }
-    
+
 void Doc::UnCastOff()
-{  
+{
     Page *contentPage = new Page();
     System *contentSystem = new System();
     contentPage->AddSystem(contentSystem);
@@ -404,19 +401,19 @@ void Doc::UnCastOff()
 
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &params);
-    
+
     this->ClearChildren();
-    
+
     this->AddPage(contentPage);
-    
-    //LogDebug("ContinousLayout: %d pages", this->GetChildCount());
-    
+
+    // LogDebug("ContinousLayout: %d pages", this->GetChildCount());
+
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->SetCurrentScoreDef(true);
 }
-    
+
 bool Doc::HasPage(int pageIdx)
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));
@@ -424,9 +421,9 @@ bool Doc::HasPage(int pageIdx)
 
 int Doc::GetPageCount()
 {
-    return GetChildCount() ;
+    return GetChildCount();
 }
-    
+
 int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize)
 {
     int x, y, w, h;
@@ -439,7 +436,7 @@ int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize)
     h = h * staffSize / 100;
     return h;
 }
-    
+
 int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
 {
     int x, y, w, h;
@@ -457,28 +454,27 @@ int Doc::GetDrawingUnit(int staffSize)
 {
     return m_drawingUnit * staffSize / 100;
 }
-    
+
 int Doc::GetDrawingDoubleUnit(int staffSize)
 {
     return m_drawingDoubleUnit * staffSize / 100;
 }
-    
+
 int Doc::GetDrawingStaffSize(int staffSize)
 {
     return m_drawingStaffSize * staffSize / 100;
-    
 }
-    
+
 int Doc::GetDrawingOctaveSize(int staffSize)
 {
     return m_drawingOctaveSize * staffSize / 100;
 }
-    
+
 int Doc::GetDrawingBrevisWidth(int staffSize)
 {
     return m_drawingBrevisWidth * staffSize / 100;
 }
-    
+
 int Doc::GetDrawingBarLineWidth(int staffSize)
 {
     return m_style->m_barLineWidth * staffSize / 100;
@@ -500,21 +496,21 @@ int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize)
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
-    
+
 int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize)
 {
     int value = m_drawingBeamWhiteWidth * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
-    
+
 int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize)
 {
     int value = m_drawingLedgerLine * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
-    
+
 int Doc::GetGraceSize(int value)
 {
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
@@ -527,51 +523,81 @@ FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
     m_drawingSmuflFont.SetPointSize(value);
     return &m_drawingSmuflFont;
 }
-    
+
 FontInfo *Doc::GetDrawingLyricFont(int staffSize)
 {
     m_drawingLyricFont.SetPointSize(m_drawingLyricFontSize * staffSize / 100);
     return &m_drawingLyricFont;
 }
-    
-char Doc::GetLeftMargin(const ClassId classId )
+
+char Doc::GetLeftMargin(const ClassId classId)
 {
-    
-    if (classId == ACCID) return m_style->m_leftMarginAccid;
-    else if (classId == BARLINE) return m_style->m_leftMarginBarLine;
-    else if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarLineAttr;
-    else if (classId == BEATRPT) return m_style->m_leftMarginBeatRpt;
-    else if (classId == CHORD) return m_style->m_leftMarginChord;
-    else if (classId == CLEF) return m_style->m_leftMarginClef;
-    else if (classId == KEYSIG)  return m_style->m_leftMarginKeySig;
-    else if (classId == MENSUR) return m_style->m_leftMarginMensur;
-    else if (classId == METERSIG) return m_style->m_leftMarginMeterSig;
-    else if (classId == MREST) return m_style->m_leftMarginMRest;
-    else if (classId == MRPT2) return m_style->m_leftMarginMRpt2;
-    else if (classId == MULTIREST) return m_style->m_leftMarginMultiRest;
-    else if (classId == MULTIRPT) return m_style->m_leftMarginMultiRpt;
-    else if (classId == NOTE) return m_style->m_leftMarginNote;
-    else if (classId == REST) return m_style->m_leftMarginRest;
+
+    if (classId == ACCID)
+        return m_style->m_leftMarginAccid;
+    else if (classId == BARLINE)
+        return m_style->m_leftMarginBarLine;
+    else if (classId == BARLINE_ATTR)
+        return m_style->m_leftMarginBarLineAttr;
+    else if (classId == BEATRPT)
+        return m_style->m_leftMarginBeatRpt;
+    else if (classId == CHORD)
+        return m_style->m_leftMarginChord;
+    else if (classId == CLEF)
+        return m_style->m_leftMarginClef;
+    else if (classId == KEYSIG)
+        return m_style->m_leftMarginKeySig;
+    else if (classId == MENSUR)
+        return m_style->m_leftMarginMensur;
+    else if (classId == METERSIG)
+        return m_style->m_leftMarginMeterSig;
+    else if (classId == MREST)
+        return m_style->m_leftMarginMRest;
+    else if (classId == MRPT2)
+        return m_style->m_leftMarginMRpt2;
+    else if (classId == MULTIREST)
+        return m_style->m_leftMarginMultiRest;
+    else if (classId == MULTIRPT)
+        return m_style->m_leftMarginMultiRpt;
+    else if (classId == NOTE)
+        return m_style->m_leftMarginNote;
+    else if (classId == REST)
+        return m_style->m_leftMarginRest;
     return m_style->m_leftMarginDefault;
 }
-    
+
 char Doc::GetRightMargin(const ClassId classId)
 {
-    if (classId == ACCID) return m_style->m_rightMarginAccid;
-    else if (classId == BARLINE) return m_style->m_rightMarginBarLine;
-    else if (classId == BARLINE_ATTR) return m_style->m_rightMarginBarLineAttr;
-    else if (classId == BEATRPT) return m_style->m_rightMarginBeatRpt;
-    else if (classId == CHORD) return m_style->m_rightMarginChord;
-    else if (classId == CLEF) return m_style->m_rightMarginClef;
-    else if (classId == KEYSIG)  return m_style->m_rightMarginKeySig;
-    else if (classId == MENSUR) return m_style->m_rightMarginMensur;
-    else if (classId == METERSIG) return m_style->m_rightMarginMeterSig;
-    else if (classId == MREST) return m_style->m_rightMarginMRest;
-    else if (classId == MRPT2) return m_style->m_rightMarginMRpt2;
-    else if (classId == MULTIREST) return m_style->m_rightMarginMultiRest;
-    else if (classId == MULTIRPT) return m_style->m_rightMarginMultiRpt;
-    else if (classId == NOTE) return m_style->m_rightMarginNote;
-    else if (classId == REST) return m_style->m_rightMarginRest;
+    if (classId == ACCID)
+        return m_style->m_rightMarginAccid;
+    else if (classId == BARLINE)
+        return m_style->m_rightMarginBarLine;
+    else if (classId == BARLINE_ATTR)
+        return m_style->m_rightMarginBarLineAttr;
+    else if (classId == BEATRPT)
+        return m_style->m_rightMarginBeatRpt;
+    else if (classId == CHORD)
+        return m_style->m_rightMarginChord;
+    else if (classId == CLEF)
+        return m_style->m_rightMarginClef;
+    else if (classId == KEYSIG)
+        return m_style->m_rightMarginKeySig;
+    else if (classId == MENSUR)
+        return m_style->m_rightMarginMensur;
+    else if (classId == METERSIG)
+        return m_style->m_rightMarginMeterSig;
+    else if (classId == MREST)
+        return m_style->m_rightMarginMRest;
+    else if (classId == MRPT2)
+        return m_style->m_rightMarginMRpt2;
+    else if (classId == MULTIREST)
+        return m_style->m_rightMarginMultiRest;
+    else if (classId == MULTIRPT)
+        return m_style->m_rightMarginMultiRpt;
+    else if (classId == NOTE)
+        return m_style->m_rightMarginNote;
+    else if (classId == REST)
+        return m_style->m_rightMarginRest;
     return m_style->m_rightMarginDefault;
 }
 
@@ -579,8 +605,8 @@ char Doc::GetLeftPosition()
 {
     return m_style->m_leftPosition;
 }
-    
-void Doc:: SetPageHeight(int pageHeight)
+
+void Doc::SetPageHeight(int pageHeight)
 {
     m_pageHeight = pageHeight * DEFINITON_FACTOR;
 };
@@ -615,11 +641,9 @@ void Doc::SetSpacingSystem(short spacingSystem)
     m_spacingSystem = spacingSystem;
 };
 
-
-
 Page *Doc::SetDrawingPage(int pageIdx)
 {
-    // out of range 
+    // out of range
     if (!HasPage(pageIdx)) {
         return NULL;
     }
@@ -627,20 +651,20 @@ Page *Doc::SetDrawingPage(int pageIdx)
     if (m_drawingPage && m_drawingPage->GetIdx() == pageIdx) {
         return m_drawingPage;
     }
-    m_drawingPage = dynamic_cast<Page*>(this->GetChild(pageIdx));
+    m_drawingPage = dynamic_cast<Page *>(this->GetChild(pageIdx));
     assert(m_drawingPage);
-    
+
     int glyph_size;
-    
-    // we use the page members only if set (!= -1) 
+
+    // we use the page members only if set (!= -1)
     if (m_drawingPage->m_pageHeight != -1) {
         m_drawingPageHeight = m_drawingPage->m_pageHeight;
         m_drawingPageWidth = m_drawingPage->m_pageWidth;
         m_drawingPageLeftMar = m_drawingPage->m_pageLeftMar;
         m_drawingPageRightMar = m_drawingPage->m_pageRightMar;
         m_drawingPageTopMar = m_drawingPage->m_pageTopMar;
-	}
-	else if (this->m_pageHeight != -1) {
+    }
+    else if (this->m_pageHeight != -1) {
         m_drawingPageHeight = this->m_pageHeight;
         m_drawingPageWidth = this->m_pageWidth;
         m_drawingPageLeftMar = this->m_pageLeftMar;
@@ -654,8 +678,8 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageRightMar = m_style->m_pageRightMar;
         m_drawingPageTopMar = m_style->m_pageTopMar;
     }
-    
-    if (this->m_style->m_landscape) {	
+
+    if (this->m_style->m_landscape) {
         int pageHeight = m_drawingPageWidth;
         m_drawingPageWidth = m_drawingPageHeight;
         m_drawingPageHeight = pageHeight;
@@ -663,16 +687,16 @@ Page *Doc::SetDrawingPage(int pageIdx)
         m_drawingPageLeftMar = m_drawingPageRightMar;
         m_drawingPageRightMar = pageRightMar;
     }
-    
+
     // From here we could check if values have changed
     // Since  m_style->m_interlDefin stays the same, it useless to do it
     // every time for now.
-    
-	m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
-	m_drawingBeamMinSlope = this->m_style->m_beamMinSlope;
-	m_drawingBeamMaxSlope /= 100;
-	m_drawingBeamMinSlope /= 100;
-    
+
+    m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
+    m_drawingBeamMinSlope = this->m_style->m_beamMinSlope;
+    m_drawingBeamMaxSlope /= 100;
+    m_drawingBeamMinSlope /= 100;
+
     // half of the space between two lines
     m_drawingUnit = m_style->m_unit;
     // space between two lines
@@ -682,8 +706,8 @@ Page *Doc::SetDrawingPage(int pageIdx)
     // octave height
     m_drawingOctaveSize = m_drawingUnit * 7;
     // measure minimal width
-    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth / PARAM_DENOMINATOR ;
-    
+    m_drawingMinMeasureWidth = m_drawingUnit * m_style->m_minMeasureWidth / PARAM_DENOMINATOR;
+
     // values for beams
     m_drawingBeamWidth = this->m_style->m_unit;
     m_drawingBeamWhiteWidth = this->m_style->m_unit / 2;
@@ -694,19 +718,19 @@ Page *Doc::SetDrawingPage(int pageIdx)
 
     glyph_size = GetGlyphWidth(SMUFL_E0A3_noteheadHalf, 100, 0);
     m_drawingLedgerLine = glyph_size * 72 / 100;
-    
+
     glyph_size = GetGlyphWidth(SMUFL_E0A2_noteheadWhole, 100, 0);
 
     m_drawingBrevisWidth = (int)((glyph_size * 0.8) / 2);
-    
-	return m_drawingPage;
+
+    return m_drawingPage;
 }
 
 int Doc::CalcMusicFontSize()
 {
     return m_style->m_unit * 8;
 }
-    
+
 int Doc::GetAdjustedDrawingPageHeight()
 {
     assert(m_drawingPage);
@@ -714,14 +738,14 @@ int Doc::GetAdjustedDrawingPageHeight()
     return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
 }
 
-    
 int Doc::GetAdjustedDrawingPageWidth()
 {
     assert(m_drawingPage);
     int contentWidth = m_drawingPage->GetContentWidth();
-    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;;
+    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;
+    ;
 }
-    
+
 //----------------------------------------------------------------------------
 // Doc functors methods
 //----------------------------------------------------------------------------
@@ -730,13 +754,13 @@ int Doc::PrepareLyricsEnd(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
     // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl**>((*params).at(0));
-    Note **lastNote = static_cast<Note**>((*params).at(1));
-    
+    Syl **currentSyl = static_cast<Syl **>((*params).at(0));
+    Note **lastNote = static_cast<Note **>((*params).at(1));
+
     if ((*currentSyl) && (*lastNote)) {
         (*currentSyl)->SetEnd(*lastNote);
     }
-    
+
     return FUNCTOR_STOP;
 }
 

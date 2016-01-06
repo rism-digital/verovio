@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "drawinginterface.h"
 
 //----------------------------------------------------------------------------
@@ -27,19 +26,15 @@ DrawingListInterface::DrawingListInterface()
     Reset();
 }
 
-
 DrawingListInterface::~DrawingListInterface()
 {
 }
-    
-    
+
 void DrawingListInterface::Reset()
 {
     m_drawingList.clear();
 }
-    
-    
-    
+
 void DrawingListInterface::AddToDrawingList(DocObject *object)
 {
     m_drawingList.push_back(object);
@@ -56,7 +51,7 @@ void DrawingListInterface::ResetDrawingList()
 {
     m_drawingList.clear();
 }
-    
+
 //----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
@@ -100,7 +95,7 @@ void StaffDefDrawingInterface::Reset()
     m_drawMensur = false;
     m_drawMeterSig = false;
 }
-        
+
 void StaffDefDrawingInterface::SetCurrentClef(Clef *clef)
 {
     if (clef) {
@@ -141,7 +136,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig *meterSig)
     }
 }
 
-StaffDefDrawingInterface::StaffDefDrawingInterface(const StaffDefDrawingInterface& interface)
+StaffDefDrawingInterface::StaffDefDrawingInterface(const StaffDefDrawingInterface &interface)
 {
     m_currentClef = NULL;
     m_currentKeySig = NULL;
@@ -150,7 +145,7 @@ StaffDefDrawingInterface::StaffDefDrawingInterface(const StaffDefDrawingInterfac
     Reset();
 }
 
-StaffDefDrawingInterface& StaffDefDrawingInterface::operator=(const StaffDefDrawingInterface& interface)
+StaffDefDrawingInterface &StaffDefDrawingInterface::operator=(const StaffDefDrawingInterface &interface)
 {
     // not self assignement
     if (this != &interface) {
@@ -175,7 +170,6 @@ StaffDefDrawingInterface& StaffDefDrawingInterface::operator=(const StaffDefDraw
     return *this;
 }
 
-    
 //----------------------------------------------------------------------------
 // StemmedDrawingInterface
 //----------------------------------------------------------------------------
@@ -195,7 +189,7 @@ void StemmedDrawingInterface::Reset()
     m_drawingStemStart = Point(0, 0);
     m_drawingStemEnd = Point(0, 0);
 }
-    
+
 void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)
 {
     m_drawingStemDir = stemDir;
@@ -226,5 +220,4 @@ Point StemmedDrawingInterface::GetDrawingStemEnd()
     return m_drawingStemEnd;
 }
 
-    
 } // namespace vrv

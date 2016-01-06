@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "textelement.h"
 
 //----------------------------------------------------------------------------
@@ -15,19 +14,17 @@
 //----------------------------------------------------------------------------
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement():
-    DocObject("te-")
+TextElement::TextElement() : DocObject("te-")
 {
     Reset();
 }
 
-TextElement::TextElement(std::string classid):
-    DocObject(classid)
+TextElement::TextElement(std::string classid) : DocObject(classid)
 {
     Reset();
 }

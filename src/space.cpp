@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "space.h"
 
 namespace vrv {
@@ -14,18 +13,17 @@ namespace vrv {
 // Space
 //----------------------------------------------------------------------------
 
-Space::Space():
-    LayerElement("space-"), DurationInterface()
+Space::Space() : LayerElement("space-"), DurationInterface()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    
+
     Reset();
 }
 
 Space::~Space()
 {
 }
-    
+
 void Space::Reset()
 {
     LayerElement::Reset();

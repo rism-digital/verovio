@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "pitchinterface.h"
 
 //----------------------------------------------------------------------------
@@ -22,24 +21,19 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface(): Interface(),
-    AttAccidental(),
-    AttOctave(),
-    AttPitch()
-    
+PitchInterface::PitchInterface() : Interface(), AttAccidental(), AttOctave(), AttPitch()
 {
     RegisterInterfaceAttClass(ATT_ACCIDENTAL);
     RegisterInterfaceAttClass(ATT_OCTAVE);
     RegisterInterfaceAttClass(ATT_PITCH);
-    
+
     Reset();
 }
-
 
 PitchInterface::~PitchInterface()
 {
 }
-    
+
 void PitchInterface::Reset()
 {
     ResetAccidental();
@@ -59,5 +53,5 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
     }
     */
 }
-    
+
 } // namespace vrv

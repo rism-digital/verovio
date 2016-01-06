@@ -29,19 +29,19 @@
 #define STRING_FORMAT_MAX_LEN 2048
 
 namespace vrv {
-   
+
 //----------------------------------------------------------------------------
 // Static members with some default values
 //----------------------------------------------------------------------------
-    
+
 std::string Resources::m_path = "/usr/local/share/verovio";
 std::map<wchar_t, Glyph> Resources::m_font;
 std::map<wchar_t, Glyph> Resources::m_textFont;
-  
+
 //----------------------------------------------------------------------------
 // Font related methods
 //----------------------------------------------------------------------------
-    
+
 bool Resources::InitFonts()
 {
     // We will need to rethink this for adding the option to add custom fonts
@@ -49,21 +49,20 @@ bool Resources::InitFonts()
     if (!LoadFont("Bravura")) LogError("Bravura font could not be loaded.");
     // The Leipzig as the default font
     if (!LoadFont("Leipzig")) LogError("Leipzig font could not be loaded.");
-    
+
     if (m_font.size() < SMUFL_COUNT) {
-        LogError("Expected %d default SMUFL glyphs but could load only %d.",
-                 SMUFL_COUNT, m_font.size());
+        LogError("Expected %d default SMUFL glyphs but could load only %d.", SMUFL_COUNT, m_font.size());
         return false;
     }
-    
+
     if (!InitTextFont()) {
         LogError("Text font could not be initialized.");
         return false;
     }
-    
+
     return true;
 }
-    
+
 bool Resources::SetFont(std::string fontName)
 {
     return LoadFont(fontName);
@@ -80,19 +79,19 @@ Glyph *Resources::GetTextGlyph(wchar_t code)
     if (!m_textFont.count(code)) return NULL;
     return &m_textFont[code];
 }
-    
+
 bool Resources::LoadFont(std::string fontName)
 {
-    DIR*    dir;
-    dirent* pdir;
-    std::string dirname =  Resources::GetPath() + "/" + fontName;
+    DIR *dir;
+    dirent *pdir;
+    std::string dirname = Resources::GetPath() + "/" + fontName;
     dir = opendir(dirname.c_str());
-    
+
     if (!dir) {
         LogError("Font directory '%s' cannot be read", dirname.c_str());
         return false;
     }
-    
+
     // First loop through the fontName directory and load each glyph
     // Since the filename starts with the Unicode code, it is used
     // to assign the glyph to the corresponding position in m_fonts
@@ -110,10 +109,9 @@ bool Resources::LoadFont(std::string fontName)
             m_font[smuflCode] = glyph;
         }
     }
-    
+
     closedir(dir);
-    
-    
+
     // Then load the bounding boxes (if bounding box file is provided)
     pugi::xml_document doc;
     std::string filename = Resources::GetPath() + "/" + fontName + ".xml";
@@ -130,7 +128,7 @@ bool Resources::LoadFont(std::string fontName)
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    for(current = root.child("g"); current; current = current.next_sibling("g")) {
+    for (current = root.child("g"); current; current = current.next_sibling("g")) {
         if (current.attribute("c")) {
             wchar_t smuflCode = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
             if (!m_font.count(smuflCode)) {
@@ -151,11 +149,10 @@ bool Resources::LoadFont(std::string fontName)
             glyph->SetBoundingBox(x, y, width, height);
         }
     }
-    
+
     return true;
 }
 
-    
 bool Resources::InitTextFont()
 {
     // For the text font, we load the bounding boxes only
@@ -176,7 +173,7 @@ bool Resources::InitTextFont()
     }
     int unitsPerEm = atoi(root.attribute("units-per-em").value());
     pugi::xml_node current;
-    for(current = root.child("g"); current; current = current.next_sibling("g")) {
+    for (current = root.child("g"); current; current = current.next_sibling("g")) {
         if (current.attribute("c")) {
             wchar_t code = (wchar_t)strtol(current.attribute("c").value(), NULL, 16);
             // We create a glyph with only the units per em which is the only info we need for
@@ -191,20 +188,19 @@ bool Resources::InitTextFont()
             glyph.SetBoundingBox(x, y, width, height);
             m_textFont[code] = glyph;
         }
-    }                  
+    }
     return true;
 }
 
- 
 //----------------------------------------------------------------------------
 // Logging related methods
 //----------------------------------------------------------------------------
-    
+
 /** Global for LogElapsedTimeXXX functions (debugging purposes) */
 struct timeval start;
 /** For disabling log */
 bool noLog = false;
-    
+
 #ifdef EMSCRIPTEN
 std::vector<std::string> logBuffer;
 #endif
@@ -213,17 +209,17 @@ void LogElapsedTimeStart()
 {
     gettimeofday(&start, NULL);
 }
-    
+
 void LogElapsedTimeEnd(const char *msg)
 {
     double elapsedTime;
     struct timeval end;
     gettimeofday(&end, NULL);
-    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0;  // sec to ms
-    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0;   // us to ms
+    elapsedTime = (end.tv_sec - start.tv_sec) * 1000.0; // sec to ms
+    elapsedTime += (end.tv_usec - start.tv_usec) / 1000.0; // us to ms
     LogMessage("Elapsed time (%s): %.3fs", msg, elapsedTime / 1000);
 }
-    
+
 void LogDebug(const char *fmt, ...)
 {
     if (noLog) return;
@@ -231,17 +227,17 @@ void LogDebug(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end (args);
+    va_end(args);
 #else
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     printf("[Debug] ");
     vprintf(fmt, args);
     printf("\n");
-    va_end (args);
+    va_end(args);
 #endif
 #endif
 }
@@ -252,17 +248,17 @@ void LogError(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end (args);
+    va_end(args);
 #else
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     printf("[Error] ");
     vprintf(fmt, args);
     printf("\n");
-    va_end (args);
+    va_end(args);
 #endif
 }
 
@@ -272,17 +268,17 @@ void LogMessage(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end (args);
+    va_end(args);
 #else
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     printf("[Message] ");
     vprintf(fmt, args);
     printf("\n");
-    va_end (args);
+    va_end(args);
 #endif
 }
 
@@ -292,55 +288,53 @@ void LogWarning(const char *fmt, ...)
 #ifdef EMSCRIPTEN
     std::string s;
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
     AppendLogBuffer(true, s);
-    va_end (args);
+    va_end(args);
 #else
     va_list args;
-    va_start (args, fmt);
+    va_start(args, fmt);
     printf("[Warning] ");
     vprintf(fmt, args);
     printf("\n");
-    va_end (args);
+    va_end(args);
 #endif
 }
-    
+
 void DisableLog()
 {
     noLog = true;
 }
-    
+
 #ifdef EMSCRIPTEN
 bool LogBufferContains(std::string s)
 {
     std::vector<std::string>::iterator iter = logBuffer.begin();
     while (iter != logBuffer.end()) {
-        if ((*iter) == s)
-            return true;
+        if ((*iter) == s) return true;
         ++iter;
     }
     return false;
 }
 
 void AppendLogBuffer(bool checkDuplicate, std::string message)
-{    
+{
     if (checkDuplicate) {
-        if (!LogBufferContains(message))
-            logBuffer.push_back(message);
+        if (!LogBufferContains(message)) logBuffer.push_back(message);
     }
     else {
         logBuffer.push_back(message);
     }
 }
 #endif
-    
+
 bool Check(Object *object)
 {
     assert(object);
     return (object != NULL);
 }
-    
+
 //----------------------------------------------------------------------------
 // Various helpers
 //----------------------------------------------------------------------------
@@ -349,31 +343,31 @@ std::string StringFormat(const char *fmt, ...)
 {
     std::string str(STRING_FORMAT_MAX_LEN, 0);
     va_list args;
-    va_start (args, fmt);
-    vsnprintf (&str[0], STRING_FORMAT_MAX_LEN,fmt, args);
-    va_end (args);
+    va_start(args, fmt);
+    vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, fmt, args);
+    va_end(args);
     str.resize(strlen(str.data()));
     return str;
 }
 
-std::string StringFormatVariable(const char * format, va_list arg)
+std::string StringFormatVariable(const char *format, va_list arg)
 {
     std::string str(STRING_FORMAT_MAX_LEN, 0);
-    vsnprintf (&str[0], STRING_FORMAT_MAX_LEN, format, arg);
+    vsnprintf(&str[0], STRING_FORMAT_MAX_LEN, format, arg);
     str.resize(strlen(str.data()));
     return str;
 }
-    
+
 bool AreEqual(double dFirstVal, double dSecondVal)
 {
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }
-    
-std::string UTF16to8(const wchar_t * in)
+
+std::string UTF16to8(const wchar_t *in)
 {
     std::string out;
     unsigned int codepoint = 0;
-    for (;  *in != 0;  ++in) {
+    for (; *in != 0; ++in) {
         if (*in >= 0xd800 && *in <= 0xdbff)
             codepoint = ((*in - 0xd800) << 10) + 0x10000;
         else {
@@ -381,7 +375,7 @@ std::string UTF16to8(const wchar_t * in)
                 codepoint |= *in - 0xdc00;
             else
                 codepoint = *in;
-            
+
             if (codepoint <= 0x7f)
                 out.append(1, static_cast<char>(codepoint));
             else if (codepoint <= 0x7ff) {
@@ -405,12 +399,11 @@ std::string UTF16to8(const wchar_t * in)
     return out;
 }
 
-std::wstring UTF8to16(const char * in)
+std::wstring UTF8to16(const char *in)
 {
     std::wstring out;
-    if (in == NULL)
-        return out;
-    
+    if (in == NULL) return out;
+
     unsigned int codepoint;
     while (*in != 0) {
         unsigned char ch = static_cast<unsigned char>(*in);
@@ -436,13 +429,12 @@ std::wstring UTF8to16(const char * in)
     }
     return out;
 }
-    
-    
-std::string GetFileVersion(int vmaj, int vmin, int vrev) {
+
+std::string GetFileVersion(int vmaj, int vmin, int vrev)
+{
     return StringFormat("%04d.%04d.%04d", vmaj, vmin, vrev);
 }
-    
-    
+
 std::string GetFilename(std::string fullpath)
 {
     // remove extension
@@ -457,8 +449,9 @@ std::string GetFilename(std::string fullpath)
     }
     return name;
 }
-    
-std::string GetVersion() {
+
+std::string GetVersion()
+{
     std::string dev;
     if (VERSION_DEV) dev = "-dev";
     return StringFormat("%d.%d.%d%s-%s", VERSION_MAJOR, VERSION_MINOR, VERSION_REVISION, dev.c_str(), GIT_COMMIT);

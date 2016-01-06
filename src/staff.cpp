@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "staff.h"
 
 //----------------------------------------------------------------------------
@@ -27,26 +26,23 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n):
-	DocObject("staff-"),
-    AttCommon()
+Staff::Staff(int n) : DocObject("staff-"), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
-    
+
     Reset();
     SetN(n);
 }
 
 Staff::~Staff()
 {
-    
 }
 
 void Staff::Reset()
 {
     DocObject::Reset();
     ResetCommon();
-    
+
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
@@ -58,9 +54,9 @@ void Staff::Reset()
 
 void Staff::AddLayer(Layer *layer)
 {
-	layer->SetParent(this);
-	m_children.push_back(layer);
-    
+    layer->SetParent(this);
+    m_children.push_back(layer);
+
     if (layer->GetN() < 1) {
         layer->SetN(this->GetLayerCount());
     }
@@ -70,7 +66,7 @@ int Staff::GetVerticalSpacing()
 {
     return 160; // arbitrary generic value
 }
-    
+
 void Staff::ResetVerticalAlignment()
 {
     m_drawingY = 0;
@@ -81,13 +77,13 @@ bool Staff::GetPosOnPage(ArrayPtrVoid *params)
     // param 0: the Staff we are looking for
     // param 1: the position on the page (int)
     // param 2; the success flag (bool)
-    Staff *staff = static_cast<Staff*>((*params).at(0));
-	int *position = static_cast<int*>((*params).at(1));
-    bool *success = static_cast<bool*>((*params).at(2));
-    
+    Staff *staff = static_cast<Staff *>((*params).at(0));
+    int *position = static_cast<int *>((*params).at(1));
+    bool *success = static_cast<bool *>((*params).at(2));
+
     if ((*success)) {
         return true;
-    } 
+    }
     (*position)++;
     if (this == staff) {
         (*success) = true;
@@ -96,7 +92,6 @@ bool Staff::GetPosOnPage(ArrayPtrVoid *params)
     // to be verified
     return false;
 }
-
 
 int Staff::GetYRel()
 {
@@ -110,39 +105,38 @@ int Staff::GetYRel()
 // Staff functor methods
 //----------------------------------------------------------------------------
 
-
 int Staff::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
     // param 1: the staffNb
-    SystemAligner **systemAligner = static_cast<SystemAligner**>((*params).at(0));
-	int *staffNb = static_cast<int*>((*params).at(1));
-    
+    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
+    int *staffNb = static_cast<int *>((*params).at(1));
+
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
-    
+
     // this gets (or creates) the measureAligner for the measure
     StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
-    
+
     assert(alignment);
-    
+
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
-    
+
     // for next staff
     (*staffNb)++;
-    
+
     return FUNCTOR_CONTINUE;
 }
-        
+
 int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
-    std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params).at(0));
-    
-    std::vector<DocObject*>::iterator iter = elements->begin();
+    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+
+    std::vector<DocObject *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface*>(*iter);
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
         assert(interface);
         Staff *endParent = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent(STAFF));
         assert(endParent);
@@ -163,13 +157,13 @@ int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
     }
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::FillStaffCurrentLyrics(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
     // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl**>((*params).at(0));
-    
+    Syl **currentSyl = static_cast<Syl **>((*params).at(0));
+
     if ((*currentSyl)) {
         // We have a running syl started in a previous measure
         this->m_timeSpanningElements.push_back((*currentSyl));
@@ -180,18 +174,17 @@ int Staff::FillStaffCurrentLyrics(ArrayPtrVoid *params)
             }
         }
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::ResetDrawing(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
     this->m_timeSpanningElements.clear();
     return FUNCTOR_CONTINUE;
 };
-    
-    
+
 int Staff::SetDrawingXY(ArrayPtrVoid *params)
 {
     // param 0: a pointer doc
@@ -201,13 +194,13 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
-    Doc *doc = static_cast<Doc*>((*params).at(0));
-    System **currentSystem = static_cast<System**>((*params).at(1));
-    Staff **currentStaff = static_cast<Staff**>((*params).at(3));
-    bool *processLayerElements = static_cast<bool*>((*params).at(6));
-    
+    Doc *doc = static_cast<Doc *>((*params).at(0));
+    System **currentSystem = static_cast<System **>((*params).at(1));
+    Staff **currentStaff = static_cast<Staff **>((*params).at(3));
+    bool *processLayerElements = static_cast<bool *>((*params).at(6));
+
     (*currentStaff) = this;
-    
+
     // Second pass where we do just process layer elements
     if ((*processLayerElements)) return FUNCTOR_CONTINUE;
 
@@ -222,27 +215,27 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
         assert(doc->GetType() == Transcription);
         this->SetDrawingY(this->m_yAbs);
     }
-    
+
     // For avoiding unused variable warning in non debug mode
     doc = NULL;
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Staff::PrepareRpt(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the current MRpt pointer (unused)
     // param 1: a pointer to the data_BOOLEAN indicating if multiNumber
     // param 2: a pointer to the doc scoreDef
-    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN*>((*params).at(1));
-    ScoreDef *scoreDef = static_cast<ScoreDef*>((*params).at(2));
-    
+    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN *>((*params).at(1));
+    ScoreDef *scoreDef = static_cast<ScoreDef *>((*params).at(2));
+
     // If multiNumber is set, we already know that nothing needs to be done
     // Futhermore, if @multi.number is false, the functor should have stop (see below)
     if ((*multiNumber) != BOOLEAN_NONE) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // This is happening only for the first staff element of the staff @n
     if (StaffDef *staffDef = scoreDef->GetStaffDef(this->GetN())) {
         if ((staffDef->HasMultiNumber()) && (staffDef->GetMultiNumber() == BOOLEAN_false)) {

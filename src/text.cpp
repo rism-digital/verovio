@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "text.h"
 
 //----------------------------------------------------------------------------
@@ -17,20 +16,17 @@
 #include "editorial.h"
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend():
-    TextElement("rend-"),
-    AttCommon(),
-    AttTypography()
-    
+Rend::Rend() : TextElement("rend-"), AttCommon(), AttTypography()
+
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPOGRAPHY);
-    
+
     Reset();
 }
 
@@ -44,23 +40,20 @@ void Rend::Reset()
     ResetCommon();
     ResetTypography();
 }
-    
+
 void Rend::AddTextElement(TextElement *element)
 {
-    assert(dynamic_cast<Rend*>(element)
-           || dynamic_cast<Text*>(element)
-           || dynamic_cast<EditorialElement*>(element));
+    assert(dynamic_cast<Rend *>(element) || dynamic_cast<Text *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
 }
-    
+
 //----------------------------------------------------------------------------
 // Text
 //----------------------------------------------------------------------------
-    
-Text::Text():
-    TextElement("text-")
+
+Text::Text() : TextElement("text-")
 {
     Reset();
 }
@@ -73,5 +66,5 @@ void Text::Reset()
 {
     TextElement::Reset();
 }
-    
+
 } // namespace vrv

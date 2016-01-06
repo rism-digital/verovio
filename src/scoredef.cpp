@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "scoredef.h"
 
 //----------------------------------------------------------------------------
@@ -27,12 +26,10 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid):
-    Object(classid),
-    ScoreDefInterface()
+ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
-    
+
     Reset();
 }
 
@@ -74,7 +71,7 @@ bool ScoreDefElement::HasClefAttrInfo()
 {
     // We need at least a @clef.shape and a @clef.line ?
     return (this->HasClefShape() && this->HasClefLine());
-    
+
     // Eventually we can look a child clef element
     // We would probably need to take into account app and rdg?
     return false;
@@ -117,7 +114,7 @@ bool ScoreDefElement::HasMeterSigElementInfo()
 {
     return false;
 }
-    
+
 Clef *ScoreDefElement::GetClefCopy()
 {
     Clef *copy = NULL;
@@ -132,7 +129,7 @@ Clef *ScoreDefElement::GetClefCopy()
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
-    
+
 KeySig *ScoreDefElement::GetKeySigCopy()
 {
     KeySig *copy = NULL;
@@ -147,7 +144,7 @@ KeySig *ScoreDefElement::GetKeySigCopy()
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
-    
+
 Mensur *ScoreDefElement::GetMensurCopy()
 {
     Mensur *copy = NULL;
@@ -162,7 +159,7 @@ Mensur *ScoreDefElement::GetMensurCopy()
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
-    
+
 MeterSig *ScoreDefElement::GetMeterSigCopy()
 {
     MeterSig *copy = NULL;
@@ -177,13 +174,12 @@ MeterSig *ScoreDefElement::GetMeterSigCopy()
     copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
-    
+
 //----------------------------------------------------------------------------
 // ScoreDef
 //----------------------------------------------------------------------------
 
-ScoreDef::ScoreDef() :
-	ScoreDefElement("scoredef-"), ObjectListInterface()
+ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface()
 {
     Reset();
 }
@@ -195,7 +191,7 @@ ScoreDef::~ScoreDef()
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
-    
+
     m_drawLabels = false;
     m_drawingWidth = 0;
 }
@@ -203,15 +199,15 @@ void ScoreDef::Reset()
 void ScoreDef::AddStaffGrp(StaffGrp *staffGrp)
 {
     assert(m_children.empty());
-	staffGrp->SetParent(this);
-	m_children.push_back(staffGrp);
+    staffGrp->SetParent(this);
+    m_children.push_back(staffGrp);
     Modify();
 }
 
 void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
-    
+
     bool drawClef = false;
     bool drawKeySig = false;
     bool drawMensur = false;
@@ -220,7 +216,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     KeySig *keySig = NULL;
     Mensur *mensur = NULL;
     MeterSig *meterSig = NULL;
-    
+
     if (newScoreDef->HasClefInfo()) {
         drawClef = true;
         clef = newScoreDef->GetClefCopy();
@@ -239,30 +235,29 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     }
 
     ArrayPtrVoid params;
-	params.push_back(clef);
-	params.push_back(keySig);
-	params.push_back(mensur);
-	params.push_back(meterSig);
+    params.push_back(clef);
+    params.push_back(keySig);
+    params.push_back(mensur);
+    params.push_back(meterSig);
     Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
     this->Process(&replaceDrawingValuesInScoreDef, &params);
-    
+
     if (clef) delete clef;
     if (keySig) delete keySig;
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
-    
+
     // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
     this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig);
-
 }
 
 void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
 {
     assert(newStaffDef);
-    
+
     // first find the staffDef with the same @n
     StaffDef *staffDef = this->GetStaffDef(newStaffDef->GetN());
-    
+
     // if found, replace attributes
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
@@ -295,9 +290,9 @@ void ScoreDef::FilterList(ListOfObjects *childList)
 {
     // We want to keep only staffDef
     ListOfObjects::iterator iter = childList->begin();
-    
+
     while (iter != childList->end()) {
-        StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
+        StaffDef *currentStaffDef = dynamic_cast<StaffDef *>(*iter);
         if (!currentStaffDef) {
             iter = childList->erase(iter);
         }
@@ -307,38 +302,36 @@ void ScoreDef::FilterList(ListOfObjects *childList)
     }
 }
 
-
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
     StaffDef *staffDef = NULL;
-    
+
     this->ResetList(this);
-    ListOfObjects* childList = this->GetList(this);
+    ListOfObjects *childList = this->GetList(this);
     ListOfObjects::iterator iter;
 
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        staffDef = dynamic_cast<StaffDef*>(*iter);
+        staffDef = dynamic_cast<StaffDef *>(*iter);
         if (staffDef && (staffDef->GetN() == n)) {
             return staffDef;
         }
     }
-    
+
     return staffDef;
 }
-
 
 void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation)
 {
     ArrayPtrVoid params;
-	params.push_back(&clef);
+    params.push_back(&clef);
     params.push_back(&keySig);
-	params.push_back(&mensur);
+    params.push_back(&mensur);
     params.push_back(&meterSig);
     params.push_back(&keySigCancellation);
     Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
     this->Process(&setStaffDefDraw, &params);
 }
-    
+
 void ScoreDef::SetDrawingWidth(int drawingWidth)
 {
     m_drawingWidth = drawingWidth;
@@ -348,19 +341,14 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 // StaffGrp
 //----------------------------------------------------------------------------
 
-StaffGrp::StaffGrp() : Object(), ObjectListInterface(),
-    AttCommon(),
-    AttCommonPart(),
-    AttLabelsAddl(),
-    AttStaffgroupingsym(),
-    AttStaffGrpVis()
+StaffGrp::StaffGrp() : Object(), ObjectListInterface(), AttCommon(), AttCommonPart(), AttLabelsAddl(), AttStaffgroupingsym(), AttStaffGrpVis()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
-    
+
     Reset();
 }
 
@@ -380,15 +368,15 @@ void StaffGrp::Reset()
 
 void StaffGrp::AddStaffDef(StaffDef *staffDef)
 {
-	staffDef->SetParent(this);
-	m_children.push_back(staffDef);
+    staffDef->SetParent(this);
+    m_children.push_back(staffDef);
     Modify();
 }
 
 void StaffGrp::AddStaffGrp(StaffGrp *staffGrp)
 {
-	staffGrp->SetParent(this);
-	m_children.push_back(staffGrp);
+    staffGrp->SetParent(this);
+    m_children.push_back(staffGrp);
     Modify();
 }
 
@@ -396,9 +384,9 @@ void StaffGrp::FilterList(ListOfObjects *childList)
 {
     // We want to keep only staffDef
     ListOfObjects::iterator iter = childList->begin();
-    
+
     while (iter != childList->end()) {
-        StaffDef *currentStaffDef = dynamic_cast<StaffDef*>(*iter);
+        StaffDef *currentStaffDef = dynamic_cast<StaffDef *>(*iter);
         if (!currentStaffDef) {
             iter = childList->erase(iter);
         }
@@ -412,14 +400,7 @@ void StaffGrp::FilterList(ListOfObjects *childList)
 // StaffDef
 //----------------------------------------------------------------------------
 
-StaffDef::StaffDef() :
-    ScoreDefElement("staffdef-"),
-    AttCommon(),
-    AttCommonPart(),
-    AttLabelsAddl(),
-    AttNotationtype(),
-    AttScalable(),
-    AttStaffDefVis()
+StaffDef::StaffDef() : ScoreDefElement("staffdef-"), AttCommon(), AttCommonPart(), AttLabelsAddl(), AttNotationtype(), AttScalable(), AttStaffDefVis()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -427,14 +408,14 @@ StaffDef::StaffDef() :
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFVIS);
-    
+
     Reset();
 }
 
 StaffDef::~StaffDef()
 {
 }
-    
+
 void StaffDef::Reset()
 {
     ScoreDefElement::Reset();
@@ -445,8 +426,7 @@ void StaffDef::Reset()
     ResetScalable();
     ResetStaffDefVis();
 }
-    
-    
+
 //----------------------------------------------------------------------------
 // ScoreDef functor methods
 //----------------------------------------------------------------------------
@@ -459,25 +439,26 @@ int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
     // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
     // param 4: the system width (unused)
     // param 5: the current scoreDef width
-    System *contentSystem = static_cast<System*>((*params).at(0));
-    System **currentSystem = static_cast<System**>((*params).at(2));
-    int *currentScoreDefWidth = static_cast<int*>((*params).at(5));
-    
+    System *contentSystem = static_cast<System *>((*params).at(0));
+    System **currentSystem = static_cast<System **>((*params).at(2));
+    int *currentScoreDefWidth = static_cast<int *>((*params).at(5));
+
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System*>(this->m_parent));
-    
+    assert(dynamic_cast<System *>(this->m_parent));
+
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    ScoreDef *scoreDef = dynamic_cast<ScoreDef*>(contentSystem->Relinquish(this->GetIdx()));
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(contentSystem->Relinquish(this->GetIdx()));
     (*currentSystem)->AddScoreDef(scoreDef);
     // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDef (and not
     // the initial one - for this to be corrected, we would need to parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system
     // Also, the abbr label (width) changes would not be taken into account
-    (*currentScoreDefWidth) = this->GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();;
-    
+    (*currentScoreDefWidth) = this->GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
+    ;
+
     return FUNCTOR_SIBLINGS;
 }
 
@@ -491,11 +472,11 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params)
     // param 1: KeySig pointer (NULL if none)
     // param 2: Mensur pointer (NULL if none)
     // param 3: MeterSig pointer (NULL if none)
-    Clef *clef = static_cast<Clef*>((*params).at(0));
-    KeySig *keySig = static_cast<KeySig*>((*params).at(1));
-    Mensur *mensur = static_cast<Mensur*>((*params).at(2));
-    MeterSig *meterSig = static_cast<MeterSig*>((*params).at(3));
-    
+    Clef *clef = static_cast<Clef *>((*params).at(0));
+    KeySig *keySig = static_cast<KeySig *>((*params).at(1));
+    Mensur *mensur = static_cast<Mensur *>((*params).at(2));
+    MeterSig *meterSig = static_cast<MeterSig *>((*params).at(3));
+
     if (clef) {
         this->SetCurrentClef(new Clef(*clef));
     }
@@ -508,7 +489,7 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params)
     if (meterSig) {
         this->SetCurrentMeterSig(new MeterSig(*meterSig));
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -519,12 +500,12 @@ int StaffDef::SetStaffDefRedrawFlags(ArrayPtrVoid *params)
     // param 2: bool mensur flag
     // param 3: bool meterSig flag
     // param 4: bool keySig cancellation flag
-    bool *clef = static_cast<bool*>((*params).at(0));
-    bool *keysig = static_cast<bool*>((*params).at(1));
-    bool *mensur = static_cast<bool*>((*params).at(2));
-    bool *meterSig = static_cast<bool*>((*params).at(3));
-    bool *keySigCancellation = static_cast<bool*>((*params).at(4));
-    
+    bool *clef = static_cast<bool *>((*params).at(0));
+    bool *keysig = static_cast<bool *>((*params).at(1));
+    bool *mensur = static_cast<bool *>((*params).at(2));
+    bool *meterSig = static_cast<bool *>((*params).at(3));
+    bool *keySigCancellation = static_cast<bool *>((*params).at(4));
+
     if ((*clef)) {
         this->SetDrawClef(true);
     }
@@ -540,7 +521,7 @@ int StaffDef::SetStaffDefRedrawFlags(ArrayPtrVoid *params)
     if ((*keySigCancellation)) {
         this->SetDrawKeySigCancellation(true);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

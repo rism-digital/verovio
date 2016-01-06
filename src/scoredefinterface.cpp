@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "scoredefinterface.h"
 
 //----------------------------------------------------------------------------
@@ -20,20 +19,20 @@
 
 namespace vrv {
 
-
 //----------------------------------------------------------------------------
 // ScoreDefInterface
 //----------------------------------------------------------------------------
 
-ScoreDefInterface::ScoreDefInterface(): Interface(),
-    AttCleffingLog(),
-    AttKeySigDefaultLog(),
-    AttKeySigDefaultVis(),
-    AttMensuralLog(),
-    AttMensuralShared(),
-    AttMeterSigDefaultLog(),
-    AttMeterSigDefaultVis(),
-    AttMultinummeasures()
+ScoreDefInterface::ScoreDefInterface()
+    : Interface()
+    , AttCleffingLog()
+    , AttKeySigDefaultLog()
+    , AttKeySigDefaultVis()
+    , AttMensuralLog()
+    , AttMensuralShared()
+    , AttMeterSigDefaultLog()
+    , AttMeterSigDefaultVis()
+    , AttMultinummeasures()
 {
     RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
@@ -43,14 +42,14 @@ ScoreDefInterface::ScoreDefInterface(): Interface(),
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
     RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
-    
+
     Reset();
 }
 
 ScoreDefInterface::~ScoreDefInterface()
 {
-}    
-    
+}
+
 void ScoreDefInterface::Reset()
 {
     ResetCleffingLog();
@@ -62,5 +61,5 @@ void ScoreDefInterface::Reset()
     ResetMeterSigDefaultVis();
     ResetMultinummeasures();
 }
-    
+
 } // namespace vrv

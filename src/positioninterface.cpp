@@ -5,11 +5,9 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "positioninterface.h"
 
 //----------------------------------------------------------------------------
-
 
 namespace vrv {
 
@@ -17,24 +15,22 @@ namespace vrv {
 // PositionInterface
 //----------------------------------------------------------------------------
 
-PositionInterface::PositionInterface(): Interface(),
-    AttStafflocPitched()
+PositionInterface::PositionInterface() : Interface(), AttStafflocPitched()
 {
     RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
-    
+
     Reset();
 }
 
-
 PositionInterface::~PositionInterface()
 {
-}    
+}
 
 void PositionInterface::Reset()
 {
     ResetStafflocPitched();
 }
-    
+
 bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPositionInterface)
 {
     if (!otherPositionInterface) {

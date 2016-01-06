@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "glyph.h"
 
 //----------------------------------------------------------------------------
@@ -34,7 +33,7 @@ Glyph::Glyph()
     m_path = "[unset]";
     m_codeStr = "[unset]";
 }
-    
+
 Glyph::Glyph(std::string path, std::string codeStr)
 {
     m_x = 0.0;
@@ -44,7 +43,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     m_unitsPerEm = 20480;
     m_path = path;
     m_codeStr = codeStr;
-    
+
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_file(path.c_str());
     if (!result) {
@@ -52,13 +51,13 @@ Glyph::Glyph(std::string path, std::string codeStr)
         return;
     }
     pugi::xml_node root = doc.first_child();
-    
+
     // look at the viewBox attribute for getting the units per em
     if (!root.attribute("viewBox")) {
         LogMessage("Font file '%s' does not contain a viewBox attribute", path.c_str());
         return;
     }
-    
+
     std::string viewBox(root.attribute("viewBox").value());
     // the viewBox attribute is expected to be the for "0 0 2048 2048"
     // we are looking for the last value
@@ -66,10 +65,10 @@ Glyph::Glyph(std::string path, std::string codeStr)
         LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str());
         return;
     }
-    
+
     m_unitsPerEm = atoi(viewBox.substr(viewBox.find_last_of(' ')).c_str()) * 10;
 }
-    
+
 Glyph::Glyph(int unitsPerEm)
 {
     m_x = 0.0;
@@ -79,20 +78,20 @@ Glyph::Glyph(int unitsPerEm)
     m_unitsPerEm = unitsPerEm * 10;
     m_path = "[unset]";
     m_codeStr = "[unset]";
-}    
+}
 
 Glyph::~Glyph()
 {
 }
-    
+
 void Glyph::SetBoundingBox(double x, double y, double w, double h)
 {
-    m_x = (int)(10.0  * x);
-    m_y = (int)(10.0  * y);
-    m_width = (int)(10.0  * w);
-    m_height = (int)(10.0  * h);
+    m_x = (int)(10.0 * x);
+    m_y = (int)(10.0 * y);
+    m_width = (int)(10.0 * w);
+    m_height = (int)(10.0 * h);
 }
-    
+
 void Glyph::GetBoundingBox(int *x, int *y, int *w, int *h)
 {
     (*x) = m_x;
@@ -100,6 +99,5 @@ void Glyph::GetBoundingBox(int *x, int *y, int *w, int *h)
     (*w) = m_width;
     (*h) = m_height;
 }
-
 
 } // namespace vrv

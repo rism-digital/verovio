@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "mrest.h"
 
 namespace vrv {
@@ -14,8 +13,7 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest():
-    LayerElement("mrest-")
+MRest::MRest() : LayerElement("mrest-")
 {
     Reset();
 }
@@ -23,7 +21,7 @@ MRest::MRest():
 MRest::~MRest()
 {
 }
-    
+
 void MRest::Reset()
 {
     LayerElement::Reset();

@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "barline.h"
 
 namespace vrv {
@@ -14,19 +13,17 @@ namespace vrv {
 // BarLine
 //----------------------------------------------------------------------------
 
-BarLine::BarLine():
-	LayerElement("bline-"),
-    AttBarLineLog()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog()
 {
     RegisterAttClass(ATT_BARLINELOG);
-    
+
     Reset();
 }
 
 BarLine::~BarLine()
 {
 }
-    
+
 void BarLine::Reset()
 {
     LayerElement::Reset();
@@ -40,13 +37,12 @@ bool BarLine::HasRepetitionDots()
     }
     return false;
 }
-    
+
 //----------------------------------------------------------------------------
 // BarLineAttr
 //----------------------------------------------------------------------------
 
-BarLineAttr::BarLineAttr():
-    BarLine()
+BarLineAttr::BarLineAttr() : BarLine()
 {
 }
 

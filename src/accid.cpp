@@ -21,23 +21,20 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-Accid::Accid():
-    LayerElement("accid-"), PositionInterface(),
-    AttAccidental(),
-    AttAccidLog()
+Accid::Accid() : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog()
 {
-    
+
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_ACCIDLOG);
-    
+
     Reset();
 }
 
 Accid::~Accid()
 {
 }
-    
+
 void Accid::Reset()
 {
     LayerElement::Reset();
@@ -45,7 +42,7 @@ void Accid::Reset()
     ResetAccidental();
     ResetAccidLog();
 }
-    
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -53,20 +50,19 @@ void Accid::Reset()
 int Accid::PreparePointersByLayer(ArrayPtrVoid *params)
 {
     // param 0: the current Note (not used)
-    //Note **currentNote = static_cast<Note**>((*params).at(0));
-    
-    Note *note = dynamic_cast<Note*>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+    // Note **currentNote = static_cast<Note**>((*params).at(0));
+
+    Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
     if (!note) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (note->m_drawingAccid != NULL) {
         note->ResetDrawingAccid();
     }
     note->m_drawingAccid = this;
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
 
 } // namespace vrv
